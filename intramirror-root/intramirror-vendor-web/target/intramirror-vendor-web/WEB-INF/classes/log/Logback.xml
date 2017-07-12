@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<configuration>
+	
+	<property name="LOG_HOME" value="/Users/dingyifan/Documents/dev/newkj/log"/>
+	
+	<property name="APP_NAME" value="shoplus-web" /> <!-- 引用名称 -->
+	<property name="LOG_MAX_HISTORY" value="30" /> <!-- 日志文件保留天数 -->
+	<property name="APP_LOG_HOME" value="${LOG_HOME}/${APP_NAME}/app" /> <!-- 引用日志文件保留路径 -->
+	<property name="APP_SYS_HOME" value="${LOG_HOME}/${APP_NAME}/sys" /> <!-- 系统日志文件保留路径 -->
+
+	<!-- 配置控制台日志输出 -->
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>%d{HH:mm:ss.SSS} [%-5level] [%thread] %logger{36} - %msg%n</pattern>
+		</layout>
+	</appender>
+	
+	<!-- 配置应用文件日志输出 -->
+	<appender name="APP" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- 日志文件输出的文件名 -->
+			<FileNamePattern>${APP_LOG_HOME}/springweb-project.application.%d{yyyy-MM-dd}.log</FileNamePattern>
+			<!-- 日志文件保留天数 -->
+			<MaxHistory>${LOG_MAX_HISTORY}</MaxHistory>
+		</rollingPolicy>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<!-- 格式化输出 -->
+			<pattern>%d{HH:mm:ss.SSS} [%-5level] [%thread] %logger{36} - %msg%n</pattern>
+		</encoder>
+	</appender>
+	
+	<!-- 配置Freemarker日志输出 -->
+	<appender name="FREEMARKER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- 日志文件输出的文件名 -->
+			<FileNamePattern>${APP_SYS_HOME}/springweb-project.freemarker.%d{yyyy-MM-dd}.log</FileNamePattern>
+			<!-- 日志文件保留天数 -->
+			<MaxHistory>${LOG_MAX_HISTORY}</MaxHistory>
+		</rollingPolicy>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<!-- 格式化输出 -->
+			<pattern>%d{HH:mm:ss.SSS} [%-5level] [%thread] %logger{36} - %msg%n</pattern>
+		</encoder>
+	</appender>
+	
+	<!-- debug -->
+	<appender name="spring_debug" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- 日志文件输出的文件名 -->
+			<FileNamePattern>${APP_SYS_HOME}/springweb-project.debug.%d{yyyy-MM-dd}.log</FileNamePattern>
+			<!-- 日志文件保留天数 -->
+			<MaxHistory>${LOG_MAX_HISTORY}</MaxHistory>
+		</rollingPolicy>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<!-- 格式化输出 -->
+			<pattern>%d{HH:mm:ss.SSS} [%-5level] [%thread] %logger{36} - %msg%n</pattern>
+		</encoder>
+	</appender>
+	
+	<!-- error -->
+	<appender name="spring_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- 日志文件输出的文件名 -->
+			<FileNamePattern>${APP_SYS_HOME}/springweb-project.error.%d{yyyy-MM-dd}.log</FileNamePattern>
+			<!-- 日志文件保留天数 -->
+			<MaxHistory>${LOG_MAX_HISTORY}</MaxHistory>
+		</rollingPolicy>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<!-- 格式化输出 -->
+			<pattern>%d{HH:mm:ss.SSS} [%-5level] [%thread] %logger{36} - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+
+	<root name="spring-web" level="info">
+		<appender-ref ref="STDOUT" />
+	</root> 
+	
+</configuration> 
