@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="intramirror-vendor-web:war">
+    <output-path>$PROJECT_DIR$/intramirror-vendor-web/target</output-path>
+    <root id="archive" name="intramirror-vendor-web.war">
+      <element id="artifact" artifact-name="intramirror-vendor-web:war exploded" />
+    </root>
+  </artifact>
+</component>
