@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.intramirror.order.core.mapper.ApiMqMapper" >
+
+   <select id="getOrderList" resultMap="java.util.Map"  parameterType="java.util.HashMap" >
+    select 
+    DISTINCT o.order_num,o.order_id,o.created_at,o.`status`,o.current_rate,o.total_sale_price_rmb,o.total_shipping_fee_rmb,o.total_tax_rmb,o.total_rmb,
+    l.rec_name,l.rec_mobile,l.user_rec_name,l.user_rec_mobile,l.user_rec_province,l.user_rec_city,l.user_rec_area,l.user_rec_addr,v.vendor_id,
+    u.contact_person_name,o.contact_phone as telephone,o.wechat as contact_info,g.`name` as geography_name 
+    from logistics_product lp 
+    INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id 
+    INNER JOIN `order` o ON ol.order_id = o.order_id 
+    LEFT JOIN `user` u ON o.user_id = u.user_id 
+    LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id 
+    INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id 
+    INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id 
+    INNER JOIN product p ON sp.product_id = p.product_id 
+    #{joinSql,jdbcType=LONGVARCHAR} 
+	LEFT JOIN category c ON p.category_id = c.category_id 
+	LEFT JOIN brand b ON p.brand_id = b.brand_id 
+	LEFT JOIN vendor v ON lp.vendor_id = v.vendor_id 
+	LEFT JOIN geography g ON l.geography_id = g.geography_id 
+    where #{whereSql,jdbcType=LONGVARCHAR}
+    group By o.order_num 
+    ORDER BY o.created_at desc 
+    
+  </select>
+  
+</mapper>
