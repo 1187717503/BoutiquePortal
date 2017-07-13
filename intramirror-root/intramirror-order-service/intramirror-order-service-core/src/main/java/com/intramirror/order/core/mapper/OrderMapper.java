@@ -5,7 +5,7 @@ import java.util.Map;
 
 public interface OrderMapper {
 	
-	List<Map<String,Object>> getOrderList(Map<String,String> param);
+	List<Map<String,Object>> getOrderList(Map<String,Object> param);
 	
 	List<Map<String,Object>> getOrderListByOrderNumber(Map<String,Object> param);
 

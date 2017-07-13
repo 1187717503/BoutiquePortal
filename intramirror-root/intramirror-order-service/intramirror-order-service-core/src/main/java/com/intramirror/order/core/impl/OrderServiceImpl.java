@@ -24,10 +24,10 @@ public class OrderServiceImpl extends BaseDao implements IOrderService{
     	orderMapper = this.getSqlSession().getMapper(OrderMapper.class);
     }
 
-    public List<Map<String,Object>> getOrderList() {
-    	Map<String,String> param = new HashMap<String, String>();
+    public List<Map<String,Object>> getOrderList(int status) {
+    	Map<String,Object> param = new HashMap<String, Object>();
     	param.put("joinSql", null);
-    	param.put("whereSql", "1=1");
+    	param.put("status",status);
     	List<Map<String,Object>> result = orderMapper.getOrderList(param);
         logger.info("result:{}",new Gson().toJson(result));
         return result;

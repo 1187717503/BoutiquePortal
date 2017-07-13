@@ -24,7 +24,7 @@
 	LEFT JOIN brand b ON p.brand_id = b.brand_id 
 	LEFT JOIN vendor v ON lp.vendor_id = v.vendor_id 
 	LEFT JOIN geography g ON l.geography_id = g.geography_id 
-    where #{whereSql,jdbcType=LONGVARCHAR}
+    where lp.`status` = #{status,jdbcType=BIGINT} 
     group By o.order_num 
     ORDER BY o.created_at desc 
     

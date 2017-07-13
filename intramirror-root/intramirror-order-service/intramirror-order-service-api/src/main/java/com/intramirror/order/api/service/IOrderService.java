@@ -9,7 +9,7 @@ public interface IOrderService {
 	 * 获取订单列表信息
 	 * @return
 	 */
-	List<Map<String,Object>> getOrderList();
+	List<Map<String,Object>> getOrderList(int status);
 	
 	/**
 	 * 根据orderNumber 和 订单状态获取订单列表
