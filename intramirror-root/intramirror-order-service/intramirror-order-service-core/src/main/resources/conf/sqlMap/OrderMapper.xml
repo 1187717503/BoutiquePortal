@@ -1,21 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.intramirror.order.core.mapper.ApiMqMapper" >
+<mapper namespace="com.intramirror.order.core.mapper.OrderMapper" >
 
-   <select id="getOrderList" resultMap="java.util.Map"  parameterType="java.util.HashMap" >
+   <select id="getOrderList" resultType="java.util.HashMap"  parameterType="java.util.Map" >
     select 
     DISTINCT o.order_num,o.order_id,o.created_at,o.`status`,o.current_rate,o.total_sale_price_rmb,o.total_shipping_fee_rmb,o.total_tax_rmb,o.total_rmb,
     l.rec_name,l.rec_mobile,l.user_rec_name,l.user_rec_mobile,l.user_rec_province,l.user_rec_city,l.user_rec_area,l.user_rec_addr,v.vendor_id,
     u.contact_person_name,o.contact_phone as telephone,o.wechat as contact_info,g.`name` as geography_name 
     from logistics_product lp 
     INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id 
-    INNER JOIN `order` o ON ol.order_id = o.order_id 
+    INNER JOIN `order` o ON o.order_id = ol.order_id   
     LEFT JOIN `user` u ON o.user_id = u.user_id 
     LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id 
     INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id 
     INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id 
     INNER JOIN product p ON sp.product_id = p.product_id 
-    #{joinSql,jdbcType=LONGVARCHAR} 
+    
+     <if test="joinSql != null">  
+        #{joinSql,jdbcType=LONGVARCHAR} 
+     </if> 
+        
 	LEFT JOIN category c ON p.category_id = c.category_id 
 	LEFT JOIN brand b ON p.brand_id = b.brand_id 
 	LEFT JOIN vendor v ON lp.vendor_id = v.vendor_id 
@@ -26,4 +30,39 @@
     
   </select>
   
+  
+  
+  
+  <select id="getOrderListByOrderNumber" resultType="java.util.HashMap"  parameterType="java.util.Map">
+  
+  			SELECT  o.order_num,o.order_id,p.name,pp.colorCode,pp.brandID,pspv.`value` as size,p.category_id,
+			s.price,s.in_price,sps.sale_price,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,
+			lp.`status`,v.vendor_name,p.cover_img,lp.logistics_product_id FROM logistics_product lp 
+			INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id 
+			INNER JOIN `order` o ON ol.order_id = o.order_id 
+			LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id 
+			INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id 
+			INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id 
+			INNER JOIN product p ON sp.product_id = p.product_id 
+			LEFT JOIN sku s ON s.sku_id = sps.sku_id 
+			LEFT JOIN product_sku_property_key pspk ON pspk.product_id = p.product_id 
+			LEFT JOIN product_sku_property_value pspv ON pspv.product_sku_property_key_id = pspk.product_sku_property_key_id 
+			LEFT JOIN vendor v ON lp.vendor_id = v.vendor_id 
+			LEFT JOIN (
+			SELECT t_pp.product_id,
+			max(case t_pp.key_name when 'ColorCode' then t_pp.`value` else '' end) as colorCode,
+			max(case t_pp.key_name when 'BrandID' then t_pp.`value` else '' end) as brandID 
+			from product_property t_pp 
+			where t_pp.enabled = 1 and (t_pp.key_name='BrandID' or t_pp.key_name = 'ColorCode') 
+			group by t_pp.product_id 
+			) pp ON p.product_id = pp.product_id 
+			WHERE o.order_num in 
+		<foreach collection="orderNumbers" item="orderNumber" index="index"
+            open="(" close=")" separator=",">
+            #{orderNumber}
+        </foreach>
+        
+			and pspk.`name` = 'Size' and  lp.`status` = #{status,jdbcType=BIGINT}
+			GROUP BY lp.order_line_num
+  </select>
 </mapper>

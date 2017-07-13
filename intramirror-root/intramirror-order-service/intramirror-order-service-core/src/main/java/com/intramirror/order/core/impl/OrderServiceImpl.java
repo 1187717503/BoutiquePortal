@@ -1,5 +1,7 @@
 package com.intramirror.order.core.impl;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -22,9 +24,23 @@ public class OrderServiceImpl extends BaseDao implements IOrderService{
     	orderMapper = this.getSqlSession().getMapper(OrderMapper.class);
     }
 
-    public Map<String,Object> getOrderList() {
-    	Map<String,Object> result = orderMapper.getOrderList();
+    public List<Map<String,Object>> getOrderList() {
+    	Map<String,String> param = new HashMap<String, String>();
+    	param.put("joinSql", null);
+    	param.put("whereSql", "1=1");
+    	List<Map<String,Object>> result = orderMapper.getOrderList(param);
         logger.info("result:{}",new Gson().toJson(result));
         return result;
     }
+
+    
+    
+	public List<Map<String, Object>> getOrderListByOrderNumber(String numbers,int status) {
+    	Map<String,Object> param = new HashMap<String, Object>();
+    	param.put("orderNumbers", numbers.split(","));
+    	param.put("status", status);
+    	List<Map<String,Object>> result = orderMapper.getOrderListByOrderNumber(param);
+        logger.info("result:{}",new Gson().toJson(result));
+        return result;
+	}
 }

@@ -6,7 +6,6 @@
     
     <!--引入属性文件 -->
     <!-- <context:property-placeholder location="classpath:/databases.properties"/> -->
-    <context:property-placeholder location="classpath:/conf/sit/databases.properties" />
     
     <!--数据库连接-->
     <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close"> 
@@ -29,14 +28,29 @@
  	</bean>
  	
  	<!-- mybatis配置 -->
-    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    <bean id="orderSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource" />
         <property name="typeAliasesPackage" value="com.yfding.spring.model"></property>
         <property name="configLocation" value="classpath:conf/mybatis-config.xml" />
         <property name="mapperLocations" value="classpath:conf/sqlMap/*.xml"></property>
     </bean> 
     
-    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
-   		<constructor-arg ref="sqlSessionFactory" />
+    <bean id="orderSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+   		<constructor-arg ref="orderSqlSessionFactory" />
   	</bean>
+  	
+  	
+  	<beans profile="sit">
+		<context:property-placeholder location="classpath:/sit/databases.properties"/>
+	</beans>
+	<beans profile="pre">
+		<context:property-placeholder location="classpath:/pre/databases.properties"/>
+	</beans>
+	<beans profile="prd">
+		<context:property-placeholder location="classpath:/prd/databases.properties"/>
+	</beans>
+	<beans profile="default">
+		<context:property-placeholder ignore-resource-not-found="true" location="classpath:/sit/databases.properties"/>
+	</beans>
+	
 </beans>   
