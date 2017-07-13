@@ -28,15 +28,15 @@
  	</bean>
  	
  	<!-- mybatis配置 -->
-    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    <bean id="productSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource" />
         <property name="typeAliasesPackage" value="com.yfding.spring.model"></property>
         <property name="configLocation" value="classpath:conf/ProductMybatis/mybatis-config.xml" />
         <property name="mapperLocations" value="classpath:conf/ProductSqlMap/*.xml"></property>
     </bean> 
     
-    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
-   		<constructor-arg ref="sqlSessionFactory" />
+    <bean id="productSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+   		<constructor-arg ref="productSqlSessionFactory" />
   	</bean>
 
 	<beans profile="sit">

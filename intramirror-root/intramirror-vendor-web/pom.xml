@@ -21,10 +21,10 @@
       <scope>test</scope>
     </dependency>
     
-    <!-- <dependency>
+    <dependency>
     	<groupId>com.intramirror</groupId>
 		<artifactId>intramirror-product-service-core</artifactId>
-    </dependency> -->
+    </dependency>
     
     <dependency>
     	<groupId>com.intramirror</groupId>
