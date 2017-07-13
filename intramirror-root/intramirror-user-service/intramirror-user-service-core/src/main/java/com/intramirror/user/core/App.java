@@ -1,4 +1,4 @@
-package org.intramirror.user.api;
+package com.intramirror.user.core;
 
 /**
  * Hello world!
