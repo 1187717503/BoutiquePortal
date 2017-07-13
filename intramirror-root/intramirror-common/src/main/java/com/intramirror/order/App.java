@@ -1,4 +1,4 @@
-package org.intramirror.logistics.api;
+package com.intramirror.order;
 
 /**
  * Hello world!
