@@ -216,5 +216,6 @@
     <module>intramirror-logistics-service</module>
     <module>intramirror-user-service</module>
     <module>intramirror-payment-service</module>
+      <module>intramirror-common</module>
   </modules>
 </project>
