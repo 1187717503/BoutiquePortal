@@ -21,10 +21,17 @@
       <scope>test</scope>
     </dependency>
     
-    <dependency>
+    <!-- <dependency>
     	<groupId>com.intramirror</groupId>
 		<artifactId>intramirror-product-service-core</artifactId>
+    </dependency> -->
+    
+    <dependency>
+    	<groupId>com.intramirror</groupId>
+		<artifactId>intramirror-user-service-core</artifactId>
     </dependency>
+    
+    
   </dependencies>
   <build>
     <finalName>intramirror-vendor-web</finalName>

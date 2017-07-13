@@ -1,4 +1,4 @@
-package com.intramirror.product.core.dao;
+package com.intramirror.user.core.dao;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  * @date 2016年7月4日下午5:16:03
  *
  */
-@Component("productServiceProessor")
+@Component("userServiceProcessor")
 public class ServiceProcessor implements BeanPostProcessor{
 
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
