@@ -1,5 +1,7 @@
 package com.intramirror.product.core.dao;
 
+import javax.annotation.Resource;
+
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.support.SqlSessionDaoSupport;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class BaseDao extends SqlSessionDaoSupport{
 	
 	/** 注入sqlSessionTemplate */
-	@Autowired
+	@Resource(name = "productSqlSessionTemplate")
 	public void setSqlSessionTemplate(SqlSessionTemplate sqlSessionTemplate)
     {
     	super.setSqlSessionTemplate(sqlSessionTemplate);
