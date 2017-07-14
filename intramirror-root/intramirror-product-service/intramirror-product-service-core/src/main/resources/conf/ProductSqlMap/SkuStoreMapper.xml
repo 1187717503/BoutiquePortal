@@ -29,7 +29,7 @@
   </update>
   
   
-  <select id="selectSkuIdByShopProductSkuId" resultMap="java.lang.Long" parameterType="java.lang.Long" >
+  <select id="selectSkuIdByShopProductSkuId" resultType="java.lang.Long" parameterType="java.lang.Long" >
     select sps.sku_id from shop_product_sku  sps where sps.shop_product_sku_id =  #{shopProductSkuId,jdbcType=BIGINT}
   </select>
   

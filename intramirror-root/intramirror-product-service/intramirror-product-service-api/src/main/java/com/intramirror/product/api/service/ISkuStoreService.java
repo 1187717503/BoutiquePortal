@@ -9,4 +9,11 @@ public interface ISkuStoreService {
 	 * @return
 	 */
 	Long updateBySkuId(int statusType,long skuid);
+	
+	/**
+	 * 根据shopProductSkuId 查询SKUid
+	 * @param shopProductSkuId
+	 * @return
+	 */
+	Long selectSkuIdByShopProductSkuId(Long shopProductSkuId);
 }

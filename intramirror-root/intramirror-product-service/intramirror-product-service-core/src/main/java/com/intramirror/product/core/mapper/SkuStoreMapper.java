@@ -11,5 +11,12 @@ public interface SkuStoreMapper {
 	 */
 	Long updateBySkuId (Map<String,Object> param);
 	
+	/**
+	 * 根据shopProductSkuId 查询SKUid
+	 * @param shopProductSkuId
+	 * @return
+	 */
+	Long selectSkuIdByShopProductSkuId(Long shopProductSkuId);
+	
 
 }

@@ -19,6 +19,7 @@ import com.google.gson.Gson;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderService;
+import com.intramirror.web.service.LogisticsProductService;
 
 @Controller
 @RequestMapping("/order")
@@ -30,7 +31,8 @@ public class OrderController {
 	private IOrderService orderService;
 	
 	@Autowired
-	private ILogisticsProductService logisticsProductService;
+	private LogisticsProductService logisticsProductService;
+	
 	
 	@RequestMapping("/getOrderList")
 	@ResponseBody
@@ -126,15 +128,17 @@ public class OrderController {
 		//参数不能为空
 		if(map == null || map.size() == 0){
 			resultMap.put("info", "Parameter cannot be null");
-			return resultMap.toString();
+			return new Gson().toJson(resultMap);
 		}
 		
 		if(map.get("logisProductId") == null || StringUtils.isBlank(map.get("logisProductId").toString())){
 			resultMap.put("info", "logisProductId cannot be null");
+			return new Gson().toJson(resultMap);
 		}
 		
 		if(map.get("status") == null || StringUtils.isBlank(map.get("status").toString())){
 			resultMap.put("info", "status cannot be null");
+			return new Gson().toJson(resultMap);
 		}
 		
 		
@@ -142,9 +146,9 @@ public class OrderController {
 		int status =Integer.parseInt(map.get("status").toString());
 		
 		//调用修改订单状态
-		logisticsProductService.updateOrderLogisticsStatusById(logisProductId, status);
+		resultMap = logisticsProductService.updateOrderLogisticsStatusById(logisProductId, status);
 		
-		return resultMap.toString();
+		return new Gson().toJson(resultMap);
 	}
 	
 	
