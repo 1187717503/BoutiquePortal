@@ -7,7 +7,9 @@
     <artifactId>intramirror-user-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
+  <groupId>com.intramirror</groupId>
   <artifactId>intramirror-user-service-core</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
   <name>intramirror-user-service-core</name>
   <url>http://maven.apache.org</url>
   <properties>
@@ -17,96 +19,103 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
     	<groupId>com.intramirror</groupId>
 		<artifactId>intramirror-user-service-api</artifactId>
     </dependency>
+	  <dependency>
+		  <groupId>com.intramirror</groupId>
+		  <artifactId>intramirror-common</artifactId>
+		  <version>0.0.1-SNAPSHOT</version>
+	  </dependency>
+
     <dependency>
 	    <groupId>org.springframework</groupId>
 	    <artifactId>spring-core</artifactId>
 	</dependency>
-	<dependency>  
-         <groupId>javax.annotation</groupId>  
-         <artifactId>jsr250-api</artifactId>  
-     </dependency>  
-	
+	<dependency>
+         <groupId>javax.annotation</groupId>
+         <artifactId>jsr250-api</artifactId>
+     </dependency>
+
 	<dependency>
 	    <groupId>org.springframework</groupId>
 	    <artifactId>spring-context</artifactId>
 	</dependency>
-	
+
 	<dependency>
 	    <groupId>org.springframework</groupId>
 	    <artifactId>spring-context-support</artifactId>
 	</dependency>
-	
+
 	<dependency>
 	    <groupId>org.springframework</groupId>
 	    <artifactId>spring-webmvc</artifactId>
 	</dependency>
-	
+
 	<dependency>
 	    <groupId>org.springframework</groupId>
 	    <artifactId>spring-aop</artifactId>
 	</dependency>
-	
+
 	<dependency>
 	    <groupId>org.springframework</groupId>
 	    <artifactId>spring-test</artifactId>
 	</dependency>
-	
+
 	<dependency>
 		<groupId>com.alibaba</groupId>
 		<artifactId>fastjson</artifactId>
 	</dependency>
-	
+
 	<dependency>
 	    <groupId>com.google.code.gson</groupId>
 	    <artifactId>gson</artifactId>
 	</dependency>
-	
+
 	<dependency>
 	    <groupId>ch.qos.logback</groupId>
 	    <artifactId>logback-classic</artifactId>
 	</dependency>
-	
+
 	<dependency>
 	    <groupId>ch.qos.logback</groupId>
 	    <artifactId>logback-access</artifactId>
 	</dependency>
-	
+
 	<dependency>
 	    <groupId>org.slf4j</groupId>
 	    <artifactId>slf4j-api</artifactId>
 	</dependency>
-	
-	<dependency>  
-	    <groupId>org.logback-extensions</groupId>  
-	    <artifactId>logback-ext-spring</artifactId>  
-	</dependency>  
-	
+
+	<dependency>
+	    <groupId>org.logback-extensions</groupId>
+	    <artifactId>logback-ext-spring</artifactId>
+	</dependency>
+
 	<dependency>
 	    <groupId>org.springframework</groupId>
 	    <artifactId>spring-beans</artifactId>
 	</dependency>
-	
+
     <dependency>
 	    <groupId>org.freemarker</groupId>
 	    <artifactId>freemarker</artifactId>
 	</dependency>
-	
+
 	<dependency>
 	    <groupId>mysql</groupId>
 	    <artifactId>mysql-connector-java</artifactId>
 	</dependency>
-	
+
 	<dependency>
 	    <groupId>org.mybatis</groupId>
 	    <artifactId>mybatis-spring</artifactId>
 	</dependency>
-	
+
 	<dependency>
 	    <groupId>com.alibaba</groupId>
 	    <artifactId>druid</artifactId>
@@ -116,12 +125,12 @@
 	    <groupId>org.springframework</groupId>
 	    <artifactId>spring-jdbc</artifactId>
 	</dependency>
-	
+
 	<dependency>
 	    <groupId>org.mybatis.generator</groupId>
 	    <artifactId>mybatis-generator-core</artifactId>
 	</dependency>
-	
+
 	<dependency>
 	    <groupId>org.mybatis</groupId>
 	    <artifactId>mybatis</artifactId>
@@ -132,12 +141,12 @@
 		  <artifactId>spring-context</artifactId>
 	  </dependency>
   </dependencies>
-  
+
   <build>
     <finalName>intramirror-user-service-core</finalName>
     <pluginManagement>
 	    <plugins>
-	    	
+
 	    	<!-- Mybatis Generator -->
 	    	<plugin>
 			    <groupId>org.mybatis.generator</groupId>

@@ -4,7 +4,7 @@
 
 <!-- mybatis-generator:generate -->
     <classPathEntry
-        location="/Users/dingyifan/Documents/software/env/maven_house_jz/mysql/mysql-connector-java/5.1.39/mysql-connector-java-5.1.39.jar" /> <!-- 配置JAR驱动 -->
+        location="C:\Users\56996\.m2\repository\mysql\mysql-connector-java\5.1.39\mysql-connector-java-5.1.39.jar" /> <!-- 配置JAR驱动 -->
         
     <context id="context1" targetRuntime="MyBatis3">
     	<commentGenerator>
@@ -21,18 +21,18 @@
     	</javaTypeResolver>
     	
         <javaModelGenerator targetPackage="com.intramirror.user.api.model"
-            targetProject="/Users/dingyifan/Documents/dev/eclipse_dev/BoutiquePortal/intramirror-root/intramirror-user-service/intramirror-user-service-api/src/main/java" > <!-- 生成实体地址 -->
+            targetProject="D:\MyWork\shoplus\BoutiquePortal\BoutiquePortal\intramirror-root\intramirror-user-service\intramirror-user-service-api\src\main\java" > <!-- 生成实体地址 -->
             <property name="trimStrings" value="true"/> <!-- 设置string时是否使用trim调用 -->
         </javaModelGenerator>
         
-        <sqlMapGenerator targetPackage="conf.sqlMap"
-            targetProject="/Users/dingyifan/Documents/dev/eclipse_dev/BoutiquePortal/intramirror-root/intramirror-user-service/intramirror-user-service-core/src/main/resources" /> <!-- 生成MapXML文件 -->
+        <sqlMapGenerator targetPackage="conf.UserSqlMap"
+            targetProject="D:\MyWork\shoplus\BoutiquePortal\BoutiquePortal\intramirror-root\intramirror-user-service\intramirror-user-service-core\src\main\resources" /> <!-- 生成MapXML文件 -->
             
             <!-- XMLMAPPER,ANNOTATEDMAPPER -->
         <javaClientGenerator targetPackage="com.intramirror.user.core.mapper"
-            targetProject="/Users/dingyifan/Documents/dev/eclipse_dev/BoutiquePortal/intramirror-root/intramirror-user-service/intramirror-user-service-core/src/main/java" type="XMLMAPPER" /> <!-- 生成MAP对应Client -->
+            targetProject="D:\MyWork\shoplus\BoutiquePortal\BoutiquePortal\intramirror-root\intramirror-user-service\intramirror-user-service-core\src\main\java" type="XMLMAPPER" /> <!-- 生成MAP对应Client -->
 			
-			<table schema="intra-mirror-prd" tableName="api_mq" domainObjectName="UserApiMq"
+			<table schema="intra-mirror-prd" tableName="vendor" domainObjectName="Vendor"
 			    enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
 			    enableSelectByExample="false" selectByExampleQueryId="false" >
 			    <property name="useActualColumnNames" value="false"/>

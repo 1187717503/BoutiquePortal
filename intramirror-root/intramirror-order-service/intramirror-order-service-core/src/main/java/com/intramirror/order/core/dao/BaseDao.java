@@ -1,8 +1,9 @@
 package com.intramirror.order.core.dao;
 
-import javax.annotation.Resource;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.support.SqlSessionDaoSupport;
+
+import javax.annotation.Resource;
 
 /**
  * 注入sqlSessionTemplate,使用SqlSessionDaoSupport
