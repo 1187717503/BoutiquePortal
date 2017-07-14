@@ -19,6 +19,7 @@ import com.google.gson.Gson;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderService;
+import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.web.service.LogisticsProductService;
 
 @Controller
@@ -32,6 +33,9 @@ public class OrderController {
 	
 	@Autowired
 	private LogisticsProductService logisticsProductService;
+	
+	@Autowired
+	private ProductPropertyService productPropertyService;
 	
 	
 	@RequestMapping("/getOrderList")
@@ -62,6 +66,21 @@ public class OrderController {
 		List<Map<String,Object>> orderLineResult = orderService.getOrderListByOrderNumber(orderNumbers, status);
 		
 		if(orderLineResult != null && orderLineResult.size() > 0){
+			
+			//遍历获取所有商品ID
+			String productIds = "";
+			for(Map<String, Object> info : orderLineResult){
+				productIds +=info.get("product_id").toString()+",";;
+			}
+			
+			if(StringUtils.isNoneBlank(productIds)){
+				productIds = productIds.substring(0,productIds.length() -1);
+			}
+			
+			//根据ID列表获取商品属性
+			productPropertyService.getProductPropertyListByProductId(productIds);
+			
+			
 			for(Map<String, Object> orderInfo : result){
 				List<Map<String, Object>> orderLineList = new ArrayList<Map<String,Object>>();
 				int amount = 0;

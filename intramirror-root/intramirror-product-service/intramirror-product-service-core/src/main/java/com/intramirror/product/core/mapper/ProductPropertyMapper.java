@@ -14,5 +14,5 @@ public interface ProductPropertyMapper {
      * @param productId
      * @return
      */
-    List<Map<String, Object>> selectByProductId(Long productId);
+    List<Map<String, Object>> selectByProductId(Map<String,Object> param);
 }

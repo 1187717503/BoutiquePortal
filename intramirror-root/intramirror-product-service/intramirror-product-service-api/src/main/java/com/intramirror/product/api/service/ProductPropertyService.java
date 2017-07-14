@@ -21,5 +21,5 @@ public interface ProductPropertyService {
      * @param productId
      * @return
      */
-    List<Map<String, Object>> getProductPropertyListByProductId(Long productId);
+    List<Map<String, Object>> getProductPropertyListByProductId(String productIds);
 }

@@ -41,9 +41,13 @@
     </select>
     
     
-  <select id="selectByProductId" resultType="java.util.HashMap" parameterType="java.lang.Long" >
+  <select id="selectByProductId" resultType="java.util.HashMap" parameterType="java.util.Map" >
     	SELECT p.product_id,p.key_name,p.`value` FROM product_property  p 
-			 WHERE (p.key_name = 'BrandID' or p.key_name = 'ColorCode') and p.product_id = #{productId,jdbcType=BIGINT}
+			 WHERE (p.key_name = 'BrandID' or p.key_name = 'ColorCode') and p.product_id in 
+			<foreach collection="productIds" item="productId" index="index"
+            	open="(" close=")" separator=",">
+            	#{productId}
+        	</foreach>
   </select>
   
 </mapper>
