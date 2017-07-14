@@ -19,7 +19,7 @@ import com.intramirror.order.api.model.ApiMq;
 public class DemoController {
 	
 	/** 测试返回对象转换JSON !!! */
-	@RequestMapping(value = "/get_api_mq",method = RequestMethod.GET,produces="text/html;charset=UTF-8")
+	@RequestMapping(value = "/get_api_mq",method = RequestMethod.GET)
 	@ResponseBody
 	public ApiMq getApiMq(){
 		ApiMq apiMq = new ApiMq();
