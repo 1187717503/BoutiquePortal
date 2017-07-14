@@ -12,13 +12,41 @@
         http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/util 
         http://www.springframework.org/schema/util/spring-util.xsd">
-         
-    <!-- 加载其它Jar的配置文件 -->
-    <import resource="classpath*:/conf/app-datasource.xml" />
-    
-	<!-- 自动注入 -->
-	<mvc:annotation-driven />
-	<context:component-scan base-package="com.intramirror" />
+
+	<!-- start 加载其它Jar的配置文件 -->
+	<import resource="classpath*:/conf/app-datasource.xml" />
+	<!-- end 加载其它Jar的配置文件 -->
+
+	<!-- start spring 自动注解,及解决ReponseBody中文乱码问题 -->
+	<mvc:annotation-driven>
+        <mvc:message-converters>
+            <bean id="mappingJacksonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>text/plain;charset=utf-8</value>
+                        <value>text/html;charset=UTF-8</value>
+                        <value>text/json;charset=UTF-8</value>
+                        <value>application/json;charset=utf-8</value>
+                    </list>
+                </property>
+                <property name="objectMapper">
+                    <bean class="com.fasterxml.jackson.databind.ObjectMapper">
+                        <property name="dateFormat">
+                            <bean class="java.text.SimpleDateFormat">
+                                <constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss"/>
+                            </bean>
+                        </property>
+                    </bean>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+	<!-- end spring 自动注解,及解决ReponseBody中文乱码问题 -->
+
 	
-	<util:properties id="commons" location="classpath:/commons.properties"/>
+	<!-- 自动扫描 -->
+	<context:component-scan base-package="com.intramirror" />
+
+	<!-- 初始化基础配置 -->
+	<util:properties id="commons" location="classpath:/commons.properties" />
 </beans>
