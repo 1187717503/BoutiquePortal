@@ -14,4 +14,12 @@ public interface ProductPropertyService {
      * @return
      */
     List<Map<String, Object>> getProductPropertyByBrandIDAndColorCode(String brandID, String colorCode);
+    
+    
+    /**
+     * 根据productId 查询brandID colorCode 信息
+     * @param productId
+     * @return
+     */
+    List<Map<String, Object>> getProductPropertyListByProductId(Long productId);
 }

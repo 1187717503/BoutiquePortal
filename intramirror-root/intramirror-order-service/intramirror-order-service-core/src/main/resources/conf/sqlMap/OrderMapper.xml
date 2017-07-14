@@ -14,11 +14,7 @@
     LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id 
     INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id 
     INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id 
-    INNER JOIN product p ON sp.product_id = p.product_id 
-    
-     <if test="joinSql != null">  
-        #{joinSql,jdbcType=LONGVARCHAR} 
-     </if> 
+    INNER JOIN product p ON sp.product_id = p.product_id  
         
 	LEFT JOIN category c ON p.category_id = c.category_id 
 	LEFT JOIN brand b ON p.brand_id = b.brand_id 

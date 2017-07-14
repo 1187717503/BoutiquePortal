@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.ProductPropertyMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -31,4 +32,10 @@ public class ProductPropertyServiceImpl extends BaseDao implements ProductProper
         logger.info("result:{}", new Gson().toJson(result));
         return result;
     }
+
+	public List<Map<String, Object>> getProductPropertyListByProductId(Long productId) {
+        List<Map<String, Object>> result = productPropertyMapper.selectByProductId(productId);
+        logger.info("result:{}", new Gson().toJson(result));
+        return result;
+	}
 }

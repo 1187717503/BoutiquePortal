@@ -26,7 +26,6 @@ public class OrderServiceImpl extends BaseDao implements IOrderService{
 
     public List<Map<String,Object>> getOrderList(int status) {
     	Map<String,Object> param = new HashMap<String, Object>();
-    	param.put("joinSql", null);
     	param.put("status",status);
     	List<Map<String,Object>> result = orderMapper.getOrderList(param);
         logger.info("result:{}",new Gson().toJson(result));

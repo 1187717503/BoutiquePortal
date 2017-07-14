@@ -39,4 +39,11 @@
         WHERE t_pp.enabled = 1 GROUP BY t_pp.product_id ) cd
         WHERE cd.colorCode=#{colorCode} AND cd.brandID=#{brandID}
     </select>
+    
+    
+  <select id="selectByProductId" resultType="java.util.HashMap" parameterType="java.lang.Long" >
+    	SELECT p.product_id,p.key_name,p.`value` FROM product_property  p 
+			 WHERE (p.key_name = 'BrandID' or p.key_name = 'ColorCode') and p.product_id = #{productId,jdbcType=BIGINT}
+  </select>
+  
 </mapper>
