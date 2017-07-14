@@ -31,7 +31,8 @@
   
   <select id="getOrderListByOrderNumber" resultType="java.util.HashMap"  parameterType="java.util.Map">
   
-  			SELECT  o.order_num,o.order_id,p.name,pp.colorCode,pp.brandID,pspv.`value` as size,p.category_id,
+  			<!-- SELECT  o.order_num,o.order_id,p.name,pp.colorCode,pp.brandID,pspv.`value` as size,p.category_id, -->
+  			SELECT  o.order_num,o.order_id,p.name,pspv.`value` as size,p.category_id,
 			s.price,s.in_price,sps.sale_price,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,
 			lp.`status`,v.vendor_name,p.cover_img,p.product_id,lp.logistics_product_id FROM logistics_product lp 
 			INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id 
@@ -44,14 +45,14 @@
 			LEFT JOIN product_sku_property_key pspk ON pspk.product_id = p.product_id 
 			LEFT JOIN product_sku_property_value pspv ON pspv.product_sku_property_key_id = pspk.product_sku_property_key_id 
 			LEFT JOIN vendor v ON lp.vendor_id = v.vendor_id 
-			LEFT JOIN (
+			<!--  LEFT JOIN (
 			SELECT t_pp.product_id,
 			max(case t_pp.key_name when 'ColorCode' then t_pp.`value` else '' end) as colorCode,
 			max(case t_pp.key_name when 'BrandID' then t_pp.`value` else '' end) as brandID 
 			from product_property t_pp 
 			where t_pp.enabled = 1 and (t_pp.key_name='BrandID' or t_pp.key_name = 'ColorCode') 
 			group by t_pp.product_id 
-			) pp ON p.product_id = pp.product_id 
+			) pp ON p.product_id = pp.product_id   -->
 			WHERE o.order_num in 
 		<foreach collection="orderNumbers" item="orderNumber" index="index"
             open="(" close=")" separator=",">

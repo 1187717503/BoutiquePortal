@@ -40,7 +40,7 @@ public class OrderController {
 	
 	@RequestMapping("/getOrderList")
 	@ResponseBody
-	public String getOrderList(){
+	public List<Map<String,Object>> getOrderList(){
 		
 		int status = 2;
 		//获取order列表
@@ -54,7 +54,7 @@ public class OrderController {
 				orderNumbers += orderInfo.get("order_num").toString()+",";
 			}
 		}else{
-			return new Gson().toJson(result);
+			return result;
 		}
 		
 		if(StringUtils.isNoneBlank(orderNumbers)){
@@ -67,10 +67,11 @@ public class OrderController {
 		
 		if(orderLineResult != null && orderLineResult.size() > 0){
 			
+			/**------------------------------------优化----------------------------------------*/
 			//遍历获取所有商品ID
 			String productIds = "";
 			for(Map<String, Object> info : orderLineResult){
-				productIds +=info.get("product_id").toString()+",";;
+				productIds +=info.get("product_id").toString()+",";
 			}
 			
 			if(StringUtils.isNoneBlank(productIds)){
@@ -78,7 +79,24 @@ public class OrderController {
 			}
 			
 			//根据ID列表获取商品属性
-			productPropertyService.getProductPropertyListByProductId(productIds);
+			List<Map<String, Object>> productPropertyList = productPropertyService.getProductPropertyListByProductId(productIds);
+			Map<String, Map<String, String>> productPropertyResult= new HashMap<String, Map<String, String>>();
+			
+			for(Map<String, Object> productProperty : productPropertyList){
+				
+				//如果存在
+				if(productPropertyResult.containsKey(productProperty.get("product_id").toString())){
+					Map<String, String> info = productPropertyResult.get(productProperty.get("product_id").toString());
+				    info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
+				}else{
+					Map<String, String> info = new HashMap<String, String>();
+					info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
+					productPropertyResult.put(productProperty.get("product_id").toString(), info);
+				}
+				
+			}
+			/**------------------------------------优化end----------------------------------------*/
+			
 			
 			
 			for(Map<String, Object> orderInfo : result){
@@ -121,6 +139,15 @@ public class OrderController {
 							}
 							
 						}
+						
+						
+						//添加商品对应的属性
+						if(productPropertyResult.size() > 0 ){
+							if(productPropertyResult.get(info.get("product_id").toString()) != null){
+								info.put("brandID", productPropertyResult.get(info.get("product_id").toString()).get("BrandID"));
+								info.put("colorCode", productPropertyResult.get(info.get("product_id").toString()).get("ColorCode"));
+							}
+						}
 							
 						orderLineList.add(info);
 						
@@ -131,7 +158,7 @@ public class OrderController {
 				orderInfo.put("orderLineList", orderLineList);
 			}
 		}
-		return new Gson().toJson(orderLineResult);
+		return orderLineResult;
 	}
 	
 	
