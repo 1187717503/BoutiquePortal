@@ -1,6 +1,5 @@
 package com.intramirror.web.controller.order;
 
-import com.google.gson.Gson;
 import com.intramirror.common.Helper;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.product.api.model.Sku;
@@ -44,7 +43,7 @@ public class ConfirmCheckOrderController {
      */
     @RequestMapping(value = "/confirmCheckOrder", method = RequestMethod.POST)
     @ResponseBody
-    public String confirmCheckOrder(String barCode, String brandId, String colorCode, HttpServletRequest httpRequest) throws Exception {
+    public Map confirmCheckOrder(String barCode, String brandId, String colorCode, HttpServletRequest httpRequest) throws Exception {
         // 返回数据初始化
         int status = StatusType.FAILURE;
         Map<String, Object> result = new HashMap<String, Object>();
@@ -60,7 +59,7 @@ public class ConfirmCheckOrderController {
         //如果信息过期则提示重新登录。
         if (System.currentTimeMillis() > expireation.getTime()) {
             result.put("userStatus", "1000002");
-            return new Gson().toJson(result);
+            return result;
         }
         //获取用户详情
         Long userId = Long.valueOf(claims.getSubject());
@@ -68,7 +67,7 @@ public class ConfirmCheckOrderController {
         //如果匿名访问则跳过
         if (!Helper.checkNotNull(userId)) {
             result.put("userStatus", "1000003");
-            return new Gson().toJson(result);
+            return result;
         }
         Sku sku = null;
         List<Map<String, Object>> mapList = new ArrayList<Map<String, Object>>();
@@ -83,7 +82,7 @@ public class ConfirmCheckOrderController {
             status = StatusType.SUCCESS;
         }
         result.put("status", status);
-        return new Gson().toJson(result);
+        return result;
     }
 
 

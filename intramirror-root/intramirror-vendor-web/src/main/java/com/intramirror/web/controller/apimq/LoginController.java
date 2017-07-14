@@ -1,6 +1,5 @@
 package com.intramirror.web.controller.apimq;
 
-import com.google.gson.Gson;
 import com.intramirror.common.Helper;
 import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.common.parameter.StatusType;
@@ -39,6 +38,7 @@ public class LoginController {
 
     /**
      * Wang
+     *
      * @param email
      * @param userPwd
      * @return
@@ -46,7 +46,7 @@ public class LoginController {
      */
     @RequestMapping(value = "/do_login", method = RequestMethod.POST)
     @ResponseBody
-    public String do_login(String email, String userPwd) throws Exception {
+    public Map do_login(String email, String userPwd) throws Exception {
         // 返回数据初始化
         int status = StatusType.FAILURE;
         Map<String, Object> stringObjectMap = new HashMap<String, Object>();
@@ -54,15 +54,15 @@ public class LoginController {
         // check param
         if (Helper.isNullOrEmpty(email)) {
             stringObjectMap.put("status", StatusType.PARAM_EMPTY_OR_NULL);
-            return new Gson().toJson(stringObjectMap);
+            return stringObjectMap;
         }
         if (!Helper.checkEmail(email)) {
             stringObjectMap.put("status", StatusType.EMAIL_ADDRESS_ERROR);
-            return new Gson().toJson(stringObjectMap);
+            return stringObjectMap;
         }
         if (userPwd.length() > 64) {
             stringObjectMap.put("status", StatusType.PASSWORD_LENGTH_ERROR);
-            return new Gson().toJson(stringObjectMap);
+            return stringObjectMap;
         }
 
         // 根据user_id获取用户数据，如没有，返回状态
@@ -92,7 +92,7 @@ public class LoginController {
             status = StatusType.USERNAMENOTEXIST;
         }
         stringObjectMap.put("status", status);
-        return new Gson().toJson(stringObjectMap);
+        return stringObjectMap;
     }
 
     public String getJwtBase64Key() {
