@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @Controller
@@ -43,12 +44,12 @@ public class ConfirmCheckOrderController {
      */
     @RequestMapping(value = "/confirmCheckOrder", method = RequestMethod.POST)
     @ResponseBody
-    public String confirmCheckOrder(String barCode, String brandId, String colorCode, String token) throws Exception {
+    public String confirmCheckOrder(String barCode, String brandId, String colorCode, HttpServletRequest httpRequest) throws Exception {
         // 返回数据初始化
         int status = StatusType.FAILURE;
         Map<String, Object> result = new HashMap<String, Object>();
 
-        String jwt = token;
+        String jwt = httpRequest.getHeader("token");
         if (StringUtils.isEmpty(jwt)) {
             throw new JwtException("header not found,token is null");
         }

@@ -30,24 +30,21 @@
     <!--max(case t_pp.key_name when 'Recommend' then t_pp.`value` else '' end) as recomment,-->
     <!--max(case t_pp.key_name when 'SeasonCode' then t_pp.`value` else '' end) as seasonCode-->
     <select id="getProductPropertyByBrandIDAndColorCode" resultType="java.util.HashMap">
-        SELECT * FROM (
-        SELECT t_pp.product_id,
-        max(case t_pp.key_name when 'ColorCode' then t_pp.`value` else '' end) AS colorCode,
-        max(case t_pp.key_name when 'BrandID' then t_pp.`value` else '' end) AS brandID,
-        FROM
-        <include refid="selectTable"/>
-        WHERE t_pp.enabled = 1 GROUP BY t_pp.product_id ) cd
-        WHERE cd.colorCode=#{colorCode} AND cd.brandID=#{brandID}
+        SELECT pp.product_id,max(case pp.key_name when 'ColorCode' then pp.`value` else '' end) AS colorCode,
+        max(case pp2.key_name when 'BrandID' then pp2.`value` else '' end) AS brandID
+        FROM  product_property pp INNER JOIN product_property pp2 ON pp.product_id = pp2.product_id WHERE
+        pp.key_name = 'ColorCode' and pp.`value` = #{colorCode} AND
+        pp2.key_name = 'BrandID' and pp2.`value` = #{brandID} GROUP BY pp.product_id;
     </select>
-    
-    
-  <select id="selectByProductId" resultType="java.util.HashMap" parameterType="java.util.Map" >
-    	SELECT p.product_id,p.key_name,p.`value` FROM product_property  p 
-			 WHERE (p.key_name = 'BrandID' or p.key_name = 'ColorCode') and p.product_id in 
-			<foreach collection="productIds" item="productId" index="index"
-            	open="(" close=")" separator=",">
-            	#{productId}
-        	</foreach>
-  </select>
-  
+
+
+    <select id="selectByProductId" resultType="java.util.HashMap" parameterType="java.util.Map">
+        SELECT p.product_id,p.key_name,p.`value` FROM product_property p
+        WHERE (p.key_name = 'BrandID' or p.key_name = 'ColorCode') and p.product_id in
+        <foreach collection="productIds" item="productId" index="index"
+                 open="(" close=")" separator=",">
+            #{productId}
+        </foreach>
+    </select>
+
 </mapper>
