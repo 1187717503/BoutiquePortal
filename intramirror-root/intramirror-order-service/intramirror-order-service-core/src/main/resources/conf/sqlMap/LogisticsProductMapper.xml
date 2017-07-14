@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.intramirror.order.core.mapper.LogisticsProductMapper">
+
+  <resultMap id="logisProductMap" type="com.intramirror.order.api.model.LogisticsProduct" >
+    <id column="logistics_product_id" property="logistics_product_id" jdbcType="BIGINT" />
+    <result column="order_logistics_id" property="order_logistics_id" jdbcType="BIGINT" />
+    <result column="shop_product_sku_id" property="shop_product_sku_id" jdbcType="BIGINT" />
+    <result column="in_price" property="in_price" jdbcType="DECIMAL" />
+    <result column="sale_price" property="sale_price" jdbcType="DECIMAL" />
+    <result column="amount" property="amount" jdbcType="BIGINT" />
+    <result column="fee" property="fee" jdbcType="DECIMAL" />
+    <result column="deduct_amount" property="deduct_amount" jdbcType="BIGINT" />
+    <result column="deduct_fee" property="deduct_fee" jdbcType="DECIMAL" />
+    
+    <result column="remain_amount" property="remain_amount" jdbcType="BIGINT" />
+    <result column="remain_fee" property="remain_fee" jdbcType="DECIMAL" />
+    <result column="status" property="status" jdbcType="BIGINT"/>
+    <result column="created_at" property="created_at" jdbcType="TIMESTAMP" />
+    <result column="updated_at" property="updated_at" jdbcType="TIMESTAMP" />
+    <result column="enabled" property="enabled" jdbcType="BIT" />
+    <result column="order_line_num" property="order_line_num" jdbcType="LONGVARCHAR" />
+    <result column="vendor_id" property="vendor_id" jdbcType="BIGINT" />
+    <result column="shipping_fee" property="shipping_fee" jdbcType="DECIMAL" />
+    <result column="tax_fee" property="tax_fee" jdbcType="DECIMAL" />
+    <result column="tracking_num" property="tracking_num" jdbcType="LONGVARCHAR" />
+    <result column="vat_num" property="vat_num" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  
+  <update id="updateById"  parameterType="com.intramirror.order.api.model.LogisticsProduct" >
+    
+    update logistics_product 
+    <set >
+      <if test="order_logistics_id != null" >
+        order_logistics_id = #{order_logistics_id,jdbcType=BIGINT},
+      </if>
+      
+      <if test="shop_product_sku_id != null" >
+        shop_product_sku_id = #{shop_product_sku_id,jdbcType=BIGINT},
+      </if>
+      
+      <if test="in_price != null" >
+        in_price = #{in_price,jdbcType=DECIMAL},
+      </if>
+      
+      <if test="sale_price != null" >
+        sale_price = #{sale_price,jdbcType=DECIMAL},
+      </if>
+      
+      <if test="amount != null" >
+        amount = #{amount,jdbcType=BIGINT},
+      </if>
+      <if test="fee != null" >
+        fee = #{fee,jdbcType=DECIMAL},
+      </if>
+      
+      <if test="deduct_amount != null" >
+        deduct_amount = #{deduct_amount,jdbcType=BIGINT},
+      </if>
+      
+      <if test="deduct_fee != null" >
+        deduct_fee = #{deduct_fee,jdbcType=DECIMAL},
+      </if>
+      
+      <if test="remain_amount != null" >
+        remain_amount = #{remain_amount,jdbcType=BIGINT},
+      </if>
+      
+      <if test="remain_fee != null" >
+        remain_fee = #{remain_fee,jdbcType=DECIMAL},
+      </if>
+      
+      <if test="status != null" >
+        status = #{status,jdbcType=BIGINT},
+      </if>
+      
+      <if test="created_at != null" >
+        created_at = #{created_at,jdbcType=TIMESTAMP},
+      </if>
+      
+      <if test="updated_at != null" >
+        updated_at = #{updated_at,jdbcType=TIMESTAMP},
+      </if>
+      
+      <if test="enabled != null" >
+        enabled = #{enabled,jdbcType=BIT},
+      </if>
+      
+      <if test="order_line_num != null" >
+        order_line_num = #{order_line_num,jdbcType=LONGVARCHAR},
+      </if>
+      
+      <if test="vendor_id != null" >
+        vendor_id = #{vendor_id,jdbcType=BIGINT},
+      </if>
+      
+      <if test="shipping_fee != null" >
+        shipping_fee = #{shipping_fee,jdbcType=DECIMAL},
+      </if>
+      
+      <if test="tax_fee != null" >
+        tax_fee = #{tax_fee,jdbcType=DECIMAL},
+      </if>
+      
+      <if test="tracking_num != null" >
+        tracking_num = #{tracking_num,jdbcType=LONGVARCHAR},
+      </if>
+      
+      <if test="vat_num != null" >
+        vat_num = #{vat_num,jdbcType=LONGVARCHAR},
+      </if>
+      
+    </set>
+    where logistics_product_id = #{logistics_product_id,jdbcType=BIGINT}
+  </update>
+  
+  
+  <select id="selectById" resultMap="logisProductMap" parameterType="java.lang.Long" >
+    select * 
+    from logistics_product 
+    where logistics_product_id = #{logistics_product_id,jdbcType=BIGINT}
+  </select>
+  
+
+</mapper>
