@@ -13,12 +13,12 @@ public class OrderStatusType {
 	
 	
 	/**
-	 * 下单
+	 * 待收货
 	 */
 	public static final int ORDERED = 3;
 	
 	/**
-	 * 支付
+	 * 已收货
 	 */
 	public static final int PAYED = 4;
 	

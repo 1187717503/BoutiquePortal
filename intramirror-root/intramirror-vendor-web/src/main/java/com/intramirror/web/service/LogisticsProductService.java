@@ -69,8 +69,11 @@ public class LogisticsProductService{
 			logisticsProductService.updateOrderLogisticsStatusById(logistics_product_id,status);
 			
 			//修改库存相关信息
-			Long skuId = skuStoreService.selectSkuIdByShopProductSkuId(oldLogisticsProduct.getShop_product_sku_id());
-			skuStoreService.updateBySkuId(status, skuId);
+			if(status == OrderStatusType.REFUND || status == OrderStatusType.FINISHED || status == OrderStatusType.COMFIRMED || status == OrderStatusType.ORDERED){
+				Long skuId = skuStoreService.selectSkuIdByShopProductSkuId(oldLogisticsProduct.getShop_product_sku_id());
+				skuStoreService.updateBySkuId(status, skuId);
+			}
+
 			
             resultMap.put("status",StatusType.SUCCESS);
         }
