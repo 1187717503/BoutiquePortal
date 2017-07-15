@@ -10,7 +10,7 @@ public interface LogisticsProductMapper {
 	 * @param LogisticsProduct
 	 * @return
 	 */
-	Long updateById (LogisticsProduct logisticsProduct);
+	int updateByLogisticsProduct (LogisticsProduct logisticsProduct);
 	
 	
 	/**

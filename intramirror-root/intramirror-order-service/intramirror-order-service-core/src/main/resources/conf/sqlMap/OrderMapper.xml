@@ -62,4 +62,18 @@
 			and pspk.`name` = 'Size' and  lp.`status` = #{status,jdbcType=BIGINT}
 			GROUP BY lp.order_line_num
   </select>
+  
+  
+  
+   <select id="getOrderPaymentByLogisProductId" resultType="java.util.HashMap"  parameterType="java.lang.Long" >
+            select pt.order_num,lp.amount*lp.sale_price*100 as price,pr.request_id,pr.serial_number,o.pay_way,lp.logistics_product_id 
+            from `order` o 
+            left join order_logistics ol on o.order_id = ol.order_id 
+            left join logistics_product lp on lp.order_logistics_id = ol.order_logistics_id 
+            left join payment pt on pt.order_num = ol.order_id 
+            left join payment_result pr on pr.payment_id = pt.payment_id 
+            where lp.logistics_product_id = #{logisticsProductId,jdbcType=BIGINT} 
+    
+  </select>
+  
 </mapper>

@@ -68,6 +68,11 @@ public class LogisticsProductService{
 			//校验通过，修改状态
 			logisticsProductService.updateOrderLogisticsStatusById(logistics_product_id,status);
 			
+//			if(num <= 0){
+//				resultMap.put("info","Status modification failed");
+//				return resultMap;
+//			}
+			
 			//修改库存相关信息
 			if(status == OrderStatusType.REFUND || status == OrderStatusType.FINISHED || status == OrderStatusType.COMFIRMED || status == OrderStatusType.ORDERED){
 				Long skuId = skuStoreService.selectSkuIdByShopProductSkuId(oldLogisticsProduct.getShop_product_sku_id());

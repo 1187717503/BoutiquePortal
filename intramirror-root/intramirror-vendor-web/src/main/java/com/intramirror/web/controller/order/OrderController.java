@@ -165,7 +165,7 @@ public class OrderController {
 	
 	@RequestMapping("/updateOrderStatus")
 	@ResponseBody
-	public String updateOrderStatus(@RequestBody Map<String, Object> map){
+	public Map<String, Object> updateOrderStatus(@RequestBody Map<String, Object> map){
 		logger.info("updateOrderStatus param:"+new Gson().toJson(map));
 		
 		Map<String, Object> resultMap = new HashMap<String, Object>();
@@ -174,17 +174,17 @@ public class OrderController {
 		//参数不能为空
 		if(map == null || map.size() == 0){
 			resultMap.put("info", "Parameter cannot be null");
-			return new Gson().toJson(resultMap);
+			return resultMap;
 		}
 		
 		if(map.get("logisProductId") == null || StringUtils.isBlank(map.get("logisProductId").toString())){
 			resultMap.put("info", "logisProductId cannot be null");
-			return new Gson().toJson(resultMap);
+			return resultMap;
 		}
 		
 		if(map.get("status") == null || StringUtils.isBlank(map.get("status").toString())){
 			resultMap.put("info", "status cannot be null");
-			return new Gson().toJson(resultMap);
+			return resultMap;
 		}
 		
 		
@@ -194,7 +194,7 @@ public class OrderController {
 		//调用修改订单状态
 		resultMap = logisticsProductService.updateOrderLogisticsStatusById(logisProductId, status);
 		
-		return new Gson().toJson(resultMap);
+		return resultMap;
 	}
 	
 	

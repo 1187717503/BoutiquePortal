@@ -22,5 +22,14 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
+    
+        <!-- start payment sdk 注:此依赖如果报错，可能 本地未安装sdk至maven仓库-->
+		<dependency>  
+		    <groupId>ehking.sdk.core</groupId>  
+		    <artifactId>ehking-sdk-core</artifactId>  
+		    <version>1.0.0</version>  
+		</dependency> 		
+		<!-- end payment sdk -->
+		
   </dependencies>
 </project>

@@ -28,14 +28,14 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
 	 * @param LogisticsProduct
 	 * @return
 	 */
-	public Long updateOrderLogisticsStatusById(Long logistics_product_id,int status) {
+	public int updateOrderLogisticsStatusById(Long logistics_product_id,int status) {
 		
     	//根据id获取对象信息
         LogisticsProduct logisticsProduct = this.selectById(logistics_product_id);
 			
 		//修改状态
         logisticsProduct.setStatus(status);
-		return logisticsProductMapper.updateById(logisticsProduct);
+		return logisticsProductMapper.updateByLogisticsProduct(logisticsProduct);
       
         
 		

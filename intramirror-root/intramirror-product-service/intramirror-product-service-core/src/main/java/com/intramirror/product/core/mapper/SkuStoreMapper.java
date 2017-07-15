@@ -9,7 +9,7 @@ public interface SkuStoreMapper {
 	 * @param statusType-订单的状态     skuid 
 	 * @return
 	 */
-	Long updateBySkuId (Map<String,Object> param);
+	int updateBySkuId (Map<String,Object> param);
 	
 	/**
 	 * 根据shopProductSkuId 查询SKUid

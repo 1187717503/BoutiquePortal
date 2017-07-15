@@ -10,7 +10,7 @@ public interface ILogisticsProductService {
 	 * @param logistics_product_id
 	 * @return
 	 */
-	Long updateOrderLogisticsStatusById (Long logistics_product_id,int status);
+	int updateOrderLogisticsStatusById (Long logistics_product_id,int status);
 	
 	
 	/**

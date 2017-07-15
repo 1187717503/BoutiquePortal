@@ -19,5 +19,14 @@ public interface OrderMapper {
 	 * @return
 	 */
 	List<Map<String,Object>> getOrderListByOrderNumber(Map<String,Object> param);
+	
+	
+	/**
+	 * 根据logisticsProductId 获取支付相关信息
+	 * @param logisticsProductId
+	 * @return
+	 */
+	List<Map<String,Object>> getOrderPaymentByLogisProductId(Long logisticsProductId);
+	
 
 }

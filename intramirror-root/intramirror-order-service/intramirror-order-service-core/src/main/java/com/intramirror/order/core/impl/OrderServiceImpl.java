@@ -28,7 +28,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService{
     	Map<String,Object> param = new HashMap<String, Object>();
     	param.put("status",status);
     	List<Map<String,Object>> result = orderMapper.getOrderList(param);
-        logger.info("result:{}",new Gson().toJson(result));
+        logger.info("getOrderList result:{}",new Gson().toJson(result));
         return result;
     }
 
@@ -39,7 +39,13 @@ public class OrderServiceImpl extends BaseDao implements IOrderService{
     	param.put("orderNumbers", numbers.split(","));
     	param.put("status", status);
     	List<Map<String,Object>> result = orderMapper.getOrderListByOrderNumber(param);
-        logger.info("result:{}",new Gson().toJson(result));
+        logger.info("getOrderListByOrderNumber result:{}",new Gson().toJson(result));
         return result;
+	}
+
+	
+	public List<Map<String, Object>> getOrderPaymentByLogisProductId(
+			Long logisticsProductId) {
+		return orderMapper.getOrderPaymentByLogisProductId(logisticsProductId);
 	}
 }

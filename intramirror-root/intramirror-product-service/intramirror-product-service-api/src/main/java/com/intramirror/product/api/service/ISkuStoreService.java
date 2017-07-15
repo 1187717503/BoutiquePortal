@@ -8,7 +8,7 @@ public interface ISkuStoreService {
 	 * @param statusType-订单的状态     skuid 
 	 * @return
 	 */
-	Long updateBySkuId(int statusType,long skuid);
+	int updateBySkuId(int statusType,long skuid);
 	
 	/**
 	 * 根据shopProductSkuId 查询SKUid

@@ -29,7 +29,7 @@ public class SkuStoreServiceImpl extends BaseDao implements ISkuStoreService{
 	 * @param statusType-订单的状态     skuid 
 	 * @return
 	 */
-	public Long updateBySkuId(int statusType,long skuid) {
+	public int updateBySkuId(int statusType,long skuid) {
     	Map<String,Object> param = new HashMap<String, Object>();
     	param.put("statusType", statusType);
     	param.put("skuId", skuid);

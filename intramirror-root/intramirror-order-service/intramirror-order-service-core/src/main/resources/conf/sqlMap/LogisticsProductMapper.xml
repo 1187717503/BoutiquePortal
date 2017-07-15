@@ -27,7 +27,7 @@
     <result column="vat_num" property="vat_num" jdbcType="LONGVARCHAR" />
   </resultMap>
   
-  <update id="updateById"  parameterType="com.intramirror.order.api.model.LogisticsProduct" >
+  <update id="updateByLogisticsProduct"  parameterType="com.intramirror.order.api.model.LogisticsProduct" >
     
     update logistics_product 
     <set >

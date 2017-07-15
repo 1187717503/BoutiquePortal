@@ -1,0 +1,662 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.intramirror.payment.core.mapper.PaymentMapper" >
+  <resultMap id="BaseResultMap" type="com.intramirror.payment.api.model.Payment" >
+    <id column="payment_id" property="paymentId" jdbcType="BIGINT" />
+    <result column="order_num" property="orderNum" jdbcType="VARCHAR" />
+    <result column="merchant_id" property="merchantId" jdbcType="VARCHAR" />
+    <result column="order_amount" property="orderAmount" jdbcType="BIGINT" />
+    <result column="serial_number" property="serialNumber" jdbcType="INTEGER" />
+    <result column="order_currency" property="orderCurrency" jdbcType="VARCHAR" />
+    <result column="request_id" property="requestId" jdbcType="VARCHAR" />
+    <result column="notify_url" property="notifyUrl" jdbcType="VARCHAR" />
+    <result column="callback_url" property="callbackUrl" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="payment_mode_code" property="paymentModeCode" jdbcType="VARCHAR" />
+    <result column="product_details" property="productDetails" jdbcType="VARCHAR" />
+    <result column="payer_name" property="payerName" jdbcType="VARCHAR" />
+    <result column="payer_phone_number" property="payerPhoneNumber" jdbcType="VARCHAR" />
+    <result column="payer_id_type" property="payerIdType" jdbcType="VARCHAR" />
+    <result column="payer_id_num" property="payerIdNum" jdbcType="VARCHAR" />
+    <result column="payer_bank_card_num" property="payerBankCardNum" jdbcType="VARCHAR" />
+    <result column="payer_email" property="payerEmail" jdbcType="VARCHAR" />
+    <result column="bank_card_name" property="bankCardName" jdbcType="VARCHAR" />
+    <result column="bank_card_card_no" property="bankCardCardNo" jdbcType="VARCHAR" />
+    <result column="bank_card_cvv2" property="bankCardCvv2" jdbcType="VARCHAR" />
+    <result column="bank_card_id_no" property="bankCardIdNo" jdbcType="VARCHAR" />
+    <result column="bank_card_expiry_date" property="bankCardExpiryDate" jdbcType="VARCHAR" />
+    <result column="bank_card_mobile_no" property="bankCardMobileNo" jdbcType="VARCHAR" />
+    <result column="cashier_version" property="cashierVersion" jdbcType="VARCHAR" />
+    <result column="for_use" property="forUse" jdbcType="VARCHAR" />
+    <result column="merchant_user_id" property="merchantUserId" jdbcType="VARCHAR" />
+    <result column="bind_card_id" property="bindCardId" jdbcType="VARCHAR" />
+    <result column="client_ip" property="clientIp" jdbcType="VARCHAR" />
+    <result column="timeout" property="timeout" jdbcType="INTEGER" />
+    <result column="auth_code" property="authCode" jdbcType="VARCHAR" />
+    <result column="open_id" property="openId" jdbcType="VARCHAR" />
+    <result column="reveiver_name" property="reveiverName" jdbcType="VARCHAR" />
+    <result column="reveiver_phone_num" property="reveiverPhoneNum" jdbcType="VARCHAR" />
+    <result column="reveiver_address" property="reveiverAddress" jdbcType="VARCHAR" />
+    <result column="hmac" property="hmac" jdbcType="VARCHAR" />
+    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+    <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+    <result column="submit_status" property="submitStatus" jdbcType="INTEGER" />
+    <result column="input_charset" property="inputCharset" jdbcType="VARCHAR" />
+    <result column="body" property="body" jdbcType="VARCHAR" />
+    <result column="out_trade_no" property="outTradeNo" jdbcType="VARCHAR" />
+    <result column="partner" property="partner" jdbcType="VARCHAR" />
+    <result column="payment_type" property="paymentType" jdbcType="INTEGER" />
+    <result column="seller_id" property="sellerId" jdbcType="VARCHAR" />
+    <result column="service" property="service" jdbcType="VARCHAR" />
+    <result column="sign" property="sign" jdbcType="VARCHAR" />
+    <result column="sign_type" property="signType" jdbcType="VARCHAR" />
+    <result column="subject" property="subject" jdbcType="VARCHAR" />
+    <result column="total_fee" property="totalFee" jdbcType="VARCHAR" />
+    <result column="redirect_url" property="redirectUrl" jdbcType="VARCHAR" />
+    <result column="message" property="message" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    payment_id, order_num, merchant_id, order_amount, serial_number, order_currency, 
+    request_id, notify_url, callback_url, remark, payment_mode_code, product_details, 
+    payer_name, payer_phone_number, payer_id_type, payer_id_num, payer_bank_card_num, 
+    payer_email, bank_card_name, bank_card_card_no, bank_card_cvv2, bank_card_id_no, 
+    bank_card_expiry_date, bank_card_mobile_no, cashier_version, for_use, merchant_user_id, 
+    bind_card_id, client_ip, timeout, auth_code, open_id, reveiver_name, reveiver_phone_num, 
+    reveiver_address, hmac, created_at, updated_at, submit_status, input_charset, body, 
+    out_trade_no, partner, payment_type, seller_id, service, sign, sign_type, subject, 
+    total_fee, redirect_url, message
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from payment
+    where payment_id = #{paymentId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from payment
+    where payment_id = #{paymentId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.intramirror.payment.api.model.Payment" >
+    insert into payment (payment_id, order_num, merchant_id, 
+      order_amount, serial_number, order_currency, 
+      request_id, notify_url, callback_url, 
+      remark, payment_mode_code, product_details, 
+      payer_name, payer_phone_number, payer_id_type, 
+      payer_id_num, payer_bank_card_num, payer_email, 
+      bank_card_name, bank_card_card_no, bank_card_cvv2, 
+      bank_card_id_no, bank_card_expiry_date, bank_card_mobile_no, 
+      cashier_version, for_use, merchant_user_id, 
+      bind_card_id, client_ip, timeout, 
+      auth_code, open_id, reveiver_name, 
+      reveiver_phone_num, reveiver_address, hmac, 
+      created_at, updated_at, submit_status, 
+      input_charset, body, out_trade_no, 
+      partner, payment_type, seller_id, 
+      service, sign, sign_type, 
+      subject, total_fee, redirect_url, 
+      message)
+    values (#{paymentId,jdbcType=BIGINT}, #{orderNum,jdbcType=VARCHAR}, #{merchantId,jdbcType=VARCHAR}, 
+      #{orderAmount,jdbcType=BIGINT}, #{serialNumber,jdbcType=INTEGER}, #{orderCurrency,jdbcType=VARCHAR}, 
+      #{requestId,jdbcType=VARCHAR}, #{notifyUrl,jdbcType=VARCHAR}, #{callbackUrl,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, #{paymentModeCode,jdbcType=VARCHAR}, #{productDetails,jdbcType=VARCHAR}, 
+      #{payerName,jdbcType=VARCHAR}, #{payerPhoneNumber,jdbcType=VARCHAR}, #{payerIdType,jdbcType=VARCHAR}, 
+      #{payerIdNum,jdbcType=VARCHAR}, #{payerBankCardNum,jdbcType=VARCHAR}, #{payerEmail,jdbcType=VARCHAR}, 
+      #{bankCardName,jdbcType=VARCHAR}, #{bankCardCardNo,jdbcType=VARCHAR}, #{bankCardCvv2,jdbcType=VARCHAR}, 
+      #{bankCardIdNo,jdbcType=VARCHAR}, #{bankCardExpiryDate,jdbcType=VARCHAR}, #{bankCardMobileNo,jdbcType=VARCHAR}, 
+      #{cashierVersion,jdbcType=VARCHAR}, #{forUse,jdbcType=VARCHAR}, #{merchantUserId,jdbcType=VARCHAR}, 
+      #{bindCardId,jdbcType=VARCHAR}, #{clientIp,jdbcType=VARCHAR}, #{timeout,jdbcType=INTEGER}, 
+      #{authCode,jdbcType=VARCHAR}, #{openId,jdbcType=VARCHAR}, #{reveiverName,jdbcType=VARCHAR}, 
+      #{reveiverPhoneNum,jdbcType=VARCHAR}, #{reveiverAddress,jdbcType=VARCHAR}, #{hmac,jdbcType=VARCHAR}, 
+      #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}, #{submitStatus,jdbcType=INTEGER}, 
+      #{inputCharset,jdbcType=VARCHAR}, #{body,jdbcType=VARCHAR}, #{outTradeNo,jdbcType=VARCHAR}, 
+      #{partner,jdbcType=VARCHAR}, #{paymentType,jdbcType=INTEGER}, #{sellerId,jdbcType=VARCHAR}, 
+      #{service,jdbcType=VARCHAR}, #{sign,jdbcType=VARCHAR}, #{signType,jdbcType=VARCHAR}, 
+      #{subject,jdbcType=VARCHAR}, #{totalFee,jdbcType=VARCHAR}, #{redirectUrl,jdbcType=VARCHAR}, 
+      #{message,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.intramirror.payment.api.model.Payment" keyProperty="paymentId">
+      <selectKey keyProperty='paymentId' resultType='java.lang.Long' order='AFTER'  >  
+        select LAST_INSERT_ID();  
+     </selectKey>  
+    
+    insert into payment
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="paymentId != null" >
+        payment_id,
+      </if>
+      <if test="orderNum != null" >
+        order_num,
+      </if>
+      <if test="merchantId != null" >
+        merchant_id,
+      </if>
+      <if test="orderAmount != null" >
+        order_amount,
+      </if>
+      <if test="serialNumber != null" >
+        serial_number,
+      </if>
+      <if test="orderCurrency != null" >
+        order_currency,
+      </if>
+      <if test="requestId != null" >
+        request_id,
+      </if>
+      <if test="notifyUrl != null" >
+        notify_url,
+      </if>
+      <if test="callbackUrl != null" >
+        callback_url,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="paymentModeCode != null" >
+        payment_mode_code,
+      </if>
+      <if test="productDetails != null" >
+        product_details,
+      </if>
+      <if test="payerName != null" >
+        payer_name,
+      </if>
+      <if test="payerPhoneNumber != null" >
+        payer_phone_number,
+      </if>
+      <if test="payerIdType != null" >
+        payer_id_type,
+      </if>
+      <if test="payerIdNum != null" >
+        payer_id_num,
+      </if>
+      <if test="payerBankCardNum != null" >
+        payer_bank_card_num,
+      </if>
+      <if test="payerEmail != null" >
+        payer_email,
+      </if>
+      <if test="bankCardName != null" >
+        bank_card_name,
+      </if>
+      <if test="bankCardCardNo != null" >
+        bank_card_card_no,
+      </if>
+      <if test="bankCardCvv2 != null" >
+        bank_card_cvv2,
+      </if>
+      <if test="bankCardIdNo != null" >
+        bank_card_id_no,
+      </if>
+      <if test="bankCardExpiryDate != null" >
+        bank_card_expiry_date,
+      </if>
+      <if test="bankCardMobileNo != null" >
+        bank_card_mobile_no,
+      </if>
+      <if test="cashierVersion != null" >
+        cashier_version,
+      </if>
+      <if test="forUse != null" >
+        for_use,
+      </if>
+      <if test="merchantUserId != null" >
+        merchant_user_id,
+      </if>
+      <if test="bindCardId != null" >
+        bind_card_id,
+      </if>
+      <if test="clientIp != null" >
+        client_ip,
+      </if>
+      <if test="timeout != null" >
+        timeout,
+      </if>
+      <if test="authCode != null" >
+        auth_code,
+      </if>
+      <if test="openId != null" >
+        open_id,
+      </if>
+      <if test="reveiverName != null" >
+        reveiver_name,
+      </if>
+      <if test="reveiverPhoneNum != null" >
+        reveiver_phone_num,
+      </if>
+      <if test="reveiverAddress != null" >
+        reveiver_address,
+      </if>
+      <if test="hmac != null" >
+        hmac,
+      </if>
+      <if test="createdAt != null" >
+        created_at,
+      </if>
+      <if test="updatedAt != null" >
+        updated_at,
+      </if>
+      <if test="submitStatus != null" >
+        submit_status,
+      </if>
+      <if test="inputCharset != null" >
+        input_charset,
+      </if>
+      <if test="body != null" >
+        body,
+      </if>
+      <if test="outTradeNo != null" >
+        out_trade_no,
+      </if>
+      <if test="partner != null" >
+        partner,
+      </if>
+      <if test="paymentType != null" >
+        payment_type,
+      </if>
+      <if test="sellerId != null" >
+        seller_id,
+      </if>
+      <if test="service != null" >
+        service,
+      </if>
+      <if test="sign != null" >
+        sign,
+      </if>
+      <if test="signType != null" >
+        sign_type,
+      </if>
+      <if test="subject != null" >
+        subject,
+      </if>
+      <if test="totalFee != null" >
+        total_fee,
+      </if>
+      <if test="redirectUrl != null" >
+        redirect_url,
+      </if>
+      <if test="message != null" >
+        message,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="paymentId != null" >
+        #{paymentId,jdbcType=BIGINT},
+      </if>
+      <if test="orderNum != null" >
+        #{orderNum,jdbcType=VARCHAR},
+      </if>
+      <if test="merchantId != null" >
+        #{merchantId,jdbcType=VARCHAR},
+      </if>
+      <if test="orderAmount != null" >
+        #{orderAmount,jdbcType=BIGINT},
+      </if>
+      <if test="serialNumber != null" >
+        #{serialNumber,jdbcType=INTEGER},
+      </if>
+      <if test="orderCurrency != null" >
+        #{orderCurrency,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null" >
+        #{requestId,jdbcType=VARCHAR},
+      </if>
+      <if test="notifyUrl != null" >
+        #{notifyUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="callbackUrl != null" >
+        #{callbackUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="paymentModeCode != null" >
+        #{paymentModeCode,jdbcType=VARCHAR},
+      </if>
+      <if test="productDetails != null" >
+        #{productDetails,jdbcType=VARCHAR},
+      </if>
+      <if test="payerName != null" >
+        #{payerName,jdbcType=VARCHAR},
+      </if>
+      <if test="payerPhoneNumber != null" >
+        #{payerPhoneNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="payerIdType != null" >
+        #{payerIdType,jdbcType=VARCHAR},
+      </if>
+      <if test="payerIdNum != null" >
+        #{payerIdNum,jdbcType=VARCHAR},
+      </if>
+      <if test="payerBankCardNum != null" >
+        #{payerBankCardNum,jdbcType=VARCHAR},
+      </if>
+      <if test="payerEmail != null" >
+        #{payerEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="bankCardName != null" >
+        #{bankCardName,jdbcType=VARCHAR},
+      </if>
+      <if test="bankCardCardNo != null" >
+        #{bankCardCardNo,jdbcType=VARCHAR},
+      </if>
+      <if test="bankCardCvv2 != null" >
+        #{bankCardCvv2,jdbcType=VARCHAR},
+      </if>
+      <if test="bankCardIdNo != null" >
+        #{bankCardIdNo,jdbcType=VARCHAR},
+      </if>
+      <if test="bankCardExpiryDate != null" >
+        #{bankCardExpiryDate,jdbcType=VARCHAR},
+      </if>
+      <if test="bankCardMobileNo != null" >
+        #{bankCardMobileNo,jdbcType=VARCHAR},
+      </if>
+      <if test="cashierVersion != null" >
+        #{cashierVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="forUse != null" >
+        #{forUse,jdbcType=VARCHAR},
+      </if>
+      <if test="merchantUserId != null" >
+        #{merchantUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="bindCardId != null" >
+        #{bindCardId,jdbcType=VARCHAR},
+      </if>
+      <if test="clientIp != null" >
+        #{clientIp,jdbcType=VARCHAR},
+      </if>
+      <if test="timeout != null" >
+        #{timeout,jdbcType=INTEGER},
+      </if>
+      <if test="authCode != null" >
+        #{authCode,jdbcType=VARCHAR},
+      </if>
+      <if test="openId != null" >
+        #{openId,jdbcType=VARCHAR},
+      </if>
+      <if test="reveiverName != null" >
+        #{reveiverName,jdbcType=VARCHAR},
+      </if>
+      <if test="reveiverPhoneNum != null" >
+        #{reveiverPhoneNum,jdbcType=VARCHAR},
+      </if>
+      <if test="reveiverAddress != null" >
+        #{reveiverAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="hmac != null" >
+        #{hmac,jdbcType=VARCHAR},
+      </if>
+      <if test="createdAt != null" >
+        #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedAt != null" >
+        #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="submitStatus != null" >
+        #{submitStatus,jdbcType=INTEGER},
+      </if>
+      <if test="inputCharset != null" >
+        #{inputCharset,jdbcType=VARCHAR},
+      </if>
+      <if test="body != null" >
+        #{body,jdbcType=VARCHAR},
+      </if>
+      <if test="outTradeNo != null" >
+        #{outTradeNo,jdbcType=VARCHAR},
+      </if>
+      <if test="partner != null" >
+        #{partner,jdbcType=VARCHAR},
+      </if>
+      <if test="paymentType != null" >
+        #{paymentType,jdbcType=INTEGER},
+      </if>
+      <if test="sellerId != null" >
+        #{sellerId,jdbcType=VARCHAR},
+      </if>
+      <if test="service != null" >
+        #{service,jdbcType=VARCHAR},
+      </if>
+      <if test="sign != null" >
+        #{sign,jdbcType=VARCHAR},
+      </if>
+      <if test="signType != null" >
+        #{signType,jdbcType=VARCHAR},
+      </if>
+      <if test="subject != null" >
+        #{subject,jdbcType=VARCHAR},
+      </if>
+      <if test="totalFee != null" >
+        #{totalFee,jdbcType=VARCHAR},
+      </if>
+      <if test="redirectUrl != null" >
+        #{redirectUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="message != null" >
+        #{message,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.intramirror.payment.api.model.Payment" >
+    <!--
+      WARNING - @mbggenerated
+      This element is automatically generated by MyBatis Generator, do not modify.
+    -->
+    update payment
+    <set >
+      <if test="orderNum != null" >
+        order_num = #{orderNum,jdbcType=VARCHAR},
+      </if>
+      <if test="merchantId != null" >
+        merchant_id = #{merchantId,jdbcType=VARCHAR},
+      </if>
+      <if test="orderAmount != null" >
+        order_amount = #{orderAmount,jdbcType=BIGINT},
+      </if>
+      <if test="serialNumber != null" >
+        serial_number = #{serialNumber,jdbcType=INTEGER},
+      </if>
+      <if test="orderCurrency != null" >
+        order_currency = #{orderCurrency,jdbcType=VARCHAR},
+      </if>
+      <if test="requestId != null" >
+        request_id = #{requestId,jdbcType=VARCHAR},
+      </if>
+      <if test="notifyUrl != null" >
+        notify_url = #{notifyUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="callbackUrl != null" >
+        callback_url = #{callbackUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="paymentModeCode != null" >
+        payment_mode_code = #{paymentModeCode,jdbcType=VARCHAR},
+      </if>
+      <if test="productDetails != null" >
+        product_details = #{productDetails,jdbcType=VARCHAR},
+      </if>
+      <if test="payerName != null" >
+        payer_name = #{payerName,jdbcType=VARCHAR},
+      </if>
+      <if test="payerPhoneNumber != null" >
+        payer_phone_number = #{payerPhoneNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="payerIdType != null" >
+        payer_id_type = #{payerIdType,jdbcType=VARCHAR},
+      </if>
+      <if test="payerIdNum != null" >
+        payer_id_num = #{payerIdNum,jdbcType=VARCHAR},
+      </if>
+      <if test="payerBankCardNum != null" >
+        payer_bank_card_num = #{payerBankCardNum,jdbcType=VARCHAR},
+      </if>
+      <if test="payerEmail != null" >
+        payer_email = #{payerEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="bankCardName != null" >
+        bank_card_name = #{bankCardName,jdbcType=VARCHAR},
+      </if>
+      <if test="bankCardCardNo != null" >
+        bank_card_card_no = #{bankCardCardNo,jdbcType=VARCHAR},
+      </if>
+      <if test="bankCardCvv2 != null" >
+        bank_card_cvv2 = #{bankCardCvv2,jdbcType=VARCHAR},
+      </if>
+      <if test="bankCardIdNo != null" >
+        bank_card_id_no = #{bankCardIdNo,jdbcType=VARCHAR},
+      </if>
+      <if test="bankCardExpiryDate != null" >
+        bank_card_expiry_date = #{bankCardExpiryDate,jdbcType=VARCHAR},
+      </if>
+      <if test="bankCardMobileNo != null" >
+        bank_card_mobile_no = #{bankCardMobileNo,jdbcType=VARCHAR},
+      </if>
+      <if test="cashierVersion != null" >
+        cashier_version = #{cashierVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="forUse != null" >
+        for_use = #{forUse,jdbcType=VARCHAR},
+      </if>
+      <if test="merchantUserId != null" >
+        merchant_user_id = #{merchantUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="bindCardId != null" >
+        bind_card_id = #{bindCardId,jdbcType=VARCHAR},
+      </if>
+      <if test="clientIp != null" >
+        client_ip = #{clientIp,jdbcType=VARCHAR},
+      </if>
+      <if test="timeout != null" >
+        timeout = #{timeout,jdbcType=INTEGER},
+      </if>
+      <if test="authCode != null" >
+        auth_code = #{authCode,jdbcType=VARCHAR},
+      </if>
+      <if test="openId != null" >
+        open_id = #{openId,jdbcType=VARCHAR},
+      </if>
+      <if test="reveiverName != null" >
+        reveiver_name = #{reveiverName,jdbcType=VARCHAR},
+      </if>
+      <if test="reveiverPhoneNum != null" >
+        reveiver_phone_num = #{reveiverPhoneNum,jdbcType=VARCHAR},
+      </if>
+      <if test="reveiverAddress != null" >
+        reveiver_address = #{reveiverAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="hmac != null" >
+        hmac = #{hmac,jdbcType=VARCHAR},
+      </if>
+      <if test="createdAt != null" >
+        created_at = #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedAt != null" >
+        updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="submitStatus != null" >
+        submit_status = #{submitStatus,jdbcType=INTEGER},
+      </if>
+      <if test="inputCharset != null" >
+        input_charset = #{inputCharset,jdbcType=VARCHAR},
+      </if>
+      <if test="body != null" >
+        body = #{body,jdbcType=VARCHAR},
+      </if>
+      <if test="outTradeNo != null" >
+        out_trade_no = #{outTradeNo,jdbcType=VARCHAR},
+      </if>
+      <if test="partner != null" >
+        partner = #{partner,jdbcType=VARCHAR},
+      </if>
+      <if test="paymentType != null" >
+        payment_type = #{paymentType,jdbcType=INTEGER},
+      </if>
+      <if test="sellerId != null" >
+        seller_id = #{sellerId,jdbcType=VARCHAR},
+      </if>
+      <if test="service != null" >
+        service = #{service,jdbcType=VARCHAR},
+      </if>
+      <if test="sign != null" >
+        sign = #{sign,jdbcType=VARCHAR},
+      </if>
+      <if test="signType != null" >
+        sign_type = #{signType,jdbcType=VARCHAR},
+      </if>
+      <if test="subject != null" >
+        subject = #{subject,jdbcType=VARCHAR},
+      </if>
+      <if test="totalFee != null" >
+        total_fee = #{totalFee,jdbcType=VARCHAR},
+      </if>
+      <if test="redirectUrl != null" >
+        redirect_url = #{redirectUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="message != null" >
+        message = #{message,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where payment_id = #{paymentId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.intramirror.payment.api.model.Payment" >
+    <!--
+      WARNING - @mbggenerated
+      This element is automatically generated by MyBatis Generator, do not modify.
+    -->
+    update payment
+    set order_num = #{orderNum,jdbcType=VARCHAR},
+      merchant_id = #{merchantId,jdbcType=VARCHAR},
+      order_amount = #{orderAmount,jdbcType=BIGINT},
+      serial_number = #{serialNumber,jdbcType=INTEGER},
+      order_currency = #{orderCurrency,jdbcType=VARCHAR},
+      request_id = #{requestId,jdbcType=VARCHAR},
+      notify_url = #{notifyUrl,jdbcType=VARCHAR},
+      callback_url = #{callbackUrl,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      payment_mode_code = #{paymentModeCode,jdbcType=VARCHAR},
+      product_details = #{productDetails,jdbcType=VARCHAR},
+      payer_name = #{payerName,jdbcType=VARCHAR},
+      payer_phone_number = #{payerPhoneNumber,jdbcType=VARCHAR},
+      payer_id_type = #{payerIdType,jdbcType=VARCHAR},
+      payer_id_num = #{payerIdNum,jdbcType=VARCHAR},
+      payer_bank_card_num = #{payerBankCardNum,jdbcType=VARCHAR},
+      payer_email = #{payerEmail,jdbcType=VARCHAR},
+      bank_card_name = #{bankCardName,jdbcType=VARCHAR},
+      bank_card_card_no = #{bankCardCardNo,jdbcType=VARCHAR},
+      bank_card_cvv2 = #{bankCardCvv2,jdbcType=VARCHAR},
+      bank_card_id_no = #{bankCardIdNo,jdbcType=VARCHAR},
+      bank_card_expiry_date = #{bankCardExpiryDate,jdbcType=VARCHAR},
+      bank_card_mobile_no = #{bankCardMobileNo,jdbcType=VARCHAR},
+      cashier_version = #{cashierVersion,jdbcType=VARCHAR},
+      for_use = #{forUse,jdbcType=VARCHAR},
+      merchant_user_id = #{merchantUserId,jdbcType=VARCHAR},
+      bind_card_id = #{bindCardId,jdbcType=VARCHAR},
+      client_ip = #{clientIp,jdbcType=VARCHAR},
+      timeout = #{timeout,jdbcType=INTEGER},
+      auth_code = #{authCode,jdbcType=VARCHAR},
+      open_id = #{openId,jdbcType=VARCHAR},
+      reveiver_name = #{reveiverName,jdbcType=VARCHAR},
+      reveiver_phone_num = #{reveiverPhoneNum,jdbcType=VARCHAR},
+      reveiver_address = #{reveiverAddress,jdbcType=VARCHAR},
+      hmac = #{hmac,jdbcType=VARCHAR},
+      created_at = #{createdAt,jdbcType=TIMESTAMP},
+      updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+      submit_status = #{submitStatus,jdbcType=INTEGER},
+      input_charset = #{inputCharset,jdbcType=VARCHAR},
+      body = #{body,jdbcType=VARCHAR},
+      out_trade_no = #{outTradeNo,jdbcType=VARCHAR},
+      partner = #{partner,jdbcType=VARCHAR},
+      payment_type = #{paymentType,jdbcType=INTEGER},
+      seller_id = #{sellerId,jdbcType=VARCHAR},
+      service = #{service,jdbcType=VARCHAR},
+      sign = #{sign,jdbcType=VARCHAR},
+      sign_type = #{signType,jdbcType=VARCHAR},
+      subject = #{subject,jdbcType=VARCHAR},
+      total_fee = #{totalFee,jdbcType=VARCHAR},
+      redirect_url = #{redirectUrl,jdbcType=VARCHAR},
+      message = #{message,jdbcType=VARCHAR}
+    where payment_id = #{paymentId,jdbcType=BIGINT}
+  </update>
+</mapper>
