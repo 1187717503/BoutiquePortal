@@ -42,4 +42,15 @@
         AND
         u.enabled=#{enabled}
     </select>
+
+    <select id="getUserByIdAndEnabled" resultMap="BaseResultMap">
+        SELECT
+        <include refid="selectColumn"/>
+        FROM
+        <include refid="selectTable"/>
+        WHERE
+        u.user_id =#{userId}
+        AND
+        u.enabled=#{enabled}
+    </select>
 </mapper>

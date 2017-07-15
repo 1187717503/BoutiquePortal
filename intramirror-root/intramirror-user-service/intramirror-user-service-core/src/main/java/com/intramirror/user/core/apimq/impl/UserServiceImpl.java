@@ -21,7 +21,17 @@ public class UserServiceImpl extends BaseDao implements UserService {
 
     public User getUserByEmail(String email, Boolean enabled) throws Exception {
         try {
-            User user = userMapper.getUserByEmailAndEnabled(email, true);
+            User user = userMapper.getUserByEmailAndEnabled(email, enabled);
+            return user;
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
+    public User getUserById(Long userId, Boolean enabled) {
+        try {
+            User user = userMapper.getUserByIdAndEnabled(userId, enabled);
             return user;
         } catch (Exception e) {
             throw e;

@@ -76,7 +76,6 @@ public class LoginController {
                         //计算过期时间
                         DateTime dateTime = DateTime.now().plusSeconds(jwtExpireIn);
                         String token = Jwts.builder().setSubject(String.valueOf(user.getUserId())).setIssuedAt(dateTime.toDate()).signWith(SignatureAlgorithm.HS512, getJwtBase64Key()).compact();
-                        stringObjectMap.put("user", user);
                         stringObjectMap.put("token", token);
                         status = StatusType.SUCCESS;
                     }
