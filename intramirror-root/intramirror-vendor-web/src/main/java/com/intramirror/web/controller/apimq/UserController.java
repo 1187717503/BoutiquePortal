@@ -44,29 +44,35 @@ public class UserController {
         // 返回数据初始化
         int status = StatusType.FAILURE;
         Map<String, Object> result = new HashMap<String, Object>();
+        Long userId = null;
 
-        String jwt = httpRequest.getHeader("token");
-        if (StringUtils.isEmpty(jwt)) {
-            throw new JwtException("header not found,token is null");
-        }
-        //解析Jwt内容
-        Claims claims = this.parseBody(jwt);
 
-        Date expireation = claims.getIssuedAt();
-        //如果信息过期则提示重新登录。
-        if (System.currentTimeMillis() > expireation.getTime()) {
-            result.put("userStatus", "1000002");
+        try {
+            String jwt = httpRequest.getHeader("token");
+            if (StringUtils.isEmpty(jwt)) {
+                throw new JwtException("header not found,token is null");
+            }
+            //解析Jwt内容
+            Claims claims = this.parseBody(jwt);
+
+            Date expireation = claims.getIssuedAt();
+            //如果信息过期则提示重新登录。
+            if (System.currentTimeMillis() > expireation.getTime()) {
+                result.put("userStatus", "1000002");
+                return result;
+            }
+            //获取用户详情
+            userId = Long.valueOf(claims.getSubject());
+
+            //如果匿名访问则跳过
+            if (!Helper.checkNotNull(userId)) {
+                result.put("userStatus", "1000003");
+                return result;
+            }
+        } catch (Exception e) {
+            result.put("status", status);
             return result;
         }
-        //获取用户详情
-        Long userId = Long.valueOf(claims.getSubject());
-
-        //如果匿名访问则跳过
-        if (!Helper.checkNotNull(userId)) {
-            result.put("userStatus", "1000003");
-            return result;
-        }
-
         User user = userService.getUserById(userId, EnabledType.USED);
         if (user != null) {
             result.put("user", user);
