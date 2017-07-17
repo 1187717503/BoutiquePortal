@@ -32,7 +32,7 @@
         <javaClientGenerator targetPackage="com.intramirror.product.core.mapper"
             targetProject="D:\MyWork\shoplus\BoutiquePortal\BoutiquePortal\intramirror-root\intramirror-product-service\intramirror-product-service-core\src\main\java" type="XMLMAPPER" /> <!-- 生成MAP对应Client -->
 			
-			<table schema="intra-mirror-prd" tableName="price_change_rule" domainObjectName="PriceChangeRule"
+			<table schema="intra-mirror-prd" tableName="price_change_rule_category_brand" domainObjectName="PriceChangeRuleCategoryBrand"
 			    enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
 			    enableSelectByExample="false" selectByExampleQueryId="false" >
 			    <property name="useActualColumnNames" value="false"/>
