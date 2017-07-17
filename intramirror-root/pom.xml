@@ -237,6 +237,7 @@
 	</dependencyManagement>
 
 	<modules>
+		<module>intramirror-job-web</module>
 		<module>intramirror-admin-web</module>
 		<module>intramirror-vendor-web</module>
 		<module>intramirror-product-service</module>
