@@ -8,7 +8,8 @@ public class PriceChangeRuleEnum {
 
     public static enum PriceType {
         SUPPLY_PRICE(1,"supply price"),
-        SALE_PRICE(2,"sale price");
+        SALE_PRICE(2,"sale price"),
+        IM_PRICE(3,"im price");
         private Integer code;
         private String value;
 

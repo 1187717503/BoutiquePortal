@@ -50,4 +50,14 @@ public interface PriceChangeRuleMapper {
      * @mbggenerated
      */
     int updateByPrimaryKey(PriceChangeRule record);
+
+    int updatePriceChangeRuleByVendorFirstCategory();
+    int updatePriceChangeRuleByVendorAllCategory();
+    int updatePriceChangeRuleByVendorProductGroup();
+    int updatePriceChangeRuleByVendorProduct();
+
+    int updatePriceChangeRuleByShopFirstCategory();
+    int updatePriceChangeRuleByShopAllCategory();
+    int updatePriceChangeRuleByShopProductGroup();
+    int updatePriceChangeRuleByShopProduct();
 }

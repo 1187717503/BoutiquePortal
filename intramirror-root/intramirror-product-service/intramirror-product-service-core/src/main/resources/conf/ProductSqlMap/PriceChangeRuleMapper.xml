@@ -146,4 +146,174 @@
       shop_id = #{shopId,jdbcType=BIGINT}
     where price_change_rule_id = #{priceChangeRuleId,jdbcType=BIGINT}
   </update>
+
+  <!-- start dingyifan -->
+  <update id="updatePriceChangeRuleByVendorFirstCategory">
+
+    update price_change_rule t_pcr,price_change_rule_category_brand t_pcrcb,sku t_sku,product t_pro
+    set t_sku.in_price = t_sku.price * t_pcrcb.discount_percentage/((1+0.22)*100)
+    where t_pcr.price_type = 1
+    and t_pcr.`status` = 1
+    and t_sku.enabled = 1
+    and t_pro.enabled = 1
+    and t_pcrcb.exception_flag = 0
+    and t_pcr.vendor_id = t_pro.vendor_id
+    and t_sku.product_id = t_pro.product_id
+    and t_pcr.price_change_rule_id = t_pcrcb.price_change_rule_id
+    and  date_format(t_pcr.valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d')
+    and exists
+    (
+        select * from category c3
+        where c3.category_id = t_pro.category_id and c3.parent_id = t_pcrcb.category_id
+    )
+  </update>
+
+  <update id="updatePriceChangeRuleByVendorAllCategory">
+
+    update price_change_rule pcr,price_change_rule_category_brand pcrcb,sku s,product p
+     set s.in_price = s.price * pcrcb.discount_percentage/((1+0.22)*100)
+     where pcr.price_type = 1 and
+     pcr.`status` = 1 and
+     pcr.vendor_id = p.vendor_id and
+     date_format(pcr.valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d') and
+     pcr.price_change_rule_id = pcrcb.price_change_rule_id and
+     pcrcb.exception_flag = 1 and
+     p.brand_id = pcrcb.brand_id and
+     case
+        when pcrcb.`level` = 3 THEN
+             pcrcb.category_id = p.category_id
+        when pcrcb.`level` = 2 THEN
+            EXISTS (
+                select * from category c2
+                where c2.parent_id = pcrcb.category_id and
+                      c2.category_id = p.category_id
+            )
+        when pcrcb.`level` = 1 THEN
+            EXISTS (
+                select * from category c2 where exists (
+                    select category_id from category c3
+                    where c3.parent_id = c2.category_id and
+                          c3.category_id = p.category_id
+                ) and c2.parent_id = pcrcb.category_id
+            )
+     end
+     and s.product_id = p.product_id and
+     s.enabled = 1 and
+     p.enabled = 1
+  </update>
+
+  <update id="updatePriceChangeRuleByVendorProductGroup">
+
+    update price_change_rule pcr , price_change_rule_group pcrg,sku s, product p
+    set s.in_price = s.price * pcrg.discount_percentage/((1+0.22)*100)
+    where pcr.price_type = 1 and pcr.status = 1
+    and pcr.vendor_id = p.vendor_id and date_format(pcr.valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d')
+    and pcr.price_change_rule_id = pcrg.price_change_rule_id
+    and s.product_id = p.product_id and p.product_group_id = pcrg.product_group_id
+    and s.enabled = 1 and p.enabled = 1
+  </update>
+
+  <update id="updatePriceChangeRuleByVendorProduct">
+
+     update price_change_rule pcr,price_change_rule_product pcrp,sku s,product p
+     set s.in_price = s.price * pcrp.discount_percentage/((1+0.22)*100)
+     where pcr.price_type = 1 and
+     pcr.`status` = 1 and
+     pcr.vendor_id = p.vendor_id and
+     date_format(valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d') and
+     pcr.price_change_rule_id = pcrp.price_change_rule_id and
+     pcrp.product_id = p.product_id and
+     s.product_id = p.product_id and
+     s.enabled = 1 and
+     p.enabled = 1
+  </update>
+
+  <update id="updatePriceChangeRuleByShopFirstCategory">
+
+     update price_change_rule pcr,price_change_rule_category_brand pcrcb,sku s,product p,shop_product_sku sps,shop_product sp
+     set sps.sale_price = pcrcb.discount_percentage*s.price/100
+     where pcr.price_type = 2 and
+     pcr.`status` = 1 and
+     date_format(pcr.valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d') and
+     pcr.price_change_rule_id = pcrcb.price_change_rule_id and
+     pcrcb.exception_flag = 0 and
+     exists (
+            select c.category_id from category c
+                where c.parent_id = pcrcb.category_id and
+                c.category_id = p.category_id
+        ) and
+     s.product_id = p.product_id and
+     s.enabled = 1 and
+     p.enabled = 1 and
+     p.product_id = sp.product_id and
+     pcr.shop_id = sp.shop_id and
+     sp.shop_product_id = sps.shop_product_id
+  </update>
+
+  <update id="updatePriceChangeRuleByShopAllCategory">
+
+
+     update price_change_rule pcr,price_change_rule_category_brand pcrcb,sku s,product p,shop_product_sku sps,shop_product sp
+     set sps.sale_price = pcrcb.discount_percentage*s.price/100
+     where pcr.price_type = 2 and
+     pcr.`status` = 1 and
+     date_format(pcr.valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d') and
+     pcr.price_change_rule_id = pcrcb.price_change_rule_id and
+     pcrcb.exception_flag = 1 and
+     p.brand_id = pcrcb.brand_id and
+     case
+        when pcrcb.`level` = 3 THEN
+             pcrcb.category_id = p.category_id
+        when pcrcb.`level` = 2 THEN
+            EXISTS (
+                select * from category c2
+                where c2.parent_id = pcrcb.category_id and
+                      c2.category_id = p.category_id
+            )
+        when pcrcb.`level` = 1 THEN
+            EXISTS (
+                select * from category c2 where exists (
+                    select category_id from category c3
+                    where c3.parent_id = c2.category_id and
+                          c3.category_id = p.category_id
+                ) and c2.parent_id = pcrcb.category_id
+            )
+     end
+     and s.product_id = p.product_id and
+     s.enabled = 1 and
+     p.enabled = 1 and
+     p.product_id = sp.product_id and
+     pcr.shop_id = sp.shop_id and
+     sp.shop_product_id = sps.shop_product_id;
+  </update>
+
+  <update id="updatePriceChangeRuleByShopProductGroup">
+
+    update price_change_rule pcr , price_change_rule_group pcrg,sku s, shop_product sp ,shop_product_sku sps set sps.sale_price = s.price * pcrg.discount_percentage/100 
+    where pcr.price_type = 2 and pcr.status = 1 
+    and pcr.shop_id = sp.shop_id and date_format(pcr.valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d') 
+    and pcr.price_change_rule_id = pcrg.price_change_rule_id and s.product_id = sp.product_id 
+    and sp.product_group_id = pcrg.product_group_id and s.enabled = 1 and sp.enabled = 1 
+    and sp.shop_product_id = sps.shop_product_id and sps.enabled = 1 
+  </update>
+  
+  <update id="updatePriceChangeRuleByShopProduct">
+
+     update price_change_rule pcr,price_change_rule_product pcrp,sku s,product p,shop_product_sku sps,shop_product sp
+     set sps.sale_price = pcrp.discount_percentage*s.price/100
+     where pcr.price_type = 2 and
+     pcr.`status` = 1 and
+     date_format(valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d') and
+     pcr.price_change_rule_id = pcrp.price_change_rule_id and
+     pcrp.product_id = p.product_id and
+     s.product_id = p.product_id and
+     s.enabled = 1 and
+     p.enabled = 1 and
+     p.product_id = sp.product_id and
+     pcr.shop_id = sp.shop_id and
+     sp.shop_product_id = sps.shop_product_id
+  </update>
+
+
+  <!-- end dingyifan -->
 </mapper>
