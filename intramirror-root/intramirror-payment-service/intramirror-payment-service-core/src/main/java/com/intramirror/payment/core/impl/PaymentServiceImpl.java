@@ -20,13 +20,13 @@ public class PaymentServiceImpl extends BaseDao implements IPaymentService{
 
 	@Override
 	public void updatePayment(Payment paymentModel) {
-		// TODO Auto-generated method stub
+		paymentMapper.updateByPrimaryKeySelective(paymentModel);
 		
 	}
 
 	@Override
 	public void init() {
-		// TODO Auto-generated method stub
+		paymentMapper = this.getSqlSession().getMapper(PaymentMapper.class);
 		
 	}
 

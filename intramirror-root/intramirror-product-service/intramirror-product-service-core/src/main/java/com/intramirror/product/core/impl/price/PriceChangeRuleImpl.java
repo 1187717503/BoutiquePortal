@@ -5,6 +5,7 @@ import com.intramirror.product.api.service.price.IPriceChangeRule;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.impl.SkuStoreServiceImpl;
 import com.intramirror.product.core.mapper.PriceChangeRuleMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -49,4 +50,19 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     public void init() {
         priceChangeRuleMapper = this.getSqlSession().getMapper(PriceChangeRuleMapper.class);
     }
+
+	@Override
+	public int deleteByPrimaryKey(Long priceChangeRuleId) {
+		return priceChangeRuleMapper.deleteByPrimaryKey(priceChangeRuleId);
+	}
+
+	@Override
+	public int insert(PriceChangeRule record) {
+		return priceChangeRuleMapper.insert(record);
+	}
+
+	@Override
+	public int insertSelective(PriceChangeRule record) {
+		return priceChangeRuleMapper.insertSelective(record);
+	}
 }
