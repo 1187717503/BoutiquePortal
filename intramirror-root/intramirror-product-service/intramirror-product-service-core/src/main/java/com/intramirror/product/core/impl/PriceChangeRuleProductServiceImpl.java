@@ -2,13 +2,14 @@ package com.intramirror.product.core.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import com.intramirror.product.api.model.PriceChangeRuleProduct;
 import com.intramirror.product.api.service.IPriceChangeRuleProductService;
 import com.intramirror.product.core.dao.BaseDao;
-import com.intramirror.product.core.mapper.PriceChangeRuleCategoryBrandMapper;
 import com.intramirror.product.core.mapper.PriceChangeRuleProductMapper;
 
+@Service
 public class PriceChangeRuleProductServiceImpl extends BaseDao implements IPriceChangeRuleProductService{
 
     private static Logger logger = LoggerFactory.getLogger(PriceChangeRuleProductServiceImpl.class);

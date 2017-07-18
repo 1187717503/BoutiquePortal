@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -19,7 +20,11 @@ import com.google.gson.JsonParser;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.product.api.model.PriceChangeRule;
 import com.intramirror.product.api.model.PriceChangeRuleCategoryBrand;
+import com.intramirror.product.api.model.PriceChangeRuleGroup;
+import com.intramirror.product.api.model.PriceChangeRuleProduct;
 import com.intramirror.product.api.service.IPriceChangeRuleCategoryBrandService;
+import com.intramirror.product.api.service.IPriceChangeRuleGroupService;
+import com.intramirror.product.api.service.IPriceChangeRuleProductService;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
 
 /**
@@ -39,11 +44,19 @@ public class PriceChangeRuleController {
 	@Autowired
 	private IPriceChangeRule priceChangeRuleService;
 	
+	@Autowired
+	private IPriceChangeRuleProductService priceChangeRuleProductService;
+	
+	@Autowired
+	private IPriceChangeRuleGroupService priceChangeRuleGroupService;
+	
+
 
 	@SuppressWarnings("unchecked")
 	@RequestMapping("/create")
 	@ResponseBody
-	public Map<String, Object> priceChangeRuleCreate(@RequestBody Map<String, Object> map){
+	@Transactional  
+	public Map<String, Object> priceChangeRuleCreate(@RequestBody Map<String, Object> map) throws ParseException{
 		logger.info("priceChangeRuleCreate param:"+new Gson().toJson(map));
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
@@ -51,19 +64,15 @@ public class PriceChangeRuleController {
 		
 		/**-------------------------------------PriceChangeRule-------------------------------------------------*/
 		PriceChangeRule priceChangeRule = new PriceChangeRule();
-	    try {
-	    	priceChangeRule.setName(map.get("name").toString());
-	    	priceChangeRule.setPriceType(Byte.valueOf(map.get("price_type").toString()));
-	    	priceChangeRule.setVendorId(0l);
-	    	priceChangeRule.setShopId(null);
-	        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-	        priceChangeRule.setValidFrom(simpleDateFormat.parse(map.get("valid_from").toString()));
-	        priceChangeRule.setStatus(Integer.parseInt(map.get("status").toString()));
-		} catch (ParseException e) {
-			e.printStackTrace();
-			result.put("info", "参数异常");
-			return result;
-		}
+	
+    	priceChangeRule.setName(map.get("name").toString());
+    	priceChangeRule.setPriceType(Byte.valueOf(map.get("price_type").toString()));
+    	priceChangeRule.setVendorId(0l);
+    	priceChangeRule.setShopId(null);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        priceChangeRule.setValidFrom(simpleDateFormat.parse(map.get("valid_from").toString()));
+        priceChangeRule.setStatus(Integer.parseInt(map.get("status").toString()));
+
         
 	    priceChangeRuleService.insertSelective(priceChangeRule);
 	    if(priceChangeRule.getPriceChangeRuleId() == null || priceChangeRule.getPriceChangeRuleId() == 0 ){
@@ -72,6 +81,7 @@ public class PriceChangeRuleController {
 	    }
 		
 		
+	    
 		/**-------------------------------------priceChangeRuleCategoryBrand-----------------------------------*/
         JsonArray priceChangeRuleAllBrandListArray = new JsonParser().parse(map.get("price_change_rule_all_brand_list").toString()).getAsJsonArray();
 
@@ -89,10 +99,12 @@ public class PriceChangeRuleController {
     		
             if (priceChangeRuleCategoryBrand.getPriceChangeRuleCategoryBrandId() == null) {
                 result.put("status", StatusType.DATABASE_ERROR);
-                return result;
+                throw new RuntimeException("test");
             }
         }
 
+        
+        
 		/**-------------------------------------priceChangeRuleCategoryBrand  EXCEPTIONS -----------------------*/
         JsonArray priceChangeRuleCategoryListArray = new JsonParser().parse(map.get("price_change_rule_category_brand_list").toString()).getAsJsonArray();
 
@@ -110,11 +122,52 @@ public class PriceChangeRuleController {
     		
             if (priceChangeRuleCategoryBrand.getPriceChangeRuleCategoryBrandId() == null) {
                 result.put("status", StatusType.DATABASE_ERROR);
-                return result;
+                throw new RuntimeException("");
             }
         }
+        
+        
+        
+        
+		/**-------------------------------------priceChangeRuleProduct ---------------- -----------------------*/
+        JsonArray priceChangeRuleProductListArray = new JsonParser().parse(map.get("price_change_rule_product_list").toString()).getAsJsonArray();
+
+        for (int i = 0; i < priceChangeRuleProductListArray.size(); i++) {
+            PriceChangeRuleProduct priceChangeRuleProduct = new PriceChangeRuleProduct();
+            priceChangeRuleProduct.setPriceChangeRuleId(priceChangeRule.getPriceChangeRuleId());
+            priceChangeRuleProduct.setProductId(priceChangeRuleProductListArray.get(i).getAsJsonObject().get("product_id").getAsLong());
+            priceChangeRuleProduct.setBoutiqueId(priceChangeRuleProductListArray.get(i).getAsJsonObject().get("product_code").getAsString());
+            priceChangeRuleProduct.setProductName(priceChangeRuleProductListArray.get(i).getAsJsonObject().get("product_name").getAsString());
+            priceChangeRuleProduct.setDiscountPercentage(Long.valueOf("100") - priceChangeRuleProductListArray.get(i).getAsJsonObject().get("discount_percentage").getAsLong());
+
+            priceChangeRuleProductService.insertSelective(priceChangeRuleProduct);
+            if (priceChangeRuleProduct.getPriceChangeRuleProductId() == null) {
+                result.put("status", StatusType.DATABASE_ERROR);
+                throw new RuntimeException("");
+            }
+        }
+
+        
+        
+
+		/**-------------------------------------priceChangeRuleGroup ---------------- -----------------------*/
+        JsonArray priceChangeRuleGroupListArray = new JsonParser().parse(map.get("price_change_rule_group_list").toString()).getAsJsonArray();
+
+        for (int i = 0; i < priceChangeRuleGroupListArray.size(); i++) {
+            PriceChangeRuleGroup priceChangeRuleGroup = new PriceChangeRuleGroup();
+            priceChangeRuleGroup.setPriceChangeRuleId(priceChangeRule.getPriceChangeRuleId());
+            priceChangeRuleGroup.setProductGroupId(priceChangeRuleGroupListArray.get(i).getAsJsonObject().get("product_group_id").getAsLong());
+            priceChangeRuleGroup.setDiscountPercentage(Long.valueOf("100") - priceChangeRuleGroupListArray.get(i).getAsJsonObject().get("discount_percentage").getAsLong());
+
+           priceChangeRuleGroupService.insertSelective(priceChangeRuleGroup);
+            if (priceChangeRuleGroup.getPriceChangeRuleGroupId() == null) {
+                result.put("status", StatusType.DATABASE_ERROR);
+                throw new RuntimeException("");
+            }
+        }
+
 		
-		
+        result.put("status", StatusType.SUCCESS);
 		return result;
 	}
 	

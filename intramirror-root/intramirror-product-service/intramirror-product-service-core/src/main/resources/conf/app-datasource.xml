@@ -36,7 +36,9 @@
     </bean> 
     
     <bean id="productSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
-   		<constructor-arg ref="productSqlSessionFactory" />
+   		<!--  <constructor-arg ref="productSqlSessionFactory" />-->
+   		<constructor-arg index="0" ref="productSqlSessionFactory" />
+        <constructor-arg index="1" value="SIMPLE" />
   	</bean>
 
 	<beans profile="sit">
