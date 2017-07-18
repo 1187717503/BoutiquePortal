@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +62,10 @@ public class PriceChangeRuleController {
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
 		
+		if(!checkParams(map)){
+			result.put("info","parameter is incorrect");
+			return result;
+		}
 		
 		/**-------------------------------------PriceChangeRule-------------------------------------------------*/
 		PriceChangeRule priceChangeRule = new PriceChangeRule();
@@ -175,34 +180,54 @@ public class PriceChangeRuleController {
     /**
      * 检查参数
      */
-    public static int checkParams(Map<String, String> params) {
+    public static boolean checkParams(Map<String, Object> params) {
     	
-//    	if(params.get("name")){
-//    		
-//    	}
-//
-//        checker.add("name", params.get("name")).required().maxLength(256);
-//
-//        checker.add("price_type", params.get("price_type")).required().maxLength(64).numeric();
-//
-//        //checker.add("season_code", params.get("season_code")).required().json();
-//
-//        checker.add("valid_from", params.get("valid_from")).required().date();
-//
-//        checker.add("status", params.get("status")).required().maxLength(64).numeric();
-//
-//        checker.add("price_change_rule_category_brand_list", params.get("price_change_rule_category_brand_list")).required().json();
-//
-//        checker.add("price_change_rule_all_brand_list", params.get("price_change_rule_all_brand_list")).required().json();
-//
-//        checker.add("price_change_rule_product_list", params.get("price_change_rule_product_list")).required().json();
-//
-//        checker.add("price_change_rule_group_list", params.get("price_change_rule_group_list")).required().json();
-//
-//        Reports reports = checker.check();
+    	if(params.get("name") ==null || StringUtils.isBlank(params.get("name").toString())){
+    		return false;
+    	}
+    	
+    	if(params.get("price_type") == null || StringUtils.isBlank(params.get("price_type").toString()) 
+    			|| checkIntegerNumber(params.get("price_type").toString())){
+    		return false;
+    	}
+    	
+    	if(params.get("valid_from") == null || StringUtils.isBlank(params.get("valid_from").toString())){
+    		return false;
+    	}
+    	
+    	if(params.get("status") == null || StringUtils.isBlank(params.get("status").toString()) 
+    			|| checkIntegerNumber(params.get("status").toString())){
+    		return false;
+    	}
+    	
+    	if(params.get("price_change_rule_category_brand_list") == null || StringUtils.isBlank(params.get("price_change_rule_category_brand_list").toString())){
+    		return false;
+    	}
+    	
+    	if(params.get("price_change_rule_all_brand_list") == null || StringUtils.isBlank(params.get("price_change_rule_all_brand_list").toString())){
+    		return false;
+    	}
+    	
+    	if(params.get("price_change_rule_product_list") == null || StringUtils.isBlank(params.get("price_change_rule_product_list").toString())){
+    		return false;
+    	}
+    	
+    	if(params.get("price_change_rule_group_list") == null || StringUtils.isBlank(params.get("price_change_rule_group_list").toString())){
+    		return false;
+    	}
 
-//        return reports.firstError().toStatus();
-    	return 0;
+    	return true;
+    }
+    
+    private static boolean checkIntegerNumber(String vue){
+    	if(StringUtils.isNotBlank(vue)){
+    		try{
+    			Integer.parseInt(vue);
+    		}catch(Exception e){
+    			return true;
+    		}
+    	}
+    	return false;
     }
 	
 }
