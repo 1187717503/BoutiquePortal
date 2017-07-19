@@ -6,9 +6,11 @@ import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.ProductGroupMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class ProductGroupServiceImpl extends BaseDao implements IProductGroupService{
 
     private static Logger logger = LoggerFactory.getLogger(ProductGroupServiceImpl.class);
