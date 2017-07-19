@@ -5,6 +5,7 @@ import com.intramirror.common.parameter.StatusType;
 import com.intramirror.product.api.model.ProductGroup;
 import com.intramirror.product.api.service.IProductGroupService;
 import com.intramirror.web.controller.BaseController;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,11 @@ public class ProductGroupController extends BaseController {
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("status", StatusType.FAILURE);
 
+        if (!checkParams(map)) {
+            result.put("info", "parameter is incorrect");
+            return result;
+        }
+
         /**-------------------------------------ProductGroup-------------------------------------------------*/
         try {
             List<ProductGroup> productGroupList = productGroupService.getProductGroupListByGroupType(map.get("group_type").toString());
@@ -57,14 +63,25 @@ public class ProductGroupController extends BaseController {
     /**
      * 检查参数
      */
-    public static int checkParams(Map<String, String> params) {
+    public static boolean checkParams(Map<String, Object> params) {
 
-//        checker.add("group_type", params.get("group_type")).required().maxLength(64).numeric();
-//
-//        Reports reports = checker.check();
-
-//        return reports.firstError().toStatus();
-        return 0;
+        if (params.get("status") == null || StringUtils.isBlank(params.get("status").toString())
+                || checkIntegerNumber(params.get("status").toString())) {
+            return false;
+        }
+        return true;
     }
+
+    private static boolean checkIntegerNumber(String vue) {
+        if (StringUtils.isNotBlank(vue)) {
+            try {
+                Integer.parseInt(vue);
+            } catch (Exception e) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 }
