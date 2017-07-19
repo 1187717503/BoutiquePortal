@@ -17,6 +17,7 @@ import java.util.List;
 /**
  * Created by dingyifan on 2017/7/19.
  */
+@CrossOrigin
 @Controller
 @RequestMapping("/category")
 public class CategoryController {

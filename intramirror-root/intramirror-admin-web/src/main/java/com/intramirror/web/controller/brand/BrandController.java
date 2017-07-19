@@ -16,6 +16,7 @@ import java.util.Map;
 /**
  * Created by dingyifan on 2017/7/19.
  */
+@CrossOrigin
 @Controller
 @RequestMapping("/brand")
 public class BrandController {
