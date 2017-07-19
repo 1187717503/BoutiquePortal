@@ -57,7 +57,9 @@
 
 	
 	<!-- 自动扫描 -->
-	<context:component-scan base-package="com.intramirror"/>
+	<context:component-scan base-package="com.intramirror">
+	<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
 
 	<!-- 初始化基础配置 -->
 	<util:properties id="commons" location="classpath:/commons.properties" />
