@@ -6,6 +6,7 @@ import com.intramirror.product.api.service.brand.IBrandService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -16,6 +17,7 @@ import java.util.Map;
 /**
  * Created by dingyifan on 2017/7/19.
  */
+@CrossOrigin
 @Controller
 @RequestMapping("/brand")
 public class BrandController {
