@@ -272,6 +272,5 @@
     <if test="enabled != null">
       and enabled = #{enabled,jdbcType=BIT}
     </if>
-    limit 0,100
   </select>
 </mapper>
