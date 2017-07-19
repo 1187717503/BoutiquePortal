@@ -314,9 +314,18 @@
      sp.shop_product_id = sps.shop_product_id
   </update>
 
+    <select id="selectSeasonGroupRule" resultType="java.util.Map" parameterType="java.util.Map" >
+
+    select pcr.price_change_rule_id,pcrsg.season_code from price_change_rule pcr
+    inner join price_change_rule_season_group pcrsg on (pcrsg.price_change_rule_id = pcr.price_change_rule_id and pcrsg.enabled = 1)
+    where pcr.price_type = #{price_type,jdbcType=BIGINT}
+    and pcr.`status` = 1
+    and date_format(pcr.valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d');
+    </select>
+
     <select id="selectSecondCategoryRule" resultType="java.util.Map" parameterType="java.util.Map">
 
-        select pcrcb.discount_percentage,pcr.vendor_id,pcr.shop_id,pcrcb.category_id,pcrcb.`level` from price_change_rule pcr
+        select pcrcb.discount_percentage,pcr.vendor_id,pcr.shop_id,pcrcb.category_id,pcrcb.`level`,pcr.price_change_rule_id from price_change_rule pcr
         inner join price_change_rule_category_brand pcrcb on (pcr.price_change_rule_id = pcrcb.price_change_rule_id and pcrcb.`level` = 2)
         where 1=1
         and pcr.price_type = #{price_type,jdbcType=BIGINT}
@@ -327,7 +336,7 @@
 
     <select id="selectAllCategoryRule" resultType="java.util.Map" parameterType="java.util.Map">
 
-        select pcrcb.discount_percentage,pcr.vendor_id,pcr.shop_id,pcrcb.category_id,pcrcb.`level`,pcrcb.brand_id from price_change_rule pcr
+        select pcrcb.discount_percentage,pcr.vendor_id,pcr.shop_id,pcrcb.category_id,pcrcb.`level`,pcrcb.brand_id,pcr.price_change_rule_id from price_change_rule pcr
         inner join price_change_rule_category_brand pcrcb on (pcr.price_change_rule_id = pcrcb.price_change_rule_id)
         where 1=1
         and pcr.price_type = #{price_type,jdbcType=BIGINT}
@@ -338,7 +347,7 @@
 
     <select id="selectProductGroupRule" resultType="java.util.Map" parameterType="java.util.Map">
 
-        select pcrg.discount_percentage,pcr.vendor_id,pcr.shop_id,pcrg.product_group_id from price_change_rule pcr
+        select pcrg.discount_percentage,pcr.vendor_id,pcr.shop_id,pcrg.product_group_id,pcr.price_change_rule_id from price_change_rule pcr
         inner join price_change_rule_group pcrg on (pcr.price_change_rule_id = pcrg.price_change_rule_id)
         and pcr.price_type = #{price_type,jdbcType=BIGINT}
         and pcr.`status` = 1
@@ -348,7 +357,7 @@
     <select id="selectProductRule" resultType="java.util.Map" parameterType="java.util.Map">
 
 
-        select pcrp.discount_percentage,pcr.vendor_id,pcr.shop_id,pcrp.product_id from price_change_rule pcr
+        select pcrp.discount_percentage,pcr.vendor_id,pcr.shop_id,pcrp.product_id,pcr.price_change_rule_id from price_change_rule pcr
         inner join price_change_rule_product pcrp on (pcr.price_change_rule_id = pcrp.price_change_rule_id)
         and pcr.price_type = #{price_type,jdbcType=BIGINT}
         and pcr.`status` = 1
@@ -401,7 +410,7 @@
 
     <update id="updateSkuPriceByAdmin" parameterType="java.util.List">
         <foreach collection="list" item="item" index="index" open="" close="" separator=";">
-            update sku set sku.in_price = sku.im_price * #{item.discount_percentage,jdbcType=BIGINT}/((1+0.22)*100) where sku.enabled = 1 and sku.product_id in
+            update sku set sku.im_price = sku.price * #{item.discount_percentage,jdbcType=BIGINT}/100 where sku.enabled = 1 and sku.product_id in
             (
             select p.product_id from product p where p.enabled = 1
 
@@ -438,7 +447,52 @@
             <if test="item.handle_level == 4">
                 and p.product_id = #{item.product_id,jdbcType=BIGINT}
             </if>
-            and p.season_code in (#{item.season_codes});
+                and p.season_code in (#{item.season_codes})
+            )
+        </foreach>
+    </update>
+
+    <update id="updateSkuPriceByShop" parameterType="java.util.List">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update shop_product_sku sps,sku set sps.sale_price = sku.price * #{item.discount_percentage,jdbcType=BIGINT}/100
+            where sps.sku_id = sku.sku_id and sku.enabled = 1 and sps.enabled = 1 and sku.product_id in
+            (
+            select p.product_id from product p where p.enabled = 1
+
+            <if test="item.handle_level == 1">
+                and p.category_id in (
+                select category_id from category c where c.enabled = 1 and c.`level` = 2 and c.parent_id = #{item.category_id,jdbcType=BIGINT}
+                )
+            </if>
+
+            <if test="item.handle_level == 2">
+                <if test="item.level == 1">
+                    and p.category_id in (
+                    select category_id from category c where c.enabled = 1 and c.`level` = 3 and c.parent_id in
+                    (
+                    select category_id from category c2 where c2.enabled = 1 and c2.`level` = 2 and c2.parent_id = #{item.category_id,jdbcType=BIGINT}
+                    )
+                    )
+                </if>
+                <if test="item.level == 2">
+                    and p.category_id in (
+                    select category_id from category c where c.enabled = 1 and c.`level` = 2 and c.parent_id = #{item.category_id,jdbcType=BIGINT}
+                    )
+                </if>
+                <if test="item.level == 3">
+                    and p.category_id = #{item.category_id,jdbcType=BIGINT}
+                </if>
+                and p.brand_id = #{item.brand_id,jdbcType=BIGINT}
+            </if>
+
+            <if test="item.handle_level == 3">
+                and p.product_group_id = #{item.product_group_id,jdbcType=BIGINT}
+            </if>
+
+            <if test="item.handle_level == 4">
+                and p.product_id = #{item.product_id,jdbcType=BIGINT}
+            </if>
+                and p.season_code in (#{item.season_codes})
             )
         </foreach>
     </update>

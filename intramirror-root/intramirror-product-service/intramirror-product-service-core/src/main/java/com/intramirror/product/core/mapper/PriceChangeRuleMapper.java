@@ -64,6 +64,7 @@ public interface PriceChangeRuleMapper {
     int updatePriceChangeRuleByShopProductGroup();
     int updatePriceChangeRuleByShopProduct();
 
+    List<Map<String,Object>> selectSeasonGroupRule(Map<String,Object> params) ;
     List<Map<String,Object>> selectSecondCategoryRule(Map<String,Object> params) ;
     List<Map<String,Object>> selectAllCategoryRule(Map<String,Object> params);
     List<Map<String,Object>> selectProductGroupRule(Map<String,Object> params);
