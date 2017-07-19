@@ -19,4 +19,8 @@ public interface IPriceChangeRule {
     int insert(PriceChangeRule record);
 
     int insertSelective(PriceChangeRule record);
+    
+    PriceChangeRule selectByPrimaryKey(Long priceChangeRuleId);
+
+    int updateByPrimaryKeySelective(PriceChangeRule record);
 }

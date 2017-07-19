@@ -174,4 +174,14 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
 	public int insertSelective(PriceChangeRule record) {
 		return priceChangeRuleMapper.insertSelective(record);
 	}
+
+	@Override
+	public PriceChangeRule selectByPrimaryKey(Long priceChangeRuleId) {
+		return priceChangeRuleMapper.selectByPrimaryKey(priceChangeRuleId);
+	}
+
+	@Override
+	public int updateByPrimaryKeySelective(PriceChangeRule record) {
+		return priceChangeRuleMapper.updateByPrimaryKeySelective(record);
+	}
 }

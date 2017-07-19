@@ -153,6 +153,63 @@ public class PriceChangeRuleService {
 	    result.put("status", StatusType.SUCCESS);
 	    return result;
 	}
+	
+	
+	/**
+	 * 修改PriceChangeRul
+	 * @param map
+	 * @return
+	 * @throws Exception
+	 */
+	public Map<String,Object> updatePriceChangeRule(Map<String,Object> map) throws Exception{
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("status", StatusType.FAILURE);
+		
+		/**-------------------------------------PriceChangeRule-------------------------------------------------*/
+		PriceChangeRule priceChangeRule = new PriceChangeRule();
+		priceChangeRule.setPriceChangeRuleId(Long.valueOf(map.get("price_change_rule_id").toString()));
+		priceChangeRule.setName(map.get("name").toString());
+		priceChangeRule.setVendorId(Long.valueOf(map.get("vendor_id").toString()));
+	    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	    priceChangeRule.setValidFrom(simpleDateFormat.parse(map.get("valid_from").toString()));
+	    PriceChangeRule oldPriceChangeRule = priceChangeRuleService.selectByPrimaryKey(priceChangeRule.getPriceChangeRuleId());
+	    
+	    //修改之前的状态
+        if (oldPriceChangeRule.getStatus() == 3) {
+        	 priceChangeRule.setStatus(1);
+        }
+
+	    
+	    priceChangeRuleService.updateByPrimaryKeySelective(priceChangeRule);
+//	    if(priceChangeRule.getPriceChangeRuleId() == null || priceChangeRule.getPriceChangeRuleId() == 0 ){
+//	    	result.put("info", "add priceChangeRule fail");
+//	    	return result;
+//	    }
+		
+		
+	    
+		/**-------------------------------------priceChangeRuleCategoryBrand-----------------------------------*/
+	    JsonArray priceChangeRuleAllBrandListArray = new JsonParser().parse(map.get("price_change_rule_all_brand_list").toString()).getAsJsonArray();
+
+	    for (int i = 0; i < priceChangeRuleAllBrandListArray.size(); i++) {
+	    	
+			PriceChangeRuleCategoryBrand priceChangeRuleCategoryBrand = new PriceChangeRuleCategoryBrand();
+			priceChangeRuleCategoryBrand.setPriceChangeRuleCategoryBrandId(priceChangeRuleAllBrandListArray.get(i).getAsJsonObject().get("price_change_rule_category_brand_id").getAsLong());
+			priceChangeRuleCategoryBrand.setDiscountPercentage(Long.valueOf("100") - priceChangeRuleAllBrandListArray.get(i).getAsJsonObject().get("discount_percentage").getAsLong());
+
+			priceChangeRuleCategoryBrandService.updateByPrimaryKeySelective(priceChangeRuleCategoryBrand);
+			
+//	        if (priceChangeRuleCategoryBrand.getPriceChangeRuleCategoryBrandId() == null) {
+//	            result.put("status", StatusType.DATABASE_ERROR);
+//	            throw new RuntimeException("error");
+//	        }
+	    }
+		
+		
+	    result.put("status", StatusType.SUCCESS);
+	    return result;
+	}
+	
 
     
 }

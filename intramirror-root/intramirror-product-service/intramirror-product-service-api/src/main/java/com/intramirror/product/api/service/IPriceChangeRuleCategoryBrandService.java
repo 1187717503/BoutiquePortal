@@ -19,4 +19,21 @@ public interface IPriceChangeRuleCategoryBrandService {
 	 */
 	int  deletePriceChangeRuleCategoryBrand(Long priceChangeRuleCategoryBrandId);
 	
+	
+	
+    /**
+     * 根据ID查询
+     *
+     * @mbggenerated
+     */
+    PriceChangeRuleCategoryBrand selectByPrimaryKey(Long priceChangeRuleCategoryBrandId);
+
+    
+    /**
+     * 
+     *根据ID修改
+     * @mbggenerated
+     */
+    int updateByPrimaryKeySelective(PriceChangeRuleCategoryBrand record);
+	
 }

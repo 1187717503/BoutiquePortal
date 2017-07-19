@@ -38,4 +38,15 @@ public class PriceChangeRuleCategoryBrandServiceImpl extends BaseDao implements 
 		return priceChangeRuleCategoryBrandMapper.deleteByPrimaryKey(priceChangeRuleCategoryBrandId);
 	}
 
+	@Override
+	public PriceChangeRuleCategoryBrand selectByPrimaryKey(
+			Long priceChangeRuleCategoryBrandId) {
+		return priceChangeRuleCategoryBrandMapper.selectByPrimaryKey(priceChangeRuleCategoryBrandId);
+	}
+
+	@Override
+	public int updateByPrimaryKeySelective(PriceChangeRuleCategoryBrand record) {
+		return priceChangeRuleCategoryBrandMapper.updateByPrimaryKeySelective(record);
+	}
+
 }
