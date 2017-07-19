@@ -263,4 +263,14 @@
       hot_brand = #{hotBrand,jdbcType=INTEGER}
     where brand_id = #{brandId,jdbcType=BIGINT}
   </update>
+
+  <select id="selBrandByConditions" parameterType="com.intramirror.product.api.model.Brand" resultType="java.util.Map">
+    select
+    brand_id,english_name
+    from brand
+    where 1=1
+    <if test="enabled != null">
+      and enabled = #{enabled,jdbcType=BIT}
+    </if>
+  </select>
 </mapper>
