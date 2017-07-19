@@ -161,6 +161,7 @@ public class PriceChangeRuleService {
 	 * @return
 	 * @throws Exception
 	 */
+	@Transactional  
 	public Map<String,Object> updatePriceChangeRule(Map<String,Object> map) throws Exception{
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
@@ -180,7 +181,7 @@ public class PriceChangeRuleService {
         }
 
 	    
-	    priceChangeRuleService.updateByPrimaryKeySelective(priceChangeRule);
+	    int resultNum = priceChangeRuleService.updateByPrimaryKeySelective(priceChangeRule);
 //	    if(priceChangeRule.getPriceChangeRuleId() == null || priceChangeRule.getPriceChangeRuleId() == 0 ){
 //	    	result.put("info", "add priceChangeRule fail");
 //	    	return result;
