@@ -7,6 +7,8 @@ import com.intramirror.user.core.dao.BaseDao;
 import com.intramirror.user.core.mapper.UserRoleMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * 用户服务
  */
@@ -22,6 +24,14 @@ public class UserRoleServiceImpl extends BaseDao implements UserRoleService {
 
     @Override
     public UserRole getUserRoleByUserId(Long userId, Boolean enabled) {
-        return userRoleMapper.getUserRoleByUserIdAndEnabled(userId, enabled);
+        UserRole userRole = null;
+        List<UserRole> userRoleList = userRoleMapper.getUserRoleByUserIdAndEnabled(userId, enabled);
+        for (UserRole temp : userRoleList) {
+            if (temp != null) {
+                userRole = temp;
+                break;
+            }
+        }
+        return userRole;
     }
 }

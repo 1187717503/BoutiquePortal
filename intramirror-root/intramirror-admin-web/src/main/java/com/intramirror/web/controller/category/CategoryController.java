@@ -4,16 +4,15 @@ import com.intramirror.common.help.ResultMessage;
 import com.intramirror.product.api.model.Category;
 import com.intramirror.product.api.service.category.ICategoryService;
 import com.intramirror.web.controller.brand.BrandController;
-import com.sun.org.apache.regexp.internal.RE;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by dingyifan on 2017/7/19.
@@ -27,6 +26,7 @@ public class CategoryController {
     @Resource(name = "productCategoryServiceImpl")
     private ICategoryService iCategoryService;
 
+    @CrossOrigin
     @RequestMapping("/selectActiveCategorys")
     @ResponseBody
     public ResultMessage queryActiveCategorys(){

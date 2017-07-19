@@ -1,11 +1,11 @@
 package com.intramirror.web.controller.brand;
 
 import com.intramirror.common.help.ResultMessage;
-import com.intramirror.product.api.model.Brand;
 import com.intramirror.product.api.service.brand.IBrandService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -25,6 +25,7 @@ public class BrandController {
     @Resource(name = "productBrandServiceImpl")
     private IBrandService iBrandService;
 
+    @CrossOrigin
     @RequestMapping("/selectActiveBrands")
     @ResponseBody
     public ResultMessage queryActiveBrands(){
