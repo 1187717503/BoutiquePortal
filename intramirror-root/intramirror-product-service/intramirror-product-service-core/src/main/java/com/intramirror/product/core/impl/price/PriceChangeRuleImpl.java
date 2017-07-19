@@ -53,6 +53,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
 
         if(paramsList != null && paramsList.size() > 0) {
             priceChangeRuleMapper.updateSkuPriceByVendor(paramsList);
+            this.updateRuleStatus(paramsMap);
         }
         return true;
     }
@@ -85,6 +86,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
 
         if(paramsList != null && paramsList.size() > 0) {
             priceChangeRuleMapper.updateSkuPriceByShop(paramsList);
+            this.updateRuleStatus(paramsMap);
         }
         return true;
     }
@@ -117,6 +119,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
 
         if( paramsList != null && paramsList.size() > 0) {
             priceChangeRuleMapper.updateSkuPriceByAdmin(paramsList);
+            this.updateRuleStatus(paramsMap);
         }
         return true;
     }
@@ -155,6 +158,14 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         return paramsList;
     }
 
+    private boolean updateRuleStatus(Map<String,Object> params){
+        List<Map<String,Object>> selNowRuleMaps = priceChangeRuleMapper.selNowRule(params);
+        if(selNowRuleMaps != null && selNowRuleMaps.size() > 0) {
+            priceChangeRuleMapper.updateRuleInActive(params);
+        }
+        priceChangeRuleMapper.updateRuleActive(params);
+        return true;
+    }
     @Override
     public void init() {
         priceChangeRuleMapper = this.getSqlSession().getMapper(PriceChangeRuleMapper.class);

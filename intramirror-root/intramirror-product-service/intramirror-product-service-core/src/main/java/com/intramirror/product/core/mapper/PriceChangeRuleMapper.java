@@ -74,4 +74,9 @@ public interface PriceChangeRuleMapper {
     int updateSkuPriceByAdmin(List<Map<String,Object>> paramsList);
     int updateSkuPriceByShop(List<Map<String,Object>> paramsList);
 
+
+    List<Map<String,Object>> selNowRule(Map<String,Object> params);
+    int updateRuleActive(Map<String,Object> params);
+    int updateRuleInActive(Map<String,Object> params);
+
 }
