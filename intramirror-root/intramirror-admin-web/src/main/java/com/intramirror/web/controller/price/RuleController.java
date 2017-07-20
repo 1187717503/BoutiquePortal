@@ -89,6 +89,29 @@ public class RuleController {
         return resultMessage;
     }
 
+    @RequestMapping("/select/queryNotRuleByBrand")
+    @ResponseBody
+    public ResultMessage queryNotRuleByBrand(@Param("price_change_rule_id")String price_change_rule_id,@Param("english_name")String english_name){
+        ResultMessage resultMessage = ResultMessage.getInstance();
+        try {
+            if(StringUtils.isBlank(price_change_rule_id)) {
+                return resultMessage.errorStatus().putMsg("info","price_change_rule_id is null !!!");
+            }
+
+            Map<String,Object> params = new HashMap<>();
+            params.put("exception_flag", 0);
+            params.put("english_name",english_name);
+            params.put("price_change_rule_id",price_change_rule_id);
+            List<Map<String,Object>> brandMaps =  iRuleService.queryNotRuleByBrand(params);
+            resultMessage.successStatus().putMsg("info","success").setData(brandMaps);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(" error message : {}",e.getMessage());
+            resultMessage.errorStatus().putMsg("info","error message : " + e.getMessage());
+        }
+        return resultMessage;
+    }
+
     @RequestMapping("/select/queryRuleByBrandOne")
     @ResponseBody
     public ResultMessage queryRuleByBrandOne(@Param("price_change_rule_id")String price_change_rule_id){

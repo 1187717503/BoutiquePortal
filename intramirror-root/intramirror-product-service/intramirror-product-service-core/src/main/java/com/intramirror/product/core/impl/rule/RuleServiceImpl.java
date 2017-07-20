@@ -87,6 +87,11 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
     }
 
     @Override
+    public List<Map<String, Object>> queryNotRuleByBrand(Map<String, Object> params) throws Exception {
+        return seasonMapper.queryNotRuleByBrand(params);
+    }
+
+    @Override
     public List<Map<String, Object>> queryRuleByGroup(Map<String, Object> params) throws Exception {
         return seasonMapper.queryRuleByGroup(params);
     }
