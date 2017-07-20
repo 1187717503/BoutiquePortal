@@ -46,7 +46,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         List<Map<String,Object>> selProductRuleMaps = priceChangeRuleMapper.selectProductRule(paramsMap);
         logger.info("selProductRuleMaps : {}",new Gson().toJson(selProductRuleMaps));
 
-        paramsList = this.handleMapByVendor(paramsList,selSecondCategoryRuleMaps,Contants.num_one);
+        paramsList = this.handleMapByVendor(paramsList,selSecondCategoryRuleMaps,Contants.num_second);
         paramsList = this.handleMapByVendor(paramsList,selAllCategoryRuleMaps,Contants.num_second);
         paramsList = this.handleMapByVendor(paramsList,selProductGroupRuleMaps,Contants.num_three);
         paramsList = this.handleMapByVendor(paramsList,selProductRuleMaps,Contants.num_four);
@@ -79,7 +79,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         List<Map<String,Object>> selProductRuleMaps = priceChangeRuleMapper.selectProductRule(paramsMap);
         logger.info("selProductRuleMaps : {}",new Gson().toJson(selProductRuleMaps));
 
-        paramsList = this.handleMapByAdmin(paramsList,selSecondCategoryRuleMaps,Contants.num_one,selSeasonGroupRuleMaps);
+        paramsList = this.handleMapByAdmin(paramsList,selSecondCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
         paramsList = this.handleMapByAdmin(paramsList,selAllCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
         paramsList = this.handleMapByAdmin(paramsList,selProductGroupRuleMaps,Contants.num_three,selSeasonGroupRuleMaps);
         paramsList = this.handleMapByAdmin(paramsList,selProductRuleMaps,Contants.num_four,selSeasonGroupRuleMaps);
@@ -112,7 +112,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         List<Map<String,Object>> selProductRuleMaps = priceChangeRuleMapper.selectProductRule(paramsMap);
         logger.info("selProductRuleMaps : {}",new Gson().toJson(selProductRuleMaps));
 
-        paramsList = this.handleMapByAdmin(paramsList,selSecondCategoryRuleMaps,Contants.num_one,selSeasonGroupRuleMaps);
+        paramsList = this.handleMapByAdmin(paramsList,selSecondCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
         paramsList = this.handleMapByAdmin(paramsList,selAllCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
         paramsList = this.handleMapByAdmin(paramsList,selProductGroupRuleMaps,Contants.num_three,selSeasonGroupRuleMaps);
         paramsList = this.handleMapByAdmin(paramsList,selProductRuleMaps,Contants.num_four,selSeasonGroupRuleMaps);
