@@ -1,14 +1,14 @@
 package com.intramirror.product.core.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
 import com.intramirror.product.api.model.PriceChangeRuleGroup;
 import com.intramirror.product.api.service.IPriceChangeRuleGroupService;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.PriceChangeRuleGroupMapper;
-import com.intramirror.product.core.mapper.PriceChangeRuleProductMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class PriceChangeRuleGroupServiceImpl extends BaseDao implements IPriceChangeRuleGroupService{
@@ -33,6 +33,11 @@ public class PriceChangeRuleGroupServiceImpl extends BaseDao implements IPriceCh
 	public int insertSelective(PriceChangeRuleGroup record) {
 		
 		return priceChangeRuleGroupMapper.insertSelective(record);
+	}
+
+	@Override
+	public List<PriceChangeRuleGroup> getPriceChangeRuleGroupListByPriceChangeRuleId(Long priceChangeRuleId) {
+		return priceChangeRuleGroupMapper.getPriceChangeRuleGroupListByPriceChangeRuleId(priceChangeRuleId);
 	}
 
 	@Override

@@ -1,6 +1,9 @@
 package com.intramirror.product.core.mapper;
 
 import com.intramirror.product.api.model.PriceChangeRuleCategoryBrand;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface PriceChangeRuleCategoryBrandMapper {
     /**
@@ -49,8 +52,8 @@ public interface PriceChangeRuleCategoryBrandMapper {
      * @mbggenerated
      */
     int updateByPrimaryKeySelective(PriceChangeRuleCategoryBrand record);
-    
-    
+
+
     /**
      * 根据parameter 修改折扣信息
      *
@@ -65,4 +68,7 @@ public interface PriceChangeRuleCategoryBrandMapper {
      * @mbggenerated
      */
     int updateByPrimaryKey(PriceChangeRuleCategoryBrand record);
+
+
+    List<PriceChangeRuleCategoryBrand> getPriceChangeRuleGroupListByPriceChangeRuleIdAndExceptionFlag(@Param("priceChangeRuleId") Long priceChangeRuleId, @Param("exceptionFlag") Integer exceptionFlag);
 }

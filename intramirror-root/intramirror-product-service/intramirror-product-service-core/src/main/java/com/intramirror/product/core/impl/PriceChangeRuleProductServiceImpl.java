@@ -9,6 +9,8 @@ import com.intramirror.product.api.service.IPriceChangeRuleProductService;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.PriceChangeRuleProductMapper;
 
+import java.util.List;
+
 @Service
 public class PriceChangeRuleProductServiceImpl extends BaseDao implements IPriceChangeRuleProductService{
 
@@ -29,6 +31,11 @@ public class PriceChangeRuleProductServiceImpl extends BaseDao implements IPrice
 	@Override
 	public int insertSelective(PriceChangeRuleProduct record) {
 		return priceChangeRuleProductMapper.insertSelective(record);
+	}
+
+	@Override
+	public List<PriceChangeRuleProduct> getPriceChangeRuleGroupListByPriceChangeRuleId(Long priceChangeRuleId) {
+		return priceChangeRuleProductMapper.getPriceChangeRuleGroupListByPriceChangeRuleId(priceChangeRuleId);
 	}
 
 	@Override

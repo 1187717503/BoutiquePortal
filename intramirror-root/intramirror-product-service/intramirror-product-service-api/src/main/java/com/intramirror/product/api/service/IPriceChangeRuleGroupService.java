@@ -2,6 +2,8 @@ package com.intramirror.product.api.service;
 
 import com.intramirror.product.api.model.PriceChangeRuleGroup;
 
+import java.util.List;
+
 public interface IPriceChangeRuleGroupService {
 
     /**
@@ -27,4 +29,6 @@ public interface IPriceChangeRuleGroupService {
      * @mbggenerated
      */
     int insertSelective(PriceChangeRuleGroup record);
+
+    List<PriceChangeRuleGroup> getPriceChangeRuleGroupListByPriceChangeRuleId(Long priceChangeRuleId);
 }

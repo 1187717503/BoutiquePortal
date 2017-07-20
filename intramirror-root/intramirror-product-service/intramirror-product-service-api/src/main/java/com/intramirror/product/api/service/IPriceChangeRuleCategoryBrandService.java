@@ -2,34 +2,37 @@ package com.intramirror.product.api.service;
 
 import com.intramirror.product.api.model.PriceChangeRuleCategoryBrand;
 
+import java.util.List;
+
 public interface IPriceChangeRuleCategoryBrandService {
-	
-	/**
-	 * 添加
-	 * @param priceChangeRuleCategoryBrand
-	 * @return
-	 */
-	Long createPriceChangeRuleCategoryBrand(PriceChangeRuleCategoryBrand priceChangeRuleCategoryBrand);
-	
-	
-	/**
-	 * 删除
-	 * @param priceChangeRuleCategoryBrandId
-	 * @return
-	 */
-	int  deletePriceChangeRuleCategoryBrand(Long priceChangeRuleCategoryBrandId);
-	
-	
+
     /**
-     * 
-     *根据条件删除 PriceChangeRuleCategoryBrand
+     * 添加
+     *
+     * @param priceChangeRuleCategoryBrand
+     * @return
+     */
+    Long createPriceChangeRuleCategoryBrand(PriceChangeRuleCategoryBrand priceChangeRuleCategoryBrand);
+
+
+    /**
+     * 删除
+     *
+     * @param priceChangeRuleCategoryBrandId
+     * @return
+     */
+    int deletePriceChangeRuleCategoryBrand(Long priceChangeRuleCategoryBrandId);
+
+
+    /**
+     * 根据条件删除 PriceChangeRuleCategoryBrand
+     *
      * @param PriceChangeRuleCategoryBrand
      * @return
      */
     int deleteByParameter(PriceChangeRuleCategoryBrand record);
-	
-	
-	
+
+
     /**
      * 根据ID查询
      *
@@ -37,20 +40,23 @@ public interface IPriceChangeRuleCategoryBrandService {
      */
     PriceChangeRuleCategoryBrand selectByPrimaryKey(Long priceChangeRuleCategoryBrandId);
 
-    
+
     /**
-     * 
-     *根据ID修改
+     * 根据ID修改
+     *
      * @mbggenerated
      */
     int updateByPrimaryKeySelective(PriceChangeRuleCategoryBrand record);
-    
-    
+
+
     /**
      * 根据parameter 修改折扣信息
      *
      * @mbggenerated
      */
     int updateDiscountPercentageBySelective(PriceChangeRuleCategoryBrand record);
-	
+
+
+    List<PriceChangeRuleCategoryBrand> getPriceChangeRuleGroupListByPriceChangeRuleIdAndExceptionFlag(Long priceChangeRuleId, Integer exceptionFlag);
+
 }

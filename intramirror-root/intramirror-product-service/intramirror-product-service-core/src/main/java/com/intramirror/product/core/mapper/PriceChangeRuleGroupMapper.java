@@ -1,6 +1,9 @@
 package com.intramirror.product.core.mapper;
 
 import com.intramirror.product.api.model.PriceChangeRuleGroup;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface PriceChangeRuleGroupMapper {
     /**
@@ -50,4 +53,6 @@ public interface PriceChangeRuleGroupMapper {
      * @mbggenerated
      */
     int updateByPrimaryKey(PriceChangeRuleGroup record);
+
+    List<PriceChangeRuleGroup> getPriceChangeRuleGroupListByPriceChangeRuleId(@Param("priceChangeRuleId") Long priceChangeRuleId);
 }
