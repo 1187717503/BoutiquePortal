@@ -68,7 +68,7 @@ public class RuleController {
 
     @RequestMapping("/select/queryRuleByBrandZero")
     @ResponseBody
-    public ResultMessage queryRuleByBrandZero(@Param("price_change_rule_id")String price_change_rule_id){
+    public ResultMessage queryRuleByBrandZero(@Param("price_change_rule_id")String price_change_rule_id,@Param("english_name")String english_name){
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
             if(StringUtils.isBlank(price_change_rule_id)) {
@@ -77,6 +77,7 @@ public class RuleController {
 
             Map<String,Object> params = new HashMap<>();
             params.put("exception_flag", 0);
+            params.put("english_name",english_name);
             params.put("price_change_rule_id",price_change_rule_id);
             List<Map<String,Object>> brandMaps =  iRuleService.queryRuleByBrand(params);
             resultMessage.successStatus().putMsg("info","success").setData(brandMaps);
