@@ -383,7 +383,7 @@ public class PriceChangeRuleController extends BaseController{
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
 		
-		if(!checkUpdateParams(map)){
+		if(map.get("price_change_rule_product_group") == null || StringUtils.isBlank(map.get("price_change_rule_product_group").toString())){
 			result.put("info","parameter is incorrect");
 			return result;
 		}
@@ -407,7 +407,7 @@ public class PriceChangeRuleController extends BaseController{
 		    
 		} catch (Exception e) {
 			e.printStackTrace();
-			result.put("info","create priceChangeRuleCategoryBrand fail ");
+			result.put("info","create priceChangeRuleGroup fail ");
 			return result;
 		}
 
