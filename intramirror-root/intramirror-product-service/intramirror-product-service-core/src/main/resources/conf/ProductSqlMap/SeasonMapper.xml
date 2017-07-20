@@ -122,4 +122,42 @@
       updated_at = #{updatedAt,jdbcType=TIMESTAMP}
     where season_code = #{seasonCode,jdbcType=VARCHAR}
   </update>
+
+  <select id="queryRuleByHasSeason" resultType="java.util.Map" parameterType="java.util.Map">
+
+    select pcrsg.`name`,pcrsg.price_change_rule_id,pcrsg.season_code from price_change_rule_season_group pcrsg where pcrsg.price_change_rule_id in (
+                select pcr.price_change_rule_id from price_change_rule pcr where pcr.price_type = #{price_type,jdbcType=INTEGER} and pcr.status = #{status,jdbcType=INTEGER}
+    ) and pcrsg.enabled = 1
+  </select>
+
+  <select id="queryRuleByNotHasSesaon" resultType="java.util.Map" parameterType="java.util.Map">
+
+    select season_code from season where enabled = 1 and season_code not in (
+                    select distinct season_code from price_change_rule_season_group pcrsg where pcrsg.price_change_rule_id in (
+                select pcr.price_change_rule_id from price_change_rule pcr where pcr.price_type =  #{price_type,jdbcType=INTEGER} and pcr.status = #{status,jdbcType=INTEGER}
+            ) and pcrsg.enabled = 1
+    )
+  </select>
+
+  <select id="queryRuleByBrand" resultType="java.util.Map" parameterType="java.util.Map">
+
+    select pcrcb.price_change_rule_category_brand_id,pcrcb.brand_id,b.english_name,pcrcb.category_id,c.`name`,c.parent_id,pcrcb.discount_percentage from price_change_rule_category_brand pcrcb
+        inner join category c on (c.category_id = pcrcb.category_id and c.enabled = 1)
+        inner join brand b on (b.brand_id = pcrcb.brand_id and b.enabled = 1)
+        where pcrcb.exception_flag = #{exception_flag,jdbcType=INTEGER} and pcrcb.price_change_rule_id = #{price_change_rule_id,jdbcType=INTEGER}
+  </select>
+
+  <select id="queryRuleByGroup" resultType="java.util.Map" parameterType="java.util.Map">
+
+    select pcrg.price_change_rule_group_id,pg.`name`,pcrg.discount_percentage from price_change_rule_group pcrg
+        inner join product_group pg on (pcrg.product_group_id = pg.product_group_id)
+        where pcrg.price_change_rule_id = #{price_change_rule_id,jdbcType=INTEGER}
+  </select>
+
+  <select id="queryRuleByProduct" resultType="java.util.Map" parameterType="java.util.Map">
+
+   select * from price_change_rule_product p where p.price_change_rule_id = #{price_change_rule_id,jdbcType=INTEGER}
+  </select>
+
+
 </mapper>
