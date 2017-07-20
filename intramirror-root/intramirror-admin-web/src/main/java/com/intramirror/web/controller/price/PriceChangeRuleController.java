@@ -157,13 +157,13 @@ public class PriceChangeRuleController extends BaseController{
 	
 	
 	/**
-	 * 添加PriceChangeRuleCategoryBrand
+	 * 根据品牌ID添加下面所有2级类目的PriceChangeRuleCategoryBrand
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping("/createPriceChangeRuleCategoryBrand")
+	@RequestMapping("/createPriceChangeRuleCategoryBrandBatch")
 	@ResponseBody
-	public Map<String, Object> priceChangeRuleCategoryBrandCreate(@RequestBody Map<String, Object> map){
+	public Map<String, Object> priceChangeRuleCategoryBrandBatchCreate(@RequestBody Map<String, Object> map){
 		logger.info("createPriceChangeRuleCategoryBrand param:"+new Gson().toJson(map));
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
@@ -176,7 +176,7 @@ public class PriceChangeRuleController extends BaseController{
 		
 		try {
 			//创建 PriceChangeRuleCategoryBrand
-			result = priceChangeRuleService.createPriceChangeRuleCategoryBrand(map);
+			result = priceChangeRuleService.createPriceChangeRuleCategoryBrandBatch(map);
 		} catch (Exception e) {
 			e.printStackTrace();
 			result.put("info","create PriceChangeRuleCategoryBrand fail ");
@@ -190,13 +190,13 @@ public class PriceChangeRuleController extends BaseController{
 	
 	
 	/**
-	 * 删除PriceChangeRuleCategoryBrand
+	 *  根据品牌ID删除下面所有2级类目的PriceChangeRuleCategoryBrand
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping("/deletePriceChangeRuleCategoryBrand")
+	@RequestMapping("/deletePriceChangeRuleCategoryBrandBatch")
 	@ResponseBody
-	public Map<String, Object> priceChangeRuleCategoryBrandDelete(@RequestBody Map<String, Object> map){
+	public Map<String, Object> priceChangeRuleCategoryBrandBatchDelete(@RequestBody Map<String, Object> map){
 		logger.info("deletePriceChangeRuleCategoryBrand param:"+new Gson().toJson(map));
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
@@ -208,8 +208,8 @@ public class PriceChangeRuleController extends BaseController{
 		}
 		
 		try {
-			//创建 PriceChangeRuleCategoryBrand
-			result = priceChangeRuleService.deletePriceChangeRuleCategoryBrand(map);
+			//删除 PriceChangeRuleCategoryBrand
+			result = priceChangeRuleService.deletePriceChangeRuleCategoryBrandBatch(map);
 		} catch (Exception e) {
 			e.printStackTrace();
 			result.put("info","delete PriceChangeRuleCategoryBrand fail ");
@@ -279,52 +279,52 @@ public class PriceChangeRuleController extends BaseController{
 	
 	
 	
-//	/**
-//	 * 添加PriceChangeRuleCategoryBrand
-//	 * @param map
-//	 * @return
-//	 */
-//	@RequestMapping("/createPriceChangeRuleCategoryBrand")
-//	@ResponseBody
-//	public Map<String, Object> priceChangeRuleCategoryBrandCreate(@RequestBody Map<String, Object> map){
-//		logger.info("priceChangeRuleCategoryBrandCreate param:"+new Gson().toJson(map));
-//		Map<String, Object> result = new HashMap<String, Object>();
-//		result.put("status", StatusType.FAILURE);
-//		
-//		if(!checkUpdateParams(map)){
-//			result.put("info","parameter is incorrect");
-//			return result;
-//		}
-//		
-//		try {
-//			
-//		    JsonObject priceChangeRuleCategory = new JsonParser().parse(map.get("price_change_rule_category_brand").toString()).getAsJsonObject();
-//	
-//	        PriceChangeRuleCategoryBrand priceChangeRuleCategoryBrand = new PriceChangeRuleCategoryBrand();
-//	        priceChangeRuleCategoryBrand.setPriceChangeRuleId(priceChangeRuleCategory.get("price_change_rule_id").getAsLong());
-//	        priceChangeRuleCategoryBrand.setCategoryId(priceChangeRuleCategory.get("category_id").getAsLong());
-//	        priceChangeRuleCategoryBrand.setLevel(priceChangeRuleCategory.get("level").getAsByte());
-//	        priceChangeRuleCategoryBrand.setBrandId(priceChangeRuleCategory.get("brand_id").getAsLong());
-//	        priceChangeRuleCategoryBrand.setDiscountPercentage(Long.valueOf("100") - priceChangeRuleCategory.get("discount_percentage").getAsLong());
-//	        priceChangeRuleCategoryBrand.setExceptionFlag (1);
-//
-//			priceChangeRuleCategoryBrandService.createPriceChangeRuleCategoryBrand(priceChangeRuleCategoryBrand);
-//			
-//	        if (priceChangeRuleCategoryBrand.getPriceChangeRuleCategoryBrandId() == null) {
-//	            result.put("status", StatusType.DATABASE_ERROR);
-//	            return result;
-//	        }
-//		    
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			result.put("info","create priceChangeRuleCategoryBrand fail ");
-//			return result;
-//		}
-//
-//		
-//        result.put("status", StatusType.SUCCESS);
-//		return result;
-//	}
+	/**
+	 * 单个添加PriceChangeRuleCategoryBrand
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/createPriceChangeRuleCategoryBrand")
+	@ResponseBody
+	public Map<String, Object> priceChangeRuleCategoryBrandCreate(@RequestBody Map<String, Object> map){
+		logger.info("priceChangeRuleCategoryBrandCreate param:"+new Gson().toJson(map));
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("status", StatusType.FAILURE);
+		
+		if(map.get("price_change_rule_category_brand") == null ||StringUtils.isBlank(map.get("price_change_rule_category_brand").toString())){
+			result.put("info","parameter is incorrect");
+			return result;
+		}
+		
+		try {
+			
+		    JsonObject priceChangeRuleCategory = new JsonParser().parse(map.get("price_change_rule_category_brand").toString()).getAsJsonObject();
+	
+	        PriceChangeRuleCategoryBrand priceChangeRuleCategoryBrand = new PriceChangeRuleCategoryBrand();
+	        priceChangeRuleCategoryBrand.setPriceChangeRuleId(priceChangeRuleCategory.get("price_change_rule_id").getAsLong());
+	        priceChangeRuleCategoryBrand.setCategoryId(priceChangeRuleCategory.get("category_id").getAsLong());
+	        priceChangeRuleCategoryBrand.setLevel(priceChangeRuleCategory.get("level").getAsByte());
+	        priceChangeRuleCategoryBrand.setBrandId(priceChangeRuleCategory.get("brand_id").getAsLong());
+	        priceChangeRuleCategoryBrand.setDiscountPercentage(Long.valueOf("100") - priceChangeRuleCategory.get("discount_percentage").getAsLong());
+	        priceChangeRuleCategoryBrand.setExceptionFlag (1);
+
+			priceChangeRuleCategoryBrandService.createPriceChangeRuleCategoryBrand(priceChangeRuleCategoryBrand);
+			
+	        if (priceChangeRuleCategoryBrand.getPriceChangeRuleCategoryBrandId() == null) {
+	        	result.put("info","parameter is incorrect");
+	            return result;
+	        }
+		    
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.put("info","create priceChangeRuleCategoryBrand fail ");
+			return result;
+		}
+
+		
+        result.put("status", StatusType.SUCCESS);
+		return result;
+	}
 	
 	
 //	
