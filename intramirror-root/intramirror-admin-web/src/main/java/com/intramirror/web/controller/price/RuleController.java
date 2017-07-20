@@ -97,7 +97,6 @@ public class RuleController {
             if(StringUtils.isBlank(price_change_rule_id)) {
                 return resultMessage.errorStatus().putMsg("info","price_change_rule_id is null !!!");
             }
-
             Map<String,Object> params = new HashMap<>();
             params.put("exception_flag", 0);
             params.put("english_name",english_name);
@@ -124,7 +123,7 @@ public class RuleController {
             Map<String,Object> params = new HashMap<>();
             params.put("exception_flag", 1);
             params.put("price_change_rule_id",price_change_rule_id);
-            List<Map<String,Object>> brandMaps =  iRuleService.queryRuleByBrand(params);
+            List<Map<String,Object>> brandMaps =  iRuleService.queryRuleByBrandOne(params);
             resultMessage.successStatus().putMsg("info","success").setData(brandMaps);
         } catch (Exception e) {
             e.printStackTrace();

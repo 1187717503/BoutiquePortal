@@ -139,7 +139,7 @@
     )
   </select>
 
-  <select id="queryRuleByBrand" resultType="java.util.Map" parameterType="java.util.Map">
+  <select id="queryRuleByBrandZero" resultType="java.util.Map" parameterType="java.util.Map">
 
     select pcrcb.price_change_rule_category_brand_id,pcrcb.brand_id,b.english_name,pcrcb.category_id,c.`name`,c.parent_id,pcrcb.discount_percentage from price_change_rule_category_brand pcrcb
         inner join category c on (c.category_id = pcrcb.category_id and c.enabled = 1)
@@ -149,6 +149,20 @@
           <bind name="brandName" value="'%' + english_name + '%'" />
           and b.english_name like #{brandName}
         </if>
+  </select>
+
+  <select id="queryRuleByBrandOne" resultType="java.util.Map" parameterType="java.util.Map">
+
+    select c.`name` as cName,c2.`name` as c2Name,c1.`name` as c1Name,pcrcb.price_change_rule_category_brand_id,pcrcb.brand_id,b.english_name,pcrcb.category_id,c.`name`,c.parent_id,pcrcb.discount_percentage from price_change_rule_category_brand pcrcb
+    inner join category c on (c.category_id = pcrcb.category_id and c.enabled = 1)
+    inner join brand b on (b.brand_id = pcrcb.brand_id and b.enabled = 1)
+    left join category c2 on (c2.category_id = c.parent_id and c2.enabled = 1)
+    left join category c1 on (c1.category_id = c2.parent_id and c1.enabled = 1)
+    where pcrcb.exception_flag = #{exception_flag,jdbcType=INTEGER} and pcrcb.price_change_rule_id = #{price_change_rule_id,jdbcType=INTEGER}
+    <if test="english_name != null and english_name != ''">
+      <bind name="brandName" value="'%' + english_name + '%'" />
+      and b.english_name like #{brandName}
+    </if>
   </select>
 
   <select id="queryNotRuleByBrand" resultType="java.util.Map" parameterType="java.util.Map">

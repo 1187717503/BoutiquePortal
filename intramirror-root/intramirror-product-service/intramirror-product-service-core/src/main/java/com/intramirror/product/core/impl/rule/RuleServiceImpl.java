@@ -61,7 +61,7 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
     @Override
     public List<Map<String, Object>> queryRuleByBrand(Map<String, Object> params) throws Exception {
         List<Map<String,Object>> handleMaps = new ArrayList<>();
-        List<Map<String,Object>> brandMaps = seasonMapper.queryRuleByBrand(params);
+        List<Map<String,Object>> brandMaps = seasonMapper.queryRuleByBrandZero(params);
         if(brandMaps != null && brandMaps.size() > 0) {
             for(Map<String,Object> brandMap : brandMaps) {
                 String brandName = brandMap.get("english_name").toString();
@@ -71,6 +71,7 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
                     if(brandName.equals(eName)) {
                         handleMap.put(brandMap.get("category_id").toString(),brandMap.get("discount_percentage"));
                     }
+                    flag = false;
                 }
 
                 if(flag) {
@@ -84,6 +85,11 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
             }
         }
         return handleMaps;
+    }
+
+    @Override
+    public List<Map<String, Object>> queryRuleByBrandOne(Map<String, Object> params) throws Exception {
+        return seasonMapper.queryRuleByBrandOne(params);
     }
 
     @Override

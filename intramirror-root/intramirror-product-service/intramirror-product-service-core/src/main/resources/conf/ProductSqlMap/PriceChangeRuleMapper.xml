@@ -325,7 +325,7 @@
 
     <select id="selectSeasonGroupRule" resultType="java.util.Map" parameterType="java.util.Map">
 
-    select pcr.price_change_rule_id,pcrsg.season_code from price_change_rule pcr
+    select pcr.price_change_rule_id,pcrsg.season_code,pcr.vendor_id,pcr.shop_id,pcr.user_id from price_change_rule pcr
     inner join price_change_rule_season_group pcrsg on (pcrsg.price_change_rule_id = pcr.price_change_rule_id and pcrsg.enabled = 1)
     where pcr.price_type = #{price_type,jdbcType=BIGINT}
     and pcr.`status` = 1
@@ -464,6 +464,7 @@
             <if test="item.handle_level == 4">
                 and p.product_id = #{item.product_id,jdbcType=BIGINT}
             </if>
+            and vendor_id = #{item.vendor_id,jdbcType=BIGINT}
             and p.season_code in (#{item.season_codes})
             )
         </foreach>
@@ -514,6 +515,7 @@
                 and p.product_id = #{item.product_id,jdbcType=BIGINT}
             </if>
             and p.season_code in (#{item.season_codes})
+            and vendor_id = #{item.vendor_id,jdbcType=BIGINT}
             )
         </foreach>
     </update>
