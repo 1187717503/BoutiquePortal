@@ -70,8 +70,8 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
                     String eName = handleMap.get("english_name") == null ? "" : handleMap.get("english_name").toString();
                     if(brandName.equals(eName)) {
                         handleMap.put(brandMap.get("category_id").toString(),brandMap.get("discount_percentage"));
+                        flag = false;
                     }
-                    flag = false;
                 }
 
                 if(flag) {
