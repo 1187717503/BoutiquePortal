@@ -450,7 +450,7 @@ public class PriceChangeRuleController extends BaseController{
 		    
 		} catch (Exception e) {
 			e.printStackTrace();
-			result.put("info","create priceChangeRuleGroupId fail ");
+			result.put("info","delete priceChangeRuleGroupId fail ");
 			return result;
 		}
 		
