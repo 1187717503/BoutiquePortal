@@ -11,14 +11,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
+import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.product.api.model.PriceChangeRule;
 import com.intramirror.product.api.model.PriceChangeRuleCategoryBrand;
 import com.intramirror.product.api.model.PriceChangeRuleGroup;
 import com.intramirror.product.api.model.PriceChangeRuleProduct;
+import com.intramirror.product.api.model.PriceChangeRuleSeasonGroup;
+import com.intramirror.product.api.model.Shop;
 import com.intramirror.product.api.service.IPriceChangeRuleCategoryBrandService;
 import com.intramirror.product.api.service.IPriceChangeRuleGroupService;
 import com.intramirror.product.api.service.IPriceChangeRuleProductService;
+import com.intramirror.product.api.service.IPriceChangeRuleSeasonGroupService;
+import com.intramirror.product.api.service.IShopService;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
 
 @Service
@@ -35,6 +40,64 @@ public class PriceChangeRuleService {
 	
 	@Autowired
 	private IPriceChangeRuleGroupService priceChangeRuleGroupService;
+	
+	@Autowired
+	IPriceChangeRuleSeasonGroupService priceChangeRuleSeasonGroupService;
+	
+	@Autowired
+	IShopService shopService;
+	
+	
+	
+	
+	
+	/**
+	 * 初始化 PriceChangeRule
+	 * @return
+	 * @throws ParseException 
+	 */
+	@Transactional  
+	public Map<String,Object> initPriceChangeRule(Map<String,Object> map) throws Exception{
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("status", StatusType.FAILURE);
+		
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("user_id", map.get("user_id"));
+		param.put("enabled", EnabledType.USED);
+		
+		Shop shop = shopService.selectByParameter(param);
+		
+		//添加PriceChangeRule
+		PriceChangeRule priceChangeRule = new PriceChangeRule();
+
+		priceChangeRule.setName(map.get("name").toString());
+		priceChangeRule.setPriceType(Byte.valueOf(map.get("price_type").toString()));
+		priceChangeRule.setVendorId(0l);
+		priceChangeRule.setShopId(shop.getShopId());
+	    priceChangeRule.setStatus(Integer.parseInt(map.get("status").toString()));
+
+	    priceChangeRuleService.insertSelective(priceChangeRule);
+	    if(priceChangeRule.getPriceChangeRuleId() == null || priceChangeRule.getPriceChangeRuleId() == 0 ){
+	    	result.put("info", "add priceChangeRule fail");
+	    	return result;
+	    }
+	    
+	    //添加price_change_rule_season_group
+	    JsonArray priceChangeRuleSeasonGroupArray = new JsonParser().parse(map.get("priceChangeRuleSeasonGroupList").toString()).getAsJsonArray();
+
+	    for (int i = 0; i < priceChangeRuleSeasonGroupArray.size(); i++) {
+	    	PriceChangeRuleSeasonGroup priceChangeRuleSeasonGroupInfo = new PriceChangeRuleSeasonGroup();
+	    	priceChangeRuleSeasonGroupInfo.setPriceChangeRuleId(priceChangeRule.getPriceChangeRuleId());
+	    	priceChangeRuleSeasonGroupInfo.setName(priceChangeRule.getName());
+	    	priceChangeRuleSeasonGroupInfo.setSeasonCode(priceChangeRuleSeasonGroupArray.get(i).getAsString());
+	    	priceChangeRuleSeasonGroupService.insertSelective(priceChangeRuleSeasonGroupInfo);
+	    }
+	   
+	    
+	    result.put("status", StatusType.SUCCESS);
+	    return result;
+	}
+	
 	
 	/**
 	 * 创建 PriceChangeRule
