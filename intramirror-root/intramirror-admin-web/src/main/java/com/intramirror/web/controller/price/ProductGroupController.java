@@ -10,12 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,9 +30,9 @@ public class ProductGroupController extends BaseController {
 
     @CrossOrigin
     @SuppressWarnings("unchecked")
-    @RequestMapping("/list")
+    @RequestMapping(value = "/list", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String, Object> productGroupList(@RequestBody Map<String, Object> map, HttpServletRequest httpRequest) throws Exception {
+    public Map<String, Object> productGroupList(@RequestBody Map<String, Object> map) throws Exception {
         logger.info("productGroupList param:" + new Gson().toJson(map));
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("status", StatusType.FAILURE);
@@ -65,8 +61,8 @@ public class ProductGroupController extends BaseController {
      */
     public static boolean checkParams(Map<String, Object> params) {
 
-        if (params.get("status") == null || StringUtils.isBlank(params.get("status").toString())
-                || checkIntegerNumber(params.get("status").toString())) {
+        if (params.get("group_type") == null || StringUtils.isBlank(params.get("group_type").toString())
+                || checkIntegerNumber(params.get("group_type").toString())) {
             return false;
         }
         return true;
