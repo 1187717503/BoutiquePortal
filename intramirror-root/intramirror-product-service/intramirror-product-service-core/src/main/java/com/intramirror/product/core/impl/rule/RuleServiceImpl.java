@@ -5,10 +5,7 @@ import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.SeasonMapper;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by dingyifan on 2017/7/20.
@@ -94,7 +91,18 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
 
     @Override
     public List<Map<String, Object>> queryNotRuleByBrand(Map<String, Object> params) throws Exception {
-        return seasonMapper.queryNotRuleByBrand(params);
+        List<Map<String,Object>> brands = seasonMapper.queryNotRuleByBrand(params);
+        Collections.sort(brands, new Comparator() {
+            @Override
+            public int compare(Object o1, Object o2) {
+                Map<String, Object> map1 = (Map<String, Object>) o1;
+                Map<String, Object> map2 = (Map<String, Object>) o2;
+                String name1 = map1.get("english_name").toString().substring(0, 1);
+                String name2 = map2.get("english_name").toString().substring(0, 1);
+                return name1.compareTo(name2);
+            }
+        });
+        return brands;
     }
 
     @Override
