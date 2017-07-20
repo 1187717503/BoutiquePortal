@@ -5,6 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +30,8 @@ import com.intramirror.product.api.service.IPriceChangeRuleCategoryBrandService;
 import com.intramirror.product.api.service.IPriceChangeRuleGroupService;
 import com.intramirror.product.api.service.IPriceChangeRuleProductService;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
+import com.intramirror.user.api.model.User;
+import com.intramirror.web.controller.BaseController;
 import com.intramirror.web.service.PriceChangeRuleService;
 
 /**
@@ -37,7 +41,7 @@ import com.intramirror.web.service.PriceChangeRuleService;
  */
 @Controller
 @RequestMapping("/priceChangeRule")
-public class PriceChangeRuleController {
+public class PriceChangeRuleController extends BaseController{
 	
 	private static Logger logger = LoggerFactory.getLogger(PriceChangeRuleController.class);
 	
@@ -57,6 +61,54 @@ public class PriceChangeRuleController {
 	private PriceChangeRuleService priceChangeRuleService;
 	
 
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping("/initPriceChangeRule")
+	@ResponseBody
+	public Map<String, Object> initPriceChangeRule(@RequestBody Map<String, Object> map,HttpServletRequest httpRequest){
+		logger.info("initPriceChangeRule param:"+new Gson().toJson(map));
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("status", StatusType.FAILURE);
+		
+		//校验登录
+		Map< String, Object> userMap = new HashMap<String, Object>();
+		User user = null;
+		try {
+			userMap = super.baseController(httpRequest);
+			result.put("userStatus", userMap.get("userStatus"));
+			if(Integer.parseInt(userMap.get("status").toString()) == StatusType.SUCCESS){
+				user = (User) userMap.get("user");
+				if(user == null){
+					result.put("info","User not logged in");
+					return result;
+				}
+				map.put("user_id", user.getUserId());
+			}
+		} catch (Exception e1) {
+			e1.printStackTrace();
+			result.put("info","User not logged in");
+			return result;
+		}
+
+		//校验参数
+		if(!initCheckParams(map)){
+			result.put("info","parameter is incorrect");
+			return result;
+		}
+		
+		//调用service 创建 事物管理
+		try {
+			result = priceChangeRuleService.initPriceChangeRule(map);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.put("info","create priceChangeRule fail ");
+			return result;
+		}
+
+		
+        result.put("status", StatusType.SUCCESS);
+		return result;
+	}
 
 	@RequestMapping("/createPriceChangeRule")
 	@ResponseBody
@@ -296,6 +348,33 @@ public class PriceChangeRuleController {
     /**
      * 检查参数
      */
+    public static boolean  initCheckParams(Map<String, Object> params) {
+    	
+    	if(params.get("name") ==null || StringUtils.isBlank(params.get("name").toString())){
+    		return false;
+    	}
+    	
+    	if(params.get("price_type") == null || StringUtils.isBlank(params.get("price_type").toString()) 
+    			|| checkIntegerNumber(params.get("price_type").toString())){
+    		return false;
+    	}
+    	
+    	if(params.get("status") == null || StringUtils.isBlank(params.get("status").toString()) 
+    			|| checkIntegerNumber(params.get("status").toString())){
+    		return false;
+    	}
+    	
+    	if(params.get("priceChangeRuleSeasonGroupList") == null || StringUtils.isBlank(params.get("priceChangeRuleSeasonGroupList").toString())){
+    		return false;
+    	}
+
+    	return true;
+    }
+	
+	
+    /**
+     * 检查参数
+     */
     public static boolean checkParams(Map<String, Object> params) {
     	
     	if(params.get("name") ==null || StringUtils.isBlank(params.get("name").toString())){
@@ -334,6 +413,9 @@ public class PriceChangeRuleController {
 
     	return true;
     }
+    
+    
+
     
     
     /**

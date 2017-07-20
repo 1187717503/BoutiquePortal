@@ -2,12 +2,14 @@ package com.intramirror.product.core.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import com.intramirror.product.api.model.PriceChangeRuleSeasonGroup;
 import com.intramirror.product.api.service.IPriceChangeRuleSeasonGroupService;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.PriceChangeRuleSeasonGroupMapper;
 
+@Service
 public class PriceChangeRuleSeasonGroupServiceImpl extends BaseDao implements IPriceChangeRuleSeasonGroupService{
 
     private static Logger logger = LoggerFactory.getLogger(PriceChangeRuleSeasonGroupServiceImpl.class);

@@ -4,12 +4,14 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import com.intramirror.product.api.model.Shop;
 import com.intramirror.product.api.service.IShopService;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.ShopMapper;
 
+@Service
 public class ShopServiceImpl extends BaseDao implements IShopService{
 
     private static Logger logger = LoggerFactory.getLogger(ShopServiceImpl.class);
