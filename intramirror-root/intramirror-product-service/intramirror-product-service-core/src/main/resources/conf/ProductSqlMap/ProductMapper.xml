@@ -81,40 +81,40 @@
     from product
     where 1=1 
       <if test="productId != null" >
-        and product_id = #{productId,jdbcType=BIGINT},
+        and product_id = #{productId,jdbcType=BIGINT}
       </if>
       <if test="categoryId != null" >
-        and category_id = #{categoryId,jdbcType=BIGINT},
+        and category_id = #{categoryId,jdbcType=BIGINT}
       </if>
       <if test="vendorId != null" >
-        and vendor_id = #{vendorId,jdbcType=BIGINT},
+        and vendor_id = #{vendorId,jdbcType=BIGINT}
       </if>
       <if test="brandId != null" >
-        and brand_id = #{brandId,jdbcType=BIGINT},
+        and brand_id = #{brandId,jdbcType=BIGINT}
       </if>
       <if test="productCode != null" >
-        and product_code = #{productCode,jdbcType=VARCHAR},
+        and product_code = #{productCode,jdbcType=VARCHAR}
       </if>
       <if test="name != null" >
-        and name = #{name,jdbcType=VARCHAR},
+        and name = #{name,jdbcType=VARCHAR}
       </if>
       <if test="status != null" >
-        and status = #{status,jdbcType=TINYINT},
+        and status = #{status,jdbcType=TINYINT}
       </if>
       <if test="feature != null" >
-        and feature = #{feature,jdbcType=TINYINT},
+        and feature = #{feature,jdbcType=TINYINT}
       </if>
       <if test="enabled != null" >
-        and enabled = #{enabled,jdbcType=BIT},
+        and enabled = #{enabled,jdbcType=BIT}
       </if>
       <if test="score != null" >
-        and score = #{score,jdbcType=DECIMAL},
+        and score = #{score,jdbcType=DECIMAL}
       </if>
       <if test="productGroupId != null" >
-        and product_group_id = #{productGroupId,jdbcType=BIGINT},
+        and product_group_id = #{productGroupId,jdbcType=BIGINT}
       </if>
       <if test="seasonCode != null" >
-        and season_code = #{seasonCode,jdbcType=VARCHAR},
+        and season_code = #{seasonCode,jdbcType=VARCHAR}
       </if>
   </select>
   

@@ -519,7 +519,7 @@ public class PriceChangeRuleController extends BaseController{
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			result.put("info","create priceChangeRuleCategoryBrand fail ");
+			result.put("info","create PriceChangeRuleProduct fail ");
 			return result;
 		}
 
