@@ -146,7 +146,7 @@ public class PriceChangeRuleService {
 	
 	
 	/**
-	 * 添加PriceChangeRuleCategoryBrand
+	 * 添加PriceChangeRuleCategoryBrandBatch
 	 * @param map
 	 * @return
 	 */
@@ -199,7 +199,7 @@ public class PriceChangeRuleService {
 	
 	
 	/**
-	 * 删除PriceChangeRuleCategoryBrand
+	 * 删除PriceChangeRuleCategoryBrandBatch
 	 * @param map
 	 * @return
 	 */

@@ -327,47 +327,47 @@ public class PriceChangeRuleController extends BaseController{
 	}
 	
 	
-//	
-//
-//	/**
-//	 * 根据price_change_rule_category_brand_id 删除PriceChangeRuleCategoryBrand
-//	 * @param map
-//	 * @return
-//	 */
-//	@RequestMapping("/deletePriceChangeRuleCategoryBrand")
-//	@ResponseBody
-//	public Map<String, Object> deletePriceChangeRuleCategoryBrand(@RequestBody Map<String, Object> map){
-//		logger.info("priceChangeRuleCategoryBrandCreate param:"+new Gson().toJson(map));
-//		Map<String, Object> result = new HashMap<String, Object>();
-//		result.put("status", StatusType.FAILURE);
-//		
-//		//校验
-//		if(map.get("price_change_rule_category_brand_id") == null ||StringUtils.isBlank(map.get("price_change_rule_category_brand_id").toString())){
-//			result.put("info","Parameter cannot be null");
-//			return result;
-//		}
-//		
-//		try {
-//			//根据ID删除
-//			String priceChangeRuleCategoryBrandId = map.get("price_change_rule_category_brand_id").toString();
-//			int row = priceChangeRuleCategoryBrandService.deletePriceChangeRuleCategoryBrand(Long.parseLong(priceChangeRuleCategoryBrandId));
-//			
-//			//判断是否成功
-//	        if (row > 0) {
-//	            result.put("status", StatusType.SUCCESS);
-//	        }else{
-//	        	 result.put("info", "delete priceChangeRuleCategoryBrand fail");
-//	        }
-//		    
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			result.put("info","create priceChangeRuleCategoryBrand fail ");
-//			return result;
-//		}
-//		
-//		return result;
-//	}
-//	
+	
+
+	/**
+	 * 根据price_change_rule_category_brand_id 删除PriceChangeRuleCategoryBrand
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/deletePriceChangeRuleCategoryBrand")
+	@ResponseBody
+	public Map<String, Object> deletePriceChangeRuleCategoryBrand(@RequestBody Map<String, Object> map){
+		logger.info("deletePriceChangeRuleCategoryBrand param:"+new Gson().toJson(map));
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("status", StatusType.FAILURE);
+		
+		//校验
+		if(map.get("price_change_rule_category_brand_id") == null ||StringUtils.isBlank(map.get("price_change_rule_category_brand_id").toString())){
+			result.put("info","Parameter cannot be null");
+			return result;
+		}
+		
+		try {
+			//根据ID删除
+			String priceChangeRuleCategoryBrandId = map.get("price_change_rule_category_brand_id").toString();
+			int row = priceChangeRuleCategoryBrandService.deletePriceChangeRuleCategoryBrand(Long.parseLong(priceChangeRuleCategoryBrandId));
+			
+			//判断是否成功
+	        if (row > 0) {
+	            result.put("status", StatusType.SUCCESS);
+	        }else{
+	        	 result.put("info", "delete priceChangeRuleCategoryBrand fail");
+	        }
+		    
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.put("info","delete priceChangeRuleCategoryBrand fail ");
+			return result;
+		}
+		
+		return result;
+	}
+	
 	
 	
 	
