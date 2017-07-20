@@ -174,7 +174,7 @@
     )
     <if test="english_name != null and english_name != ''">
       <bind name="brandName" value="'%' + english_name + '%'" />
-      and b.english_name like #{brandName}
+      and english_name like #{brandName}
     </if>
   </select>
 

@@ -380,12 +380,12 @@
             (
             select p.product_id from product p where p.enabled = 1
 
-            <if test="item.handle_level == 1">
+            <!--<if test="item.handle_level == 1">
                 and p.category_id in (
                 select category_id from category c where c.enabled = 1 and c.`level` = 2 and c.parent_id =
                 #{item.category_id,jdbcType=BIGINT}
                 )
-            </if>
+            </if>-->
 
             <if test="item.handle_level == 2">
                 <if test="item.level == 1">
@@ -406,7 +406,9 @@
                 <if test="item.level == 3">
                     and p.category_id = #{item.category_id,jdbcType=BIGINT}
                 </if>
-                and p.brand_id = #{item.brand_id,jdbcType=BIGINT}
+                <if test="item.brand_id != null and item.brand_id != ''">
+                    and p.brand_id = #{item.brand_id,jdbcType=BIGINT}
+                </if>
             </if>
 
             <if test="item.handle_level == 3">
@@ -428,12 +430,12 @@
             (
             select p.product_id from product p where p.enabled = 1
 
-            <if test="item.handle_level == 1">
+            <!--<if test="item.handle_level == 1">
                 and p.category_id in (
                 select category_id from category c where c.enabled = 1 and c.`level` = 2 and c.parent_id =
                 #{item.category_id,jdbcType=BIGINT}
                 )
-            </if>
+            </if>-->
 
             <if test="item.handle_level == 2">
                 <if test="item.level == 1">
@@ -454,7 +456,9 @@
                 <if test="item.level == 3">
                     and p.category_id = #{item.category_id,jdbcType=BIGINT}
                 </if>
-                and p.brand_id = #{item.brand_id,jdbcType=BIGINT}
+                <if test="item.brand_id != null and item.brand_id != ''">
+                    and p.brand_id = #{item.brand_id,jdbcType=BIGINT}
+                </if>
             </if>
 
             <if test="item.handle_level == 3">
@@ -478,12 +482,12 @@
             (
             select p.product_id from product p where p.enabled = 1
 
-            <if test="item.handle_level == 1">
+            <!--<if test="item.handle_level == 1">
                 and p.category_id in (
                 select category_id from category c where c.enabled = 1 and c.`level` = 2 and c.parent_id =
                 #{item.category_id,jdbcType=BIGINT}
                 )
-            </if>
+            </if>-->
 
             <if test="item.handle_level == 2">
                 <if test="item.level == 1">
@@ -504,7 +508,9 @@
                 <if test="item.level == 3">
                     and p.category_id = #{item.category_id,jdbcType=BIGINT}
                 </if>
-                and p.brand_id = #{item.brand_id,jdbcType=BIGINT}
+                <if test="item.brand_id != null and item.brand_id != ''">
+                    and p.brand_id = #{item.brand_id,jdbcType=BIGINT}
+                </if>
             </if>
 
             <if test="item.handle_level == 3">
