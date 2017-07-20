@@ -84,15 +84,16 @@
     ,
     <include refid="Blob_Column_List" />
     from shop
-    where 1=1
+    where 
     
    <if test="enabled != null" >
-     and enabled = #{enabled,jdbcType=BIT},
+     enabled = #{enabled,jdbcType=BIT} and 
    </if>
    
-   <if test="user_id != null" >
-     and user_id =  #{userId,jdbcType=BIGINT},
+   <if test="userId != null" >
+     user_id =  #{userId,jdbcType=BIGINT} and
    </if>
+   1=1
    
   </select>
   

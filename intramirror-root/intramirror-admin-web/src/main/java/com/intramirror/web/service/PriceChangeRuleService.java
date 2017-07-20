@@ -2,6 +2,7 @@ package com.intramirror.web.service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
+import com.intramirror.common.Helper;
 import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.product.api.model.PriceChangeRule;
@@ -62,8 +64,8 @@ public class PriceChangeRuleService {
 		result.put("status", StatusType.FAILURE);
 		
 		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("user_id", map.get("user_id"));
-		param.put("enabled", EnabledType.USED);
+		param.put("userId", map.get("userId"));
+		param.put("enabled", 1);
 		
 		Shop shop = shopService.selectByParameter(param);
 		
@@ -73,7 +75,10 @@ public class PriceChangeRuleService {
 		priceChangeRule.setName(map.get("name").toString());
 		priceChangeRule.setPriceType(Byte.valueOf(map.get("price_type").toString()));
 		priceChangeRule.setVendorId(0l);
-		priceChangeRule.setShopId(shop.getShopId());
+		if(shop != null){
+			priceChangeRule.setShopId(shop.getShopId());
+		}
+	
 	    priceChangeRule.setStatus(Integer.parseInt(map.get("status").toString()));
 
 	    priceChangeRuleService.insertSelective(priceChangeRule);
@@ -83,13 +88,17 @@ public class PriceChangeRuleService {
 	    }
 	    
 	    //添加price_change_rule_season_group
-	    JsonArray priceChangeRuleSeasonGroupArray = new JsonParser().parse(map.get("priceChangeRuleSeasonGroupList").toString()).getAsJsonArray();
+	    JsonArray priceChangeRuleSeasonGroupArray = new JsonParser().parse(map.get("price_change_rule_season_group_List").toString()).getAsJsonArray();
 
 	    for (int i = 0; i < priceChangeRuleSeasonGroupArray.size(); i++) {
 	    	PriceChangeRuleSeasonGroup priceChangeRuleSeasonGroupInfo = new PriceChangeRuleSeasonGroup();
 	    	priceChangeRuleSeasonGroupInfo.setPriceChangeRuleId(priceChangeRule.getPriceChangeRuleId());
 	    	priceChangeRuleSeasonGroupInfo.setName(priceChangeRule.getName());
 	    	priceChangeRuleSeasonGroupInfo.setSeasonCode(priceChangeRuleSeasonGroupArray.get(i).getAsString());
+	    	priceChangeRuleSeasonGroupInfo.setEnabled(1);
+	    	Date currentDate = Helper.getCurrentTimeToUTCWithDate();
+	    	priceChangeRuleSeasonGroupInfo.setCreatedAt(currentDate);
+	    	priceChangeRuleSeasonGroupInfo.setUpdatedAt(currentDate);
 	    	priceChangeRuleSeasonGroupService.insertSelective(priceChangeRuleSeasonGroupInfo);
 	    }
 	   
