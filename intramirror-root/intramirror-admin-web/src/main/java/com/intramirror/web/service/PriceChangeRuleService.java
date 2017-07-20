@@ -151,7 +151,7 @@ public class PriceChangeRuleService {
 	 * @return
 	 */
 	@Transactional  
-	public Map<String, Object> priceChangeRuleCategoryBrandCreate(Map<String, Object> map) throws Exception{
+	public Map<String, Object> createPriceChangeRuleCategoryBrand(Map<String, Object> map) throws Exception{
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
 
@@ -193,6 +193,58 @@ public class PriceChangeRuleService {
         result.put("status", StatusType.SUCCESS);
 		return result;
 	}
+	
+	
+	
+	
+	
+	/**
+	 * 删除PriceChangeRuleCategoryBrand
+	 * @param map
+	 * @return
+	 */
+	@Transactional  
+	public Map<String, Object> deletePriceChangeRuleCategoryBrand(Map<String, Object> map) throws Exception{
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("status", StatusType.FAILURE);
+
+	    JsonArray priceChangeRuleCategoryListArray = new JsonParser().parse(map.get("price_change_rule_category_brand_list").toString()).getAsJsonArray();
+	    Long priceChangeRuleId =Long.parseLong(map.get("price_change_rule_id").toString());
+
+	 	Category category = new Category();
+        //类目只有2级
+	 	category.setLevel(Byte.valueOf("2"));
+	 	category.setEnabled(EnabledType.USED);
+	 	
+	 	//获取brand列表
+	    for (int i = 0; i < priceChangeRuleCategoryListArray.size(); i++) {
+	    	
+	    	//获取类目列表
+	    	List<Map<String,Object>> categoryList = categoryService.queryCategoryListByConditions(category);
+	    	for(Map<String,Object> categoryMap : categoryList){
+		        PriceChangeRuleCategoryBrand priceChangeRuleCategoryBrand = new PriceChangeRuleCategoryBrand();
+		        priceChangeRuleCategoryBrand.setPriceChangeRuleId(priceChangeRuleId);
+		        priceChangeRuleCategoryBrand.setCategoryId(Long.parseLong(categoryMap.get("category_id").toString()));
+		        //类目只有2级
+		        priceChangeRuleCategoryBrand.setLevel(Byte.valueOf("2"));
+		        priceChangeRuleCategoryBrand.setBrandId(priceChangeRuleCategoryListArray.get(i).getAsLong());
+		        priceChangeRuleCategoryBrand.setExceptionFlag (0);
+
+				int row = priceChangeRuleCategoryBrandService.deleteByParameter(priceChangeRuleCategoryBrand);
+				
+		        if (row == 0) {
+		        	result.put("info","parameter is incorrect");
+		        	logger.error("delete priceChangeRuleCategoryBrand fail parameter:"+ new Gson().toJson(priceChangeRuleCategoryBrand));
+		            throw new RuntimeException("error");
+		        }
+	    	}
+
+	     }
+
+        result.put("status", StatusType.SUCCESS);
+		return result;
+	}
+	
 	
 	
 	

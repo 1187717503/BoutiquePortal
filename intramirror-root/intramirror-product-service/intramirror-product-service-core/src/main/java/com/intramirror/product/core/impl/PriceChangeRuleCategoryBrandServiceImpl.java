@@ -55,4 +55,9 @@ public class PriceChangeRuleCategoryBrandServiceImpl extends BaseDao implements 
 		return priceChangeRuleCategoryBrandMapper.updateDiscountPercentageBySelective(record);
 	}
 
+	@Override
+	public int deleteByParameter(PriceChangeRuleCategoryBrand record) {
+		return priceChangeRuleCategoryBrandMapper.deleteByParameter(record);
+	}
+
 }
