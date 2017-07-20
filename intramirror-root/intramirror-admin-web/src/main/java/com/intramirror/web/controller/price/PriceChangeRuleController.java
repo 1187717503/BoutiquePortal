@@ -451,12 +451,12 @@ public class PriceChangeRuleController extends BaseController{
 	        if (row > 0) {
 	            result.put("status", StatusType.SUCCESS);
 	        }else{
-	        	 result.put("info", "delete priceChangeRuleGroupId fail");
+	        	 result.put("info", "delete priceChangeRuleGroup fail");
 	        }
 		    
 		} catch (Exception e) {
 			e.printStackTrace();
-			result.put("info","delete priceChangeRuleGroupId fail ");
+			result.put("info","delete priceChangeRuleGroup fail ");
 			return result;
 		}
 		
@@ -466,7 +466,7 @@ public class PriceChangeRuleController extends BaseController{
 	
 	
 	/**
-	 * 添加priceChangeRuleProductGroup
+	 * 添加PriceChangeRuleProduct
 	 * @param map
 	 * @return
 	 */
@@ -529,6 +529,47 @@ public class PriceChangeRuleController extends BaseController{
 	}
 	
 	
+	
+	
+	
+	/**
+	 * 根据price_change_rule_product_id 删除PriceChangeRuleProduct
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/deletePriceChangeRuleProduct")
+	@ResponseBody
+	public Map<String, Object> deletePriceChangeRuleProduct(@RequestBody Map<String, Object> map){
+		logger.info("deletePriceChangeRuleGroup param:"+new Gson().toJson(map));
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("status", StatusType.FAILURE);
+		
+		//校验
+		if(map.get("price_change_rule_product_id") == null ||StringUtils.isBlank(map.get("price_change_rule_product_id").toString())){
+			result.put("info","Parameter cannot be null");
+			return result;
+		}
+		
+		try {
+			//根据ID删除
+			String priceChangeRuleProductId = map.get("price_change_rule_product_id").toString();
+			int row = priceChangeRuleProductService.deleteByPrimaryKey(Long.parseLong(priceChangeRuleProductId));
+			
+			//判断是否成功
+	        if (row > 0) {
+	            result.put("status", StatusType.SUCCESS);
+	        }else{
+	        	 result.put("info", "delete priceChangeRuleProduct fail");
+	        }
+		    
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.put("info","delete priceChangeRuleProduct fail ");
+			return result;
+		}
+		
+		return result;
+	}
 	
 	
 	
