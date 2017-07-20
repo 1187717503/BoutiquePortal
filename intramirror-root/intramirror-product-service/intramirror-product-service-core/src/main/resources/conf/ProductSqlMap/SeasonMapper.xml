@@ -145,6 +145,23 @@
         inner join category c on (c.category_id = pcrcb.category_id and c.enabled = 1)
         inner join brand b on (b.brand_id = pcrcb.brand_id and b.enabled = 1)
         where pcrcb.exception_flag = #{exception_flag,jdbcType=INTEGER} and pcrcb.price_change_rule_id = #{price_change_rule_id,jdbcType=INTEGER}
+        <if test="english_name != null and english_name != ''">
+          <bind name="brandName" value="'%' + english_name + '%'" />
+          and b.english_name like #{brandName}
+        </if>
+  </select>
+
+  <select id="queryNotRuleByBrand" resultType="java.util.Map" parameterType="java.util.Map">
+    select distinct brand_id,english_name from brand where brand_id not in (
+      select pcrcb.brand_id from price_change_rule_category_brand pcrcb
+      inner join category c on (c.category_id = pcrcb.category_id and c.enabled = 1)
+      inner join brand b on (b.brand_id = pcrcb.brand_id and b.enabled = 1)
+      where pcrcb.exception_flag = #{exception_flag,jdbcType=INTEGER} and pcrcb.price_change_rule_id = #{price_change_rule_id,jdbcType=INTEGER}
+    )
+    <if test="english_name != null and english_name != ''">
+      <bind name="brandName" value="'%' + english_name + '%'" />
+      and b.english_name like #{brandName}
+    </if>
   </select>
 
   <select id="queryRuleByGroup" resultType="java.util.Map" parameterType="java.util.Map">
