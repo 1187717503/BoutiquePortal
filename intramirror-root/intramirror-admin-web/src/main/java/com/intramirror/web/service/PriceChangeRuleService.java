@@ -58,13 +58,13 @@ public class PriceChangeRuleService {
 	private IPriceChangeRuleGroupService priceChangeRuleGroupService;
 	
 	@Autowired
-	IPriceChangeRuleSeasonGroupService priceChangeRuleSeasonGroupService;
+	private IPriceChangeRuleSeasonGroupService priceChangeRuleSeasonGroupService;
 	
 	@Autowired
-	IShopService shopService;
+	private IShopService shopService;
 	
 	@Autowired
-	VendorService vendorService;
+	private VendorService vendorService;
 	
 	@Autowired
     private ICategoryService categoryService;

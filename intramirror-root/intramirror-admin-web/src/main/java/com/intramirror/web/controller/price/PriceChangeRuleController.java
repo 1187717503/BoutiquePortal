@@ -20,9 +20,12 @@ import com.google.gson.JsonParser;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.product.api.model.PriceChangeRuleCategoryBrand;
 import com.intramirror.product.api.model.PriceChangeRuleGroup;
+import com.intramirror.product.api.model.PriceChangeRuleProduct;
+import com.intramirror.product.api.model.ProductWithBLOBs;
 import com.intramirror.product.api.service.IPriceChangeRuleCategoryBrandService;
 import com.intramirror.product.api.service.IPriceChangeRuleGroupService;
 import com.intramirror.product.api.service.IPriceChangeRuleProductService;
+import com.intramirror.product.api.service.IProductService;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
 import com.intramirror.user.api.model.User;
 import com.intramirror.web.controller.BaseController;
@@ -53,6 +56,9 @@ public class PriceChangeRuleController extends BaseController{
 	
 	@Autowired
 	private PriceChangeRuleService priceChangeRuleService;
+	
+	@Autowired
+	private IProductService productService;
 	
 
 	
@@ -401,7 +407,7 @@ public class PriceChangeRuleController extends BaseController{
 	        priceChangeRuleGroupService.insertSelective(priceChangeRuleGroup);
 	        
 	        if (priceChangeRuleGroup.getPriceChangeRuleGroupId() == null) {
-	            result.put("status", StatusType.DATABASE_ERROR);
+	        	result.put("info","parameter is incorrect");
 	            return result;
 	        }
 		    
@@ -456,6 +462,76 @@ public class PriceChangeRuleController extends BaseController{
 		
 		return result;
 	}
+	
+	
+	
+	/**
+	 * 添加priceChangeRuleProductGroup
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/createPriceChangeRuleProduct")
+	@ResponseBody
+	public Map<String, Object> priceChangeRuleProductCreate(@RequestBody Map<String, Object> map){
+		logger.info("createPriceChangeRuleProduct param:"+new Gson().toJson(map));
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("status", StatusType.FAILURE);
+		
+		//校验
+		if(!checkCreatePriceChangeRuleProductParams(map)){
+			result.put("info","parameter is incorrect");
+			return result;
+		}
+		
+		try {
+            String productCode = map.get("product_code").toString();
+            String price_change_rule_id = map.get("price_change_rule_id").toString();
+ 
+            //查询是否存在该商品
+            ProductWithBLOBs nproductWithBLOBs = null;
+            if (StringUtils.isNotBlank(productCode)) {
+            	ProductWithBLOBs productWithBLOBs = new ProductWithBLOBs();
+            	productWithBLOBs.setProductCode(productCode);
+            	nproductWithBLOBs = productService.selectByParameter(productWithBLOBs);
+    
+            }
+            
+            if(nproductWithBLOBs == null ){
+    			result.put("info","Can't find the goods");
+    			return result;
+
+            }
+            
+            //添加 priceChangeRuleProduct
+            PriceChangeRuleProduct priceChangeRuleProduct = new PriceChangeRuleProduct();
+            priceChangeRuleProduct.setPriceChangeRuleId(Long.valueOf(price_change_rule_id));
+            priceChangeRuleProduct.setProductId(nproductWithBLOBs.getProductId());
+            priceChangeRuleProduct.setBoutiqueId(nproductWithBLOBs.getProductCode());
+            priceChangeRuleProduct.setProductName(nproductWithBLOBs.getName());
+            priceChangeRuleProduct.setDiscountPercentage(Long.valueOf("100") - Long.valueOf(map.get("discount_percentage").toString()));
+            priceChangeRuleProductService.insertSelective(priceChangeRuleProduct);
+            
+            if(priceChangeRuleProduct.getPriceChangeRuleProductId() == null){
+	        	result.put("info","parameter is incorrect");
+	            return result;
+            }
+            
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.put("info","create priceChangeRuleCategoryBrand fail ");
+			return result;
+		}
+
+		
+        result.put("status", StatusType.SUCCESS);
+		return result;
+	}
+	
+	
+	
+	
+	
 	
 	
     /**
@@ -538,9 +614,9 @@ public class PriceChangeRuleController extends BaseController{
     /**
      * 检查参数
      */
-    public static boolean checkUpdateParams(Map<String, Object> params) {
+    public static boolean checkCreatePriceChangeRuleProductParams(Map<String, Object> params) {
     	
-    	if(params.get("name") ==null || StringUtils.isBlank(params.get("name").toString())){
+    	if(params.get("product_code") ==null || StringUtils.isBlank(params.get("product_code").toString())){
     		return false;
     	}
     	
@@ -548,20 +624,10 @@ public class PriceChangeRuleController extends BaseController{
     		return false;
     	}
     	
-    	if(params.get("valid_from") == null || StringUtils.isBlank(params.get("valid_from").toString())){
+    	if(params.get("discount_percentage") == null || StringUtils.isBlank(params.get("discount_percentage").toString())){
     		return false;
     	}
     	
-    	if(params.get("status") == null || StringUtils.isBlank(params.get("status").toString()) 
-    			|| checkIntegerNumber(params.get("status").toString())){
-    		return false;
-    	}
-    	
-    	if(params.get("price_change_rule_all_brand_list") == null || StringUtils.isBlank(params.get("price_change_rule_all_brand_list").toString())){
-    		return false;
-    	}
-    	
-
     	return true;
     }
     
