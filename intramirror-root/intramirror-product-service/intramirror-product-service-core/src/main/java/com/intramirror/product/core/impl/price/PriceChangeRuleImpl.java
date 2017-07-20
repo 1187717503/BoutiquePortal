@@ -35,9 +35,11 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         paramsMap.put("price_type", PriceChangeRuleEnum.PriceType.SUPPLY_PRICE.getCode());
 
         List<Map<String,Object>> selSecondCategoryRuleMaps = priceChangeRuleMapper.selectSecondCategoryRule(paramsMap);
+        selSecondCategoryRuleMaps = this.sortListByLevel(selSecondCategoryRuleMaps);
         logger.info("selSecondCategoryRuleMaps : {}",new Gson().toJson(selSecondCategoryRuleMaps));
 
         List<Map<String,Object>> selAllCategoryRuleMaps = priceChangeRuleMapper.selectAllCategoryRule(paramsMap);
+        selAllCategoryRuleMaps = this.sortListByLevel(selAllCategoryRuleMaps);
         logger.info("selAllCategoryRuleMaps : {}",new Gson().toJson(selAllCategoryRuleMaps));
 
         List<Map<String,Object>> selProductGroupRuleMaps = priceChangeRuleMapper.selectProductGroupRule(paramsMap);
@@ -68,13 +70,15 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         logger.info("selSeasonGroupRuleMaps : {}",new Gson().toJson(selSeasonGroupRuleMaps));
 
         List<Map<String,Object>> selSecondCategoryRuleMaps = priceChangeRuleMapper.selectSecondCategoryRule(paramsMap);
+        selSecondCategoryRuleMaps = this.sortListByLevel(selSecondCategoryRuleMaps);
         logger.info("selSecondCategoryRuleMaps : {}",new Gson().toJson(selSecondCategoryRuleMaps));
 
         List<Map<String,Object>> selAllCategoryRuleMaps = priceChangeRuleMapper.selectAllCategoryRule(paramsMap);
+        selAllCategoryRuleMaps = this.sortListByLevel(selAllCategoryRuleMaps);
         logger.info("selAllCategoryRuleMaps : {}",new Gson().toJson(selAllCategoryRuleMaps));
 
         List<Map<String,Object>> selProductGroupRuleMaps = priceChangeRuleMapper.selectProductGroupRule(paramsMap);
-        logger.info("selProductGroupRuleMaps : {}",new Gson().toJson(selAllCategoryRuleMaps));
+        logger.info("selProductGroupRuleMaps : {}",new Gson().toJson(selProductGroupRuleMaps));
 
         List<Map<String,Object>> selProductRuleMaps = priceChangeRuleMapper.selectProductRule(paramsMap);
         logger.info("selProductRuleMaps : {}",new Gson().toJson(selProductRuleMaps));
@@ -91,6 +95,31 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         return true;
     }
 
+    public List<Map<String,Object>> sortListByLevel(List<Map<String,Object>> maps) {
+        List<Map<String,Object>> sortMaps = new ArrayList<>();
+        if(maps != null && maps.size() > 0) {
+            for(Map<String,Object> map : maps) {
+                String level = map.get("level").toString();
+                if(level.equals("1")) {
+                    sortMaps.add(map);
+                }
+            }
+            for(Map<String,Object> map : maps) {
+                String level = map.get("level").toString();
+                if(level.equals("2")) {
+                    sortMaps.add(map);
+                }
+            }
+            for(Map<String,Object> map : maps) {
+                String level = map.get("level").toString();
+                if(level.equals("3")) {
+                    sortMaps.add(map);
+                }
+            }
+        }
+        return sortMaps;
+    }
+
     @Override
     public boolean updateAdminPrice() {
         Map<String,Object> paramsMap = new HashMap<>();
@@ -101,13 +130,15 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         logger.info("selSeasonGroupRuleMaps : {}",new Gson().toJson(selSeasonGroupRuleMaps));
 
         List<Map<String,Object>> selSecondCategoryRuleMaps = priceChangeRuleMapper.selectSecondCategoryRule(paramsMap);
+        selSecondCategoryRuleMaps = this.sortListByLevel(selSecondCategoryRuleMaps);
         logger.info("selSecondCategoryRuleMaps : {}",new Gson().toJson(selSecondCategoryRuleMaps));
 
         List<Map<String,Object>> selAllCategoryRuleMaps = priceChangeRuleMapper.selectAllCategoryRule(paramsMap);
+        selAllCategoryRuleMaps = this.sortListByLevel(selAllCategoryRuleMaps);
         logger.info("selAllCategoryRuleMaps : {}",new Gson().toJson(selAllCategoryRuleMaps));
 
         List<Map<String,Object>> selProductGroupRuleMaps = priceChangeRuleMapper.selectProductGroupRule(paramsMap);
-        logger.info("selProductGroupRuleMaps : {}",new Gson().toJson(selAllCategoryRuleMaps));
+        logger.info("selProductGroupRuleMaps : {}",new Gson().toJson(selProductGroupRuleMaps));
 
         List<Map<String,Object>> selProductRuleMaps = priceChangeRuleMapper.selectProductRule(paramsMap);
         logger.info("selProductRuleMaps : {}",new Gson().toJson(selProductRuleMaps));
