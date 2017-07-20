@@ -151,7 +151,7 @@ public class PriceChangeRuleService {
 	 * @return
 	 */
 	@Transactional  
-	public Map<String, Object> createPriceChangeRuleCategoryBrand(Map<String, Object> map) throws Exception{
+	public Map<String, Object> createPriceChangeRuleCategoryBrandBatch(Map<String, Object> map) throws Exception{
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
 
@@ -204,7 +204,7 @@ public class PriceChangeRuleService {
 	 * @return
 	 */
 	@Transactional  
-	public Map<String, Object> deletePriceChangeRuleCategoryBrand(Map<String, Object> map) throws Exception{
+	public Map<String, Object> deletePriceChangeRuleCategoryBrandBatch(Map<String, Object> map) throws Exception{
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
 
