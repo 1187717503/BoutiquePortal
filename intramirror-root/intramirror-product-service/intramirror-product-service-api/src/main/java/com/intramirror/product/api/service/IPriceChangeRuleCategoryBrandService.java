@@ -35,5 +35,13 @@ public interface IPriceChangeRuleCategoryBrandService {
      * @mbggenerated
      */
     int updateByPrimaryKeySelective(PriceChangeRuleCategoryBrand record);
+    
+    
+    /**
+     * 根据parameter 修改折扣信息
+     *
+     * @mbggenerated
+     */
+    int updateDiscountPercentageBySelective(PriceChangeRuleCategoryBrand record);
 	
 }

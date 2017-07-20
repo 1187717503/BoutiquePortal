@@ -49,4 +49,10 @@ public class PriceChangeRuleCategoryBrandServiceImpl extends BaseDao implements 
 		return priceChangeRuleCategoryBrandMapper.updateByPrimaryKeySelective(record);
 	}
 
+	@Override
+	public int updateDiscountPercentageBySelective(
+			PriceChangeRuleCategoryBrand record) {
+		return priceChangeRuleCategoryBrandMapper.updateDiscountPercentageBySelective(record);
+	}
+
 }

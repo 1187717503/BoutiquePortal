@@ -103,6 +103,54 @@ public class PriceChangeRuleController extends BaseController{
         result.put("status", StatusType.SUCCESS);
 		return result;
 	}
+	
+	
+	/**
+	 * 修改PriceChangeRuleCategoryBrand
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping("/updatePriceChangeRuleCategoryBrand")
+	@ResponseBody
+	public Map<String, Object> priceChangeRuleCategoryBrandUpdate(@RequestBody Map<String, Object> map){
+		logger.info("priceChangeRuleCategoryBrandUpdate param:"+new Gson().toJson(map));
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("status", StatusType.FAILURE);
+		
+		if(map.get("price_change_rule_category_brand") == null || StringUtils.isBlank(map.get("price_change_rule_category_brand").toString())){
+			result.put("info","parameter is incorrect");
+			return result;
+		}
+		
+		try {
+			
+		    JsonObject priceChangeRuleCategory = new JsonParser().parse(map.get("price_change_rule_category_brand").toString()).getAsJsonObject();
+	
+	        PriceChangeRuleCategoryBrand priceChangeRuleCategoryBrand = new PriceChangeRuleCategoryBrand();
+	        priceChangeRuleCategoryBrand.setPriceChangeRuleId(priceChangeRuleCategory.get("price_change_rule_id").getAsLong());
+	        priceChangeRuleCategoryBrand.setCategoryId(priceChangeRuleCategory.get("category_id").getAsLong());
+	        priceChangeRuleCategoryBrand.setLevel(priceChangeRuleCategory.get("level").getAsByte());
+	        priceChangeRuleCategoryBrand.setBrandId(priceChangeRuleCategory.get("brand_id").getAsLong());
+	        priceChangeRuleCategoryBrand.setDiscountPercentage(priceChangeRuleCategory.get("discount_percentage").getAsLong());
+
+			int row = priceChangeRuleCategoryBrandService.updateDiscountPercentageBySelective(priceChangeRuleCategoryBrand);
+			
+	        if (row == 0) {
+	            result.put("status", StatusType.DATABASE_ERROR);
+	            return result;
+	        }
+		    
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.put("info","update priceChangeRuleCategoryBrand fail ");
+			return result;
+		}
+
+		
+        result.put("status", StatusType.SUCCESS);
+		return result;
+	}
+	
 
 	@RequestMapping("/createPriceChangeRule")
 	@ResponseBody
@@ -345,6 +393,10 @@ public class PriceChangeRuleController extends BaseController{
     public static boolean  initCheckParams(Map<String, Object> params) {
     	
     	if(params.get("name") ==null || StringUtils.isBlank(params.get("name").toString())){
+    		return false;
+    	}
+    	
+    	if(params.get("vendorId") ==null || StringUtils.isBlank(params.get("vendorId").toString())){
     		return false;
     	}
     	

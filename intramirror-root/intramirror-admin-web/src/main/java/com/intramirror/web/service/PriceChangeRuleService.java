@@ -27,6 +27,8 @@ import com.intramirror.product.api.service.IPriceChangeRuleProductService;
 import com.intramirror.product.api.service.IPriceChangeRuleSeasonGroupService;
 import com.intramirror.product.api.service.IShopService;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
+import com.intramirror.user.api.model.Vendor;
+import com.intramirror.user.api.service.VendorService;
 
 @Service
 public class PriceChangeRuleService {
@@ -49,6 +51,9 @@ public class PriceChangeRuleService {
 	@Autowired
 	IShopService shopService;
 	
+	@Autowired
+	VendorService vendorService;
+	
 	
 	
 	
@@ -68,13 +73,20 @@ public class PriceChangeRuleService {
 		param.put("enabled", 1);
 		
 		Shop shop = shopService.selectByParameter(param);
+//		Vendor vendor = vendorService.getVendorByUserId(Long.parseLong(map.get("userId").toString()));
 		
 		//添加PriceChangeRule
 		PriceChangeRule priceChangeRule = new PriceChangeRule();
 
 		priceChangeRule.setName(map.get("name").toString());
 		priceChangeRule.setPriceType(Byte.valueOf(map.get("price_type").toString()));
-		priceChangeRule.setVendorId(0l);
+		Long vendorId =Long.parseLong(map.get("vendorId").toString());
+		
+//		if(vendor != null ){
+//			vendorId = vendor.getVendorId();
+//		}
+		priceChangeRule.setVendorId(vendorId);
+		
 		if(shop != null){
 			priceChangeRule.setShopId(shop.getShopId());
 		}
