@@ -136,7 +136,8 @@ public class PriceChangeRuleController extends BaseController{
 			int row = priceChangeRuleCategoryBrandService.updateDiscountPercentageBySelective(priceChangeRuleCategoryBrand);
 			
 	        if (row == 0) {
-	            result.put("status", StatusType.DATABASE_ERROR);
+//	            result.put("status", StatusType.PARAMETEREXIST);
+	            result.put("info","parameter is incorrect");
 	            return result;
 	        }
 		    
@@ -151,63 +152,6 @@ public class PriceChangeRuleController extends BaseController{
 		return result;
 	}
 	
-
-	@RequestMapping("/createPriceChangeRule")
-	@ResponseBody
-	public Map<String, Object> priceChangeRuleCreate(@RequestBody Map<String, Object> map){
-		logger.info("priceChangeRuleCreate param:"+new Gson().toJson(map));
-		Map<String, Object> result = new HashMap<String, Object>();
-		result.put("status", StatusType.FAILURE);
-		
-		if(!checkParams(map)){
-			result.put("info","parameter is incorrect");
-			return result;
-		}
-		
-		//调用service 创建 事物管理
-		try {
-			result = priceChangeRuleService.createPriceChangeRule(map);
-		} catch (Exception e) {
-			e.printStackTrace();
-			result.put("info","create priceChangeRule fail ");
-			return result;
-		}
-
-		
-        result.put("status", StatusType.SUCCESS);
-		return result;
-	}
-	
-	
-	
-	@RequestMapping("/updatePriceChangeRule")
-	@ResponseBody
-	public Map<String, Object> priceChangeRuleUpdate(@RequestBody Map<String, Object> map){
-		logger.info("priceChangeRuleCreate param:"+new Gson().toJson(map));
-		Map<String, Object> result = new HashMap<String, Object>();
-		result.put("status", StatusType.FAILURE);
-		
-		if(!checkUpdateParams(map)){
-			result.put("info","parameter is incorrect");
-			return result;
-		}
-		
-		//调用service 创建 事物管理
-		try {
-			result = priceChangeRuleService.updatePriceChangeRule(map);
-		} catch (Exception e) {
-			e.printStackTrace();
-			result.put("info","update priceChangeRule fail ");
-			return result;
-		}
-
-		
-        result.put("status", StatusType.SUCCESS);
-		return result;
-	}
-	
-	
-	
 	/**
 	 * 添加PriceChangeRuleCategoryBrand
 	 * @param map
@@ -216,37 +160,22 @@ public class PriceChangeRuleController extends BaseController{
 	@RequestMapping("/createPriceChangeRuleCategoryBrand")
 	@ResponseBody
 	public Map<String, Object> priceChangeRuleCategoryBrandCreate(@RequestBody Map<String, Object> map){
-		logger.info("priceChangeRuleCategoryBrandCreate param:"+new Gson().toJson(map));
+		logger.info("createPriceChangeRuleCategoryBrand param:"+new Gson().toJson(map));
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
 		
-		if(!checkUpdateParams(map)){
+		//校验
+		if(map.get("price_change_rule_id") == null || StringUtils.isBlank(map.get("price_change_rule_id").toString()) || map.get("price_change_rule_category_brand_list") == null || StringUtils.isBlank(map.get("price_change_rule_category_brand_list").toString())){
 			result.put("info","parameter is incorrect");
 			return result;
 		}
 		
 		try {
-			
-		    JsonObject priceChangeRuleCategory = new JsonParser().parse(map.get("price_change_rule_category_brand").toString()).getAsJsonObject();
-	
-	        PriceChangeRuleCategoryBrand priceChangeRuleCategoryBrand = new PriceChangeRuleCategoryBrand();
-	        priceChangeRuleCategoryBrand.setPriceChangeRuleId(priceChangeRuleCategory.get("price_change_rule_id").getAsLong());
-	        priceChangeRuleCategoryBrand.setCategoryId(priceChangeRuleCategory.get("category_id").getAsLong());
-	        priceChangeRuleCategoryBrand.setLevel(priceChangeRuleCategory.get("level").getAsByte());
-	        priceChangeRuleCategoryBrand.setBrandId(priceChangeRuleCategory.get("brand_id").getAsLong());
-	        priceChangeRuleCategoryBrand.setDiscountPercentage(Long.valueOf("100") - priceChangeRuleCategory.get("discount_percentage").getAsLong());
-	        priceChangeRuleCategoryBrand.setExceptionFlag (1);
-
-			priceChangeRuleCategoryBrandService.createPriceChangeRuleCategoryBrand(priceChangeRuleCategoryBrand);
-			
-	        if (priceChangeRuleCategoryBrand.getPriceChangeRuleCategoryBrandId() == null) {
-	            result.put("status", StatusType.DATABASE_ERROR);
-	            return result;
-	        }
-		    
+			//创建 PriceChangeRuleCategoryBrand
+			result = priceChangeRuleService.priceChangeRuleCategoryBrandCreate(map);
 		} catch (Exception e) {
 			e.printStackTrace();
-			result.put("info","create priceChangeRuleCategoryBrand fail ");
+			result.put("info","create PriceChangeRuleCategoryBrand fail ");
 			return result;
 		}
 
@@ -254,6 +183,110 @@ public class PriceChangeRuleController extends BaseController{
         result.put("status", StatusType.SUCCESS);
 		return result;
 	}
+	
+
+//	@RequestMapping("/createPriceChangeRule")
+//	@ResponseBody
+//	public Map<String, Object> priceChangeRuleCreate(@RequestBody Map<String, Object> map){
+//		logger.info("priceChangeRuleCreate param:"+new Gson().toJson(map));
+//		Map<String, Object> result = new HashMap<String, Object>();
+//		result.put("status", StatusType.FAILURE);
+//		
+//		if(!checkParams(map)){
+//			result.put("info","parameter is incorrect");
+//			return result;
+//		}
+//		
+//		//调用service 创建 事物管理
+//		try {
+//			result = priceChangeRuleService.createPriceChangeRule(map);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			result.put("info","create priceChangeRule fail ");
+//			return result;
+//		}
+//
+//		
+//        result.put("status", StatusType.SUCCESS);
+//		return result;
+//	}
+//	
+//	
+//	
+//	@RequestMapping("/updatePriceChangeRule")
+//	@ResponseBody
+//	public Map<String, Object> priceChangeRuleUpdate(@RequestBody Map<String, Object> map){
+//		logger.info("priceChangeRuleCreate param:"+new Gson().toJson(map));
+//		Map<String, Object> result = new HashMap<String, Object>();
+//		result.put("status", StatusType.FAILURE);
+//		
+//		if(!checkUpdateParams(map)){
+//			result.put("info","parameter is incorrect");
+//			return result;
+//		}
+//		
+//		//调用service 创建 事物管理
+//		try {
+//			result = priceChangeRuleService.updatePriceChangeRule(map);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			result.put("info","update priceChangeRule fail ");
+//			return result;
+//		}
+//
+//		
+//        result.put("status", StatusType.SUCCESS);
+//		return result;
+//	}
+	
+	
+	
+//	/**
+//	 * 添加PriceChangeRuleCategoryBrand
+//	 * @param map
+//	 * @return
+//	 */
+//	@RequestMapping("/createPriceChangeRuleCategoryBrand")
+//	@ResponseBody
+//	public Map<String, Object> priceChangeRuleCategoryBrandCreate(@RequestBody Map<String, Object> map){
+//		logger.info("priceChangeRuleCategoryBrandCreate param:"+new Gson().toJson(map));
+//		Map<String, Object> result = new HashMap<String, Object>();
+//		result.put("status", StatusType.FAILURE);
+//		
+//		if(!checkUpdateParams(map)){
+//			result.put("info","parameter is incorrect");
+//			return result;
+//		}
+//		
+//		try {
+//			
+//		    JsonObject priceChangeRuleCategory = new JsonParser().parse(map.get("price_change_rule_category_brand").toString()).getAsJsonObject();
+//	
+//	        PriceChangeRuleCategoryBrand priceChangeRuleCategoryBrand = new PriceChangeRuleCategoryBrand();
+//	        priceChangeRuleCategoryBrand.setPriceChangeRuleId(priceChangeRuleCategory.get("price_change_rule_id").getAsLong());
+//	        priceChangeRuleCategoryBrand.setCategoryId(priceChangeRuleCategory.get("category_id").getAsLong());
+//	        priceChangeRuleCategoryBrand.setLevel(priceChangeRuleCategory.get("level").getAsByte());
+//	        priceChangeRuleCategoryBrand.setBrandId(priceChangeRuleCategory.get("brand_id").getAsLong());
+//	        priceChangeRuleCategoryBrand.setDiscountPercentage(Long.valueOf("100") - priceChangeRuleCategory.get("discount_percentage").getAsLong());
+//	        priceChangeRuleCategoryBrand.setExceptionFlag (1);
+//
+//			priceChangeRuleCategoryBrandService.createPriceChangeRuleCategoryBrand(priceChangeRuleCategoryBrand);
+//			
+//	        if (priceChangeRuleCategoryBrand.getPriceChangeRuleCategoryBrandId() == null) {
+//	            result.put("status", StatusType.DATABASE_ERROR);
+//	            return result;
+//	        }
+//		    
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			result.put("info","create priceChangeRuleCategoryBrand fail ");
+//			return result;
+//		}
+//
+//		
+//        result.put("status", StatusType.SUCCESS);
+//		return result;
+//	}
 	
 	
 	

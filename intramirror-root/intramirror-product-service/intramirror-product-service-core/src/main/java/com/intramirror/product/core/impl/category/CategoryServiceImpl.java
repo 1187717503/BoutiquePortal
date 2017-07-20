@@ -5,6 +5,7 @@ import com.intramirror.product.api.model.Category;
 import com.intramirror.product.api.service.category.ICategoryService;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.CategoryMapper;
+
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -54,4 +55,10 @@ public class CategoryServiceImpl extends BaseDao implements ICategoryService {
         }
         return categorys;
     }
+
+	@Override
+	public List<Map<String,Object>> queryCategoryListByConditions(Category category)
+			throws Exception {
+		return categoryMapper.selCategoryByConditions(category);
+	}
 }

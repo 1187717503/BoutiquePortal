@@ -259,5 +259,9 @@
     <if test="enabled != null">
       and enabled = #{enabled,jdbcType=BIT}
     </if>
+    
+    <if test="level != null">
+      and level = #{level,jdbcType=TINYINT}
+    </if>
   </select>
 </mapper>
