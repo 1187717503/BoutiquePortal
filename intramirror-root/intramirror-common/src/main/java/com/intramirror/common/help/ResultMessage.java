@@ -38,6 +38,14 @@ public class ResultMessage {
         this.msg = msg;
     }
 
+    public Map<String, Object> getInfoMap() {
+        return infoMap;
+    }
+
+    public void setInfoMap(Map<String, Object> infoMap) {
+        this.infoMap = infoMap;
+    }
+
     public ResultMessage addMsg(String msg){
         this.msg = (this.msg == null ? "" : this.msg) + msg + ";";
         return this;

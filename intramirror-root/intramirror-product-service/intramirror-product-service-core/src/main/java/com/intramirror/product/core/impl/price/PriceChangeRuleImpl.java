@@ -3,12 +3,14 @@ package com.intramirror.product.core.impl.price;
 import com.google.gson.Gson;
 import com.intramirror.common.Contants;
 import com.intramirror.common.enums.PriceChangeRuleEnum;
+import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.help.StringUtils;
 import com.intramirror.product.api.model.PriceChangeRule;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.PriceChangeRuleMapper;
 
+import com.intramirror.product.core.mapper.SeasonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,8 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     private static Logger logger = LoggerFactory.getLogger(PriceChangeRuleImpl.class);
 
     private PriceChangeRuleMapper priceChangeRuleMapper;
+
+    private SeasonMapper seasonMapper;
 
     @Override
     public boolean updateVendorPrice() {
@@ -200,6 +204,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     @Override
     public void init() {
         priceChangeRuleMapper = this.getSqlSession().getMapper(PriceChangeRuleMapper.class);
+        seasonMapper = this.getSqlSession().getMapper(SeasonMapper.class);
     }
 
 	@Override
@@ -226,4 +231,40 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
 	public int updateByPrimaryKeySelective(PriceChangeRule record) {
 		return priceChangeRuleMapper.updateByPrimaryKeySelective(record);
 	}
+
+    @Override
+    public ResultMessage copyRule(Map<String, Object> params) {
+        ResultMessage resultMessage = ResultMessage.getInstance();
+        try {
+            String vendor_id = params.get("vendor_id").toString();
+            String discount = params.get("discount") == null ? "" : params.get("discount").toString();
+            String status = params.get("status").toString();
+
+            params.put("price_type",PriceChangeRuleEnum.PriceType.SUPPLY_PRICE.getCode());
+            List<Map<String,Object>> ruleByConditionsMaps =  seasonMapper.queryRuleByConditions(params);
+
+            if(ruleByConditionsMaps == null || ruleByConditionsMaps.size() == 0) {
+                return resultMessage.errorStatus().putMsg("info"," 没有规则 !!!");
+            }
+
+            for(Map<String,Object> map : ruleByConditionsMaps){
+                String price_change_rule_id = map.get("price_change_rule_id").toString();
+                params.put("price_change_rule_id",price_change_rule_id);
+
+                // copy price_change_rule
+                params.put("insert_price_type",PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
+                params.put("insert_status",PriceChangeRuleEnum.Status.PENDING.getCode());
+                params.put("insert_vendor_id",vendor_id);
+                params.put("insert_user_id",11);
+                int price_change_rule_id_new = seasonMapper.copyPriceChangeRule(params);
+                System.out.println(price_change_rule_id_new);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("error message : {}",e.getMessage());
+            resultMessage.errorStatus().putMsg("info","error message : " + e.getMessage());
+        }
+        return resultMessage;
+    }
+
 }

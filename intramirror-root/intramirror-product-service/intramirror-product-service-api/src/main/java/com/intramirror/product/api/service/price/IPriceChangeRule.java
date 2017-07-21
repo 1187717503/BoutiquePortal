@@ -1,5 +1,6 @@
 package com.intramirror.product.api.service.price;
 
+import com.intramirror.common.help.ResultMessage;
 import com.intramirror.product.api.model.PriceChangeRule;
 
 import java.util.Map;
@@ -23,4 +24,6 @@ public interface IPriceChangeRule {
     PriceChangeRule selectByPrimaryKey(Long priceChangeRuleId);
 
     int updateByPrimaryKeySelective(PriceChangeRule record);
+
+    ResultMessage copyRule(Map<String,Object> params);
 }

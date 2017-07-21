@@ -190,5 +190,70 @@
    select * from price_change_rule_product p where p.price_change_rule_id = #{price_change_rule_id,jdbcType=INTEGER}
   </select>
 
+  <select id="queryRuleByConditions" resultType="java.util.Map" parameterType="java.util.Map">
 
+    select price_change_rule_id,`name` from price_change_rule pcr
+    where pcr.price_type = #{price_type,jdbcType=INTEGER} and `status` = #{status,jdbcType=INTEGER} and vendor_id = #{vendor_id,jdbcType=INTEGER}
+  </select>
+
+  <insert id="copyPriceChangeRule" parameterType="java.util.Map">
+
+    insert into price_change_rule(`name`,price_type,`status`,vendor_id,user_id)
+    values(#{insert_name,jdbcType=INTEGER},#{insert_price_type,jdbcType=INTEGER},#{insert_status,jdbcType=INTEGER},#{insert_vendor_id,jdbcType=INTEGER},#{insert_user_id,jdbcType=INTEGER})
+  </insert>
+
+  <insert id="copyPriceChangeRuleCategoryBrand" parameterType="java.util.Map">
+
+    insert into price_change_rule_category_brand(price_change_rule_id,category_id,`level`,brand_id,discount_percentage,exception_flag)
+    select #{insert_price_change_rule_id,jdbcType=INTEGER},category_id,`level`,brand_id,
+    <choose>
+      <when test="discount_percentage != null and discount_percentage != ''">
+        #{discount_percentage,jdbcType=INTEGER},
+      </when>
+      <otherwise>
+        discount_percentage,
+      </otherwise>
+    </choose>
+    exception_flag from price_change_rule_category_brand pcrcb
+    where pcrcb.price_change_rule_id = #{price_change_rule_id,jdbcType=INTEGER}
+  </insert>
+
+  <insert id="copyPriceChangeRuleGroup" parameterType="java.util.Map">
+
+    insert price_change_rule_group(price_change_rule_id,product_group_id,discount_percentage)
+    select #{insert_price_change_rule_id,jdbcType=INTEGER},product_group_id,
+    <choose>
+      <when test="discount_percentage != null and discount_percentage != ''">
+        #{discount_percentage,jdbcType=INTEGER}
+      </when>
+      <otherwise>
+        discount_percentage
+      </otherwise>
+    </choose>
+    from price_change_rule_group pcrg
+    where pcrg.price_change_rule_id = #{price_change_rule_id,jdbcType=INTEGER}
+  </insert>
+
+  <insert id="copyPriceChangeRuleProduct" parameterType="java.util.Map">
+
+    insert into price_change_rule_product(price_change_rule_id,product_id,boutique_id,product_name,discount_percentage)
+    select #{insert_price_change_rule_id,jdbcType=INTEGER},product_id,boutique_id,product_name,
+    <choose>
+      <when test="discount_percentage != null and discount_percentage != ''">
+        #{discount_percentage,jdbcType=INTEGER}
+      </when>
+      <otherwise>
+        discount_percentage
+      </otherwise>
+    </choose>
+    from price_change_rule_product pcrp
+    where pcrp.price_change_rule_id = #{price_change_rule_id,jdbcType=INTEGER}
+  </insert>
+
+  <insert id="copyPriceChangeRuleSeasonGroup" parameterType="java.util.Map">
+
+    insert into price_change_rule_season_group(`name`,price_change_rule_id,season_code,enabled,created_at,updated_at)
+    select `name`,#{insert_price_change_rule_id,jdbcType=INTEGER},season_code,enabled,now(),now() from price_change_rule_season_group pcrsg
+    where pcrsg.price_change_rule_id = #{price_change_rule_id,jdbcType=INTEGER}
+  </insert>
 </mapper>
