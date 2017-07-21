@@ -32,12 +32,13 @@ public class RuleController {
 
     @RequestMapping("/select/queryRuleByHasSeason")
     @ResponseBody
-    public ResultMessage queryRuleByHasSeason(@Param("ruleStatus") String ruleStatus){
+    public ResultMessage queryRuleByHasSeason(@Param("ruleStatus") String ruleStatus,@Param("vendor_id")String vendor_id){
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
             Map<String,Object> params = new HashMap<>();
             params.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
             params.put("status",ruleStatus);
+            params.put("vendor_id",vendor_id);
             List<Map<String,Object>> hasSeasonMaps =  iRuleService.queryRuleByHasSeason(params);
             resultMessage.successStatus().putMsg("info","success").setData(hasSeasonMaps);
         } catch (Exception e) {
@@ -50,12 +51,13 @@ public class RuleController {
 
     @RequestMapping("/select/queryRuleByNotHasSesaon")
     @ResponseBody
-    public ResultMessage queryRuleByNotHasSesaon(@Param("ruleStatus") String ruleStatus){
+    public ResultMessage queryRuleByNotHasSesaon(@Param("ruleStatus") String ruleStatus,@Param("vendor_id") String vendor_id){
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
             Map<String,Object> params = new HashMap<>();
             params.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
             params.put("status",ruleStatus);
+            params.put("vendor_id",vendor_id);
             List<Map<String,Object>> notHasSeasonMaps =  iRuleService.queryRuleByNotHasSesaon(params);
             resultMessage.successStatus().putMsg("info","success").setData(notHasSeasonMaps);
         } catch (Exception e) {
