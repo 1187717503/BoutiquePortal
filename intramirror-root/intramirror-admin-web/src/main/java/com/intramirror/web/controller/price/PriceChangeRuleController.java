@@ -1,5 +1,6 @@
 package com.intramirror.web.controller.price;
 
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,9 +19,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.intramirror.common.parameter.StatusType;
+import com.intramirror.product.api.model.PriceChangeRule;
 import com.intramirror.product.api.model.PriceChangeRuleCategoryBrand;
 import com.intramirror.product.api.model.PriceChangeRuleGroup;
 import com.intramirror.product.api.model.PriceChangeRuleProduct;
@@ -609,6 +613,44 @@ public class PriceChangeRuleController extends BaseController{
 		
         result.put("status", StatusType.SUCCESS);
 		return result;
+	}
+	
+	
+	/**
+	 * 修改PriceChangeRul 修改有效日期
+	 * @param map
+	 * @return
+	 * @throws Exception
+	 */ 
+	@RequestMapping(value = "/updatePriceChangeRule", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String,Object> updatePriceChangeRule(@RequestBody Map<String,Object> map){
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("status", StatusType.FAILURE);
+		
+		try{
+			//根据price_change_rule_id  修改有效期
+			PriceChangeRule priceChangeRuleInfo = new PriceChangeRule();
+			priceChangeRuleInfo.setPriceChangeRuleId(Long.valueOf(map.get("price_change_rule_id").toString()));
+		    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		    priceChangeRuleInfo.setValidFrom(simpleDateFormat.parse(map.get("valid_from").toString()));
+		    int row = priceChangeRule.updateByPrimaryKeySelective(priceChangeRuleInfo);
+		    
+		    //修改有效期
+	        if (row  <= 0) {
+	        	result.put("info","parameter is incorrect");
+	        	logger.error("update PriceChangeRule fail parameter:"+ new Gson().toJson(priceChangeRuleInfo));
+	        	return result;
+	        }
+	        
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.put("info","update PriceChangeRule fail ");
+			return result;
+		}
+		
+	    result.put("status", StatusType.SUCCESS);
+	    return result;
 	}
 	
 	
