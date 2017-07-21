@@ -79,4 +79,7 @@ public interface PriceChangeRuleMapper {
     int updateRuleActive(Map<String,Object> params);
     int updateRuleInActive(Map<String,Object> params);
 
+    int updateDefaultPriceByVendor(Map<String,Object> params);
+    int updateDefaultPriceByAdmin(Map<String,Object> params);
+
 }
