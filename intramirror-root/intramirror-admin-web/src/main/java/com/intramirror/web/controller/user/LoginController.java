@@ -15,6 +15,7 @@ import io.jsonwebtoken.impl.Base64Codec;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -41,42 +42,39 @@ public class LoginController {
     private UserRoleService userRoleService;
 
     /**
-     * Wang
-     *
-     * @param email
-     * @param userPwd
+     * @param map
      * @return
      * @throws Exception
      */
     @RequestMapping(value = "/do_login", method = RequestMethod.POST)
     @ResponseBody
-    public Map do_login(String email, String userPwd) throws Exception {
+    public Map do_login(@RequestBody Map<String, Object> map) throws Exception {
         // 返回数据初始化
         int status = StatusType.FAILURE;
         Map<String, Object> stringObjectMap = new HashMap<String, Object>();
 
         // check param
-        if (Helper.isNullOrEmpty(email)) {
+        if (Helper.isNullOrEmpty(map.get("email").toString())) {
             stringObjectMap.put("status", StatusType.PARAM_EMPTY_OR_NULL);
             return stringObjectMap;
         }
-        if (!Helper.checkEmail(email)) {
+        if (!Helper.checkEmail(map.get("email").toString())) {
             stringObjectMap.put("status", StatusType.EMAIL_ADDRESS_ERROR);
             return stringObjectMap;
         }
-        if (userPwd.length() > 64) {
+        if (map.get("userPwd").toString().length() > 64) {
             stringObjectMap.put("status", StatusType.PASSWORD_LENGTH_ERROR);
             return stringObjectMap;
         }
 
         // 根据user_id获取用户数据，如没有，返回状态
-        User user = userService.getUserByEmail(email, EnabledType.USED);
+        User user = userService.getUserByEmail(map.get("email").toString(), EnabledType.USED);
         // 权限验证
         UserRole userRole = userRoleService.getUserRoleByUserId(user.getUserId(), EnabledType.USED);
         if (userRole == null) {
             stringObjectMap.put("status", StatusType.ADMIN_USER_ROLE_NOT_EXIST);
             return stringObjectMap;
-        } else if (user.getPassword().equals(Helper.md5Jdk(userPwd))) {
+        } else if (user.getPassword().equals(Helper.md5Jdk(map.get("userPwd").toString()))) {
             Role role = roleService.getRoleById(userRole.getRoleId());
             if (role != null) {
                 //计算过期时间生成token
