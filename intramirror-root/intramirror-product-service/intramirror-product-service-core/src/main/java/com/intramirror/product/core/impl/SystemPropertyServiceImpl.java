@@ -2,12 +2,14 @@ package com.intramirror.product.core.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import com.intramirror.product.api.model.SystemProperty;
 import com.intramirror.product.api.service.ISystemPropertyService;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.SystemPropertyMapper;
 
+@Service
 public class SystemPropertyServiceImpl extends BaseDao implements ISystemPropertyService{
 
     private static Logger logger = LoggerFactory.getLogger(SystemPropertyServiceImpl.class);
@@ -54,6 +56,12 @@ public class SystemPropertyServiceImpl extends BaseDao implements ISystemPropert
 	public void init() {
 		systemPropertyMapper = this.getSqlSession().getMapper(SystemPropertyMapper.class);
 		
+	}
+
+	@Override
+	public int updateByNameSelective(SystemProperty record) {
+		
+		return systemPropertyMapper.updateByNameSelective(record);
 	}
 
 }

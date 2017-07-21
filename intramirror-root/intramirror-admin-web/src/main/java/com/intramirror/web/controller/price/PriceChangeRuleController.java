@@ -63,6 +63,8 @@ public class PriceChangeRuleController extends BaseController{
 	@Autowired
 	private IProductService productService;
 	
+	
+	
 
 	
 	@SuppressWarnings("unchecked")
@@ -576,6 +578,38 @@ public class PriceChangeRuleController extends BaseController{
 	
 	
 	
+	/**
+	 * 修改 SystemProperty 全局默认折扣 
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping(value = "/updateDefaultDiscount", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> systemPropertyByNameUpdate(@RequestBody Map<String, Object> map){
+		logger.info("updateSystemProperty param:"+new Gson().toJson(map));
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("status", StatusType.FAILURE);
+		
+		//校验
+		if(map.get("boutique_discount_default") == null || StringUtils.isBlank(map.get("boutique_discount_default").toString()) 
+				|| map.get("im_discount_default") == null || StringUtils.isBlank(map.get("im_discount_default").toString())){
+			result.put("info","parameter is incorrect");
+			return result;
+		}
+		
+		try {
+			//修改 SystemProperty 全局默认折扣
+			result = priceChangeRuleService.updateSystemPropertyByName(map);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.put("info","update SystemProperty fail ");
+			return result;
+		}
+
+		
+        result.put("status", StatusType.SUCCESS);
+		return result;
+	}
 	
 	
     /**

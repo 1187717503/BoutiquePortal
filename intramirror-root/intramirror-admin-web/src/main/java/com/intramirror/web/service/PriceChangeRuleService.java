@@ -21,6 +21,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.intramirror.common.Helper;
+import com.intramirror.common.enums.SystemPropertyEnum;
 import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.product.api.model.Category;
@@ -30,11 +31,13 @@ import com.intramirror.product.api.model.PriceChangeRuleGroup;
 import com.intramirror.product.api.model.PriceChangeRuleProduct;
 import com.intramirror.product.api.model.PriceChangeRuleSeasonGroup;
 import com.intramirror.product.api.model.Shop;
+import com.intramirror.product.api.model.SystemProperty;
 import com.intramirror.product.api.service.IPriceChangeRuleCategoryBrandService;
 import com.intramirror.product.api.service.IPriceChangeRuleGroupService;
 import com.intramirror.product.api.service.IPriceChangeRuleProductService;
 import com.intramirror.product.api.service.IPriceChangeRuleSeasonGroupService;
 import com.intramirror.product.api.service.IShopService;
+import com.intramirror.product.api.service.ISystemPropertyService;
 import com.intramirror.product.api.service.category.ICategoryService;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
 import com.intramirror.user.api.model.Vendor;
@@ -68,6 +71,9 @@ public class PriceChangeRuleService {
 	
 	@Autowired
     private ICategoryService categoryService;
+	
+	@Autowired
+	private ISystemPropertyService systemPropertyService;
 	
 	
 	
@@ -270,6 +276,54 @@ public class PriceChangeRuleService {
 	    	}
 
 	     }
+
+        result.put("status", StatusType.SUCCESS);
+		return result;
+	}
+	
+	
+	
+	
+	
+	/**
+	 * 修改SystemProperty  默认全局规则修改
+	 * @param map
+	 * @return
+	 */
+	@Transactional  
+	public Map<String, Object> updateSystemPropertyByName(Map<String, Object> map) throws Exception{
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("status", StatusType.FAILURE);
+		
+		//获取参数
+	    long boutiqueDiscountDefault =Long.parseLong(map.get("boutique_discount_default").toString());
+	    long imDiscountDefault =Long.parseLong(map.get("im_discount_default").toString());
+	    
+	    //修改Boutique_discount_default
+		SystemProperty systemProperty = new SystemProperty();
+		systemProperty.setSystemPropertyName(SystemPropertyEnum.propertyName.BOUTIQUE_DISCOUNT_DEFAULT.getCode());
+		systemProperty.setSystemPropertyValue((Long.valueOf("100") - boutiqueDiscountDefault)+"");
+		int boutiqueRow = systemPropertyService.updateByNameSelective(systemProperty);
+		
+		//判断影响行数,确认是否成功
+		if(boutiqueRow == 0){
+        	result.put("info","parameter is incorrect");
+        	logger.error("update SystemProperty fail parameter:"+ new Gson().toJson(systemProperty));
+            throw new RuntimeException("error");
+		}
+		
+		
+	    //修改Im_discount_default
+		systemProperty.setSystemPropertyName(SystemPropertyEnum.propertyName.IM_DISCOUNT_DEFAULT.getCode());
+		systemProperty.setSystemPropertyValue((Long.valueOf("100") - imDiscountDefault)+"");
+		int imRow = systemPropertyService.updateByNameSelective(systemProperty);
+		
+		//判断影响行数,确认是否成功
+		if(imRow == 0){
+        	result.put("info","parameter is incorrect");
+        	logger.error("update SystemProperty fail parameter:"+ new Gson().toJson(systemProperty));
+            throw new RuntimeException("error");
+		}
 
         result.put("status", StatusType.SUCCESS);
 		return result;
