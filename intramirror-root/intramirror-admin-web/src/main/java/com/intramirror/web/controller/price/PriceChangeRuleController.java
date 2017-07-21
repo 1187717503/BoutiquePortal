@@ -306,7 +306,7 @@ public class PriceChangeRuleController extends BaseController{
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
 		
-		if(map.get("price_change_rule_category_brand") == null ||StringUtils.isBlank(map.get("price_change_rule_category_brand").toString())){
+		if(!checkCreatePriceChangeRuleCategoryBrandParams(map)){
 			result.put("info","parameter is incorrect");
 			return result;
 		}
@@ -314,7 +314,7 @@ public class PriceChangeRuleController extends BaseController{
 		try {
 			
 		    JsonObject priceChangeRuleCategory = new JsonParser().parse(map.get("price_change_rule_category_brand").toString()).getAsJsonObject();
-	
+
 	        PriceChangeRuleCategoryBrand priceChangeRuleCategoryBrand = new PriceChangeRuleCategoryBrand();
 	        priceChangeRuleCategoryBrand.setPriceChangeRuleId(priceChangeRuleCategory.get("price_change_rule_id").getAsLong());
 	        priceChangeRuleCategoryBrand.setCategoryId(priceChangeRuleCategory.get("category_id").getAsLong());
@@ -397,8 +397,8 @@ public class PriceChangeRuleController extends BaseController{
 		logger.info("priceChangeRuleProductGroupCreate param:"+new Gson().toJson(map));
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
-		
-		if(map.get("price_change_rule_product_group") == null || StringUtils.isBlank(map.get("price_change_rule_product_group").toString())){
+
+		if(!checkCreatePriceChangeRuleProductGroupParams(map)){
 			result.put("info","parameter is incorrect");
 			return result;
 		}
@@ -747,6 +747,71 @@ public class PriceChangeRuleController extends BaseController{
     	if(params.get("discount_percentage") == null || StringUtils.isBlank(params.get("discount_percentage").toString())){
     		return false;
     	}
+    	
+    	return true;
+    }
+    
+    
+    /**
+     * 检查参数
+     */
+    public static boolean checkCreatePriceChangeRuleCategoryBrandParams(Map<String, Object> map) {
+    	
+    	if(map.get("price_change_rule_category_brand") == null ||StringUtils.isBlank(map.get("price_change_rule_category_brand").toString())){
+    		return false;
+    	}
+    	
+    	JsonObject priceChangeRuleCategory = new JsonParser().parse(map.get("price_change_rule_category_brand").toString()).getAsJsonObject();
+
+        if(priceChangeRuleCategory.get("price_change_rule_id").isJsonNull() || StringUtils.isBlank(priceChangeRuleCategory.get("price_change_rule_id").getAsString())){
+        	return false;
+        }
+
+        if(priceChangeRuleCategory.get("category_id").isJsonNull() || StringUtils.isBlank(priceChangeRuleCategory.get("category_id").getAsString())){
+        	return false;
+        }
+        
+        if(priceChangeRuleCategory.get("level").isJsonNull() || StringUtils.isBlank(priceChangeRuleCategory.get("level").getAsString())){
+        	return false;
+        }
+        
+        if(priceChangeRuleCategory.get("brand_id").isJsonNull() || StringUtils.isBlank(priceChangeRuleCategory.get("brand_id").getAsString())){
+        	return false;
+        }
+        
+        if(priceChangeRuleCategory.get("discount_percentage").isJsonNull() || StringUtils.isBlank(priceChangeRuleCategory.get("discount_percentage").getAsString())){
+        	return false;
+        }
+    	
+    	return true;
+    }
+    
+    
+    
+    
+    /**
+     * 检查参数
+     */
+    public static boolean checkCreatePriceChangeRuleProductGroupParams(Map<String, Object> map) {
+    	
+    	if(map.get("price_change_rule_product_group") == null || StringUtils.isBlank(map.get("price_change_rule_product_group").toString())){
+    		return false;
+    	}
+    	
+		//获取对象值
+		JsonObject priceChangeRuleGroupjson= new JsonParser().parse(map.get("price_change_rule_product_group").toString()).getAsJsonObject();
+
+        if(priceChangeRuleGroupjson.get("price_change_rule_id").isJsonNull() || StringUtils.isBlank(priceChangeRuleGroupjson.get("price_change_rule_id").getAsString())){
+        	return false;
+        }
+
+        if(priceChangeRuleGroupjson.get("product_group_id").isJsonNull() || StringUtils.isBlank(priceChangeRuleGroupjson.get("product_group_id").getAsString())){
+        	return false;
+        }
+        
+        if(priceChangeRuleGroupjson.get("discount_percentage").isJsonNull() || StringUtils.isBlank(priceChangeRuleGroupjson.get("discount_percentage").getAsString())){
+        	return false;
+        }
     	
     	return true;
     }

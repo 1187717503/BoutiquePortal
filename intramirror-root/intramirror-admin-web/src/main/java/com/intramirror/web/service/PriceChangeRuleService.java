@@ -332,6 +332,32 @@ public class PriceChangeRuleService {
 	
 	
 	
+	
+	
+	/**
+	 * 删除PriceChangeRul
+	 * @param map
+	 * @return
+	 * @throws Exception
+	 */
+	@Transactional  
+	public Map<String,Object> deletePriceChangeRule(Map<String,Object> map) throws Exception{
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("status", StatusType.FAILURE);
+		
+		Long priceChangeRuleId =Long.parseLong(map.get("price_change_rule_id").toString());
+
+		priceChangeRuleProductService.deleteBypriceChangeRuleId(priceChangeRuleId);
+		
+		
+//		1111
+	    result.put("status", StatusType.SUCCESS);
+	    return result;
+	}
+	
+	
+	
+	
 	/**
 	 * 创建 PriceChangeRule
 	 * @return
