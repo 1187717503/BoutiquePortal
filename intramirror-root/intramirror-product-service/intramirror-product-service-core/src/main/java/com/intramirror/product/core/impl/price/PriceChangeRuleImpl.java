@@ -283,6 +283,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
                 return resultMessage.errorStatus().putMsg("info"," 没有规则 !!!");
             }
             this.copyAllRuleByActivePending(ruleByConditionsMaps,vendor_id,discount);
+            resultMessage.successStatus().putMsg("info","SUCCESS !!!");
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //            logger.error("error message : {}",e.getMessage());
