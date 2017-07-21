@@ -298,26 +298,30 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     public ResultMessage copyRuleBySeason(Map<String, Object> params) throws Exception {
         ResultMessage resultMessage = ResultMessage.getInstance();
         String vendor_id = params.get("vendor_id") == null ? "" : params.get("vendor_id").toString();
-        String[] season_codes = (String[]) (params.get("season_codes") == null ? "" : params.get("season_codes"));
+        String seasons = params.get("seasons") == null ? "" : params.get("seasons").toString();
+        params.put("name",seasons);
+        String[] season_codes = seasons.split(",");
         List<Map<String,Object>> ruleByConditionsMaps = new ArrayList<>();
         ruleByConditionsMaps.add(params);
         Long price_change_rule_id_new = this.copyAllRuleByActivePending(ruleByConditionsMaps,vendor_id,"0",false);
 
         // create price_season_group
         for(String season_code : season_codes) {
-            PriceChangeRuleSeasonGroup priceChangeRuleSeasonGroup = new PriceChangeRuleSeasonGroup();
-            priceChangeRuleSeasonGroup.setSeasonCode(season_code);
-            priceChangeRuleSeasonGroup.setCreatedAt(new Date());
-            priceChangeRuleSeasonGroup.setUpdatedAt(new Date());
-            priceChangeRuleSeasonGroup.setEnabled(1);
-            priceChangeRuleSeasonGroup.setPriceChangeRuleId(price_change_rule_id_new);
-            if(season_codes.length > 1) {
-                priceChangeRuleSeasonGroup.setName(season_code + price_change_rule_id_new);
-            } else {
-                priceChangeRuleSeasonGroup.setName(season_code);
-            }
+            if(StringUtils.isNotBlank(season_code)) {
+                PriceChangeRuleSeasonGroup priceChangeRuleSeasonGroup = new PriceChangeRuleSeasonGroup();
+                priceChangeRuleSeasonGroup.setSeasonCode(season_code);
+                priceChangeRuleSeasonGroup.setCreatedAt(new Date());
+                priceChangeRuleSeasonGroup.setUpdatedAt(new Date());
+                priceChangeRuleSeasonGroup.setEnabled(1);
+                priceChangeRuleSeasonGroup.setPriceChangeRuleId(price_change_rule_id_new);
+                if(season_codes.length > 1) {
+                    priceChangeRuleSeasonGroup.setName("Multiple" + price_change_rule_id_new);
+                } else {
+                    priceChangeRuleSeasonGroup.setName(season_code);
+                }
 
-            priceChangeRuleSeasonGroupMapper.insert(priceChangeRuleSeasonGroup);
+                priceChangeRuleSeasonGroupMapper.insert(priceChangeRuleSeasonGroup);
+            }
         }
         return resultMessage;
     }
