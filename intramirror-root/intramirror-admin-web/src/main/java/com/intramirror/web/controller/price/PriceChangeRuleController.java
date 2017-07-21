@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
@@ -65,7 +66,7 @@ public class PriceChangeRuleController extends BaseController{
 
 	
 	@SuppressWarnings("unchecked")
-	@RequestMapping("/initPriceChangeRule")
+    @RequestMapping(value = "/initPriceChangeRule", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> initPriceChangeRule(@RequestBody Map<String, Object> map,HttpServletRequest httpRequest){
 		logger.info("initPriceChangeRule param:"+new Gson().toJson(map));
@@ -120,7 +121,7 @@ public class PriceChangeRuleController extends BaseController{
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping("/updatePriceChangeRuleCategoryBrand")
+	@RequestMapping(value = "/updatePriceChangeRuleCategoryBrand", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> priceChangeRuleCategoryBrandUpdate(@RequestBody Map<String, Object> map){
 		logger.info("priceChangeRuleCategoryBrandUpdate param:"+new Gson().toJson(map));
@@ -141,7 +142,7 @@ public class PriceChangeRuleController extends BaseController{
 	        priceChangeRuleCategoryBrand.setCategoryId(priceChangeRuleCategory.get("category_id").getAsLong());
 	        priceChangeRuleCategoryBrand.setLevel(priceChangeRuleCategory.get("level").getAsByte());
 	        priceChangeRuleCategoryBrand.setBrandId(priceChangeRuleCategory.get("brand_id").getAsLong());
-	        priceChangeRuleCategoryBrand.setDiscountPercentage(priceChangeRuleCategory.get("discount_percentage").getAsLong());
+	        priceChangeRuleCategoryBrand.setDiscountPercentage(Long.valueOf("100") - priceChangeRuleCategory.get("discount_percentage").getAsLong());
 
 			int row = priceChangeRuleCategoryBrandService.updateDiscountPercentageBySelective(priceChangeRuleCategoryBrand);
 			
@@ -169,7 +170,7 @@ public class PriceChangeRuleController extends BaseController{
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping("/createPriceChangeRuleCategoryBrandBatch")
+	@RequestMapping(value = "/createPriceChangeRuleCategoryBrandBatch", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> priceChangeRuleCategoryBrandBatchCreate(@RequestBody Map<String, Object> map){
 		logger.info("createPriceChangeRuleCategoryBrand param:"+new Gson().toJson(map));
@@ -202,7 +203,7 @@ public class PriceChangeRuleController extends BaseController{
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping("/deletePriceChangeRuleCategoryBrandBatch")
+	@RequestMapping(value = "/deletePriceChangeRuleCategoryBrandBatch", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> priceChangeRuleCategoryBrandBatchDelete(@RequestBody Map<String, Object> map){
 		logger.info("deletePriceChangeRuleCategoryBrand param:"+new Gson().toJson(map));
@@ -292,7 +293,7 @@ public class PriceChangeRuleController extends BaseController{
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping("/createPriceChangeRuleCategoryBrand")
+	@RequestMapping(value = "/createPriceChangeRuleCategoryBrand", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> priceChangeRuleCategoryBrandCreate(@RequestBody Map<String, Object> map){
 		logger.info("priceChangeRuleCategoryBrandCreate param:"+new Gson().toJson(map));
@@ -342,7 +343,7 @@ public class PriceChangeRuleController extends BaseController{
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping("/deletePriceChangeRuleCategoryBrand")
+	@RequestMapping(value = "/deletePriceChangeRuleCategoryBrand", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> deletePriceChangeRuleCategoryBrand(@RequestBody Map<String, Object> map){
 		logger.info("deletePriceChangeRuleCategoryBrand param:"+new Gson().toJson(map));
@@ -384,7 +385,7 @@ public class PriceChangeRuleController extends BaseController{
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping("/createPriceChangeRuleProductGroup")
+	@RequestMapping(value = "/createPriceChangeRuleProductGroup", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> priceChangeRuleProductGroupCreate(@RequestBody Map<String, Object> map){
 		logger.info("priceChangeRuleProductGroupCreate param:"+new Gson().toJson(map));
@@ -431,7 +432,7 @@ public class PriceChangeRuleController extends BaseController{
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping("/deletePriceChangeRuleGroup")
+	@RequestMapping(value = "/deletePriceChangeRuleGroup", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> deletePriceChangeRuleGroup(@RequestBody Map<String, Object> map){
 		logger.info("deletePriceChangeRuleGroup param:"+new Gson().toJson(map));
@@ -472,7 +473,7 @@ public class PriceChangeRuleController extends BaseController{
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping("/createPriceChangeRuleProduct")
+	@RequestMapping(value = "/createPriceChangeRuleProduct", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> priceChangeRuleProductCreate(@RequestBody Map<String, Object> map){
 		logger.info("createPriceChangeRuleProduct param:"+new Gson().toJson(map));
@@ -539,7 +540,7 @@ public class PriceChangeRuleController extends BaseController{
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping("/deletePriceChangeRuleProduct")
+	@RequestMapping(value = "/deletePriceChangeRuleProduct", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> deletePriceChangeRuleProduct(@RequestBody Map<String, Object> map){
 		logger.info("deletePriceChangeRuleGroup param:"+new Gson().toJson(map));

@@ -135,6 +135,36 @@ public class PriceChangeRuleService {
 	            throw new RuntimeException("error");
 	        }
 	    }
+	    
+	    
+
+	 	Category category = new Category();
+        //类目只有2级
+	 	category.setLevel(Byte.valueOf("2"));
+	 	category.setEnabled(EnabledType.USED);
+	 	
+    	//获取类目列表
+    	List<Map<String,Object>> categoryList = categoryService.queryCategoryListByConditions(category);
+	 	//设置默认值
+    	for(Map<String,Object> categoryMap : categoryList){
+	        PriceChangeRuleCategoryBrand priceChangeRuleCategoryBrand = new PriceChangeRuleCategoryBrand();
+	        priceChangeRuleCategoryBrand.setPriceChangeRuleId(priceChangeRule.getPriceChangeRuleId());
+	        priceChangeRuleCategoryBrand.setCategoryId(Long.parseLong(categoryMap.get("category_id").toString()));
+	        //类目只有2级
+	        priceChangeRuleCategoryBrand.setLevel(Byte.valueOf("2"));
+	        priceChangeRuleCategoryBrand.setBrandId(0l);
+	        //折扣默认值
+	        priceChangeRuleCategoryBrand.setDiscountPercentage(100l);
+	        priceChangeRuleCategoryBrand.setExceptionFlag (0);
+
+			priceChangeRuleCategoryBrandService.createPriceChangeRuleCategoryBrand(priceChangeRuleCategoryBrand);
+			
+	        if (priceChangeRuleCategoryBrand.getPriceChangeRuleCategoryBrandId() == null) {
+	        	result.put("info","parameter is incorrect");
+	        	logger.error("create priceChangeRuleCategoryBrand fail parameter:"+ new Gson().toJson(priceChangeRuleCategoryBrand));
+	            throw new RuntimeException("error");
+	        }
+    	}
 	   
 	    
 	    result.put("status", StatusType.SUCCESS);
