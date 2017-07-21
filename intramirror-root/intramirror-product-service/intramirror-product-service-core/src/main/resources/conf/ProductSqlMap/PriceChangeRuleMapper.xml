@@ -547,5 +547,16 @@
         and `status` = 2
         and date_format(valid_from,'%y-%m-%d') != date_format(now(),'%y-%m-%d');
     </update>
+
+    <update id="updateDefaultPriceByVendor" parameterType="java.util.Map">
+
+        update sku set sku.in_price = sku.price * #{default_discount_percentage,jdbcType=BIGINT}/((1+0.22)*100)
+    </update>
+
+    <update id="updateDefaultPriceByAdmin" parameterType="java.util.Map">
+
+        update sku set sku.im_price = sku.price * #{default_discount_percentage,jdbcType=BIGINT}/100
+    </update>
+
     <!-- end dingyifan -->
 </mapper>

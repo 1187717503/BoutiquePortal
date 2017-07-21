@@ -3,6 +3,7 @@ package com.intramirror.product.core.impl.price;
 import com.google.gson.Gson;
 import com.intramirror.common.Contants;
 import com.intramirror.common.enums.PriceChangeRuleEnum;
+import com.intramirror.common.enums.SystemPropertyEnum;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.help.StringUtils;
 import com.intramirror.product.api.model.PriceChangeRule;
@@ -11,6 +12,7 @@ import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.PriceChangeRuleMapper;
 
 import com.intramirror.product.core.mapper.SeasonMapper;
+import com.intramirror.product.core.mapper.SystemPropertyMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -33,11 +35,20 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
 
     private SeasonMapper seasonMapper;
 
+    private SystemPropertyMapper systemPropertyMapper;
+
     @Override
     public boolean updateVendorPrice() {
         Map<String,Object> paramsMap = new HashMap<>();
         List<Map<String,Object>> paramsList = new ArrayList<>();
         paramsMap.put("price_type", PriceChangeRuleEnum.PriceType.SUPPLY_PRICE.getCode());
+
+        // update default discount
+        int default_discount = this.getDeafultDisscount(PriceChangeRuleEnum.PriceType.SUPPLY_PRICE);
+        if(default_discount > 0 && default_discount < 100) {
+            paramsMap.put("default_discount_percentage",default_discount);
+            priceChangeRuleMapper.updateDefaultPriceByVendor(paramsMap);
+        }
 
         List<Map<String,Object>> selSecondCategoryRuleMaps = priceChangeRuleMapper.selectSecondCategoryRule(paramsMap);
         selSecondCategoryRuleMaps = this.sortListByLevel(selSecondCategoryRuleMaps);
@@ -67,7 +78,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
 
     @Override
     public boolean updateShopPrice() {
-        Map<String,Object> paramsMap = new HashMap<>();
+        /*Map<String,Object> paramsMap = new HashMap<>();
         List<Map<String,Object>> paramsList = new ArrayList<>();
         paramsMap.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
 
@@ -96,7 +107,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         if(paramsList != null && paramsList.size() > 0) {
             priceChangeRuleMapper.updateSkuPriceByShop(paramsList);
             this.updateRuleStatus(paramsMap);
-        }
+        }*/
         return true;
     }
 
@@ -131,6 +142,12 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         List<Map<String,Object>> paramsList = new ArrayList<>();
         paramsMap.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
 
+        int default_discount = this.getDeafultDisscount(PriceChangeRuleEnum.PriceType.IM_PRICE);
+        if(default_discount > 0 && default_discount < 100) {
+            paramsMap.put("default_discount_percentage",default_discount);
+            priceChangeRuleMapper.updateDefaultPriceByAdmin(paramsMap);
+        }
+
         List<Map<String,Object>> selSeasonGroupRuleMaps = priceChangeRuleMapper.selectSeasonGroupRule(paramsMap);
         logger.info("selSeasonGroupRuleMaps : {}",new Gson().toJson(selSeasonGroupRuleMaps));
 
@@ -158,6 +175,23 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             this.updateRuleStatus(paramsMap);
         }
         return true;
+    }
+
+    private int getDeafultDisscount(PriceChangeRuleEnum.PriceType priceType){
+        List<Map<String,Object>> mapList = systemPropertyMapper.selectSystemProperty();
+        if(mapList != null && mapList.size() > 0) {
+            for(Map<String,Object> map : mapList){
+                if(priceType.getCode().intValue() == PriceChangeRuleEnum.PriceType.SUPPLY_PRICE.getCode().intValue())
+                    if(map.get("system_property_name").toString().equals(SystemPropertyEnum.propertyName.BOUTIQUE_DISCOUNT_DEFAULT.getCode())) {
+                        return Integer.parseInt(map.get("system_property_value").toString());
+                    }
+                if(priceType.getCode().intValue() == PriceChangeRuleEnum.PriceType.IM_PRICE.getCode().intValue())
+                    if(map.get("system_property_name").toString().equals(SystemPropertyEnum.propertyName.IM_DISCOUNT_DEFAULT.getCode())) {
+                        return Integer.parseInt(map.get("system_property_value").toString());
+                    }
+            }
+        }
+        return 100;
     }
 
     private List<Map<String,Object>> handleMapByVendor(List<Map<String,Object>> paramsList,List<Map<String,Object>> dataList,int level){
@@ -206,6 +240,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     public void init() {
         priceChangeRuleMapper = this.getSqlSession().getMapper(PriceChangeRuleMapper.class);
         seasonMapper = this.getSqlSession().getMapper(SeasonMapper.class);
+        systemPropertyMapper = this.getSqlSession().getMapper(SystemPropertyMapper.class);
     }
 
 	@Override
