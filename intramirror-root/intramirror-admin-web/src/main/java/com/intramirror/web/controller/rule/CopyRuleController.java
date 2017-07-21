@@ -75,9 +75,22 @@ public class CopyRuleController {
 
     @RequestMapping("/seasonVendor")
     @ResponseBody
-    public ResultMessage seasonVendor(){
+    public ResultMessage seasonVendor(@Param("price_change_rule_id")String price_change_rule_id,@Param("season_codes")String[] seasons){
         ResultMessage resultMessage = ResultMessage.getInstance();
+        try {
+            if(StringUtils.isBlank(price_change_rule_id) || seasons == null || seasons.length == 0) {
+                return resultMessage.errorStatus().putMsg("info","params is error !!!");
+            }
 
+            Map<String,Object> params = new HashMap<>();
+            params.put("price_change_rule_id",price_change_rule_id);
+            params.put("seasons",seasons);
+            return iPriceChangeRule.copyRule(params);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("error message : {}",e.getMessage());
+            resultMessage.errorStatus().putMsg("info","error message : " + e.getMessage());
+        }
         return resultMessage;
     }
 

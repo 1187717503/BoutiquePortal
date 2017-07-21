@@ -236,35 +236,71 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     public ResultMessage copyRule(Map<String, Object> params) {
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
-            String vendor_id = params.get("vendor_id").toString();
-            String discount = params.get("discount") == null ? "" : params.get("discount").toString();
-            String status = params.get("status").toString();
-
+            String vendor_id = params.get("vendor_id") == null ? "" : params.get("vendor_id").toString();
+            String discount = params.get("discount") == null ? "0" : params.get("discount").toString();
+            String status = params.get("status") == null ? "" : params.get("status").toString();
             params.put("price_type",PriceChangeRuleEnum.PriceType.SUPPLY_PRICE.getCode());
             List<Map<String,Object>> ruleByConditionsMaps =  seasonMapper.queryRuleByConditions(params);
 
             if(ruleByConditionsMaps == null || ruleByConditionsMaps.size() == 0) {
                 return resultMessage.errorStatus().putMsg("info"," 没有规则 !!!");
             }
-
-            for(Map<String,Object> map : ruleByConditionsMaps){
-                String price_change_rule_id = map.get("price_change_rule_id").toString();
-                params.put("price_change_rule_id",price_change_rule_id);
-
-                // copy price_change_rule
-                params.put("insert_price_type",PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
-                params.put("insert_status",PriceChangeRuleEnum.Status.PENDING.getCode());
-                params.put("insert_vendor_id",vendor_id);
-                params.put("insert_user_id",11);
-                int price_change_rule_id_new = seasonMapper.copyPriceChangeRule(params);
-                System.out.println(price_change_rule_id_new);
-            }
+            this.copyAllRuleByActivePending(ruleByConditionsMaps,vendor_id,discount);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("error message : {}",e.getMessage());
             resultMessage.errorStatus().putMsg("info","error message : " + e.getMessage());
         }
         return resultMessage;
+    }
+
+    private void copyAllRuleByActivePending(List<Map<String,Object>> ruleByConditionsMaps,String vendor_id,String discount){
+        for(Map<String,Object> map : ruleByConditionsMaps){
+            String price_change_rule_id = map.get("price_change_rule_id").toString();
+            String name = map.get("name").toString();
+
+            /** start copy price_change_rule */
+            PriceChangeRule priceChangeRule = new PriceChangeRule();
+            priceChangeRule.setName(name);
+            priceChangeRule.setPriceType(Byte.parseByte(PriceChangeRuleEnum.PriceType.IM_PRICE.getCode() + ""));
+            priceChangeRule.setStatus(PriceChangeRuleEnum.Status.PENDING.getCode());
+            priceChangeRule.setVendorId(Long.parseLong(vendor_id));
+            priceChangeRule.setUserId(12L);
+            priceChangeRuleMapper.insert(priceChangeRule);
+            Long price_change_rule_id_new = priceChangeRule.getPriceChangeRuleId();
+            /** end copy price_change_rule */
+
+            /** start copy price_change_rule_category_brand */
+            Map<String,Object> insert_price_change_rule_category_brand_maps = new HashMap<>();
+            insert_price_change_rule_category_brand_maps.put("insert_price_change_rule_id",price_change_rule_id_new);
+            insert_price_change_rule_category_brand_maps.put("price_change_rule_id",price_change_rule_id);
+            insert_price_change_rule_category_brand_maps.put("discount_percentage",Integer.parseInt(discount));
+            seasonMapper.copyPriceChangeRuleCategoryBrand(insert_price_change_rule_category_brand_maps);
+            /** end copy price_change_rule_category_brand */
+
+            /** start copy price_change_rule_group */
+            Map<String,Object> insert_price_change_rule_group_maps = new HashMap<>();
+            insert_price_change_rule_group_maps.put("insert_price_change_rule_id",price_change_rule_id_new);
+            insert_price_change_rule_group_maps.put("discount_percentage",Integer.parseInt(discount));
+            insert_price_change_rule_group_maps.put("price_change_rule_id",price_change_rule_id);
+            seasonMapper.copyPriceChangeRuleGroup(insert_price_change_rule_group_maps);
+            /** end copy price_change_rule_group */
+
+            /** start copy price_change_rule_product */
+            Map<String,Object> insert_price_change_rule_product_maps = new HashMap<>();
+            insert_price_change_rule_product_maps.put("insert_price_change_rule_id",price_change_rule_id_new);
+            insert_price_change_rule_product_maps.put("discount_percentage",Integer.parseInt(discount));
+            insert_price_change_rule_product_maps.put("price_change_rule_id",price_change_rule_id);
+            seasonMapper.copyPriceChangeRuleProduct(insert_price_change_rule_product_maps);
+            /** end copy price_change_rule_product */
+
+            /** start copy price_change_rule_season_group */
+            Map<String,Object> insert_price_change_rule_season_group_maps = new HashMap<>();
+            insert_price_change_rule_season_group_maps.put("insert_price_change_rule_id",price_change_rule_id_new);
+            insert_price_change_rule_season_group_maps.put("price_change_rule_id",price_change_rule_id);
+            seasonMapper.copyPriceChangeRuleSeasonGroup(insert_price_change_rule_season_group_maps);
+            /** end copy price_change_rule_season_group */
+        }
     }
 
 }

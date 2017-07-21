@@ -206,14 +206,16 @@
 
     insert into price_change_rule_category_brand(price_change_rule_id,category_id,`level`,brand_id,discount_percentage,exception_flag)
     select #{insert_price_change_rule_id,jdbcType=INTEGER},category_id,`level`,brand_id,
-    <choose>
-      <when test="discount_percentage != null and discount_percentage != ''">
-        #{discount_percentage,jdbcType=INTEGER},
-      </when>
-      <otherwise>
-        discount_percentage,
-      </otherwise>
-    </choose>
+    case
+    when
+      (pcrcb.discount_percentage - #{discount_percentage,jdbcType=INTEGER}) <![CDATA[  >=  ]]> 0
+    then
+      (pcrcb.discount_percentage - #{discount_percentage,jdbcType=INTEGER})
+    when
+      (pcrcb.discount_percentage - #{discount_percentage,jdbcType=INTEGER}) <![CDATA[   <=  ]]> 0
+    then
+      0
+    end,
     exception_flag from price_change_rule_category_brand pcrcb
     where pcrcb.price_change_rule_id = #{price_change_rule_id,jdbcType=INTEGER}
   </insert>
@@ -222,14 +224,16 @@
 
     insert price_change_rule_group(price_change_rule_id,product_group_id,discount_percentage)
     select #{insert_price_change_rule_id,jdbcType=INTEGER},product_group_id,
-    <choose>
-      <when test="discount_percentage != null and discount_percentage != ''">
-        #{discount_percentage,jdbcType=INTEGER}
-      </when>
-      <otherwise>
-        discount_percentage
-      </otherwise>
-    </choose>
+    case
+    when
+      (pcrg.discount_percentage - #{discount_percentage,jdbcType=INTEGER}) <![CDATA[  >=  ]]> 0
+    then
+      (pcrg.discount_percentage - #{discount_percentage,jdbcType=INTEGER})
+    when
+      (pcrg.discount_percentage - #{discount_percentage,jdbcType=INTEGER}) <![CDATA[  <=  ]]> 0
+    then
+      0
+    end
     from price_change_rule_group pcrg
     where pcrg.price_change_rule_id = #{price_change_rule_id,jdbcType=INTEGER}
   </insert>
@@ -238,14 +242,16 @@
 
     insert into price_change_rule_product(price_change_rule_id,product_id,boutique_id,product_name,discount_percentage)
     select #{insert_price_change_rule_id,jdbcType=INTEGER},product_id,boutique_id,product_name,
-    <choose>
-      <when test="discount_percentage != null and discount_percentage != ''">
-        #{discount_percentage,jdbcType=INTEGER}
-      </when>
-      <otherwise>
-        discount_percentage
-      </otherwise>
-    </choose>
+    case
+    when
+    (pcrp.discount_percentage - #{discount_percentage,jdbcType=INTEGER}) <![CDATA[  >=  ]]> 0
+    then
+    (pcrp.discount_percentage - #{discount_percentage,jdbcType=INTEGER})
+    when
+    (pcrp.discount_percentage - #{discount_percentage,jdbcType=INTEGER}) <![CDATA[  <=  ]]> 0
+    then
+    0
+    end
     from price_change_rule_product pcrp
     where pcrp.price_change_rule_id = #{price_change_rule_id,jdbcType=INTEGER}
   </insert>
