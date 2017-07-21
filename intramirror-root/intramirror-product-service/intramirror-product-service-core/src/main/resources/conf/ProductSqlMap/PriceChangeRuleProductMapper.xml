@@ -40,6 +40,31 @@
         where price_change_rule_id = #{priceChangeRuleId,jdbcType=BIGINT}
     </select>
     
+    <select id="selectByParameter" resultMap="BaseResultMap" parameterType="com.intramirror.product.api.model.PriceChangeRuleProduct">
+        select
+        <include refid="Base_Column_List"/>
+        from price_change_rule_product
+        where 1=1 
+            <if test="priceChangeRuleProductId != null">
+                and price_change_rule_product_id = #{priceChangeRuleProductId,jdbcType=BIGINT}
+            </if>
+            <if test="priceChangeRuleId != null">
+                and price_change_rule_id = #{priceChangeRuleId,jdbcType=BIGINT}
+            </if>
+            <if test="productId != null">
+                and product_id = #{productId,jdbcType=BIGINT}
+            </if>
+            <if test="boutiqueId != null">
+                and boutique_id = #{boutiqueId,jdbcType=VARCHAR}
+            </if>
+            <if test="productName != null">
+                and product_name = #{productName,jdbcType=VARCHAR}
+            </if>
+            <if test="discountPercentage != null">
+                and discount_percentage = #{discountPercentage,jdbcType=BIGINT}
+            </if>
+    </select>
+    
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         <!--
           WARNING - @mbggenerated

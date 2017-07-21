@@ -57,4 +57,11 @@ public class PriceChangeRuleProductServiceImpl extends BaseDao implements IPrice
 		return priceChangeRuleProductMapper.selectByPriceChangeRuleId(priceChangeRuleId);
 	}
 
+	@Override
+	public List<PriceChangeRuleProduct> selectByParameter(
+			PriceChangeRuleProduct record) {
+	
+		return priceChangeRuleProductMapper.selectByParameter(record);
+	}
+
 }

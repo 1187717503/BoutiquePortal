@@ -29,6 +29,25 @@
         where price_change_rule_group_id = #{priceChangeRuleGroupId,jdbcType=BIGINT}
     </select>
     
+    <select id="selectByParameter" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from price_change_rule_group
+        where 1=1
+            <if test="priceChangeRuleGroupId != null">
+                and price_change_rule_group_id = #{priceChangeRuleGroupId,jdbcType=BIGINT}
+            </if>
+            <if test="priceChangeRuleId != null">
+                and price_change_rule_id = #{priceChangeRuleId,jdbcType=BIGINT}
+            </if>
+            <if test="productGroupId != null">
+                and product_group_id = #{productGroupId,jdbcType=BIGINT}
+            </if>
+            <if test="discountPercentage != null">
+                and discount_percentage = #{discountPercentage,jdbcType=BIGINT}
+            </if>
+    </select>
+    
     <select id="selectByPriceChangeRuleId" resultMap="BaseResultMap" parameterType="java.lang.Long">
         select
         <include refid="Base_Column_List"/>

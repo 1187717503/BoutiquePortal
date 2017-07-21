@@ -48,4 +48,12 @@ public interface IPriceChangeRuleProductService {
      * @return
      */
     List<PriceChangeRuleProduct> selectByPriceChangeRuleId(Long priceChangeRuleId);
+    
+    /**
+     * 根据条件 查询
+     * @param PriceChangeRuleProduct
+     * @return
+     */
+    List<PriceChangeRuleProduct>  selectByParameter(PriceChangeRuleProduct record);
+    
 }

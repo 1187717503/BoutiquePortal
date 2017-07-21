@@ -60,4 +60,11 @@ public class PriceChangeRuleGroupServiceImpl extends BaseDao implements IPriceCh
 		return priceChangeRuleGroupMapper.selectByPriceChangeRuleId(priceChangeRuleId);
 	}
 
+	@Override
+	public List<PriceChangeRuleGroup> selectByParameter(
+			PriceChangeRuleGroup record) {
+		
+		return priceChangeRuleGroupMapper.selectByParameter(record);
+	}
+
 }

@@ -2,6 +2,7 @@ package com.intramirror.web.controller.price;
 
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +23,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.product.api.model.PriceChangeRule;
 import com.intramirror.product.api.model.PriceChangeRuleCategoryBrand;
@@ -412,6 +414,16 @@ public class PriceChangeRuleController extends BaseController{
 			//获取对象值
 			JsonObject priceChangeRuleGroupjson= new JsonParser().parse(map.get("price_change_rule_product_group").toString()).getAsJsonObject();
 
+            //判断是否已经存在规则
+			PriceChangeRuleGroup priceChangeRuleGroupParam = new PriceChangeRuleGroup();
+			priceChangeRuleGroupParam.setPriceChangeRuleId(priceChangeRuleGroupjson.get("price_change_rule_id").getAsLong());
+			priceChangeRuleGroupParam.setProductGroupId(priceChangeRuleGroupjson.get("product_group_id").getAsLong());
+			List<PriceChangeRuleGroup> list = priceChangeRuleGroupService.selectByParameter(priceChangeRuleGroupParam);
+            if(list != null && list.size() > 0){
+    			result.put("info","Records already exist");
+    			return result;
+            }
+			
 	        PriceChangeRuleGroup priceChangeRuleGroup = new PriceChangeRuleGroup();
 	        priceChangeRuleGroup.setPriceChangeRuleId(priceChangeRuleGroupjson.get("price_change_rule_id").getAsLong());
 	        priceChangeRuleGroup.setProductGroupId(priceChangeRuleGroupjson.get("product_group_id").getAsLong());
@@ -506,6 +518,7 @@ public class PriceChangeRuleController extends BaseController{
             if (StringUtils.isNotBlank(productCode)) {
             	ProductWithBLOBs productWithBLOBs = new ProductWithBLOBs();
             	productWithBLOBs.setProductCode(productCode);
+            	productWithBLOBs.setEnabled(EnabledType.USED);
             	nproductWithBLOBs = productService.selectByParameter(productWithBLOBs);
     
             }
@@ -514,6 +527,16 @@ public class PriceChangeRuleController extends BaseController{
     			result.put("info","Can't find the goods");
     			return result;
 
+            }
+            
+            //判断是否已经存在规则
+            PriceChangeRuleProduct priceChangeRuleProductParam = new PriceChangeRuleProduct();
+            priceChangeRuleProductParam.setPriceChangeRuleId(Long.valueOf(price_change_rule_id));
+            priceChangeRuleProductParam.setBoutiqueId(productCode);
+            List<PriceChangeRuleProduct> list = priceChangeRuleProductService.selectByParameter(priceChangeRuleProductParam);
+            if(list != null && list.size() > 0){
+    			result.put("info","Records already exist");
+    			return result;
             }
             
             //添加 priceChangeRuleProduct
