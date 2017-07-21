@@ -109,6 +109,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             priceChangeRuleMapper.updateSkuPriceByShop(paramsList);
             this.updateRuleStatus(paramsMap);
         }*/
+        priceChangeRuleMapper.updateSkuPriceByImPrice();
         return true;
     }
 

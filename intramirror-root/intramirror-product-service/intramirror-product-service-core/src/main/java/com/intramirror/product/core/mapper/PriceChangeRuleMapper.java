@@ -91,4 +91,6 @@ public interface PriceChangeRuleMapper {
     int updateDefaultPriceByVendor(Map<String,Object> params);
     int updateDefaultPriceByAdmin(Map<String,Object> params);
 
+    int updateSkuPriceByImPrice();
+
 }

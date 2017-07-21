@@ -30,6 +30,13 @@ public class RuleController {
     @Resource(name = "productRuleServiceImpl")
     private IRuleService iRuleService;
 
+    /**
+     * 查询vendor不同status规则中包含的season
+     * @param ruleStatus
+     * @see PriceChangeRuleEnum.Status
+     * @param vendor_id
+     * @return ResultMessage
+     */
     @RequestMapping("/select/queryRuleByHasSeason")
     @ResponseBody
     public ResultMessage queryRuleByHasSeason(@Param("ruleStatus") String ruleStatus,@Param("vendor_id")String vendor_id){
@@ -49,6 +56,13 @@ public class RuleController {
         return resultMessage;
     }
 
+    /**
+     * 查询vendor不同status规则中不包含的season
+     * @param ruleStatus
+     * @see PriceChangeRuleEnum.Status
+     * @param vendor_id
+     * @return ResultMessage
+     */
     @RequestMapping("/select/queryRuleByNotHasSesaon")
     @ResponseBody
     public ResultMessage queryRuleByNotHasSesaon(@Param("ruleStatus") String ruleStatus,@Param("vendor_id") String vendor_id){
@@ -68,6 +82,12 @@ public class RuleController {
         return resultMessage;
     }
 
+    /**
+     * 根据price_change_rule_id查询exception_flag为0的品牌目录规则(brand_id为0的是默认规则),支持品牌模糊查询
+     * @param price_change_rule_id
+     * @param english_name
+     * @return ResultMessage
+     */
     @RequestMapping("/select/queryRuleByBrandZero")
     @ResponseBody
     public ResultMessage queryRuleByBrandZero(@Param("price_change_rule_id")String price_change_rule_id,@Param("english_name")String english_name){
@@ -91,6 +111,12 @@ public class RuleController {
         return resultMessage;
     }
 
+    /**
+     * 根据price_change_rule_id查询改规则中不包含的品牌数据
+     * @param price_change_rule_id
+     * @param english_name
+     * @return ResultMessage
+     */
     @RequestMapping("/select/queryNotRuleByBrand")
     @ResponseBody
     public ResultMessage queryNotRuleByBrand(@Param("price_change_rule_id")String price_change_rule_id,@Param("english_name")String english_name){
@@ -113,6 +139,11 @@ public class RuleController {
         return resultMessage;
     }
 
+    /**
+     * 根据price_change_rule_id查询exception_flag为1的品牌目录规则
+     * @param price_change_rule_id
+     * @return ResultMessage
+     */
     @RequestMapping("/select/queryRuleByBrandOne")
     @ResponseBody
     public ResultMessage queryRuleByBrandOne(@Param("price_change_rule_id")String price_change_rule_id){
@@ -135,6 +166,11 @@ public class RuleController {
         return resultMessage;
     }
 
+    /**
+     * 根据price_change_rule_id
+     * @param price_change_rule_id
+     * @return
+     */
     @RequestMapping("/select/queryRuleByGroup")
     @ResponseBody
     public ResultMessage queryRuleByGroup(@Param("price_change_rule_id")String price_change_rule_id){

@@ -567,5 +567,11 @@
         update sku set sku.im_price = sku.price * #{default_discount_percentage,jdbcType=BIGINT}/100
     </update>
 
+    <update id="updateSkuPriceByImPrice" >
+
+        update sku,shop_product_sku sps set sps.sale_price = sku.im_price
+        where sku.enabled = 1 and sps.enabled = 1 and sku.sku_id = sps.sku_id
+    </update>
+
     <!-- end dingyifan -->
 </mapper>

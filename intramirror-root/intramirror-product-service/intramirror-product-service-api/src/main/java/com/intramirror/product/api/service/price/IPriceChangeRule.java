@@ -10,10 +10,26 @@ import java.util.Map;
  * Created by dingyifan on 2017/7/17.
  */
 public interface IPriceChangeRule {
+
+    /**
+     * 定时job修改vendor价格
+     * @return true,false
+     * @throws Exception
+     */
     boolean updateVendorPrice() throws Exception;
 
+    /**
+     * 定时job修改shop价格
+     * @return true,false
+     * @throws Exception
+     */
     boolean updateShopPrice() throws Exception;
 
+    /**
+     * 定时job修改admin价格
+     * @return true,false
+     * @throws Exception
+     */
     boolean updateAdminPrice() throws Exception;
 
     int deleteByPrimaryKey(Long priceChangeRuleId);
