@@ -14,6 +14,7 @@ import com.intramirror.product.core.mapper.SeasonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -232,10 +233,11 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
 		return priceChangeRuleMapper.updateByPrimaryKeySelective(record);
 	}
 
+    @Transactional
     @Override
-    public ResultMessage copyRule(Map<String, Object> params) {
+    public ResultMessage copyRule(Map<String, Object> params) throws Exception{
         ResultMessage resultMessage = ResultMessage.getInstance();
-        try {
+//        try {
             String vendor_id = params.get("vendor_id") == null ? "" : params.get("vendor_id").toString();
             String discount = params.get("discount") == null ? "0" : params.get("discount").toString();
             String status = params.get("status") == null ? "" : params.get("status").toString();
@@ -246,15 +248,15 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
                 return resultMessage.errorStatus().putMsg("info"," 没有规则 !!!");
             }
             this.copyAllRuleByActivePending(ruleByConditionsMaps,vendor_id,discount);
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("error message : {}",e.getMessage());
-            resultMessage.errorStatus().putMsg("info","error message : " + e.getMessage());
-        }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            logger.error("error message : {}",e.getMessage());
+//            resultMessage.errorStatus().putMsg("info","error message : " + e.getMessage());
+//        }
         return resultMessage;
     }
 
-    private void copyAllRuleByActivePending(List<Map<String,Object>> ruleByConditionsMaps,String vendor_id,String discount){
+    private void copyAllRuleByActivePending(List<Map<String,Object>> ruleByConditionsMaps,String vendor_id,String discount) throws Exception{
         for(Map<String,Object> map : ruleByConditionsMaps){
             String price_change_rule_id = map.get("price_change_rule_id").toString();
             String name = map.get("name").toString();
