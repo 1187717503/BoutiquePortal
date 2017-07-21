@@ -40,6 +40,11 @@
         delete from price_change_rule_category_brand
         where price_change_rule_category_brand_id = #{priceChangeRuleCategoryBrandId,jdbcType=BIGINT}
     </delete>
+    
+    <delete id="deleteByPriceChangeRuleId" parameterType="java.lang.Long">
+        delete from price_change_rule_category_brand
+        where price_change_rule_id = #{priceChangeRuleId,jdbcType=BIGINT}
+    </delete>
 
     <delete id="deleteByParameter" parameterType="com.intramirror.product.api.model.PriceChangeRuleCategoryBrand">
         delete from price_change_rule_category_brand

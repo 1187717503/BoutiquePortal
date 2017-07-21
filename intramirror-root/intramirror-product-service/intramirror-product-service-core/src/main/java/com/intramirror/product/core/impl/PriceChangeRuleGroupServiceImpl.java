@@ -4,6 +4,7 @@ import com.intramirror.product.api.model.PriceChangeRuleGroup;
 import com.intramirror.product.api.service.IPriceChangeRuleGroupService;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.PriceChangeRuleGroupMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,12 @@ public class PriceChangeRuleGroupServiceImpl extends BaseDao implements IPriceCh
 	public void init() {
 		priceChangeRuleGroupMapper = this.getSqlSession().getMapper(PriceChangeRuleGroupMapper.class);
 		
+	}
+
+	@Override
+	public int deleteByPriceChangeRuleId(Long priceChangeRuleId) {
+		
+		return priceChangeRuleGroupMapper.deleteByPriceChangeRuleId(priceChangeRuleId);
 	}
 
 }

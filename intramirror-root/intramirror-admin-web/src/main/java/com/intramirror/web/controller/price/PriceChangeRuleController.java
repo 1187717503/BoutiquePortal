@@ -740,11 +740,11 @@ public class PriceChangeRuleController extends BaseController{
     		return false;
     	}
     	
-    	if(params.get("price_change_rule_id") == null || StringUtils.isBlank(params.get("price_change_rule_id").toString())){
+    	if(params.get("price_change_rule_id") == null || StringUtils.isBlank(params.get("price_change_rule_id").toString()) || checkNumber(params.get("price_change_rule_id").toString())){
     		return false;
     	}
     	
-    	if(params.get("discount_percentage") == null || StringUtils.isBlank(params.get("discount_percentage").toString())){
+    	if(params.get("discount_percentage") == null || StringUtils.isBlank(params.get("discount_percentage").toString()) || checkNumber(params.get("discount_percentage").toString())){
     		return false;
     	}
     	
@@ -763,11 +763,11 @@ public class PriceChangeRuleController extends BaseController{
     	
     	JsonObject priceChangeRuleCategory = new JsonParser().parse(map.get("price_change_rule_category_brand").toString()).getAsJsonObject();
 
-        if(priceChangeRuleCategory.get("price_change_rule_id").isJsonNull() || StringUtils.isBlank(priceChangeRuleCategory.get("price_change_rule_id").getAsString())){
+        if(priceChangeRuleCategory.get("price_change_rule_id").isJsonNull() || StringUtils.isBlank(priceChangeRuleCategory.get("price_change_rule_id").getAsString()) || checkNumber(priceChangeRuleCategory.get("price_change_rule_id").getAsString())){
         	return false;
         }
 
-        if(priceChangeRuleCategory.get("category_id").isJsonNull() || StringUtils.isBlank(priceChangeRuleCategory.get("category_id").getAsString())){
+        if(priceChangeRuleCategory.get("category_id").isJsonNull() || StringUtils.isBlank(priceChangeRuleCategory.get("category_id").getAsString()) || checkNumber(priceChangeRuleCategory.get("category_id").getAsString())){
         	return false;
         }
         
@@ -775,11 +775,11 @@ public class PriceChangeRuleController extends BaseController{
         	return false;
         }
         
-        if(priceChangeRuleCategory.get("brand_id").isJsonNull() || StringUtils.isBlank(priceChangeRuleCategory.get("brand_id").getAsString())){
+        if(priceChangeRuleCategory.get("brand_id").isJsonNull() || StringUtils.isBlank(priceChangeRuleCategory.get("brand_id").getAsString()) || checkNumber(priceChangeRuleCategory.get("brand_id").getAsString())){
         	return false;
         }
         
-        if(priceChangeRuleCategory.get("discount_percentage").isJsonNull() || StringUtils.isBlank(priceChangeRuleCategory.get("discount_percentage").getAsString())){
+        if(priceChangeRuleCategory.get("discount_percentage").isJsonNull() || StringUtils.isBlank(priceChangeRuleCategory.get("discount_percentage").getAsString()) || checkNumber(priceChangeRuleCategory.get("discount_percentage").getAsString())){
         	return false;
         }
     	
@@ -801,15 +801,15 @@ public class PriceChangeRuleController extends BaseController{
 		//获取对象值
 		JsonObject priceChangeRuleGroupjson= new JsonParser().parse(map.get("price_change_rule_product_group").toString()).getAsJsonObject();
 
-        if(priceChangeRuleGroupjson.get("price_change_rule_id").isJsonNull() || StringUtils.isBlank(priceChangeRuleGroupjson.get("price_change_rule_id").getAsString())){
+        if(priceChangeRuleGroupjson.get("price_change_rule_id").isJsonNull() || StringUtils.isBlank(priceChangeRuleGroupjson.get("price_change_rule_id").getAsString()) || checkNumber(priceChangeRuleGroupjson.get("price_change_rule_id").getAsString())){
         	return false;
         }
 
-        if(priceChangeRuleGroupjson.get("product_group_id").isJsonNull() || StringUtils.isBlank(priceChangeRuleGroupjson.get("product_group_id").getAsString())){
+        if(priceChangeRuleGroupjson.get("product_group_id").isJsonNull() || StringUtils.isBlank(priceChangeRuleGroupjson.get("product_group_id").getAsString()) || checkNumber(priceChangeRuleGroupjson.get("product_group_id").getAsString())){
         	return false;
         }
         
-        if(priceChangeRuleGroupjson.get("discount_percentage").isJsonNull() || StringUtils.isBlank(priceChangeRuleGroupjson.get("discount_percentage").getAsString())){
+        if(priceChangeRuleGroupjson.get("discount_percentage").isJsonNull() || StringUtils.isBlank(priceChangeRuleGroupjson.get("discount_percentage").getAsString()) || checkNumber(priceChangeRuleGroupjson.get("discount_percentage").getAsString())){
         	return false;
         }
     	
@@ -820,6 +820,21 @@ public class PriceChangeRuleController extends BaseController{
     	if(StringUtils.isNotBlank(vue)){
     		try{
     			Integer.parseInt(vue);
+    		}catch(Exception e){
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+    
+    
+    private static boolean checkNumber(String vue){
+    	if(StringUtils.isNotBlank(vue)){
+    		try{
+    			Long number = Long.parseLong(vue);
+    			if(number == null || number == 0){
+    				return true;
+    			}
     		}catch(Exception e){
     			return true;
     		}

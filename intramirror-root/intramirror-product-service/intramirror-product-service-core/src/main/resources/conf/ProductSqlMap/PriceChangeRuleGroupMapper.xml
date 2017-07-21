@@ -36,6 +36,12 @@
         delete from price_change_rule_group
         where price_change_rule_group_id = #{priceChangeRuleGroupId,jdbcType=BIGINT}
     </delete>
+    
+    <delete id="deleteByPriceChangeRuleId" parameterType="java.lang.Long">
+        delete from price_change_rule_group
+        where price_change_rule_id = #{priceChangeRuleId,jdbcType=BIGINT}
+    </delete>
+    
     <insert id="insert" parameterType="com.intramirror.product.api.model.PriceChangeRuleGroup">
         <!--
           WARNING - @mbggenerated

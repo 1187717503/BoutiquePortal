@@ -4,6 +4,7 @@ import com.intramirror.product.api.model.PriceChangeRuleCategoryBrand;
 import com.intramirror.product.api.service.IPriceChangeRuleCategoryBrandService;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.PriceChangeRuleCategoryBrandMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -59,6 +60,12 @@ public class PriceChangeRuleCategoryBrandServiceImpl extends BaseDao implements 
 	@Override
 	public int deleteByParameter(PriceChangeRuleCategoryBrand record) {
 		return priceChangeRuleCategoryBrandMapper.deleteByParameter(record);
+	}
+
+	@Override
+	public int deleteByPriceChangeRuleId(Long priceChangeRuleId) {
+		
+		return priceChangeRuleCategoryBrandMapper.deleteByPriceChangeRuleId(priceChangeRuleId);
 	}
 
 }

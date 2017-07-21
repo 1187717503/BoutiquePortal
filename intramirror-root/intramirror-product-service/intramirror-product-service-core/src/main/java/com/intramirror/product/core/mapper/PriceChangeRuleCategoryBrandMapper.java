@@ -1,6 +1,7 @@
 package com.intramirror.product.core.mapper;
 
 import com.intramirror.product.api.model.PriceChangeRuleCategoryBrand;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -19,6 +20,13 @@ public interface PriceChangeRuleCategoryBrandMapper {
      * @mbggenerated
      */
     int deleteByParameter(PriceChangeRuleCategoryBrand record);
+    
+    /**
+     * 根据priceChangeRuleId 删除
+     * @param priceChangeRuleId
+     * @return
+     */
+    int deleteByPriceChangeRuleId(Long priceChangeRuleId);
     
 
     /**

@@ -22,6 +22,14 @@ public interface IPriceChangeRuleCategoryBrandService {
      * @return
      */
     int deletePriceChangeRuleCategoryBrand(Long priceChangeRuleCategoryBrandId);
+    
+    
+    /**
+     * 根据priceChangeRuleId 删除
+     * @param priceChangeRuleId
+     * @return
+     */
+    int deleteByPriceChangeRuleId(Long priceChangeRuleId);
 
 
     /**

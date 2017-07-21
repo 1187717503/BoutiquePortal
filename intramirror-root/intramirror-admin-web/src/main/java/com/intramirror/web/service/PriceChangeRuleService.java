@@ -347,10 +347,38 @@ public class PriceChangeRuleService {
 		
 		Long priceChangeRuleId =Long.parseLong(map.get("price_change_rule_id").toString());
 
-		priceChangeRuleProductService.deleteBypriceChangeRuleId(priceChangeRuleId);
+		//删除priceChangeRuleProduct
+		int ProductRow = priceChangeRuleProductService.deleteBypriceChangeRuleId(priceChangeRuleId);
+		
+		//判断影响行数,确认是否成功
+		if(ProductRow <= 0){
+        	result.put("info","parameter is incorrect");
+        	logger.error("delete priceChangeRuleProduct fail parameter:"+ new Gson().toJson(priceChangeRuleId));
+            throw new RuntimeException("error");
+		}
 		
 		
-//		1111
+		//删除priceChangeRuleGroup
+		int groupRow = priceChangeRuleGroupService.deleteByPriceChangeRuleId(priceChangeRuleId);
+		
+		//判断影响行数,确认是否成功
+		if(groupRow <= 0){
+        	result.put("info","parameter is incorrect");
+        	logger.error("delete priceChangeRuleGroup fail parameter:"+ new Gson().toJson(priceChangeRuleId));
+            throw new RuntimeException("error");
+		}
+		
+		
+		//删除priceChangeRuleCategoryBrand
+		int categoryBrandRow = priceChangeRuleCategoryBrandService.deleteByPriceChangeRuleId(priceChangeRuleId);
+		
+		//判断影响行数,确认是否成功
+		if(categoryBrandRow <= 0){
+        	result.put("info","parameter is incorrect");
+        	logger.error("delete priceChangeRuleCategoryBrand fail parameter:"+ new Gson().toJson(priceChangeRuleId));
+            throw new RuntimeException("error");
+		}
+//111
 	    result.put("status", StatusType.SUCCESS);
 	    return result;
 	}
