@@ -354,7 +354,7 @@ public class PriceChangeRuleService {
 		if(ProductRow <= 0){
         	result.put("info","parameter is incorrect");
         	logger.error("delete priceChangeRuleProduct fail parameter:"+ new Gson().toJson(priceChangeRuleId));
-            throw new RuntimeException("error");
+            throw new RuntimeException("error  delete priceChangeRuleProduct fail");
 		}
 		
 		
@@ -365,7 +365,7 @@ public class PriceChangeRuleService {
 		if(groupRow <= 0){
         	result.put("info","parameter is incorrect");
         	logger.error("delete priceChangeRuleGroup fail parameter:"+ new Gson().toJson(priceChangeRuleId));
-            throw new RuntimeException("error");
+            throw new RuntimeException("error  delete priceChangeRuleGroup fail");
 		}
 		
 		
@@ -376,9 +376,32 @@ public class PriceChangeRuleService {
 		if(categoryBrandRow <= 0){
         	result.put("info","parameter is incorrect");
         	logger.error("delete priceChangeRuleCategoryBrand fail parameter:"+ new Gson().toJson(priceChangeRuleId));
-            throw new RuntimeException("error");
+            throw new RuntimeException("error  delete priceChangeRuleCategoryBrand fail");
 		}
-//111
+		
+		
+		//删除priceChangeRuleSeasonGroup
+		int seasonGroupRow = priceChangeRuleSeasonGroupService.deleteByPriceChangeRuleId(priceChangeRuleId);
+		
+		//判断影响行数,确认是否成功
+		if(seasonGroupRow <= 0){
+        	result.put("info","parameter is incorrect");
+        	logger.error("delete priceChangeRuleSeasonGroup fail parameter:"+ new Gson().toJson(priceChangeRuleId));
+            throw new RuntimeException("error  delete priceChangeRuleSeasonGroup fail");
+		}
+		
+		
+		
+		//删除priceChangeRule
+		int priceChangeRuleRow = priceChangeRuleService.deleteByPrimaryKey(priceChangeRuleId);
+		
+		//判断影响行数,确认是否成功
+		if(priceChangeRuleRow <= 0){
+        	result.put("info","parameter is incorrect");
+        	logger.error("delete priceChangeRule fail parameter:"+ new Gson().toJson(priceChangeRuleId));
+            throw new RuntimeException("error  delete priceChangeRule fail");
+		}
+
 	    result.put("status", StatusType.SUCCESS);
 	    return result;
 	}

@@ -654,6 +654,51 @@ public class PriceChangeRuleController extends BaseController{
 	}
 	
 	
+	
+	
+	
+	
+	/**
+	 * 根据price_change_rule_id 删除PriceChangeRule
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping(value = "/deletePriceChangeRule", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> deletePriceChangeRule(@RequestBody Map<String, Object> map){
+		logger.info("deletePriceChangeRule param:"+new Gson().toJson(map));
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("status", StatusType.FAILURE);
+		
+		//校验
+		if(map.get("price_change_rule_id") == null ||StringUtils.isBlank(map.get("price_change_rule_id").toString())){
+			result.put("info","Parameter cannot be null");
+			return result;
+		}
+		
+		try {
+		
+			//调用service 创建 事物管理
+			try {
+				//根据ID删除
+				result = priceChangeRuleService.deletePriceChangeRule(map); 
+			} catch (Exception e) {
+				e.printStackTrace();
+				result.put("info","delete priceChangeRule fail ");
+				return result;
+			}
+
+		    
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.put("info","delete priceChangeRule fail ");
+			return result;
+		}
+		
+		return result;
+	}
+	
+	
     /**
      * 检查参数
      */
