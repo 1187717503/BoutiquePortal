@@ -100,4 +100,8 @@
       system_property_value = #{systemPropertyValue,jdbcType=VARCHAR}
     where system_property_id = #{systemPropertyId,jdbcType=BIGINT}
   </update>
+
+  <select id="selectSystemProperty" resultType="java.util.Map">
+    select * from system_property
+  </select>
 </mapper>
