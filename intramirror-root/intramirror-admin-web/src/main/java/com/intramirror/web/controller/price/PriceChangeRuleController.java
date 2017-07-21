@@ -85,6 +85,7 @@ public class PriceChangeRuleController extends BaseController{
 		try {
 			userMap = super.baseController(httpRequest);
 			result.put("userStatus", userMap.get("userStatus"));
+			
 			if(Integer.parseInt(userMap.get("status").toString()) == StatusType.SUCCESS){
 				user = (User) userMap.get("user");
 				if(user == null){
@@ -92,7 +93,11 @@ public class PriceChangeRuleController extends BaseController{
 					return result;
 				}
 				map.put("userId", user.getUserId());
+			}else{
+				result.put("info","User not logged in");
+				return result;
 			}
+			
 		} catch (Exception e1) {
 			e1.printStackTrace();
 			result.put("info","User not logged in");

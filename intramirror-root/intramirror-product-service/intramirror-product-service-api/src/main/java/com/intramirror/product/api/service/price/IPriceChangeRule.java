@@ -3,6 +3,7 @@ package com.intramirror.product.api.service.price;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.product.api.model.PriceChangeRule;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,5 +29,12 @@ public interface IPriceChangeRule {
     ResultMessage copyRuleByVendor(Map<String,Object> params) throws Exception;
 
     ResultMessage copyRuleBySeason(Map<String,Object> params) throws Exception;
+    
+    /**
+     * 根据name 模糊查询
+     * @param priceChangeRuleId
+     * @return
+     */
+    List<PriceChangeRule> selectByName(String name);
 
 }

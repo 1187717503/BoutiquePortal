@@ -11,10 +11,10 @@ import com.intramirror.product.api.model.PriceChangeRuleSeasonGroup;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.PriceChangeRuleMapper;
-
 import com.intramirror.product.core.mapper.PriceChangeRuleSeasonGroupMapper;
 import com.intramirror.product.core.mapper.SeasonMapper;
 import com.intramirror.product.core.mapper.SystemPropertyMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -378,5 +378,10 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         }
         return price_change_rule_id_new;
     }
+
+	@Override
+	public List<PriceChangeRule> selectByName(String name) {
+		return priceChangeRuleMapper.selectByName(name);
+	}
 
 }

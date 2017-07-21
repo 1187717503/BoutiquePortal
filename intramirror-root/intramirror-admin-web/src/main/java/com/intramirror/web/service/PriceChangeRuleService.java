@@ -98,8 +98,19 @@ public class PriceChangeRuleService {
 		
 		//添加PriceChangeRule
 		PriceChangeRule priceChangeRule = new PriceChangeRule();
+		
+		//设置名称
+		String name = map.get("name").toString();
+		if(name.contains(",")){
+			List<PriceChangeRule> list = priceChangeRuleService.selectByName("Multiple");
+			if(list != null && list.size() > 0){
+				name = "Multiple"+(list.size() +1);
+			}else{
+				name = "Multiple";
+			}
+		}
 
-		priceChangeRule.setName(map.get("name").toString());
+		priceChangeRule.setName(name);
 		priceChangeRule.setPriceType(Byte.valueOf(map.get("price_type").toString()));
 		Long vendorId =Long.parseLong(map.get("vendorId").toString());
 		
