@@ -3,6 +3,7 @@ package com.intramirror.product.api.service;
 import com.intramirror.product.api.model.PriceChangeRuleProduct;
 
 import java.util.List;
+import java.util.Map;
 
 public interface IPriceChangeRuleProductService {
 	
@@ -39,4 +40,12 @@ public interface IPriceChangeRuleProductService {
     int insertSelective(PriceChangeRuleProduct record);
 
     List<PriceChangeRuleProduct> getPriceChangeRuleGroupListByPriceChangeRuleId(Long priceChangeRuleId);
+    
+    
+    /**
+     * 根据priceChangeRuleId 查询
+     * @param priceChangeRuleId
+     * @return
+     */
+    List<PriceChangeRuleProduct> selectByPriceChangeRuleId(Long priceChangeRuleId);
 }

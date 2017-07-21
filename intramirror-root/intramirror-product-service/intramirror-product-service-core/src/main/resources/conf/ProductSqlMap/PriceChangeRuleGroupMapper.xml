@@ -28,6 +28,15 @@
         from price_change_rule_group
         where price_change_rule_group_id = #{priceChangeRuleGroupId,jdbcType=BIGINT}
     </select>
+    
+    <select id="selectByPriceChangeRuleId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from price_change_rule_group
+        where price_change_rule_id = #{priceChangeRuleId,jdbcType=BIGINT}
+    </select>
+    
+    
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         <!--
           WARNING - @mbggenerated

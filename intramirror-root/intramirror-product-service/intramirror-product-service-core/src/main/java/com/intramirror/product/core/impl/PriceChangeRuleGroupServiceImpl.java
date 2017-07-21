@@ -53,4 +53,11 @@ public class PriceChangeRuleGroupServiceImpl extends BaseDao implements IPriceCh
 		return priceChangeRuleGroupMapper.deleteByPriceChangeRuleId(priceChangeRuleId);
 	}
 
+	@Override
+	public List<PriceChangeRuleGroup> selectByPriceChangeRuleId(
+			Long priceChangeRuleId) {
+		
+		return priceChangeRuleGroupMapper.selectByPriceChangeRuleId(priceChangeRuleId);
+	}
+
 }

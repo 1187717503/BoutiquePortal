@@ -347,26 +347,37 @@ public class PriceChangeRuleService {
 		
 		Long priceChangeRuleId =Long.parseLong(map.get("price_change_rule_id").toString());
 
-		//删除priceChangeRuleProduct
-		int ProductRow = priceChangeRuleProductService.deleteBypriceChangeRuleId(priceChangeRuleId);
+		//查询判断是否存在
+		List<PriceChangeRuleProduct> priceChangeRuleProductList = priceChangeRuleProductService.selectByPriceChangeRuleId(priceChangeRuleId);
+		if(priceChangeRuleProductList != null && priceChangeRuleProductList.size() > 0){
+			//删除priceChangeRuleProduct
+			int ProductRow = priceChangeRuleProductService.deleteBypriceChangeRuleId(priceChangeRuleId);
+			
+			//判断影响行数,确认是否成功
+			if(ProductRow <= 0){
+	        	result.put("info","parameter is incorrect");
+	        	logger.error("delete priceChangeRuleProduct fail parameter:"+ new Gson().toJson(priceChangeRuleId));
+	            throw new RuntimeException("error  delete priceChangeRuleProduct fail");
+			}
+		}
+
 		
-		//判断影响行数,确认是否成功
-		if(ProductRow <= 0){
-        	result.put("info","parameter is incorrect");
-        	logger.error("delete priceChangeRuleProduct fail parameter:"+ new Gson().toJson(priceChangeRuleId));
-            throw new RuntimeException("error  delete priceChangeRuleProduct fail");
+		
+		//查询判断是否存在
+		List<PriceChangeRuleGroup> priceChangeRuleGroupList =  priceChangeRuleGroupService.selectByPriceChangeRuleId(priceChangeRuleId);
+		if(priceChangeRuleGroupList != null && priceChangeRuleGroupList.size() > 0){
+			//删除priceChangeRuleGroup
+			int groupRow = priceChangeRuleGroupService.deleteByPriceChangeRuleId(priceChangeRuleId);
+			
+			//判断影响行数,确认是否成功
+			if(groupRow <= 0){
+	        	result.put("info","parameter is incorrect");
+	        	logger.error("delete priceChangeRuleGroup fail parameter:"+ new Gson().toJson(priceChangeRuleId));
+	            throw new RuntimeException("error  delete priceChangeRuleGroup fail");
+			}
 		}
 		
-		
-		//删除priceChangeRuleGroup
-		int groupRow = priceChangeRuleGroupService.deleteByPriceChangeRuleId(priceChangeRuleId);
-		
-		//判断影响行数,确认是否成功
-		if(groupRow <= 0){
-        	result.put("info","parameter is incorrect");
-        	logger.error("delete priceChangeRuleGroup fail parameter:"+ new Gson().toJson(priceChangeRuleId));
-            throw new RuntimeException("error  delete priceChangeRuleGroup fail");
-		}
+
 		
 		
 		//删除priceChangeRuleCategoryBrand
@@ -378,6 +389,7 @@ public class PriceChangeRuleService {
         	logger.error("delete priceChangeRuleCategoryBrand fail parameter:"+ new Gson().toJson(priceChangeRuleId));
             throw new RuntimeException("error  delete priceChangeRuleCategoryBrand fail");
 		}
+		
 		
 		
 		//删除priceChangeRuleSeasonGroup
