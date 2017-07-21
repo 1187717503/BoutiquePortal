@@ -7,10 +7,12 @@ import com.intramirror.common.enums.SystemPropertyEnum;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.help.StringUtils;
 import com.intramirror.product.api.model.PriceChangeRule;
+import com.intramirror.product.api.model.PriceChangeRuleSeasonGroup;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.PriceChangeRuleMapper;
 
+import com.intramirror.product.core.mapper.PriceChangeRuleSeasonGroupMapper;
 import com.intramirror.product.core.mapper.SeasonMapper;
 import com.intramirror.product.core.mapper.SystemPropertyMapper;
 import org.slf4j.Logger;
@@ -18,10 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by dingyifan on 2017/7/17.
@@ -36,6 +35,8 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     private SeasonMapper seasonMapper;
 
     private SystemPropertyMapper systemPropertyMapper;
+
+    private PriceChangeRuleSeasonGroupMapper priceChangeRuleSeasonGroupMapper;
 
     @Override
     public boolean updateVendorPrice() {
@@ -241,6 +242,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         priceChangeRuleMapper = this.getSqlSession().getMapper(PriceChangeRuleMapper.class);
         seasonMapper = this.getSqlSession().getMapper(SeasonMapper.class);
         systemPropertyMapper = this.getSqlSession().getMapper(SystemPropertyMapper.class);
+        priceChangeRuleSeasonGroupMapper = this.getSqlSession().getMapper(PriceChangeRuleSeasonGroupMapper.class);
     }
 
 	@Override
@@ -270,19 +272,18 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
 
     @Transactional
     @Override
-    public ResultMessage copyRule(Map<String, Object> params) throws Exception{
+    public ResultMessage copyRuleByVendor(Map<String, Object> params) throws Exception{
         ResultMessage resultMessage = ResultMessage.getInstance();
 //        try {
             String vendor_id = params.get("vendor_id") == null ? "" : params.get("vendor_id").toString();
             String discount = params.get("discount") == null ? "0" : params.get("discount").toString();
-            String status = params.get("status") == null ? "" : params.get("status").toString();
             params.put("price_type",PriceChangeRuleEnum.PriceType.SUPPLY_PRICE.getCode());
             List<Map<String,Object>> ruleByConditionsMaps =  seasonMapper.queryRuleByConditions(params);
 
             if(ruleByConditionsMaps == null || ruleByConditionsMaps.size() == 0) {
                 return resultMessage.errorStatus().putMsg("info"," 没有规则 !!!");
             }
-            this.copyAllRuleByActivePending(ruleByConditionsMaps,vendor_id,discount);
+            this.copyAllRuleByActivePending(ruleByConditionsMaps,vendor_id,discount,true);
             resultMessage.successStatus().putMsg("info","SUCCESS !!!");
 //        } catch (Exception e) {
 //            e.printStackTrace();
@@ -292,7 +293,37 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         return resultMessage;
     }
 
-    private void copyAllRuleByActivePending(List<Map<String,Object>> ruleByConditionsMaps,String vendor_id,String discount) throws Exception{
+    @Transactional
+    @Override
+    public ResultMessage copyRuleBySeason(Map<String, Object> params) throws Exception {
+        ResultMessage resultMessage = ResultMessage.getInstance();
+        String vendor_id = params.get("vendor_id") == null ? "" : params.get("vendor_id").toString();
+        String[] season_codes = (String[]) (params.get("season_codes") == null ? "" : params.get("season_codes"));
+        List<Map<String,Object>> ruleByConditionsMaps = new ArrayList<>();
+        ruleByConditionsMaps.add(params);
+        Long price_change_rule_id_new = this.copyAllRuleByActivePending(ruleByConditionsMaps,vendor_id,"0",false);
+
+        // create price_season_group
+        for(String season_code : season_codes) {
+            PriceChangeRuleSeasonGroup priceChangeRuleSeasonGroup = new PriceChangeRuleSeasonGroup();
+            priceChangeRuleSeasonGroup.setSeasonCode(season_code);
+            priceChangeRuleSeasonGroup.setCreatedAt(new Date());
+            priceChangeRuleSeasonGroup.setUpdatedAt(new Date());
+            priceChangeRuleSeasonGroup.setEnabled(1);
+            priceChangeRuleSeasonGroup.setPriceChangeRuleId(price_change_rule_id_new);
+            if(season_codes.length > 1) {
+                priceChangeRuleSeasonGroup.setName(season_code + price_change_rule_id_new);
+            } else {
+                priceChangeRuleSeasonGroup.setName(season_code);
+            }
+
+            priceChangeRuleSeasonGroupMapper.insert(priceChangeRuleSeasonGroup);
+        }
+        return resultMessage;
+    }
+
+    private Long copyAllRuleByActivePending(List<Map<String,Object>> ruleByConditionsMaps,String vendor_id,String discount,boolean insert_season_group_flag) throws Exception{
+        Long price_change_rule_id_new = 0L;
         for(Map<String,Object> map : ruleByConditionsMaps){
             String price_change_rule_id = map.get("price_change_rule_id").toString();
             String name = map.get("name").toString();
@@ -305,7 +336,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             priceChangeRule.setVendorId(Long.parseLong(vendor_id));
             priceChangeRule.setUserId(12L);
             priceChangeRuleMapper.insert(priceChangeRule);
-            Long price_change_rule_id_new = priceChangeRule.getPriceChangeRuleId();
+            price_change_rule_id_new = priceChangeRule.getPriceChangeRuleId();
             /** end copy price_change_rule */
 
             /** start copy price_change_rule_category_brand */
@@ -332,13 +363,16 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             seasonMapper.copyPriceChangeRuleProduct(insert_price_change_rule_product_maps);
             /** end copy price_change_rule_product */
 
-            /** start copy price_change_rule_season_group */
-            Map<String,Object> insert_price_change_rule_season_group_maps = new HashMap<>();
-            insert_price_change_rule_season_group_maps.put("insert_price_change_rule_id",price_change_rule_id_new);
-            insert_price_change_rule_season_group_maps.put("price_change_rule_id",price_change_rule_id);
-            seasonMapper.copyPriceChangeRuleSeasonGroup(insert_price_change_rule_season_group_maps);
-            /** end copy price_change_rule_season_group */
+            if(insert_season_group_flag) {
+                /** start copy price_change_rule_season_group */
+                Map<String,Object> insert_price_change_rule_season_group_maps = new HashMap<>();
+                insert_price_change_rule_season_group_maps.put("insert_price_change_rule_id",price_change_rule_id_new);
+                insert_price_change_rule_season_group_maps.put("price_change_rule_id",price_change_rule_id);
+                seasonMapper.copyPriceChangeRuleSeasonGroup(insert_price_change_rule_season_group_maps);
+                /** end copy price_change_rule_season_group */
+            }
         }
+        return price_change_rule_id_new;
     }
 
 }

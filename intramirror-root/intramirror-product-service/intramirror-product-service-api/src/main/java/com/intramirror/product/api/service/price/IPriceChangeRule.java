@@ -25,5 +25,8 @@ public interface IPriceChangeRule {
 
     int updateByPrimaryKeySelective(PriceChangeRule record);
 
-    ResultMessage copyRule(Map<String,Object> params) throws Exception;
+    ResultMessage copyRuleByVendor(Map<String,Object> params) throws Exception;
+
+    ResultMessage copyRuleBySeason(Map<String,Object> params) throws Exception;
+
 }

@@ -42,7 +42,7 @@ public class CopyRuleController {
             params.put("vendor_id",vendor_id);
             params.put("discount",discount);
             params.put("status", PriceChangeRuleEnum.Status.ACTIVE.getCode());
-            return iPriceChangeRule.copyRule(params);
+            return iPriceChangeRule.copyRuleByVendor(params);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("error message : {}",e.getMessage());
@@ -64,7 +64,7 @@ public class CopyRuleController {
             params.put("vendor_id",vendor_id);
             params.put("discount",discount);
             params.put("status", PriceChangeRuleEnum.Status.PENDING.getCode());
-            return iPriceChangeRule.copyRule(params);
+            return iPriceChangeRule.copyRuleByVendor(params);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("error message : {}",e.getMessage());
@@ -75,7 +75,7 @@ public class CopyRuleController {
 
     @RequestMapping("/seasonVendor")
     @ResponseBody
-    public ResultMessage seasonVendor(@Param("price_change_rule_id")String price_change_rule_id,@Param("season_codes")String[] seasons){
+    public ResultMessage seasonVendor(@Param("price_change_rule_id")String price_change_rule_id,@Param("season_codes")String[] seasons,@Param("vendor_id")String vendor_id){
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
             if(StringUtils.isBlank(price_change_rule_id) || seasons == null || seasons.length == 0) {
@@ -85,7 +85,8 @@ public class CopyRuleController {
             Map<String,Object> params = new HashMap<>();
             params.put("price_change_rule_id",price_change_rule_id);
             params.put("seasons",seasons);
-            return iPriceChangeRule.copyRule(params);
+            params.put("vendor_id",vendor_id);
+            return iPriceChangeRule.copyRuleBySeason(params);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("error message : {}",e.getMessage());
