@@ -44,4 +44,10 @@ public class PriceChangeRuleProductServiceImpl extends BaseDao implements IPrice
 		
 	}
 
+	@Override
+	public int deleteBypriceChangeRuleId(Long priceChangeRuleId) {
+		
+		return priceChangeRuleProductMapper.deleteBypriceChangeRuleId(priceChangeRuleId);
+	}
+
 }

@@ -1,5 +1,6 @@
 package com.intramirror.web.controller.price;
 
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,9 +19,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.intramirror.common.parameter.StatusType;
+import com.intramirror.product.api.model.PriceChangeRule;
 import com.intramirror.product.api.model.PriceChangeRuleCategoryBrand;
 import com.intramirror.product.api.model.PriceChangeRuleGroup;
 import com.intramirror.product.api.model.PriceChangeRuleProduct;
@@ -302,7 +306,7 @@ public class PriceChangeRuleController extends BaseController{
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
 		
-		if(map.get("price_change_rule_category_brand") == null ||StringUtils.isBlank(map.get("price_change_rule_category_brand").toString())){
+		if(!checkCreatePriceChangeRuleCategoryBrandParams(map)){
 			result.put("info","parameter is incorrect");
 			return result;
 		}
@@ -310,7 +314,7 @@ public class PriceChangeRuleController extends BaseController{
 		try {
 			
 		    JsonObject priceChangeRuleCategory = new JsonParser().parse(map.get("price_change_rule_category_brand").toString()).getAsJsonObject();
-	
+
 	        PriceChangeRuleCategoryBrand priceChangeRuleCategoryBrand = new PriceChangeRuleCategoryBrand();
 	        priceChangeRuleCategoryBrand.setPriceChangeRuleId(priceChangeRuleCategory.get("price_change_rule_id").getAsLong());
 	        priceChangeRuleCategoryBrand.setCategoryId(priceChangeRuleCategory.get("category_id").getAsLong());
@@ -393,8 +397,8 @@ public class PriceChangeRuleController extends BaseController{
 		logger.info("priceChangeRuleProductGroupCreate param:"+new Gson().toJson(map));
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
-		
-		if(map.get("price_change_rule_product_group") == null || StringUtils.isBlank(map.get("price_change_rule_product_group").toString())){
+
+		if(!checkCreatePriceChangeRuleProductGroupParams(map)){
 			result.put("info","parameter is incorrect");
 			return result;
 		}
@@ -612,6 +616,44 @@ public class PriceChangeRuleController extends BaseController{
 	}
 	
 	
+	/**
+	 * 修改PriceChangeRul 修改有效日期
+	 * @param map
+	 * @return
+	 * @throws Exception
+	 */ 
+	@RequestMapping(value = "/updatePriceChangeRule", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String,Object> updatePriceChangeRule(@RequestBody Map<String,Object> map){
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("status", StatusType.FAILURE);
+		
+		try{
+			//根据price_change_rule_id  修改有效期
+			PriceChangeRule priceChangeRuleInfo = new PriceChangeRule();
+			priceChangeRuleInfo.setPriceChangeRuleId(Long.valueOf(map.get("price_change_rule_id").toString()));
+		    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		    priceChangeRuleInfo.setValidFrom(simpleDateFormat.parse(map.get("valid_from").toString()));
+		    int row = priceChangeRule.updateByPrimaryKeySelective(priceChangeRuleInfo);
+		    
+		    //修改有效期
+	        if (row  <= 0) {
+	        	result.put("info","parameter is incorrect");
+	        	logger.error("update PriceChangeRule fail parameter:"+ new Gson().toJson(priceChangeRuleInfo));
+	        	return result;
+	        }
+	        
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.put("info","update PriceChangeRule fail ");
+			return result;
+		}
+		
+	    result.put("status", StatusType.SUCCESS);
+	    return result;
+	}
+	
+	
     /**
      * 检查参数
      */
@@ -705,6 +747,71 @@ public class PriceChangeRuleController extends BaseController{
     	if(params.get("discount_percentage") == null || StringUtils.isBlank(params.get("discount_percentage").toString())){
     		return false;
     	}
+    	
+    	return true;
+    }
+    
+    
+    /**
+     * 检查参数
+     */
+    public static boolean checkCreatePriceChangeRuleCategoryBrandParams(Map<String, Object> map) {
+    	
+    	if(map.get("price_change_rule_category_brand") == null ||StringUtils.isBlank(map.get("price_change_rule_category_brand").toString())){
+    		return false;
+    	}
+    	
+    	JsonObject priceChangeRuleCategory = new JsonParser().parse(map.get("price_change_rule_category_brand").toString()).getAsJsonObject();
+
+        if(priceChangeRuleCategory.get("price_change_rule_id").isJsonNull() || StringUtils.isBlank(priceChangeRuleCategory.get("price_change_rule_id").getAsString())){
+        	return false;
+        }
+
+        if(priceChangeRuleCategory.get("category_id").isJsonNull() || StringUtils.isBlank(priceChangeRuleCategory.get("category_id").getAsString())){
+        	return false;
+        }
+        
+        if(priceChangeRuleCategory.get("level").isJsonNull() || StringUtils.isBlank(priceChangeRuleCategory.get("level").getAsString())){
+        	return false;
+        }
+        
+        if(priceChangeRuleCategory.get("brand_id").isJsonNull() || StringUtils.isBlank(priceChangeRuleCategory.get("brand_id").getAsString())){
+        	return false;
+        }
+        
+        if(priceChangeRuleCategory.get("discount_percentage").isJsonNull() || StringUtils.isBlank(priceChangeRuleCategory.get("discount_percentage").getAsString())){
+        	return false;
+        }
+    	
+    	return true;
+    }
+    
+    
+    
+    
+    /**
+     * 检查参数
+     */
+    public static boolean checkCreatePriceChangeRuleProductGroupParams(Map<String, Object> map) {
+    	
+    	if(map.get("price_change_rule_product_group") == null || StringUtils.isBlank(map.get("price_change_rule_product_group").toString())){
+    		return false;
+    	}
+    	
+		//获取对象值
+		JsonObject priceChangeRuleGroupjson= new JsonParser().parse(map.get("price_change_rule_product_group").toString()).getAsJsonObject();
+
+        if(priceChangeRuleGroupjson.get("price_change_rule_id").isJsonNull() || StringUtils.isBlank(priceChangeRuleGroupjson.get("price_change_rule_id").getAsString())){
+        	return false;
+        }
+
+        if(priceChangeRuleGroupjson.get("product_group_id").isJsonNull() || StringUtils.isBlank(priceChangeRuleGroupjson.get("product_group_id").getAsString())){
+        	return false;
+        }
+        
+        if(priceChangeRuleGroupjson.get("discount_percentage").isJsonNull() || StringUtils.isBlank(priceChangeRuleGroupjson.get("discount_percentage").getAsString())){
+        	return false;
+        }
     	
     	return true;
     }
