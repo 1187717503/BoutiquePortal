@@ -61,11 +61,11 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
         List<Map<String,Object>> brandMaps = seasonMapper.queryRuleByBrandZero(params);
         if(brandMaps != null && brandMaps.size() > 0) {
             for(Map<String,Object> brandMap : brandMaps) {
-                String brandName = brandMap.get("english_name").toString();
+                String brandId = brandMap.get("brand_id").toString();
                 boolean flag = true;
                 for(Map<String,Object> handleMap : handleMaps){
-                    String eName = handleMap.get("english_name") == null ? "" : handleMap.get("english_name").toString();
-                    if(brandName.equals(eName)) {
+                    String eName = handleMap.get("brand_id") == null ? "" : handleMap.get("brand_id").toString();
+                    if(brandId.equals(eName)) {
                         handleMap.put(brandMap.get("category_id").toString(),brandMap.get("discount_percentage"));
                         flag = false;
                     }
@@ -73,7 +73,8 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
 
                 if(flag) {
                     Map<String,Object> map = new HashMap<>();
-                    map.put("english_name",brandName);
+                    String englishName = brandMap.get("english_name") == null ? "default" : brandMap.get("english_name").toString();
+                    map.put("english_name",englishName);
                     map.put("brand_id",brandMap.get("brand_id"));
                     map.put("price_change_rule_category_brand_id",brandMap.get("price_change_rule_category_brand_id"));
                     map.put(brandMap.get("category_id").toString(),brandMap.get("discount_percentage"));
