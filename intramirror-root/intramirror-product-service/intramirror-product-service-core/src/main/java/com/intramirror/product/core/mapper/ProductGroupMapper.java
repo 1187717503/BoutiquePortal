@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface ProductGroupMapper {
 
-    List<ProductGroup> getProductGroupListByGroupType(@Param("groupType") String groupType);
+    List<ProductGroup> getProductGroupListByGroupTypeAndVendorId(@Param("groupType") String groupType,@Param("vendorId") Long vendorId);
 }

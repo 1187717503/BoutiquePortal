@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface IProductGroupService {
 
-    List<ProductGroup> getProductGroupListByGroupType(String groupType);
+    List<ProductGroup> getProductGroupListByGroupTypeAndVendorId(String groupType, Long vendorId);
 }

@@ -44,7 +44,7 @@ public class ProductGroupController extends BaseController {
 
         /**-------------------------------------ProductGroup-------------------------------------------------*/
         try {
-            List<ProductGroup> productGroupList = productGroupService.getProductGroupListByGroupType(map.get("group_type").toString());
+            List<ProductGroup> productGroupList = productGroupService.getProductGroupListByGroupTypeAndVendorId(map.get("group_type").toString(), Long.valueOf(map.get("vendor_id").toString()));
             result.put("productGroupList", productGroupList);
             result.put("status", StatusType.SUCCESS);
         } catch (Exception e) {

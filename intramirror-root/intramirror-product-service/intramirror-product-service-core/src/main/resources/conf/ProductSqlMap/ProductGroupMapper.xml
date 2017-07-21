@@ -21,12 +21,14 @@
     product_group pg
   </sql>
 
-    <select id="getProductGroupListByGroupType" resultMap="BaseResultMap">
+    <select id="getProductGroupListByGroupTypeAndVendorId" resultMap="BaseResultMap">
         SELECT
         <include refid="selectColumn"/>
         FROM
         <include refid="selectTable"/>
         WHERE
         pg.group_type=#{groupType}
+        AND
+        pg.vendorId=#{vendorId}
     </select>
 </mapper>

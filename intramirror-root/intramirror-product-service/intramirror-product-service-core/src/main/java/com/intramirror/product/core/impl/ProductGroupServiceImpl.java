@@ -11,18 +11,18 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class ProductGroupServiceImpl extends BaseDao implements IProductGroupService{
+public class ProductGroupServiceImpl extends BaseDao implements IProductGroupService {
 
     private static Logger logger = LoggerFactory.getLogger(ProductGroupServiceImpl.class);
 
     private ProductGroupMapper productGroupMapper;
 
-	public void init() {
-		productGroupMapper = this.getSqlSession().getMapper(ProductGroupMapper.class);
-	}
+    public void init() {
+        productGroupMapper = this.getSqlSession().getMapper(ProductGroupMapper.class);
+    }
 
-	@Override
-	public List<ProductGroup> getProductGroupListByGroupType(String groupType) {
-		return productGroupMapper.getProductGroupListByGroupType(groupType);
-	}
+    @Override
+    public List<ProductGroup> getProductGroupListByGroupTypeAndVendorId(String groupType, Long vendorId) {
+        return productGroupMapper.getProductGroupListByGroupTypeAndVendorId(groupType, vendorId);
+    }
 }
