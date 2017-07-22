@@ -324,6 +324,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
                 priceChangeRuleSeasonGroupMapper.insert(priceChangeRuleSeasonGroup);
             }
         }
+        resultMessage.successStatus().putMsg("info","success !!!");
         return resultMessage;
     }
 
