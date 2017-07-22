@@ -660,7 +660,7 @@ public class PriceChangeRuleController extends BaseController{
 			//根据price_change_rule_id  修改有效期
 			PriceChangeRule priceChangeRuleInfo = new PriceChangeRule();
 			priceChangeRuleInfo.setPriceChangeRuleId(Long.valueOf(map.get("price_change_rule_id").toString()));
-		    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
+		    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		    priceChangeRuleInfo.setValidFrom(simpleDateFormat.parse(map.get("valid_from").toString()));
 		    int row = priceChangeRule.updateByPrimaryKeySelective(priceChangeRuleInfo);
 		    
