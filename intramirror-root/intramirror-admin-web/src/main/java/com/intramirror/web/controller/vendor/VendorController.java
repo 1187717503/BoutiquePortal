@@ -61,7 +61,7 @@ public class VendorController {
             if(allVendorMaps != null && allVendorMaps.size() > 0) {
                 resultMessage.successStatus().putMsg("info","success").setData(allVendorMaps);
             } else {
-                resultMessage.successStatus().putMsg("info","empty !!!");
+                resultMessage.errorStatus().putMsg("info","empty !!!");
             }
 
         } catch (Exception e) {
