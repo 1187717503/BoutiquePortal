@@ -279,6 +279,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     public ResultMessage copyRuleByVendor(Map<String, Object> params) throws Exception{
         ResultMessage resultMessage = ResultMessage.getInstance();
         String vendor_id = params.get("vendor_id") == null ? "" : params.get("vendor_id").toString();
+        String to_vendor_id = params.get("to_vendor_id") == null ? "" : params.get("to_vendor_id").toString();
         String discount = params.get("discount") == null ? "0" : params.get("discount").toString();
         Long user_id = Long.parseLong(params.get("user_id").toString());
         params.put("price_type",PriceChangeRuleEnum.PriceType.SUPPLY_PRICE.getCode());
@@ -292,14 +293,14 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         Map<String,Object> newParams = new HashMap<>();
         newParams.put("status",PriceChangeRuleEnum.Status.PENDING.getCode());
         newParams.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
-        newParams.put("vendor_id",vendor_id);
+        newParams.put("vendor_id",to_vendor_id);
         List<Map<String,Object>> newRuleByConditionsMaps =  seasonMapper.queryRuleByConditions(newParams);
         if(newRuleByConditionsMaps != null && newRuleByConditionsMaps.size() > 0) {
             return resultMessage.errorStatus().putMsg("info"," The rules that have been copied vendor !!!");
         }
         /** end checked 新规则是否存在 */
 
-        this.copyAllRuleByActivePending(ruleByConditionsMaps,vendor_id,discount,true,user_id);
+        this.copyAllRuleByActivePending(ruleByConditionsMaps,to_vendor_id,discount,true,user_id);
         resultMessage.successStatus().putMsg("info","SUCCESS !!!");
         return resultMessage;
     }

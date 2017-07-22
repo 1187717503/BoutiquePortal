@@ -34,10 +34,10 @@ public class CopyRuleController extends BaseController{
 
     @RequestMapping("/activeVendor")
     @ResponseBody
-    public ResultMessage activeVendor(@Param("vendor_id")String vendor_id,@Param("discount")String discount,HttpServletRequest httpRequest){
+    public ResultMessage activeVendor(@Param("vendor_id")String vendor_id,@Param("discount")String discount,@Param("to_vendor_id")String to_vendor_id,HttpServletRequest httpRequest){
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
-            if(!this.checkParams(vendor_id)) {
+            if(!this.checkParams(vendor_id) || !this.checkParams(to_vendor_id)) {
                 return resultMessage.errorStatus().putMsg("info","params is error !!!");
             }
             User user = super.getUserInfo(httpRequest);
@@ -49,6 +49,7 @@ public class CopyRuleController extends BaseController{
             params.put("discount",discount);
             params.put("user_id",user.getUserId());
             params.put("status", PriceChangeRuleEnum.Status.ACTIVE.getCode());
+            params.put("to_vendor_id",to_vendor_id);
             return iPriceChangeRule.copyRuleByVendor(params);
         } catch (Exception e) {
             e.printStackTrace();
@@ -60,7 +61,7 @@ public class CopyRuleController extends BaseController{
 
     @RequestMapping("/pengingVendor")
     @ResponseBody
-    public ResultMessage pengingVendor(@Param("vendor_id")String vendor_id,@Param("discount")String discount,HttpServletRequest httpRequest){
+    public ResultMessage pengingVendor(@Param("vendor_id")String vendor_id,@Param("discount")String discount,@Param("to_vendor_id")String to_vendor_id,HttpServletRequest httpRequest){
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
             if(!this.checkParams(vendor_id)) {
@@ -74,6 +75,7 @@ public class CopyRuleController extends BaseController{
             params.put("vendor_id",vendor_id);
             params.put("discount",discount);
             params.put("user_id",user.getUserId());
+            params.put("to_vendor_id",to_vendor_id);
             params.put("status", PriceChangeRuleEnum.Status.PENDING.getCode());
             return iPriceChangeRule.copyRuleByVendor(params);
         } catch (Exception e) {
