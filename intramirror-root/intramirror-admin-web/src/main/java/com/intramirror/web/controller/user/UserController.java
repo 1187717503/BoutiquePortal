@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
+@CrossOrigin
 @Controller
 @RequestMapping("/user")
 public class UserController extends BaseController {
@@ -26,7 +27,6 @@ public class UserController extends BaseController {
      * @return
      * @throws Exception
      */
-    @CrossOrigin
     @RequestMapping(value = "/getUser", method = RequestMethod.POST)
     @ResponseBody
     public Map getUser(HttpServletRequest httpRequest) throws Exception {
