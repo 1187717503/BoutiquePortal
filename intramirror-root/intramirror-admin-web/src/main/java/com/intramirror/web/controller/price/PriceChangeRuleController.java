@@ -384,6 +384,7 @@ public class PriceChangeRuleController extends BaseController{
 		    paramMaps.put("level", priceChangeRuleCategory.get("level").getAsByte());
 		    paramMaps.put("brand_id", priceChangeRuleCategory.get("brand_id").getAsLong());
 		    paramMaps.put("exceptionFlag", 1);
+		    paramMaps.put("price_change_rule_id", priceChangeRuleCategory.get("price_change_rule_id").toString());
 			List<Map<String,Object>> brandCategoryMaps = priceChangeRuleCategoryBrandService.selectPriceChangeRuleCategoryBrandExists(paramMaps);
 			if(brandCategoryMaps != null && brandCategoryMaps.size() > 0) {
 				result.put("info","Data already exists !!!");
