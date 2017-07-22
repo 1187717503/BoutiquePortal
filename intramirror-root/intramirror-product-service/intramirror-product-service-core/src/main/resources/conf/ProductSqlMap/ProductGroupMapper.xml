@@ -29,6 +29,6 @@
         WHERE
         pg.group_type=#{groupType}
         AND
-        pg.vendorId=#{vendorId}
+        pg.vendor_id=#{vendorId}
     </select>
 </mapper>

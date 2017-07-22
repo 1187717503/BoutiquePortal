@@ -375,17 +375,22 @@ public class PriceChangeRuleController extends BaseController{
 		}
 		
 		try {
-			map.put("exceptionFlag",1);
 
-			/** start checked 重复数据 */
-			List<Map<String,Object>> brandCategoryMaps = priceChangeRuleCategoryBrandService.selectPriceChangeRuleCategoryBrandExists(map);
+		    JsonObject priceChangeRuleCategory = new JsonParser().parse(map.get("price_change_rule_category_brand").toString()).getAsJsonObject();
+		    
+		    /** start checked 重复数据 */
+		    Map<String,Object> paramMaps = new HashMap<>();
+		    paramMaps.put("catgeory_id", priceChangeRuleCategory.get("category_id").getAsLong());
+		    paramMaps.put("level", priceChangeRuleCategory.get("level").getAsByte());
+		    paramMaps.put("brand_id", priceChangeRuleCategory.get("brand_id").getAsLong());
+		    paramMaps.put("exceptionFlag", 1);
+		    paramMaps.put("price_change_rule_id", priceChangeRuleCategory.get("price_change_rule_id").toString());
+			List<Map<String,Object>> brandCategoryMaps = priceChangeRuleCategoryBrandService.selectPriceChangeRuleCategoryBrandExists(paramMaps);
 			if(brandCategoryMaps != null && brandCategoryMaps.size() > 0) {
 				result.put("info","Data already exists !!!");
 				return result;
 			}
 			/** end checked 重复数据 */
-
-		    JsonObject priceChangeRuleCategory = new JsonParser().parse(map.get("price_change_rule_category_brand").toString()).getAsJsonObject();
 
 	        PriceChangeRuleCategoryBrand priceChangeRuleCategoryBrand = new PriceChangeRuleCategoryBrand();
 	        priceChangeRuleCategoryBrand.setPriceChangeRuleId(priceChangeRuleCategory.get("price_change_rule_id").getAsLong());

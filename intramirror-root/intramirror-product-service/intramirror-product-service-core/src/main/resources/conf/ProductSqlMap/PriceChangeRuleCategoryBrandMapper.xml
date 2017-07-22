@@ -226,7 +226,7 @@
     <select id="selectPriceChangeRuleCategoryBrandExists" resultType="java.util.Map" parameterType="java.util.Map">
 
         select pcrcb.price_change_rule_id from price_change_rule_category_brand pcrcb
-        where pcrcb.category_id = #{level,jdbcType=INTEGER} and pcrcb.`level` = #{level,jdbcType=INTEGER} and pcrcb.brand_id = #{brand_id,jdbcType=INTEGER} and pcrcb.exception_flag = #{exceptionFlag,jdbcType=INTEGER}
+        where pcrcb.price_change_rule_id = #{price_change_rule_id,jdbcType=INTEGER} and  pcrcb.category_id = #{catgeory_id,jdbcType=INTEGER} and pcrcb.`level` = #{level,jdbcType=INTEGER} and pcrcb.brand_id = #{brand_id,jdbcType=INTEGER} and pcrcb.exception_flag = #{exceptionFlag,jdbcType=INTEGER}
     </select>
 
 </mapper>

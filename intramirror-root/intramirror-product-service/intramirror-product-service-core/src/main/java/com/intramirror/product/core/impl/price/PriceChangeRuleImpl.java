@@ -293,7 +293,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         newParams.put("status",PriceChangeRuleEnum.Status.PENDING.getCode());
         newParams.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
         newParams.put("vendor_id",vendor_id);
-        List<Map<String,Object>> newRuleByConditionsMaps =  seasonMapper.queryRuleByConditions(params);
+        List<Map<String,Object>> newRuleByConditionsMaps =  seasonMapper.queryRuleByConditions(newParams);
         if(newRuleByConditionsMaps != null && newRuleByConditionsMaps.size() > 0) {
             return resultMessage.errorStatus().putMsg("info"," The rules that have been copied vendor !!!");
         }
