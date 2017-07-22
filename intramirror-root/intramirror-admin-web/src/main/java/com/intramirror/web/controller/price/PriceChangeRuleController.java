@@ -7,7 +7,10 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.intramirror.common.help.ResultMessage;
+import com.sun.org.apache.regexp.internal.RE;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,8 +72,30 @@ public class PriceChangeRuleController extends BaseController{
 	@Autowired
 	private IProductService productService;
 	
-	
-	
+
+	@RequestMapping("select")
+	@ResponseBody
+	public ResultMessage queryPriceChangeRuleById(@Param("price_change_rule_id") String price_change_rule_id){
+		ResultMessage resultMessage = ResultMessage.getInstance();
+		try {
+			if(StringUtils.isBlank(price_change_rule_id))
+				return resultMessage.errorStatus().putMsg("info","params is null !!!");
+			PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
+
+			SimpleDateFormat simpleDateFormat =new SimpleDateFormat("dd/MM/yyyy");
+
+			if(pcrModel != null && pcrModel.getValidFrom() != null) {
+				pcrModel.setValidFromStr(simpleDateFormat.format(pcrModel.getValidFrom()));
+			}
+
+			resultMessage.successStatus().putMsg("info","success !!!").setData(pcrModel);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("error message : " + e.getMessage());
+			resultMessage.errorStatus().putMsg("info","error message : " + e.getMessage());
+		}
+		return resultMessage;
+	}
 
 	
 	@SuppressWarnings("unchecked")
