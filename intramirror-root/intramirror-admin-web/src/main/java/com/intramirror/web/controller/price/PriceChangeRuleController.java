@@ -106,13 +106,16 @@ public class PriceChangeRuleController extends BaseController{
 			List<Map<String,Object>> systemMaps = iSystemPropertyService.selectSystemProperty();
 			Map<String,Object> mapDiscounts = new HashMap<>();
 			for(Map<String,Object> map : systemMaps) {
-				String bd = map.get(SystemPropertyEnum.propertyName.BOUTIQUE_DISCOUNT_DEFAULT.getCode()) == null ?"":map.get(SystemPropertyEnum.propertyName.BOUTIQUE_DISCOUNT_DEFAULT.getCode()).toString();
-				String id = map.get(SystemPropertyEnum.propertyName.IM_DISCOUNT_DEFAULT.getCode()) == null ? "" :map.get(SystemPropertyEnum.propertyName.IM_DISCOUNT_DEFAULT.getCode()).toString();
-
-				if(StringUtils.isNotBlank(bd)) {
+				
+				String bd = "";
+				String id = "";
+				if(map.get("system_property_name").toString().equals(SystemPropertyEnum.propertyName.BOUTIQUE_DISCOUNT_DEFAULT.getCode())) {
+					bd = map.get("system_property_value").toString();
 					mapDiscounts.put("bDiscount",bd);
 				}
-				if(StringUtils.isNotBlank(id)) {
+				
+				if(map.get("system_property_name").toString().equals(SystemPropertyEnum.propertyName.IM_DISCOUNT_DEFAULT.getCode())) {
+					id = map.get("system_property_value").toString();
 					mapDiscounts.put("iDiscount",id);
 				}
 			}
