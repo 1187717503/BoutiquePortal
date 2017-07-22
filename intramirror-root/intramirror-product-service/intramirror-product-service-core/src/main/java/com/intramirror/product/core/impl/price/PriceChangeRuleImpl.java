@@ -284,6 +284,18 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             if(ruleByConditionsMaps == null || ruleByConditionsMaps.size() == 0) {
                 return resultMessage.errorStatus().putMsg("info"," 没有规则 !!!");
             }
+
+            /** start checked 新规则是否存在 */
+            Map<String,Object> newParams = new HashMap<>();
+            newParams.put("status",PriceChangeRuleEnum.Status.PENDING.getCode());
+            newParams.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
+            newParams.put("vendor_id",vendor_id);
+            List<Map<String,Object>> newRuleByConditionsMaps =  seasonMapper.queryRuleByConditions(params);
+            if(newRuleByConditionsMaps != null && newRuleByConditionsMaps.size() > 0) {
+                return resultMessage.errorStatus().putMsg("info"," 规则已copy !!!");
+            }
+            /** end checked 新规则是否存在 */
+
             this.copyAllRuleByActivePending(ruleByConditionsMaps,vendor_id,discount,true);
             resultMessage.successStatus().putMsg("info","SUCCESS !!!");
 //        } catch (Exception e) {

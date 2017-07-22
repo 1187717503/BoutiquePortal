@@ -139,7 +139,7 @@ public class PriceChangeRuleService {
 	    for (int i = 0; i < priceChangeRuleSeasonGroupArray.size(); i++) {
 	    	PriceChangeRuleSeasonGroup priceChangeRuleSeasonGroupInfo = new PriceChangeRuleSeasonGroup();
 	    	priceChangeRuleSeasonGroupInfo.setPriceChangeRuleId(priceChangeRule.getPriceChangeRuleId());
-	    	priceChangeRuleSeasonGroupInfo.setName(priceChangeRule.getName());
+	    	priceChangeRuleSeasonGroupInfo.setName("Multiple"+priceChangeRule.getPriceChangeRuleId());
 	    	priceChangeRuleSeasonGroupInfo.setSeasonCode(priceChangeRuleSeasonGroupArray.get(i).getAsString());
 	    	priceChangeRuleSeasonGroupInfo.setEnabled(1);
 	    	Date currentDate = Helper.getCurrentTimeToUTCWithDate();
