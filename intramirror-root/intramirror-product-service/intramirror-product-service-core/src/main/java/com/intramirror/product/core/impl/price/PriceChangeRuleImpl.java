@@ -277,6 +277,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         ResultMessage resultMessage = ResultMessage.getInstance();
         String vendor_id = params.get("vendor_id") == null ? "" : params.get("vendor_id").toString();
         String discount = params.get("discount") == null ? "0" : params.get("discount").toString();
+        Long user_id = Long.parseLong(params.get("user_id").toString());
         params.put("price_type",PriceChangeRuleEnum.PriceType.SUPPLY_PRICE.getCode());
         List<Map<String,Object>> ruleByConditionsMaps =  seasonMapper.queryRuleByConditions(params);
 
@@ -295,7 +296,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         }
         /** end checked 新规则是否存在 */
 
-        this.copyAllRuleByActivePending(ruleByConditionsMaps,vendor_id,discount,true);
+        this.copyAllRuleByActivePending(ruleByConditionsMaps,vendor_id,discount,true,user_id);
         resultMessage.successStatus().putMsg("info","SUCCESS !!!");
         return resultMessage;
     }
@@ -306,11 +307,12 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         ResultMessage resultMessage = ResultMessage.getInstance();
         String vendor_id = params.get("vendor_id") == null ? "" : params.get("vendor_id").toString();
         String seasons = params.get("seasons") == null ? "" : params.get("seasons").toString();
+        Long user_id = Long.parseLong(params.get("user_id").toString());
         params.put("name",seasons);
         String[] season_codes = seasons.split(",");
         List<Map<String,Object>> ruleByConditionsMaps = new ArrayList<>();
         ruleByConditionsMaps.add(params);
-        Long price_change_rule_id_new = this.copyAllRuleByActivePending(ruleByConditionsMaps,vendor_id,"0",false);
+        Long price_change_rule_id_new = this.copyAllRuleByActivePending(ruleByConditionsMaps,vendor_id,"0",false,user_id);
 
         // create price_season_group
         for(String season_code : season_codes) {
@@ -334,7 +336,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         return resultMessage;
     }
 
-    private Long copyAllRuleByActivePending(List<Map<String,Object>> ruleByConditionsMaps,String vendor_id,String discount,boolean insert_season_group_flag) throws Exception{
+    private Long copyAllRuleByActivePending(List<Map<String,Object>> ruleByConditionsMaps,String vendor_id,String discount,boolean insert_season_group_flag,Long user_id) throws Exception{
         Long price_change_rule_id_new = 0L;
         for(Map<String,Object> map : ruleByConditionsMaps){
             String price_change_rule_id = map.get("price_change_rule_id").toString();
@@ -346,7 +348,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             priceChangeRule.setPriceType(Byte.parseByte(PriceChangeRuleEnum.PriceType.IM_PRICE.getCode() + ""));
             priceChangeRule.setStatus(PriceChangeRuleEnum.Status.PENDING.getCode());
             priceChangeRule.setVendorId(Long.parseLong(vendor_id));
-            priceChangeRule.setUserId(12L);
+            priceChangeRule.setUserId(user_id);
             priceChangeRuleMapper.insert(priceChangeRule);
             price_change_rule_id_new = priceChangeRule.getPriceChangeRuleId();
             /** end copy price_change_rule */

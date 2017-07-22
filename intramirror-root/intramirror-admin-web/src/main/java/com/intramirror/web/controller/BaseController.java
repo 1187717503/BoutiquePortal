@@ -79,6 +79,48 @@ public class BaseController {
         return result;
     }
 
+    @CrossOrigin
+    public User getUser(HttpServletRequest httpRequest) throws Exception {
+        // 返回数据初始化
+        int status = StatusType.FAILURE;
+        Map<String, Object> result = new HashMap<String, Object>();
+        Long userId = null;
+
+        try {
+            String jwt = httpRequest.getHeader("token");
+            if (StringUtils.isEmpty(jwt)) {
+                throw new JwtException("header not found,token is null");
+            }
+            //解析Jwt内容
+            Claims claims = this.parseBody(jwt);
+
+            Date expireation = claims.getIssuedAt();
+            //如果信息过期则提示重新登录。
+            if (System.currentTimeMillis() > expireation.getTime()) {
+                result.put("userStatus", "1000002");
+                return null;
+            }
+            //获取用户详情
+            userId = Long.valueOf(claims.getSubject());
+
+            //如果匿名访问则跳过
+            if (!Helper.checkNotNull(userId)) {
+                result.put("userStatus", "1000003");
+                return null;
+            }
+        } catch (Exception e) {
+            result.put("status", status);
+            return null;
+        }
+        User user = userService.getUserById(userId, EnabledType.USED);
+        if (user != null) {
+            result.put("user", user);
+            status = StatusType.SUCCESS;
+        }
+        result.put("status", status);
+        return user;
+    }
+
 
     public String getJwtBase64Key() {
         return Base64Codec.BASE64.encode(jwtSecret);
