@@ -428,6 +428,7 @@
                 and p.product_id = #{item.product_id,jdbcType=BIGINT}
             </if>
             and vendor_id = #{item.vendor_id,jdbcType=BIGINT}
+            and p.season_code in (#{item.season_codes})
             )
         </foreach>
     </update>

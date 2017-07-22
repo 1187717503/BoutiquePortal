@@ -51,6 +51,9 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             priceChangeRuleMapper.updateDefaultPriceByVendor(paramsMap);
         }
 
+        List<Map<String,Object>> selSeasonGroupRuleMaps = priceChangeRuleMapper.selectSeasonGroupRule(paramsMap);
+        logger.info("selSeasonGroupRuleMaps : {}",new Gson().toJson(selSeasonGroupRuleMaps));
+
         List<Map<String,Object>> selSecondCategoryRuleMaps = priceChangeRuleMapper.selectSecondCategoryRule(paramsMap);
         selSecondCategoryRuleMaps = this.sortListByLevel(selSecondCategoryRuleMaps);
         logger.info("selSecondCategoryRuleMaps : {}",new Gson().toJson(selSecondCategoryRuleMaps));
@@ -65,10 +68,10 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         List<Map<String,Object>> selProductRuleMaps = priceChangeRuleMapper.selectProductRule(paramsMap);
         logger.info("selProductRuleMaps : {}",new Gson().toJson(selProductRuleMaps));
 
-        paramsList = this.handleMapByVendor(paramsList,selSecondCategoryRuleMaps,Contants.num_second);
-        paramsList = this.handleMapByVendor(paramsList,selAllCategoryRuleMaps,Contants.num_second);
-        paramsList = this.handleMapByVendor(paramsList,selProductGroupRuleMaps,Contants.num_three);
-        paramsList = this.handleMapByVendor(paramsList,selProductRuleMaps,Contants.num_four);
+        paramsList = this.handleMap(paramsList,selSecondCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
+        paramsList = this.handleMap(paramsList,selAllCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
+        paramsList = this.handleMap(paramsList,selProductGroupRuleMaps,Contants.num_three,selSeasonGroupRuleMaps);
+        paramsList = this.handleMap(paramsList,selProductRuleMaps,Contants.num_four,selSeasonGroupRuleMaps);
 
         if(paramsList != null && paramsList.size() > 0) {
             priceChangeRuleMapper.updateSkuPriceByVendor(paramsList);
@@ -167,10 +170,10 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         List<Map<String,Object>> selProductRuleMaps = priceChangeRuleMapper.selectProductRule(paramsMap);
         logger.info("selProductRuleMaps : {}",new Gson().toJson(selProductRuleMaps));
 
-        paramsList = this.handleMapByAdmin(paramsList,selSecondCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
-        paramsList = this.handleMapByAdmin(paramsList,selAllCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
-        paramsList = this.handleMapByAdmin(paramsList,selProductGroupRuleMaps,Contants.num_three,selSeasonGroupRuleMaps);
-        paramsList = this.handleMapByAdmin(paramsList,selProductRuleMaps,Contants.num_four,selSeasonGroupRuleMaps);
+        paramsList = this.handleMap(paramsList,selSecondCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
+        paramsList = this.handleMap(paramsList,selAllCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
+        paramsList = this.handleMap(paramsList,selProductGroupRuleMaps,Contants.num_three,selSeasonGroupRuleMaps);
+        paramsList = this.handleMap(paramsList,selProductRuleMaps,Contants.num_four,selSeasonGroupRuleMaps);
 
         if( paramsList != null && paramsList.size() > 0) {
             priceChangeRuleMapper.updateSkuPriceByAdmin(paramsList);
@@ -196,7 +199,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         return 100;
     }
 
-    private List<Map<String,Object>> handleMapByVendor(List<Map<String,Object>> paramsList,List<Map<String,Object>> dataList,int level){
+    /*private List<Map<String,Object>> handleMapByVendor(List<Map<String,Object>> paramsList,List<Map<String,Object>> dataList,int level){
         if(dataList != null && dataList.size() > 0) {
             for (Map<String,Object> dataMap : dataList) {
                 dataMap.put("handle_level",level);
@@ -204,9 +207,9 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             }
         }
         return paramsList;
-    }
+    }*/
 
-    private List<Map<String,Object>> handleMapByAdmin(List<Map<String,Object>> paramsList,List<Map<String,Object>> dataList,int level,List<Map<String,Object>> seasonGroupMaps){
+    private List<Map<String,Object>> handleMap(List<Map<String,Object>> paramsList,List<Map<String,Object>> dataList,int level,List<Map<String,Object>> seasonGroupMaps){
         if(dataList != null && dataList.size() > 0) {
             for (Map<String,Object> dataMap : dataList) {
                 dataMap.put("handle_level",level);
