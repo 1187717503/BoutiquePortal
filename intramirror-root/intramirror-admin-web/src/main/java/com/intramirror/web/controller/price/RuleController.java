@@ -42,6 +42,9 @@ public class RuleController {
     public ResultMessage queryRuleByHasSeason(@Param("ruleStatus") String ruleStatus,@Param("vendor_id")String vendor_id){
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
+            if(StringUtils.isBlank(ruleStatus) || StringUtils.isBlank(vendor_id))
+                return resultMessage.errorStatus().putMsg("info"," params is null !!!");
+
             Map<String,Object> params = new HashMap<>();
             params.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
             params.put("status",ruleStatus);
@@ -68,6 +71,9 @@ public class RuleController {
     public ResultMessage queryRuleByNotHasSesaon(@Param("ruleStatus") String ruleStatus,@Param("vendor_id") String vendor_id){
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
+            if(StringUtils.isBlank(ruleStatus) || StringUtils.isBlank(vendor_id))
+                return resultMessage.errorStatus().putMsg("info"," params is null !!!");
+
             Map<String,Object> params = new HashMap<>();
             params.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
             params.put("status",ruleStatus);
@@ -125,6 +131,7 @@ public class RuleController {
             if(StringUtils.isBlank(price_change_rule_id)) {
                 return resultMessage.errorStatus().putMsg("info","price_change_rule_id is null !!!");
             }
+
             Map<String,Object> params = new HashMap<>();
             params.put("exception_flag", 0);
             params.put("english_name",english_name);
