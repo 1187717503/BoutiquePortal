@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.intramirror.common.enums.SystemPropertyEnum;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.product.api.service.*;
 import com.sun.org.apache.regexp.internal.RE;
@@ -103,7 +104,19 @@ public class PriceChangeRuleController extends BaseController{
 		ResultMessage resultMessage = ResultMessage.getInstance();
 		try {
 			List<Map<String,Object>> systemMaps = iSystemPropertyService.selectSystemProperty();
-			resultMessage.successStatus().putMsg("info","success !!!").setData(systemMaps);
+			Map<String,Object> mapDiscounts = new HashMap<>();
+			for(Map<String,Object> map : systemMaps) {
+				String bd = map.get(SystemPropertyEnum.propertyName.BOUTIQUE_DISCOUNT_DEFAULT.getCode()) == null ?"":map.get(SystemPropertyEnum.propertyName.BOUTIQUE_DISCOUNT_DEFAULT.getCode()).toString();
+				String id = map.get(SystemPropertyEnum.propertyName.IM_DISCOUNT_DEFAULT.getCode()) == null ? "" :map.get(SystemPropertyEnum.propertyName.IM_DISCOUNT_DEFAULT.getCode()).toString();
+
+				if(StringUtils.isNotBlank(bd)) {
+					mapDiscounts.put("bDiscount",bd);
+				}
+				if(StringUtils.isNotBlank(id)) {
+					mapDiscounts.put("iDiscount",id);
+				}
+			}
+			resultMessage.successStatus().putMsg("info","success !!!").setData(mapDiscounts);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("error message : " + e.getMessage());
