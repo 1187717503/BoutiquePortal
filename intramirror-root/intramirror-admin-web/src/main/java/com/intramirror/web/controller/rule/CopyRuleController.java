@@ -75,7 +75,7 @@ public class CopyRuleController {
 
     @RequestMapping("/seasonVendor")
     @ResponseBody
-    public ResultMessage seasonVendor(@Param("price_change_rule_id")String price_change_rule_id,@Param("season_codes")String seasons,@Param("vendor_id")String vendor_id){
+    public ResultMessage seasonVendor(@Param("price_change_rule_id")String price_change_rule_id,@Param("seasons")String seasons,@Param("vendor_id")String vendor_id){
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
             if(StringUtils.isBlank(price_change_rule_id) || seasons == null || seasons.length() == 0) {
