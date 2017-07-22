@@ -9,6 +9,9 @@ import com.intramirror.product.api.service.ISystemPropertyService;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.SystemPropertyMapper;
 
+import java.util.List;
+import java.util.Map;
+
 @Service
 public class SystemPropertyServiceImpl extends BaseDao implements ISystemPropertyService{
 
@@ -50,6 +53,11 @@ public class SystemPropertyServiceImpl extends BaseDao implements ISystemPropert
 	public int updateByPrimaryKey(SystemProperty record) {
 	
 		return systemPropertyMapper.updateByPrimaryKey(record);
+	}
+
+	@Override
+	public List<Map<String, Object>> selectSystemProperty() throws Exception {
+		return systemPropertyMapper.selectSystemProperty();
 	}
 
 	@Override

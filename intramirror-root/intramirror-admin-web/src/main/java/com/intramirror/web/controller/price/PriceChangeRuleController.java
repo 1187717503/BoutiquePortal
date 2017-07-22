@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import com.intramirror.common.help.ResultMessage;
+import com.intramirror.product.api.service.*;
 import com.sun.org.apache.regexp.internal.RE;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
@@ -33,10 +34,6 @@ import com.intramirror.product.api.model.PriceChangeRuleCategoryBrand;
 import com.intramirror.product.api.model.PriceChangeRuleGroup;
 import com.intramirror.product.api.model.PriceChangeRuleProduct;
 import com.intramirror.product.api.model.ProductWithBLOBs;
-import com.intramirror.product.api.service.IPriceChangeRuleCategoryBrandService;
-import com.intramirror.product.api.service.IPriceChangeRuleGroupService;
-import com.intramirror.product.api.service.IPriceChangeRuleProductService;
-import com.intramirror.product.api.service.IProductService;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
 import com.intramirror.user.api.model.User;
 import com.intramirror.web.controller.BaseController;
@@ -71,6 +68,9 @@ public class PriceChangeRuleController extends BaseController{
 	
 	@Autowired
 	private IProductService productService;
+
+	@Autowired
+	private ISystemPropertyService iSystemPropertyService;
 	
 
 	@RequestMapping("select")
@@ -89,6 +89,21 @@ public class PriceChangeRuleController extends BaseController{
 			}
 
 			resultMessage.successStatus().putMsg("info","success !!!").setData(pcrModel);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("error message : " + e.getMessage());
+			resultMessage.errorStatus().putMsg("info","error message : " + e.getMessage());
+		}
+		return resultMessage;
+	}
+
+	@RequestMapping("selectDefaultDiscount")
+	@ResponseBody
+	public ResultMessage queryDefaultDiscount(){
+		ResultMessage resultMessage = ResultMessage.getInstance();
+		try {
+			List<Map<String,Object>> systemMaps = iSystemPropertyService.selectSystemProperty();
+			resultMessage.successStatus().putMsg("info","success !!!").setData(systemMaps);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("error message : " + e.getMessage());
