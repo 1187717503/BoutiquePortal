@@ -40,7 +40,7 @@ public class CopyRuleController extends BaseController{
             if(!this.checkParams(vendor_id)) {
                 return resultMessage.errorStatus().putMsg("info","params is error !!!");
             }
-            User user = super.getUser(httpRequest);
+            User user = super.getUserInfo(httpRequest);
             if(user == null) {
                 return resultMessage.errorStatus().putMsg("info","user is not login !!!");
             }
@@ -66,7 +66,7 @@ public class CopyRuleController extends BaseController{
             if(!this.checkParams(vendor_id)) {
                 return resultMessage.errorStatus().putMsg("info","params is error !!!");
             }
-            User user = super.getUser(httpRequest);
+            User user = super.getUserInfo(httpRequest);
             if(user == null) {
                 return resultMessage.errorStatus().putMsg("info","user is not login !!!");
             }
@@ -92,7 +92,7 @@ public class CopyRuleController extends BaseController{
             if(StringUtils.isBlank(price_change_rule_id) || seasons == null || seasons.length() == 0) {
                 return resultMessage.errorStatus().putMsg("info","params is error !!!");
             }
-            User user = super.getUser(httpRequest);
+            User user = super.getUserInfo(httpRequest);
             if(user == null) {
                 return resultMessage.errorStatus().putMsg("info","user is not login !!!");
             }

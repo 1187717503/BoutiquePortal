@@ -80,7 +80,7 @@ public class BaseController {
     }
 
     @CrossOrigin
-    public User getUser(HttpServletRequest httpRequest) throws Exception {
+    public User getUserInfo(HttpServletRequest httpRequest) throws Exception {
         // 返回数据初始化
         int status = StatusType.FAILURE;
         Map<String, Object> result = new HashMap<String, Object>();
