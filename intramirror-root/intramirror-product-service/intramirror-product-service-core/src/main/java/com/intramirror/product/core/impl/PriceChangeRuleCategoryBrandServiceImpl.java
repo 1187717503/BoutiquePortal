@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -50,6 +51,11 @@ public class PriceChangeRuleCategoryBrandServiceImpl extends BaseDao implements 
     public int updateDiscountPercentageBySelective(
             PriceChangeRuleCategoryBrand record) {
         return priceChangeRuleCategoryBrandMapper.updateDiscountPercentageBySelective(record);
+    }
+
+    @Override
+    public List<Map<String, Object>> selectPriceChangeRuleCategoryBrandExists(Map<String, Object> map) throws Exception {
+        return priceChangeRuleCategoryBrandMapper.selectPriceChangeRuleCategoryBrandExists(map);
     }
 
     @Override

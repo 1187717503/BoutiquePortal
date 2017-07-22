@@ -375,7 +375,16 @@ public class PriceChangeRuleController extends BaseController{
 		}
 		
 		try {
-			
+			map.put("exceptionFlag",1);
+
+			/** start checked 重复数据 */
+			List<Map<String,Object>> brandCategoryMaps = priceChangeRuleCategoryBrandService.selectPriceChangeRuleCategoryBrandExists(map);
+			if(brandCategoryMaps != null && brandCategoryMaps.size() > 0) {
+				result.put("info","Data already exists !!!");
+				return result;
+			}
+			/** end checked 重复数据 */
+
 		    JsonObject priceChangeRuleCategory = new JsonParser().parse(map.get("price_change_rule_category_brand").toString()).getAsJsonObject();
 
 	        PriceChangeRuleCategoryBrand priceChangeRuleCategoryBrand = new PriceChangeRuleCategoryBrand();

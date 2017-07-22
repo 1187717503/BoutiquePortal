@@ -5,6 +5,7 @@ import com.intramirror.product.api.model.PriceChangeRuleCategoryBrand;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface PriceChangeRuleCategoryBrandMapper {
     /**
@@ -77,6 +78,6 @@ public interface PriceChangeRuleCategoryBrandMapper {
      */
     int updateByPrimaryKey(PriceChangeRuleCategoryBrand record);
 
-
+    List<Map<String,Object>> selectPriceChangeRuleCategoryBrandExists(Map<String,Object> map);
     List<PriceChangeRuleCategoryBrand> getPriceChangeRuleGroupListByPriceChangeRuleIdAndExceptionFlag(@Param("priceChangeRuleId") Long priceChangeRuleId, @Param("exceptionFlag") Integer exceptionFlag);
 }

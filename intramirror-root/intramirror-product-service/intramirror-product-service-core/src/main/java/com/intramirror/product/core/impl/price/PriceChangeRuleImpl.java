@@ -275,34 +275,28 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     @Override
     public ResultMessage copyRuleByVendor(Map<String, Object> params) throws Exception{
         ResultMessage resultMessage = ResultMessage.getInstance();
-//        try {
-            String vendor_id = params.get("vendor_id") == null ? "" : params.get("vendor_id").toString();
-            String discount = params.get("discount") == null ? "0" : params.get("discount").toString();
-            params.put("price_type",PriceChangeRuleEnum.PriceType.SUPPLY_PRICE.getCode());
-            List<Map<String,Object>> ruleByConditionsMaps =  seasonMapper.queryRuleByConditions(params);
+        String vendor_id = params.get("vendor_id") == null ? "" : params.get("vendor_id").toString();
+        String discount = params.get("discount") == null ? "0" : params.get("discount").toString();
+        params.put("price_type",PriceChangeRuleEnum.PriceType.SUPPLY_PRICE.getCode());
+        List<Map<String,Object>> ruleByConditionsMaps =  seasonMapper.queryRuleByConditions(params);
 
-            if(ruleByConditionsMaps == null || ruleByConditionsMaps.size() == 0) {
-                return resultMessage.errorStatus().putMsg("info"," 没有规则 !!!");
-            }
+        if(ruleByConditionsMaps == null || ruleByConditionsMaps.size() == 0) {
+            return resultMessage.errorStatus().putMsg("info"," Vendor has no rules !!!");
+        }
 
-            /** start checked 新规则是否存在 */
-            Map<String,Object> newParams = new HashMap<>();
-            newParams.put("status",PriceChangeRuleEnum.Status.PENDING.getCode());
-            newParams.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
-            newParams.put("vendor_id",vendor_id);
-            List<Map<String,Object>> newRuleByConditionsMaps =  seasonMapper.queryRuleByConditions(params);
-            if(newRuleByConditionsMaps != null && newRuleByConditionsMaps.size() > 0) {
-                return resultMessage.errorStatus().putMsg("info"," 规则已copy !!!");
-            }
-            /** end checked 新规则是否存在 */
+        /** start checked 新规则是否存在 */
+        Map<String,Object> newParams = new HashMap<>();
+        newParams.put("status",PriceChangeRuleEnum.Status.PENDING.getCode());
+        newParams.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
+        newParams.put("vendor_id",vendor_id);
+        List<Map<String,Object>> newRuleByConditionsMaps =  seasonMapper.queryRuleByConditions(params);
+        if(newRuleByConditionsMaps != null && newRuleByConditionsMaps.size() > 0) {
+            return resultMessage.errorStatus().putMsg("info"," The rules that have been copied vendor !!!");
+        }
+        /** end checked 新规则是否存在 */
 
-            this.copyAllRuleByActivePending(ruleByConditionsMaps,vendor_id,discount,true);
-            resultMessage.successStatus().putMsg("info","SUCCESS !!!");
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            logger.error("error message : {}",e.getMessage());
-//            resultMessage.errorStatus().putMsg("info","error message : " + e.getMessage());
-//        }
+        this.copyAllRuleByActivePending(ruleByConditionsMaps,vendor_id,discount,true);
+        resultMessage.successStatus().putMsg("info","SUCCESS !!!");
         return resultMessage;
     }
 

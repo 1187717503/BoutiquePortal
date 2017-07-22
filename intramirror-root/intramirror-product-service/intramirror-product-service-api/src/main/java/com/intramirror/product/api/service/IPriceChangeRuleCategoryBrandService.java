@@ -3,6 +3,7 @@ package com.intramirror.product.api.service;
 import com.intramirror.product.api.model.PriceChangeRuleCategoryBrand;
 
 import java.util.List;
+import java.util.Map;
 
 public interface IPriceChangeRuleCategoryBrandService {
 
@@ -64,6 +65,7 @@ public interface IPriceChangeRuleCategoryBrandService {
      */
     int updateDiscountPercentageBySelective(PriceChangeRuleCategoryBrand record);
 
+    List<Map<String,Object>> selectPriceChangeRuleCategoryBrandExists(Map<String,Object> map) throws Exception;
 
     List<PriceChangeRuleCategoryBrand> getPriceChangeRuleGroupListByPriceChangeRuleIdAndExceptionFlag(Long priceChangeRuleId, Integer exceptionFlag);
 
