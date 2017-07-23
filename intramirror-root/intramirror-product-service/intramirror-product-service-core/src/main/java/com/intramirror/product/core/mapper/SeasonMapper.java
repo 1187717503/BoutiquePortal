@@ -69,4 +69,6 @@ public interface SeasonMapper {
     int copyPriceChangeRuleGroup(Map<String,Object> params);
     int copyPriceChangeRuleProduct(Map<String,Object> params);
     int copyPriceChangeRuleSeasonGroup(Map<String,Object> params);
+
+    List<Map<String,Object>> querySeasonByVendor(Map<String,Object> params);
 }

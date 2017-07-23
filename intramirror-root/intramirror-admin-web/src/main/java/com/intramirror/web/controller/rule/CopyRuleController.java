@@ -37,15 +37,17 @@ public class CopyRuleController extends BaseController{
     public ResultMessage activeVendor(@Param("vendor_id")String vendor_id,@Param("discount")String discount,@Param("to_vendor_id")String to_vendor_id,HttpServletRequest httpRequest){
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
-            if(!this.checkParams(vendor_id) || !this.checkParams(to_vendor_id)) {
+            if( !this.checkParams(to_vendor_id)) {
                 return resultMessage.errorStatus().putMsg("info","params is error !!!");
             }
+
             User user = super.getUserInfo(httpRequest);
             if(user == null) {
                 return resultMessage.errorStatus().putMsg("info","user is not login !!!");
             }
+
             Map<String,Object> params = new HashMap<>();
-            params.put("vendor_id",vendor_id);
+            params.put("vendor_id",to_vendor_id);
             params.put("discount",discount);
             params.put("user_id",user.getUserId());
             params.put("status", PriceChangeRuleEnum.Status.ACTIVE.getCode());
@@ -64,7 +66,7 @@ public class CopyRuleController extends BaseController{
     public ResultMessage pengingVendor(@Param("vendor_id")String vendor_id,@Param("discount")String discount,@Param("to_vendor_id")String to_vendor_id,HttpServletRequest httpRequest){
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
-            if(!this.checkParams(vendor_id)) {
+            if(!this.checkParams(to_vendor_id)) {
                 return resultMessage.errorStatus().putMsg("info","params is error !!!");
             }
             User user = super.getUserInfo(httpRequest);
@@ -72,7 +74,7 @@ public class CopyRuleController extends BaseController{
                 return resultMessage.errorStatus().putMsg("info","user is not login !!!");
             }
             Map<String,Object> params = new HashMap<>();
-            params.put("vendor_id",vendor_id);
+            params.put("vendor_id",to_vendor_id);
             params.put("discount",discount);
             params.put("user_id",user.getUserId());
             params.put("to_vendor_id",to_vendor_id);
@@ -94,14 +96,14 @@ public class CopyRuleController extends BaseController{
             if(StringUtils.isBlank(price_change_rule_id) || seasons == null || seasons.length() == 0) {
                 return resultMessage.errorStatus().putMsg("info","params is error !!!");
             }
-            User user = super.getUserInfo(httpRequest);
+            /*User user = super.getUserInfo(httpRequest);
             if(user == null) {
                 return resultMessage.errorStatus().putMsg("info","user is not login !!!");
-            }
+            }*/
             Map<String,Object> params = new HashMap<>();
             params.put("price_change_rule_id",price_change_rule_id);
             params.put("seasons",seasons);
-            params.put("user_id",user.getUserId());
+            params.put("user_id",0);
             params.put("vendor_id",vendor_id);
             return iPriceChangeRule.copyRuleBySeason(params);
         } catch (Exception e) {

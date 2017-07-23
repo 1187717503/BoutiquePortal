@@ -316,6 +316,16 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         String[] season_codes = seasons.split(",");
         List<Map<String,Object>> ruleByConditionsMaps = new ArrayList<>();
         ruleByConditionsMaps.add(params);
+
+        /** start checked 该vendor下是否存在该season_code */
+        params.put("season_codes",season_codes);
+        List<Map<String,Object>> seasonCodeMaps =  seasonMapper.querySeasonByVendor(params);
+
+        if(seasonCodeMaps != null && seasonCodeMaps.size() > 0) {
+            return resultMessage.errorStatus().putMsg("info"," Vendor already contains the rule !!!");
+        }
+        /** end checked 该vendor下是否存在该season_code */
+
         Long price_change_rule_id_new = this.copyAllRuleByActivePending(ruleByConditionsMaps,vendor_id,"0",false,user_id);
 
         // create price_season_group
