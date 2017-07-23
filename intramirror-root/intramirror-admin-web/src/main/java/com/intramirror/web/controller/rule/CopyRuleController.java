@@ -96,14 +96,14 @@ public class CopyRuleController extends BaseController{
             if(StringUtils.isBlank(price_change_rule_id) || seasons == null || seasons.length() == 0) {
                 return resultMessage.errorStatus().putMsg("info","params is error !!!");
             }
-            /*User user = super.getUserInfo(httpRequest);
+            User user = super.getUserInfo(httpRequest);
             if(user == null) {
                 return resultMessage.errorStatus().putMsg("info","user is not login !!!");
-            }*/
+            }
             Map<String,Object> params = new HashMap<>();
             params.put("price_change_rule_id",price_change_rule_id);
             params.put("seasons",seasons);
-            params.put("user_id",0);
+            params.put("user_id",user.getUserId());
             params.put("vendor_id",vendor_id);
             return iPriceChangeRule.copyRuleBySeason(params);
         } catch (Exception e) {
