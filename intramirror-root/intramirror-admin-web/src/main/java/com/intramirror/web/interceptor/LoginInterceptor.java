@@ -21,7 +21,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.intramirror.common.Helper;
 
-@CrossOrigin
 @Repository
 public class LoginInterceptor implements HandlerInterceptor{
     private String jwtSecret = "qazxswedcvfr543216yhnmju70plmjkiu89";
@@ -40,23 +39,24 @@ public class LoginInterceptor implements HandlerInterceptor{
 		
 	}
 
+    @CrossOrigin
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
 			Object arg2) throws Exception {
     	logger.info("start LoginInterceptor");
 		boolean status = true;
 		
-		response.setHeader("Access-Control-Allow-Origin", "*");
-
-		response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
-
-		response.setHeader("Access-Control-Max-Age", "0");
-
-		response.setHeader("Access-Control-Allow-Headers", "Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With,userId,token");
-
-		response.setHeader("Access-Control-Allow-Credentials", "true");
-
-		response.setHeader("XDomainRequestAllowed","1");
+//		response.setHeader("Access-Control-Allow-Origin", "*");
+//
+//		response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+//
+//		response.setHeader("Access-Control-Max-Age", "0");
+//
+//		response.setHeader("Access-Control-Allow-Headers", "Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With,userId,token");
+//
+//		response.setHeader("Access-Control-Allow-Credentials", "true");
+//
+//		response.setHeader("XDomainRequestAllowed","1");
 		
         //获取url地址  
         String reqUrl=request.getRequestURI().replace(request.getContextPath(), "");  
