@@ -5,7 +5,7 @@
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
     
     <!--引入属性文件 -->
-     <context:property-placeholder location="classpath:/sit/databases.properties"/>
+     <context:property-placeholder location="classpath:/prd/databases.properties"/>
     
     <!--数据库连接-->
     <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close"> 
