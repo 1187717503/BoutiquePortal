@@ -15,11 +15,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.intramirror.common.Helper;
 
+@CrossOrigin
 @Repository
 public class LoginInterceptor implements HandlerInterceptor{
     private String jwtSecret = "qazxswedcvfr543216yhnmju70plmjkiu89";
