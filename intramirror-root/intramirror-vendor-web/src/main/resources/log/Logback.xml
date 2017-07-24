@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <configuration>
 	
-	<property name="LOG_HOME" value="/Users/dingyifan/Documents/dev/newkj/log"/>
+	<property name="LOG_HOME" value="/opt/intramirror_admin_web/logs"/>
 	
 	<property name="APP_NAME" value="shoplus-web" /> <!-- 引用名称 -->
 	<property name="LOG_MAX_HISTORY" value="30" /> <!-- 日志文件保留天数 -->
