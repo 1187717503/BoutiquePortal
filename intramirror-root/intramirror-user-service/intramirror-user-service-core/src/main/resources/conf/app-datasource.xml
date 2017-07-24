@@ -5,7 +5,7 @@
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
     
     <!--引入属性文件 -->
-    <!-- <context:property-placeholder location="classpath:/databases.properties"/> -->
+     <context:property-placeholder location="classpath:/pre/databases.properties"/>
 
 	<!--数据库连接-->
     <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close"> 
@@ -39,7 +39,7 @@
    		<constructor-arg ref="userSqlSessionFactory" />
   	</bean>
 
-	<beans profile="sit">
+	<!--<beans profile="sit">
 		<context:property-placeholder location="classpath:/sit/databases.properties"/>
 	</beans>
 	<beans profile="pre">
@@ -48,7 +48,8 @@
 	<beans profile="prd">
 		<context:property-placeholder location="classpath:/prd/databases.properties"/>
 	</beans>
+
 	<beans profile="default">
-		<context:property-placeholder ignore-resource-not-found="true" location="classpath:/sit/databases.properties"/>
-	</beans>
+		<context:property-placeholder ignore-resource-not-found="true" location="classpath:/pre/databases.properties"/>
+	</beans>-->
 </beans>
