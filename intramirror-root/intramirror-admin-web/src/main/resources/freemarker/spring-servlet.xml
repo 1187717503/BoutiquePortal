@@ -46,6 +46,15 @@
           <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service" /> 
     </context:component-scan>
 
+	<!--设置登录拦截器 -->  
+    <mvc:interceptors>  
+        <mvc:interceptor>  
+            <mvc:mapping path="/*.htm" />  
+            <mvc:mapping path="/*/*.htm" />   
+            <bean class="com.intramirror.web.interceptor.LoginInterceptor"/>  
+        </mvc:interceptor>  
+    </mvc:interceptors> 
+    
 	<!-- 配置转义符 -->
 	<bean id="fmXmlEscape" class="freemarker.template.utility.XmlEscape" />
 	
