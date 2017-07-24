@@ -10,6 +10,10 @@
 	</context-param>
 
 	<listener>
+		<listener-class>ch.qos.logback.ext.spring.web.LogbackConfigListener</listener-class>
+	</listener>
+	
+	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
 	
@@ -19,9 +23,6 @@
 		<param-value>classpath:log/Logback.xml</param-value>
 	</context-param>
 	
-	<listener>
-		<listener-class>ch.qos.logback.ext.spring.web.LogbackConfigListener</listener-class>
-	</listener>
 	
 	<!-- 过滤请求乱码问题,针对POST请求 -->
 	<filter>
