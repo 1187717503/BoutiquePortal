@@ -38,6 +38,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
 
     private PriceChangeRuleSeasonGroupMapper priceChangeRuleSeasonGroupMapper;
 
+    @Transactional
     @Override
     public boolean updateVendorPrice() {
         Map<String,Object> paramsMap = new HashMap<>();
@@ -57,7 +58,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         List<Map<String,Object>> selSeasonGroupRuleMaps = priceChangeRuleMapper.selectSeasonGroupRule(paramsMap);
         logger.info("selSeasonGroupRuleMaps : {}",new Gson().toJson(selSeasonGroupRuleMaps));
         /**
-             select pcr.price_change_rule_id,pcrsg.season_code,pcr.vendor_id,pcr.shop_id,pcr.user_id,pcrcb.brand_id from price_change_rule pcr
+             select pcr.price_change_rule_id,pcrsg.season_code,pcr.vendor_id,pcr.shop_id,pcr.user_id from price_change_rule pcr
              inner join price_change_rule_season_group pcrsg on (pcrsg.price_change_rule_id = pcr.price_change_rule_id and pcrsg.enabled = 1)
              where pcr.price_type = #{price_type,jdbcType=BIGINT}
              and pcr.`status` = 1
@@ -67,7 +68,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         List<Map<String,Object>> selSecondCategoryRuleMaps = priceChangeRuleMapper.selectSecondCategoryRule(paramsMap);
         logger.info("selSecondCategoryRuleMaps : {}",new Gson().toJson(selSecondCategoryRuleMaps));
         /**
-             select pcrcb.discount_percentage,pcr.vendor_id,pcr.shop_id,pcrcb.category_id,pcrcb.`level`,pcr.price_change_rule_id from price_change_rule pcr
+             select pcrcb.discount_percentage,pcr.vendor_id,pcr.shop_id,pcrcb.category_id,pcrcb.`level`,pcr.price_change_rule_id,pcrcb.brand_id from price_change_rule pcr
              inner join price_change_rule_category_brand pcrcb on (pcr.price_change_rule_id = pcrcb.price_change_rule_id and pcrcb.`level` = 2)
              where 1=1
              and pcr.price_type = #{price_type,jdbcType=BIGINT}
@@ -117,14 +118,17 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         this.updatePrice(paramsList,paramsMap);
         paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selProductRuleMaps,Contants.num_four,selSeasonGroupRuleMaps);
         this.updatePrice(paramsList,paramsMap);
+
+        this.updateRuleStatus(paramsMap);
         return true;
     }
 
-    private void updatePrice(List<Map<String,Object>> paramsList,Map<String,Object> paramsMap){
+    private int updatePrice(List<Map<String,Object>> paramsList,Map<String,Object> paramsMap){
         if(paramsList != null && paramsList.size() > 0) {
-            priceChangeRuleMapper.updateSkuPriceByVendor(paramsList);
-            this.updateRuleStatus(paramsMap);
+            int i = priceChangeRuleMapper.updateSkuPriceByVendor(paramsList);
+            logger.info("update price success num : {}",i);
         }
+        return 0;
     }
 
     @Override
