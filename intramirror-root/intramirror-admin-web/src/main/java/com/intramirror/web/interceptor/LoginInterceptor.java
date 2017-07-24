@@ -46,6 +46,18 @@ public class LoginInterceptor implements HandlerInterceptor{
     	logger.info("start LoginInterceptor");
 		boolean status = true;
 		
+		response.setHeader("Access-Control-Allow-Origin", "*");
+
+		response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+
+		response.setHeader("Access-Control-Max-Age", "0");
+
+		response.setHeader("Access-Control-Allow-Headers", "Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With,userId,token");
+
+		response.setHeader("Access-Control-Allow-Credentials", "true");
+
+		response.setHeader("XDomainRequestAllowed","1");
+		
         //获取url地址  
         String reqUrl=request.getRequestURI().replace(request.getContextPath(), "");  
         
