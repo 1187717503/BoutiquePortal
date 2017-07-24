@@ -432,7 +432,7 @@
             </if>
             and vendor_id = #{item.vendor_id,jdbcType=BIGINT}
             and p.season_code in
-            <foreach item="item" index="index" collection="season_codes" open="(" separator="," close=")">
+            <foreach item="item" index="index" collection="item.season_codes" open="(" separator="," close=")">
                 #{item}
             </foreach>
             )
