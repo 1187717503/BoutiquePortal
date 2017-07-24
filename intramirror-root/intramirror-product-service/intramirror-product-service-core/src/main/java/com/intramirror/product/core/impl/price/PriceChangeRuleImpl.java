@@ -49,70 +49,91 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         if(default_discount > 0 && default_discount < 100) {
             paramsMap.put("default_discount_percentage",default_discount);
             priceChangeRuleMapper.updateDefaultPriceByVendor(paramsMap);
+            /**
+                 update sku set sku.in_price = sku.price * #{default_discount_percentage,jdbcType=BIGINT}/((1+0.22)*100)
+             */
         }
 
         List<Map<String,Object>> selSeasonGroupRuleMaps = priceChangeRuleMapper.selectSeasonGroupRule(paramsMap);
         logger.info("selSeasonGroupRuleMaps : {}",new Gson().toJson(selSeasonGroupRuleMaps));
+        /**
+             select pcr.price_change_rule_id,pcrsg.season_code,pcr.vendor_id,pcr.shop_id,pcr.user_id,pcrcb.brand_id from price_change_rule pcr
+             inner join price_change_rule_season_group pcrsg on (pcrsg.price_change_rule_id = pcr.price_change_rule_id and pcrsg.enabled = 1)
+             where pcr.price_type = #{price_type,jdbcType=BIGINT}
+             and pcr.`status` = 1
+             and date_format(pcr.valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d');
+         */
 
         List<Map<String,Object>> selSecondCategoryRuleMaps = priceChangeRuleMapper.selectSecondCategoryRule(paramsMap);
-        selSecondCategoryRuleMaps = this.sortListByLevel(selSecondCategoryRuleMaps);
         logger.info("selSecondCategoryRuleMaps : {}",new Gson().toJson(selSecondCategoryRuleMaps));
+        /**
+             select pcrcb.discount_percentage,pcr.vendor_id,pcr.shop_id,pcrcb.category_id,pcrcb.`level`,pcr.price_change_rule_id from price_change_rule pcr
+             inner join price_change_rule_category_brand pcrcb on (pcr.price_change_rule_id = pcrcb.price_change_rule_id and pcrcb.`level` = 2)
+             where 1=1
+             and pcr.price_type = #{price_type,jdbcType=BIGINT}
+             and pcr.`status` = 1
+             and pcrcb.exception_flag = 0
+             and  date_format(pcr.valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d')
+         */
 
         List<Map<String,Object>> selAllCategoryRuleMaps = priceChangeRuleMapper.selectAllCategoryRule(paramsMap);
         selAllCategoryRuleMaps = this.sortListByLevel(selAllCategoryRuleMaps);
         logger.info("selAllCategoryRuleMaps : {}",new Gson().toJson(selAllCategoryRuleMaps));
+        /**
+             select pcrcb.discount_percentage,pcr.vendor_id,pcr.shop_id,pcrcb.category_id,pcrcb.`level`,pcrcb.brand_id,pcr.price_change_rule_id from price_change_rule pcr
+             inner join price_change_rule_category_brand pcrcb on (pcr.price_change_rule_id = pcrcb.price_change_rule_id)
+             where 1=1
+             and pcr.price_type = #{price_type,jdbcType=BIGINT}
+             and pcr.`status` = 1
+             and pcrcb.exception_flag = 1
+             and  date_format(pcr.valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d')
+         */
 
         List<Map<String,Object>> selProductGroupRuleMaps = priceChangeRuleMapper.selectProductGroupRule(paramsMap);
         logger.info("selProductGroupRuleMaps : {}",new Gson().toJson(selAllCategoryRuleMaps));
+        /**
+             select pcrg.discount_percentage,pcr.vendor_id,pcr.shop_id,pcrg.product_group_id,pcr.price_change_rule_id from price_change_rule pcr
+             inner join price_change_rule_group pcrg on (pcr.price_change_rule_id = pcrg.price_change_rule_id)
+             and pcr.price_type = #{price_type,jdbcType=BIGINT}
+             and pcr.`status` = 1
+             and date_format(pcr.valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d')
+         */
 
         List<Map<String,Object>> selProductRuleMaps = priceChangeRuleMapper.selectProductRule(paramsMap);
         logger.info("selProductRuleMaps : {}",new Gson().toJson(selProductRuleMaps));
+        /**
+             select pcrp.discount_percentage,pcr.vendor_id,pcr.shop_id,pcrp.product_id,pcr.price_change_rule_id from price_change_rule pcr
+             inner join price_change_rule_product pcrp on (pcr.price_change_rule_id = pcrp.price_change_rule_id)
+             and pcr.price_type = #{price_type,jdbcType=BIGINT}
+             and pcr.`status` = 1
+             and  date_format(pcr.valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d')
+         */
 
-        paramsList = this.handleMap(paramsList,selSecondCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
-        paramsList = this.handleMap(paramsList,selAllCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
-        paramsList = this.handleMap(paramsList,selProductGroupRuleMaps,Contants.num_three,selSeasonGroupRuleMaps);
-        paramsList = this.handleMap(paramsList,selProductRuleMaps,Contants.num_four,selSeasonGroupRuleMaps);
+        paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selSecondCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
+        this.updatePrice(paramsList,paramsMap);
+        paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selAllCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
+        this.updatePrice(paramsList,paramsMap);
+        paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selProductGroupRuleMaps,Contants.num_three,selSeasonGroupRuleMaps);
+        this.updatePrice(paramsList,paramsMap);
+        paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selProductRuleMaps,Contants.num_four,selSeasonGroupRuleMaps);
+        this.updatePrice(paramsList,paramsMap);
+        return true;
+    }
 
+    private void updatePrice(List<Map<String,Object>> paramsList,Map<String,Object> paramsMap){
         if(paramsList != null && paramsList.size() > 0) {
             priceChangeRuleMapper.updateSkuPriceByVendor(paramsList);
             this.updateRuleStatus(paramsMap);
         }
-        return true;
     }
 
     @Override
     public boolean updateShopPrice() {
-        /*Map<String,Object> paramsMap = new HashMap<>();
-        List<Map<String,Object>> paramsList = new ArrayList<>();
-        paramsMap.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
-
-        List<Map<String,Object>> selSeasonGroupRuleMaps = priceChangeRuleMapper.selectSeasonGroupRule(paramsMap);
-        logger.info("selSeasonGroupRuleMaps : {}",new Gson().toJson(selSeasonGroupRuleMaps));
-
-        List<Map<String,Object>> selSecondCategoryRuleMaps = priceChangeRuleMapper.selectSecondCategoryRule(paramsMap);
-        selSecondCategoryRuleMaps = this.sortListByLevel(selSecondCategoryRuleMaps);
-        logger.info("selSecondCategoryRuleMaps : {}",new Gson().toJson(selSecondCategoryRuleMaps));
-
-        List<Map<String,Object>> selAllCategoryRuleMaps = priceChangeRuleMapper.selectAllCategoryRule(paramsMap);
-        selAllCategoryRuleMaps = this.sortListByLevel(selAllCategoryRuleMaps);
-        logger.info("selAllCategoryRuleMaps : {}",new Gson().toJson(selAllCategoryRuleMaps));
-
-        List<Map<String,Object>> selProductGroupRuleMaps = priceChangeRuleMapper.selectProductGroupRule(paramsMap);
-        logger.info("selProductGroupRuleMaps : {}",new Gson().toJson(selProductGroupRuleMaps));
-
-        List<Map<String,Object>> selProductRuleMaps = priceChangeRuleMapper.selectProductRule(paramsMap);
-        logger.info("selProductRuleMaps : {}",new Gson().toJson(selProductRuleMaps));
-
-        paramsList = this.handleMapByAdmin(paramsList,selSecondCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
-        paramsList = this.handleMapByAdmin(paramsList,selAllCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
-        paramsList = this.handleMapByAdmin(paramsList,selProductGroupRuleMaps,Contants.num_three,selSeasonGroupRuleMaps);
-        paramsList = this.handleMapByAdmin(paramsList,selProductRuleMaps,Contants.num_four,selSeasonGroupRuleMaps);
-
-        if(paramsList != null && paramsList.size() > 0) {
-            priceChangeRuleMapper.updateSkuPriceByShop(paramsList);
-            this.updateRuleStatus(paramsMap);
-        }*/
         priceChangeRuleMapper.updateSkuPriceByImPrice();
+        /**
+            update sku,shop_product_sku sps set sps.sale_price = sku.im_price
+            where sku.enabled = 1 and sps.enabled = 1 and sku.sku_id = sps.sku_id
+         */
         return true;
     }
 
@@ -170,15 +191,14 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         List<Map<String,Object>> selProductRuleMaps = priceChangeRuleMapper.selectProductRule(paramsMap);
         logger.info("selProductRuleMaps : {}",new Gson().toJson(selProductRuleMaps));
 
-        paramsList = this.handleMap(paramsList,selSecondCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
-        paramsList = this.handleMap(paramsList,selAllCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
-        paramsList = this.handleMap(paramsList,selProductGroupRuleMaps,Contants.num_three,selSeasonGroupRuleMaps);
-        paramsList = this.handleMap(paramsList,selProductRuleMaps,Contants.num_four,selSeasonGroupRuleMaps);
-
-        if( paramsList != null && paramsList.size() > 0) {
-            priceChangeRuleMapper.updateSkuPriceByAdmin(paramsList);
-            this.updateRuleStatus(paramsMap);
-        }
+        paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selSecondCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
+        this.updatePrice(paramsList,paramsMap);
+        paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selAllCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
+        this.updatePrice(paramsList,paramsMap);
+        paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selProductGroupRuleMaps,Contants.num_three,selSeasonGroupRuleMaps);
+        this.updatePrice(paramsList,paramsMap);
+        paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selProductRuleMaps,Contants.num_four,selSeasonGroupRuleMaps);
+        this.updatePrice(paramsList,paramsMap);
         return true;
     }
 
@@ -199,31 +219,20 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         return 100;
     }
 
-    /*private List<Map<String,Object>> handleMapByVendor(List<Map<String,Object>> paramsList,List<Map<String,Object>> dataList,int level){
-        if(dataList != null && dataList.size() > 0) {
-            for (Map<String,Object> dataMap : dataList) {
-                dataMap.put("handle_level",level);
-                paramsList.add(dataMap);
-            }
-        }
-        return paramsList;
-    }*/
-
     private List<Map<String,Object>> handleMap(List<Map<String,Object>> paramsList,List<Map<String,Object>> dataList,int level,List<Map<String,Object>> seasonGroupMaps){
         if(dataList != null && dataList.size() > 0) {
             for (Map<String,Object> dataMap : dataList) {
                 dataMap.put("handle_level",level);
                 if(seasonGroupMaps != null && seasonGroupMaps.size() > 0) {
-                    String seasons = "";
+                    List<String> season_codes = new ArrayList<>();
                     for(Map<String,Object> seasonRuleMap : seasonGroupMaps) {
                         String p1 = dataMap.get("price_change_rule_id").toString();
-                        String p2 = dataMap.get("price_change_rule_id").toString();
+                        String p2 = seasonRuleMap.get("price_change_rule_id").toString();
                         if(p1.equals(p2)) {
-                            seasons = seasons + "'"+seasonRuleMap.get("season_code").toString()+"'" + ",";
+                            season_codes.add(seasonRuleMap.get("season_code").toString());
                         }
                     }
-                    if(StringUtils.isNotBlank(seasons)) {
-                        String season_codes = seasons.substring(0,seasons.length() - 1);
+                    if(season_codes != null && season_codes.size() > 0) {
                         dataMap.put("season_codes",season_codes);
                     }
                 }
