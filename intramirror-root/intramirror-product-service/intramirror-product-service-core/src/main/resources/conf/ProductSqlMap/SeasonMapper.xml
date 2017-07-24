@@ -149,6 +149,7 @@
           <bind name="brandName" value="'%' + english_name + '%'" />
           and b.english_name like #{brandName}
         </if>
+         ORDER BY pcrcb.price_change_rule_category_brand_id DESC
   </select>
 
   <select id="queryRuleByBrandOne" resultType="java.util.Map" parameterType="java.util.Map">
