@@ -163,6 +163,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     }
 
     @Override
+    @Transactional
     public boolean updateAdminPrice() {
         Map<String,Object> paramsMap = new HashMap<>();
         List<Map<String,Object>> paramsList = new ArrayList<>();
