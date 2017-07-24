@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -21,6 +23,7 @@ import com.intramirror.common.Helper;
 @Repository
 public class LoginInterceptor implements HandlerInterceptor{
     private String jwtSecret = "qazxswedcvfr543216yhnmju70plmjkiu89";
+	private static Logger logger = LoggerFactory.getLogger(LoginInterceptor.class);
 
 	@Override
 	public void afterCompletion(HttpServletRequest arg0,
@@ -38,6 +41,7 @@ public class LoginInterceptor implements HandlerInterceptor{
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
 			Object arg2) throws Exception {
+    	logger.info("start LoginInterceptor");
 		boolean status = true;
 		
         //获取url地址  
@@ -78,7 +82,9 @@ public class LoginInterceptor implements HandlerInterceptor{
             
         }
         if(!status){
-        	response.sendRedirect("/login");
+        	logger.info("LoginInterceptor: User not logged in");
+//        	response.sendRedirect("/login");
+        	response.sendError(2001, "User not logged in !");
         	return false;    
         }
         return true;    
