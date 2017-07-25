@@ -1,3 +1,5 @@
+
+
 package com.intramirror.product.core.impl.price;
 
 import com.google.gson.Gson;
@@ -38,6 +40,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
 
     private PriceChangeRuleSeasonGroupMapper priceChangeRuleSeasonGroupMapper;
 
+    @Transactional
     @Override
     public boolean updateVendorPrice() {
         Map<String,Object> paramsMap = new HashMap<>();
@@ -48,92 +51,62 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         int default_discount = this.getDeafultDisscount(PriceChangeRuleEnum.PriceType.SUPPLY_PRICE);
         if(default_discount > 0 && default_discount < 100) {
             paramsMap.put("default_discount_percentage",default_discount);
-            priceChangeRuleMapper.updateDefaultPriceByVendor(paramsMap);
-            /**
-                 update sku set sku.in_price = sku.price * #{default_discount_percentage,jdbcType=BIGINT}/((1+0.22)*100)
-             */
+            int i = priceChangeRuleMapper.updateDefaultPriceByVendor(paramsMap);
+            logger.info("update vendor price by default discount : {}",i );
         }
 
         List<Map<String,Object>> selSeasonGroupRuleMaps = priceChangeRuleMapper.selectSeasonGroupRule(paramsMap);
         logger.info("selSeasonGroupRuleMaps : {}",new Gson().toJson(selSeasonGroupRuleMaps));
-        /**
-             select pcr.price_change_rule_id,pcrsg.season_code,pcr.vendor_id,pcr.shop_id,pcr.user_id,pcrcb.brand_id from price_change_rule pcr
-             inner join price_change_rule_season_group pcrsg on (pcrsg.price_change_rule_id = pcr.price_change_rule_id and pcrsg.enabled = 1)
-             where pcr.price_type = #{price_type,jdbcType=BIGINT}
-             and pcr.`status` = 1
-             and date_format(pcr.valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d');
-         */
 
         List<Map<String,Object>> selSecondCategoryRuleMaps = priceChangeRuleMapper.selectSecondCategoryRule(paramsMap);
         logger.info("selSecondCategoryRuleMaps : {}",new Gson().toJson(selSecondCategoryRuleMaps));
-        /**
-             select pcrcb.discount_percentage,pcr.vendor_id,pcr.shop_id,pcrcb.category_id,pcrcb.`level`,pcr.price_change_rule_id from price_change_rule pcr
-             inner join price_change_rule_category_brand pcrcb on (pcr.price_change_rule_id = pcrcb.price_change_rule_id and pcrcb.`level` = 2)
-             where 1=1
-             and pcr.price_type = #{price_type,jdbcType=BIGINT}
-             and pcr.`status` = 1
-             and pcrcb.exception_flag = 0
-             and  date_format(pcr.valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d')
-         */
 
         List<Map<String,Object>> selAllCategoryRuleMaps = priceChangeRuleMapper.selectAllCategoryRule(paramsMap);
         selAllCategoryRuleMaps = this.sortListByLevel(selAllCategoryRuleMaps);
         logger.info("selAllCategoryRuleMaps : {}",new Gson().toJson(selAllCategoryRuleMaps));
-        /**
-             select pcrcb.discount_percentage,pcr.vendor_id,pcr.shop_id,pcrcb.category_id,pcrcb.`level`,pcrcb.brand_id,pcr.price_change_rule_id from price_change_rule pcr
-             inner join price_change_rule_category_brand pcrcb on (pcr.price_change_rule_id = pcrcb.price_change_rule_id)
-             where 1=1
-             and pcr.price_type = #{price_type,jdbcType=BIGINT}
-             and pcr.`status` = 1
-             and pcrcb.exception_flag = 1
-             and  date_format(pcr.valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d')
-         */
 
         List<Map<String,Object>> selProductGroupRuleMaps = priceChangeRuleMapper.selectProductGroupRule(paramsMap);
-        logger.info("selProductGroupRuleMaps : {}",new Gson().toJson(selAllCategoryRuleMaps));
-        /**
-             select pcrg.discount_percentage,pcr.vendor_id,pcr.shop_id,pcrg.product_group_id,pcr.price_change_rule_id from price_change_rule pcr
-             inner join price_change_rule_group pcrg on (pcr.price_change_rule_id = pcrg.price_change_rule_id)
-             and pcr.price_type = #{price_type,jdbcType=BIGINT}
-             and pcr.`status` = 1
-             and date_format(pcr.valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d')
-         */
+        logger.info("selProductGroupRuleMaps : {}",new Gson().toJson(selProductGroupRuleMaps));
 
         List<Map<String,Object>> selProductRuleMaps = priceChangeRuleMapper.selectProductRule(paramsMap);
         logger.info("selProductRuleMaps : {}",new Gson().toJson(selProductRuleMaps));
-        /**
-             select pcrp.discount_percentage,pcr.vendor_id,pcr.shop_id,pcrp.product_id,pcr.price_change_rule_id from price_change_rule pcr
-             inner join price_change_rule_product pcrp on (pcr.price_change_rule_id = pcrp.price_change_rule_id)
-             and pcr.price_type = #{price_type,jdbcType=BIGINT}
-             and pcr.`status` = 1
-             and  date_format(pcr.valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d')
-         */
 
         paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selSecondCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
-        this.updatePrice(paramsList,paramsMap);
+        this.updatePriceByVendor(paramsList,paramsMap);
         paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selAllCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
-        this.updatePrice(paramsList,paramsMap);
+        this.updatePriceByVendor(paramsList,paramsMap);
         paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selProductGroupRuleMaps,Contants.num_three,selSeasonGroupRuleMaps);
-        this.updatePrice(paramsList,paramsMap);
+        this.updatePriceByVendor(paramsList,paramsMap);
         paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selProductRuleMaps,Contants.num_four,selSeasonGroupRuleMaps);
-        this.updatePrice(paramsList,paramsMap);
+        this.updatePriceByVendor(paramsList,paramsMap);
+
+        this.updateRuleStatus(paramsMap);
+        this.updateAdminPrice();
+        this.updateShopPrice();
         return true;
     }
 
-    private void updatePrice(List<Map<String,Object>> paramsList,Map<String,Object> paramsMap){
+    private int updatePriceByVendor(List<Map<String,Object>> paramsList,Map<String,Object> paramsMap){
         if(paramsList != null && paramsList.size() > 0) {
-            priceChangeRuleMapper.updateSkuPriceByVendor(paramsList);
-            this.updateRuleStatus(paramsMap);
+            int i = priceChangeRuleMapper.updateSkuPriceByVendor(paramsList);
+            logger.info("update vendor price success num : {}",i);
         }
+        logger.info("update vendor price success num : {}",0);
+        return 0;
+    }
+
+    private int updatePriceByAdmin(List<Map<String,Object>> paramsList,Map<String,Object> paramsMap){
+        if(paramsList != null && paramsList.size() > 0) {
+            int i = priceChangeRuleMapper.updateSkuPriceByAdmin(paramsList);
+            logger.info("update admin price success num : {}",i);
+        }
+        logger.info("update admin price success num : {}",0);
+        return 0;
     }
 
     @Override
     public boolean updateShopPrice() {
         priceChangeRuleMapper.updateSkuPriceByImPrice();
-        /**
-            update sku,shop_product_sku sps set sps.sale_price = sku.im_price
-            where sku.enabled = 1 and sps.enabled = 1 and sku.sku_id = sps.sku_id
-         */
         return true;
     }
 
@@ -192,13 +165,15 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         logger.info("selProductRuleMaps : {}",new Gson().toJson(selProductRuleMaps));
 
         paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selSecondCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
-        this.updatePrice(paramsList,paramsMap);
+        this.updatePriceByAdmin(paramsList,paramsMap);
         paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selAllCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
-        this.updatePrice(paramsList,paramsMap);
+        this.updatePriceByAdmin(paramsList,paramsMap);
         paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selProductGroupRuleMaps,Contants.num_three,selSeasonGroupRuleMaps);
-        this.updatePrice(paramsList,paramsMap);
+        this.updatePriceByAdmin(paramsList,paramsMap);
         paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selProductRuleMaps,Contants.num_four,selSeasonGroupRuleMaps);
-        this.updatePrice(paramsList,paramsMap);
+        this.updatePriceByAdmin(paramsList,paramsMap);
+
+        this.updateRuleStatus(paramsMap);
         return true;
     }
 
@@ -245,11 +220,15 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     private boolean updateRuleStatus(Map<String,Object> params){
         List<Map<String,Object>> selNowRuleMaps = priceChangeRuleMapper.selNowRule(params);
         if(selNowRuleMaps != null && selNowRuleMaps.size() > 0) {
-            priceChangeRuleMapper.updateRuleInActive(params);
+            for(Map<String,Object> map : selNowRuleMaps){
+                params.put("price_change_rule_id",map.get("price_change_rule_id"));
+                priceChangeRuleMapper.updateRuleInActive(params);
+                priceChangeRuleMapper.updateRuleActive(params);
+            }
         }
-        priceChangeRuleMapper.updateRuleActive(params);
         return true;
     }
+
     @Override
     public void init() {
         priceChangeRuleMapper = this.getSqlSession().getMapper(PriceChangeRuleMapper.class);
@@ -258,30 +237,30 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         priceChangeRuleSeasonGroupMapper = this.getSqlSession().getMapper(PriceChangeRuleSeasonGroupMapper.class);
     }
 
-	@Override
-	public int deleteByPrimaryKey(Long priceChangeRuleId) {
-		return priceChangeRuleMapper.deleteByPrimaryKey(priceChangeRuleId);
-	}
+    @Override
+    public int deleteByPrimaryKey(Long priceChangeRuleId) {
+        return priceChangeRuleMapper.deleteByPrimaryKey(priceChangeRuleId);
+    }
 
-	@Override
-	public int insert(PriceChangeRule record) {
-		return priceChangeRuleMapper.insert(record);
-	}
+    @Override
+    public int insert(PriceChangeRule record) {
+        return priceChangeRuleMapper.insert(record);
+    }
 
-	@Override
-	public int insertSelective(PriceChangeRule record) {
-		return priceChangeRuleMapper.insertSelective(record);
-	}
+    @Override
+    public int insertSelective(PriceChangeRule record) {
+        return priceChangeRuleMapper.insertSelective(record);
+    }
 
-	@Override
-	public PriceChangeRule selectByPrimaryKey(Long priceChangeRuleId) {
-		return priceChangeRuleMapper.selectByPrimaryKey(priceChangeRuleId);
-	}
+    @Override
+    public PriceChangeRule selectByPrimaryKey(Long priceChangeRuleId) {
+        return priceChangeRuleMapper.selectByPrimaryKey(priceChangeRuleId);
+    }
 
-	@Override
-	public int updateByPrimaryKeySelective(PriceChangeRule record) {
-		return priceChangeRuleMapper.updateByPrimaryKeySelective(record);
-	}
+    @Override
+    public int updateByPrimaryKeySelective(PriceChangeRule record) {
+        return priceChangeRuleMapper.updateByPrimaryKeySelective(record);
+    }
 
     @Transactional
     @Override
@@ -412,9 +391,9 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         return price_change_rule_id_new;
     }
 
-	@Override
-	public List<PriceChangeRule> selectByName(String name) {
-		return priceChangeRuleMapper.selectByName(name);
-	}
+    @Override
+    public List<PriceChangeRule> selectByName(String name) {
+        return priceChangeRuleMapper.selectByName(name);
+    }
 
 }
