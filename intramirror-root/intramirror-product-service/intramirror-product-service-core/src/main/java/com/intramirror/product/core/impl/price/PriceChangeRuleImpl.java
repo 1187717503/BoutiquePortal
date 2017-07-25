@@ -66,7 +66,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         logger.info("selAllCategoryRuleMaps : {}",new Gson().toJson(selAllCategoryRuleMaps));
 
         List<Map<String,Object>> selProductGroupRuleMaps = priceChangeRuleMapper.selectProductGroupRule(paramsMap);
-        logger.info("selProductGroupRuleMaps : {}",new Gson().toJson(selAllCategoryRuleMaps));
+        logger.info("selProductGroupRuleMaps : {}",new Gson().toJson(selProductGroupRuleMaps));
 
         List<Map<String,Object>> selProductRuleMaps = priceChangeRuleMapper.selectProductRule(paramsMap);
         logger.info("selProductRuleMaps : {}",new Gson().toJson(selProductRuleMaps));
@@ -81,6 +81,8 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         this.updatePriceByVendor(paramsList,paramsMap);
 
         this.updateRuleStatus(paramsMap);
+        this.updateAdminPrice();
+        this.updateShopPrice();
         return true;
     }
 
@@ -105,10 +107,6 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     @Override
     public boolean updateShopPrice() {
         priceChangeRuleMapper.updateSkuPriceByImPrice();
-        /**
-         update sku,shop_product_sku sps set sps.sale_price = sku.im_price
-         where sku.enabled = 1 and sps.enabled = 1 and sku.sku_id = sps.sku_id
-         */
         return true;
     }
 
@@ -175,7 +173,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selProductRuleMaps,Contants.num_four,selSeasonGroupRuleMaps);
         this.updatePriceByAdmin(paramsList,paramsMap);
 
-
+        this.updateRuleStatus(paramsMap);
         return true;
     }
 
@@ -222,9 +220,12 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     private boolean updateRuleStatus(Map<String,Object> params){
         List<Map<String,Object>> selNowRuleMaps = priceChangeRuleMapper.selNowRule(params);
         if(selNowRuleMaps != null && selNowRuleMaps.size() > 0) {
-            priceChangeRuleMapper.updateRuleInActive(params);
+            for(Map<String,Object> map : selNowRuleMaps){
+                params.put("price_change_rule_id",map.get("price_change_rule_id"));
+                priceChangeRuleMapper.updateRuleInActive(params);
+                priceChangeRuleMapper.updateRuleActive(params);
+            }
         }
-        priceChangeRuleMapper.updateRuleActive(params);
         return true;
     }
 

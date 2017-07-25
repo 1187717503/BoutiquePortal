@@ -554,17 +554,18 @@
     <update id="updateRuleActive" parameterType="java.util.Map">
 
         update price_change_rule pcr set pcr.`status` = 2 where
-        pcr.price_type = #{price_type,jdbcType=BIGINT}
-        and pcr.`status` = 1
-        and date_format(pcr.valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d');
+        pcr.price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
     </update>
 
     <update id="updateRuleInActive" parameterType="java.util.Map">
 
-        update price_change_rule set `status` = 3 where
-        price_type = #{price_type,jdbcType=BIGINT}
-        and `status` = 2
-        and date_format(valid_from,'%y-%m-%d') != date_format(now(),'%y-%m-%d');
+        update price_change_rule pcr,price_change_rule_season_group pcrsg set `status` = 3 where
+        pcr.price_type = #{price_type,jdbcType=BIGINT}
+        and pcr.`status` = 2
+        and pcr.price_change_rule_id = pcrsg.price_change_rule_id
+        and pcrsg.season_code in (
+            select season_code from price_change_rule_season_group where price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
+        )
     </update>
 
     <update id="updateDefaultPriceByVendor" parameterType="java.util.Map">
