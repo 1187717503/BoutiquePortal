@@ -465,7 +465,7 @@
                 </if>
                 <if test="item.level == 2">
                     and p.category_id in (
-                    select category_id from category c where c.enabled = 1 and c.`level` = 2 and c.parent_id =
+                    select category_id from category c where c.enabled = 1 and c.`level` = 3 and c.parent_id =
                     #{item.category_id,jdbcType=BIGINT}
                     )
                 </if>
