@@ -1,4 +1,4 @@
-package com.intramirror.web.interceptor;
+package com.intramirror.web.filter;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -6,66 +6,61 @@ import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.impl.Base64Codec;
 
+import java.io.IOException;
 import java.util.Date;
 
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.stereotype.Component;
 
 import com.intramirror.common.Helper;
 
-@Repository
-public class LoginInterceptor implements HandlerInterceptor{
+@Component
+public class LoginFilter implements Filter{
+	
     private String jwtSecret = "qazxswedcvfr543216yhnmju70plmjkiu89";
-	private static Logger logger = LoggerFactory.getLogger(LoginInterceptor.class);
+	private static Logger logger = LoggerFactory.getLogger(LoginFilter.class);
+	
 
 	@Override
-	public void afterCompletion(HttpServletRequest arg0,
-			HttpServletResponse arg1, Object arg2, Exception arg3)
-			throws Exception {
+	public void destroy() {
+		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void postHandle(HttpServletRequest arg0, HttpServletResponse arg1,
-			Object arg2, ModelAndView arg3) throws Exception {
-		
-	}
-
-    @CrossOrigin
-	@Override
-	public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
-			Object arg2) throws Exception {
+	public void doFilter(ServletRequest req, ServletResponse res,
+			FilterChain chain) throws IOException, ServletException {
     	logger.info("start LoginInterceptor");
 		boolean status = true;
 		
-//		response.setHeader("Access-Control-Allow-Origin", "*");
-//
-//		response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
-//
-//		response.setHeader("Access-Control-Max-Age", "0");
-//
-//		response.setHeader("Access-Control-Allow-Headers", "Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With,userId,token");
-//
-//		response.setHeader("Access-Control-Allow-Credentials", "true");
-//
-//		response.setHeader("XDomainRequestAllowed","1");
+		HttpServletResponse response = (HttpServletResponse) res;
+		HttpServletRequest  request = (HttpServletRequest) req;
 		
+	    response.setHeader("Access-Control-Allow-Origin", "http://192.168.31.250"); 
+//		response.setHeader("Access-Control-Allow-Origin", "http://www.cnblogs.com");
+	    response.setHeader("Access-Control-Allow-Headers", "token,Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With,userId");
+        response.setHeader("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS"); 
+        
         //获取url地址  
         String reqUrl=request.getRequestURI().replace(request.getContextPath(), "");  
-        
+
         //当url地址为登录的url的时候跳过拦截器  
-        if(reqUrl.contains("/login")){  
-            return true; 
+        if(reqUrl.contains("/login")){    
          
-        }else{  
+        }else if(request.getMethod().equals("OPTIONS") && !reqUrl.contains("/login")){  
+             
+        }else{
         	
             Long userId = null;
 
@@ -97,12 +92,21 @@ public class LoginInterceptor implements HandlerInterceptor{
         }
         if(!status){
         	logger.info("LoginInterceptor: User not logged in");
-//        	response.sendRedirect("/login");
-        	response.sendError(2001, "User not logged in !");
-        	return false;    
+           	response.getWriter().write("token Check failed,Please log in again");
+        	response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        }else{
+        	response.reset();
+            chain.doFilter(request, response); 
         }
-        return true;    
+		
 	}
+
+	@Override
+	public void init(FilterConfig arg0) throws ServletException {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	
     public String getJwtBase64Key() {
         return Base64Codec.BASE64.encode(jwtSecret);
