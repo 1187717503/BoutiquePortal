@@ -41,16 +41,17 @@ public class LoginFilter implements Filter{
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res,
 			FilterChain chain) throws IOException, ServletException {
-    	logger.info("start LoginInterceptor");
+//    	logger.info("start doFilter");
 		boolean status = true;
 		
 		HttpServletResponse response = (HttpServletResponse) res;
 		HttpServletRequest  request = (HttpServletRequest) req;
 		
-	    response.setHeader("Access-Control-Allow-Origin", "http://192.168.31.250"); 
-//		response.setHeader("Access-Control-Allow-Origin", "http://www.cnblogs.com");
+//	    response.setHeader("Access-Control-Allow-Origin", "http://192.168.31.250"); 
+		response.setHeader("Access-Control-Allow-Origin", "*");
 	    response.setHeader("Access-Control-Allow-Headers", "token,Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With,userId");
         response.setHeader("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS"); 
+        response.addHeader("Access-Control-Max-Age", "3600");
         
         //获取url地址  
         String reqUrl=request.getRequestURI().replace(request.getContextPath(), "");  
