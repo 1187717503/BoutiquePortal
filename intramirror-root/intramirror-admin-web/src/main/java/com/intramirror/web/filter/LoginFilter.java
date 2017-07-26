@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import com.intramirror.common.Helper;
 
@@ -51,6 +52,8 @@ public class LoginFilter implements Filter{
 		response.setHeader("Access-Control-Allow-Origin", "*");
 	    response.setHeader("Access-Control-Allow-Headers", "token,Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With,userId");
         response.setHeader("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS"); 
+        
+        //设置时间   controller 可以去掉@CrossOrigin注解
         response.addHeader("Access-Control-Max-Age", "3600");
         
         //获取url地址  
@@ -59,6 +62,8 @@ public class LoginFilter implements Filter{
         //当url地址为登录的url的时候跳过拦截器  
         if(reqUrl.contains("/login")){    
          
+        //会请求两次，第一次是options 类型,但第一次状态返回200 才会第二次请求
+        //先请求OPTIONS，得到许可后就可以跨域访问POST请求
         }else if(request.getMethod().equals("OPTIONS") && !reqUrl.contains("/login")){  
              
         }else{
