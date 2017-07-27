@@ -39,15 +39,15 @@ public class RuleController {
      */
     @RequestMapping("/select/queryRuleByHasSeason")
     @ResponseBody
-    public ResultMessage queryRuleByHasSeason(@Param("ruleStatus") String ruleStatus,@Param("vendor_id")String vendor_id){
+    public ResultMessage queryRuleByHasSeason(@Param("ruleStatus") String ruleStatus,@Param("vendor_id")String vendor_id,@Param("price_type")String price_type){
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
             if(StringUtils.isBlank(ruleStatus) || StringUtils.isBlank(vendor_id))
                 return resultMessage.errorStatus().putMsg("info"," params is null !!!");
 
             Map<String,Object> params = new HashMap<>();
-            params.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
-//            params.put("price_type",priceType);
+//            params.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
+            params.put("price_type",price_type);
             params.put("status",ruleStatus);
             params.put("vendor_id",vendor_id);
             List<Map<String,Object>> hasSeasonMaps =  iRuleService.queryRuleByHasSeason(params);
@@ -69,15 +69,15 @@ public class RuleController {
      */
     @RequestMapping("/select/queryRuleByNotHasSesaon")
     @ResponseBody
-    public ResultMessage queryRuleByNotHasSesaon(@Param("ruleStatus") String ruleStatus,@Param("vendor_id") String vendor_id){
+    public ResultMessage queryRuleByNotHasSesaon(@Param("ruleStatus") String ruleStatus,@Param("vendor_id") String vendor_id,@Param("price_type")String price_type){
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
             if(StringUtils.isBlank(ruleStatus) || StringUtils.isBlank(vendor_id))
                 return resultMessage.errorStatus().putMsg("info"," params is null !!!");
 
             Map<String,Object> params = new HashMap<>();
-            params.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
-//            params.put("price_type",priceType);
+//            params.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
+            params.put("price_type",price_type);
             params.put("status",ruleStatus);
             params.put("vendor_id",vendor_id);
             List<Map<String,Object>> notHasSeasonMaps =  iRuleService.queryRuleByNotHasSesaon(params);
