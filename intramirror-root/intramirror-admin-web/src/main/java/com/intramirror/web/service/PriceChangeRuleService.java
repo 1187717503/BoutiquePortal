@@ -102,7 +102,7 @@ public class PriceChangeRuleService {
 		//设置名称
 		String name = map.get("name").toString();
 		if(name.contains(",")){
-			List<PriceChangeRule> list = priceChangeRuleService.selectByName("Multiple");
+			List<PriceChangeRule> list = priceChangeRuleService.selectByName("Multiple",Long.parseLong(map.get("vendorId").toString()));
 			if(list != null && list.size() > 0){
 				name = "Multiple"+(list.size() +1);
 			}else{

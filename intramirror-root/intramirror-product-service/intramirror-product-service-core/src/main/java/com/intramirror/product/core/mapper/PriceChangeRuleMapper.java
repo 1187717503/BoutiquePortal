@@ -40,11 +40,11 @@ public interface PriceChangeRuleMapper {
     
     
     /**
-     * 根据name 模糊查询
+     * 根据vendorId name 模糊查询
      * @param priceChangeRuleId
      * @return
      */
-    List<PriceChangeRule> selectByName(String name);
+    List<PriceChangeRule> selectByName(Map<String,Object> map);
     
 
     /**

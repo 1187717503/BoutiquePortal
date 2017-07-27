@@ -34,11 +34,11 @@
     </select>
     
     
-   <select id="selectByName" resultMap="BaseResultMap" parameterType="String">
+   <select id="selectByName" resultMap="BaseResultMap" parameterType="java.util.Map">
         select
         <include refid="Base_Column_List"/>
         from price_change_rule
-        where name like  CONCAT('%',#{name},'%')
+        where vendor_id = #{vendorId} and name like  CONCAT('%',#{name},'%')
     </select>
     
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">

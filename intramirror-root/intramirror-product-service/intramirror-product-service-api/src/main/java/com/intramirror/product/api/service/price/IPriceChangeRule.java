@@ -47,10 +47,10 @@ public interface IPriceChangeRule {
     ResultMessage copyRuleBySeason(Map<String,Object> params) throws Exception;
     
     /**
-     * 根据name 模糊查询
+     * 根据vendorId name 模糊查询
      * @param priceChangeRuleId
      * @return
      */
-    List<PriceChangeRule> selectByName(String name);
+    List<PriceChangeRule> selectByName(String name,Long vendorId);
 
 }
