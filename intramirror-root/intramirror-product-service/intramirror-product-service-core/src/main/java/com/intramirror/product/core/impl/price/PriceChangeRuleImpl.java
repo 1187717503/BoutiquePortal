@@ -380,6 +380,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         // copy
         Long new_price_change_rule_id = this.copyAllRuleByActivePending(activeMaps,params.get("vendor_id").toString(),"0",true,Long.parseLong(params.get("user_id").toString()), Integer.parseInt(params.get("price_type").toString()));
         logger.info(" new_price_change_rule_id : {}",new_price_change_rule_id);
+        resultMessage.successStatus().putMsg("info","success");
         return resultMessage;
     }
 
