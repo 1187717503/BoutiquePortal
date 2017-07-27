@@ -147,7 +147,7 @@ public class CopyRuleController extends BaseController{
             }
             params.put("user_id",vendor.getUserId());
 
-            iPriceChangeRule.copyRule(params);
+            return iPriceChangeRule.copyRule(params);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("error message : {}",e.getMessage());
