@@ -1,5 +1,6 @@
 package com.intramirror.web.filter;
 
+import com.intramirror.web.common.CommonsProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
@@ -9,6 +10,7 @@ import io.jsonwebtoken.impl.Base64Codec;
 import java.io.IOException;
 import java.util.Date;
 
+import javax.annotation.Resource;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -21,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
@@ -31,7 +34,9 @@ public class LoginFilter implements Filter{
 	
     private String jwtSecret = "qazxswedcvfr543216yhnmju70plmjkiu89";
 	private static Logger logger = LoggerFactory.getLogger(LoginFilter.class);
-	
+
+	@Resource(name = "commonsProperties")
+	private CommonsProperties commonsProperties;
 
 	@Override
 	public void destroy() {
@@ -66,7 +71,9 @@ public class LoginFilter implements Filter{
         //先请求OPTIONS，得到许可后就可以跨域访问POST请求
         }else if(request.getMethod().equals("OPTIONS") && !reqUrl.contains("/login")){  
              
-        }else{
+        }else if(commonsProperties.getFilterEnabled().equals("0")){
+            // 跳过
+        } else {
         	
             Long userId = null;
 

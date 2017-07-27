@@ -9,6 +9,9 @@ public class CommonsProperties {
 	@Value("#{commons.baseUrl}")
 	private String baseUrl;
 
+	@Value("#{commons.filterEnabled}")
+	private String filterEnabled;
+
 	public String getBaseUrl() {
 		return baseUrl;
 	}
@@ -17,5 +20,11 @@ public class CommonsProperties {
 		this.baseUrl = baseUrl;
 	}
 
-	
+	public String getFilterEnabled() {
+		return filterEnabled;
+	}
+
+	public void setFilterEnabled(String filterEnabled) {
+		this.filterEnabled = filterEnabled;
+	}
 }
