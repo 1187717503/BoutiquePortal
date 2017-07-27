@@ -85,6 +85,7 @@ public interface PriceChangeRuleMapper {
 
 
     List<Map<String,Object>> selNowRule(Map<String,Object> params);
+    List<Map<String,Object>> selRuleByVendorPriceType(Map<String,Object> params);
     int updateRuleActive(Map<String,Object> params);
     int updateRuleInActive(Map<String,Object> params);
 
