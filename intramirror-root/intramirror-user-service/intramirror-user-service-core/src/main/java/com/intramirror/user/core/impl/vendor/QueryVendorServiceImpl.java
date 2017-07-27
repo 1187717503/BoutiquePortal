@@ -1,5 +1,6 @@
 package com.intramirror.user.core.impl.vendor;
 
+import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.vendor.IQueryVendorService;
 import com.intramirror.user.core.dao.BaseDao;
 import com.intramirror.user.core.mapper.VendorMapper;
@@ -24,6 +25,11 @@ public class QueryVendorServiceImpl extends BaseDao implements IQueryVendorServi
     @Override
     public List<Map<String, Object>> queryRuleVendor(Map<String, Object> params) throws Exception {
         return vendorMapper.queryRuleVendor(params);
+    }
+
+    @Override
+    public Vendor queryVendorByVendorId(Map<String, Object> params) throws Exception {
+        return vendorMapper.queryVendorByVendorId(params);
     }
 
     @Override

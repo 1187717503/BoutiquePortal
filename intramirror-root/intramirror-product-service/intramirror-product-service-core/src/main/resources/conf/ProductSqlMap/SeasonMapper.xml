@@ -167,7 +167,7 @@
   </select>
 
   <select id="queryNotRuleByBrand" resultType="java.util.Map" parameterType="java.util.Map">
-    select distinct brand_id,english_name from brand where brand_id not in (
+    select distinct brand_id,english_name from brand where enabled = 1 and brand_id not in (
       select pcrcb.brand_id from price_change_rule_category_brand pcrcb
       inner join category c on (c.category_id = pcrcb.category_id and c.enabled = 1)
       inner join brand b on (b.brand_id = pcrcb.brand_id and b.enabled = 1)

@@ -255,6 +255,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         seasonMapper = this.getSqlSession().getMapper(SeasonMapper.class);
         systemPropertyMapper = this.getSqlSession().getMapper(SystemPropertyMapper.class);
         priceChangeRuleSeasonGroupMapper = this.getSqlSession().getMapper(PriceChangeRuleSeasonGroupMapper.class);
+
     }
 
     @Override
@@ -308,7 +309,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         }
         /** end checked 新规则是否存在 */
 
-        this.copyAllRuleByActivePending(ruleByConditionsMaps,to_vendor_id,discount,true,user_id);
+        this.copyAllRuleByActivePending(ruleByConditionsMaps,to_vendor_id,discount,true,user_id, PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
         resultMessage.successStatus().putMsg("info","SUCCESS !!!");
         return resultMessage;
     }
@@ -334,7 +335,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         }
         /** end checked 该vendor下是否存在该season_code */
 
-        Long price_change_rule_id_new = this.copyAllRuleByActivePending(ruleByConditionsMaps,vendor_id,"0",false,user_id);
+        Long price_change_rule_id_new = this.copyAllRuleByActivePending(ruleByConditionsMaps,vendor_id,"0",false,user_id, PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
 
         // create price_season_group
         for(String season_code : season_codes) {
@@ -358,7 +359,32 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         return resultMessage;
     }
 
-    private Long copyAllRuleByActivePending(List<Map<String,Object>> ruleByConditionsMaps,String vendor_id,String discount,boolean insert_season_group_flag,Long user_id) throws Exception{
+    @Override
+    public ResultMessage copyRule(Map<String, Object> params) throws Exception {
+        ResultMessage resultMessage = ResultMessage.getInstance();
+
+        // select vendor exists pending rule
+        params.put("status",PriceChangeRuleEnum.Status.PENDING.getCode());
+        List<Map<String,Object>> pendingMaps = priceChangeRuleMapper.selRuleByVendorPriceType(params);
+        if(pendingMaps != null && pendingMaps.size() > 0) {
+            return resultMessage.errorStatus().putMsg("info","vendor existing pending rules.");
+        }
+
+        // select vendor no exists active rule
+        params.put("status",PriceChangeRuleEnum.Status.ACTIVE.getCode());
+        List<Map<String,Object>> activeMaps = priceChangeRuleMapper.selRuleByVendorPriceType(params);
+        if(activeMaps == null || activeMaps.size() == 0) {
+            return resultMessage.errorStatus().putMsg("info","vendor no active rules exist.");
+        }
+
+        // copy
+        Long new_price_change_rule_id = this.copyAllRuleByActivePending(activeMaps,params.get("vendor_id").toString(),"0",true,Long.parseLong(params.get("user_id").toString()), Integer.parseInt(params.get("price_type").toString()));
+        logger.info(" new_price_change_rule_id : {}",new_price_change_rule_id);
+        resultMessage.successStatus().putMsg("info","success");
+        return resultMessage;
+    }
+
+    private Long copyAllRuleByActivePending(List<Map<String,Object>> ruleByConditionsMaps,String vendor_id,String discount,boolean insert_season_group_flag,Long user_id,Integer priceType) throws Exception{
         Long price_change_rule_id_new = 0L;
         for(Map<String,Object> map : ruleByConditionsMaps){
             String price_change_rule_id = map.get("price_change_rule_id").toString();
@@ -367,7 +393,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             /** start copy price_change_rule */
             PriceChangeRule priceChangeRule = new PriceChangeRule();
             priceChangeRule.setName(name);
-            priceChangeRule.setPriceType(Byte.parseByte(PriceChangeRuleEnum.PriceType.IM_PRICE.getCode() + ""));
+            priceChangeRule.setPriceType(Byte.parseByte(priceType+ ""));
             priceChangeRule.setStatus(PriceChangeRuleEnum.Status.PENDING.getCode());
             priceChangeRule.setVendorId(Long.parseLong(vendor_id));
             priceChangeRule.setUserId(user_id);
