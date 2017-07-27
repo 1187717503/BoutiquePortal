@@ -366,7 +366,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         // select vendor exists pending rule
         params.put("status",PriceChangeRuleEnum.Status.PENDING.getCode());
         List<Map<String,Object>> pendingMaps = priceChangeRuleMapper.selRuleByVendorPriceType(params);
-        if(pendingMaps != null || pendingMaps.size() > 0) {
+        if(pendingMaps != null && pendingMaps.size() > 0) {
             return resultMessage.errorStatus().putMsg("info","vendor existing pending rules.");
         }
 
