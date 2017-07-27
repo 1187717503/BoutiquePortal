@@ -9,6 +9,7 @@ import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.vendor.IQueryVendorService;
 import com.intramirror.web.controller.BaseController;
+
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -100,7 +102,7 @@ public class CopyRuleController extends BaseController{
 
     @RequestMapping("/seasonVendor")
     @ResponseBody
-    public ResultMessage seasonVendor(@Param("price_change_rule_id")String price_change_rule_id,@Param("seasons")String seasons,@Param("vendor_id")String vendor_id,HttpServletRequest httpRequest){
+    public ResultMessage seasonVendor(@Param("price_change_rule_id")String price_change_rule_id,@Param("seasons")String seasons,@Param("vendor_id")String vendor_id,@Param("price_type")String price_type,HttpServletRequest httpRequest){
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
             if(StringUtils.isBlank(price_change_rule_id) || seasons == null || seasons.length() == 0) {
@@ -111,6 +113,8 @@ public class CopyRuleController extends BaseController{
             params.put("price_change_rule_id",price_change_rule_id);
             params.put("seasons",seasons);
             params.put("vendor_id",vendor_id);
+            params.put("price_type",price_type);
+            
 
             // select user_id
             Vendor vendor = iQueryVendorService.queryVendorByVendorId(params);

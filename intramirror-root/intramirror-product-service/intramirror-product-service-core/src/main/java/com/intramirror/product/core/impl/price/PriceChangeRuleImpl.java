@@ -334,8 +334,9 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             return resultMessage.errorStatus().putMsg("info"," Vendor already contains the rule !!!");
         }
         /** end checked 该vendor下是否存在该season_code */
-
-        Long price_change_rule_id_new = this.copyAllRuleByActivePending(ruleByConditionsMaps,vendor_id,"0",false,user_id, PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
+        
+        Integer price_type =Integer.parseInt(params.get("price_type").toString());
+        Long price_change_rule_id_new = this.copyAllRuleByActivePending(ruleByConditionsMaps,vendor_id,"0",false,user_id, price_type);
 
         // create price_season_group
         for(String season_code : season_codes) {
