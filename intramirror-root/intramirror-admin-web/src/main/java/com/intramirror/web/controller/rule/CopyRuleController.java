@@ -39,7 +39,7 @@ public class CopyRuleController extends BaseController{
 
     @RequestMapping("/activeVendor")
     @ResponseBody
-    public ResultMessage activeVendor(@Param("vendor_id")String vendor_id,@Param("discount")String discount,@Param("to_vendor_id")String to_vendor_id,HttpServletRequest httpRequest){
+    public ResultMessage activeVendor(@Param("discount")String discount,@Param("to_vendor_id")String to_vendor_id,HttpServletRequest httpRequest){
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
             if( !this.checkParams(to_vendor_id)) {
@@ -69,7 +69,7 @@ public class CopyRuleController extends BaseController{
 
     @RequestMapping("/pengingVendor")
     @ResponseBody
-    public ResultMessage pengingVendor(@Param("vendor_id")String vendor_id,@Param("discount")String discount,@Param("to_vendor_id")String to_vendor_id,HttpServletRequest httpRequest){
+    public ResultMessage pengingVendor(@Param("discount")String discount,@Param("to_vendor_id")String to_vendor_id,HttpServletRequest httpRequest){
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
             if(!this.checkParams(to_vendor_id)) {
