@@ -74,10 +74,13 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
 
                 if(flag) {
                     Map<String,Object> map = new HashMap<>();
-                    String englishName = brandMap.get("english_name") == null ? "default" : brandMap.get("english_name").toString();
+                    String englishName = brandMap.get("english_name") == null ? "" : brandMap.get("english_name").toString();
+                    if(brandId.equals("0")) {
+                        englishName = "default";
+                    }
                     map.put("english_name",englishName);
-                    map.put("brand_id",brandMap.get("brand_id"));
-                    map.put("price_change_rule_category_brand_id",brandMap.get("price_change_rule_category_brand_id"));
+                    map.put("brand_id",brandId);
+//                    map.put("price_change_rule_category_brand_id",brandMap.get("price_change_rule_category_brand_id"));
                     map.put(brandMap.get("category_id").toString(),brandMap.get("discount_percentage"));
                     handleMaps.add(map);
                 }
