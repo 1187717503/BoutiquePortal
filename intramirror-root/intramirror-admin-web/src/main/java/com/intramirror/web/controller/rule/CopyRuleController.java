@@ -6,6 +6,8 @@ import com.intramirror.common.help.StringUtils;
 import com.intramirror.product.api.model.PriceChangeRule;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
 import com.intramirror.user.api.model.User;
+import com.intramirror.user.api.model.Vendor;
+import com.intramirror.user.api.service.vendor.IQueryVendorService;
 import com.intramirror.web.controller.BaseController;
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
@@ -32,6 +34,9 @@ public class CopyRuleController extends BaseController{
     @Resource(name = "productPriceChangeRule")
     private IPriceChangeRule iPriceChangeRule;
 
+    @Resource(name = "userQueryVendorServiceImpl")
+    private IQueryVendorService iQueryVendorService;
+
     @RequestMapping("/activeVendor")
     @ResponseBody
     public ResultMessage activeVendor(@Param("vendor_id")String vendor_id,@Param("discount")String discount,@Param("to_vendor_id")String to_vendor_id,HttpServletRequest httpRequest){
@@ -41,17 +46,18 @@ public class CopyRuleController extends BaseController{
                 return resultMessage.errorStatus().putMsg("info","params is error !!!");
             }
 
-            User user = super.getUserInfo(httpRequest);
-            if(user == null) {
-                return resultMessage.errorStatus().putMsg("info","user is not login !!!");
-            }
-
             Map<String,Object> params = new HashMap<>();
             params.put("vendor_id",to_vendor_id);
             params.put("discount",discount);
-            params.put("user_id",user.getUserId());
             params.put("status", PriceChangeRuleEnum.Status.ACTIVE.getCode());
             params.put("to_vendor_id",to_vendor_id);
+
+            // select user_id
+            Vendor vendor = iQueryVendorService.queryVendorByVendorId(params);
+            if(vendor == null) {
+                return resultMessage.errorStatus().putMsg("info"," vendor is null !!!");
+            }
+            params.put("user_id",vendor.getUserId());
             return iPriceChangeRule.copyRuleByVendor(params);
         } catch (Exception e) {
             e.printStackTrace();
@@ -69,16 +75,20 @@ public class CopyRuleController extends BaseController{
             if(!this.checkParams(to_vendor_id)) {
                 return resultMessage.errorStatus().putMsg("info","params is error !!!");
             }
-            User user = super.getUserInfo(httpRequest);
-            if(user == null) {
-                return resultMessage.errorStatus().putMsg("info","user is not login !!!");
-            }
+
             Map<String,Object> params = new HashMap<>();
             params.put("vendor_id",to_vendor_id);
             params.put("discount",discount);
-            params.put("user_id",user.getUserId());
             params.put("to_vendor_id",to_vendor_id);
             params.put("status", PriceChangeRuleEnum.Status.PENDING.getCode());
+
+            // select user_id
+            Vendor vendor = iQueryVendorService.queryVendorByVendorId(params);
+            if(vendor == null) {
+                return resultMessage.errorStatus().putMsg("info"," vendor is null !!!");
+            }
+            params.put("user_id",vendor.getUserId());
+
             return iPriceChangeRule.copyRuleByVendor(params);
         } catch (Exception e) {
             e.printStackTrace();
@@ -96,16 +106,48 @@ public class CopyRuleController extends BaseController{
             if(StringUtils.isBlank(price_change_rule_id) || seasons == null || seasons.length() == 0) {
                 return resultMessage.errorStatus().putMsg("info","params is error !!!");
             }
-            User user = super.getUserInfo(httpRequest);
-            if(user == null) {
-                return resultMessage.errorStatus().putMsg("info","user is not login !!!");
-            }
+
             Map<String,Object> params = new HashMap<>();
             params.put("price_change_rule_id",price_change_rule_id);
             params.put("seasons",seasons);
-            params.put("user_id",user.getUserId());
             params.put("vendor_id",vendor_id);
+
+            // select user_id
+            Vendor vendor = iQueryVendorService.queryVendorByVendorId(params);
+            if(vendor == null) {
+                return resultMessage.errorStatus().putMsg("info"," vendor is null !!!");
+            }
+            params.put("user_id",vendor.getUserId());
+
             return iPriceChangeRule.copyRuleBySeason(params);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("error message : {}",e.getMessage());
+            resultMessage.errorStatus().putMsg("info","error message : " + e.getMessage());
+        }
+        return resultMessage;
+    }
+
+    @RequestMapping("/copyRule")
+    @ResponseBody
+    public ResultMessage copyRule(@Param("vendor_id")String vendor_id,@Param("price_type")String price_type){
+        ResultMessage resultMessage = ResultMessage.getInstance();
+        try {
+            if(StringUtils.isBlank(vendor_id) || StringUtils.isBlank(price_type)) {
+                return resultMessage.errorStatus().putMsg("info"," params is null !!!");
+            }
+            Map<String,Object> params = new HashMap<>();
+            params.put("vendor_id",vendor_id);
+            params.put("price_type",price_type);
+
+            // select user_id
+            Vendor vendor = iQueryVendorService.queryVendorByVendorId(params);
+            if(vendor == null) {
+                return resultMessage.errorStatus().putMsg("info"," vendor is null !!!");
+            }
+            params.put("user_id",vendor.getUserId());
+
+            iPriceChangeRule.copyRule(params);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("error message : {}",e.getMessage());

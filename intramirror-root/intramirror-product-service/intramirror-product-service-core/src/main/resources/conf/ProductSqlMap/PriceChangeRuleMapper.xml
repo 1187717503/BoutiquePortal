@@ -551,6 +551,12 @@
         and date_format(valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d')
     </select>
 
+    <select id="selRuleByVendorPriceType" resultType="java.util.Map" parameterType="java.util.Map">
+
+        select * from price_change_rule pcr where
+        pcr.price_type = #{price_type,jdbcType=BIGINT} and pcr.vendor_id = #{vendor_id,jdbcType=BIGINT} and pcr.`status` = #{status,jdbcType=BIGINT}
+    </select>
+
     <update id="updateRuleActive" parameterType="java.util.Map">
 
         update price_change_rule pcr set pcr.`status` = 2 where
