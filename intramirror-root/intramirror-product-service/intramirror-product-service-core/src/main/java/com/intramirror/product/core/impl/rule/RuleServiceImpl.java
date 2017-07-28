@@ -1,8 +1,12 @@
 package com.intramirror.product.core.impl.rule;
 
+import com.google.gson.Gson;
+import com.intramirror.common.help.StringUtils;
 import com.intramirror.product.api.service.rule.IRuleService;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.SeasonMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -14,6 +18,8 @@ import java.util.*;
 public class RuleServiceImpl extends BaseDao implements IRuleService {
 
     private SeasonMapper seasonMapper;
+
+    private static Logger logger = LoggerFactory.getLogger(RuleServiceImpl.class);
 
     @Override
     public void init() {
@@ -62,6 +68,11 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
         List<Map<String,Object>> newMaps = new ArrayList<>();
         if(brandMaps != null && brandMaps.size() > 0) {
             for(Map<String,Object> brandMap : brandMaps) {
+                String englishName = brandMap.get("english_name") == null ? "" : brandMap.get("english_name").toString();
+                if(StringUtils.isBlank(englishName)) {
+                    logger.info("englishName is null !!!{}",new Gson().toJson(brandMap));
+                    continue;
+                }
                 String brandId = brandMap.get("brand_id").toString();
                 boolean flag = true;
                 for(Map<String,Object> handleMap : handleMaps){
@@ -74,7 +85,6 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
 
                 if(flag) {
                     Map<String,Object> map = new HashMap<>();
-                    String englishName = brandMap.get("english_name") == null ? "" : brandMap.get("english_name").toString();
                     if(brandId.equals("0")) {
                         englishName = "Default";
                     }
