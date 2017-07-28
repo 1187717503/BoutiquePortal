@@ -211,15 +211,45 @@ public class PriceChangeRuleController extends BaseController{
 	        priceChangeRuleCategoryBrand.setCategoryId(priceChangeRuleCategory.get("category_id").getAsLong());
 	        priceChangeRuleCategoryBrand.setLevel(priceChangeRuleCategory.get("level").getAsByte());
 	        priceChangeRuleCategoryBrand.setBrandId(priceChangeRuleCategory.get("brand_id").getAsLong());
+	        priceChangeRuleCategoryBrand.setExceptionFlag(0);
 	        priceChangeRuleCategoryBrand.setDiscountPercentage(Long.valueOf("100") - priceChangeRuleCategory.get("discount_percentage").getAsLong());
 
-			int row = priceChangeRuleCategoryBrandService.updateDiscountPercentageBySelective(priceChangeRuleCategoryBrand);
+	        
+		    /** start checked 数据 */
+		    Map<String,Object> paramMaps = new HashMap<>();
+		    paramMaps.put("catgeory_id", priceChangeRuleCategory.get("category_id").getAsLong());
+		    paramMaps.put("level", priceChangeRuleCategory.get("level").getAsByte());
+		    paramMaps.put("brand_id", priceChangeRuleCategory.get("brand_id").getAsLong());
+		    paramMaps.put("exceptionFlag", 0);
+		    paramMaps.put("price_change_rule_id", priceChangeRuleCategory.get("price_change_rule_id").toString());
+			List<Map<String,Object>> brandCategoryMaps = priceChangeRuleCategoryBrandService.selectPriceChangeRuleCategoryBrandExists(paramMaps);
+			/** end checked 重复数据 */
 			
-	        if (row == 0) {
-//	            result.put("status", StatusType.PARAMETEREXIST);
-	            result.put("info","parameter is incorrect");
-	            return result;
-	        }
+			
+			//如果不存在则创建(主要针对老数据可能会有不存在的可能)
+			if(brandCategoryMaps == null || brandCategoryMaps.size() == 0) {
+				logger.info("Record does not exist ! start createPriceChangeRuleCategoryBrand ");
+				priceChangeRuleCategoryBrandService.createPriceChangeRuleCategoryBrand(priceChangeRuleCategoryBrand);
+				
+		        if (priceChangeRuleCategoryBrand.getPriceChangeRuleCategoryBrandId() == null) {
+		        	result.put("info","parameter is incorrect");
+		            return result;
+		        }
+			
+		    //修改
+			}else{
+				int row = priceChangeRuleCategoryBrandService.updateDiscountPercentageBySelective(priceChangeRuleCategoryBrand);
+				
+		        if (row == 0) {
+//		            result.put("status", StatusType.PARAMETEREXIST);
+		            result.put("info","parameter is incorrect");
+		            return result;
+		        }
+			}
+
+			
+			
+
 		    
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -144,7 +144,7 @@
     select pcrcb.price_change_rule_category_brand_id,pcrcb.brand_id,b.english_name,pcrcb.category_id,c.`name`,c.parent_id,pcrcb.discount_percentage from price_change_rule_category_brand pcrcb
         inner join category c on (c.category_id = pcrcb.category_id and c.enabled = 1)
         left join brand b on (b.brand_id = pcrcb.brand_id and b.enabled = 1)
-        where pcrcb.exception_flag = #{exception_flag,jdbcType=INTEGER} and pcrcb.price_change_rule_id = #{price_change_rule_id,jdbcType=INTEGER}
+        where pcrcb.exception_flag = #{exception_flag,jdbcType=INTEGER} and c.level = 2 and pcrcb.price_change_rule_id = #{price_change_rule_id,jdbcType=INTEGER}
         <if test="english_name != null and english_name != ''">
           <bind name="brandName" value="'%' + english_name + '%'" />
           and b.english_name like #{brandName}
