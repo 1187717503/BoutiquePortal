@@ -35,8 +35,8 @@ public class LoginFilter implements Filter{
     private String jwtSecret = "qazxswedcvfr543216yhnmju70plmjkiu89";
 	private static Logger logger = LoggerFactory.getLogger(LoginFilter.class);
 
-	@Resource(name = "commonsProperties")
-	private CommonsProperties commonsProperties;
+//	@Resource(name = "commonsProperties")
+//	private CommonsProperties commonsProperties;
 
 	@Override
 	public void destroy() {
@@ -71,7 +71,7 @@ public class LoginFilter implements Filter{
         //先请求OPTIONS，得到许可后就可以跨域访问POST请求
         }else if(request.getMethod().equals("OPTIONS") && !reqUrl.contains("/login")){  
              
-        }else if(commonsProperties.getFilterEnabled().equals("0")){
+//        }else if(commonsProperties.getFilterEnabled().equals("0")){
             // 跳过
         } else {
         	
