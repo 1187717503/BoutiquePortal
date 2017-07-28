@@ -76,7 +76,7 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
                     Map<String,Object> map = new HashMap<>();
                     String englishName = brandMap.get("english_name") == null ? "" : brandMap.get("english_name").toString();
                     if(brandId.equals("0")) {
-                        englishName = "default";
+                        englishName = "Default";
                     }
                     map.put("english_name",englishName);
                     map.put("brand_id",brandId);
@@ -89,7 +89,7 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
             if(handleMaps != null && handleMaps.size() > 0) {
                 for(Map<String,Object> brandMap : handleMaps) {
                     String brandName = brandMap.get("english_name") == null ? "" : brandMap.get("english_name").toString();
-                    if(brandName.equals("default")) {
+                    if(brandName.equals("Default")) {
                         newMaps.add(brandMap);
                         break;
                     }
@@ -97,7 +97,7 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
 
                 for(Map<String,Object> brandMap : handleMaps) {
                     String brandName = brandMap.get("english_name") == null ? "" : brandMap.get("english_name").toString();
-                    if(!brandName.equals("default")) {
+                    if(!brandName.equals("Default")) {
                         newMaps.add(brandMap);
                     }
                 }
