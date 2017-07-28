@@ -201,7 +201,7 @@
 
     select distinct season_code from price_change_rule pcr left join
     price_change_rule_season_group pcrsg on (pcr.price_change_rule_id = pcrsg.price_change_rule_id and pcrsg.enabled = 1)
-    where vendor_id = #{vendor_id,jdbcType=INTEGER} and pcr.`status` = 1 and pcrsg.season_code in
+    where vendor_id = #{vendor_id,jdbcType=INTEGER} and pcr.`status` = 1 and pcr.price_type = #{price_type,jdbcType=INTEGER} and pcrsg.season_code in
     <foreach item="item" index="index" collection="season_codes" open="(" separator="," close=")">
       #{item}
     </foreach>
