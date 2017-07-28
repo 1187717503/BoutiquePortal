@@ -280,14 +280,39 @@ public class PriceChangeRuleService {
 		        priceChangeRuleCategoryBrand.setLevel(Byte.valueOf("2"));
 		        priceChangeRuleCategoryBrand.setBrandId(priceChangeRuleCategoryListArray.get(i).getAsLong());
 		        priceChangeRuleCategoryBrand.setExceptionFlag (0);
-
+		        
 				int row = priceChangeRuleCategoryBrandService.deleteByParameter(priceChangeRuleCategoryBrand);
 				
-		        if (row == 0) {
-		        	result.put("info","parameter is incorrect");
-		        	logger.error("delete priceChangeRuleCategoryBrand fail parameter:"+ new Gson().toJson(priceChangeRuleCategoryBrand));
-		            throw new RuntimeException("error");
-		        }
+//		        if (row == 0) {
+//		        	result.put("info","parameter is incorrect");
+//		        	logger.error("delete priceChangeRuleCategoryBrand fail parameter:"+ new Gson().toJson(priceChangeRuleCategoryBrand));
+//		            throw new RuntimeException("error");
+//		        }
+		        
+		        
+//			    /** start checked 数据 */
+//			    Map<String,Object> paramMaps = new HashMap<>();
+//			    paramMaps.put("catgeory_id", priceChangeRuleCategoryBrand.getCategoryId());
+//			    paramMaps.put("level", priceChangeRuleCategoryBrand.getLevel());
+//			    paramMaps.put("brand_id", priceChangeRuleCategoryBrand.getBrandId());
+//			    paramMaps.put("exceptionFlag", 0);
+//			    paramMaps.put("price_change_rule_id", priceChangeRuleCategoryBrand.getPriceChangeRuleId());
+//				List<Map<String,Object>> brandCategoryMaps = priceChangeRuleCategoryBrandService.selectPriceChangeRuleCategoryBrandExists(paramMaps);
+//				/** end checked 数据 */
+//				
+//				
+//				//存在才删除
+//				if(brandCategoryMaps != null && brandCategoryMaps.size() > 0) {
+//					int row = priceChangeRuleCategoryBrandService.deleteByParameter(priceChangeRuleCategoryBrand);
+//					
+//			        if (row == 0) {
+//			        	result.put("info","parameter is incorrect");
+//			        	logger.error("delete priceChangeRuleCategoryBrand fail parameter:"+ new Gson().toJson(priceChangeRuleCategoryBrand));
+//			            throw new RuntimeException("error");
+//			        }
+//				}
+
+
 	    	}
 
 	     }

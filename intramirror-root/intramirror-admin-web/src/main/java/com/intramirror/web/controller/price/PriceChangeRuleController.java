@@ -223,7 +223,7 @@ public class PriceChangeRuleController extends BaseController{
 		    paramMaps.put("exceptionFlag", 0);
 		    paramMaps.put("price_change_rule_id", priceChangeRuleCategory.get("price_change_rule_id").toString());
 			List<Map<String,Object>> brandCategoryMaps = priceChangeRuleCategoryBrandService.selectPriceChangeRuleCategoryBrandExists(paramMaps);
-			/** end checked 重复数据 */
+			/** end checked 数据 */
 			
 			
 			//如果不存在则创建(主要针对老数据可能会有不存在的可能)
