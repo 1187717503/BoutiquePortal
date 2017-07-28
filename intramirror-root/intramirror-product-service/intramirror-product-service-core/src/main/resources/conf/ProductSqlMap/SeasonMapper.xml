@@ -229,8 +229,8 @@
     end,
     exception_flag from price_change_rule_category_brand pcrcb
     where pcrcb.price_change_rule_id = #{price_change_rule_id,jdbcType=INTEGER}
-    and exists (select brand_id from brand b where b.brand_id = pcrcb.brand_id and b.enabled = 1)
-    and exists (select category_id from category c where c.category_id = pcrcb.category_id and c.enabled = 1)
+    and exists (select brand_id from brand b where (b.brand_id = pcrcb.brand_id and b.enabled = 1) or pcrcb.brand_id = 0)
+    and exists (select category_id from category c where (c.category_id = pcrcb.category_id and c.enabled = 1) or pcrcb.brand_id = 0)
   </insert>
 
   <insert id="copyPriceChangeRuleGroup" parameterType="java.util.Map">
