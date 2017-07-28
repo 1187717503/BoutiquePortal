@@ -69,11 +69,11 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
         if(brandMaps != null && brandMaps.size() > 0) {
             for(Map<String,Object> brandMap : brandMaps) {
                 String englishName = brandMap.get("english_name") == null ? "" : brandMap.get("english_name").toString();
-                if(StringUtils.isBlank(englishName)) {
+                String brandId = brandMap.get("brand_id").toString();
+                if(StringUtils.isBlank(englishName) && !brandId.equals("0")) {
                     logger.info("englishName is null !!!{}",new Gson().toJson(brandMap));
                     continue;
                 }
-                String brandId = brandMap.get("brand_id").toString();
                 boolean flag = true;
                 for(Map<String,Object> handleMap : handleMaps){
                     String eName = handleMap.get("brand_id") == null ? "" : handleMap.get("brand_id").toString();
