@@ -80,9 +80,9 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
 
         this.updateDefaultPrice(PriceChangeRuleEnum.PriceType.SUPPLY_PRICE,paramsMap);
 
-        this.updateAdminPrice();
+        /*this.updateAdminPrice();
         
-        this.updateShopPrice();
+        this.updateShopPrice();*/
         return true;
     }
 
@@ -266,9 +266,13 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         List<Map<String,Object>> selNowRuleMaps = priceChangeRuleMapper.selNowRule(params);
         if(selNowRuleMaps != null && selNowRuleMaps.size() > 0) {
             for(Map<String,Object> map : selNowRuleMaps){
-                params.put("price_change_rule_id",map.get("price_change_rule_id"));
+//                params.put("price_change_rule_id",map.get("price_change_rule_id"));
                 params.put("vendor_id",map.get("vendor_id"));
                 priceChangeRuleMapper.updateRuleInActive(params);
+            }
+
+            for(Map<String,Object> map : selNowRuleMaps){
+                params.put("price_change_rule_id",map.get("price_change_rule_id"));
                 priceChangeRuleMapper.updateRuleActive(params);
             }
         }
