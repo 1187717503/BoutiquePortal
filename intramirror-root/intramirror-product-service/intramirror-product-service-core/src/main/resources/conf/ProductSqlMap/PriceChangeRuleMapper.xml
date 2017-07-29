@@ -578,10 +578,11 @@
         and pcr.`status` = 2
         and pcr.vendor_id = #{vendor_id,jdbcType=BIGINT}
         and pcr.price_change_rule_id = pcrsg.price_change_rule_id
-        and pcrsg.season_code in (
-            select season_code from price_change_rule_season_group where price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
-        )
     </update>
+<!--
+    and pcrsg.season_code in (
+    select season_code from price_change_rule_season_group where price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
+    )-->
 
     <update id="updateDefaultPriceByVendor" parameterType="java.util.Map">
 
