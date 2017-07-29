@@ -341,6 +341,14 @@
     and date_format(pcr.valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d');
     </select>
 
+    <select id="selectActiveSeasonGroupRule" resultType="java.util.Map" parameterType="java.util.Map">
+
+        select pcr.price_change_rule_id,pcrsg.season_code,pcr.vendor_id,pcr.shop_id,pcr.user_id from price_change_rule pcr
+        inner join price_change_rule_season_group pcrsg on (pcrsg.price_change_rule_id = pcr.price_change_rule_id and pcrsg.enabled = 1)
+        where pcr.price_type = #{price_type,jdbcType=BIGINT}
+        and pcr.`status` = 2
+    </select>
+
     <select id="selectSecondCategoryRule" resultType="java.util.Map" parameterType="java.util.Map">
 
         select pcrcb.discount_percentage,pcr.vendor_id,pcr.shop_id,pcrcb.category_id,pcrcb.`level`,pcr.price_change_rule_id,pcrcb.brand_id from price_change_rule pcr
@@ -578,11 +586,35 @@
     <update id="updateDefaultPriceByVendor" parameterType="java.util.Map">
 
         update sku set sku.in_price = sku.price * #{default_discount_percentage,jdbcType=BIGINT}/((1+0.22)*100)
+        where not exists(
+            select p.product_id from product p where sku.product_id = p.product_id
+            and p.enabled = 1
+            and p.vendor_id in
+            <foreach item="item" index="index" collection="vendor_ids" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            and p.season_code in
+            <foreach item="item" index="index" collection="season_codes" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        )   and sku.enabled = 1
     </update>
 
     <update id="updateDefaultPriceByAdmin" parameterType="java.util.Map">
 
         update sku set sku.im_price = sku.price * #{default_discount_percentage,jdbcType=BIGINT}/100
+        where not exists(
+        select p.product_id from product p where sku.product_id = p.product_id
+        and p.enabled = 1
+        and p.vendor_id in
+        <foreach item="item" index="index" collection="vendor_ids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and p.season_code in
+        <foreach item="item" index="index" collection="season_codes" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        )   and sku.enabled = 1
     </update>
 
     <update id="updateSkuPriceByImPrice" >

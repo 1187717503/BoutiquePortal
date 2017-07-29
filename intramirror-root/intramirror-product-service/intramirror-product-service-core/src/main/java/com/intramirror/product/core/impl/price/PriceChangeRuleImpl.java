@@ -49,54 +49,75 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         List<Map<String,Object>> selSeasonGroupRuleMaps = priceChangeRuleMapper.selectSeasonGroupRule(paramsMap);
         logger.info("vendor selSeasonGroupRuleMaps : {}",selSeasonGroupRuleMaps.size());
         
-        //只有存在需要执行的pending状态的规则，才去修改价格 
-        if(selSeasonGroupRuleMaps != null && selSeasonGroupRuleMaps.size() >0) {
-        		
-	        // update default discount 
-	        int default_discount = this.getDeafultDisscount(PriceChangeRuleEnum.PriceType.SUPPLY_PRICE);
-	        if(default_discount > 0) {
-	            paramsMap.put("default_discount_percentage",default_discount);
-	            int i = priceChangeRuleMapper.updateDefaultPriceByVendor(paramsMap);
-	            logger.info("update vendor price by default discount : {}",i );
-	        }
-	
-	
-	
-	        List<Map<String,Object>> selSecondCategoryRuleMaps = priceChangeRuleMapper.selectSecondCategoryRule(paramsMap);
-	        logger.info("vendor selSecondCategoryRuleMaps : {}",selSecondCategoryRuleMaps.size());
-	
-	        List<Map<String,Object>> selAllCategoryRuleMaps = priceChangeRuleMapper.selectAllCategoryRule(paramsMap);
-	        selAllCategoryRuleMaps = this.sortListByLevel(selAllCategoryRuleMaps);
-	        logger.info("vendor selAllCategoryRuleMaps : {}",selAllCategoryRuleMaps.size());
-	
-	        List<Map<String,Object>> selProductGroupRuleMaps = priceChangeRuleMapper.selectProductGroupRule(paramsMap);
-	        logger.info("vendor selProductGroupRuleMaps : {}",selProductGroupRuleMaps.size());
-	
-	        List<Map<String,Object>> selProductRuleMaps = priceChangeRuleMapper.selectProductRule(paramsMap);
-	        logger.info("vendor selProductRuleMaps : {}",selProductRuleMaps.size());
-	
-	        paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selSecondCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
-	        this.updatePriceByVendor(paramsList,paramsMap);
-	        logger.info("updatePriceByVendor selSecondCategoryRuleMaps end !");
-	        paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selAllCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
-	        this.updatePriceByVendor(paramsList,paramsMap);
-	        logger.info("updatePriceByVendor selAllCategoryRuleMaps end !");
-	        paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selProductGroupRuleMaps,Contants.num_three,selSeasonGroupRuleMaps);
-	        this.updatePriceByVendor(paramsList,paramsMap);
-	        logger.info("updatePriceByVendor selProductGroupRuleMaps end !");
-	        paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selProductRuleMaps,Contants.num_four,selSeasonGroupRuleMaps);
-	        this.updatePriceByVendor(paramsList,paramsMap);
-	        logger.info("updatePriceByVendor selProductRuleMaps end !");
-	
-	        this.updateRuleStatus(paramsMap);
-	        logger.info("updatePriceByVendor updateRuleStatus end !");
+        List<Map<String,Object>> selSecondCategoryRuleMaps = priceChangeRuleMapper.selectSecondCategoryRule(paramsMap);
+        logger.info("vendor selSecondCategoryRuleMaps : {}",selSecondCategoryRuleMaps.size());
 
-        }
-        	
+        List<Map<String,Object>> selAllCategoryRuleMaps = priceChangeRuleMapper.selectAllCategoryRule(paramsMap);
+        selAllCategoryRuleMaps = this.sortListByLevel(selAllCategoryRuleMaps);
+        logger.info("vendor selAllCategoryRuleMaps : {}",selAllCategoryRuleMaps.size());
+
+        List<Map<String,Object>> selProductGroupRuleMaps = priceChangeRuleMapper.selectProductGroupRule(paramsMap);
+        logger.info("vendor selProductGroupRuleMaps : {}",selProductGroupRuleMaps.size());
+
+        List<Map<String,Object>> selProductRuleMaps = priceChangeRuleMapper.selectProductRule(paramsMap);
+        logger.info("vendor selProductRuleMaps : {}",selProductRuleMaps.size());
+
+        paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selSecondCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
+        this.updatePriceByVendor(paramsList,paramsMap);
+        logger.info("updatePriceByVendor selSecondCategoryRuleMaps end !");
+        paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selAllCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
+        this.updatePriceByVendor(paramsList,paramsMap);
+        logger.info("updatePriceByVendor selAllCategoryRuleMaps end !");
+        paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selProductGroupRuleMaps,Contants.num_three,selSeasonGroupRuleMaps);
+        this.updatePriceByVendor(paramsList,paramsMap);
+        logger.info("updatePriceByVendor selProductGroupRuleMaps end !");
+        paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selProductRuleMaps,Contants.num_four,selSeasonGroupRuleMaps);
+        this.updatePriceByVendor(paramsList,paramsMap);
+        logger.info("updatePriceByVendor selProductRuleMaps end !");
+	
+        this.updateRuleStatus(paramsMap);
+        logger.info("updatePriceByVendor updateRuleStatus end !");
+
+        this.updateDefaultPrice(PriceChangeRuleEnum.PriceType.SUPPLY_PRICE,paramsMap);
+
         this.updateAdminPrice();
         
         this.updateShopPrice();
         return true;
+    }
+
+    private void updateDefaultPrice(PriceChangeRuleEnum.PriceType priceType,Map<String,Object> paramsMap){
+        // update default discount
+        int default_discount = this.getDeafultDisscount(priceType);
+        if(default_discount > 0) {
+            paramsMap.put("default_discount_percentage",default_discount);
+
+            List<String> vendor_ids = new ArrayList<>();
+            List<String> season_codes = new ArrayList<>();
+            List<Map<String,Object>> activeSeasonList = priceChangeRuleMapper.selectActiveSeasonGroupRule(paramsMap);
+            if(activeSeasonList != null && activeSeasonList.size() > 0) {
+                for(Map<String,Object> map : activeSeasonList) {
+                    vendor_ids.add(map.get("vendor_id").toString());
+                    season_codes.add(map.get("season_code").toString());
+                }
+            }
+
+            paramsMap.put("vendor_ids",vendor_ids);
+            paramsMap.put("season_codes",season_codes);
+
+            if(vendor_ids == null || vendor_ids.size() ==0 ){vendor_ids.add("-1");}
+            if(season_codes == null || season_codes.size() ==0 ){season_codes.add("-1");}
+
+            logger.info(" update default price params : {}",new Gson().toJson(paramsMap));
+
+            if(priceType.getCode().intValue() == PriceChangeRuleEnum.PriceType.SUPPLY_PRICE.getCode().intValue()) {
+                int i = priceChangeRuleMapper.updateDefaultPriceByVendor(paramsMap);
+                logger.info("update vendor price by default discount : {}",i );
+            } else if(priceType.getCode().intValue() == PriceChangeRuleEnum.PriceType.IM_PRICE.getCode().intValue()) {
+                int i = priceChangeRuleMapper.updateDefaultPriceByAdmin(paramsMap);
+                logger.info("update admin price by default discount : {}",i );
+            }
+        }
     }
 
     private int updatePriceByVendor(List<Map<String,Object>> paramsList,Map<String,Object> paramsMap){
@@ -168,47 +189,36 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         List<Map<String,Object>> selSeasonGroupRuleMaps = priceChangeRuleMapper.selectSeasonGroupRule(paramsMap);
         logger.info("admin selSeasonGroupRuleMaps : {}",selSeasonGroupRuleMaps.size());
         
-        //只有存在需要执行的pending状态的规则，才去修改价格 
-        if(selSeasonGroupRuleMaps != null && selSeasonGroupRuleMaps.size() >0) {
-        	
-	        int default_discount = this.getDeafultDisscount(PriceChangeRuleEnum.PriceType.IM_PRICE);
-	        if(default_discount > 0) {
-	            paramsMap.put("default_discount_percentage",default_discount);
-	            priceChangeRuleMapper.updateDefaultPriceByAdmin(paramsMap);
-	        }
-	
-	
-	
-	        List<Map<String,Object>> selSecondCategoryRuleMaps = priceChangeRuleMapper.selectSecondCategoryRule(paramsMap);
-	        logger.info("admin selSecondCategoryRuleMaps : {}",selSecondCategoryRuleMaps.size());
-	
-	        List<Map<String,Object>> selAllCategoryRuleMaps = priceChangeRuleMapper.selectAllCategoryRule(paramsMap);
-	        selAllCategoryRuleMaps = this.sortListByLevel(selAllCategoryRuleMaps);
-	        logger.info("admin selAllCategoryRuleMaps : {}",selAllCategoryRuleMaps.size());
-	
-	        List<Map<String,Object>> selProductGroupRuleMaps = priceChangeRuleMapper.selectProductGroupRule(paramsMap);
-	        logger.info("admin selProductGroupRuleMaps : {}",selProductGroupRuleMaps.size());
-	
-	        List<Map<String,Object>> selProductRuleMaps = priceChangeRuleMapper.selectProductRule(paramsMap);
-	        logger.info("admin selProductRuleMaps : {}",selProductRuleMaps.size());
-	
-	        paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selSecondCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
-	        this.updatePriceByAdmin(paramsList,paramsMap);
-	        logger.info("updatePriceByAdmin selSecondCategoryRuleMaps end !");
-	        paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selAllCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
-	        this.updatePriceByAdmin(paramsList,paramsMap);
-	        logger.info("updatePriceByAdmin selAllCategoryRuleMaps end !");
-	        paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selProductGroupRuleMaps,Contants.num_three,selSeasonGroupRuleMaps);
-	        this.updatePriceByAdmin(paramsList,paramsMap);
-	        logger.info("updatePriceByAdmin selProductGroupRuleMaps end !");
-	        paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selProductRuleMaps,Contants.num_four,selSeasonGroupRuleMaps);
-	        this.updatePriceByAdmin(paramsList,paramsMap);
-	        logger.info("updatePriceByAdmin selProductRuleMaps end !");
-	
-	        this.updateRuleStatus(paramsMap);
-	        logger.info("updatePriceByAdmin updateRuleStatus end !");
-        
-        }
+        List<Map<String,Object>> selSecondCategoryRuleMaps = priceChangeRuleMapper.selectSecondCategoryRule(paramsMap);
+        logger.info("admin selSecondCategoryRuleMaps : {}",selSecondCategoryRuleMaps.size());
+
+        List<Map<String,Object>> selAllCategoryRuleMaps = priceChangeRuleMapper.selectAllCategoryRule(paramsMap);
+        selAllCategoryRuleMaps = this.sortListByLevel(selAllCategoryRuleMaps);
+        logger.info("admin selAllCategoryRuleMaps : {}",selAllCategoryRuleMaps.size());
+
+        List<Map<String,Object>> selProductGroupRuleMaps = priceChangeRuleMapper.selectProductGroupRule(paramsMap);
+        logger.info("admin selProductGroupRuleMaps : {}",selProductGroupRuleMaps.size());
+
+        List<Map<String,Object>> selProductRuleMaps = priceChangeRuleMapper.selectProductRule(paramsMap);
+        logger.info("admin selProductRuleMaps : {}",selProductRuleMaps.size());
+
+        paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selSecondCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
+        this.updatePriceByAdmin(paramsList,paramsMap);
+        logger.info("updatePriceByAdmin selSecondCategoryRuleMaps end !");
+        paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selAllCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
+        this.updatePriceByAdmin(paramsList,paramsMap);
+        logger.info("updatePriceByAdmin selAllCategoryRuleMaps end !");
+        paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selProductGroupRuleMaps,Contants.num_three,selSeasonGroupRuleMaps);
+        this.updatePriceByAdmin(paramsList,paramsMap);
+        logger.info("updatePriceByAdmin selProductGroupRuleMaps end !");
+        paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selProductRuleMaps,Contants.num_four,selSeasonGroupRuleMaps);
+        this.updatePriceByAdmin(paramsList,paramsMap);
+        logger.info("updatePriceByAdmin selProductRuleMaps end !");
+
+        this.updateRuleStatus(paramsMap);
+        logger.info("updatePriceByAdmin updateRuleStatus end !");
+
+        this.updateDefaultPrice(PriceChangeRuleEnum.PriceType.IM_PRICE,paramsMap);
         return true;
     }
 
