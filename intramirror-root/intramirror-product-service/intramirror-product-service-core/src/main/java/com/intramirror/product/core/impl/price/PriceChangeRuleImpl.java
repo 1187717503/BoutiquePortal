@@ -476,5 +476,10 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     	map.put("vendorId", vendorId);
         return priceChangeRuleMapper.selectByName(map);
     }
+    
+    @Override
+	public List<Map<String,Object>> selRuleByVendorPriceType(Map<String,Object> params){
+    	return priceChangeRuleMapper.selRuleByVendorPriceType(params);
+    };
 
 }

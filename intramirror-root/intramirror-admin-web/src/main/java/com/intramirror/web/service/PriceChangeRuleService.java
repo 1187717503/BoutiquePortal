@@ -1,5 +1,6 @@
 package com.intramirror.web.service;
 
+import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -21,6 +22,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.intramirror.common.Helper;
+import com.intramirror.common.enums.PriceChangeRuleEnum;
 import com.intramirror.common.enums.SystemPropertyEnum;
 import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.common.parameter.StatusType;
@@ -456,6 +458,53 @@ public class PriceChangeRuleService {
 
 	    result.put("status", StatusType.SUCCESS);
 	    return result;
+	}
+	
+	
+	
+	/**
+	 * 修改PriceChangeRul 修改有效日期
+	 * @param map
+	 * @return
+	 * @throws Exception
+	 */ 
+	@Transactional  
+	public Map<String, Object> updatePriceChangeRuleDate(Map<String, Object> map) throws Exception{
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("status", StatusType.FAILURE);
+		
+		//根据参数获取所有的price_change_rule列表
+	    Map<String,Object> params = new HashMap<String, Object>();
+	    params.put("price_type", map.get("price_type").toString());
+	    params.put("vendor_id", map.get("vendorId").toString());
+	    params.put("status", PriceChangeRuleEnum.Status.PENDING.getCode());
+	    List<Map<String,Object>> list = priceChangeRuleService.selRuleByVendorPriceType(params);
+	    
+	    //循环修改列表的有效期
+	    if(list != null && list.size() > 0){
+	    	for(Map<String,Object> info : list){
+	    		
+	    		//根据price_change_rule_id  修改有效期
+	    		PriceChangeRule priceChangeRuleInfo = new PriceChangeRule();
+	    		priceChangeRuleInfo.setPriceChangeRuleId(Long.valueOf(info.get("price_change_rule_id").toString()));
+	    	    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+	    	    priceChangeRuleInfo.setValidFrom(simpleDateFormat.parse(map.get("valid_from").toString()));
+	    	    
+	    	    logger.info(MessageFormat.format("updatePriceChangeRuleDate price_change_rule_id:{0},valid_from:{1}",priceChangeRuleInfo.getPriceChangeRuleId(),priceChangeRuleInfo.getValidFromStr()));
+	    	    int row = priceChangeRuleService.updateByPrimaryKeySelective(priceChangeRuleInfo);
+	    	    
+	    	    //修改有效期
+	            if (row  <= 0) {
+	            	result.put("info","parameter is incorrect");
+	            	logger.error("update PriceChangeRule fail parameter:"+ new Gson().toJson(priceChangeRuleInfo));
+	            	return result;
+	            }
+	    	}
+	    }
+
+
+        result.put("status", StatusType.SUCCESS);
+		return result;
 	}
 	
 	

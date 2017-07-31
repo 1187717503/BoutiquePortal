@@ -49,5 +49,7 @@ public interface IPriceChangeRule {
     ResultMessage copyRule(Map<String,Object> params) throws Exception;
     
     List<PriceChangeRule> selectByName(String name,Long vendorId);
+    
+    List<Map<String,Object>> selRuleByVendorPriceType(Map<String,Object> params);
 
 }

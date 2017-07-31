@@ -757,19 +757,7 @@ public class PriceChangeRuleController extends BaseController{
 		result.put("status", StatusType.FAILURE);
 		
 		try{
-			//根据price_change_rule_id  修改有效期
-			PriceChangeRule priceChangeRuleInfo = new PriceChangeRule();
-			priceChangeRuleInfo.setPriceChangeRuleId(Long.valueOf(map.get("price_change_rule_id").toString()));
-		    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		    priceChangeRuleInfo.setValidFrom(simpleDateFormat.parse(map.get("valid_from").toString()));
-		    int row = priceChangeRule.updateByPrimaryKeySelective(priceChangeRuleInfo);
-		    
-		    //修改有效期
-	        if (row  <= 0) {
-	        	result.put("info","parameter is incorrect");
-	        	logger.error("update PriceChangeRule fail parameter:"+ new Gson().toJson(priceChangeRuleInfo));
-	        	return result;
-	        }
+			result = priceChangeRuleService.updatePriceChangeRuleDate(map);
 	        
 		} catch (Exception e) {
 			e.printStackTrace();
