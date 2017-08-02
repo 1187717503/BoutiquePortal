@@ -1,11 +1,11 @@
 package com.intramirror.product.api.vo.product;
 
-import com.intramirror.common.help.StringUtils;
-import com.intramirror.product.core.vo.sku.SkuOptions;
-import com.intramirror.product.core.vo.vendor.VendorOptions;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.intramirror.common.help.StringUtils;
+import com.intramirror.product.api.vo.sku.SkuOptions;
+import com.intramirror.product.api.vo.vendor.VendorOptions;
 
 /**
  * Created by dingyifan on 2017/8/2.
