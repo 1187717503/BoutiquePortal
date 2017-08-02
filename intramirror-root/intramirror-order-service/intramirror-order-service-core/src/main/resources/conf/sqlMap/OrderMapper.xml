@@ -32,19 +32,26 @@
   <select id="getOrderListByOrderNumber" resultType="java.util.HashMap"  parameterType="java.util.Map">
   
   			<!-- SELECT  o.order_num,o.order_id,p.name,pp.colorCode,pp.brandID,pspv.`value` as size,p.category_id, -->
-  			SELECT  o.order_num,o.order_id,p.name,pspv.`value` as size,p.category_id,
-			s.price,s.in_price,sps.sale_price,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,
-			lp.`status`,v.vendor_name,p.cover_img,p.product_id,lp.logistics_product_id FROM logistics_product lp 
-			INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id 
-			INNER JOIN `order` o ON ol.order_id = o.order_id 
-			LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id 
-			INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id 
-			INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id 
-			INNER JOIN product p ON sp.product_id = p.product_id 
-			LEFT JOIN sku s ON s.sku_id = sps.sku_id 
-			LEFT JOIN product_sku_property_key pspk ON pspk.product_id = p.product_id 
-			LEFT JOIN product_sku_property_value pspv ON pspv.product_sku_property_key_id = pspk.product_sku_property_key_id 
-			LEFT JOIN vendor v ON lp.vendor_id = v.vendor_id 
+			SELECT  o.order_num,o.order_id,p.name,pp.colorCode,pp.brandID,pspv.`value` as size,p.category_id,
+			s.price,s.in_price,sps.sale_price,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
+			v.vendor_name,p.cover_img,lp.logistics_product_id  
+			FROM logistics_product lp  INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id  
+			INNER JOIN `order` o ON ol.order_id = o.order_id   
+			LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id   
+			INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id  
+			INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id   
+			INNER JOIN product p ON (sp.product_id = p.product_id )  
+			INNER JOIN sku s ON (s.sku_id = sps.sku_id and s.enabled = 1)  
+			INNER JOIN sku_property skup on (skup.sku_id = s.sku_id and skup.enabled = 1)  
+			INNER JOIN product_sku_property_key pspk ON (
+				pspk.product_id = p.product_id 
+				and pspk.product_sku_property_key_id = skup.product_sku_property_key_id 
+				and pspk.enabled = 1
+			) INNER JOIN product_sku_property_value pspv ON (
+				pspv.product_sku_property_key_id = skup.product_sku_property_key_id 
+				and pspv.product_sku_property_value_id = skup.product_sku_property_value_id 
+				and pspv.enabled = 1
+			) INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
 			<!--  LEFT JOIN (
 			SELECT t_pp.product_id,
 			max(case t_pp.key_name when 'ColorCode' then t_pp.`value` else '' end) as colorCode,
