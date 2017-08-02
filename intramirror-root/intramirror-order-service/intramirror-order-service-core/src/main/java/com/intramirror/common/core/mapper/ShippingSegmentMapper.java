@@ -1,6 +1,7 @@
 package com.intramirror.common.core.mapper;
 
-import com.intramirror.common.api.model.ShippingSegment;
+import com.intramirror.order.api.model.ShippingSegment;
+
 
 public interface ShippingSegmentMapper {
     /**

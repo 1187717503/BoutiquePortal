@@ -1,6 +1,7 @@
 package com.intramirror.common.core.mapper;
 
-import com.intramirror.common.api.model.Invoice;
+import com.intramirror.order.api.model.Invoice;
+
 
 public interface InvoiceMapper {
     /**
