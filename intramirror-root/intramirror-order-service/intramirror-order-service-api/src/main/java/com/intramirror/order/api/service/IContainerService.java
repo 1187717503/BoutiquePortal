@@ -3,6 +3,8 @@
  */
 package com.intramirror.order.api.service;
 
+import java.util.Map;
+
 import com.intramirror.order.api.model.Container;
 
 /**
@@ -16,20 +18,20 @@ public interface IContainerService {
 	 * @param container
 	 * @return Container
 	 */
-	int saveContainerByShipment(Container container);
+	int saveContainerByShipment(Map<String, Object> map);
 	
 	/**
 	 * 查询箱子
 	 * @param barcode
 	 * @return Container
 	 */
-	Container getContainerByBarcode(String barcode);
+	Container getContainerBybarcode(Map<String, Object> map);
 	
 	/**
 	 * 修改箱子
 	 * @param container
 	 * @return int
 	 */
-	int updateContainerByBarcode(Container container);
+	int updateContainerBybarcode(Map<String, Object> map);
 	
 }

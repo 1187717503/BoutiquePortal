@@ -3,6 +3,8 @@
  */
 package com.intramirror.order.core.mapper;
 
+import java.util.Map;
+
 import com.intramirror.order.api.model.Container;
 
 /**
@@ -23,12 +25,12 @@ public interface ContainerMapper {
 	 * @param barcode
 	 * @return Container
 	 */
-	Container getContainerByBarcode(String barcode);
+	Container getContainerBybarcode(Map<String, Object> map);
 	
 	/**
 	 * 修改箱子
 	 * @param container
 	 * @return int
 	 */
-	int updateContainerByBarcode(Container container);
+	int updateContainerBybarcode(Map<String, Object> map);
 }

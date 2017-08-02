@@ -98,7 +98,7 @@
   </insert>
   
   
-	<update id="updateContainerByBarcode" parameterType="com.intramirror.order.api.model.ProductWithBLOBs" >
+	<update id="updateContainerByBarcode" parameterType="com.intramirror.order.api.model.Container" >
 		UPDATE container
 		<set>
 			<if test="length != null" >
@@ -111,9 +111,11 @@
 			  #{height,jdbcType=BIGINT},
 			</if>
 		</set>
+		WHERE barcode = #{barcode,jdbcType=VARCHAR}
   	</update>
   
-  <select id="getContainerByBarcode" resultType="java.util.HashMap"  parameterType="java.util.Map">
-  		
+  <select id="getContainerByBarcode" resultMap="BaseResultMap"  parameterType="java.util.Map">
+  		select * from container
+		where barcode =  #{barcode,jdbcType=VARCHAR} and status = #{status,jdbcType=INTEGER}
   </select>
 </mapper>
