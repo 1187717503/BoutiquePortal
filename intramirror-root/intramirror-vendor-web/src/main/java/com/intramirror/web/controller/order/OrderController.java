@@ -265,6 +265,7 @@ public class OrderController {
 //				orderInfo.put("orderLineList", orderLineList);
 //			}
 //		}
+		result.successStatus();
 		result.setData(orderList);
 		return result;
 	}
