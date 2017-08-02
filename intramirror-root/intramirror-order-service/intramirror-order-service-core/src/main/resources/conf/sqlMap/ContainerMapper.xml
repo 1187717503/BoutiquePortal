@@ -18,100 +18,24 @@
   	</resultMap>
 	
 	<insert id="saveContainerByShipment" parameterType="com.intramirror.order.api.model.Container">
-    insert into shipment
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="containerId != null" >
-        container_id,
-      </if>
-      <if test="containerType != null" >
-        container_type,
-      </if>
-      <if test="shipToGeography != null" >
-        ship_to_geography,
-      </if>
-      <if test="status != null" >
-        status,
-      </if>
-      <if test="height != null" >
-        height,
-      </if>
-      <if test="width != null" >
-        width,
-      </if>
-      <if test="length != null" >
-        length,
-      </if>
-      <if test="weight != null" >
-        weight,
-      </if>
-      <if test="barcode != null" >
-        barcode,
-      </if>
-      <if test="createdAt != null" >
-        created_at,
-      </if>
-      <if test="updatedAt != null" >
-        updated_at,
-      </if>
-      <if test="shipmentId != null" >
-        shipment_id,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="containerId != null" >
-         #{containerId,jdbcType=BIGINT},
-      </if>
-      <if test="containerType != null" >
-        #{containerType,jdbcType=VARCHAR},
-      </if>
-      <if test="shipToGeography != null" >
-        #{shipToGeography,jdbcType=VARCHAR},
-      </if>
-      <if test="status != null" >
-        #{status,jdbcType=INTEGER},
-      </if>
-      <if test="height != null" >
-        #{height,jdbcType=BIGINT},
-      </if>
-      <if test="width != null" >
-        #{width,jdbcType=BIGINT},
-      </if>
-      <if test="length != null" >
-        #{length,jdbcType=BIGINT},
-      </if>
-      <if test="weight != null" >
-        #{weight,jdbcType=DECIMAL},
-      </if>
-      <if test="barcode != null" >
-        #{barcode,jdbcType=VARCHAR},
-      </if>
-      <if test="createdAt != null" >
-        #{createdAt,jdbcType=TIMESTAMP},
-      </if>
-       <if test="updatedAt != null" >
-        #{updatedAt,jdbcType=TIMESTAMP},
-      </if>
-      <if test="shipmentId != null" >
-        #{shipmentId,jdbcType=BIGINT},
-      </if>
-    </trim>
-  </insert>
+   insert into container(container_type,ship_to_geography,status,height,width,length,weight,barcode,created_at,updated_at,shipment_id)
+values(#{containerType,jdbcType=VARCHAR}, #{shipToGeography,jdbcType=VARCHAR},#{status,jdbcType=INTEGER}, #{height,jdbcType=BIGINT},#{width,jdbcType=BIGINT}, #{length,jdbcType=BIGINT}, #{weight,jdbcType=DECIMAL},#{barcode,jdbcType=VARCHAR},#{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP},#{shipmentId,jdbcType=BIGINT})
+  	</insert>
   
   
-	<update id="updateContainerByBarcode" parameterType="com.intramirror.order.api.model.Container" >
+	<update id="updateContainerByBarcode"  parameterType="com.intramirror.order.api.model.Container" >
 		UPDATE container
-		<set>
+		<trim prefix="set" suffixOverrides=","  suffix=" WHERE barcode = #{barcode,jdbcType=VARCHAR} ">
 			<if test="length != null" >
-			  #{length,jdbcType=BIGINT},
+			 length =  #{length,jdbcType=BIGINT},
 			</if>
-			<if test="weight != null" >
-			  #{weight,jdbcType=DECIMAL},
+			<if test="width != null" >
+			width =   #{width,jdbcType=DECIMAL},
 			</if>
 			<if test="height != null" >
-			  #{height,jdbcType=BIGINT},
+			height =   #{height,jdbcType=BIGINT},
 			</if>
-		</set>
-		WHERE barcode = #{barcode,jdbcType=VARCHAR}
+		</trim>
   	</update>
   
   <select id="selectContainerByBarcode" resultMap="BaseResultMap" parameterType="java.util.Map" >

@@ -32,5 +32,5 @@ public interface ContainerMapper {
 	 * @param container
 	 * @return int
 	 */
-	int updateContainerBybarcode(Map<String, Object> map);
+	int updateContainerByBarcode(Map<String, Object> map);
 }

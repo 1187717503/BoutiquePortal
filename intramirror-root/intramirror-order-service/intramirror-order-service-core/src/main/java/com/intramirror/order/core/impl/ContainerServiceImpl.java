@@ -81,7 +81,7 @@ public class ContainerServiceImpl extends BaseDao implements IContainerService{
 	 * @return Container
 	 */
 	public int updateContainerBybarcode(Map<String, Object> map) {
-		return containerMapper.updateContainerBybarcode(map);
+		return containerMapper.updateContainerByBarcode(map);
 	}
 
 
