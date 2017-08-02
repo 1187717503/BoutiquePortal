@@ -144,7 +144,7 @@
     select pcrcb.price_change_rule_category_brand_id,pcrcb.brand_id,b.english_name,pcrcb.category_id,c.`name`,c.parent_id,pcrcb.discount_percentage from price_change_rule_category_brand pcrcb
         inner join category c on (c.category_id = pcrcb.category_id and c.enabled = 1)
         left join brand b on (b.brand_id = pcrcb.brand_id and b.enabled = 1)
-        where pcrcb.exception_flag = #{exception_flag,jdbcType=INTEGER} and pcrcb.price_change_rule_id = #{price_change_rule_id,jdbcType=INTEGER}
+        where pcrcb.exception_flag = #{exception_flag,jdbcType=INTEGER} and c.level = 2 and pcrcb.price_change_rule_id = #{price_change_rule_id,jdbcType=INTEGER}
         <if test="english_name != null and english_name != ''">
           <bind name="brandName" value="'%' + english_name + '%'" />
           and b.english_name like #{brandName}
@@ -167,7 +167,7 @@
   </select>
 
   <select id="queryNotRuleByBrand" resultType="java.util.Map" parameterType="java.util.Map">
-    select distinct brand_id,english_name from brand where brand_id not in (
+    select distinct brand_id,english_name from brand where enabled = 1 and brand_id not in (
       select pcrcb.brand_id from price_change_rule_category_brand pcrcb
       inner join category c on (c.category_id = pcrcb.category_id and c.enabled = 1)
       inner join brand b on (b.brand_id = pcrcb.brand_id and b.enabled = 1)
@@ -201,7 +201,7 @@
 
     select distinct season_code from price_change_rule pcr left join
     price_change_rule_season_group pcrsg on (pcr.price_change_rule_id = pcrsg.price_change_rule_id and pcrsg.enabled = 1)
-    where vendor_id = #{vendor_id,jdbcType=INTEGER} and pcr.`status` = 1 and pcrsg.season_code in
+    where vendor_id = #{vendor_id,jdbcType=INTEGER} and pcr.`status` = 1 and pcr.price_type = #{price_type,jdbcType=INTEGER} and pcrsg.season_code in
     <foreach item="item" index="index" collection="season_codes" open="(" separator="," close=")">
       #{item}
     </foreach>
@@ -229,6 +229,8 @@
     end,
     exception_flag from price_change_rule_category_brand pcrcb
     where pcrcb.price_change_rule_id = #{price_change_rule_id,jdbcType=INTEGER}
+    and exists (select brand_id from brand b where (b.brand_id = pcrcb.brand_id and b.enabled = 1) or pcrcb.brand_id = 0)
+    and exists (select category_id from category c where (c.category_id = pcrcb.category_id and c.enabled = 1) or pcrcb.brand_id = 0)
   </insert>
 
   <insert id="copyPriceChangeRuleGroup" parameterType="java.util.Map">

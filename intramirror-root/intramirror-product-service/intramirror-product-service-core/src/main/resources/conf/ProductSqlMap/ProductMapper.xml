@@ -27,7 +27,6 @@
     <result column="img_modified" property="imgModified" jdbcType="BIT" />
     <result column="product_group_id" property="productGroupId" jdbcType="BIGINT" />
     <result column="season_code" property="seasonCode" jdbcType="VARCHAR" />
-    <result column="im_price" property="imPrice" jdbcType="DECIMAL" />
   </resultMap>
   <resultMap id="ResultMapWithBLOBs" type="com.intramirror.product.api.model.ProductWithBLOBs" extends="BaseResultMap" >
     <!--
@@ -47,7 +46,7 @@
     -->
     product_id, category_id, vendor_id, brand_id, product_code, name, status, publish_at, 
     valid_at, feature, rejected_by, rejected_at, created_at, updated_at, enabled, customer_rating, 
-    shop_rating, score, img_modified, product_group_id, season_code, im_price
+    shop_rating, score, img_modified, product_group_id, season_code
   </sql>
   <sql id="Blob_Column_List" >
     <!--
@@ -139,7 +138,7 @@
       created_at, updated_at, enabled, 
       customer_rating, shop_rating, score, 
       img_modified, product_group_id, season_code, 
-      im_price, cover_img, description, 
+      cover_img, description, 
       description_img, remark, rejected_reason
       )
     values (#{productId,jdbcType=BIGINT}, #{categoryId,jdbcType=BIGINT}, #{vendorId,jdbcType=BIGINT}, 
@@ -149,7 +148,7 @@
       #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}, #{enabled,jdbcType=BIT}, 
       #{customerRating,jdbcType=DECIMAL}, #{shopRating,jdbcType=DECIMAL}, #{score,jdbcType=DECIMAL}, 
       #{imgModified,jdbcType=BIT}, #{productGroupId,jdbcType=BIGINT}, #{seasonCode,jdbcType=VARCHAR}, 
-      #{imPrice,jdbcType=DECIMAL}, #{coverImg,jdbcType=LONGVARCHAR}, #{description,jdbcType=LONGVARCHAR}, 
+      #{coverImg,jdbcType=LONGVARCHAR}, #{description,jdbcType=LONGVARCHAR}, 
       #{descriptionImg,jdbcType=LONGVARCHAR}, #{remark,jdbcType=LONGVARCHAR}, #{rejectedReason,jdbcType=LONGVARCHAR}
       )
   </insert>
@@ -222,9 +221,6 @@
       </if>
       <if test="seasonCode != null" >
         season_code,
-      </if>
-      <if test="imPrice != null" >
-        im_price,
       </if>
       <if test="coverImg != null" >
         cover_img,
@@ -305,9 +301,6 @@
       </if>
       <if test="seasonCode != null" >
         #{seasonCode,jdbcType=VARCHAR},
-      </if>
-      <if test="imPrice != null" >
-        #{imPrice,jdbcType=DECIMAL},
       </if>
       <if test="coverImg != null" >
         #{coverImg,jdbcType=LONGVARCHAR},
@@ -393,9 +386,6 @@
       <if test="seasonCode != null" >
         season_code = #{seasonCode,jdbcType=VARCHAR},
       </if>
-      <if test="imPrice != null" >
-        im_price = #{imPrice,jdbcType=DECIMAL},
-      </if>
       <if test="coverImg != null" >
         cover_img = #{coverImg,jdbcType=LONGVARCHAR},
       </if>
@@ -440,7 +430,6 @@
       img_modified = #{imgModified,jdbcType=BIT},
       product_group_id = #{productGroupId,jdbcType=BIGINT},
       season_code = #{seasonCode,jdbcType=VARCHAR},
-      im_price = #{imPrice,jdbcType=DECIMAL},
       cover_img = #{coverImg,jdbcType=LONGVARCHAR},
       description = #{description,jdbcType=LONGVARCHAR},
       description_img = #{descriptionImg,jdbcType=LONGVARCHAR},
@@ -473,8 +462,7 @@
       score = #{score,jdbcType=DECIMAL},
       img_modified = #{imgModified,jdbcType=BIT},
       product_group_id = #{productGroupId,jdbcType=BIGINT},
-      season_code = #{seasonCode,jdbcType=VARCHAR},
-      im_price = #{imPrice,jdbcType=DECIMAL}
+      season_code = #{seasonCode,jdbcType=VARCHAR}
     where product_id = #{productId,jdbcType=BIGINT}
   </update>
 </mapper>

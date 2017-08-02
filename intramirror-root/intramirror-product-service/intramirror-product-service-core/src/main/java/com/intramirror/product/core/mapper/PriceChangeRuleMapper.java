@@ -40,11 +40,11 @@ public interface PriceChangeRuleMapper {
     
     
     /**
-     * 根据name 模糊查询
+     * 根据vendorId name 模糊查询
      * @param priceChangeRuleId
      * @return
      */
-    List<PriceChangeRule> selectByName(String name);
+    List<PriceChangeRule> selectByName(Map<String,Object> map);
     
 
     /**
@@ -73,6 +73,7 @@ public interface PriceChangeRuleMapper {
     int updatePriceChangeRuleByShopProductGroup();
     int updatePriceChangeRuleByShopProduct();
 
+    List<Map<String,Object>> selectActiveSeasonGroupRule(Map<String,Object> params) ;
     List<Map<String,Object>> selectSeasonGroupRule(Map<String,Object> params) ;
     List<Map<String,Object>> selectSecondCategoryRule(Map<String,Object> params) ;
     List<Map<String,Object>> selectAllCategoryRule(Map<String,Object> params);
@@ -85,6 +86,7 @@ public interface PriceChangeRuleMapper {
 
 
     List<Map<String,Object>> selNowRule(Map<String,Object> params);
+    List<Map<String,Object>> selRuleByVendorPriceType(Map<String,Object> params);
     int updateRuleActive(Map<String,Object> params);
     int updateRuleInActive(Map<String,Object> params);
 

@@ -30,4 +30,6 @@ public interface ILogisticsProductService {
 	 * @throws Exception
 	 */
 	List<LogisticsProduct> getLogisticsProductListByCondition(Map<String, Object> conditionMap);
+	
 }
+

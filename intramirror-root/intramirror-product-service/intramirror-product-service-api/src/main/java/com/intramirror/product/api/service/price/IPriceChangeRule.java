@@ -45,12 +45,11 @@ public interface IPriceChangeRule {
     ResultMessage copyRuleByVendor(Map<String,Object> params) throws Exception;
 
     ResultMessage copyRuleBySeason(Map<String,Object> params) throws Exception;
+
+    ResultMessage copyRule(Map<String,Object> params) throws Exception;
     
-    /**
-     * 根据name 模糊查询
-     * @param priceChangeRuleId
-     * @return
-     */
-    List<PriceChangeRule> selectByName(String name);
+    List<PriceChangeRule> selectByName(String name,Long vendorId);
+    
+    List<Map<String,Object>> selRuleByVendorPriceType(Map<String,Object> params);
 
 }

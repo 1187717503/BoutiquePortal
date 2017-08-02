@@ -107,4 +107,5 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
 	public List<LogisticsProduct> getLogisticsProductListByCondition(Map<String, Object> conditionMap) {
 		return logisticsProductMapper.getLogisticsProductListByCondition(conditionMap);
 	}
+	
 }

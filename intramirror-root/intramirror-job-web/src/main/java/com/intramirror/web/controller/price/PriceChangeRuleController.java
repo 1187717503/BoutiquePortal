@@ -40,7 +40,7 @@ public class PriceChangeRuleController {
         return resultMessage;
     }
 
-    @RequestMapping(value = "/updatePriceByShop",method = RequestMethod.GET)
+    /*@RequestMapping(value = "/updatePriceByShop",method = RequestMethod.GET)
     @ResponseBody
     public ResultMessage updatePriceByShop(){
 
@@ -54,7 +54,7 @@ public class PriceChangeRuleController {
             resultMessage.errorStatus().addMsg("error message : " + e.getMessage());
         }
         return resultMessage;
-    }
+    }*/
 
     @RequestMapping(value = "/updatePriceByAdmin",method = RequestMethod.GET)
     @ResponseBody
@@ -63,6 +63,7 @@ public class PriceChangeRuleController {
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
             iPriceChangeRule.updateAdminPrice();
+            iPriceChangeRule.updateShopPrice();
             resultMessage.successStatus().addMsg("SUCCESS");
         } catch (Exception e) {
             e.printStackTrace();
