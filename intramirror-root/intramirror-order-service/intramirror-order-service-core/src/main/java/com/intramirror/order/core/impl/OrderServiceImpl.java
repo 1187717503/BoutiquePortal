@@ -83,5 +83,16 @@ public class OrderServiceImpl extends BaseDao implements IOrderService{
 	public Shipment getOrderByShipment(int logisticsProductId) {
 		return orderMapper.getOrderByShipment(logisticsProductId);
 	}
+
+
+	/**
+	 * 根据 订单状态获取子订单列表
+	 * @param orderNumber status
+	 * @return
+	 */
+	@Override
+	public List<Map<String, Object>> getOrderListByStatus(int status) {
+		return orderMapper.getOrderListByStatus(status);
+	}
 	
 }

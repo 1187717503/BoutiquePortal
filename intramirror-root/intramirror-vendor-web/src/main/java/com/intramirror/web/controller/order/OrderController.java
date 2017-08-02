@@ -64,37 +64,24 @@ public class OrderController {
 	
 	@RequestMapping("/getOrderList")
 	@ResponseBody
-	public List<Map<String,Object>> getOrderList(){
+	public ResultMessage getOrderList(@RequestBody Map<String,Object> map){
+		ResultMessage result= new ResultMessage();
+		result.errorStatus();
 		
-		int status = 2;
-		//获取order列表
-		List<Map<String,Object>> result = orderService.getOrderList(status);
-		
-		String orderNumbers = "";
-		
-		//遍历获取所有的orderNumber
-		if(result != null && result.size() > 0){
-			for(Map<String, Object> orderInfo : result){
-				orderNumbers += orderInfo.get("order_num").toString()+",";
-			}
-		}else{
+		if(map == null || map.size() == 0 || map.get("status") == null || StringUtils.isBlank(map.get("status").toString())){
+			result.setMsg("Parameter cannot be empty");
 			return result;
 		}
 		
-		if(StringUtils.isNoneBlank(orderNumbers)){
-			orderNumbers = orderNumbers.substring(0,orderNumbers.length() -1);
-		}
+		//根据订单状态查询订单
+		List<Map<String,Object>> orderList = orderService.getOrderListByStatus(Integer.parseInt(map.get("status").toString()));
 		
-		
-		//根据orderNumber 获取orderLine信息
-		List<Map<String,Object>> orderLineResult = orderService.getOrderListByOrderNumber(orderNumbers, status);
-		
-		if(orderLineResult != null && orderLineResult.size() > 0){
+		if(orderList != null && orderList.size() > 0 ){
 			
 			/**------------------------------------优化----------------------------------------*/
 			//遍历获取所有商品ID
 			String productIds = "";
-			for(Map<String, Object> info : orderLineResult){
+			for(Map<String, Object> info : orderList){
 				productIds +=info.get("product_id").toString()+",";
 			}
 			
@@ -122,67 +109,164 @@ public class OrderController {
 			/**------------------------------------优化end----------------------------------------*/
 			
 			
-			
-			for(Map<String, Object> orderInfo : result){
-				List<Map<String, Object>> orderLineList = new ArrayList<Map<String,Object>>();
-				int amount = 0;
-				for(Map<String, Object> info : orderLineResult){
-					if(orderInfo.get("order_num").toString().equals(info.get("order_num").toString())){
-						//累加数量
-						amount +=Integer.parseInt(info.get("amount").toString());
-						//汇率
-						Double rate =  Double.parseDouble(orderInfo.get("current_rate").toString());
-						
-						//按汇率计算人民币价钱
-						Double sale_price2 = Double.parseDouble(info.get("sale_price").toString()) * rate;
-						info.put("sale_price2", sale_price2);
-						//计算利润
-						Double profit = Double.parseDouble(info.get("sale_price").toString()) - Double.parseDouble(info.get("in_price").toString());
-						BigDecimal b = new BigDecimal(profit);  
-						profit = b.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();  
-						info.put("profit", profit * rate);
-						
-						//计算折扣 
-						Double salePrice = Double.parseDouble(info.get("sale_price").toString());
-						Double price = Double.parseDouble(info.get("price").toString());
-						Double inPrice = Double.parseDouble(info.get("in_price").toString());
-						
-						BigDecimal sale_price_discount = new BigDecimal((salePrice / price)*100);  
-//						info.put("sale_price_discount",sale_price_discount.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() +" %");
-						info.put("sale_price_discount",sale_price_discount.intValue() +" %");
-						
-						BigDecimal supply_price_discount = new BigDecimal((inPrice*(1+0.22)/price)*100);
-						info.put("supply_price_discount", supply_price_discount.intValue()+" %");
-						
-						//如果一条订单下面有多个子订单  判断子订单状态是否一致 不一致则修改父订单状态为Multiple
-						if(orderLineList != null && orderLineList.size() > 0){
-							for(Map<String, Object> orderMap : orderLineList){
-								if(!orderMap.get("status").toString().equals(info.get("status").toString())){
-									orderInfo.put("status", "Multiple");
-								}
-							}
-							
-						}
-						
-						
-						//添加商品对应的属性
-						if(productPropertyResult.size() > 0 ){
-							if(productPropertyResult.get(info.get("product_id").toString()) != null){
-								info.put("brandID", productPropertyResult.get(info.get("product_id").toString()).get("BrandID"));
-								info.put("colorCode", productPropertyResult.get(info.get("product_id").toString()).get("ColorCode"));
-							}
-						}
-							
-						orderLineList.add(info);
-						
+			for(Map<String, Object> info : orderList){
 
+				//汇率
+				Double rate =  Double.parseDouble(info.get("current_rate").toString());
+				
+				//按汇率计算人民币价钱
+				Double sale_price2 = Double.parseDouble(info.get("sale_price").toString()) * rate;
+				info.put("sale_price2", sale_price2);
+				//计算利润
+				Double profit = Double.parseDouble(info.get("sale_price").toString()) - Double.parseDouble(info.get("in_price").toString());
+				BigDecimal b = new BigDecimal(profit);  
+				profit = b.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();  
+				info.put("profit", profit * rate);
+				
+				//计算折扣 
+				Double salePrice = Double.parseDouble(info.get("sale_price").toString());
+				Double price = Double.parseDouble(info.get("price").toString());
+				Double inPrice = Double.parseDouble(info.get("in_price").toString());
+				
+				BigDecimal sale_price_discount = new BigDecimal((salePrice / price)*100);  
+//				info.put("sale_price_discount",sale_price_discount.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() +" %");
+				info.put("sale_price_discount",sale_price_discount.intValue() +" %");
+				
+				BigDecimal supply_price_discount = new BigDecimal((inPrice*(1+0.22)/price)*100);
+				info.put("supply_price_discount", supply_price_discount.intValue()+" %");
+				
+				
+				//添加商品对应的属性
+				if(productPropertyResult.size() > 0 ){
+					if(productPropertyResult.get(info.get("product_id").toString()) != null){
+						info.put("brandID", productPropertyResult.get(info.get("product_id").toString()).get("BrandID"));
+						info.put("colorCode", productPropertyResult.get(info.get("product_id").toString()).get("ColorCode"));
 					}
 				}
-				orderInfo.put("total_qty", amount);
-				orderInfo.put("orderLineList", orderLineList);
+				
 			}
+			
 		}
-		return orderLineResult;
+		
+		
+//		//获取order列表
+//		List<Map<String,Object>> orderList = orderService.getOrderList(status);
+//		
+//		String orderNumbers = "";
+//		
+//		//遍历获取所有的orderNumber
+//		if(orderList != null && orderList.size() > 0){
+//			for(Map<String, Object> orderInfo : orderList){
+//				orderNumbers += orderInfo.get("order_num").toString()+",";
+//			}
+//		}else{
+//			result.setData(orderList);
+//			return result;
+//		}
+//		
+//		if(StringUtils.isNoneBlank(orderNumbers)){
+//			orderNumbers = orderNumbers.substring(0,orderNumbers.length() -1);
+//		}
+//		
+//		
+//		//根据orderNumber 获取orderLine信息
+//		List<Map<String,Object>> orderLineResult = orderService.getOrderListByOrderNumber(orderNumbers, status);
+//		
+//		if(orderLineResult != null && orderLineResult.size() > 0){
+//			
+//			/**------------------------------------优化----------------------------------------*/
+//			//遍历获取所有商品ID
+//			String productIds = "";
+//			for(Map<String, Object> info : orderLineResult){
+//				productIds +=info.get("product_id").toString()+",";
+//			}
+//			
+//			if(StringUtils.isNoneBlank(productIds)){
+//				productIds = productIds.substring(0,productIds.length() -1);
+//			}
+//			
+//			//根据ID列表获取商品属性
+//			List<Map<String, Object>> productPropertyList = productPropertyService.getProductPropertyListByProductId(productIds);
+//			Map<String, Map<String, String>> productPropertyResult= new HashMap<String, Map<String, String>>();
+//			
+//			for(Map<String, Object> productProperty : productPropertyList){
+//				
+//				//如果存在
+//				if(productPropertyResult.containsKey(productProperty.get("product_id").toString())){
+//					Map<String, String> info = productPropertyResult.get(productProperty.get("product_id").toString());
+//				    info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
+//				}else{
+//					Map<String, String> info = new HashMap<String, String>();
+//					info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
+//					productPropertyResult.put(productProperty.get("product_id").toString(), info);
+//				}
+//				
+//			}
+//			/**------------------------------------优化end----------------------------------------*/
+//			
+//			
+//			
+//			for(Map<String, Object> orderInfo : orderList){
+//				List<Map<String, Object>> orderLineList = new ArrayList<Map<String,Object>>();
+//				int amount = 0;
+//				for(Map<String, Object> info : orderLineResult){
+//					if(orderInfo.get("order_num").toString().equals(info.get("order_num").toString())){
+//						//累加数量
+//						amount +=Integer.parseInt(info.get("amount").toString());
+//						//汇率
+//						Double rate =  Double.parseDouble(orderInfo.get("current_rate").toString());
+//						
+//						//按汇率计算人民币价钱
+//						Double sale_price2 = Double.parseDouble(info.get("sale_price").toString()) * rate;
+//						info.put("sale_price2", sale_price2);
+//						//计算利润
+//						Double profit = Double.parseDouble(info.get("sale_price").toString()) - Double.parseDouble(info.get("in_price").toString());
+//						BigDecimal b = new BigDecimal(profit);  
+//						profit = b.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();  
+//						info.put("profit", profit * rate);
+//						
+//						//计算折扣 
+//						Double salePrice = Double.parseDouble(info.get("sale_price").toString());
+//						Double price = Double.parseDouble(info.get("price").toString());
+//						Double inPrice = Double.parseDouble(info.get("in_price").toString());
+//						
+//						BigDecimal sale_price_discount = new BigDecimal((salePrice / price)*100);  
+////						info.put("sale_price_discount",sale_price_discount.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() +" %");
+//						info.put("sale_price_discount",sale_price_discount.intValue() +" %");
+//						
+//						BigDecimal supply_price_discount = new BigDecimal((inPrice*(1+0.22)/price)*100);
+//						info.put("supply_price_discount", supply_price_discount.intValue()+" %");
+//						
+//						//如果一条订单下面有多个子订单  判断子订单状态是否一致 不一致则修改父订单状态为Multiple
+//						if(orderLineList != null && orderLineList.size() > 0){
+//							for(Map<String, Object> orderMap : orderLineList){
+//								if(!orderMap.get("status").toString().equals(info.get("status").toString())){
+//									orderInfo.put("status", "Multiple");
+//								}
+//							}
+//							
+//						}
+//						
+//						
+//						//添加商品对应的属性
+//						if(productPropertyResult.size() > 0 ){
+//							if(productPropertyResult.get(info.get("product_id").toString()) != null){
+//								info.put("brandID", productPropertyResult.get(info.get("product_id").toString()).get("BrandID"));
+//								info.put("colorCode", productPropertyResult.get(info.get("product_id").toString()).get("ColorCode"));
+//							}
+//						}
+//							
+//						orderLineList.add(info);
+//						
+//
+//					}
+//				}
+//				orderInfo.put("total_qty", amount);
+//				orderInfo.put("orderLineList", orderLineList);
+//			}
+//		}
+		result.setData(orderList);
+		return result;
 	}
 	
 	
@@ -446,6 +530,37 @@ System.out.println("*******************************");
         }
         return resultMessage;
 		
+	}
+	
+	
+	
+	@RequestMapping("/getPackOrderList")
+	@ResponseBody
+	public ResultMessage getPackOrderList(@RequestBody Map<String,Object> map){
+		ResultMessage result= new ResultMessage();
+		result.errorStatus();
+		
+		if(map == null || map.size() == 0 || map.get("status") == null){
+			result.setMsg("Parameter cannot be empty");
+			return result;
+		}
+		
+		
+		try{
+			//获取PackOrderorder列表
+			List<Map<String,Object>> packList = orderService.getOrderListByStatus(Integer.parseInt(map.get("status").toString()));
+			result.successStatus();
+			result.setData(packList);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setMsg("Query order list fail,Check parameters, please ");
+			return result;
+		}
+
+		
+		
+		return result;
 	}
 	
 	/**
