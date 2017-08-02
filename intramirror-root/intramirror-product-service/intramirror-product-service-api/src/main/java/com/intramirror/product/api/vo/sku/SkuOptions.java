@@ -1,10 +1,11 @@
-package com.intramirror.product.core.vo.sku;
+package com.intramirror.product.api.vo.sku;
+
 
 /**
  * Created by dingyifan on 2017/8/2.
  * 这个是提供给接口用的sku vo,用于创建商品，修改商品，或者修改库存
  */
-public class SkuOptions {
+public class SkuOptions{
     public String size;
 
     public String stock;

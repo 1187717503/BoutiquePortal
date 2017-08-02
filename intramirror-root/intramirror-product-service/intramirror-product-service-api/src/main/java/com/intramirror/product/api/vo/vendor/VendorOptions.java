@@ -1,4 +1,4 @@
-package com.intramirror.product.core.vo.vendor;
+package com.intramirror.product.api.vo.vendor;
 
 /**
  * Created by dingyifan on 2017/8/2.

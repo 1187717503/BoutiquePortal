@@ -1,7 +1,8 @@
-package com.intramirror.product.core.vo.product;
+package com.intramirror.product.api.vo.product;
 
 import com.intramirror.common.help.StringUtils;
 import com.intramirror.product.core.vo.sku.SkuOptions;
+import com.intramirror.product.core.vo.vendor.VendorOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,51 +13,53 @@ import java.util.List;
  */
 public class ProductOptions {
 
-    public String name = "";
+    private String name = "";
 
-    public String code = "";
+    private String code = "";
 
-    public String brandCode = "";
+    private String brandCode = "";
 
-    public String seasonCode = "";
+    private String seasonCode = "";
 
-    public String carryOver = "";
+    private String carryOver = "";
 
-    public String brandName = "";
+    private String brandName = "";
 
-    public String colorCode = "";
+    private String colorCode = "";
 
-    public String colorDesc = "";
+    private String colorDesc = "";
 
-    public String categoryId = "";
+    private String categoryId = "";
 
-    public String desc = "";
+    private String desc = "";
 
-    public String composition = "";
+    private String composition = "";
 
-    public String madeIn = "";
+    private String madeIn = "";
 
-    public String sizeFit = "";
+    private String sizeFit = "";
 
-    public String coverImg = "";
+    private String coverImg = "";
 
-    public String descImg = "";
+    private String descImg = "";
 
-    public String weight = "";
+    private String weight = "";
 
-    public String length = "";
+    private String length = "";
 
-    public String width = "";
+    private String width = "";
 
-    public String heigit = "";
+    private String heigit = "";
 
-    public String retailPrice = "";
+    private String retailPrice = "";
 
-    public String salePrice = "";
+    private String salePrice = "";
 
-    public String imgByFilippo;
+    private String imgByFilippo;
 
-    public List<SkuOptions> skus = new ArrayList<>();
+    private List<SkuOptions> skus = new ArrayList<>();
+
+    private VendorOptions vendorOptions;
 
     public String getName() {
         return name;
@@ -262,5 +265,13 @@ public class ProductOptions {
 
     public void setImgByFilippo(String imgByFilippo) {
         this.imgByFilippo = imgByFilippo;
+    }
+
+    public VendorOptions getVendorOptions() {
+        return vendorOptions;
+    }
+
+    public void setVendorOptions(VendorOptions vendorOptions) {
+        this.vendorOptions = vendorOptions;
     }
 }
