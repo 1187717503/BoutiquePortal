@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.intramirror.order.core.mapper.ShipmentMapper">
+	<resultMap id="BaseResultMap" type="com.intramirror.order.api.model.Shipment" >
+	    <id column="shipment_id" property="shipmentId" jdbcType="BIGINT" />
+	    <result column="ship_to_geography" property="shipToGeography" jdbcType="VARCHAR" />
+	    <result column="consignee" property="consignee" jdbcType="VARCHAR" />
+	    <result column="ship_to_addr" property="shipToAddr" jdbcType="VARCHAR" />
+	    <result column="ship_to_district" property="shipToDistrict" jdbcType="VARCHAR" />
+	    <result column="ship_to_city" property="shipToCity" jdbcType="VARCHAR" />
+	    <result column="ship_to_province" property="shipToProvince" jdbcType="VARCHAR" />
+	    <result column="ship_to_country" property="shipToCountry" jdbcType="VARCHAR" />
+	    <result column="status" property="status" jdbcType="BIGINT" />
+	    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+	    <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+  	</resultMap>
+	
+	<insert id="saveShipmentByOrderId" parameterType="com.intramirror.order.api.model.Shipment" >
+    insert into shipment
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="shipment_id != null" >
+        shipment_id,
+      </if>
+      <if test="shipToGeography != null" >
+        ship_to_geography,
+      </if>
+      <if test="consignee != null" >
+        consignee,
+      </if>
+      <if test="shipToAddr != null" >
+        ship_to_addr,
+      </if>
+      <if test="shipToDistrict != null" >
+        ship_to_district,
+      </if>
+      <if test="shipToCity != null" >
+        ship_to_city,
+      </if>
+      <if test="shipToProvince != null" >
+        ship_to_province,
+      </if>
+      <if test="shipToCountry != null" >
+        ship_to_country,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createdAt != null" >
+        created_at,
+      </if>
+       <if test="updatedAt != null" >
+        updated_at,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="shipment_id != null" >
+         #{shipment_id,jdbcType=BIGINT},
+      </if>
+      <if test="shipToGeography != null" >
+        #{ship_to_geography,jdbcType=VARCHAR},
+      </if>
+      <if test="consignee != null" >
+        #{consignee,jdbcType=VARCHAR},
+      </if>
+      <if test="shipToAddr != null" >
+        #{ship_to_addr,jdbcType=VARCHAR},
+      </if>
+      <if test="shipToDistrict != null" >
+        #{ship_to_district,jdbcType=VARCHAR},
+      </if>
+      <if test="shipToCity != null" >
+        #{ship_to_city,jdbcType=VARCHAR},
+      </if>
+      <if test="shipToProvince != null" >
+        #{ship_to_province,jdbcType=VARCHAR},
+      </if>
+      <if test="shipToCountry != null" >
+        #{ship_to_country,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=BIGINT},
+      </if>
+      <if test="createdAt != null" >
+        #{created_at,jdbcType=TIMESTAMP},
+      </if>
+       <if test="updatedAt != null" >
+        #{updated_at,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+</mapper>

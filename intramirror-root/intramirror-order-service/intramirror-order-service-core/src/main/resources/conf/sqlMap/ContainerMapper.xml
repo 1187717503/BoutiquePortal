@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.intramirror.order.core.mapper.ContainerMapper">
+	<resultMap id="BaseResultMap" type="com.intramirror.order.api.model.Container" >
+	    <id column="container_id" property="containerId" jdbcType="BIGINT" />
+	    <result column="container_type" property="containerType" jdbcType="VARCHAR" />
+	    <result column="ship_to_geography" property="shipToGeography" jdbcType="VARCHAR" />
+	    <result column="status" property="status" jdbcType="INTEGER" />
+	    <result column="height" property="height" jdbcType="BIGINT" />
+	    <result column="width" property="width" jdbcType="BIGINT" />
+	    <result column="length" property="length" jdbcType="BIGINT" />
+	    <result column="weight" property="weight" jdbcType="DECIMAL" />
+	    <result column="barcode" property="barcode" jdbcType="VARCHAR" />
+	    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+	    <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+	    <result column="shipment_id" property="shipmentId" jdbcType="BIGINT" />
+  	</resultMap>
+	
+	<insert id="saveContainerByShipment" parameterType="com.intramirror.order.api.model.Container">
+    insert into shipment
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="containerId != null" >
+        container_id,
+      </if>
+      <if test="containerType != null" >
+        container_type,
+      </if>
+      <if test="shipToGeography != null" >
+        ship_to_geography,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="height != null" >
+        height,
+      </if>
+      <if test="width != null" >
+        width,
+      </if>
+      <if test="length != null" >
+        length,
+      </if>
+      <if test="weight != null" >
+        weight,
+      </if>
+      <if test="barcode != null" >
+        barcode,
+      </if>
+      <if test="createdAt != null" >
+        created_at,
+      </if>
+      <if test="updatedAt != null" >
+        updated_at,
+      </if>
+      <if test="shipmentId != null" >
+        shipment_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="containerId != null" >
+         #{containerId,jdbcType=BIGINT},
+      </if>
+      <if test="containerType != null" >
+        #{containerType,jdbcType=VARCHAR},
+      </if>
+      <if test="shipToGeography != null" >
+        #{shipToGeography,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="height != null" >
+        #{height,jdbcType=BIGINT},
+      </if>
+      <if test="width != null" >
+        #{width,jdbcType=BIGINT},
+      </if>
+      <if test="length != null" >
+        #{length,jdbcType=BIGINT},
+      </if>
+      <if test="weight != null" >
+        #{weight,jdbcType=DECIMAL},
+      </if>
+      <if test="barcode != null" >
+        #{barcode,jdbcType=VARCHAR},
+      </if>
+      <if test="createdAt != null" >
+        #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+       <if test="updatedAt != null" >
+        #{updatedAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="shipmentId != null" >
+        #{shipmentId,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  
+  
+	<update id="updateContainerByBarcode" parameterType="com.intramirror.order.api.model.ProductWithBLOBs" >
+		UPDATE container
+		<set>
+			<if test="length != null" >
+			  #{length,jdbcType=BIGINT},
+			</if>
+			<if test="weight != null" >
+			  #{weight,jdbcType=DECIMAL},
+			</if>
+			<if test="height != null" >
+			  #{height,jdbcType=BIGINT},
+			</if>
+		</set>
+  	</update>
+  
+  <select id="getContainerByBarcode" resultType="java.util.HashMap"  parameterType="java.util.Map">
+  		
+  </select>
+</mapper>
