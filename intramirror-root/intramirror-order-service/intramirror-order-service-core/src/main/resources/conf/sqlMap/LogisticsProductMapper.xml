@@ -121,5 +121,10 @@
     where logistics_product_id = #{logistics_product_id,jdbcType=BIGINT}
   </select>
   
-
+<!-- 根据condition map 来获取 OrderLogistics list -->
+<select id="getLogisticsProductListByCondition" resultType="com.intramirror.order.api.model.LogisticsProduct" parameterType="java.util.Map">
+		select * 
+		from logistics_product
+		where order_logistics_id=#{order_logistics_id,jdbcType=BIGINT}  and vendor_id = #{vendor_id,jdbcType=BIGINT}  and enabled = #{enabled,jdbcType=BIT} 
+</select>
 </mapper>

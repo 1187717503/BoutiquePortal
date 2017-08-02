@@ -11,7 +11,7 @@
 
 	<context-param>
 		<param-name>spring.profiles.active</param-name>
-		<param-value>${profiles.active}</param-value>
+		<param-value>sit</param-value>
 	</context-param>
 
 	<listener>

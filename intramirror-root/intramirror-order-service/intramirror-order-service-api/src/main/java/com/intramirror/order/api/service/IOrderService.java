@@ -3,6 +3,8 @@ package com.intramirror.order.api.service;
 import java.util.List;
 import java.util.Map;
 
+import com.intramirror.order.api.model.Shipment;
+
 public interface IOrderService {
 	
 	/**
@@ -24,4 +26,33 @@ public interface IOrderService {
 	 * @return
 	 */
 	List<Map<String,Object>> getOrderPaymentByLogisProductId(Long logisticsProductId);
+	
+	/**
+	 * 根据status统计各个状态的订单数量
+	 * @param status
+	 * @return
+	 */
+	int getOrderByIsvalidCount(int status);
+	
+	/**
+	 * 根据订单号查询物流ID
+	 * @param orderId
+	 * @return map
+	 */
+	Map<String,Object> getOrderPaymentInfoByOrderId(int orderId);
+	
+	/**
+	 * 根据订单号查询支付信息
+	 * @param orderId
+	 * @return
+	 */
+	Map<String,Object> getPaymentInfoByOrderId(int orderId);
+	
+	/**
+	 * 根据订单获取Shipment 
+	 * @param orderId
+	 * @return
+	 */
+	Shipment getOrderByShipment(int logisticsProductId);
+	
 }

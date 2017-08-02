@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.order.api.common.OrderStatusType;
 import com.intramirror.order.api.model.LogisticsProduct;
+import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.service.ILogisticsProductService;
+import com.intramirror.order.api.service.IShipmentService;
 import com.intramirror.order.core.dao.BaseDao;
 import com.intramirror.order.core.mapper.LogisticsProductMapper;
 import com.intramirror.product.api.service.ISkuStoreService;
@@ -28,7 +30,6 @@ public class LogisticsProductService{
 
 	@Autowired
 	private ISkuStoreService skuStoreService;
-	
 	
 	/**
 	 * 根据logistics_product_id 修改相关信息
@@ -63,11 +64,14 @@ public class LogisticsProductService{
 				return resultMap;
 			}
 			
-			
 			oldLogisticsProduct.setStatus(status);
 			//校验通过，修改状态
 			logisticsProductService.updateOrderLogisticsStatusById(logistics_product_id,status);
 			
+			//如果COMFIRMED 生成Shipment 新的Shipment 默认有一个箱子
+			if (2==status){
+				
+			}
 //			if(num <= 0){
 //				resultMap.put("info","Status modification failed");
 //				return resultMap;

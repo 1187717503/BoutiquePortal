@@ -1,6 +1,9 @@
 package com.intramirror.order.core.impl;
 
 
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -93,5 +96,15 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
 	 */
 	public LogisticsProduct selectById(Long logistics_product_id) {
 		return logisticsProductMapper.selectById(logistics_product_id);
+	}
+	
+	/**
+	 * 根据condition map 来获取 OrderLogistics list
+	 * @param conditionMap
+	 * @return 
+	 * @throws Exception
+	 */
+	public List<LogisticsProduct> getLogisticsProductListByCondition(Map<String, Object> conditionMap) {
+		return logisticsProductMapper.getLogisticsProductListByCondition(conditionMap);
 	}
 }

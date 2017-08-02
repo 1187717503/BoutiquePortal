@@ -75,5 +75,52 @@
             where lp.logistics_product_id = #{logisticsProductId,jdbcType=BIGINT} 
     
   </select>
+<!--   根据status统计各个状态的订单数量 -->
+  <select id="getOrderByIsvalidCount" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+		  SELECT COUNT(1)FROM (SELECT
+			DISTINCT o.order_num,o.order_id,o.created_at,o.`status`,o.current_rate,o.total_sale_price_rmb,o.total_shipping_fee_rmb,o.total_tax_rmb,o.total_rmb,
+			l.rec_name,l.rec_mobile,l.user_rec_name,l.user_rec_mobile,l.user_rec_province,l.user_rec_city,l.user_rec_area,l.user_rec_addr,v.vendor_id,
+			u.contact_person_name,o.contact_phone as telephone,o.wechat as contact_info,g.`name` as geography_name 
+			from logistics_product lp 
+			INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id 
+			INNER JOIN `order` o ON o.order_id = ol.order_id   
+			LEFT JOIN `user` u ON o.user_id = u.user_id 
+			LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id 
+			INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id 
+			INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id 
+			INNER JOIN product p ON sp.product_id = p.product_id  
+			LEFT JOIN category c ON p.category_id = c.category_id 
+			LEFT JOIN brand b ON p.brand_id = b.brand_id 
+			LEFT JOIN vendor v ON lp.vendor_id = v.vendor_id 
+			LEFT JOIN geography g ON l.geography_id = g.geography_id 
+			where lp.`status` = #{status,jdbcType=BIGINT}
+			group By o.order_num 
+			ORDER BY o.created_at desc) AS D
+  </select>
+<!--   根据订单号查询物流ID -->
+<select id="getOrderPaymentInfoByOrderId" resultType="java.util.HashMap" parameterType="java.lang.Integer">
+	SELECT order_logistics_id FROM order_logistics ol
+	LEFT JOIN `order` o  ON o.order_id =ol.order_id
+	WHERE o.order_id= #{orderId,jdbcType=BIGINT} 
+</select>
   
+<!-- 根据订单号查询支付信息 -->
+<select id="getPaymentInfoByOrderId" resultType="java.util.HashMap" parameterType="java.lang.Integer">
+		select t5.pay_way,t1.order_num,sum(t4.amount*t4.sale_price) as price,t2.request_id,t2.serial_number  ,t4.logistics_product_id from payment t1,payment_result t2,order_logistics t3,logistics_product t4 ,`order` t5 
+where t1.payment_id = t2.payment_id and t3.order_id = t1.order_num
+and t3.order_logistics_id = t4.order_logistics_id and t5.order_id = t3.order_id group by t2.request_id,t2.serial_number
+and t1.order_num =  #{orderId,jdbcType=BIGINT} 
+</select>
+  
+ <select id="getOrderByShipment" resultType="com.intramirror.order.api.model.Shipment">
+	 select g.`name` as ship_to_geography,u.username as consignee,l.user_rec_addr as ship_to_addr,l.user_rec_area as ship_to_district,
+		l.user_rec_city as ship_to_city,l.user_rec_province as ship_to_province,o.`status`,l.user_rec_country as ship_to_country
+		from logistics_product lp
+		INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id 
+		INNER JOIN `order` o ON o.order_id = ol.order_id   
+		LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id 
+		LEFT JOIN geography g ON l.geography_id = g.geography_id 
+		LEFT JOIN `user` u ON o.user_id = u.user_id
+		where lp.logistics_product_id =  #{logisticsProductId,jdbcType=BIGINT} 
+ </select>
 </mapper>
