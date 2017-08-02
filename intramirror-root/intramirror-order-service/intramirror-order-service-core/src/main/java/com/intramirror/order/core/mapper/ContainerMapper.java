@@ -25,7 +25,7 @@ public interface ContainerMapper {
 	 * @param barcode
 	 * @return Container
 	 */
-	Container getContainerBybarcode(Map<String, Object> map);
+	Container selectContainerByBarcode(Map<String, Object> map);
 	
 	/**
 	 * 修改箱子

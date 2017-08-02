@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.intramirror.order.core.mapper.ContainerMapper" >
 
-<mapper namespace="com.intramirror.order.core.mapper.ContainerMapper">
-	<resultMap id="BaseResultMap" type="com.intramirror.order.api.model.Container" >
+   	<resultMap id="BaseResultMap" type="com.intramirror.order.api.model.Container" >
 	    <id column="container_id" property="containerId" jdbcType="BIGINT" />
 	    <result column="container_type" property="containerType" jdbcType="VARCHAR" />
 	    <result column="ship_to_geography" property="shipToGeography" jdbcType="VARCHAR" />
@@ -114,7 +114,7 @@
 		WHERE barcode = #{barcode,jdbcType=VARCHAR}
   	</update>
   
-  <select id="getContainerByBarcode" resultMap="BaseResultMap"  parameterType="java.util.Map">
+  <select id="selectContainerByBarcode" resultMap="BaseResultMap" parameterType="java.util.Map" >
   		select * from container
 		where barcode =  #{barcode,jdbcType=VARCHAR} and status = #{status,jdbcType=INTEGER}
   </select>

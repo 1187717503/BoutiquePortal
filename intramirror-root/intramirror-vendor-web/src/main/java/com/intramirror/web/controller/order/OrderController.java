@@ -3,7 +3,6 @@ package com.intramirror.web.controller.order;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +34,10 @@ import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.payment.api.model.ResultMsg;
 import com.intramirror.product.api.service.ProductPropertyService;
+import com.intramirror.user.api.model.User;
+import com.intramirror.user.api.model.Vendor;
+import com.intramirror.user.api.service.VendorService;
+import com.intramirror.web.controller.BaseController;
 import com.intramirror.web.service.LogisticsProductService;
 import com.intramirror.web.service.OrderRefund;
 
@@ -45,7 +48,7 @@ import com.intramirror.web.service.OrderRefund;
 @CrossOrigin
 @Controller
 @RequestMapping("/order")
-public class OrderController {
+public class OrderController extends BaseController{
 
 	private static Logger logger = LoggerFactory.getLogger(OrderController.class);
 	 
@@ -61,12 +64,15 @@ public class OrderController {
 	@Autowired
 	private ILogisticsProductService iLogisticsProductService;
 	
+	@Autowired
+	private VendorService vendorService;
+	
 	
 	
 	
     @RequestMapping(value = "/getOrderList", method = RequestMethod.POST)
 	@ResponseBody
-	public ResultMessage getOrderList(@RequestBody Map<String,Object> map){
+	public ResultMessage getOrderList(@RequestBody Map<String,Object> map,HttpServletRequest httpRequest){
 		ResultMessage result= new ResultMessage();
 		result.errorStatus();
 		
@@ -75,8 +81,26 @@ public class OrderController {
 			return result;
 		}
 		
+		User user = this.getUser(httpRequest);
+		if(user == null){
+			result.setMsg("Please log in again");
+			return result;
+		}
+		
+		Vendor vendor= null;
+		try {
+			vendor= vendorService.getVendorByUserId(user.getUserId());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if(vendor == null){
+			result.setMsg("Please log in again");
+			return result;
+		}
+		
+		Long vendorId = vendor.getVendorId();
 		//根据订单状态查询订单
-		List<Map<String,Object>> orderList = orderService.getOrderListByStatus(Integer.parseInt(map.get("status").toString()));
+		List<Map<String,Object>> orderList = orderService.getOrderListByStatus(Integer.parseInt(map.get("status").toString()),vendorId);
 		
 		if(orderList != null && orderList.size() > 0 ){
 			
@@ -539,19 +563,70 @@ System.out.println("*******************************");
 	
 	@RequestMapping("/getPackOrderList")
 	@ResponseBody
-	public ResultMessage getPackOrderList(@RequestBody Map<String,Object> map){
+	public ResultMessage getPackOrderList(@RequestBody Map<String,Object> map,HttpServletRequest httpRequest){
 		ResultMessage result= new ResultMessage();
 		result.errorStatus();
 		
-		if(map == null || map.size() == 0 || map.get("status") == null){
+		if(map == null || map.size() == 0 || map.get("status") == null || map.get("containerId") == null){
 			result.setMsg("Parameter cannot be empty");
 			return result;
 		}
 		
+		User user = this.getUser(httpRequest);
+		if(user == null){
+			result.setMsg("Please log in again");
+			return result;
+		}
+		
+		Vendor vendor= null;
+		try {
+			vendor= vendorService.getVendorByUserId(user.getUserId());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if(vendor == null){
+			result.setMsg("Please log in again");
+			return result;
+		}
+		
+		
 		
 		try{
 			//获取PackOrderorder列表
-			List<Map<String,Object>> packList = orderService.getOrderListByStatus(Integer.parseInt(map.get("status").toString()));
+			List<Map<String,Object>> packList = orderService.getOrderListByStatusAndContainerId(Integer.parseInt(map.get("containerId").toString()),Integer.parseInt(map.get("status").toString()),vendor.getVendorId());
+			
+
+			if(packList != null && packList.size() > 0){
+				//遍历获取所有商品ID
+				String productIds = "";
+				for(Map<String, Object> info : packList){
+					productIds +=info.get("product_id").toString()+",";
+				}
+				
+				if(StringUtils.isNoneBlank(productIds)){
+					productIds = productIds.substring(0,productIds.length() -1);
+				}
+				
+				//根据ID列表获取商品属性
+				List<Map<String, Object>> productPropertyList = productPropertyService.getProductPropertyListByProductId(productIds);
+				Map<String, Map<String, String>> productPropertyResult= new HashMap<String, Map<String, String>>();
+				
+				for(Map<String, Object> productProperty : productPropertyList){
+					
+					//如果存在
+					if(productPropertyResult.containsKey(productProperty.get("product_id").toString())){
+						Map<String, String> info = productPropertyResult.get(productProperty.get("product_id").toString());
+					    info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
+					}else{
+						Map<String, String> info = new HashMap<String, String>();
+						info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
+						productPropertyResult.put(productProperty.get("product_id").toString(), info);
+					}
+					
+				}
+			}
+
+
 			result.successStatus();
 			result.setData(packList);
 			

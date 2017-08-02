@@ -72,7 +72,7 @@ public class ContainerServiceImpl extends BaseDao implements IContainerService{
 	 * @return Container
 	 */
 	public Container getContainerBybarcode(Map<String, Object> map) {
-		return containerMapper.getContainerBybarcode(map);
+		return containerMapper.selectContainerByBarcode(map);
 	}
 
 	/**

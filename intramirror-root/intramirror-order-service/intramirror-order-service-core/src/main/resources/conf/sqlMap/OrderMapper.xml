@@ -100,7 +100,8 @@
 			where t_pp.enabled = 1 and (t_pp.key_name='BrandID' or t_pp.key_name = 'ColorCode') 
 			group by t_pp.product_id 
 			) pp ON p.product_id = pp.product_id   
-			where pspk.`name` = 'Size' and  lp.`status` = #{status,jdbcType=BIGINT}
+			where pspk.`name` = 'Size' and  lp.`status` = #{status,jdbcType=BIGINT} 
+			and v.vendor_id = #{vendorId,jdbcType=BIGINT}
 			GROUP BY lp.order_line_num
   </select>
   
@@ -137,7 +138,8 @@
 			) pp ON p.product_id = pp.product_id   
 			where pspk.`name` = 'Size' 
 			and c.container_id =#{containerId,jdbcType=BIGINT} 
-			and  lp.`status` = #{status,jdbcType=BIGINT}
+			and lp.`status` = #{status,jdbcType=BIGINT}
+			and v.vendor_id = #{vendorId,jdbcType=BIGINT}
 			GROUP BY lp.order_line_num
   </select>
   

@@ -91,8 +91,26 @@ public class OrderServiceImpl extends BaseDao implements IOrderService{
 	 * @return
 	 */
 	@Override
-	public List<Map<String, Object>> getOrderListByStatus(int status) {
-		return orderMapper.getOrderListByStatus(status);
+	public List<Map<String, Object>> getOrderListByStatus(int status,Long vendorId) {
+		Map<String, Object> conditionMap = new HashMap<String, Object>();
+		conditionMap.put("status", status);
+		conditionMap.put("vendorId", vendorId);
+		return orderMapper.getOrderListByStatus(conditionMap);
+	}
+
+	/**
+	 * 根据 订单状态获 和 container ID取子订单列表
+	 * @param orderNumber status
+	 * @return
+	 */
+	@Override
+	public List<Map<String, Object>> getOrderListByStatusAndContainerId(
+			int containerId, int status,Long vendorId) {
+		Map<String, Object> conditionMap = new HashMap<String, Object>();
+		conditionMap.put("status", status);
+		conditionMap.put("vendorId", vendorId);
+		conditionMap.put("containerId", containerId);
+		return orderMapper.getOrderListByStatusAndContainerId(conditionMap);
 	}
 	
 }

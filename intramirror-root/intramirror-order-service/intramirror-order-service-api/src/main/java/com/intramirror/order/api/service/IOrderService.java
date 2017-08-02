@@ -60,6 +60,13 @@ public interface IOrderService {
 	 * @param orderNumber status
 	 * @return
 	 */
-	List<Map<String,Object>> getOrderListByStatus(int status);
+	List<Map<String,Object>> getOrderListByStatus(int status,Long vendorId);
+	
+	/**
+	 * 根据 订单状态获取子订单列表
+	 * @param orderNumber status
+	 * @return
+	 */
+	List<Map<String,Object>> getOrderListByStatusAndContainerId(int containerId ,int status,Long vendorId);
 	
 }
