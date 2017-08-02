@@ -103,7 +103,7 @@ public class LoginFilter implements Filter{
            	response.getWriter().write("token Check failed,Please log in again");
         	response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }else{
-//        	response.reset();
+        	response.reset();
             chain.doFilter(request, response); 
         }
 		
