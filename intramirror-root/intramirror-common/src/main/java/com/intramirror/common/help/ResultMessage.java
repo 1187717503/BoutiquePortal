@@ -72,4 +72,16 @@ public class ResultMessage {
         this.status = StatusType.SUCCESS;
         return this;
     }
+
+    public boolean isSUCCESS(){
+        if(this.status == StatusType.SUCCESS)
+            return true;
+        return false;
+    }
+
+    public boolean isERROR(){
+        if(this.status == StatusType.FAILURE)
+            return true;
+        return false;
+    }
 }

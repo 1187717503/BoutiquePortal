@@ -465,4 +465,5 @@
       season_code = #{seasonCode,jdbcType=VARCHAR}
     where product_id = #{productId,jdbcType=BIGINT}
   </update>
+
 </mapper>

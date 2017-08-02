@@ -3,7 +3,9 @@ package com.intramirror.product.api.vo.product;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.help.StringUtils;
+import com.intramirror.product.api.enums.ApiErrorTypeEnum;
 import com.intramirror.product.api.vo.sku.SkuOptions;
 import com.intramirror.product.api.vo.vendor.VendorOptions;
 
@@ -273,5 +275,50 @@ public class ProductOptions {
 
     public void setVendorOptions(VendorOptions vendorOptions) {
         this.vendorOptions = vendorOptions;
+    }
+
+    public ResultMessage checkBasicsParams(){
+        ResultMessage resultMessage = ResultMessage.getInstance();
+        resultMessage.errorStatus();
+
+        // check product
+        if(StringUtils.isBlank(this.name)) {
+            resultMessage.setData(ApiErrorTypeEnum.BOUTIQUE_NAME_NOT_EXIST);
+        } else if(StringUtils.isBlank(this.code)) {
+            resultMessage.setData(ApiErrorTypeEnum.BOUTIQUE_ID_NOT_EXIST);
+        } else if(StringUtils.isBlank(this.brandCode)) {
+            resultMessage.setData(ApiErrorTypeEnum.BRANDID_NOT_EXIST);
+        } else if(StringUtils.isBlank(this.brandName)) {
+            resultMessage.setData(ApiErrorTypeEnum.BRANDNAME_NOT_EXIST);
+        } else if(StringUtils.isBlank(this.colorCode)) {
+            resultMessage.setData(ApiErrorTypeEnum.COLORCODE_NOT_EXIST);
+        } else if(StringUtils.isBlank(this.categoryId)) {
+            resultMessage.setData(ApiErrorTypeEnum.CATEGORY_NOT_EXIST);
+        } else if(StringUtils.isBlank(this.coverImg) || StringUtils.isBlank(this.descImg)) {
+            resultMessage.setData(ApiErrorTypeEnum.IMG_NOT_EXIST);
+        } else if(StringUtils.isBlank(this.salePrice) || Integer.parseInt(this.salePrice) == 0) {
+            resultMessage.setData(ApiErrorTypeEnum.RETAIL_PRICE_IS_ZERO);
+        } else if(StringUtils.isBlank(this.weight)) {
+            resultMessage.setData(ApiErrorTypeEnum.WEIGHT_NOT_EXIST);
+        } else {
+            resultMessage.successStatus();
+        }
+
+        if(resultMessage.isERROR())
+            return resultMessage;
+
+        // check sku
+        resultMessage.successStatus();
+        if(this.skus == null || this.skus.size() == 0) {
+            resultMessage.errorStatus().setData(ApiErrorTypeEnum.SKU_NOT_EXIST);
+        } else {
+            for(SkuOptions skuOptions : skus) {
+                if(StringUtils.isBlank(skuOptions.getBarcodes())) {
+                    resultMessage.errorStatus().setData(ApiErrorTypeEnum.SKU_SIZT_NOT_EXIST);
+                    break;
+                }
+            }
+        }
+        return resultMessage;
     }
 }
