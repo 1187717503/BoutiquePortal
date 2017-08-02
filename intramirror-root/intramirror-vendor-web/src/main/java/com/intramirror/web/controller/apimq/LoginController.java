@@ -8,12 +8,15 @@ import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.model.VendorApplication;
 import com.intramirror.user.api.service.UserService;
 import com.intramirror.user.api.service.VendorService;
+
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.Base64Codec;
+
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.HashMap;
 import java.util.Map;
 
+@CrossOrigin
 @Controller
 @RequestMapping("/login")
 public class LoginController {
