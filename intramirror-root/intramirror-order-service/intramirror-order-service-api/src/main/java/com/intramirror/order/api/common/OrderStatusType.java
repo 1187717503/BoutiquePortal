@@ -1,6 +1,12 @@
 package com.intramirror.order.api.common;
 public class OrderStatusType {
 
+	
+	/**
+	 * @Fileds 装箱
+	 */
+	public static final int READYTOSHIP = 7;
+	
 	/**
 	 * pending
 	 */
@@ -87,8 +93,12 @@ public class OrderStatusType {
 			lastStatus = PENDING;
 			break;
 			
-		case ORDERED:
+		case READYTOSHIP:
 			lastStatus = COMFIRMED;
+			break;
+			
+		case ORDERED:
+			lastStatus = READYTOSHIP;
 			break;
 			
 		case PAYED:

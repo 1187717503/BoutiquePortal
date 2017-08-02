@@ -1,6 +1,9 @@
 package com.intramirror.order.api.service;
 
 
+import java.util.List;
+import java.util.Map;
+
 import com.intramirror.order.api.model.LogisticsProduct;
 
 public interface ILogisticsProductService {
@@ -19,4 +22,14 @@ public interface ILogisticsProductService {
 	 * @return
 	 */
 	LogisticsProduct selectById(Long logistics_product_id);
+	
+	/**
+	 * 根据condition map 来获取 OrderLogistics list
+	 * @param conditionMap
+	 * @return 
+	 * @throws Exception
+	 */
+	List<LogisticsProduct> getLogisticsProductListByCondition(Map<String, Object> conditionMap);
+	
 }
+

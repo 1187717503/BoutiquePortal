@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
+import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.core.dao.BaseDao;
 import com.intramirror.order.core.mapper.OrderMapper;
@@ -48,4 +49,39 @@ public class OrderServiceImpl extends BaseDao implements IOrderService{
 			Long logisticsProductId) {
 		return orderMapper.getOrderPaymentByLogisProductId(logisticsProductId);
 	}
+
+	/**
+	 * 根据status统计各个状态的订单数量
+	 * @param status
+	 * @return Integer
+	 */
+	public int getOrderByIsvalidCount(int status){
+		return orderMapper.getOrderByIsvalidCount(status);
+	}
+
+	/**
+	 * 根据订单号查询物流ID
+	 * @param orderId
+	 * @return map
+	 */
+	public Map<String, Object> getOrderPaymentInfoByOrderId(int orderId){
+		return orderMapper.getOrderPaymentInfoByOrderId(orderId);
+	}
+
+	/**
+	 * 根据订单号查询支付信息
+	 * @param orderId
+	 * @return
+	 */
+	public Map<String, Object> getPaymentInfoByOrderId(int orderId){
+		return orderMapper.getPaymentInfoByOrderId(orderId);
+	}
+
+	/**
+	 * 根据订单获取Shipment 
+	 */
+	public Shipment getOrderByShipment(int logisticsProductId) {
+		return orderMapper.getOrderByShipment(logisticsProductId);
+	}
+	
 }
