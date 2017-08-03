@@ -397,7 +397,7 @@
             (
             select p.product_id from product p where p.enabled = 1
 
-            <!--<if test="item.handle_level == 1">
+            <!--sittest="item.handle_level == 1">
                 and p.category_id in (
                 select category_id from category c where c.enabled = 1 and c.`level` = 2 and c.parent_id =
                 #{item.category_id,jdbcType=BIGINT}
@@ -454,7 +454,7 @@
             (
             select p.product_id from product p where p.enabled = 1
 
-            <!--<if test="item.handle_level == 1">
+            <!--sittest="item.handle_level == 1">
                 and p.category_id in (
                 select category_id from category c where c.enabled = 1 and c.`level` = 2 and c.parent_id =
                 #{item.category_id,jdbcType=BIGINT}
@@ -509,7 +509,7 @@
             (
             select p.product_id from product p where p.enabled = 1
 
-            <!--<if test="item.handle_level == 1">
+            <!--sittest="item.handle_level == 1">
                 and p.category_id in (
                 select category_id from category c where c.enabled = 1 and c.`level` = 2 and c.parent_id =
                 #{item.category_id,jdbcType=BIGINT}
