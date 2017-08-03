@@ -561,7 +561,7 @@ System.out.println("*******************************");
 	
 	
 	
-	@RequestMapping("/getPackOrderList")
+	@RequestMapping(value="/getPackOrderList", method = RequestMethod.POST)
 	@ResponseBody
 	public ResultMessage getPackOrderList(@RequestBody Map<String,Object> map,HttpServletRequest httpRequest){
 		ResultMessage result= new ResultMessage();
