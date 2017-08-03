@@ -30,6 +30,6 @@
   	<module>intramirror-common</module>
     <module>intramirror-shoplus-service</module>
     <module>intramirror-shoplus-oss</module>
-
+    <module>intramirror-shoplus-message</module>
   </modules>
 </project>
