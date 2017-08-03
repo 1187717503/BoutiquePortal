@@ -77,6 +77,16 @@
 				<artifactId>intramirror-user-service-api</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
+			<dependency>
+				<groupId>com.intramirror</groupId>
+				<artifactId>intramirror-shoplus-oss</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intramirror</groupId>
+				<artifactId>intramirror-shoplus-service</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
 			<!-- end intramirror project -->
 
 			<!-- start spring POM -->

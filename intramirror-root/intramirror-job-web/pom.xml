@@ -54,7 +54,10 @@
             <groupId>com.intramirror</groupId>
             <artifactId>intramirror-product-service-core</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.intramirror</groupId>
+            <artifactId>intramirror-shoplus-service</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.intramirror</groupId>
             <artifactId>intramirror-user-service-core</artifactId>
