@@ -6,11 +6,11 @@ package com.intramirror.order.core.impl;
 import java.util.Date;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.google.gson.Gson;
 import com.intramirror.order.api.common.ContainerType;
 import com.intramirror.order.api.model.Container;
 import com.intramirror.order.api.service.IContainerService;
@@ -43,26 +43,34 @@ public class ContainerServiceImpl extends BaseDao implements IContainerService{
 		container.setLength(Long.parseLong(map.get("length").toString()));
 		container.setWidth(Long.parseLong(map.get("width").toString()));
 		container.setHeight(Long.parseLong(map.get("height").toString()));
+		container.setBarcode(map.get("barcode").toString());
 		//新增默认箱子为open 
 		container.setStatus(ContainerType.OPEN);
 		Date currentDate = new Date();
 		container.setCreatedAt(currentDate);
 		container.setUpdatedAt(currentDate);
-		if (null != map.get("containerType") || StringUtils.isNotBlank(map.get("containerType").toString())){
+		if (null != map.get("containerType")){
 			container.setContainerType(map.get("containerType").toString());
+		}else{
+			container.setContainerType("");
 		}
-		if (null != map.get("shipmentId") || StringUtils.isNotBlank(map.get("shipmentId").toString())){
+		if (null != map.get("shipmentId")){
 			container.setShipmentId(Long.parseLong(map.get("shipmentId").toString()));
+		}else{
+			//默认设置为0
+			container.setShipmentId(Long.parseLong("0"));
 		}
-		if (null != map.get("shipToGeography") || StringUtils.isNotBlank(map.get("shipToGeography").toString())){
+		if (null != map.get("shipToGeography")){
 			container.setShipToGeography(map.get("shipToGeography").toString());
+		}else{
+			container.setShipToGeography("");
 		}
-		if (null != map.get("weight") || StringUtils.isNotBlank(map.get("weight").toString())){
+		if (null != map.get("weight")){
 			container.setWeight(Long.parseLong(map.get("weight").toString()));
+		}else{
+			container.setWeight(Long.parseLong("0"));
 		}
-		if (null != map.get("barcode") || StringUtils.isNotBlank(map.get("barcode").toString())){
-			container.setBarcode(map.get("barcode").toString());
-		}
+		logger.info("perameter "+new Gson().toJson(container));
 		return containerMapper.saveContainerByShipment(container);
 	}
 
@@ -82,6 +90,15 @@ public class ContainerServiceImpl extends BaseDao implements IContainerService{
 	 */
 	public int updateContainerBybarcode(Map<String, Object> map) {
 		return containerMapper.updateContainerByBarcode(map);
+	}
+
+	/**
+	 * 修改箱子状态
+	 * @param map
+	 * @return int
+	 */
+	public int updateContainerBystatus(Map<String, Object> map) {
+		return containerMapper.updateContainerBystatus(map);
 	}
 
 

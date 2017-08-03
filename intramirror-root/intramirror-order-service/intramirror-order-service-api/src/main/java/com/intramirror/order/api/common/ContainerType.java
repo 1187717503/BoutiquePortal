@@ -27,4 +27,14 @@ public final class ContainerType {
 	 */
 	public static final int DELIVERED = 4;
 	
+	/**
+	 * @Fields 收到状态
+	 */
+	public static final int RECEIVED = 5;
+	
+	/**
+	 * @Fields 支付状态
+	 */
+	public static final int SUBDELIVERED = 6;
+	
 }

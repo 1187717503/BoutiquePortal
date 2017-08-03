@@ -34,4 +34,11 @@ public interface IContainerService {
 	 */
 	int updateContainerBybarcode(Map<String, Object> map);
 	
+	/**
+	 * 修改箱子状态
+	 * @param map
+	 * @return int
+	 */
+	int updateContainerBystatus(Map<String, Object> map);
+	
 }

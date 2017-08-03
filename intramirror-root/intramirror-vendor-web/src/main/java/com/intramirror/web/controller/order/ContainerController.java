@@ -10,8 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
@@ -24,6 +26,7 @@ import com.intramirror.order.api.service.IContainerService;
  * @author 袁孟亮
  *
  */
+@CrossOrigin
 @Controller
 @RequestMapping("/container")
 public class ContainerController {
@@ -38,7 +41,7 @@ public class ContainerController {
 	 * @param map
 	 * @return result
 	 */
-	@RequestMapping("/saveContainer")
+	@RequestMapping(value = "/saveContainer", method = RequestMethod.POST)
 	@ResponseBody
 	public ResultMessage saveContainer(@RequestBody Map<String, Object> map){
 		logger.info("saveContainer param " + new Gson().toJson(map));
@@ -78,7 +81,7 @@ public class ContainerController {
 	 * @param map
 	 * @return resultMessage
 	 */
-	@RequestMapping("/updateContainerBybarcode")
+	@RequestMapping(value = "/updateContainerBybarcode", method = RequestMethod.POST)
 	@ResponseBody
 	public ResultMessage updateContainerBybarcode(@RequestBody Map<String, Object> map){
 		ResultMessage message = ResultMessage.getInstance();
@@ -115,7 +118,7 @@ public class ContainerController {
 	 * @param map
 	 * @return resultMessage
 	 */
-	@RequestMapping("/getContainerBybarcode")
+	@RequestMapping(value = "/getContainerBybarcode", method = RequestMethod.POST)
 	@ResponseBody
 	public ResultMessage getContainerBybarcode(@RequestBody Map<String, Object> map){
 		ResultMessage message = ResultMessage.getInstance();
@@ -142,6 +145,28 @@ public class ContainerController {
 			e.printStackTrace();
 			logger.error(" error Message : {}", e.getMessage());
 			message.errorStatus().putMsg("info", "error Message : "+e.getMessage());
+		}
+		return message;
+	}
+	
+	/**
+	 * 修改箱子状态
+	 * @return message
+	 */
+	@RequestMapping(value = "/updateContainerStatus", method = RequestMethod.POST)
+	@ResponseBody
+	public ResultMessage updateContainerStatus(@RequestBody Map<String, Object> map){
+		logger.info("updateContainerStatus param" + new Gson().toJson(map));
+		ResultMessage message = ResultMessage.getInstance();
+		try {
+			if (null == map || 0 == map.size()){
+				
+				return message;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(" error Message : {}", e.getMessage());
+			message.errorStatus().putMsg("info", "error Message : " +e.getMessage());
 		}
 		return message;
 	}
