@@ -8,6 +8,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.intramirror.order.api.model.ApiMq;
+import org.sql2o.Connection;
+import pk.shoplus.DBConnector;
+import pk.shoplus.model.Product;
+import pk.shoplus.service.ProductService;
+import pk.shoplus.util.RedisUtils;
 
 /**
  * 
@@ -39,5 +44,15 @@ public class DemoController {
 	@ResponseBody
 	public Date getDate(){
 		return new Date();
+	}
+
+	@RequestMapping(value = "/get_product")
+	@ResponseBody
+	public Product getProduct() throws Exception {
+		Connection conn = DBConnector.sql2o.beginTransaction();
+		new DBConnector();
+		ProductService productService = new ProductService(conn);
+		Product product = productService.getProductById(341L);
+		return product;
 	}
 }
