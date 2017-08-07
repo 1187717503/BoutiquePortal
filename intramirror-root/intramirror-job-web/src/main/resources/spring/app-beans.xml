@@ -61,6 +61,5 @@
 
 	<!-- 初始化基础配置 -->
 	<util:properties id="common" location="classpath:/properties/common/common.properties" />
-    <util:properties id="message" location="classpath:/properties/message/message.properties" />
 
 </beans>
