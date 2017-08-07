@@ -112,5 +112,15 @@ public class OrderServiceImpl extends BaseDao implements IOrderService{
 		conditionMap.put("containerId", containerId);
 		return orderMapper.getOrderListByStatusAndContainerId(conditionMap);
 	}
+
+	@Override
+	public Map<String, Object> getOrderInfoByCondition(
+			Map<String, Object> map) {
+		List<Map<String, Object>> list = orderMapper.getOrderInfoByCondition(map);
+		if(list != null && list.size() > 0){
+			return list.get(0);
+		}
+		 return null;
+	}
 	
 }

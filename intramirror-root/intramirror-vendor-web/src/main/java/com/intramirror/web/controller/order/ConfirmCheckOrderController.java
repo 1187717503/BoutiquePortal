@@ -1,23 +1,28 @@
 package com.intramirror.web.controller.order;
 
 import com.intramirror.common.Helper;
+import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.product.api.model.Sku;
 import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.product.api.service.SkuService;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.impl.Base64Codec;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+
 import java.util.*;
 
 @Controller
@@ -43,10 +48,11 @@ public class ConfirmCheckOrderController {
      */
     @RequestMapping(value = "/confirmCheckOrder", method = RequestMethod.POST)
     @ResponseBody
-    public Map confirmCheckOrder(String barCode, String brandId, String colorCode, HttpServletRequest httpRequest) throws Exception {
+    public ResultMessage confirmCheckOrder(@RequestBody Map<String,Object> map, HttpServletRequest httpRequest) throws Exception {
         // 返回数据初始化
         int status = StatusType.FAILURE;
-        Map<String, Object> result = new HashMap<String, Object>();
+		ResultMessage result= new ResultMessage();
+		result.errorStatus();
 
         String jwt = httpRequest.getHeader("token");
         if (StringUtils.isEmpty(jwt)) {
@@ -58,7 +64,7 @@ public class ConfirmCheckOrderController {
         Date expireation = claims.getIssuedAt();
         //如果信息过期则提示重新登录。
         if (System.currentTimeMillis() > expireation.getTime()) {
-            result.put("userStatus", "1000002");
+        	result.addMsg("1000002");
             return result;
         }
         //获取用户详情
@@ -66,22 +72,26 @@ public class ConfirmCheckOrderController {
 
         //如果匿名访问则跳过
         if (!Helper.checkNotNull(userId)) {
-            result.put("userStatus", "1000003");
+        	result.addMsg("1000003");
             return result;
         }
+        
+        String barCode = map.get("barCode").toString(); 
+        String brandId = map.get("brandId").toString(); 
+        String colorCode = map.get("colorCode").toString(); 
         Sku sku = null;
         List<Map<String, Object>> mapList = new ArrayList<Map<String, Object>>();
         if (barCode != null) {
             sku = skuService.getSkuBySkuCode(barCode);
-            result.put("sku", sku);
+//            result.put("sku", sku);
         } else {
             mapList = productPropertyService.getProductPropertyByBrandIDAndColorCode(brandId, colorCode);
-            result.put("mapList", mapList);
+//            result.put("mapList", mapList);
         }
         if (sku != null || mapList != null) {
-            status = StatusType.SUCCESS;
+        	result.successStatus();
         }
-        result.put("status", status);
+        
         return result;
     }
 

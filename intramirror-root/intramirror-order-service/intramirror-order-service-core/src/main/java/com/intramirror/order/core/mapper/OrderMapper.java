@@ -73,5 +73,14 @@ public interface OrderMapper {
 	 * @return
 	 */
 	List<Map<String,Object>> getOrderListByStatusAndContainerId(Map<String, Object> conditionMap);
+	
+	
+	/**
+	 * 根据 条件获取子订单信息
+	 * @param orderNumber status vendor Id 
+	 * @return
+	 */
+	List<Map<String,Object>> getOrderInfoByCondition(Map<String, Object> conditionMap);
+	
 
 }
