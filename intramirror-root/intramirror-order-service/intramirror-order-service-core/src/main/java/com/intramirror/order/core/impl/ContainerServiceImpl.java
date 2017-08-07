@@ -101,6 +101,15 @@ public class ContainerServiceImpl extends BaseDao implements IContainerService{
 		return containerMapper.updateContainerBystatus(map);
 	}
 
+	/**
+	 * 删除箱子
+	 * @param map
+	 * @return int
+	 */
+	public int deleteContainerById(Map<String, Object> map) {
+		return containerMapper.deleteContainerById(map);
+	}
+
 
 	
 

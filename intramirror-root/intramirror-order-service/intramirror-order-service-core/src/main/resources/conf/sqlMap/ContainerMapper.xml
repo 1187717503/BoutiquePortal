@@ -51,4 +51,9 @@ values(#{containerType,jdbcType=VARCHAR}, #{shipToGeography,jdbcType=VARCHAR},#{
 			</if>
 		</trim>
   </update>
+  
+  <delete id="deleteContainerById" parameterType="java.util.Map">
+  		DELETE FROM container 
+		WHERE container_id = #{containerId,jdbcType=BIGINT}
+  </delete>
 </mapper>

@@ -32,7 +32,7 @@ public interface IOrderService {
 	 * @param status
 	 * @return
 	 */
-	int getOrderByIsvalidCount(int status);
+	int getOrderByIsvalidCount(Map<String,Object> param);
 	
 	/**
 	 * 根据订单号查询物流ID

@@ -160,13 +160,42 @@ public class ContainerController {
 		ResultMessage message = ResultMessage.getInstance();
 		try {
 			if (null == map || 0 == map.size()){
-				
+				message.successStatus().putMsg("info", "parameter cannot be null");
 				return message;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(" error Message : {}", e.getMessage());
 			message.errorStatus().putMsg("info", "error Message : " +e.getMessage());
+		}
+		return message;
+	}
+	
+	/**
+	 * 删除箱子
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping(value="deleteContainerById", method=RequestMethod.POST)
+	@ResponseBody
+	public ResultMessage deleteContainerById(@RequestBody Map<String, Object> map){
+		ResultMessage message = ResultMessage.getInstance();
+		try {
+			if (null == map || 0 == map.size()){
+				message.successStatus().putMsg("info", "parameter cannot be null");
+				return message;
+			}
+			if (null == map.get("containerId") || StringUtils.isBlank(map.get("containerId").toString())){
+				message.successStatus().putMsg("info", "containerId cannot be null");
+				return message;
+			}
+			int result = containerService.deleteContainerById(map);
+			message.successStatus().putMsg("info", "SUCCESS").setData(result);
+			return message;
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(" error Message : {}", e.getMessage());
+			message.errorStatus().putMsg("info", "error Message :" + e.getMessage());
 		}
 		return message;
 	}

@@ -22,17 +22,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.intramirror.common.Helper;
 import com.intramirror.common.help.ResultMessage;
-import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.common.parameter.StatusType;
-import com.intramirror.order.api.common.Contants;
-import com.intramirror.order.api.model.LogisticsProduct;
-import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderService;
-import com.intramirror.payment.api.model.ResultMsg;
 import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
@@ -60,9 +54,6 @@ public class OrderController extends BaseController{
 	
 	@Autowired
 	private ProductPropertyService productPropertyService;
-	
-	@Autowired
-	private ILogisticsProductService iLogisticsProductService;
 	
 	@Autowired
 	private VendorService vendorService;
@@ -339,7 +330,7 @@ public class OrderController extends BaseController{
 	 */
 	@RequestMapping("/getOrderCount")
 	@ResponseBody
-	public ResultMessage getOrderCount(@RequestBody Map<String, Object> map){
+	public ResultMessage getOrderCount(@RequestBody Map<String, Object> map, HttpServletRequest httpRequest){
 		logger.info("getOrderCount param " + new Gson().toJson(map));
 		ResultMessage resultMessage = ResultMessage.getInstance();
         try {
@@ -351,8 +342,25 @@ public class OrderController extends BaseController{
         		resultMessage.successStatus().putMsg("info", "status cannot be null");
         		return resultMessage;
         	}
-        	int status =Integer.parseInt(map.get("status").toString());
-            int result = orderService.getOrderByIsvalidCount(status);
+        	User user = this.getUser(httpRequest);
+    		if(user == null){
+    			resultMessage.setMsg("Please log in again");
+    			return resultMessage;
+    		}
+    		
+    		Vendor vendor= null;
+    		try {
+    			vendor= vendorService.getVendorByUserId(user.getUserId());
+    		} catch (Exception e) {
+    			e.printStackTrace();
+    		}
+    		if(vendor == null){
+    			resultMessage.setMsg("Please log in again");
+    			return resultMessage;
+    		}
+    		
+    		map.put("vendorId", vendor.getVendorId());
+            int result = orderService.getOrderByIsvalidCount(map);
             resultMessage.successStatus().putMsg("info","SUCCESS").setData(result);
         } catch (Exception e) {
             e.printStackTrace();
@@ -370,196 +378,67 @@ public class OrderController extends BaseController{
 	 */
 	@RequestMapping("/orderRefund")
 	@ResponseBody
-	public Map<String, Object> orderRefund(@RequestBody Map<String, Object> map, HttpServletRequest request){
-		// 响应数据
-    	Map<String, Object> returnMap = new HashMap<String, Object>();
-    	
-    	// 响应状态(默认为失败)
-        int status = StatusType.FAILURE;
-//        User user = (User) request.getSession().getAttribute("sessionUser");
-//        if (user == null) {
-//            returnMap.put("status", StatusType.SESSION_USER_NULL);
-//            returnMap.put("errorMsg", "session失效,请重新登陆!!!");
-//            return returnMap;
-//        }
-
-        // 处理入参
-        Map<String, String> params;
-        try {
-            params = getParamsFromRequest(request);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            returnMap.put("status", StatusType.STRING_CONVERT_UNSUPPORTED_ENCODING_EXCEPTION);
-            return returnMap;
-        }
-        
-        //订单状态
-        Integer orderStatus = Integer.valueOf(params.get("status"));
-//        String trackingNum = params.get("tracking_num").toString();
-//        String vatNum = params.get("vat_num").toString();
-System.out.println("*******************************");
-        int checkResult = checkParams(params);
-
-        // check params
-        if (checkResult != StatusType.SUCCESS) {
-            returnMap.put("status", checkResult);
-            returnMap.put("errorMsg", "参数校验失败!!!");
-            return returnMap;
-        }
-        StringBuffer stringBuffer = new StringBuffer();
-        String errorMsg = "";
-		
-//		Long logisProductId =Long.parseLong(map.get("logisProductId").toString());
-		
-		
-		//单个或多个logistics_product_id编辑改变状态
-        JsonArray logisticsProductArray = new JsonParser().parse(params.get("logistics_product_list").toString()).getAsJsonArray();
-        try{
-			if (logisticsProductArray.size() != 0) {
-				 for (int i = 0; i < logisticsProductArray.size(); i++) {
-					 boolean isUpdateflag = false;
-					 JsonObject logisticsProductObj = logisticsProductArray.get(i).getAsJsonObject();
-					 String logisticsid = logisticsProductObj.get("logistics_product_id").getAsString();
-					 OrderRefund orderRefund = new OrderRefund();
-					 	if(orderStatus.intValue() == -4) {
-							 //根据商品ID查询订单
-							List<Map<String, Object>> porudctList =  orderService.getOrderPaymentByLogisProductId(Long.valueOf(logisticsid));
-								 if (null != porudctList){
-									 Map<String, Object> refundMap = porudctList.get(0);
-									 if (Contants.PAY_OFFLINE.equals(refundMap.get("pay_way").toString())){ // 线下支付
-										 isUpdateflag = true;
-					                 }else if(refundMap.get("serial_number") != null && StringUtils.isNotBlank(refundMap.get("serial_number").toString())){
-						            		ResultMsg rsMsg = orderRefund.refund(refundMap);
-						                    if (!rsMsg.getStatus()) {
-						                       status = StatusType.FAILURE;
-						                       logger.info(rsMsg.getMsg());
-						                    } else {
-						                   	 	isUpdateflag = true;
-						                    }
-					                        // 记录退款日志
-					                        orderRefund.recordPaymentLog(refundMap);
-					                 }else{
-					                	 status = StatusType.FAILURE;
-					                	 stringBuffer.append(","+logisticsid+" 子订单数据异常,找不到有效支付记录!!!");
-					                	 logger.info(logisticsid+" 子订单数据异常,找不到有效支付记录!!!");
-					                 }
-									 
-								 } else {
-					                 status = StatusType.FAILURE;
-					                 stringBuffer.append(","+logisticsid+" 子订单数据异常,找不到有效支付记录!!!");
-					                 logger.info(logisticsid+" 子订单数据异常,找不到有效支付记录!!!");
-								 }
-								 
-							 if (porudctList != null && ((orderStatus.intValue() == -4 && isUpdateflag) || orderStatus.intValue() != -4)) {
-								 //调用修改订单状态
-								 Map<String, Object> result = logisticsProductService.updateOrderLogisticsStatusById(Long.valueOf(logisticsid), orderStatus);
-								 if(Integer.parseInt(result.get("status").toString()) == StatusType.FAILURE){
-				                 	status = StatusType.FAILURE;
-				                 	stringBuffer.append(","+result.get("info").toString());
-				                 	logger.info(result.get("info").toString());
-				                 }
-				             }
-							 
-				         }
-				 	}
-			}
-			
-			
-			//传过来order_num和vendor_id进行编辑改变状态
-	        JsonArray orderVendorArray = new JsonParser().parse(params.get("order_vendor_list").toString()).getAsJsonArray();
-			if (orderVendorArray.size() != 0) {
-				 for (int i = 0; i < orderVendorArray.size(); i++) {
-					 JsonObject orderVendorObj = orderVendorArray.get(i).getAsJsonObject();
-	                 String orderId = orderVendorObj.get("order_num").getAsString();
-	                 Map<String, Object> orderMap = orderService.getOrderPaymentInfoByOrderId(Integer.parseInt(orderId));
-	                 String order_logistics_id = orderMap.get("order_logistics_id").toString();
-	                 boolean isUpdateflag = false;
-	                 OrderRefund orderRefund = new OrderRefund();
-	                 // 执行退款操作
-	                 if (orderStatus.intValue() == -4) {
-	                	 Map<String, Object> resultMap = orderService.getPaymentInfoByOrderId(Integer.parseInt(orderId));
-	                	 if (null != resultMap) {
-	                		 if (Contants.PAY_OFFLINE.equals(resultMap.get("pay_way").toString())){ // 线下支付
-	 	                     	isUpdateflag = true;
-	 	                    }else {
-	 	                     	ResultMsg rsMsg = orderRefund.refund(resultMap);
-	 	                         if (!rsMsg.getStatus()) {
-	 	                            status = StatusType.FAILURE;
-	 	                            stringBuffer.append("," + rsMsg.getMsg());
-	 	                         } else {
-	 	                        	 isUpdateflag = true;
-	 	                         }
-	 	                         // 记录退款日志
-	 	                         orderRefund.recordPaymentLog(resultMap);
-	 	                     }
-	                	 }else {
-		                     status = StatusType.FAILURE;
-		                     stringBuffer.append(","+orderId+" 订单数据异常,找不到有效支付记录!!!");
-		                     logger.info(orderId+" 订单数据异常,找不到有效支付记录!!!");
-	                	 }
-	                 }
-	                 
-	                 if((orderStatus.intValue() == -4 && isUpdateflag) || orderStatus.intValue() != -4) {
-	                 	// 修改状态
-	                     Map<String, Object> logisticsProductConditionMap = new HashMap<String, Object>();
-	                     logisticsProductConditionMap.put("order_logistics_id", Integer.parseInt(order_logistics_id));
-	                     logisticsProductConditionMap.put("vendor_id", Integer.parseInt(orderVendorObj.get("vendor_id").getAsString()));
-	                     logisticsProductConditionMap.put("enabled", EnabledType.USED);
-	
-	                     List<LogisticsProduct> logisticsProductList = iLogisticsProductService.
-	                    		 getLogisticsProductListByCondition(logisticsProductConditionMap);
-	                     if (logisticsProductList.size() != 0) {
-	                         for (int k = 0; k < logisticsProductList.size(); k++) {
-	                        	 logger.info(logisticsProductList.get(0).getTracking_num());
-	                        	 LogisticsProduct logisticsProduct = logisticsProductList.get(k);
-	                             logisticsProduct.setStatus(Integer.valueOf(params.get("status")));
-	                             Map<String, Object> result = logisticsProductService.updateOrderLogisticsStatusById(logisticsProduct.getLogistics_product_id(), orderStatus.intValue());
-								 if(Integer.parseInt(result.get("status").toString()) == StatusType.FAILURE){
-				                 	status = StatusType.FAILURE;
-				                 	logger.info(result.get("info").toString());
-				                 }
-	                         }
-	                     }
-	                 }
-				}
-			}
-		
+	public ResultMessage orderRefund(@RequestBody Map<String, Object> map, HttpServletRequest request){
+		//打印退款参数
+		logger.info("info parameter" + new Gson().toJson(map));
+		ResultMessage message = ResultMessage.getInstance();		
+		User user = this.getUser(request);
+		if (null == user){
+			message.successStatus().putMsg("status", ""+StatusType.SESSION_USER_NULL);
+			message.successStatus().putMsg("errorMsg", "session失效,请重新登陆!!!");
+			return message;
+		}
+		//入参处理
+		Map<String, String> params;
+		try {
+			params = getParamsFromRequest(request);
 		} catch (Exception e) {
-	        status = StatusType.DATABASE_ERROR;
-	        e.printStackTrace();
-	        logger.info("error" + e.getMessage());
-	        if(StringUtils.isBlank(errorMsg)) {
-	        	errorMsg = e.getMessage();
-	        }
-	    }
-		returnMap.put("status", status);
-        returnMap.put("errorMsg", errorMsg);
-		
-		return returnMap;
-	}
-	
-	/**
-	 * 订单打包装箱
-	 * @param map
-	 * @return
-	 */
-	@RequestMapping("/PackOrder")
-	@ResponseBody
-	public ResultMessage PackOrder(@RequestBody Map<String, Object> map){
-		logger.info("PackOrder param " + new Gson().toJson(map));
-		ResultMessage resultMessage = ResultMessage.getInstance();
-        try {
-        	
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(" error message : {}", e.getMessage());
-            resultMessage.errorStatus().putMsg("info","error message : " + e.getMessage());
+			e.printStackTrace();
+			message.errorStatus().putMsg("errorMsg", e.getMessage());
+			message.errorStatus().putMsg("status", ""+StatusType.STRING_CONVERT_UNSUPPORTED_ENCODING_EXCEPTION);
+            return message;
+		}
+        //判断status
+		int checkResult = checkParams(params);
+        if (StatusType.SUCCESS != checkResult){
+        	message.errorStatus().putMsg("errorMsg", "参数校验失败！！！");
+        	message.errorStatus().putMsg("status", checkResult+"");
+        	return message;
         }
-        return resultMessage;
-		
+        //获取订单状态
+  		Integer orderStatus = Integer.valueOf(params.get("status"));
+  		//该接口只针对退款，如果不是走状态机接口
+  		if (-4 != orderStatus){
+  			message.errorStatus().putMsg("errorMsg", "status not in -4");
+  			message.errorStatus().putMsg("status", checkResult+"");
+  			return message;
+  		}
+  		//单个或多个logistics_product_id编辑改变状态
+  		JsonArray logisticsProductArray = null;
+  		//传过来order_num和vendor_id进行编辑改变状态
+  		JsonArray orderVendorArray = null;
+  		// 响应状态(默认为失败)
+        int status = StatusType.FAILURE;
+        try {
+        	//退款处理
+	  		OrderRefund orderRefund = new OrderRefund();
+	  		if (null != params.get("logistics_product_list") || StringUtils.isNoneBlank(params.get("logistics_product_list").toString())){
+	  			logisticsProductArray = new JsonParser().parse(params.get("logistics_product_list").toString()).getAsJsonArray();
+	  			status = orderRefund.updateStausByJson(logisticsProductArray, null, orderStatus);
+	  			
+	  		}
+	  		if (null != params.get("order_vendor_list") || StringUtils.isNoneBlank(params.get("order_vendor_list").toString())){
+	  			orderVendorArray = new JsonParser().parse(params.get("order_vendor_list").toString()).getAsJsonArray();
+	  			status = orderRefund.updateStausByJson(null, orderVendorArray, orderStatus);
+	  		}
+	  		message.successStatus().putMsg("status", ""+status).setData(status);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.info("error"+ e.getMessage());
+			message.errorStatus().putMsg("errorMsg", e.getMessage());
+		}
+		return message;
 	}
-	
-	
 	
 	@RequestMapping(value="/getPackOrderList", method = RequestMethod.POST)
 	@ResponseBody

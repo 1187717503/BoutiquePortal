@@ -41,4 +41,11 @@ public interface IContainerService {
 	 */
 	int updateContainerBystatus(Map<String, Object> map);
 	
+	/**
+	 * 删除箱子
+	 * @param map
+	 * @return
+	 */
+	int deleteContainerById(Map<String, Object> map);
+	
 }
