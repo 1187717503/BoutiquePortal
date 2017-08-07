@@ -65,6 +65,29 @@
             <artifactId>intramirror-payment-service-core</artifactId>
         </dependency>
         
+        <!--oss文件上传-->
+		<dependency>
+			<groupId>pk</groupId>
+			<artifactId>shoplus-oss</artifactId>
+			<version>1.0.0</version>
+			<exclusions>
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+            </exclusions>
+		</dependency>
+		
+		<dependency>
+			<groupId>pk</groupId>
+			<artifactId>shoplus-message</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+        
         <dependency>
             <groupId>com.intramirror</groupId>
             <artifactId>intramirror-common</artifactId>
@@ -112,6 +135,13 @@
             <groupId>com.intramirror</groupId>
             <artifactId>intramirror-order-service-core</artifactId>
         </dependency>
+        
+        
+        <dependency>
+    		<groupId>javax.mail</groupId>
+    		<artifactId>mail</artifactId>
+    		<version>1.4.7</version>
+		</dependency>
 
     </dependencies>
 

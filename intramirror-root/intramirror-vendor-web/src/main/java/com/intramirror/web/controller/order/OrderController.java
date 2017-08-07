@@ -3,6 +3,7 @@ package com.intramirror.web.controller.order;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import pk.shoplus.common.FileUploadHelper;
+import pk.shoplus.common.vo.MediaStorangeRespVo;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -37,6 +41,7 @@ import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.VendorService;
+import com.intramirror.web.common.BarcodeUtil;
 import com.intramirror.web.controller.BaseController;
 import com.intramirror.web.service.LogisticsProductService;
 import com.intramirror.web.service.OrderRefund;
@@ -293,6 +298,137 @@ public class OrderController extends BaseController{
 //		}
 		result.successStatus();
 		result.setData(orderList);
+		return result;
+	}
+    
+    
+    
+    @RequestMapping(value = "/getOrderDetail", method = RequestMethod.POST)
+	@ResponseBody
+	public ResultMessage getOrderDetail(@RequestBody Map<String,Object> map,HttpServletRequest httpRequest){
+		ResultMessage result= new ResultMessage();
+		result.errorStatus();
+		
+		if(map == null || map.size() == 0 || map.get("status") == null || StringUtils.isBlank(map.get("status").toString())|| map.get("orderNumber") == null){
+			result.setMsg("Parameter cannot be empty");
+			return result;
+		}
+		
+		User user = this.getUser(httpRequest);
+		if(user == null){
+			result.setMsg("Please log in again");
+			return result;
+		}
+		
+		Vendor vendor= null;
+		try {
+			vendor= vendorService.getVendorByUserId(user.getUserId());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if(vendor == null){
+			result.setMsg("Please log in again");
+			return result;
+		}
+		
+		Long vendorId = vendor.getVendorId();
+		
+		Map<String, Object> conditionMap = new HashMap<String, Object>();
+		conditionMap.put("status", Integer.parseInt(map.get("status").toString()));
+		conditionMap.put("vendorId", vendorId);
+		conditionMap.put("orderNumber", map.get("orderNumber").toString());
+		
+		//根据订单状态查询订单
+		Map<String,Object> orderInfo = orderService.getOrderInfoByCondition(conditionMap);
+		
+		if(orderInfo != null ){
+			
+			
+			//根据ID列表获取商品属性
+			List<Map<String, Object>> productPropertyList = productPropertyService.getProductPropertyListByProductId(orderInfo.get("product_id").toString());
+			Map<String, Map<String, String>> productPropertyResult= new HashMap<String, Map<String, String>>();
+			
+			for(Map<String, Object> productProperty : productPropertyList){
+				
+				//如果存在
+				if(productPropertyResult.containsKey(productProperty.get("product_id").toString())){
+					Map<String, String> info = productPropertyResult.get(productProperty.get("product_id").toString());
+				    info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
+				}else{
+					Map<String, String> info = new HashMap<String, String>();
+					info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
+					productPropertyResult.put(productProperty.get("product_id").toString(), info);
+				}
+				
+			}
+			
+			
+
+			//汇率
+			Double rate =  Double.parseDouble(orderInfo.get("current_rate").toString());
+			
+			//按汇率计算人民币价钱
+			Double sale_price2 = Double.parseDouble(orderInfo.get("sale_price").toString()) * rate;
+			orderInfo.put("sale_price2", sale_price2);
+			//计算利润
+			Double profit = Double.parseDouble(orderInfo.get("sale_price").toString()) - Double.parseDouble(orderInfo.get("in_price").toString());
+			BigDecimal b = new BigDecimal(profit);  
+			profit = b.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();  
+			orderInfo.put("profit", profit * rate);
+			
+			//计算折扣 
+			Double salePrice = Double.parseDouble(orderInfo.get("sale_price").toString());
+			Double price = Double.parseDouble(orderInfo.get("price").toString());
+			Double inPrice = Double.parseDouble(orderInfo.get("in_price").toString());
+			
+			BigDecimal sale_price_discount = new BigDecimal((salePrice / price)*100);  
+//				info.put("sale_price_discount",sale_price_discount.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() +" %");
+			orderInfo.put("sale_price_discount",sale_price_discount.intValue() +" %");
+			
+			BigDecimal supply_price_discount = new BigDecimal((inPrice*(1+0.22)/price)*100);
+			orderInfo.put("supply_price_discount", supply_price_discount.intValue()+" %");
+			
+			
+			//添加商品对应的属性
+			if(productPropertyResult.size() > 0 ){
+				if(productPropertyResult.get(orderInfo.get("product_id").toString()) != null){
+					orderInfo.put("brandID", productPropertyResult.get(orderInfo.get("product_id").toString()).get("BrandID"));
+					orderInfo.put("colorCode", productPropertyResult.get(orderInfo.get("product_id").toString()).get("ColorCode"));
+				}
+			}
+			
+		}
+		
+		
+//		List<String> fileUrls = new ArrayList<String>();
+//		int status = StatusType.FILE_UPLOAD_ERROR;
+//		try {
+//			fileUrls = FileUploadHelper.uploadS3File(httpRequest);
+//			status = StatusType.SUCCESS;
+//			result.put("urls", fileUrls);
+//
+//		} catch (Exception e) {
+//			status = StatusType.DATABASE_ERROR;
+//			e.printStackTrace();
+//		}
+
+
+		String orderNumberUrl = "Barcode-"+orderInfo.get("order_line_num").toString()+".png";
+		orderNumberUrl = BarcodeUtil.generateFile(orderInfo.get("order_line_num").toString(), orderNumberUrl);
+		orderInfo.put("orderNumberUrl", orderNumberUrl);
+		
+		//如果包含#号  则不生成条形码
+		String skuBarcodeUrl = "Barcode-"+orderInfo.get("sku_code").toString()+".png";
+		if(!skuBarcodeUrl.contains("#")){
+			skuBarcodeUrl = BarcodeUtil.generateFile(orderInfo.get("sku_code").toString(), skuBarcodeUrl);
+			orderInfo.put("skuBarcodeUrl", skuBarcodeUrl);
+		}else{
+			orderInfo.put("skuBarcodeUrl", null);
+		}
+
+		
+		result.successStatus();
+		result.setData(orderInfo);
 		return result;
 	}
 	
