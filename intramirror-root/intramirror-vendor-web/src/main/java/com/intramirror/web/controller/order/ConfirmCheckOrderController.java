@@ -78,9 +78,21 @@ public class ConfirmCheckOrderController {
             return result;
         }
         
-        String barCode = map.get("barCode").toString(); 
-        String brandId = map.get("brandId").toString(); 
-        String colorCode = map.get("colorCode").toString(); 
+        String barCode = null;
+        String brandId = null; 
+        String colorCode = null; 
+        if(map.get("barCode") != null &&StringUtils.isNotBlank(map.get("barCode").toString()) && !map.get("barCode").toString().equals("#")){
+        	barCode = map.get("barCode").toString(); 
+        }
+        
+        if(map.get("brandId") != null &&StringUtils.isNotBlank(map.get("brandId").toString())){
+        	brandId = map.get("brandId").toString(); 
+        }
+        
+        if(map.get("colorCode") != null &&StringUtils.isNotBlank(map.get("colorCode").toString())){
+        	colorCode = map.get("colorCode").toString(); 
+        }
+        
         Sku sku = null;
         List<Map<String, Object>> mapList = new ArrayList<Map<String, Object>>();
         if (barCode != null) {
@@ -90,7 +102,7 @@ public class ConfirmCheckOrderController {
             mapList = productPropertyService.getProductPropertyByBrandIDAndColorCode(brandId, colorCode);
 //            result.put("mapList", mapList);
         }
-        if (sku != null || mapList != null) {
+        if (sku != null || (mapList != null && mapList.size() > 0)) {
         	result.successStatus();
         }
         
