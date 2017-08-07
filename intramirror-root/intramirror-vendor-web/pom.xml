@@ -54,39 +54,19 @@
             <groupId>com.intramirror</groupId>
             <artifactId>intramirror-product-service-core</artifactId>
         </dependency>
+        <dependency>
+	        <groupId>com.intramirror</groupId>
+			<artifactId>intramirror-shoplus-oss</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.intramirror</groupId>
             <artifactId>intramirror-user-service-core</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.intramirror</groupId>
             <artifactId>intramirror-payment-service-core</artifactId>
         </dependency>
-        
-        <!--oss文件上传-->
-		<dependency>
-			<groupId>pk</groupId>
-			<artifactId>shoplus-oss</artifactId>
-			<version>1.0.0</version>
-			<exclusions>
-                <exclusion>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </exclusion>
-            </exclusions>
-		</dependency>
-		
-		<dependency>
-			<groupId>pk</groupId>
-			<artifactId>shoplus-message</artifactId>
-			<version>1.0.0</version>
-		</dependency>
         
         <dependency>
             <groupId>com.intramirror</groupId>
