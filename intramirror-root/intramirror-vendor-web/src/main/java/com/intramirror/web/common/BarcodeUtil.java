@@ -14,6 +14,7 @@ import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.krysalis.barcode4j.HumanReadablePlacement;
 import org.krysalis.barcode4j.impl.code128.Code128Bean;
 import org.krysalis.barcode4j.impl.code39.Code39Bean;
 import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
@@ -78,12 +79,12 @@ public class BarcodeUtil {
      * @param path
      * @return
      */
-    public static String generateFile(String msg, String path) {
+    public static String generateFile(String msg, String path,Boolean show) {
     	path = storeFolderName +"/"+path;
 //        File file = new File(path);
         MediaStorangeRespVo mediaStorangeRespVo;
 		try {
-			mediaStorangeRespVo=mediaStorageService.storageMediaWithPath(new ByteArrayInputStream(generate(msg)) ,path);
+			mediaStorangeRespVo=mediaStorageService.storageMediaWithPath(new ByteArrayInputStream(generate(msg,show)) ,path);
 			System.out.println(new Gson().toJson(mediaStorangeRespVo));
 			return mediaStorangeRespVo.getHttpUrl();
 		} catch (MediaStorageFailException e1) {
@@ -99,9 +100,9 @@ public class BarcodeUtil {
      * @param msg
      * @return
      */
-    public static byte[] generate(String msg) {
+    public static byte[] generate(String msg,Boolean show) {
         ByteArrayOutputStream ous = new ByteArrayOutputStream();
-        generate(msg, ous);
+        generate(msg, ous,show);
         return ous.toByteArray();
     }
  
@@ -111,7 +112,7 @@ public class BarcodeUtil {
      * @param msg
      * @param ous
      */
-    public static void generate(String msg, OutputStream ous) {
+    public static void generate(String msg, OutputStream ous,Boolean show) {
         if (StringUtils.isBlank(msg) || ous == null) {
             return;
         }
@@ -125,8 +126,13 @@ public class BarcodeUtil {
  
         // 配置对象
         bean.setModuleWidth(moduleWidth);
-        bean.setWideFactor(3);
-        bean.doQuietZone(false);
+        bean.setWideFactor(2);
+        bean.doQuietZone(true);
+        if(!show){
+            bean.setMsgPosition(HumanReadablePlacement.HRP_NONE);
+        }
+
+        
  
         String format = "image/png";
         try {
@@ -148,7 +154,7 @@ public class BarcodeUtil {
     public static void main(String[] args) {
         String msg = "123a456z78a9";
         String path = "D:/barcode.png";
-        generateFile(msg, path);
+        generateFile(msg, path,true);
     }
 
 }

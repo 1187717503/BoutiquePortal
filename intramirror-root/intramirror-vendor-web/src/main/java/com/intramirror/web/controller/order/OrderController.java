@@ -405,13 +405,13 @@ public class OrderController extends BaseController{
 
 
 		String orderNumberUrl = "Barcode-"+orderInfo.get("order_line_num").toString()+".png";
-		orderNumberUrl = BarcodeUtil.generateFile(orderInfo.get("order_line_num").toString(), orderNumberUrl);
+		orderNumberUrl = BarcodeUtil.generateFile(orderInfo.get("order_line_num").toString(), orderNumberUrl,true);
 		orderInfo.put("orderNumberUrl", orderNumberUrl);
 		
 		//如果包含#号  则不生成条形码
 		String skuBarcodeUrl = "Barcode-"+orderInfo.get("sku_code").toString()+".png";
 		if(!skuBarcodeUrl.contains("#")){
-			skuBarcodeUrl = BarcodeUtil.generateFile(orderInfo.get("sku_code").toString(), skuBarcodeUrl);
+			skuBarcodeUrl = BarcodeUtil.generateFile(orderInfo.get("sku_code").toString(), skuBarcodeUrl,true);
 			orderInfo.put("skuBarcodeUrl", skuBarcodeUrl);
 		}else{
 			orderInfo.put("skuBarcodeUrl", null);
