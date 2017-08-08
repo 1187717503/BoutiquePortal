@@ -133,6 +133,7 @@ public class ConfirmCheckOrderController {
                 		upLogis.setLogistics_product_id(logis.getLogistics_product_id());
                 		
                 		upLogis.setEst_ship_date(sdf.parse(estShipDate));
+                		upLogis.setConfirmed_at(Helper.getCurrentUTCTime());
                 		logisticsProductServiceImpl.updateByLogisticsProduct(upLogis);
             		}else{
             			result.setMsg("Order does not exist,logisticsProductId:"+logisticsProductId);

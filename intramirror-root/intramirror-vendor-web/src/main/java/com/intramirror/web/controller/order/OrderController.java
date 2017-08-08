@@ -388,17 +388,6 @@ public class OrderController extends BaseController{
 		}
 		
 		
-//		List<String> fileUrls = new ArrayList<String>();
-//		int status = StatusType.FILE_UPLOAD_ERROR;
-//		try {
-//			fileUrls = FileUploadHelper.uploadS3File(httpRequest);
-//			status = StatusType.SUCCESS;
-//			result.put("urls", fileUrls);
-//
-//		} catch (Exception e) {
-//			status = StatusType.DATABASE_ERROR;
-//			e.printStackTrace();
-//		}
 
 
 		String orderNumberUrl = "Barcode-"+orderInfo.get("order_line_num").toString()+".png";
