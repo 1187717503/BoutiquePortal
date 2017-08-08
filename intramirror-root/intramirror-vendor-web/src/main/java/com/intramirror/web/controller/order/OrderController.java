@@ -405,7 +405,7 @@ public class OrderController extends BaseController{
 
 
 		String orderNumberUrl = "Barcode-"+orderInfo.get("order_line_num").toString()+".png";
-		orderNumberUrl = BarcodeUtil.generateFile(orderInfo.get("order_line_num").toString(), orderNumberUrl,true);
+		orderNumberUrl = BarcodeUtil.generateFile(orderInfo.get("order_line_num").toString(), orderNumberUrl,false);
 		orderInfo.put("orderNumberUrl", orderNumberUrl);
 		
 		//如果包含#号  则不生成条形码
