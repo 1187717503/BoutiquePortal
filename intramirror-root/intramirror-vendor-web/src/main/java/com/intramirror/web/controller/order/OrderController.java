@@ -421,39 +421,54 @@ public class OrderController extends BaseController{
 	}
 	
 	
-	
-	@RequestMapping("/updateOrderStatus")
+	/**
+	 * 状态机借口
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping(value="/updateOrderStatus", method=RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> updateOrderStatus(@RequestBody Map<String, Object> map){
+	public ResultMessage updateOrderStatus(@RequestBody Map<String, Object> map){
 		logger.info("updateOrderStatus param:"+new Gson().toJson(map));
-		
+		ResultMessage message = ResultMessage.getInstance();
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 		resultMap.put("status", StatusType.FAILURE);
-		
-		//参数不能为空
-		if(map == null || map.size() == 0){
-			resultMap.put("info", "Parameter cannot be null");
-			return resultMap;
+		try {
+			//参数不能为空
+			if(map == null || map.size() == 0){
+				message.successStatus().putMsg("info", "Parameter cannot be null");
+				return message;
+			}
+			
+			if(map.get("logisProductId") == null || StringUtils.isBlank(map.get("logisProductId").toString())){
+				message.successStatus().putMsg("info", "logisProductId cannot be null");
+				return message;
+			}
+			
+			if(map.get("status") == null || StringUtils.isBlank(map.get("status").toString())){
+				message.successStatus().putMsg("info", "status cannot be null");
+				return message;
+			}
+			
+			
+			Long logisProductId =Long.parseLong(map.get("logisProductId").toString());
+			int status =Integer.parseInt(map.get("status").toString());
+			
+			//调用修改订单状态
+			resultMap = logisticsProductService.updateOrderLogisticsStatusById(logisProductId, status);
+			if (StatusType.SUCCESS == Integer.parseInt(resultMap.get("status").toString())){
+				message.successStatus().putMsg("Info", "SUCCESS").setData(resultMap);
+				return message;
+			}
+			message.successStatus().putMsg("Info", ""+StatusType.FAILURE).setData(resultMap);
+			return message;
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.info("errorMsg : " +e.getMessage());
+			message.errorStatus().putMsg("errorMsg", e.getMessage());
 		}
 		
-		if(map.get("logisProductId") == null || StringUtils.isBlank(map.get("logisProductId").toString())){
-			resultMap.put("info", "logisProductId cannot be null");
-			return resultMap;
-		}
-		
-		if(map.get("status") == null || StringUtils.isBlank(map.get("status").toString())){
-			resultMap.put("info", "status cannot be null");
-			return resultMap;
-		}
-		
-		
-		Long logisProductId =Long.parseLong(map.get("logisProductId").toString());
-		int status =Integer.parseInt(map.get("status").toString());
-		
-		//调用修改订单状态
-		resultMap = logisticsProductService.updateOrderLogisticsStatusById(logisProductId, status);
-		
-		return resultMap;
+		return message;
 	}
 	
 	/**
