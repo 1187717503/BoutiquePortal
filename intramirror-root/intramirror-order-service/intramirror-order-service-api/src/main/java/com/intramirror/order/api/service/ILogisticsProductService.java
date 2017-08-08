@@ -31,5 +31,12 @@ public interface ILogisticsProductService {
 	 */
 	List<LogisticsProduct> getLogisticsProductListByCondition(Map<String, Object> conditionMap);
 	
+	/**
+	 * 根据logistics_product_id 修改相关信息
+	 * @param LogisticsProduct
+	 * @return
+	 */
+	int updateByLogisticsProduct (LogisticsProduct logisticsProduct);
+	
 }
 
