@@ -25,6 +25,8 @@ public class LogisticsProduct{
 	private BigDecimal tax_fee;
 	private String tracking_num;
 	private String vat_num;
+	private Date confirmed_at;
+	private Date est_ship_date;
 	
 	
 	public Integer getAmount() {
@@ -152,6 +154,18 @@ public class LogisticsProduct{
 	}
 	public void setVendor_id(Long vendor_id) {
 		this.vendor_id = vendor_id;
+	}
+	public Date getConfirmed_at() {
+		return confirmed_at;
+	}
+	public void setConfirmed_at(Date confirmed_at) {
+		this.confirmed_at = confirmed_at;
+	}
+	public Date getEst_ship_date() {
+		return est_ship_date;
+	}
+	public void setEst_ship_date(Date est_ship_date) {
+		this.est_ship_date = est_ship_date;
 	}
 
 	

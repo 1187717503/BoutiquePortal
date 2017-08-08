@@ -3,6 +3,8 @@ package com.intramirror.web.controller.order;
 import com.intramirror.common.Helper;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.parameter.StatusType;
+import com.intramirror.order.api.model.LogisticsProduct;
+import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.product.api.model.Sku;
 import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.product.api.service.SkuService;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @CrossOrigin
@@ -39,6 +42,10 @@ public class ConfirmCheckOrderController {
 
     @Autowired
     private ProductPropertyService productPropertyService;
+    
+    @Autowired
+    ILogisticsProductService logisticsProductServiceImpl;
+    
 
     /**
      * Wang
@@ -51,8 +58,6 @@ public class ConfirmCheckOrderController {
     @RequestMapping(value = "/confirmCheckOrder", method = RequestMethod.POST)
     @ResponseBody
     public ResultMessage confirmCheckOrder(@RequestBody Map<String,Object> map, HttpServletRequest httpRequest) throws Exception {
-        // 返回数据初始化
-        int status = StatusType.FAILURE;
 		ResultMessage result= new ResultMessage();
 		result.errorStatus();
 
@@ -81,6 +86,9 @@ public class ConfirmCheckOrderController {
         String barCode = null;
         String brandId = null; 
         String colorCode = null; 
+        String estShipDate = null;
+        String logisticsProductId = null;
+        
         if(map.get("barCode") != null &&StringUtils.isNotBlank(map.get("barCode").toString()) && !map.get("barCode").toString().equals("#")){
         	barCode = map.get("barCode").toString(); 
         }
@@ -93,6 +101,15 @@ public class ConfirmCheckOrderController {
         	colorCode = map.get("colorCode").toString(); 
         }
         
+        if(map.get("estShipDate") != null &&StringUtils.isNotBlank(map.get("estShipDate").toString())){
+        	estShipDate = map.get("estShipDate").toString(); 
+        }
+        
+        if(map.get("logisticsProductId") != null &&StringUtils.isNotBlank(map.get("logisticsProductId").toString())){
+        	logisticsProductId = map.get("logisticsProductId").toString(); 
+        }
+        
+        
         Sku sku = null;
         List<Map<String, Object>> mapList = new ArrayList<Map<String, Object>>();
         if (barCode != null) {
@@ -102,8 +119,26 @@ public class ConfirmCheckOrderController {
             mapList = productPropertyService.getProductPropertyByBrandIDAndColorCode(brandId, colorCode);
 //            result.put("mapList", mapList);
         }
+        
         if (sku != null || (mapList != null && mapList.size() > 0)) {
         	result.successStatus();
+        	
+        	try {
+            	if(logisticsProductId != null && estShipDate != null ){
+                  	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                  	
+            		LogisticsProduct logis = logisticsProductServiceImpl.selectById(Long.parseLong(logisticsProductId));
+            		LogisticsProduct upLogis = new LogisticsProduct();
+            		upLogis.setLogistics_product_id(logis.getLogistics_product_id());
+            		
+            		upLogis.setEst_ship_date(sdf.parse(estShipDate));
+            		logisticsProductServiceImpl.updateByLogisticsProduct(upLogis);
+            	}
+            	
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
         }
         
         return result;
