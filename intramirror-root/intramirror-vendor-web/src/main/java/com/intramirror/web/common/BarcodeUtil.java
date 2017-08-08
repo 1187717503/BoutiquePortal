@@ -123,17 +123,18 @@ public class BarcodeUtil {
             return;
         }
  
-        Code39Bean bean = new Code39Bean();
+//        Code39Bean bean = new Code39Bean();
+        Code128Bean bean = new Code128Bean();
  
         // 精细度
-        final int dpi = 200;
-//        final int dpi = 150;
+//        final int dpi = 200;
+        final int dpi = 150;
         // module宽度
         final double moduleWidth = UnitConv.in2mm(1.0f / dpi);
  
         // 配置对象
         bean.setModuleWidth(moduleWidth);
-        bean.setWideFactor(3);
+//        bean.setWideFactor(3);
         bean.doQuietZone(true);
         if(!show){
             bean.setMsgPosition(HumanReadablePlacement.HRP_NONE);
