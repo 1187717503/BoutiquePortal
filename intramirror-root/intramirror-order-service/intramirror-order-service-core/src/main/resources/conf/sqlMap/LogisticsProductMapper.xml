@@ -20,6 +20,9 @@
     <result column="updated_at" property="updated_at" jdbcType="TIMESTAMP" />
     <result column="confirmed_at" property="confirmed_at" jdbcType="TIMESTAMP" />
     <result column="est_ship_date" property="est_ship_date" jdbcType="TIMESTAMP" />
+    
+    <result column="packed_at" property="packed_at" jdbcType="TIMESTAMP" />
+    <result column="shipped_at" property="shipped_at" jdbcType="TIMESTAMP" />
     <result column="enabled" property="enabled" jdbcType="BIT" />
     <result column="order_line_num" property="order_line_num" jdbcType="LONGVARCHAR" />
     <result column="vendor_id" property="vendor_id" jdbcType="BIGINT" />
@@ -90,6 +93,14 @@
       
       <if test="est_ship_date != null" >
         est_ship_date = #{est_ship_date,jdbcType=TIMESTAMP},
+      </if>
+      
+      <if test="packed_at != null" >
+        packed_at = #{packed_at,jdbcType=TIMESTAMP},
+      </if>
+      
+      <if test="shipped_at != null" >
+        shipped_at = #{shipped_at,jdbcType=TIMESTAMP},
       </if>
       
       <if test="enabled != null" >

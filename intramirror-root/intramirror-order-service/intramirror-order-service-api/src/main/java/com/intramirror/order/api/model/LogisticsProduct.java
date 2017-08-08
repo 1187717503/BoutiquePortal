@@ -27,6 +27,8 @@ public class LogisticsProduct{
 	private String vat_num;
 	private Date confirmed_at;
 	private Date est_ship_date;
+	private Date packed_at;
+	private Date shipped_at;
 	
 	
 	public Integer getAmount() {
@@ -166,6 +168,18 @@ public class LogisticsProduct{
 	}
 	public void setEst_ship_date(Date est_ship_date) {
 		this.est_ship_date = est_ship_date;
+	}
+	public Date getPacked_at() {
+		return packed_at;
+	}
+	public void setPacked_at(Date packed_at) {
+		this.packed_at = packed_at;
+	}
+	public Date getShipped_at() {
+		return shipped_at;
+	}
+	public void setShipped_at(Date shipped_at) {
+		this.shipped_at = shipped_at;
 	}
 
 	
