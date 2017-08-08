@@ -464,7 +464,7 @@ public class OrderController extends BaseController{
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping("/getOrderCount")
+	@RequestMapping(value="/getOrderCount", method=RequestMethod.POST)
 	@ResponseBody
 	public ResultMessage getOrderCount(@RequestBody Map<String, Object> map, HttpServletRequest httpRequest){
 		logger.info("getOrderCount param " + new Gson().toJson(map));
@@ -512,7 +512,7 @@ public class OrderController extends BaseController{
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping("/orderRefund")
+	@RequestMapping( value ="/orderRefund", method=RequestMethod.POST)
 	@ResponseBody
 	public ResultMessage orderRefund(@RequestBody Map<String, Object> map, HttpServletRequest request){
 		//打印退款参数
