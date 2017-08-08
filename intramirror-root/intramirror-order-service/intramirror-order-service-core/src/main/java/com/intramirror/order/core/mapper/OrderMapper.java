@@ -49,7 +49,7 @@ public interface OrderMapper {
 	 * @param orderId
 	 * @return
 	 */
-	Map<String,Object> getPaymentInfoByOrderId(int orderId);
+	List<Map<String, Object>> getPaymentInfoByOrderId(int orderId);
 	
 	/**
 	 * 根据订单获取Shipment 

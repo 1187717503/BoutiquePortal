@@ -74,7 +74,11 @@ public class OrderServiceImpl extends BaseDao implements IOrderService{
 	 * @return
 	 */
 	public Map<String, Object> getPaymentInfoByOrderId(int orderId){
-		return orderMapper.getPaymentInfoByOrderId(orderId);
+		List<Map<String, Object>> orderMapList = orderMapper.getPaymentInfoByOrderId(orderId);
+        if (orderMapList.size() > 0) {
+            return orderMapList.get(0);
+        }
+		return null;
 	}
 
 	/**

@@ -37,7 +37,8 @@ public class RefundService {
 		setRemark(refundVO.getRemark()).
 		setNotifyUrl(refundVO.getNotifyUrl());
 		
-		JSONObject requestData = builder.build();
+//		JSONObject requestData = builder.build();
+		JSONObject requestData = JSONObject.parseObject(new Gson().toJson(builder));
 		OnlinePayOrderExecuter executer = new OnlinePayOrderExecuter();
 		logger.info("【退款】开始调用易汇金SDK,入参数据:"+new Gson().toJson(refundVO));
 		try{
@@ -92,7 +93,8 @@ public class RefundService {
 
 		RefundBuilder builder = new RefundBuilder(merchantId);
 		builder.setRequestId(requestId);
-		JSONObject requestData = builder.build();
+//		JSONObject requestData = builder.build();
+		JSONObject requestData = JSONObject.parseObject(new Gson().toJson(builder));
 		OnlinePayOrderExecuter executer = new OnlinePayOrderExecuter();
 		logger.info("【退款查询】开始调用易汇金SDK,入参数据:"+new Gson().toJson(refundVO));
 		try{
