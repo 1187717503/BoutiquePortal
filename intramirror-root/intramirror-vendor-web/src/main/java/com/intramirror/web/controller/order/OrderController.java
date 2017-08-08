@@ -26,7 +26,11 @@ import com.google.gson.JsonParser;
 import com.intramirror.common.Helper;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.parameter.StatusType;
+import com.intramirror.order.api.common.OrderStatusType;
+import com.intramirror.order.api.model.LogisticsProduct;
+import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderService;
+import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
@@ -61,6 +65,12 @@ public class OrderController extends BaseController{
 	
 	@Autowired
 	private OrderRefund orderRefund;
+	
+	@Autowired
+	private ISkuStoreService skuStoreService;
+	
+	@Autowired
+	private ILogisticsProductService iLogisticsProductService;
 	
 	
     @RequestMapping(value = "/getOrderList", method = RequestMethod.POST)
@@ -465,20 +475,12 @@ public class OrderController extends BaseController{
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping(value="/getOrderCount", method=RequestMethod.POST)
+	@RequestMapping(value="/getOrderCount", method=RequestMethod.GET)
 	@ResponseBody
-	public ResultMessage getOrderCount(@RequestBody Map<String, Object> map, HttpServletRequest httpRequest){
-		logger.info("getOrderCount param " + new Gson().toJson(map));
+	public ResultMessage getOrderCount(HttpServletRequest httpRequest){
 		ResultMessage resultMessage = ResultMessage.getInstance();
+		Map<String, Object> map;
         try {
-        	if(map == null || map.size() == 0){
-        		resultMessage.successStatus().putMsg("info", "Parameter cannot be null");
-        		return resultMessage;
-        	}
-        	if(map.get("status") == null || StringUtils.isBlank(map.get("status").toString())){
-        		resultMessage.successStatus().putMsg("info", "status cannot be null");
-        		return resultMessage;
-        	}
         	User user = this.getUser(httpRequest);
     		if(user == null){
     			resultMessage.setMsg("Please log in again");
@@ -495,10 +497,20 @@ public class OrderController extends BaseController{
     			resultMessage.setMsg("Please log in again");
     			return resultMessage;
     		}
-    		
-    		map.put("vendorId", vendor.getVendorId());
-            int result = orderService.getOrderByIsvalidCount(map);
-            resultMessage.successStatus().putMsg("info","SUCCESS").setData(result);
+    		Long vendorId = vendor.getVendorId();
+    		int [] item = {OrderStatusType.PENDING,OrderStatusType.COMFIRMED};
+    		Map<String, Object> resultMap = new HashMap<>();
+    		for (int i = 0; i < item.length; i++) {
+    			map = new HashMap<>();
+    			map.put("status",item[i]);
+    			map.put("vendorId", vendorId);
+    			int result = orderService.getOrderByIsvalidCount(map);
+    			if (OrderStatusType.PENDING == item[i])
+    				resultMap.put("comfirmed", result);
+    			if (OrderStatusType.COMFIRMED == item[i])
+    				resultMap.put("pack", result);
+			}
+    		resultMessage.successStatus().putMsg("info","SUCCESS").setData(resultMap);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(" error message : {}", e.getMessage());
@@ -720,7 +732,6 @@ public class OrderController extends BaseController{
      * @return
      */
     public int checkParams(Map<String, String> params) {
-    	System.out.println("==========================????????????????");
         // 判断status是否合法
         if (Helper.isNullOrEmpty(params.get("status").toString())) {
             return StatusType.PARAM_EMPTY_OR_NULL;
@@ -748,5 +759,63 @@ public class OrderController extends BaseController{
             return StatusType.IS_NOT_GOOD_JSON;
         }
         return StatusType.SUCCESS;
+    }
+    
+    /**
+     * 回调接口
+     * @return
+     */
+    @RequestMapping(value="/orderRefundCallback")
+	@ResponseBody
+    public ResultMessage orderRefundCallback(@RequestBody Map<String,Object> map){
+		logger.info("info parameter :"+ new Gson().toJson(map));
+		ResultMessage message= ResultMessage.getInstance();
+		try {
+			//校验入参
+	    	if (null == map || 0 == map.size()){
+	    		message.successStatus().putMsg("info", "Parameter cannot be null");
+	    		logger.info("info parameter cannot be null");
+	    		return message;
+	    	}
+	    	if (null == map.get("logisProductId") || StringUtils.isBlank(map.get("logisProductId").toString())){
+	    		message.successStatus().putMsg("info", "logisProductId cannot be null");
+	    		logger.info("info logisProductId  cannot be null");
+	    		return message;
+	    	}
+	    	if (null == map.get("status") || StringUtils.isBlank(map.get("status").toString())){
+	    		message.successStatus().putMsg("info", "status cannot be null");
+	    		logger.info("info status  cannot be null");
+	    		return message;
+	    	}
+	    	Long logisProductId =Long.parseLong(map.get("logisProductId").toString());
+			int status =Integer.parseInt(map.get("status").toString());
+			
+			//回调接口只支持取消
+			if (OrderStatusType.CANCELED != status){
+				message.successStatus().putMsg("info", "status not is 6");
+	    		logger.info("info status not is 6");
+	    		return message;
+			}
+	    	logger.info(logisProductId +"： 进入退款回调流程!!");
+	    	Map<String, Object> resultMap = logisticsProductService.updateOrderLogisticsStatusById(logisProductId, status);
+	    	//获取SKU
+	    	LogisticsProduct oldLogisticsProduct = iLogisticsProductService.selectById(logisProductId);
+	    	//开始修改库存
+			if (StatusType.SUCCESS == Integer.parseInt(resultMap.get("status").toString())){
+				//如果成功，释放库存
+				Long skuId = skuStoreService.selectSkuIdByShopProductSkuId(oldLogisticsProduct.getShop_product_sku_id());
+				int result = skuStoreService.updateBySkuId(OrderStatusType.REFUND, skuId);
+				message.successStatus().putMsg("Info", "SUCCESS").setData(result);
+				logger.info(logisProductId + "===========>>>>>释放库存");
+				return message;
+			}
+			message.successStatus().putMsg("Info", "当前状态不符合状态机扭转请检查");
+			logger.info("退款回调结束!!");
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.info("errorMsg : "+e.getMessage());
+			message.errorStatus().putMsg("errorMsg", e.getMessage());
+		}
+    	return message;
     }
 }

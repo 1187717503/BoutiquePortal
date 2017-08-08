@@ -13,11 +13,7 @@ import org.springframework.stereotype.Service;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.order.api.common.OrderStatusType;
 import com.intramirror.order.api.model.LogisticsProduct;
-import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.service.ILogisticsProductService;
-import com.intramirror.order.api.service.IShipmentService;
-import com.intramirror.order.core.dao.BaseDao;
-import com.intramirror.order.core.mapper.LogisticsProductMapper;
 import com.intramirror.product.api.service.ISkuStoreService;
 
 @Service
@@ -68,26 +64,19 @@ public class LogisticsProductService{
 			//校验通过，修改状态
 			logisticsProductService.updateOrderLogisticsStatusById(logistics_product_id,status);
 			
-			//如果COMFIRMED 生成Shipment 新的Shipment 默认有一个箱子
-			if (2==status){
-				
-			}
 //			if(num <= 0){
 //				resultMap.put("info","Status modification failed");
 //				return resultMap;
 //			}
-			
-			//修改库存相关信息
-			if(status == OrderStatusType.REFUND || status == OrderStatusType.FINISHED || status == OrderStatusType.COMFIRMED || status == OrderStatusType.ORDERED){
-				Long skuId = skuStoreService.selectSkuIdByShopProductSkuId(oldLogisticsProduct.getShop_product_sku_id());
-				skuStoreService.updateBySkuId(status, skuId);
-			}
-
-			
             resultMap.put("status",StatusType.SUCCESS);
         }
 		
 		return resultMap;
+	}
+
+	public LogisticsProduct selectById(Long logisProductId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	

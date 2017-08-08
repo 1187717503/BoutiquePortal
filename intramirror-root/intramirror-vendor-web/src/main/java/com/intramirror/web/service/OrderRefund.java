@@ -22,6 +22,7 @@ import com.google.gson.JsonObject;
 import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.order.api.common.Contants;
+import com.intramirror.order.api.common.OrderStatusType;
 import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderService;
@@ -31,6 +32,7 @@ import com.intramirror.payment.api.model.RefundVO;
 import com.intramirror.payment.api.model.ResultMsg;
 import com.intramirror.payment.api.service.IPaymentResultService;
 import com.intramirror.payment.api.service.IPaymentService;
+import com.intramirror.product.api.service.ISkuStoreService;
 
 
 /**
@@ -66,6 +68,9 @@ public class OrderRefund{
 	
 	@Autowired
 	private ILogisticsProductService iLogisticsProductService;
+	
+	@Autowired
+	private ISkuStoreService skuStoreService;
 	
 
 	/** init properties */
@@ -209,7 +214,16 @@ public class OrderRefund{
         		// 修改状态
             	try {
             		logisticsProductService.updateOrderLogisticsStatusById(Long.parseLong(refundMap.get("request_id").toString()),Contants.LOGISTICSPRODUCT_CANCELED_STATUS);
-                } catch (Exception e) {
+            		Map<String, Object> resultMap = logisticsProductService.updateOrderLogisticsStatusById(Long.parseLong(refundMap.get("request_id").toString()),Contants.LOGISTICSPRODUCT_CANCELED_STATUS);
+        	    	//获取SKU
+        	    	LogisticsProduct oldLogisticsProduct = iLogisticsProductService.selectById(Long.parseLong(refundMap.get("request_id").toString()));
+            		if (StatusType.SUCCESS == Integer.parseInt(resultMap.get("status").toString())){
+        				//如果成功，释放库存
+        				Long skuId = skuStoreService.selectSkuIdByShopProductSkuId(oldLogisticsProduct.getShop_product_sku_id());
+        				int result = skuStoreService.updateBySkuId(OrderStatusType.REFUND, skuId);
+        				LOGGER.info(Long.parseLong(refundMap.get("request_id").toString()) + "===========>>>>>释放库存 : " + result);
+        			}
+            	} catch (Exception e) {
                 	e.printStackTrace();
                 }
         	}
