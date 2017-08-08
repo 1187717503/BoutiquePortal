@@ -3,7 +3,6 @@ package com.intramirror.web.controller.order;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,9 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import pk.shoplus.common.FileUploadHelper;
-import pk.shoplus.common.vo.MediaStorangeRespVo;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -63,7 +59,8 @@ public class OrderController extends BaseController{
 	@Autowired
 	private VendorService vendorService;
 	
-	
+	@Autowired
+	private OrderRefund orderRefund;
 	
 	
     @RequestMapping(value = "/getOrderList", method = RequestMethod.POST)
@@ -557,7 +554,6 @@ public class OrderController extends BaseController{
         int status = StatusType.FAILURE;
         try {
         	//退款处理
-	  		OrderRefund orderRefund = new OrderRefund();
 	  		if (null != params.get("logistics_product_list") || StringUtils.isNoneBlank(params.get("logistics_product_list").toString())){
 	  			logisticsProductArray = new JsonParser().parse(params.get("logistics_product_list").toString()).getAsJsonArray();
 	  			status = orderRefund.updateStausByJson(logisticsProductArray, null, orderStatus);
@@ -567,6 +563,7 @@ public class OrderController extends BaseController{
 	  			orderVendorArray = new JsonParser().parse(params.get("order_vendor_list").toString()).getAsJsonArray();
 	  			status = orderRefund.updateStausByJson(null, orderVendorArray, orderStatus);
 	  		}
+	  		status = StatusType.SUCCESS;
 	  		message.successStatus().putMsg("status", ""+status).setData(status);
 		} catch (Exception e) {
 			e.printStackTrace();
