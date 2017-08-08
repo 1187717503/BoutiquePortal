@@ -90,6 +90,12 @@ public class BarcodeUtil {
 		} catch (MediaStorageFailException e1) {
 			e1.printStackTrace();
 		} 
+//        File file = new File(path);
+//        try {
+//            generate(msg, new FileOutputStream(file),show);
+//        } catch (FileNotFoundException e) {
+//            throw new RuntimeException(e);
+//        }
 		return null;
        
     }
@@ -120,13 +126,14 @@ public class BarcodeUtil {
         Code39Bean bean = new Code39Bean();
  
         // 精细度
-        final int dpi = 150;
+        final int dpi = 200;
+//        final int dpi = 150;
         // module宽度
         final double moduleWidth = UnitConv.in2mm(1.0f / dpi);
  
         // 配置对象
         bean.setModuleWidth(moduleWidth);
-        bean.setWideFactor(2);
+        bean.setWideFactor(3);
         bean.doQuietZone(true);
         if(!show){
             bean.setMsgPosition(HumanReadablePlacement.HRP_NONE);
@@ -152,9 +159,9 @@ public class BarcodeUtil {
     }
  
     public static void main(String[] args) {
-        String msg = "123a456z78a9";
-        String path = "D:/barcode.png";
-        generateFile(msg, path,true);
+        String msg = "2017081231456875";
+        String path = "D:/barcode3.png";
+        generateFile(msg, path,false);
     }
 
 }
