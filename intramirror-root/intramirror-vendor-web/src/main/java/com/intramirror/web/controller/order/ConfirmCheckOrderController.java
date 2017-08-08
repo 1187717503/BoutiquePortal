@@ -128,11 +128,16 @@ public class ConfirmCheckOrderController {
                   	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                   	
             		LogisticsProduct logis = logisticsProductServiceImpl.selectById(Long.parseLong(logisticsProductId));
-            		LogisticsProduct upLogis = new LogisticsProduct();
-            		upLogis.setLogistics_product_id(logis.getLogistics_product_id());
-            		
-            		upLogis.setEst_ship_date(sdf.parse(estShipDate));
-            		logisticsProductServiceImpl.updateByLogisticsProduct(upLogis);
+            		if(logis != null){
+                		LogisticsProduct upLogis = new LogisticsProduct();
+                		upLogis.setLogistics_product_id(logis.getLogistics_product_id());
+                		
+                		upLogis.setEst_ship_date(sdf.parse(estShipDate));
+                		logisticsProductServiceImpl.updateByLogisticsProduct(upLogis);
+            		}else{
+            			result.setMsg("Order does not exist,logisticsProductId:"+logisticsProductId);
+            		}
+
             	}
             	
 			} catch (Exception e) {
