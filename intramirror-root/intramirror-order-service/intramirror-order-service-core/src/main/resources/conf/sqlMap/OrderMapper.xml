@@ -112,7 +112,7 @@
 			s.price,s.in_price,sps.sale_price,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,b.english_name as brandName,
 			v.vendor_name,p.cover_img,lp.logistics_product_id  
 			FROM logistics_product lp  
-			INNER JOIN container c on lp.container_id = c.container_id
+			INNER JOIN container c on lp.container_id = c.container_id 
 			INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id  
 			INNER JOIN `order` o ON ol.order_id = o.order_id   
 			LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id   
