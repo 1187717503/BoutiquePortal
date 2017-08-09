@@ -65,7 +65,6 @@ public class ContainerController {
 				message.successStatus().putMsg("info", "height cannot be null");
 				return message;
 			}
-			map.put("barcode", "1123333321312321");
 			int result = containerService.saveContainerByShipment(map);
 			message.successStatus().putMsg("info","SUCCESS").setData(result);
 		} catch (Exception e) {

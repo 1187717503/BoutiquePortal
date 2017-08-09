@@ -43,12 +43,16 @@ public class ContainerServiceImpl extends BaseDao implements IContainerService{
 		container.setLength(Long.parseLong(map.get("length").toString()));
 		container.setWidth(Long.parseLong(map.get("width").toString()));
 		container.setHeight(Long.parseLong(map.get("height").toString()));
-		container.setBarcode(map.get("barcode").toString());
 		//新增默认箱子为open 
 		container.setStatus(ContainerType.OPEN);
 		Date currentDate = new Date();
 		container.setCreatedAt(currentDate);
 		container.setUpdatedAt(currentDate);
+		if (null != map.get("barcode")){
+			container.setBarcode(map.get("barcode").toString());
+		}else{
+			container.setBarcode("");
+		}
 		if (null != map.get("containerType")){
 			container.setContainerType(map.get("containerType").toString());
 		}else{
