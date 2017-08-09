@@ -107,35 +107,35 @@ public class OrderController extends BaseController{
 		
 		if(orderList != null && orderList.size() > 0 ){
 			
-			/**------------------------------------优化----------------------------------------*/
-			//遍历获取所有商品ID
-			String productIds = "";
-			for(Map<String, Object> info : orderList){
-				productIds +=info.get("product_id").toString()+",";
-			}
-			
-			if(StringUtils.isNoneBlank(productIds)){
-				productIds = productIds.substring(0,productIds.length() -1);
-			}
-			
-			//根据ID列表获取商品属性
-			List<Map<String, Object>> productPropertyList = productPropertyService.getProductPropertyListByProductId(productIds);
-			Map<String, Map<String, String>> productPropertyResult= new HashMap<String, Map<String, String>>();
-			
-			for(Map<String, Object> productProperty : productPropertyList){
-				
-				//如果存在
-				if(productPropertyResult.containsKey(productProperty.get("product_id").toString())){
-					Map<String, String> info = productPropertyResult.get(productProperty.get("product_id").toString());
-				    info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
-				}else{
-					Map<String, String> info = new HashMap<String, String>();
-					info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
-					productPropertyResult.put(productProperty.get("product_id").toString(), info);
-				}
-				
-			}
-			/**------------------------------------优化end----------------------------------------*/
+//			/**------------------------------------优化----------------------------------------*/
+//			//遍历获取所有商品ID
+//			String productIds = "";
+//			for(Map<String, Object> info : orderList){
+//				productIds +=info.get("product_id").toString()+",";
+//			}
+//			
+//			if(StringUtils.isNoneBlank(productIds)){
+//				productIds = productIds.substring(0,productIds.length() -1);
+//			}
+//			
+//			//根据ID列表获取商品属性
+//			List<Map<String, Object>> productPropertyList = productPropertyService.getProductPropertyListByProductId(productIds);
+//			Map<String, Map<String, String>> productPropertyResult= new HashMap<String, Map<String, String>>();
+//			
+//			for(Map<String, Object> productProperty : productPropertyList){
+//				
+//				//如果存在
+//				if(productPropertyResult.containsKey(productProperty.get("product_id").toString())){
+//					Map<String, String> info = productPropertyResult.get(productProperty.get("product_id").toString());
+//				    info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
+//				}else{
+//					Map<String, String> info = new HashMap<String, String>();
+//					info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
+//					productPropertyResult.put(productProperty.get("product_id").toString(), info);
+//				}
+//				
+//			}
+//			/**------------------------------------优化end----------------------------------------*/
 			
 			
 			for(Map<String, Object> info : orderList){
@@ -165,13 +165,13 @@ public class OrderController extends BaseController{
 				info.put("supply_price_discount", (100 - supply_price_discount.intValue())+" %");
 				
 				
-				//添加商品对应的属性
-				if(productPropertyResult.size() > 0 ){
-					if(productPropertyResult.get(info.get("product_id").toString()) != null){
-						info.put("brandID", productPropertyResult.get(info.get("product_id").toString()).get("BrandID"));
-						info.put("colorCode", productPropertyResult.get(info.get("product_id").toString()).get("ColorCode"));
-					}
-				}
+//				//添加商品对应的属性
+//				if(productPropertyResult.size() > 0 ){
+//					if(productPropertyResult.get(info.get("product_id").toString()) != null){
+//						info.put("brandID", productPropertyResult.get(info.get("product_id").toString()).get("BrandID"));
+//						info.put("colorCode", productPropertyResult.get(info.get("product_id").toString()).get("ColorCode"));
+//					}
+//				}
 				
 			}
 			

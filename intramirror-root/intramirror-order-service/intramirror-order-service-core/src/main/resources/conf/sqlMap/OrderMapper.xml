@@ -74,10 +74,12 @@
     <select id="getOrderListByStatus" resultType="java.util.HashMap"  parameterType="java.util.Map">
 			SELECT  o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id,pp.colorCode,pp.brandID,pspv.`value` as size,p.category_id,
 			s.price,s.in_price,sps.sale_price,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
-			v.vendor_name,v.vendor_id,p.cover_img,lp.logistics_product_id  
+			lp.confirmed_at,lp.est_ship_date,lp.packed_at,lp.shipped_at,
+			v.vendor_name,v.vendor_id,g.english_name as geography_name,p.cover_img,lp.logistics_product_id  
 			FROM logistics_product lp  INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id  
 			INNER JOIN `order` o ON ol.order_id = o.order_id   
-			LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id   
+			LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id  
+			INNER JOIN geography g on l.geography_id = g.geography_id  
 			INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id  
 			INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id   
 			INNER JOIN product p ON (sp.product_id = p.product_id )  
@@ -106,7 +108,7 @@
   </select>
   
   <select id="getOrderListByStatusAndContainerId" resultType="java.util.HashMap"  parameterType="java.util.Map">
-			SELECT  o.order_num,o.order_id,o.current_rate,p.name,p.product_id,pp.colorCode,pp.brandID,pspv.`value` as size,p.category_id,
+			SELECT  o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id,pp.colorCode,pp.brandID,pspv.`value` as size,p.category_id,
 			s.price,s.in_price,sps.sale_price,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
 			v.vendor_name,p.cover_img,lp.logistics_product_id  
 			FROM logistics_product lp  
