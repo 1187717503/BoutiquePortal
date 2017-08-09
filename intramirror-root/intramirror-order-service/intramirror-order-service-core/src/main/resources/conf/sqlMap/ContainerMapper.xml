@@ -56,4 +56,11 @@ values(#{containerType,jdbcType=VARCHAR}, #{shipToGeography,jdbcType=VARCHAR},#{
   		DELETE FROM container 
 		WHERE container_id = #{containerId,jdbcType=BIGINT}
   </delete>
+  
+<!--   生成条形码sql -->
+	<select id="getMaxBarcode" resultType="java.lang.Integer">
+		select MAX(right(barcode,7)) AS maxCode
+		from container;
+	</select>
+
 </mapper>

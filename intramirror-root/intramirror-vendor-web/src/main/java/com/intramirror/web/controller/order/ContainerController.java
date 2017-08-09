@@ -138,7 +138,7 @@ public class ContainerController {
 			}
 			Container container = containerService.getContainerBybarcode(map);
 			if (null == container){
-				message.successStatus().putMsg("info", "SUCCESS").setData(null);
+				message.errorStatus().putMsg("info", "SUCCESS").setData(null);
 			}
 			message.successStatus().putMsg("info", "SUCCESS").setData(container);
 		} catch (Exception e){
@@ -191,6 +191,24 @@ public class ContainerController {
 			}
 			int result = containerService.deleteContainerById(map);
 			message.successStatus().putMsg("info", "SUCCESS").setData(result);
+			return message;
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(" error Message : {}", e.getMessage());
+			message.errorStatus().putMsg("info", "error Message :" + e.getMessage());
+		}
+		return message;
+	}
+	
+	@RequestMapping(value="/getBarcode", method=RequestMethod.GET)
+	@ResponseBody
+	public ResultMessage getBarcode(){
+		ResultMessage message = ResultMessage.getInstance();
+		String barCode = "CTN";
+		try {
+			int maxCode = containerService.getMaxBarcode();
+			barCode+=(maxCode+1);
+			message.successStatus().addMsg("info SUCCESS").setData(barCode);
 			return message;
 		} catch (Exception e) {
 			e.printStackTrace();

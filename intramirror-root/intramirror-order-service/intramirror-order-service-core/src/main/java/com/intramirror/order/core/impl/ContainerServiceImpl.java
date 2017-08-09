@@ -110,6 +110,15 @@ public class ContainerServiceImpl extends BaseDao implements IContainerService{
 		return containerMapper.deleteContainerById(map);
 	}
 
+	/**
+	 * 生成条形码
+	 * @return int
+	 */
+	@Override
+	public int getMaxBarcode() {
+		return containerMapper.getMaxBarcode();
+	}
+
 
 	
 

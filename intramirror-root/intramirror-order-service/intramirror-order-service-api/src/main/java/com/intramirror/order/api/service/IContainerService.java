@@ -48,4 +48,10 @@ public interface IContainerService {
 	 */
 	int deleteContainerById(Map<String, Object> map);
 	
+	/**
+	 * 获取条形码
+	 * @return int
+	 */
+	int getMaxBarcode();
+	
 }
