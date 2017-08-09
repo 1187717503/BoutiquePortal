@@ -159,10 +159,10 @@ public class OrderController extends BaseController{
 				
 				BigDecimal sale_price_discount = new BigDecimal((salePrice / price)*100);  
 //				info.put("sale_price_discount",sale_price_discount.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() +" %");
-				info.put("sale_price_discount",sale_price_discount.intValue() +" %");
+				info.put("sale_price_discount",(100 -sale_price_discount.intValue()) +" %");
 				
 				BigDecimal supply_price_discount = new BigDecimal((inPrice*(1+0.22)/price)*100);
-				info.put("supply_price_discount", supply_price_discount.intValue()+" %");
+				info.put("supply_price_discount", (100 - supply_price_discount.intValue())+" %");
 				
 				
 				//添加商品对应的属性
@@ -381,10 +381,10 @@ public class OrderController extends BaseController{
 			
 			BigDecimal sale_price_discount = new BigDecimal((salePrice / price)*100);  
 //				info.put("sale_price_discount",sale_price_discount.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() +" %");
-			orderInfo.put("sale_price_discount",sale_price_discount.intValue() +" %");
+			orderInfo.put("sale_price_discount",(100 - sale_price_discount.intValue()) +" %");
 			
 			BigDecimal supply_price_discount = new BigDecimal((inPrice*(1+0.22)/price)*100);
-			orderInfo.put("supply_price_discount", supply_price_discount.intValue()+" %");
+			orderInfo.put("supply_price_discount", (100 -supply_price_discount.intValue())+" %");
 			
 			
 			//添加商品对应的属性
