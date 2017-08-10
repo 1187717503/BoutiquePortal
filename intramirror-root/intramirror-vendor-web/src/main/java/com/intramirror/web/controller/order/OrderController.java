@@ -101,9 +101,15 @@ public class OrderController extends BaseController{
 			return result;
 		}
 		
+		String sortByName = null;
+		if(map.get("sortByName") != null){
+			sortByName = map.get("sortByName").toString();
+		}
+		
+		
 		Long vendorId = vendor.getVendorId();
 		//根据订单状态查询订单
-		List<Map<String,Object>> orderList = orderService.getOrderListByStatus(Integer.parseInt(map.get("status").toString()),vendorId);
+		List<Map<String,Object>> orderList = orderService.getOrderListByStatus(Integer.parseInt(map.get("status").toString()),vendorId,sortByName);
 		
 		if(orderList != null && orderList.size() > 0 ){
 			

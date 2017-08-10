@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -95,10 +96,13 @@ public class OrderServiceImpl extends BaseDao implements IOrderService{
 	 * @return
 	 */
 	@Override
-	public List<Map<String, Object>> getOrderListByStatus(int status,Long vendorId) {
+	public List<Map<String, Object>> getOrderListByStatus(int status,Long vendorId,String sortByName) {
 		Map<String, Object> conditionMap = new HashMap<String, Object>();
 		conditionMap.put("status", status);
 		conditionMap.put("vendorId", vendorId);
+		if(sortByName != null && StringUtils.isNoneBlank(sortByName)){
+			conditionMap.put(sortByName, sortByName);
+		}
 		return orderMapper.getOrderListByStatus(conditionMap);
 	}
 
