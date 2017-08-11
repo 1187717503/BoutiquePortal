@@ -54,7 +54,7 @@ public class ContainerServiceImpl extends BaseDao implements IContainerService{
 		if (null != map.get("height")){
 			container.setHeight(Long.parseLong(map.get("height").toString()));
 		}else{
-			container.setHeight(Long.parseLong(""));
+			container.setHeight(Long.parseLong("0"));
 		}
 		//新增默认箱子为open 
 		container.setStatus(ContainerType.OPEN);
