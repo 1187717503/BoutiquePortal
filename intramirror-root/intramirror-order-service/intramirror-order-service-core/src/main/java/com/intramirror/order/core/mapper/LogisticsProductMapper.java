@@ -23,6 +23,16 @@ public interface LogisticsProductMapper {
 	 */
 	LogisticsProduct selectById(Long logistics_product_id);
 	
+	
+	/**
+	 * 根据condition map 查询详情
+	 * @param conditionMap
+	 * @return  
+	 * @throws Exception
+	 */
+	List<LogisticsProduct> selectByCondition(Map<String, Object> conditionMap);
+	
+	
 
 	/**
 	 * 根据condition map 来获取 OrderLogistics list

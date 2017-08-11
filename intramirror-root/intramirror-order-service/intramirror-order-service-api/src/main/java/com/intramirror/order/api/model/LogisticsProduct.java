@@ -25,6 +25,7 @@ public class LogisticsProduct{
 	private BigDecimal tax_fee;
 	private String tracking_num;
 	private String vat_num;
+	private Long container_id;
 	private Date confirmed_at;
 	private Date est_ship_date;
 	private Date packed_at;
@@ -180,6 +181,12 @@ public class LogisticsProduct{
 	}
 	public void setShipped_at(Date shipped_at) {
 		this.shipped_at = shipped_at;
+	}
+	public Long getContainer_id() {
+		return container_id;
+	}
+	public void setContainer_id(Long container_id) {
+		this.container_id = container_id;
 	}
 
 	

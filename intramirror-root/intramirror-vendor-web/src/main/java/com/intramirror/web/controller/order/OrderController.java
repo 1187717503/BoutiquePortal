@@ -183,123 +183,6 @@ public class OrderController extends BaseController{
 			
 		}
 		
-		
-//		//获取order列表
-//		List<Map<String,Object>> orderList = orderService.getOrderList(status);
-//		
-//		String orderNumbers = "";
-//		
-//		//遍历获取所有的orderNumber
-//		if(orderList != null && orderList.size() > 0){
-//			for(Map<String, Object> orderInfo : orderList){
-//				orderNumbers += orderInfo.get("order_num").toString()+",";
-//			}
-//		}else{
-//			result.setData(orderList);
-//			return result;
-//		}
-//		
-//		if(StringUtils.isNoneBlank(orderNumbers)){
-//			orderNumbers = orderNumbers.substring(0,orderNumbers.length() -1);
-//		}
-//		
-//		
-//		//根据orderNumber 获取orderLine信息
-//		List<Map<String,Object>> orderLineResult = orderService.getOrderListByOrderNumber(orderNumbers, status);
-//		
-//		if(orderLineResult != null && orderLineResult.size() > 0){
-//			
-//			/**------------------------------------优化----------------------------------------*/
-//			//遍历获取所有商品ID
-//			String productIds = "";
-//			for(Map<String, Object> info : orderLineResult){
-//				productIds +=info.get("product_id").toString()+",";
-//			}
-//			
-//			if(StringUtils.isNoneBlank(productIds)){
-//				productIds = productIds.substring(0,productIds.length() -1);
-//			}
-//			
-//			//根据ID列表获取商品属性
-//			List<Map<String, Object>> productPropertyList = productPropertyService.getProductPropertyListByProductId(productIds);
-//			Map<String, Map<String, String>> productPropertyResult= new HashMap<String, Map<String, String>>();
-//			
-//			for(Map<String, Object> productProperty : productPropertyList){
-//				
-//				//如果存在
-//				if(productPropertyResult.containsKey(productProperty.get("product_id").toString())){
-//					Map<String, String> info = productPropertyResult.get(productProperty.get("product_id").toString());
-//				    info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
-//				}else{
-//					Map<String, String> info = new HashMap<String, String>();
-//					info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
-//					productPropertyResult.put(productProperty.get("product_id").toString(), info);
-//				}
-//				
-//			}
-//			/**------------------------------------优化end----------------------------------------*/
-//			
-//			
-//			
-//			for(Map<String, Object> orderInfo : orderList){
-//				List<Map<String, Object>> orderLineList = new ArrayList<Map<String,Object>>();
-//				int amount = 0;
-//				for(Map<String, Object> info : orderLineResult){
-//					if(orderInfo.get("order_num").toString().equals(info.get("order_num").toString())){
-//						//累加数量
-//						amount +=Integer.parseInt(info.get("amount").toString());
-//						//汇率
-//						Double rate =  Double.parseDouble(orderInfo.get("current_rate").toString());
-//						
-//						//按汇率计算人民币价钱
-//						Double sale_price2 = Double.parseDouble(info.get("sale_price").toString()) * rate;
-//						info.put("sale_price2", sale_price2);
-//						//计算利润
-//						Double profit = Double.parseDouble(info.get("sale_price").toString()) - Double.parseDouble(info.get("in_price").toString());
-//						BigDecimal b = new BigDecimal(profit);  
-//						profit = b.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();  
-//						info.put("profit", profit * rate);
-//						
-//						//计算折扣 
-//						Double salePrice = Double.parseDouble(info.get("sale_price").toString());
-//						Double price = Double.parseDouble(info.get("price").toString());
-//						Double inPrice = Double.parseDouble(info.get("in_price").toString());
-//						
-//						BigDecimal sale_price_discount = new BigDecimal((salePrice / price)*100);  
-////						info.put("sale_price_discount",sale_price_discount.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() +" %");
-//						info.put("sale_price_discount",sale_price_discount.intValue() +" %");
-//						
-//						BigDecimal supply_price_discount = new BigDecimal((inPrice*(1+0.22)/price)*100);
-//						info.put("supply_price_discount", supply_price_discount.intValue()+" %");
-//						
-//						//如果一条订单下面有多个子订单  判断子订单状态是否一致 不一致则修改父订单状态为Multiple
-//						if(orderLineList != null && orderLineList.size() > 0){
-//							for(Map<String, Object> orderMap : orderLineList){
-//								if(!orderMap.get("status").toString().equals(info.get("status").toString())){
-//									orderInfo.put("status", "Multiple");
-//								}
-//							}
-//							
-//						}
-//						
-//						
-//						//添加商品对应的属性
-//						if(productPropertyResult.size() > 0 ){
-//							if(productPropertyResult.get(info.get("product_id").toString()) != null){
-//								info.put("brandID", productPropertyResult.get(info.get("product_id").toString()).get("BrandID"));
-//								info.put("colorCode", productPropertyResult.get(info.get("product_id").toString()).get("ColorCode"));
-//							}
-//						}
-//							
-//						orderLineList.add(info);
-//						
-//
-//					}
-//				}
-//				orderInfo.put("total_qty", amount);
-//				orderInfo.put("orderLineList", orderLineList);
-//			}
-//		}
 		result.successStatus();
 		result.setData(orderList);
 		return result;
@@ -630,35 +513,35 @@ public class OrderController extends BaseController{
 			List<Map<String,Object>> packList = orderService.getOrderListByStatusAndContainerId(Integer.parseInt(map.get("containerId").toString()),Integer.parseInt(map.get("status").toString()),vendor.getVendorId());
 			
 
-			if(packList != null && packList.size() > 0){
-				//遍历获取所有商品ID
-				String productIds = "";
-				for(Map<String, Object> info : packList){
-					productIds +=info.get("product_id").toString()+",";
-				}
-				
-				if(StringUtils.isNoneBlank(productIds)){
-					productIds = productIds.substring(0,productIds.length() -1);
-				}
-				
-				//根据ID列表获取商品属性
-				List<Map<String, Object>> productPropertyList = productPropertyService.getProductPropertyListByProductId(productIds);
-				Map<String, Map<String, String>> productPropertyResult= new HashMap<String, Map<String, String>>();
-				
-				for(Map<String, Object> productProperty : productPropertyList){
-					
-					//如果存在
-					if(productPropertyResult.containsKey(productProperty.get("product_id").toString())){
-						Map<String, String> info = productPropertyResult.get(productProperty.get("product_id").toString());
-					    info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
-					}else{
-						Map<String, String> info = new HashMap<String, String>();
-						info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
-						productPropertyResult.put(productProperty.get("product_id").toString(), info);
-					}
-					
-				}
-			}
+//			if(packList != null && packList.size() > 0){
+//				//遍历获取所有商品ID
+//				String productIds = "";
+//				for(Map<String, Object> info : packList){
+//					productIds +=info.get("product_id").toString()+",";
+//				}
+//				
+//				if(StringUtils.isNoneBlank(productIds)){
+//					productIds = productIds.substring(0,productIds.length() -1);
+//				}
+//				
+//				//根据ID列表获取商品属性
+//				List<Map<String, Object>> productPropertyList = productPropertyService.getProductPropertyListByProductId(productIds);
+//				Map<String, Map<String, String>> productPropertyResult= new HashMap<String, Map<String, String>>();
+//				
+//				for(Map<String, Object> productProperty : productPropertyList){
+//					
+//					//如果存在
+//					if(productPropertyResult.containsKey(productProperty.get("product_id").toString())){
+//						Map<String, String> info = productPropertyResult.get(productProperty.get("product_id").toString());
+//					    info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
+//					}else{
+//						Map<String, String> info = new HashMap<String, String>();
+//						info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
+//						productPropertyResult.put(productProperty.get("product_id").toString(), info);
+//					}
+//					
+//				}
+//			}
 
 
 			result.successStatus();
@@ -674,6 +557,164 @@ public class OrderController extends BaseController{
 		
 		return result;
 	}
+	
+	
+	
+	/**
+	 * 装箱验证
+	 * @param map
+	 * @param httpRequest
+	 * @return
+	 */
+	@RequestMapping(value="/packingCheckOrder", method = RequestMethod.POST)
+	@ResponseBody
+	public ResultMessage packingCheckOrder(@RequestBody Map<String,Object> map,HttpServletRequest httpRequest){
+		ResultMessage result= new ResultMessage();
+		result.errorStatus();
+		
+		
+		if(checkParamsBypackingCheckOrder(map)){
+			result.setMsg("Parameter cannot be empty");
+			return result;
+		}
+		
+		User user = this.getUser(httpRequest);
+		if(user == null){
+			result.setMsg("Please log in again");
+			return result;
+		}
+		
+		Vendor vendor= null;
+		try {
+			vendor= vendorService.getVendorByUserId(user.getUserId());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if(vendor == null){
+			result.setMsg("Please log in again");
+			return result;
+		}
+		
+        String barCode = null;
+        String brandId = null; 
+        String colorCode = null; 
+        Map<String,Object> currentOrder = null;
+        
+        if(map.get("barCode") != null &&StringUtils.isNotBlank(map.get("barCode").toString()) && !map.get("barCode").toString().equals("#")){
+        	barCode = map.get("barCode").toString(); 
+        }
+        
+        if(map.get("brandId") != null &&StringUtils.isNotBlank(map.get("brandId").toString())){
+        	brandId = map.get("brandId").toString(); 
+        }
+        
+        if(map.get("colorCode") != null &&StringUtils.isNotBlank(map.get("colorCode").toString())){
+        	colorCode = map.get("colorCode").toString(); 
+        }
+        
+		
+		Long vendorId = vendor.getVendorId();
+		//根据订单状态查询订单
+		List<Map<String,Object>> orderList = orderService.getOrderListByStatus(Integer.parseInt(map.get("status").toString()),vendorId,null);
+		if(orderList ==null || orderList.size() == 0){
+			result.setMsg("The current order list is empty");
+			return result;
+		}
+		
+		//校验barCode
+		if(barCode != null && StringUtils.isNoneBlank(barCode)){
+			for(Map<String,Object> info :orderList){
+				if(barCode.equals(info.get("sku_code").toString())){
+					currentOrder = info;
+					result.successStatus();
+					break;
+				}
+			}
+		}else{
+			
+			//校验brandId colorCode
+			if(brandId != null && StringUtils.isNoneBlank(brandId) && colorCode != null && StringUtils.isNoneBlank(colorCode)){
+				for(Map<String,Object> info :orderList){
+					if(brandId.equals(info.get("brandId").toString()) && colorCode.equals(info.get("colorCode").toString())){
+						currentOrder = info;
+						result.successStatus();
+						break;
+					}
+				}
+			}
+			
+		}
+		
+		//如果订单存在该商品 则存入箱子(如果查询出多个怎么办)
+		if(currentOrder != null){
+			
+		}
+		
+		
+
+		
+		
+		return result;
+	}
+	
+	
+	/**
+	 * 删除箱子中的订单
+	 * @param map
+	 * @param httpRequest
+	 * @return
+	 */
+	@RequestMapping(value="/deletePackingCheckOrder", method = RequestMethod.POST)
+	@ResponseBody
+	public ResultMessage deletePackingCheckOrder(@RequestBody Map<String,Object> map,HttpServletRequest httpRequest){
+		ResultMessage result= new ResultMessage();
+		result.errorStatus();
+		
+		if(map == null || map.size() == 0 || map.get("logistics_product_id") == null || map.get("container_id") == null){
+			result.setMsg("Parameter cannot be empty");
+			return result;
+		}
+		
+		try{
+			
+			Map<String, Object> conditionMap = new HashMap<String, Object>();
+			conditionMap.put("logistics_product_id", Long.parseLong(map.get("logistics_product_id").toString()));
+			conditionMap.put("container_id", Long.parseLong(map.get("container_id").toString()));
+			conditionMap.put("status", OrderStatusType.READYTOSHIP);
+			
+			//检查判断该箱子是否存在订单
+			List<LogisticsProduct> list = iLogisticsProductService.selectByCondition(conditionMap);
+			if(list == null || list.size() == 0){
+				result.setMsg("Order does not exist ");
+				return result;
+			}
+			
+			
+			//取消订单跟箱子的关联,并修改状态为CONFIRMED
+			LogisticsProduct logisticsProduct = new LogisticsProduct();
+			logisticsProduct.setLogistics_product_id(Long.parseLong(map.get("logistics_product_id").toString()));
+			logisticsProduct.setContainer_id(0l);
+			logisticsProduct.setStatus(OrderStatusType.COMFIRMED);
+			int row = iLogisticsProductService.updateByLogisticsProduct(logisticsProduct);
+			
+			if(row > 0){
+				result.successStatus();
+			}else{
+				result.setMsg("Order does not exist ");
+			}
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+
+		
+		
+		return result;
+	}
+	
+	
+	
+	
 	
 	/**
      * 获取请求参数
@@ -766,6 +807,30 @@ public class OrderController extends BaseController{
         }
         return StatusType.SUCCESS;
     }
+    
+    
+    
+    /**
+     * packingCheckOrder 接口的参数校验
+     * @return
+     */
+    public boolean checkParamsBypackingCheckOrder(Map<String,Object> map){
+    	if(map == null || map.size() == 0){
+    		return true;
+    	}
+    	
+    	if(map.get("containerId") == null || StringUtils.isBlank(map.get("containerId").toString())){
+    		return true;
+    	}
+    	
+    	if(map.get("status") == null || StringUtils.isBlank(map.get("status").toString())){
+    		return true;
+    	}
+    	
+    	return false;
+    }
+    
+    
     
     /**
      * 回调接口
