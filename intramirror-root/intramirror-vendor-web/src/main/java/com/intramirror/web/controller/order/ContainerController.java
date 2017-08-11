@@ -53,18 +53,18 @@ public class ContainerController {
 				message.successStatus().putMsg("info", "Parameter cannot be null");
 				return message;
 			}
-			if (null == map.get("length") || StringUtils.isBlank(map.get("length").toString())){
-				message.successStatus().putMsg("info", "length cannot be null");
-				return message;
-			}
-			if (null == map.get("width") || StringUtils.isBlank(map.get("width").toString())){
-				message.successStatus().putMsg("info", "width cannot be null");
-				return message;
-			}
-			if (null == map.get("height") || StringUtils.isBlank(map.get("height").toString())){
-				message.successStatus().putMsg("info", "height cannot be null");
-				return message;
-			}
+//			if (null == map.get("length") || StringUtils.isBlank(map.get("length").toString())){
+//				message.successStatus().putMsg("info", "length cannot be null");
+//				return message;
+//			}
+//			if (null == map.get("width") || StringUtils.isBlank(map.get("width").toString())){
+//				message.successStatus().putMsg("info", "width cannot be null");
+//				return message;
+//			}
+//			if (null == map.get("height") || StringUtils.isBlank(map.get("height").toString())){
+//				message.successStatus().putMsg("info", "height cannot be null");
+//				return message;
+//			}
 			int result = containerService.saveContainerByShipment(map);
 			message.successStatus().putMsg("info","SUCCESS").setData(result);
 		} catch (Exception e) {
