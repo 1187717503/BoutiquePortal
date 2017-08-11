@@ -33,7 +33,9 @@
     </bean> 
     
     <bean id="orderSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
-   		<constructor-arg ref="orderSqlSessionFactory" />
+   		<!--  <constructor-arg ref="orderSqlSessionFactory" />-->
+   		<constructor-arg index="0" ref="orderSqlSessionFactory" />
+   		<constructor-arg index="1" value="SIMPLE" />
   	</bean>
 
 	<beans profile="sit">

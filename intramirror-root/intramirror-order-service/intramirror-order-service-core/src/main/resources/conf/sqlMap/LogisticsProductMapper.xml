@@ -23,6 +23,7 @@
     
     <result column="packed_at" property="packed_at" jdbcType="TIMESTAMP" />
     <result column="shipped_at" property="shipped_at" jdbcType="TIMESTAMP" />
+    <result column="container_id" property="container_id" jdbcType="BIGINT" />
     <result column="enabled" property="enabled" jdbcType="BIT" />
     <result column="order_line_num" property="order_line_num" jdbcType="LONGVARCHAR" />
     <result column="vendor_id" property="vendor_id" jdbcType="BIGINT" />
@@ -103,6 +104,10 @@
         shipped_at = #{shipped_at,jdbcType=TIMESTAMP},
       </if>
       
+      <if test="container_id != null" >
+        container_id = #{container_id,jdbcType=BIGINT},
+   	  </if>
+      
       <if test="enabled != null" >
         enabled = #{enabled,jdbcType=BIT},
       </if>
@@ -141,6 +146,25 @@
     from logistics_product 
     where logistics_product_id = #{logistics_product_id,jdbcType=BIGINT}
   </select>
+  
+   <select id="selectByCondition" resultMap="logisProductMap" parameterType="java.util.Map" >
+   select * 
+   from logistics_product 
+   where 1=1 
+   
+   <if test="logistics_product_id != null" >
+       and logistics_product_id = #{logistics_product_id,jdbcType=BIGINT} 
+   </if>
+    
+   <if test="container_id != null" >
+       and container_id = #{container_id,jdbcType=BIGINT} 
+   </if>
+   
+   <if test="status != null" >
+       and status = #{status,jdbcType=BIGINT} 
+   </if>
+
+ </select>
   
 <!-- 根据condition map 来获取 OrderLogistics list -->
 <select id="getLogisticsProductListByCondition" resultType="com.intramirror.order.api.model.LogisticsProduct" parameterType="java.util.Map">

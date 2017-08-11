@@ -114,5 +114,14 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
 	public int updateByLogisticsProduct(LogisticsProduct logisticsProduct) {
 		return logisticsProductMapper.updateByLogisticsProduct(logisticsProduct);
 	}
+
+
+
+	@Override
+	public List<LogisticsProduct> selectByCondition(
+			Map<String, Object> conditionMap) {
+		
+		return logisticsProductMapper.selectByCondition(conditionMap);
+	}
 	
 }
