@@ -41,6 +41,15 @@ public interface ContainerMapper {
 	 */
 	int updateContainerBystatus(Map<String, Object> map);
 	
+	
+	/**
+	 * 修改箱子信息
+	 * @param map
+	 * @return int
+	 */
+	int updateContainerByCondition(Map<String, Object> map);
+	
+	
 	/**
 	 * 删除箱子
 	 * @param map

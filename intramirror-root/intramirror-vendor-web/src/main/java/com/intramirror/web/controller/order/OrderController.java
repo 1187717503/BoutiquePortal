@@ -3,6 +3,7 @@ package com.intramirror.web.controller.order;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,10 +27,13 @@ import com.google.gson.JsonParser;
 import com.intramirror.common.Helper;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.parameter.StatusType;
+import com.intramirror.order.api.common.ContainerType;
 import com.intramirror.order.api.common.OrderStatusType;
 import com.intramirror.order.api.model.LogisticsProduct;
+import com.intramirror.order.api.service.IContainerService;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderService;
+import com.intramirror.order.api.service.IShipmentService;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.user.api.model.User;
@@ -71,6 +75,12 @@ public class OrderController extends BaseController{
 	
 	@Autowired
 	private ILogisticsProductService iLogisticsProductService;
+	
+	@Autowired
+	private IShipmentService iShipmentService;
+	
+	@Autowired
+	private IContainerService containerService;
 	
 	
     @RequestMapping(value = "/getOrderList", method = RequestMethod.POST)
@@ -595,22 +605,9 @@ public class OrderController extends BaseController{
 			return result;
 		}
 		
-        String barCode = null;
-        String brandId = null; 
-        String colorCode = null; 
+        String orderLineNum = map.get("orderLineNum").toString();
         Map<String,Object> currentOrder = null;
         
-        if(map.get("barCode") != null &&StringUtils.isNotBlank(map.get("barCode").toString()) && !map.get("barCode").toString().equals("#")){
-        	barCode = map.get("barCode").toString(); 
-        }
-        
-        if(map.get("brandId") != null &&StringUtils.isNotBlank(map.get("brandId").toString())){
-        	brandId = map.get("brandId").toString(); 
-        }
-        
-        if(map.get("colorCode") != null &&StringUtils.isNotBlank(map.get("colorCode").toString())){
-        	colorCode = map.get("colorCode").toString(); 
-        }
         
 		
 		Long vendorId = vendor.getVendorId();
@@ -621,34 +618,90 @@ public class OrderController extends BaseController{
 			return result;
 		}
 		
-		//校验barCode
-		if(barCode != null && StringUtils.isNoneBlank(barCode)){
-			for(Map<String,Object> info :orderList){
-				if(barCode.equals(info.get("sku_code").toString())){
-					currentOrder = info;
-					result.successStatus();
-					break;
-				}
+		//校验order_line_num  是否在CONFIRMED中存在
+		for(Map<String,Object> info :orderList){
+			if(orderLineNum.equals(info.get("order_line_num").toString())){
+				currentOrder = info;
+				result.successStatus();
+				break;
 			}
-		}else{
-			
-			//校验brandId colorCode
-			if(brandId != null && StringUtils.isNoneBlank(brandId) && colorCode != null && StringUtils.isNoneBlank(colorCode)){
-				for(Map<String,Object> info :orderList){
-					if(brandId.equals(info.get("brandId").toString()) && colorCode.equals(info.get("colorCode").toString())){
-						currentOrder = info;
-						result.successStatus();
-						break;
-					}
-				}
-			}
-			
+		}
+		if(currentOrder == null){
+			result.setMsg("Order does not exist");
+			return result;
 		}
 		
-		//如果订单存在该商品 则存入箱子(如果查询出多个怎么办)
-		if(currentOrder != null){
+		
+		
+		Map<String, Object> conditionMap = new HashMap<String, Object>();
+		conditionMap.put("container_id", Long.parseLong(map.get("containerId").toString()));
+		conditionMap.put("status", OrderStatusType.READYTOSHIP);
+		
+		//检查判断该箱子是否存在订单
+		List<LogisticsProduct> list = iLogisticsProductService.selectByCondition(conditionMap);
+		
+		//如果是新箱子，则需要关联Shipment,如果存在符合条件的Shipment有多个则返回列表供选择,如果只有一个则默认存入，没有则需要新建Shipment
+		if(list == null || list.size() == 0){
 			
+			//
+			if(StringUtils.isNotBlank(currentOrder.get("address_country_id").toString())){
+				Map<String, Object> selectShipmentParam = new HashMap<String, Object>();
+				selectShipmentParam.put("shipToCountry", currentOrder.get("address_country_id").toString());
+				
+				//shipment 状态
+				selectShipmentParam.put("status", ContainerType.OPEN);
+				//查询shipment(不需要根据物流类型？)
+				List<Map<String, Object>> resultMap = iShipmentService.selectShipmentByOrder(selectShipmentParam);
+				
+				//如果为空  新建Shipment
+				if(resultMap == null || resultMap.size() == 0  ){
+					
+					Map<String, Object> saveShipmentParam = new HashMap<String, Object>();
+					saveShipmentParam.put("shipToGeography", currentOrder.get("geography_name").toString());
+					saveShipmentParam.put("consignee", currentOrder.get("user_rec_name").toString());
+					saveShipmentParam.put("shipToAddr", currentOrder.get("user_rec_addr").toString());
+					saveShipmentParam.put("shipToDistrict", currentOrder.get("user_rec_area").toString());
+					saveShipmentParam.put("shipToCity", currentOrder.get("user_rec_city").toString());
+					saveShipmentParam.put("shipToProvince", currentOrder.get("user_rec_province").toString());
+					saveShipmentParam.put("shipToCountry", currentOrder.get("user_rec_country").toString());
+					
+					//发货国家
+					saveShipmentParam.put("consigner_country_id", currentOrder.get("vendor_address_country_id").toString());
+					//收货国家
+					saveShipmentParam.put("consignee_country_id", currentOrder.get("address_country_id").toString());
+
+					
+					int row = iShipmentService.saveShipmentByOrderId(map);
+					if (row != 0){
+						
+					}
+					
+				//如果匹配的Shipment 只存在一个,就直接关联箱子   并把订单存入箱子
+				}else if(resultMap.size() == 1){
+					
+					//箱子关联Shipment
+					Map<String, Object> updateContainer = new HashMap<String, Object>(); 
+					updateContainer.put("shipment_id", resultMap.get(0).get("shipment_id").toString());
+					updateContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
+					logger.info(MessageFormat.format("packOrder updateContainerByCondition shipment_id:{0},container_id:{1}",resultMap.get(0).get("shipment_id").toString(),Long.parseLong(map.get("containerId").toString())));
+					int row = containerService.updateContainerByCondition(conditionMap);
+					if(row > 0 ){
+						//订单加入箱子
+					}
+				
+				//如果匹配的Shipment 存在多个，则返回列表供选择
+				}else if(resultMap.size() > 1){
+					
+				}
+			}
+		
+		//如果箱子中存在订单，则直接加入箱子
+		}else{
+			
+
 		}
+		
+
 		
 		
 
@@ -827,6 +880,10 @@ public class OrderController extends BaseController{
     		return true;
     	}
     	
+    	if(map.get("orderLineNum") == null || StringUtils.isBlank(map.get("orderLineNum").toString())){
+    		return true;
+    	}
+    	
     	return false;
     }
     
@@ -889,4 +946,42 @@ public class OrderController extends BaseController{
 		}
     	return message;
     }
+    
+    
+	/**
+	 * 订单装箱
+	 * @param map
+	 * @return
+	 */
+	public ResultMessage updateLogisticsProduct(Map<String,Object> orderMap,Map<String,Object> shipMentMap){
+		ResultMessage result= new ResultMessage();
+		result.errorStatus();
+		
+		//校验该订单跟箱子所属的Shipment的目的地是否一致,一致则加入,是否分段运输，发货员自行判断
+		if(!orderMap.get("geography_id").toString().equals(shipMentMap.get("geography_id").toString())){
+			
+			if(shipMentMap.get("shipment_type_id").toString().equals("1")){
+				return result;
+			}else if(shipMentMap.get("shipment_type_id").toString().equals("2")){
+				//比较具体地址 省市区
+			}
+			
+
+		}
+		
+		
+		//添加订单跟箱子的关联,并修改状态为READYTOSHIP
+		LogisticsProduct logisticsProduct = new LogisticsProduct();
+		logisticsProduct.setLogistics_product_id(Long.parseLong(orderMap.get("logistics_product_id").toString()));
+		logisticsProduct.setContainer_id(Long.parseLong(orderMap.get("containerId").toString()));
+		logisticsProduct.setStatus(OrderStatusType.READYTOSHIP);
+		int row = iLogisticsProductService.updateByLogisticsProduct(logisticsProduct);
+		
+		if(row > 0){
+			result.successStatus();
+		}else{
+			result.setMsg("Boxed success");
+		}
+		return result;
+	}
 }

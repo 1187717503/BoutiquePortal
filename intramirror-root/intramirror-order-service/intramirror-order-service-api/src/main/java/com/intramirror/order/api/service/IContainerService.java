@@ -54,4 +54,11 @@ public interface IContainerService {
 	 */
 	int getMaxBarcode();
 	
+	/**
+	 * 修改箱子信息
+	 * @param map
+	 * @return int
+	 */
+	int updateContainerByCondition(Map<String, Object> map);
+	
 }

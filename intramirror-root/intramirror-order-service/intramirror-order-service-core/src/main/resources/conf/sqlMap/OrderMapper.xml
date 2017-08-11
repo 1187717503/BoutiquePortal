@@ -75,10 +75,10 @@
 			SELECT  o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id,pp.colorCode,pp.brandID,pspv.`value` as size,p.category_id,
 			s.price,s.in_price,sps.sale_price,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
 			lp.confirmed_at,lp.est_ship_date,lp.packed_at,lp.shipped_at,s.sku_code,usa.address_country_id,b.english_name as brandName,
-			l.user_rec_name,l.user_rec_province,l.user_rec_city,l.user_rec_area,l.user_rec_addr,l.user_rec_country,
+			l.user_rec_name,l.user_rec_province,l.user_rec_city,l.user_rec_area,l.user_rec_addr,l.user_rec_country,l.geography_id,
 			v.vendor_name,v.vendor_id,g.english_name as geography_name,v.address_country_id as vendor_address_country_id,p.cover_img,lp.logistics_product_id  
 			FROM logistics_product lp  INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id  
-			INNER JOIN `order` o ON ol.order_id = o.order_id
+			INNER JOIN `order` o ON ol.order_id = o.order_id 
 			INNER JOIN user_ship_address usa ON o.user_id = usa.user_id    
 			LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id  
 			INNER JOIN geography g on l.geography_id = g.geography_id  

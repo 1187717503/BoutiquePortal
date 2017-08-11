@@ -52,6 +52,27 @@ values(#{containerType,jdbcType=VARCHAR}, #{shipToGeography,jdbcType=VARCHAR},#{
 		</trim>
   </update>
   
+  
+  
+  <update id="updateContainerByCondition" parameterType="java.util.Map">
+  	update container
+    <set >
+      <if test="shipment_id != null" >
+        shipment_id = #{shipment_id,jdbcType=BIGINT},
+      </if>
+    </set>
+     where 1=1
+     
+   <if test="container_id != null" >
+       and container_id = #{container_id,jdbcType=BIGINT} 
+   </if>
+    
+   <if test="barcode != null" >
+       and barcode = #{barcode,jdbcType=VARCHAR} 
+   </if>
+   
+  </update>
+  
   <delete id="deleteContainerById" parameterType="java.util.Map">
   		DELETE FROM container 
 		WHERE container_id = #{containerId,jdbcType=BIGINT}

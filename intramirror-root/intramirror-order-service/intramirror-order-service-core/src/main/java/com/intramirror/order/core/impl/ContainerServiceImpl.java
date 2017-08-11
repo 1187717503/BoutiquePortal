@@ -136,6 +136,12 @@ public class ContainerServiceImpl extends BaseDao implements IContainerService{
 		return containerMapper.getMaxBarcode();
 	}
 
+	@Override
+	public int updateContainerByCondition(Map<String, Object> map) {
+	
+		return containerMapper.updateContainerByCondition(map);
+	}
+
 
 	
 
