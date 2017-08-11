@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.order.api.model.Container;
 import com.intramirror.order.api.service.IContainerService;
+import com.intramirror.web.common.BarcodeUtil;
 
 
 /**
@@ -178,6 +179,7 @@ public class ContainerController {
 	@RequestMapping(value="deleteContainerById", method=RequestMethod.POST)
 	@ResponseBody
 	public ResultMessage deleteContainerById(@RequestBody Map<String, Object> map){
+		logger.info("deleteContainerById param" + new Gson().toJson(map));
 		ResultMessage message = ResultMessage.getInstance();
 		try {
 			if (null == map || 0 == map.size()){
@@ -216,5 +218,32 @@ public class ContainerController {
 		}
 		return message;
 	}
+	
+	@RequestMapping(value="/printBarcode", method=RequestMethod.POST)
+	@ResponseBody
+	public ResultMessage printBarcode(@RequestBody Map<String, Object> map){
+		logger.info("printBarcode param" + new Gson().toJson(map));
+		ResultMessage message = ResultMessage.getInstance();
+		try {
+			if (null == map || 0 == map.size()){
+				message.errorStatus().putMsg("info", "parameter cannot be null");
+				return message;
+			}
+			if (null == map.get("barCode") || StringUtils.isBlank(map.get("barCode").toString())){
+				message.errorStatus().putMsg("info", "barCode cannot be null");
+				return message;
+			}
+			String orderNumberUrl = "Barcode-"+map.get("barCode").toString()+".png";
+			orderNumberUrl = BarcodeUtil.generateFile(map.get("barCode").toString(), orderNumberUrl,false);
+			message.successStatus().putMsg("info", "success").setData(orderNumberUrl);
+			return message;
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(" error Message : {}", e.getMessage());
+			message.errorStatus().putMsg("info", "error Message :" + e.getMessage());
+		}
+		return message;
+	}
+	
 	
 }
