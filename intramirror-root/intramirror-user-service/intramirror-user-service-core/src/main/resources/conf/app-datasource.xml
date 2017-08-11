@@ -27,7 +27,7 @@
  	<!-- mybatis配置 -->
     <bean id="userSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource" />
-        <property name="typeAliasesPackage" value="com.yfding.spring.model"></property>
+        <property name="typeAliasesPackage" value="com.intramirror.user.api.model"></property>
         <property name="configLocation" value="classpath:conf/UserMybatis/mybatis-config.xml" />
         <property name="mapperLocations" value="classpath:conf/UserSqlMap/*.xml"></property>
     </bean> 
