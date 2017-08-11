@@ -10,6 +10,12 @@
     <result column="shipping_segment_id" property="shippingSegmentId" jdbcType="VARCHAR" />
     <result column="segment_sequence" property="segmentSequence" jdbcType="BIGINT" />
     <result column="awb_num" property="awbNum" jdbcType="BIGINT" />
+    <result column="consignee" property="consignee" jdbcType="VARCHAR" />
+    <result column="ship_to_addr" property="shipToAddr" jdbcType="VARCHAR" />
+    <result column="ship_to_district" property="shipToDistrict" jdbcType="VARCHAR" />
+    <result column="ship_to_city" property="shipToCity" jdbcType="VARCHAR" />
+    <result column="ship_to_province" property="shipToProvince" jdbcType="VARCHAR" />
+    <result column="ship_to_country" property="shipToCountry" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="INTEGER" />
     <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
     <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
@@ -147,4 +153,12 @@
       updated_at = #{updatedAt,jdbcType=TIMESTAMP}
     where sub_shipment_id = #{subShipmentId,jdbcType=BIGINT}
   </update>
+  
+  <insert id="saveSubshipment" parameterType="com.intramirror.order.api.model.SubShipment">
+  INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_addr,ship_to_district,ship_to_city,ship_to_province,ship_to_country,`status`,created_at,updated_at)
+ VALUES(
+ #{shippingSegmentId,jdbcType=INTEGER},#{segmentSequence,jdbcType=INTEGER},#{consignee,jdbcType=VARCHAR},
+ #{shipToAddr,jdbcType=VARCHAR},#{shipToDistrict,jdbcType=VARCHAR},#{shipToCity,jdbcType=VARCHAR},
+ #{shipToProvince,jdbcType=VARCHAR},#{shipToCountry,jdbcType=VARCHAR},#{status,jdbcType=INTEGER},#{createdAt,jdbcType=TIMESTAMP},#{updatedAt,jdbcType=TIMESTAMP});
+  </insert>
 </mapper>

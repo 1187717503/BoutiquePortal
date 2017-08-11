@@ -651,7 +651,7 @@ public class OrderController extends BaseController{
 				//shipment 状态
 				selectShipmentParam.put("status", ContainerType.OPEN);
 				//查询shipment(不需要根据物流类型？)
-				List<Map<String, Object>> resultMap = iShipmentService.selectShipmentByOrder(selectShipmentParam);
+				List<Map<String, Object>> resultMap = iShipmentService.getShipmentByStatus(selectShipmentParam);
 				
 				//如果为空  新建Shipment
 				if(resultMap == null || resultMap.size() == 0  ){

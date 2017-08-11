@@ -6,6 +6,8 @@ package com.intramirror.order.api.service;
 import java.util.List;
 import java.util.Map;
 
+import com.intramirror.order.api.model.SubShipment;
+
 /**
  * @author yuan
  *
@@ -21,11 +23,11 @@ public interface IShipmentService {
 	
 	
 	/**
-	 * 根据订单号查询shipment基本信息
+	 * 根据订单号查询shipment type
 	 * @param map
 	 * @return map
 	 */
-	List<Map<String, Object>> selectShipmentByOrder(Map<String, Object> map);
+	Map<String, Object> selectShipmentByOrder(Map<String, Object> map);
 	
 	/**
 	 * 根据订单号查询shipment基本信息
@@ -33,4 +35,19 @@ public interface IShipmentService {
 	 * @return map
 	 */
 	List<Map<String, Object>> getShippmentByType(Map<String, Object> map);
+	
+	
+	/**
+	 * 根据shipment状态大区查询shipment
+	 * @param map
+	 * @return
+	 */
+	List<Map<String,Object>> getShipmentByStatus(Map<String, Object> map);
+	
+	/**
+	 * 新增subshipment
+	 * @param sub
+	 * @return
+	 */
+	int saveSubShipment(SubShipment sub);
 }
