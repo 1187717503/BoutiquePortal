@@ -15,8 +15,13 @@
 	    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
 	    <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
   	</resultMap>
-	
 	<insert id="saveShipmentByOrderId" parameterType="com.intramirror.order.api.model.Shipment" >
+	INSERT INTO shipment(ship_to_geography,consignee,ship_to_addr,ship_to_district,ship_to_city,ship_to_province,ship_to_country,`status`,created_at,updated_at)
+VALUES( #{shipToGeography,jdbcType=VARCHAR},#{consignee,jdbcType=VARCHAR},#{shipToAddr,jdbcType=VARCHAR},#{shipToDistrict,jdbcType=VARCHAR},
+#{shipToCity,jdbcType=VARCHAR},#{shipToProvince,jdbcType=VARCHAR},#{shipToCountry,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},#{createdAt,jdbcType=TIMESTAMP},#{updatedAt,jdbcType=TIMESTAMP})
+	
+	</insert>
+	<insert id="save" parameterType="com.intramirror.order.api.model.Shipment" >
     insert into shipment
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="shipment_id != null" >
@@ -89,4 +94,23 @@
       </if>
     </trim>
   </insert>
+  
+  <select id="selectShipmentByOrder" resultType="java.util.HashMap"  parameterType="java.util.Map">
+  		SELECT * FROM shipment
+		WHERE `status` = #{status,jdbcType=BIGINT} AND ship_to_country = #{shipToCountry,jdbcType=VARCHAR}	
+  </select>
+  
+  <select id="getShippmentByType" resultType="java.util.HashMap"  parameterType="java.util.Map">
+  SELECT ss.shipping_segment_id,vsr.vendor_id,sr.routing_name
+	,st.shipment_type_id,sp.shipping_provider_id,g.english_name,ss.segment_sequence
+	FROM shipping_segment ss
+	INNER JOIN shipping_routing sr ON (sr.shipping_routing_id = ss.shipping_routing_id)
+	INNER JOIN vendor_shipping_routing vsr ON (vsr.vendor_shipping_routing_id = sr.shipping_routing_id)
+	INNER JOIN shipment_type st ON (st.shipment_type_id = ss.shipment_type_id)
+	INNER JOIN address_country ac ON (ac.address_country_id = sr.consignee_country_id)
+	INNER JOIN geography g ON (ac.geography_id = g.geography_id)
+	INNER JOIN shipping_provider  sp ON (sp.shipping_provider_id = ss.shipping_provider_id)
+	WHERE ss.shipping_routing_id = (SELECT shipping_routing_id FROM shipping_routing 
+	WHERE consigner_country_id = #{consigner_country_id,jdbcType=BIGINT} and consignee_country_id =#{consignee_country_id,jdbcType=BIGINT}) AND vsr.vendor_id=#{vendor_id,jdbcType=BIGINT} AND ss.segment_sequence IN (1,2,3);
+  </select>
 </mapper>

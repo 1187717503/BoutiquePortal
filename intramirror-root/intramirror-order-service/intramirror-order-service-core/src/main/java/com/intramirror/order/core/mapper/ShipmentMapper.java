@@ -3,6 +3,9 @@
  */
 package com.intramirror.order.core.mapper;
 
+import java.util.List;
+import java.util.Map;
+
 import com.intramirror.order.api.model.Shipment;
 
 /**
@@ -16,5 +19,21 @@ public interface ShipmentMapper {
 	 * @param shipment
 	 * @return
 	 */
-	Shipment saveShipmentByOrderId(Shipment shipment);
+	int saveShipmentByOrderId(Shipment shipment);
+	
+	/**
+	 * 根据状态国家查询shipment
+	 * @param map
+	 * @return map
+	 */
+	List<Map<String, Object>> selectShipmentByOrder(Map<String, Object> map);
+	
+	
+	/**
+	 * 根据订单号查询shipment基本信息
+	 * @param map
+	 * @return map
+	 */
+	List<Map<String, Object>> getShippmentByType(Map<String, Object> map);
+	
 }
