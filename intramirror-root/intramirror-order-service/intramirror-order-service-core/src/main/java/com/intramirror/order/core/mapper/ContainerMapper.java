@@ -28,6 +28,14 @@ public interface ContainerMapper {
 	Container selectContainerByBarcode(Map<String, Object> map);
 	
 	/**
+	 * 查询箱子
+	 * @param ContainerId
+	 * @return Container
+	 */
+	Container selectContainerById(Map<String, Object> map);
+	
+	
+	/**
 	 * 修改箱子
 	 * @param container
 	 * @return int

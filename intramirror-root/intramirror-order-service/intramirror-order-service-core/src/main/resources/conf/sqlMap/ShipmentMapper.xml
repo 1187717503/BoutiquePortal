@@ -38,6 +38,12 @@ VALUES( #{shipToGeography,jdbcType=VARCHAR},#{consignee,jdbcType=VARCHAR},#{ship
 		WHERE `status` = #{status,jdbcType=BIGINT} AND ship_to_geography = #{shipToCountry,jdbcType=VARCHAR}	
   </select>
   
+  
+  <select id="getShipmentById" resultType="java.util.HashMap"  parameterType="java.util.Map">
+  		SELECT * FROM shipment
+		WHERE shipment_id = #{shipment_id,jdbcType=BIGINT} 	
+  </select>
+  
   <select id="getShippmentByType" resultType="java.util.HashMap"  parameterType="java.util.Map">
   SELECT sp.*,ss.segment_sequence,ss.shipping_segment_id
 	FROM shipping_segment ss

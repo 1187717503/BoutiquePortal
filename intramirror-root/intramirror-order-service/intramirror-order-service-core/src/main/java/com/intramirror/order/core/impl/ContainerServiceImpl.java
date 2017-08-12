@@ -142,6 +142,11 @@ public class ContainerServiceImpl extends BaseDao implements IContainerService{
 		return containerMapper.updateContainerByCondition(map);
 	}
 
+	@Override
+	public Container selectContainerById(Map<String, Object> map) {
+		return containerMapper.selectContainerById(map);
+	}
+
 
 	
 

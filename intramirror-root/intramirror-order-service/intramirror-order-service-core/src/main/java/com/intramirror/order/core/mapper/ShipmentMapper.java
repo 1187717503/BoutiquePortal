@@ -44,6 +44,15 @@ public interface ShipmentMapper {
 	 */
 	List<Map<String,Object>> getShipmentByStatus(Map<String, Object> map);
 	
+	/**
+	 * 根据shipmentID查询shipment
+	 * @param map
+	 * @return
+	 */
+	List<Map<String,Object>> getShipmentById(Map<String, Object> map);
+	
+	
+	
 	
 	/**
 	 * 新增subshipment

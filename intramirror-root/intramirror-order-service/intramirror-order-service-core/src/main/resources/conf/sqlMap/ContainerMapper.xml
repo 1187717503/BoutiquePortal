@@ -43,6 +43,11 @@ values(#{containerType,jdbcType=VARCHAR}, #{shipToGeography,jdbcType=VARCHAR},#{
 		where barcode =  #{barcode,jdbcType=VARCHAR} and status = #{status,jdbcType=INTEGER}
   </select>
   
+   <select id="selectContainerById" resultMap="BaseResultMap" parameterType="java.util.Map" >
+  		select * from container
+		where container_id =  #{container_id,jdbcType=BIGINT}
+  </select>
+  
   <update id="updateContainerBystatus" parameterType="com.intramirror.order.api.model.Container">
   	UPDATE container
 		<trim prefix="set" suffixOverrides=","  suffix=" WHERE barcode = #{barcode,jdbcType=VARCHAR} ">
