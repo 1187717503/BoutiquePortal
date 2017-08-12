@@ -684,6 +684,15 @@ public class OrderController extends BaseController{
 		//如果是新箱子，则需要关联Shipment,如果存在符合条件的Shipment有多个则返回列表供选择,如果只有一个则默认存入，没有则需要新建Shipment
 		if(list == null || list.size() == 0){
 			
+			Map<String, Object> selectContainer = new HashMap<String, Object>(); 
+			selectContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
+			Container container =  containerService.selectContainerById(selectContainer);
+			//判断箱子的geography 跟订单的大区是否一致
+			if(container != null && !container.getShipToGeography().equals(currentOrder.get("geography_name").toString())){
+				result.setMsg("The shipping area is inconsistent");
+				return result;
+			}
+			
 			if(StringUtils.isNotBlank(currentOrder.get("address_country_id").toString())){
 				Map<String, Object> selectShipmentParam = new HashMap<String, Object>();
 				selectShipmentParam.put("shipToCountry", currentOrder.get("geography_name").toString());
