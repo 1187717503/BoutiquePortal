@@ -175,11 +175,6 @@ public class ShipmentController extends BaseController{
 				message.errorStatus().putMsg("Info", "shipmentId cannot be null");
 				return message;
 			}
-			if (null == map.get("status") || StringUtils.isBlank(map.get("status").toString())){
-				logger.info("status cannot be null");
-				message.errorStatus().putMsg("Info", "status cannot be null");
-				return message;
-			}
 			Map<String, Object> resultMap = iShipmentService.getShipmentTypeById(map);
 			logger.info("result :" + new Gson().toJson(resultMap));
 			if (null == resultMap || 0 == map.size()){

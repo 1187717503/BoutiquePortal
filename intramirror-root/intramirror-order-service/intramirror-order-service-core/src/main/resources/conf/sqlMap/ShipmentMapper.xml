@@ -70,7 +70,7 @@ VALUES( #{shipToGeography,jdbcType=VARCHAR},#{consignee,jdbcType=VARCHAR},#{ship
 		INNER JOIN shipment s ON (sub.shipment_id = s.shipment_id)
 		INNER JOIN shipping_segment ss ON (sub.shipping_segment_id = ss.shipping_segment_id)
 		INNER JOIN shipment_type st ON (ss.shipment_type_id = st.shipment_type_id)
-		WHERE sub.shipment_id=#{shipmentId,jdbcType=BIGINT} AND s.`status` = #{status,jdbcType=BIGINT}
+		WHERE sub.shipment_id=#{shipmentId,jdbcType=BIGINT}
 		GROUP BY sub.segment_sequence ASC LIMIT 1;
   </select>
   
