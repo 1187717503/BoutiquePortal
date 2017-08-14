@@ -582,6 +582,9 @@ public class OrderController extends BaseController{
 	public ResultMessage packingCheckOrder(@RequestBody Map<String,Object> map,HttpServletRequest httpRequest){
 		ResultMessage result= new ResultMessage();
 		result.errorStatus();
+		Map<String,Object> infoMap = new HashMap<String, Object>();
+		//0 校验   2返回shipment列表  3箱子为空时  4不为空时  
+		infoMap.put("statusType", 0);
 		
 		
 		if(checkParamsBypackingCheckOrder(map)){
@@ -634,188 +637,188 @@ public class OrderController extends BaseController{
 		
 		
 		
-		Map<String, Object> conditionMap = new HashMap<String, Object>();
-		conditionMap.put("container_id", Long.parseLong(map.get("containerId").toString()));
-		conditionMap.put("status", OrderStatusType.READYTOSHIP);
-		currentOrder.put("containerId", Long.parseLong(map.get("containerId").toString())); 
-		
-		//检查判断该箱子是否存在订单
-		List<LogisticsProduct> list = iLogisticsProductService.selectByCondition(conditionMap);
-		String shipment_id = map.get("shipment_id").toString();
-		
-		//如果为空箱子，并且已经选择过shipMent 则直接关联，并加入箱子
-		if(StringUtils.isNoneBlank(shipment_id) && (list == null || list.size() == 0)){
+		try{
 			
-			//根据ID获取Shipment 信息
-			Map<String, Object> getShipment = new HashMap<String, Object>();
-			getShipment.put("shipment_id", Long.parseLong(shipment_id));
-			List<Map<String, Object>> shipmentMapList = iShipmentService.getShipmentById(getShipment);
+			Map<String, Object> conditionMap = new HashMap<String, Object>();
+			conditionMap.put("container_id", Long.parseLong(map.get("containerId").toString()));
+			conditionMap.put("status", OrderStatusType.READYTOSHIP);
+			currentOrder.put("containerId", Long.parseLong(map.get("containerId").toString())); 
 			
-			//箱子关联Shipment
-			Map<String, Object> updateContainer = new HashMap<String, Object>(); 
-			updateContainer.put("shipment_id", shipmentMapList.get(0).get("shipment_id").toString());
-			updateContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
-			logger.info(MessageFormat.format("packOrder updateContainerByCondition shipment_id:{0},container_id:{1}",shipmentMapList.get(0).get("shipment_id").toString(),Long.parseLong(map.get("containerId").toString())));
-			int row = containerService.updateContainerByCondition(conditionMap);
+			//检查判断该箱子是否存在订单
+			List<LogisticsProduct> list = iLogisticsProductService.selectByCondition(conditionMap);
+			String shipment_id = map.get("shipment_id").toString();
 			
-			//关联成功，则往箱子里存入订单
-			if(row > 0 ){
+			//如果为空箱子，并且已经选择过shipMent 则直接关联，并加入箱子
+			if(StringUtils.isNoneBlank(shipment_id) && (list == null || list.size() == 0)){
 				
-				//获取当前ShipMent 第一段的物流类型
-				Map<String, Object> selectShipment = new HashMap<String, Object>();
-				selectShipment.put("vendor_id",Long.parseLong(currentOrder.get("vendor_id").toString()));
-				//发货国家
-				selectShipment.put("consigner_country_id", currentOrder.get("vendor_address_country_id").toString());
-				//收货国家(目前是获取不到的,接口需要修改)
-				selectShipment.put("consignee_country_id", currentOrder.get("address_country_id").toString());
-				Map<String, Object> shipMentMap = iShipmentService.selectShipmentByOrder(selectShipment);
-				shipMentMap.put("ship_to_geography", shipmentMapList.get(0).get("ship_to_geography").toString());
+				//根据ID获取Shipment 信息
+				Map<String, Object> getShipment = new HashMap<String, Object>();
+				getShipment.put("shipment_id", Long.parseLong(shipment_id));
+				List<Map<String, Object>> shipmentMapList = iShipmentService.getShipmentById(getShipment);
 				
-				//订单加入箱子
-				return updateLogisticsProduct(currentOrder,shipMentMap,false);
+				//箱子关联Shipment
+				Map<String, Object> updateContainer = new HashMap<String, Object>(); 
+				updateContainer.put("shipment_id", shipmentMapList.get(0).get("shipment_id").toString());
+				updateContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
+				logger.info(MessageFormat.format("packOrder updateContainerByCondition shipment_id:{0},container_id:{1}",shipmentMapList.get(0).get("shipment_id").toString(),Long.parseLong(map.get("containerId").toString())));
+				int row = containerService.updateContainerByCondition(conditionMap);
 				
-			}
-			
-			return result;
-		}
-		
-		
-		
-		//如果是新箱子，则需要关联Shipment,如果存在符合条件的Shipment有多个则返回列表供选择,如果只有一个则默认存入，没有则需要新建Shipment
-		if(list == null || list.size() == 0){
-			
-			Map<String, Object> selectContainer = new HashMap<String, Object>(); 
-			selectContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
-			Container container =  containerService.selectContainerById(selectContainer);
-			//判断箱子的geography 跟订单的大区是否一致
-			if(container != null && !container.getShipToGeography().equals(currentOrder.get("geography_name").toString())){
-				result.setMsg("The shipping area is inconsistent");
+				//关联成功，则往箱子里存入订单
+				if(row > 0 ){
+					
+					Map<String, Object> shipMentMap = new HashMap<String, Object>();
+					//根据订单大区创建的   所以只需要用订单的大区即可
+					shipMentMap.put("ship_to_geography", currentOrder.get("geography_name").toString());
+					
+//					//获取当前ShipMent 第一段的物流类型(不需要  空箱子不比较shipmentType 直接放入)
+					
+					//订单加入箱子
+					result =  updateLogisticsProduct(currentOrder,shipMentMap,false);
+					infoMap.put("statusType", 3);
+					result.setInfoMap(infoMap);
+					return result;
+					
+				}
+				
 				return result;
 			}
 			
-			if(StringUtils.isNotBlank(currentOrder.get("address_country_id").toString())){
-				Map<String, Object> selectShipmentParam = new HashMap<String, Object>();
-				selectShipmentParam.put("shipToCountry", currentOrder.get("geography_name").toString());
-				
-				//shipment 状态
-				selectShipmentParam.put("status", ContainerType.OPEN);
-				//查询shipment(不需要vendor?)
-				List<Map<String, Object>> shipmentMapList = iShipmentService.getShipmentByStatus(selectShipmentParam);
-				
-				//如果为空  新建Shipment
-				if(shipmentMapList == null || shipmentMapList.size() == 0  ){
-					
-					Map<String, Object> saveShipmentParam = new HashMap<String, Object>();
-					saveShipmentParam.put("shipToGeography", currentOrder.get("geography_name").toString());
-					saveShipmentParam.put("consignee", currentOrder.get("user_rec_name").toString());
-					saveShipmentParam.put("shipToAddr", currentOrder.get("user_rec_addr").toString());
-					saveShipmentParam.put("shipToDistrict", currentOrder.get("user_rec_area").toString());
-					saveShipmentParam.put("shipToCity", currentOrder.get("user_rec_city").toString());
-					saveShipmentParam.put("shipToProvince", currentOrder.get("user_rec_province").toString());
-					saveShipmentParam.put("shipToCountry", currentOrder.get("user_rec_country").toString());
 			
-					//发货国家
-					saveShipmentParam.put("consigner_country_id", currentOrder.get("vendor_address_country_id").toString());
-					//收货国家
-					saveShipmentParam.put("consignee_country_id", currentOrder.get("address_country_id").toString());
+			
+			//如果是新箱子，则需要关联Shipment,如果存在符合条件的Shipment有多个则返回列表供选择,如果只有一个则默认存入，没有则需要新建Shipment
+			if(list == null || list.size() == 0){
+				
+				Map<String, Object> selectContainer = new HashMap<String, Object>(); 
+				selectContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
+				Container container =  containerService.selectContainerById(selectContainer);
+				//判断箱子的geography 跟订单的大区是否一致
+				if(container != null && !container.getShipToGeography().equals(currentOrder.get("geography_name").toString())){
+					result.setMsg("The shipping area is inconsistent");
+					return result;
+				}
+				
+				//要改
+				if(StringUtils.isNotBlank(currentOrder.get("address_country_id").toString())){
+					Map<String, Object> selectShipmentParam = new HashMap<String, Object>();
+					selectShipmentParam.put("shipToCountry", currentOrder.get("geography_name").toString());
+					
+					//shipment 状态
+					selectShipmentParam.put("status", ContainerType.OPEN);
+					//查询shipment(不需要vendor?)
+					List<Map<String, Object>> shipmentMapList = iShipmentService.getShipmentByStatus(selectShipmentParam);
+					
+					//如果为空  新建Shipment
+					if(shipmentMapList == null || shipmentMapList.size() == 0  ){
+						
+						Map<String, Object> saveShipmentParam = new HashMap<String, Object>();
+						saveShipmentParam.put("shipToGeography", currentOrder.get("geography_name").toString());
+						saveShipmentParam.put("consignee", currentOrder.get("user_rec_name").toString());
+						saveShipmentParam.put("shipToAddr", currentOrder.get("user_rec_addr").toString());
+						saveShipmentParam.put("shipToDistrict", currentOrder.get("user_rec_area").toString());
+						saveShipmentParam.put("shipToCity", currentOrder.get("user_rec_city").toString());
+						saveShipmentParam.put("shipToProvince", currentOrder.get("user_rec_province").toString());
+						saveShipmentParam.put("shipToCountry", currentOrder.get("user_rec_country").toString());
+				
+						//发货国家
+						saveShipmentParam.put("consigner_country_id", currentOrder.get("vendor_address_country_id").toString());
+						//收货国家
+						saveShipmentParam.put("consignee_country_id", currentOrder.get("address_country_id").toString());
 
-					//接口需要返回shipmentId
-					int row = iShipmentService.saveShipmentByOrderId(saveShipmentParam);
-					Long shipmentId = 0l;
-					if (row > 0){
+						//接口需要返回shipmentId
+						int row = iShipmentService.saveShipmentByOrderId(saveShipmentParam);
+						Long shipmentId = 0l;
+						if (row > 0){
+							
+							//箱子关联Shipment
+							Map<String, Object> updateContainer = new HashMap<String, Object>(); 
+							updateContainer.put("shipment_id", shipmentId);
+							updateContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
+							logger.info(MessageFormat.format("packOrder updateContainerByCondition shipment_id:{0},container_id:{1}",shipmentId,Long.parseLong(map.get("containerId").toString())));
+							int updateContainerRow = containerService.updateContainerByCondition(conditionMap);
+							
+							//关联成功，则往箱子里存入订单
+							if(updateContainerRow > 0 ){
+								
+								Map<String, Object> shipMentMap = new HashMap<String, Object>();
+								//根据订单大区创建的Shipment   所以只需要用订单的大区即可
+								shipMentMap.put("ship_to_geography", currentOrder.get("geography_name").toString());
+//								//获取当前ShipMent 第一段的物流类型(不需要  空箱子不比较shipmentType 直接放入)
+								
+								//订单加入箱子
+								result =  updateLogisticsProduct(currentOrder,shipMentMap,false);
+								infoMap.put("statusType", 3);
+								result.setInfoMap(infoMap);
+							}
+							
+						}
+						
+					//如果匹配的Shipment 只存在一个,就直接关联箱子   并把订单存入箱子
+					}else if(shipmentMapList.size() == 1){
 						
 						//箱子关联Shipment
 						Map<String, Object> updateContainer = new HashMap<String, Object>(); 
-						updateContainer.put("shipment_id", shipmentId);
+						updateContainer.put("shipment_id", shipmentMapList.get(0).get("shipment_id").toString());
 						updateContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
-						logger.info(MessageFormat.format("packOrder updateContainerByCondition shipment_id:{0},container_id:{1}",shipmentId,Long.parseLong(map.get("containerId").toString())));
-						int updateContainerRow = containerService.updateContainerByCondition(conditionMap);
+						logger.info(MessageFormat.format("packOrder updateContainerByCondition shipment_id:{0},container_id:{1}",shipmentMapList.get(0).get("shipment_id").toString(),Long.parseLong(map.get("containerId").toString())));
+						int row = containerService.updateContainerByCondition(conditionMap);
 						
 						//关联成功，则往箱子里存入订单
-						if(updateContainerRow > 0 ){
+						if(row > 0 ){
 							
-							//获取当前ShipMent 第一段的物流类型
-							Map<String, Object> selectShipment = new HashMap<String, Object>();
-							selectShipment.put("vendor_id",Long.parseLong(currentOrder.get("vendor_id").toString()));
-							//发货国家
-							selectShipment.put("consigner_country_id", currentOrder.get("vendor_address_country_id").toString());
-							//收货国家(目前是获取不到的,接口需要修改)
-							selectShipment.put("consignee_country_id", currentOrder.get("address_country_id").toString());
-							Map<String, Object> shipMentMap = iShipmentService.selectShipmentByOrder(selectShipment);
-							shipMentMap.put("ship_to_geography", currentOrder.get("geography_name").toString());
+							Map<String, Object> shipMentMap = shipmentMapList.get(0);
+							//获取当前ShipMent 第一段的物流类型(不需要  空箱子不比较shipmentType 直接放入)
 							
 							//订单加入箱子
-							return updateLogisticsProduct(currentOrder,shipMentMap,false);
+							result =  updateLogisticsProduct(currentOrder,shipMentMap,false);
+							infoMap.put("statusType", 3);
+							result.setInfoMap(infoMap);
 						}
+					
+					//如果匹配的Shipment 存在多个，则返回列表供选择
+					}else if(shipmentMapList.size() > 1){
 						
+						result.setData(shipmentMapList);
+						infoMap.put("statusType", 2);
+						result.setInfoMap(infoMap);
 					}
-					
-				//如果匹配的Shipment 只存在一个,就直接关联箱子   并把订单存入箱子
-				}else if(shipmentMapList.size() == 1){
-					
-					//箱子关联Shipment
-					Map<String, Object> updateContainer = new HashMap<String, Object>(); 
-					updateContainer.put("shipment_id", shipmentMapList.get(0).get("shipment_id").toString());
-					updateContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
-					logger.info(MessageFormat.format("packOrder updateContainerByCondition shipment_id:{0},container_id:{1}",shipmentMapList.get(0).get("shipment_id").toString(),Long.parseLong(map.get("containerId").toString())));
-					int row = containerService.updateContainerByCondition(conditionMap);
-					
-					//关联成功，则往箱子里存入订单
-					if(row > 0 ){
-						
-						//获取当前ShipMent 第一段的物流类型
-						Map<String, Object> selectShipment = new HashMap<String, Object>();
-						selectShipment.put("vendor_id",Long.parseLong(currentOrder.get("vendor_id").toString()));
-						//发货国家
-						selectShipment.put("consigner_country_id", currentOrder.get("vendor_address_country_id").toString());
-						//收货国家(目前是获取不到的,接口需要修改,返回修改删除了箱子，没有关联的订单，无法查询到)
-						selectShipment.put("consignee_country_id", currentOrder.get("address_country_id").toString());
-						Map<String, Object> shipMentMap = iShipmentService.selectShipmentByOrder(selectShipment);
-						shipMentMap.put("ship_to_geography", shipmentMapList.get(0).get("ship_to_geography").toString());
-						
-						//订单加入箱子
-						return updateLogisticsProduct(currentOrder,shipMentMap,false);
-					}
-				
-				//如果匹配的Shipment 存在多个，则返回列表供选择
-				}else if(shipmentMapList.size() > 1){
-					
-					result.setData(shipmentMapList);
 				}
-			}
-		
-		//如果箱子中存在订单，则直接加入箱子
-		}else{
-			Map<String, Object> getShipment = new HashMap<String, Object>();
-			getShipment.put("shipment_id", Long.parseLong(shipment_id));
-			List<Map<String, Object>> shipmentMapList = iShipmentService.getShipmentById(getShipment);
 			
-			if(shipmentMapList != null && shipmentMapList.size() > 0){
-				//获取当前ShipMent 第一段的物流类型
-				Map<String, Object> selectShipment = new HashMap<String, Object>();
-				selectShipment.put("vendor_id",Long.parseLong(currentOrder.get("vendor_id").toString()));
-				//发货国家
-				selectShipment.put("consigner_country_id", currentOrder.get("vendor_address_country_id").toString());
-				//收货国家(目前是获取不到的,接口需要修改)
-				selectShipment.put("consignee_country_id", currentOrder.get("address_country_id").toString());
-				Map<String, Object> shipMentMap = iShipmentService.selectShipmentByOrder(selectShipment);
-				shipMentMap.put("ship_to_geography", shipmentMapList.get(0).get("ship_to_geography").toString());
+			//如果箱子中存在订单，则直接加入箱子
+			}else{
+				Map<String, Object> getShipment = new HashMap<String, Object>();
+				getShipment.put("shipment_id", Long.parseLong(shipment_id));
+				List<Map<String, Object>> shipmentMapList = iShipmentService.getShipmentById(getShipment);
 				
-				//订单加入箱子
-				return updateLogisticsProduct(currentOrder,shipMentMap,true);
+				if(shipmentMapList != null && shipmentMapList.size() > 0){
+					//获取当前ShipMent 第一段的物流类型
+					Map<String, Object> selectShipment = new HashMap<String, Object>();
+					selectShipment.put("vendor_id",Long.parseLong(currentOrder.get("vendor_id").toString()));
+					//发货国家
+					selectShipment.put("consigner_country_id", currentOrder.get("vendor_address_country_id").toString());
+					//收货国家(目前是获取不到的,接口需要修改)
+					selectShipment.put("consignee_country_id", currentOrder.get("address_country_id").toString());
+					Map<String, Object> shipMentMap = iShipmentService.selectShipmentByOrder(selectShipment);
+					shipMentMap.put("ship_to_geography", shipmentMapList.get(0).get("ship_to_geography").toString());
+					
+
+					//订单加入箱子
+					result =  updateLogisticsProduct(currentOrder,shipMentMap,true);
+					infoMap.put("statusType", 4);
+					result.setInfoMap(infoMap);
+				}
+				
+
 			}
 			
-
+		}catch(Exception e){
+			e.printStackTrace();
 		}
-		
 
-		
-		
-
-		
 		
 		return result;
 	}
+	
+	
 	
 	
 	/**
@@ -1067,6 +1070,7 @@ public class OrderController extends BaseController{
 		//校验该订单跟箱子所属的Shipment的目的地是否一致,一致则加入,是否分段运输，发货员自行判断
 		if(!orderMap.get("geography_name").toString().equals(shipMentMap.get("ship_to_geography").toString())){
 			
+			//空箱子不需要判断,直接存入   shipment_type 用于判断该箱子是否能存放多个，状态为1 只能存放一个  所以不能在存入
 			if(ischeck && shipMentMap.get("shipment_type_id").toString().equals("1")){
 				return result;
 			}
