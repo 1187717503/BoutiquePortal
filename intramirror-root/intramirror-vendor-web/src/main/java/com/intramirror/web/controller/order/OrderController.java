@@ -248,7 +248,7 @@ public class OrderController extends BaseController{
 		conditionMap.put("vendorId", vendorId);
 		conditionMap.put("orderNumber", map.get("orderNumber").toString());
 		
-		//根据订单状态查询订单
+		//根据订单orderLineNumber 查询订单详情
 		Map<String,Object> orderInfo = orderService.getOrderInfoByCondition(conditionMap);
 		
 		if(orderInfo != null ){

@@ -102,6 +102,7 @@ public class OrderShipController extends BaseController{
 		
 		try{
 			Map<String, Object> paramtMap = new HashMap<String, Object>();
+			paramtMap.put("vendorId", vendor.getVendorId());
 			//获取箱子列表信息
 			List<Map<String, Object>> containerList = containerService.getContainerList(paramtMap);
 			
@@ -154,6 +155,7 @@ public class OrderShipController extends BaseController{
 					//将cartonList 存入shipMent详情
 					for(Map<String, Object> shipMent:shipMentList){
 						shipMent.put("cartonList", shipMentCartonList.get(shipMent.get("shipment_id").toString()));
+						shipMent.put("carton_qty", shipMentCartonList.get(shipMent.get("shipment_id").toString()).size());
 					}
 				}
 
