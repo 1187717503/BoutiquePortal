@@ -84,6 +84,12 @@ public class OrderController extends BaseController{
 	private IContainerService containerService;
 	
 	
+	/**
+	 * 获取订单列表
+	 * @param status 
+	 * @param httpRequest
+	 * @return
+	 */
     @RequestMapping(value = "/getOrderList", method = RequestMethod.POST)
 	@ResponseBody
 	public ResultMessage getOrderList(@RequestBody Map<String,Object> map,HttpServletRequest httpRequest){
@@ -201,6 +207,12 @@ public class OrderController extends BaseController{
     
     
     
+    /**
+     * 获取订单详情
+     * @param status  orderNumber 
+     * @param httpRequest
+     * @return
+     */
     @RequestMapping(value = "/getOrderDetail", method = RequestMethod.POST)
 	@ResponseBody
 	public ResultMessage getOrderDetail(@RequestBody Map<String,Object> map,HttpServletRequest httpRequest){
@@ -240,28 +252,6 @@ public class OrderController extends BaseController{
 		Map<String,Object> orderInfo = orderService.getOrderInfoByCondition(conditionMap);
 		
 		if(orderInfo != null ){
-			
-			
-			//根据ID列表获取商品属性
-			List<Map<String, Object>> productPropertyList = productPropertyService.getProductPropertyListByProductId(orderInfo.get("product_id").toString());
-			Map<String, Map<String, String>> productPropertyResult= new HashMap<String, Map<String, String>>();
-			
-			for(Map<String, Object> productProperty : productPropertyList){
-				
-				//如果存在
-				if(productPropertyResult.containsKey(productProperty.get("product_id").toString())){
-					Map<String, String> info = productPropertyResult.get(productProperty.get("product_id").toString());
-				    info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
-				}else{
-					Map<String, String> info = new HashMap<String, String>();
-					info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
-					productPropertyResult.put(productProperty.get("product_id").toString(), info);
-				}
-				
-			}
-			
-			
-
 			//汇率
 			Double rate =  Double.parseDouble(orderInfo.get("current_rate").toString());
 			
@@ -286,14 +276,58 @@ public class OrderController extends BaseController{
 			BigDecimal supply_price_discount = new BigDecimal((inPrice*(1+0.22)/price)*100);
 			orderInfo.put("supply_price_discount", (100 -supply_price_discount.intValue())+" %");
 			
-			
-			//添加商品对应的属性
-			if(productPropertyResult.size() > 0 ){
-				if(productPropertyResult.get(orderInfo.get("product_id").toString()) != null){
-					orderInfo.put("brandID", productPropertyResult.get(orderInfo.get("product_id").toString()).get("BrandID"));
-					orderInfo.put("colorCode", productPropertyResult.get(orderInfo.get("product_id").toString()).get("ColorCode"));
-				}
-			}
+//			//根据ID列表获取商品属性
+//			List<Map<String, Object>> productPropertyList = productPropertyService.getProductPropertyListByProductId(orderInfo.get("product_id").toString());
+//			Map<String, Map<String, String>> productPropertyResult= new HashMap<String, Map<String, String>>();
+//			
+//			for(Map<String, Object> productProperty : productPropertyList){
+//				
+//				//如果存在
+//				if(productPropertyResult.containsKey(productProperty.get("product_id").toString())){
+//					Map<String, String> info = productPropertyResult.get(productProperty.get("product_id").toString());
+//				    info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
+//				}else{
+//					Map<String, String> info = new HashMap<String, String>();
+//					info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
+//					productPropertyResult.put(productProperty.get("product_id").toString(), info);
+//				}
+//				
+//			}
+//			
+//			
+//
+//			//汇率
+//			Double rate =  Double.parseDouble(orderInfo.get("current_rate").toString());
+//			
+//			//按汇率计算人民币价钱
+//			Double sale_price2 = Double.parseDouble(orderInfo.get("sale_price").toString()) * rate;
+//			orderInfo.put("sale_price2", sale_price2);
+//			//计算利润
+//			Double profit = Double.parseDouble(orderInfo.get("sale_price").toString()) - Double.parseDouble(orderInfo.get("in_price").toString());
+//			BigDecimal b = new BigDecimal(profit);  
+//			profit = b.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();  
+//			orderInfo.put("profit", profit * rate);
+//			
+//			//计算折扣 
+//			Double salePrice = Double.parseDouble(orderInfo.get("sale_price").toString());
+//			Double price = Double.parseDouble(orderInfo.get("price").toString());
+//			Double inPrice = Double.parseDouble(orderInfo.get("in_price").toString());
+//			
+//			BigDecimal sale_price_discount = new BigDecimal((salePrice / price)*100);  
+////				info.put("sale_price_discount",sale_price_discount.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() +" %");
+//			orderInfo.put("sale_price_discount",(100 - sale_price_discount.intValue()) +" %");
+//			
+//			BigDecimal supply_price_discount = new BigDecimal((inPrice*(1+0.22)/price)*100);
+//			orderInfo.put("supply_price_discount", (100 -supply_price_discount.intValue())+" %");
+//			
+//			
+//			//添加商品对应的属性
+//			if(productPropertyResult.size() > 0 ){
+//				if(productPropertyResult.get(orderInfo.get("product_id").toString()) != null){
+//					orderInfo.put("brandID", productPropertyResult.get(orderInfo.get("product_id").toString()).get("BrandID"));
+//					orderInfo.put("colorCode", productPropertyResult.get(orderInfo.get("product_id").toString()).get("ColorCode"));
+//				}
+//			}
 			
 		}
 		
@@ -328,7 +362,7 @@ public class OrderController extends BaseController{
 	@RequestMapping(value="/updateOrderStatus", method=RequestMethod.POST)
 	@ResponseBody
 	public ResultMessage updateOrderStatus(@RequestBody Map<String, Object> map){
-		logger.info("updateOrderStatus param:"+new Gson().toJson(map));
+		logger.info("updateOrderStatus param:{}",new Gson().toJson(map));
 		ResultMessage message = ResultMessage.getInstance();
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 		resultMap.put("status", StatusType.FAILURE);
@@ -489,6 +523,14 @@ public class OrderController extends BaseController{
 		return message;
 	}
 	
+	
+	
+	/***
+	 * 获取箱子里面的订单信息
+	 * @param status containerId
+	 * @param httpRequest
+	 * @return
+	 */
 	@RequestMapping(value="/getPackOrderList", method = RequestMethod.POST)
 	@ResponseBody
 	public ResultMessage getPackOrderList(@RequestBody Map<String,Object> map,HttpServletRequest httpRequest){
@@ -651,23 +693,18 @@ public class OrderController extends BaseController{
 			//如果为空箱子，并且已经选择过shipMent 则直接关联，并加入箱子
 			if(StringUtils.isNoneBlank(shipment_id) && (list == null || list.size() == 0)){
 				
-				//根据ID获取Shipment 信息
-				Map<String, Object> getShipment = new HashMap<String, Object>();
-				getShipment.put("shipment_id", Long.parseLong(shipment_id));
-				List<Map<String, Object>> shipmentMapList = iShipmentService.getShipmentById(getShipment);
-				
 				//箱子关联Shipment
 				Map<String, Object> updateContainer = new HashMap<String, Object>(); 
-				updateContainer.put("shipment_id", shipmentMapList.get(0).get("shipment_id").toString());
+				updateContainer.put("shipment_id",shipment_id);
 				updateContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
-				logger.info(MessageFormat.format("packOrder updateContainerByCondition shipment_id:{0},container_id:{1}",shipmentMapList.get(0).get("shipment_id").toString(),Long.parseLong(map.get("containerId").toString())));
+				logger.info(MessageFormat.format("packOrder updateContainerByCondition shipment_id:{0},container_id:{1}",shipment_id,Long.parseLong(map.get("containerId").toString())));
 				int row = containerService.updateContainerByCondition(conditionMap);
 				
 				//关联成功，则往箱子里存入订单
 				if(row > 0 ){
 					
 					Map<String, Object> shipMentMap = new HashMap<String, Object>();
-					//根据订单大区创建的   所以只需要用订单的大区即可
+					//根据订单大区选择的Shipment   所以只需要用订单的大区即可(只有箱子为空时)
 					shipMentMap.put("ship_to_geography", currentOrder.get("geography_name").toString());
 					
 //					//获取当前ShipMent 第一段的物流类型(不需要  空箱子不比较shipmentType 直接放入)
@@ -697,60 +734,61 @@ public class OrderController extends BaseController{
 					return result;
 				}
 				
-				//要改
-				if(StringUtils.isNotBlank(currentOrder.get("address_country_id").toString())){
-					Map<String, Object> selectShipmentParam = new HashMap<String, Object>();
-					selectShipmentParam.put("shipToCountry", currentOrder.get("geography_name").toString());
-					
-					//shipment 状态
-					selectShipmentParam.put("status", ContainerType.OPEN);
-					//查询shipment(不需要vendor?)
-					List<Map<String, Object>> shipmentMapList = iShipmentService.getShipmentByStatus(selectShipmentParam);
-					
-					//如果为空  新建Shipment
-					if(shipmentMapList == null || shipmentMapList.size() == 0  ){
-						
-						Map<String, Object> saveShipmentParam = new HashMap<String, Object>();
-						saveShipmentParam.put("shipToGeography", currentOrder.get("geography_name").toString());
-						saveShipmentParam.put("consignee", currentOrder.get("user_rec_name").toString());
-						saveShipmentParam.put("shipToAddr", currentOrder.get("user_rec_addr").toString());
-						saveShipmentParam.put("shipToDistrict", currentOrder.get("user_rec_area").toString());
-						saveShipmentParam.put("shipToCity", currentOrder.get("user_rec_city").toString());
-						saveShipmentParam.put("shipToProvince", currentOrder.get("user_rec_province").toString());
-						saveShipmentParam.put("shipToCountry", currentOrder.get("user_rec_country").toString());
-				
-						//发货国家
-						saveShipmentParam.put("consigner_country_id", currentOrder.get("vendor_address_country_id").toString());
-						//收货国家
-						saveShipmentParam.put("consignee_country_id", currentOrder.get("address_country_id").toString());
 
-						//接口需要返回shipmentId
-						int row = iShipmentService.saveShipmentByOrderId(saveShipmentParam);
-						Long shipmentId = 0l;
-						if (row > 0){
+				Map<String, Object> selectShipmentParam = new HashMap<String, Object>();
+				selectShipmentParam.put("shipToGeography", currentOrder.get("geography_name").toString());
+				
+				//shipment 状态
+				selectShipmentParam.put("status", ContainerType.OPEN);
+				selectShipmentParam.put("vendorId", vendorId);
+				
+				//查询shipment
+				List<Map<String, Object>> shipmentMapList = iShipmentService.getShipmentsByVendor(selectShipmentParam);
+				
+				//如果为空  新建Shipment
+				if(shipmentMapList == null || shipmentMapList.size() == 0  ){
+					
+					Map<String, Object> saveShipmentParam = new HashMap<String, Object>();
+					saveShipmentParam.put("shipToGeography", currentOrder.get("geography_name").toString());
+					saveShipmentParam.put("consignee", currentOrder.get("user_rec_name").toString());
+					saveShipmentParam.put("shipToAddr", currentOrder.get("user_rec_addr").toString());
+					saveShipmentParam.put("shipToDistrict", currentOrder.get("user_rec_area").toString());
+					saveShipmentParam.put("shipToCity", currentOrder.get("user_rec_city").toString());
+					saveShipmentParam.put("shipToProvince", currentOrder.get("user_rec_province").toString());
+					saveShipmentParam.put("shipToCountry", currentOrder.get("user_rec_country").toString());
+			
+					//发货国家
+					saveShipmentParam.put("consigner_country_id", currentOrder.get("vendor_address_country_id").toString());
+					//收货国家
+					saveShipmentParam.put("consignee_country_id", currentOrder.get("address_country_id").toString());
+
+					//接口需要返回shipmentId
+					int row = iShipmentService.saveShipmentByOrderId(saveShipmentParam);
+					Long shipmentId = 0l;
+					if (row > 0){
+						
+						//箱子关联Shipment
+						Map<String, Object> updateContainer = new HashMap<String, Object>(); 
+						updateContainer.put("shipment_id", shipmentId);
+						updateContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
+						logger.info(MessageFormat.format("packOrder updateContainerByCondition shipment_id:{0},container_id:{1}",shipmentId,Long.parseLong(map.get("containerId").toString())));
+						int updateContainerRow = containerService.updateContainerByCondition(conditionMap);
+						
+						//关联成功，则往箱子里存入订单
+						if(updateContainerRow > 0 ){
 							
-							//箱子关联Shipment
-							Map<String, Object> updateContainer = new HashMap<String, Object>(); 
-							updateContainer.put("shipment_id", shipmentId);
-							updateContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
-							logger.info(MessageFormat.format("packOrder updateContainerByCondition shipment_id:{0},container_id:{1}",shipmentId,Long.parseLong(map.get("containerId").toString())));
-							int updateContainerRow = containerService.updateContainerByCondition(conditionMap);
-							
-							//关联成功，则往箱子里存入订单
-							if(updateContainerRow > 0 ){
-								
-								Map<String, Object> shipMentMap = new HashMap<String, Object>();
-								//根据订单大区创建的Shipment   所以只需要用订单的大区即可
-								shipMentMap.put("ship_to_geography", currentOrder.get("geography_name").toString());
+							Map<String, Object> shipMentMap = new HashMap<String, Object>();
+							//根据订单大区创建的Shipment   所以只需要用订单的大区即可(只有箱子为空时)
+							shipMentMap.put("ship_to_geography", currentOrder.get("geography_name").toString());
 //								//获取当前ShipMent 第一段的物流类型(不需要  空箱子不比较shipmentType 直接放入)
-								
-								//订单加入箱子
-								result =  updateLogisticsProduct(currentOrder,shipMentMap,false);
-								infoMap.put("statusType", 3);
-								result.setInfoMap(infoMap);
-							}
 							
+							//订单加入箱子
+							result =  updateLogisticsProduct(currentOrder,shipMentMap,false);
+							infoMap.put("statusType", 3);
+							result.setInfoMap(infoMap);
 						}
+						
+					}
 						
 					//如果匹配的Shipment 只存在一个,就直接关联箱子   并把订单存入箱子
 					}else if(shipmentMapList.size() == 1){
@@ -781,28 +819,20 @@ public class OrderController extends BaseController{
 						infoMap.put("statusType", 2);
 						result.setInfoMap(infoMap);
 					}
-				}
+				
 			
 			//如果箱子中存在订单，则直接加入箱子
 			}else{
 				Map<String, Object> getShipment = new HashMap<String, Object>();
-				getShipment.put("shipment_id", Long.parseLong(shipment_id));
-				List<Map<String, Object>> shipmentMapList = iShipmentService.getShipmentById(getShipment);
+				getShipment.put("shipmentId", Long.parseLong(shipment_id));
 				
-				if(shipmentMapList != null && shipmentMapList.size() > 0){
-					//获取当前ShipMent 第一段的物流类型
-					Map<String, Object> selectShipment = new HashMap<String, Object>();
-					selectShipment.put("vendor_id",Long.parseLong(currentOrder.get("vendor_id").toString()));
-					//发货国家
-					selectShipment.put("consigner_country_id", currentOrder.get("vendor_address_country_id").toString());
-					//收货国家(目前是获取不到的,接口需要修改)
-					selectShipment.put("consignee_country_id", currentOrder.get("address_country_id").toString());
-					Map<String, Object> shipMentMap = iShipmentService.selectShipmentByOrder(selectShipment);
-					shipMentMap.put("ship_to_geography", shipmentMapList.get(0).get("ship_to_geography").toString());
-					
+				//根据shipmentId 获取shipment 相关信息及物流第一段类型
+				Map<String, Object> shipmentMap = iShipmentService.getShipmentTypeById(getShipment);
+				
+				if(shipmentMap != null ){
 
 					//订单加入箱子
-					result =  updateLogisticsProduct(currentOrder,shipMentMap,true);
+					result =  updateLogisticsProduct(currentOrder,shipmentMap,true);
 					infoMap.put("statusType", 4);
 					result.setInfoMap(infoMap);
 				}

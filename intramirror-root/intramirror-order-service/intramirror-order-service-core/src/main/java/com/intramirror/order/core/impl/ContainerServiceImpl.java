@@ -4,6 +4,7 @@
 package com.intramirror.order.core.impl;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -145,6 +146,12 @@ public class ContainerServiceImpl extends BaseDao implements IContainerService{
 	@Override
 	public Container selectContainerById(Map<String, Object> map) {
 		return containerMapper.selectContainerById(map);
+	}
+
+	@Override
+	public List<Map<String, Object>> getContainerList(Map<String, Object> map) {
+		
+		return containerMapper.getContainerList(map);
 	}
 
 

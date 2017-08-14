@@ -3,6 +3,7 @@
  */
 package com.intramirror.order.api.service;
 
+import java.util.List;
 import java.util.Map;
 
 import com.intramirror.order.api.model.Container;
@@ -68,5 +69,12 @@ public interface IContainerService {
 	 * @return int
 	 */
 	int updateContainerByCondition(Map<String, Object> map);
+	
+	/**
+	 * 获取Container 列表
+	 * @param map
+	 * @return
+	 */
+	List<Map<String,Object>> getContainerList(Map<String, Object> map);
 	
 }
