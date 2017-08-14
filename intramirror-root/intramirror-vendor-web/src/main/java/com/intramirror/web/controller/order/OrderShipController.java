@@ -143,7 +143,7 @@ public class OrderShipController extends BaseController{
 						Map<String, Object> shipMent = new HashMap<String, Object>();
 						shipMent.put("shipment_id", container.get("shipment_id").toString());
 						shipMent.put("shipment_no", container.get("shipment_no").toString());
-						shipMent.put("shipment_type", container.get("shipment_id").toString());
+						shipMent.put("shipment_status", container.get("shipment_status").toString());
 						shipMent.put("product_qty", container.get("product_qty").toString());
 						shipMent.put("ship_to_geography", container.get("ship_to_geography").toString());
 						shipMentList.add(shipMent);

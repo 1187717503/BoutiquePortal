@@ -91,13 +91,25 @@ values(#{containerType,jdbcType=VARCHAR}, #{shipToGeography,jdbcType=VARCHAR},#{
 	
 
   <select id="getContainerList" resultType="java.util.HashMap"  parameterType="java.util.Map">
-	SELECT c.container_id,c.barcode,c.ship_to_geography,s.`status` as shipment_type,s.shipment_no,s.shipment_id,
-	c.`status` as container_type,c.barcode,
+	SELECT c.container_id,c.barcode,c.ship_to_geography,s.`status` as shipment_status,s.shipment_no,s.shipment_id,
+	c.`status` as container_status,c.barcode,
 	(SELECT count(lp.logistics_product_id) FROM logistics_product lp 
 	WHERE lp.container_id = c.container_id AND lp.enabled = 1) as product_qty
 	FROM container c
 	INNER JOIN shipment s ON c.shipment_id = s.shipment_id
-	WHERE s.vendor_id =  #{vendorId,jdbcType=BIGINT} 
+	WHERE s.vendor_id =  #{vendorId,jdbcType=BIGINT}  
+	
+    <if test="shipment_status != null" >
+      	order by s.`status` desc
+    </if>
+    		
+    <if test="shipment_no != null" >
+      	order by s.shipment_no desc
+    </if>
+    		
+    <if test="geography_name != null" >
+      	order by c.ship_to_geography asc
+    </if>
 	
   </select>
 
