@@ -99,6 +99,15 @@ values(#{containerType,jdbcType=VARCHAR}, #{shipToGeography,jdbcType=VARCHAR},#{
 	INNER JOIN shipment s ON c.shipment_id = s.shipment_id
 	WHERE s.vendor_id =  #{vendorId,jdbcType=BIGINT}  
 	
+	<if test="shipmentStatus != null" >
+      	and s.`status` = #{shipmentStatus,jdbcType=BIGINT}
+    </if>
+    
+    <if test="ship_to_geography != null" >
+      	and c.ship_to_geography = #{ship_to_geography,jdbcType=VARCHAR}
+    </if>
+	
+			
     <if test="shipment_status != null" >
       	order by s.`status` desc
     </if>

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,10 +77,10 @@ public class OrderShipController extends BaseController{
 		ResultMessage result= new ResultMessage();
 		result.errorStatus();
 		
-		if(map == null || map.size() == 0 || map.get("status") == null){
-			result.setMsg("Parameter cannot be empty");
-			return result;
-		}
+//		if(map == null || map.size() == 0 || map.get("status") == null){
+//			result.setMsg("Parameter cannot be empty");
+//			return result;
+//		}
 		
 		User user = this.getUser(httpRequest);
 		if(user == null){
@@ -103,6 +104,19 @@ public class OrderShipController extends BaseController{
 		try{
 			Map<String, Object> paramtMap = new HashMap<String, Object>();
 			paramtMap.put("vendorId", vendor.getVendorId());
+			
+			if(map.get("sortByName") != null && StringUtils.isNoneBlank(map.get("sortByName").toString())){
+				paramtMap.put("sortByName", map.get("sortByName").toString());
+			}
+
+			if(map.get("shipmentStatus") != null && StringUtils.isNoneBlank(map.get("shipmentStatus").toString())){
+				paramtMap.put("shipmentStatus", Integer.parseInt(map.get("shipmentStatus").toString()));
+			}
+			
+			if(map.get("ship_to_geography") != null && StringUtils.isNoneBlank(map.get("ship_to_geography").toString())){
+				paramtMap.put("ship_to_geography", map.get("ship_to_geography").toString());
+			}
+			
 			//获取箱子列表信息
 			List<Map<String, Object>> containerList = containerService.getContainerList(paramtMap);
 			
