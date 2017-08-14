@@ -251,6 +251,7 @@
 		<module>intramirror-admin-web</module>
 		<module>intramirror-vendor-web</module>
 		<module>intramirror-product-service</module>
+		<module>intramirror-main-service</module>
 		<module>intramirror-order-service</module>
 		<module>intramirror-logistics-service</module>
 		<module>intramirror-user-service</module>
