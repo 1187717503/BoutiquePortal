@@ -202,9 +202,14 @@
 			where t_pp.enabled = 1 and (t_pp.key_name='BrandID' or t_pp.key_name = 'ColorCode') 
 			group by t_pp.product_id 
 			) pp ON p.product_id = pp.product_id   
-			where pspk.`name` = 'Size' 
-			and lp.`status` = #{status,jdbcType=BIGINT}
-			and v.vendor_id = #{vendorId,jdbcType=BIGINT}
+			where pspk.`name` = 'Size' and lp.enabled = 1 
+			
+			<if test="status != null" >
+      			and lp.`status` = #{status,jdbcType=BIGINT}
+   			</if>
+   			<if test="vendorId != null" >
+      			and v.vendor_id = #{vendorId,jdbcType=BIGINT}
+   			</if>
 			and lp.order_line_num =  #{orderNumber,jdbcType=VARCHAR}
   </select>
   
