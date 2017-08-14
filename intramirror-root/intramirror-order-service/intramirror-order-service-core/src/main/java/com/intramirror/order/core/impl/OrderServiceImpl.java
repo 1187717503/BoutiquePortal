@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.intramirror.order.api.vo.ShippedParam;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -143,5 +144,12 @@ public class OrderServiceImpl extends BaseDao implements IOrderService {
         conditionMap.put("shippedParam", shippedParam);
         return orderMapper.getShippedOrderListByStatus(conditionMap);
     }
+
+	@Override
+	public List<Map<String, Object>> getOrderListByShipmentId(
+			Map<String, Object> conditionMap) {
+		
+		return orderMapper.getOrderListByShipmentId(conditionMap);
+	}
 
 }

@@ -79,6 +79,14 @@ public interface IOrderService {
      * @return
      */
     List<Map<String, Object>> getOrderListByStatusAndContainerId(int containerId, int status, Long vendorId);
+    
+    
+	/**
+	 * 根据 ShipmentId 查询箱子跟订单信息
+	 * @param ShipmentId status vendorId
+	 * @return
+	 */
+	List<Map<String,Object>> getOrderListByShipmentId(Map<String, Object> conditionMap);
 
 
     /**
