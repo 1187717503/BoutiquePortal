@@ -2,10 +2,12 @@ package com.intramirror.web.controller.order;
 
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.order.api.service.IOrderService;
+import com.intramirror.order.api.vo.ShippedParam;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.VendorService;
 import com.intramirror.web.controller.BaseController;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -32,9 +35,9 @@ public class ShippedController extends BaseController {
     private VendorService vendorService;
 
 
-    @RequestMapping(value = "/getShippedList", method = RequestMethod.POST)
+	@RequestMapping(value="/getShippedList", method = RequestMethod.POST)
     @ResponseBody
-    public ResultMessage getShippedList(@RequestBody Map shippedParam, HttpServletRequest httpRequest) {
+    public ResultMessage getShippedList(@RequestBody ShippedParam shippedParam, HttpServletRequest httpRequest) {
         ResultMessage result = new ResultMessage();
         result.errorStatus();
 
