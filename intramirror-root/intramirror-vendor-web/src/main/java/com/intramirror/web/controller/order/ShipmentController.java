@@ -108,91 +108,91 @@ public class ShipmentController extends BaseController{
 		return message;
 	}
 	
-	
 	/**
-	 * 按国家查询当前status的shipment
+	 * 根据大区，vendorId查询shipment列表
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping(value="/getShipmentByStatus", method=RequestMethod.POST)
+	@RequestMapping(value="/getShipmentList", method=RequestMethod.POST)
 	@ResponseBody
-	public ResultMessage getShipmentByStatus(@RequestBody Map<String, Object> map){
-		logger.info("getShipment param : " +new Gson().toJson(map));
+	public ResultMessage getShipmentList(@RequestBody Map<String, Object> map){
+		logger.info("getShipmentList parameter : "+new Gson().toJson(map));
 		ResultMessage message = ResultMessage.getInstance();
 		try {
-			if (null == map || 0==map.size()){
+			if (null == map || 0 == map.size()){
 				logger.info("parameter cannot be null");
-				message.errorStatus().putMsg("error Message", "parameter is null");
-			 	return message;
-			}
-			//shipment状态参数校验
-			if(map.get("status") == null || StringUtils.isBlank(map.get("status").toString())){
-				message.successStatus().putMsg("info", "status cannot be null");
+				message.errorStatus().putMsg("Info", "parameter cannot be null");
 				return message;
 			}
-			if(map.get("shipToCountry") == null || StringUtils.isBlank(map.get("shipToCountry").toString())){
-				message.successStatus().putMsg("info", "shipToCountry cannot be null");
+			if (null == map.get("vendorId") || StringUtils.isBlank(map.get("vendorId").toString())){
+				logger.info("vendorId cannot be null");
+				message.errorStatus().putMsg("Info", "vendorId cannot be null");
 				return message;
 			}
-			List<Map<String, Object>> resultMap = iShipmentService.getShipmentByStatus(map);
-			if (null != resultMap){
-				message.successStatus().putMsg("info","SUCCESS").setData(resultMap);
+			if (null == map.get("shipToGeography") || StringUtils.isBlank(map.get("shipToGeography").toString())){
+				logger.info("shipToGeography cannot be null");
+				message.errorStatus().putMsg("Info", "shipToGeography cannot be null");
 				return message;
 			}
-			message.errorStatus().putMsg("info","SUCCESS").setData(resultMap);
+			if (null == map.get("status") || StringUtils.isBlank(map.get("status").toString())){
+				logger.info("status cannot be null");
+				message.errorStatus().putMsg("Info", "status cannot be null");
+				return message;
+			}
+			List<Map<String, Object>> list = iShipmentService.getShipmentsByVendor(map);
+			logger.info("result :" + new Gson().toJson(list));
+			if (null == list || 0==list.size()){
+				message.errorStatus().putMsg("Info", "result is null").setData("result null");
+				return message;
+			}
+			message.successStatus().putMsg("Info", "SUCCESS").setData(list);
 		} catch (Exception e) {
 			e.printStackTrace();
-			logger.info("Error Mssage : " + e.getMessage() );
+			logger.info("Error Message : " + e.getMessage());
 			message.errorStatus().putMsg("error Message", e.getMessage());
 		}
-		
 		return message;
 	}
 	
 	/**
-	 * 查询第一段shipment type
+	 * 根据shipmentId 查询 shipmentType
 	 * @param map
 	 * @return
 	 */
-	@RequestMapping(value="/selectShipmentByOrder", method=RequestMethod.POST)
+	@RequestMapping(value="/getShipmentTypeById", method=RequestMethod.POST)
 	@ResponseBody
-	public ResultMessage selectShipmentByOrder(@RequestBody Map<String, Object> map){
-		logger.info("selectShipmentByOrder param : " +new Gson().toJson(map));
+	public ResultMessage getShipmentTypeById(@RequestBody Map<String, Object> map){
+		logger.info("getShipmentTypeById parameter : "+new Gson().toJson(map));
 		ResultMessage message = ResultMessage.getInstance();
 		try {
-			if (null == map || 0==map.size()){
-				logger.info("selectShipmentByOrder cannot be null");
-				message.errorStatus().putMsg("error Message", "parameter is null");
-			 	return message;
-			}
-			//查询shipmentType参数校验
-			if(map.get("consigner_country_id") == null || StringUtils.isBlank(map.get("consigner_country_id").toString())){
-				message.successStatus().putMsg("info", "status cannot be null");
+			if (null == map || 0 == map.size()){
+				logger.info("parameter cannot be null");
+				message.errorStatus().putMsg("Info", "parameter cannot be null");
 				return message;
 			}
-			if(map.get("consignee_country_id") == null || StringUtils.isBlank(map.get("consignee_country_id").toString())){
-				message.successStatus().putMsg("info", "status cannot be null");
+			if (null == map.get("shipmentId") || StringUtils.isBlank(map.get("shipmentId").toString())){
+				logger.info("vendorId cannot be null");
+				message.errorStatus().putMsg("Info", "shipmentId cannot be null");
 				return message;
 			}
-			if(map.get("vendor_id") == null || StringUtils.isBlank(map.get("vendor_id").toString())){
-				message.successStatus().putMsg("info", "status cannot be null");
+			if (null == map.get("status") || StringUtils.isBlank(map.get("status").toString())){
+				logger.info("status cannot be null");
+				message.errorStatus().putMsg("Info", "status cannot be null");
 				return message;
 			}
-			Map<String, Object> resultMap = iShipmentService.selectShipmentByOrder(map);
-			if (null != resultMap){
-				message.successStatus().putMsg("info","SUCCESS").setData(resultMap);
+			Map<String, Object> resultMap = iShipmentService.getShipmentTypeById(map);
+			logger.info("result :" + new Gson().toJson(resultMap));
+			if (null == resultMap || 0 == map.size()){
+				message.errorStatus().putMsg("Info", "result is null").setData("result null");
 				return message;
 			}
-			message.errorStatus().putMsg("info","SUCCESS").setData(resultMap);
+			message.successStatus().putMsg("Info", "SUCCESS").setData(map);
 		} catch (Exception e) {
 			e.printStackTrace();
-			logger.info("Error Mssage : " + e.getMessage() );
+			logger.info("Error Message : " + e.getMessage());
 			message.errorStatus().putMsg("error Message", e.getMessage());
 		}
-		
 		return message;
-		
 	}
-	
 	
 }

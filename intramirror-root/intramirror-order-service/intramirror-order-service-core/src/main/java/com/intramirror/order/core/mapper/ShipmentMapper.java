@@ -45,20 +45,23 @@ public interface ShipmentMapper {
 	List<Map<String,Object>> getShipmentByStatus(Map<String, Object> map);
 	
 	/**
-	 * 根据shipmentID查询shipment
-	 * @param map
-	 * @return
-	 */
-	List<Map<String,Object>> getShipmentById(Map<String, Object> map);
-	
-	
-	
-	
-	/**
 	 * 新增subshipment
 	 * @param sub
 	 * @return
 	 */
 	int saveSubShipment(SubShipment sub);
 	
+	
+	/**
+	 * 根据vendorId大区查询shipment open的列表 如果可以返回第一段
+	 * @return
+	 */
+	List<Map<String, Object>> getShipmentsByVendor(Map<String, Object> map);
+	
+	/**
+	 * 根据shipmentID查询shipmentType
+	 * @param map
+	 * @return
+	 */
+	Map<String,Object> getShipmentTypeById(Map<String, Object> map);
 }

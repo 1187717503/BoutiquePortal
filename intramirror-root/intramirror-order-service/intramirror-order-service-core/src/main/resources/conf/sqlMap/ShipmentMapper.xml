@@ -38,12 +38,6 @@ VALUES( #{shipToGeography,jdbcType=VARCHAR},#{consignee,jdbcType=VARCHAR},#{ship
 		WHERE `status` = #{status,jdbcType=BIGINT} AND ship_to_geography = #{shipToCountry,jdbcType=VARCHAR}	
   </select>
   
-  
-  <select id="getShipmentById" resultType="java.util.HashMap"  parameterType="java.util.Map">
-  		SELECT * FROM shipment
-		WHERE shipment_id = #{shipment_id,jdbcType=BIGINT} 	
-  </select>
-  
   <select id="getShippmentByType" resultType="java.util.HashMap"  parameterType="java.util.Map">
   SELECT sp.*,ss.segment_sequence,ss.shipping_segment_id
 	FROM shipping_segment ss
@@ -65,5 +59,19 @@ VALUES( #{shipToGeography,jdbcType=VARCHAR},#{consignee,jdbcType=VARCHAR},#{ship
  #{shipToAddr,jdbcType=VARCHAR},#{shipToDistrict,jdbcType=VARCHAR},#{shipToCity,jdbcType=VARCHAR},
  #{shipToProvince,jdbcType=VARCHAR},#{shipToCountry,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},#{createdAt,jdbcType=TIMESTAMP},#{updatedAt,jdbcType=TIMESTAMP});
   </insert>
+  
+  <select id="getShipmentsByVendor" resultType="java.util.HashMap"  parameterType="java.util.Map">
+  SELECT * FROM shipment
+	WHERE vendor_id = #{vendorId,jdbcType=BIGINT} AND `status` = #{status,jdbcType=BIGINT} AND ship_to_geography = #{shipToGeography,jdbcType=VARCHAR};
+  </select>
+  
+  <select id="getShipmentTypeById" resultType="java.util.HashMap"  parameterType="java.util.Map">
+	  SELECT ss.shipment_type_id FROM sub_shipment sub
+		INNER JOIN shipment s ON (sub.shipment_id = s.shipment_id)
+		INNER JOIN shipping_segment ss ON (sub.shipping_segment_id = ss.shipping_segment_id)
+		INNER JOIN shipment_type st ON (ss.shipment_type_id = st.shipment_type_id)
+		WHERE sub.shipment_id=#{shipmentId,jdbcType=BIGINT} AND s.`status` = #{status,jdbcType=BIGINT}
+		GROUP BY sub.segment_sequence ASC LIMIT 1;
+  </select>
   
 </mapper>

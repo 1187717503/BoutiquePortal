@@ -3,7 +3,6 @@
  */
 package com.intramirror.order.core.impl;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -58,7 +57,8 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		typeMap.put("vendor_id",Long.parseLong(map.get("vendor_id").toString()));	
 		List<Map<String, Object>> listMap = shipmentMapper.getShippmentByType(typeMap);
 		logger.info("parameter :" + new Gson().toJson(listMap));
-		saveSubShipment(listMap, map);
+		Long shipmentId =null;
+		saveSubShipment(listMap, map,shipmentId);
 		return shipmentMapper.saveShipmentByOrderId(shipment);
 	}
 
@@ -81,7 +81,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		return shipmentMapper.getShippmentByType(map);
 	}
 
-	public void saveSubShipment(List<Map<String, Object>> map, Map<String, Object> lastMap){
+	public void saveSubShipment(List<Map<String, Object>> map, Map<String, Object> lastMap, Long shipmentId){
 		//打印入参段
 		logger.info("pararmeter " + new Gson().toJson(map));
 		Date currentDate = new Date();
@@ -90,25 +90,25 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			//每条路线生成不同sub-shipment
 			if (map.size() == 1){
 				//最终到达段sub_shipment
-				shipmentMapper.saveSubShipment(saveBean(lastMap, currentDate));
+				shipmentMapper.saveSubShipment(saveBean(lastMap, currentDate, shipmentId));
 			}
 			if (map.size() == 2){
 				Map<String, Object> thisMap = map.get(1);
-				SubShipment sub = saveBeanByMap(thisMap, currentDate);
+				SubShipment sub = saveBeanByMap(thisMap, currentDate, shipmentId);
 				shipmentMapper.saveSubShipment(sub);
-				shipmentMapper.saveSubShipment(saveBean(lastMap, currentDate));
+				shipmentMapper.saveSubShipment(saveBean(lastMap, currentDate, shipmentId));
 			}
 			if (map.size() == 3){
 				Map<String, Object> oneMap = map.get(1);
 				Map<String, Object> twoMap = map.get(2);
-				shipmentMapper.saveSubShipment(saveBeanByMap(oneMap, currentDate));
-				shipmentMapper.saveSubShipment(saveBeanByMap(twoMap, currentDate));
-				shipmentMapper.saveSubShipment(saveBean(lastMap, currentDate));
+				shipmentMapper.saveSubShipment(saveBeanByMap(oneMap, currentDate, shipmentId));
+				shipmentMapper.saveSubShipment(saveBeanByMap(twoMap, currentDate, shipmentId));
+				shipmentMapper.saveSubShipment(saveBean(lastMap, currentDate, shipmentId));
 			}
 		}
 	}
 	
-	public SubShipment saveBean(Map<String, Object> map, Date currentDate){
+	public SubShipment saveBean(Map<String, Object> map, Date currentDate, Long shipmentId){
 		SubShipment subShipment = new SubShipment();
 		subShipment.setConsignee(map.get("consignee").toString());
 		subShipment.setSegmentSequence(Long.parseLong(map.get("consignee").toString()));
@@ -118,13 +118,14 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		subShipment.setShipToCountry(map.get("shipToCountry").toString());
 		subShipment.setShipToDistrict(map.get("shipToDistrict").toString());
 		subShipment.setShipToProvince(map.get("shipToProvince").toString());
+		subShipment.setShipmentId(shipmentId);
 		subShipment.setStatus(ContainerType.OPEN);
 		subShipment.setUpdatedAt(currentDate);
 		subShipment.setCreatedAt(currentDate);
 		return subShipment;
 	}
 	
-	public SubShipment saveBeanByMap(Map<String, Object> map, Date currentDate){
+	public SubShipment saveBeanByMap(Map<String, Object> map, Date currentDate, Long shipmentId){
 		SubShipment subShipment = new SubShipment();
 		subShipment.setConsignee(map.get("transfer_consignee")==null?" ":map.get("transfer_consignee").toString());
 		subShipment.setSegmentSequence(Long.parseLong(map.get("segmentSequence")==null?"0":map.get("segmentSequence").toString()));
@@ -134,6 +135,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		subShipment.setShipToCity(map.get("addr_city")==null?" ":map.get("addr_city").toString());
 		subShipment.setShipToProvince(map.get("addr_province")==null?" ":map.get("addr_province").toString());
 		subShipment.setShipToCountry(map.get("addr_country")==null?" ":map.get("addr_country").toString());
+		subShipment.setShipmentId(shipmentId);
 		subShipment.setStatus(ContainerType.OPEN);
 		subShipment.setUpdatedAt(currentDate);
 		subShipment.setCreatedAt(currentDate);
@@ -158,9 +160,21 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		return shipmentMapper.saveSubShipment(sub);
 	}
 
-	@Override
-	public List<Map<String, Object>> getShipmentById(Map<String, Object> map) {
-		return shipmentMapper.getShipmentById(map);
+	/**
+	 * 根据shipmentID查询shipmentType
+	 * @param map
+	 * @return
+	 */
+	public Map<String, Object> getShipmentTypeById(Map<String, Object> map) {
+		return shipmentMapper.getShipmentTypeById(map);
+	}
+	
+	/**
+	 * 根据vendorId大区查询shipment open的列表 如果可以返回第一段
+	 * @return
+	 */
+	public List<Map<String, Object>> getShipmentsByVendor(Map<String, Object> map) {
+		return shipmentMapper.getShipmentsByVendor(map);
 	}
 
 }

@@ -59,6 +59,11 @@ public class SubShipment {
 	 * @Fields 国家
 	 */
 	private String shipToCountry;
+	
+	/**
+	 * @Fields shipment ID
+	 */
+	private Long shipmentId;
 
     public String getConsignee() {
 		return consignee;
@@ -299,4 +304,12 @@ public class SubShipment {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+	public Long getShipmentId() {
+		return shipmentId;
+	}
+
+	public void setShipmentId(Long shipmentId) {
+		this.shipmentId = shipmentId;
+	}
 }
