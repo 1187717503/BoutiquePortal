@@ -67,7 +67,7 @@
             <groupId>com.intramirror</groupId>
             <artifactId>intramirror-payment-service-core</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>com.intramirror</groupId>
             <artifactId>intramirror-common</artifactId>
