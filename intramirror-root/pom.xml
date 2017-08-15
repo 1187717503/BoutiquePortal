@@ -54,6 +54,16 @@
 			</dependency>
 			<dependency>
 				<groupId>com.intramirror</groupId>
+				<artifactId>intramirror-logistics-service-core</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intramirror</groupId>
+				<artifactId>intramirror-logistics-service-api</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intramirror</groupId>
 				<artifactId>intramirror-payment-service-core</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
