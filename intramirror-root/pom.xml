@@ -89,6 +89,16 @@
 			</dependency>
 			<dependency>
 				<groupId>com.intramirror</groupId>
+				<artifactId>intramirror-main-service-core</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intramirror</groupId>
+				<artifactId>intramirror-main-service-api</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>com.intramirror</groupId>
 				<artifactId>intramirror-shoplus-oss</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
