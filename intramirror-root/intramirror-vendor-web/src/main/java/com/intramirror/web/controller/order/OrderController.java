@@ -754,6 +754,7 @@ public class OrderController extends BaseController{
 
 					//接口需要返回shipmentId
 					Map<String, Object> orderResult = orderService.getShipmentDetails(saveShipmentParam);
+					orderResult.put("shipmentId", 0);
 					String shipmentId = iShipmentService.saveShipmentByOrderId(orderResult);
 					if (shipmentId != null && StringUtils.isNotBlank(shipmentId)){
 						
@@ -762,7 +763,7 @@ public class OrderController extends BaseController{
 						updateContainer.put("shipment_id", Long.parseLong(shipmentId));
 						updateContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
 						logger.info(MessageFormat.format("packOrder updateContainerByCondition shipment_id:{0},container_id:{1}",shipmentId,Long.parseLong(map.get("containerId").toString())));
-						int updateContainerRow = containerService.updateContainerByCondition(conditionMap);
+						int updateContainerRow = containerService.updateContainerByCondition(updateContainer);
 						
 						//关联成功，则往箱子里存入订单
 						if(updateContainerRow > 0 ){
@@ -770,6 +771,7 @@ public class OrderController extends BaseController{
 							Map<String, Object> shipMentMap = new HashMap<String, Object>();
 							//根据订单大区创建的Shipment   所以只需要用订单的大区即可(只有箱子为空时)
 							shipMentMap.put("ship_to_geography", currentOrder.get("geography_name").toString());
+							shipMentMap.put("shipment_id", shipmentId);
 //								//获取当前ShipMent 第一段的物流类型(不需要  空箱子不比较shipmentType 直接放入)
 							
 							//订单加入箱子
@@ -1121,6 +1123,7 @@ public class OrderController extends BaseController{
 			saveShipmentParam.put("orderNumber", orderMap.get("order_line_num").toString());
 			saveShipmentParam.put("shipmentId", Long.parseLong(shipMentMap.get("shipment_id").toString()));
 			Map<String, Object> orderResult = orderService.getShipmentDetails(saveShipmentParam);
+			orderResult.put("shipmentId", Long.parseLong(shipMentMap.get("shipment_id").toString()));
 			
 			//添加第三段物流
 			iShipmentService.saveShipmentByOrderId(orderResult);

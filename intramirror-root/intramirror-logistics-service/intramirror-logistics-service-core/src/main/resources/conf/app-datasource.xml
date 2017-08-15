@@ -28,8 +28,8 @@
     <bean id="logisticsSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource" />
         <property name="typeAliasesPackage" value="com.yfding.spring.model"></property>
-        <property name="configLocation" value="classpath:conf/mybatis-config.xml" />
-        <property name="mapperLocations" value="classpath:conf/sqlMap/*.xml"></property>
+        <property name="configLocation" value="classpath:conf/logisticsMybatis/mybatis-config.xml" />
+        <property name="mapperLocations" value="classpath:conf/logisticsSqlMap/*.xml"></property>
     </bean> 
     
     <bean id="logisticsSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">

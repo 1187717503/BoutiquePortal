@@ -7,9 +7,8 @@
     <artifactId>intramirror-logistics-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <groupId>com.intramirror</groupId>
+  
   <artifactId>intramirror-logistics-service-core</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
   <name>intramirror-logistics-service-core</name>
   <url>http://maven.apache.org</url>
   <properties>
@@ -19,7 +18,6 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
     
@@ -137,7 +135,7 @@
   
   
       <build>
-        <finalName>intramirror-logistics-service-core</finalName>
+        <finalName>intramirror-product-service-core</finalName>
         <pluginManagement>
             <plugins>
 
