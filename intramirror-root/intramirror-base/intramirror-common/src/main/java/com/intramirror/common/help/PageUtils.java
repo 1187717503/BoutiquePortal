@@ -17,13 +17,13 @@ public class PageUtils {
         this.page = page;
 
         int startPage = 0;
-        int endPage = 0;
+//        int endPage = 0;
 
         startPage = page.getCurrentPage() * page.getPageSize() - page.getPageSize();
-        endPage = page.getCurrentPage() * page.getPageSize();
+//        endPage = page.getCurrentPage() * page.getPageSize();
 
         params.put("startPage",startPage);
-        params.put("endPage",endPage);
+        params.put("endPage",page.getPageSize());
 
         result = iPageService.getResult(params);
         params.put("count","1");
