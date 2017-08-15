@@ -753,12 +753,13 @@ public class OrderController extends BaseController{
 					saveShipmentParam.put("shipment_id", null);
 
 					//接口需要返回shipmentId
-					String shipmentId = iShipmentService.saveShipmentByOrderId(saveShipmentParam);
+					Map<String, Object> orderResult = orderService.getShipmentDetails(saveShipmentParam);
+					String shipmentId = iShipmentService.saveShipmentByOrderId(orderResult);
 					if (shipmentId != null && StringUtils.isNotBlank(shipmentId)){
 						
 						//箱子关联Shipment
 						Map<String, Object> updateContainer = new HashMap<String, Object>(); 
-						updateContainer.put("shipment_id", shipmentId);
+						updateContainer.put("shipment_id", Long.parseLong(shipmentId));
 						updateContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
 						logger.info(MessageFormat.format("packOrder updateContainerByCondition shipment_id:{0},container_id:{1}",shipmentId,Long.parseLong(map.get("containerId").toString())));
 						int updateContainerRow = containerService.updateContainerByCondition(conditionMap);
@@ -784,10 +785,10 @@ public class OrderController extends BaseController{
 						
 						//箱子关联Shipment
 						Map<String, Object> updateContainer = new HashMap<String, Object>(); 
-						updateContainer.put("shipment_id", shipmentMapList.get(0).get("shipment_id").toString());
+						updateContainer.put("shipment_id", Long.parseLong(shipmentMapList.get(0).get("shipment_id").toString()));
 						updateContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
 						logger.info(MessageFormat.format("packOrder updateContainerByCondition shipment_id:{0},container_id:{1}",shipmentMapList.get(0).get("shipment_id").toString(),Long.parseLong(map.get("containerId").toString())));
-						int row = containerService.updateContainerByCondition(conditionMap);
+						int row = containerService.updateContainerByCondition(updateContainer);
 						
 						//关联成功，则往箱子里存入订单
 						if(row > 0 ){
@@ -1118,10 +1119,11 @@ public class OrderController extends BaseController{
 			
 			Map<String, Object> saveShipmentParam = new HashMap<String, Object>();
 			saveShipmentParam.put("orderNumber", orderMap.get("order_line_num").toString());
-			saveShipmentParam.put("shipment_id", shipMentMap.get("shipment_id").toString());
-
+			saveShipmentParam.put("shipmentId", shipMentMap.get("shipment_id").toString());
+			Map<String, Object> orderResult = orderService.getShipmentDetails(saveShipmentParam);
+			
 			//添加第三段物流
-			iShipmentService.saveShipmentByOrderId(saveShipmentParam);
+			iShipmentService.saveShipmentByOrderId(orderResult);
 			
 		}else{
 			result.setMsg("Boxed success");
