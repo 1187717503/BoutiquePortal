@@ -29,6 +29,12 @@
 			<artifactId>fastjson</artifactId>
 			<version>1.2.24</version>
 		</dependency>
+
+    <dependency>
+      <groupId>com.intramirror</groupId>
+      <artifactId>intramirror-common</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
 		
 		<dependency>
             <groupId>org.apache.commons</groupId>

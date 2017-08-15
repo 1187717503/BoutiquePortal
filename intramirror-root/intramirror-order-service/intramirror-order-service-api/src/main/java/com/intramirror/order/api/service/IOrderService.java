@@ -1,10 +1,12 @@
 package com.intramirror.order.api.service;
 
-import java.util.List;
-import java.util.Map;
-
+import com.intramirror.common.help.Page;
+import com.intramirror.common.help.PageUtils;
 import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.vo.ShippedParam;
+
+import java.util.List;
+import java.util.Map;
 
 public interface IOrderService {
 
@@ -34,7 +36,7 @@ public interface IOrderService {
     /**
      * 根据status统计各个状态的订单数量
      *
-     * @param status
+     * @param
      * @return
      */
     int getOrderByIsvalidCount(Map<String, Object> param);
@@ -58,7 +60,7 @@ public interface IOrderService {
     /**
      * 根据订单获取Shipment
      *
-     * @param orderId
+     * @param
      * @return
      */
     Shipment getOrderByShipment(int logisticsProductId);
@@ -66,7 +68,7 @@ public interface IOrderService {
     /**
      * 根据 订单状态获取子订单列表
      *
-     * @param orderNumber status
+     * @param  status
      * @return
      */
     List<Map<String, Object>> getOrderListByStatus(int status, Long vendorId, String sortByName);
@@ -74,7 +76,7 @@ public interface IOrderService {
     /**
      * 根据 订单状态获取子订单列表
      *
-     * @param orderNumber status
+     * @param  status
      * @return
      */
     List<Map<String, Object>> getOrderListByStatusAndContainerId(int containerId, int status, Long vendorId);
@@ -82,7 +84,7 @@ public interface IOrderService {
     
 	/**
 	 * 根据 ShipmentId 查询箱子跟订单信息
-	 * @param ShipmentId status vendorId
+	 * @param
 	 * @return
 	 */
 	List<Map<String,Object>> getOrderListByShipmentId(Map<String, Object> conditionMap);
@@ -91,7 +93,7 @@ public interface IOrderService {
     /**
      * 根据 条件获取子订单详情
      *
-     * @param orderNumber status vendor id
+     * @param
      * @return
      */
     Map<String, Object> getOrderInfoByCondition(Map<String, Object> map);
@@ -99,10 +101,10 @@ public interface IOrderService {
     /**
      * Shipped根据 订单状态获取子订单列表
      *
-     * @param orderNumber
+     * @param
      * @return
      */
-    List<Map<String, Object>> getShippedOrderListByStatus(Long vendorId, ShippedParam shippedParam);
+    PageUtils getShippedOrderListByStatus(Page page, Long vendorId, ShippedParam shippedParam);
     
     /**
 	 * 根据条件查询订单信息

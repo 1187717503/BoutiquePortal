@@ -20,19 +20,19 @@
     		<property name="forceBigDecimals" value="false"/> <!-- 是否使用bigDecimal， false可自动转化以下类型(Long, Integer, Short, etc.) -->
     	</javaTypeResolver>
     	
-        <javaModelGenerator targetPackage="com.intramirror.product.api.model"
-							targetProject="D:\MyWork\shoplus\BoutiquePortal\BoutiquePortal\intramirror-root\intramirror-product-service\intramirror-product-service-api\src\main\java" > <!-- 生成实体地址 -->
+        <javaModelGenerator targetPackage="com.intramirror.main.api.model"
+							targetProject="D:\MyWork\shoplus\BoutiquePortal\BoutiquePortal\intramirror-root\intramirror-main-service\intramirror-main-service-api\src\main\java" > <!-- 生成实体地址 -->
             <property name="trimStrings" value="true"/> <!-- 设置string时是否使用trim调用 -->
         </javaModelGenerator>
         
-        <sqlMapGenerator targetPackage="conf.ProductSqlMap"
-            targetProject="D:\MyWork\shoplus\BoutiquePortal\BoutiquePortal\intramirror-root\intramirror-product-service\intramirror-product-service-core\src\main\resources" /> <!-- 生成MapXML文件 -->
+        <sqlMapGenerator targetPackage="conf.MainSqlMap"
+            targetProject="D:\MyWork\shoplus\BoutiquePortal\BoutiquePortal\intramirror-root\intramirror-main-service\intramirror-main-service-core\src\main\resources" /> <!-- 生成MapXML文件 -->
             
             <!-- XMLMAPPER,ANNOTATEDMAPPER -->
-        <javaClientGenerator targetPackage="com.intramirror.product.core.mapper"
-            targetProject="D:\MyWork\shoplus\BoutiquePortal\BoutiquePortal\intramirror-root\intramirror-product-service\intramirror-product-service-core\src\main\java" type="XMLMAPPER" /> <!-- 生成MAP对应Client -->
+        <javaClientGenerator targetPackage="com.intramirror.main.core.mapper"
+            targetProject="D:\MyWork\shoplus\BoutiquePortal\BoutiquePortal\intramirror-root\intramirror-main-service\intramirror-main-service-core\src\main\java" type="XMLMAPPER" /> <!-- 生成MAP对应Client -->
 			
-			<table schema="intra-mirror-prd" tableName="system_property" domainObjectName="SystemProperty"
+			<table schema="intra-mirror-prd" tableName="geography" domainObjectName="Geography"
 			    enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
 			    enableSelectByExample="false" selectByExampleQueryId="false" >
 			    <property name="useActualColumnNames" value="false"/>

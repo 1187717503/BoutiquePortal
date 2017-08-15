@@ -10,6 +10,4 @@ public interface IPageService {
 
     List<Map<String,Object>> getResult(Map<String,Object> params);
 
-    int getCount(Map<String,Object> params);
-
 }
