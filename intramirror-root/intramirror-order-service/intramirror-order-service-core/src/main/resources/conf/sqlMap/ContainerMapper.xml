@@ -125,4 +125,6 @@ values(#{containerType,jdbcType=VARCHAR}, #{shipToGeography,jdbcType=VARCHAR},#{
 	<select id="getShipmentList" resultType="java.util.HashMap"  parameterType="java.util.Map">
 		SELECT * FROM container where shipment_id = #{shipmentId,jdbcType=BIGINT};
 	</select>
+	
+	
 </mapper>

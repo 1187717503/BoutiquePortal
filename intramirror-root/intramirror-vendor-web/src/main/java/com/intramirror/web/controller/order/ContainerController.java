@@ -4,6 +4,7 @@
 package com.intramirror.web.controller.order;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +23,7 @@ import com.intramirror.common.help.ResultMessage;
 import com.intramirror.order.api.model.Container;
 import com.intramirror.order.api.service.IContainerService;
 import com.intramirror.order.api.service.IShipmentService;
+import com.intramirror.order.api.service.ISubShipmentService;
 import com.intramirror.web.common.BarcodeUtil;
 
 
@@ -42,6 +44,8 @@ public class ContainerController {
 	@Autowired
 	private IShipmentService shipmentService;
 	
+	@Autowired
+	private ISubShipmentService subShipmentService;
 	/**
 	 * 新增箱子
 	 * @param map
@@ -205,9 +209,22 @@ public class ContainerController {
 				message.successStatus().putMsg("info", "containerId cannot be null");
 				return message;
 			}
+			map.put("container_id", Long.parseLong(map.get("containerId").toString()));
+			Container container = containerService.selectContainerById(map);
 			int result = containerService.deleteContainerById(map);
-			message.successStatus().putMsg("info", "SUCCESS").setData(result);
-			return message;
+			if (result == 1){
+				Map<String, Object> setShipment = new HashMap<>();
+				setShipment.put("shipmentId", container.getShipmentId());
+				List<Map<String, Object>> list = containerService.getShipmentList(setShipment);
+				//最后一个箱子的时候删除shipment
+				if (list.size() == 0){
+					shipmentService.deleteShipmentById(setShipment);
+					subShipmentService.deleteSubShipmentByShipmentId(setShipment);
+				}
+				message.successStatus().putMsg("info", "SUCCESS").setData(result);
+				return message;
+			}
+			message.errorStatus().putMsg("info", "delete fail").setData(result);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(" error Message : {}", e.getMessage());

@@ -96,4 +96,11 @@ public interface ShipmentMapper {
 	 * @return
 	 */
 	List<Shipment> selectContainerId(Map<String, Object> map);
+	
+	/**
+	 * 根据shipmentId删除shipment
+	 * @param map
+	 * @return
+	 */
+	int deleteShipmentById(Map<String, Object> map);
 }

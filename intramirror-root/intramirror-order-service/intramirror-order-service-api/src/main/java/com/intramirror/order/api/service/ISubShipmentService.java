@@ -24,4 +24,12 @@ public interface ISubShipmentService {
 	 * @return
 	 */
 	Long getSubshipment(Map<String, Object> map);
+	
+	
+	/**
+	 * 根据shipmentId删除subshipment
+	 * @param map
+	 * @return
+	 */
+	int deleteSubShipmentByShipmentId(Map<String, Object> map);
 }
