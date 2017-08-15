@@ -306,10 +306,11 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		int status = Integer.parseInt(map.get("status").toString());
 		//查询当前对象信息
 		Shipment shipment = shipmentMapper.selectShipmentById(map);
+		System.out.println(shipment.getVendorId());
 		int result = 0;
 		//修改状态
 		if (null != shipment){
-			logger.info(MessageFormat.format("当前container状态:{0},需要修改后的container状态:{1}",shipment.getStatus(),status));
+			logger.info(MessageFormat.format("当前shipment状态:{0},需要修改后的shipment状态:{1}",shipment.getStatus(),status));
 			//状态一直不需要修改
 			if(shipment.getStatus() == status){
 	        	return result;
@@ -331,6 +332,11 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	@Override
 	public Shipment selectShipmentById(Map<String, Object> map) {
 		return shipmentMapper.selectShipmentById(map);
+	}
+
+	@Override
+	public List<Shipment> selectContainerId(Map<String, Object> map) {
+		return shipmentMapper.selectContainerId(map);
 	}
 
 }

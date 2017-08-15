@@ -100,7 +100,13 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 	</update>
 	
 <!-- 	根据shipmentId查询shipment对象 -->
-	<select id="selectShipmentById" resultType="com.intramirror.order.api.model.Shipment" parameterType="java.util.Map">
+	<select id="selectShipmentById" resultMap="BaseResultMap" parameterType="java.util.Map">
+		select * from shipment
+		where shipment_id=#{shipmentId,jdbcType=BIGINT};
+	</select>
+	
+<!-- 	根据container查询shipment列表 -->
+<select id="selectContainerId" resultType="com.intramirror.order.api.model.Shipment" parameterType="java.util.Map">
 		SELECT * FROM shipment
 		WHERE shipment_id =#{shipmentId,jdbcType=BIGINT}
 	</select>

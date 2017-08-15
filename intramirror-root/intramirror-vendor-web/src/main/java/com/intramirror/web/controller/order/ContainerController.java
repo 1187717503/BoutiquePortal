@@ -3,7 +3,7 @@
  */
 package com.intramirror.web.controller.order;
 
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -156,12 +156,27 @@ public class ContainerController {
 				message.successStatus().putMsg("info", "parameter cannot be null");
 				return message;
 			}
+			if (null == map.get("containerId") || StringUtils.isBlank(map.get("containerId").toString())){
+				message.errorStatus().putMsg("info", "container_id cannot be null");
+				return message;
+			}
+			if (null == map.get("status") || StringUtils.isBlank(map.get("status").toString())){
+				message.errorStatus().putMsg("info", "status cannot be null");
+				return message;
+			}
 			int result = containerService.updateContainerBystatus(map);
 			if (result == 1){
 				//状态修改成功修改shipment状态
-				Map<String, Object> spMap = shipmentService.getShipmentTypeById(map);
+				logger.info("update shipment status");
+				Container container = containerService.selectContainerById(map);
+				Map<String, Object> uMap = new HashMap<>();
+				uMap.put("status", map.get("status").toString());
+				uMap.put("shipmentId", container.getShipmentId());
+				logger.info("update shipment param" + new Gson().toJson(uMap));
+				shipmentService.updateShipmentStatus(uMap);
+				message.successStatus().putMsg("info", "SUCCESS").setData(result);
 			}
-			
+			message.errorStatus().putMsg("info", "SUCCESS").setData(null);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(" error Message : {}", e.getMessage());

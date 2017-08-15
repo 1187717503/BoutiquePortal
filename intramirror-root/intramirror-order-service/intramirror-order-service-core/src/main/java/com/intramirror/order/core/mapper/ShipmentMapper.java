@@ -89,4 +89,11 @@ public interface ShipmentMapper {
 	 * @return
 	 */
 	Shipment selectShipmentById(Map<String, Object> map);
+	
+	/**
+	 * 根据containerId查询对应的shipment
+	 * @param map
+	 * @return
+	 */
+	List<Shipment> selectContainerId(Map<String, Object> map);
 }

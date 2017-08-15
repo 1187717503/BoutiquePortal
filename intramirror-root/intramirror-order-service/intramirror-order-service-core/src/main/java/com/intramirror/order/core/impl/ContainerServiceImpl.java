@@ -118,6 +118,7 @@ public class ContainerServiceImpl extends BaseDao implements IContainerService{
 	 */
 	public int updateContainerBystatus(Map<String, Object> map) {
 		int status = Integer.parseInt(map.get("status").toString());
+		map.put("container_id", map.get("containerId"));
 		//查询当前对象信息
 		Container container = containerMapper.selectContainerById(map);
 		int result = 0;
