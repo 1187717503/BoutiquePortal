@@ -9,6 +9,9 @@ public class ShippedParam {
     private Date startDate;
     private Date endDate;
     private String dateType;
+    private Integer pageSize;
+    private Integer pageNum;
+
 
     public String getOrderLineNo() {
         return orderLineNo;
@@ -56,5 +59,21 @@ public class ShippedParam {
 
     public void setDateType(String dateType) {
         this.dateType = dateType;
+    }
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    public Integer getPageNum() {
+        return pageNum;
+    }
+
+    public void setPageNum(Integer pageNum) {
+        this.pageNum = pageNum;
     }
 }

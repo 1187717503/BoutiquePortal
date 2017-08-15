@@ -37,7 +37,7 @@ public class ShippedController extends BaseController {
 
     @RequestMapping(value = "/getShippedList", method = RequestMethod.POST)
     @ResponseBody
-    public ResultMessage getShippedList(@RequestBody ShippedParam shippedParam, Integer pageNum, Integer pageSize, HttpServletRequest httpRequest) {
+    public ResultMessage getShippedList(@RequestBody ShippedParam shippedParam, HttpServletRequest httpRequest) {
         ResultMessage result = new ResultMessage();
         result.errorStatus();
 
@@ -60,14 +60,14 @@ public class ShippedController extends BaseController {
 
         Long vendorId = vendor.getVendorId();
         Page page = new Page();
-        if (pageNum == null) {
-            pageNum = 1;
+        if (shippedParam.getPageNum() == null) {
+            shippedParam.setPageNum(1);
         }
-        if (pageSize == null) {
-            pageSize = 10;
+        if (shippedParam.getPageSize() == null) {
+            shippedParam.setPageSize(10);
         }
-        page.setCurrentPage(pageNum);
-        page.setPageSize(pageSize);
+        page.setCurrentPage(shippedParam.getPageNum());
+        page.setPageSize(shippedParam.getPageSize());
         //根据订单状态查询订单
         PageUtils pageUtils = orderService.getShippedOrderListByStatus(page, vendorId, shippedParam);
 
