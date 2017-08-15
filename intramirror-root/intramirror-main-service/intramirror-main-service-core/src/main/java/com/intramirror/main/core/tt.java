@@ -1,4 +1,4 @@
-package com.intramirror.main.service;
+package com.intramirror.main.core;
 
 /**
  * Created by dingyifan on 2017/8/14.

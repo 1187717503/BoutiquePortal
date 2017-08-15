@@ -1,5 +1,7 @@
 package com.intramirror.web.controller.order;
 
+import com.intramirror.common.help.Page;
+import com.intramirror.common.help.PageUtils;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.vo.ShippedParam;
@@ -7,7 +9,6 @@ import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.VendorService;
 import com.intramirror.web.controller.BaseController;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -35,9 +35,9 @@ public class ShippedController extends BaseController {
     private VendorService vendorService;
 
 
-	@RequestMapping(value="/getShippedList", method = RequestMethod.POST)
+    @RequestMapping(value = "/getShippedList", method = RequestMethod.POST)
     @ResponseBody
-    public ResultMessage getShippedList(@RequestBody ShippedParam shippedParam, HttpServletRequest httpRequest) {
+    public ResultMessage getShippedList(@RequestBody ShippedParam shippedParam, Integer pageNum, Integer pageSize, HttpServletRequest httpRequest) {
         ResultMessage result = new ResultMessage();
         result.errorStatus();
 
@@ -59,9 +59,19 @@ public class ShippedController extends BaseController {
         }
 
         Long vendorId = vendor.getVendorId();
+        Page page = new Page();
+        if (pageNum == null) {
+            pageNum = 1;
+        }
+        if (pageSize == null) {
+            pageSize = 10;
+        }
+        page.setCurrentPage(pageNum);
+        page.setPageSize(pageSize);
         //根据订单状态查询订单
-        List<Map<String, Object>> orderList = orderService.getShippedOrderListByStatus(vendorId, null);
+        PageUtils pageUtils = orderService.getShippedOrderListByStatus(page, vendorId, shippedParam);
 
+        List<Map<String, Object>> orderList = pageUtils.getResult();
         if (orderList != null && orderList.size() > 0) {
 
             for (Map<String, Object> info : orderList) {
@@ -93,7 +103,7 @@ public class ShippedController extends BaseController {
             }
         }
         result.successStatus();
-        result.setData(orderList);
+        result.setData(pageUtils);
         return result;
     }
 

@@ -4,7 +4,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-	<!--数据库连接-->
+    <!--数据库连接-->
     <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close"> 
 	    <property name="driverClassName" value="${jdbc.driver}"/>
 	    <property name="url" value="${jdbc.url}" />
@@ -25,17 +25,17 @@
  	</bean>
  	
  	<!-- mybatis配置 -->
-    <bean id="mainSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    <bean id="logisticsSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource" />
-        <property name="typeAliasesPackage" value="com.intramirror.main.api.model"></property>
-        <property name="configLocation" value="classpath:conf/MainMybatis/mybatis-config.xml" />
-        <property name="mapperLocations" value="classpath:conf/MainSqlMap/*.xml"></property>
+        <property name="typeAliasesPackage" value="com.yfding.spring.model"></property>
+        <property name="configLocation" value="classpath:conf/mybatis-config.xml" />
+        <property name="mapperLocations" value="classpath:conf/sqlMap/*.xml"></property>
     </bean> 
     
-    <bean id="mainSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
-   		<!--  <constructor-arg ref="productSqlSessionFactory" />-->
-   		<constructor-arg index="0" ref="mainSqlSessionFactory" />
-        <constructor-arg index="1" value="SIMPLE" />
+    <bean id="logisticsSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+   		<!--  <constructor-arg ref="orderSqlSessionFactory" />-->
+   		<constructor-arg index="0" ref="logisticsSqlSessionFactory" />
+   		<constructor-arg index="1" value="SIMPLE" />
   	</bean>
 
 	<beans profile="sit">
@@ -47,4 +47,5 @@
 	<beans profile="prd">
 		<context:property-placeholder location="classpath:/prd/databases.properties"/>
 	</beans>
-</beans>
+	
+</beans>   

@@ -1,24 +1,25 @@
 package com.intramirror.order.core.impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.gson.Gson;
+import com.intramirror.common.help.IPageService;
+import com.intramirror.common.help.Page;
+import com.intramirror.common.help.PageUtils;
+import com.intramirror.order.api.model.Shipment;
+import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.vo.ShippedParam;
-
+import com.intramirror.order.core.dao.BaseDao;
+import com.intramirror.order.core.mapper.OrderMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.google.gson.Gson;
-import com.intramirror.order.api.model.Shipment;
-import com.intramirror.order.api.service.IOrderService;
-import com.intramirror.order.core.dao.BaseDao;
-import com.intramirror.order.core.mapper.OrderMapper;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
-public class OrderServiceImpl extends BaseDao implements IOrderService {
+public class OrderServiceImpl extends BaseDao implements IOrderService,IPageService {
 
     private static Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
@@ -55,7 +56,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService {
     /**
      * 根据status统计各个状态的订单数量
      *
-     * @param status
+     * @param
      * @return Integer
      */
     public int getOrderByIsvalidCount(Map<String, Object> param) {
@@ -97,7 +98,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService {
     /**
      * 根据 订单状态获取子订单列表
      *
-     * @param orderNumber status
+     * @param  status
      * @return
      */
     @Override
@@ -114,7 +115,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService {
     /**
      * 根据 订单状态获 和 container ID取子订单列表
      *
-     * @param orderNumber status
+     * @param  status
      * @return
      */
     @Override
@@ -138,11 +139,12 @@ public class OrderServiceImpl extends BaseDao implements IOrderService {
     }
 
     @Override
-    public List<Map<String, Object>> getShippedOrderListByStatus(Long vendorId, ShippedParam shippedParam) {
+    public PageUtils getShippedOrderListByStatus(Page page, Long vendorId, ShippedParam shippedParam) {
         Map<String, Object> conditionMap = new HashMap<String, Object>();
         conditionMap.put("vendorId", vendorId);
         conditionMap.put("shippedParam", shippedParam);
-        return orderMapper.getShippedOrderListByStatus(conditionMap);
+        PageUtils pageUtils = new PageUtils(page,this,conditionMap);
+        return pageUtils;
     }
 
 	@Override
@@ -161,4 +163,8 @@ public class OrderServiceImpl extends BaseDao implements IOrderService {
 	        return null;
 	}
 
+    @Override
+    public List<Map<String, Object>> getResult(Map<String, Object> params) {
+        return orderMapper.getShippedOrderListByStatus(params);
+    }
 }

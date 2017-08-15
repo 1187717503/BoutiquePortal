@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.intramirror.main.api.service.GeographyService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,8 +62,9 @@ public class OrderShipController extends BaseController{
 	
 	@Autowired
 	private IContainerService containerService;
-	
-	
+
+	@Autowired
+	private GeographyService geographyService;
 	
 	
 	/***
@@ -265,16 +267,19 @@ public class OrderShipController extends BaseController{
 						List<Map<String, Object>> cons = new ArrayList<Map<String,Object>>();
 						cons.add(container);
 						orderList.put(container.get("container_id").toString(), cons);
+						
+						
+						//获取container信息
+						Map<String, Object> cartonInfo = new HashMap<String, Object>();
+						cartonInfo.put("container_id", container.get("container_id").toString());
+						cartonInfo.put("barcode", container.get("barcode").toString());
+						cartonInfo.put("height", container.get("height").toString());
+						cartonInfo.put("width", container.get("width").toString());
+						cartonInfo.put("length", container.get("length").toString());
+						shipMentCartonList.add(cartonInfo);
+						
 					}
 					
-					//获取container信息
-					Map<String, Object> cartonInfo = new HashMap<String, Object>();
-					cartonInfo.put("container_id", container.get("container_id").toString());
-					cartonInfo.put("barcode", container.get("barcode").toString());
-					cartonInfo.put("height", container.get("height").toString());
-					cartonInfo.put("width", container.get("width").toString());
-					cartonInfo.put("length", container.get("length").toString());
-					shipMentCartonList.add(cartonInfo);
 					
 				}
 				
@@ -309,6 +314,23 @@ public class OrderShipController extends BaseController{
 		
 		return result;
 	}
-	
-	
+
+	@RequestMapping(value = "/getGeography", method = RequestMethod.POST)
+	@ResponseBody
+	public ResultMessage getGeography() {
+		ResultMessage result = new ResultMessage();
+		result.errorStatus();
+		try {
+			List<Map<String, Object>> geographyList = geographyService.getGeographyList();
+
+			result.successStatus();
+			result.setData(geographyList);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setMsg("Query container list fail,Check parameters, please ");
+			return result;
+		}
+
+		return result;
+	}
 }
