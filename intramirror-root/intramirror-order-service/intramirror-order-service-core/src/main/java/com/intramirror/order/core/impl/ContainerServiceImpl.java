@@ -3,6 +3,7 @@
  */
 package com.intramirror.order.core.impl;
 
+import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -116,7 +117,29 @@ public class ContainerServiceImpl extends BaseDao implements IContainerService{
 	 * @return int
 	 */
 	public int updateContainerBystatus(Map<String, Object> map) {
-		return containerMapper.updateContainerBystatus(map);
+		int status = Integer.parseInt(map.get("status").toString());
+		//查询当前对象信息
+		Container container = containerMapper.selectContainerById(map);
+		int result = 0;
+		//修改状态
+		if (null != container){
+			logger.info(MessageFormat.format("当前container状态:{0},需要修改后的container状态:{1}",container.getStatus(),status));
+			//状态一直不需要修改
+			if(container.getStatus() == status){
+	        	return result;
+	        }
+			//获取上一个状态
+			int lastStatus= ContainerType.getLastStatus(status);
+			//如果一直修改状态
+			if (lastStatus == container.getStatus()){
+				result = containerMapper.updateContainerBystatus(map);
+			}
+			//如果为编辑箱子，修改箱子状态
+			if (status == 1){
+				result = containerMapper.updateContainerBystatus(map);
+			}
+		}
+		return result;
 	}
 
 	/**

@@ -75,4 +75,18 @@ public interface ShipmentMapper {
 	 * @return
 	 */
 	Integer getMaxShipmentNo();
+	
+	/**
+	 * 修改shipment状态
+	 * @param map
+	 * @return
+	 */
+	int updateShipmentStatus(Map<String, Object> map);
+	
+	/**
+	 * 根据shipmentId查询shipment
+	 * @param map
+	 * @return
+	 */
+	Shipment selectShipmentById(Map<String, Object> map);
 }

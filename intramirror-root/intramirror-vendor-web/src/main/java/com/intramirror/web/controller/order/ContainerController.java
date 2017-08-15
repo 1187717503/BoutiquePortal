@@ -3,6 +3,7 @@
  */
 package com.intramirror.web.controller.order;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +21,7 @@ import com.google.gson.Gson;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.order.api.model.Container;
 import com.intramirror.order.api.service.IContainerService;
+import com.intramirror.order.api.service.IShipmentService;
 import com.intramirror.web.common.BarcodeUtil;
 
 
@@ -36,6 +38,9 @@ public class ContainerController {
 	
 	@Autowired
 	private IContainerService containerService;
+	
+	@Autowired
+	private IShipmentService shipmentService;
 	
 	/**
 	 * 新增箱子
@@ -54,18 +59,6 @@ public class ContainerController {
 				message.successStatus().putMsg("info", "Parameter cannot be null");
 				return message;
 			}
-//			if (null == map.get("length") || StringUtils.isBlank(map.get("length").toString())){
-//				message.successStatus().putMsg("info", "length cannot be null");
-//				return message;
-//			}
-//			if (null == map.get("width") || StringUtils.isBlank(map.get("width").toString())){
-//				message.successStatus().putMsg("info", "width cannot be null");
-//				return message;
-//			}
-//			if (null == map.get("height") || StringUtils.isBlank(map.get("height").toString())){
-//				message.successStatus().putMsg("info", "height cannot be null");
-//				return message;
-//			}
 			int result = containerService.saveContainerByShipment(map);
 			message.successStatus().putMsg("info","SUCCESS").setData(result);
 		} catch (Exception e) {
@@ -163,6 +156,12 @@ public class ContainerController {
 				message.successStatus().putMsg("info", "parameter cannot be null");
 				return message;
 			}
+			int result = containerService.updateContainerBystatus(map);
+			if (result == 1){
+				//状态修改成功修改shipment状态
+				Map<String, Object> spMap = shipmentService.getShipmentTypeById(map);
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(" error Message : {}", e.getMessage());

@@ -60,12 +60,15 @@ public class ShipmentController extends BaseController{
 			if(map.get("orderNumber") == null || StringUtils.isBlank(map.get("orderNumber").toString())){
 				message.errorStatus().putMsg("info", "orderNumber cannot be null");
 				return message;
-			}			
+			}
+			if(map.get("shipmentId") == null || StringUtils.isBlank(map.get("shipmentId").toString())){
+				message.errorStatus().putMsg("info", "shipmentId cannot be null");
+				return message;
+			}	
 			Map<String, Object> orderResult = orderService.getShipmentDetails(map);
-			System.out.println(new Gson().toJson(orderResult));
 			//新的入参
-			int result = iShipmentService.saveShipmentByOrderId(orderResult);
-			if (result == 1){
+			String result = iShipmentService.saveShipmentByOrderId(orderResult);
+			if (StringUtils.isNotBlank(result)){
 				message.successStatus().putMsg("info","SUCCESS").setData(result);
 				return message;
 			}

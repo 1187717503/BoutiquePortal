@@ -3,6 +3,7 @@
  */
 package com.intramirror.order.core.impl;
 
+import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -48,44 +49,64 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	 * Confirmed的Order生成Shipment 新的Shipment默认有一个carton
 	 */
 	@Override
-	public int saveShipmentByOrderId(Map<String, Object> map) {
+	public String saveShipmentByOrderId(Map<String, Object> map) {
 		logger.info("shimentSaveService parameter " + new Gson().toJson(map));
-		Long shipmentId =null;
-		//获取当前时间
-		Date currentDate = new Date();
-		//保存对象信息
+		//如果shipment为null创建新的shipment 如果有直接拿shipment生成SUBshipment
+		Long shipmentId = Long.parseLong(map.get("shipmentId").toString());
+		int result = 0;
 		Shipment shipment = new Shipment();
-		shipment.setShipToGeography(map.get("shipToGeography")==null?" ":map.get("shipToGeography").toString());
-		Long vendorId = Long.parseLong(map.get("vendor_id").toString());
-		String top = shipmentMapper.getVendorCodeById(vendorId);
-		Integer maxNo = shipmentMapper.getMaxShipmentNo();
-		if (null == maxNo)
-			maxNo = 1000001;
-		else 
-			maxNo ++;
-		//生成shipmentNo
-		shipment.setShipmentNo(top+"SP"+maxNo);
-		shipment.setVendorId(vendorId);
-		shipment.setStatus(ContainerType.OPEN);
-		shipment.setCreatedAt(currentDate);
-		shipment.setUpdatedAt(currentDate);
-		logger.info("parameter :" + new Gson().toJson(shipment));
-		int result = shipmentMapper.saveShipmentByOrderId(shipment);
-		logger.info("insert shipment result : " +result);
-		if (result == 1){
-			//根据段生成subshipment
-			Map<String, Object> typeMap = new HashMap<String, Object>();
-			typeMap.put("consigner_country_id",Long.parseLong(map.get("consigner_country_id").toString()));	
-			typeMap.put("consignee_country_id",Long.parseLong(map.get("consignee_country_id").toString()));
-			typeMap.put("vendor_id",vendorId);
-			logger.info("getShipmentId :" + new Gson().toJson(typeMap));
-			List<Map<String, Object>> listMap = shipmentMapper.getShippmentByType(typeMap);
-			logger.info("result shipmentType:" + new Gson().toJson(listMap));
-			shipmentId = shipmentMapper.getShipmentId(shipment);
-			saveSubShipment(listMap, map,shipmentId,Long.parseLong(
-					map.get("logistics_product_id")==null?"0":map.get("logistics_product_id").toString()));
+		if (null == map.get("shipmentId") || "null".equals(map.get("shipmentId").toString())){
+			//获取当前时间
+			Date currentDate = new Date();
+			//保存对象信息
+			shipment.setShipToGeography(map.get("shipToGeography")==null?" ":map.get("shipToGeography").toString());
+			Long vendorId = Long.parseLong(map.get("vendor_id").toString());
+			String top = shipmentMapper.getVendorCodeById(vendorId);
+			Integer maxNo = shipmentMapper.getMaxShipmentNo();
+			if (null == maxNo)
+				maxNo = 1000001;
+			else 
+				maxNo ++;
+			//生成shipmentNo
+			shipment.setShipmentNo(top+"SP"+maxNo);
+			shipment.setVendorId(vendorId);
+			shipment.setStatus(ContainerType.OPEN);
+			shipment.setCreatedAt(currentDate);
+			shipment.setUpdatedAt(currentDate);
+			logger.info("parameter :" + new Gson().toJson(shipment));
+			result = shipmentMapper.saveShipmentByOrderId(shipment);
+			logger.info("insert shipment result : " +result);
+			if (result == 1){
+				//根据段生成subshipment
+				Map<String, Object> typeMap = new HashMap<String, Object>();
+				typeMap.put("consigner_country_id",Long.parseLong(map.get("consigner_country_id").toString()));	
+				typeMap.put("consignee_country_id",Long.parseLong(map.get("consignee_country_id").toString()));
+				typeMap.put("vendor_id",vendorId);
+				logger.info("getShipmentId :" + new Gson().toJson(typeMap));
+				List<Map<String, Object>> listMap = shipmentMapper.getShippmentByType(typeMap);
+				logger.info("result shipmentType:" + new Gson().toJson(listMap));
+				shipmentId = shipmentMapper.getShipmentId(shipment);
+				saveSubShipment(listMap, map,shipmentId,Long.parseLong(
+						map.get("logistics_product_id")==null?"0":map.get("logistics_product_id").toString()));
+				return ""+shipmentId;
+			}
+		}else{
+			shipment = shipmentMapper.selectShipmentById(map);
+			shipmentId = shipment.getShipmentId();
+			if (null != shipment){
+				Map<String, Object> typeMap = new HashMap<String, Object>();
+				typeMap.put("consigner_country_id",Long.parseLong(map.get("consigner_country_id").toString()));	
+				typeMap.put("consignee_country_id",Long.parseLong(map.get("consignee_country_id").toString()));
+				typeMap.put("vendor_id",shipment.getVendorId());
+				logger.info("getShipmentId :" + new Gson().toJson(typeMap));
+				List<Map<String, Object>> listMap = shipmentMapper.getShippmentByType(typeMap);
+				logger.info("result shipmentType:" + new Gson().toJson(listMap));
+				saveSubShipment(listMap, map,shipmentId,Long.parseLong(
+						map.get("logistics_product_id")==null?"0":map.get("logistics_product_id").toString()));
+				return ""+shipment.getShipmentId();
+			}
 		}
-		return result;
+		return null;
 	}
 
 	/**
@@ -275,6 +296,41 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	 */
 	public Integer getMaxShipmentNo() {
 		return shipmentMapper.getMaxShipmentNo();
+	}
+
+	/**
+	 * 根据shipmentId修改状态
+	 */
+	@Override
+	public int updateShipmentStatus(Map<String, Object> map) {
+		int status = Integer.parseInt(map.get("status").toString());
+		//查询当前对象信息
+		Shipment shipment = shipmentMapper.selectShipmentById(map);
+		int result = 0;
+		//修改状态
+		if (null != shipment){
+			logger.info(MessageFormat.format("当前container状态:{0},需要修改后的container状态:{1}",shipment.getStatus(),status));
+			//状态一直不需要修改
+			if(shipment.getStatus() == status){
+	        	return result;
+	        }
+			//获取上一个状态
+			int lastStatus= ContainerType.getLastStatus(status);
+			//如果一直修改状态
+			if (lastStatus == shipment.getStatus()){
+				result = shipmentMapper.updateShipmentStatus(map);
+			}
+			//如果为编辑箱子，修改箱子状态
+			if (status == 1){
+				result = shipmentMapper.updateShipmentStatus(map);
+			}
+		}
+		return result;
+	}
+
+	@Override
+	public Shipment selectShipmentById(Map<String, Object> map) {
+		return shipmentMapper.selectShipmentById(map);
 	}
 
 }

@@ -86,8 +86,22 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
   	SELECT shipment_id FROM shipment
 	WHERE vendor_id=#{vendorId,jdbcType=BIGINT} AND shipment_no = #{shipmentNo,jdbcType=VARCHAR} AND `status` = #{status,jdbcType=BIGINT} AND ship_to_geography = #{shipToGeography,jdbcType=VARCHAR}
   </select>
+  
    <select id="getMaxShipmentNo" resultType="java.lang.Integer">
 		select MAX(right(shipment_no,7)) AS maxCode
 		from shipment;
+	</select>
+	
+<!-- 	修改shipment状态 -->
+	<update id="updateShipmentStatus" parameterType="java.util.Map">
+		UPDATE shipment
+		SET `status` = #{status,jdbcType=BIGINT}
+		WHERE shipment_id=#{shipmentId,jdbcType=BIGINT}
+	</update>
+	
+<!-- 	根据shipmentId查询shipment对象 -->
+	<select id="selectShipmentById" resultType="com.intramirror.order.api.model.Shipment" parameterType="java.util.Map">
+		SELECT * FROM shipment
+		WHERE shipment_id =#{shipmentId,jdbcType=BIGINT}
 	</select>
 </mapper>

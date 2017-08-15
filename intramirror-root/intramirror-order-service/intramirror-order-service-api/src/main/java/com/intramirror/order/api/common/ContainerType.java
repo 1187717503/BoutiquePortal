@@ -37,4 +37,38 @@ public final class ContainerType {
 	 */
 	public static final int SUBDELIVERED = 6;
 	
+	/**
+	 * 根据传入的container状态，获取流转的前一个状态
+	 * @param status
+	 * @return
+	 */
+	public static int getLastStatus(int status){
+        //上一个状态值，默认为open
+        int lastStatus= OPEN;
+        //获取当前状态的上一个状态，校验状态机
+		switch(status){
+		case OPEN:
+			lastStatus = OPEN;
+			break;
+			
+		case CLOSED:
+			lastStatus = OPEN;
+			break;
+			
+		case SHIPPED:
+			lastStatus = CLOSED;
+			break;
+			
+		case DELIVERED:
+			lastStatus = SHIPPED;
+			break;
+			
+		default: 
+			lastStatus = OPEN;
+			break; 
+		}
+		
+		return lastStatus;
+	}
+	
 }

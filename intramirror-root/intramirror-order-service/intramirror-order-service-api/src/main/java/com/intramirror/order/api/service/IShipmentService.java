@@ -19,7 +19,7 @@ public interface IShipmentService {
 	 * @param shipment
 	 * @return
 	 */
-	int saveShipmentByOrderId(Map<String, Object> map);
+	String saveShipmentByOrderId(Map<String, Object> map);
 	
 	
 	/**
@@ -76,4 +76,18 @@ public interface IShipmentService {
 	 * @return
 	 */
 	Integer getMaxShipmentNo();
+	
+	/**
+	 * 修改shipment状态
+	 * @param map
+	 * @return
+	 */
+	int updateShipmentStatus(Map<String, Object> map);
+	
+	/**
+	 * 根据shipmentId查询shipment
+	 * @param map
+	 * @return
+	 */
+	Shipment selectShipmentById(Map<String, Object> map);
 }
