@@ -66,7 +66,7 @@ public class ShipmentController extends BaseController{
 				return message;
 			}	
 			Map<String, Object> orderResult = orderService.getShipmentDetails(map);
-			orderResult.put("shipmentId", map.get("shipmentId"));
+			orderResult.put("shipmentId", map.get("shipmentId").toString());
 			//新的入参
 			String result = iShipmentService.saveShipmentByOrderId(orderResult);
 			if (StringUtils.isNotBlank(result)){

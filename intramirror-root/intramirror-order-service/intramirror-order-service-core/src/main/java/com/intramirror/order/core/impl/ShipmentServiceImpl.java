@@ -52,10 +52,10 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	public String saveShipmentByOrderId(Map<String, Object> map) {
 		logger.info("shimentSaveService parameter " + new Gson().toJson(map));
 		//如果shipment为null创建新的shipment 如果有直接拿shipment生成SUBshipment
-		Long shipmentId = Long.parseLong(map.get("shipmentId").toString());
+		Long shipmentId = Long.parseLong(map.get("shipmentId")==null?"0":map.get("shipmentId").toString());
 		int result = 0;
 		Shipment shipment = new Shipment();
-		if (null == map.get("shipmentId") || "null".equals(map.get("shipmentId").toString())){
+		if (shipmentId == 0){
 			//获取当前时间
 			Date currentDate = new Date();
 			//保存对象信息
