@@ -265,16 +265,19 @@ public class OrderShipController extends BaseController{
 						List<Map<String, Object>> cons = new ArrayList<Map<String,Object>>();
 						cons.add(container);
 						orderList.put(container.get("container_id").toString(), cons);
+						
+						
+						//获取container信息
+						Map<String, Object> cartonInfo = new HashMap<String, Object>();
+						cartonInfo.put("container_id", container.get("container_id").toString());
+						cartonInfo.put("barcode", container.get("barcode").toString());
+						cartonInfo.put("height", container.get("height").toString());
+						cartonInfo.put("width", container.get("width").toString());
+						cartonInfo.put("length", container.get("length").toString());
+						shipMentCartonList.add(cartonInfo);
+						
 					}
 					
-					//获取container信息
-					Map<String, Object> cartonInfo = new HashMap<String, Object>();
-					cartonInfo.put("container_id", container.get("container_id").toString());
-					cartonInfo.put("barcode", container.get("barcode").toString());
-					cartonInfo.put("height", container.get("height").toString());
-					cartonInfo.put("width", container.get("width").toString());
-					cartonInfo.put("length", container.get("length").toString());
-					shipMentCartonList.add(cartonInfo);
 					
 				}
 				
