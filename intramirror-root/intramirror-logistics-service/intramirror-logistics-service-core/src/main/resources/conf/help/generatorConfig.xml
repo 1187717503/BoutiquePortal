@@ -28,7 +28,7 @@
         <sqlMapGenerator targetPackage="conf.sqlMap"
             targetProject="C:/Users/123/git/BoutiquePortal/intramirror-root/intramirror-logistics-service/intramirror-logistics-service-core/src/main/resources" /> <!-- 生成MapXML文件 -->
             <!-- XMLMAPPER,ANNOTATEDMAPPER -->
-        <javaClientGenerator targetPackage="com.intramirror.common.core.mapper"
+        <javaClientGenerator targetPackage="com.intramirror.logistics.core.mapper"
 			targetProject="C:/Users/123/git/BoutiquePortal/intramirror-root/intramirror-logistics-service/intramirror-logistics-service-core/src/main/java" type="XMLMAPPER" /> <!-- 生成MAP对应Client -->
 			
 			<!--&lt;!&ndash; <table schema="intra-mirror-prd" tableName="api_mq" domainObjectName="ApiMq"
