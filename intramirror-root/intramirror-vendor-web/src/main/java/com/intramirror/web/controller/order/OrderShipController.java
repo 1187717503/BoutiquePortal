@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.intramirror.main.api.service.GeographyService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,8 +62,9 @@ public class OrderShipController extends BaseController{
 	
 	@Autowired
 	private IContainerService containerService;
-	
-	
+
+	@Autowired
+	private GeographyService geographyService;
 	
 	
 	/***
@@ -312,6 +314,23 @@ public class OrderShipController extends BaseController{
 		
 		return result;
 	}
-	
-	
+
+	@RequestMapping(value = "/getGeography", method = RequestMethod.POST)
+	@ResponseBody
+	public ResultMessage getGeography() {
+		ResultMessage result = new ResultMessage();
+		result.errorStatus();
+		try {
+			List<Map<String, Object>> geographyList = geographyService.getGeographyList();
+
+			result.successStatus();
+			result.setData(geographyList);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setMsg("Query container list fail,Check parameters, please ");
+			return result;
+		}
+
+		return result;
+	}
 }
