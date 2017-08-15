@@ -332,7 +332,7 @@ and t1.order_num =  #{orderId,jdbcType=BIGINT}
 
 		<choose>
 			<when test="count == 1">
-				count(*) as count
+				lp.order_line_num
 			</when>
 			<otherwise>
 				o.created_at AS  order_date,o.current_rate,pp.colorCode,pp.brandID,pspv.`value` as size,
@@ -372,7 +372,7 @@ and t1.order_num =  #{orderId,jdbcType=BIGINT}
         ) pp ON p.product_id = pp.product_id
         LEFT JOIN shipment sm on sm.vendor_id = v.vendor_id
         where pspk.`name` = 'Size' and (lp.`status` = 3 OR lp.`status` = 4)
-
+		<!--and v.vendor_id = #{vendorId,jdbcType=BIGINT}-->
         <if test="shippedParam.orderLineNo!=null and shippedParam.orderLineNo!=''">
             and lp.order_line_num=#{shippedParam.orderLineNo}
         </if>
@@ -388,13 +388,13 @@ and t1.order_num =  #{orderId,jdbcType=BIGINT}
         <if test="shippedParam.dateType!= null and shippedParam.dateType!='' and shippedParam.dateType == '1'.toString()">
             and (lp.shipped_at between #{shippedParam.startDate} and #{shippedParam.endDate})
         </if>
-
+		GROUP BY lp.order_line_num
 		<choose>
 			<when test="count == 1">
 
 			</when>
 			<otherwise>
-				GROUP BY lp.order_line_num limit #{startPage},#{endPage}
+				 limit #{startPage},#{endPage}
 			</otherwise>
 		</choose>
     </select>

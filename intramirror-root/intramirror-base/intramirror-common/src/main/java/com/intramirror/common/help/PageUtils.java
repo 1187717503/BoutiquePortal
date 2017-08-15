@@ -29,7 +29,12 @@ public class PageUtils {
         params.put("count","1");
         List<Map<String,Object>> list = iPageService.getResult(params);
         if(list != null && list.size() > 0) {
-            total = Integer.parseInt(list.get(0).get("count").toString());
+
+            if(list.get(0).get("count") != null) {
+                total = Integer.parseInt(list.get(0).get("count").toString());
+            } else {
+                total = list.size();
+            }
         }
         sumPage = (total + page.getPageSize() - 1) / page.getPageSize();
     }
