@@ -749,23 +749,12 @@ public class OrderController extends BaseController{
 				if(shipmentMapList == null || shipmentMapList.size() == 0  ){
 					
 					Map<String, Object> saveShipmentParam = new HashMap<String, Object>();
-					saveShipmentParam.put("shipToGeography", currentOrder.get("geography_name").toString());
-					saveShipmentParam.put("consignee", currentOrder.get("user_rec_name").toString());
-					saveShipmentParam.put("shipToAddr", currentOrder.get("user_rec_addr").toString());
-					saveShipmentParam.put("shipToDistrict", currentOrder.get("user_rec_area").toString());
-					saveShipmentParam.put("shipToCity", currentOrder.get("user_rec_city").toString());
-					saveShipmentParam.put("shipToProvince", currentOrder.get("user_rec_province").toString());
-					saveShipmentParam.put("shipToCountry", currentOrder.get("user_rec_country").toString());
-			
-					//发货国家
-					saveShipmentParam.put("consigner_country_id", currentOrder.get("vendor_address_country_id").toString());
-					//收货国家
-					saveShipmentParam.put("consignee_country_id", currentOrder.get("address_country_id").toString());
+					saveShipmentParam.put("orderNumber", orderLineNum);
+					saveShipmentParam.put("shipment_id", null);
 
 					//接口需要返回shipmentId
-					int row = iShipmentService.saveShipmentByOrderId(saveShipmentParam);
-					Long shipmentId = 0l;
-					if (row > 0){
+					String shipmentId = iShipmentService.saveShipmentByOrderId(saveShipmentParam);
+					if (shipmentId != null && StringUtils.isNotBlank(shipmentId)){
 						
 						//箱子关联Shipment
 						Map<String, Object> updateContainer = new HashMap<String, Object>(); 
@@ -1126,6 +1115,14 @@ public class OrderController extends BaseController{
 		
 		if(row > 0){
 			result.successStatus();
+			
+			Map<String, Object> saveShipmentParam = new HashMap<String, Object>();
+			saveShipmentParam.put("orderNumber", orderMap.get("order_line_num").toString());
+			saveShipmentParam.put("shipment_id", shipMentMap.get("shipment_id").toString());
+
+			//添加第三段物流
+			iShipmentService.saveShipmentByOrderId(saveShipmentParam);
+			
 		}else{
 			result.setMsg("Boxed success");
 		}
