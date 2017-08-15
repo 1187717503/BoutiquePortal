@@ -240,6 +240,10 @@ public class OrderShipController extends BaseController{
 			
 			//根据shipmentId 获取shipment 相关信息及物流第一段类型
 			Map<String, Object> shipmentMap = iShipmentService.getShipmentTypeById(getShipment);
+			if(shipmentMap == null || shipmentMap.size() == 0){
+				result.setMsg("Query Shipment fail,Check parameters, please ");
+				return result;
+			}
 			
 
 			//获取carton列表
