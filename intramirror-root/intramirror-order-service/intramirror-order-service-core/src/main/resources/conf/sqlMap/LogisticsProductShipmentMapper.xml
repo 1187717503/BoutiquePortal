@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.intramirror.order.core.mapper.LogisticProductShipmentMapper">
+  
+   <resultMap id="BaseResultMap" type="com.intramirror.order.api.model.LogisticProductShipment" >
+    <id column="logistic_product_shipment_id" property="logisticProductShipmentId" jdbcType="BIGINT" />
+    <result column="logistic_product_id" property="logisticProductId" jdbcType="BIGINT" />
+    <result column="sub_shipment_id" property="subShipmentId" jdbcType="BIGINT" />
+  </resultMap>
+  <insert id="insertlpShipment" parameterType="java.util.Map" >
+  	INSERT INTO logistic_product_shipment(logistic_product_id,sub_shipment_id)
+	VALUE(#{logisticProductId,jdbcType=BIGINT},#{subShipmentId,jdbcType=BIGINT})
+  </insert>
+
+</mapper>

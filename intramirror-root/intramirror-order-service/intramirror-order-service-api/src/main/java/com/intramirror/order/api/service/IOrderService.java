@@ -1,6 +1,5 @@
 package com.intramirror.order.api.service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -104,5 +103,12 @@ public interface IOrderService {
      * @return
      */
     List<Map<String, Object>> getShippedOrderListByStatus(Long vendorId, ShippedParam shippedParam);
+    
+    /**
+	 * 根据条件查询订单信息
+	 * @param conditionMap
+	 * @return
+	 */
+    Map<String, Object> getShipmentDetails(Map<String, Object> conditionMap);
 
 }
