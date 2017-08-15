@@ -152,4 +152,13 @@ public class OrderServiceImpl extends BaseDao implements IOrderService {
 		return orderMapper.getOrderListByShipmentId(conditionMap);
 	}
 
+	@Override
+	public Map<String, Object> getShipmentDetails(Map<String, Object> conditionMap) {
+		 List<Map<String, Object>> list = orderMapper.getShipmentDetails(conditionMap);
+	        if (list != null && list.size() > 0) {
+	            return list.get(0);
+	        }
+	        return null;
+	}
+
 }

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.intramirror.order.api.model.Shipment;
-import com.intramirror.order.api.model.SubShipment;
 
 /**
  * @author 123
@@ -45,14 +44,6 @@ public interface ShipmentMapper {
 	List<Map<String,Object>> getShipmentByStatus(Map<String, Object> map);
 	
 	/**
-	 * 新增subshipment
-	 * @param sub
-	 * @return
-	 */
-	int saveSubShipment(SubShipment sub);
-	
-	
-	/**
 	 * 根据vendorId大区查询shipment open的列表 如果可以返回第一段
 	 * @return
 	 */
@@ -64,4 +55,24 @@ public interface ShipmentMapper {
 	 * @return
 	 */
 	Map<String,Object> getShipmentTypeById(Map<String, Object> map);
+	
+	/**
+	 * 根据vendorId查询vendorCode
+	 * @param map
+	 * @return
+	 */
+	String getVendorCodeById(Long vendorId);
+	
+	/**
+	 * 根据条件查询shipment
+	 * @param map
+	 * @return
+	 */
+	Long getShipmentId(Shipment shipment);
+	
+	/**
+	 * 生成shipmentNo码
+	 * @return
+	 */
+	Integer getMaxShipmentNo();
 }

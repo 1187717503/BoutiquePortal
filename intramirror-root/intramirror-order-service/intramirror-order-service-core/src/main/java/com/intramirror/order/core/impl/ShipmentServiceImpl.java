@@ -13,11 +13,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
+import com.intramirror.common.core.mapper.SubShipmentMapper;
 import com.intramirror.order.api.common.ContainerType;
 import com.intramirror.order.api.model.Shipment;
-import com.intramirror.order.api.model.SubShipment;
 import com.intramirror.order.api.service.IShipmentService;
 import com.intramirror.order.core.dao.BaseDao;
+import com.intramirror.order.core.mapper.LogisticProductShipmentMapper;
 import com.intramirror.order.core.mapper.ShipmentMapper;
 
 /**
@@ -32,9 +33,15 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	
 	private ShipmentMapper shipmentMapper;
 	
+	private SubShipmentMapper subShipmentMapper;
+	
+	private LogisticProductShipmentMapper logisticProductShipmentMapper;
+	
 	@Override
 	public void init() {
 		shipmentMapper = this.getSqlSession().getMapper(ShipmentMapper.class);
+		subShipmentMapper = this.getSqlSession().getMapper(SubShipmentMapper.class);
+		logisticProductShipmentMapper = this.getSqlSession().getMapper(LogisticProductShipmentMapper.class);
 	}
 	
 	/**
@@ -43,23 +50,41 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	@Override
 	public int saveShipmentByOrderId(Map<String, Object> map) {
 		logger.info("shimentSaveService parameter " + new Gson().toJson(map));
-		Shipment shipment = new Shipment();
+		Long shipmentId =null;
+		//获取当前时间
 		Date currentDate = new Date();
+		//保存对象信息
+		Shipment shipment = new Shipment();
 		shipment.setShipToGeography(map.get("shipToGeography").toString());
+		Long vendorId = Long.parseLong(map.get("vendor_id").toString());
+		String top = shipmentMapper.getVendorCodeById(vendorId);
+		Integer maxNo = shipmentMapper.getMaxShipmentNo();
+		if (null == maxNo)
+			maxNo = 1000001;
+		else 
+			maxNo ++;
+		//生成shipmentNo
+		shipment.setShipmentNo(top+"SP"+maxNo);
+		shipment.setVendorId(vendorId);
 		shipment.setStatus(ContainerType.OPEN);
 		shipment.setCreatedAt(currentDate);
 		shipment.setUpdatedAt(currentDate);
 		logger.info("parameter :" + new Gson().toJson(shipment));
-		//根据段生成subshipment
-		Map<String, Object> typeMap = new HashMap<String, Object>();
-		typeMap.put("consigner_country_id",Long.parseLong(map.get("consigner_country_id").toString()));	
-		typeMap.put("consignee_country_id",Long.parseLong(map.get("consignee_country_id").toString()));
-		typeMap.put("vendor_id",Long.parseLong(map.get("vendor_id").toString()));	
-		List<Map<String, Object>> listMap = shipmentMapper.getShippmentByType(typeMap);
-		logger.info("parameter :" + new Gson().toJson(listMap));
-		Long shipmentId =null;
-		saveSubShipment(listMap, map,shipmentId);
-		return shipmentMapper.saveShipmentByOrderId(shipment);
+		int result = shipmentMapper.saveShipmentByOrderId(shipment);
+		logger.info("insert shipment result : " +result);
+		if (result == 1){
+			//根据段生成subshipment
+			Map<String, Object> typeMap = new HashMap<String, Object>();
+			typeMap.put("consigner_country_id",Long.parseLong(map.get("consigner_country_id").toString()));	
+			typeMap.put("consignee_country_id",Long.parseLong(map.get("consignee_country_id").toString()));
+			typeMap.put("vendor_id",vendorId);
+			logger.info("getShipmentId :" + new Gson().toJson(typeMap));
+			List<Map<String, Object>> listMap = shipmentMapper.getShippmentByType(typeMap);
+			logger.info("result shipmentType:" + new Gson().toJson(listMap));
+			shipmentId = shipmentMapper.getShipmentId(shipment);
+			saveSubShipment(listMap, map,shipmentId);
+		}
+		return result;
 	}
 
 	/**
@@ -82,6 +107,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	}
 
 	public void saveSubShipment(List<Map<String, Object>> map, Map<String, Object> lastMap, Long shipmentId){
+		Long logisticProductId = Long.parseLong("0");
 		//打印入参段
 		logger.info("pararmeter " + new Gson().toJson(map));
 		Date currentDate = new Date();
@@ -89,57 +115,107 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		if (null != map && 0 < map.size()){
 			//每条路线生成不同sub-shipment
 			if (map.size() == 1){
-				//最终到达段sub_shipment
-				shipmentMapper.saveSubShipment(saveBean(lastMap, currentDate, shipmentId));
+				//插入物流订单关联查询是否已有记录
+				Long subShipmentId1 = subShipmentMapper.getSubshipment(saveBean(lastMap, currentDate, shipmentId));
+				if (null == subShipmentId1){
+					subShipmentMapper.insertSubshipment(saveBean(lastMap, currentDate, shipmentId));
+					Map<String, Object> lpsMap = new HashMap<>();
+					Long subShipmentId = subShipmentMapper.getSubshipment(saveBean(lastMap, currentDate, shipmentId));
+					lpsMap.put("logisticProductId", logisticProductId);
+					lpsMap.put("subShipmentId", subShipmentId);
+					logisticProductShipmentMapper.insertlpShipment(lpsMap);
+				}
 			}
 			if (map.size() == 2){
 				Map<String, Object> thisMap = map.get(1);
-				SubShipment sub = saveBeanByMap(thisMap, currentDate, shipmentId);
-				shipmentMapper.saveSubShipment(sub);
-				shipmentMapper.saveSubShipment(saveBean(lastMap, currentDate, shipmentId));
+				//如果该段没有数据生成
+				Long subShipmentId1 = subShipmentMapper.getSubshipment(saveBeanByMap(thisMap, currentDate, shipmentId));
+				if (null == subShipmentId1){
+					subShipmentMapper.insertSubshipment(saveBeanByMap(thisMap, currentDate, shipmentId));
+					Map<String, Object> lpsMap = new HashMap<>();
+					Long subShipmentId = subShipmentMapper.getSubshipment(saveBeanByMap(thisMap, currentDate, shipmentId));
+					lpsMap.put("logisticProductId", logisticProductId);
+					lpsMap.put("subShipmentId", subShipmentId);
+					logisticProductShipmentMapper.insertlpShipment(lpsMap);
+				}
+				//生成最后段
+				Long subShipmentId2 = subShipmentMapper.getSubshipment(saveBean(lastMap, currentDate, shipmentId));
+				if (null == subShipmentId2){
+					subShipmentMapper.insertSubshipment(saveBean(lastMap, currentDate, shipmentId));
+					Map<String, Object> lpsMap = new HashMap<>();
+					Long subShipmentId = subShipmentMapper.getSubshipment(saveBean(lastMap, currentDate, shipmentId));
+					lpsMap.put("logisticProductId", logisticProductId);
+					lpsMap.put("subShipmentId", subShipmentId);
+					logisticProductShipmentMapper.insertlpShipment(lpsMap);
+				}
 			}
 			if (map.size() == 3){
 				Map<String, Object> oneMap = map.get(1);
 				Map<String, Object> twoMap = map.get(2);
-				shipmentMapper.saveSubShipment(saveBeanByMap(oneMap, currentDate, shipmentId));
-				shipmentMapper.saveSubShipment(saveBeanByMap(twoMap, currentDate, shipmentId));
-				shipmentMapper.saveSubShipment(saveBean(lastMap, currentDate, shipmentId));
+				Long subShipmentId1 = subShipmentMapper.getSubshipment(saveBeanByMap(oneMap, currentDate, shipmentId));
+				if (null == subShipmentId1){
+					subShipmentMapper.insertSubshipment(saveBeanByMap(oneMap, currentDate, shipmentId));
+					Map<String, Object> lpsMap = new HashMap<>();
+					Long subShipmentId = subShipmentMapper.getSubshipment(saveBeanByMap(oneMap, currentDate, shipmentId));
+					lpsMap.put("logisticProductId", logisticProductId);
+					lpsMap.put("subShipmentId", subShipmentId);
+					logisticProductShipmentMapper.insertlpShipment(lpsMap);
+				}
+				Long subShipmentId2 = subShipmentMapper.getSubshipment(saveBeanByMap(twoMap, currentDate, shipmentId));
+				if (null == subShipmentId2){
+					subShipmentMapper.insertSubshipment(saveBeanByMap(twoMap, currentDate, shipmentId));
+					Map<String, Object> lpsMap = new HashMap<>();
+					Long subShipmentId = subShipmentMapper.getSubshipment(saveBeanByMap(twoMap, currentDate, shipmentId));
+					lpsMap.put("logisticProductId", logisticProductId);
+					lpsMap.put("subShipmentId", subShipmentId);
+					logisticProductShipmentMapper.insertlpShipment(lpsMap);
+				}
+				Long subShipmentId3 = subShipmentMapper.getSubshipment(saveBean(lastMap, currentDate, shipmentId));
+				if (null == subShipmentId3){
+					subShipmentMapper.insertSubshipment(saveBean(lastMap, currentDate, shipmentId));
+					Map<String, Object> lpsMap = new HashMap<>();
+					Long subShipmentId = subShipmentMapper.getSubshipment(saveBean(lastMap, currentDate, shipmentId));
+					lpsMap.put("logisticProductId", logisticProductId);
+					lpsMap.put("subShipmentId", subShipmentId);
+					logisticProductShipmentMapper.insertlpShipment(lpsMap);
+				}
+				
 			}
 		}
 	}
 	
-	public SubShipment saveBean(Map<String, Object> map, Date currentDate, Long shipmentId){
-		SubShipment subShipment = new SubShipment();
-		subShipment.setConsignee(map.get("consignee").toString());
-		subShipment.setSegmentSequence(Long.parseLong(map.get("consignee").toString()));
-		subShipment.setShippingSegmentId(map.get("shippingSegmentId").toString());
-		subShipment.setShipToAddr(map.get("shipToAddr").toString());
-		subShipment.setShipToCity(map.get("shipToCity").toString());
-		subShipment.setShipToCountry(map.get("shipToCountry").toString());
-		subShipment.setShipToDistrict(map.get("shipToDistrict").toString());
-		subShipment.setShipToProvince(map.get("shipToProvince").toString());
-		subShipment.setShipmentId(shipmentId);
-		subShipment.setStatus(ContainerType.OPEN);
-		subShipment.setUpdatedAt(currentDate);
-		subShipment.setCreatedAt(currentDate);
-		return subShipment;
+	public Map<String, Object> saveBean(Map<String, Object> map, Date currentDate, Long shipmentId){
+		Map<String, Object> beanMap = new HashMap<String, Object>();
+		beanMap.put("consignee", map.get("consignee").toString());
+		beanMap.put("segmentSequence", Long.parseLong(map.get("segmentSequence").toString()));
+		beanMap.put("shippingSegmentId", Long.parseLong(map.get("shippingSegmentId").toString()));
+		beanMap.put("shipToAddr", map.get("shipToAddr").toString());
+		beanMap.put("shipToCity", map.get("shipToCity").toString());
+		beanMap.put("shipToCountry", map.get("shipToCountry").toString());
+		beanMap.put("shipToDistrict", map.get("shipToDistrict").toString());
+		beanMap.put("shipToProvince", map.get("shipToProvince").toString());
+		beanMap.put("shipmentId", shipmentId);
+		beanMap.put("status", ContainerType.RECEIVED);
+		beanMap.put("updatedAt", currentDate);
+		beanMap.put("createdAt", currentDate);
+		return beanMap;
 	}
 	
-	public SubShipment saveBeanByMap(Map<String, Object> map, Date currentDate, Long shipmentId){
-		SubShipment subShipment = new SubShipment();
-		subShipment.setConsignee(map.get("transfer_consignee")==null?" ":map.get("transfer_consignee").toString());
-		subShipment.setSegmentSequence(Long.parseLong(map.get("segmentSequence")==null?"0":map.get("segmentSequence").toString()));
-		subShipment.setShippingSegmentId(map.get("shippingSegmentId")==null?" ":map.get("shippingSegmentId").toString());
-		subShipment.setShipToAddr(map.get("transfer_addr")==null?" ":map.get("transfer_addr").toString());
-		subShipment.setShipToDistrict(map.get("addr_district")==null?" ":map.get("addr_district").toString());
-		subShipment.setShipToCity(map.get("addr_city")==null?" ":map.get("addr_city").toString());
-		subShipment.setShipToProvince(map.get("addr_province")==null?" ":map.get("addr_province").toString());
-		subShipment.setShipToCountry(map.get("addr_country")==null?" ":map.get("addr_country").toString());
-		subShipment.setShipmentId(shipmentId);
-		subShipment.setStatus(ContainerType.OPEN);
-		subShipment.setUpdatedAt(currentDate);
-		subShipment.setCreatedAt(currentDate);
-		return subShipment;
+	public Map<String, Object> saveBeanByMap(Map<String, Object> map, Date currentDate, Long shipmentId){
+		Map<String, Object> beanMap = new HashMap<String, Object>();
+		beanMap.put("consignee", map.get("transfer_consignee")==null?" ":map.get("transfer_consignee").toString());
+		beanMap.put("segmentSequence", Long.parseLong(map.get("segment_sequence")==null?"0":map.get("segment_sequence").toString()));
+		beanMap.put("shippingSegmentId", Long.parseLong(map.get("shipping_segment_id")==null?"0":map.get("shipping_segment_id").toString()));
+		beanMap.put("shipToAddr", map.get("transfer_addr")==null?" ":map.get("transfer_addr").toString());
+		beanMap.put("shipToDistrict", map.get("addr_district")==null?" ":map.get("addr_district").toString());
+		beanMap.put("shipToCity", map.get("addr_city")==null?" ":map.get("addr_city").toString());
+		beanMap.put("shipToProvince", map.get("addr_province")==null?" ":map.get("addr_province").toString());
+		beanMap.put("shipToCountry", map.get("addr_country")==null?" ":map.get("addr_country").toString());
+		beanMap.put("shipmentId", shipmentId);
+		beanMap.put("status", ContainerType.RECEIVED);
+		beanMap.put("updatedAt", currentDate);
+		beanMap.put("createdAt", currentDate);
+		return beanMap;
 	}
 
 	/**
@@ -150,14 +226,6 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	@Override
 	public List<Map<String, Object>> getShipmentByStatus(Map<String, Object> map) {
 		return shipmentMapper.getShipmentByStatus(map);
-	}
-
-	/**
-	 * 新增subspment
-	 */
-	@Override
-	public int saveSubShipment(SubShipment sub) {
-		return shipmentMapper.saveSubShipment(sub);
 	}
 
 	/**
@@ -175,6 +243,31 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	 */
 	public List<Map<String, Object>> getShipmentsByVendor(Map<String, Object> map) {
 		return shipmentMapper.getShipmentsByVendor(map);
+	}
+	
+	/**
+	 * 根据vendorId查询vendorCode
+	 * @param map
+	 * @return
+	 */
+	public String getVendorCodeById(Long vendorId) {
+		return shipmentMapper.getVendorCodeById(vendorId);
+	}
+	
+	/**
+	 * 根据条件查询shipment
+	 * @param map
+	 * @return
+	 */
+	public Long getShipmentId(Shipment shipment) {
+		return shipmentMapper.getShipmentId(shipment);
+	}
+
+	/**
+	 * 获取最大shipmentNo
+	 */
+	public Integer getMaxShipmentNo() {
+		return shipmentMapper.getMaxShipmentNo();
 	}
 
 }

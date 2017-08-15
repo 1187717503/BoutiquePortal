@@ -6,6 +6,8 @@
 	    <id column="shipment_id" property="shipmentId" jdbcType="BIGINT" />
 	    <result column="ship_to_geography" property="shipToGeography" jdbcType="VARCHAR" />
 	    <result column="status" property="status" jdbcType="BIGINT" />
+	    <result column="vendor_id" property="vendorId" jdbcType="BIGINT" />
+	    <result column="shipment_no" property="shipmentNo" jdbcType="VARCHAR" />
 	    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
 	    <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
   	</resultMap>
@@ -16,8 +18,8 @@ VALUES( #{shipToGeography,jdbcType=VARCHAR},#{consignee,jdbcType=VARCHAR},#{ship
 	
 	</insert>
 	<insert id="saveShipmentByOrderId" parameterType="com.intramirror.order.api.model.Shipment" >
-    	INSERT INTO shipment(ship_to_geography,`status`,created_at,updated_at)
-		VALUES(#{shipToGeography,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},#{createdAt,jdbcType=TIMESTAMP},#{updatedAt,jdbcType=TIMESTAMP});
+    	INSERT INTO shipment(ship_to_geography,`status`,created_at,updated_at,shipment_no,vendor_id)
+VALUES(#{shipToGeography,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},#{createdAt,jdbcType=TIMESTAMP},#{updatedAt,jdbcType=TIMESTAMP},#{shipmentNo,jdbcType=VARCHAR},#{vendorId,jdbcType=BIGINT});
   	</insert>
   
   <select id="selectShipmentByOrder" resultType="java.util.HashMap"  parameterType="java.util.Map">
@@ -52,12 +54,13 @@ VALUES( #{shipToGeography,jdbcType=VARCHAR},#{consignee,jdbcType=VARCHAR},#{ship
   </select>
   
   
-   <insert id="saveSubshipment" parameterType="com.intramirror.order.api.model.SubShipment">
-   INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_addr,ship_to_district,ship_to_city,ship_to_province,ship_to_country,`status`,created_at,updated_at)
+   <insert id="test" parameterType="java.util.Map">
+INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_addr,ship_to_district,ship_to_city,ship_to_province,ship_to_country,`status`,created_at,updated_at,shipment_id)
  VALUES(
  #{shippingSegmentId,jdbcType=BIGINT},#{segmentSequence,jdbcType=BIGINT},#{consignee,jdbcType=VARCHAR},
  #{shipToAddr,jdbcType=VARCHAR},#{shipToDistrict,jdbcType=VARCHAR},#{shipToCity,jdbcType=VARCHAR},
- #{shipToProvince,jdbcType=VARCHAR},#{shipToCountry,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},#{createdAt,jdbcType=TIMESTAMP},#{updatedAt,jdbcType=TIMESTAMP});
+ #{shipToProvince,jdbcType=VARCHAR},#{shipToCountry,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},#{createdAt,jdbcType=TIMESTAMP},#{updatedAt,jdbcType=TIMESTAMP},#{shipmentId,jdbcType=BIGINT}
+);
   </insert>
   
   <select id="getShipmentsByVendor" resultType="java.util.HashMap"  parameterType="java.util.Map">
@@ -74,4 +77,17 @@ VALUES( #{shipToGeography,jdbcType=VARCHAR},#{consignee,jdbcType=VARCHAR},#{ship
 		GROUP BY sub.segment_sequence ASC LIMIT 1;
   </select>
   
+   <select id="getVendorCodeById" resultType="java.lang.String"  parameterType="java.lang.Long">
+	  SELECT vendor_code FROM vendor
+		WHERE vendor_id=#{vendorId,jdbcType=BIGINT};
+  </select>
+  
+  <select id="getShipmentId" resultType="java.lang.Long"  parameterType="com.intramirror.order.api.model.Shipment">
+  	SELECT shipment_id FROM shipment
+	WHERE vendor_id=#{vendorId,jdbcType=BIGINT} AND shipment_no = #{shipmentNo,jdbcType=VARCHAR} AND `status` = #{status,jdbcType=BIGINT} AND ship_to_geography = #{shipToGeography,jdbcType=VARCHAR}
+  </select>
+   <select id="getMaxShipmentNo" resultType="java.lang.Integer">
+		select MAX(right(shipment_no,7)) AS maxCode
+		from shipment;
+	</select>
 </mapper>

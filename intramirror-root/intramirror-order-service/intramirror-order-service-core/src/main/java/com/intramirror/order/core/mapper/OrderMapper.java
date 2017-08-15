@@ -96,4 +96,11 @@ public interface OrderMapper {
 	 * @return
 	 */
 	List<Map<String,Object>> getShippedOrderListByStatus(Map<String, Object> conditionMap);
+	
+	/**
+	 * 根据条件查询订单信息
+	 * @param conditionMap
+	 * @return
+	 */
+	List<Map<String,Object>> getShipmentDetails(Map<String, Object> conditionMap);
 }

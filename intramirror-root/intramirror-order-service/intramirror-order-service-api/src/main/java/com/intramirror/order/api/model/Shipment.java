@@ -25,6 +25,14 @@ public class Shipment {
 	 */
 	private int status;
 	/**
+	 * @Fields 门店Id
+	 */
+	private Long vendorId;
+	/**
+	 * @Fields 装货条码
+	 */
+	private String shipmentNo;
+	/**
 	 * @Fields 创建时间
 	 */
 	private Date createdAt;
@@ -62,6 +70,18 @@ public class Shipment {
 	}
 	public void setUpdatedAt(Date updatedAt) {
 		this.updatedAt = updatedAt;
+	}
+	public String getShipmentNo() {
+		return shipmentNo;
+	}
+	public void setShipmentNo(String shipmentNo) {
+		this.shipmentNo = shipmentNo;
+	}
+	public Long getVendorId() {
+		return vendorId;
+	}
+	public void setVendorId(Long vendorId) {
+		this.vendorId = vendorId;
 	}
 	
 	

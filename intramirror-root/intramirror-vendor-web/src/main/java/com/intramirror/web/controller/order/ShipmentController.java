@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 import com.intramirror.common.help.ResultMessage;
+import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.service.IShipmentService;
 import com.intramirror.web.controller.BaseController;
 
@@ -32,9 +33,12 @@ import com.intramirror.web.controller.BaseController;
 public class ShipmentController extends BaseController{
 
 	private static Logger logger = LoggerFactory.getLogger(ShipmentController.class);
-	
+
 	@Autowired
 	private IShipmentService iShipmentService;
+
+	@Autowired
+	private  IOrderService orderService;
 	
 	/**
 	 * 保存shipment
@@ -53,48 +57,15 @@ public class ShipmentController extends BaseController{
 				message.errorStatus().putMsg("error Message", "parameter is null");
 			 	return message;
 			}
-			if(map.get("consigner_country_id") == null || StringUtils.isBlank(map.get("consigner_country_id").toString())){
-				message.errorStatus().putMsg("info", "consigner_country_id cannot be null");
+			if(map.get("orderNumber") == null || StringUtils.isBlank(map.get("orderNumber").toString())){
+				message.errorStatus().putMsg("info", "orderNumber cannot be null");
 				return message;
-			}
-			if(map.get("consignee_country_id") == null || StringUtils.isBlank(map.get("consignee_country_id").toString())){
-				message.errorStatus().putMsg("info", "consignee_country_id cannot be null");
-				return message;
-			}
-			if(map.get("vendor_id") == null || StringUtils.isBlank(map.get("vendor_id").toString())){
-				message.errorStatus().putMsg("info", "vendor_id cannot be null");
-				return message;
-			}
-			if(map.get("shipToProvince") == null || StringUtils.isBlank(map.get("shipToProvince").toString())){
-				message.errorStatus().putMsg("info", "shipToProvince cannot be null");
-				return message;
-			}
-			if(map.get("shipToCity") == null || StringUtils.isBlank(map.get("shipToCity").toString())){
-				message.errorStatus().putMsg("info", "shipToCity cannot be null");
-				return message;
-			}
-			if(map.get("shipToDistrict") == null || StringUtils.isBlank(map.get("shipToDistrict").toString())){
-				message.errorStatus().putMsg("info", "shipToDistrict cannot be null");
-				return message;
-			}
-			if(map.get("shipToAddr") == null || StringUtils.isBlank(map.get("shipToAddr").toString())){
-				message.errorStatus().putMsg("info", "shipToAddr cannot be null");
-				return message;
-			}
-			if(map.get("shipToGeography") == null || StringUtils.isBlank(map.get("shipToGeography").toString())){
-				message.errorStatus().putMsg("info", "shipToGeography cannot be null");
-				return message;
-			}
-			if(map.get("consignee") == null || StringUtils.isBlank(map.get("consignee").toString())){
-				message.errorStatus().putMsg("info", "consignee cannot be null");
-				return message;
-			}
-			if(map.get("shipToCountry") == null || StringUtils.isBlank(map.get("shipToCountry").toString())){
-				message.errorStatus().putMsg("info", "shipToCountry cannot be null");
-				return message;
-			}
-			int result = iShipmentService.saveShipmentByOrderId(map);
-			if (result != 0){
+			}			
+			Map<String, Object> orderResult = orderService.getShipmentDetails(map);
+			System.out.println(new Gson().toJson(orderResult));
+			//新的入参
+			int result = iShipmentService.saveShipmentByOrderId(orderResult);
+			if (result == 1){
 				message.successStatus().putMsg("info","SUCCESS").setData(result);
 				return message;
 			}

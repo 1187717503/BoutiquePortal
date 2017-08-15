@@ -9,7 +9,7 @@
     <id column="sub_shipment_id" property="subShipmentId" jdbcType="BIGINT" />
     <result column="shipping_segment_id" property="shippingSegmentId" jdbcType="VARCHAR" />
     <result column="segment_sequence" property="segmentSequence" jdbcType="BIGINT" />
-    <result column="awb_num" property="awbNum" jdbcType="BIGINT" />
+    <result column="awb_num" property="awbNum" jdbcType="VARCHAR" />
     <result column="consignee" property="consignee" jdbcType="VARCHAR" />
     <result column="ship_to_addr" property="shipToAddr" jdbcType="VARCHAR" />
     <result column="ship_to_district" property="shipToDistrict" jdbcType="VARCHAR" />
@@ -154,11 +154,20 @@
     where sub_shipment_id = #{subShipmentId,jdbcType=BIGINT}
   </update>
   
-  <insert id="saveSubshipment" parameterType="com.intramirror.order.api.model.SubShipment">
-  INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_addr,ship_to_district,ship_to_city,ship_to_province,ship_to_country,`status`,created_at,updated_at)
+<insert id="insertSubshipment" parameterType="java.util.Map">
+INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_addr,ship_to_district,ship_to_city,ship_to_province,ship_to_country,`status`,created_at,updated_at,shipment_id)
  VALUES(
- #{shippingSegmentId,jdbcType=INTEGER},#{segmentSequence,jdbcType=INTEGER},#{consignee,jdbcType=VARCHAR},
+ #{shippingSegmentId,jdbcType=BIGINT},#{segmentSequence,jdbcType=BIGINT},#{consignee,jdbcType=VARCHAR},
  #{shipToAddr,jdbcType=VARCHAR},#{shipToDistrict,jdbcType=VARCHAR},#{shipToCity,jdbcType=VARCHAR},
- #{shipToProvince,jdbcType=VARCHAR},#{shipToCountry,jdbcType=VARCHAR},#{status,jdbcType=INTEGER},#{createdAt,jdbcType=TIMESTAMP},#{updatedAt,jdbcType=TIMESTAMP});
-  </insert>
+ #{shipToProvince,jdbcType=VARCHAR},#{shipToCountry,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},#{createdAt,jdbcType=TIMESTAMP},#{updatedAt,jdbcType=TIMESTAMP},#{shipmentId,jdbcType=BIGINT}
+);
+</insert>
+
+<select id="getSubshipment" resultType="java.lang.Long" parameterType="java.util.Map">
+	SELECT sub_shipment_id FROM sub_shipment
+WHERE  shipping_segment_id = #{shippingSegmentId,jdbcType=BIGINT} AND segment_sequence=#{segmentSequence,jdbcType=BIGINT} AND consignee=#{consignee,jdbcType=VARCHAR} 
+AND ship_to_addr=#{shipToAddr,jdbcType=VARCHAR} AND ship_to_district =#{shipToDistrict,jdbcType=VARCHAR} AND ship_to_city = #{shipToCity,jdbcType=VARCHAR}
+AND ship_to_province= #{shipToProvince,jdbcType=VARCHAR} AND ship_to_country=#{shipToCountry,jdbcType=VARCHAR} AND `status` = #{status,jdbcType=BIGINT}  LIMIT 1;
+</select>
+
 </mapper>
