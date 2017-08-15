@@ -80,8 +80,8 @@ public class ShippedController extends BaseController {
                 Double rate = Double.parseDouble(info.get("current_rate").toString());
 
                 //按汇率计算人民币价钱
-                Double sale_price2 = Double.parseDouble(info.get("sale_price").toString()) * rate;
-                info.put("sale_price2", sale_price2);
+                Double rmb_sale_price = Double.parseDouble(info.get("sale_price").toString()) * rate;
+                info.put("rmb_sale_price", rmb_sale_price);
                 //计算利润
                 Double profit = Double.parseDouble(info.get("sale_price").toString()) - Double.parseDouble(info.get("in_price").toString());
                 BigDecimal b = new BigDecimal(profit);

@@ -335,9 +335,9 @@ and t1.order_num =  #{orderId,jdbcType=BIGINT}
 				count(*) as count
 			</when>
 			<otherwise>
-				o.created_at,o.current_rate,pp.colorCode,pp.brandID,pspv.`value` as size,
+				o.created_at AS  order_date,o.current_rate,pp.colorCode,pp.brandID,pspv.`value` as size,
 				s.price,s.in_price,sps.sale_price,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
-				lp.shipped_at,s.sku_code,b.english_name as brandName,
+				lp.shipped_at AS shipped_date,s.sku_code,b.english_name as brandName,
 				v.vendor_name,sm.shipment_no,g.english_name as geography_name,p.cover_img
 			</otherwise>
 		</choose>
