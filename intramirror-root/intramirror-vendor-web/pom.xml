@@ -55,10 +55,6 @@
             <artifactId>intramirror-product-service-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.intramirror</groupId>
-            <artifactId>intramirror-logistics-service-core</artifactId>
-        </dependency>
-        <dependency>
 	        <groupId>com.intramirror</groupId>
 			<artifactId>intramirror-shoplus-oss</artifactId>
         </dependency>
