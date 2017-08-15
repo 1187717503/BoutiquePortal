@@ -750,7 +750,7 @@ public class OrderController extends BaseController{
 					
 					Map<String, Object> saveShipmentParam = new HashMap<String, Object>();
 					saveShipmentParam.put("orderNumber", orderLineNum);
-					saveShipmentParam.put("shipment_id", null);
+					saveShipmentParam.put("shipment_id", 0);
 
 					//接口需要返回shipmentId
 					Map<String, Object> orderResult = orderService.getShipmentDetails(saveShipmentParam);
@@ -1119,7 +1119,7 @@ public class OrderController extends BaseController{
 			
 			Map<String, Object> saveShipmentParam = new HashMap<String, Object>();
 			saveShipmentParam.put("orderNumber", orderMap.get("order_line_num").toString());
-			saveShipmentParam.put("shipmentId", shipMentMap.get("shipment_id").toString());
+			saveShipmentParam.put("shipmentId", Long.parseLong(shipMentMap.get("shipment_id").toString()));
 			Map<String, Object> orderResult = orderService.getShipmentDetails(saveShipmentParam);
 			
 			//添加第三段物流
