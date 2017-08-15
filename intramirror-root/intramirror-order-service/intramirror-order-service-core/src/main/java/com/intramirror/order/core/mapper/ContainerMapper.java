@@ -80,4 +80,11 @@ public interface ContainerMapper {
 	 * @return int
 	 */
 	int getMaxBarcode();
+	
+	/**
+	 * 根据shipmentid获取Container 列表
+	 * @param map
+	 * @return
+	 */
+	List<Map<String,Object>> getShipmentList(Map<String, Object> map);
 }

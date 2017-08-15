@@ -77,4 +77,12 @@ public interface IContainerService {
 	 */
 	List<Map<String,Object>> getContainerList(Map<String, Object> map);
 	
+	/**
+	 * 根据shipmentid获取Container 列表
+	 * @param map
+	 * @return
+	 */
+	List<Map<String,Object>> getShipmentList(Map<String, Object> map);
+	
+	
 }

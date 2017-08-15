@@ -306,7 +306,6 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		int status = Integer.parseInt(map.get("status").toString());
 		//查询当前对象信息
 		Shipment shipment = shipmentMapper.selectShipmentById(map);
-		System.out.println(shipment.getVendorId());
 		int result = 0;
 		//修改状态
 		if (null != shipment){

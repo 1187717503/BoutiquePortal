@@ -3,6 +3,7 @@
  */
 package com.intramirror.web.controller.order;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 import com.intramirror.common.help.ResultMessage;
+import com.intramirror.order.api.service.IContainerService;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.service.IShipmentService;
 import com.intramirror.web.controller.BaseController;
@@ -39,6 +41,9 @@ public class ShipmentController extends BaseController{
 
 	@Autowired
 	private  IOrderService orderService;
+	
+	@Autowired
+	private IContainerService containerService;
 	
 	/**
 	 * 保存shipment
@@ -146,7 +151,7 @@ public class ShipmentController extends BaseController{
 				return message;
 			}
 			if (null == map.get("shipmentId") || StringUtils.isBlank(map.get("shipmentId").toString())){
-				logger.info("vendorId cannot be null");
+				logger.info("shipmentId cannot be null");
 				message.errorStatus().putMsg("Info", "shipmentId cannot be null");
 				return message;
 			}
@@ -166,5 +171,50 @@ public class ShipmentController extends BaseController{
 	}
 	
 	
+	@RequestMapping(value="/updateShipmentById", method=RequestMethod.POST)
+	@ResponseBody
+	public ResultMessage updateShipmentById(@RequestBody Map<String, Object> map){
+		logger.info("getShipmentTypeById parameter : "+new Gson().toJson(map));
+		ResultMessage message = ResultMessage.getInstance();
+		try {
+			if (null == map || 0 == map.size()){
+				logger.info("parameter cannot be null");
+				message.errorStatus().putMsg("Info", "parameter cannot be null");
+				return message;
+			}
+			if (null == map.get("shipmentId") || StringUtils.isBlank(map.get("shipmentId").toString())){
+				logger.info("shipmentId cannot be null");
+				message.errorStatus().putMsg("Info", "shipmentId cannot be null");
+				return message;
+			}
+			if (null == map.get("status") || StringUtils.isBlank(map.get("status").toString())){
+				logger.info("status cannot be null");
+				message.errorStatus().putMsg("Info", "status cannot be null");
+				return message;
+			}
+			int result = iShipmentService.updateShipmentStatus(map);
+			logger.info("result :" + new Gson().toJson(result));
+			if (0==result){
+				message.errorStatus().putMsg("Info", "update fail").setData(0);
+				return message;
+			}
+			//状态修改成功修改container状态
+			logger.info("update container status");
+			List<Map<String, Object>> container = containerService.getShipmentList(map);
+			for (Map<String, Object> map2 : container) {
+				Map<String, Object> uMap = new HashMap<>();
+				uMap.put("status", map.get("status").toString());
+				uMap.put("containerId", map2.get("container_id").toString());
+				logger.info("update container param" + new Gson().toJson(uMap));
+				containerService.updateContainerBystatus(uMap);
+			}
+			message.successStatus().putMsg("Info", "SUCCESS").setData(1);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.info("Error Message : " + e.getMessage());
+			message.errorStatus().putMsg("error Message", e.getMessage());
+		}
+		return message;
+	}
 	
 }

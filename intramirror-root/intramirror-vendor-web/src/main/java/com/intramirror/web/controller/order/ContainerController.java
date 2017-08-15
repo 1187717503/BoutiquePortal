@@ -175,8 +175,9 @@ public class ContainerController {
 				logger.info("update shipment param" + new Gson().toJson(uMap));
 				shipmentService.updateShipmentStatus(uMap);
 				message.successStatus().putMsg("info", "SUCCESS").setData(result);
+			}else{
+				message.errorStatus().putMsg("info", "SUCCESS").setData(0);
 			}
-			message.errorStatus().putMsg("info", "SUCCESS").setData(null);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(" error Message : {}", e.getMessage());
