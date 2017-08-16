@@ -167,4 +167,9 @@ public class OrderServiceImpl extends BaseDao implements IOrderService,IPageServ
     public List<Map<String, Object>> getResult(Map<String, Object> params) {
         return orderMapper.getShippedOrderListByStatus(params);
     }
+
+	@Override
+	public Integer getShippedCount(Map<String, Object> map) {
+		return orderMapper.getShippedCount(map);
+	}
 }

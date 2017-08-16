@@ -157,7 +157,7 @@ public class ContainerServiceImpl extends BaseDao implements IContainerService{
 	 * @return int
 	 */
 	@Override
-	public int getMaxBarcode() {
+	public Integer getMaxBarcode() {
 		return containerMapper.getMaxBarcode();
 	}
 
@@ -180,6 +180,11 @@ public class ContainerServiceImpl extends BaseDao implements IContainerService{
 	@Override
 	public List<Map<String, Object>> getShipmentList(Map<String, Object> map) {
 		return containerMapper.getShipmentList(map);
+	}
+
+	@Override
+	public Integer getContainerCount(Map<String, Object> map) {
+		return containerMapper.getContainerCount(map);
 	}
 
 

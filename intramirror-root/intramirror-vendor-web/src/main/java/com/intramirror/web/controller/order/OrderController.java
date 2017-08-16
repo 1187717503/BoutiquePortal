@@ -444,6 +444,17 @@ public class OrderController extends BaseController{
     			if (OrderStatusType.COMFIRMED == item[i])
     				resultMap.put("pack", result);
 			}
+    		
+    		//readytoship数量
+    		map = new HashMap<>();
+    		map.put("vendorId", vendorId);
+    		int result = containerService.getContainerCount(map);
+    		resultMap.put("readyToship", result);
+    		
+    		//shippedCount
+    		int shippedCount = orderService.getShippedCount(resultMap);
+    		resultMap.put("shipped", shippedCount);
+    		
     		resultMessage.successStatus().putMsg("info","SUCCESS").setData(resultMap);
         } catch (Exception e) {
             e.printStackTrace();

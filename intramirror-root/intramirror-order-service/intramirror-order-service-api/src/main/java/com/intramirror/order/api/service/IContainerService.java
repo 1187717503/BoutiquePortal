@@ -61,7 +61,7 @@ public interface IContainerService {
 	 * 获取条形码
 	 * @return int
 	 */
-	int getMaxBarcode();
+	Integer getMaxBarcode();
 	
 	/**
 	 * 修改箱子信息
@@ -84,5 +84,10 @@ public interface IContainerService {
 	 */
 	List<Map<String,Object>> getShipmentList(Map<String, Object> map);
 	
-	
+	/**
+	 * 根据vendorId查询数量
+	 * @param map
+	 * @return
+	 */
+	Integer getContainerCount(Map<String, Object> map);
 }

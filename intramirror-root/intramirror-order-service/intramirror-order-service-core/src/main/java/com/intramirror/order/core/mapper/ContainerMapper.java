@@ -79,7 +79,7 @@ public interface ContainerMapper {
 	 * 获取条形码
 	 * @return int
 	 */
-	int getMaxBarcode();
+	Integer getMaxBarcode();
 	
 	/**
 	 * 根据shipmentid获取Container 列表
@@ -87,4 +87,11 @@ public interface ContainerMapper {
 	 * @return
 	 */
 	List<Map<String,Object>> getShipmentList(Map<String, Object> map);
+	
+	/**
+	 * 根据vendorId查询数量
+	 * @param map
+	 * @return
+	 */
+	Integer getContainerCount(Map<String, Object> map);
 }
