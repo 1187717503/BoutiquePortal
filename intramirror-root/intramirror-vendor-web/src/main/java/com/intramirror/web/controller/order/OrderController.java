@@ -927,8 +927,8 @@ public class OrderController extends BaseController{
 				
 				//根据sub_shipment_id 删除sub_shipment
 				if(logisProShipmentInfo != null && logisProShipmentInfo.get("sub_shipment_id") != null ){
-					subShipmentService.deleteByPrimaryKey(Long.parseLong(logisProShipmentInfo.get("sub_shipment_id").toString()));
-					logisticProductShipmentService.deleteById(Long.parseLong(logisProShipmentInfo.get("sub_shipment_id").toString()));
+//					subShipmentService.deleteByPrimaryKey(Long.parseLong(logisProShipmentInfo.get("sub_shipment_id").toString()));
+//					logisticProductShipmentService.deleteById(Long.parseLong(logisProShipmentInfo.get("sub_shipment_id").toString()));
 				}
 				result.successStatus();
 			}else{
