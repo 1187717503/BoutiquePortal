@@ -728,7 +728,7 @@ public class OrderController extends BaseController{
 				Map<String, Object> selectContainer = new HashMap<String, Object>(); 
 				selectContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
 				Container container =  containerService.selectContainerById(selectContainer);
-				//判断箱子的geography 跟订单的大区是否一致
+				//判断箱子的geography 跟订单的大区是否一致 
 				if(container != null && !container.getShipToGeography().equals(currentOrder.get("geography_name").toString())){
 					result.setMsg("The shipping area is inconsistent");
 					return result;
@@ -822,13 +822,14 @@ public class OrderController extends BaseController{
 				Map<String, Object> shipmentMap = iShipmentService.getShipmentTypeById(getShipment);
 				
 				if(shipmentMap != null ){
-
 					//订单加入箱子
 					result =  updateLogisticsProduct(currentOrder,shipmentMap,true);
-					infoMap.put("statusType", 4);
-					result.setInfoMap(infoMap);
+				}else{
+					result.setMsg("shipment Query is empty ");
 				}
 				
+				result.setInfoMap(infoMap);
+				infoMap.put("statusType", 4);
 
 			}
 			
