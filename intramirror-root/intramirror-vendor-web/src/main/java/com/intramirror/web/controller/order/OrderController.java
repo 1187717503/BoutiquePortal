@@ -708,7 +708,7 @@ public class OrderController extends BaseController{
 					Map<String, Object> shipMentMap = new HashMap<String, Object>();
 					//根据订单大区选择的Shipment   所以只需要用订单的大区即可(只有箱子为空时)
 					shipMentMap.put("ship_to_geography", currentOrder.get("geography_name").toString());
-					
+					shipMentMap.put("shipment_id", Long.parseLong(shipment_id));
 //					//获取当前ShipMent 第一段的物流类型(不需要  空箱子不比较shipmentType 直接放入)
 					
 					//订单加入箱子
@@ -834,7 +834,6 @@ public class OrderController extends BaseController{
 					result.setMsg("shipment Query is empty ");
 				}
 				
-
 
 			}
 			
