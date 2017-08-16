@@ -135,4 +135,9 @@ values(#{containerType,jdbcType=VARCHAR}, #{shipToGeography,jdbcType=VARCHAR},#{
 		)AS DD
 	</select>
 	
+	<update id="updateContainerShipment" parameterType="java.util.Map">
+		update container
+			SET shipment_id=#{shipment_id,jdbcType=BIGINT}  
+			where container_id= #{container_id,jdbcType=BIGINT}  
+	</update>
 </mapper>

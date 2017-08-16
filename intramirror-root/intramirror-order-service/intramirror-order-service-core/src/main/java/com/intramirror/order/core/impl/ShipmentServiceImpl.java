@@ -361,4 +361,31 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		return shipmentMapper.getShipmentInfoById(map);
 	}
 
+	public Long newShipment(Map<String, Object> map){
+		Shipment shipment = new Shipment();
+		//获取当前时间
+		Date currentDate = new Date();
+		//保存对象信息
+		shipment.setShipToGeography(map.get("shipToGeography")==null?" ":map.get("shipToGeography").toString());
+		Long vendorId = Long.parseLong(map.get("vendor_id").toString());
+		String top = shipmentMapper.getVendorCodeById(vendorId);
+		Map<String, Object> noMap = new HashMap<>();
+		noMap.put("topName", top+"SP");
+		Integer maxNo = shipmentMapper.getMaxShipmentNo(noMap);
+		if (null == maxNo)
+			maxNo = 1000001;
+		else 
+			maxNo ++;
+		//生成shipmentNo
+		shipment.setShipmentNo(top+"SP"+maxNo);
+		shipment.setVendorId(vendorId);
+		shipment.setStatus(ContainerType.OPEN);
+		shipment.setCreatedAt(currentDate);
+		shipment.setUpdatedAt(currentDate);
+		logger.info("parameter :" + new Gson().toJson(shipment));
+		int result = shipmentMapper.saveShipmentByOrderId(shipment);
+		logger.info("insert shipment result : " +result);
+		Long shipmentId = shipmentMapper.getShipmentId(shipment);
+		return shipmentId;
+	}
 }

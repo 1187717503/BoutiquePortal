@@ -3,6 +3,7 @@
  */
 package com.intramirror.web.controller.order;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,9 +21,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 import com.intramirror.common.help.ResultMessage;
+import com.intramirror.order.api.common.ContainerType;
+import com.intramirror.order.api.model.LogisticProductShipment;
+import com.intramirror.order.api.model.LogisticsProduct;
+import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.service.IContainerService;
+import com.intramirror.order.api.service.ILogisticProductShipmentService;
+import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.service.IShipmentService;
+import com.intramirror.order.core.impl.LogisticProductShipmentServiceImpl;
 import com.intramirror.web.controller.BaseController;
 
 /**
@@ -44,6 +52,12 @@ public class ShipmentController extends BaseController{
 	
 	@Autowired
 	private IContainerService containerService;
+	
+	@Autowired
+	private ILogisticProductShipmentService logisticProductShipmentService;
+	
+	@Autowired
+	private ILogisticsProductService logisticsProductService;
 	
 	/**
 	 * 保存shipment
@@ -216,5 +230,49 @@ public class ShipmentController extends BaseController{
 		}
 		return message;
 	}
+	
+	@RequestMapping(value="/newShipment", method=RequestMethod.POST)
+	@ResponseBody
+	public ResultMessage newShipment(@RequestBody Map<String, Object> map){
+		logger.info("getShipmentTypeById parameter : "+new Gson().toJson(map));
+		ResultMessage message = ResultMessage.getInstance();
+		try {
+			if (null == map || 0 == map.size()){
+				logger.info("parameter cannot be null");
+				message.errorStatus().putMsg("Info", "parameter cannot be null");
+				return message;
+			}
+			if (null == map.get("shipmentId") || StringUtils.isBlank(map.get("shipmentId").toString())){
+				logger.info("shipmentId cannot be null");
+				message.errorStatus().putMsg("Info", "shipmentId cannot be null");
+				return message;
+			}
+			if (null == map.get("container_id") || StringUtils.isBlank(map.get("container_id").toString())){
+				logger.info("containerId cannot be null");
+				message.errorStatus().putMsg("Info", "status cannot be null");
+				return message;
+			}
+			List<LogisticsProduct> list  = logisticsProductService.selectByCondition(map);
+			Map<String, Object> paramMap = new HashMap<>();
+			paramMap.put("orderNumber", list.get(0).getOrder_line_num());
+			paramMap.put("shipmentId", "");
+			Map<String, Object> orderResult = orderService.getShipmentDetails(paramMap);
+			Long shipmentId = iShipmentService.newShipment(orderResult);
+			if (shipmentId != null){
+				Map<String, Object> containerMap = new HashMap<>();
+				containerMap.put("shipment_id", shipmentId);
+				containerMap.put("container_id", Long.parseLong(map.get("container_id").toString()));
+				int result = containerService.updateContainerShipment(containerMap);
+				message.successStatus().putMsg("Info", "SUCCESS").setData(result);
+			}
+			message.successStatus().putMsg("Info", "SUCCESS").setData(-1);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.info("Error Message : " + e.getMessage());
+			message.errorStatus().putMsg("error Message", e.getMessage());
+		}
+		return message;
+	}
+	
 	
 }

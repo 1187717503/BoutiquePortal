@@ -112,4 +112,11 @@ public interface IShipmentService {
 	 * @return
 	 */
 	int deleteShipmentById(Map<String, Object> map);
+	
+	/**
+	 * 创建新的shipment
+	 * @param map
+	 * @return
+	 */
+	Long newShipment(Map<String, Object> map);
 }

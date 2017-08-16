@@ -90,4 +90,11 @@ public interface IContainerService {
 	 * @return
 	 */
 	Integer getContainerCount(Map<String, Object> map);
+	
+	/**
+	 * 修改container下面的subshipment
+	 * @param map
+	 * @return
+	 */
+	int updateContainerShipment(Map<String, Object> map);
 }
