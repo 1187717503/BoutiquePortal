@@ -244,7 +244,7 @@ public class OrderShipController extends BaseController {
             getShipment.put("shipmentId", Long.parseLong(map.get("shipment_id").toString()));
 
             //根据shipmentId 获取shipment 相关信息及物流第一段类型
-            Map<String, Object> shipmentMap = iShipmentService.getShipmentTypeById(getShipment);
+            Map<String, Object> shipmentMap = iShipmentService.getShipmentInfoById(getShipment);
             if (shipmentMap == null || shipmentMap.size() == 0) {
                 result.setMsg("Query Shipment fail,Check parameters, please ");
                 return result;
