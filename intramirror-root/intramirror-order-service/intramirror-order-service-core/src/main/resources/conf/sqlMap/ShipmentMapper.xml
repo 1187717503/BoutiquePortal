@@ -97,9 +97,9 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 	WHERE vendor_id=#{vendorId,jdbcType=BIGINT} AND shipment_no = #{shipmentNo,jdbcType=VARCHAR} AND `status` = #{status,jdbcType=BIGINT} AND ship_to_geography = #{shipToGeography,jdbcType=VARCHAR}
   </select>
   
-   <select id="getMaxShipmentNo" resultType="java.lang.Integer">
+   <select id="getMaxShipmentNo" resultType="java.lang.Integer" parameterType="java.util.Map">
 		select MAX(right(shipment_no,7)) AS maxCode
-		from shipment;
+		from shipment where shipment_no LIKE "%"#{topName}"%";
 	</select>
 	
 <!-- 	修改shipment状态 -->

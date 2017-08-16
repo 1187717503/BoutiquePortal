@@ -62,7 +62,9 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			shipment.setShipToGeography(map.get("shipToGeography")==null?" ":map.get("shipToGeography").toString());
 			Long vendorId = Long.parseLong(map.get("vendor_id").toString());
 			String top = shipmentMapper.getVendorCodeById(vendorId);
-			Integer maxNo = shipmentMapper.getMaxShipmentNo();
+			Map<String, Object> noMap = new HashMap<>();
+			noMap.put("topName", top+"SP");
+			Integer maxNo = shipmentMapper.getMaxShipmentNo(noMap);
 			if (null == maxNo)
 				maxNo = 1000001;
 			else 
@@ -304,8 +306,8 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	/**
 	 * 获取最大shipmentNo
 	 */
-	public Integer getMaxShipmentNo() {
-		return shipmentMapper.getMaxShipmentNo();
+	public Integer getMaxShipmentNo(Map<String, Object> map) {
+		return shipmentMapper.getMaxShipmentNo(map);
 	}
 
 	/**

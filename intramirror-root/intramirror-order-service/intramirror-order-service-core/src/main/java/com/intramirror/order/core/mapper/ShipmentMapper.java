@@ -84,7 +84,7 @@ public interface ShipmentMapper {
 	 * 生成shipmentNo码
 	 * @return
 	 */
-	Integer getMaxShipmentNo();
+	Integer getMaxShipmentNo(Map<String, Object> map);
 	
 	/**
 	 * 修改shipment状态
