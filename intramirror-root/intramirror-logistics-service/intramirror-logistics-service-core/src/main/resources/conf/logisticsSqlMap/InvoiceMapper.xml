@@ -31,6 +31,14 @@
     from invoice
     where invoice_id = #{invoiceId,jdbcType=BIGINT}
   </select>
+  
+  <select id="selectByShipmentId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from invoice
+    where shipment_id = #{shipmentId,jdbcType=BIGINT} and enabled = 1 
+  </select>
+  
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
     <!--
       WARNING - @mbggenerated
