@@ -30,76 +30,76 @@ import com.intramirror.web.controller.BaseController;
 @RequestMapping("/invoice")
 public class InvoiceController extends BaseController{
 	
-//	@Autowired
-//	private IOrderService orderService;
-//	
-//	@Autowired
-//	private IInvoiceService invoiceService;
-//	
-//	@Autowired
-//	private IContainerService containerService;
-//	
-//	
-//	
-//	/**
-//	 * 创建invoice
-//	 * @param invoice invoiceDate shipmentId
-//	 * @param httpRequest
-//	 * @return
-//	 */
-//	@RequestMapping(value="/addInvoice", method = RequestMethod.POST)
-//	@ResponseBody
-//	public ResultMessage deletePackingCheckOrder(@RequestBody Map<String,Object> map,HttpServletRequest httpRequest){
-//		ResultMessage result= new ResultMessage();
-//		result.errorStatus();
-//		
-//		if(map == null || map.size() == 0 || map.get("shipmentId") == null || map.get("invoiceNo") == null || map.get("invoiceDate") == null){
-//			result.setMsg("Parameter cannot be empty");
-//			return result;
-//		}
-//		
-//		try{
-//			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//			Invoice invoice = new Invoice();
-//			invoice.setEnabled(EnabledType.DISCARD);
-//			invoice.setShipmentId(Long.parseLong(map.get("shipmentId").toString()));
-//			
-//			Invoice oldInvoice = invoiceService.selectByShipmentId(Long.parseLong(map.get("shipmentId").toString()));
-//			if(oldInvoice != null ){
-//				//先将之前的发票信息删除
-//				invoiceService.updateByShipmentId(invoice);
-//				
-//				//根据shipMentId 获取contain 列表
-//				List<Map<String, Object>> containList = containerService.getShipmentList(map);
-//				if(containList != null && containList.size() > 0){
-//					
-//				}
-//				
-//				invoice.setEnabled(EnabledType.USED);
-//				invoice.setInvoiceNum(map.get("invoiceNo").toString());
-//				invoice.setInvoiceDate(sdf.parse(map.get("invoiceDate").toString()));
-//				
-//				int row = invoiceService.insertSelective(invoice);
-//				
-//				if(row > 0){
-//					//修改logistics_product表
-//					
-//					result.successStatus();
-//				}else{
-//					result.setMsg("Failed to add invoice");
-//				}
-//			}
-//			
-//
-//			
-//		}catch(Exception e){
-//			e.printStackTrace();
-//		}
-//
-//		
-//		
-//		return result;
-//	}
-//	
+	@Autowired
+	private IOrderService orderService;
+	
+	@Autowired
+	private IInvoiceService invoiceService;
+	
+	@Autowired
+	private IContainerService containerService;
+	
+	
+	
+	/**
+	 * 创建invoice
+	 * @param invoice invoiceDate shipmentId
+	 * @param httpRequest
+	 * @return
+	 */
+	@RequestMapping(value="/addInvoice", method = RequestMethod.POST)
+	@ResponseBody
+	public ResultMessage deletePackingCheckOrder(@RequestBody Map<String,Object> map,HttpServletRequest httpRequest){
+		ResultMessage result= new ResultMessage();
+		result.errorStatus();
+		
+		if(map == null || map.size() == 0 || map.get("shipmentId") == null || map.get("invoiceNo") == null || map.get("invoiceDate") == null){
+			result.setMsg("Parameter cannot be empty");
+			return result;
+		}
+		
+		try{
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			Invoice invoice = new Invoice();
+			invoice.setEnabled(EnabledType.DISCARD);
+			invoice.setShipmentId(Long.parseLong(map.get("shipmentId").toString()));
+			
+			Invoice oldInvoice = invoiceService.getInvoiceByShipmentId(Long.parseLong(map.get("shipmentId").toString()));
+			if(oldInvoice != null ){
+				//先将之前的发票信息删除
+				invoiceService.updateByShipmentId(invoice);
+				
+				//根据shipMentId 获取contain 列表
+				List<Map<String, Object>> containList = containerService.getShipmentList(map);
+				if(containList != null && containList.size() > 0){
+					
+				}
+				
+				invoice.setEnabled(EnabledType.USED);
+				invoice.setInvoiceNum(map.get("invoiceNo").toString());
+				invoice.setInvoiceDate(sdf.parse(map.get("invoiceDate").toString()));
+				
+				int row = invoiceService.insertSelective(invoice);
+				
+				if(row > 0){
+					//修改logistics_product表
+					
+					result.successStatus();
+				}else{
+					result.setMsg("Failed to add invoice");
+				}
+			}
+			
+
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+
+		
+		
+		return result;
+	}
+	
 
 }

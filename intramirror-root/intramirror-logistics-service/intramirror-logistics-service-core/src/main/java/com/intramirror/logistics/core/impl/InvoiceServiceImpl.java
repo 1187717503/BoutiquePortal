@@ -45,12 +45,6 @@ public class InvoiceServiceImpl extends BaseDao implements IInvoiceService{
 		return invoiceMapper.selectByPrimaryKey(invoiceId);
 	}
 	
-	@Override
-	public Invoice selectByShipmentId(Long shipmentId) {
-		
-		return invoiceMapper.selectByShipmentId(shipmentId);
-	}
-	
 
 	@Override
 	public int updateByPrimaryKeySelective(Invoice record) {

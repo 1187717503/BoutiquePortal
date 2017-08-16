@@ -37,12 +37,6 @@ public interface IInvoiceService {
     Invoice selectByPrimaryKey(Long invoiceId);
     
     
-    /**
-     * 根据shipmentId 查询详情
-     * @param shipmentId
-     * @return
-     */
-	Invoice selectByShipmentId(Long shipmentId);
 	
 
     /**
@@ -70,6 +64,12 @@ public interface IInvoiceService {
      */
     int updateByPrimaryKey(Invoice record);
 
+    
+    /**
+     * 根据shipmentId 查询详情
+     * @param shipmentId
+     * @return
+     */
     Invoice getInvoiceByShipmentId(Long shipmentId);
 
 }
