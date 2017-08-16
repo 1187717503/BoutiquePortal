@@ -218,10 +218,6 @@ public class ContainerController {
 				message.successStatus().putMsg("info", "containerId cannot be null");
 				return message;
 			}
-			if (null == map.get("logistic_product_id") || StringUtils.isBlank(map.get("logistic_product_id").toString())){
-				message.successStatus().putMsg("info", "containerId cannot be null");
-				return message;
-			}
 			map.put("container_id", Long.parseLong(map.get("containerId").toString()));
 			Container container = containerService.selectContainerById(map);
 			int result = containerService.deleteContainerById(map);

@@ -15,7 +15,7 @@
   <select id="selectById" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select * 
     from logistics_product 
-    where logistics_product_id = #{logistics_product_id,jdbcType=BIGINT}
+    where container_id = #{container_id,jdbcType=BIGINT}
   </select>
   
    <select id="selectByCondition" resultMap="logisProductMap" parameterType="java.util.Map" >
