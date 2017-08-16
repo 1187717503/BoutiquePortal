@@ -391,30 +391,30 @@ public class OrderShipController extends BaseController {
             }
             //获取Invoice 信息
             Invoice invoice = invoiceService.getInvoiceByShipmentId(Long.parseLong(map.get("shipment_id").toString()));
-            resultMap.put("Invoice Number", invoice.getInvoiceNum());
-            resultMap.put("Invoice Date", invoice.getInvoiceDate());
-            resultMap.put("VAT Number", invoice.getVatNum());
+            resultMap.put("InvoiceNumber", invoice.getInvoiceNum());
+            resultMap.put("InvoiceDate", invoice.getInvoiceDate());
+            resultMap.put("VATNumber", invoice.getVatNum());
 
             //获取Ship From信息
             Map<String, Object> vendorParams = new HashMap<>();
             vendorParams.put("vendor_id", shipmentMap.get("vendor_id"));
             Vendor shipVendor = vendorService.getVendorByVendorId(vendorParams);
-            resultMap.put("Ship From", shipVendor.getBusinessLicenseLocation());
-            resultMap.put("Ship Company Name", shipVendor.getCompanyName());
+            resultMap.put("ShipFrom", shipVendor.getBusinessLicenseLocation());
+            resultMap.put("ShipCompanyName", shipVendor.getCompanyName());
 
             //获取Invoice To信息
             Shop shop = shopService.selectByPrimaryKey(65l);
-            resultMap.put("Invoice To", shop.getBusinessLicenseLocation());
-            resultMap.put("Invoice Name", shop.getShopName());
+            resultMap.put("InvoiceTo", shop.getBusinessLicenseLocation());
+            resultMap.put("InvoiceName", shop.getShopName());
 
             List<SubShipment> subShipmentList = subShipmentService.getSubShipmentByShipmentId(Long.parseLong(map.get("shipment_id").toString()));
             if (subShipmentList.size() > 1) {
                 ShippingProvider shippingProvider = shippingProviderService.getShippingProviderByShipmentId(Long.parseLong(map.get("shipment_id").toString()));
-                resultMap.put("Deliver To", shippingProvider);
+                resultMap.put("DeliverTo", shippingProvider);
             } else if (subShipmentList.size() == 1) {
-                resultMap.put("Deliver To", subShipmentList.get(0));
+                resultMap.put("DeliverTo", subShipmentList.get(0));
             } else {
-                resultMap.put("Deliver To", null);
+                resultMap.put("DeliverTo", null);
             }
             //获取carton列表
             List<Map<String, Object>> containerList = orderService.getOrderListByShipmentId(map);
@@ -534,7 +534,6 @@ public class OrderShipController extends BaseController {
                         shipMentCartonList.add(cartonInfo);
 
                     }
-
 
                 }
 
