@@ -692,13 +692,15 @@ public class OrderController extends BaseController{
 			
 			//如果为空箱子，并且已经选择过shipMent 则直接关联，并加入箱子
 			if(StringUtils.isNoneBlank(shipment_id) && (list == null || list.size() == 0)){
+				infoMap.put("statusType", 3);
+				result.setInfoMap(infoMap);
 				
 				//箱子关联Shipment
 				Map<String, Object> updateContainer = new HashMap<String, Object>(); 
 				updateContainer.put("shipment_id",shipment_id);
 				updateContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
 				logger.info(MessageFormat.format("packOrder updateContainerByCondition shipment_id:{0},container_id:{1}",shipment_id,Long.parseLong(map.get("containerId").toString())));
-				int row = containerService.updateContainerByCondition(conditionMap);
+				int row = containerService.updateContainerByCondition(updateContainer);
 				
 				//关联成功，则往箱子里存入订单
 				if(row > 0 ){
@@ -706,17 +708,17 @@ public class OrderController extends BaseController{
 					Map<String, Object> shipMentMap = new HashMap<String, Object>();
 					//根据订单大区选择的Shipment   所以只需要用订单的大区即可(只有箱子为空时)
 					shipMentMap.put("ship_to_geography", currentOrder.get("geography_name").toString());
-					
+					shipMentMap.put("shipment_id", Long.parseLong(shipment_id));
 //					//获取当前ShipMent 第一段的物流类型(不需要  空箱子不比较shipmentType 直接放入)
 					
 					//订单加入箱子
 					result =  updateLogisticsProduct(currentOrder,shipMentMap,false);
-					infoMap.put("statusType", 3);
-					result.setInfoMap(infoMap);
-					return result;
+
 					
+				}else{
+					result.setMsg("The modification failed. Check that the parameters are correct ");
 				}
-				
+
 				return result;
 			}
 			
@@ -728,7 +730,7 @@ public class OrderController extends BaseController{
 				Map<String, Object> selectContainer = new HashMap<String, Object>(); 
 				selectContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
 				Container container =  containerService.selectContainerById(selectContainer);
-				//判断箱子的geography 跟订单的大区是否一致
+				//判断箱子的geography 跟订单的大区是否一致 
 				if(container != null && !container.getShipToGeography().equals(currentOrder.get("geography_name").toString())){
 					result.setMsg("The shipping area is inconsistent");
 					return result;
@@ -758,6 +760,9 @@ public class OrderController extends BaseController{
 					String shipmentId = iShipmentService.saveShipmentByOrderId(orderResult);
 					if (shipmentId != null && StringUtils.isNotBlank(shipmentId)){
 						
+						infoMap.put("statusType", 3);
+						result.setInfoMap(infoMap);
+						
 						//箱子关联Shipment
 						Map<String, Object> updateContainer = new HashMap<String, Object>(); 
 						updateContainer.put("shipment_id", Long.parseLong(shipmentId));
@@ -776,14 +781,14 @@ public class OrderController extends BaseController{
 							
 							//订单加入箱子
 							result =  updateLogisticsProduct(currentOrder,shipMentMap,false);
-							infoMap.put("statusType", 3);
-							result.setInfoMap(infoMap);
 						}
 						
 					}
 						
 					//如果匹配的Shipment 只存在一个,就直接关联箱子   并把订单存入箱子
 					}else if(shipmentMapList.size() == 1){
+						infoMap.put("statusType", 3);
+						result.setInfoMap(infoMap);
 						
 						//箱子关联Shipment
 						Map<String, Object> updateContainer = new HashMap<String, Object>(); 
@@ -800,8 +805,6 @@ public class OrderController extends BaseController{
 							
 							//订单加入箱子
 							result =  updateLogisticsProduct(currentOrder,shipMentMap,false);
-							infoMap.put("statusType", 3);
-							result.setInfoMap(infoMap);
 						}
 					
 					//如果匹配的Shipment 存在多个，则返回列表供选择
@@ -815,6 +818,9 @@ public class OrderController extends BaseController{
 			
 			//如果箱子中存在订单，则直接加入箱子
 			}else{
+				result.setInfoMap(infoMap);
+				infoMap.put("statusType", 4);
+				
 				Map<String, Object> getShipment = new HashMap<String, Object>();
 				getShipment.put("shipmentId", Long.parseLong(shipment_id));
 				
@@ -822,11 +828,10 @@ public class OrderController extends BaseController{
 				Map<String, Object> shipmentMap = iShipmentService.getShipmentTypeById(getShipment);
 				
 				if(shipmentMap != null ){
-
 					//订单加入箱子
 					result =  updateLogisticsProduct(currentOrder,shipmentMap,true);
-					infoMap.put("statusType", 4);
-					result.setInfoMap(infoMap);
+				}else{
+					result.setMsg("shipment Query is empty ");
 				}
 				
 
