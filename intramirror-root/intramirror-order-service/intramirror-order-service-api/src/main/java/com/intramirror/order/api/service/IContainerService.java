@@ -84,5 +84,10 @@ public interface IContainerService {
 	 */
 	List<Map<String,Object>> getShipmentList(Map<String, Object> map);
 	
-	
+	/**
+	 * 根据vendorId查询数量
+	 * @param map
+	 * @return
+	 */
+	Integer getContainerCount(Map<String, Object> map);
 }

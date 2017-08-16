@@ -449,4 +449,41 @@ and t1.order_num =  #{orderId,jdbcType=BIGINT}
 				where pspk.`name` = 'Size' and lp.enabled = 1 
 				and lp.order_line_num =  #{orderNumber,jdbcType=VARCHAR};
 	</select>
+	
+	 <select id="getShippedCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+		SELECT COUNT(1) FROM(
+	SELECT  lp.order_line_num
+	FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+	INNER JOIN `order` o ON ol.order_id = o.order_id
+	INNER JOIN user_ship_address usa ON o.user_id = usa.user_id
+	LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
+	INNER JOIN geography g on l.geography_id = g.geography_id
+	INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
+	INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
+	INNER JOIN product p ON (sp.product_id = p.product_id )
+	INNER JOIN brand b ON (p.brand_id = b.brand_id and b.enabled = 1 )
+	INNER JOIN sku s ON (s.sku_id = sps.sku_id and s.enabled = 1)
+	INNER JOIN sku_property skup on (skup.sku_id = s.sku_id and skup.enabled = 1)
+	INNER JOIN product_sku_property_key pspk ON (
+	pspk.product_id = p.product_id
+	and pspk.product_sku_property_key_id = skup.product_sku_property_key_id
+	and pspk.enabled = 1
+	) INNER JOIN product_sku_property_value pspv ON (
+	pspv.product_sku_property_key_id = skup.product_sku_property_key_id
+	and pspv.product_sku_property_value_id = skup.product_sku_property_value_id
+	and pspv.enabled = 1
+	) INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
+	LEFT JOIN (
+	SELECT t_pp.product_id,
+	max(case t_pp.key_name when 'ColorCode' then t_pp.`value` else '' end) as colorCode,
+	max(case t_pp.key_name when 'BrandID' then t_pp.`value` else '' end) as brandID
+	from product_property t_pp
+	where t_pp.enabled = 1 and (t_pp.key_name='BrandID' or t_pp.key_name = 'ColorCode')
+	group by t_pp.product_id
+	) pp ON p.product_id = pp.product_id
+	LEFT JOIN shipment sm on sm.vendor_id = v.vendor_id
+	where pspk.`name` = 'Size' and (lp.`status` = 3 OR lp.`status` = 4)
+	GROUP BY lp.order_line_num
+	)AS DD
+	</select>
 </mapper>

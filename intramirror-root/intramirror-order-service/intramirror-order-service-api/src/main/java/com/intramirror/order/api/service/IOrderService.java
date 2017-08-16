@@ -112,5 +112,12 @@ public interface IOrderService {
 	 * @return
 	 */
     Map<String, Object> getShipmentDetails(Map<String, Object> conditionMap);
+    
+    /**
+     * 统计shipped数量
+     * @param map
+     * @return
+     */
+    Integer getShippedCount(Map<String,Object> map); 
 
 }

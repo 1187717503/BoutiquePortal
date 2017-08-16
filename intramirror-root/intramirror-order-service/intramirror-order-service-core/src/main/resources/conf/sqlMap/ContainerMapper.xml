@@ -126,5 +126,13 @@ values(#{containerType,jdbcType=VARCHAR}, #{shipToGeography,jdbcType=VARCHAR},#{
 		SELECT * FROM container where shipment_id = #{shipmentId,jdbcType=BIGINT};
 	</select>
 	
+	<select id="getContainerCount" resultType="java.lang.Integer">
+		SELECT COUNT(1) FROM(
+		SELECT c.container_id
+			FROM container c
+			INNER JOIN shipment s ON c.shipment_id = s.shipment_id
+			WHERE s.vendor_id = #{vendorId,jdbcType=BIGINT}  
+		)AS DD
+	</select>
 	
 </mapper>
