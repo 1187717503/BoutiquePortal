@@ -162,6 +162,13 @@
     where logistics_product_id = #{logistics_product_id,jdbcType=BIGINT}
   </select>
   
+  <select id="selectLogisProShipmentById" resultType="java.util.HashMap" parameterType="java.lang.Long" >
+  SELECT lps.* FROM logistics_product lp 
+  INNER JOIN logistic_product_shipment lps ON lp.logistics_product_id = lps.logistic_product_id
+  where lp.logistics_product_id = = #{logistics_product_id,jdbcType=BIGINT} and enabled = 1 
+  </select>
+
+  
    <select id="selectByCondition" resultMap="logisProductMap" parameterType="java.util.Map" >
    select * 
    from logistics_product 

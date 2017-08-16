@@ -35,6 +35,7 @@ import com.intramirror.order.api.service.IContainerService;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.service.IShipmentService;
+import com.intramirror.order.api.service.ISubShipmentService;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.user.api.model.User;
@@ -82,6 +83,10 @@ public class OrderController extends BaseController{
 	
 	@Autowired
 	private IContainerService containerService;
+	
+	@Autowired
+	private ISubShipmentService subShipmentService;
+	
 	
 	
 	/**
@@ -910,6 +915,13 @@ public class OrderController extends BaseController{
 			int row = iLogisticsProductService.updateByLogisticsProduct(logisticsProduct);
 			
 			if(row > 0){
+				//查询相关的logisProShipmentInfo 表获取sub_shipment_id
+				Map<String,Object> logisProShipmentInfo = iLogisticsProductService.selectLogisProShipmentById(Long.parseLong(map.get("logistics_product_id").toString()));
+				
+				//根据sub_shipment_id 删除sub_shipment
+				if(logisProShipmentInfo != null && logisProShipmentInfo.get("sub_shipment_id") != null ){
+					subShipmentService.deleteByPrimaryKey(Long.parseLong(logisProShipmentInfo.get("sub_shipment_id").toString()));
+				}
 				result.successStatus();
 			}else{
 				result.setMsg("Order does not exist ");

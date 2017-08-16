@@ -9,6 +9,7 @@ import com.intramirror.order.api.common.ContainerType;
 import com.intramirror.order.api.model.SubShipment;
 import com.intramirror.order.api.service.ISubShipmentService;
 import com.intramirror.order.core.dao.BaseDao;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -74,6 +75,12 @@ public class SubShipmentServiceImpl extends BaseDao implements ISubShipmentServi
 	@Override
 	public List<SubShipment> getSubShipmentByShipmentId(Long shipmentId) {
 		return subShipmentMapper.getSubShipmentByShipmentId(shipmentId);
+	}
+
+	@Override
+	public int deleteByPrimaryKey(Long subShipmentId) {
+		// TODO Auto-generated method stub
+		return subShipmentMapper.deleteByPrimaryKey(subShipmentId);
 	}
 
 

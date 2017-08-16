@@ -131,5 +131,16 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
 		
 		return logisticsProductMapper.updateByContainerId(conditionMap);
 	}
+
+
+
+	@Override
+	public Map<String,Object> selectLogisProShipmentById(Long logistics_product_id) {
+		List<Map<String,Object>> map = logisticsProductMapper.selectLogisProShipmentById(logistics_product_id);
+		if(map != null && map.size() > 0){
+			return map.get(0);
+		}
+		return null;
+	}
 	
 }
