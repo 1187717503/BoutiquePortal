@@ -17,6 +17,7 @@ import com.intramirror.user.api.service.VendorService;
 import com.intramirror.web.common.BarcodeUtil;
 import com.intramirror.web.controller.BaseController;
 import com.intramirror.web.service.LogisticsProductService;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -250,6 +253,8 @@ public class OrderShipController extends BaseController {
                 result.setMsg("Query Shipment fail,Check parameters, please ");
                 return result;
             }
+			SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+			shipmentMap.put("invoice_date", sdf.format(sdf.parse(shipmentMap.get("invoice_date").toString())));
 
 
             //获取carton列表
