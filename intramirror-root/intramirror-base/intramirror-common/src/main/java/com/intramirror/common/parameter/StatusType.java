@@ -661,5 +661,24 @@ public final class StatusType {
 
 	/** Boutique ID already exists */
 	public static final int NOT_PRODUCT = -8005;
+	
+	/*****************order***************************/
+	/** packingOrderType -校验*/
+	public static final int ORDER_CHECK_ORDER = 0;
+	
+	/** packingOrderType -返回shipment列表 */
+	public static final int ORDER_QUERY_LIST = 2;
+	
+	/** packingOrderType -箱子为空*/
+	public static final int ORDER_CONTAINER_EMPTY = 3;
+	
+	/** packingOrderType -箱子不为空*/
+	public static final int ORDER_CONTAINER_NOT_EMPTY = 4;
+	
+	/** packingOrder -订单打包处理逻辑错误*/
+	public static final int ORDER_ERROR_CODE = 1001;
+	
+	
+	
 
 }

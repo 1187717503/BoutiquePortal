@@ -626,7 +626,8 @@ public class OrderController extends BaseController{
 		result.errorStatus();
 		Map<String,Object> infoMap = new HashMap<String, Object>();
 		//0 校验   2返回shipment列表  3箱子为空时  4不为空时  
-		infoMap.put("statusType", 0);
+		infoMap.put("statusType", StatusType.ORDER_CHECK_ORDER);
+		infoMap.put("code", StatusType.ORDER_ERROR_CODE);
 		
 		
 		if(checkParamsBypackingCheckOrder(map)){
@@ -690,10 +691,21 @@ public class OrderController extends BaseController{
 			List<LogisticsProduct> list = iLogisticsProductService.selectByCondition(conditionMap);
 			String shipment_id = map.get("shipment_id").toString();
 			
+			//获取箱子信息
+			Map<String, Object> selectContainer = new HashMap<String, Object>(); 
+			selectContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
+			Container container =  containerService.selectContainerById(selectContainer);
+			
 			//如果为空箱子，并且已经选择过shipMent 则直接关联，并加入箱子
 			if(StringUtils.isNoneBlank(shipment_id) && (list == null || list.size() == 0)){
 				logger.info("已经选择过shipMent 直接关联，并加入箱子 start");
-				infoMap.put("statusType", 3);
+				infoMap.put("statusType", StatusType.ORDER_CONTAINER_EMPTY);
+				
+				//判断箱子的geography 跟订单的大区是否一致 
+				if(container != null && !container.getShipToGeography().equals(currentOrder.get("geography_name").toString())){
+					result.setMsg("The delivery area is inconsistent");
+					return result;
+				}
 				
 				//箱子关联Shipment
 				Map<String, Object> updateContainer = new HashMap<String, Object>(); 
@@ -729,12 +741,9 @@ public class OrderController extends BaseController{
 			//如果是新箱子，则需要关联Shipment,如果存在符合条件的Shipment有多个则返回列表供选择,如果只有一个则默认存入，没有则需要新建Shipment
 			if(list == null || list.size() == 0){
 				logger.info("箱子内订单列表为空    ");
-				Map<String, Object> selectContainer = new HashMap<String, Object>(); 
-				selectContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
-				Container container =  containerService.selectContainerById(selectContainer);
 				//判断箱子的geography 跟订单的大区是否一致 
 				if(container != null && !container.getShipToGeography().equals(currentOrder.get("geography_name").toString())){
-					result.setMsg("The shipping area is inconsistent");
+					result.setMsg("The delivery area is inconsistent");
 					return result;
 				}
 				
@@ -762,7 +771,7 @@ public class OrderController extends BaseController{
 					String shipmentId = iShipmentService.saveShipmentByOrderId(orderResult);
 					if (shipmentId != null && StringUtils.isNotBlank(shipmentId)){
 						
-						infoMap.put("statusType", 3);
+						infoMap.put("statusType", StatusType.ORDER_CONTAINER_EMPTY);
 						
 						//箱子关联Shipment
 						Map<String, Object> updateContainer = new HashMap<String, Object>(); 
@@ -789,7 +798,7 @@ public class OrderController extends BaseController{
 					//如果匹配的Shipment 只存在一个,就直接关联箱子   并把订单存入箱子
 					}else if(shipmentMapList.size() == 1){
 						logger.info("shipmentMapList size 1  start  ");
-						infoMap.put("statusType", 3);
+						infoMap.put("statusType", StatusType.ORDER_CONTAINER_EMPTY);
 						
 						//箱子关联Shipment
 						Map<String, Object> updateContainer = new HashMap<String, Object>(); 
@@ -813,7 +822,7 @@ public class OrderController extends BaseController{
 					}else if(shipmentMapList.size() > 1){
 						logger.info("shipmentMapList size >1  start  ");
 						result.setData(shipmentMapList);
-						infoMap.put("statusType", 2);
+						infoMap.put("statusType", StatusType.ORDER_QUERY_LIST);
 						result.setInfoMap(infoMap);
 					}
 				
@@ -821,7 +830,7 @@ public class OrderController extends BaseController{
 			//如果箱子中存在订单，则直接加入箱子
 			}else{
 				logger.info("箱子内已经存在订单   start  ");
-				infoMap.put("statusType", 4);
+				infoMap.put("statusType", StatusType.ORDER_CONTAINER_NOT_EMPTY);
 				
 				Map<String, Object> getShipment = new HashMap<String, Object>();
 				getShipment.put("shipmentId", Long.parseLong(shipment_id));
@@ -1137,7 +1146,10 @@ public class OrderController extends BaseController{
 			iShipmentService.saveShipmentByOrderId(orderResult);
 			
 		}else{
-			result.setMsg("Boxed success");
+			Map<String, Object> info = new HashMap<String, Object>();
+			info.put("code", StatusType.ORDER_ERROR_CODE);
+			result.setInfoMap(info);
+			result.setMsg("Package failure");
 		}
 		return result;
 	}
