@@ -79,6 +79,11 @@
 
         <dependency>
             <groupId>com.intramirror</groupId>
+            <artifactId>intramirror-logistics-service-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.intramirror</groupId>
             <artifactId>intramirror-common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>

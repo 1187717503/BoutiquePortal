@@ -1,8 +1,9 @@
 package com.intramirror.common.core.mapper;
 
-import java.util.Map;
-
 import com.intramirror.order.api.model.SubShipment;
+
+import java.util.List;
+import java.util.Map;
 
 
 public interface SubShipmentMapper {
@@ -53,25 +54,30 @@ public interface SubShipmentMapper {
      * @mbggenerated
      */
     int updateByPrimaryKey(SubShipment record);
-    
+
     /**
-	 * 新增subshipment
-	 * @param sub
-	 * @return
-	 */
-	int insertSubshipment(Map<String, Object> map);
-	
-	/**
-	 * 根据详情查询ID
-	 * @param map
-	 * @return
-	 */
-	Long getSubshipment(Map<String, Object> map);
-	
-	/**
-	 * 根据shipmentId删除subshipment
-	 * @param map
-	 * @return
-	 */
-	int deleteSubShipmentByShipmentId(Map<String, Object> map);
+     * 新增subshipment
+     *
+     * @param sub
+     * @return
+     */
+    int insertSubshipment(Map<String, Object> map);
+
+    /**
+     * 根据详情查询ID
+     *
+     * @param map
+     * @return
+     */
+    Long getSubshipment(Map<String, Object> map);
+
+    /**
+     * 根据shipmentId删除subshipment
+     *
+     * @param map
+     * @return
+     */
+    int deleteSubShipmentByShipmentId(Map<String, Object> map);
+
+    List<SubShipment> getSubShipmentByShipmentId(Long shipmentId);
 }

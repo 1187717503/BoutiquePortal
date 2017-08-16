@@ -57,7 +57,7 @@ public class BaseController {
             if (!Helper.checkNotNull(userId)) {
                 return user;
             }
-            
+
             user = userService.getUserById(userId, EnabledType.USED);
         } catch (Exception e) {
             return user;

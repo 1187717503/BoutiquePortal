@@ -11,6 +11,7 @@ import com.intramirror.user.core.mapper.VendorMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * vendor服务
@@ -55,6 +56,15 @@ public class VendorServiceImpl extends BaseDao implements VendorService {
                 }
             }
             return vendor;
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
+    public Vendor getVendorByVendorId(Map<String, Object> params) {
+        try {
+            return vendorMapper.queryVendorByVendorId(params);
         } catch (Exception e) {
             throw e;
         }

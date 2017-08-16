@@ -61,4 +61,6 @@ public interface IInvoiceService {
      */
     int updateByPrimaryKey(Invoice record);
 
+    Invoice getInvoiceByShipmentId(Long shipmentId);
+
 }
