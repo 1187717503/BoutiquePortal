@@ -26,6 +26,7 @@ public class LogisticsProduct{
 	private String tracking_num;
 	private String vat_num;
 	private Long container_id;
+	private Long invoice_id;
 	private Date confirmed_at;
 	private Date est_ship_date;
 	private Date packed_at;
@@ -187,6 +188,12 @@ public class LogisticsProduct{
 	}
 	public void setContainer_id(Long container_id) {
 		this.container_id = container_id;
+	}
+	public Long getInvoice_id() {
+		return invoice_id;
+	}
+	public void setInvoice_id(Long invoice_id) {
+		this.invoice_id = invoice_id;
 	}
 
 	

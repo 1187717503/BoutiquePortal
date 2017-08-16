@@ -254,7 +254,7 @@ public class OrderShipController extends BaseController {
                 return result;
             }
     		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    		SimpleDateFormat sdf2 = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+    		SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
     		if(shipmentMap.get("invoice_date") != null && StringUtils.isNotBlank(shipmentMap.get("invoice_date").toString())){
     			shipmentMap.put("invoice_date", sdf2.format(sdf.parse(shipmentMap.get("invoice_date").toString())));
     		}
