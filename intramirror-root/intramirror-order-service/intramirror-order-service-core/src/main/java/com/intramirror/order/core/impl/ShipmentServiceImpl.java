@@ -136,18 +136,28 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		if (null != map && 0 < map.size()){
 			//每条路线生成不同sub-shipment
 			if (map.size() == 1){
-				Long segmentSequence = Long.parseLong(map.get(0).get("segment_sequence").toString());
-				//插入物流订单关联查询是否已有记录
-				Long subShipmentId1 = subShipmentMapper.getSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence));
-				if (null == subShipmentId1){
-					
+//				if (1==Long.parseLong(shipmentType)){
+					Long segmentSequence = Long.parseLong(map.get(0).get("segment_sequence").toString());
 					subShipmentMapper.insertSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence));
 					Map<String, Object> lpsMap = new HashMap<>();
 					Long subShipmentId = subShipmentMapper.getSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence));
 					lpsMap.put("logisticProductId", logisticProductId);
 					lpsMap.put("subShipmentId", subShipmentId);
 					logisticProductShipmentMapper.insertlpShipment(lpsMap);
-				}
+//				}else {
+//					Long segmentSequence = Long.parseLong(map.get(0).get("segment_sequence").toString());
+//					//插入物流订单关联查询是否已有记录
+//					Long subShipmentId1 = subShipmentMapper.getSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence));
+//					if (null == subShipmentId1){
+//						subShipmentMapper.insertSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence));
+//						Map<String, Object> lpsMap = new HashMap<>();
+//						Long subShipmentId = subShipmentMapper.getSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence));
+//						lpsMap.put("logisticProductId", logisticProductId);
+//						lpsMap.put("subShipmentId", subShipmentId);
+//						logisticProductShipmentMapper.insertlpShipment(lpsMap);
+//					}
+//				}
+				
 			}
 			if (map.size() == 2){
 				Map<String, Object> thisMap = map.get(1);
@@ -164,15 +174,15 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 				}
 				Long segmentSequence1 = Long.parseLong(map.get(1).get("segment_sequence").toString());
 				//生成最后段
-				Long subShipmentId2 = subShipmentMapper.getSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence1));
-				if (null == subShipmentId2){
+//				Long subShipmentId2 = subShipmentMapper.getSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence1));
+//				if (null == subShipmentId2){
 					subShipmentMapper.insertSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence1));
 					Map<String, Object> lpsMap = new HashMap<>();
 					Long subShipmentId = subShipmentMapper.getSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence1));
 					lpsMap.put("logisticProductId", logisticProductId);
 					lpsMap.put("subShipmentId", subShipmentId);
 					logisticProductShipmentMapper.insertlpShipment(lpsMap);
-				}
+//				}
 			}
 			if (map.size() == 3){
 				Map<String, Object> oneMap = map.get(1);
@@ -198,15 +208,15 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 					lpsMap.put("subShipmentId", subShipmentId);
 					logisticProductShipmentMapper.insertlpShipment(lpsMap);
 				}
-				Long subShipmentId3 = subShipmentMapper.getSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence3));
-				if (null == subShipmentId3){
+//				Long subShipmentId3 = subShipmentMapper.getSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence3));
+//				if (null == subShipmentId3){
 					subShipmentMapper.insertSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence3));
 					Map<String, Object> lpsMap = new HashMap<>();
 					Long subShipmentId = subShipmentMapper.getSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence3));
 					lpsMap.put("logisticProductId", logisticProductId);
 					lpsMap.put("subShipmentId", subShipmentId);
 					logisticProductShipmentMapper.insertlpShipment(lpsMap);
-				}
+//				}
 				
 			}
 		}
