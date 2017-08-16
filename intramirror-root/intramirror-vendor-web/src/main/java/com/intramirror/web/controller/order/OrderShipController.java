@@ -390,8 +390,12 @@ public class OrderShipController extends BaseController {
             }
             //获取Invoice 信息
             Invoice invoice = invoiceService.getInvoiceByShipmentId(Long.parseLong(map.get("shipment_id").toString()));
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
             resultMap.put("InvoiceNumber", invoice.getInvoiceNum());
-            resultMap.put("InvoiceDate", invoice.getInvoiceDate());
+            if (invoice.getInvoiceDate() != null && StringUtils.isNotBlank(invoice.getInvoiceDate().toString())) {
+                resultMap.put("InvoiceDate", sdf2.format(sdf.parse(invoice.getInvoiceDate().toString())));
+            }
             resultMap.put("VATNumber", invoice.getVatNum());
 
             //获取Ship From信息
@@ -504,7 +508,6 @@ public class OrderShipController extends BaseController {
             Map<String, List<Map<String, Object>>> orderList = new HashMap<String, List<Map<String, Object>>>();
             List<Map<String, Object>> shipMentCartonList = new ArrayList<Map<String, Object>>();
 
-            double allTotal = 0;
 
             if (containerList != null && containerList.size() > 0) {
 
@@ -544,12 +547,13 @@ public class OrderShipController extends BaseController {
                     for (Map<String, Object> carton : shipMentCartonList) {
                         List<Map<String, Object>> list = orderList.get(carton.get("container_id").toString());
                         carton.put("orderList", list);
+                        double allTotal = 0;
                         for (Map<String, Object> conInfo : list) {
                             double total = Double.parseDouble(conInfo.get("sale_price").toString()) * Double.parseDouble(conInfo.get("amount").toString());
                             allTotal = allTotal + total;
                             conInfo.put("Total", total);
 
-                            carton.put("allTotal", containerList == null ? 0 : containerList.size());
+                            carton.put("allTotal", list == null ? 0 : list.size());
                             carton.put("allTotalNum", allTotal);
                         }
 
