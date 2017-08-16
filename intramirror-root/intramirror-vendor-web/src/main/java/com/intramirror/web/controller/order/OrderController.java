@@ -692,6 +692,8 @@ public class OrderController extends BaseController{
 			
 			//如果为空箱子，并且已经选择过shipMent 则直接关联，并加入箱子
 			if(StringUtils.isNoneBlank(shipment_id) && (list == null || list.size() == 0)){
+				infoMap.put("statusType", 3);
+				result.setInfoMap(infoMap);
 				
 				//箱子关联Shipment
 				Map<String, Object> updateContainer = new HashMap<String, Object>(); 
@@ -716,9 +718,7 @@ public class OrderController extends BaseController{
 				}else{
 					result.setMsg("The modification failed. Check that the parameters are correct ");
 				}
-				
-				infoMap.put("statusType", 3);
-				result.setInfoMap(infoMap);
+
 				return result;
 			}
 			
@@ -760,6 +760,9 @@ public class OrderController extends BaseController{
 					String shipmentId = iShipmentService.saveShipmentByOrderId(orderResult);
 					if (shipmentId != null && StringUtils.isNotBlank(shipmentId)){
 						
+						infoMap.put("statusType", 3);
+						result.setInfoMap(infoMap);
+						
 						//箱子关联Shipment
 						Map<String, Object> updateContainer = new HashMap<String, Object>(); 
 						updateContainer.put("shipment_id", Long.parseLong(shipmentId));
@@ -778,14 +781,14 @@ public class OrderController extends BaseController{
 							
 							//订单加入箱子
 							result =  updateLogisticsProduct(currentOrder,shipMentMap,false);
-							infoMap.put("statusType", 3);
-							result.setInfoMap(infoMap);
 						}
 						
 					}
 						
 					//如果匹配的Shipment 只存在一个,就直接关联箱子   并把订单存入箱子
 					}else if(shipmentMapList.size() == 1){
+						infoMap.put("statusType", 3);
+						result.setInfoMap(infoMap);
 						
 						//箱子关联Shipment
 						Map<String, Object> updateContainer = new HashMap<String, Object>(); 
@@ -802,8 +805,6 @@ public class OrderController extends BaseController{
 							
 							//订单加入箱子
 							result =  updateLogisticsProduct(currentOrder,shipMentMap,false);
-							infoMap.put("statusType", 3);
-							result.setInfoMap(infoMap);
 						}
 					
 					//如果匹配的Shipment 存在多个，则返回列表供选择
@@ -817,6 +818,9 @@ public class OrderController extends BaseController{
 			
 			//如果箱子中存在订单，则直接加入箱子
 			}else{
+				result.setInfoMap(infoMap);
+				infoMap.put("statusType", 4);
+				
 				Map<String, Object> getShipment = new HashMap<String, Object>();
 				getShipment.put("shipmentId", Long.parseLong(shipment_id));
 				
@@ -830,8 +834,7 @@ public class OrderController extends BaseController{
 					result.setMsg("shipment Query is empty ");
 				}
 				
-				result.setInfoMap(infoMap);
-				infoMap.put("statusType", 4);
+
 
 			}
 			
