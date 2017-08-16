@@ -396,6 +396,9 @@ public class OrderShipController extends BaseController {
             if (invoice.getInvoiceDate() != null) {
                 String invoiceDate = sdf.format(invoice.getInvoiceDate());
                 resultMap.put("InvoiceDate", sdf2.format(sdf.parse(invoiceDate)));
+            } else {
+                result.setMsg("invoiceDate is null ");
+                return result;
             }
             resultMap.put("VATNumber", invoice.getVatNum());
 
