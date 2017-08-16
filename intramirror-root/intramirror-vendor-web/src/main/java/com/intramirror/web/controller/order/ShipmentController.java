@@ -270,7 +270,7 @@ public class ShipmentController extends BaseController{
 				containerMap = new HashMap<>();
 				containerMap.put("shipmentId", shipmentId);
 				containerMap.put("shipment_id", Long.parseLong(map.get("shipmentId").toString()));
-				int result = subShipmentService.updateSubShipment(containerMap);
+				subShipmentService.updateSubShipment(containerMap);
 				message.successStatus().putMsg("Info", "SUCCESS").setData(1);
 			}
 			message.successStatus().putMsg("Info", "SUCCESS").setData(-1);
