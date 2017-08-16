@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -22,7 +23,11 @@ import com.intramirror.logistics.api.service.IInvoiceService;
 import com.intramirror.order.api.common.OrderStatusType;
 import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.service.IContainerService;
+import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderService;
+import com.intramirror.user.api.model.User;
+import com.intramirror.user.api.model.Vendor;
+import com.intramirror.user.api.service.VendorService;
 import com.intramirror.web.controller.BaseController;
 
 @CrossOrigin
@@ -38,6 +43,12 @@ public class InvoiceController extends BaseController{
 	
 	@Autowired
 	private IContainerService containerService;
+	
+	@Autowired
+	private ILogisticsProductService iLogisticsProductService;
+	
+	@Autowired
+	private VendorService vendorService;
 	
 	
 	
@@ -58,6 +69,24 @@ public class InvoiceController extends BaseController{
 			return result;
 		}
 		
+		User user = this.getUser(httpRequest);
+		if(user == null){
+			result.setMsg("Please log in again");
+			return result;
+		}
+		
+		Vendor vendor= null;
+		try {
+			vendor= vendorService.getVendorByUserId(user.getUserId());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if(vendor == null){
+			result.setMsg("Please log in again");
+			return result;
+		}
+		
+		
 		try{
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			Invoice invoice = new Invoice();
@@ -65,30 +94,60 @@ public class InvoiceController extends BaseController{
 			invoice.setShipmentId(Long.parseLong(map.get("shipmentId").toString()));
 			
 			Invoice oldInvoice = invoiceService.getInvoiceByShipmentId(Long.parseLong(map.get("shipmentId").toString()));
+			
+			//根据shipMentId 获取contain 列表
+			List<Map<String, Object>> containList = containerService.getShipmentList(map);
+			//shipMent 必须有关联的箱子
+			if(containList == null ||containList.size() == 0){
+				result.setMsg("The corresponding container cannot be found");
+				return result;
+			}
+			
+			String containIds = "";
+			/****************************************删除*******************************************/
 			if(oldInvoice != null ){
 				//先将之前的发票信息删除
 				invoiceService.updateByShipmentId(invoice);
-				
-				//根据shipMentId 获取contain 列表
-				List<Map<String, Object>> containList = containerService.getShipmentList(map);
-				if(containList != null && containList.size() > 0){
-					
-				}
-				
-				invoice.setEnabled(EnabledType.USED);
-				invoice.setInvoiceNum(map.get("invoiceNo").toString());
-				invoice.setInvoiceDate(sdf.parse(map.get("invoiceDate").toString()));
-				
-				int row = invoiceService.insertSelective(invoice);
-				
-				if(row > 0){
-					//修改logistics_product表
-					
-					result.successStatus();
-				}else{
-					result.setMsg("Failed to add invoice");
-				}
 			}
+				
+			/****************************************创建*******************************************/
+			invoice.setEnabled(EnabledType.USED);
+			invoice.setInvoiceNum(map.get("invoiceNo").toString());
+			invoice.setInvoiceDate(sdf.parse(map.get("invoiceDate").toString()));
+			invoice.setVatNum(0l);
+			invoice.setVendorId(vendor.getVendorId());
+			
+			invoiceService.insertSelective(invoice);
+			
+			if(invoice.getInvoiceId() != null){
+				
+				if(containList != null && containList.size() > 0){
+					for(Map<String, Object> conInfo : containList){
+						containIds +=","+conInfo.get("container_id").toString();
+					}
+					containIds = containIds.substring(1);
+					
+					//修改logistics_product表
+					Map<String, Object> conditionMap = new HashMap<String, Object>();
+					conditionMap.put("invoice_id", invoice.getInvoiceId());
+					conditionMap.put("container_ids", containIds.split(","));
+					//添加相关订单对invoice的关联
+					iLogisticsProductService.updateByContainerId(conditionMap);
+					
+//					Map<String, Object> conditionMap = new HashMap<String, Object>();
+//					conditionMap.put("invoice_id", 0);
+//					conditionMap.put("container_ids", containIds.split(","));
+//					//取消相关订单对invoice的关联
+//					iLogisticsProductService.updateByContainerId(conditionMap);
+					
+				}
+
+				
+				result.successStatus();
+			}else{
+				result.setMsg("Failed to add invoice");
+			}
+	
 			
 
 			

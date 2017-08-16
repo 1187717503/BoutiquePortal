@@ -17,6 +17,14 @@ public interface ILogisticsProductService {
 	
 	
 	/**
+	 * 根据containerId 修改相关信息
+	 * @param invoice id  containerId 数组
+	 * @return
+	 */
+	int updateByContainerId (Map<String, Object> conditionMap);
+	
+	
+	/**
 	 * 根据 logistics_product_id 查询详情
 	 * @param logistics_product_id
 	 * @return

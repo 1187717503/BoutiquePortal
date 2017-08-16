@@ -142,110 +142,17 @@
      where logistics_product_id = #{logistics_product_id,jdbcType=BIGINT}
   </update>
   
-  <update id="updateByInvoiceId" parameterType="com.intramirror.order.api.model.LogisticsProduct" >
+  <update id="updateByContainerId" parameterType="java.util.Map" >
       update logistics_product 
     <set >
-      <if test="order_logistics_id != null" >
-        order_logistics_id = #{order_logistics_id,jdbcType=BIGINT},
-      </if>
-      
-      <if test="shop_product_sku_id != null" >
-        shop_product_sku_id = #{shop_product_sku_id,jdbcType=BIGINT},
-      </if>
-      
-      <if test="in_price != null" >
-        in_price = #{in_price,jdbcType=DECIMAL},
-      </if>
-      
-      <if test="sale_price != null" >
-        sale_price = #{sale_price,jdbcType=DECIMAL},
-      </if>
-      
-      <if test="amount != null" >
-        amount = #{amount,jdbcType=BIGINT},
-      </if>
-      <if test="fee != null" >
-        fee = #{fee,jdbcType=DECIMAL},
-      </if>
-      
-      <if test="deduct_amount != null" >
-        deduct_amount = #{deduct_amount,jdbcType=BIGINT},
-      </if>
-      
-      <if test="deduct_fee != null" >
-        deduct_fee = #{deduct_fee,jdbcType=DECIMAL},
-      </if>
-      
-      <if test="remain_amount != null" >
-        remain_amount = #{remain_amount,jdbcType=BIGINT},
-      </if>
-      
-      <if test="remain_fee != null" >
-        remain_fee = #{remain_fee,jdbcType=DECIMAL},
-      </if>
-      
-      <if test="status != null" >
-        status = #{status,jdbcType=BIGINT},
-      </if>
-      
-      <if test="created_at != null" >
-        created_at = #{created_at,jdbcType=TIMESTAMP},
-      </if>
-      
-      <if test="updated_at != null" >
-        updated_at = #{updated_at,jdbcType=TIMESTAMP},
-      </if>
-      
-      <if test="confirmed_at != null" >
-        confirmed_at = #{confirmed_at,jdbcType=TIMESTAMP},
-      </if>
-      
-      <if test="est_ship_date != null" >
-        est_ship_date = #{est_ship_date,jdbcType=TIMESTAMP},
-      </if>
-      
-      <if test="packed_at != null" >
-        packed_at = #{packed_at,jdbcType=TIMESTAMP},
-      </if>
-      
-      <if test="shipped_at != null" >
-        shipped_at = #{shipped_at,jdbcType=TIMESTAMP},
-      </if>
-      
-      <if test="container_id != null" >
-        container_id = #{container_id,jdbcType=BIGINT},
+      <if test="invoice_id != null" >
+        invoice_id = #{invoice_id,jdbcType=BIGINT},
    	  </if>
-      
-      <if test="enabled != null" >
-        enabled = #{enabled,jdbcType=BIT},
-      </if>
-      
-      <if test="order_line_num != null" >
-        order_line_num = #{order_line_num,jdbcType=LONGVARCHAR},
-      </if>
-      
-      <if test="vendor_id != null" >
-        vendor_id = #{vendor_id,jdbcType=BIGINT},
-      </if>
-      
-      <if test="shipping_fee != null" >
-        shipping_fee = #{shipping_fee,jdbcType=DECIMAL},
-      </if>
-      
-      <if test="tax_fee != null" >
-        tax_fee = #{tax_fee,jdbcType=DECIMAL},
-      </if>
-      
-      <if test="tracking_num != null" >
-        tracking_num = #{tracking_num,jdbcType=LONGVARCHAR},
-      </if>
-      
-      <if test="vat_num != null" >
-        vat_num = #{vat_num,jdbcType=LONGVARCHAR},
-      </if>
-      
     </set>
-     where logistics_product_id = #{logistics_product_id,jdbcType=BIGINT}
+     where container_id in
+            <foreach item="item" index="index" collection="container_ids" open="(" separator="," close=")">
+                #{item}
+            </foreach>
   </update>
   
   
