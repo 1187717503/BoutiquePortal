@@ -393,8 +393,8 @@ public class OrderShipController extends BaseController {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
             resultMap.put("InvoiceNumber", invoice.getInvoiceNum());
-            if (invoice.getInvoiceDate() != null && StringUtils.isNotBlank(invoice.getInvoiceDate().toString())) {
-                resultMap.put("InvoiceDate", sdf2.format(sdf.parse(invoice.getInvoiceDate().toString())));
+            if (invoice.getInvoiceDate() != null && StringUtils.isNotBlank(invoice.getInvoiceDate().toLocaleString())) {
+                resultMap.put("InvoiceDate", sdf2.format(sdf.parse(invoice.getInvoiceDate().toLocaleString())));
             }
             resultMap.put("VATNumber", invoice.getVatNum());
 
