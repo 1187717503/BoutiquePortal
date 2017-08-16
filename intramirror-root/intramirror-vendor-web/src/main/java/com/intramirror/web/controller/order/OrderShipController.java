@@ -14,6 +14,7 @@ import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.VendorService;
+import com.intramirror.web.common.BarcodeUtil;
 import com.intramirror.web.controller.BaseController;
 import com.intramirror.web.service.LogisticsProductService;
 import org.apache.commons.lang3.StringUtils;
@@ -395,7 +396,7 @@ public class OrderShipController extends BaseController {
             //获取Invoice To信息
             Shop shop = shopService.selectByPrimaryKey(65l);
             resultMap.put("Invoice To", shop.getBusinessLicenseLocation());
-            resultMap.put("Invoice Company Name", shop.getCompanyName());
+            resultMap.put("Invoice Name", shop.getShopName());
 
             List<SubShipment> subShipmentList = subShipmentService.getSubShipmentByShipmentId(Long.parseLong(map.get("shipment_id").toString()));
             if (subShipmentList.size() > 1) {
@@ -409,18 +410,19 @@ public class OrderShipController extends BaseController {
             //获取carton列表
             List<Map<String, Object>> containerList = orderService.getOrderListByShipmentId(map);
 
-            Double allTotal = null;
+            double allTotal = 0;
 
             if (containerList != null && containerList.size() > 0) {
 
                 for (Map<String, Object> container : containerList) {
-                    Double total = Double.parseDouble(container.get("sale_price").toString()) * Double.parseDouble(container.get("amount").toString());
-                    allTotal = total++;
+                    double total = Double.parseDouble(container.get("sale_price").toString()) * Double.parseDouble(container.get("amount").toString());
+                    allTotal = allTotal + total;
                     container.put("Total", total);
                 }
             }
 
             shipmentMap.put("all_qty", containerList == null ? 0 : containerList.size());
+            resultMap.put("all_qty", containerList == null ? 0 : containerList.size());
             resultMap.put("cartonList", containerList);
             resultMap.put("shipmentInfo", shipmentMap);
             resultMap.put("allTotal", allTotal);
@@ -437,4 +439,122 @@ public class OrderShipController extends BaseController {
         return result;
     }
 
+
+    /**
+     * packingList
+     *
+     * @param map
+     * @param httpRequest
+     * @return
+     */
+    @RequestMapping(value = "/printPackingList", method = RequestMethod.POST)
+    @ResponseBody
+    public ResultMessage printPackingList(@RequestBody Map<String, Object> map, HttpServletRequest httpRequest) {
+        ResultMessage result = new ResultMessage();
+        result.errorStatus();
+
+        if (map == null || map.size() == 0 || map.get("status") == null || map.get("shipment_id") == null) {
+            result.setMsg("Parameter cannot be empty");
+            return result;
+        }
+
+        User user = this.getUser(httpRequest);
+        if (user == null) {
+            result.setMsg("Please log in again");
+            return result;
+        }
+
+        Vendor vendor = null;
+        try {
+            vendor = vendorService.getVendorByUserId(user.getUserId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (vendor == null) {
+            result.setMsg("Please log in again");
+            return result;
+        }
+
+        try {
+            map.put("vendorId", vendor.getVendorId());
+
+            Map<String, Object> getShipment = new HashMap<String, Object>();
+            getShipment.put("shipmentId", Long.parseLong(map.get("shipment_id").toString()));
+
+            //根据shipmentId 获取shipment 相关信息及物流第一段类型
+            Map<String, Object> shipmentMap = iShipmentService.getShipmentTypeById(getShipment);
+            if (shipmentMap == null || shipmentMap.size() == 0) {
+                result.setMsg("Query Shipment fail,Check parameters, please ");
+                return result;
+            }
+
+            //获取carton列表
+            List<Map<String, Object>> containerList = orderService.getOrderListByShipmentId(map);
+            Map<String, Object> resultMap = new HashMap<String, Object>();
+
+            Map<String, List<Map<String, Object>>> orderList = new HashMap<String, List<Map<String, Object>>>();
+            List<Map<String, Object>> shipMentCartonList = new ArrayList<Map<String, Object>>();
+
+            if (containerList != null && containerList.size() > 0) {
+
+                for (Map<String, Object> container : containerList) {
+
+                    //根据shipment_id 分组
+                    if (orderList.containsKey(container.get("container_id").toString())) {
+                        List<Map<String, Object>> cons = orderList.get(container.get("container_id").toString());
+                        cons.add(container);
+                    } else {
+                        List<Map<String, Object>> cons = new ArrayList<Map<String, Object>>();
+                        cons.add(container);
+                        orderList.put(container.get("container_id").toString(), cons);
+
+
+                        //获取container信息
+                        Map<String, Object> cartonInfo = new HashMap<String, Object>();
+                        cartonInfo.put("container_id", container.get("container_id").toString());
+                        cartonInfo.put("barcode", container.get("barcode").toString());
+
+                        //生成条形码
+                        String cartonNumUrl = "Barcode-" + container.get("barcode").toString() + ".png";
+                        cartonNumUrl = BarcodeUtil.generateFile(container.get("barcode").toString(), cartonNumUrl, false);
+                        cartonInfo.put("cartonNumUrl", cartonNumUrl);
+
+                        cartonInfo.put("height", container.get("height").toString());
+                        cartonInfo.put("width", container.get("width").toString());
+                        cartonInfo.put("length", container.get("length").toString());
+                        shipMentCartonList.add(cartonInfo);
+
+                    }
+
+
+                }
+
+                if (shipMentCartonList != null && shipMentCartonList.size() > 0) {
+                    //将orderList 存入container详情
+                    for (Map<String, Object> carton : shipMentCartonList) {
+                        carton.put("orderList", orderList.get(carton.get("container_id").toString()));
+                        carton.put("order_qty", orderList.get(carton.get("container_id").toString()).size());
+                    }
+                }
+
+
+            }
+
+            shipmentMap.put("carton_qty", shipMentCartonList == null ? 0 : shipMentCartonList.size());
+            resultMap.put("cartonList", shipMentCartonList);
+            resultMap.put("shipmentInfo", shipmentMap);
+
+
+            result.successStatus();
+            result.setData(resultMap);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setMsg("Query container list fail,Check parameters, please ");
+            return result;
+        }
+
+
+        return result;
+    }
 }
