@@ -30,6 +30,7 @@ import com.intramirror.order.api.service.ILogisticProductShipmentService;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.service.IShipmentService;
+import com.intramirror.order.api.service.ISubShipmentService;
 import com.intramirror.order.core.impl.LogisticProductShipmentServiceImpl;
 import com.intramirror.web.controller.BaseController;
 
@@ -58,6 +59,9 @@ public class ShipmentController extends BaseController{
 	
 	@Autowired
 	private ILogisticsProductService logisticsProductService;
+	
+	@Autowired
+	private ISubShipmentService subShipmentService;
 	
 	/**
 	 * 保存shipment
@@ -262,8 +266,12 @@ public class ShipmentController extends BaseController{
 				Map<String, Object> containerMap = new HashMap<>();
 				containerMap.put("shipment_id", shipmentId);
 				containerMap.put("container_id", Long.parseLong(map.get("container_id").toString()));
-				int result = containerService.updateContainerShipment(containerMap);
-				message.successStatus().putMsg("Info", "SUCCESS").setData(result);
+				containerService.updateContainerShipment(containerMap);
+				containerMap = new HashMap<>();
+				containerMap.put("shipmentId", shipmentId);
+				containerMap.put("shipment_id", Long.parseLong(map.get("shipmentId").toString()));
+				int result = subShipmentService.updateSubShipment(containerMap);
+				message.successStatus().putMsg("Info", "SUCCESS").setData(1);
 			}
 			message.successStatus().putMsg("Info", "SUCCESS").setData(-1);
 		} catch (Exception e) {

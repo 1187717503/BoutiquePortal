@@ -79,8 +79,12 @@ public class SubShipmentServiceImpl extends BaseDao implements ISubShipmentServi
 
 	@Override
 	public int deleteByPrimaryKey(Long subShipmentId) {
-		// TODO Auto-generated method stub
 		return subShipmentMapper.deleteByPrimaryKey(subShipmentId);
+	}
+
+	@Override
+	public int updateSubShipment(Map<String, Object> map) {
+		return subShipmentMapper.updateSubShipment(map);
 	}
 
 

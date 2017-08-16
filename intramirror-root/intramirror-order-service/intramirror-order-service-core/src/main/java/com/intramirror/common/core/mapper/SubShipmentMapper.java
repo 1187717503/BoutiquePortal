@@ -80,4 +80,11 @@ public interface SubShipmentMapper {
     int deleteSubShipmentByShipmentId(Map<String, Object> map);
 
     List<SubShipment> getSubShipmentByShipmentId(Long shipmentId);
+    
+    /**
+     * 根据shipmentId修改subshipment关联
+     * @param map
+     * @return
+     */
+    int updateSubShipment(Map<String, Object> map);
 }

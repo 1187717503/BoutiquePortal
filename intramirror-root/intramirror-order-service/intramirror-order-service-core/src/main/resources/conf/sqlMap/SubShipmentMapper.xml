@@ -181,4 +181,10 @@ AND ship_to_province= #{shipToProvince,jdbcType=VARCHAR} AND ship_to_country=#{s
         from sub_shipment
         where shipment_id = #{shipmentId,jdbcType=BIGINT}
     </select>
+    
+    <update id="updateSubShipment">
+    	update sub_shipment
+		set shipment_id = #{shipmentId,jdbcType=BIGINT}
+		where shipment_id = #{shipment_id,jdbcType=BIGINT}
+    </update>
 </mapper>
