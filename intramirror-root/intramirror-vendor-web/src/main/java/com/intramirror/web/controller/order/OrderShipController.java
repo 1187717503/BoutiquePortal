@@ -253,12 +253,11 @@ public class OrderShipController extends BaseController {
                 result.setMsg("Query Shipment fail,Check parameters, please ");
                 return result;
             }
-    		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    		SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
-    		if(shipmentMap.get("invoice_date") != null && StringUtils.isNotBlank(shipmentMap.get("invoice_date").toString())){
-    			shipmentMap.put("invoice_date", sdf2.format(sdf.parse(shipmentMap.get("invoice_date").toString())));
-    		}
-
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
+            if (shipmentMap.get("invoice_date") != null && StringUtils.isNotBlank(shipmentMap.get("invoice_date").toString())) {
+                shipmentMap.put("invoice_date", sdf2.format(sdf.parse(shipmentMap.get("invoice_date").toString())));
+            }
 
 
             //获取carton列表
@@ -401,6 +400,7 @@ public class OrderShipController extends BaseController {
             Vendor shipVendor = vendorService.getVendorByVendorId(vendorParams);
             resultMap.put("ShipFrom", shipVendor.getBusinessLicenseLocation());
             resultMap.put("ShipCompanyName", shipVendor.getCompanyName());
+            resultMap.put("ShipVendorName", shipVendor.getVendorName());
 
             //获取Invoice To信息
             Shop shop = shopService.selectByPrimaryKey(65l);
@@ -504,6 +504,8 @@ public class OrderShipController extends BaseController {
             Map<String, List<Map<String, Object>>> orderList = new HashMap<String, List<Map<String, Object>>>();
             List<Map<String, Object>> shipMentCartonList = new ArrayList<Map<String, Object>>();
 
+            double allTotal = 0;
+
             if (containerList != null && containerList.size() > 0) {
 
                 for (Map<String, Object> container : containerList) {
@@ -517,10 +519,10 @@ public class OrderShipController extends BaseController {
                         cons.add(container);
                         orderList.put(container.get("container_id").toString(), cons);
 
-
                         //获取container信息
                         Map<String, Object> cartonInfo = new HashMap<String, Object>();
                         cartonInfo.put("container_id", container.get("container_id").toString());
+                        cartonInfo.put("ship_to_geography", container.get("ship_to_geography").toString());
                         cartonInfo.put("barcode", container.get("barcode").toString());
 
                         //生成条形码
@@ -540,7 +542,18 @@ public class OrderShipController extends BaseController {
                 if (shipMentCartonList != null && shipMentCartonList.size() > 0) {
                     //将orderList 存入container详情
                     for (Map<String, Object> carton : shipMentCartonList) {
-                        carton.put("orderList", orderList.get(carton.get("container_id").toString()));
+                        List<Map<String, Object>> list = orderList.get(carton.get("container_id").toString());
+                        carton.put("orderList", list);
+                        for (Map<String, Object> conInfo : list) {
+                            double total = Double.parseDouble(conInfo.get("sale_price").toString()) * Double.parseDouble(conInfo.get("amount").toString());
+                            allTotal = allTotal + total;
+                            conInfo.put("Total", total);
+
+                            carton.put("allTotal", containerList == null ? 0 : containerList.size());
+                            carton.put("allTotalNum", allTotal);
+                        }
+
+
                         carton.put("order_qty", orderList.get(carton.get("container_id").toString()).size());
                     }
                 }
