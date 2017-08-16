@@ -353,4 +353,10 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		return shipmentMapper.deleteShipmentById(map);
 	}
 
+	@Override
+	public Map<String, Object> getShipmentInfoById(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return shipmentMapper.getShipmentInfoById(map);
+	}
+
 }

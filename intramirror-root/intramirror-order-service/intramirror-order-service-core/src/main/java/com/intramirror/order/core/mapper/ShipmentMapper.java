@@ -56,6 +56,16 @@ public interface ShipmentMapper {
 	 */
 	Map<String,Object> getShipmentTypeById(Map<String, Object> map);
 	
+	
+	/**
+	 * 根据shipmentID查询shipment相关信息
+	 * @param map
+	 * @return
+	 */
+	Map<String,Object> getShipmentInfoById(Map<String, Object> map);
+	
+	
+	
 	/**
 	 * 根据vendorId查询vendorCode
 	 * @param map
