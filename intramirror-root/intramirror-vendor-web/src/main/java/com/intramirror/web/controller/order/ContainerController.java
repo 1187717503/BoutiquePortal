@@ -239,7 +239,11 @@ public class ContainerController {
 		ResultMessage message = ResultMessage.getInstance();
 		String barCode = "CTN";
 		try {
-			int maxCode = containerService.getMaxBarcode();
+			Integer maxCode = containerService.getMaxBarcode();
+			if (null == maxCode)
+				maxCode = 1000001;
+			else 
+				maxCode ++;
 			barCode+=(maxCode+1);
 			message.successStatus().addMsg("info SUCCESS").setData(barCode);
 			return message;

@@ -61,7 +61,7 @@ public interface IContainerService {
 	 * 获取条形码
 	 * @return int
 	 */
-	int getMaxBarcode();
+	Integer getMaxBarcode();
 	
 	/**
 	 * 修改箱子信息

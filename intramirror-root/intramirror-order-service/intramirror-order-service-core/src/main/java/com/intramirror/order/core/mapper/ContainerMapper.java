@@ -79,7 +79,7 @@ public interface ContainerMapper {
 	 * 获取条形码
 	 * @return int
 	 */
-	int getMaxBarcode();
+	Integer getMaxBarcode();
 	
 	/**
 	 * 根据shipmentid获取Container 列表
