@@ -88,7 +88,8 @@ public class InvoiceController extends BaseController{
 		
 		
 		try{
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    		SimpleDateFormat sdf2 = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 			Invoice invoice = new Invoice();
 			invoice.setEnabled(EnabledType.DISCARD);
 			invoice.setShipmentId(Long.parseLong(map.get("shipmentId").toString()));
@@ -113,7 +114,7 @@ public class InvoiceController extends BaseController{
 			/****************************************创建*******************************************/
 			invoice.setEnabled(EnabledType.USED);
 			invoice.setInvoiceNum(map.get("invoiceNo").toString());
-			invoice.setInvoiceDate(sdf.parse(map.get("invoiceDate").toString()));
+			invoice.setInvoiceDate(sdf2.parse(map.get("invoiceDate").toString()));
 			invoice.setVatNum(0l);
 			invoice.setVendorId(vendor.getVendorId());
 			
