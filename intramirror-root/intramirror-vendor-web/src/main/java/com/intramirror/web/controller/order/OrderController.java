@@ -724,6 +724,7 @@ public class OrderController extends BaseController{
 				//判断箱子的geography 跟订单的大区是否一致 
 				if(container != null && !container.getShipToGeography().equals(currentOrder.get("geography_name").toString())){
 					result.setMsg("The delivery area is inconsistent");
+					result.setInfoMap(infoMap);
 					return result;
 				}
 				
@@ -760,10 +761,12 @@ public class OrderController extends BaseController{
 			
 			//如果是新箱子，则需要关联Shipment,如果存在符合条件的Shipment有多个则返回列表供选择,如果只有一个则默认存入，没有则需要新建Shipment
 			if(list == null || list.size() == 0){
+				infoMap.put("statusType", StatusType.ORDER_CONTAINER_EMPTY);
 				logger.info("箱子内订单列表为空    ");
 				//判断箱子的geography 跟订单的大区是否一致 
 				if(container != null && !container.getShipToGeography().equals(currentOrder.get("geography_name").toString())){
 					result.setMsg("The delivery area is inconsistent");
+					result.setInfoMap(infoMap);
 					return result;
 				}
 				
