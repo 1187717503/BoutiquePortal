@@ -12,4 +12,30 @@
 	VALUE(#{logisticProductId,jdbcType=BIGINT},#{subShipmentId,jdbcType=BIGINT})
   </insert>
 
+  <select id="selectById" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select * 
+    from logistics_product 
+    where logistics_product_id = #{logistics_product_id,jdbcType=BIGINT}
+  </select>
+  
+   <select id="selectByCondition" resultMap="logisProductMap" parameterType="java.util.Map" >
+   select * 
+   from logistics_product 
+   where 1=1 
+   
+   <if test="logistics_product_id != null" >
+       and logistics_product_id = #{logistics_product_id,jdbcType=BIGINT} 
+   </if>
+    
+   <if test="sub_shipment_id != null" >
+       and sub_shipment_id = #{sub_shipment_id,jdbcType=BIGINT} 
+   </if>
+
+ </select>
+ 
+ <delete id="deleteById" parameterType="java.lang.Long">
+       delete from logistic_product_shipment
+			where sub_shipment_id = #{subShipmentId,jdbcType=BIGINT}
+ </delete>
+ 
 </mapper>

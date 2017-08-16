@@ -142,5 +142,12 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
 		}
 		return null;
 	}
+
+
+
+	@Override
+	public int updateContainerById(Long order_logistics_id) {
+		return logisticsProductMapper.updateContainerById(order_logistics_id);
+	}
 	
 }

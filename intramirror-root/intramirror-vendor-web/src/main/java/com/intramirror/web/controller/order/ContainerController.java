@@ -21,7 +21,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.order.api.model.Container;
+import com.intramirror.order.api.model.LogisticProductShipment;
 import com.intramirror.order.api.service.IContainerService;
+import com.intramirror.order.api.service.ILogisticProductShipmentService;
+import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IShipmentService;
 import com.intramirror.order.api.service.ISubShipmentService;
 import com.intramirror.web.common.BarcodeUtil;
@@ -46,6 +49,12 @@ public class ContainerController {
 	
 	@Autowired
 	private ISubShipmentService subShipmentService;
+	
+	@Autowired
+	private ILogisticsProductService logisticProductService;
+	
+	@Autowired
+	private ILogisticProductShipmentService logisticProductShipmentService;
 	/**
 	 * 新增箱子
 	 * @param map
@@ -209,6 +218,10 @@ public class ContainerController {
 				message.successStatus().putMsg("info", "containerId cannot be null");
 				return message;
 			}
+			if (null == map.get("logistic_product_id") || StringUtils.isBlank(map.get("logistic_product_id").toString())){
+				message.successStatus().putMsg("info", "containerId cannot be null");
+				return message;
+			}
 			map.put("container_id", Long.parseLong(map.get("containerId").toString()));
 			Container container = containerService.selectContainerById(map);
 			int result = containerService.deleteContainerById(map);
@@ -220,7 +233,17 @@ public class ContainerController {
 				if (list.size() == 0){
 					shipmentService.deleteShipmentById(setShipment);
 					subShipmentService.deleteSubShipmentByShipmentId(setShipment);
+				}else{
+					List<LogisticProductShipment> lpsList = logisticProductShipmentService.selectById(map);
+					if (null != lpsList && 0 < lpsList.size()){
+						for (LogisticProductShipment lps : lpsList) {
+							subShipmentService.deleteByPrimaryKey(lps.getSubShipmentId());
+							logisticProductShipmentService.deleteById(lps.getSubShipmentId());
+						}
+					}
 				}
+				logger.info("update logisticProduct ");
+				logisticProductService.updateContainerById(Long.parseLong(map.get("logistic_product_id").toString()));
 				message.successStatus().putMsg("info", "SUCCESS").setData(result);
 				return message;
 			}

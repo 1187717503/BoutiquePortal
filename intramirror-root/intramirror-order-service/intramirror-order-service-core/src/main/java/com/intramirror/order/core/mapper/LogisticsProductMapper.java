@@ -59,4 +59,11 @@ public interface LogisticsProductMapper {
 	 * @throws Exception
 	 */
 	List<LogisticsProduct> getLogisticsProductListByCondition(Map<String, Object> conditionMap);
+	
+	/**
+	 * 根据Id修改container关联
+	 * @param LogisticsProduct
+	 * @return
+	 */
+	int updateContainerById(Long order_logistics_id);
 }

@@ -65,5 +65,12 @@ public interface ILogisticsProductService {
 	 */
 	int updateByLogisticsProduct (LogisticsProduct logisticsProduct);
 	
+	/**
+	 * 根据Id修改container关联
+	 * @param LogisticsProduct
+	 * @return
+	 */
+	int updateContainerById(Long order_logistics_id);
+	
 }
 
