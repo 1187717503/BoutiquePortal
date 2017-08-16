@@ -698,7 +698,7 @@ public class OrderController extends BaseController{
 				updateContainer.put("shipment_id",shipment_id);
 				updateContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
 				logger.info(MessageFormat.format("packOrder updateContainerByCondition shipment_id:{0},container_id:{1}",shipment_id,Long.parseLong(map.get("containerId").toString())));
-				int row = containerService.updateContainerByCondition(conditionMap);
+				int row = containerService.updateContainerByCondition(updateContainer);
 				
 				//关联成功，则往箱子里存入订单
 				if(row > 0 ){
@@ -711,12 +711,14 @@ public class OrderController extends BaseController{
 					
 					//订单加入箱子
 					result =  updateLogisticsProduct(currentOrder,shipMentMap,false);
-					infoMap.put("statusType", 3);
-					result.setInfoMap(infoMap);
-					return result;
+
 					
+				}else{
+					result.setMsg("The modification failed. Check that the parameters are correct ");
 				}
 				
+				infoMap.put("statusType", 3);
+				result.setInfoMap(infoMap);
 				return result;
 			}
 			
