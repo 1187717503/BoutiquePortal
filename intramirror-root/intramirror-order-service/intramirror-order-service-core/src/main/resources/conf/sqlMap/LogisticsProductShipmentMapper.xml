@@ -18,7 +18,7 @@
     where container_id = #{container_id,jdbcType=BIGINT}
   </select>
   
-   <select id="selectByCondition" resultMap="logisProductMap" parameterType="java.util.Map" >
+   <select id="selectByCondition" resultMap="BaseResultMap" parameterType="java.util.Map" >
    select * 
    from logistics_product 
    where 1=1 
