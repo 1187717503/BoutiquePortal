@@ -388,7 +388,7 @@ and t1.order_num =  #{orderId,jdbcType=BIGINT}
         ) pp ON p.product_id = pp.product_id
         LEFT JOIN shipment sm on sm.vendor_id = v.vendor_id
         where pspk.`name` = 'Size' and (lp.`status` = 3 OR lp.`status` = 4)
-        <!--and v.vendor_id = #{vendorId,jdbcType=BIGINT}-->
+        and v.vendor_id = #{vendorId,jdbcType=BIGINT}
         <if test="shippedParam.orderLineNo!=null and shippedParam.orderLineNo!=''">
             and lp.order_line_num=#{shippedParam.orderLineNo}
         </if>
