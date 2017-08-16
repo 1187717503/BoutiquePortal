@@ -7,7 +7,9 @@ import com.intramirror.logistics.api.model.Invoice;
 import com.intramirror.logistics.api.service.IInvoiceService;
 import com.intramirror.logistics.core.dao.BaseDao;
 import com.intramirror.logistics.core.mapper.InvoiceMapper;
+import org.springframework.stereotype.Service;
 
+@Service
 public class InvoiceServiceImpl extends BaseDao implements IInvoiceService{
 	
 	private static Logger logger = LoggerFactory.getLogger(InvoiceServiceImpl.class);
@@ -60,6 +62,11 @@ public class InvoiceServiceImpl extends BaseDao implements IInvoiceService{
 	public int updateByPrimaryKey(Invoice record) {
 		
 		return invoiceMapper.updateByPrimaryKey(record);
+	}
+
+	@Override
+	public Invoice getInvoiceByShipmentId(Long shipmentId) {
+		return invoiceMapper.getInvoiceByShipmentId(shipmentId);
 	}
 
 	@Override

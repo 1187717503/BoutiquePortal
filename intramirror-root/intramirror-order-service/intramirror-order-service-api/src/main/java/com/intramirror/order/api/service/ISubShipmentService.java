@@ -3,6 +3,9 @@
  */
 package com.intramirror.order.api.service;
 
+import com.intramirror.order.api.model.SubShipment;
+
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,4 +35,6 @@ public interface ISubShipmentService {
 	 * @return
 	 */
 	int deleteSubShipmentByShipmentId(Map<String, Object> map);
+
+	List<SubShipment> getSubShipmentByShipmentId(Long shipmentId);
 }

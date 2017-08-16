@@ -71,4 +71,6 @@ public interface InvoiceMapper {
      * @mbggenerated
      */
     int updateByPrimaryKey(Invoice record);
+
+    Invoice getInvoiceByShipmentId(Long shipmentId);
 }

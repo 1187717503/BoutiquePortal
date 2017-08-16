@@ -175,7 +175,7 @@
     <select id="getOrderListByShipmentId" resultType="java.util.HashMap" parameterType="java.util.Map">
 			SELECT  o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id,pp.colorCode,pp.brandID,pspv.`value` as size,p.category_id,
 			s.price,s.in_price,sps.sale_price,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,b.english_name as brandName,
-			v.vendor_name,p.cover_img,lp.logistics_product_id,c.*  
+			v.vendor_name,p.cover_img,lp.logistics_product_id,c.*  ,c2.name AS categoryName
 			FROM logistics_product lp  
 			INNER JOIN container c on lp.container_id = c.container_id 
 			INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id  
@@ -183,7 +183,9 @@
 			LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id   
 			INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id  
 			INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id   
-			INNER JOIN product p ON (sp.product_id = p.product_id )  
+			INNER JOIN product p ON (sp.product_id = p.product_id )
+			LEFT JOIN (select * from category where `level` = 3 and enabled = 1) c3 on(c3.category_id=p.category_id)
+			LEFT JOIN (select * from category where `level` = 2 and enabled = 1) c2 on(c2.category_id=c3.parent_id)
 			INNER JOIN brand b ON (p.brand_id = b.brand_id and b.enabled = 1 )  
 			INNER JOIN sku s ON (s.sku_id = sps.sku_id and s.enabled = 1)  
 			INNER JOIN sku_property skup on (skup.sku_id = s.sku_id and skup.enabled = 1)  
@@ -352,7 +354,7 @@ and t1.order_num =  #{orderId,jdbcType=BIGINT}
                 o.created_at AS order_date,o.current_rate,pp.colorCode,pp.brandID,pspv.`value` as size,
                 s.price,s.in_price,sps.sale_price,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
                 lp.shipped_at AS shipped_date,sm.shipment_no,s.sku_code,b.english_name as brandName,
-                v.vendor_name,sm.shipment_no,g.english_name as geography_name,p.cover_img
+                v.vendor_name,g.english_name as geography_name,p.cover_img
             </otherwise>
         </choose>
 

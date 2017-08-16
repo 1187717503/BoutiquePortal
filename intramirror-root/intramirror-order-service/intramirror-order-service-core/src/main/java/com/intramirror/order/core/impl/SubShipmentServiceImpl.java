@@ -3,19 +3,20 @@
  */
 package com.intramirror.order.core.impl;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.google.gson.Gson;
+import com.intramirror.common.core.mapper.SubShipmentMapper;
+import com.intramirror.order.api.common.ContainerType;
+import com.intramirror.order.api.model.SubShipment;
+import com.intramirror.order.api.service.ISubShipmentService;
+import com.intramirror.order.core.dao.BaseDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.google.gson.Gson;
-import com.intramirror.common.core.mapper.SubShipmentMapper;
-import com.intramirror.order.api.common.ContainerType;
-import com.intramirror.order.api.service.ISubShipmentService;
-import com.intramirror.order.core.dao.BaseDao;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 订单装箱service
@@ -69,6 +70,11 @@ public class SubShipmentServiceImpl extends BaseDao implements ISubShipmentServi
 	public int deleteSubShipmentByShipmentId(Map<String, Object> map) {
 		return subShipmentMapper.deleteSubShipmentByShipmentId(map);
 	}
-	
+
+	@Override
+	public List<SubShipment> getSubShipmentByShipmentId(Long shipmentId) {
+		return subShipmentMapper.getSubShipmentByShipmentId(shipmentId);
+	}
+
 
 }

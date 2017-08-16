@@ -4,7 +4,7 @@
 
 <!-- mybatis-generator:generate -->
     <classPathEntry
-        location="/Users/dingyifan/Documents/software/env/maven_house_jz/mysql/mysql-connector-java/5.1.39/mysql-connector-java-5.1.39.jar" /> <!-- 配置JAR驱动 -->
+			location="C:\Users\56996\.m2\repository\mysql\mysql-connector-java\5.1.39\mysql-connector-java-5.1.39.jar" /> <!-- 配置JAR驱动 -->
         
     <context id="context1" targetRuntime="MyBatis3">
     	<commentGenerator>
@@ -20,17 +20,17 @@
     		<property name="forceBigDecimals" value="false"/> <!-- 是否使用bigDecimal， false可自动转化以下类型(Long, Integer, Short, etc.) -->
     	</javaTypeResolver>
     	
-        <javaModelGenerator targetPackage="com.intramirror.common.api.model"
-            targetProject="/Users/dingyifan/Documents/dev/bak/BoutiquePortal/intramirror-root/intramirror-order-service/intramirror-order-service-api/src/main/java" > <!-- 生成实体地址 -->
+        <javaModelGenerator targetPackage="com.intramirror.order.api.model"
+            targetProject="D:\MyWork\shoplus\BoutiquePortal\BoutiquePortal\intramirror-root\intramirror-order-service\intramirror-order-service-api\src\main\java" > <!-- 生成实体地址 -->
             <property name="trimStrings" value="true"/> <!-- 设置string时是否使用trim调用 -->
         </javaModelGenerator>
         
         <sqlMapGenerator targetPackage="conf.sqlMap"
-            targetProject="/Users/dingyifan/Documents/dev/bak/BoutiquePortal/intramirror-root/intramirror-order-service/intramirror-order-service-core/src/main/resources" /> <!-- 生成MapXML文件 -->
+            targetProject="D:\MyWork\shoplus\BoutiquePortal\BoutiquePortal\intramirror-root\intramirror-order-service\intramirror-order-service-core\src\main\resources" /> <!-- 生成MapXML文件 -->
             
             <!-- XMLMAPPER,ANNOTATEDMAPPER -->
-        <javaClientGenerator targetPackage="com.intramirror.common.core.mapper"
-            targetProject="/Users/dingyifan/Documents/dev/bak/BoutiquePortal/intramirror-root/intramirror-order-service/intramirror-order-service-core/src/main/java" type="XMLMAPPER" /> <!-- 生成MAP对应Client -->
+        <javaClientGenerator targetPackage="com.intramirror.order.core.mapper"
+            targetProject="D:\MyWork\shoplus\BoutiquePortal\BoutiquePortal\intramirror-root\intramirror-order-service\intramirror-order-service-core\src\main\java" type="XMLMAPPER" /> <!-- 生成MAP对应Client -->
 			
 			<!--&lt;!&ndash; <table schema="intra-mirror-prd" tableName="api_mq" domainObjectName="ApiMq"
 			    enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
@@ -43,23 +43,23 @@
 			    <property name="useActualColumnNames" value="false"/>
 			</table>-->
 
-		<table schema="intra-mirror-prd" tableName="invoice" domainObjectName="Invoice"
+		<table schema="intra-mirror-prd" tableName="shipping_provider" domainObjectName="ShippingProvider"
 			   enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
 			   enableSelectByExample="false" selectByExampleQueryId="false" >
 			<property name="useActualColumnNames" value="false"/>
 		</table>
 
-		<table schema="intra-mirror-prd" tableName="sub_shipment" domainObjectName="SubShipment"
-			   enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
-			   enableSelectByExample="false" selectByExampleQueryId="false" >
-			<property name="useActualColumnNames" value="false"/>
-		</table>
+		<!--<table schema="intra-mirror-prd" tableName="sub_shipment" domainObjectName="SubShipment"-->
+			   <!--enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"-->
+			   <!--enableSelectByExample="false" selectByExampleQueryId="false" >-->
+			<!--<property name="useActualColumnNames" value="false"/>-->
+		<!--</table>-->
 
-		<table schema="intra-mirror-prd" tableName="shipping_segment" domainObjectName="ShippingSegment"
-			   enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
-			   enableSelectByExample="false" selectByExampleQueryId="false" >
-			<property name="useActualColumnNames" value="false"/>
-		</table>
+		<!--<table schema="intra-mirror-prd" tableName="shipping_segment" domainObjectName="ShippingSegment"-->
+			   <!--enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"-->
+			   <!--enableSelectByExample="false" selectByExampleQueryId="false" >-->
+			<!--<property name="useActualColumnNames" value="false"/>-->
+		<!--</table>-->
         
     </context>
 </generatorConfiguration>
