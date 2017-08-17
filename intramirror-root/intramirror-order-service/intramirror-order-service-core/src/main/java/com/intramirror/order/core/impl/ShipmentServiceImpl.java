@@ -133,6 +133,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	public void saveSubShipment(List<Map<String, Object>> map, Map<String, Object> lastMap, Long shipmentId, Long logisticProductId){
 		//打印入参段
 		logger.info("pararmeter " + new Gson().toJson(map));
+		lastMap.put("shippingSegmentId", Long.parseLong(map.get(0).get("shipping_segment_id").toString()));
 		Date currentDate = new Date();
 		//根据不同段生成不同sub-shipment
 		if (null != map && 0 < map.size()){
@@ -228,7 +229,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		Map<String, Object> beanMap = new HashMap<String, Object>();
 		beanMap.put("consignee", map.get("consignee")==null?" ":map.get("consignee").toString());
 		beanMap.put("segmentSequence", segmentSequence);
-		beanMap.put("shippingSegmentId", Long.parseLong(map.get("shippingSegmentId")==null?"0":map.get("shipping_segment_id").toString()));
+		beanMap.put("shippingSegmentId", Long.parseLong(map.get("shippingSegmentId")==null?"0":map.get("shippingSegmentId").toString()));
 		beanMap.put("shipToAddr", map.get("shipToAddr")==null?" ":map.get("shipToAddr").toString());
 		beanMap.put("shipToCity", map.get("shipToCity")==null?" ":map.get("shipToCity").toString());
 		beanMap.put("shipToCountry", map.get("shipToCountry")==null?" ":map.get("shipToCountry").toString());
