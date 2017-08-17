@@ -1163,7 +1163,15 @@ public class OrderController extends BaseController{
 		
 		//校验该订单跟箱子所属的Shipment的目的地是否一致,一致则加入,是否分段运输，发货员自行判断
 		logger.info("order updateLogisticsProduct 装箱校验  1.大区是否一致 2.是否为空箱子 3.shipment_type");
+		
+		//如果大区不一致，直接返回
 		if(!orderMap.get("geography_name").toString().equals(shipMentMap.get("ship_to_geography").toString())){
+			result.setMsg("The delivery area is inconsistent ");
+			return result;
+		}
+		
+		//如果大区一致,且不为空箱子,则比较shipment_type(空箱子ischeck 都为false)
+		if(orderMap.get("geography_name").toString().equals(shipMentMap.get("ship_to_geography").toString())){
 			
 			//空箱子不需要判断,直接存入   shipment_type 用于判断该箱子是否能存放多个，状态为1 只能存放一个  所以不能在存入
 			if(ischeck && shipMentMap.get("shipment_type_id").toString().equals("1")){
