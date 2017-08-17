@@ -125,7 +125,7 @@ public class ConfirmCheckOrderController {
         	
         	try {
             	if(logisticsProductId != null && estShipDate != null ){
-                  	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                  	SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                   	
             		LogisticsProduct logis = logisticsProductServiceImpl.selectById(Long.parseLong(logisticsProductId));
             		if(logis != null){
