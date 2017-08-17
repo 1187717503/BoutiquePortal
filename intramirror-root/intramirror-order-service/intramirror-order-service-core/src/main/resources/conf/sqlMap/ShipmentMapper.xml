@@ -44,7 +44,7 @@ VALUES(#{shipToGeography,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},#{createdAt
   SELECT sp.*,ss.segment_sequence,ss.shipping_segment_id
 	FROM shipping_segment ss
 	INNER JOIN shipping_routing sr ON (sr.shipping_routing_id = ss.shipping_routing_id)
-	INNER JOIN vendor_shipping_routing vsr ON (vsr.vendor_shipping_routing_id = sr.shipping_routing_id)
+	INNER JOIN vendor_shipping_routing vsr ON (vsr.shipping_routing_id = sr.shipping_routing_id)
 	INNER JOIN shipment_type st ON (st.shipment_type_id = ss.shipment_type_id)
 	INNER JOIN address_country ac ON (ac.address_country_id = sr.consignee_country_id)
 	INNER JOIN geography g ON (ac.geography_id = g.geography_id)
