@@ -145,7 +145,8 @@ public class ContainerController {
 			}
 			Container container = containerService.getContainerBybarcode(map);
 			if (null == container){
-				message.errorStatus().putMsg("info", "SUCCESS").setData(null);
+				message.errorStatus().putMsg("info", "SUCCESS").setData(-1);
+				return message;
 			}
 			message.successStatus().putMsg("info", "SUCCESS").setData(container);
 		} catch (Exception e){
