@@ -3,7 +3,6 @@
  */
 package com.intramirror.web.controller.order;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,17 +20,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 import com.intramirror.common.help.ResultMessage;
-import com.intramirror.order.api.common.ContainerType;
-import com.intramirror.order.api.model.LogisticProductShipment;
 import com.intramirror.order.api.model.LogisticsProduct;
-import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.service.IContainerService;
 import com.intramirror.order.api.service.ILogisticProductShipmentService;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.service.IShipmentService;
 import com.intramirror.order.api.service.ISubShipmentService;
-import com.intramirror.order.core.impl.LogisticProductShipmentServiceImpl;
 import com.intramirror.web.controller.BaseController;
 
 /**
@@ -225,6 +220,15 @@ public class ShipmentController extends BaseController{
 				uMap.put("containerId", map2.get("container_id").toString());
 				logger.info("update container param" + new Gson().toJson(uMap));
 				containerService.updateContainerBystatus(uMap);
+				uMap = new HashMap<>();
+				uMap.put("container_id", map2.get("container_id").toString());
+				List<LogisticsProduct> list  = logisticsProductService.selectByCondition(uMap);
+				logger.info("update LogisticsProduct param" + new Gson().toJson(uMap));
+				for (LogisticsProduct logisticsProduct : list) {
+					logger.info("update LogisticsProduct param Logistics_product_id" + logisticsProduct.getLogistics_product_id());
+					logisticsProductService.updateOrderLogisticsStatusById(logisticsProduct.getLogistics_product_id(),
+							Integer.parseInt(map.get("status").toString()));
+				}
 			}
 			message.successStatus().putMsg("Info", "SUCCESS").setData(1);
 		} catch (Exception e) {
