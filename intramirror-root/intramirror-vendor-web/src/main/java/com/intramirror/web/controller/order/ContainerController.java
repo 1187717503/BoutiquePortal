@@ -236,7 +236,9 @@ public class ContainerController {
 						List<LogisticProductShipment> lpsList = logisticProductShipmentService.selectById(submap);
 						if (null != lpsList && 0 < lpsList.size()){
 							for (LogisticProductShipment lps : lpsList) {
+								//删除关联关系
 								logisticProductService.updateContainerById(lps.getLogisticProductId());
+								logisticProductShipmentService.deleteById(lps.getSubShipmentId());
 								subShipmentService.deleteByPrimaryKey(lps.getSubShipmentId());
 							}
 						}
