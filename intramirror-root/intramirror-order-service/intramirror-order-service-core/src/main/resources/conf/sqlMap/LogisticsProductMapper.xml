@@ -162,10 +162,17 @@
     where logistics_product_id = #{logistics_product_id,jdbcType=BIGINT}
   </select>
   
-  <select id="selectLogisProShipmentById" resultType="java.util.HashMap" parameterType="java.lang.Long" >
+  <select id="selectLogisProShipmentById" resultType="java.util.HashMap" parameterType="java.util.Map" >
+  <!--  SELECT lps.* FROM logistics_product lp 
+  INNER JOIN logistic_product_shipment lps ON lp.logistics_product_id = lps.logistic_product_id
+  where lp.logistics_product_id = #{logistics_product_id,jdbcType=BIGINT} and enabled = 1 -->
+  
   SELECT lps.* FROM logistics_product lp 
   INNER JOIN logistic_product_shipment lps ON lp.logistics_product_id = lps.logistic_product_id
-  where lp.logistics_product_id = #{logistics_product_id,jdbcType=BIGINT} and enabled = 1 
+  INNER JOIN sub_shipment ss ON ss.sub_shipment_id = lps.sub_shipment_id
+  where lp.logistics_product_id = #{logistics_product_id,jdbcType=BIGINT} 
+	and lp.enabled = 1 
+  GROUP BY ss.segment_sequence DESC LIMIT 1 
   </select>
 
   

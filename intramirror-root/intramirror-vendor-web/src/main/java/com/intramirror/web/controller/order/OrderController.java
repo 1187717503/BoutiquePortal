@@ -746,7 +746,7 @@ public class OrderController extends BaseController{
 					
 					//订单加入箱子
 					logger.info("start updateLogisticsProduct");
-					result =  updateLogisticsProduct(currentOrder,shipMentMap,false);
+					result =  updateLogisticsProduct(currentOrder,shipMentMap,false,true);
 
 					
 				}else{
@@ -788,9 +788,11 @@ public class OrderController extends BaseController{
 					saveShipmentParam.put("orderNumber", orderLineNum);
 					saveShipmentParam.put("shipment_id", 0);
 
-					//接口需要返回shipmentId
+					//获取需要的参数
 					Map<String, Object> orderResult = orderService.getShipmentDetails(saveShipmentParam);
+					//默认为0
 					orderResult.put("shipmentId", 0);
+					//接口返回shipmentId
 					String shipmentId = iShipmentService.saveShipmentByOrderId(orderResult);
 					if (shipmentId != null && StringUtils.isNotBlank(shipmentId)){
 						
@@ -812,8 +814,8 @@ public class OrderController extends BaseController{
 							shipMentMap.put("shipment_id", shipmentId);
 //								//获取当前ShipMent 第一段的物流类型(不需要  空箱子不比较shipmentType 直接放入)
 							
-							//订单加入箱子
-							result =  updateLogisticsProduct(currentOrder,shipMentMap,false);
+							//订单加入箱子(已经调用过saveShipmentByOrderId 方法  不需要再次创建)
+							result =  updateLogisticsProduct(currentOrder,shipMentMap,false,false);
 						}
 						result.setInfoMap(infoMap);
 					}
@@ -837,7 +839,7 @@ public class OrderController extends BaseController{
 							//获取当前ShipMent 第一段的物流类型(不需要  空箱子不比较shipmentType 直接放入)
 							
 							//订单加入箱子
-							result =  updateLogisticsProduct(currentOrder,shipMentMap,false);
+							result =  updateLogisticsProduct(currentOrder,shipMentMap,false,true);
 						}
 						result.setInfoMap(infoMap);
 					
@@ -863,7 +865,7 @@ public class OrderController extends BaseController{
 				
 				if(shipmentMap != null ){
 					//订单加入箱子
-					result =  updateLogisticsProduct(currentOrder,shipmentMap,true);
+					result =  updateLogisticsProduct(currentOrder,shipmentMap,true,true);
 				}else{
 					result.setMsg("shipment Query is empty ");
 				}
@@ -927,8 +929,8 @@ public class OrderController extends BaseController{
 				
 				//根据sub_shipment_id 删除sub_shipment
 				if(logisProShipmentInfo != null && logisProShipmentInfo.get("sub_shipment_id") != null ){
-//					subShipmentService.deleteByPrimaryKey(Long.parseLong(logisProShipmentInfo.get("sub_shipment_id").toString()));
-//					logisticProductShipmentService.deleteById(Long.parseLong(logisProShipmentInfo.get("sub_shipment_id").toString()));
+					subShipmentService.deleteByPrimaryKey(Long.parseLong(logisProShipmentInfo.get("sub_shipment_id").toString()));
+					logisticProductShipmentService.deleteById(Long.parseLong(logisProShipmentInfo.get("sub_shipment_id").toString()));
 				}
 				result.successStatus();
 			}else{
@@ -1132,7 +1134,7 @@ public class OrderController extends BaseController{
 	 * @param map
 	 * @return
 	 */
-	public ResultMessage updateLogisticsProduct(Map<String,Object> orderMap,Map<String,Object> shipMentMap,boolean ischeck){
+	public ResultMessage updateLogisticsProduct(Map<String,Object> orderMap,Map<String,Object> shipMentMap,boolean ischeck,boolean isSaveSubShipment){
 		ResultMessage result= new ResultMessage();
 		result.errorStatus();
 		
@@ -1173,8 +1175,11 @@ public class OrderController extends BaseController{
 			Map<String, Object> orderResult = orderService.getShipmentDetails(saveShipmentParam);
 			orderResult.put("shipmentId", Long.parseLong(shipMentMap.get("shipment_id").toString()));
 			
-			//添加第三段物流
-			iShipmentService.saveShipmentByOrderId(orderResult);
+			if(isSaveSubShipment){
+				//添加第三段物流
+				iShipmentService.saveShipmentByOrderId(orderResult);
+			}
+
 			
 		}else{
 			Map<String, Object> info = new HashMap<String, Object>();

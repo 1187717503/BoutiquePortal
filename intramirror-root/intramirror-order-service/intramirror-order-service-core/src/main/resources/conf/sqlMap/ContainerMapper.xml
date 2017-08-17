@@ -99,9 +99,14 @@ values(#{containerType,jdbcType=VARCHAR}, #{shipToGeography,jdbcType=VARCHAR},#{
 	INNER JOIN shipment s ON c.shipment_id = s.shipment_id
 	WHERE s.vendor_id =  #{vendorId,jdbcType=BIGINT}  
 	
-	<if test="shipmentStatus != null" >
-      	and s.`status` = #{shipmentStatus,jdbcType=BIGINT}
-    </if>
+	<choose>
+        <when test="shipmentStatus != null and shipmentStatus != ''">
+            and s.`status` = #{shipmentStatus,jdbcType=BIGINT}
+        </when>
+        <otherwise>
+            and (s.`status` = 1 or s.`status` = 2)
+        </otherwise>
+    </choose>
     
     <if test="ship_to_geography != null" >
       	and c.ship_to_geography = #{ship_to_geography,jdbcType=VARCHAR}
