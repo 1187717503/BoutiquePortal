@@ -213,11 +213,11 @@ public class ContainerController {
 		ResultMessage message = ResultMessage.getInstance();
 		try {
 			if (null == map || 0 == map.size()){
-				message.successStatus().putMsg("info", "parameter cannot be null");
+				message.errorStatus().putMsg("info", "parameter cannot be null");
 				return message;
 			}
 			if (null == map.get("containerId") || StringUtils.isBlank(map.get("containerId").toString())){
-				message.successStatus().putMsg("info", "containerId cannot be null");
+				message.errorStatus().putMsg("info", "containerId cannot be null");
 				return message;
 			}
 			map.put("container_id", Long.parseLong(map.get("containerId").toString()));
@@ -258,9 +258,7 @@ public class ContainerController {
 					}
 				}
 				logger.info("update logisticProduct ");
-				
 				message.successStatus().putMsg("info", "SUCCESS").setData(result);
-				return message;
 			}
 			message.errorStatus().putMsg("info", "delete fail").setData(result);
 		} catch (Exception e) {
