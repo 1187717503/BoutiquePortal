@@ -22,6 +22,7 @@ import com.google.gson.Gson;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.order.api.model.Container;
 import com.intramirror.order.api.model.LogisticProductShipment;
+import com.intramirror.order.api.model.SubShipment;
 import com.intramirror.order.api.service.IContainerService;
 import com.intramirror.order.api.service.ILogisticProductShipmentService;
 import com.intramirror.order.api.service.ILogisticsProductService;
@@ -227,19 +228,36 @@ public class ContainerController {
 				List<Map<String, Object>> list = containerService.getShipmentList(setShipment);
 				//最后一个箱子的时候删除shipment
 				if (list.size() == 0){
+					List<SubShipment> subList = subShipmentService.getSubShipmentByShipmentId(container.getShipmentId());
+					Map<String, Object> submap = new HashMap<>();
+					for (SubShipment subShipment : subList) {
+						submap.put("sub_shipment_id", subShipment.getSubShipmentId());
+						List<LogisticProductShipment> lpsList = logisticProductShipmentService.selectById(submap);
+						if (null != lpsList && 0 < lpsList.size()){
+							for (LogisticProductShipment lps : lpsList) {
+								logisticProductService.updateContainerById(lps.getLogisticProductId());
+							}
+						}
+					}
 					shipmentService.deleteShipmentById(setShipment);
 					subShipmentService.deleteSubShipmentByShipmentId(setShipment);
 				}else{
-					List<LogisticProductShipment> lpsList = logisticProductShipmentService.selectById(map);
-					if (null != lpsList && 0 < lpsList.size()){
-						for (LogisticProductShipment lps : lpsList) {
-							subShipmentService.deleteByPrimaryKey(lps.getSubShipmentId());
-							logisticProductShipmentService.deleteById(lps.getSubShipmentId());
+					List<SubShipment> subList = subShipmentService.getSubShipmentByShipmentId(container.getShipmentId());
+					Map<String, Object> submap = new HashMap<>();
+					for (SubShipment subShipment : subList) {
+						submap.put("sub_shipment_id", subShipment.getSubShipmentId());
+						List<LogisticProductShipment> lpsList = logisticProductShipmentService.selectById(map);
+						if (null != lpsList && 0 < lpsList.size()){
+							for (LogisticProductShipment lps : lpsList) {
+								subShipmentService.deleteByPrimaryKey(lps.getSubShipmentId());
+								logisticProductShipmentService.deleteById(lps.getSubShipmentId());
+								logisticProductService.updateContainerById(lps.getLogisticProductId());
+							}
 						}
 					}
 				}
 				logger.info("update logisticProduct ");
-				logisticProductService.updateContainerById(Long.parseLong(map.get("logistic_product_id").toString()));
+				
 				message.successStatus().putMsg("info", "SUCCESS").setData(result);
 				return message;
 			}
