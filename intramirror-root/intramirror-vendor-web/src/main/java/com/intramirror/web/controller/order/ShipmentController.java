@@ -224,10 +224,12 @@ public class ShipmentController extends BaseController{
 				uMap.put("container_id", map2.get("container_id").toString());
 				List<LogisticsProduct> list  = logisticsProductService.selectByCondition(uMap);
 				logger.info("update LogisticsProduct param" + new Gson().toJson(uMap));
-				for (LogisticsProduct logisticsProduct : list) {
-					logger.info("update LogisticsProduct param Logistics_product_id" + logisticsProduct.getLogistics_product_id());
-					logisticsProductService.updateOrderLogisticsStatusById(logisticsProduct.getLogistics_product_id(),
-							Integer.parseInt(map.get("status").toString()));
+				if (3 == Long.parseLong(map.get("status").toString())){
+					for (LogisticsProduct logisticsProduct : list) {
+						logger.info("update LogisticsProduct param Logistics_product_id" + logisticsProduct.getLogistics_product_id());
+						logisticsProductService.updateOrderLogisticsStatusById(logisticsProduct.getLogistics_product_id(),
+								Integer.parseInt(map.get("status").toString()));
+					}
 				}
 			}
 			message.successStatus().putMsg("Info", "SUCCESS").setData(1);

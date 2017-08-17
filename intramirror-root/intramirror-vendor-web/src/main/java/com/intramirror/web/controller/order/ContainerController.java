@@ -22,6 +22,7 @@ import com.google.gson.Gson;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.order.api.model.Container;
 import com.intramirror.order.api.model.LogisticProductShipment;
+import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.model.SubShipment;
 import com.intramirror.order.api.service.IContainerService;
 import com.intramirror.order.api.service.ILogisticProductShipmentService;
@@ -56,6 +57,7 @@ public class ContainerController {
 	
 	@Autowired
 	private ILogisticProductShipmentService logisticProductShipmentService;
+	
 	/**
 	 * 新增箱子
 	 * @param map
@@ -190,6 +192,17 @@ public class ContainerController {
 				logger.info("update shipment param" + new Gson().toJson(uMap));
 				shipmentService.updateShipmentStatus(uMap);
 				message.successStatus().putMsg("info", "SUCCESS").setData(result);
+				uMap = new HashMap<>();
+				uMap.put("container_id", map.get("containerId").toString());
+				List<LogisticsProduct> list  = logisticProductService.selectByCondition(uMap);
+				logger.info("update LogisticsProduct param" + new Gson().toJson(uMap));
+				if (3 == Long.parseLong(map.get("status").toString())){
+					for (LogisticsProduct logisticsProduct : list) {
+						logger.info("update LogisticsProduct param Logistics_product_id" + logisticsProduct.getLogistics_product_id());
+						logisticProductService.updateOrderLogisticsStatusById(logisticsProduct.getLogistics_product_id(),
+								Integer.parseInt(map.get("status").toString()));
+					}
+				}
 			}else{
 				message.errorStatus().putMsg("info", "SUCCESS").setData(0);
 			}
