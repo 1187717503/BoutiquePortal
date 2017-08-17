@@ -132,15 +132,15 @@ public class ContainerController {
 		logger.info("getContainerBybarcode param " + new Gson().toJson(map));
 		try{
 			if (null == map || map.size() == 0){
-				message.successStatus().putMsg("info", "parameter cannot be null");
+				message.errorStatus().putMsg("info", "parameter cannot be null");
 				return message;
 			}
 			if (null == map.get("barcode") || StringUtils.isBlank(map.get("barcode").toString())){
-				message.successStatus().putMsg("info", "barcode cannot be null");
+				message.errorStatus().putMsg("info", "barcode cannot be null");
 				return message;
 			}
 			if (null == map.get("status") || StringUtils.isBlank(map.get("status").toString())){
-				message.successStatus().putMsg("info", "status cannot be null");
+				message.errorStatus().putMsg("info", "status cannot be null");
 				return message;
 			}
 			Container container = containerService.getContainerBybarcode(map);
