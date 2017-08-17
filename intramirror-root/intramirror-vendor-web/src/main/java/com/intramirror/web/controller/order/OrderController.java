@@ -11,8 +11,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -56,7 +55,8 @@ import com.intramirror.web.service.OrderRefund;
 @RequestMapping("/order")
 public class OrderController extends BaseController{
 
-	private static Logger logger = LoggerFactory.getLogger(OrderController.class);
+//	private static Logger logger = LoggerFactory.getLogger(OrderController.class);
+	private static Logger logger = Logger.getLogger(OrderController.class);
 	 
 	@Autowired
 	private IOrderService orderService;
@@ -102,6 +102,7 @@ public class OrderController extends BaseController{
     @RequestMapping(value = "/getOrderList", method = RequestMethod.POST)
 	@ResponseBody
 	public ResultMessage getOrderList(@RequestBody Map<String,Object> map,HttpServletRequest httpRequest){
+    	logger.info(MessageFormat.format("order getOrderList 入参:{0}", new Gson().toJson(map)));
 		ResultMessage result= new ResultMessage();
 		result.errorStatus();
 		
@@ -135,6 +136,7 @@ public class OrderController extends BaseController{
 		
 		Long vendorId = vendor.getVendorId();
 		//根据订单状态查询订单
+		logger.info(MessageFormat.format("order getOrderList 调用接口 orderService.getOrderListByStatus 查询订单信息  入参 status:{0},vendorId:{1},sortByName:{2}",map.get("status").toString(),vendorId,sortByName));
 		List<Map<String,Object>> orderList = orderService.getOrderListByStatus(Integer.parseInt(map.get("status").toString()),vendorId,sortByName);
 		
 		if(orderList != null && orderList.size() > 0 ){
@@ -169,7 +171,7 @@ public class OrderController extends BaseController{
 //			}
 //			/**------------------------------------优化end----------------------------------------*/
 			
-			
+			logger.info("order getOrderList 解析订单列表信息  ");
 			for(Map<String, Object> info : orderList){
 
 				//汇率
@@ -225,6 +227,7 @@ public class OrderController extends BaseController{
     @RequestMapping(value = "/getOrderDetail", method = RequestMethod.POST)
 	@ResponseBody
 	public ResultMessage getOrderDetail(@RequestBody Map<String,Object> map,HttpServletRequest httpRequest){
+    	logger.info(MessageFormat.format("order getOrderDetail 入参:{0}", new Gson().toJson(map)));
 		ResultMessage result= new ResultMessage();
 		result.errorStatus();
 		
@@ -258,9 +261,11 @@ public class OrderController extends BaseController{
 		conditionMap.put("orderNumber", map.get("orderNumber").toString());
 		
 		//根据订单orderLineNumber 查询订单详情
+    	logger.info(MessageFormat.format("order getOrderDetail 调用 orderService.getOrderInfoByCondition接口获取详情 入参:{0}", new Gson().toJson(conditionMap)));
 		Map<String,Object> orderInfo = orderService.getOrderInfoByCondition(conditionMap);
 		
 		if(orderInfo != null ){
+			logger.info("order getOrderDetail 解析订单详情,计算价格折扣");
 			//汇率
 			Double rate =  Double.parseDouble(orderInfo.get("current_rate").toString());
 			
@@ -343,6 +348,7 @@ public class OrderController extends BaseController{
 		
 
 
+		logger.info("order getOrderDetail 生成条形码  返回URL");
 		String orderNumberUrl = "Barcode-"+orderInfo.get("order_line_num").toString()+".png";
 		orderNumberUrl = BarcodeUtil.generateFile(orderInfo.get("order_line_num").toString(), orderNumberUrl,false);
 		orderInfo.put("orderNumberUrl", orderNumberUrl);
@@ -371,7 +377,7 @@ public class OrderController extends BaseController{
 	@RequestMapping(value="/updateOrderStatus", method=RequestMethod.POST)
 	@ResponseBody
 	public ResultMessage updateOrderStatus(@RequestBody Map<String, Object> map){
-		logger.info("updateOrderStatus param:{}",new Gson().toJson(map));
+		logger.info(MessageFormat.format("updateOrderStatus param:{}",new Gson().toJson(map)));
 		ResultMessage message = ResultMessage.getInstance();
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 		resultMap.put("status", StatusType.FAILURE);
@@ -467,7 +473,7 @@ public class OrderController extends BaseController{
     		resultMessage.successStatus().putMsg("info","SUCCESS").setData(resultMap);
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error(" error message : {}", e.getMessage());
+            logger.error(MessageFormat.format(" error message : {}", e.getMessage()));
             resultMessage.errorStatus().putMsg("info","error message : " + e.getMessage());
         }
         return resultMessage;
@@ -554,6 +560,7 @@ public class OrderController extends BaseController{
 	@RequestMapping(value="/getPackOrderList", method = RequestMethod.POST)
 	@ResponseBody
 	public ResultMessage getPackOrderList(@RequestBody Map<String,Object> map,HttpServletRequest httpRequest){
+    	logger.info(MessageFormat.format("order getPackOrderList 入参:{0}", new Gson().toJson(map)));
 		ResultMessage result= new ResultMessage();
 		result.errorStatus();
 		
@@ -583,6 +590,7 @@ public class OrderController extends BaseController{
 		
 		try{
 			//获取PackOrderorder列表
+	    	logger.info(MessageFormat.format("order getPackOrderList 调用接口getOrderListByStatusAndContainerId 获取箱子内订单列表 入参 containerId:{0},containerId:{1},containerId:{2}", map.get("containerId").toString(),map.get("status").toString(),vendor.getVendorId()));
 			List<Map<String,Object>> packList = orderService.getOrderListByStatusAndContainerId(Integer.parseInt(map.get("containerId").toString()),Integer.parseInt(map.get("status").toString()),vendor.getVendorId());
 			
 
@@ -642,6 +650,7 @@ public class OrderController extends BaseController{
 	@RequestMapping(value="/packingCheckOrder", method = RequestMethod.POST)
 	@ResponseBody
 	public ResultMessage packingCheckOrder(@RequestBody Map<String,Object> map,HttpServletRequest httpRequest){
+    	logger.info(MessageFormat.format("order packingCheckOrder 入参:{0}", new Gson().toJson(map)));
 		ResultMessage result= new ResultMessage();
 		result.errorStatus();
 		Map<String,Object> infoMap = new HashMap<String, Object>();
@@ -679,6 +688,7 @@ public class OrderController extends BaseController{
 		
 		Long vendorId = vendor.getVendorId();
 		//根据订单状态查询订单
+		logger.info(MessageFormat.format("order packingCheckOrder 调用接口getOrderListByStatus 查询订单信息 入参  status:{0},vendorId:{1}",map.get("status").toString(),vendorId));
 		List<Map<String,Object>> orderList = orderService.getOrderListByStatus(Integer.parseInt(map.get("status").toString()),vendorId,null);
 		if(orderList ==null || orderList.size() == 0){
 			result.setMsg("The current order list is empty");
@@ -686,6 +696,7 @@ public class OrderController extends BaseController{
 		}
 		
 		//校验order_line_num  是否在CONFIRMED中存在
+		logger.info("order packingCheckOrder 校验订单是否存在   orderLineNum:"+orderLineNum);
 		for(Map<String,Object> info :orderList){
 			if(orderLineNum.equals(info.get("order_line_num").toString())){
 				currentOrder = info;
@@ -708,6 +719,7 @@ public class OrderController extends BaseController{
 			currentOrder.put("containerId", Long.parseLong(map.get("containerId").toString())); 
 			
 			//检查判断该箱子是否存在订单
+			logger.info(MessageFormat.format("order packingCheckOrder 获取箱子内订单列表 判断是否为空箱  iLogisticsProductService.selectByCondition 入参:{0}",new Gson().toJson(conditionMap)));
 			List<LogisticsProduct> list = iLogisticsProductService.selectByCondition(conditionMap);
 			String shipment_id = map.get("shipment_id").toString();
 			
@@ -718,10 +730,11 @@ public class OrderController extends BaseController{
 			
 			//如果为空箱子，并且已经选择过shipMent 则直接关联，并加入箱子
 			if(StringUtils.isNoneBlank(shipment_id) && (list == null || list.size() == 0)){
-				logger.info("已经选择过shipMent 直接关联，并加入箱子 start");
+				logger.info("order packingCheckOrder 已经选择过shipMent 直接关联，并加入箱子 ");
 				infoMap.put("statusType", StatusType.ORDER_CONTAINER_EMPTY);
 				
 				//判断箱子的geography 跟订单的大区是否一致 
+				logger.info("order packingCheckOrder 校验箱子与订单大区是否一致");
 				if(container != null && !container.getShipToGeography().equals(currentOrder.get("geography_name").toString())){
 					result.setMsg("The delivery area is inconsistent");
 					result.setInfoMap(infoMap);
@@ -732,7 +745,8 @@ public class OrderController extends BaseController{
 				Map<String, Object> updateContainer = new HashMap<String, Object>(); 
 				updateContainer.put("shipment_id",shipment_id);
 				updateContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
-				logger.info(MessageFormat.format("packOrder updateContainerByCondition shipment_id:{0},container_id:{1}",shipment_id,Long.parseLong(map.get("containerId").toString())));
+//				logger.info(MessageFormat.format("packOrder updateContainerByCondition shipment_id:{0},container_id:{1}",shipment_id,Long.parseLong(map.get("containerId").toString())));
+				logger.info("order packingCheckOrder 箱子关联Shipment 调用接口 containerService.updateContainerByCondition 入参"+new Gson().toJson(updateContainer));
 				int row = containerService.updateContainerByCondition(updateContainer);
 				
 				//关联成功，则往箱子里存入订单
@@ -745,7 +759,7 @@ public class OrderController extends BaseController{
 //					//获取当前ShipMent 第一段的物流类型(不需要  空箱子不比较shipmentType 直接放入)
 					
 					//订单加入箱子
-					logger.info("start updateLogisticsProduct");
+					logger.info("order packingCheckOrder updateLogisticsProduct");
 					result =  updateLogisticsProduct(currentOrder,shipMentMap,false,true);
 
 					
@@ -762,7 +776,8 @@ public class OrderController extends BaseController{
 			//如果是新箱子，则需要关联Shipment,如果存在符合条件的Shipment有多个则返回列表供选择,如果只有一个则默认存入，没有则需要新建Shipment
 			if(list == null || list.size() == 0){
 				infoMap.put("statusType", StatusType.ORDER_CONTAINER_EMPTY);
-				logger.info("箱子内订单列表为空    ");
+				logger.info("order packingCheckOrder 箱子内订单列表为空    ");
+				logger.info("order packingCheckOrder 校验箱子与订单大区是否一致");
 				//判断箱子的geography 跟订单的大区是否一致 
 				if(container != null && !container.getShipToGeography().equals(currentOrder.get("geography_name").toString())){
 					result.setMsg("The delivery area is inconsistent");
@@ -779,11 +794,12 @@ public class OrderController extends BaseController{
 				selectShipmentParam.put("vendorId", vendorId);
 				
 				//查询shipment
+				logger.info("order packingCheckOrder 查询shipment 列表  iShipmentService.getShipmentsByVendor 入参:"+new Gson().toJson(selectShipmentParam));
 				List<Map<String, Object>> shipmentMapList = iShipmentService.getShipmentsByVendor(selectShipmentParam);
 				
 				//如果为空  新建Shipment
 				if(shipmentMapList == null || shipmentMapList.size() == 0  ){
-					logger.info("shipmentMapList is null  start  ");
+					logger.info("order packingCheckOrder shipmentMapList is null ");
 					Map<String, Object> saveShipmentParam = new HashMap<String, Object>();
 					saveShipmentParam.put("orderNumber", orderLineNum);
 					saveShipmentParam.put("shipment_id", 0);
@@ -802,7 +818,8 @@ public class OrderController extends BaseController{
 						Map<String, Object> updateContainer = new HashMap<String, Object>(); 
 						updateContainer.put("shipment_id", Long.parseLong(shipmentId));
 						updateContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
-						logger.info(MessageFormat.format("packOrder updateContainerByCondition shipment_id:{0},container_id:{1}",shipmentId,Long.parseLong(map.get("containerId").toString())));
+//						logger.info(MessageFormat.format("packOrder updateContainerByCondition shipment_id:{0},container_id:{1}",shipmentId,Long.parseLong(map.get("containerId").toString())));
+						logger.info("order packingCheckOrder 箱子关联Shipment 调用接口 containerService.updateContainerByCondition 入参"+new Gson().toJson(updateContainer));
 						int updateContainerRow = containerService.updateContainerByCondition(updateContainer);
 						
 						//关联成功，则往箱子里存入订单
@@ -829,7 +846,7 @@ public class OrderController extends BaseController{
 						Map<String, Object> updateContainer = new HashMap<String, Object>(); 
 						updateContainer.put("shipment_id", Long.parseLong(shipmentMapList.get(0).get("shipment_id").toString()));
 						updateContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
-						logger.info(MessageFormat.format("packOrder updateContainerByCondition shipment_id:{0},container_id:{1}",shipmentMapList.get(0).get("shipment_id").toString(),Long.parseLong(map.get("containerId").toString())));
+						logger.info("order packingCheckOrder 箱子关联Shipment 调用接口 containerService.updateContainerByCondition 入参"+new Gson().toJson(updateContainer));
 						int row = containerService.updateContainerByCondition(updateContainer);
 						
 						//关联成功，则往箱子里存入订单
@@ -845,7 +862,7 @@ public class OrderController extends BaseController{
 					
 					//如果匹配的Shipment 存在多个，则返回列表供选择
 					}else if(shipmentMapList.size() > 1){
-						logger.info("shipmentMapList size >1  start  ");
+						logger.info("order packingCheckOrder shipmentMapList 存在多条,返回列表供选择");
 						result.setData(shipmentMapList);
 						infoMap.put("statusType", StatusType.ORDER_QUERY_LIST);
 						result.setInfoMap(infoMap);
@@ -854,7 +871,7 @@ public class OrderController extends BaseController{
 			
 			//如果箱子中存在订单，则直接加入箱子
 			}else{
-				logger.info("箱子内已经存在订单   start  ");
+				logger.info("order packingCheckOrder 箱子不为空    ");
 				infoMap.put("statusType", StatusType.ORDER_CONTAINER_NOT_EMPTY);
 				
 				Map<String, Object> getShipment = new HashMap<String, Object>();
@@ -893,6 +910,7 @@ public class OrderController extends BaseController{
 	@RequestMapping(value="/deletePackingCheckOrder", method = RequestMethod.POST)
 	@ResponseBody
 	public ResultMessage deletePackingCheckOrder(@RequestBody Map<String,Object> map,HttpServletRequest httpRequest){
+		logger.info(MessageFormat.format("order deletePackingCheckOrder 入参:{0}", new Gson().toJson(map)));
 		ResultMessage result= new ResultMessage();
 		result.errorStatus();
 		
@@ -921,6 +939,7 @@ public class OrderController extends BaseController{
 			logisticsProduct.setLogistics_product_id(Long.parseLong(map.get("logistics_product_id").toString()));
 			logisticsProduct.setContainer_id(0l);
 			logisticsProduct.setStatus(OrderStatusType.COMFIRMED);
+			logger.info("order deletePackingCheckOrder 取消订单与箱子的关联 并修改状态  调用接口iLogisticsProductService.updateByLogisticsProduct 订单修改前状态:"+OrderStatusType.READYTOSHIP+"  入参:"+new Gson().toJson(logisticsProduct));
 			int row = iLogisticsProductService.updateByLogisticsProduct(logisticsProduct);
 			
 			if(row > 0){
@@ -929,7 +948,10 @@ public class OrderController extends BaseController{
 				
 				//根据sub_shipment_id 删除sub_shipment
 				if(logisProShipmentInfo != null && logisProShipmentInfo.get("sub_shipment_id") != null ){
+					logger.info("order deletePackingCheckOrder 删除订单相关联的 sub_shipment 调用接口  subShipmentService.deleteByPrimaryKey sub_shipment_id:"+logisProShipmentInfo.get("sub_shipment_id").toString());
 					subShipmentService.deleteByPrimaryKey(Long.parseLong(logisProShipmentInfo.get("sub_shipment_id").toString()));
+					
+					logger.info("order deletePackingCheckOrder 删除订单相关联的 logisticProductShipment 调用接口  logisticProductShipmentService.deleteById sub_shipment_id:"+logisProShipmentInfo.get("sub_shipment_id").toString());
 					logisticProductShipmentService.deleteById(Long.parseLong(logisProShipmentInfo.get("sub_shipment_id").toString()));
 				}
 				result.successStatus();
@@ -1135,10 +1157,12 @@ public class OrderController extends BaseController{
 	 * @return
 	 */
 	public ResultMessage updateLogisticsProduct(Map<String,Object> orderMap,Map<String,Object> shipMentMap,boolean ischeck,boolean isSaveSubShipment){
+		logger.info(MessageFormat.format("order updateLogisticsProduct 订单装箱 入参信息   orderMap:{0},shipMentMap:{1},ischeck:{2},isSaveSubShipment:{3}",new Gson().toJson(orderMap),new Gson().toJson(shipMentMap),ischeck,isSaveSubShipment));
 		ResultMessage result= new ResultMessage();
 		result.errorStatus();
 		
 		//校验该订单跟箱子所属的Shipment的目的地是否一致,一致则加入,是否分段运输，发货员自行判断
+		logger.info("order updateLogisticsProduct 装箱校验  1.大区是否一致 2.是否为空箱子 3.shipment_type");
 		if(!orderMap.get("geography_name").toString().equals(shipMentMap.get("ship_to_geography").toString())){
 			
 			//空箱子不需要判断,直接存入   shipment_type 用于判断该箱子是否能存放多个，状态为1 只能存放一个  所以不能在存入
@@ -1160,10 +1184,12 @@ public class OrderController extends BaseController{
 		
 		
 		//添加订单跟箱子的关联,并修改状态为READYTOSHIP
+		logger.info("order updateLogisticsProduct 添加订单与箱子的关联  ");
 		LogisticsProduct logisticsProduct = new LogisticsProduct();
 		logisticsProduct.setLogistics_product_id(Long.parseLong(orderMap.get("logistics_product_id").toString()));
 		logisticsProduct.setContainer_id(Long.parseLong(orderMap.get("containerId").toString()));
 		logisticsProduct.setStatus(OrderStatusType.READYTOSHIP);
+		logger.info("order updateLogisticsProduct 添加订单与箱子的关联 并修改状态  调用接口iLogisticsProductService.updateByLogisticsProduct 订单修改前状态:"+orderMap.get("status").toString()+"  入参:"+new Gson().toJson(logisticsProduct));
 		int row = iLogisticsProductService.updateByLogisticsProduct(logisticsProduct);
 		
 		if(row > 0){
@@ -1177,6 +1203,7 @@ public class OrderController extends BaseController{
 			
 			if(isSaveSubShipment){
 				//添加第三段物流
+				logger.info("order updateLogisticsProduct 添加sub_shipment物流信息   调用接口   iShipmentService.saveShipmentByOrderId 入参:"+new Gson().toJson(orderResult));
 				iShipmentService.saveShipmentByOrderId(orderResult);
 			}
 

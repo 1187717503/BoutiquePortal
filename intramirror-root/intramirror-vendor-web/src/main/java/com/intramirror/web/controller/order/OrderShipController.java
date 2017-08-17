@@ -1,5 +1,6 @@
 package com.intramirror.web.controller.order;
 
+import com.google.gson.Gson;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.logistics.api.service.IInvoiceService;
 import com.intramirror.main.api.service.GeographyService;
@@ -19,8 +20,7 @@ import com.intramirror.web.controller.BaseController;
 import com.intramirror.web.service.LogisticsProductService;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +38,7 @@ import java.util.Map;
 @RequestMapping("/orderShip")
 public class OrderShipController extends BaseController {
 
-    private static Logger logger = LoggerFactory.getLogger(OrderShipController.class);
+	private static Logger logger = Logger.getLogger(OrderShipController.class);
 
     @Autowired
     private IOrderService orderService;
@@ -89,6 +89,7 @@ public class OrderShipController extends BaseController {
     @RequestMapping(value = "/getReadyToShipCartonList", method = RequestMethod.POST)
     @ResponseBody
     public ResultMessage getPackOrderList(@RequestBody Map<String, Object> map, HttpServletRequest httpRequest) {
+    	logger.info("order getReadyToShipCartonList 入参:"+new Gson().toJson(map));
         ResultMessage result = new ResultMessage();
         result.errorStatus();
 
@@ -132,13 +133,14 @@ public class OrderShipController extends BaseController {
             }
 
             //获取箱子列表信息
+        	logger.info("order getReadyToShipCartonList 获取container 列表信息   调用接口containerService.getContainerList 入参:"+new Gson().toJson(paramtMap));
             List<Map<String, Object>> containerList = containerService.getContainerList(paramtMap);
 
             Map<String, List<Map<String, Object>>> shipMentCartonList = new HashMap<String, List<Map<String, Object>>>();
             List<Map<String, Object>> shipMentList = new ArrayList<Map<String, Object>>();
 
             if (containerList != null && containerList.size() > 0) {
-
+            	logger.info("order getReadyToShipCartonList 解析container 列表信息 ");
 //				for(Map<String, Object> container : containerList){
 //					
 //					//根据shipment_id 分组
@@ -215,6 +217,7 @@ public class OrderShipController extends BaseController {
     @RequestMapping(value = "/getShipmentInfo", method = RequestMethod.POST)
     @ResponseBody
     public ResultMessage getShipmentInfo(@RequestBody Map<String, Object> map, HttpServletRequest httpRequest) {
+    	logger.info("order getShipmentInfo 入参:"+new Gson().toJson(map));
         ResultMessage result = new ResultMessage();
         result.errorStatus();
 
