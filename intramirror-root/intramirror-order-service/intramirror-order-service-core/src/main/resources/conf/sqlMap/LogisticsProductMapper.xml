@@ -201,4 +201,8 @@
 		from logistics_product
 		where order_logistics_id=#{order_logistics_id,jdbcType=BIGINT}  and vendor_id = #{vendor_id,jdbcType=BIGINT}  and enabled = #{enabled,jdbcType=BIT} 
 </select>
+
+<update id="updateContainerById" parameterType="java.lang.Long" >
+	update logistics_product set container_id=0,`status`=2 where logistics_product_id=#{order_logistics_id,jdbcType=BIGINT} 
+</update>
 </mapper>

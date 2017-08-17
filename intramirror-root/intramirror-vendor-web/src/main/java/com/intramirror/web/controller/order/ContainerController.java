@@ -237,11 +237,11 @@ public class ContainerController {
 						if (null != lpsList && 0 < lpsList.size()){
 							for (LogisticProductShipment lps : lpsList) {
 								logisticProductService.updateContainerById(lps.getLogisticProductId());
+								subShipmentService.deleteByPrimaryKey(lps.getSubShipmentId());
 							}
 						}
 					}
 					shipmentService.deleteShipmentById(setShipment);
-					subShipmentService.deleteSubShipmentByShipmentId(setShipment);
 				}else{
 					List<SubShipment> subList = subShipmentService.getSubShipmentByShipmentId(container.getShipmentId());
 					Map<String, Object> submap = new HashMap<>();
@@ -259,6 +259,7 @@ public class ContainerController {
 				}
 				logger.info("update logisticProduct ");
 				message.successStatus().putMsg("info", "SUCCESS").setData(result);
+				return message;
 			}
 			message.errorStatus().putMsg("info", "delete fail").setData(result);
 		} catch (Exception e) {
