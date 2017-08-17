@@ -377,7 +377,7 @@ public class OrderController extends BaseController{
 	@RequestMapping(value="/updateOrderStatus", method=RequestMethod.POST)
 	@ResponseBody
 	public ResultMessage updateOrderStatus(@RequestBody Map<String, Object> map){
-		logger.info(MessageFormat.format("updateOrderStatus param:{}",new Gson().toJson(map)));
+		logger.info(MessageFormat.format("updateOrderStatus param:{0}",new Gson().toJson(map)));
 		ResultMessage message = ResultMessage.getInstance();
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 		resultMap.put("status", StatusType.FAILURE);
