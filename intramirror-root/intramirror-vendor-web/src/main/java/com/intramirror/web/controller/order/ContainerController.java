@@ -315,7 +315,7 @@ public class ContainerController {
 					Map<String, Object> submap = new HashMap<>();
 					for (SubShipment subShipment : subList) {
 						submap.put("sub_shipment_id", subShipment.getSubShipmentId());
-						List<LogisticProductShipment> lpsList = logisticProductShipmentService.selectById(map);
+						List<LogisticProductShipment> lpsList = logisticProductShipmentService.selectById(submap);
 						if (null != lpsList && 0 < lpsList.size()){
 							for (LogisticProductShipment lps : lpsList) {
 								subShipmentService.deleteByPrimaryKey(lps.getSubShipmentId());
