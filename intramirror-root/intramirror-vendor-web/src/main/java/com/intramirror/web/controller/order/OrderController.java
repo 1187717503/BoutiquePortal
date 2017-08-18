@@ -173,27 +173,10 @@ public class OrderController extends BaseController{
 			
 			logger.info("order getOrderList 解析订单列表信息  ");
 			for(Map<String, Object> info : orderList){
-
-				//汇率
-				Double rate =  Double.parseDouble(info.get("current_rate").toString());
-				
-				//按汇率计算人民币价钱
-				Double sale_price2 = Double.parseDouble(info.get("sale_price").toString()) * rate;
-				info.put("sale_price2", sale_price2);
-				//计算利润
-				Double profit = Double.parseDouble(info.get("sale_price").toString()) - Double.parseDouble(info.get("in_price").toString());
-				BigDecimal b = new BigDecimal(profit);  
-				profit = b.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();  
-				info.put("profit", profit * rate);
 				
 				//计算折扣 
-				Double salePrice = Double.parseDouble(info.get("sale_price").toString());
 				Double price = Double.parseDouble(info.get("price").toString());
 				Double inPrice = Double.parseDouble(info.get("in_price").toString());
-				
-				BigDecimal sale_price_discount = new BigDecimal((salePrice / price)*100);  
-//				info.put("sale_price_discount",sale_price_discount.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() +" %");
-				info.put("sale_price_discount",(100 -sale_price_discount.intValue()) +" %");
 				
 				BigDecimal supply_price_discount = new BigDecimal((inPrice*(1+0.22)/price)*100);
 				info.put("supply_price_discount", (100 - supply_price_discount.intValue())+" %");
@@ -1197,6 +1180,7 @@ public class OrderController extends BaseController{
 		logisticsProduct.setLogistics_product_id(Long.parseLong(orderMap.get("logistics_product_id").toString()));
 		logisticsProduct.setContainer_id(Long.parseLong(orderMap.get("containerId").toString()));
 		logisticsProduct.setStatus(OrderStatusType.READYTOSHIP);
+		logisticsProduct.setPacked_at(Helper.getCurrentUTCTime());
 		logger.info("order updateLogisticsProduct 添加订单与箱子的关联 并修改状态  调用接口iLogisticsProductService.updateByLogisticsProduct 订单修改前状态:"+orderMap.get("status").toString()+"  入参:"+new Gson().toJson(logisticsProduct));
 		int row = iLogisticsProductService.updateByLogisticsProduct(logisticsProduct);
 		
