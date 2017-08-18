@@ -74,7 +74,7 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 		INNER JOIN shipping_segment ss ON (sub.shipping_segment_id = ss.shipping_segment_id)
 		INNER JOIN shipment_type st ON (ss.shipment_type_id = st.shipment_type_id)
 		WHERE sub.shipment_id=#{shipmentId,jdbcType=BIGINT}
-		GROUP BY sub.segment_sequence ASC LIMIT 1;
+		GROUP BY ss.segment_sequence ASC LIMIT 1;
   </select>
   
    <select id="getShipmentInfoById" resultType="java.util.HashMap"  parameterType="java.util.Map">
@@ -84,7 +84,7 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 		INNER JOIN shipment_type st ON (ss.shipment_type_id = st.shipment_type_id)
 		LEFT JOIN invoice i ON (s.shipment_id = i.shipment_id and i.enabled = 1) 
 		WHERE sub.shipment_id=#{shipmentId,jdbcType=BIGINT}
-		GROUP BY sub.segment_sequence ASC LIMIT 1;
+		GROUP BY ss.segment_sequence ASC LIMIT 1;
   </select>
   
    <select id="getVendorCodeById" resultType="java.lang.String"  parameterType="java.lang.Long">
