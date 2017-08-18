@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.intramirror.common.Helper;
 import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.core.dao.BaseDao;
@@ -38,6 +39,10 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
 			
 		//修改状态
         logisticsProduct.setStatus(status);
+        //如果修改状态为shipped修改shippedat
+        if (status == 3){
+        	logisticsProduct.setShipped_at(Helper.getCurrentUTCTime());
+        }
 		return logisticsProductMapper.updateByLogisticsProduct(logisticsProduct);
       
         
