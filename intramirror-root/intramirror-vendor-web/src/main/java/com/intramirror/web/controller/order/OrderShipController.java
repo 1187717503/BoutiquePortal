@@ -425,7 +425,8 @@ public class OrderShipController extends BaseController {
             } else if (subShipmentList.size() == 1) {
                 resultMap.put("DeliverTo", subShipmentList.get(0));
             } else {
-                resultMap.put("DeliverTo", null);
+                result.setMsg("DeliverTo is null ");
+                return result;
             }
             //获取carton列表
             List<Map<String, Object>> containerList = orderService.getOrderListByShipmentId(map);
