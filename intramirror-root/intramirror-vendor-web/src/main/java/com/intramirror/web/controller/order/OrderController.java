@@ -246,6 +246,10 @@ public class OrderController extends BaseController{
 		//根据订单orderLineNumber 查询订单详情
     	logger.info(MessageFormat.format("order getOrderDetail 调用 orderService.getOrderInfoByCondition接口获取详情 入参:{0}", new Gson().toJson(conditionMap)));
 		Map<String,Object> orderInfo = orderService.getOrderInfoByCondition(conditionMap);
+		if(orderInfo == null || orderInfo.size() == 0 ){
+			result.setMsg("Order does not exist");
+			return result;
+		}
 		
 		if(orderInfo != null ){
 			logger.info("order getOrderDetail 解析订单详情,计算价格折扣");
@@ -639,17 +643,20 @@ public class OrderController extends BaseController{
 		Map<String,Object> infoMap = new HashMap<String, Object>();
 		//0 校验   2返回shipment列表  3箱子为空时  4不为空时  
 		infoMap.put("statusType", StatusType.ORDER_CHECK_ORDER);
-		infoMap.put("code", StatusType.ORDER_ERROR_CODE);
 		
 		
 		if(checkParamsBypackingCheckOrder(map)){
 			result.setMsg("Parameter cannot be empty");
+			infoMap.put("code", StatusType.ORDER_ERROR_CODE);
+			result.setInfoMap(infoMap);
 			return result;
 		}
 		
 		User user = this.getUser(httpRequest);
 		if(user == null){
 			result.setMsg("Please log in again");
+			infoMap.put("code", StatusType.ORDER_ERROR_CODE);
+			result.setInfoMap(infoMap);
 			return result;
 		}
 		
@@ -661,6 +668,8 @@ public class OrderController extends BaseController{
 		}
 		if(vendor == null){
 			result.setMsg("Please log in again");
+			infoMap.put("code", StatusType.ORDER_ERROR_CODE);
+			result.setInfoMap(infoMap);
 			return result;
 		}
 		
@@ -675,6 +684,8 @@ public class OrderController extends BaseController{
 		List<Map<String,Object>> orderList = orderService.getOrderListByStatus(Integer.parseInt(map.get("status").toString()),vendorId,null);
 		if(orderList ==null || orderList.size() == 0){
 			result.setMsg("The current order list is empty");
+			infoMap.put("code", StatusType.ORDER_ERROR_CODE);
+			result.setInfoMap(infoMap);
 			return result;
 		}
 		
@@ -689,6 +700,8 @@ public class OrderController extends BaseController{
 		}
 		if(currentOrder == null){
 			result.setMsg("Order does not exist");
+			infoMap.put("code", StatusType.ORDER_ERROR_CODE);
+			result.setInfoMap(infoMap);
 			return result;
 		}
 		
@@ -720,6 +733,7 @@ public class OrderController extends BaseController{
 				logger.info("order packingCheckOrder 校验箱子与订单大区是否一致");
 				if(container != null && !container.getShipToGeography().equals(currentOrder.get("geography_name").toString())){
 					result.setMsg("This Order's ship-to geography is different than carton's");
+					infoMap.put("code", StatusType.ORDER_ERROR_CODE);
 					result.setInfoMap(infoMap);
 					return result;
 				}
@@ -748,9 +762,11 @@ public class OrderController extends BaseController{
 					
 				}else{
 					result.setMsg("The modification failed. Check that the parameters are correct ");
+					infoMap.put("code", StatusType.ORDER_ERROR_CODE);
+					result.setInfoMap(infoMap);
 				}
 				logger.info("已经选择过shipMent 直接关联，并加入箱子 end");
-				result.setInfoMap(infoMap);
+//				result.setInfoMap(infoMap);
 				return result;
 			}
 			
@@ -764,6 +780,7 @@ public class OrderController extends BaseController{
 				//判断箱子的geography 跟订单的大区是否一致 
 				if(container != null && !container.getShipToGeography().equals(currentOrder.get("geography_name").toString())){
 					result.setMsg("This Order's ship-to geography is different than carton's");
+					infoMap.put("code", StatusType.ORDER_ERROR_CODE);
 					result.setInfoMap(infoMap);
 					return result;
 				}
@@ -817,7 +834,7 @@ public class OrderController extends BaseController{
 							//订单加入箱子(已经调用过saveShipmentByOrderId 方法  不需要再次创建)
 							result =  updateLogisticsProduct(currentOrder,shipMentMap,false,false);
 						}
-						result.setInfoMap(infoMap);
+//						result.setInfoMap(infoMap);
 					}
 						
 					//如果匹配的Shipment 只存在一个,就直接关联箱子   并把订单存入箱子
@@ -841,7 +858,7 @@ public class OrderController extends BaseController{
 							//订单加入箱子
 							result =  updateLogisticsProduct(currentOrder,shipMentMap,false,true);
 						}
-						result.setInfoMap(infoMap);
+//						result.setInfoMap(infoMap);
 					
 					//如果匹配的Shipment 存在多个，则返回列表供选择
 					}else if(shipmentMapList.size() > 1){
@@ -869,9 +886,11 @@ public class OrderController extends BaseController{
 					result =  updateLogisticsProduct(currentOrder,shipmentMap,true,true);
 				}else{
 					result.setMsg("shipment Query is empty ");
+					infoMap.put("code", StatusType.ORDER_ERROR_CODE);
+					result.setInfoMap(infoMap);
 				}
 				
-				result.setInfoMap(infoMap);
+//				result.setInfoMap(infoMap);
 			}
 			
 		}catch(Exception e){
@@ -1143,6 +1162,12 @@ public class OrderController extends BaseController{
 	public ResultMessage updateLogisticsProduct(Map<String,Object> orderMap,Map<String,Object> shipMentMap,boolean ischeck,boolean isSaveSubShipment){
 		logger.info(MessageFormat.format("order updateLogisticsProduct 订单装箱 入参信息   orderMap:{0},shipMentMap:{1},ischeck:{2},isSaveSubShipment:{3}",new Gson().toJson(orderMap),new Gson().toJson(shipMentMap),ischeck,isSaveSubShipment));
 		ResultMessage result= new ResultMessage();
+		Map<String, Object> info = new HashMap<String, Object>();
+		if(ischeck){
+			info.put("statusType", StatusType.ORDER_CONTAINER_NOT_EMPTY);
+		}else{
+			info.put("statusType", StatusType.ORDER_CONTAINER_EMPTY);
+		}
 		result.errorStatus();
 		
 		//校验该订单跟箱子所属的Shipment的目的地是否一致,一致则加入,是否分段运输，发货员自行判断
@@ -1151,6 +1176,8 @@ public class OrderController extends BaseController{
 		//如果大区不一致，直接返回
 		if(!orderMap.get("geography_name").toString().equals(shipMentMap.get("ship_to_geography").toString())){
 			result.setMsg("This Order's consignee address is different than carton's. ");
+			info.put("code", StatusType.ORDER_ERROR_CODE);
+			result.setInfoMap(info);
 			return result;
 		}
 		
@@ -1160,6 +1187,8 @@ public class OrderController extends BaseController{
 			//空箱子不需要判断,直接存入   shipment_type 用于判断该箱子是否能存放多个，状态为1 只能存放一个  所以不能在存入
 			if(ischeck && shipMentMap.get("shipment_type_id").toString().equals("1")){
 				result.setMsg("Only one Order can be packed in this carton. ");
+				info.put("code", StatusType.ORDER_ERROR_CODE);
+				result.setInfoMap(info);
 				return result;
 			}
 				
@@ -1202,11 +1231,11 @@ public class OrderController extends BaseController{
 
 			
 		}else{
-			Map<String, Object> info = new HashMap<String, Object>();
 			info.put("code", StatusType.ORDER_ERROR_CODE);
 			result.setInfoMap(info);
 			result.setMsg("Package failure");
 		}
+		result.setInfoMap(info);
 		return result;
 	}
 }
