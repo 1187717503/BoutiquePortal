@@ -119,4 +119,12 @@ public interface IShipmentService {
 	 * @return
 	 */
 	Long newShipment(Map<String, Object> map);
+	
+
+	/**
+	 * 根据shipmentId查询shipmentNo
+	 * @param map
+	 * @return
+	 */
+	String getShipmentNoById(Map<String, Object> map);
 }

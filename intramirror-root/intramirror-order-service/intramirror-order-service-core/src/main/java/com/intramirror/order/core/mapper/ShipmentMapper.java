@@ -113,4 +113,11 @@ public interface ShipmentMapper {
 	 * @return
 	 */
 	int deleteShipmentById(Map<String, Object> map);
+	
+	/**
+	 * 根据shipmentId查询shipmentNo
+	 * @param map
+	 * @return
+	 */
+	String getShipmentNoById(Map<String, Object> map);
 }

@@ -389,4 +389,12 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		Long shipmentId = shipmentMapper.getShipmentId(shipment);
 		return shipmentId;
 	}
+
+	/**
+	 * 根据shipmentId查询shipmentNo
+	 */
+	@Override
+	public String getShipmentNoById(Map<String, Object> map) {
+		return shipmentMapper.getShipmentNoById(map);
+	}
 }

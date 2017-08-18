@@ -159,6 +159,59 @@ public class ContainerController {
 		return message;
 	}
 	
+	@RequestMapping(value = "/getShipmentNo", method = RequestMethod.POST)
+	@ResponseBody
+	public ResultMessage getShipmentNo(@RequestBody Map<String, Object> map){
+		ResultMessage message = ResultMessage.getInstance();
+		logger.info("getContainerBybarcode param " + new Gson().toJson(map));
+		try{
+			if (null == map || map.size() == 0){
+				message.errorStatus().putMsg("info", "parameter cannot be null");
+				return message;
+			}
+			if (null == map.get("barcode") || StringUtils.isBlank(map.get("barcode").toString())){
+				message.errorStatus().putMsg("info", "barcode cannot be null");
+				return message;
+			}
+			if (null == map.get("status") || StringUtils.isBlank(map.get("status").toString())){
+				message.errorStatus().putMsg("info", "status cannot be null");
+				return message;
+			}
+			Container container = containerService.getContainerBybarcode(map);
+			if (null == container){
+				message.errorStatus().putMsg("info", "SUCCESS").setData(-1);
+				return message;
+			}
+			//根据shipmentId查询shipmentNo
+			Map<String, Object> sMap = new HashMap<>();
+			sMap.put("shipmentId", container.getShipmentId());
+			logger.info("shipmentNo param : " + new Gson().toJson(sMap));
+			String shipmentNo = shipmentService.getShipmentNoById(sMap);
+			logger.info("shipmentNo  : " + shipmentNo);
+			//查询当前箱子在数据中排第几个
+			int index = 1;
+			List<Map<String, Object>> list = containerService.getShipmentList(sMap);
+			if(list.size()>1){
+				for (int i = 0; i < list.size(); i++) {
+					if (list.get(i).get("container_id").toString().equals(container.getContainerId())){
+						index = (i+1);
+					}
+				}
+			}
+			Map<String, Object> resultMap = new HashMap<>();
+			resultMap.put("shipmentNo", shipmentNo);
+			//返回当前shipment关联的container数
+			resultMap.put("count", list.size());
+			resultMap.put("currentSort", index);
+			message.successStatus().putMsg("info", "SUCCESS").setData(resultMap);
+		} catch (Exception e){
+			e.printStackTrace();
+			logger.error(" error Message : {}", e.getMessage());
+			message.errorStatus().putMsg("info", "error Message : "+e.getMessage());
+		}
+		return message;
+	}
+	
 	/**
 	 * 修改箱子状态
 	 * @return message

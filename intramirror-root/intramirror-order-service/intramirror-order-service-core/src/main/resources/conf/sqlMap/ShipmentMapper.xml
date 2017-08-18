@@ -125,4 +125,9 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
   		DELETE FROM shipment 
 		WHERE shipment_id = #{shipmentId,jdbcType=BIGINT}
   	</delete>
+  	
+<select id="getShipmentNoById" resultType="java.lang.String" parameterType="java.util.Map">
+		SELECT shipment_no FROM shipment
+		where shipment_id = #{shipmentId,jdbcType=BIGINT};
+</select>
 </mapper>
