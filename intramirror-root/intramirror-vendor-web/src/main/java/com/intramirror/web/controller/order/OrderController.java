@@ -719,7 +719,7 @@ public class OrderController extends BaseController{
 				//判断箱子的geography 跟订单的大区是否一致 
 				logger.info("order packingCheckOrder 校验箱子与订单大区是否一致");
 				if(container != null && !container.getShipToGeography().equals(currentOrder.get("geography_name").toString())){
-					result.setMsg("The delivery area is inconsistent");
+					result.setMsg("This Order's ship-to geography is different than carton's");
 					result.setInfoMap(infoMap);
 					return result;
 				}
@@ -763,7 +763,7 @@ public class OrderController extends BaseController{
 				logger.info("order packingCheckOrder 校验箱子与订单大区是否一致");
 				//判断箱子的geography 跟订单的大区是否一致 
 				if(container != null && !container.getShipToGeography().equals(currentOrder.get("geography_name").toString())){
-					result.setMsg("The delivery area is inconsistent");
+					result.setMsg("This Order's ship-to geography is different than carton's");
 					result.setInfoMap(infoMap);
 					return result;
 				}
@@ -1149,7 +1149,7 @@ public class OrderController extends BaseController{
 		
 		//如果大区不一致，直接返回
 		if(!orderMap.get("geography_name").toString().equals(shipMentMap.get("ship_to_geography").toString())){
-			result.setMsg("The delivery area is inconsistent ");
+			result.setMsg("This Order's consignee address is different than carton's. ");
 			return result;
 		}
 		
@@ -1158,7 +1158,7 @@ public class OrderController extends BaseController{
 			
 			//空箱子不需要判断,直接存入   shipment_type 用于判断该箱子是否能存放多个，状态为1 只能存放一个  所以不能在存入
 			if(ischeck && shipMentMap.get("shipment_type_id").toString().equals("1")){
-				result.setMsg("Only one can be deposited ");
+				result.setMsg("Only one Order can be packed in this carton. ");
 				return result;
 			}
 				
