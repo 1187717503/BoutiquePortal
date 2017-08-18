@@ -861,6 +861,7 @@ public class OrderController extends BaseController{
 				getShipment.put("shipmentId", Long.parseLong(shipment_id));
 				
 				//根据shipmentId 获取shipment 相关信息及物流第一段类型
+				logger.info("order packingCheckOrder 获取shipment 及第一段物流信息   调用接口 iShipmentService.getShipmentTypeById 入参:"+new Gson().toJson(getShipment));
 				Map<String, Object> shipmentMap = iShipmentService.getShipmentTypeById(getShipment);
 				
 				if(shipmentMap != null ){
