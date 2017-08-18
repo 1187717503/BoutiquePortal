@@ -435,7 +435,7 @@ public class OrderShipController extends BaseController {
             if (containerList != null && containerList.size() > 0) {
 
                 for (Map<String, Object> container : containerList) {
-                    double total = Double.parseDouble(container.get("sale_price").toString()) * Double.parseDouble(container.get("amount").toString());
+                    double total = Double.parseDouble(container.get("in_price").toString()) * Double.parseDouble(container.get("amount").toString());
                     allTotal = allTotal + total;
                     container.put("Total", total);
                 }
@@ -556,7 +556,7 @@ public class OrderShipController extends BaseController {
                         carton.put("orderList", list);
                         double allTotal = 0;
                         for (Map<String, Object> conInfo : list) {
-                            double total = Double.parseDouble(conInfo.get("sale_price").toString()) * Double.parseDouble(conInfo.get("amount").toString());
+                            double total = Double.parseDouble(conInfo.get("in_price").toString()) * Double.parseDouble(conInfo.get("amount").toString());
                             allTotal = allTotal + total;
                             conInfo.put("Total", total);
 
