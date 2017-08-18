@@ -177,7 +177,7 @@
     shipping_provider sp
     WHERE sp.shipping_provider_id =(
     SELECT shipping_provider_id FROM shipping_segment ss
-    WHERE ss.custom = 1 AND ss.enable=1 AND ss.shipping_segment_id in
+    WHERE ss.custom = 1 AND ss.enabled=1 AND ss.shipping_segment_id in
     (SELECT subs.shipping_segment_id FROM sub_shipment subs where subs.shipment_id = #{shipmentId,jdbcType=BIGINT}))
   </select>
 
