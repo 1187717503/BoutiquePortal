@@ -179,7 +179,12 @@ public class OrderController extends BaseController{
 				Double inPrice = Double.parseDouble(info.get("in_price").toString());
 				
 				BigDecimal supply_price_discount = new BigDecimal((inPrice*(1+0.22)/price)*100);
-				info.put("supply_price_discount", (100 - supply_price_discount.setScale(0,BigDecimal.ROUND_HALF_UP).intValue())+" %");
+				if(supply_price_discount.intValue() > 100 || supply_price_discount.intValue() < 0 ){
+					info.put("supply_price_discount",0 +" %");
+				}else{
+					info.put("supply_price_discount", (100 - supply_price_discount.setScale(0,BigDecimal.ROUND_HALF_UP).intValue())+" %");
+				}
+
 				
 				
 //				//添加商品对应的属性
@@ -275,7 +280,12 @@ public class OrderController extends BaseController{
 			orderInfo.put("sale_price_discount",(100 - sale_price_discount.setScale(0,BigDecimal.ROUND_HALF_UP).intValue()) +" %");
 			
 			BigDecimal supply_price_discount = new BigDecimal((inPrice*(1+0.22)/price)*100);
-			orderInfo.put("supply_price_discount", (100 -supply_price_discount.setScale(0,BigDecimal.ROUND_HALF_UP).intValue())+" %");
+//			orderInfo.put("supply_price_discount", (100 -supply_price_discount.setScale(0,BigDecimal.ROUND_HALF_UP).intValue())+" %");
+			if(supply_price_discount.intValue() > 100 || supply_price_discount.intValue() < 0 ){
+				orderInfo.put("supply_price_discount",0 +" %");
+			}else{
+				orderInfo.put("supply_price_discount", (100 -supply_price_discount.setScale(0,BigDecimal.ROUND_HALF_UP).intValue())+" %");
+			}
 			
 //			//根据ID列表获取商品属性
 //			List<Map<String, Object>> productPropertyList = productPropertyService.getProductPropertyListByProductId(orderInfo.get("product_id").toString());
