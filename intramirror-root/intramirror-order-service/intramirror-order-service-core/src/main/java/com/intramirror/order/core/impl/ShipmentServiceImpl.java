@@ -133,10 +133,10 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	public void saveSubShipment(List<Map<String, Object>> map, Map<String, Object> lastMap, Long shipmentId, Long logisticProductId){
 		//打印入参段
 		logger.info("pararmeter " + new Gson().toJson(map));
-		lastMap.put("shippingSegmentId", Long.parseLong(map.get(0).get("shipping_segment_id").toString()));
 		Date currentDate = new Date();
 		//根据不同段生成不同sub-shipment
 		if (null != map && 0 < map.size()){
+			lastMap.put("shippingSegmentId", Long.parseLong(map.get(0).get("shipping_segment_id").toString()));
 			//每条路线生成不同sub-shipment
 			if (map.size() == 1){
 //				if (1==Long.parseLong(shipmentType)){
