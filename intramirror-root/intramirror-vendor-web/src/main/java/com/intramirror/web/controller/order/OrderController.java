@@ -45,6 +45,7 @@ import com.intramirror.web.common.BarcodeUtil;
 import com.intramirror.web.controller.BaseController;
 import com.intramirror.web.service.LogisticsProductService;
 import com.intramirror.web.service.OrderRefund;
+import com.intramirror.web.service.OrderService;
 
 
 
@@ -72,6 +73,10 @@ public class OrderController extends BaseController{
 	
 	@Autowired
 	private OrderRefund orderRefund;
+	
+	@Autowired
+	private OrderService orderServiceImpl;
+	
 	
 	@Autowired
 	private ISkuStoreService skuStoreService;
@@ -682,233 +687,21 @@ public class OrderController extends BaseController{
 			result.setInfoMap(infoMap);
 			return result;
 		}
-		
-        String orderLineNum = map.get("orderLineNum").toString();
-        Map<String,Object> currentOrder = null;
         
-        
-		
-		Long vendorId = vendor.getVendorId();
-		//根据订单状态查询订单
-		logger.info(MessageFormat.format("order packingCheckOrder 调用接口getOrderListByStatus 查询订单信息 入参  status:{0},vendorId:{1}",map.get("status").toString(),vendorId));
-		List<Map<String,Object>> orderList = orderService.getOrderListByStatus(Integer.parseInt(map.get("status").toString()),vendorId,null);
-		if(orderList ==null || orderList.size() == 0){
-			result.setMsg("The current order list is empty");
-			infoMap.put("code", StatusType.ORDER_ERROR_CODE);
-			result.setInfoMap(infoMap);
-			return result;
-		}
-		
-		//校验order_line_num  是否在CONFIRMED中存在
-		logger.info("order packingCheckOrder 校验订单是否存在   orderLineNum:"+orderLineNum);
-		for(Map<String,Object> info :orderList){
-			if(orderLineNum.equals(info.get("order_line_num").toString())){
-				currentOrder = info;
-				result.successStatus();
-				break;
-			}
-		}
-		if(currentOrder == null){
-			result.setMsg("Order does not exist");
-			infoMap.put("code", StatusType.ORDER_ERROR_CODE);
-			result.setInfoMap(infoMap);
-			return result;
-		}
+		map.put("vendorId", vendor.getVendorId());
 		
 		
-		
+		//订单装箱
 		try{
-			
-			Map<String, Object> conditionMap = new HashMap<String, Object>();
-			conditionMap.put("container_id", Long.parseLong(map.get("containerId").toString()));
-			conditionMap.put("status", OrderStatusType.READYTOSHIP);
-			currentOrder.put("containerId", Long.parseLong(map.get("containerId").toString())); 
-			
-			//检查判断该箱子是否存在订单
-			logger.info(MessageFormat.format("order packingCheckOrder 获取箱子内订单列表 判断是否为空箱  iLogisticsProductService.selectByCondition 入参:{0}",new Gson().toJson(conditionMap)));
-			List<LogisticsProduct> list = iLogisticsProductService.selectByCondition(conditionMap);
-			String shipment_id = map.get("shipment_id").toString();
-			
-			//获取箱子信息
-			Map<String, Object> selectContainer = new HashMap<String, Object>(); 
-			selectContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
-			Container container =  containerService.selectContainerById(selectContainer);
-			
-			//如果为空箱子，并且已经选择过shipMent 则直接关联，并加入箱子
-			if(StringUtils.isNoneBlank(shipment_id) && (list == null || list.size() == 0)){
-				logger.info("order packingCheckOrder 已经选择过shipMent 直接关联，并加入箱子 ");
-				infoMap.put("statusType", StatusType.ORDER_CONTAINER_EMPTY);
-				
-				//判断箱子的geography 跟订单的大区是否一致 
-				logger.info("order packingCheckOrder 校验箱子与订单大区是否一致");
-				if(container != null && !container.getShipToGeography().equals(currentOrder.get("geography_name").toString())){
-					result.setMsg("This Order's ship-to geography is different than carton's");
-					infoMap.put("code", StatusType.ORDER_ERROR_CODE);
-					result.setInfoMap(infoMap);
-					return result;
-				}
-				
-				//箱子关联Shipment
-				Map<String, Object> updateContainer = new HashMap<String, Object>(); 
-				updateContainer.put("shipment_id",shipment_id);
-				updateContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
-//				logger.info(MessageFormat.format("packOrder updateContainerByCondition shipment_id:{0},container_id:{1}",shipment_id,Long.parseLong(map.get("containerId").toString())));
-				logger.info("order packingCheckOrder 箱子关联Shipment 调用接口 containerService.updateContainerByCondition 入参"+new Gson().toJson(updateContainer));
-				int row = containerService.updateContainerByCondition(updateContainer);
-				
-				//关联成功，则往箱子里存入订单
-				if(row > 0 ){
-					
-					Map<String, Object> shipMentMap = new HashMap<String, Object>();
-					//根据订单大区选择的Shipment   所以只需要用订单的大区即可(只有箱子为空时)
-					shipMentMap.put("ship_to_geography", currentOrder.get("geography_name").toString());
-					shipMentMap.put("shipment_id", Long.parseLong(shipment_id));
-//					//获取当前ShipMent 第一段的物流类型(不需要  空箱子不比较shipmentType 直接放入)
-					
-					//订单加入箱子
-					logger.info("order packingCheckOrder updateLogisticsProduct");
-					result =  updateLogisticsProduct(currentOrder,shipMentMap,false,true);
-
-					
-				}else{
-					result.setMsg("The modification failed. Check that the parameters are correct ");
-					infoMap.put("code", StatusType.ORDER_ERROR_CODE);
-					result.setInfoMap(infoMap);
-				}
-				logger.info("已经选择过shipMent 直接关联，并加入箱子 end");
-//				result.setInfoMap(infoMap);
-				return result;
-			}
-			
-			
-			
-			//如果是新箱子，则需要关联Shipment,如果存在符合条件的Shipment有多个则返回列表供选择,如果只有一个则默认存入，没有则需要新建Shipment
-			if(list == null || list.size() == 0){
-				infoMap.put("statusType", StatusType.ORDER_CONTAINER_EMPTY);
-				logger.info("order packingCheckOrder 箱子内订单列表为空    ");
-				logger.info("order packingCheckOrder 校验箱子与订单大区是否一致");
-				//判断箱子的geography 跟订单的大区是否一致 
-				if(container != null && !container.getShipToGeography().equals(currentOrder.get("geography_name").toString())){
-					result.setMsg("This Order's ship-to geography is different than carton's");
-					infoMap.put("code", StatusType.ORDER_ERROR_CODE);
-					result.setInfoMap(infoMap);
-					return result;
-				}
-				
-
-				Map<String, Object> selectShipmentParam = new HashMap<String, Object>();
-				selectShipmentParam.put("shipToGeography", currentOrder.get("geography_name").toString());
-				
-				//shipment 状态
-				selectShipmentParam.put("status", ContainerType.OPEN);
-				selectShipmentParam.put("vendorId", vendorId);
-				
-				//查询shipment
-				logger.info("order packingCheckOrder 查询shipment 列表  iShipmentService.getShipmentsByVendor 入参:"+new Gson().toJson(selectShipmentParam));
-				List<Map<String, Object>> shipmentMapList = iShipmentService.getShipmentsByVendor(selectShipmentParam);
-				
-				//如果为空  新建Shipment
-				if(shipmentMapList == null || shipmentMapList.size() == 0  ){
-					logger.info("order packingCheckOrder shipmentMapList is null ");
-					Map<String, Object> saveShipmentParam = new HashMap<String, Object>();
-					saveShipmentParam.put("orderNumber", orderLineNum);
-					saveShipmentParam.put("shipment_id", 0);
-
-					//获取需要的参数
-					Map<String, Object> orderResult = orderService.getShipmentDetails(saveShipmentParam);
-					//默认为0
-					orderResult.put("shipmentId", 0);
-					//接口返回shipmentId
-					String shipmentId = iShipmentService.saveShipmentByOrderId(orderResult);
-					if (shipmentId != null && StringUtils.isNotBlank(shipmentId)){
-						
-//						infoMap.put("statusType", StatusType.ORDER_CONTAINER_EMPTY);
-						
-						//箱子关联Shipment
-						Map<String, Object> updateContainer = new HashMap<String, Object>(); 
-						updateContainer.put("shipment_id", Long.parseLong(shipmentId));
-						updateContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
-//						logger.info(MessageFormat.format("packOrder updateContainerByCondition shipment_id:{0},container_id:{1}",shipmentId,Long.parseLong(map.get("containerId").toString())));
-						logger.info("order packingCheckOrder 箱子关联Shipment 调用接口 containerService.updateContainerByCondition 入参"+new Gson().toJson(updateContainer));
-						int updateContainerRow = containerService.updateContainerByCondition(updateContainer);
-						
-						//关联成功，则往箱子里存入订单
-						if(updateContainerRow > 0 ){
-							
-							Map<String, Object> shipMentMap = new HashMap<String, Object>();
-							//根据订单大区创建的Shipment   所以只需要用订单的大区即可(只有箱子为空时)
-							shipMentMap.put("ship_to_geography", currentOrder.get("geography_name").toString());
-							shipMentMap.put("shipment_id", shipmentId);
-//								//获取当前ShipMent 第一段的物流类型(不需要  空箱子不比较shipmentType 直接放入)
-							
-							//订单加入箱子(已经调用过saveShipmentByOrderId 方法  不需要再次创建)
-							result =  updateLogisticsProduct(currentOrder,shipMentMap,false,false);
-						}
-//						result.setInfoMap(infoMap);
-					}else{
-						//生成shipment 失败
-						result.setInfoMap(infoMap);
-					}
-						
-					//如果匹配的Shipment 只存在一个,就直接关联箱子   并把订单存入箱子
-					}else if(shipmentMapList.size() == 1){
-						logger.info("shipmentMapList size 1  start  ");
-//						infoMap.put("statusType", StatusType.ORDER_CONTAINER_EMPTY);
-						
-						//箱子关联Shipment
-						Map<String, Object> updateContainer = new HashMap<String, Object>(); 
-						updateContainer.put("shipment_id", Long.parseLong(shipmentMapList.get(0).get("shipment_id").toString()));
-						updateContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
-						logger.info("order packingCheckOrder 箱子关联Shipment 调用接口 containerService.updateContainerByCondition 入参"+new Gson().toJson(updateContainer));
-						int row = containerService.updateContainerByCondition(updateContainer);
-						
-						//关联成功，则往箱子里存入订单
-						if(row > 0 ){
-							
-							Map<String, Object> shipMentMap = shipmentMapList.get(0);
-							//获取当前ShipMent 第一段的物流类型(不需要  空箱子不比较shipmentType 直接放入)
-							
-							//订单加入箱子
-							result =  updateLogisticsProduct(currentOrder,shipMentMap,false,true);
-						}
-//						result.setInfoMap(infoMap);
-					
-					//如果匹配的Shipment 存在多个，则返回列表供选择
-					}else if(shipmentMapList.size() > 1){
-						logger.info("order packingCheckOrder shipmentMapList 存在多条,返回列表供选择");
-						result.setData(shipmentMapList);
-						infoMap.put("statusType", StatusType.ORDER_QUERY_LIST);
-						result.setInfoMap(infoMap);
-					}
-				
-			
-			//如果箱子中存在订单，则直接加入箱子
-			}else{
-				logger.info("order packingCheckOrder 箱子不为空    ");
-				infoMap.put("statusType", StatusType.ORDER_CONTAINER_NOT_EMPTY);
-				
-				Map<String, Object> getShipment = new HashMap<String, Object>();
-				getShipment.put("shipmentId", Long.parseLong(shipment_id));
-				
-				//根据shipmentId 获取shipment 相关信息及物流第一段类型
-				logger.info("order packingCheckOrder 获取shipment 及第一段物流信息   调用接口 iShipmentService.getShipmentTypeById 入参:"+new Gson().toJson(getShipment));
-				Map<String, Object> shipmentMap = iShipmentService.getShipmentTypeById(getShipment);
-				
-				if(shipmentMap != null ){
-					//订单加入箱子
-					result =  updateLogisticsProduct(currentOrder,shipmentMap,true,true);
-				}else{
-					result.setMsg("shipment Query is empty ");
-					infoMap.put("code", StatusType.ORDER_ERROR_CODE);
-					result.setInfoMap(infoMap);
-				}
-				
-//				result.setInfoMap(infoMap);
-			}
-			
+			result = orderServiceImpl.packingOrder(map);
 		}catch(Exception e){
 			e.printStackTrace();
+			result.setMsg("Package failed. Please check parameters");
+			infoMap.put("code", StatusType.ORDER_ERROR_CODE);
+			result.setInfoMap(infoMap);
+			return result;
 		}
+
 
 		
 		return result;
