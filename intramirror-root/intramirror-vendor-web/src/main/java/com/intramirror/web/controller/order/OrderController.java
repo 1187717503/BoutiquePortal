@@ -822,7 +822,7 @@ public class OrderController extends BaseController{
 					String shipmentId = iShipmentService.saveShipmentByOrderId(orderResult);
 					if (shipmentId != null && StringUtils.isNotBlank(shipmentId)){
 						
-						infoMap.put("statusType", StatusType.ORDER_CONTAINER_EMPTY);
+//						infoMap.put("statusType", StatusType.ORDER_CONTAINER_EMPTY);
 						
 						//箱子关联Shipment
 						Map<String, Object> updateContainer = new HashMap<String, Object>(); 
@@ -845,12 +845,15 @@ public class OrderController extends BaseController{
 							result =  updateLogisticsProduct(currentOrder,shipMentMap,false,false);
 						}
 //						result.setInfoMap(infoMap);
+					}else{
+						//生成shipment 失败
+						result.setInfoMap(infoMap);
 					}
 						
 					//如果匹配的Shipment 只存在一个,就直接关联箱子   并把订单存入箱子
 					}else if(shipmentMapList.size() == 1){
 						logger.info("shipmentMapList size 1  start  ");
-						infoMap.put("statusType", StatusType.ORDER_CONTAINER_EMPTY);
+//						infoMap.put("statusType", StatusType.ORDER_CONTAINER_EMPTY);
 						
 						//箱子关联Shipment
 						Map<String, Object> updateContainer = new HashMap<String, Object>(); 
