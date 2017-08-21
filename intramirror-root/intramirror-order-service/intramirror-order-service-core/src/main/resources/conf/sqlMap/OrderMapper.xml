@@ -484,7 +484,7 @@ and t1.order_num =  #{orderId,jdbcType=BIGINT}
 	group by t_pp.product_id
 	) pp ON p.product_id = pp.product_id
 	LEFT JOIN shipment sm on sm.vendor_id = v.vendor_id
-	where pspk.`name` = 'Size' and (lp.`status` = 3 OR lp.`status` = 4)
+	where pspk.`name` = 'Size' and (lp.`status` = 3 OR lp.`status` = 4) and v.vendor_id = #{vendorId,jdbcType=BIGINT}
 	GROUP BY lp.order_line_num
 	)AS DD
 	</select>
