@@ -464,7 +464,7 @@ public class OrderController extends BaseController{
     		resultMap.put("readyToship", result);
     		
     		//shippedCount
-    		int shippedCount = orderService.getShippedCount(resultMap);
+    		int shippedCount = orderService.getShippedCount(map);
     		resultMap.put("shipped", shippedCount);
     		
     		resultMessage.successStatus().putMsg("info","SUCCESS").setData(resultMap);
