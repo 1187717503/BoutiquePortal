@@ -8,8 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -22,7 +21,6 @@ import com.google.gson.Gson;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.service.IContainerService;
-import com.intramirror.order.api.service.ILogisticProductShipmentService;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.service.IShipmentService;
@@ -38,7 +36,7 @@ import com.intramirror.web.controller.BaseController;
 @RequestMapping("/shipment")
 public class ShipmentController extends BaseController{
 
-	private static Logger logger = LoggerFactory.getLogger(ShipmentController.class);
+	private static Logger logger = Logger.getLogger(ShipmentController.class);
 
 	@Autowired
 	private IShipmentService iShipmentService;
@@ -48,10 +46,7 @@ public class ShipmentController extends BaseController{
 	
 	@Autowired
 	private IContainerService containerService;
-	
-	@Autowired
-	private ILogisticProductShipmentService logisticProductShipmentService;
-	
+
 	@Autowired
 	private ILogisticsProductService logisticsProductService;
 	

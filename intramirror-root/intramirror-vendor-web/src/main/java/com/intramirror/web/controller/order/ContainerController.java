@@ -8,8 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -41,7 +40,7 @@ import com.intramirror.web.common.BarcodeUtil;
 @RequestMapping("/container")
 public class ContainerController {
 
-	private static Logger logger = LoggerFactory.getLogger(ContainerController.class);
+	private static Logger logger = Logger.getLogger(ContainerController.class);
 	
 	@Autowired
 	private IContainerService containerService;
@@ -79,7 +78,7 @@ public class ContainerController {
 			message.successStatus().putMsg("info","SUCCESS").setData(result);
 		} catch (Exception e) {
 			 e.printStackTrace();
-            logger.error(" error message : {}", e.getMessage());
+            logger.error(" error message : "+ e.getMessage());
             message.errorStatus().putMsg("info","error message : " + e.getMessage());
 		}
 			return message;
@@ -116,7 +115,7 @@ public class ContainerController {
 			message.successStatus().putMsg("info","SUCCESS").setData(result);
 		} catch (Exception e) {
 			e.printStackTrace();
-			logger.error(" error Message : {}", e.getMessage());
+			logger.error(" error Message : "+ e.getMessage());
 			message.errorStatus().putMsg("info", "error Message : "+ e.getMessage());
 		}
 		return message;
@@ -153,7 +152,7 @@ public class ContainerController {
 			message.successStatus().putMsg("info", "SUCCESS").setData(container);
 		} catch (Exception e){
 			e.printStackTrace();
-			logger.error(" error Message : {}", e.getMessage());
+			logger.error(" error Message :  "+ e.getMessage());
 			message.errorStatus().putMsg("info", "error Message : "+e.getMessage());
 		}
 		return message;
@@ -206,7 +205,7 @@ public class ContainerController {
 			message.successStatus().putMsg("info", "SUCCESS").setData(resultMap);
 		} catch (Exception e){
 			e.printStackTrace();
-			logger.error(" error Message : {}", e.getMessage());
+			logger.error(" error Message : "+ e.getMessage());
 			message.errorStatus().putMsg("info", "error Message : "+e.getMessage());
 		}
 		return message;
@@ -261,7 +260,7 @@ public class ContainerController {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			logger.error(" error Message : {}", e.getMessage());
+			logger.error(" error Message : "+ e.getMessage());
 			message.errorStatus().putMsg("info", "error Message : " +e.getMessage());
 		}
 		return message;
@@ -332,7 +331,7 @@ public class ContainerController {
 			message.errorStatus().putMsg("info", "delete fail").setData(result);
 		} catch (Exception e) {
 			e.printStackTrace();
-			logger.error(" error Message : {}", e.getMessage());
+			logger.error(" error Message : "+ e.getMessage());
 			message.errorStatus().putMsg("info", "error Message :" + e.getMessage());
 		}
 		return message;
@@ -354,7 +353,7 @@ public class ContainerController {
 			return message;
 		} catch (Exception e) {
 			e.printStackTrace();
-			logger.error(" error Message : {}", e.getMessage());
+			logger.error(" error Message : "+ e.getMessage());
 			message.errorStatus().putMsg("info", "error Message :" + e.getMessage());
 		}
 		return message;
@@ -380,7 +379,7 @@ public class ContainerController {
 			return message;
 		} catch (Exception e) {
 			e.printStackTrace();
-			logger.error(" error Message : {}", e.getMessage());
+			logger.error(" error Message : "+ e.getMessage());
 			message.errorStatus().putMsg("info", "error Message :" + e.getMessage());
 		}
 		return message;
