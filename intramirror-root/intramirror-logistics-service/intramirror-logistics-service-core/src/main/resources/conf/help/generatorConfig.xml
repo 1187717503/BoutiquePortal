@@ -25,7 +25,7 @@
             <property name="trimStrings" value="true"/> <!-- 设置string时是否使用trim调用 -->
         </javaModelGenerator>
         
-        <sqlMapGenerator targetPackage="conf.sqlMap"
+        <sqlMapGenerator targetPackage="conf.logisticsSqlMap"
             targetProject="C:/Users/123/git/BoutiquePortal/intramirror-root/intramirror-logistics-service/intramirror-logistics-service-core/src/main/resources" /> <!-- 生成MapXML文件 -->
             <!-- XMLMAPPER,ANNOTATEDMAPPER -->
         <javaClientGenerator targetPackage="com.intramirror.logistics.core.mapper"
@@ -42,7 +42,7 @@
 			    <property name="useActualColumnNames" value="false"/>
 			</table>-->
 
-		<table schema="intra-mirror-prd" tableName="invoice" domainObjectName="Invoice"
+		<table schema="intra-mirror-prd" tableName="tax" domainObjectName="Tax"
 			   enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
 			   enableSelectByExample="false" selectByExampleQueryId="false" >
 			<property name="useActualColumnNames" value="false"/>
