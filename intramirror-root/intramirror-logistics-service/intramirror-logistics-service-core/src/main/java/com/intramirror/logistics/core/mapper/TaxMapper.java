@@ -50,4 +50,6 @@ public interface TaxMapper {
      * @mbggenerated
      */
     int updateByPrimaryKey(Tax record);
+
+    Tax getTaxByAddressCountryId(Long addressCountryId);
 }

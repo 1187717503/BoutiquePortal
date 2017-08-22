@@ -1,6 +1,7 @@
 package com.intramirror.main.core.impl;
 
 
+import com.intramirror.main.api.model.Geography;
 import com.intramirror.main.api.service.GeographyService;
 import com.intramirror.main.core.dao.BaseDao;
 import com.intramirror.main.core.mapper.GeographyMapper;
@@ -25,5 +26,10 @@ public class GeographyServiceImpl extends BaseDao implements GeographyService {
     @Override
     public List<Map<String, Object>> getGeographyList() {
         return geographyMapper.getGeographyList();
+    }
+
+    @Override
+    public Geography getGeographyById(Long geographyId) {
+        return geographyMapper.selectByPrimaryKey(geographyId);
     }
 }

@@ -175,7 +175,7 @@
     <select id="getOrderListByShipmentId" resultType="java.util.HashMap" parameterType="java.util.Map">
 			SELECT  o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id,pp.colorCode,pp.brandID,pspv.`value` as size,p.category_id,
 			s.price,s.in_price,sps.sale_price,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,b.english_name as brandName,
-			v.vendor_name,p.cover_img,lp.logistics_product_id,c.*  ,c2.name AS categoryName
+			v.vendor_name,p.cover_img,lp.logistics_product_id,c.*  ,c2.name AS categoryName,l.logistics_id,l.user_rec_country,l.geography_id
 			FROM logistics_product lp  
 			INNER JOIN container c on lp.container_id = c.container_id 
 			INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id  
@@ -451,8 +451,8 @@ and t1.order_num =  #{orderId,jdbcType=BIGINT}
 				where pspk.`name` = 'Size' and lp.enabled = 1 
 				and lp.order_line_num =  #{orderNumber,jdbcType=VARCHAR} GROUP BY o.order_num;
 	</select>
-	
-	 <select id="getShippedCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+
+    <select id="getShippedCount" resultType="java.lang.Integer" parameterType="java.util.Map">
 		SELECT COUNT(1) FROM(
 	SELECT  lp.order_line_num
 	FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
