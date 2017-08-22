@@ -729,50 +729,12 @@ public class OrderController extends BaseController{
 		}
 		
 		try{
-			
-			Map<String, Object> conditionMap = new HashMap<String, Object>();
-			conditionMap.put("logistics_product_id", Long.parseLong(map.get("logistics_product_id").toString()));
-			conditionMap.put("container_id", Long.parseLong(map.get("container_id").toString()));
-			conditionMap.put("status", OrderStatusType.READYTOSHIP);
-			
-			//检查判断该箱子是否存在订单
-			List<LogisticsProduct> list = iLogisticsProductService.selectByCondition(conditionMap);
-			if(list == null || list.size() == 0){
-				result.setMsg("Order does not exist ");
-				return result;
-			}
-			
-			
-			//取消订单跟箱子的关联,并修改状态为CONFIRMED
-			LogisticsProduct logisticsProduct = new LogisticsProduct();
-			logisticsProduct.setLogistics_product_id(Long.parseLong(map.get("logistics_product_id").toString()));
-			logisticsProduct.setContainer_id(0l);
-			logisticsProduct.setStatus(OrderStatusType.COMFIRMED);
-			logger.info("order deletePackingCheckOrder 取消订单与箱子的关联 并修改状态  调用接口iLogisticsProductService.updateByLogisticsProduct 订单修改前状态:"+OrderStatusType.READYTOSHIP+"  入参:"+new Gson().toJson(logisticsProduct));
-			int row = iLogisticsProductService.updateByLogisticsProduct(logisticsProduct);
-			
-			if(row > 0){
-				//查询相关的logisProShipmentInfo 表获取sub_shipment_id
-				Map<String,Object> logisProShipmentInfo = iLogisticsProductService.selectLogisProShipmentById(Long.parseLong(map.get("logistics_product_id").toString()));
-				
-				//根据sub_shipment_id 删除sub_shipment
-				if(logisProShipmentInfo != null && logisProShipmentInfo.get("sub_shipment_id") != null ){
-					logger.info("order deletePackingCheckOrder 删除订单相关联的 sub_shipment 调用接口  subShipmentService.deleteByPrimaryKey sub_shipment_id:"+logisProShipmentInfo.get("sub_shipment_id").toString());
-					subShipmentService.deleteByPrimaryKey(Long.parseLong(logisProShipmentInfo.get("sub_shipment_id").toString()));
-					
-					logger.info("order deletePackingCheckOrder 删除订单相关联的 logisticProductShipment 调用接口  logisticProductShipmentService.deleteById sub_shipment_id:"+logisProShipmentInfo.get("sub_shipment_id").toString());
-					logisticProductShipmentService.deleteById(Long.parseLong(logisProShipmentInfo.get("sub_shipment_id").toString()));
-				}
-				result.successStatus();
-			}else{
-				result.setMsg("Order does not exist ");
-			}
-			
+			result = orderServiceImpl.deleteOrder(map);
 		}catch(Exception e){
+			result.setMsg("Delete failed, please check whether the parameter is correct");
+			logger.error("order deletePackingCheckOrder failed,调用接口orderServiceImpl.deleteOrder 入参:"+new Gson().toJson(map));
 			e.printStackTrace();
 		}
-
-		
 		
 		return result;
 	}
