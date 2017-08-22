@@ -461,10 +461,12 @@ public class OrderShipController extends BaseController {
                     Map<String, Object> shipmentPramMap = new HashMap<>();
                     shipmentPramMap.put("shipmentId", Long.parseLong(map.get("shipment_id").toString()));
                     Shipment shipment = iShipmentService.selectShipmentById(shipmentPramMap);
-                    if (geography != null && shipment != null && geography.getGeographyId().equals(container.get("geography_id").toString())) {
+                    if (geography != null && shipment != null && geography.getGeographyId().toString().equals(container.get("geography_id").toString())) {
                         if (geography.getEnglishName().equals(shipment.getShipToGeography())) {
+                            logger.info("打印Invoice----查询当前订单的到货国家");
                             //查询当前订单的到货国家
                             AddressCountry addressCountry = addressCountryService.getAddressCountryByName(container.get("user_rec_country").toString());
+                            logger.info("打印Invoice----查询当前到货国家的tax_rate");
                             //查询当前到货国家的tax_rate
                             Tax tax = taxService.getTaxByAddressCountryId(addressCountry.getAddressCountryId());
                             if (tax.getTaxRate() != null) {
