@@ -46,7 +46,7 @@ public class QuadraSynProductMapping implements IMapping{
             Map<String,Object> serviceProductMap = productEDSManagement.createProduct(productOptions,vendorOptions);
             logger.info("Quadra结束调用商品创建Service by Quadra,serviceProductMap:" + new Gson().toJson(serviceProductMap));
 
-            if(serviceProductMap != null && serviceProductMap.get("status").equals(StatusType.NOT_PRODUCT)) {
+            if(serviceProductMap != null && serviceProductMap.get("status").equals(StatusType.PRODUCT_ALREADY_EXISTS)) {
 
                 logger.info("Quadra开始调用商品修改Service by Quadra,productOptions:" + new Gson().toJson(productOptions) + " , vendorOptions:" + new Gson().toJson(vendorOptions));
                 serviceProductMap = iProductService.updateProduct(productOptions,vendorOptions);
