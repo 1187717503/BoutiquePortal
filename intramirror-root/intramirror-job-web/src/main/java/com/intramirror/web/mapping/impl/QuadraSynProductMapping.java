@@ -1,11 +1,14 @@
-package pk.shoplus.service.mapping.impl;
+package com.intramirror.web.mapping.impl;
 
 import com.alibaba.fastjson15.JSONObject;
 import com.google.gson.Gson;
+
 import difflib.DiffRow;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.sql2o.Connection;
+
 import pk.shoplus.DBConnector;
 import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.parameter.StatusType;
@@ -35,11 +38,11 @@ public class QuadraSynProductMapping implements IMapping{
     @Override
     public Map<String, Object> handleMappingAndExecute(String mqData) {
         logger.info(" start QuadraSynProductMapping.handleMappingAndExecute();");
-        MapUtils mapUtils = new MapUtils(new HashMap<>());
+        MapUtils mapUtils = new MapUtils(new HashMap<String, Object>());
         try {
             Map<String,Object> mqDataMap = JSONObject.parseObject(mqData);
             ProductEDSManagement.VendorOptions vendorOptions = new Gson().fromJson(mqDataMap.get("vendorOptions").toString(), ProductEDSManagement.VendorOptions.class);
-            String propertyValue = mqDataMap.get("product_data").toString();
+            String propertyValue = mqDataMap.get("product").toString();
             ProductEDSManagement.ProductOptions productOptions = this.handleMappingData(propertyValue,vendorOptions);
 
             logger.info("Quadra开始调用商品创建Service by Quadra,productOptions:" + new Gson().toJson(productOptions) + " , vendorOptions:" + new Gson().toJson(vendorOptions));
