@@ -5,27 +5,23 @@ import com.google.gson.Gson;
 import difflib.DiffRow;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.sql2o.Connection;
-import pk.shoplus.DBConnector;
 import pk.shoplus.common.Contants;
-import pk.shoplus.model.ProductEDSManagement;
+import pk.shoplus.enums.ApiErrorTypeEnum;
 import pk.shoplus.model.ProductStockEDSManagement;
 import pk.shoplus.model.SkuStore;
 import pk.shoplus.parameter.StatusType;
-import pk.shoplus.service.MappingCategoryService;
 import pk.shoplus.service.mapping.api.IMapping;
-import pk.shoplus.service.product.api.IProductService;
-import pk.shoplus.service.product.impl.ProductServiceImpl;
 import pk.shoplus.service.stock.api.IStoreService;
 import pk.shoplus.service.stock.impl.StoreServiceImpl;
-import pk.shoplus.thirdpart.easypay.Status;
+import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.util.MapUtils;
 import pk.shoplus.vo.ResultMessage;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+
+import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.handle_stock_rule_error;
+import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.Runtime_exception;
 
 /**
  * Created by dingyifan on 2017/7/5.
@@ -48,7 +44,7 @@ public class FilippoSynStockMapping implements IMapping{
             ProductStockEDSManagement.StockOptions stockOptions = this.handleMappingData(propertyValue);
 
             if(StringUtils.isBlank(stockOptions.getQuantity())) {
-                return mapUtils.putData("status", StatusType.FAILURE).putData("info","FilippoSynStockMapping.handleMappingAndExecute() quantity is null !!!").getMap();
+                return mapUtils.putData("status", StatusType.FAILURE).putData("key","stock").putData("value","null").putData("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null).putData("info","FilippoSynStockMapping.handleMappingAndExecute() quantity is null !!!").getMap();
             } else {
                 IStoreService storeService = new StoreServiceImpl();
                 int qty = Integer.parseInt(stockOptions.getQuantity());
@@ -58,18 +54,29 @@ public class FilippoSynStockMapping implements IMapping{
                     stockOptions.setQuantity(skuStore.getStore().toString());
                     stockOptions.setReserved(skuStore.getReserved().toString());
                 } else {
-                    return mapUtils.putData("status",StatusType.FAILURE).putData("info",resultMessage.getMsg()).getMap();
+                    return mapUtils.putData("status",StatusType.FAILURE)
+                            .putData("error_enum",handle_stock_rule_error)
+                            .putData("product_code",stockOptions.getProductCode())
+                            .putData("key","size")
+                            .putData("value",stockOptions.getSizeValue())
+                            .putData("size",stockOptions.getSizeValue())
+                            .putData("info",resultMessage.getMsg()).getMap();
                 }
+
                 logger.info("开始调用filippo库存更新Service,stockOptions:"+new Gson().toJson(stockOptions));
                 Map<String, Object> serviceResultMap = productStockEDSManagement.updateStock(stockOptions);
-                logger.info("结束调用filippo库存更新Service,serviceResultMap:"+new Gson().toJson(serviceResultMap));
-
+                logger.info("结束调用filippo库存更新Service,serviceResultMap:"+new Gson().toJson(serviceResultMap)+",stockOptions:"+new Gson().toJson(stockOptions));
+                serviceResultMap.put("product_code",stockOptions.getProductCode());
+                serviceResultMap.put("size",stockOptions.getSizeValue());
                 return serviceResultMap;
             }
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(" error message : " + e.getMessage());
-            mapUtils.putData("status", StatusType.FAILURE).putData("info","FilippoSynStockMapping error message : " + e.getMessage());
+            mapUtils.putData("key","exception");
+            mapUtils.putData("value",ExceptionUtils.getExceptionDetail(e));
+            mapUtils.putData("error_enum", Runtime_exception);
+            mapUtils.putData("status", StatusType.FAILURE).putData("info","FilippoSynStockMapping error message : " + ExceptionUtils.getExceptionDetail(e));
         }
         logger.info(" end FilippoSynStockMapping.handleMappingAndExecute();");
         return mapUtils.getMap();

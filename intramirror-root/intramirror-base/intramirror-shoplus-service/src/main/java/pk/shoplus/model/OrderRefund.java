@@ -185,7 +185,7 @@ public class OrderRefund{
             		LogisticsProduct logisticsProduct = new LogisticsProduct();
             		logisticsProduct.setLogistics_product_id(Long.parseLong(refundMap.get("request_id").toString()));
             		logisticsProduct.setStatus(Contants.LOGISTICSPRODUCT_CANCELED_STATUS);
-            		logisticsProductService.updateLogisticsProduct(logisticsProduct,-4);
+            		logisticsProductService.updateLogisticsProduct(logisticsProduct,-4, false);
             		conn.commit();
                 } catch (Exception e) {
                 	e.printStackTrace();

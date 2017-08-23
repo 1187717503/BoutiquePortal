@@ -171,7 +171,7 @@ public class OrderCloudStoreMapping implements IMapping {
 					if(resultJson != null && "ok".equals(resultJson.getString("status"))){
 						//修改订单状态为COMFIRMED
 						LogisticsProduct logisticsProduct = logisticsProductService.getLogisticsProductById(Long.parseLong(orderMager.getOrderId()));
-						logisticsProductService.updateOrderLogisticsByOrderLogisticsId(logisticsProduct,2);
+						logisticsProductService.updateOrderLogisticsByOrderLogisticsId(logisticsProduct,2, false);
 						
 						//标识成功
 						dataMap.put("status", StatusType.SUCCESS);

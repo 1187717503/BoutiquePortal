@@ -12,7 +12,7 @@ public class NotificationMsg {
 	/**
 	 * 初始化图片
 	 */
-	public static final String NOTIFICATION_PIC = "http://img.cheezmall.com/sit/e7f361e5-63fa-42a0-9ced-c9a01d8c9648";
+	public static final String NOTIFICATION_PIC = "http://img.cheezmall.com/test/e7f361e5-63fa-42a0-9ced-c9a01d8c9648";
 	
 	/**
 	 * shop

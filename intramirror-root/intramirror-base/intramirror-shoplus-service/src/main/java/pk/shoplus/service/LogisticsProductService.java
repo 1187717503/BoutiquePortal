@@ -1,25 +1,21 @@
 package pk.shoplus.service;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.sql2o.Connection;
+import pk.shoplus.dao.EntityDao;
+import pk.shoplus.enums.OrderStatusEnum;
+import pk.shoplus.model.LogisticsProduct;
+import pk.shoplus.model.Page;
+import pk.shoplus.parameter.EnabledType;
+import pk.shoplus.parameter.OrderStatusType;
+import pk.shoplus.parameter.StatusType;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.sql2o.Connection;
-
-import pk.shoplus.common.Helper;
-import pk.shoplus.dao.EntityDao;
-import pk.shoplus.enums.OrderStatusEnum;
-import pk.shoplus.model.LogisticsProduct;
-import pk.shoplus.model.Page;
-import pk.shoplus.parameter.EdsOrderStatusType;
-import pk.shoplus.parameter.EnabledType;
-import pk.shoplus.parameter.OrderStatusMap;
-import pk.shoplus.parameter.OrderStatusType;
-import pk.shoplus.parameter.StatusType;
 
 public class LogisticsProductService {
 
@@ -549,7 +545,7 @@ public class LogisticsProductService {
 	/**
 	 * 根据条件获取sku 库存相关信息
 	 * 
-	 * @param whereStr
+	 * @param whereString
 	 * @return
 	 * @throws Exception
 	 */
@@ -617,7 +613,7 @@ public class LogisticsProductService {
 	 * @return
 	 * @throws Exception
 	 */
-    public Map<String, Object> updateOrderLogisticsByOrderLogisticsId(LogisticsProduct logisticsProduct,int status) throws Exception{
+    public Map<String, Object> updateOrderLogisticsByOrderLogisticsId(LogisticsProduct logisticsProduct,int status, boolean isCallBack) throws Exception{
     	Map<String, Object> resultMap = new HashMap<String, Object>();
     	resultMap.put("status",StatusType.FAILURE);
     	
@@ -658,14 +654,14 @@ public class LogisticsProductService {
 			
             
             logisticsProduct.status = status;
-            this.updateLogisticsProduct(logisticsProduct,status);
+            this.updateLogisticsProduct(logisticsProduct, status, isCallBack);
             resultMap.put("status",StatusType.SUCCESS);
         }
     	return resultMap;
     	
     }
 
-	public void updateLogisticsProduct(LogisticsProduct logisticsProduct,Integer orderStatus) throws Exception {
+	public void updateLogisticsProduct(LogisticsProduct logisticsProduct,Integer orderStatus, boolean isCallBack) throws Exception {
 		try {
 			LogisticsProduct lp = this.getLogisticsProductById(logisticsProduct.getLogistics_product_id());
 			if(lp.getStatus().intValue() != logisticsProduct.getStatus().intValue()) {
@@ -673,7 +669,12 @@ public class LogisticsProductService {
 				logisticsProduct = this.getLogisticsProductById(logisticsProduct.getLogistics_product_id());
 				
 				String skuId = this.getSkuId(logisticsProduct.getShop_product_sku_id().toString());
-				this.updateStatus(orderStatus, skuId);
+
+				if (isCallBack) {
+					this.cancleOrderUpdateStatus(skuId);
+				} else {
+					this.updateStatus(orderStatus, skuId);
+				}
 			}
 		} catch (Exception e) {
 			throw e;
@@ -700,9 +701,7 @@ public class LogisticsProductService {
 	public boolean updateStatus(Integer statusType,String skuId){
 		if(statusType != null && skuId != null) {
 			String sql = "";
-			if(statusType.intValue() == OrderStatusEnum.CANCEL.getCode().intValue()) {
-				sql = "update sku_store ss set ss.ordered = ss.ordered - 1 where ss.sku_id = '" + skuId + "' ";
-			} else if(statusType.intValue() == OrderStatusEnum.CLOSE.getCode().intValue()) {
+			if(statusType.intValue() == OrderStatusEnum.CLOSE.getCode().intValue()) {
 				sql = "update sku_store ss set ss.ship = ss.ship - 1, ss.finished = ss.finished + 1 where ss.sku_id = '" + skuId + "' ";
 			}  else if(statusType.intValue() == OrderStatusEnum.CONFIM.getCode().intValue()) {
 				sql = "update sku_store ss set ss.ordered = ss.ordered - 1,ss.confirm = ss.confirm + 1 where ss.sku_id = '" + skuId + "' ";
@@ -718,6 +717,26 @@ public class LogisticsProductService {
 				}
 			}
 		}
+		return false;
+	}
+
+	public boolean cancleOrderUpdateStatus(String skuId){
+		if(skuId != null) {
+			String sql = sql = "update sku_store ss set ss.ordered = ss.ordered - 1 where ss.sku_id = '" + skuId + "' ";
+			System.out.println("sku: "+skuId+" 取消订单,扣减库存!");
+
+			if(StringUtils.isNotBlank(sql)) {
+				try {
+					logisticsProductDao.updateBySQL(sql, null);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		} else {
+			System.out.println("取消订单sku为空,扣减库存失败!");
+		}
+
 		return false;
 	}
 

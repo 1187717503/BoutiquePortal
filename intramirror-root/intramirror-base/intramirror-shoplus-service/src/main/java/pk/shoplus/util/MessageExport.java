@@ -31,7 +31,9 @@ public class MessageExport {
             int j = 0;
             for(Map.Entry<String, Object> entry : maps.entrySet()){
                 JSONObject data = JSONObject.parseObject(entry.getValue().toString());
-                JSONObject responseBody = data.getJSONObject("data").getJSONObject("body").getJSONObject("responseBody");
+//                JSONObject responseBody = data.getJSONObject("data").getJSONObject("body").getJSONObject("responseBody");
+                JSONObject responseBody = data.getJSONObject("data").getJSONObject("body");
+
                 Iterator iterator = responseBody.keySet().iterator();
                 while(iterator.hasNext()){
                     String key = (String) iterator.next();
@@ -60,7 +62,8 @@ public class MessageExport {
 
             for(Map.Entry<String, Object> entry : maps.entrySet()){
                 JSONObject data = JSONObject.parseObject(entry.getValue().toString());
-                JSONObject responseBody = data.getJSONObject("data").getJSONObject("body").getJSONObject("responseBody");
+                JSONObject responseBody = data.getJSONObject("data").getJSONObject("body");
+//                JSONObject responseBody = data.getJSONObject("data").getJSONObject("body").getJSONObject("responseBody");
                 List<String> list = new ArrayList<>();
                 for (Object obj : sets) {
                     if(obj.toString().contains("cat_ids-1")) {

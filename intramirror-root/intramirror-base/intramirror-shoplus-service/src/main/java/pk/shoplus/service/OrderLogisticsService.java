@@ -184,11 +184,11 @@ public class OrderLogisticsService {
             	sql.append(" and t4.logistics_product_id = " + logisticsProductId);
             }*/
             
-            sql.append(" select pt.order_num,lp.amount*lp.sale_price*100 as price,pr.request_id,pr.serial_number,o.pay_way,lp.logistics_product_id from `order` o "); 
-            sql.append(" left join order_logistics ol on o.order_id = ol.order_id ");
-            sql.append(" left join logistics_product lp on lp.order_logistics_id = ol.order_logistics_id ");
-            sql.append(" left join payment pt on pt.order_num = ol.order_id ");
-            sql.append(" left join payment_result pr on pr.payment_id = pt.payment_id ");
+            sql.append(" select pt.order_num,CAST(ROUND((lp.amount*lp.sale_price+lp.shipping_fee+lp.tax_fee)*o.current_rate, 2)*100 as signed) as price,pr.request_id,pr.serial_number,o.pay_way,lp.logistics_product_id from `order` o ");
+            sql.append(" inner join order_logistics ol on o.order_id = ol.order_id ");
+            sql.append(" inner join logistics_product lp on lp.order_logistics_id = ol.order_logistics_id ");
+            sql.append(" inner join payment pt on pt.order_num = ol.order_id ");
+            sql.append(" inner join payment_result pr on pr.payment_id = pt.payment_id ");
             sql.append(" where 1=1 "); // pr.request_id is not null
             
             if(StringUtils.isNotBlank(logisticsProductId)) {
@@ -217,7 +217,7 @@ public class OrderLogisticsService {
     		/*//and t2.process_status = 1
     		select * from payment t1,payment_result t2 where t1.payment_id = t2.payment_id and t1.order_num = */
             StringBuilder sql = new StringBuilder("");
-            sql.append(" select t5.pay_way,t1.order_num,sum(t4.amount*t4.sale_price) as price,t2.request_id,t2.serial_number  ,t4.logistics_product_id from payment t1,payment_result t2,order_logistics t3,logistics_product t4 ,`order` t5 ");
+            sql.append(" select t5.pay_way,t1.order_num,CAST(ROUND((t4.sale_price+t4.shipping_fee+t4.tax_fee)*t5.current_rate, 2)*100 as signed) as price,t2.request_id,t2.serial_number  ,t4.logistics_product_id from payment t1,payment_result t2,order_logistics t3,logistics_product t4 ,`order` t5 ");
             sql.append(" where t1.payment_id = t2.payment_id and t3.order_id = t1.order_num ");
             sql.append(" and t3.order_logistics_id = t4.order_logistics_id and t5.order_id = t3.order_id group by t2.request_id,t2.serial_number ");
             

@@ -277,6 +277,7 @@ public class ProductStatusServiceImpl implements IProductStatusService{
                         ", changeStatus : " + changeStatus +
                         ", 请查询状态机,此状态跳转不被允许！");
             } else {
+                logger.info("状态机更改商品状态,product:"+new Gson().toJson(product));
                 resultMessage.setMsg("SUCCESS");
             }
         } catch (Exception e) {

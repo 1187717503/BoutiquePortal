@@ -1,5 +1,6 @@
 package pk.shoplus.service.stock.impl;
 
+import com.google.gson.Gson;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.sql2o.Connection;
@@ -26,14 +27,15 @@ public class StoreServiceImpl implements IStoreService{
         ResultMessage resultMessage = new ResultMessage();
         Connection conn = null;
         try {
-        	conn = DBConnector.sql2o.beginTransaction();
+        	conn = DBConnector.sql2o.open();
             int store = 0;
             int reserved = 0;
             int rs = 0;
+            long sku_store_id = 0;
 
             // checked
             if(StringUtils.isBlank(size) || StringUtils.isBlank(productCode)) {
-                return resultMessage.sStatus(false).sMsg(".handleApiStockRule 入参校验失败!!!");
+                return resultMessage.sStatus(false).sMsg("handleApiStockRule size或者productCode为空。size:"+size+",productCode:"+productCode);
             }
 
             /* get sku store,reserved */
@@ -46,10 +48,12 @@ public class StoreServiceImpl implements IStoreService{
             if(skuStoreIdList != null && skuStoreIdList.size() > 0) {
                 SkuStoreService skuStoreService = new SkuStoreService(conn);
                 SkuStore skuStore = skuStoreService.getSkuStoreByID(skuStoreIdList.get(0).get("sku_store_id").toString());
+                logger.info(" updateStock before,skuStore:"+new Gson().toJson(skuStore)+",size:"+size+","+productCode);
                 store = skuStore.getStore() == null ? 0 : skuStore.getStore().intValue();
                 reserved = skuStore.getReserved() == null ? 0 : skuStore.getReserved().intValue();
+                sku_store_id = skuStore.getSku_store_id();
             } else {
-                return resultMessage.sStatus(false).sMsg("sku信息查询失败!!!");
+                return resultMessage.sStatus(false).sMsg("handleApiStockRule 没有查询到SKU信息。size:"+size+",productCode:"+productCode);
             }
 
             // get qty_diff
@@ -58,7 +62,7 @@ public class StoreServiceImpl implements IStoreService{
             } else if(Contants.STOCK_QTY_DIFF == qtyType) {
                 rs = qtyDiff;
             } else {
-                return  resultMessage.sStatus(false).sMsg("入参qty_type有误!!!");
+                return  resultMessage.sStatus(false).sMsg("handleApiStockRule 入参qtyType有误。qtyType:"+qtyType);
             }
 
             // 开始计算
@@ -80,12 +84,12 @@ public class StoreServiceImpl implements IStoreService{
             SkuStore skuStore = new SkuStore();
             skuStore.store = Long.valueOf(store);
             skuStore.reserved = Long.valueOf(reserved);
-            conn.commit();
+            skuStore.sku_store_id = sku_store_id;
             if(conn != null) {conn.close();}
             return resultMessage.sStatus(true).sMsg("SUCCESS").sData(skuStore);
         } catch (Exception e) {
             logger.error(" errorMessage  : " + e.getMessage());
-            if(conn != null) {conn.rollback();conn.close();}
+            if(conn != null) {conn.close();}
             throw e;
         } finally {
             if(conn != null) {conn.close();}

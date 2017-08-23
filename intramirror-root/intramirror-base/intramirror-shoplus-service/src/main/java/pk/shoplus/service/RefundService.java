@@ -92,7 +92,7 @@ public class RefundService {
 		builder.setRequestId(requestId);
 		JSONObject requestData = builder.build();
 		OnlinePayOrderExecuter executer = new OnlinePayOrderExecuter();
-		logger.info("【退款查询】开始调用易汇金SDK,入参数据:"+new Gson().toJson(refundVO));
+		logger.info("【退款查询】开始调用易汇金SDK,入参数据:"+new Gson().toJson(requestData));
 		try{
 			executer.refundQuery(requestData, new ResultListenerAdpater() {
 	            public void success(JSONObject jsonObject) {
@@ -115,21 +115,25 @@ public class RefundService {
 			e.printStackTrace();
 			rMsg.status(false).setMsg("【退款查询】响应异常！" + new Gson().toJson(refundVO));;
 			logger.error("【退款查询】订单号 {"+refundVO.getOrderId()+"} 交易号 {"+refundVO.getRequestId()+"} 退款查询-响应异常,errorMessage:{"+e+"}");
+			throw  e;
 		}
 		catch(HmacVerifyException e){
 			e.printStackTrace();
 			rMsg.status(false).setMsg("【退款查询】签名验证异常！" + new Gson().toJson(refundVO));
 			logger.error("【退款查询】订单号 {"+refundVO.getOrderId()+"} 交易号 {"+refundVO.getRequestId()+"} 退款查询-签名验证异常,errorMessage:{"+e+"}");
+			throw e;
 		}
 		catch(RequestException e){
 			e.printStackTrace();
 			rMsg.status(false).setMsg("【退款查询】请求异常！" + new Gson().toJson(refundVO));;
 			logger.error("【退款查询】订单号 {"+refundVO.getOrderId()+"} 交易号 {"+refundVO.getRequestId()+"} 退款查询-请求异常,errorMessage:{"+e+"}");
+			throw e;
 		}
 		catch(UnknownException e){
 			e.printStackTrace();
 			rMsg.status(false).setMsg("【退款查询】未知异常！" + new Gson().toJson(refundVO));
 			logger.error("【退款查询】订单号 {"+refundVO.getOrderId()+"} 交易号 {"+refundVO.getRequestId()+"} 退款查询-未知异常,errorMessage:{"+e+"}");
+			throw e;
 		}
 		logger.info("【退款查询】结束！响应数据："+new Gson().toJson(rMsg));
 		return rMsg;

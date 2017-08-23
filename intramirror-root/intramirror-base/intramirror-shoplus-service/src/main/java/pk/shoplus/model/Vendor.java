@@ -118,8 +118,27 @@ public class Vendor{
 */
 	 @Column	public BigDecimal score;
 
+//	 @Column public String vendor_code;
+
+//	 @Column public String contact;
+
 	   @Column
 	   public Long address_country_id;
+	   
+	   
+	/**
+	 * contact(email)
+	 */
+	@Column
+	public String contact;
+	
+	/**
+	 * vendor_code
+	 */
+	@Column
+	public String vendor_code;
+	
+		
 
 	   public Long getAddress_country_id() {
 		   return address_country_id;
@@ -206,5 +225,127 @@ public class Vendor{
 	public BigDecimal getScore(){
 		return score;
 	}
-}
+	
+	public String getContact() {
+		return contact;
+	}
+	
+	public String getVendor_code() {
+		return vendor_code;
+	}
+	
+
+	   public void setVendor_id(Long vendor_id) {
+		   this.vendor_id = vendor_id;
+	   }
+
+	   public void setGrade(Integer grade) {
+		   this.grade = grade;
+	   }
+
+	   public void setVendor_name(String vendor_name) {
+		   this.vendor_name = vendor_name;
+	   }
+
+	   public void setUser_id(Long user_id) {
+		   this.user_id = user_id;
+	   }
+
+	   public void setVendor_applicant_id(Long vendor_applicant_id) {
+		   this.vendor_applicant_id = vendor_applicant_id;
+	   }
+
+	   public void setIdentity_card(String identity_card) {
+		   this.identity_card = identity_card;
+	   }
+
+	   public void setBrand_type(Integer brand_type) {
+		   this.brand_type = brand_type;
+	   }
+
+	   public void setCredit_card(String credit_card) {
+		   this.credit_card = credit_card;
+	   }
+
+	   public void setStatus(Integer status) {
+		   this.status = status;
+	   }
+
+	   public void setRemark(String remark) {
+		   this.remark = remark;
+	   }
+
+	   public void setCompany_name(String company_name) {
+		   this.company_name = company_name;
+	   }
+
+	   public void setRegistered_person(String registered_person) {
+		   this.registered_person = registered_person;
+	   }
+
+	   public void setElectronic_identification_card(String electronic_identification_card) {
+		   this.electronic_identification_card = electronic_identification_card;
+	   }
+
+	   public void setBusiness_license_number(String business_license_number) {
+		   this.business_license_number = business_license_number;
+	   }
+
+	   public void setBusiness_license_duration(Date business_license_duration) {
+		   this.business_license_duration = business_license_duration;
+	   }
+
+	   public void setValid_end_at(Date valid_end_at) {
+		   this.valid_end_at = valid_end_at;
+	   }
+
+	   public void setElectronic_business_license(String electronic_business_license) {
+		   this.electronic_business_license = electronic_business_license;
+	   }
+
+	   public void setLegal_management_scope(String legal_management_scope) {
+		   this.legal_management_scope = legal_management_scope;
+	   }
+
+	   public void setBusiness_license_location(String business_license_location) {
+		   this.business_license_location = business_license_location;
+	   }
+
+	   public void setUpdated_at(Date updated_at) {
+		   this.updated_at = updated_at;
+	   }
+
+	   public void setCreated_at(Date created_at) {
+		   this.created_at = created_at;
+	   }
+
+	   public void setEnabled(Boolean enabled) {
+		   this.enabled = enabled;
+	   }
+
+	   public void setLast_login(Date last_login) {
+		   this.last_login = last_login;
+	   }
+
+	   public void setNational_mark(String national_mark) {
+		   this.national_mark = national_mark;
+	   }
+
+	   public void setProduct_image_score(Integer product_image_score) {
+		   this.product_image_score = product_image_score;
+	   }
+
+	   public void setVendor_score(Integer vendor_score) {
+		   this.vendor_score = vendor_score;
+	   }
+
+	   public void setScore(BigDecimal score) {
+		   this.score = score;
+	   }
+
+
+	   public void setAddress_country_id(Long address_country_id) {
+		   this.address_country_id = address_country_id;
+	   }
+   }
 

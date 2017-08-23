@@ -1,5 +1,6 @@
 package pk.shoplus.service.mapping.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson15.JSONObject;
 import com.google.gson.Gson;
 import difflib.DiffRow;
@@ -13,13 +14,15 @@ import pk.shoplus.service.MappingCategoryService;
 import pk.shoplus.service.mapping.api.IMapping;
 import pk.shoplus.service.product.api.IProductService;
 import pk.shoplus.service.product.impl.ProductServiceImpl;
-import pk.shoplus.util.FileUtil;
+import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.util.MapUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.Runtime_exception;
 
 /**
  * Created by dingyifan on 2017/7/5.
@@ -42,24 +45,31 @@ public class FilippoSynProductMapping implements IMapping{
             Map<String,Object> mqDataMap = JSONObject.parseObject(mqData);
             ProductEDSManagement.VendorOptions vendorOptions = new Gson().fromJson(mqDataMap.get("vendorOptions").toString(), ProductEDSManagement.VendorOptions.class);
             String propertyValue = mqDataMap.get("product_data").toString();
+            String full_update_product = mqDataMap.get("full_update_product") == null ? "0" : mqDataMap.get("full_update_product").toString();
             ProductEDSManagement.ProductOptions productOptions = this.handleMappingData(propertyValue,vendorOptions);
+            productOptions.setFullUpdateProductFlag(full_update_product);
 
             logger.info("Filippo开始调用商品创建Service by atelier,productOptions:" + new Gson().toJson(productOptions) + " , vendorOptions:" + new Gson().toJson(vendorOptions));
             Map<String,Object> serviceProductMap = productEDSManagement.createProduct(productOptions,vendorOptions);
-            logger.info("Filippo结束调用商品创建Service by atelier,serviceProductMap:" + new Gson().toJson(serviceProductMap));
+            logger.info("Filippo结束调用商品创建Service by atelier,serviceProductMap:" + new Gson().toJson(serviceProductMap)+",productOptions:" + new Gson().toJson(productOptions) + " , vendorOptions:" + new Gson().toJson(vendorOptions));
 
-            if(serviceProductMap != null && serviceProductMap.get("status").equals(StatusType.NOT_PRODUCT)) {
+            if(serviceProductMap != null && serviceProductMap.get("status").equals(StatusType.PRODUCT_ALREADY_EXISTS)) {
 
                 logger.info("Filippo开始调用商品修改Service by atelier,productOptions:" + new Gson().toJson(productOptions) + " , vendorOptions:" + new Gson().toJson(vendorOptions));
                 serviceProductMap = iProductService.updateProduct(productOptions,vendorOptions);
-                logger.info("Filippo结束调用商品修改Service by atelier,serviceProductMap:" + new Gson().toJson(serviceProductMap));
+                logger.info("Filippo结束调用商品修改Service by atelier,serviceProductMap:" + JSON.toJSONString(serviceProductMap)+",productOptions:" + new Gson().toJson(productOptions) + " , vendorOptions:" + new Gson().toJson(vendorOptions));
             }
-
+            serviceProductMap.put("product_code",productOptions.getCode());
+            serviceProductMap.put("color_code",productOptions.getColorCode());
+            serviceProductMap.put("brand_id",productOptions.getBrandCode());
             return  serviceProductMap;
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(" error message : " + e.getMessage());
-            mapUtils.putData("status", StatusType.FAILURE).putData("info","FilippoSynProductMapping error message : " + e.getMessage());
+            mapUtils.putData("key","exception");
+            mapUtils.putData("value",ExceptionUtils.getExceptionDetail(e));
+            mapUtils.putData("error_enum", Runtime_exception);
+            mapUtils.putData("status", StatusType.FAILURE).putData("info","FilippoSynProductMapping error message : " + ExceptionUtils.getExceptionDetail(e));
         }
         logger.info(" end FilippoSynProductMapping.handleMappingAndExecute();");
         return mapUtils.getMap();
@@ -128,12 +138,12 @@ public class FilippoSynProductMapping implements IMapping{
             MappingCategoryService mappingCategoryService = new MappingCategoryService(conn);
             Object [] object = new Object[]{vendorOptions.getStoreCode(), firstCategory,secondCategory,threeCategory};
 
-            /*// -- sit
+            /*// -- test
             String sql = "insert into `intra-mirror-prd`.`api_category_map` ( `boutique_third_category`, `boutique_second_category`, `category_id`, `second_category`, `boutique_first_category`, `third_category`, `enabled`, `api_configuration_id`, `first_category`, `created_at`, `updated_at`) \n" +
                     "values ( '"+threeCategory+"', '"+secondCategory+"', '1518', 'Clothing', '"+firstCategory+"', 'Beachwear', b'1', '55', 'Men','2017-07-06','2017-07-06');\n";
-            logger.info("filippo sit : " + sql);
-            FileUtil.writeFileAppendContent("/opt/data/sit/api_category_map.sql",sql);
-            // -- sit*/
+            logger.info("filippo test : " + sql);
+            FileUtil.writeFileAppendContent("/opt/data/test/api_category_map.sql",sql);
+            // -- test*/
 
             List<Map<String, Object>> apiCategoryMap = mappingCategoryService.getMappingCategoryInfoByCondition(object);
             if(apiCategoryMap != null && apiCategoryMap.size() > 0) {

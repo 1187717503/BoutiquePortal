@@ -3,6 +3,7 @@ package pk.shoplus.service.mapping.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.log4j.Logger;
 
 import com.google.gson.Gson;
@@ -13,6 +14,9 @@ import pk.shoplus.parameter.StatusType;
 import pk.shoplus.service.mapping.api.IMapping;
 import pk.shoplus.service.product.api.IProductService;
 import pk.shoplus.service.product.impl.ProductServiceImpl;
+import pk.shoplus.util.ExceptionUtils;
+
+import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.Runtime_exception;
 
 
 /**
@@ -25,7 +29,7 @@ public class UpdateProductMapping implements IMapping{
     private static Logger logger = Logger.getLogger(UpdateProductMapping.class);
 
     private static IProductService productServie = new ProductServiceImpl();
-
+    private ProductEDSManagement productEDSManagement = new ProductEDSManagement();
     private static ProductAtelierMapping productAtelierMapping = new ProductAtelierMapping();
 
     @Override
@@ -38,20 +42,34 @@ public class UpdateProductMapping implements IMapping{
                 ProductEDSManagement.ProductOptions productOptions = (ProductEDSManagement.ProductOptions)convertMap.get("productOptions");
                 ProductEDSManagement.VendorOptions vendorOptions = (ProductEDSManagement.VendorOptions)convertMap.get("vendorOptions");
 
-                logger.info("开始调用商品修改Service by atelier,productOptions:" + new Gson().toJson(productOptions) + " , vendorOptions:" + new Gson().toJson(vendorOptions));
-                Map<String,Object> serviceProductMap = productServie.updateProduct(productOptions,vendorOptions);
-                logger.info("结束调用商品修改Service by atelier,serviceProductMap:" + new Gson().toJson(serviceProductMap));
+                logger.info("Atelier开始调用商品创建Service by atelier,productOptions:" + new Gson().toJson(productOptions) + " , vendorOptions:" + new Gson().toJson(vendorOptions));
+                Map<String,Object> serviceProductMap = productEDSManagement.createProduct(productOptions,vendorOptions);
+                logger.info("Ateler结束调用商品创建Service by atelier,serviceProductMap:" + new Gson().toJson(serviceProductMap)+",productOptions:" + new Gson().toJson(productOptions) + " , vendorOptions:" + new Gson().toJson(vendorOptions));
 
-                // 返回结果
-                String updateStockResult = serviceProductMap.get("status") == null ? "" : serviceProductMap.get("status").toString();
-                resultMap.put("status",updateStockResult);
-                resultMap.put("info", "serviceResultMap:" + new Gson().toJson(serviceProductMap));
+                if(serviceProductMap != null && serviceProductMap.get("status").equals(StatusType.PRODUCT_ALREADY_EXISTS)) {
+                    logger.info("调用Atelier商品修改Service by atelier,productOptions:" + new Gson().toJson(productOptions) + " , vendorOptions:" + new Gson().toJson(vendorOptions));
+                    serviceProductMap = productServie.updateProduct(productOptions,vendorOptions);
+                    logger.info("调用Atelier商品修改Service by atelier,serviceProductMap:" + JSON.toJSONString(serviceProductMap)+",productOptions:" + new Gson().toJson(productOptions) + " , vendorOptions:" + new Gson().toJson(vendorOptions));
+                }
+
+                serviceProductMap.put("product_code",productOptions.getCode());
+                serviceProductMap.put("color_code",productOptions.getColorCode());
+                serviceProductMap.put("brand_id",productOptions.getBrandCode());
+
+                resultMap.put("product_code",productOptions.getCode());
+                resultMap.put("color_code",productOptions.getColorCode());
+                resultMap.put("brand_id",productOptions.getBrandCode());
+                return serviceProductMap;
             } else {
                 return convertMap;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            resultMap.put("info", "系统异常! errorMsg:" + e.getMessage());
+            resultMap.put("status",StatusType.FAILURE);
+            resultMap.put("key","exception");
+            resultMap.put("value", ExceptionUtils.getExceptionDetail(e));
+            resultMap.put("info", "UpdateProductMapping - " + Runtime_exception.getDesc() + "error message : " + e.getMessage());
+            resultMap.put("error_enum", Runtime_exception);
             logger.error("ERROR:"+new Gson().toJson(resultMap));
         }
         logger.info("------------------------------------------end UpdateProductMapping.handleMappingAndExecuteCreate,resultMap:" + new Gson().toJson(resultMap));

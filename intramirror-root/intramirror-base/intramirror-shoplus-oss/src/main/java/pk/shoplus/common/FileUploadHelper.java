@@ -42,6 +42,8 @@ public class FileUploadHelper {
     
     public static final String OSS_CONFIG_FILE = "/oss.properties";
 
+    public static final int maxSize = 204800;
+
     private static MediaStorageService mediaStorageService;
 
     private static String ossUrl;
@@ -131,7 +133,8 @@ public class FileUploadHelper {
                 String fileName = part.getName();
                 logger.info("part:"+part.getContentType());
                 inputStream=part.getInputStream();
-                if (part.getContentType().contains("image") && part.getSize() >= 100000) {
+                logger.info("part size : " + part.getSize());
+                if (part.getContentType().contains("image") && part.getSize() > maxSize) {
 //                    inputStream=compressImage(part.getInputStream(), 0.5f);
                     inputStream = ImageHelper.compressImage(part.getInputStream(), 0.5f);
                 }

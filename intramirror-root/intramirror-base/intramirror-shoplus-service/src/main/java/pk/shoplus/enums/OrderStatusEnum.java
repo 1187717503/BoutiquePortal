@@ -1,7 +1,7 @@
 package pk.shoplus.enums;
 
 public enum OrderStatusEnum {
-	CANCEL(-4,"CANCEL"),
+	//CANCEL(-4,"CANCEL"),
 	CLOSE(5,"CLOSE"),
 	CONFIM(2,"CONFIM"),
 	SHIP(3,"SHIP");

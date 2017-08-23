@@ -36,11 +36,9 @@ public class DBConnector {
 	static {
 		Properties props = new Properties();
 		// sql2o
-		InputStream in = null;
+		InputStream in = DBConnector.class.getResourceAsStream(DBConfiguration.DB_CONFIG_FILE);
+		props = new Properties();
 		try {
-
-			in = DBConnector.class.getResourceAsStream(DBConfiguration.DB_CONFIG_FILE);
-			props = new Properties();
 			props.load(in);
 			in.close();
 			HikariConfig config = new HikariConfig(props);
@@ -74,5 +72,4 @@ public class DBConnector {
 			throw new RuntimeException(e);
 		}
 	}
-
 }

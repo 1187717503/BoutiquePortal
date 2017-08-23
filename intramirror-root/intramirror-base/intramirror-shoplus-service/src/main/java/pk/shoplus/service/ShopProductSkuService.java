@@ -46,7 +46,7 @@ public class ShopProductSkuService {
 		}
 	}
 
-	// 根据whereString 获取数据 包括sku相关信息 - to sit
+	// 根据whereString 获取数据 包括sku相关信息 - to test
 	public List<Map<String, Object>> getShopProductSkuListWithSku(String whereStringInput) throws Exception {
 		List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
 		try {
@@ -91,7 +91,7 @@ public class ShopProductSkuService {
 		return result;
 	}
 
-	// 根据whereString 获取数据 包括sku相关信息 - to sit
+	// 根据whereString 获取数据 包括sku相关信息 - to test
 	public List<Map<String, Object>> getShopProductSkuListWithProductAndSkuId(String whereStringInput)
 			throws Exception {
 		List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();

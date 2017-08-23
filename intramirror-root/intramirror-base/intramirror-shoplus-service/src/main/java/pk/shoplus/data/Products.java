@@ -425,7 +425,7 @@ public class Products {
                 sku.created_at = Helper.getCurrentTimeToUTCWithDate();
                 sku.updated_at = Helper.getCurrentTimeToUTCWithDate();
                 sku.enabled = EnabledType.USED;
-
+                logger.info(" api create sku : "+new Gson().toJson(sku));
                 SkuService skuService = new SkuService(conn);
                 sku = skuService.createSku(sku);
 
@@ -682,6 +682,7 @@ public class Products {
                     }
                     model.description_img = arr.toJSONString();
                 }
+                model.season_code = contentDetails.getSeasonCode();
             }
 
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -695,7 +696,6 @@ public class Products {
             model.created_at = Helper.getCurrentTimeToUTCWithDate();
             model.updated_at = Helper.getCurrentTimeToUTCWithDate();
             model.enabled = EnabledType.USED;
-
             productService.createProduct(model);
             return model;
         }
@@ -821,10 +821,10 @@ public class Products {
             Products.ListResponse res = new Products.ListResponse();
             res.setItems(items);
 
-            String category = null;
-            if (params.containsKey("category")) {
-                category = (String) params.get("category");
-            }
+//            String category = null;
+//            if (params.containsKey("category")) {
+//                category = (String) params.get("category");
+//            }
             if (chart.equals("bestSeller")) {
                 chart = "BestSeller";
             } else if (chart.equals("newThisWeek")) {
@@ -896,16 +896,16 @@ public class Products {
                     "WHERE " +
                     "sp.enabled = 1 AND p.enabled = 1 AND sp.shop_id = 65 AND " +
                     "p.status = 3 AND sp.status = 0 AND pp.value > 0 " +
-                    (category != null ? "AND p.category_id IN " +
-                            "(" +
-                            "SELECT category_id FROM category " +
-                            "WHERE level = 3 AND " +
-                            "(category_id IN (" + category + ") OR " +
-                            "parent_id IN (" + category + "))" +
-                            ") " : "") +
+//                    (category != null ? "AND p.category_id IN " +
+//                            "(" +
+//                            "SELECT category_id FROM category " +
+//                            "WHERE level = 3 AND " +
+//                            "(category_id IN (" + category + ") OR " +
+//                            "parent_id IN (" + category + "))" +
+//                            ") " : "") +
                     "GROUP BY p.product_id " +
                     "ORDER BY CAST(pp.value AS DECIMAL) " +
-                    "LIMIT 0, 100";
+                    "LIMIT 0, 200";
 
             java.util.List<Row> rows = DataBase.query(sql);
 

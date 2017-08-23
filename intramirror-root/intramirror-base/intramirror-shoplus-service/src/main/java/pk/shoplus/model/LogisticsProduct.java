@@ -81,6 +81,13 @@ public class LogisticsProduct{
    @Column	public String tracking_num;
 
    @Column	public String vat_num;
+   
+   @Column public Long container_id;
+   @Column public Long invoice_id;
+   @Column public Date confirmed_at;
+   @Column public Date est_ship_date;
+   @Column public Date packed_at;
+   @Column public Date shipped_at;
 
 	   public String getTracking_num() {
 		   return tracking_num;
@@ -234,6 +241,26 @@ public class LogisticsProduct{
 
 	public void setTax_fee(BigDecimal tax_fee) {
 		this.tax_fee = tax_fee;
+	}
+	
+	
+	public Long getContainer_id(){
+		return container_id;
+	}
+	public Long getInvoice_id(){
+		return invoice_id;
+	}
+	public Date getConfirmed_at(){
+		return confirmed_at;
+	}
+	public Date getEst_ship_date(){
+		return est_ship_date;
+	}
+	public Date getPacked_at(){
+		return packed_at;
+	}
+	public Date getShipped_at(){
+		return shipped_at;
 	}
 	
 	

@@ -26,7 +26,7 @@ public class OrderUpdateStatusMapping{
 
     /**
      * 根据orderLineNum 修改订单状态
-     * @param String logisProductId
+     * @param orderLineNum
      * * @param int status 订单状态
      * @return 
      */
@@ -76,7 +76,7 @@ public class OrderUpdateStatusMapping{
 								//只有退款成功，才去修改状态
 								if(StatusType.SUCCESS == Integer.parseInt(refundStatus)){
 									
-									Map<String, Object> resultMap = logisticsProductService.updateOrderLogisticsByOrderLogisticsId(logisProduct, OrderStatusType.REFUND);
+									Map<String, Object> resultMap = logisticsProductService.updateOrderLogisticsByOrderLogisticsId(logisProduct, OrderStatusType.REFUND, false);
 									LOGGER.info("orderUpdateStatus mapping 更新订单状态"+OrderStatusType.REFUND+"结果:"+new Gson().toJson(resultMap));
 									
 									if(Integer.parseInt(resultMap.get("status").toString()) ==StatusType.SUCCESS){
@@ -98,7 +98,7 @@ public class OrderUpdateStatusMapping{
 								
 							//如果状态为refund 修改为canceled
 							}else if(logisProduct.getStatus() == OrderStatusType.REFUND){
-								Map<String, Object> resultMap = logisticsProductService.updateOrderLogisticsByOrderLogisticsId(logisProduct, OrderStatusType.CANCELED);
+								Map<String, Object> resultMap = logisticsProductService.updateOrderLogisticsByOrderLogisticsId(logisProduct, OrderStatusType.CANCELED, false);
 								LOGGER.info("orderUpdateStatus mapping 更新订单状态"+OrderStatusType.CANCELED+"结果:"+new Gson().toJson(resultMap));
 								dataMap.put("info", resultMap.get("info"));
 								break; //跳出循环
@@ -120,7 +120,7 @@ public class OrderUpdateStatusMapping{
 								//获取下一个流转状态,更新订单
 								int nextStatus = OrderStatusType.getNextStatus(logisProduct.status);
 								LOGGER.info("orderUpdateStatus mapping: current state:"+logisProduct.getStatus()+"After modification:"+nextStatus);
-								Map<String, Object> resultMap = logisticsProductService.updateOrderLogisticsByOrderLogisticsId(logisProduct,nextStatus);
+								Map<String, Object> resultMap = logisticsProductService.updateOrderLogisticsByOrderLogisticsId(logisProduct,nextStatus, false);
 								LOGGER.info("orderUpdateStatus mapping: Modify order status results:"+new Gson().toJson(resultMap));
 								
 								if(Integer.parseInt(resultMap.get("status").toString()) ==StatusType.SUCCESS){

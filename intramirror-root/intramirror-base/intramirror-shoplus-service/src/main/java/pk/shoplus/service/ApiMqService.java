@@ -125,7 +125,22 @@ public class ApiMqService {
 		}
     	return listMap;
     }
-    
+
+	// ApiError查询Api
+	public List<Map<String,Object>> getApiByVendorId(String vendorId){
+		List<Map<String,Object>> listMap = new ArrayList<Map<String,Object>>();
+		try {
+			String sql = " select aep.api_end_point_id,aep.`name` from api_end_point aep where aep.api_end_point_id in ( " +
+					" select ac.api_end_point_id from api_configuration ac where ac.vendor_id = '" + vendorId +  "')  and aep.enabled = 1 ";
+			listMap = apiMqDao.executeBySql(sql, null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return listMap;
+	}
+
+
     // 查询ApiConfig
     public List<Map<String,Object>> getApiConfig(String vendorId,String apiCfgId){
     	List<Map<String,Object>> listMap = new ArrayList<Map<String,Object>>();

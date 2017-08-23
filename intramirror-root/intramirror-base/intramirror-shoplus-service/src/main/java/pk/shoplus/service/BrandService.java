@@ -386,6 +386,10 @@ public class BrandService {
         }
     }
 
+    public List<Brand> getBrandListByIds(String ids) throws Exception {
+        return brandDao.getBySql(Brand.class,"*"," where brand_id in("+ids+") ",null);
+    }
+
     /**
      * 通过条件获取BrandList
      *

@@ -114,8 +114,7 @@ public class OrderStatusType {
 		
 		return lastStatus;
 	}
-	
-	
+
 	/**
 	 * 根据传入的订单状态，获取订单流转的下一个状态   只能获取正常下单发货流程状态，取消流程未考虑在内
 	 * @param status

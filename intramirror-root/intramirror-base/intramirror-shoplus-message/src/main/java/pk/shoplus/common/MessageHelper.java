@@ -39,7 +39,7 @@ public class MessageHelper {
      * @param messageRequestVo
      * @throws MessageFailException
      */
-    public static void putMessage (MessageRequestVo messageRequestVo) throws MessageFailException {
+    public static String putMessage (MessageRequestVo messageRequestVo) throws MessageFailException {
         /** start update 2017-06-20 环境配置*/
         if(messageRequestVo != null){
             messageRequestVo.setQueueName(messageRequestVo.getQueueName() + ConfigurationProperties.getInstance().getMq_env());}
@@ -49,13 +49,13 @@ public class MessageHelper {
 
         //如果是error 则存入redis
         if(messageRequestVo != null && messageRequestVo.getQueueName().contains(QueueTypeEnum.ERROR.getCode())){
-        	putMessageToRedis(messageRequestVo);
+        	return putMessageToRedis(messageRequestVo);
         
         //其他则存入MQ
         }else{
             messageService.putMessage(messageRequestVo);
         }
-
+        return "SUCCESS";
     }
     
 
@@ -186,14 +186,15 @@ public class MessageHelper {
      * @param messageRequestVo
      * @throws MessageFailException
      */
-    private static void putMessageToRedis (MessageRequestVo messageRequestVo) throws MessageFailException {
+    private static String putMessageToRedis (MessageRequestVo messageRequestVo) throws MessageFailException {
 //        RedisService redis = new RedisService();
         /** start update 2017-06-20 环境配置
         if(messageRequestVo != null){
             messageRequestVo.setQueueName(messageRequestVo.getQueueName() + ConfigurationProperties.getInstance().getMq_env());}
         * end update 2017-06-20 */
-
-    	RedisService.getInstance().putMap(messageRequestVo.getQueueName(), Helper.getUUID(), messageRequestVo.getRequestBody());
+        String key = Helper.getUUID();
+    	RedisService.getInstance().putMap(messageRequestVo.getQueueName(), key, messageRequestVo.getRequestBody());
+    	return key;
     }
     
     

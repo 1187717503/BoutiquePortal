@@ -22,7 +22,7 @@ public class ReturnProductService {
 		returnProductDao = new EntityDao<ReturnProduct>(conn);
 	}
 	
-	// 通过return application id 获取 return_product_list - 待调试， to sit 20161107
+	// 通过return application id 获取 return_product_list - 待调试， to test 20161107
 	public List<Map<String, Object>> getReturnProductListByReturnApplication(String whereStringInput) throws Exception {
 		List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
 		try {

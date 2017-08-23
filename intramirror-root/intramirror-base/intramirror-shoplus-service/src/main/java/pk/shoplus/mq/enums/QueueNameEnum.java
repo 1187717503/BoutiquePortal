@@ -1,6 +1,5 @@
 package pk.shoplus.mq.enums;
 
-import org.redisson.Redisson;
 import pk.shoplus.DBConnector;
 import pk.shoplus.model.*;
 import pk.shoplus.service.ApiMqService;
@@ -8,51 +7,49 @@ import pk.shoplus.service.RedisService;
 import pk.shoplus.service.mapping.api.IMapping;
 import pk.shoplus.service.mapping.impl.*;
 
-import java.util.Map;
-import java.util.Queue;
-
-import org.sql2o.Connection;
-
 public enum QueueNameEnum {
-	/*EdsCreateProduct_1("EdsCreateProduct1",new ProductEDSMapping(),"调用EDS接口创建商品"),
-	EdsUpdateStock_11("EdsUpdateStock11",new ProductStockEDSMapping(),"调用EDS接口修改库存"),
-	EdsCreateOrder_12("EdsCreateOrder12",new OrderEDSMapping(),"调用EDS接口创建订单"),
-	EdsGetOrderStatus_14("EdsGetOrderStatus14",new OrderEdsUpdateStatusMapping(),"调用EDS接口获取订单状态"),
-	AtelierCreateProduct_13("AtelierCreateProduct13",new ProductAtelierMapping(),"Atelier调用IM接口创建商品"),
-	AtelierUpdateSkuStock_15("AtelierUpdateSkuStock15",new ProductStockAtelierMapping(),"Atelier调用IM修改库存"),
-	AtelierUpdateOrderStatus_16("AtelierUpdateOrderStatus16",new OrderAtelierUpdateStatusMapping(),"Atelier调用IM接口修改订单状态"),
-	AtelierUpdateProduct_29("AtelierUpdateProduct",new UpdateProductMapping(),"Atelier调用IM接口修改商品信息"),
-	CloudStoreCreateOrder_31("CloudStoreCreateOrder31",new OrderCloudStoreMapping(),"调用CloudStore接口创建订单"),
-	CloudStoreUpdateOrderStatus_32("CloudStoreUpdateOrderStatus32",new OrderCloudStoreUpdateStatusMapping(),"调用CloudStoreUpdateOrderStatus接口更新订单状态"),
-	CloudStoreSynProduct_17("CloudStoreSynProduct17",new CloudStoreGetInventoryMapping(),"IM调用cloudstore getInventory更新商品信息"),
-	CloudStoreSynStock_18("CloudStoreSynStock18",new CloudStoreGetEventsMapping(),"IM调用cloudstore getEvents更新库存信息"),
 
-	EdsCreateProduct("EdsCreateProduct","调用EDS接口创建商品"),
-	EdsUpdateStock("EdsUpdateStock","调用EDS接口修改库存"),
-	EdsCreateOrder("EdsCreateOrder","调用EDS接口创建订单"),
-	EdsGetOrderStatus("EdsGetOrderStatus","调用EDS接口获取订单状态"),
-	AtelierCreateProduct("AtelierCreateProduct","Atelier调用IM接口创建商品"),
-	AtelierUpdateSkuStock("AtelierUpdateSkuStock","Atelier调用IM修改库存"),
-	AtelierUpdateOrderStatus("AtelierUpdateOrderStatus","Atelier调用IM接口修改订单状态"),
-	AtelierUpdateProduct("AtelierUpdateProduct","Atelier调用IM修改商品信息"),
-	CloudStoreCreateOrder("CloudStoreCreateOrder","调用CloudStore接口创建订单"),
-	CloudStoreUpdateOrderStatus("CloudStoreUpdateOrderStatus","调用CloudStoreUpdateOrderStatus接口 更新订单状态"),
-	CloudStoreSynProduct("CloudStoreSynProduct","IM调用cloudstore getInventory更新商品信息"),
-	CloudStoreSynStock("CloudStoreSynStock","IM调用cloudstore getEvents更新库存信息");*/
-
-	EdsCreateProduct("EdsCreateProduct",new ProductEDSMapping(),"调用EDS接口创建商品"),
-	EdsUpdateStock("EdsUpdateStock",new ProductStockEDSMapping(),"调用EDS接口修改库存"),
-	EdsCreateOrder("EdsCreateOrder",new OrderEDSMapping(),"调用EDS接口创建订单"),
-	EdsGetOrderStatus("EdsGetOrderStatus",new OrderEdsUpdateStatusMapping(),"调用EDS接口获取订单状态"),
-	AtelierCreateProduct("AtelierCreateProduct",new ProductAtelierMapping(),"Atelier调用IM接口创建商品"),
-	AtelierUpdateSkuStock("AtelierUpdateSkuStock",new ProductStockAtelierMapping(),"Atelier调用IM修改库存"),
 	AtelierUpdateOrderStatus("AtelierUpdateOrderStatus",new OrderAtelierUpdateStatusMapping(),"Atelier调用IM接口修改订单状态"),
-	AtelierUpdateProduct("AtelierUpdateProduct",new UpdateProductMapping(),"Atelier调用IM接口修改商品信息"),
 	CloudStoreCreateOrder("CloudStoreCreateOrder",new OrderCloudStoreMapping(),"调用CloudStore接口创建订单"),
 	CloudStoreUpdateOrderStatus("CloudStoreUpdateOrderStatus",new OrderCloudStoreUpdateStatusMapping(),"调用CloudStoreUpdateOrderStatus接口更新订单状态"),
+	EdsCreateOrder("EdsCreateOrder",new OrderEDSMapping(),"调用EDS接口创建订单"),
+	EdsGetOrderStatus("EdsGetOrderStatus",new OrderEdsUpdateStatusMapping(),"调用EDS接口获取订单状态"),
+
+	EdsCreateProduct("EdsCreateProduct",new ProductEDSMapping(),"调用EDS接口创建商品"),
+	EdsUpdateAllProduct("EdsUpdateAllProduct",new ProductEDSMapping(),"调用EDS接口创建商品-全量"),
+
+	EdsUpdateStock("EdsUpdateStock",new ProductStockEDSMapping(),"调用EDS接口修改库存"),
+
+	AtelierCreateProductLucianaBari("AtelierCreateProductLucianaBari",new ProductAtelierMapping(),"Atelier调用IM接口创建商品"),
+	AtelierCreateProductDante("AtelierCreateProductDante",new ProductAtelierMapping(),"Atelier调用IM接口创建商品"),
+	AtelierCreateProductICinqueFiori("AtelierCreateProductICinqueFiori",new ProductAtelierMapping(),"Atelier调用IM接口创建商品"),
+	AtelierCreateProductMimmaNinni("AtelierCreateProductMimmaNinni",new ProductAtelierMapping(),"Atelier调用IM接口创建商品"),
+	AtelierCreateProductDiPierro("AtelierCreateProductDiPierro",new ProductAtelierMapping(),"Atelier调用IM接口创建商品"),
+	AtelierCreateProductGisaBoutique("AtelierCreateProductGisaBoutique",new ProductAtelierMapping(),"Atelier调用IM接口创建商品"),
+	AtelierCreateProductWiseBoutique("AtelierCreateProductWiseBoutique",new ProductAtelierMapping(),"Atelier调用IM接口创建商品"),
+
+	AtelierUpdateSkuStockLucianaBari("AtelierUpdateSkuStockLucianaBari",new ProductStockAtelierMapping(),"Atelier调用IM修改库存"),
+	AtelierUpdateSkuStockDante("AtelierUpdateSkuStockDante",new ProductStockAtelierMapping(),"Atelier调用IM修改库存"),
+	AtelierUpdateSkuStockICinqueFiori("AtelierUpdateSkuStockICinqueFiori",new ProductStockAtelierMapping(),"Atelier调用IM修改库存"),
+	AtelierUpdateSkuStockMimmaNinni("AtelierUpdateSkuStockMimmaNinni",new ProductStockAtelierMapping(),"Atelier调用IM修改库存"),
+	AtelierUpdateSkuStockDiPierro("AtelierUpdateSkuStockDiPierro",new ProductStockAtelierMapping(),"Atelier调用IM修改库存"),
+	AtelierUpdateSkuStockGisaBoutique("AtelierUpdateSkuStockGisaBoutique",new ProductStockAtelierMapping(),"Atelier调用IM修改库存"),
+	AtelierUpdateSkuStockWiseBoutique("AtelierUpdateSkuStockWiseBoutique",new ProductStockAtelierMapping(),"Atelier调用IM修改库存"),
+
+	AtelierUpdateProductLucianaBari("AtelierUpdateProductLucianaBari",new UpdateProductMapping(),"Atelier调用IM接口修改商品信息"),
+	AtelierUpdateProductDante("AtelierUpdateProductDante",new UpdateProductMapping(),"Atelier调用IM接口修改商品信息"),
+	AtelierUpdateProductICinqueFiori("AtelierUpdateProductICinqueFiori",new UpdateProductMapping(),"Atelier调用IM接口修改商品信息"),
+	AtelierUpdateProductMimmaNinni("AtelierUpdateProductMimmaNinni",new UpdateProductMapping(),"Atelier调用IM接口修改商品信息"),
+	AtelierUpdateProductDiPierro("AtelierUpdateProductDiPierro",new UpdateProductMapping(),"Atelier调用IM接口修改商品信息"),
+	AtelierUpdateProductGisaBoutique("AtelierUpdateProductGisaBoutique",new UpdateProductMapping(),"Atelier调用IM接口修改商品信息"),
+	AtelierUpdateProductWiseBoutique("AtelierUpdateProductWiseBoutique",new UpdateProductMapping(),"Atelier调用IM接口修改商品信息"),
+
 	CloudStoreSynProduct("CloudStoreSynProduct",new CloudStoreGetInventoryMapping(),"IM调用cloudstore getInventory更新商品信息"),
 	CloudStoreSynStock("CloudStoreSynStock",new CloudStoreGetEventsMapping(),"IM调用cloudstore getEvents更新库存信息"),
+
 	FilippoSynProduct("FilippoSynProduct",new FilippoSynProductMapping(),"IM调用filippo 接口更新商品信息"),
+	FilippoSynAllProduct("FilippoSynAllProduct",new FilippoSynProductMapping(),"IM调用filippo 接口更新商品信息-全量"),
+
 	FilippoSynStock("FilippoSynStock",new FilippoSynStockMapping(),"IM调用filippo 接口更新库存信息");
 
 	private String code;
@@ -117,6 +114,4 @@ public enum QueueNameEnum {
 		}
 		return null;
 	}
-
-
 }

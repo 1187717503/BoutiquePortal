@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.log4j.Logger;
 import org.sql2o.Connection;
 
@@ -20,6 +21,13 @@ import pk.shoplus.parameter.StatusType;
 import pk.shoplus.service.CategoryService;
 import pk.shoplus.service.MappingCategoryService;
 import pk.shoplus.service.mapping.api.IMapping;
+import pk.shoplus.service.product.api.IProductService;
+import pk.shoplus.service.product.impl.ProductServiceImpl;
+import pk.shoplus.util.ExceptionUtils;
+
+import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.category_not_exist;
+import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.Data_can_not_find_mapping;
+import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.Runtime_exception;
 
 /**
  * im调用eds接口创建商品 底层mapping
@@ -33,17 +41,20 @@ public class ProductEDSMapping implements IMapping{
 	public ProductEDSManagement productEDSManagement = new ProductEDSManagement();
 
 	public static final String method_handleMappingAndExecute = "ProductEDSMapping.handleMappingAndExecute()";
-	
+
+	private static IProductService productServie = new ProductServiceImpl();
+
 	@Override
 	public Map<String, Object> handleMappingAndExecute(String mqData){
-		logger.info("start " + method_handleMappingAndExecute);
+		logger.info("start product eds mapping mqData : "+mqData);
 		Map<String,Object> resultMap = new HashMap<String,Object>();
 		try {
 			// init mqData
 			Map<String,Object> mqDataMap = JSONObject.parseObject(mqData);
 			JSONObject productMap = com.alibaba.fastjson15.JSON.parseObject(mqDataMap.get("product").toString());
 			String storeCode = mqDataMap.get("store_code").toString();
-			
+			String full_update_product = mqDataMap.get("full_update_product") == null ? "0" : mqDataMap.get("full_update_product").toString();
+
 			// init 创建商品入参
 			ProductOptions productOptions = productEDSManagement.getProductOptions();
 			VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
@@ -62,6 +73,8 @@ public class ProductEDSMapping implements IMapping{
 			productOptions.setColorCode(productMap.getString("color_reference"));
 			
 			productOptions.setColorDesc(productMap.getString("color"));
+
+			productOptions.setFullUpdateProductFlag(full_update_product);
 			
 			// category_id for gender,first_category,second_category
 			Connection conn = null;
@@ -76,23 +89,32 @@ public class ProductEDSMapping implements IMapping{
 		        List<Map<String, Object>> apiCategoryMap = null;
 		        apiCategoryMap = mappingCategoryService.getMappingCategoryInfoByCondition(object);
 		        if (null != apiCategoryMap && apiCategoryMap.size() > 0) {
-		            if (apiCategoryMap.size() > 1) {
-		            	resultMap.put("info", "  json_data[ 11 ] find multiple same category!!!");
-		            	resultMap.put("status", StatusType.FAILURE);
-		            } else {
-		                category = categoryService.convertMapToCategory(apiCategoryMap.get(0));
-		            }
+					category = categoryService.convertMapToCategory(apiCategoryMap.get(0));
 		        } else {
-		        	resultMap.put("info", " json_data[ 8,9,10 ] can not find category to map!!!");
+					resultMap.put("error_enum", Data_can_not_find_mapping);
+		        	resultMap.put("info", "update eds product mapping - "+category_not_exist.getDesc()+"object:" + new Gson().toJson(object));
+					resultMap.put("key","category");
+					resultMap.put("value",new Gson().toJson(object));
+					resultMap.put("product_code",productOptions.getCode());
+					resultMap.put("color_code",productOptions.getColorCode());
+					resultMap.put("brand_id",productOptions.getBrandCode());
 		        	resultMap.put("status", StatusType.FAILURE);
-		        }
-		        if(category == null) {
-		        	return resultMap;
+					return resultMap;
 		        }
 		        productOptions.setCategoryId(category.getCategory_id()+"");
 				conn.commit();
 			}catch (Exception e) {
 				e.printStackTrace();
+				if(conn != null) {conn.rollback();conn.rollback();}
+				resultMap.put("status",StatusType.FAILURE);
+				resultMap.put("error_enum", Runtime_exception);
+				resultMap.put("key","exception");
+				resultMap.put("value",ExceptionUtils.getExceptionDetail(e));
+				resultMap.put("product_code",productOptions.getCode());
+				resultMap.put("color_code",productOptions.getColorCode());
+				resultMap.put("brand_id",productOptions.getBrandCode());
+				resultMap.put("info", " update eds product - " + Runtime_exception.getDesc()+"error message : " + ExceptionUtils.getExceptionDetail(e));
+				return resultMap;
 			} finally {
 				if(conn != null) {
 					conn.close();
@@ -164,29 +186,33 @@ public class ProductEDSMapping implements IMapping{
 			vendorOptions.setApiConfigurationId(Long.parseLong(mqDataMap.get("api_configuration_id").toString()));
 			vendorOptions.setStoreCode(mqDataMap.get("store_code").toString());
 			vendorOptions.setVendorId(Long.parseLong(mqDataMap.get("vendor_id").toString()));
-			
+
 			// 调用Service创建商品
 			logger.info("开始调用EDS商品创建Service,productOptions:" + new Gson().toJson(productOptions) + " , vendorOptions:" + new Gson().toJson(vendorOptions));
 			Map<String,Object> serviceResultMap = productEDSManagement.createProduct(productOptions, vendorOptions);
-			logger.info("结束调用EDS商品创建Service,serviceResultMap:" + new Gson().toJson(serviceResultMap));
+			logger.info("结束调用EDS商品创建Service,serviceResultMap:" + new Gson().toJson(serviceResultMap)+",productOptions:" + new Gson().toJson(productOptions) + " , vendorOptions:" + new Gson().toJson(vendorOptions));
 
-			// 返回结果
-			String updateStockResult = serviceResultMap.get("status") == null ? "" : serviceResultMap.get("status").toString();
-			if(updateStockResult.equals(StatusType.SUCCESS+"")) {
-				resultMap.put("status",updateStockResult);
-			} else {
-				resultMap.put("status",StatusType.FAILURE);
+			if(serviceResultMap != null && serviceResultMap.get("status").equals(StatusType.PRODUCT_ALREADY_EXISTS)) {
+				logger.info("调用eds商品修改Service by eds,productOptions:" + new Gson().toJson(productOptions) + " , vendorOptions:" + new Gson().toJson(vendorOptions));
+				serviceResultMap = productServie.updateProduct(productOptions,vendorOptions);
+				logger.info("调用eds商品修改Service by eds,serviceResultMap:" + JSON.toJSONString(serviceResultMap)+",productOptions:" + JSON.toJSONString(productOptions) + " , vendorOptions:" + JSON.toJSONString(vendorOptions));
 			}
-			resultMap.put("info", "serviceResultMap:" + new Gson().toJson(serviceResultMap));
-//			resultMap.put("data", mqData);
-			
+
+			serviceResultMap.put("product_code",productOptions.getCode());
+			serviceResultMap.put("color_code",productOptions.getColorCode());
+			serviceResultMap.put("brand_id",productOptions.getBrandCode());
+
+			return serviceResultMap;
 		} catch (Exception e) {
 			e.printStackTrace();
-			resultMap.put("info", "系统异常! errorMsg:" + e.getMessage());
-//			resultMap.put("data", mqData);
+			resultMap.put("status",StatusType.FAILURE);
+			resultMap.put("error_enum", Runtime_exception);
+			resultMap.put("key","exception");
+			resultMap.put("value",ExceptionUtils.getExceptionDetail(e));
+			resultMap.put("info", "update eds product - " + Runtime_exception.getDesc()+"error message : " + ExceptionUtils.getExceptionDetail(e));
         	logger.error("ERROR:"+new Gson().toJson(resultMap));
 		}
-		logger.info("end " + method_handleMappingAndExecute);
+		logger.info("start product eds mapping resultMap : " + new Gson().toJson(resultMap));
 		return resultMap;
 	}
 	

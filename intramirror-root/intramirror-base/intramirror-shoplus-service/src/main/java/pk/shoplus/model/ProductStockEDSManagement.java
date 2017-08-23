@@ -1,16 +1,14 @@
 package pk.shoplus.model;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.sql2o.Connection;
-
-import com.google.gson.Gson;
 
 import pk.shoplus.DBConnector;
 import pk.shoplus.common.Contants;
@@ -25,9 +23,12 @@ import pk.shoplus.service.SkuService;
 import pk.shoplus.service.SkuStoreService;
 import pk.shoplus.service.price.api.IPriceService;
 import pk.shoplus.service.price.impl.PriceServiceImpl;
-import pk.shoplus.util.ConnectionUtils;
+import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.util.MapUtils;
 import pk.shoplus.vo.ResultMessage;
+
+import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.Runtime_exception;
+import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.updateStock_params_is_error;
 
 /**
  * 更新库存接口
@@ -41,7 +42,7 @@ public class ProductStockEDSManagement {
 	private final String method_updateStock = "ProductStockEDSManagement.updateStock()";
 
 	public Map<String, Object> updateStock(StockOptions stockOptions){
-	    logger.info("start " + this.method_updateStock);
+	    logger.info("start updateStock service stockOptions : " + new Gson().toJson(stockOptions));
 
         MapUtils mapUtils = new MapUtils(new HashMap<>());
         Connection connection = null;
@@ -76,7 +77,7 @@ public class ProductStockEDSManagement {
                         if(StringUtils.isBlank(stockOptions.getType()) || !stockOptions.getType().equals(Contants.EVENTS_TYPE_1+"")) {
                             skuStore.reserved = reserved;
                         }
-
+                        logger.info("updateSkuStore skuStore : " + new Gson().toJson(skuStore));
                         skuStoreService.updateSkuStore(skuStore);
                     }
                 } else {
@@ -86,13 +87,23 @@ public class ProductStockEDSManagement {
                 }
                 mapUtils.putData("status",StatusType.SUCCESS).putData("info","SUCCESS");
             } else {
-                mapUtils.putData("status",StatusType.FAILURE).putLog("info"," params is error !!!");
+                mapUtils.putData("status",StatusType.FAILURE)
+                        .putData("info",resultMessage.getMsg())
+                        .putData("sku_size",stockOptions.getSizeValue())
+                        .putData("product_code",stockOptions.getProductCode())
+                        .putData("key","info")
+                        .putData("value",resultMessage.getMsg())
+                        .putData("error_enum",updateStock_params_is_error);
             }
             connection.commit();
 		}catch (Exception e) {
             if(connection != null) {connection.rollback();connection.close();}
 			e.printStackTrace();
-            mapUtils.putData("status",StatusType.FAILURE).putLog("info","errorMessage : " + e.getMessage());
+            mapUtils.putData("status",StatusType.FAILURE)
+                    .putData("info","update stock - " + Runtime_exception.getDesc()+"error message : " + ExceptionUtils.getExceptionDetail(e))
+                    .putData("key","exception")
+                    .putData("value",ExceptionUtils.getExceptionDetail(e))
+            .putData("error_enum", Runtime_exception);
 		} finally {
            if(connection != null) {connection.close();}
         }
@@ -220,19 +231,19 @@ public class ProductStockEDSManagement {
             condition.put("enabled", EnabledType.USED);
             product = productService.getProductByCondition(condition, null);
             if(product == null){
-                return resultMessage.sStatus(false).sMsg("productCode is error !!!");
+                return resultMessage.sStatus(false).sMsg("update stock - 找不到这个商品 。");
             }
         } else {
-            return resultMessage.sStatus(false).sMsg("productCode is null !!!");
+            return resultMessage.sStatus(false).sMsg("update stock - productCode is null 。");
         }
 
         // checked sizeValue
         if(org.apache.commons.lang.StringUtils.isBlank(sizeValue))
-            return resultMessage.sStatus(false).sMsg("sizeValue is null !!!");
+            return resultMessage.sStatus(false).sMsg("update stock - sizeValue is null 。");
 
         // checked quantity
         if(org.apache.commons.lang.StringUtils.isBlank(quantity))
-            return resultMessage.sStatus(false).sMsg("quantity is null !!!");
+            return resultMessage.sStatus(false).sMsg("update stock - quantity is null 。");
 
         return resultMessage.sStatus(true).sMsg("SUCCESS").sData(product);
     }

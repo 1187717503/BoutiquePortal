@@ -1,5 +1,6 @@
 package pk.shoplus.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -91,6 +92,13 @@ public class ProductSkuPropertyKey {
 
 	public List<ProductSkuPropertyValue> getPropertyValueList() {
 		return propertyValueList;
+	}
+
+	public void addPropertyValueList(ProductSkuPropertyValue productSkuPropertyValue){
+		if(propertyValueList == null  || propertyValueList.size() == 0) {
+			propertyValueList = new ArrayList<>();
+		}
+		propertyValueList.add(productSkuPropertyValue);
 	}
 
 }

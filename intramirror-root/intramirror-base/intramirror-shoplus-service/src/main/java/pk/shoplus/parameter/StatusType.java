@@ -12,6 +12,8 @@ public final class StatusType {
 	 */
 	public static final int FAILURE = -1;
 
+	public static final int WARNING = -11;
+
 	/**
 	 * 用户名不存在或已废弃(即将废弃)
 	 */
@@ -660,6 +662,6 @@ public final class StatusType {
 	public static final int STORE_CODE_NOT_EXISTED = -7004;
 
 	/** Boutique ID already exists */
-	public static final int NOT_PRODUCT = -8005;
+	public static final int PRODUCT_ALREADY_EXISTS = -100001;
 
 }

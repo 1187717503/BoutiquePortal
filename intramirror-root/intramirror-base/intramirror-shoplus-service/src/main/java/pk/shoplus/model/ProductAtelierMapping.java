@@ -14,6 +14,9 @@ import pk.shoplus.model.ProductEDSManagement.SkuOptions;
 import pk.shoplus.model.ProductEDSManagement.VendorOptions;
 import pk.shoplus.parameter.StatusType;
 import pk.shoplus.service.mapping.api.IMapping;
+import pk.shoplus.util.ExceptionUtils;
+
+import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.Runtime_exception;
 
 /**
  * Atelier 调用createProduct创建商品 底层mapping
@@ -43,15 +46,22 @@ public class ProductAtelierMapping implements IMapping {
 				VendorOptions vendorOptions = (VendorOptions)convertMap.get("vendorOptions");
 
 				// 调用Service创建商品
-				logger.info("开始调用商品创建Service by atelier,productOptions:" + new Gson().toJson(productOptions) + " , vendorOptions:" + new Gson().toJson(vendorOptions));
+				logger.info("开始调用Atelier商品创建Service by atelier,productOptions:" + new Gson().toJson(productOptions) + " , vendorOptions:" + new Gson().toJson(vendorOptions));
 				resultMap = productEDSManagement.createProduct(productOptions, vendorOptions);
-				logger.info("结束调用商品创建Service by atelier,resultMap:" + new Gson().toJson(resultMap));
+				logger.info("结束调用Atelier商品创建Service by atelier,resultMap:" + new Gson().toJson(resultMap)+",productOptions:" + new Gson().toJson(productOptions) + " , vendorOptions:" + new Gson().toJson(vendorOptions));
+				resultMap.put("product_code",productOptions.getCode());
+				resultMap.put("color_code",productOptions.getColorCode());
+				resultMap.put("brand_id",productOptions.getBrandCode());
 			} else {
 				return convertMap;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			resultMap.put("info", "系统异常! errorMsg:" + e.getMessage());
+			resultMap.put("status",StatusType.FAILURE);
+			resultMap.put("error_enum", Runtime_exception);
+			resultMap.put("key","exception");
+			resultMap.put("value",ExceptionUtils.getExceptionDetail(e));
+			resultMap.put("info", "update atelier product - "+ Runtime_exception.getDesc()+" error message : " +ExceptionUtils.getExceptionDetail(e));
         	logger.error("ERROR:"+new Gson().toJson(resultMap));
 		}
 		logger.info("------------------------------------------end UpdateProductAtelierMapping.handleMappingAndExecuteCreate,resultMap:" + new Gson().toJson(resultMap));
@@ -100,7 +110,11 @@ public class ProductAtelierMapping implements IMapping {
 			resultMap.put("vendorOptions",vendorOptions);
 		} catch (Exception e) {
 			e.printStackTrace();
-			resultMap.put("info","参数转换异常,errorMessage:"+e.getMessage());
+			resultMap.put("status",StatusType.FAILURE);
+			resultMap.put("error_enum", Runtime_exception);
+			resultMap.put("key","exception");
+			resultMap.put("value",ExceptionUtils.getExceptionDetail(e));
+			resultMap.put("info", "update atelier product mapping - "+ Runtime_exception.getDesc()+" error message : " + ExceptionUtils.getExceptionDetail(e));
 			logger.error("参数转换异常!errorMessage:"+e.getMessage());
 		}
 		return resultMap;

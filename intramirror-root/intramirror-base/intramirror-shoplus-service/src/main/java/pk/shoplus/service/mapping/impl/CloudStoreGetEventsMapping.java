@@ -1,31 +1,30 @@
 package pk.shoplus.service.mapping.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
-import org.apache.commons.lang.StringUtils;
-import org.sql2o.Connection;
-import pk.shoplus.DBConnector;
+import org.apache.log4j.Logger;
 import pk.shoplus.common.Contants;
 import pk.shoplus.model.ProductStockEDSManagement;
 import pk.shoplus.model.SkuStore;
-import pk.shoplus.mq.enums.QueueNameEnum;
-import pk.shoplus.mq.enums.QueueTypeEnum;
 import pk.shoplus.parameter.StatusType;
-import pk.shoplus.service.SkuPropertyService;
 import pk.shoplus.service.mapping.api.IMapping;
 import pk.shoplus.service.stock.api.IStoreService;
 import pk.shoplus.service.stock.impl.StoreServiceImpl;
+import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.vo.ResultMessage;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+
+import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.handle_stock_rule_error;
+import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.Runtime_exception;
 
 /**
  * Created by dingyifan on 2017/6/7.
  */
 public class CloudStoreGetEventsMapping implements IMapping{
+
+    private static Logger logger = Logger.getLogger(CloudStoreGetEventsMapping.class);
 
     @Override
     public Map<String, Object> handleMappingAndExecute(String mqData) {
@@ -72,6 +71,8 @@ public class CloudStoreGetEventsMapping implements IMapping{
                     skuStore = (SkuStore) resultMessage.getData();
                 } else {
                     resultMap.put("info",resultMessage.getMsg());
+                    resultMap.put("error_enum",handle_stock_rule_error);
+                    resultMap.put("product_code",productCode);
                     return resultMap;
                 }
 
@@ -88,15 +89,18 @@ public class CloudStoreGetEventsMapping implements IMapping{
             stockOptions.setSizeValue(size);
             stockOptions.setQuantity(skuStore.getStore().toString());
             stockOptions.setReserved(skuStore.getReserved() == null ? "" : skuStore.getReserved().toString());
+            logger.info("开始cloudstore调用修改库存 stockOptions : " + new Gson().toJson(stockOptions));
             Map<String, Object> updateMap = productStockEDSManagement.updateStock(stockOptions);
-            if(updateMap != null && updateMap.get("status").toString().equals(StatusType.SUCCESS+"")) {
-                return updateMap;
-            } else {
-                resultMap.put("info",new Gson().toJson(updateMap));
-            }
+            logger.info("结束cloudstore调用修改库存 updateMap : " + new Gson().toJson(updateMap)+", stockOptions : " + new Gson().toJson(stockOptions));
+            updateMap.put("product_code",stockOptions.getProductCode());
+            updateMap.put("sku_size",size);
+            return updateMap;
         } catch (Exception e) {
             e.printStackTrace();
-            resultMap.put("info","CloudStoreGetEventsMapping.handleMappingAndExecute" + e.getMessage());
+            resultMap.put("key","exception");
+            resultMap.put("value", ExceptionUtils.getExceptionDetail(e));
+            resultMap.put("info","CloudStoreGetEventsMapping.handleMappingAndExecute" + ExceptionUtils.getExceptionDetail(e));
+            resultMap.put("error_enum", Runtime_exception);
         }
         return resultMap;
     }

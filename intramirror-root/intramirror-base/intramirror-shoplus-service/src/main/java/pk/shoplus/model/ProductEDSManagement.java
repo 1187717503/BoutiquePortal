@@ -1,7 +1,6 @@
 package pk.shoplus.model;
 
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -26,13 +25,14 @@ import com.google.gson.JsonParser;
 import pk.shoplus.DBConnector;
 import pk.shoplus.common.FileUploadHelper;
 import pk.shoplus.common.Helper;
-import pk.shoplus.data.DataBase;
+import pk.shoplus.enums.ApiErrorTypeEnum;
 import pk.shoplus.parameter.EnabledType;
 import pk.shoplus.parameter.ProductFeatureType;
 import pk.shoplus.parameter.ProductStatusType;
 import pk.shoplus.parameter.StatusType;
 import pk.shoplus.parameter.VendorStatus;
 import pk.shoplus.service.*;
+import pk.shoplus.util.ExceptionUtils;
 
 /**
  * 创建商品
@@ -45,14 +45,6 @@ public class ProductEDSManagement {
 	
 	public Map<String,Object> createProduct(ProductOptions productOptions,VendorOptions vendorOptions){
 		Map<String,Object> resultMap = new HashMap<String,Object>();
-
-        /** start update by dingyifan 2017-07-31 */
-        if(org.apache.commons.lang3.StringUtils.isBlank(productOptions.getSalePrice()) || "0".equals(org.apache.commons.lang3.StringUtils.trim(productOptions.getSalePrice()))) {
-            resultMap.put("status",StatusType.FAILURE);
-            resultMap.put("info", "The price of the goods is empty or 0!!!");
-            return resultMap;
-        }
-        /** end update by dingyifan 2017-07-31 */
 
 		// ProductOptions转换成List对象
 		List<String> productList = this.convertProductList(productOptions);
@@ -72,7 +64,10 @@ public class ProductEDSManagement {
         Connection conn = null ;
         try {
             conn = DBConnector.sql2o.beginTransaction();
-            //Check parameters
+
+            result.put("status",StatusType.FAILURE);
+
+            //check params
             boolean b = validateParam(conn, columnDataList, result);
             if (b) {
                 return b;
@@ -80,13 +75,11 @@ public class ProductEDSManagement {
 
             Vendor vendor = this.getVendor(conn, vendorId, result);
             if (null == vendor) {
-            	result.put("status", StatusType.FAILURE);
-            	result.put("info", "vendor is null");
+                result.put("info","create product - " + ApiErrorTypeEnum.errorType.vendor_is_null.getDesc() + "vendor_id:"+vendorId );
+                result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null);
+                result.put("key","vendor_id");
+                result.put("value",vendorId);
                 return true;
-            } else {
-                if (this.checkVendorAcitived(vendor, result)) {
-                    return true;
-                }
             }
 
             //get category id
@@ -94,23 +87,21 @@ public class ProductEDSManagement {
             String categoryId = columnDataList.get(10).toString();
             Category category = categoryService.getCategoryById(Long.parseLong(categoryId));// this.getCategory(columnDataList, categoryService, mappingCategoryService, result, storeCode);
             if (null == category) {
-            	result.put("status", StatusType.FAILURE);
-            	result.put("info", "category is null");
+                result.put("info","create product - " + ApiErrorTypeEnum.errorType.category_not_exist.getDesc() + "category_id:"+categoryId );
+                result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_find_mapping);
+                result.put("key","category_id");
+                result.put("value",categoryId);
                 return true;
             }
 
             // 检查category是否是最后一级
             if (!categoryService.isLastNode(category.getCategory_id())) {
-                result.put("info", "The category of data is not level three!!!");
-                result.put("status", StatusType.Category_HAVE_NODE);
+                result.put("info","create product - " + ApiErrorTypeEnum.errorType.category_not_exist.getDesc() + "category_id:"+categoryId );
+                result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_find_mapping);
+                result.put("key","category_id");
+                result.put("value",categoryId);
                 return true;
             }
-
-            /*Brand brand = this.getBrand(englishName, apiConfigurationId, conn, result);
-
-            if (null == brand) {
-                return true;
-            }*/
 
             /** start update by dingyifan 2017-06-15 */
             boolean no_img = false;
@@ -120,8 +111,10 @@ public class ProductEDSManagement {
             if(StringUtils.isBlank(brandId)) {
                 brandId = apiBrandMapService.getBrandNameByBrandMapping(englishName,apiConfigurationId.toString());
                 if(StringUtils.isBlank(brandId)) {
-                    result.put("info", " json_data[ 6 ] brand doesn't exist !!!");
-                    result.put("status", StatusType.FAILURE);
+                    result.put("info","create product - " + ApiErrorTypeEnum.errorType.brand_not_exist.getDesc() + "brand_name:"+englishName);
+                    result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_find_mapping);
+                    result.put("key","brand_name");
+                    result.put("value",englishName);
                     return true;
                 }
 
@@ -129,6 +122,15 @@ public class ProductEDSManagement {
 
             BrandService brandService = new BrandService(conn);
             Brand brand = brandService.getBrandById(Long.parseLong(brandId));
+
+            if(brand == null) {
+                result.put("info","create product - " + ApiErrorTypeEnum.errorType.brand_not_exist.getDesc() + "brand_name:"+englishName);
+                result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_find_mapping);
+                result.put("key","brand_name");
+                result.put("value",englishName);
+                return true;
+            }
+
             if(brand != null) {
                 Map<String,Object> getApiBrandMaps = new HashMap<>();
                 getApiBrandMaps.put("api_configuration_id",apiConfigurationId.toString());
@@ -147,35 +149,31 @@ public class ProductEDSManagement {
             Product product = this.setProduct(category, brand, columnDataList, vendor, result, conn,productOptions,no_img);
             ProductService productService = new ProductService(conn);
             SeasonService seasonService = new SeasonService(conn);
-            if (null != product) {
-                logger.info(" start productedsmanagement createproduct select season_code by boutiquecode : " + productOptions.getSeasonCode());
-                String season_code = seasonService.selSeasonCodeByBoutiqueCode(productOptions.getSeasonCode());
-                logger.info(" end productedsmanagement createproduct select season_code by boutiquecode : season_code " + season_code);
+            logger.info(" start productedsmanagement createproduct select season_code by boutiquecode : " + productOptions.getSeasonCode());
+            String season_code = seasonService.selSeasonCodeByBoutiqueCode(productOptions.getSeasonCode());
+            logger.info(" end productedsmanagement createproduct select season_code by boutiquecode : season_code " + season_code);
 
-                if(org.apache.commons.lang3.StringUtils.isBlank(season_code) || org.apache.commons.lang3.StringUtils.isBlank(productOptions.getSeasonCode())) {
-                    result.put("status",StatusType.FAILURE);
-                    result.put("info", " season_code is null 找不到映射!!!");
-                    return true;
-                }
-
-                if(StringUtils.isNotBlank(season_code)) {
-                    product.season_code = season_code;
-                } else {
-                    product.season_code = productOptions.getSeasonCode();
-                }
-                product = productService.createProduct(product);
-            } else {
-                result.put("info", "The commodity already exists!!!");
-                result.put("status", StatusType.FAILURE);
+            if(org.apache.commons.lang3.StringUtils.isBlank(season_code) || org.apache.commons.lang3.StringUtils.isBlank(productOptions.getSeasonCode())) {
+                result.put("info","create product - " + ApiErrorTypeEnum.errorType.season_not_exist.getDesc() + "season_code:"+productOptions.getSeasonCode() );
+                result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_find_mapping);
+                result.put("key","season_code");
+                result.put("value",productOptions.getSeasonCode());
                 return true;
             }
+
+            if(StringUtils.isNotBlank(season_code)) {
+                product.season_code = season_code;
+            } else {
+                product.season_code = productOptions.getSeasonCode();
+            }
+            product = productService.createProduct(product);
 
             // 在category上增加数据
             List<ProductSkuPropertyKey> propertyKeyIdArr = this.createProductSku(conn, category, product, result, columnDataList);
 
             // 4. 根据sku_list，在sku表,sku_store表以及sku_property表中插入相关数据
             // 4.1) 把sku_list 转换成 array
-            this.createSku(conn, columnDataList, product, propertyKeyIdArr, result, vendor);
+            this.createSku(conn, columnDataList, product, propertyKeyIdArr, result, vendor,productOptions);
 
             // 5. 在vendor_product_cashback表中加入cash_back_list数据
             // 5.1) 把cash_back_list 转换成 jsonarray
@@ -206,23 +204,11 @@ public class ProductEDSManagement {
             ProductInfoService productInfoService = new ProductInfoService(conn);
             List<Map<String, String>> costList = getCostList(columnDataList, category, categoryProductInfoService);
             ProductInfo productInfo = null;
-            try {
-                productInfo = createProductInfo(costList, categoryProductInfoService, productInfoService, product, result);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            if (productInfo == null) {
-                result.put("info",  "failed to create product infomation");
-                result.put("status", StatusType.DATABASE_ERROR);
-                return true;
-            }
+            productInfo = createProductInfo(costList, categoryProductInfoService, productInfoService, product, result);
 
             // 7.创建productproperty信息
             List<CategoryProductProperty> cppList = this.getCategoryProductProperty(conn, category);
             createProductProperty(conn, cppList, columnDataList, product, result);
-
-            result.put("product", product);
-            result.put("status", StatusType.SUCCESS);
 
             // 为了减少并发情况下当前product已经被其他进程插入，在commit前再做一次校验
             // TODO: commit过程中的发生的不一致性也需要处理
@@ -230,18 +216,28 @@ public class ProductEDSManagement {
             condition.put("product_code", product.product_code);
             condition.put("enabled", 1);
             long pcount = productService.countProductByCondition(condition);
+            logger.info(" create product service by product : " + new Gson().toJson(product));
 
             if (pcount > 1) {
+                result.put("info","create product -- " + ApiErrorTypeEnum.errorType.boutique_create_error.getDesc() + "boutique_id:"+productOptions.getCode() );
+                result.put("error_enum", ApiErrorTypeEnum.errorType.Runtime_exception);
+                result.put("key","create product error!");
+                result.put("value","null");
                 conn.rollback();
             } else {
+                result.put("product", product);
+                result.put("status", StatusType.SUCCESS);
                 conn.commit();
             }
             return false;
         } catch (Exception e) {
             if(conn != null) {conn.rollback();conn.close();}
             e.printStackTrace();
-            result.put("info", e.getMessage());
-            result.put("status", StatusType.DATABASE_ERROR);
+            result.put("status",StatusType.FAILURE);
+            result.put("key","exception");
+            result.put("value",ExceptionUtils.getExceptionDetail(e));
+            result.put("info","create product - " + ApiErrorTypeEnum.errorType.Runtime_exception.getDesc() + " error message:" + ExceptionUtils.getExceptionDetail(e));
+            result.put("error_enum", ApiErrorTypeEnum.errorType.Runtime_exception);
             return true;
         } finally {
             if(conn != null) {conn.close();}
@@ -583,7 +579,7 @@ public class ProductEDSManagement {
 	                        && StringUtils.isNotBlank(skuCode)
 	                        && StringUtils.isNotBlank(store)
 	                        && StringUtils.isNotBlank(price)) {
-	                    int storeNum = Integer.parseInt(store);
+	                    int storeNum = (new Double(store)).intValue();
 	                    sizeList = new ArrayList<>();
 	                    sizeList.add(size);
 
@@ -604,7 +600,7 @@ public class ProductEDSManagement {
 
 	        return skuList;
 	    }
-	public void createSku(Connection conn, List<String> columnDataList, Product product, List<ProductSkuPropertyKey> propertyKeyIdArr, Map<String, Object> result, Vendor vendor) throws Exception {
+	public void createSku(Connection conn, List<String> columnDataList, Product product, List<ProductSkuPropertyKey> propertyKeyIdArr, Map<String, Object> result, Vendor vendor,ProductOptions productOptions) throws Exception {
         List<Map<String, Object>> skuList = this.getSkuList(columnDataList);
         JsonArray skuArray = new JsonParser().parse(JSONArray.toJSONString(skuList)).getAsJsonArray();
         CategoryProductInfoService categoryProductInfoService = new CategoryProductInfoService(conn);
@@ -643,6 +639,12 @@ public class ProductEDSManagement {
             sku.updated_at = Helper.getCurrentTimeToUTCWithDate();
             sku.enabled = EnabledType.USED;
 
+            if(StringUtils.isNotBlank(productOptions.getFullUpdateProductFlag())){
+                if(productOptions.getFullUpdateProductFlag().equals("1")) {
+                    sku.full_modify_date = new Date();
+                    logger.info("createProduct set full modify date sku : " + new Gson().toJson(sku));
+                }
+            }
             SkuService skuService = new SkuService(conn);
 
             sku = skuService.createSku(sku);
@@ -849,7 +851,7 @@ public class ProductEDSManagement {
 	        return propertyKeyIdArr;
 	    }
 	
-	public Product setProduct(Category category, Brand brand, List<String> cloumnDataList, Vendor vendor, Map<String, Object> result,Connection conn,ProductOptions productOptions,boolean no_img) {
+	public Product setProduct(Category category, Brand brand, List<String> cloumnDataList, Vendor vendor, Map<String, Object> result,Connection conn,ProductOptions productOptions,boolean no_img) throws Exception{
         Product product = null;
         try {
             product = new Product();
@@ -887,6 +889,11 @@ public class ProductEDSManagement {
             }
 
             product.name = cloumnDataList.get(0);
+
+            if(StringUtils.isBlank(product.name)) {
+                product.name = category.getName();
+            }
+
             product.description = cloumnDataList.get(11);
             if(!no_img) {
 //                product.description_img = convertImgPath(cloumnDataList.get(16));
@@ -905,15 +912,10 @@ public class ProductEDSManagement {
             product.created_at = Helper.getCurrentTimeToUTCWithDate();
             product.updated_at = Helper.getCurrentTimeToUTCWithDate();
             product.enabled = EnabledType.USED;
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-            product = null;
-        } catch (ParseException e) {
-            e.printStackTrace();
-            product = null;
         } catch (Exception e) {
             e.printStackTrace();
             product = null;
+            throw e;
         }
 
         return product;
@@ -1007,8 +1009,6 @@ public class ProductEDSManagement {
             result.put("info", " json_data[ 8,9,10 ] can not find category to map!!!");
             result.put("status", StatusType.FAILURE);
         }
-
-
         return category;
     }
 	
@@ -1090,19 +1090,22 @@ public class ProductEDSManagement {
      * @return
      */
     public boolean validateParam(Connection conn, List<String> columnDataList, Map<String, Object> result) {
-        // Check parameters First rows
-        StringBuffer info = new StringBuffer();
-        StringBuffer info2 = new StringBuffer();
-        String errorMsg = "";
-        boolean b = false;
-
-        String productName = columnDataList.get(0);
+        /*String productName = columnDataList.get(0);
         if (StringUtils.isBlank(productName)) {
-            info.append(" json_data[ 1 ] productName ,");
-        }
+            result.put("info","create product - "+ ApiErrorTypeEnum.errorType.boutique_name_is_null.getDesc()+"boutique_name:null");
+            result.put("error_enum", ApiErrorTypeEnum.errorType.boutique_name_is_null);
+            result.put("key","boutique_name");
+            result.put("value","null");
+            return true;
+        }*/
+        result.put("status", StatusType.FAILURE);
         String boutiqueId = columnDataList.get(1);
         if (StringUtils.isBlank(boutiqueId)) {
-            info.append(" json_data[ 2 ] boutiqueId ,");
+            result.put("info","create product - "+ ApiErrorTypeEnum.errorType.boutique_id_is_null.getDesc()+"boutique_id:null");
+            result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null);
+            result.put("key","boutique_id");
+            result.put("value","null");
+            return true;
         } else {
             ProductService productService = new ProductService(conn);
             Map<String, Object> condition = new HashMap<>();
@@ -1111,66 +1114,88 @@ public class ProductEDSManagement {
             try {
                 Product product = productService.getProductByCondition(condition, null);
                 if (null != product) {
-                    info2.append("json_data[ 2 ] Boutique ID already exists !!!");
-                    result.put("status",StatusType.NOT_PRODUCT);
-                    result.put("info",info2.toString());
+                    result.put("status",StatusType.PRODUCT_ALREADY_EXISTS);
+                    result.put("info","create product - "+ ApiErrorTypeEnum.errorType.boutique_id_already_exist.getDesc()+"boutique_id:"+boutiqueId);
+                    result.put("error_enum", ApiErrorTypeEnum.errorType.Data_is_duplicated);
+                    result.put("key","boutique_id");
+                    result.put("value",boutiqueId);
                     return true;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+
         String brandId = columnDataList.get(2);
         if (StringUtils.isBlank(brandId)) {
-            info.append(" brandId json_data[ 3 ] ,");
-        }
-//        String seasonCode = columnDataList.get(3);
-//        if (StringUtils.isBlank(seasonCode)) {
-//            info.append(" json_data[ 4 ],");
-//        }
-//        String carryOver = columnDataList.get(4);
-//        if (StringUtils.isBlank(carryOver)) {
-//            info.append("and 5 columns,");
-//        }
-        String brand = columnDataList.get(5);
-        if (StringUtils.isBlank(brand)) {
-            info.append(" brand json_data[ 6 ],");
-        }
-        String colorCode = columnDataList.get(6);
-        if (StringUtils.isBlank(colorCode)) {
-            info.append(" colorCode json_data[ 7 ],");
+            result.put("info","create product - "+ ApiErrorTypeEnum.errorType.brandID_is_null.getDesc()+"BrandID:null");
+            result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null);
+            result.put("key","BrandID");
+            result.put("value","null");
+            return true;
         }
 
-//        String firstCategoryId = columnDataList.get(8);
-//        if (StringUtils.isBlank(firstCategoryId)) {
-//            info.append(" json_data[ 8 ],");
-//        }
-//
-//        String secondCategoryId = columnDataList.get(9);
-//        if (StringUtils.isBlank(secondCategoryId)) {
-//            info.append(" json_data[ 9 ],");
-//        }
+        String brand = columnDataList.get(5);
+        if (StringUtils.isBlank(brand)) {
+            result.put("info","create product - "+ ApiErrorTypeEnum.errorType.brand_name_is_null.getDesc()+"brand_name:null");
+            result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null);
+            result.put("key","brand");
+            result.put("value",null);
+            return true;
+        }
+
+        String colorCode = columnDataList.get(6);
+        if (StringUtils.isBlank(colorCode)) {
+            result.put("info","create product - "+ ApiErrorTypeEnum.errorType.colorCode_is_null.getDesc()+"colorCode:null");
+            result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null);
+            result.put("key","ColorCode");
+            result.put("value","null");
+            return true;
+        }
 
         String threeCategoryId = columnDataList.get(10);
         if (StringUtils.isBlank(threeCategoryId)) {
-            info.append(" categoryId json_data[ 10 ],");
+            result.put("info","create product - "+ ApiErrorTypeEnum.errorType.category_is_null.getDesc()+"category_id:null");
+            result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null);
+            result.put("key","category_id");
+            result.put("value","null");
+            return true;
         }
 
         String coverImage = columnDataList.get(15);
         if (StringUtils.isBlank(coverImage)) {
-            info.append(" coverImage json_data[ 16 ],");
+            result.put("info","create product - "+ ApiErrorTypeEnum.errorType.coverImage_is_null.getDesc()+"coverImage:null");
+            result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null);
+            result.put("key","coverImage");
+            result.put("value","null");
+            return true;
         }
+
         String descriptionImage = columnDataList.get(16);
         if (StringUtils.isBlank(descriptionImage)) {
-            info.append(" descriptionImage json_data[ 17 ],");
+            result.put("info","create product - "+ ApiErrorTypeEnum.errorType.descImage_is_null.getDesc()+"descImage:null");
+            result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null);
+            result.put("key","descImage");
+            result.put("value","null");
+            return true;
         }
+
         String weight = columnDataList.get(17);
         if (StringUtils.isBlank(weight)) {
-            info.append(" weight json_data[ 18 ],");
+            result.put("info","create product - "+ ApiErrorTypeEnum.errorType.weight_is_null.getDesc()+"descImage:null");
+            result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null);
+            result.put("key","weight");
+            result.put("value","null");
+            return true;
         }
+
         String salePrice = columnDataList.get(21);
-        if (StringUtils.isBlank(salePrice)) {
-            info.append(" salePrice json_data[ 22 ],");
+        if (StringUtils.isBlank(salePrice) || "0".equals(StringUtils.trim(salePrice))) {
+            result.put("info","create product - "+ ApiErrorTypeEnum.errorType.retail_price_is_zero.getDesc()+"salePrice:"+salePrice);
+            result.put("error_enum", ApiErrorTypeEnum.errorType.retail_price_is_zero);
+            result.put("key","retail_price");
+            result.put("value",salePrice);
+            return true;
         }
 
         String size = "";
@@ -1179,29 +1204,30 @@ public class ProductEDSManagement {
         for (int i = 22; i < columnDataList.size(); i = i + 3) {
             size = columnDataList.get(i);
             if (StringUtils.isBlank(size)) {
-                info.append("json_data[ " + (i + 1) + "],");
+                result.put("info","create product - "+ ApiErrorTypeEnum.errorType.skuSize_is_null.getDesc()+"size:null");
+                result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null);
+                result.put("key","size");
+                result.put("value","null");
+                return true;
             }
             barcode = columnDataList.get(i + 1);
             if (StringUtils.isBlank(barcode)) {
-                info.append("json_data[ " + (i + 2) + "],");
+                result.put("info","create product - "+ ApiErrorTypeEnum.errorType.skuCode_is_null.getDesc()+"barcode:null");
+                result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null);
+                result.put("key","barcode");
+                result.put("value","null");
+                return true;
             }
             stock = columnDataList.get(i + 2);
             if (StringUtils.isBlank(stock)) {
-                info.append("json_data[ " + (i + 3) + "],");
+                result.put("info","create product - "+ ApiErrorTypeEnum.errorType.skuStock_is_null.getDesc()+"stock:null");
+                result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null);
+                result.put("key","stock");
+                result.put("value","null");
+                return true;
             }
         }
-
-        if (StringUtils.isNotBlank(info.toString()) || StringUtils.isNotBlank(info2.toString())) {
-            if (StringUtils.isNotBlank(info.toString())) {
-                info.append(" can't be blank !!!");
-            }
-            errorMsg =  info.toString() + info2.toString();
-            b = true;
-            result.put("status", StatusType.FAILURE);
-            result.put("info", errorMsg);
-        }
-
-        return b;
+        return false;
     }
 	
 	/**
@@ -1353,8 +1379,18 @@ public class ProductEDSManagement {
 		public String salePrice = "";
 
 		public String imgByFilippo;
-		
-		public List<SkuOptions> skus = new ArrayList<>();
+
+		public String fullUpdateProductFlag = "";
+
+        public String getFullUpdateProductFlag() {
+            return fullUpdateProductFlag;
+        }
+
+        public void setFullUpdateProductFlag(String fullUpdateProductFlag) {
+            this.fullUpdateProductFlag = fullUpdateProductFlag;
+        }
+
+        public List<SkuOptions> skus = new ArrayList<>();
 		
 		public String getName() {
 			return name;

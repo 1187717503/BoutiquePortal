@@ -115,9 +115,9 @@ public class ShopProductService {
             if (conditionType.equals("=")) {
                 if (conditionFiled.equals("t_pro.category_id")) {
                     resultSql = " and " + conditionFiled + " in (";
-                    Connection conn = null ;
+                    Connection conn = null;
                     try {
-                    	conn = DBConnector.sql2o.beginTransaction();
+                        conn = DBConnector.sql2o.beginTransaction();
                         CategoryService categoryService = new CategoryService(conn);
                         List<Map<String, Object>> mapList = categoryService.getAllCategory();
 //			            List<Category> categoryList = convertMapToCategory(mapList, new ArrayList<Category>(), -1L);
@@ -143,11 +143,16 @@ public class ShopProductService {
                         conn.commit();
                     } catch (Exception e) {
                         e.printStackTrace();
-                        if(conn != null) {conn.rollback();conn.close();}
+                        if (conn != null) {
+                            conn.rollback();
+                            conn.close();
+                        }
                     } finally {
-                        if(conn != null) {conn.close();}
+                        if (conn != null) {
+                            conn.close();
+                        }
                     }
-                    
+
                 } else if (conditionFiled.equals("t_pro.`status`")) {
                     String statusSQL = "";
                     String appendSQL = " and " + conditionFiled + " in (";
@@ -224,7 +229,7 @@ public class ShopProductService {
     @SuppressWarnings("static-access")
     public String genSQLByProducts(Long shopId, ProductQueryVo pqv, String fileds) {
         StringBuilder sb = new StringBuilder();
-        sb.append("select "+fileds+"\n" +
+        sb.append("select " + fileds + "\n" +
                 "from product t_pro left join vendor t_v on (t_v.vendor_id = t_pro.vendor_id and t_v.enabled = 1)\n" +
                 "left join brand t_brand on (t_brand.brand_id = t_pro.brand_id and t_brand.enabled = 1)\n" +
                 "left join product_group t_pg on(t_pg.product_group_id = t_pro.product_group_id)\n" +
@@ -292,7 +297,7 @@ public class ShopProductService {
             StringBuffer stringBuffer = new StringBuffer();
             if (null != filedValues && filedValues.length > 0) {
                 for (String season : filedValues) {
-                    stringBuffer.append(",'"+season+"'");
+                    stringBuffer.append(",'" + season + "'");
                 }
             }
             String seasonStr = stringBuffer.toString().replaceFirst(",", "");
@@ -336,6 +341,16 @@ public class ShopProductService {
                 sb.append(" and t_pro.created_at = t_pro.updated_at ");
             }
         }
+
+        String selImageModify = pqv.getSelImageModify();
+        if (StringUtils.isNotBlank(selImageModify)) {
+            if (selImageModify.equals(Contants.hasImageModify)) {
+                sb.append(" and t_pro.img_modified = 1 ");
+            } else if (selImageModify.equals(Contants.notHasImageModify)) {
+                sb.append(" and t_pro.img_modified = 0 ");
+            }
+        }
+
         sb.append(" order by t_sp.updated_at desc  ");
         log.info("【genSQLByProducts】-" + sb.toString());
         return sb.toString();
@@ -413,7 +428,7 @@ public class ShopProductService {
      */
     public List<Map<String, Object>> getShopProductList(Long shopId, Integer status, String productName, String orderBy)
             throws Exception {
-		/*
+        /*
 		 * SELECT
 		 * t.product_id,t.`name`,t.coverpic,t.`status`,t3.valid_at,t1.max_price,
 		 * t1.min_price,t1.max_sale_price,t1.min_sale_price,t1.max_raise_price,
@@ -834,6 +849,14 @@ public class ShopProductService {
         String shopProductUpdateSql = "update shop_product set status=" + ShopProductType.STOP_SELLING
                 + ",updated_at=:p2 where shop_product_id=:p1";
         shopProductDao.batchExecuteBySql(shopProductUpdateSql, params);
+    }
+
+    public void changeShopProductStopByProduct(String product_id) throws Exception {
+        if(StringUtils.isBlank(product_id)) {
+            String sql = "update shop_product set status ="+ShopProductType.STOP_SELLING+" where enabled = 1 and product_id ="+product_id;
+            shopProductDao.executeBySql(sql,null);
+            log.info("updateproduct修改商品上下架状态 ,sql : " + sql);
+        }
     }
 
     /**

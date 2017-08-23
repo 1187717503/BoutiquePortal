@@ -10,12 +10,17 @@ import com.alibaba.fastjson15.JSONObject;
 import com.google.gson.Gson;
 
 import pk.shoplus.common.Contants;
+import pk.shoplus.enums.ApiErrorTypeEnum;
 import pk.shoplus.model.ProductStockEDSManagement.StockOptions;
 import pk.shoplus.parameter.StatusType;
 import pk.shoplus.service.mapping.api.IMapping;
 import pk.shoplus.service.stock.api.IStoreService;
 import pk.shoplus.service.stock.impl.StoreServiceImpl;
+import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.vo.ResultMessage;
+
+import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.handle_stock_rule_error;
+import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.Runtime_exception;
 
 /** 
  * 提供给Atelier用的Service,通过此service映射Atelier的数据并并调用更新库存Service
@@ -48,8 +53,12 @@ public class ProductStockAtelierMapping implements IMapping {
 //				stockOptions.setQuantity(jsonSku.getString("stock"));
 				String stock = jsonSku.getString("stock");
 				if(StringUtils.isBlank(stock)) {
-					resultMap.put("status", StatusType.FAILURE);
-					resultMap.put("info",".handleMappingAndExecute stock is null !!!");
+					resultMap.put("status",StatusType.FAILURE);
+					resultMap.put("key","stock");
+					resultMap.put("value","null");
+					resultMap.put("info","update atelier stock mapping - "+ ApiErrorTypeEnum.errorType.stock_is_null.getDesc()+"quantity:null");
+					resultMap.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null);
+					resultMap.put("product_code",stockOptions.getProductCode());
 					return resultMap;
 				}
 				int qty = Integer.parseInt(stock);
@@ -61,21 +70,25 @@ public class ProductStockAtelierMapping implements IMapping {
 				} else {
 					resultMap.put("status", StatusType.FAILURE);
 					resultMap.put("info",resultMessage.getMsg());
+					resultMap.put("error_enum",handle_stock_rule_error);
+					resultMap.put("product_code",stockOptions.getProductCode());
 					return resultMap;
 				}
 			}
 			
 			logger.info("开始调用Atelier库存更新Service,stockOptions:"+new Gson().toJson(stockOptions));
 			Map<String, Object> serviceResultMap = productStockEDSManagement.updateStock(stockOptions);
-			logger.info("结束调用Atelier库存更新Service,serviceResultMap:"+new Gson().toJson(serviceResultMap));
-			
-			// 返回结果
-			String updateStockResult = serviceResultMap.get("status") == null ? "" : serviceResultMap.get("status").toString();
-			resultMap.put("status",updateStockResult);
-			resultMap.put("info", "serviceResultMap:" + new Gson().toJson(serviceResultMap));
+			logger.info("结束调用Atelier库存更新Service,serviceResultMap:"+new Gson().toJson(serviceResultMap)+",stockOptions:"+new Gson().toJson(stockOptions));
+			serviceResultMap.put("product_code",stockOptions.getProductCode());
+			serviceResultMap.put("sku_size",stockOptions.getSizeValue());
+			return serviceResultMap;
 		} catch (Exception e) {
 			e.printStackTrace();
-			resultMap.put("info", "系统异常! errorMsg:" + e.getMessage());
+			resultMap.put("status",StatusType.FAILURE);
+			resultMap.put("error_enum", Runtime_exception);
+			resultMap.put("key","exception");
+			resultMap.put("value",ExceptionUtils.getExceptionDetail(e));
+			resultMap.put("info", "update atelier stock mapping - "+ Runtime_exception.getDesc()+" error message : " + ExceptionUtils.getExceptionDetail(e));
 //			resultMap.put("data", mqData);
 			logger.error("ERROR:"+new Gson().toJson(resultMap));
 		}

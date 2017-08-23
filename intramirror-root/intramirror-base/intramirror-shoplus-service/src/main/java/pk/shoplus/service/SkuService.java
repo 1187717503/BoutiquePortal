@@ -1,5 +1,6 @@
 package pk.shoplus.service;
 
+import org.apache.log4j.Logger;
 import org.sql2o.Connection;
 import pk.shoplus.common.Helper;
 import pk.shoplus.dao.DaoHelper;
@@ -100,6 +101,17 @@ public class SkuService {
 		}
 	}
 
+	private static Logger logger = Logger.getLogger(SkuService.class);
+	public List<Map<String,Object>> getSkuByProductId(String product_id) throws Exception {
+		try {
+			String sql = "select * from sku where enabled=1 and product_id ='" +product_id + "'";
+			logger.info("getSkuByCode : "+sql);
+			return skuDao.executeBySql(sql,null);
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+
 	/**
 	 * 根据条件获取 sku 列表
 	 *
@@ -157,7 +169,7 @@ public class SkuService {
 			// BY product_id
 			StringBuilder sql = new StringBuilder("");
 			sql.append("SELECT k.product_id, MAX(price), MIN(price),MAX(in_price), MIN(in_price) FROM sku k ");
-			sql.append("WHERE EXISTS (");
+			sql.append("WHERE k.enabled = 1 and EXISTS (");
 			sql.append("SELECT a.product_id FROM product a where k.product_id = a.product_id");
 			if (whereStringInput.length() > 0) {
 				sql.append(" and (" + whereStringInput + ") ");
@@ -297,7 +309,7 @@ public class SkuService {
 			sql.append(
 					"SELECT s.*, b.store, b.remind, b.ordered, b.confirm, b.ship, b.finished, b.returned, b.changed, b.clear, b.agree_return_rate from sku s ");
 			sql.append("LEFT JOIN sku_store b on s.sku_id = b.sku_id ");
-			sql.append("WHERE EXISTS (");
+			sql.append("WHERE b.enabled = 1 and s.enabled = 1 and EXISTS (");
 			sql.append("SELECT a.product_id FROM product a where s.product_id = a.product_id");
 			if (whereStringInput.length() > 0) {
 				sql.append(" and (" + whereStringInput + ") ");

@@ -191,8 +191,8 @@ public class PriceChangeRuleService {
         List<Map<String,Object>> selProductGroupRuleByAdmin = this.selProductGroupRuleSql("3",vendorId,product_group_id,season_code);
 
         // select product category brand rule 1
-        List<Map<String,Object>> selProductCategoryBrandRule1ByVendor = this.selProductCategoryBrandRuleSql1("1",vendorId,brandId,categoryId,season_code);
-        List<Map<String,Object>> selProductCategoryBrandRule1ByAdmin = this.selProductCategoryBrandRuleSql1("3",vendorId,brandId,categoryId,season_code);
+        List<Map<String,Object>> selProductCategoryBrandRule1ByVendor = this.selProductCategoryBrandRuleSql1("1",vendorId,0L,categoryId,season_code);
+        List<Map<String,Object>> selProductCategoryBrandRule1ByAdmin = this.selProductCategoryBrandRuleSql1("3",vendorId,0L,categoryId,season_code);
 
         // select product category brand rule 0
         List<Map<String,Object>> selProductCategoryBrandRule0ByVendor = this.selProductCategoryBrandRuleSql0("1",vendorId,brandId,categoryId,season_code);
@@ -264,7 +264,8 @@ public class PriceChangeRuleService {
             String sql = "select distinct discount_percentage from price_change_rule pcr\n" +
                     "inner join price_change_rule_category_brand pcrcb on (pcr.price_change_rule_id = pcrcb.price_change_rule_id)\n" +
                     "inner join price_change_rule_season_group pcrsg on(pcr.price_change_rule_id = pcrsg.price_change_rule_id)\n"+
-                    "where pcr.price_type ="+price_type+" and pcr.`status` = 2 and pcr.vendor_id ="+vendor_id+" and pcrcb.brand_id ="+brand_id+" and pcrcb.category_id ="+category_id+"\n"+
+                    "where pcr.price_type ="+price_type+" and pcr.`status` = 2 and pcr.vendor_id ="+vendor_id+" and pcrcb.brand_id ="+brand_id+" and pcrcb.category_id in (\n"+
+                    "select c.parent_id from category c where c.category_id ="+category_id+")\n"+
                     "and pcrsg.enabled = 1 and pcrsg.season_code = '"+season_code+"'";
             mapList = priceChangeRuleDao.executeBySql(sql,null);
         } catch (Exception e) {

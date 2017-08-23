@@ -156,6 +156,22 @@ public class ApiConfigurationService {
         }
         return null;
     }
+
+    public ApiConfiguration getMq(Map<String, Object> condition) throws Exception {
+        try {
+            String sql = // "select * from api_configuration ac \n" +
+                    "\nac left join api_end_point aep on(ac.api_end_point_id = aep.api_end_point_id and aep.enabled = 1)\n" +
+                    "where ac.enabled = 1 and ac.store_code = '"+condition.get("store_code")+"' and ac.system = '"+condition.get("system")+"' and aep.`name` = '"+condition.get("aep_name")+"'";
+            List<ApiConfiguration> list = mappingDao.getBySql(ApiConfiguration.class,"ac.api_configuration_id,ac.vendor_id,ac.store_code,ac.api_end_point_id,ac.system,ac.enabled",sql,null);
+            if (list != null && list.size() > 0) {
+                return list.get(0);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+        return null;
+    }
     
     /**
      * 根据条件查询Mapping信息
