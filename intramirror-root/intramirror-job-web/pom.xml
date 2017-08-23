@@ -67,6 +67,15 @@
             <groupId>com.intramirror</groupId>
             <artifactId>intramirror-payment-service-core</artifactId>
         </dependency>
+       	<dependency>
+			<groupId>com.intramirror</groupId>
+			<artifactId>intramirror-main-service-core</artifactId>
+		</dependency>
+        <dependency>
+			<groupId>com.intramirror</groupId>
+			<artifactId>intramirror-shoplus-message</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 
         <dependency>
             <groupId>com.intramirror</groupId>

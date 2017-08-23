@@ -53,7 +53,8 @@ public enum QueueNameEnum {
 	CloudStoreSynProduct("CloudStoreSynProduct",new CloudStoreGetInventoryMapping(),"IM调用cloudstore getInventory更新商品信息"),
 	CloudStoreSynStock("CloudStoreSynStock",new CloudStoreGetEventsMapping(),"IM调用cloudstore getEvents更新库存信息"),
 	FilippoSynProduct("FilippoSynProduct",new FilippoSynProductMapping(),"IM调用filippo 接口更新商品信息"),
-	FilippoSynStock("FilippoSynStock",new FilippoSynStockMapping(),"IM调用filippo 接口更新库存信息");
+	FilippoSynStock("FilippoSynStock",new FilippoSynStockMapping(),"IM调用filippo 接口更新库存信息"),
+	QuadraSynProduct("QuadraSynProduct",new QuadraSynProductMapping(),"IM调用Quadra 接口更新商品信息");
 
 	private String code;
 	private IMapping mapping;

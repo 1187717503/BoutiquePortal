@@ -28,6 +28,16 @@
     from api_end_point
     where api_end_point_id = #{apiEndPointId,jdbcType=BIGINT}
   </select>
+  
+  <select id="getapiEndpointInfoByCondition" resultType="java.util.HashMap" parameterType="java.util.Map" >
+        select ac.api_configuration_id,ac.store_code,ac.vendor_id,aep.url,aep.api_end_point_id
+               from api_configuration ac,api_end_point aep
+               where ac.api_end_point_id =  aep.api_end_point_id and 
+               aep.enabled = 1 and ac.enabled = 1 
+               and ac.system = #{system,jdbcType=VARCHAR}
+               and aep.`name` = #{name,jdbcType=VARCHAR}
+  </select>
+  
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
     <!--
       WARNING - @mbggenerated
