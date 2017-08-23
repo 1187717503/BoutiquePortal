@@ -29,6 +29,13 @@
     from api_parameter
     where api_parameter_id = #{apiParameterId,jdbcType=BIGINT}
   </select>
+  
+  
+  <select id="getapiParameterByCondition" resultType="java.util.HashMap" parameterType="java.util.Map" >
+  		select * from api_parameter ap where ap.api_end_point_id = #{api_end_point_id,jdbcType=BIGINT}
+  </select>
+  
+  
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
     <!--
       WARNING - @mbggenerated
