@@ -145,7 +145,7 @@ public class FilippoSynProductMapping implements IMapping{
             FileUtil.writeFileAppendContent("/opt/data/test/api_category_map.sql",sql);
             // -- test*/
 
-            List<Map<String, Object>> apiCategoryMap = mappingCategoryService.getMappingCategoryInfoByCondition(object);
+            List<Map<String, Object>> apiCategoryMap = mappingCategoryService.getMappingCategoryInfoByCondition(vendorOptions.getVendorId().toString(),firstCategory,secondCategory,threeCategory);
             if(apiCategoryMap != null && apiCategoryMap.size() > 0) {
                 productOptions.setCategoryId(apiCategoryMap.get(0).get("category_id").toString());
             }

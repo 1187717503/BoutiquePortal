@@ -13,6 +13,7 @@ import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.parameter.EnabledType;
 import pk.shoplus.parameter.StatusType;
 import pk.shoplus.service.ApiCategoryMapService;
+import pk.shoplus.service.MappingCategoryService;
 import pk.shoplus.service.mapping.api.IMapping;
 import pk.shoplus.service.product.api.IProductService;
 import pk.shoplus.service.product.impl.ProductServiceImpl;
@@ -85,7 +86,7 @@ public class CloudStoreGetInventoryMapping implements IMapping{
         MapUtils mapUtils = new MapUtils(new HashMap<>());
         Connection conn = null;
         try {
-        	conn = DBConnector.sql2o.beginTransaction();
+        	conn = DBConnector.sql2o.open();
 
             Map<String,Object> bodyDataMap = JSONObject.parseObject(mqData);
 
@@ -101,23 +102,15 @@ public class CloudStoreGetInventoryMapping implements IMapping{
             JSONArray jsonArray = jsonObjectData.getJSONArray("cat_ids");
             Iterator<Object> it = jsonArray.iterator();
             String boutique_category_id = "";
-            ApiCategoryMap apiCategoryMap = new ApiCategoryMap();
+            String category_id = "";
             while (it.hasNext()) {
                 JSONObject jsonObject = (JSONObject) it.next();
                 boutique_category_id = jsonObject.getString("$id");
 
-                // get category_id
-                ApiCategoryMapService apiCategoryMapService = new ApiCategoryMapService(conn);
-                Map<String,Object> apiCatgeoryMapConditions = new HashMap<>();
-                apiCatgeoryMapConditions.put("api_configuration_id",vendorOptions.getApiConfigurationId());
-                apiCatgeoryMapConditions.put("boutique_category_id",boutique_category_id);
-                apiCatgeoryMapConditions.put("enabled", EnabledType.USED);
-                List<ApiCategoryMap> apiCategoryMapList = apiCategoryMapService.queryByConditions(apiCatgeoryMapConditions);
-                if(apiCategoryMapList != null && apiCategoryMapList.size() > 0) {
-                    apiCategoryMap = apiCategoryMapList.get(0);
-                }
-
-                if(apiCategoryMap.getCategory_id() != null) {
+                MappingCategoryService mappingCategoryService = new MappingCategoryService(conn);
+                List<Map<String,Object>> categoryMaps = mappingCategoryService.getMappingCategoryInfoByCondition(vendorOptions.getVendorId().toString(),boutique_category_id);
+                if(categoryMaps != null && categoryMaps.size() >0){
+                    category_id = categoryMaps.get(0).get("category_id").toString();
                     break;
                 }
             }
@@ -131,7 +124,7 @@ public class CloudStoreGetInventoryMapping implements IMapping{
                     .setBrandName(jsonObjectData.getString("brand").trim())
                     .setColorCode(colorCode)
                     .setColorDesc(jsonObjectData.getString("color_en"))
-                    .setCategoryId(apiCategoryMap.getCategory_id() == null?"":apiCategoryMap.getCategory_id().toString())
+                    .setCategoryId(category_id)
                     .setDesc(jsonObjectData.getString("desc_en"))
                     .setComposition(jsonObjectData.getString("material_en"))
                     .setCoverImg(jsonObjectData.getString("images"))
@@ -159,9 +152,8 @@ public class CloudStoreGetInventoryMapping implements IMapping{
             }
 
             mapUtils.putData("status",StatusType.SUCCESS).putData("productOptions",productOptions).putData("vendorOptions",vendorOptions);
-            conn.commit();
         } catch (Exception e) {
-        	if(conn != null) {conn.rollback();conn.close();}
+        	if(conn != null) {conn.close();}
             e.printStackTrace();
             mapUtils.putData("key","exception");
             mapUtils.putData("value",ExceptionUtils.getExceptionDetail(e));

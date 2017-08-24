@@ -129,7 +129,7 @@ public class ProductServiceImpl implements IProductService{
             ApiBrandMapService apiBrandMapService = new ApiBrandMapService(conn);
             String brandId = apiBrandMapService.getBrandNameByBrand(englishName);
             if(StringUtils.isBlank(brandId)) {
-                brandId = apiBrandMapService.getBrandNameByBrandMapping(englishName,vendorOptions.apiConfigurationId.toString());
+                brandId = apiBrandMapService.getBrandNameByBrandMapping(englishName,vendorOptions.getVendorId().toString());
                 if(StringUtils.isBlank(brandId)) {
                     mapUtils = new MapUtils(new HashMap<>());
                     mapUtils.putData("status",StatusType.WARNING)

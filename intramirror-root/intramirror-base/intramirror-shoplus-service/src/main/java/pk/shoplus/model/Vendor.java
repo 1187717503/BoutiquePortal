@@ -1,7 +1,10 @@
 package pk.shoplus.model;
-import java.util.*;
+import pk.shoplus.model.annotation.Column;
+import pk.shoplus.model.annotation.Entity;
+import pk.shoplus.model.annotation.Id;
+
 import java.math.BigDecimal;
-import pk.shoplus.model.annotation.*;
+import java.util.Date;
 
    /**
     * vendor 实体类
@@ -117,6 +120,11 @@ public class Vendor{
 * 27:score
 */
 	 @Column	public BigDecimal score;
+//@Column public String vendor_code;
+
+	   public String getVendor_code() {
+		   return vendor_code;
+	   }
 
 //	 @Column public String vendor_code;
 
@@ -230,9 +238,9 @@ public class Vendor{
 		return contact;
 	}
 	
-	public String getVendor_code() {
-		return vendor_code;
-	}
+//	public String getVendor_code() {
+//		return vendor_code;
+//	}
 	
 
 	   public void setVendor_id(Long vendor_id) {

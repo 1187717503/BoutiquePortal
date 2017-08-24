@@ -99,11 +99,27 @@ public class ApiBrandMapService {
 		return null;
 	}
 
-	public String getBrandNameByBrandMapping(String brandName,String cfgId) throws Exception {
+	public String getBrandNameByBrandMapping(String brandName,String vendor_id) throws Exception {
 		try {
-			if(StringUtils.isNotBlank(brandName) && StringUtils.isNotBlank(cfgId)) {
+			if(StringUtils.isNotBlank(brandName) && StringUtils.isNotBlank(vendor_id)) {
+				String cfgIds = "";
+				String sql = "select distinct api_configuration_id from api_configuration ac where ac.enabled = 1 and ac.vendor_id = "+vendor_id;
+
+				List<Map<String,Object>> apiCfgMaps = apiBrandMapEntityDao.executeBySql(sql,null);
+				if(apiCfgMaps != null && apiCfgMaps.size() > 0){
+					for(Map<String,Object> map : apiCfgMaps) {
+						String api_configuration_id = map.get("api_configuration_id").toString();
+						cfgIds = cfgIds + api_configuration_id + ",";
+					}
+				}
+
+				if(StringUtils.isNotBlank(cfgIds)) {
+					cfgIds = cfgIds.substring(0,cfgIds.length()-1);
+				} else {
+					return null;
+				}
 				logger.info(" .getBrandNameByBrandMapping brandName  before escape : " + brandName);
-				String sql  = "select abm.brand_id from api_brand_map abm where lower(abm.boutique_brand_name) = lower(\"" + pk.shoplus.util.StringUtils.escapeStr(brandName) + "\") and abm.api_configuration_id = '" + cfgId + "' and abm.enabled = 1";
+				sql  = "select distinct abm.brand_id from api_brand_map abm where lower(abm.boutique_brand_name) = lower(\"" + pk.shoplus.util.StringUtils.escapeStr(brandName) + "\") and abm.api_configuration_id in(" + cfgIds + ") and abm.enabled = 1";
 				logger.info(" .getBrandNameByBrandMapping brandName  after escape : " + sql);
 
 				List<Map<String, Object>> list = apiBrandMapEntityDao.executeBySql(sql, null);

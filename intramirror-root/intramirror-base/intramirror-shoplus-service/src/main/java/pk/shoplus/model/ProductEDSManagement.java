@@ -109,7 +109,7 @@ public class ProductEDSManagement {
             ApiBrandMapService apiBrandMapService = new ApiBrandMapService(conn);
             String brandId = apiBrandMapService.getBrandNameByBrand(englishName);
             if(StringUtils.isBlank(brandId)) {
-                brandId = apiBrandMapService.getBrandNameByBrandMapping(englishName,apiConfigurationId.toString());
+                brandId = apiBrandMapService.getBrandNameByBrandMapping(englishName,vendorId.toString());
                 if(StringUtils.isBlank(brandId)) {
                     result.put("info","create product - " + ApiErrorTypeEnum.errorType.brand_not_exist.getDesc() + "brand_name:"+englishName);
                     result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_find_mapping);
@@ -988,7 +988,7 @@ public class ProductEDSManagement {
      * @param categoryService
      * @return
      */
-    public Category getCategory(List<String> columnDataList, CategoryService categoryService, MappingCategoryService mappingCategoryService, Map<String, Object> result, String storeCode) throws Exception {
+    /*public Category getCategory(List<String> columnDataList, CategoryService categoryService, MappingCategoryService mappingCategoryService, Map<String, Object> result, String storeCode) throws Exception {
         String firstCategoryName = columnDataList.get(8).toString();
         String secondCategoryName = columnDataList.get(9).toString();
         String thirdCategoryName = columnDataList.get(10).toString();
@@ -1010,7 +1010,7 @@ public class ProductEDSManagement {
             result.put("status", StatusType.FAILURE);
         }
         return category;
-    }
+    }*/
 	
 	 public boolean checkVendorAcitived(Vendor vendor, Map<String, Object> result) {
 	        boolean b = false;

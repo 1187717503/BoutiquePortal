@@ -79,7 +79,7 @@ public class ProductEDSMapping implements IMapping{
 			// category_id for gender,first_category,second_category
 			Connection conn = null;
 			try{
-				conn = DBConnector.sql2o.beginTransaction();
+				conn = DBConnector.sql2o.open();
 				MappingCategoryService mappingCategoryService = new MappingCategoryService(conn);
 				CategoryService categoryService = new CategoryService(conn);
 				Category category = null;
@@ -87,7 +87,7 @@ public class ProductEDSMapping implements IMapping{
 		        Object [] object = new Object[]{storeCode, productMap.get("gender").toString(), productMap.get("first_category").toString(), productMap.get("second_category").toString()};
 
 		        List<Map<String, Object>> apiCategoryMap = null;
-		        apiCategoryMap = mappingCategoryService.getMappingCategoryInfoByCondition(object);
+		        apiCategoryMap = mappingCategoryService.getMappingCategoryInfoByCondition(mqDataMap.get("vendor_id").toString(),productMap.get("gender").toString(),productMap.get("first_category").toString(),productMap.get("second_category").toString());
 		        if (null != apiCategoryMap && apiCategoryMap.size() > 0) {
 					category = categoryService.convertMapToCategory(apiCategoryMap.get(0));
 		        } else {
@@ -102,10 +102,9 @@ public class ProductEDSMapping implements IMapping{
 					return resultMap;
 		        }
 		        productOptions.setCategoryId(category.getCategory_id()+"");
-				conn.commit();
 			}catch (Exception e) {
 				e.printStackTrace();
-				if(conn != null) {conn.rollback();conn.rollback();}
+				if(conn != null) {conn.close();}
 				resultMap.put("status",StatusType.FAILURE);
 				resultMap.put("error_enum", Runtime_exception);
 				resultMap.put("key","exception");
@@ -116,9 +115,7 @@ public class ProductEDSMapping implements IMapping{
 				resultMap.put("info", " update eds product - " + Runtime_exception.getDesc()+"error message : " + ExceptionUtils.getExceptionDetail(e));
 				return resultMap;
 			} finally {
-				if(conn != null) {
-					conn.close();
-				}
+				if(conn != null) {conn.close();}
 			}
 			
 			productOptions.setDesc(productMap.getString("item_description"));

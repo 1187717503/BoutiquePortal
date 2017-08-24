@@ -79,7 +79,7 @@ public class ProductService {
     public List<Map<String, Object>> getBrandIdListByVendorId(Long vendorId) throws Exception {
         try {
             String sql = "SELECT * FROM brand b WHERE b.brand_id in(\n" +
-                    "select distinct brand_id   from product p where p.enabled = 1 and vendor_id = '" + vendorId + "' "+
+                    "select distinct brand_id   from product p where p.enabled = 1 and vendor_id = '" + vendorId + "' " +
                     ") AND b.enabled =1  ORDER BY  b.english_name ";
             return productDao.executeBySql(sql, null);
         } catch (Exception e) {
@@ -274,7 +274,7 @@ public class ProductService {
             // a.enabled = 0;
 
             sql.append(
-                    "SELECT a.*, b.vendor_name, c.chinese_name, c.english_name, d.name AS category_name,e.value FROM product a ");
+                    "SELECT a.*, b.vendor_name, c.chinese_name, c.english_name, d.name AS category_name,e.value,a.season_code FROM product a ");
             sql.append("LEFT JOIN vendor b on a.vendor_id = b.vendor_id ");
             sql.append("LEFT JOIN brand c on a.brand_id = c.brand_id ");
             sql.append("LEFT JOIN category d on a.category_id = d.category_id ");

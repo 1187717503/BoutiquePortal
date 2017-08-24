@@ -533,6 +533,11 @@ public final class StatusType {
 	public static final int SHOP_PRODUCT_STOCK_EMPTY = -5012;
 
 	/**
+	 * product图片为空
+	 */
+	public static final int SHOP_PRODUCT_IMG_EMPTY = -5020;
+
+	/**
 	 * 商店不存在
 	 */
 	public static final int SHOP_IS_NOT_EXIST = -5013;
