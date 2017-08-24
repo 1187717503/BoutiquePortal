@@ -2,8 +2,13 @@ package com.intramirror.web.service;
 
 import com.google.gson.Gson;
 import com.intramirror.common.help.ExceptionUtils;
+import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.common.parameter.StatusType;
+import com.intramirror.product.api.model.ApiErrorProcessing;
+import com.intramirror.product.api.model.ApiErrorType;
 import com.intramirror.product.api.model.ApiMq;
+import com.intramirror.product.api.service.IApiErrorProcessingService;
+import com.intramirror.product.api.service.IApiErrorTypeService;
 import com.intramirror.product.api.service.IApiMqService;
 import com.intramirror.web.enums.QueueNameJobEnum;
 import org.apache.log4j.Logger;
@@ -16,6 +21,7 @@ import pk.shoplus.enums.ApiErrorTypeEnum;
 import pk.shoplus.mq.enums.QueueTypeEnum;
 import pk.shoplus.mq.vo.MessageInfo;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +37,11 @@ public class ConsumeService {
     @Autowired
     private IApiMqService iApiMqService;
 
+    @Autowired
+    private IApiErrorTypeService iApiErrorTypeService;
+
+    @Autowired
+    private IApiErrorProcessingService iApiErrorProcessingService;
 
     public void main(){
         try {
@@ -72,7 +83,7 @@ public class ConsumeService {
             for(QueueNameJobEnum queueNameEnum : QueueNameJobEnum.values()) {
                 if(queueNameEnum.getCode().equalsIgnoreCase(apiMq.getName())) {
                     Map<String,Object> resultMap = queueNameEnum.getMapping().handleMappingAndExecute(new Gson().toJson(messageInfo.getBody()));
-                    consumeResult(resultMap,mqName,messageInfo,queueNameEnum);
+                    consumeResult(resultMap,mqName,messageInfo,queueNameEnum,apiMq);
                 }
             }
         } catch (Exception e) {
@@ -81,7 +92,7 @@ public class ConsumeService {
         }
     }
 
-    public void consumeResult(Map<String,Object> resultMap,String queueName,MessageInfo message,QueueNameJobEnum queueNameEnum){
+    public void consumeResult(Map<String,Object> resultMap,String queueName,MessageInfo message,QueueNameJobEnum queueNameEnum,ApiMq apiMq){
         try {
             MessageRequestVo mrv = new MessageRequestVo();
             String status = resultMap.get("status") == null ? "" : resultMap.get("status").toString();
@@ -101,14 +112,14 @@ public class ConsumeService {
                 mrv.setRequestBody(new Gson().toJson(resultMap));
                 String redisKey = MessageHelper.putMessage(mrv);
                 if(obj == null) {
-                    this.putErrorMessage(resultMap,queueNameEnum,redisKey);
+                    this.putErrorMessage(resultMap,queueNameEnum,redisKey,apiMq);
                 } else {
                     List<Map<String,Object>> warningMaps = (List<Map<String, Object>>) obj;
                     for(Map<String,Object> map : warningMaps) {
                         map.put("product_code",resultMap.get("product_code"));
                         map.put("color_code",resultMap.get("color_code"));
                         map.put("brand_id",resultMap.get("brand_id"));
-                        this.putErrorMessage(map,queueNameEnum,redisKey);
+                        this.putErrorMessage(map,queueNameEnum,redisKey,apiMq);
                     }
                 }
             }
@@ -118,7 +129,7 @@ public class ConsumeService {
         }
     }
 
-    public void putErrorMessage(Map<String,Object> resultMap,QueueNameJobEnum queueNameEnum,String redisKey){
+    public void putErrorMessage(Map<String,Object> resultMap,QueueNameJobEnum queueNameEnum,String redisKey,ApiMq apiMq){
         try {
             String product_code = resultMap.get("product_code") == null ? "" : resultMap.get("product_code").toString();
             String color_code = resultMap.get("color_code") == null ? "" : resultMap.get("color_code").toString();
@@ -131,6 +142,35 @@ public class ConsumeService {
 
             if(errorType != null) {
                 long api_error_type_id = 0L;
+                ApiErrorType apiErrorType = iApiErrorTypeService.selectByName(errorType.getCode());
+                if(apiErrorType == null) {
+                    apiErrorType = new ApiErrorType();
+                    apiErrorType.setErrorTypeDesc(errorType.getDesc());
+                    apiErrorType.setEnabled(EnabledType.USED);
+                    apiErrorType.setErrorTypeName(errorType.getCode());
+                    api_error_type_id = iApiErrorTypeService.insert(apiErrorType);
+                } else {
+                    api_error_type_id = apiErrorType.getApiErrorTypeId();
+                }
+
+                ApiErrorProcessing apiErrorProcessing = new ApiErrorProcessing();
+                apiErrorProcessing.setApiMqId(apiMq.getApiMqId());
+                apiErrorProcessing.setApiErrorTypeId(apiErrorType.getApiErrorTypeId());
+                apiErrorProcessing.setErrorId(redisKey);
+                apiErrorProcessing.setBoutiqueId(product_code);
+                apiErrorProcessing.setSkuSize(sku_size);
+                apiErrorProcessing.setBrandId(brand_id);
+                apiErrorProcessing.setColorCode(color_code);
+                apiErrorProcessing.setDataField(key);
+                apiErrorProcessing.setBoutiqueData(value);
+                apiErrorProcessing.setNoProcess(true);
+                apiErrorProcessing.setEnabled(true);
+                apiErrorProcessing.setCreateTime(new Date());
+                if(errorType.getCode().equals(ApiErrorTypeEnum.errorType.Runtime_exception.getCode())) {
+                    apiErrorProcessing.setDataField("Exception");
+                    apiErrorProcessing.setBoutiqueData(info);
+                }
+                iApiErrorProcessingService.insert(apiErrorProcessing);
             } else {
                 logger.info("putErrorMessage errorType is null !!!" + new Gson().toJson(resultMap));
             }
