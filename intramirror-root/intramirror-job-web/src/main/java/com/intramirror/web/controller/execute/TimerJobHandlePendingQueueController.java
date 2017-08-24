@@ -16,7 +16,7 @@ import java.util.Map;
 
 /**
  * Created by dingyifan on 2017/8/23.
- * 消费MQ消息
+ * 消费MQ线程池
  */
 @Controller
 @RequestMapping("/timer")

@@ -1,4 +1,4 @@
-package pk.shoplus.mq.enums;
+package com.intramirror.web.enums;
 
 import pk.shoplus.DBConnector;
 import pk.shoplus.model.*;
@@ -7,7 +7,7 @@ import pk.shoplus.service.RedisService;
 import pk.shoplus.service.mapping.api.IMapping;
 import pk.shoplus.service.mapping.impl.*;
 
-public enum QueueNameEnum {
+public enum QueueNameJobEnum {
 
 	AtelierUpdateOrderStatus("AtelierUpdateOrderStatus",new OrderAtelierUpdateStatusMapping(),"Atelier调用IM接口修改订单状态"),
 	CloudStoreCreateOrder("CloudStoreCreateOrder",new OrderCloudStoreMapping(),"调用CloudStore接口创建订单"),
@@ -56,13 +56,13 @@ public enum QueueNameEnum {
 	private IMapping mapping;
 	private String value;
 
-	private QueueNameEnum(String code,IMapping mapping, String value) {
+	private QueueNameJobEnum(String code, IMapping mapping, String value) {
 		this.code = code;
 		this.mapping = mapping;
 		this.value = value;
 	}
 
-	private QueueNameEnum(String code, String value) {
+	private QueueNameJobEnum(String code, String value) {
 		this.code = code;
 		this.value = value;
 	}
