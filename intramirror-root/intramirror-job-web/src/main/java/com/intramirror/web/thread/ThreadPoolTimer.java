@@ -1,6 +1,9 @@
 package com.intramirror.web.thread;
 
+import com.intramirror.web.service.ConsumeService;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -22,6 +25,8 @@ public class ThreadPoolTimer {
 	private static final Long initialDelay = 5L;// 10L;
 	
 	private static final Long period = 3L;// ;
+
+
 	
 	public static ThreadPoolTimer getInstance(){
 		if(scheduExec.isShutdown()) {

@@ -139,5 +139,4 @@ public class ConsumeService {
             logger.info("putErrorMessage errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
         }
     }
-
 }
