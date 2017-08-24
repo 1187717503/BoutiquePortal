@@ -3,10 +3,15 @@ package com.intramirror.web.mapping.impl;
 import com.alibaba.fastjson15.JSONObject;
 import com.google.gson.Gson;
 import com.intramirror.product.api.service.category.ICategoryService;
+import com.intramirror.product.core.impl.category.CategoryServiceImpl;
+import com.intramirror.web.util.SpringContextUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
 import org.springframework.stereotype.Service;
 
 import pk.shoplus.model.ProductEDSManagement;
@@ -20,6 +25,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.annotation.Resource;
 
 /**
  * Created by wzh on 2017/8/23.
@@ -35,10 +42,21 @@ public class QuadraSynProductMapping implements IMapping{
     private ProductEDSManagement productEDSManagement = new ProductEDSManagement();
 
     private IProductService iProductService = new ProductServiceImpl();
+    
+	private static final String BASEIMGURL = "http://apiquadra.teknosis.link:89/images/";
+    
 
     @Override
     public Map<String, Object> handleMappingAndExecute(String mqData) {
         logger.info(" start QuadraSynProductMapping.handleMappingAndExecute();");
+        
+        //如果未注入进来,手动获取bean
+        if(categoryService == null){
+            categoryService = (ICategoryService)SpringContextUtils.getContext().getBean("productCategoryServiceImpl");
+        }
+
+
+        
         MapUtils mapUtils = new MapUtils(new HashMap<String, Object>());
         try {
         	//获取mq 中消息
@@ -51,8 +69,8 @@ public class QuadraSynProductMapping implements IMapping{
             vendorOptions.setVendorId(Long.parseLong(mqDataMap.get("vendor_id").toString()));
             
             //封装ProductOptions 对象消息
-//            Map<String,Object> productMap = JSONObject.parseObject( mqDataMap.get("product").toString());
-            Map<String,Object> productMap = JSONObject.parseObject(mqDataMap.toString());
+            Map<String,Object> productMap = JSONObject.parseObject( mqDataMap.get("product").toString());
+//            Map<String,Object> productMap = JSONObject.parseObject(mqDataMap.toString());
             ProductEDSManagement.ProductOptions productOptions = this.handleMappingData(productMap,vendorOptions);
 
             //创建商品
@@ -99,7 +117,9 @@ public class QuadraSynProductMapping implements IMapping{
         ProductEDSManagement.ProductOptions productOptions = productEDSManagement.getProductOptions();
     	if(product != null && product.size() > 0 ){
     		productOptions.setCode(product.get("KEY").toString());
-    		productOptions.setSeasonCode(product.get("IDSTAGIONE").toString());
+//    		productOptions.setSeasonCode(product.get("IDSTAGIONE").toString());
+    		productOptions.setSeasonCode("A17");
+    		
     		productOptions.setBrandName(product.get("BRAND").toString());
     		
     		productOptions.setColorCode(product.get("IDCOLORE").toString());
@@ -112,29 +132,30 @@ public class QuadraSynProductMapping implements IMapping{
     		
     		List<String> imageList = new ArrayList<String>();
     		if(checkValue(product.get("FOTO1"))){
-        		imageList.add(product.get("FOTO1").toString());
+        		imageList.add(BASEIMGURL + product.get("FOTO1").toString());
     		}
     		if(checkValue(product.get("FOTO2"))){
-        		imageList.add(product.get("FOTO2").toString());
+        		imageList.add(BASEIMGURL + product.get("FOTO2").toString());
     		}
     		if(checkValue(product.get("FOTO3"))){
-        		imageList.add(product.get("FOTO3").toString());
+        		imageList.add(BASEIMGURL + product.get("FOTO3").toString());
     		}
     		if(checkValue(product.get("FOTO4"))){
-        		imageList.add(product.get("FOTO4").toString());
+        		imageList.add(BASEIMGURL + product.get("FOTO4").toString());
     		}
     		if(checkValue(product.get("FOTO5"))){
-        		imageList.add(product.get("FOTO5").toString());
+        		imageList.add(BASEIMGURL + product.get("FOTO5").toString());
     		}
     		if(checkValue(product.get("FOTO6"))){
-        		imageList.add(product.get("FOTO6").toString());
+        		imageList.add(BASEIMGURL + product.get("FOTO6").toString());
     		}
     		if(checkValue(product.get("FOTO7"))){
-        		imageList.add(product.get("FOTO7").toString());
+        		imageList.add(BASEIMGURL + product.get("FOTO7").toString());
     		}
     		if(checkValue(product.get("FOTO8"))){
-        		imageList.add(product.get("FOTO8").toString());
+        		imageList.add(BASEIMGURL + product.get("FOTO8").toString());
     		}
+    		logger.info("quadra product coverImg list:"+ new Gson().toJson(imageList));
     		productOptions.setCoverImg(new Gson().toJson(imageList));
     		
 //    		productOptions.setImgByFilippo(product.get("KEY").toString());

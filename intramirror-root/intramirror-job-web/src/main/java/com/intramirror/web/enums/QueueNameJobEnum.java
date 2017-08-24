@@ -54,7 +54,7 @@ public enum QueueNameJobEnum {
 
 	FilippoSynStock("FilippoSynStock",new FilippoSynStockMapping(),"IM调用filippo 接口更新库存信息"),
 	
-	QuadraSynProduct("QuadraSynProduct",new QuadraSynProductMapping(),"IM调用quadra 接口更新商品信息");
+	QuadraSynProduct("QuadraSynAllProduct",new QuadraSynProductMapping(),"IM调用quadra 接口更新商品信息");
 	
 
 	private String code;
