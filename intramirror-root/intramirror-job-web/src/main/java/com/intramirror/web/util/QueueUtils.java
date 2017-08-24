@@ -1,6 +1,7 @@
 package com.intramirror.web.util;
 
 import com.google.gson.Gson;
+import com.intramirror.web.enums.QueueNameJobEnum;
 
 import org.apache.log4j.Logger;
 
@@ -18,7 +19,7 @@ public class QueueUtils {
 
     private static Logger logger = Logger.getLogger(QueueUtils.class);
 
-    public static void putMessage(Object mqDataMap,String offset,String url,QueueNameEnum queueNameEnum) {
+    public static void putMessage(Object mqDataMap,String offset,String url,QueueNameJobEnum queueNameEnum) {
         MessageInfo messageInfo = new MessageInfo();
         messageInfo.setBody(mqDataMap);
         messageInfo.setCurrentIndex(offset);
@@ -32,7 +33,7 @@ public class QueueUtils {
         MessageHelper.putMessage(messageRequestVo);
     }
 
-    public static void putMessage(Object mqDataMap,QueueNameEnum queueNameEnum,QueueTypeEnum queueTypeEnum) {
+    public static void putMessage(Object mqDataMap,QueueNameJobEnum queueNameEnum,QueueTypeEnum queueTypeEnum) {
         logger.info("start putMessage by : " + queueNameEnum.getCode() + queueTypeEnum.getCode());
         MessageInfo messageInfo = new MessageInfo();
         messageInfo.setBody(mqDataMap);

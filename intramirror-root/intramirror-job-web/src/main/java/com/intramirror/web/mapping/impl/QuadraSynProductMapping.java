@@ -2,21 +2,18 @@ package com.intramirror.web.mapping.impl;
 
 import com.alibaba.fastjson15.JSONObject;
 import com.google.gson.Gson;
-
-import difflib.DiffRow;
+import com.intramirror.product.api.service.category.ICategoryService;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.sql2o.Connection;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import pk.shoplus.DBConnector;
 import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.parameter.StatusType;
-import pk.shoplus.service.MappingCategoryService;
 import pk.shoplus.service.mapping.api.IMapping;
 import pk.shoplus.service.product.api.IProductService;
 import pk.shoplus.service.product.impl.ProductServiceImpl;
-import pk.shoplus.util.FileUtil;
 import pk.shoplus.util.MapUtils;
 
 import java.util.ArrayList;
@@ -27,10 +24,14 @@ import java.util.Map;
 /**
  * Created by wzh on 2017/8/23.
  */
+@Service
 public class QuadraSynProductMapping implements IMapping{
 
     private static Logger logger = Logger.getLogger(QuadraSynProductMapping.class);
 
+    @Autowired
+    private ICategoryService categoryService;
+    
     private ProductEDSManagement productEDSManagement = new ProductEDSManagement();
 
     private IProductService iProductService = new ProductServiceImpl();
@@ -40,15 +41,26 @@ public class QuadraSynProductMapping implements IMapping{
         logger.info(" start QuadraSynProductMapping.handleMappingAndExecute();");
         MapUtils mapUtils = new MapUtils(new HashMap<String, Object>());
         try {
+        	//获取mq 中消息
             Map<String,Object> mqDataMap = JSONObject.parseObject(mqData);
-            ProductEDSManagement.VendorOptions vendorOptions = new Gson().fromJson(mqDataMap.get("vendorOptions").toString(), ProductEDSManagement.VendorOptions.class);
-            String propertyValue = mqDataMap.get("product").toString();
-            ProductEDSManagement.ProductOptions productOptions = this.handleMappingData(propertyValue,vendorOptions);
+            
+            //封装vendorOptions 对象消息
+            ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
+            vendorOptions.setStoreCode(mqDataMap.get("store_code").toString());
+            vendorOptions.setApiConfigurationId(Long.parseLong(mqDataMap.get("api_configuration_id").toString()));
+            vendorOptions.setVendorId(Long.parseLong(mqDataMap.get("vendor_id").toString()));
+            
+            //封装ProductOptions 对象消息
+//            Map<String,Object> productMap = JSONObject.parseObject( mqDataMap.get("product").toString());
+            Map<String,Object> productMap = JSONObject.parseObject(mqDataMap.toString());
+            ProductEDSManagement.ProductOptions productOptions = this.handleMappingData(productMap,vendorOptions);
 
+            //创建商品
             logger.info("Quadra开始调用商品创建Service by Quadra,productOptions:" + new Gson().toJson(productOptions) + " , vendorOptions:" + new Gson().toJson(vendorOptions));
             Map<String,Object> serviceProductMap = productEDSManagement.createProduct(productOptions,vendorOptions);
             logger.info("Quadra结束调用商品创建Service by Quadra,serviceProductMap:" + new Gson().toJson(serviceProductMap));
 
+            //修改商品
             if(serviceProductMap != null && serviceProductMap.get("status").equals(StatusType.PRODUCT_ALREADY_EXISTS)) {
 
                 logger.info("Quadra开始调用商品修改Service by Quadra,productOptions:" + new Gson().toJson(productOptions) + " , vendorOptions:" + new Gson().toJson(vendorOptions));
@@ -66,25 +78,100 @@ public class QuadraSynProductMapping implements IMapping{
         return mapUtils.getMap();
     }
 
-    public ProductEDSManagement.ProductOptions handleMappingData(String propertyValue, ProductEDSManagement.VendorOptions vendorOptions) throws Exception{
-
-        if(StringUtils.isNotBlank(propertyValue) && propertyValue.contains("newLine")) {
-            DiffRow diffRow = new Gson().fromJson(propertyValue, DiffRow.class);
-            propertyValue = diffRow.getNewLine();
-        }
-
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    /**
+     * 封装商品对象
+     * @param product
+     * @param vendorOptions
+     * @return
+     * @throws Exception
+     */
+    public ProductEDSManagement.ProductOptions handleMappingData(Map<String,Object> product, ProductEDSManagement.VendorOptions vendorOptions) throws Exception{
+    	
         ProductEDSManagement.ProductOptions productOptions = productEDSManagement.getProductOptions();
-        Connection conn = null;
-        try {
+    	if(product != null && product.size() > 0 ){
+    		productOptions.setCode(product.get("KEY").toString());
+    		productOptions.setSeasonCode(product.get("IDSTAGIONE").toString());
+    		productOptions.setBrandName(product.get("BRAND").toString());
+    		
+    		productOptions.setColorCode(product.get("IDCOLORE").toString());
+    		productOptions.setName(product.get("DESCRIZIONE_CORTA").toString());
+    		
+    		productOptions.setSalePrice(product.get("LISTINO").toString());
+//    		productOptions.setMadeIn(product.get("KEY").toString());
+//    		productOptions.setComposition(product.get("KEY").toString());	
+//    		productOptions.setDescImg(product.get("KEY").toString());
+    		
+    		List<String> imageList = new ArrayList<String>();
+    		if(checkValue(product.get("FOTO1"))){
+        		imageList.add(product.get("FOTO1").toString());
+    		}
+    		if(checkValue(product.get("FOTO2"))){
+        		imageList.add(product.get("FOTO2").toString());
+    		}
+    		if(checkValue(product.get("FOTO3"))){
+        		imageList.add(product.get("FOTO3").toString());
+    		}
+    		if(checkValue(product.get("FOTO4"))){
+        		imageList.add(product.get("FOTO4").toString());
+    		}
+    		if(checkValue(product.get("FOTO5"))){
+        		imageList.add(product.get("FOTO5").toString());
+    		}
+    		if(checkValue(product.get("FOTO6"))){
+        		imageList.add(product.get("FOTO6").toString());
+    		}
+    		if(checkValue(product.get("FOTO7"))){
+        		imageList.add(product.get("FOTO7").toString());
+    		}
+    		if(checkValue(product.get("FOTO8"))){
+        		imageList.add(product.get("FOTO8").toString());
+    		}
+    		productOptions.setCoverImg(new Gson().toJson(imageList));
+    		
+//    		productOptions.setImgByFilippo(product.get("KEY").toString());
+    		productOptions.setBrandCode(product.get("ARTICOLO").toString());
+            List<ProductEDSManagement.SkuOptions> skuOptionsList = new ArrayList<>();
+            ProductEDSManagement.SkuOptions skuOptions = productEDSManagement.getSkuOptions();
+            skuOptions.setBarcodes("#");
+            skuOptions.setStock(product.get("DISPO").toString());
+            skuOptions.setSize(product.get("TAGLIA").toString());
+            skuOptionsList.add(skuOptions);
+    		productOptions.setSkus(skuOptionsList);
+    		
+    		
+    		//根据传过来的类目   获取映射的类目信息
+            Map<String, Object> categoryMap = new HashMap<String, Object>();
+            categoryMap.put("store_code", vendorOptions.getStoreCode());
+            categoryMap.put("boutique_first_category", product.get("SESSO_ENG").toString());
+            categoryMap.put("boutique_second_category", product.get("IDGRTIPO").toString());
+            categoryMap.put("boutique_third_category", product.get("IDMOD").toString());
+            
+            List<Map<String, Object>> apiCategoryMap = categoryService.getMappingCategoryInfoByCondition(categoryMap);
+            if(apiCategoryMap != null && apiCategoryMap.size() > 0) {
+                productOptions.setCategoryId(apiCategoryMap.get(0).get("category_id").toString());
+            }
+            productOptions.setCategoryId("1532");
             logger.info(" productOptions filippo : " + new Gson().toJson(productOptions));
-        } catch (Exception e) {
-            if(conn != null) {conn.close();}
-            e.printStackTrace();
-            throw e;
-        } finally {
-            if(conn != null) {conn.close();}
-        }
-        return productOptions;
+    	}
+		return productOptions;
     }
+    
+    
+    private boolean checkValue(Object val) {
+    	if(val != null && StringUtils.isNotBlank(val.toString())){
+    		return true;
+    	}
+    	return false;
+		
+	}
 
 }

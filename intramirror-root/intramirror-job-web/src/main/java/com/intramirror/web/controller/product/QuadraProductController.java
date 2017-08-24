@@ -22,6 +22,7 @@ import com.google.gson.Gson;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.main.api.service.ApiEndPointService;
 import com.intramirror.main.api.service.ApiParameterService;
+import com.intramirror.web.enums.QueueNameJobEnum;
 import com.intramirror.web.util.QueueUtils;
 
 @Controller
@@ -80,7 +81,12 @@ public class QuadraProductController {
                             
                             // 放入MQ
                 			System.out.println(i++);
-                            QueueUtils.putMessage(mqDataMap, "",urlMap.get("url").toString(), QueueNameEnum.QuadraSynProduct);
+                            QueueUtils.putMessage(mqDataMap, "",urlMap.get("url").toString(), QueueNameJobEnum.QuadraSynProduct);
+                            
+                            //跳出循环,测试用
+                            if(i>5){
+                            	break;
+                            }
                 		}
                 	}
                     

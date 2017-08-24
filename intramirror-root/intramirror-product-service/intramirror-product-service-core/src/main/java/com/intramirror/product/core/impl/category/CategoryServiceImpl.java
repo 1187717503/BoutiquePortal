@@ -61,4 +61,11 @@ public class CategoryServiceImpl extends BaseDao implements ICategoryService {
 			throws Exception {
 		return categoryMapper.selCategoryByConditions(category);
 	}
+
+	@Override
+	public List<Map<String, Object>> getMappingCategoryInfoByCondition(
+			Map<String, Object> param) {
+		
+		return categoryMapper.getMappingCategoryInfoByCondition(param);
+	}
 }

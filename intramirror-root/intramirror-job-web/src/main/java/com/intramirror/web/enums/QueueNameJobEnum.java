@@ -1,5 +1,7 @@
 package com.intramirror.web.enums;
 
+import com.intramirror.web.mapping.impl.QuadraSynProductMapping;
+
 import pk.shoplus.DBConnector;
 import pk.shoplus.model.*;
 import pk.shoplus.service.ApiMqService;
@@ -50,7 +52,10 @@ public enum QueueNameJobEnum {
 	FilippoSynProduct("FilippoSynProduct",new FilippoSynProductMapping(),"IM调用filippo 接口更新商品信息"),
 	FilippoSynAllProduct("FilippoSynAllProduct",new FilippoSynProductMapping(),"IM调用filippo 接口更新商品信息-全量"),
 
-	FilippoSynStock("FilippoSynStock",new FilippoSynStockMapping(),"IM调用filippo 接口更新库存信息");
+	FilippoSynStock("FilippoSynStock",new FilippoSynStockMapping(),"IM调用filippo 接口更新库存信息"),
+	
+	QuadraSynProduct("QuadraSynProduct",new QuadraSynProductMapping(),"IM调用quadra 接口更新商品信息");
+	
 
 	private String code;
 	private IMapping mapping;

@@ -14,4 +14,12 @@ public interface ICategoryService {
     
     public List<Map<String,Object>> queryCategoryListByConditions(Category category) throws Exception;
     
+	/**
+	 * 根据条件获取相关信息
+	 * @param boutique_first_category,boutique_second_category,boutique_third_category
+	 * @return
+	 */
+	List<Map<String,Object>> getMappingCategoryInfoByCondition(Map<String,Object> param);
+	
+    
 }

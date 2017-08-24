@@ -64,4 +64,13 @@ public interface CategoryMapper {
     int updateByPrimaryKey(Category record);
 
     List<Map<String,Object>> selCategoryByConditions(Category param);
+    
+    
+	/**
+	 * 根据条件获取相关信息
+	 * @param boutique_first_category,boutique_second_category,boutique_third_category
+	 * @return
+	 */
+	List<Map<String,Object>> getMappingCategoryInfoByCondition(Map<String,Object> param);
+    
 }
