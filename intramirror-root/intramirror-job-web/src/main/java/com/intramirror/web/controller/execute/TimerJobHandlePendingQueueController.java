@@ -44,7 +44,7 @@ public class TimerJobHandlePendingQueueController {
             if(StringUtils.isNotBlank(event)) {
 
                 if(event.equals("execute")) {
-
+                	 consumeService.main();
                 } else if(event.equals("start")) {
                     this.start();
                     mapUtils.putData("status",StatusType.SUCCESS).putData("info","timer start success!!!");
@@ -64,7 +64,7 @@ public class TimerJobHandlePendingQueueController {
     }
 
     public TimerJobHandlePendingQueueController(){
-        this.start();
+//        this.start();
     }
 
     public void start(){
