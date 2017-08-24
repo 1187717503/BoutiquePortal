@@ -2,8 +2,7 @@ package com.intramirror.web.controller.demo;
 
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,7 +19,7 @@ import com.intramirror.order.api.model.ApiMq;
 @RequestMapping("/demo_test")
 public class DemoController {
 
-	private static Logger logger = LoggerFactory.getLogger(DemoController.class);
+	private static Logger logger = Logger.getLogger(DemoController.class);
 	
 	/** 测试返回对象转换JSON !!! */
 	@RequestMapping(value = "/get_api_mq",method = RequestMethod.GET)
