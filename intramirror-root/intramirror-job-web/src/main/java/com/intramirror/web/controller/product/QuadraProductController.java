@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import pk.shoplus.mq.enums.QueueNameEnum;
 import pk.shoplus.service.request.api.IGetPostRequest;
 import pk.shoplus.service.request.impl.GetPostRequestService;
 
@@ -37,16 +36,16 @@ public class QuadraProductController {
     @Autowired
     private ApiParameterService apiParameterService;
     
-    @RequestMapping(value = "/updateProduct",method = RequestMethod.GET)
+    @RequestMapping(value = "/updateProductAll",method = RequestMethod.GET)
     @ResponseBody
-    public ResultMessage updateProduct(){
+    public ResultMessage updateProductAll(){
 
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
         	Map<String, Object> param = new HashMap<String, Object>();
         	param.put("system", "quadra");
         	param.put("name", "QuadraSynAllProduct");
-            logger.info("job updateProduct 获取apiEndpointList 入参:"+new Gson().toJson(param));
+            logger.info("job updateProductAll 获取apiEndpointList 入参:"+new Gson().toJson(param));
         	List<Map<String, Object>> apiEndpointList = apiEndPointService.getapiEndpointInfoByCondition(param);
         	
             // 获取相关接口数据
@@ -59,12 +58,12 @@ public class QuadraProductController {
         	
         	if(urlMap != null){
                 IGetPostRequest requestGet = new GetPostRequestService();
-                logger.info("job updateProduct  Call the interface to get the data    url:"+urlMap.get("url").toString());
+                logger.info("job updateProductAll  Call the interface to get the data    url:"+urlMap.get("url").toString());
                 String json = requestGet.requestMethod(GetPostRequestService.HTTP_GET,urlMap.get("url").toString(),null);
                 if(StringUtils.isNotBlank(json)) {
                 	
                     // Quadra 拆分接口返回的product放入mq
-                    logger.info("job updateProduct 返回的json 数据转换成对象");
+                    logger.info("job updateProductAll 返回的json 数据转换成对象");
                 	List<Map<String, Object>> List = (List<Map<String, Object>>) JSONObject.parse(json);
                 	
                 	if(List !=null && List.size() > 0 ){
@@ -81,18 +80,90 @@ public class QuadraProductController {
                             
                             // 放入MQ
                 			System.out.println(i++);
-                            QueueUtils.putMessage(mqDataMap, "",urlMap.get("url").toString(), QueueNameJobEnum.QuadraSynProduct);
+                            QueueUtils.putMessage(mqDataMap, "",urlMap.get("url").toString(), QueueNameJobEnum.QuadraSynAllProduct);
                             
-                            //跳出循环,测试用
-                            if(i>855){
-                            	break;
-                            }
+//                            //跳出循环,测试用
+//                            if(i>855){
+//                            	break;
+//                            }
                 		}
                 	}
                     
 
                 }else{
-                	 logger.info("job updateProduct  请求接口获取的商品对象数据为空");
+                	 logger.info("job updateProductAll  请求接口获取的商品对象数据为空");
+                }
+            	
+                resultMessage.successStatus().addMsg("SUCCESS");
+        	}
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(" error message : {}",e.getMessage());
+            resultMessage.errorStatus().addMsg("error message : " + e.getMessage());
+        }
+        return resultMessage;
+    }
+    
+    
+    
+    
+    @RequestMapping(value = "/updateProductDay",method = RequestMethod.GET)
+    @ResponseBody
+    public ResultMessage updateProductDay(){
+
+        ResultMessage resultMessage = ResultMessage.getInstance();
+        try {
+        	Map<String, Object> param = new HashMap<String, Object>();
+        	param.put("system", "quadra");
+        	param.put("name", "QuadraSynDayProduct");
+            logger.info("job updateProductDay 获取apiEndpointList 入参:"+new Gson().toJson(param));
+        	List<Map<String, Object>> apiEndpointList = apiEndPointService.getapiEndpointInfoByCondition(param);
+        	
+            // 获取相关接口数据
+        	Map<String, Object> urlMap = null;
+        	 Map<String, Object> apiEndpointMap = null;
+        	if(apiEndpointList != null && apiEndpointList.size() > 0 ){
+        		apiEndpointMap = apiEndpointList.get(0);
+                urlMap = this.getUrl(apiEndpointMap);
+        	}
+        	
+        	if(urlMap != null){
+                IGetPostRequest requestGet = new GetPostRequestService();
+                logger.info("job updateProductDay  Call the interface to get the data    url:"+urlMap.get("url").toString());
+                String json = requestGet.requestMethod(GetPostRequestService.HTTP_GET,urlMap.get("url").toString(),null);
+                if(StringUtils.isNotBlank(json)) {
+                	
+                    // Quadra 拆分接口返回的product放入mq
+                    logger.info("job updateProduct 返回的json 数据转换成对象");
+                	List<Map<String, Object>> List = (List<Map<String, Object>>) JSONObject.parse(json);
+                	
+                	if(List !=null && List.size() > 0 ){
+                		
+                        logger.info("job updateProductDay  遍历解析商品列表   存入MQ队列    productList Size:"+List.size());
+                        int i = 0;
+                		for(Map<String, Object> productInfo :List ){
+                			
+                            Map<String,Object> mqDataMap = new HashMap<String,Object>();
+                            mqDataMap.put("product", productInfo);
+                            mqDataMap.put("store_code", apiEndpointMap.get("store_code").toString());
+                            mqDataMap.put("vendor_id", apiEndpointMap.get("vendor_id").toString());
+                            mqDataMap.put("api_configuration_id", apiEndpointMap.get("api_configuration_id").toString());
+                            
+                            // 放入MQ
+                			System.out.println(i++);
+                            QueueUtils.putMessage(mqDataMap, "",urlMap.get("url").toString(), QueueNameJobEnum.QuadraSynDayProduct);
+                            
+//                            //跳出循环,测试用
+//                            if(i>1000){
+//                            	break;
+//                            }
+                		}
+                	}
+                    
+
+                }else{
+                	 logger.info("job updateProductDay  请求接口获取的商品对象数据为空");
                 }
             	
                 resultMessage.successStatus().addMsg("SUCCESS");

@@ -85,6 +85,10 @@ public class QuadraSynProductMapping implements IMapping{
                 serviceProductMap = iProductService.updateProduct(productOptions,vendorOptions);
                 logger.info("Quadra结束调用商品修改Service by Quadra,serviceProductMap:" + new Gson().toJson(serviceProductMap));
             }
+            
+            serviceProductMap.put("product_code",productOptions.getCode());
+            serviceProductMap.put("color_code",productOptions.getColorCode());
+            serviceProductMap.put("brand_id",productOptions.getBrandCode());
 
             return  serviceProductMap;
         } catch (Exception e) {
@@ -117,8 +121,8 @@ public class QuadraSynProductMapping implements IMapping{
         ProductEDSManagement.ProductOptions productOptions = productEDSManagement.getProductOptions();
     	if(product != null && product.size() > 0 ){
     		productOptions.setCode(product.get("KEY").toString());
-//    		productOptions.setSeasonCode(product.get("IDSTAGIONE").toString());
-    		productOptions.setSeasonCode("A17");
+    		productOptions.setSeasonCode(product.get("IDSTAGIONE").toString());
+//    		productOptions.setSeasonCode("A17");
     		
     		productOptions.setBrandName(product.get("BRAND").toString());
     		
@@ -155,7 +159,7 @@ public class QuadraSynProductMapping implements IMapping{
     		if(checkValue(product.get("FOTO8"))){
         		imageList.add(BASEIMGURL + product.get("FOTO8").toString());
     		}
-    		logger.info("quadra product coverImg list:"+ new Gson().toJson(imageList));
+    		logger.info("quadra product handleMappingData coverImg list:"+ new Gson().toJson(imageList));
     		productOptions.setCoverImg(new Gson().toJson(imageList));
     		
 //    		productOptions.setImgByFilippo(product.get("KEY").toString());
@@ -167,7 +171,7 @@ public class QuadraSynProductMapping implements IMapping{
             skuOptions.setSize(product.get("TAGLIA").toString());
             skuOptionsList.add(skuOptions);
     		productOptions.setSkus(skuOptionsList);
-    		
+    		logger.info("quadra product handleMappingData skuOptionsList:"+ new Gson().toJson(skuOptionsList));
     		
     		//根据传过来的类目   获取映射的类目信息
             Map<String, Object> categoryMap = new HashMap<String, Object>();
@@ -180,7 +184,7 @@ public class QuadraSynProductMapping implements IMapping{
             if(apiCategoryMap != null && apiCategoryMap.size() > 0) {
                 productOptions.setCategoryId(apiCategoryMap.get(0).get("category_id").toString());
             }
-            productOptions.setCategoryId("1532");
+//            productOptions.setCategoryId("1532");
             logger.info(" productOptions filippo : " + new Gson().toJson(productOptions));
     	}
 		return productOptions;
