@@ -123,7 +123,7 @@ public class QuadraSynProductMapping implements IMapping{
     		productOptions.setCode(product.get("KEY").toString());
     		productOptions.setSeasonCode(product.get("IDSTAGIONE").toString());
 //    		productOptions.setSeasonCode("A17");
-    		
+    		productOptions.setBrandCode(product.get("CODICE").toString());
     		productOptions.setBrandName(product.get("BRAND").toString());
     		
     		productOptions.setColorCode(product.get("IDCOLORE").toString());
