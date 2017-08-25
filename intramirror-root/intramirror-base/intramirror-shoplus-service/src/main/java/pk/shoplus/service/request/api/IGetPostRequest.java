@@ -18,4 +18,7 @@ public interface IGetPostRequest {
      * @return 返回内容
      */
     public String requestMethod(String requestType, String urlStr, String body);
+    
+    
+    public String requestMethodType(String requestType, String urlStr, String body);
 }

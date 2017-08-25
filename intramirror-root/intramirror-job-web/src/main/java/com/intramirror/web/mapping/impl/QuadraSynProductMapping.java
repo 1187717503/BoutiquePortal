@@ -120,6 +120,7 @@ public class QuadraSynProductMapping implements IMapping{
     	
         ProductEDSManagement.ProductOptions productOptions = productEDSManagement.getProductOptions();
     	if(product != null && product.size() > 0 ){
+    		
     		productOptions.setCode(product.get("KEY").toString());
     		productOptions.setSeasonCode(product.get("IDSTAGIONE").toString());
 //    		productOptions.setSeasonCode("A17");
@@ -176,7 +177,7 @@ public class QuadraSynProductMapping implements IMapping{
     		
     		//根据传过来的类目   获取映射的类目信息
             Map<String, Object> categoryMap = new HashMap<String, Object>();
-            categoryMap.put("store_code", vendorOptions.getStoreCode());
+            categoryMap.put("vendor_id", vendorOptions.getVendorId());
             categoryMap.put("boutique_first_category", product.get("SESSO_ENG").toString());
             categoryMap.put("boutique_second_category", product.get("IDGRTIPO").toString());
             categoryMap.put("boutique_third_category", product.get("IDMOD").toString());

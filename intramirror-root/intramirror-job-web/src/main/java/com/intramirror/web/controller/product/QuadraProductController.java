@@ -59,7 +59,7 @@ public class QuadraProductController {
         	if(urlMap != null){
                 IGetPostRequest requestGet = new GetPostRequestService();
                 logger.info("job updateProductAll  Call the interface to get the data    url:"+urlMap.get("url").toString());
-                String json = requestGet.requestMethod(GetPostRequestService.HTTP_GET,urlMap.get("url").toString(),null);
+                String json = requestGet.requestMethodType(GetPostRequestService.HTTP_GET,urlMap.get("url").toString(),null);
                 if(StringUtils.isNotBlank(json)) {
                 	
                     // Quadra 拆分接口返回的product放入mq
