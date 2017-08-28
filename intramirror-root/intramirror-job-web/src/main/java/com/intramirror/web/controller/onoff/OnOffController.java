@@ -64,6 +64,7 @@ public class OnOffController {
         apiMq.setName(mqName);
         int result = iApiMqService.updateByMqName(apiMq);
         mapUtils.putData("staus",StatusType.SUCCESS).putData("info",new Gson().toJson(apiMq)).putData("result",result);
+        logger.info("OnOffControllerMapUtils : " + new Gson().toJson(mapUtils));
         return mapUtils.getMap();
     }
 }
