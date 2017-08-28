@@ -82,8 +82,8 @@ public class QuadraProductController {
                 			System.out.println(i++);
                             QueueUtils.putMessage(mqDataMap, "",urlMap.get("url").toString(), QueueNameJobEnum.QuadraSynAllProduct);
                             
-//                            //跳出循环,测试用
-//                            if(i>855){
+                            //跳出循环,测试用
+//                            if(i>150){
 //                            	break;
 //                            }
                 		}
