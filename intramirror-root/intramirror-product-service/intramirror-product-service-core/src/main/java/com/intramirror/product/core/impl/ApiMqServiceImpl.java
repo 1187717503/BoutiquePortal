@@ -24,4 +24,9 @@ public class ApiMqServiceImpl extends BaseDao implements IApiMqService{
     public List<ApiMq> getMqs() {
         return apiMqMapper.selectAllActiveData();
     }
+
+    @Override
+    public int updateByMqName(ApiMq apiMq) {
+        return apiMqMapper.updateByMqName(apiMq);
+    }
 }

@@ -10,5 +10,5 @@ import java.util.List;
 public interface IApiMqService {
     List<ApiMq> getMqs();
 
-
+    int updateByMqName(ApiMq apiMq);
 }

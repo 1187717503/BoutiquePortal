@@ -54,4 +54,6 @@ public interface ApiMqMapper {
     int updateByPrimaryKey(ApiMq record);
 
     List<ApiMq> selectAllActiveData();
+
+    int updateByMqName(ApiMq apiMq);
 }
