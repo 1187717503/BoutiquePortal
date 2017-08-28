@@ -121,16 +121,31 @@ public class QuadraSynProductMapping implements IMapping{
         ProductEDSManagement.ProductOptions productOptions = productEDSManagement.getProductOptions();
     	if(product != null && product.size() > 0 ){
     		
-    		productOptions.setCode(product.get("CODICE").toString());
-    		productOptions.setSeasonCode(product.get("IDSTAGIONE").toString());
+    		if(product.get("CODICE") != null){
+        		productOptions.setCode(product.get("CODICE").toString());
+    		}
+
+    		if(product.get("IDSTAGIONE") != null){
+        		productOptions.setSeasonCode(product.get("IDSTAGIONE").toString());
+    		}
 //    		productOptions.setSeasonCode("A17");
 
-    		productOptions.setBrandName(product.get("BRAND").toString());
-    		
-    		productOptions.setColorCode(product.get("IDCOLORE").toString());
-    		productOptions.setName(product.get("DESCRIZIONE_CORTA").toString());
-    		
-    		productOptions.setSalePrice(product.get("LISTINO").toString());
+    		if(product.get("BRAND") != null){
+        		productOptions.setBrandName(product.get("BRAND").toString());
+    		}
+
+    		if(product.get("IDCOLORE") != null){
+        		productOptions.setColorCode(product.get("IDCOLORE").toString());
+    		}
+
+    		if(product.get("DESCRIZIONE_CORTA") != null){
+        		productOptions.setName(product.get("DESCRIZIONE_CORTA").toString());
+    		}
+
+    		if(product.get("LISTINO") != null){
+        		productOptions.setSalePrice(product.get("LISTINO").toString());
+    		}
+
 //    		productOptions.setMadeIn(product.get("KEY").toString());
 //    		productOptions.setComposition(product.get("KEY").toString());	
 //    		productOptions.setDescImg(product.get("KEY").toString());
@@ -164,12 +179,23 @@ public class QuadraSynProductMapping implements IMapping{
     		productOptions.setCoverImg(new Gson().toJson(imageList));
     		
 //    		productOptions.setImgByFilippo(product.get("KEY").toString());
-    		productOptions.setBrandCode(product.get("ARTICOLO").toString());
+    		if(product.get("ARTICOLO") != null ){
+        		productOptions.setBrandCode(product.get("ARTICOLO").toString());
+    		}
+
             List<ProductEDSManagement.SkuOptions> skuOptionsList = new ArrayList<>();
             ProductEDSManagement.SkuOptions skuOptions = productEDSManagement.getSkuOptions();
             skuOptions.setBarcodes("#");
-            skuOptions.setStock(product.get("DISPO").toString());
-            skuOptions.setSize(product.get("TAGLIA").toString());
+            
+            if(product.get("DISPO") != null ){
+                skuOptions.setStock(product.get("DISPO").toString());
+            }
+
+            
+            if(product.get("TAGLIA") != null ){
+                skuOptions.setSize(product.get("TAGLIA").toString());
+            }
+
             skuOptionsList.add(skuOptions);
     		productOptions.setSkus(skuOptionsList);
     		logger.info("quadra product handleMappingData skuOptionsList:"+ new Gson().toJson(skuOptionsList));
