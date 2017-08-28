@@ -94,9 +94,9 @@ public class QuadraSynProductMapping implements IMapping{
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(" error message : " + e.getMessage());
-            mapUtils.putData("status", StatusType.FAILURE).putData("info","FilippoSynProductMapping error message : " + e.getMessage());
+            mapUtils.putData("status", StatusType.FAILURE).putData("info","QuadraSynProductMapping error message : " + e.getMessage());
         }
-        logger.info(" end FilippoSynProductMapping.handleMappingAndExecute();");
+        logger.info(" end QuadraSynProductMapping.handleMappingAndExecute();");
         return mapUtils.getMap();
     }
 
@@ -212,7 +212,7 @@ public class QuadraSynProductMapping implements IMapping{
                 productOptions.setCategoryId(apiCategoryMap.get(0).get("category_id").toString());
             }
 //            productOptions.setCategoryId("1532");
-            logger.info(" productOptions filippo : " + new Gson().toJson(productOptions));
+            logger.info(" productOptions quadra : " + new Gson().toJson(productOptions));
     	}
 		return productOptions;
     }
