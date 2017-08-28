@@ -49,9 +49,10 @@ public class MappingCategoryService {
                     "left join api_configuration ac on(ac.enabled = 1 and ac.api_configuration_id = acm.api_configuration_id)\n" +
                     "left join category c on(c.enabled = 1 and c.category_id = acm.category_id)\n" +
                     "where acm.enabled = 1 and ac.vendor_id = '"+vendor_id+"'\n"+
-                    "and acm.boutique_first_category = '"+one+"'\n"+
-                    "and acm.boutique_second_category = '"+two+"'\n"+
-                    "and acm.boutique_third_category = '"+three+"'\n";
+                    "and LOWER(acm.boutique_first_category) = LOWER('"+one+"')\n"+
+                    "and LOWER(acm.boutique_second_category) = LOWER('"+two+"')\n"+
+                    "and LOWER(acm.boutique_third_category) = LOWER('"+three+"')\n"+
+                    " and c.category_id is not null ";
             logger.info("endSelectCategoryMappingByCategory sql:"+sql);
             return mappingCategoryDao.executeBySql(sql, null);
         } catch (Exception e) {
@@ -76,7 +77,8 @@ public class MappingCategoryService {
                     "left join api_configuration ac on(ac.enabled = 1 and ac.api_configuration_id = acm.api_configuration_id)\n" +
                     "left join category c on(c.enabled = 1 and c.category_id = acm.category_id)\n" +
                     "where acm.enabled = 1 and ac.vendor_id = '"+vendor_id+"'\n"+
-                    "and acm.boutique_category_id = '"+boutique_category_id+"'\n";
+                    "and LOWER(acm.boutique_category_id) = LOWER('"+boutique_category_id+"')\n"+
+                    " and c.category_id is not null ";
             logger.info("endSelectCategoryMappingByBoutiqueCategory By sql:"+sql);
             return mappingCategoryDao.executeBySql(sql, null);
         } catch (Exception e) {

@@ -90,7 +90,7 @@ public class ProductEDSMapping implements IMapping{
 		        apiCategoryMap = mappingCategoryService.getMappingCategoryInfoByCondition(mqDataMap.get("vendor_id").toString(),productMap.get("gender").toString(),productMap.get("first_category").toString(),productMap.get("second_category").toString());
 		        if (null != apiCategoryMap && apiCategoryMap.size() > 0) {
 					category = categoryService.convertMapToCategory(apiCategoryMap.get(0));
-		        } else {
+		        } /*else {
 					resultMap.put("error_enum", Data_can_not_find_mapping);
 		        	resultMap.put("info", "update eds product mapping - "+category_not_exist.getDesc()+"object:" + new Gson().toJson(object));
 					resultMap.put("key","category");
@@ -100,8 +100,10 @@ public class ProductEDSMapping implements IMapping{
 					resultMap.put("brand_id",productOptions.getBrandCode());
 		        	resultMap.put("status", StatusType.FAILURE);
 					return resultMap;
-		        }
-		        productOptions.setCategoryId(category.getCategory_id()+"");
+		        }*/
+				if(category != null) {
+					productOptions.setCategoryId(category.getCategory_id()+"");
+				}
 			}catch (Exception e) {
 				e.printStackTrace();
 				if(conn != null) {conn.close();}

@@ -119,7 +119,7 @@ public class ApiBrandMapService {
 					return null;
 				}
 				logger.info(" .getBrandNameByBrandMapping brandName  before escape : " + brandName);
-				sql  = "select distinct abm.brand_id from api_brand_map abm where lower(abm.boutique_brand_name) = lower(\"" + pk.shoplus.util.StringUtils.escapeStr(brandName) + "\") and abm.api_configuration_id in(" + cfgIds + ") and abm.enabled = 1";
+				sql  = "select distinct abm.brand_id from api_brand_map abm where abm.brand_id is not null and lower(abm.boutique_brand_name) = lower(\"" + pk.shoplus.util.StringUtils.escapeStr(brandName) + "\") and abm.api_configuration_id in(" + cfgIds + ") and abm.enabled = 1";
 				logger.info(" .getBrandNameByBrandMapping brandName  after escape : " + sql);
 
 				List<Map<String, Object>> list = apiBrandMapEntityDao.executeBySql(sql, null);

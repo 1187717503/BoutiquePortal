@@ -80,6 +80,7 @@ public class ProductServiceImpl implements IProductService{
                                .getMap();
             }
 
+            Category category = null ;
             if(StringUtils.isBlank(productOptions.getCategoryId())) {
                 mapUtils = new MapUtils(new HashMap<>());
                 mapUtils.putData("status",StatusType.WARNING)
@@ -88,20 +89,20 @@ public class ProductServiceImpl implements IProductService{
                         .putData("key","category_id")
                         .putData("value","null");
                 warningMaps.add(mapUtils.getMap());
+            } else {
+                category = categoryService.getCategoryById(Long.parseLong(productOptions.getCategoryId()));
+                if(category == null) {
+                    mapUtils = new MapUtils(new HashMap<>());
+                    mapUtils.putData("status",StatusType.WARNING)
+                            .putData("info","update product - "+ ApiErrorTypeEnum.errorType.category_not_exist.getDesc()+" category_id:"+productOptions.getCategoryId())
+                            .putData("error_enum",warning_data_can_not_find_mapping)
+                            .putData("key","category_id")
+                            .putData("value",productOptions.getCategoryId());
+                    warningMaps.add(mapUtils.getMap());
+                }
             }
 
-            Category category = categoryService.getCategoryById(Long.parseLong(productOptions.getCategoryId()));
-            if(category == null) {
-                mapUtils = new MapUtils(new HashMap<>());
-                mapUtils.putData("status",StatusType.WARNING)
-                        .putData("info","update product - "+ ApiErrorTypeEnum.errorType.category_not_exist.getDesc()+" category_id:"+productOptions.getCategoryId())
-                        .putData("error_enum",warning_data_can_not_find_mapping)
-                        .putData("key","category_id")
-                        .putData("value",productOptions.getCategoryId());
-                warningMaps.add(mapUtils.getMap());
-            }
-
-            if(!categoryService.isLastNode(category.getCategory_id())) {
+            if(category != null && !categoryService.isLastNode(category.getCategory_id())) {
                 mapUtils = new MapUtils(new HashMap<>());
                 mapUtils.putData("status",StatusType.WARNING)
                         .putData("info","update product - "+ ApiErrorTypeEnum.errorType.category_is_not_three.getDesc()+" category_id:"+productOptions.getCategoryId())
@@ -109,7 +110,7 @@ public class ProductServiceImpl implements IProductService{
                         .putData("key","category_id")
                         .putData("value",category.getCategory_id());
                 warningMaps.add(mapUtils.getMap());
-            } else {
+            } else if(category != null) {
                 product.category_id = category.getCategory_id();
             }
 
@@ -243,7 +244,12 @@ public class ProductServiceImpl implements IProductService{
                         .putData("value","null");
                 warningMaps.add(mapUtils.getMap());
             } else {
-                product.season_code = season_code;
+                if(StringUtils.isNotBlank(season_code)) {
+                    product.season_code = season_code;
+                } else if(StringUtils.isNotBlank(productOptions.getSeasonCode())) {
+                    product.season_code = productOptions.getSeasonCode();
+                }
+
             }
             product.updated_at = new Date();
             productService.updateProduct(product);

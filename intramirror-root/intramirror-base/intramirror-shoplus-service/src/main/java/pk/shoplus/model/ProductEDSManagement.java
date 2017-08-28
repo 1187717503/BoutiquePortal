@@ -85,6 +85,14 @@ public class ProductEDSManagement {
             //get category id
             CategoryService categoryService = new CategoryService(conn);
             String categoryId = columnDataList.get(10).toString();
+            if(StringUtils.isBlank(categoryId)) {
+                result.put("info","create product - " + ApiErrorTypeEnum.errorType.category_not_exist.getDesc() + "category_id:"+categoryId );
+                result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_find_mapping);
+                result.put("key","category_id");
+                result.put("value",categoryId);
+                return true;
+            }
+
             Category category = categoryService.getCategoryById(Long.parseLong(categoryId));// this.getCategory(columnDataList, categoryService, mappingCategoryService, result, storeCode);
             if (null == category) {
                 result.put("info","create product - " + ApiErrorTypeEnum.errorType.category_not_exist.getDesc() + "category_id:"+categoryId );
@@ -1256,8 +1264,7 @@ public class ProductEDSManagement {
 		
 		productList.add(7,productOptions.getColorDesc()); // color
 		
-		productList.add(8,"");
-//		productList.add(8,productOptions.getSkus().get(0).getSizeid()); // 注意 - sizeid for filippo
+		productList.add(8,productOptions.getSkus().get(0).getSizeid()); // 注意 - sizeid for filippo
 		
 		productList.add(9,""); // 注意 - first_category 
 		

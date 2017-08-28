@@ -71,7 +71,7 @@ public class ApiParameterService {
     public boolean updateByApi (String size,String endPointId) throws  Exception {
     	if(StringUtils.isNotBlank(size) && StringUtils.isNotBlank(endPointId)) {
     		String sql = "update api_parameter ap set ap.param_value = ap.param_value + " + size + " where ap.api_end_point_id = " + endPointId + " and ap.param_key = 'offset'";
-    		logger.info("ApiParameterService.updateByApi------------------------------------------------sql" + sql);
+    		logger.info("EdsUpdateStockeUrl------------------------------------------------sql" + sql);
     		apiParameterDao.updateBySQL(sql, null);
     		return true;
     	}
