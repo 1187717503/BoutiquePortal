@@ -26,6 +26,11 @@ public class ApiParameterServiceImpl extends BaseDao implements ApiParameterServ
 		return apiParameterMapper.getapiParameterByCondition(param);
 	}
 
+	@Override
+	public int updateApiParameterByKey(Map<String, Object> map) {
+		return apiParameterMapper.updateApiParameterByKey(map);
+	}
+
 
 
 }

@@ -62,4 +62,11 @@ public interface ApiParameterMapper {
      * @mbggenerated
      */
     int updateByPrimaryKey(ApiParameter record);
+    
+    /**
+     * 根据key值修改
+     * @param map
+     * @return
+     */
+    int updateApiParameterByKey(Map<String, Object> map);
 }

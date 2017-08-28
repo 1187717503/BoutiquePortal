@@ -129,4 +129,10 @@
       enabled = #{enabled,jdbcType=BIT}
     where api_parameter_id = #{apiParameterId,jdbcType=BIGINT}
   </update>
+  
+  <update id="updateApiParameterByKey" parameterType="java.util.Map">
+  	update api_parameter
+    	set param_value = #{paramValue,jdbcType=VARCHAR}
+    	where param_key = #{paramKey,jdbcType=VARCHAR}
+  </update>
 </mapper>

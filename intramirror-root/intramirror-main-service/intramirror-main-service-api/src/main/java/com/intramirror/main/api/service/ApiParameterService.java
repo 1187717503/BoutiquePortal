@@ -11,4 +11,11 @@ public interface ApiParameterService {
 	 * @return
 	 */
 	List<Map<String,Object>> getapiParameterByCondition(Map<String,Object> param);
+	
+	/**
+     * 根据key值修改
+     * @param map
+     * @return
+     */
+    int updateApiParameterByKey(Map<String, Object> map);
 }

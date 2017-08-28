@@ -1256,7 +1256,8 @@ public class ProductEDSManagement {
 		
 		productList.add(7,productOptions.getColorDesc()); // color
 		
-		productList.add(8,productOptions.getSkus().get(0).getSizeid()); // 注意 - sizeid for filippo
+		productList.add(8,"");
+//		productList.add(8,productOptions.getSkus().get(0).getSizeid()); // 注意 - sizeid for filippo
 		
 		productList.add(9,""); // 注意 - first_category 
 		

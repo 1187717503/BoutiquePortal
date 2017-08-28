@@ -72,5 +72,12 @@ public interface CategoryMapper {
 	 * @return
 	 */
 	List<Map<String,Object>> getMappingCategoryInfoByCondition(Map<String,Object> param);
+	
+	/**
+	 * 根据条件查询商品信息
+	 * @param map
+	 * @return
+	 */
+	List<Map<String,Object>> getCategoryInfoByCondition(Map<String, Object> map);
     
 }
