@@ -94,6 +94,7 @@ public class ConsumeService {
 
     public void consumeResult(Map<String,Object> resultMap,String queueName,MessageInfo message,QueueNameJobEnum queueNameEnum,ApiMq apiMq){
         try {
+            logger.info("consumeResultResultMap:"+new Gson().toJson(resultMap));
             MessageRequestVo mrv = new MessageRequestVo();
             String status = resultMap.get("status") == null ? "" : resultMap.get("status").toString();
             resultMap.put("data", message);
@@ -101,6 +102,7 @@ public class ConsumeService {
                 mrv.setQueueName(queueName+ QueueTypeEnum.SUCCESS.getCode());
                 mrv.setRequestBody(new Gson().toJson(resultMap));
                 MessageHelper.putMessage(mrv);
+                logger.info("consumeResultPutMessageBySuccess:"+new Gson().toJson(mrv));
             } else {
                 Object obj = resultMap.get("warningMaps");
                 if(obj != null){
@@ -170,6 +172,7 @@ public class ConsumeService {
                     apiErrorProcessing.setDataField("Exception");
                     apiErrorProcessing.setBoutiqueData(info);
                 }
+                logger.info("iApiErrorProcessingServiceInSert:"+new Gson().toJson(apiErrorProcessing));
                 iApiErrorProcessingService.insert(apiErrorProcessing);
             } else {
                 logger.info("putErrorMessage errorType is null !!!" + new Gson().toJson(resultMap));
