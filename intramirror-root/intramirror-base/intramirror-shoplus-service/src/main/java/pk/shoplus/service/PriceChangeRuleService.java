@@ -1,5 +1,7 @@
 package pk.shoplus.service;
 
+import com.google.gson.Gson;
+import org.apache.log4j.Logger;
 import org.sql2o.Connection;
 import pk.shoplus.common.Helper;
 import pk.shoplus.dao.EntityDao;
@@ -19,6 +21,8 @@ public class PriceChangeRuleService {
      * 获取数据库连接
      */
     private EntityDao<PriceChangeRule> priceChangeRuleDao = null;
+
+    private static Logger logger = Logger.getLogger(PriceChangeRuleService.class);
 
     /**
      * @param conn
@@ -182,23 +186,27 @@ public class PriceChangeRuleService {
         map.put("price1","100");
         map.put("price3","100");
 
-        // select product rule
+        // select product rule 查询商品级别折扣
         List<Map<String,Object>> selProductRuleByVendor = this.selProductRuleSql("1",vendorId,boutique_id,season_code);
         List<Map<String,Object>> selProductRuleByAdmin = this.selProductRuleSql("3",vendorId,boutique_id,season_code);
 
-        // select product group rule
+        // select product group rule 查询group级别折扣
         List<Map<String,Object>> selProductGroupRuleByVendor = this.selProductGroupRuleSql("1",vendorId,product_group_id,season_code);
         List<Map<String,Object>> selProductGroupRuleByAdmin = this.selProductGroupRuleSql("3",vendorId,product_group_id,season_code);
 
-        // select product category brand rule 1
-        List<Map<String,Object>> selProductCategoryBrandRule1ByVendor = this.selProductCategoryBrandRuleSql1("1",vendorId,0L,categoryId,season_code);
-        List<Map<String,Object>> selProductCategoryBrandRule1ByAdmin = this.selProductCategoryBrandRuleSql1("3",vendorId,0L,categoryId,season_code);
+        // select product category brand rule 查询三级目录品牌指定折扣
+        List<Map<String,Object>> selProductCategoryBrandRule2ByVendor = this.selProductCategoryBrandRuleSql2("1",vendorId,brandId,categoryId,season_code);
+        List<Map<String,Object>> selProductCategoryBrandRule2ByAdmin = this.selProductCategoryBrandRuleSql2("3",vendorId,brandId,categoryId,season_code);
 
-        // select product category brand rule 0
-        List<Map<String,Object>> selProductCategoryBrandRule0ByVendor = this.selProductCategoryBrandRuleSql0("1",vendorId,brandId,categoryId,season_code);
-        List<Map<String,Object>> selProductCategoryBrandRule0ByAdmin = this.selProductCategoryBrandRuleSql0("3",vendorId,brandId,categoryId,season_code);
+        // select product category brand rule 查询二级目录品牌指定折扣
+        List<Map<String,Object>> selProductCategoryBrandRule1ByVendor = this.selProductCategoryBrandRuleSql1("1",vendorId,brandId,categoryId,season_code);
+        List<Map<String,Object>> selProductCategoryBrandRule1ByAdmin = this.selProductCategoryBrandRuleSql1("3",vendorId,brandId,categoryId,season_code);
 
-        // select default
+        // select product category brand rule 查询二级目录品牌执行默认折扣
+        List<Map<String,Object>> selProductCategoryBrandRule0ByVendor = this.selProductCategoryBrandRuleSql0("1",vendorId,0L,categoryId,season_code);
+        List<Map<String,Object>> selProductCategoryBrandRule0ByAdmin = this.selProductCategoryBrandRuleSql0("3",vendorId,0L,categoryId,season_code);
+
+        // select default 查询兜底默认折扣
         List<Map<String,Object>> sel1Default = priceChangeRuleDao.executeBySql("select sp.system_property_value from system_property sp where sp.system_property_name = 'Boutique_Discount_Default'",null);
         List<Map<String,Object>> sel3Default = priceChangeRuleDao.executeBySql("select sp.system_property_value from system_property sp where sp.system_property_name = 'IM_Discount_Default'",null);
 
@@ -206,6 +214,8 @@ public class PriceChangeRuleService {
             map.put("price1",selProductRuleByVendor.get(0).get("discount_percentage").toString());
         } else if(selProductGroupRuleByVendor != null && selProductGroupRuleByVendor.size() > 0) {
             map.put("price1",selProductGroupRuleByVendor.get(0).get("discount_percentage").toString());
+        } else if(selProductCategoryBrandRule2ByVendor != null && selProductCategoryBrandRule2ByVendor.size() > 0){
+            map.put("price1",selProductCategoryBrandRule2ByVendor.get(0).get("discount_percentage").toString());
         } else if(selProductCategoryBrandRule1ByVendor != null && selProductCategoryBrandRule1ByVendor.size() > 0){
             map.put("price1",selProductCategoryBrandRule1ByVendor.get(0).get("discount_percentage").toString());
         } else if(selProductCategoryBrandRule0ByVendor != null && selProductCategoryBrandRule0ByVendor.size() > 0) {
@@ -218,6 +228,8 @@ public class PriceChangeRuleService {
             map.put("price3",selProductRuleByAdmin.get(0).get("discount_percentage").toString());
         } else if(selProductGroupRuleByAdmin != null && selProductGroupRuleByAdmin.size() > 0) {
             map.put("price3",selProductGroupRuleByAdmin.get(0).get("discount_percentage").toString());
+        } else if(selProductCategoryBrandRule2ByAdmin != null && selProductCategoryBrandRule2ByAdmin.size() > 0){
+            map.put("price3",selProductCategoryBrandRule2ByAdmin.get(0).get("discount_percentage").toString());
         } else if(selProductCategoryBrandRule1ByAdmin != null && selProductCategoryBrandRule1ByAdmin.size() > 0){
             map.put("price3",selProductCategoryBrandRule1ByAdmin.get(0).get("discount_percentage").toString());
         } else if(selProductCategoryBrandRule0ByAdmin != null && selProductCategoryBrandRule0ByAdmin.size() > 0) {
@@ -225,6 +237,7 @@ public class PriceChangeRuleService {
         } else if(sel3Default != null && sel3Default.size() > 0) {
             map.put("price3",sel3Default.get(0).get("system_property_value").toString());
         }
+        logger.info("getCurrentChangeRuleByProduct:"+new Gson().toJson(product)+",getCurrentChangeRuleByProductMap:"+new Gson().toJson(map));
         return map;
     }
 
@@ -236,7 +249,8 @@ public class PriceChangeRuleService {
                     "inner join price_change_rule_season_group pcrsg on(pcr.price_change_rule_id = pcrsg.price_change_rule_id)\n"+
                     "where pcr.price_type ="+price_type+" and pcr.`status` = 2 and pcr.vendor_id ="+vendor_id+" and pcrp.boutique_id = '"+boutique_id+"'\n" +
                     "and pcrsg.enabled = 1 and pcrsg.season_code = '"+season_code+"'";
-            mapList = priceChangeRuleDao.executeBySql(sql,null);;
+            mapList = priceChangeRuleDao.executeBySql(sql,null);
+            logger.info("selProductRuleSql:"+sql);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -252,6 +266,7 @@ public class PriceChangeRuleService {
                     "where pcr.price_type ="+price_type+" and pcr.`status` = 2 and pcr.vendor_id ="+vendor_id+" and pcrg.product_group_id ="+product_group_id+"\n"+
                     "and pcrsg.enabled = 1 and pcrsg.season_code = '"+season_code+"'";
             mapList = priceChangeRuleDao.executeBySql(sql,null);
+            logger.info("selProductGroupRuleSql:"+sql);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -268,6 +283,23 @@ public class PriceChangeRuleService {
                     "select c.parent_id from category c where c.category_id ="+category_id+")\n"+
                     "and pcrsg.enabled = 1 and pcrsg.season_code = '"+season_code+"'";
             mapList = priceChangeRuleDao.executeBySql(sql,null);
+            logger.info("selProductCategoryBrandRuleSql1:"+sql);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return mapList;
+    }
+
+    private List<Map<String,Object>> selProductCategoryBrandRuleSql2(String price_type,Long vendor_id,Long brand_id,Long category_id,String season_code){
+        List<Map<String,Object>> mapList = new ArrayList<>();
+        try {
+            String sql = "select distinct discount_percentage from price_change_rule pcr\n" +
+                    "inner join price_change_rule_category_brand pcrcb on (pcr.price_change_rule_id = pcrcb.price_change_rule_id)\n" +
+                    "inner join price_change_rule_season_group pcrsg on(pcr.price_change_rule_id = pcrsg.price_change_rule_id)\n"+
+                    "where pcr.price_type ="+price_type+" and pcr.`status` = 2 and pcr.vendor_id ="+vendor_id+" and pcrcb.brand_id ="+brand_id+" and pcrcb.category_id ="+category_id+" \n"+
+                    "and pcrsg.enabled = 1 and pcrsg.season_code = '"+season_code+"'";
+            mapList = priceChangeRuleDao.executeBySql(sql,null);
+            logger.info("selProductCategoryBrandRuleSql2:"+sql);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -284,6 +316,7 @@ public class PriceChangeRuleService {
                     "select c.parent_id from category c where c.category_id ="+category_id+")\n"+
                     "and pcrsg.enabled = 1 and pcrsg.season_code = '"+season_code+"'";
             mapList = priceChangeRuleDao.executeBySql(sql,null);
+            logger.info("selProductCategoryBrandRuleSql0:"+sql);
         } catch (Exception e) {
             e.printStackTrace();
         }
