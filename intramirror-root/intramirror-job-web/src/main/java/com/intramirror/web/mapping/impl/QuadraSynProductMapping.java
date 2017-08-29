@@ -203,10 +203,19 @@ public class QuadraSynProductMapping implements IMapping{
     		//根据传过来的类目   获取映射的类目信息
             Map<String, Object> categoryMap = new HashMap<String, Object>();
             categoryMap.put("vendor_id", vendorOptions.getVendorId());
-            categoryMap.put("boutique_first_category", product.get("SESSO_ENG").toString().toLowerCase());
-            categoryMap.put("boutique_second_category", product.get("IDGRTIPO").toString().toLowerCase());
-            categoryMap.put("boutique_third_category", product.get("IDMOD").toString().toLowerCase());
+            if(product.get("SESSO_ENG") != null ){
+                categoryMap.put("boutique_first_category", product.get("SESSO_ENG").toString().toLowerCase());
+            }
+            if(product.get("IDGRTIPO") != null ){
+                categoryMap.put("boutique_second_category", product.get("IDGRTIPO").toString().toLowerCase());
+            }
+            if(product.get("IDMOD") != null ){
+                categoryMap.put("boutique_third_category", product.get("IDMOD").toString().toLowerCase());
+            }
+
+
             
+    		logger.info("quadra product handleMappingData getMappingCategoryInfoByCondition param:"+ new Gson().toJson(categoryMap));
             List<Map<String, Object>> apiCategoryMap = categoryService.getMappingCategoryInfoByCondition(categoryMap);
             if(apiCategoryMap != null && apiCategoryMap.size() > 0) {
                 productOptions.setCategoryId(apiCategoryMap.get(0).get("category_id").toString());
