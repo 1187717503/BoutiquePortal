@@ -343,6 +343,8 @@ public class ProductServiceImpl implements IProductService{
                     if(category != null) {
                         // 添加sku信息
                         this.updateProductByAddSku(conn,product,category,skuOption,productOptions.getSalePrice(),vendorOptions.getVendorId(),productOptions);
+
+                    } else {
                         logger.info("productServiceImplCatgeoryIsNull."+new Gson().toJson(product));
                     }
                 } else {
