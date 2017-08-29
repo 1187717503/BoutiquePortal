@@ -852,10 +852,10 @@ public class ShopProductService {
     }
 
     public void changeShopProductStopByProduct(String product_id) throws Exception {
-        if(StringUtils.isBlank(product_id)) {
-            String sql = "update shop_product set status ="+ShopProductType.STOP_SELLING+" where enabled = 1 and product_id ="+product_id;
+        if(StringUtils.isNotBlank(product_id)) {
+            String sql = "update shop_product set status ="+ShopProductType.STOP_SELLING+",updated_at=now() where enabled = 1 and product_id ="+product_id;
             shopProductDao.updateBySQL(sql,null);
-            log.info("updateproduct修改商品上下架状态 ,sql : " + sql);
+            log.info("changeShopProductStopByProductSql : " + sql);
         }
     }
 

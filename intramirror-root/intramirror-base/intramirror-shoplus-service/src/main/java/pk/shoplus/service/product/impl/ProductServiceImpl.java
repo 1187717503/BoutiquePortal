@@ -768,6 +768,7 @@ public class ProductServiceImpl implements IProductService{
                             .putData("key","ColorCode")
                             .putData("value",value);
                     maps.add(mapUtils.getMap());
+                    logger.info("warning_ColorCode_changeProductProperty,value:"+value+",list:"+new Gson().toJson(list));
                     shopProductService.changeShopProductStopByProduct(productId.toString());
                 } else if(keyName.equals(ProductPropertyEnumKeyName.BrandID.getCode())) {
                     mapUtils = new MapUtils(new HashMap<>());
@@ -777,6 +778,7 @@ public class ProductServiceImpl implements IProductService{
                             .putData("key","BrandID")
                             .putData("value",value);
                     maps.add(mapUtils.getMap());
+                    logger.info("warning_BrandID_changeProductProperty,value:"+value+",list:"+new Gson().toJson(list));
                     shopProductService.changeShopProductStopByProduct(productId.toString());
                 }
             }
