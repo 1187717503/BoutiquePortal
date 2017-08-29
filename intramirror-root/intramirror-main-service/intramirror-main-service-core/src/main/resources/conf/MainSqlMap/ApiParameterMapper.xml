@@ -133,6 +133,6 @@
   <update id="updateApiParameterByKey" parameterType="java.util.Map">
   	update api_parameter
     	set param_value = #{paramValue,jdbcType=VARCHAR}
-    	where param_key = #{paramKey,jdbcType=VARCHAR}
+    	where param_key = #{paramKey,jdbcType=VARCHAR} and api_end_point_id = #{apiEndPointId,jdbcType=BIGINT}
   </update>
 </mapper>

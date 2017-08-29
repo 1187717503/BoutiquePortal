@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson15.JSONObject;
 import com.google.gson.Gson;
 import com.intramirror.product.api.service.category.ICategoryService;
+import com.intramirror.web.util.SpringContextUtils;
 
 import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.model.ProductEDSManagement.SkuOptions;
@@ -45,6 +46,10 @@ public class XmagSynProductMapping implements IMapping{
         logger.info(" start XmagSynProductMapping.handleMappingAndExecute();");
         MapUtils mapUtils = new MapUtils(new HashMap<String, Object>());
         try {
+        	//如果未注入进来,手动获取bean
+            if(categoryService == null){
+                categoryService = (ICategoryService)SpringContextUtils.getContext().getBean("productCategoryServiceImpl");
+            }
         	logger.info("mqData : ===========>>>>>>" +mqData);
             Map<String,Object> mqDataMap = JSONObject.parseObject(mqData);
             
@@ -54,8 +59,8 @@ public class XmagSynProductMapping implements IMapping{
             vendorOptions.setApiConfigurationId(Long.parseLong(mqDataMap.get("api_configuration_id").toString()));
             vendorOptions.setVendorId(Long.parseLong(mqDataMap.get("vendor_id").toString()));
             
-            //封装ProductOptions 对象消息
-            Map<String,Object> productMap = JSONObject.parseObject(mqDataMap.get("product").toString().substring(1, (mqDataMap.get("product").toString().length()-1)));
+            //封装ProductOptions 对象消息 .substring(1, (mqDataMap.get("product").toString().length()-1)
+            Map<String,Object> productMap = JSONObject.parseObject(mqDataMap.get("product").toString());
             ProductEDSManagement.ProductOptions productOptions = this.handleMappingData(productMap,vendorOptions);
 
             //创建商品
@@ -116,8 +121,8 @@ public class XmagSynProductMapping implements IMapping{
         		String productDescription = product.get("description").toString();
         		productOptions.setDesc(productDescription);
         	}
-        	String type = product.get("type").toString(); //查询二级
-        	String category = product.get("category").toString(); //查询三级
+        	String type = product.get("type")==null?" ":product.get("type").toString(); //查询二级
+        	String category = product.get("category")==null?" ":product.get("type").toString(); //查询三级
         	
         	//根据传过来的类目   获取映射的类目信息
             Map<String, Object> categoryMap = new HashMap<String, Object>();
@@ -125,8 +130,10 @@ public class XmagSynProductMapping implements IMapping{
             //字符转小写
             categoryMap.put("boutique_second_category", type.toLowerCase());
             categoryMap.put("boutique_third_category", category.toLowerCase());
+            logger.info("categoryService param " + new Gson().toJson(categoryMap));
         	List<Map<String, Object>> apiCategoryMap = categoryService.getCategoryInfoByCondition(categoryMap);
-        	if(apiCategoryMap != null && apiCategoryMap.size() > 0) {
+        	 logger.info("categoryService result " + new Gson().toJson(apiCategoryMap));
+        	if(null != apiCategoryMap && 0 < apiCategoryMap.size()) {
                 productOptions.setCategoryId(apiCategoryMap.get(0).get("category_id").toString());
             }
         	
@@ -150,8 +157,8 @@ public class XmagSynProductMapping implements IMapping{
         	List<SkuOptions> skus = new ArrayList<SkuOptions>();
         	ProductEDSManagement management = new ProductEDSManagement();
         	//遍历子集
-        	if (checkValue(product.get("itemns"))){
-	        	Map<String, Object> itemMap = (Map<String, Object>) product.get("itemns");
+        	if (checkValue(product.get("items"))){
+	        	Map<String, Object> itemMap = (Map<String, Object>) product.get("items");
 	        	List<Map<String, Object>> items = (List<Map<String, Object>>) itemMap.get("item");
 	        	//获取imgurl
 	        	String pictures = "";
@@ -189,13 +196,6 @@ public class XmagSynProductMapping implements IMapping{
     	}
     	return false;
 	}
-    
-    private char charToLowerCase(char ch){  
-        if(ch <= 90 && ch >= 65){  
-            ch += 32;  
-        }  
-        return ch;  
-    }  
     
     
 }

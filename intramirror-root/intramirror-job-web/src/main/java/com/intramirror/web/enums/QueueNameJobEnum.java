@@ -59,6 +59,8 @@ public enum QueueNameJobEnum {
 	
 	XmagSynProduct("XmagSynProduct",new XmagSynProductMapping(),"IM调用Xmag 接口更新商品信息"),
 	
+	XmagSynProductByDate("XmagSynProductByDate",new XmagSynProductMapping(),"IM调用Xmag 接口更新商品信息"),
+	
 	QuadraSynDayProduct("QuadraSynDayProduct",new QuadraSynProductMapping(),"IM调用quadra 接口更新商品信息");
 	
 
