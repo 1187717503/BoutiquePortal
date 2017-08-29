@@ -340,9 +340,11 @@ public class ProductServiceImpl implements IProductService{
                 }
 
                 if(!ifFlag) {
-
-                    // 添加sku信息
-                    this.updateProductByAddSku(conn,product,category,skuOption,productOptions.getSalePrice(),vendorOptions.getVendorId(),productOptions);
+                    if(category != null) {
+                        // 添加sku信息
+                        this.updateProductByAddSku(conn,product,category,skuOption,productOptions.getSalePrice(),vendorOptions.getVendorId(),productOptions);
+                        logger.info("productServiceImplCatgeoryIsNull."+new Gson().toJson(product));
+                    }
                 } else {
                     ProductStockEDSManagement.StockOptions stockOptions = productStockEDSManagement.getStockOptions();
                     IStoreService storeService = new StoreServiceImpl();
