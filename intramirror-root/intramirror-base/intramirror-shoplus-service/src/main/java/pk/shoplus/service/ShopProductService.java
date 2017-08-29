@@ -854,7 +854,7 @@ public class ShopProductService {
     public void changeShopProductStopByProduct(String product_id) throws Exception {
         if(StringUtils.isBlank(product_id)) {
             String sql = "update shop_product set status ="+ShopProductType.STOP_SELLING+" where enabled = 1 and product_id ="+product_id;
-            shopProductDao.executeBySql(sql,null);
+            shopProductDao.updateBySQL(sql,null);
             log.info("updateproduct修改商品上下架状态 ,sql : " + sql);
         }
     }
