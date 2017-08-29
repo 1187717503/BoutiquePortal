@@ -27,7 +27,7 @@ public class ThreadPoolTimer {
 	private static final Long period = 3L;// ;
 
 
-	
+
 	public static ThreadPoolTimer getInstance(){
 		if(scheduExec.isShutdown()) {
 			scheduExec = Executors.newScheduledThreadPool(3);
