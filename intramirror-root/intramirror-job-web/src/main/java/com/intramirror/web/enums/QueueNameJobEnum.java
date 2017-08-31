@@ -2,6 +2,7 @@ package com.intramirror.web.enums;
 
 import com.intramirror.web.mapping.impl.QuadraSynProductMapping;
 import com.intramirror.web.mapping.impl.XmagAllStockMapping;
+import com.intramirror.web.mapping.impl.XmagOrderMapping;
 import com.intramirror.web.mapping.impl.XmagSynProductMapping;
 
 import pk.shoplus.DBConnector;
@@ -63,6 +64,8 @@ public enum QueueNameJobEnum {
 	XmagSynProductByDate("XmagSynProductByDate",new XmagSynProductMapping(),"IM调用Xmag 接口更新商品信息"),
 	
 	XmagAllStock("XmagAllStock",new XmagAllStockMapping(),"IM调用Xmag 接口更新商品信息"),
+	
+	OrderSetCheck("OrderSetCheck",new XmagOrderMapping(),"IM调用Xmag setOrder 接口更新订单信息"),
 	
 	QuadraSynDayProduct("QuadraSynDayProduct",new QuadraSynProductMapping(),"IM调用quadra 接口更新商品信息");
 	

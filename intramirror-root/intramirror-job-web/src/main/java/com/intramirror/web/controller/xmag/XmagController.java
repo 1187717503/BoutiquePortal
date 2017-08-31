@@ -23,6 +23,7 @@ import com.intramirror.main.api.service.ApiEndPointService;
 import com.intramirror.main.api.service.ApiParameterService;
 import com.intramirror.main.api.service.SeasonMappingService;
 import com.intramirror.web.enums.QueueNameJobEnum;
+import com.intramirror.web.util.QueueNameEnumUtils;
 import com.intramirror.web.util.QueueUtils;
 
 import pk.shoplus.service.SeasonService;
@@ -50,7 +51,7 @@ public class XmagController {
     
     @RequestMapping(value="/getProducts", method=RequestMethod.GET)
     @ResponseBody
-	public Map<String, Object> getProducts(){
+	public Map<String, Object> getProducts(String mqName){
     	//返回参数MAP
     	Map<String, Object> resultMap = new HashMap<>();
 		try {
@@ -100,7 +101,7 @@ public class XmagController {
 	                        String src = new Gson().toJson(mqDataMap);
 	                        System.out.println(src);
 	                        index++;
-	                        QueueUtils.putMessage(mqDataMap, "",urlMap.get("url").toString(),QueueNameJobEnum.XmagSynProduct);
+	                        QueueUtils.putMessage(mqDataMap, "",urlMap.get("url").toString(),QueueNameEnumUtils.searchQueue(mqName));
 	            		}
 		    		}
 		    	}else{
@@ -136,7 +137,7 @@ public class XmagController {
     
     @RequestMapping(value="/getProductByDate", method=RequestMethod.GET)
     @ResponseBody
-	public Map<String, Object> getProductByDate(){
+	public Map<String, Object> getProductByDate(String mqName){
     	//返回参数MAP
     	Map<String, Object> resultMap = new HashMap<>();
 		try {
@@ -186,7 +187,7 @@ public class XmagController {
 	                        String src = new Gson().toJson(mqDataMap);
 	                        logger.info("Push data" + src);
 	                        index++;
-	                        QueueUtils.putMessage(mqDataMap, "",urlMap.get("url").toString(),QueueNameJobEnum.XmagSynProductByDate);
+	                        QueueUtils.putMessage(mqDataMap, "",urlMap.get("url").toString(),QueueNameEnumUtils.searchQueue(mqName));
 	            		}
 		    		}
 		    	}else{
@@ -223,7 +224,7 @@ public class XmagController {
 
     @RequestMapping(value="/getAllStock", method=RequestMethod.GET)
     @ResponseBody
-	public Map<String, Object> getAllStock(){
+	public Map<String, Object> getAllStock(String mqName){
     	//返回参数MAP
     	Map<String, Object> resultMap = new HashMap<>();
 		try {
@@ -271,7 +272,7 @@ public class XmagController {
 				                        String src = new Gson().toJson(mqDataMap);
 				                        logger.info("Push data" + src);
 				                        index++;
-				                        QueueUtils.putMessage(mqDataMap, "",urlMap.get("url").toString(),QueueNameJobEnum.XmagAllStock);
+				                        QueueUtils.putMessage(mqDataMap, "",urlMap.get("url").toString(),QueueNameEnumUtils.searchQueue(mqName));
 				            		}
 					    		}
 					    	}else{
