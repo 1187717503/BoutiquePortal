@@ -74,7 +74,7 @@ public class QuadraProductController {
                 		for(Map<String, Object> productInfo :List ){
                 			
                             Map<String,Object> mqDataMap = new HashMap<String,Object>();
-                            mqDataMap.put("product", productInfo);
+                            mqDataMap.put("product", productInfo.toString());
                             mqDataMap.put("store_code", apiEndpointMap.get("store_code").toString());
                             mqDataMap.put("vendor_id", apiEndpointMap.get("vendor_id").toString());
                             mqDataMap.put("api_configuration_id", apiEndpointMap.get("api_configuration_id").toString());
@@ -146,7 +146,7 @@ public class QuadraProductController {
                 		for(Map<String, Object> productInfo :List ){
                 			
                             Map<String,Object> mqDataMap = new HashMap<String,Object>();
-                            mqDataMap.put("product", productInfo);
+                            mqDataMap.put("product", productInfo.toString());
                             mqDataMap.put("store_code", apiEndpointMap.get("store_code").toString());
                             mqDataMap.put("vendor_id", apiEndpointMap.get("vendor_id").toString());
                             mqDataMap.put("api_configuration_id", apiEndpointMap.get("api_configuration_id").toString());

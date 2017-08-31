@@ -112,6 +112,7 @@ public class ConsumeService {
 
                 mrv.setQueueName(queueName+QueueTypeEnum.ERROR.getCode());
                 mrv.setRequestBody(new Gson().toJson(resultMap));
+                logger.info("consumeResultPutMessageByError:"+new Gson().toJson(mrv));
                 String redisKey = MessageHelper.putMessage(mrv);
                 if(obj == null) {
                     this.putErrorMessage(resultMap,queueNameEnum,redisKey,apiMq);
