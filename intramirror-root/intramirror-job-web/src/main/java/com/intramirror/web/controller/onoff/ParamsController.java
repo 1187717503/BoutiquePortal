@@ -3,6 +3,7 @@ package com.intramirror.web.controller.onoff;
 import com.google.gson.Gson;
 import com.intramirror.common.help.ExceptionUtils;
 import com.intramirror.common.help.ResultMessage;
+import com.intramirror.common.utils.DateUtils;
 import com.intramirror.main.api.service.ApiParameterService;
 import com.intramirror.product.api.service.IApiMqService;
 import com.intramirror.web.vo.ParamsVo;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +37,8 @@ public class ParamsController {
 
     @Autowired
     private ApiParameterService apiParameterService;
+
+    private final static String[] dateParams = new String[]{"datetime","DateStart","DateEnd"};
 
     @RequestMapping("/change")
     @ResponseBody
@@ -66,6 +71,17 @@ public class ParamsController {
             logger.info("ParamsControllerChangeParams,paramMap:"+new Gson().toJson(paramMap));
             int rs = apiParameterService.updateApiParameterByKey(paramMap);
             logger.info("ParamsControllerChangeParams,rs"+rs);
+
+            String currentDate = DateUtils.getStrDate(new Date());
+
+            for(String dateParam : dateParams) {
+                paramMap.put("paramValue",currentDate);
+                paramMap.put("paramKey",dateParam);
+                paramMap.put("apiEndPointId",apiMqList.get(0).get("api_end_point_id"));
+                logger.info("ParamsControllerChangeParams,"+dateParam+":"+new Gson().toJson(paramMap));
+                rs = apiParameterService.updateApiParameterByKey(paramMap);
+                logger.info("ParamsControllerChangeParams,"+dateParam+",rs:"+new Gson().toJson(paramMap));
+            }
             resultMessage.successStatus().putMsg("info","success");
         } catch (Exception e) {
             e.printStackTrace();
