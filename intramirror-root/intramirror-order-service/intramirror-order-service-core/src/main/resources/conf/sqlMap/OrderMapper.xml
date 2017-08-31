@@ -173,9 +173,10 @@
 
 
     <select id="getOrderListByShipmentId" resultType="java.util.HashMap" parameterType="java.util.Map">
-			SELECT  o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id,pp.colorCode,pp.brandID,pspv.`value` as size,p.category_id,
-			s.price,s.in_price,sps.sale_price,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,b.english_name as brandName,
-			v.vendor_name,p.cover_img,lp.logistics_product_id,c.*  ,c2.name AS categoryName,l.logistics_id,l.user_rec_country,l.geography_id
+			SELECT  o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id,pp.colorCode,pp.brandID,pp.MadeIn,pp.Composition,
+			pspv.`value` as size,p.category_id,	s.price,s.in_price,sps.sale_price,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,
+			lp.`status`,b.english_name as brandName,v.vendor_name,p.cover_img,lp.logistics_product_id,c.*  ,c3.name AS categoryName,
+			l.logistics_id,l.user_rec_country,l.geography_id
 			FROM logistics_product lp  
 			INNER JOIN container c on lp.container_id = c.container_id 
 			INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id  
@@ -185,7 +186,6 @@
 			INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id   
 			INNER JOIN product p ON (sp.product_id = p.product_id )
 			LEFT JOIN (select * from category where `level` = 3 and enabled = 1) c3 on(c3.category_id=p.category_id)
-			LEFT JOIN (select * from category where `level` = 2 and enabled = 1) c2 on(c2.category_id=c3.parent_id)
 			INNER JOIN brand b ON (p.brand_id = b.brand_id and b.enabled = 1 )  
 			INNER JOIN sku s ON (s.sku_id = sps.sku_id and s.enabled = 1)  
 			INNER JOIN sku_property skup on (skup.sku_id = s.sku_id and skup.enabled = 1)  
@@ -201,9 +201,11 @@
         	LEFT JOIN (
 			SELECT t_pp.product_id,
 			max(case t_pp.key_name when 'ColorCode' then t_pp.`value` else '' end) as colorCode,
-			max(case t_pp.key_name when 'BrandID' then t_pp.`value` else '' end) as brandID 
+			max(case t_pp.key_name when 'BrandID' then t_pp.`value` else '' end) as brandID ,
+			max(case t_pp.key_name when 'MadeIn' then t_pp.`value` else '' end) as MadeIn,
+			max(case t_pp.key_name when 'Composition' then t_pp.`value` else '' end) as Composition
 			from product_property t_pp 
-			where t_pp.enabled = 1 and (t_pp.key_name='BrandID' or t_pp.key_name = 'ColorCode') 
+			where t_pp.enabled = 1 and (t_pp.key_name='BrandID' or t_pp.key_name = 'ColorCode'or t_pp.key_name = 'MadeIn'or t_pp.key_name = 'Composition')
 			group by t_pp.product_id 
 			) pp ON p.product_id = pp.product_id   
 			where pspk.`name` = 'Size' 
