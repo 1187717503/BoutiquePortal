@@ -260,7 +260,7 @@ public class XmagController {
 	                        String src = new Gson().toJson(mqDataMap);
 	                        logger.info("Push data" + src);
 	                        index++;
-	                        QueueUtils.putMessage(mqDataMap, "",urlMap.get("url").toString(),QueueNameJobEnum.XmagAllStock);
+//	                        QueueUtils.putMessage(mqDataMap, "",urlMap.get("url").toString(),QueueNameJobEnum.XmagAllStock);
 	            		}
 		    		}
 		    	}else{

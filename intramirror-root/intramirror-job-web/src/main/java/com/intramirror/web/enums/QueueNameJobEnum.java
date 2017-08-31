@@ -1,7 +1,7 @@
 package com.intramirror.web.enums;
 
 import com.intramirror.web.mapping.impl.QuadraSynProductMapping;
-import com.intramirror.web.mapping.impl.XmagAllStockMapping;
+//import com.intramirror.web.mapping.impl.XmagAllStockMapping;
 import com.intramirror.web.mapping.impl.XmagSynProductMapping;
 
 import pk.shoplus.DBConnector;
@@ -20,6 +20,7 @@ public enum QueueNameJobEnum {
 	EdsGetOrderStatus("EdsGetOrderStatus",new OrderEdsUpdateStatusMapping(),"调用EDS接口获取订单状态"),
 
 	EdsCreateProduct("EdsCreateProduct",new ProductEDSMapping(),"调用EDS接口创建商品"),
+	EdsUpdateProductByDay("EdsUpdateProductByDay",new ProductEDSMapping(),"调用EDS接口修改商品"),
 	EdsUpdateAllProduct("EdsUpdateAllProduct",new ProductEDSMapping(),"调用EDS接口创建商品-全量"),
 
 	EdsUpdateStock("EdsUpdateStock",new ProductStockEDSMapping(),"调用EDS接口修改库存"),
@@ -62,7 +63,7 @@ public enum QueueNameJobEnum {
 	
 	XmagSynProductByDate("XmagSynProductByDate",new XmagSynProductMapping(),"IM调用Xmag 接口更新商品信息"),
 	
-	XmagAllStock("XmagAllStock",new XmagAllStockMapping(),"IM调用Xmag 接口更新商品信息"),
+//	XmagAllStock("XmagAllStock",new XmagAllStockMapping(),"IM调用Xmag 接口更新商品信息"),
 	
 	QuadraSynDayProduct("QuadraSynDayProduct",new QuadraSynProductMapping(),"IM调用quadra 接口更新商品信息");
 	
