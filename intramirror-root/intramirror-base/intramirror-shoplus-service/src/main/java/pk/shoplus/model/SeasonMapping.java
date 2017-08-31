@@ -28,6 +28,9 @@ public class SeasonMapping {
 
     @Column
     public Date updated_at;
+    
+    @Column
+	private Long vendor_id;
 
     public String getSeason_code() {
         return season_code;
@@ -75,6 +78,14 @@ public class SeasonMapping {
 
 	public void setSeason_mapping_id(Long season_mapping_id) {
 		this.season_mapping_id = season_mapping_id;
+	}
+
+	public Long getVendor_id() {
+		return vendor_id;
+	}
+
+	public void setVendor_id(Long vendor_id) {
+		this.vendor_id = vendor_id;
 	}
     
 }
