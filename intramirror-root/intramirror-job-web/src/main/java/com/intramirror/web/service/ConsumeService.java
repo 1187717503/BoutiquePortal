@@ -46,7 +46,7 @@ public class ConsumeService {
     public void main(){
         try {
             List<ApiMq> apiMqs = iApiMqService.getMqs();
-
+            logger.info("ConsumeServiceMain,apiMqs:"+new Gson().toJson(apiMqs));
             if(apiMqs != null && apiMqs.size() > 0) {
                 for(ApiMq apiMq : apiMqs) {
                     String mqName = apiMq.getName() + apiMq.getApiConfigurationId();
