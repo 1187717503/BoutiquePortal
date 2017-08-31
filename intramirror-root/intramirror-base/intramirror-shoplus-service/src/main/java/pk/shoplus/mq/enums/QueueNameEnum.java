@@ -16,6 +16,7 @@ public enum QueueNameEnum {
 	EdsGetOrderStatus("EdsGetOrderStatus",new OrderEdsUpdateStatusMapping(),"调用EDS接口获取订单状态"),
 
 	EdsCreateProduct("EdsCreateProduct",new ProductEDSMapping(),"调用EDS接口创建商品"),
+	EdsUpdateProductByDay("EdsUpdateProductByDay",new ProductEDSMapping(),"调用EDS接口修改商品"),
 	EdsUpdateAllProduct("EdsUpdateAllProduct",new ProductEDSMapping(),"调用EDS接口创建商品-全量"),
 
 	EdsUpdateStock("EdsUpdateStock",new ProductStockEDSMapping(),"调用EDS接口修改库存"),

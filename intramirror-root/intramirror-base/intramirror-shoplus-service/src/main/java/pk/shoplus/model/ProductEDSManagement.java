@@ -1263,9 +1263,11 @@ public class ProductEDSManagement {
 		productList.add(6,productOptions.getColorCode()); // color_reference
 		
 		productList.add(7,productOptions.getColorDesc()); // color
-		
-		productList.add(8,productOptions.getSkus().get(0).getSizeid()); // 注意 - sizeid for filippo
-		
+		if(productOptions.getSkus() != null) {
+            productList.add(8,productOptions.getSkus().get(0).getSizeid()); // 注意 - sizeid for filippo
+        } else {
+            productList.add(8,"");
+        }
 		productList.add(9,""); // 注意 - first_category 
 		
 		productList.add(10,productOptions.getCategoryId()); // 注意 - second_category

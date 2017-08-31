@@ -3,6 +3,7 @@ package com.intramirror.product.core.mapper;
 import com.intramirror.product.api.model.ApiMq;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ApiMqMapper {
     /**
@@ -56,4 +57,6 @@ public interface ApiMqMapper {
     List<ApiMq> selectAllActiveData();
 
     int updateByMqName(ApiMq apiMq);
+
+    List<Map<String,Object>> selectMqByName(String mqName);
 }

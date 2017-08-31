@@ -21,6 +21,7 @@ import org.sql2o.Connection;
 
 import pk.shoplus.DBConnector;
 import pk.shoplus.model.Product;
+import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.service.ProductService;
 import pk.shoplus.util.RedisUtils;
 
@@ -68,11 +69,9 @@ public class DemoController {
 	@RequestMapping(value = "/get_product")
 	@ResponseBody
 	public Product getProduct() throws Exception {
-		Connection conn = DBConnector.sql2o.beginTransaction();
-		new DBConnector();
-		ProductService productService = new ProductService(conn);
-		Product product = productService.getProductById(341L);
-		return product;
+		ProductEDSManagement productEDSManagement = new ProductEDSManagement();
+		productEDSManagement.convertImgPath("[\"https://s3-eu-west-1.amazonaws.com/nugnes-images/sheet/010055880701_1.jpg\",\"https://s3-eu-west-1.amazonaws.com/nugnes-images/sheet/010055880701_2.jpg\",\"https://s3-eu-west-1.amazonaws.com/nugnes-images/sheet/010055880701_3.jpg\",\"https://s3-eu-west-1.amazonaws.com/nugnes-images/sheet/010055880701_4.jpg\",\"https://s3-eu-west-1.amazonaws.com/nugnes-images/sheet/010055880701_5.jpg\"]");
+		return null;
 	}
 	
 	

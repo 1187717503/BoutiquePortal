@@ -284,7 +284,6 @@ public class XmagController {
 						logger.info("job XmagAllStock seasonMappingService result null ");
 					}
 		    	}
-		    	
     	} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(" error message : " + e.getMessage());
