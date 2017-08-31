@@ -136,4 +136,13 @@
     where name = #{name,jdbcType=VARCHAR}
   </update>
 
+  <select id="selectMqByName" parameterType="java.lang.String" resultType="java.util.Map" >
+
+    select aep.api_end_point_id,ac.vendor_id,ac.store_code,aep.url,ap.param_key,ap.param_value from api_mq am
+    inner join api_configuration ac on(ac.enabled = 1 and ac.api_configuration_id = am.api_configuration_id)
+    inner join api_end_point aep on(aep.enabled = 1 and aep.api_end_point_id = ac.api_end_point_id)
+    inner join api_parameter ap on(ap.enabled = 1 and ap.api_end_point_id = aep.api_end_point_id)
+    where am.enabled = 1 and am.`name` = #{mqName,jdbcType=VARCHAR}
+  </select>
+
 </mapper>

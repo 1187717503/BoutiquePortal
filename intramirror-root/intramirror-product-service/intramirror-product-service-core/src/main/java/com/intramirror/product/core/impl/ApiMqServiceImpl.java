@@ -7,6 +7,7 @@ import com.intramirror.product.core.mapper.ApiMqMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by dingyifan on 2017/8/24.
@@ -28,5 +29,10 @@ public class ApiMqServiceImpl extends BaseDao implements IApiMqService{
     @Override
     public int updateByMqName(ApiMq apiMq) {
         return apiMqMapper.updateByMqName(apiMq);
+    }
+
+    @Override
+    public List<Map<String, Object>> selectMqByName(String mqName) {
+        return apiMqMapper.selectMqByName(mqName);
     }
 }
