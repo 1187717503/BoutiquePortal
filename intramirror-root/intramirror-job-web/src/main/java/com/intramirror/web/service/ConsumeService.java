@@ -46,7 +46,7 @@ public class ConsumeService {
     public void main(){
         try {
             List<ApiMq> apiMqs = iApiMqService.getMqs();
-
+            logger.info("ConsumeServiceMain,apiMqs:"+new Gson().toJson(apiMqs));
             if(apiMqs != null && apiMqs.size() > 0) {
                 for(ApiMq apiMq : apiMqs) {
                     String mqName = apiMq.getName() + apiMq.getApiConfigurationId();
@@ -112,6 +112,7 @@ public class ConsumeService {
 
                 mrv.setQueueName(queueName+QueueTypeEnum.ERROR.getCode());
                 mrv.setRequestBody(new Gson().toJson(resultMap));
+                logger.info("consumeResultPutMessageByError:"+new Gson().toJson(mrv));
                 String redisKey = MessageHelper.putMessage(mrv);
                 if(obj == null) {
                     this.putErrorMessage(resultMap,queueNameEnum,redisKey,apiMq);
