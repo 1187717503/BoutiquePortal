@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.intramirror.main.api.service.ApiEndPointService;
 import com.intramirror.main.api.service.ApiParameterService;
-import com.intramirror.web.enums.QueueNameJobEnum;
+import com.intramirror.product.api.service.IApiMqService;
 import com.intramirror.web.util.QueueNameEnumUtils;
 import com.intramirror.web.util.QueueUtils;
 
@@ -40,6 +40,9 @@ public class OrderController {
 	@Autowired
     private ApiParameterService apiParameterService;
 	
+	@Autowired
+	private IApiMqService apiMqService;
+	
  	@RequestMapping(value="/setOrder", method=RequestMethod.GET)
     @ResponseBody
 	public Map<String, Object> setOrder(String mqName){
@@ -47,10 +50,10 @@ public class OrderController {
     	Map<String, Object> resultMap = new HashMap<>();
     	try {
     		logger.info("job setOrder Start ");
-			Map<String, Object> param = new HashMap<String, Object>();
-	    	param.put("name", mqName);
-	    	logger.info("job setOrder 获取apiEndpointList 入参:"+new Gson().toJson(param));
-	    	List<Map<String, Object>> apiEndpointList = apiEndPointService.getapiEndpointInfoByCondition(param);
+	    	logger.info("job setOrder 获取apiEndpointList 入参:" + mqName);
+	    	
+	    	List<Map<String, Object>> apiEndpointList = apiMqService.selectMqByName(mqName);
+//	    	List<Map<String, Object>> apiEndpointList = apiEndPointService.getapiEndpointInfoByCondition(param);
 	    	// 获取相关接口数据
 	    	Map<String, Object> urlMap = null;
 	    	Map<String, Object> apiEndpointMap = null;
@@ -82,6 +85,7 @@ public class OrderController {
                     mqDataMap.put("store_code", apiEndpointMap.get("store_code").toString());
                     mqDataMap.put("vendor_id", apiEndpointMap.get("vendor_id").toString());
                     mqDataMap.put("api_configuration_id", apiEndpointMap.get("api_configuration_id").toString());
+                    mqDataMap.put("mqName", mqName); 
                     logger.info("setOrder Push Index" + index);
                     String src = new Gson().toJson(mqDataMap);
                     logger.info("setOrder Push data" + src);

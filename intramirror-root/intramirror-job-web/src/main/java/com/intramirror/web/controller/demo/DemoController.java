@@ -15,6 +15,7 @@ import com.intramirror.order.api.model.ApiMq;
 import com.intramirror.web.mapping.api.IMapping;
 import com.intramirror.web.mapping.impl.QuadraSynProductMapping;
 import com.intramirror.web.mapping.impl.XmagAllStockMapping;
+import com.intramirror.web.mapping.impl.XmagOrderMapping;
 import com.intramirror.web.mapping.impl.XmagSynProductMapping;
 
 import org.sql2o.Connection;
@@ -42,6 +43,10 @@ public class DemoController {
 	
 	@Autowired
 	private XmagAllStockMapping xmagAllStockMapping;
+	
+	@Autowired
+	private XmagOrderMapping xmagOrderMapping;
+	
 	
 	/** 测试返回对象转换JSON !!! */
 	@RequestMapping(value = "/get_api_mq",method = RequestMethod.GET)
@@ -91,6 +96,12 @@ public class DemoController {
 	@ResponseBody
 	public void xmagAllProduct(@RequestBody Map<String,Object> mqData) throws Exception {
 		xmagAllStockMapping.handleMappingAndExecute(new Gson().toJson(mqData));
+	}
+	
+	@RequestMapping(value = "/xmagOrder")
+	@ResponseBody
+	public void xmagOrder(@RequestBody Map<String,Object> mqData) throws Exception {
+		xmagOrderMapping.handleMappingAndExecute(new Gson().toJson(mqData));
 	}
 	
 	

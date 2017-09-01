@@ -4,15 +4,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson15.JSONObject;
 import com.google.gson.Gson;
-import com.intramirror.main.api.service.ApiEndPointService;
 import com.intramirror.main.api.service.ApiParameterService;
+import com.intramirror.product.api.service.IApiMqService;
 
+import pk.shoplus.model.OrderRefund;
 import pk.shoplus.parameter.StatusType;
 import pk.shoplus.service.mapping.api.IMapping;
 import pk.shoplus.service.request.api.IGetPostRequest;
@@ -32,7 +34,10 @@ public class XmagOrderMapping implements IMapping{
     private ApiParameterService apiParameterService;
     
     @Autowired
-    private ApiEndPointService apiEndPointService;
+    private IApiMqService apiMqService;
+    
+    @Autowired
+	private OrderRefund orderRefund;
 
     @Override
     public Map<String, Object> handleMappingAndExecute(String mqData) {
@@ -42,11 +47,7 @@ public class XmagOrderMapping implements IMapping{
         	logger.info("mqData : ===========>>>>>>" +mqData);
             Map<String,Object> mqDataMap = JSONObject.parseObject(mqData);
             logger.info("DataMap :" + new Gson().toJson(mqDataMap));
-        	Map<String, Object> param = new HashMap<String, Object>();
-         	param.put("system", "xmag");
-         	param.put("name", "setOrder");
-         	logger.info("job updateProduct 获取apiEndpointList 入参:"+new Gson().toJson(param));
-         	List<Map<String, Object>> apiEndpointList = apiEndPointService.getapiEndpointInfoByCondition(param);
+         	List<Map<String, Object>> apiEndpointList = apiMqService.selectMqByName(mqDataMap.get("mqName").toString());
          	// 获取相关接口数据
          	Map<String, Object> urlMap = null;
          	Map<String, Object> apiEndpointMap = null;
@@ -57,16 +58,28 @@ public class XmagOrderMapping implements IMapping{
          	
          	String json = "";
          	IGetPostRequest requestGet = new GetPostRequestService();
-    		logger.info("job getProudcts  Call the interface to get the data    url:"+urlMap.get("url").toString());
+    		logger.info("job XmagOrderMapping  Call the interface to get the data    url:"+urlMap.get("url").toString());
     		json = requestGet.requestMethod(GetPostRequestService.HTTP_GET, urlMap.get("url").toString(), null);
-    		logger.info("job getProudcts result:"+json);
+    		logger.info("job XmagOrderMapping result:"+json);
+    		
+    		if (StringUtils.isNotBlank(json)){
+    			JSONObject jsonOjbect = JSONObject.parseObject(json);
+    			String result = jsonOjbect.get("Status").toString();
+    			logger.info("job XmagOrderMapping result:"+result);
+    			// Purchase_No 
+    			if ("KO".equals(result)){
+    				//没有库存执行退款
+    				String logisProductId = "";
+//    				orderRefund.orderRefund(logisProductId);
+    			}
+    		}
          	
 		} catch (Exception e) {
 			e.printStackTrace();
             logger.error(" error message : " + e.getMessage());
             mapUtils.putData("status", StatusType.FAILURE).putData("info","XmagOrderMapping error message : " + e.getMessage());
 		}
-        logger.info(" end XmagOrderMapping.handleMappingAndExecute();");
+        logger.info(" end XmagOrderMapping.handleMappingAndExecute()");
         return mapUtils.getMap();
     }
 
@@ -113,7 +126,8 @@ public class XmagOrderMapping implements IMapping{
                 	urlBuffer.append(paramKey+"="+orderMap.get("orderNumber").toString()+"&");
                 }
                 if ("barcode".equals(paramKey)) {
-                	urlBuffer.append(paramKey+"="+orderMap.get("barcode").toString()+"&");
+                	String src = orderMap.get("barcode").toString().equals("#")?"":orderMap.get("barcode").toString();
+                	urlBuffer.append(paramKey+"="+src+"&");
                 }
                 if ("ordQty".equals(paramKey)) {
                 	urlBuffer.append(paramKey+"="+orderMap.get("itemsCount").toString()+"&");
