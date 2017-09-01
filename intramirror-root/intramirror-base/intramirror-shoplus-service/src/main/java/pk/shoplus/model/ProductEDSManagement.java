@@ -1396,8 +1396,9 @@ public class ProductEDSManagement {
             return fullUpdateProductFlag;
         }
 
-        public void setFullUpdateProductFlag(String fullUpdateProductFlag) {
+        public ProductOptions setFullUpdateProductFlag(String fullUpdateProductFlag) {
             this.fullUpdateProductFlag = fullUpdateProductFlag;
+            return this;
         }
 
         public List<SkuOptions> skus = new ArrayList<>();

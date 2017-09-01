@@ -81,7 +81,7 @@ public class TimerJobHandlePendingQueueController {
         public void run() {
             try {
                 consumeService.main();
-                System.out.println(Thread.currentThread().getName()+"-----");
+                logger.info("ConsumeRunStart:"+Thread.currentThread().getName());
             } catch (Exception e) {
                 e.printStackTrace();
                 logger.info("consume queue error !!!" + e.getMessage());
