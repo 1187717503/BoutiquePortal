@@ -33,6 +33,7 @@ import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.service.IContainerService;
 import com.intramirror.order.api.service.ILogisticProductShipmentService;
 import com.intramirror.order.api.service.ILogisticsProductService;
+import com.intramirror.order.api.service.IOrderCommentsService;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.service.IShipmentService;
 import com.intramirror.order.api.service.ISubShipmentService;
@@ -96,7 +97,8 @@ public class OrderController extends BaseController{
 	@Autowired
 	private ILogisticProductShipmentService logisticProductShipmentService;
 	
-	
+	@Autowired
+	private IOrderCommentsService orderCommentsService;
 	
 	/**
 	 * 获取订单列表
@@ -1005,5 +1007,45 @@ public class OrderController extends BaseController{
 		}
 		result.setInfoMap(info);
 		return result;
+	}
+	
+	@RequestMapping(value="/saveUserComment", method=RequestMethod.POST)
+	@ResponseBody
+	public ResultMessage saveUserComment(@RequestBody Map<String,Object> map){
+		logger.info("order saveUserComment Param : " + new Gson().toJson(map));
+		ResultMessage message= new ResultMessage();
+		try{
+			if (null == map || 0 == map.size()){
+				logger.info("parameter cannot be null");
+				message.errorStatus().putMsg("info", "Parameter cannot be null");
+				return message;
+			}
+			if(map.get("logistics_product_id") == null || StringUtils.isBlank(map.get("logistics_product_id").toString())){
+				logger.info("logistics_product_id cannot be null");
+				message.errorStatus().putMsg("info", "logistics_product_id cannot be null");
+				return message;
+			}
+			if(map.get("comments") == null || StringUtils.isBlank(map.get("comments").toString())){
+				logger.info("comments cannot be null");
+				message.errorStatus().putMsg("info", "comments cannot be null");
+				return message;
+			}
+			if(map.get("reason") == null || StringUtils.isBlank(map.get("reason").toString())){
+				logger.info("reason cannot be null");
+				message.errorStatus().putMsg("info", "reason cannot be null");
+				return message;
+			}
+			
+			int result = orderCommentsService.saveOrderComments(map);
+			if (result == 1){
+				message.successStatus().putMsg("SUCCESS", "result " +result);
+				return message;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.info("errorMsg : "+e.getMessage());
+			message.errorStatus().putMsg("errorMsg", e.getMessage());
+		}
+	return message;
 	}
 }
