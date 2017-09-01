@@ -36,8 +36,8 @@ public class XmagOrderMapping implements IMapping{
     @Autowired
     private IApiMqService apiMqService;
     
-    @Autowired
-	private OrderRefund orderRefund;
+//    @Autowired
+//	private OrderRefund orderRefund;
 
     @Override
     public Map<String, Object> handleMappingAndExecute(String mqData) {
