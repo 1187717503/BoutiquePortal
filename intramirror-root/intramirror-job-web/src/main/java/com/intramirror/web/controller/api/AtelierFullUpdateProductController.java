@@ -32,7 +32,7 @@ import java.util.Map;
  * Created by dingyifan on 2017/9/3.
  */
 @Controller
-@RequestMapping("/api/atelier")
+@RequestMapping("/api")
 public class AtelierFullUpdateProductController {
 
     private static Logger logger = Logger.getLogger(AtelierFullUpdateProductController.class);
