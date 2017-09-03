@@ -50,6 +50,8 @@ public enum QueueNameJobEnum {
 	AtelierUpdateProductGisaBoutique("AtelierUpdateProductGisaBoutique",new UpdateProductMapping(),"Atelier调用IM接口修改商品信息"),
 	AtelierUpdateProductWiseBoutique("AtelierUpdateProductWiseBoutique",new UpdateProductMapping(),"Atelier调用IM接口修改商品信息"),
 
+	AtelierFullUpdateProductDante("AtelierFullUpdateProductDante",new UpdateProductMapping(),"Atelier调用IM接口修改商品信息"),
+
 	CloudStoreSynProduct("CloudStoreSynProduct",new CloudStoreGetInventoryMapping(),"IM调用cloudstore getInventory更新商品信息"),
 	CloudStoreSynStock("CloudStoreSynStock",new CloudStoreGetEventsMapping(),"IM调用cloudstore getEvents更新库存信息"),
 

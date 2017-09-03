@@ -59,4 +59,6 @@ public interface ApiMqMapper {
     int updateByMqName(ApiMq apiMq);
 
     List<Map<String,Object>> selectMqByName(String mqName);
+
+    List<Map<String,Object>> selectApiInfoByAtelier(Map<String,Object> params);
 }

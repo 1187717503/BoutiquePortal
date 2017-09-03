@@ -35,4 +35,9 @@ public class ApiMqServiceImpl extends BaseDao implements IApiMqService{
     public List<Map<String, Object>> selectMqByName(String mqName) {
         return apiMqMapper.selectMqByName(mqName);
     }
+
+    @Override
+    public List<Map<String, Object>> selectApiInfoByAtelier(Map<String, Object> params) {
+        return apiMqMapper.selectApiInfoByAtelier(params);
+    }
 }

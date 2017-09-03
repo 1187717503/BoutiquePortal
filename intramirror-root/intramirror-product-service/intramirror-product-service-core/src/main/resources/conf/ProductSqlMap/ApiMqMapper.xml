@@ -145,4 +145,13 @@
     where am.enabled = 1 and am.`name` = #{mqName,jdbcType=VARCHAR}
   </select>
 
+
+  <select id="selectApiInfoByAtelier" parameterType="java.util.Map" resultType="java.util.Map">
+
+    select am.`name`,ac.api_configuration_id,ac.vendor_id,ac.store_code,ac.api_end_point_id,ac.system from api_configuration ac
+    left join api_mq am on(am.enabled = 1 and am.api_configuration_id = ac.api_configuration_id)
+    left join api_end_point aep on(aep.enabled = 1 and aep.api_end_point_id = ac.api_end_point_id)
+    where ac.enabled = 1 and ac.store_code = #{store_code,jdbcType=VARCHAR} and ac.system = #{system,jdbcType=VARCHAR} and aep.`name` = #{name,jdbcType=VARCHAR}
+  </select>
+
 </mapper>
