@@ -20,11 +20,16 @@ public enum QueueNameJobEnum {
 	EdsCreateOrder("EdsCreateOrder",new OrderEDSMapping(),"调用EDS接口创建订单"),
 	EdsGetOrderStatus("EdsGetOrderStatus",new OrderEdsUpdateStatusMapping(),"调用EDS接口获取订单状态"),
 
+	// nugnes
 	EdsCreateProduct("EdsCreateProduct",new ProductEDSMapping(),"调用EDS接口创建商品"),
-	EdsUpdateProductByDay("EdsUpdateProductByDay",new ProductEDSMapping(),"调用EDS接口修改商品"),
 	EdsUpdateAllProduct("EdsUpdateAllProduct",new ProductEDSMapping(),"调用EDS接口创建商品-全量"),
-
 	EdsUpdateStock("EdsUpdateStock",new ProductStockEDSMapping(),"调用EDS接口修改库存"),
+	EdsUpdateProductByDayNugnes("EdsUpdateProductByDayNugnes",new ProductEDSMapping(),"调用EDS接口修改商品"),
+
+	// base.blu
+	EdsCreateProductBaseBlu("EdsCreateProductBaseBlu",new ProductEDSMapping(),"调用EDS接口创建商品"),
+	EdsUpdateStockBaseBlu("EdsUpdateStockBaseBlu",new ProductStockEDSMapping(),"调用EDS接口修改库存"),
+	EdsUpdateProductByDay("EdsUpdateProductByDay",new ProductEDSMapping(),"调用EDS接口修改商品"),
 
 	AtelierCreateProductLucianaBari("AtelierCreateProductLucianaBari",new ProductAtelierMapping(),"Atelier调用IM接口创建商品"),
 	AtelierCreateProductDante("AtelierCreateProductDante",new ProductAtelierMapping(),"Atelier调用IM接口创建商品"),
