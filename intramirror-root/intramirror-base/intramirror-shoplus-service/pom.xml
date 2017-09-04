@@ -25,6 +25,12 @@
             </properties>
         </profile>
         <profile>
+            <id>shenv</id>
+            <properties>
+                <profiles.active>shenv</profiles.active>
+            </properties>
+        </profile>
+        <profile>
             <id>sit</id>
             <properties>
                 <profiles.active>sit</profiles.active>
@@ -181,6 +187,7 @@
                     <exclude>prd/*</exclude>
                     <exclude>pre/*</exclude>
                     <exclude>sit/*</exclude>
+                    <exclude>shenv/*</exclude>
                 </excludes>
             </resource>
             <resource>
