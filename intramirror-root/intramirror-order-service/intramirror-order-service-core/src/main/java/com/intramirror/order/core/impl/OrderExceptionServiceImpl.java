@@ -9,22 +9,22 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import com.intramirror.order.api.common.ContainerType;
-import com.intramirror.order.api.service.IOrderCommentsService;
+import com.intramirror.order.api.service.IOrderExceptionService;
 import com.intramirror.order.core.dao.BaseDao;
-import com.intramirror.order.core.mapper.OrderCommentsMapper;
+import com.intramirror.order.core.mapper.OrderExceptionMapper;
 
 /**
  * @author yml
  *
  */
 @Service
-public class OrderCommentsServiceImpl extends BaseDao implements IOrderCommentsService {
+public class OrderExceptionServiceImpl extends BaseDao implements IOrderExceptionService {
 
-	private OrderCommentsMapper orderCommentsMapper;
+	private OrderExceptionMapper orderExceptionMapper;
 	
 	@Override
 	public void init() {
-		orderCommentsMapper = this.getSqlSession().getMapper(OrderCommentsMapper.class);
+		orderExceptionMapper = this.getSqlSession().getMapper(OrderExceptionMapper.class);
 	}
 	
 	@Override
@@ -34,7 +34,7 @@ public class OrderCommentsServiceImpl extends BaseDao implements IOrderCommentsS
 		map.put("order_exception_type_id", Long.parseLong(map.get("reason").toString()));
 		map.put("created_at", currentDate);
 		map.put("status",ContainerType.PENDINGAUDIT);
-		return orderCommentsMapper.saveOrderComments(map);
+		return orderExceptionMapper.saveOrderComments(map);
 	}
 
 	

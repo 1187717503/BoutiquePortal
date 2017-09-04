@@ -31,7 +31,8 @@ import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.service.IContainerService;
 import com.intramirror.order.api.service.ILogisticProductShipmentService;
 import com.intramirror.order.api.service.ILogisticsProductService;
-import com.intramirror.order.api.service.IOrderCommentsService;
+import com.intramirror.order.api.service.IOrderExceptionService;
+import com.intramirror.order.api.service.IOrderExceptionTypeService;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.service.IShipmentService;
 import com.intramirror.order.api.service.ISubShipmentService;
@@ -95,7 +96,10 @@ public class OrderController extends BaseController{
 	private ILogisticProductShipmentService logisticProductShipmentService;
 	
 	@Autowired
-	private IOrderCommentsService orderCommentsService;
+	private IOrderExceptionService orderExceptionService;
+	
+	@Autowired
+	private IOrderExceptionTypeService orderExceptionTypeService;
 	
 	/**
 	 * 获取订单列表
@@ -1032,7 +1036,7 @@ public class OrderController extends BaseController{
 				message.errorStatus().putMsg("info", "reason cannot be null");
 				return message;
 			}
-			int result = orderCommentsService.saveOrderComments(map);
+			int result = orderExceptionService.saveOrderComments(map);
 			if (result == 1){
 				message.successStatus().putMsg("SUCCESS", "result " +result);
 				return message;
@@ -1043,5 +1047,25 @@ public class OrderController extends BaseController{
 			message.errorStatus().putMsg("errorMsg", e.getMessage());
 		}
 	return message;
+	}
+	
+	@RequestMapping(value="/getExceptionType", method=RequestMethod.GET)
+	@ResponseBody
+	public ResultMessage getExceptionType(){
+		logger.info("order getExceptionType ");
+		ResultMessage message= new ResultMessage();
+		try{
+			List<Map<String, Object>> list = orderExceptionTypeService.getExceptionType(null);
+			if (null != list && 0 < list.size()){
+				message.successStatus().putMsg("INFO", "SUCCESS").setData(list);
+				return message;
+			}
+			message.errorStatus().putMsg("INFO", "SUCCESS").setData(null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.info("errorMsg : "+e.getMessage());
+			message.errorStatus().putMsg("errorMsg", e.getMessage());
+		}
+		return message;
 	}
 }

@@ -9,7 +9,7 @@ import java.util.Map;
  * @author yml
  *
  */
-public interface OrderCommentsMapper {
+public interface OrderExceptionMapper {
 
 	/**
 	 * 保存订单当前的用户留言
