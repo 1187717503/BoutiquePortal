@@ -86,6 +86,7 @@ public class OrderController {
                     mqDataMap.put("vendor_id", apiEndpointMap.get("vendor_id").toString());
                     mqDataMap.put("api_configuration_id", apiEndpointMap.get("api_configuration_id").toString());
                     mqDataMap.put("mqName", mqName); 
+                    mqDataMap.put("orderId", order.getOrderId());
                     logger.info("setOrder Push Index" + index);
                     String src = new Gson().toJson(mqDataMap);
                     logger.info("setOrder Push data" + src);

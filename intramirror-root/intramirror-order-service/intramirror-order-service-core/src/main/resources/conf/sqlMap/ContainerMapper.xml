@@ -145,4 +145,26 @@ values(#{containerType,jdbcType=VARCHAR}, #{shipToGeography,jdbcType=VARCHAR},#{
 			SET shipment_id=#{shipment_id,jdbcType=BIGINT}  
 			where container_id= #{container_id,jdbcType=BIGINT}  
 	</update>
+	
+	<update id="updateContainerById"  parameterType="java.util.Map" >
+		UPDATE container
+		<trim prefix="set" suffixOverrides=","  suffix=" WHERE container_id = #{container_id,jdbcType=BIGINT} ">
+			<if test="length != null" >
+			 length =  #{length,jdbcType=BIGINT},
+			</if>
+			<if test="width != null" >
+			width =   #{width,jdbcType=DECIMAL},
+			</if>
+			<if test="height != null" >
+			height =   #{height,jdbcType=BIGINT},
+			</if>
+			<if test="updated_at != null" >
+			 updated_at =  #{updated_at,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+  	</update>
+  	
+  	<select id="getListByShipmentId" resultType="java.util.HashMap"  parameterType="java.util.Map">
+		SELECT * FROM container where shipment_id = #{shipmentId,jdbcType=BIGINT} and `status`=1 GROUP BY created_at ASC;
+	</select>
 </mapper>

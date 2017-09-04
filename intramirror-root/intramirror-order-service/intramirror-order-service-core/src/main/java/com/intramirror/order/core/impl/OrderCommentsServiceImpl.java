@@ -31,8 +31,8 @@ public class OrderCommentsServiceImpl extends BaseDao implements IOrderCommentsS
 	public int saveOrderComments(Map<String, Object> map) {
 		map.put("logistics_product_id", Long.parseLong(map.get("logistics_product_id").toString()));
 		Date currentDate = new Date();
+		map.put("order_exception_type_id", Long.parseLong(map.get("reason").toString()));
 		map.put("created_at", currentDate);
-		map.put("updated_at", currentDate);
 		map.put("status",ContainerType.PENDINGAUDIT);
 		return orderCommentsMapper.saveOrderComments(map);
 	}

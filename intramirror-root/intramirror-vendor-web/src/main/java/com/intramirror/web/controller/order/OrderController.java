@@ -26,9 +26,7 @@ import com.google.gson.JsonParser;
 import com.intramirror.common.Helper;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.parameter.StatusType;
-import com.intramirror.order.api.common.ContainerType;
 import com.intramirror.order.api.common.OrderStatusType;
-import com.intramirror.order.api.model.Container;
 import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.service.IContainerService;
 import com.intramirror.order.api.service.ILogisticProductShipmentService;
@@ -42,7 +40,6 @@ import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.VendorService;
-import com.intramirror.web.common.BarcodeUtil;
 import com.intramirror.web.controller.BaseController;
 import com.intramirror.web.service.LogisticsProductService;
 import com.intramirror.web.service.OrderRefund;
@@ -1035,7 +1032,6 @@ public class OrderController extends BaseController{
 				message.errorStatus().putMsg("info", "reason cannot be null");
 				return message;
 			}
-			
 			int result = orderCommentsService.saveOrderComments(map);
 			if (result == 1){
 				message.successStatus().putMsg("SUCCESS", "result " +result);

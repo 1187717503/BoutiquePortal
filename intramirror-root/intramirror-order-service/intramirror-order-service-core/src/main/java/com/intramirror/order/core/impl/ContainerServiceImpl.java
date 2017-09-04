@@ -192,7 +192,17 @@ public class ContainerServiceImpl extends BaseDao implements IContainerService{
 		return containerMapper.updateContainerShipment(map);
 	}
 
+	@Override
+	public int updateContainerById(Map<String, Object> map) {
+		map.put("updated_at", new Date());
+		return containerMapper.updateContainerById(map);
+	}
 
+	@Override
+	public List<Map<String, Object>> getListByShipmentId(Map<String, Object> map) {
+		return containerMapper.getListByShipmentId(map);
+	}
+	
 	
 
 }

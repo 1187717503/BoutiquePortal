@@ -36,9 +36,6 @@ public class XmagOrderMapping implements IMapping{
     @Autowired
     private IApiMqService apiMqService;
     
-//    @Autowired
-//	private OrderRefund orderRefund;
-
     @Override
     public Map<String, Object> handleMappingAndExecute(String mqData) {
         logger.info(" start XmagOrderMapping.handleMappingAndExecute();");
@@ -54,26 +51,31 @@ public class XmagOrderMapping implements IMapping{
          	if(apiEndpointList != null && apiEndpointList.size() > 0 ){
          		apiEndpointMap = apiEndpointList.get(0);
      			urlMap = this.getUrl(apiEndpointMap, mqDataMap);
+     			String json = "";
+             	IGetPostRequest requestGet = new GetPostRequestService();
+        		logger.info("job XmagOrderMapping  Call the interface to get the data    url:"+urlMap.get("url").toString());
+        		json = requestGet.requestMethod(GetPostRequestService.HTTP_GET, urlMap.get("url").toString(), null);
+        		logger.info("job XmagOrderMapping result:"+json);
+        		
+        		if (StringUtils.isNotBlank(json)){
+        			JSONObject jsonOjbect = JSONObject.parseObject(json);
+        			String result = jsonOjbect.get("Status").toString();
+        			logger.info("job XmagOrderMapping result:"+result);
+        			if ("KO".equals(result)){
+        				//没有库存执行退款
+        				OrderRefund orderRefund = new OrderRefund();
+        				String logisProductId = mqDataMap.get("orderId").toString();
+        				if (orderRefund != null){
+        					orderRefund.orderRefund(logisProductId);
+        					mapUtils.putData("status", StatusType.SUCCESS).putData("info","XmagOrderMapping orderRefund SUCCESS :" + logisProductId);
+        				}
+        			}
+        			mapUtils.putData("status", StatusType.SUCCESS).putData("info","XmagOrderMapping SUCCESS :" +mqDataMap.get("orderId").toString());
+        		}
+         	}else{
+         		logger.info(" apiEndpointList is null");
          	}
-         	
-         	String json = "";
-         	IGetPostRequest requestGet = new GetPostRequestService();
-    		logger.info("job XmagOrderMapping  Call the interface to get the data    url:"+urlMap.get("url").toString());
-    		json = requestGet.requestMethod(GetPostRequestService.HTTP_GET, urlMap.get("url").toString(), null);
-    		logger.info("job XmagOrderMapping result:"+json);
-    		
-    		if (StringUtils.isNotBlank(json)){
-    			JSONObject jsonOjbect = JSONObject.parseObject(json);
-    			String result = jsonOjbect.get("Status").toString();
-    			logger.info("job XmagOrderMapping result:"+result);
-    			// Purchase_No 
-    			if ("KO".equals(result)){
-    				//没有库存执行退款
-    				String logisProductId = "";
-//    				orderRefund.orderRefund(logisProductId);
-    			}
-    		}
-         	
+         	mapUtils.putData("status", StatusType.SUCCESS).putData("info","XmagOrderMapping SUCCESS :" +mqDataMap.get("orderId").toString());
 		} catch (Exception e) {
 			e.printStackTrace();
             logger.error(" error message : " + e.getMessage());

@@ -5,14 +5,14 @@
         <id column="order_comments_id" property="order_comments_id" jdbcType="BIGINT"/>
         <result column="logistics_product_id" property="logistics_product_id" jdbcType="BIGINT"/>
         <result column="comments" property="comments" jdbcType="VARCHAR"/>
-        <result column="reason" property="reason" jdbcType="VARCHAR"/>
+        <result column="exception_type_id" property="exception_type_id" jdbcType="BIGINT"/>
         <result column="status" property="status" jdbcType="BIGINT"/>
         <result column="created_at" property="created_at" jdbcType="TIMESTAMP"/>
         <result column="updated_at" property="updated_at" jdbcType="TIMESTAMP"/>
     </resultMap>
    
    <insert id="saveOrderComments" parameterType="java.util.Map">
-   INSERT INTO order_comments(logistics_product_id,comments,reason,`status`,created_at,updated_at)
-	VALUE(#{logistics_product_id,jdbcType=BIGINT},#{comments,jdbcType=VARCHAR},#{reason,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},#{created_at,jdbcType=TIMESTAMP},#{updated_at,jdbcType=TIMESTAMP})
+   INSERT INTO order_comments(logistics_product_id,comments,exception_type_id,`status`,created_at,updated_at)
+	VALUE(#{logistics_product_id,jdbcType=BIGINT},#{comments,jdbcType=VARCHAR},#{exception_type_id,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},#{created_at,jdbcType=TIMESTAMP},#{updated_at,jdbcType=TIMESTAMP})
    </insert>
 </mapper>
