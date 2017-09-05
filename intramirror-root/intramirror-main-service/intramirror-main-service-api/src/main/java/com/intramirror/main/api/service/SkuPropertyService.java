@@ -17,5 +17,5 @@ public interface SkuPropertyService {
 	 * @param skuCode
 	 * @return
 	 */
-	Map<String, Object> getSizeValue(String skuCode);
+	Map<String, Object> getSizeValue(Map<String, Object> map);
 }

@@ -49,7 +49,12 @@ public class XmagAllStockMapping implements IMapping{
             Map<String,Object> mqDataMap = JSONObject.parseObject(mqData);
             Map<String,Object> productMap = JSONObject.parseObject(mqDataMap.get("product").toString());
             logger.info("sizeValue param :" + new Gson().toJson(productMap.get("Barcode").toString()));
-            Map<String, Object> sizeValue = skuPropertyService.getSizeValue(productMap.get("Barcode").toString());
+            Map<String, Object> param = new HashMap<>();
+            param.put("skuCode", productMap.get("Barcode").toString());
+            param.put("vendor_id", Long.parseLong(mqDataMap.get("vendor_id")==null?"0":
+            	mqDataMap.get("vendor_id").toString().toString()));
+            logger.info("sizeValue param :" + new Gson().toJson(param));
+            Map<String, Object> sizeValue = skuPropertyService.getSizeValue(param);
             logger.info("sizeValue result :" + new Gson().toJson(sizeValue));
             
             ProductStockEDSManagement.StockOptions stockOptions = this.handleMappingData1(productMap,sizeValue);
