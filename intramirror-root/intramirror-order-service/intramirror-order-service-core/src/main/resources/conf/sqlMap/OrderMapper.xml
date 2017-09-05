@@ -109,8 +109,8 @@
         where t_pp.enabled = 1 and (t_pp.key_name='BrandID' or t_pp.key_name = 'ColorCode')
         group by t_pp.product_id
         ) pp ON p.product_id = pp.product_id
-        INNER JOIN order_exception oe ON(oe.logistics_product_id=lp.logistics_product_id)
-		INNER JOIN order_exception_type oet ON(oet.order_exception_type_id=oe.order_exception_type_id)
+        LEFT JOIN order_exception oe ON(oe.logistics_product_id=lp.logistics_product_id)
+		LEFT JOIN order_exception_type oet ON(oet.order_exception_type_id=oe.order_exception_type_id)
 		LEFT JOIN `user` u ON(u.user_id=oe.created_by_user_id)
 		LEFT JOIN  `user` uu on(uu.user_id=oe.modified_by_user_id)
         where pspk.`name` = 'Size' and lp.`status` = #{status,jdbcType=BIGINT}
