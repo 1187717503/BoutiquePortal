@@ -17,4 +17,11 @@ public interface IOrderExceptionService {
 	 * @return
 	 */
 	int saveOrderComments(Map<String, Object> map);
+	
+	/**
+	 * 修改orderException
+	 * @param map
+	 * @return
+	 */
+	int updateOrderExceptionById (Map<String, Object> map);
 }

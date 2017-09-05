@@ -17,4 +17,11 @@ public interface OrderExceptionMapper {
 	 * @return
 	 */
 	int saveOrderComments(Map<String, Object> map);
+	
+	/**
+	 * 修改orderException
+	 * @param map
+	 * @return
+	 */
+	int updateOrderException(Map<String, Object> map);
 }

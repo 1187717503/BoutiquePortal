@@ -1076,4 +1076,55 @@ public class OrderController extends BaseController{
 		}
 		return message;
 	}
+	
+	@RequestMapping(value="/updateException", method=RequestMethod.POST)
+	@ResponseBody
+	public ResultMessage updateException(@RequestBody Map<String, Object> map){
+		logger.info("order updateException Param : " +new Gson().toJson(map));
+		ResultMessage message= new ResultMessage();
+		try{
+			if(null == map || 0 == map.size()){
+				logger.info("parameter cannot be null");
+				message.errorStatus().putMsg("info", "Parameter cannot be null");
+				return message;
+			}
+			if(map.get("status") == null || StringUtils.isBlank(map.get("status").toString())){
+				logger.info("status cannot be null");
+				message.errorStatus().putMsg("info", "status cannot be null");
+				return message;
+			}
+			if(map.get("modified_at") == null || StringUtils.isBlank(map.get("modified_at").toString())){
+				logger.info("modified_at cannot be null");
+				message.errorStatus().putMsg("info", "modified_at cannot be null");
+				return message;
+			}
+			if(map.get("modified_by_user_id") == null || StringUtils.isBlank(map.get("modified_by_user_id").toString())){
+				logger.info("modified_by_user_id cannot be null");
+				message.errorStatus().putMsg("info", "modified_by_user_id cannot be null");
+				return message;
+			}
+			if(map.get("resolution") == null || StringUtils.isBlank(map.get("resolution").toString())){
+				logger.info("resolution cannot be null");
+				message.errorStatus().putMsg("info", "resolution cannot be null");
+				return message;
+			}
+			if(map.get("order_exception_id") == null || StringUtils.isBlank(map.get("order_exception_id").toString())){
+				logger.info("order_exception_id cannot be null");
+				message.errorStatus().putMsg("info", "order_exception_id cannot be null");
+				return message;
+			}
+			int result = orderExceptionService.updateOrderExceptionById(map);
+			if (1==result){
+				message.successStatus().putMsg("INFO", "SUCCESS").setData(result);
+				return message;
+			}
+			message.errorStatus().putMsg("INFO", "SUCCESS").setData(-1);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.info("errorMsg : "+e.getMessage());
+			message.errorStatus().putMsg("errorMsg", e.getMessage());
+		}
+		return message;
+	}
+	
 }

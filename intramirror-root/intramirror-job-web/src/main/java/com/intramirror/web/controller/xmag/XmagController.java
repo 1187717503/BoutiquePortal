@@ -411,14 +411,6 @@ public class XmagController {
                 if ("EndIndex".equals(paramKey)){
                 	EndIndex = paramValue;
                 }
-                if ("DateStart".equals(paramKey)){
-                	urlBuffer.append(paramKey+"="+paramValue+"&");
-                	continue;
-                }
-                if ("DateEnd".equals(paramKey)){
-                	urlBuffer.append(paramKey+"="+paramValue+"&");
-                	continue;
-                }
                 if ("SeasonCode".equals(paramKey)){
                 	continue;
                 }

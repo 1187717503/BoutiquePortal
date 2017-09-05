@@ -37,6 +37,11 @@ public class OrderExceptionServiceImpl extends BaseDao implements IOrderExceptio
 		return orderExceptionMapper.saveOrderComments(map);
 	}
 
+	@Override
+	public int updateOrderExceptionById(Map<String, Object> map) {
+		return orderExceptionMapper.updateOrderException(map);
+	}
+
 	
 
 }
