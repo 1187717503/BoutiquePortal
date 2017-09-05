@@ -1012,7 +1012,7 @@ public class OrderController extends BaseController{
 	
 	@RequestMapping(value="/saveUserComment", method=RequestMethod.POST)
 	@ResponseBody
-	public ResultMessage saveUserComment(@RequestBody Map<String,Object> map){
+	public ResultMessage saveUserComment(@RequestBody Map<String,Object> map,HttpServletRequest httpRequest){
 		logger.info("order saveUserComment Param : " + new Gson().toJson(map));
 		ResultMessage message= new ResultMessage();
 		try{
@@ -1036,6 +1036,14 @@ public class OrderController extends BaseController{
 				message.errorStatus().putMsg("info", "reason cannot be null");
 				return message;
 			}
+			User user = this.getUser(httpRequest);
+			if(user == null){
+				logger.info("user cannot be null");
+				message.errorStatus().putMsg("info", "user cannot be null");
+				return message;
+			}
+			map.put("created_by_user_id", user.getUserId());
+			System.out.println(user.getEmail());
 			int result = orderExceptionService.saveOrderComments(map);
 			if (result == 1){
 				message.successStatus().putMsg("SUCCESS", "result " +result);

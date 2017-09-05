@@ -4,7 +4,7 @@
   
    
    <insert id="saveOrderComments" parameterType="java.util.Map">
-   INSERT INTO order_exception(logistics_product_id,comments,order_exception_type_id,`status`,created_at)
-	VALUE(#{logistics_product_id,jdbcType=BIGINT},#{comments,jdbcType=VARCHAR},#{order_exception_type_id,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},#{created_at,jdbcType=TIMESTAMP})
+   INSERT INTO order_exception(logistics_product_id,comments,order_exception_type_id,`status`,created_at,created_by_user_id)
+	VALUE(#{logistics_product_id,jdbcType=BIGINT},#{comments,jdbcType=VARCHAR},#{order_exception_type_id,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},#{created_at,jdbcType=TIMESTAMP},#{created_by_user_id,jdbcType=BIGINT})
    </insert>
 </mapper>

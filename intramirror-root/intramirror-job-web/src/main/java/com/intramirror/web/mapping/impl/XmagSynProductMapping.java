@@ -122,7 +122,7 @@ public class XmagSynProductMapping implements IMapping{
         		productOptions.setDesc(productDescription);
         	}
         	String type = product.get("type")==null?" ":product.get("type").toString(); //查询二级
-        	String category = product.get("category")==null?" ":product.get("type").toString(); //查询三级
+        	String category = product.get("category")==null?" ":product.get("category").toString(); //查询三级
         	
         	//根据传过来的类目   获取映射的类目信息
             Map<String, Object> categoryMap = new HashMap<String, Object>();
@@ -158,30 +158,32 @@ public class XmagSynProductMapping implements IMapping{
         	ProductEDSManagement management = new ProductEDSManagement();
         	//遍历子集
         	if (checkValue(product.get("items"))){
-	        	Map<String, Object> itemMap = (Map<String, Object>) product.get("items");
-	        	List<Map<String, Object>> items = (List<Map<String, Object>>) itemMap.get("item");
-	        	//获取imgurl
-	        	String pictures = "";
-	        	Set<String> pic = new HashSet<>();
-	        	if (null != items && 0!= items.size()){
-	        		SkuOptions sku = management.getSkuOptions();
-		        	for (int i = 0; i < items.size(); i++) {
-		        		sku.setSize(items.get(i).get("item_size").toString());
-		        		sku.setBarcodes(items.get(i).get("barcode").toString());
-		        		sku.setStock(items.get(i).get("stock").toString());
-		        		productOptions.setColorCode(items.get(i).get("color").toString());
-		        		pic.add(items.get(i).get("pictures").toString());
-		        		skus.add(sku);
-					}
-		        	int index = 1;
-		        	for (String img : pic) {
-		        		if (pic.size() > index)
-		        			pictures = img+",";
-		        		else
-		        			pictures = pictures+img;
-		        		index++;
-					}
-		        	productOptions.setCoverImg(pictures);
+	        	Map<String, Object> itemMap = JSONObject.parseObject(product.get("items").toString());
+	        	if (checkValue(itemMap.get("item"))){
+					List<Map<String, Object>> items = (List<Map<String, Object>>) itemMap.get("item");
+		        	//获取imgurl
+		        	String pictures = "";
+		        	Set<String> pic = new HashSet<>();
+		        	if (null != items && 0< items.size()){
+		        		SkuOptions sku = management.getSkuOptions();
+			        	for (int i = 0; i < items.size(); i++) {
+			        		sku.setSize(items.get(i).get("item_size").toString());
+			        		sku.setBarcodes(items.get(i).get("barcode").toString());
+			        		sku.setStock(items.get(i).get("stock").toString());
+			        		productOptions.setColorCode(items.get(i).get("color").toString());
+			        		pic.add(items.get(i).get("pictures").toString());
+			        		skus.add(sku);
+						}
+			        	int index = 1;
+			        	for (String img : pic) {
+			        		if (pic.size() > index)
+			        			pictures = img+",";
+			        		else
+			        			pictures = pictures+img;
+			        		index++;
+						}
+			        	productOptions.setCoverImg(pictures);
+		        	}
 	        	}
         	}
         	productOptions.setSkus(skus);
