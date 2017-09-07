@@ -14,7 +14,9 @@ import com.google.gson.Gson;
 import com.intramirror.main.api.service.ApiParameterService;
 import com.intramirror.product.api.service.IApiMqService;
 
+import pk.shoplus.model.OrderManagement;
 import pk.shoplus.model.OrderRefund;
+import pk.shoplus.model.OrderManagement.OrderMager;
 import pk.shoplus.parameter.StatusType;
 import pk.shoplus.service.mapping.api.IMapping;
 import pk.shoplus.service.request.api.IGetPostRequest;
@@ -64,18 +66,18 @@ public class XmagOrderMapping implements IMapping{
         			if ("KO".equals(result)){
         				//没有库存执行退款
         				OrderRefund orderRefund = new OrderRefund();
-        				String logisProductId = mqDataMap.get("orderId").toString();
+        				String logisProductId = mqDataMap.get("logistics_product_id").toString();
         				if (orderRefund != null){
         					orderRefund.orderRefund(logisProductId);
         					mapUtils.putData("status", StatusType.SUCCESS).putData("info","XmagOrderMapping orderRefund SUCCESS :" + logisProductId);
         				}
         			}
-        			mapUtils.putData("status", StatusType.SUCCESS).putData("info","XmagOrderMapping SUCCESS :" +mqDataMap.get("orderId").toString());
+        			mapUtils.putData("status", StatusType.SUCCESS).putData("info","XmagOrderMapping SUCCESS :" +mqDataMap.get("logistics_product_id").toString());
         		}
          	}else{
          		logger.info(" apiEndpointList is null");
          	}
-         	mapUtils.putData("status", StatusType.SUCCESS).putData("info","XmagOrderMapping SUCCESS :" +mqDataMap.get("orderId").toString());
+         	mapUtils.putData("status", StatusType.SUCCESS).putData("info","XmagOrderMapping SUCCESS :" +mqDataMap.get("logistics_product_id").toString());
 		} catch (Exception e) {
 			e.printStackTrace();
             logger.error(" error message : " + e.getMessage());
@@ -102,6 +104,27 @@ public class XmagOrderMapping implements IMapping{
         	Map<String, Object> param = new HashMap<String, Object>();
         	param.put("api_end_point_id", apiEndPointId);
             apiParameterList = apiParameterService.getapiParameterByCondition(param);
+            //获取数据
+	    	OrderManagement orderManagement = new OrderManagement();
+	    	Long vendorId = Long.parseLong(mqDataMap.get("vendorId").toString());
+	    	int logisticsProductId = (Integer.parseInt(mqDataMap.get("logistics_product_id").toString())-1);
+	    	Long pageTokenId = (long) logisticsProductId;
+	    	int limit = 0;
+	    	//查询当前的订单信息
+	    	logger.info("OrderList param : vendorId" + vendorId + "  pageTokenId :" +pageTokenId +" limit :" +limit);
+     		List<OrderMager> list = orderManagement.getOrderList(vendorId, pageTokenId, limit);
+     		logger.info("OrderList result :" + new Gson().toJson(list));
+     		if (null != list && 0<list.size()){
+     			for (OrderMager orderMager : list) {
+     				if (mqDataMap.get("logistics_product_id").toString().equals(orderMager.getOrderId())){
+     					mqDataMap.put("orderMager", new Gson().toJson(orderMager));
+     					break;
+     				}
+				}
+     		}
+     		if(mqDataMap.get("orderMager") == null || StringUtils.isBlank(mqDataMap.get("orderMager").toString())){
+     			mqDataMap.put("orderMager", null);
+			}
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -111,34 +134,37 @@ public class XmagOrderMapping implements IMapping{
             String paramValue = "";
             urlBuffer.append("?");
             JSONObject jsonOjbect = JSONObject.parseObject(new Gson().toJson(mqDataMap));
-    		Map<String, Object> orderMap = (Map<String, Object>) JSONObject.parseObject(jsonOjbect.get("orderMager").toString());
-            for (Map<String, Object> apiParameter : apiParameterList) {
-                paramKey = apiParameter.get("param_key").toString();
-                paramValue = apiParameter.get("param_value").toString();
-                if ("DBContext".equals(paramKey)) {
-                    urlBuffer.append(paramKey+"="+paramValue+"&");
-                }
-                if ("Key".equals(paramKey)) {
-                	urlBuffer.append(paramKey+"="+paramValue+"&");
-                }
-                if ("order_no".equals(paramKey)){
-                	urlBuffer.append(paramKey+"="+paramValue+"&");
-                }
-                if ("purchase_no".equals(paramKey)) {
-                	urlBuffer.append(paramKey+"="+orderMap.get("orderNumber").toString()+"&");
-                }
-                if ("barcode".equals(paramKey)) {
-                	String src = orderMap.get("barcode").toString().equals("#")?"":orderMap.get("barcode").toString();
-                	urlBuffer.append(paramKey+"="+src+"&");
-                }
-                if ("ordQty".equals(paramKey)) {
-                	urlBuffer.append(paramKey+"="+orderMap.get("itemsCount").toString()+"&");
-                }
-                if ("sellPrice".equals(paramKey)) {
-                	urlBuffer.append(paramKey+"="+orderMap.get("price").toString()+"&");
-                }
-                
+            if(mqDataMap.get("orderMager") == null || StringUtils.isBlank(mqDataMap.get("orderMager").toString())){
+            	return null;
             }
+			Map<String, Object> orderMap = (Map<String, Object>) JSONObject.parseObject(jsonOjbect.get("orderMager").toString());
+	        for (Map<String, Object> apiParameter : apiParameterList) {
+	            paramKey = apiParameter.get("param_key").toString();
+	            paramValue = apiParameter.get("param_value").toString();
+	            if ("DBContext".equals(paramKey)) {
+	                urlBuffer.append(paramKey+"="+paramValue+"&");
+	            }
+	            if ("Key".equals(paramKey)) {
+	            	urlBuffer.append(paramKey+"="+paramValue+"&");
+	            }
+	            if ("order_no".equals(paramKey)){
+	            	urlBuffer.append(paramKey+"="+paramValue+"&");
+	            }
+	            if ("purchase_no".equals(paramKey)) {
+	            	urlBuffer.append(paramKey+"="+orderMap.get("orderNumber").toString()+"&");
+	            }
+	            if ("barcode".equals(paramKey)) {
+	            	String src = orderMap.get("barcode").toString().equals("#")?"":orderMap.get("barcode").toString();
+	            	urlBuffer.append(paramKey+"="+src+"&");
+	            }
+	            if ("ordQty".equals(paramKey)) {
+	            	urlBuffer.append(paramKey+"="+orderMap.get("itemsCount").toString()+"&");
+	            }
+	            if ("sellPrice".equals(paramKey)) {
+	            	urlBuffer.append(paramKey+"="+orderMap.get("price").toString()+"&");
+	            }
+	            
+	        }
         }
         String url =  urlBuffer.toString();
         map.put("url", url);
@@ -147,4 +173,5 @@ public class XmagOrderMapping implements IMapping{
         return map;
     }
     
+  
 }
