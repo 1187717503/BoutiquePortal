@@ -36,7 +36,7 @@ public class ProductStockEDSMapping implements IMapping{
 	private static final String handleMappingAndExecute = " ProductStockEDSMapping.handleMappingAndExecute ";
 
 	@Override
-	public Map<String, Object> handleMappingAndExecute(String mqData){
+	public Map<String, Object> handleMappingAndExecute(String mqData,String queueNameEnum){
 		logger.info(handleMappingAndExecute + " mqData.length : " + mqData == null ? 0 : mqData.length());
 
 		Map<String,Object> resultMap = new HashMap<String,Object>();
@@ -65,10 +65,11 @@ public class ProductStockEDSMapping implements IMapping{
 				Double doubleStock = Double.parseDouble(stockOptions.getQuantity());
 				int qty = doubleStock.intValue();
 				logger.info("ProductStockEDSMappingHandleMappingAndExecute,covertStock,qty:"+qty);
-				ResultMessage resultMessage = storeService.handleApiStockRule(Contants.STOCK_QTY,qty,stockOptions.getSizeValue(),stockOptions.getProductCode());
+				ResultMessage resultMessage = storeService.handleApiStockRule(Contants.STOCK_QTY,qty,stockOptions.getSizeValue(),stockOptions.getProductCode(),queueNameEnum);
 				if(resultMessage.getStatus()) {
 						SkuStore skuStore = (SkuStore) resultMessage.getData();
 					stockOptions.setQuantity(skuStore.getStore().toString());
+					stockOptions.setVendor_id(resultMessage.getDesc());
 					stockOptions.setReserved(skuStore.getReserved().toString());
 				} else {
 					resultMap.put("info",resultMessage.getMsg());

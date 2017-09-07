@@ -35,7 +35,7 @@ public class FilippoSynStockMapping implements IMapping{
     private ProductStockEDSManagement productStockEDSManagement = new ProductStockEDSManagement();
 
     @Override
-    public Map<String, Object> handleMappingAndExecute(String mqData) {
+    public Map<String, Object> handleMappingAndExecute(String mqData,String queueNameEnum) {
         logger.info(" start FilippoSynStockMapping.handleMappingAndExecute();");
         MapUtils mapUtils = new MapUtils(new HashMap<>());
         try {
@@ -51,7 +51,7 @@ public class FilippoSynStockMapping implements IMapping{
                 Double doubleStock = Double.parseDouble(stockOptions.getQuantity());
                 int qty = doubleStock.intValue();
                 logger.info("FilippoSynStockMappingHandleMappingAndExecute,covertStock,qty:"+qty);
-                ResultMessage resultMessage = storeService.handleApiStockRule(Contants.STOCK_QTY,qty,stockOptions.getSizeValue(),stockOptions.getProductCode());
+                ResultMessage resultMessage = storeService.handleApiStockRule(Contants.STOCK_QTY,qty,stockOptions.getSizeValue(),stockOptions.getProductCode(),queueNameEnum);
                 if(resultMessage.getStatus()) {
                     SkuStore skuStore = (SkuStore) resultMessage.getData();
                     stockOptions.setQuantity(skuStore.getStore().toString());

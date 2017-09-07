@@ -3,6 +3,8 @@ package pk.shoplus.service.mapping.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import org.apache.log4j.Logger;
+import org.sql2o.Connection;
+import pk.shoplus.DBConnector;
 import pk.shoplus.common.Contants;
 import pk.shoplus.model.ProductStockEDSManagement;
 import pk.shoplus.model.SkuStore;
@@ -27,7 +29,7 @@ public class CloudStoreGetEventsMapping implements IMapping{
     private static Logger logger = Logger.getLogger(CloudStoreGetEventsMapping.class);
 
     @Override
-    public Map<String, Object> handleMappingAndExecute(String mqData) {
+    public Map<String, Object> handleMappingAndExecute(String mqData,String queueNameEnum) {
         Map<String,Object> resultMap = new HashMap<>();
         resultMap.put("status", StatusType.FAILURE);
 
@@ -62,9 +64,9 @@ public class CloudStoreGetEventsMapping implements IMapping{
                 // get rs
                 ResultMessage resultMessage = new ResultMessage();
                 if(type == Contants.EVENTS_TYPE_4) {
-                    resultMessage = storeService.handleApiStockRule(Contants.STOCK_QTY,qtyDiff,size,productCode);
+                    resultMessage = storeService.handleApiStockRule(Contants.STOCK_QTY,qtyDiff,size,productCode,queueNameEnum);
                 } else {
-                    resultMessage  = storeService.handleApiStockRule(Contants.STOCK_QTY_DIFF,qtyDiff,size,productCode);
+                    resultMessage  = storeService.handleApiStockRule(Contants.STOCK_QTY_DIFF,qtyDiff,size,productCode,queueNameEnum);
                 }
 
                 if(resultMessage.getStatus()) {
@@ -89,6 +91,20 @@ public class CloudStoreGetEventsMapping implements IMapping{
             stockOptions.setSizeValue(size);
             stockOptions.setQuantity(skuStore.getStore().toString());
             stockOptions.setReserved(skuStore.getReserved() == null ? "" : skuStore.getReserved().toString());
+
+            Connection conn = null;
+            try {
+                conn = DBConnector.sql2o.open();
+                StoreServiceImpl iStoreService = new StoreServiceImpl();
+                String vendor_id = iStoreService.getVendor_id(queueNameEnum,conn);
+                stockOptions.setVendor_id(vendor_id);
+                if(conn != null) {conn.close();}
+            } catch (Exception e) {
+                if(conn != null) {conn.close();}
+            } finally {
+                if(conn != null) {conn.close();}
+            }
+
             logger.info("开始cloudstore调用修改库存 stockOptions : " + new Gson().toJson(stockOptions));
             Map<String, Object> updateMap = productStockEDSManagement.updateStock(stockOptions);
             logger.info("结束cloudstore调用修改库存 updateMap : " + new Gson().toJson(updateMap)+", stockOptions : " + new Gson().toJson(stockOptions));

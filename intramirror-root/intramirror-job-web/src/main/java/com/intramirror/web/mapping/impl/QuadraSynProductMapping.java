@@ -47,7 +47,7 @@ public class QuadraSynProductMapping implements IMapping{
     
 
     @Override
-    public Map<String, Object> handleMappingAndExecute(String mqData) {
+    public Map<String, Object> handleMappingAndExecute(String mqData,String queueNameEnum) {
         logger.info(" start QuadraSynProductMapping.handleMappingAndExecute();");
         
         //如果未注入进来,手动获取bean

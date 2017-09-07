@@ -6,10 +6,13 @@ import org.apache.log4j.Logger;
 import org.sql2o.Connection;
 import pk.shoplus.DBConnector;
 import pk.shoplus.common.Contants;
+import pk.shoplus.model.Category;
 import pk.shoplus.model.SkuStore;
+import pk.shoplus.service.CategoryService;
 import pk.shoplus.service.SkuPropertyService;
 import pk.shoplus.service.SkuStoreService;
 import pk.shoplus.service.stock.api.IStoreService;
+import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.vo.ResultMessage;
 
 import java.util.List;
@@ -23,8 +26,8 @@ public class StoreServiceImpl implements IStoreService{
     private static Logger logger = Logger.getLogger(StoreServiceImpl.class);
 
     @Override
-    public ResultMessage handleApiStockRule(int qtyType,int qtyDiff, String size, String productCode) throws Exception {
-        logger.info("StoreServiceImplHandleApiStockRule,inputParams,qtyType:"+qtyType+",qtyDiff:"+qtyDiff+",size:"+size+",productCode:"+productCode);
+    public ResultMessage handleApiStockRule(int qtyType,int qtyDiff, String size, String productCode,String queueNameEnum) throws Exception {
+        logger.info("StoreServiceImplHandleApiStockRule,inputParams,qtyType:"+qtyType+",qtyDiff:"+qtyDiff+",size:"+size+",productCode:"+productCode+",queueNameEnum:"+queueNameEnum);
         ResultMessage resultMessage = new ResultMessage();
         Connection conn = null;
         try {
@@ -32,9 +35,16 @@ public class StoreServiceImpl implements IStoreService{
             int store = 0,reserved = 0,rs = 0;
             long sku_store_id = 0;
 
+            if(StringUtils.isBlank(queueNameEnum)) {
+                return resultMessage.sStatus(false).sMsg("handleApiStockRule 枚举类型为空。size:"+size+",productCode:"+productCode+",queueNameEnum:"+queueNameEnum);
+            }
+
+            String vendor_id = this.getVendor_id(queueNameEnum,conn);
+
             // checked
             if(StringUtils.isBlank(size) || StringUtils.isBlank(productCode)) {
                 logger.info("StoreServiceImplHandleApiStockRule,inputParamsIsNull,size:"+size+",productCode:"+productCode);
+                if(conn != null) {conn.close();}
                 return resultMessage.sStatus(false).sMsg("handleApiStockRule size或者productCode为空。size:"+size+",productCode:"+productCode);
             }
 
@@ -42,7 +52,7 @@ public class StoreServiceImpl implements IStoreService{
             SkuPropertyService skuPropertyService = new SkuPropertyService(conn);
             if(StringUtils.isNotBlank(productCode) && StringUtils.isNotBlank(size)) {
                 logger.info("StoreServiceImplHandleApiStockRule,getSkuPropertyListWithSizeAndProductCode,size:"+size+",productCode:"+productCode);
-                skuStoreIdList = skuPropertyService.getSkuPropertyListWithSizeAndProductCode(size, productCode);
+                skuStoreIdList = skuPropertyService.getSkuPropertyListWithSizeAndProductCode(size, productCode,vendor_id);
                 logger.info("StoreServiceImplHandleApiStockRule,getSkuPropertyListWithSizeAndProductCode,skuStoreIdList:"+new Gson().toJson(skuStoreIdList));
             }
 
@@ -61,7 +71,10 @@ public class StoreServiceImpl implements IStoreService{
                 skuStore.reserved = 0L;
                 skuStore.sku_store_id = sku_store_id;
                 logger.info("StoreServiceImplHandleApiStockRule,skuInfoIsNull,skuStore:"+new Gson().toJson(skuStore));
-                return resultMessage.sStatus(true).sMsg("SUCCESS").sData(skuStore);
+                if(conn != null) {conn.close();}
+                resultMessage.sStatus(true).sMsg("SUCCESS").sData(skuStore).setDesc(vendor_id);
+                logger.info("StoreServiceImplHandleApiStockRule,resultMessage:"+new Gson().toJson(resultMessage));
+                return resultMessage;
             }
 
             // get qty_diff
@@ -95,7 +108,9 @@ public class StoreServiceImpl implements IStoreService{
             skuStore.sku_store_id = sku_store_id;
             logger.info("StoreServiceImplHandleApiStockRule,outputParams,skuStore:"+new Gson().toJson(skuStore));
             if(conn != null) {conn.close();}
-            return resultMessage.sStatus(true).sMsg("SUCCESS").sData(skuStore);
+            resultMessage.sStatus(true).sMsg("SUCCESS").sData(skuStore).setDesc(vendor_id);
+            logger.info("StoreServiceImplHandleApiStockRule,resultMessage:"+new Gson().toJson(resultMessage));
+            return resultMessage;
         } catch (Exception e) {
             logger.error(" errorMessage  : " + e.getMessage());
             if(conn != null) {conn.close();}
@@ -103,6 +118,34 @@ public class StoreServiceImpl implements IStoreService{
         } finally {
             if(conn != null) {conn.close();}
         }
+    }
+
+    public String getVendor_id(String queueNameEnum,Connection conn) throws Exception {
+        logger.info("StoreServiceImplGetVendor_id,queueNameEnum:"+queueNameEnum);
+        // start 2017-09-07 特殊判断,由于product_code允许重复引起
+        String vendor_id = "";
+        try {
+            Double.parseDouble(queueNameEnum);
+            vendor_id = queueNameEnum;
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("StoreServiceImplHandleApiStockRule,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+",queueNameEnum:"+queueNameEnum);
+        }
+
+        if(StringUtils.isBlank(vendor_id)) {
+            String sql = "select ac.vendor_id from api_mq am\n" +
+                    "                inner join api_configuration ac on(am.api_configuration_id = ac.api_configuration_id)\n" +
+                    "                where am.enabled = 1 and am.enabled = 1 and am.`name` = '"+queueNameEnum+"'";
+            logger.info("StoreServiceImplHandleApiStockRule,sql:"+sql);
+            CategoryService categoryService = new CategoryService(conn);
+            List<Map<String,Object>> maps = categoryService.executeSQL(sql);
+            if(maps != null && maps.size() > 0) {
+                vendor_id = maps.get(0).get("vendor_id").toString();
+            }
+        }
+        // end 2017-09-07 特殊判断,由于product_code允许重复引起
+        logger.info("StoreServiceImplGetVendor_id,vendor_id:"+vendor_id);
+        return vendor_id;
     }
 
 }

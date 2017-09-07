@@ -33,7 +33,7 @@ public class UpdateProductMapping implements IMapping{
     private static ProductAtelierMapping productAtelierMapping = new ProductAtelierMapping();
 
     @Override
-    public Map<String, Object> handleMappingAndExecute(String mqData) {
+    public Map<String, Object> handleMappingAndExecute(String mqData,String queueNameEnum) {
         logger.info("------------------------------------------start UpdateProductMapping.handleMappingAndExecuteCreate,mqData:" + mqData);
         Map<String,Object> resultMap = new HashMap<String,Object>();
         try {

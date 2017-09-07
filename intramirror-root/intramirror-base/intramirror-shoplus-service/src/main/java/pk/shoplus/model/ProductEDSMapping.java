@@ -38,7 +38,7 @@ public class ProductEDSMapping implements IMapping {
 	private static IProductService productServie = new ProductServiceImpl();
 
 	@Override
-	public Map<String, Object> handleMappingAndExecute(String mqData){
+	public Map<String, Object> handleMappingAndExecute(String mqData,String queueNameEnum){
 		logger.info("ProductEDSMappingHandleMappingAndExecute,mqData:"+mqData);
 		MapUtils mapUtils = new MapUtils(new HashMap<>());
 		try {

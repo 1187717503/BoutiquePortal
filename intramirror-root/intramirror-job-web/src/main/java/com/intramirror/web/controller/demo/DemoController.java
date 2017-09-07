@@ -80,7 +80,7 @@ public class DemoController {
 	}
 	
 	
-	@RequestMapping(value = "/create_product")
+	/*@RequestMapping(value = "/create_product")
 	@ResponseBody
 	public void addProduct(@RequestBody Map<String,Object> mqData) throws Exception {
 		productMappingService.handleMappingAndExecute(new Gson().toJson(mqData));
@@ -102,7 +102,7 @@ public class DemoController {
 	@ResponseBody
 	public void xmagOrder(@RequestBody Map<String,Object> mqData) throws Exception {
 		xmagOrderMapping.handleMappingAndExecute(new Gson().toJson(mqData));
-	}
+	}*/
 	
 	
 }

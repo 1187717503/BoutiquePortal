@@ -354,7 +354,7 @@ public class ProductServiceImpl implements IProductService{
                     ProductStockEDSManagement.StockOptions stockOptions = productStockEDSManagement.getStockOptions();
                     IStoreService storeService = new StoreServiceImpl();
                     BigDecimal bigDecimal = new BigDecimal(skuOption.getStock());
-                    ResultMessage resultMessage = storeService.handleApiStockRule(Contants.STOCK_QTY,bigDecimal.intValue(),skuOption.getSize(),product.getProduct_code());
+                    ResultMessage resultMessage = storeService.handleApiStockRule(Contants.STOCK_QTY,bigDecimal.intValue(),skuOption.getSize(),product.getProduct_code(),vendorOptions.getVendorId().toString());
 
                     SkuStore skuStore = null;
                     if(resultMessage.getStatus()) {
