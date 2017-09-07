@@ -79,9 +79,9 @@ public class XmagAllStockMapping implements IMapping{
                             .putData("info",resultMessage.getMsg()).getMap();
                 }
 
-                logger.info("Xmag开始调用filippo库存更新Service,stockOptions:"+new Gson().toJson(stockOptions));
+                logger.info("Xmag开始调用库存更新Service,stockOptions:"+new Gson().toJson(stockOptions));
                 Map<String, Object> serviceResultMap = productStockEDSManagement.updateStock(stockOptions);
-                logger.info("Xmag结束调用filippo库存更新Service,serviceResultMap:"+new Gson().toJson(serviceResultMap)+",stockOptions:"+new Gson().toJson(stockOptions));
+                logger.info("Xmag结束调用库存更新Service,serviceResultMap:"+new Gson().toJson(serviceResultMap)+",stockOptions:"+new Gson().toJson(stockOptions));
                 serviceResultMap.put("product_code",stockOptions.getProductCode());
                 serviceResultMap.put("size",sizeValue);
                 return serviceResultMap;
