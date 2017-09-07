@@ -61,7 +61,10 @@ public class ProductStockAtelierMapping implements IMapping {
 					resultMap.put("product_code",stockOptions.getProductCode());
 					return resultMap;
 				}
-				int qty = Integer.parseInt(stock);
+				logger.info("ProductStockAtelierMappingHandleMappingAndExecute,covertStock,stock:"+new Gson().toJson(stock));
+				Double doubleStock = Double.parseDouble(stock);
+				int qty = doubleStock.intValue();
+				logger.info("ProductStockAtelierMappingHandleMappingAndExecute,covertStock,qty:"+qty);
 				ResultMessage resultMessage = storeService.handleApiStockRule(Contants.STOCK_QTY,qty,stockOptions.getSizeValue(),stockOptions.getProductCode());
 				if(resultMessage.getStatus()) {
 					SkuStore skuStore = (SkuStore) resultMessage.getData();

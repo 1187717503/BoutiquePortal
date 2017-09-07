@@ -61,7 +61,10 @@ public class ProductStockEDSMapping implements IMapping{
 				return resultMap;
 			} else {
 				IStoreService storeService = new StoreServiceImpl();
-				int qty = Integer.parseInt(stockOptions.getQuantity());
+				logger.info("ProductStockEDSMappingHandleMappingAndExecute,covertStock,stockOptions:"+new Gson().toJson(stockOptions));
+				Double doubleStock = Double.parseDouble(stockOptions.getQuantity());
+				int qty = doubleStock.intValue();
+				logger.info("ProductStockEDSMappingHandleMappingAndExecute,covertStock,qty:"+qty);
 				ResultMessage resultMessage = storeService.handleApiStockRule(Contants.STOCK_QTY,qty,stockOptions.getSizeValue(),stockOptions.getProductCode());
 				if(resultMessage.getStatus()) {
 						SkuStore skuStore = (SkuStore) resultMessage.getData();

@@ -53,6 +53,7 @@ public class ProductServiceImpl implements IProductService{
 
     @Override
     public Map<String, Object> updateProduct(ProductEDSManagement.ProductOptions productOptions, ProductEDSManagement.VendorOptions vendorOptions) {
+        logger.info("ProductServiceImplUpdateProduct,inputParams,productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions));
         List<Map<String,Object>> warningMaps = new ArrayList<>();
         MapUtils mapUtils = new MapUtils(new HashMap<>());
         Connection conn = null ;
@@ -68,9 +69,11 @@ public class ProductServiceImpl implements IProductService{
 
             Map<String,Object> productConditions = new HashMap<>();
             productConditions.put("product_code",productOptions.getCode());
+            productConditions.put("vendor_id",vendorOptions.getVendorId());
             productConditions.put("enabled",EnabledType.USED);
+            logger.info("ProductServiceImplUpdateProduct,getProductByCondition,productConditions:"+new Gson().toJson(productConditions));
             Product product = productService.getProductByCondition(productConditions,null);
-            logger.info("updateProduct原始数据,product:"+new Gson().toJson(product));
+            logger.info("ProductServiceImplUpdateProduct,getProductByCondition,product:"+new Gson().toJson(product));
             if(product == null) {
                 return mapUtils.putData("status",StatusType.FAILURE)
                                .putData("info","update product - "+ ApiErrorTypeEnum.errorType.boutique_id_not_exist.getDesc()+" boutique_id:"+productOptions.getCode())
@@ -464,7 +467,7 @@ public class ProductServiceImpl implements IProductService{
                 mapUtils.putData("status",StatusType.WARNING);
             }
 
-            logger.info(" update product service by product : " + new Gson().toJson(product));
+            logger.info("ProductServiceImplUpdateProduct,outputParams,product:"+new Gson().toJson(product));
             conn.commit();
         } catch (Exception e) {
             if(conn != null) {conn.rollback();conn.close();}

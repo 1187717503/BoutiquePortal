@@ -47,7 +47,10 @@ public class FilippoSynStockMapping implements IMapping{
                 return mapUtils.putData("status", StatusType.FAILURE).putData("key","stock").putData("value","null").putData("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null).putData("info","FilippoSynStockMapping.handleMappingAndExecute() quantity is null !!!").getMap();
             } else {
                 IStoreService storeService = new StoreServiceImpl();
-                int qty = Integer.parseInt(stockOptions.getQuantity());
+                logger.info("FilippoSynStockMappingHandleMappingAndExecute,covertStock,stockOptions:"+new Gson().toJson(stockOptions));
+                Double doubleStock = Double.parseDouble(stockOptions.getQuantity());
+                int qty = doubleStock.intValue();
+                logger.info("FilippoSynStockMappingHandleMappingAndExecute,covertStock,qty:"+qty);
                 ResultMessage resultMessage = storeService.handleApiStockRule(Contants.STOCK_QTY,qty,stockOptions.getSizeValue(),stockOptions.getProductCode());
                 if(resultMessage.getStatus()) {
                     SkuStore skuStore = (SkuStore) resultMessage.getData();

@@ -101,6 +101,7 @@ public class CloudStoreGetEventsMapping implements IMapping{
             resultMap.put("value", ExceptionUtils.getExceptionDetail(e));
             resultMap.put("info","CloudStoreGetEventsMapping.handleMappingAndExecute" + ExceptionUtils.getExceptionDetail(e));
             resultMap.put("error_enum", Runtime_exception);
+            logger.info("CloudStoreGetEventsMappingHandleMappingAndExecute,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
         }
         return resultMap;
     }

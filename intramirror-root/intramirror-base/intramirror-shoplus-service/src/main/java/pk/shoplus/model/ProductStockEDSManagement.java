@@ -39,11 +39,8 @@ public class ProductStockEDSManagement {
 
 	private static Logger logger = Logger.getLogger(ProductStockEDSManagement.class);
 
-	private final String method_updateStock = "ProductStockEDSManagement.updateStock()";
-
 	public Map<String, Object> updateStock(StockOptions stockOptions){
-	    logger.info("start updateStock service stockOptions : " + new Gson().toJson(stockOptions));
-
+        logger.info("ProductStockEDSManagementUpdateStock,inputParams,stockOptions:"+new Gson().toJson(stockOptions));
         MapUtils mapUtils = new MapUtils(new HashMap<>());
         Connection connection = null;
 		try{
@@ -52,14 +49,18 @@ public class ProductStockEDSManagement {
 			SkuPropertyService skuPropertyService = new SkuPropertyService(connection);
 			SkuStoreService skuStoreService = new SkuStoreService(connection);
 
+			logger.info("ProductStockEDSManagementUpdateStock,validateParam,stockOptions:"+new Gson().toJson(stockOptions));
 			ResultMessage resultMessage = this.validateParam(stockOptions,connection);
-			if(resultMessage.getStatus()) {
+            logger.info("ProductStockEDSManagementUpdateStock,validateParam,resultMessage:"+new Gson().toJson(resultMessage));
+            if(resultMessage.getStatus()) {
 
 			    // get product
 			    Product product = (Product) resultMessage.getData();
 
+			    logger.info("ProductStockEDSManagementUpdateStock,getSkuPropertyListWithSizeAndProductCode,skuOptions:"+new Gson().toJson(stockOptions));
                 List<Map<String, Object>> skuStoreIdList = skuPropertyService
                         .getSkuPropertyListWithSizeAndProductCode(stockOptions.getSizeValue(), stockOptions.getProductCode());
+                logger.info("ProductStockEDSManagementUpdateStock,getSkuPropertyListWithSizeAndProductCode,skuStoreIdList:"+new Gson().toJson(skuStoreIdList));
 
                 Long reserved = 0L;
                 if(org.apache.commons.lang.StringUtils.isNotBlank(stockOptions.getReserved())) {
@@ -69,17 +70,15 @@ public class ProductStockEDSManagement {
                 if(skuStoreIdList != null && skuStoreIdList.size() > 0) {
                     // update sku_store
                     Object skuStoreIdObj = skuStoreIdList.get(0).get("sku_store_id");
-                    if (skuStoreIdObj != null) {
-                        Long skuStoreId = (Long) skuStoreIdObj;
-                        SkuStore skuStore = new SkuStore();
-                        skuStore.sku_store_id = skuStoreId;
-                        skuStore.store = Long.valueOf(stockOptions.getQuantity());
-                        if(StringUtils.isBlank(stockOptions.getType()) || !stockOptions.getType().equals(Contants.EVENTS_TYPE_1+"")) {
-                            skuStore.reserved = reserved;
-                        }
-                        logger.info("updateSkuStore skuStore : " + new Gson().toJson(skuStore));
-                        skuStoreService.updateSkuStore(skuStore);
+                    Long skuStoreId = (Long) skuStoreIdObj;
+                    SkuStore skuStore = new SkuStore();
+                    skuStore.sku_store_id = skuStoreId;
+                    skuStore.store = Long.valueOf(stockOptions.getQuantity());
+                    if(StringUtils.isBlank(stockOptions.getType()) || !stockOptions.getType().equals(Contants.EVENTS_TYPE_1+"")) {
+                        skuStore.reserved = reserved;
                     }
+                    logger.info("ProductStockEDSManagementUpdateStock,updateSkuStore,skuStore:" + new Gson().toJson(skuStore));
+                    skuStoreService.updateSkuStore(skuStore);
                 } else {
 
                     // create sku_store
@@ -107,7 +106,8 @@ public class ProductStockEDSManagement {
 		} finally {
            if(connection != null) {connection.close();}
         }
-		return mapUtils.getMap();
+        logger.info("ProductStockEDSManagementUpdateStock,outputParams,mapUtils:"+new Gson().toJson(mapUtils));
+        return mapUtils.getMap();
 	}
 	
 	/**
@@ -130,8 +130,6 @@ public class ProductStockEDSManagement {
             sku.coverpic = product.cover_img;
             sku.introduction = product.getDescription();
 
-
-
             Map condition = new HashMap<>();
             condition.put("product_id", product.getProduct_id());
             condition.put("enabled", 1);
@@ -148,6 +146,7 @@ public class ProductStockEDSManagement {
             sku.updated_at = new Date();
             sku.enabled = EnabledType.USED;
             Sku newSku = skuService.createSku(sku);
+            logger.info("ProductStockEDSManagementCreateSkuInfo,createSku,sku:"+new Gson().toJson(sku));
 
             //创建sku_store
             SkuStore skuStore = new SkuStore();
@@ -167,6 +166,7 @@ public class ProductStockEDSManagement {
             skuStore.updated_at = new Date();
             skuStore.enabled = EnabledType.USED;
             skuStoreService.createSkuStore(skuStore);
+            logger.info("ProductStockEDSManagementCreateSkuInfo,createSkuStore,skuStore:"+new Gson().toJson(skuStore));
 
             //创建product_sku_property_key
             ProductPropertyKeyService productPropertyKeyService = new ProductPropertyKeyService(connection);
@@ -190,6 +190,7 @@ public class ProductStockEDSManagement {
             productSkuPropertyValue.updated_at = new Date();
             productSkuPropertyValue.enabled = EnabledType.USED;
             ProductSkuPropertyValue pspv = productPropertyValueService.createProductPropertyValue(productSkuPropertyValue);
+            logger.info("ProductStockEDSManagementCreateSkuInfo,createProductPropertyValue,pspv:"+new Gson().toJson(pspv));
 
             //创建sku_property
             SkuProperty skuProperty = new SkuProperty();
@@ -202,6 +203,7 @@ public class ProductStockEDSManagement {
             skuProperty.updated_at = new Date();
             skuProperty.enabled = EnabledType.USED;
             skuPropertyService.createSkuProperty(skuProperty);
+            logger.info("ProductStockEDSManagementCreateSkuInfo,createSkuProperty,skuProperty:"+new Gson().toJson(skuProperty));
 
         }
     }
@@ -212,17 +214,14 @@ public class ProductStockEDSManagement {
      * @return
      */
     public ResultMessage validateParam(StockOptions stockOptions, Connection conn) throws Exception {
-        // init resultMap
+        logger.info("ProductStockEDSManagementValidateParam,inputParams,stockOptions:"+new Gson().toJson(stockOptions));
         ResultMessage resultMessage = new ResultMessage();
 
-        // get params
         String productCode = stockOptions.getProductCode();
         String sizeValue = stockOptions.getSizeValue();
         String quantity = stockOptions.getQuantity();
-//        String reserved = stockOptions.getReserved();
         Product product = null;
 
-        // checked productCode
         if(org.apache.commons.lang.StringUtils.isNotBlank(productCode)) {
 
             ProductService productService = new ProductService(conn);
@@ -231,21 +230,21 @@ public class ProductStockEDSManagement {
             condition.put("enabled", EnabledType.USED);
             product = productService.getProductByCondition(condition, null);
             if(product == null){
-                return resultMessage.sStatus(false).sMsg("update stock - 找不到这个商品 。");
+                 resultMessage.sStatus(false).sMsg("update stock - 找不到这个商品 。");
             }
-        } else {
-            return resultMessage.sStatus(false).sMsg("update stock - productCode is null 。");
         }
 
-        // checked sizeValue
-        if(org.apache.commons.lang.StringUtils.isBlank(sizeValue))
-            return resultMessage.sStatus(false).sMsg("update stock - sizeValue is null 。");
-
-        // checked quantity
-        if(org.apache.commons.lang.StringUtils.isBlank(quantity))
-            return resultMessage.sStatus(false).sMsg("update stock - quantity is null 。");
-
-        return resultMessage.sStatus(true).sMsg("SUCCESS").sData(product);
+        if(StringUtils.isBlank(productCode)) {
+            resultMessage.sStatus(false).sMsg("update stock - productCode is null 。");
+        } else if(org.apache.commons.lang.StringUtils.isBlank(sizeValue))
+            resultMessage.sStatus(false).sMsg("update stock - sizeValue is null 。");
+        else if(org.apache.commons.lang.StringUtils.isBlank(quantity)){
+            resultMessage.sStatus(false).sMsg("update stock - quantity is null 。");
+        } else {
+            resultMessage.sStatus(true).sMsg("SUCCESS").sData(product);
+        }
+        logger.info("ProductStockEDSManagementValidateParam,outputParams,stockOptions:"+new Gson().toJson(stockOptions));
+        return resultMessage;
     }
 
     /**

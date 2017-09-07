@@ -270,7 +270,7 @@ public class SkuPropertyService {
 			sql.append(" pspk.product_sku_property_key_id = sp.product_sku_property_key_id and ");
 			sql.append(" pspk.`name` = 'Size' and ");
 			sql.append(" s.sku_id = ss.sku_id and ");
-			sql.append(" ss.enabled = 1 and p.enabled = 1 and sp.enabled = 1 and pspk.enabled = 1 and pspv.enabled = 1 and ");
+			sql.append(" s.enabled = 1 and ss.enabled = 1 and p.enabled = 1 and sp.enabled = 1 and pspk.enabled = 1 and pspv.enabled = 1 and ");
 			sql.append(" pspv.`value` = :p1 and ");
 			sql.append(" p.product_code = :p2 ");
 			result = skuPropertyDao.executeBySql(sql.toString(), new Object[] {size, productCode });
