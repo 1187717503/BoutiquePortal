@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.intramirror.common.help.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,8 +29,8 @@ import com.intramirror.web.util.QueueUtils;
 @RequestMapping("/job/product")
 public class QuadraProductController {
 
-    private static Logger logger = LoggerFactory.getLogger(QuadraProductController.class);
-    
+    private static Logger logger = Logger.getLogger(QuadraProductController.class);
+
     @Autowired
     private ApiEndPointService apiEndPointService;
     
@@ -101,7 +101,7 @@ public class QuadraProductController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error(" error message : {}",e.getMessage());
+            logger.info("QuadraProductControllerUpdateProductAll,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
             resultMessage.errorStatus().addMsg("error message : " + e.getMessage());
         }
         return resultMessage;
@@ -174,7 +174,7 @@ public class QuadraProductController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error(" error message : {}",e.getMessage());
+            logger.info("QuadraProductControllerUpdateProductDay,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
             resultMessage.errorStatus().addMsg("error message : " + e.getMessage());
         }
         return resultMessage;
