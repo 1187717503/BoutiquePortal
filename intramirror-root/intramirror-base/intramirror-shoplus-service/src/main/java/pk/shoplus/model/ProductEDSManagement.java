@@ -222,6 +222,7 @@ public class ProductEDSManagement {
             // TODO: commit过程中的发生的不一致性也需要处理
             Map<String, Object> condition = new HashMap<String,Object>();
             condition.put("product_code", product.product_code);
+            condition.put("vendor_id",vendorId);
             condition.put("enabled", 1);
             long pcount = productService.countProductByCondition(condition);
             logger.info(" create product service by product : " + new Gson().toJson(product));
