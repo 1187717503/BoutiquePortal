@@ -62,6 +62,7 @@ public class XmagAllStockMapping implements IMapping{
                 ResultMessage resultMessage = storeService.handleApiStockRule(Contants.STOCK_QTY,qty,stockOptions.getSizeValue(),stockOptions.getProductCode(),queueNameEnum);
                 if(resultMessage.getStatus()) {
                     SkuStore skuStore = (SkuStore) resultMessage.getData();
+                    stockOptions.setVendor_id(resultMessage.getDesc());
                     stockOptions.setQuantity(skuStore.getStore().toString());
                     stockOptions.setReserved(skuStore.getReserved().toString());
                 } else {

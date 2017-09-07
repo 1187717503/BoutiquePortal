@@ -128,7 +128,7 @@ public class StoreServiceImpl implements IStoreService{
             Double.parseDouble(queueNameEnum);
             vendor_id = queueNameEnum;
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             logger.info("StoreServiceImplHandleApiStockRule,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+",queueNameEnum:"+queueNameEnum);
         }
 
