@@ -64,7 +64,7 @@ public class TimerJobHandlePendingQueueController {
     }
 
     public TimerJobHandlePendingQueueController(){
-//        this.start();
+        this.start();
     }
 
     public void start(){

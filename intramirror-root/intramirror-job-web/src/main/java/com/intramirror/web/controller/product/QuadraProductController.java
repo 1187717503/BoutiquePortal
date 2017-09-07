@@ -81,6 +81,7 @@ public class QuadraProductController {
                             
                             // 放入MQ
                 			System.out.println(i++);
+                            logger.info("QuadraProductControllerUpdateProductAll,putMessage,mqDateMap:"+new Gson().toJson(mqDataMap)+",urlMap:"+new Gson().toJson(urlMap));
                             QueueUtils.putMessage(mqDataMap, "",urlMap.get("url").toString(), QueueNameJobEnum.QuadraSynAllProduct);
                             
                             //跳出循环,测试用
@@ -153,6 +154,7 @@ public class QuadraProductController {
                             
                             // 放入MQ
                 			System.out.println(i++);
+                			logger.info("QuadraProductControllerUpdateProductDay,putMessage,mqDateMap:"+new Gson().toJson(mqDataMap)+",urlMap:"+new Gson().toJson(urlMap));
                             QueueUtils.putMessage(mqDataMap, "",urlMap.get("url").toString(), QueueNameJobEnum.QuadraSynDayProduct);
                             
 //                            //跳出循环,测试用
