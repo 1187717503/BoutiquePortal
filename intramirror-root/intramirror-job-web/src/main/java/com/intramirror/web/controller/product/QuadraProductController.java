@@ -78,6 +78,7 @@ public class QuadraProductController {
                             mqDataMap.put("store_code", apiEndpointMap.get("store_code").toString());
                             mqDataMap.put("vendor_id", apiEndpointMap.get("vendor_id").toString());
                             mqDataMap.put("api_configuration_id", apiEndpointMap.get("api_configuration_id").toString());
+                            mqDataMap.put("full_update_product","1");
                             
                             // 放入MQ
                 			System.out.println(i++);
