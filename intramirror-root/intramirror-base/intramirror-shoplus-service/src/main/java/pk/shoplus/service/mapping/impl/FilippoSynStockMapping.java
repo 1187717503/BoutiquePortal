@@ -36,7 +36,7 @@ public class FilippoSynStockMapping implements IMapping{
 
     @Override
     public Map<String, Object> handleMappingAndExecute(String mqData,String queueNameEnum) {
-        logger.info(" start FilippoSynStockMapping.handleMappingAndExecute();");
+        logger.info("FilippoSynStockMappingHandleMappingAndExecute,inputParams,mqData"+mqData);
         MapUtils mapUtils = new MapUtils(new HashMap<>());
         try {
             Map<String,Object> mqDataMap = JSONObject.parseObject(mqData);
