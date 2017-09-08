@@ -81,6 +81,7 @@ public class FilippoSynStockMapping implements IMapping{
             mapUtils.putData("value",ExceptionUtils.getExceptionDetail(e));
             mapUtils.putData("error_enum", Runtime_exception);
             mapUtils.putData("status", StatusType.FAILURE).putData("info","FilippoSynStockMapping error message : " + ExceptionUtils.getExceptionDetail(e));
+            logger.info("FilippoSynStockMappingHandleMappingAndExecute,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+",mqData:"+mqData);
         }
         logger.info(" end FilippoSynStockMapping.handleMappingAndExecute();");
         return mapUtils.getMap();
@@ -109,6 +110,8 @@ public class FilippoSynStockMapping implements IMapping{
             }
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println(propertyValue);
+            logger.info("FilippoSynStockMappingHandleMappingData,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+",propertyValue:"+propertyValue);
             throw e;
         }
         return stockOptions;
