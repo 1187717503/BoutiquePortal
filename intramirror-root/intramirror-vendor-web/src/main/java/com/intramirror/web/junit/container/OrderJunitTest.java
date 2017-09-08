@@ -41,6 +41,8 @@ public class OrderJunitTest extends BaseJunit4Test{
 	public void Test(){
 		
 		Map<String, Object> map = new HashMap<>();
+		map.put("logisProductId", "123");
+		map.put("status", "1");
 		ResultMessage message = orderController.updateOrderStatus(map);
 		System.out.println("updateOrderStatus=============>> result  : " +new Gson().toJson(message));
 		
@@ -57,6 +59,7 @@ public class OrderJunitTest extends BaseJunit4Test{
 		
 		map = new HashMap<>();
 		map.put("logistics_product_id", "123");
+		map.put("container_id", "123");
 		ResultMessage message4 = orderController.deletePackingCheckOrder(map, httpRequest);
 		System.out.println("deletePackingCheckOrder=============>> result  : " +new Gson().toJson(message4));
 		
@@ -68,6 +71,9 @@ public class OrderJunitTest extends BaseJunit4Test{
 		
 		
 		map = new HashMap<>();
+		map.put("logisProductId", "123");
+		map.put("comments", "1");
+		map.put("reason", "1");
 		ResultMessage message6 = orderController.saveUserComment(map, httpRequest);
 		System.out.println("saveUserComment=============>> result  : " +new Gson().toJson(message6));
 		
