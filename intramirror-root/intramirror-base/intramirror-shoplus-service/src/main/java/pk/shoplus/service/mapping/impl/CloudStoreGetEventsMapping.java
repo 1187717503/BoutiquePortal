@@ -30,6 +30,7 @@ public class CloudStoreGetEventsMapping implements IMapping{
 
     @Override
     public Map<String, Object> handleMappingAndExecute(String mqData,String queueNameEnum) {
+        logger.info("CloudStoreGetEventsMappingHandleMappingAndExecute,inputParams,mqData:"+mqData+",queueNameEnum:"+queueNameEnum);
         Map<String,Object> resultMap = new HashMap<>();
         resultMap.put("status", StatusType.FAILURE);
 
