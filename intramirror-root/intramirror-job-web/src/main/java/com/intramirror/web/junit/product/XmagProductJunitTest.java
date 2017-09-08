@@ -42,7 +42,7 @@ public class XmagProductJunitTest extends BaseJunit4Test {
     	Map<String,Object> data = new HashMap<String, Object>();
     
     	data.put("vendorId", "7");
-    	data.put("logistics_product_id", "100");
+    	data.put("logisticsProductId", "100");
     	data.put("mqName", "OrderSetCheck");
         System.out.println("Test assume");  
         System.out.println(new Gson().toJson(data));

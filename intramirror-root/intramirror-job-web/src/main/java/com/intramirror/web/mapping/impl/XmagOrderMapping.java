@@ -66,18 +66,18 @@ public class XmagOrderMapping implements IMapping{
         			if ("KO".equals(result)){
         				//没有库存执行退款
         				OrderRefund orderRefund = new OrderRefund();
-        				String logisProductId = mqDataMap.get("logistics_product_id").toString();
+        				String logisProductId = mqDataMap.get("logisticsProductId").toString();
         				if (orderRefund != null){
         					orderRefund.orderRefund(logisProductId);
         					mapUtils.putData("status", StatusType.SUCCESS).putData("info","XmagOrderMapping orderRefund SUCCESS :" + logisProductId);
         				}
         			}
-        			mapUtils.putData("status", StatusType.SUCCESS).putData("info","XmagOrderMapping SUCCESS :" +mqDataMap.get("logistics_product_id").toString());
+        			mapUtils.putData("status", StatusType.SUCCESS).putData("info","XmagOrderMapping SUCCESS :" +mqDataMap.get("logisticsProductId").toString());
         		}
          	}else{
          		logger.info(" apiEndpointList is null");
          	}
-         	mapUtils.putData("status", StatusType.SUCCESS).putData("info","XmagOrderMapping SUCCESS :" +mqDataMap.get("logistics_product_id").toString());
+         	mapUtils.putData("status", StatusType.SUCCESS).putData("info","XmagOrderMapping SUCCESS :" +mqDataMap.get("logisticsProductId").toString());
 		} catch (Exception e) {
 			e.printStackTrace();
             logger.error(" error message : " + e.getMessage());
@@ -107,7 +107,7 @@ public class XmagOrderMapping implements IMapping{
             //获取数据
 	    	OrderManagement orderManagement = new OrderManagement();
 	    	Long vendorId = Long.parseLong(mqDataMap.get("vendorId").toString());
-	    	int logisticsProductId = (Integer.parseInt(mqDataMap.get("logistics_product_id").toString())-1);
+	    	int logisticsProductId = (Integer.parseInt(mqDataMap.get("logisticsProductId").toString())-1);
 	    	Long pageTokenId = (long) logisticsProductId;
 	    	int limit = 0;
 	    	//查询当前的订单信息
@@ -116,7 +116,7 @@ public class XmagOrderMapping implements IMapping{
      		logger.info("OrderList result :" + new Gson().toJson(list));
      		if (null != list && 0<list.size()){
      			for (OrderMager orderMager : list) {
-     				if (mqDataMap.get("logistics_product_id").toString().equals(orderMager.getOrderId())){
+     				if (mqDataMap.get("logisticsProductId").toString().equals(orderMager.getOrderId())){
      					mqDataMap.put("orderMager", new Gson().toJson(orderMager));
      					break;
      				}
