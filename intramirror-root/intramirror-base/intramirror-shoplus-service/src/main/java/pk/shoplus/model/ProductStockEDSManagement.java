@@ -1,5 +1,6 @@
 package pk.shoplus.model;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -23,12 +24,14 @@ import pk.shoplus.service.SkuService;
 import pk.shoplus.service.SkuStoreService;
 import pk.shoplus.service.price.api.IPriceService;
 import pk.shoplus.service.price.impl.PriceServiceImpl;
+import pk.shoplus.service.product.impl.ProductServiceImpl;
 import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.util.MapUtils;
 import pk.shoplus.vo.ResultMessage;
 
 import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.Runtime_exception;
 import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.updateStock_params_is_error;
+import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.warning_price_out_of_range;
 
 /**
  * 更新库存接口
@@ -39,7 +42,10 @@ public class ProductStockEDSManagement {
 
 	private static Logger logger = Logger.getLogger(ProductStockEDSManagement.class);
 
-	public Map<String, Object> updateStock(StockOptions stockOptions){
+    private IPriceService priceService = new PriceServiceImpl();
+
+
+    public Map<String, Object> updateStock(StockOptions stockOptions){
         logger.info("ProductStockEDSManagementUpdateStock,inputParams,stockOptions:"+new Gson().toJson(stockOptions));
         MapUtils mapUtils = new MapUtils(new HashMap<>());
         Connection connection = null;
@@ -84,6 +90,45 @@ public class ProductStockEDSManagement {
                     // create sku_store
                     this.createSkuInfo(product, connection, stockOptions.getQuantity(),reserved, stockOptions.getSizeValue(), skuPropertyService, skuStoreService);
                 }
+
+                // update price
+                if(StringUtils.isNotBlank(stockOptions.getPrice())) {
+                    logger.info("ProductStockEDSManagementUpdateStock,startUpdatePricem,stockOptions:"+new Gson().toJson(stockOptions));
+                    BigDecimal price = BigDecimal.valueOf(Double.parseDouble(stockOptions.getPrice()));
+
+                    Map<String,Object> skuConditions = new HashMap<>();
+                    skuConditions.put("product_id",product.product_id);
+                    skuConditions.put("enabled",EnabledType.USED);
+                    SkuService skuService = new SkuService(connection);
+                    List<Sku> skuList = skuService.getSkuListByCondition(skuConditions);
+
+                    BigDecimal oldPrice = skuList.get(0).getPrice();
+                    boolean flag = ProductServiceImpl.isPrice(oldPrice,price);
+                    if(flag) {
+                        Sku skuPrice = priceService.getPriceByRule(product,Long.parseLong(stockOptions.getVendor_id()),price,connection);
+                        BigDecimal inPrice = skuPrice.getIn_price();
+                        for(Sku sku : skuList){
+                            logger.info("ProductStockEDSManagementUpdateStock,updateSkuPrice,originSku:"+new Gson().toJson(sku));
+                            sku.price = price;
+                            sku.in_price = inPrice;
+                            sku.im_price = skuPrice.getIm_price();
+                            sku.updated_at = new Date();
+                            skuService.updateSku(sku);
+                            logger.info("ProductStockEDSManagementUpdateStock,updateSkuPrice,updateSku:"+new Gson().toJson(sku));
+                        }
+                    } else {
+                         mapUtils.putData("status",StatusType.FAILURE)
+                                .putData("info","update stock - " + warning_price_out_of_range.getDesc() + " price:" + price)
+                                .putData("sku_size",stockOptions.getSizeValue())
+                                .putData("product_code",stockOptions.getProductCode())
+                                .putData("key","retail_price")
+                                .putData("value",price)
+                                .putData("error_enum",warning_price_out_of_range);
+                        logger.info("ProductStockEDSManagementUpdateStock,outputParams,mapUtils:"+new Gson().toJson(mapUtils));
+                        if(connection!=null) {connection.commit();connection.close();}
+                        return mapUtils.getMap();
+                    }
+                }
                 mapUtils.putData("status",StatusType.SUCCESS).putData("info","SUCCESS");
             } else {
                 mapUtils.putData("status",StatusType.FAILURE)
@@ -103,7 +148,8 @@ public class ProductStockEDSManagement {
                     .putData("key","exception")
                     .putData("value",ExceptionUtils.getExceptionDetail(e))
             .putData("error_enum", Runtime_exception);
-		} finally {
+            logger.info("ProductStockEDSManagementUpdateStock,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
+        } finally {
            if(connection != null) {connection.close();}
         }
         logger.info("ProductStockEDSManagementUpdateStock,outputParams,mapUtils:"+new Gson().toJson(mapUtils));
@@ -322,12 +368,21 @@ public class ProductStockEDSManagement {
 	public class StockOptions{
 		public String productCode;
 		public String sizeValue;
-		public String quantity;
-		public String reserved;
+        public String quantity;
+        public String reserved;
 		public String type;
 		public String vendor_id;
-		
-		public String getProductCode() {
+		public String price;
+
+        public String getPrice() {
+            return price;
+        }
+
+        public void setPrice(String price) {
+            this.price = price;
+        }
+
+        public String getProductCode() {
 			return productCode;
 		}
 		public void setProductCode(String productCode) {

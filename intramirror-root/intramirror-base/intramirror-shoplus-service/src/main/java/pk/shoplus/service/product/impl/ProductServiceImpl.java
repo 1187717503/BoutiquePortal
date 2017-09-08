@@ -812,8 +812,8 @@ public class ProductServiceImpl implements IProductService{
 
         int dy = newPrice.compareTo(minPrice);
         int xy = newPrice.compareTo(maxPrice);
-        System.out.println(dy+"----"+xy);
-        System.out.println(minPrice+"----"+maxPrice);
+        System.out.println(dy+" ---- "+xy);
+        System.out.println(minPrice+" ---- "+maxPrice);
 
         if(dy == 1 && xy == -1) {
             return true;

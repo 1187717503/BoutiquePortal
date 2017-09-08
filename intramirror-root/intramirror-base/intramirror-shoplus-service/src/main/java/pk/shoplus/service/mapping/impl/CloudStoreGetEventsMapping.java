@@ -50,9 +50,10 @@ public class CloudStoreGetEventsMapping implements IMapping{
 
             String productCode = sku == null ? "" : sku.substring(0,sku.indexOf("-"));
             String size = sku == null ?  "" : sku.substring(sku.indexOf("-")+1,sku.length());
-
+            String stock_price = "";
             if(type == Contants.EVENTS_TYPE_4) {
                 qtyDiff = additionalInfo.getInteger("qty");
+                stock_price = additionalInfo.getString("stock_price");
             } else if(type == Contants.EVENTS_TYPE_0){
                 qtyDiff = additionalInfo.getInteger("qty_diff");
             }
@@ -92,7 +93,7 @@ public class CloudStoreGetEventsMapping implements IMapping{
             stockOptions.setSizeValue(size);
             stockOptions.setQuantity(skuStore.getStore().toString());
             stockOptions.setReserved(skuStore.getReserved() == null ? "" : skuStore.getReserved().toString());
-
+            stockOptions.setPrice(stock_price);
             Connection conn = null;
             try {
                 conn = DBConnector.sql2o.open();
