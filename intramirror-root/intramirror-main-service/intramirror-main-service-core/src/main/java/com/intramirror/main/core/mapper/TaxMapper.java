@@ -55,7 +55,7 @@ public interface TaxMapper {
      */
     int updateByPrimaryKey(Tax record);
 
-    List<Map<String, Object>> getTaxByCategoryId(@Param("taxType") String taxType,@Param("categoryIds") String categoryIds);
+    List<Map<String, Object>> getTaxByCategoryId(@Param("taxType") String taxType,@Param("categoryIds") String[] categoryIds);
 
     List<Map<String, Object>> getTaxRateListById(@Param("fromCountryId") String fromCountryId,@Param("taxType") String taxType);
 }

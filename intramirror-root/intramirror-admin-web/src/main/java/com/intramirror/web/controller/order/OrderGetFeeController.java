@@ -256,7 +256,7 @@ public class OrderGetFeeController extends BaseController {
                 switch (geographyId) {
                     case "1":
                         String taxType = "2";// 在tax表中，tax-type为2，为关税，大陆，默认显示关税
-                        List<Map<String, Object>> list = taxService.getTaxByCategoryId(taxType, categoryIds);
+                        List<Map<String, Object>> list = taxService.getTaxByCategoryId(taxType, categoryIds.split(","));
                         result.put("customDuty", list);
                         break;
                     case "2":
