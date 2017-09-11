@@ -187,8 +187,9 @@ public class OrderGetFeeController extends BaseController {
                     }
 
                     if (null != coefficientList && coefficientList.size() > 0) {
+                        BigDecimal resultFee;
                         if (null != map.get("fee")) {
-                            BigDecimal resultFee = new BigDecimal(map.get("fee").toString());
+                            resultFee = new BigDecimal(map.get("fee").toString());
 
                             Integer operation_type = 0;
                             BigDecimal coefficient = null;
@@ -224,6 +225,10 @@ public class OrderGetFeeController extends BaseController {
                                 map.put("eurFee", resultFee.divide(new BigDecimal(currentRate), 2, RoundingMode.HALF_UP));
                             }
 
+                        } else {
+                            resultFee = new BigDecimal(0);
+                            map.put("fee", resultFee.setScale(2, RoundingMode.HALF_UP));
+                            map.put("eurFee", resultFee.setScale(2, RoundingMode.HALF_UP));
                         }
                     } else {
                         BigDecimal resultFee;
