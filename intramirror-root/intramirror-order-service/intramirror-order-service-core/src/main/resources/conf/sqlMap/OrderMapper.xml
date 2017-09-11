@@ -516,32 +516,83 @@ and t1.order_num =  #{orderId,jdbcType=BIGINT}
 
     <update id="updateById" parameterType="com.intramirror.order.api.model.Order">
         update order
-        set order_num = #{orderNum,jdbcType=VARCHAR},
-        user_id = #{userId,jdbcType=BIGINT},
-        fee = #{fee,jdbcType=DECIMAL},
-        coupon = #{coupon,jdbcType=VARCHAR},
-        coupon_fee = #{couponFee,jdbcType=DECIMAL},
-        discount = #{discount,jdbcType=INTEGER},
-        discount_fee = #{discountFee,jdbcType=DECIMAL},
-        ship_fee = #{shipFee,jdbcType=DECIMAL},
-        pay_fee = #{payFee,jdbcType=DECIMAL},
-        pay_way = #{payWay,jdbcType=TINYINT},
-        online_payment_id = #{onlinePaymentId,jdbcType=BIGINT},
-        confirmed_at = #{confirmedAt,jdbcType=TIMESTAMP},
-        status = #{status,jdbcType=INTEGER},
-        cancel_type = #{cancelType,jdbcType=TINYINT},
-        created_at = #{createdAt,jdbcType=TIMESTAMP},
-        updated_at = #{updatedAt,jdbcType=TIMESTAMP},
-        enabled = #{enabled,jdbcType=BIT},
-        tax_fee = #{taxFee,jdbcType=DECIMAL},
-        current_rate = #{currentRate,jdbcType=DECIMAL},
-        total_sale_price_rmb = #{totalSalePriceRmb,jdbcType=DECIMAL},
-        total_shipping_fee_rmb = #{totalShippingFeeRmb,jdbcType=DECIMAL},
-        total_tax_rmb = #{totalTaxRmb,jdbcType=DECIMAL},
-        total_rmb = #{totalRmb,jdbcType=VARCHAR},
-        wechat = #{wechat,jdbcType=VARCHAR},
-        contact_phone = #{contactPhone,jdbcType=VARCHAR},
-        area_code = #{areaCode,jdbcType=VARCHAR}
+        <set>
+            <if test="order_num != null">
+                order_num = #{orderNum,jdbcType=VARCHAR},
+            </if>
+            <if test="user_id != null">
+                user_id = #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="fee != null">
+                fee = #{fee,jdbcType=DECIMAL},
+            </if>
+            <if test="coupon != null">
+                coupon = #{coupon,jdbcType=VARCHAR},
+            </if>
+            <if test="couponFee != null">
+                coupon_fee = #{couponFee,jdbcType=DECIMAL},
+            </if>
+            <if test="discount != null">
+                discount = #{discount,jdbcType=INTEGER},
+            </if>
+            <if test="discountFee != null">
+                discount_fee = #{discountFee,jdbcType=DECIMAL},
+            </if>
+            <if test="shipFee != null">
+                ship_fee = #{shipFee,jdbcType=DECIMAL},
+            </if>
+            <if test="payFee != null">
+                pay_fee = #{payFee,jdbcType=DECIMAL},
+            </if>
+            <if test="onlinePaymentId != null">
+                online_payment_id = #{onlinePaymentId,jdbcType=BIGINT},
+            </if>
+            <if test="confirmedAt != null">
+                confirmed_at = #{confirmedAt,jdbcType=TIMESTAMP},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="cancelType != null">
+                cancel_type = #{cancelType,jdbcType=TINYINT},
+            </if>
+            <if test="createdAt != null">
+                created_at = #{createdAt,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updatedAt != null">
+                updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+            </if>
+            <if test="enabled != null">
+                enabled = #{enabled,jdbcType=BIT},
+            </if>
+            <if test="taxFee != null">
+                tax_fee = #{taxFee,jdbcType=DECIMAL},
+            </if>
+            <if test="currentRate != null">
+                current_rate = #{currentRate,jdbcType=DECIMAL},
+            </if>
+            <if test="totalSalePriceRmb != null">
+                total_sale_price_rmb = #{totalSalePriceRmb,jdbcType=DECIMAL},
+            </if>
+            <if test="totalShippingFeeRmb != null">
+                total_shipping_fee_rmb = #{totalShippingFeeRmb,jdbcType=DECIMAL},
+            </if>
+            <if test="totalTaxRmb != null">
+                total_tax_rmb = #{totalTaxRmb,jdbcType=DECIMAL},
+            </if>
+            <if test="totalRmb != null">
+                total_rmb = #{totalRmb,jdbcType=VARCHAR},
+            </if>
+            <if test="wechat != null">
+                wechat = #{wechat,jdbcType=VARCHAR},
+            </if>
+            <if test="contactPhone != null">
+                contact_phone = #{contactPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="areaCode != null">
+                area_code = #{areaCode,jdbcType=VARCHAR}
+            </if>
+        </set>
         where order_id = #{orderId,jdbcType=BIGINT}
     </update>
 </mapper>

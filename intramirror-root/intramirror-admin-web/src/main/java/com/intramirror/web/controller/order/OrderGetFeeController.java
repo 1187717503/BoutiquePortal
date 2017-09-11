@@ -251,9 +251,7 @@ public class OrderGetFeeController extends BaseController {
         Map<String, Object> result = new HashMap<String, Object>();
 
         try {
-            BigDecimal shippingFees = new BigDecimal(0.0);
 
-            result.put("shippingFee", shippingFees);
             if (Helper.checkNotNull(geographyId)) {
                 BigDecimal taxFees = new BigDecimal(0.0);
                 BigDecimal allTaxFees = new BigDecimal(0.0);
@@ -276,6 +274,8 @@ public class OrderGetFeeController extends BaseController {
                                 fromCountryId.get(0).get("address_country_id").toString(), taxTypeVAT);
 
                         Map<String, BigDecimal> prices = skuService.getSkuInfoBySkuId(shopProductSkuId);
+
+                        result.put("tax_id", taxRatelist.get(0).get("tax_id"));
 
                         BigDecimal taxRate = new BigDecimal(taxRatelist.get(0).get("tax_rate").toString());
                         BigDecimal markupRate = new BigDecimal(taxRatelist.get(0).get("markup_rate").toString());

@@ -11,4 +11,6 @@ import com.intramirror.order.api.model.OrderLogistics;
 public interface OrderLogisticsService {
 
     OrderLogistics createOrderLogistics(OrderLogistics orderLogistics);
+
+    void updateOrderLogistics(OrderLogistics orderLogistics);
 }

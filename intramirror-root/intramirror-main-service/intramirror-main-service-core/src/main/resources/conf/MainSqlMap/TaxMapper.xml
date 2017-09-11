@@ -195,7 +195,7 @@
     </select>
 
     <select id="getTaxRateListById" resultType="java.util.HashMap">
-        SELECT tax_rate,markup_rate
+        SELECT tax_rate,markup_rate,tax_id
         FROM tax
         WHERE address_country_id = #{fromCountryId} AND tax_type = #{taxType}
     </select>

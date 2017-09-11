@@ -16,20 +16,20 @@ public class InputCreateOrder {
 
     public Map<String, Object> shipToMap;
 
-    public String productId;
+    //商品信息
     public List<JsonObject> checkoutListStr;
 
-    public BigDecimal totalFee;
+    //金额（不包括运费和增值税）
+    public BigDecimal subTotalPrice;
 
+    //总运费
     public BigDecimal totalShipFee;
 
-    public BigDecimal subtotalPrice;
-
-    public String shippingFee;
-    public String vatFee;
-    public String addressCountryId;
-
+    //总增值税
     public BigDecimal totalTaxFee;
+
+    //尚未支付的钱
+    public BigDecimal balanceDue;
 
 
     public String getBuyerName() {
@@ -72,14 +72,6 @@ public class InputCreateOrder {
         this.shipToMap = shipToMap;
     }
 
-    public String getProductId() {
-        return productId;
-    }
-
-    public void setProductId(String productId) {
-        this.productId = productId;
-    }
-
     public List<JsonObject> getCheckoutListStr() {
         return checkoutListStr;
     }
@@ -88,12 +80,12 @@ public class InputCreateOrder {
         this.checkoutListStr = checkoutListStr;
     }
 
-    public BigDecimal getTotalFee() {
-        return totalFee;
+    public BigDecimal getSubTotalPrice() {
+        return subTotalPrice;
     }
 
-    public void setTotalFee(BigDecimal totalFee) {
-        this.totalFee = totalFee;
+    public void setSubTotalPrice(BigDecimal subTotalPrice) {
+        this.subTotalPrice = subTotalPrice;
     }
 
     public BigDecimal getTotalShipFee() {
@@ -104,35 +96,19 @@ public class InputCreateOrder {
         this.totalShipFee = totalShipFee;
     }
 
-    public BigDecimal getSubtotalPrice() {
-        return subtotalPrice;
+    public BigDecimal getTotalTaxFee() {
+        return totalTaxFee;
     }
 
-    public void setSubtotalPrice(BigDecimal subtotalPrice) {
-        this.subtotalPrice = subtotalPrice;
+    public void setTotalTaxFee(BigDecimal totalTaxFee) {
+        this.totalTaxFee = totalTaxFee;
     }
 
-    public String getShippingFee() {
-        return shippingFee;
+    public BigDecimal getBalanceDue() {
+        return balanceDue;
     }
 
-    public void setShippingFee(String shippingFee) {
-        this.shippingFee = shippingFee;
-    }
-
-    public String getVatFee() {
-        return vatFee;
-    }
-
-    public void setVatFee(String vatFee) {
-        this.vatFee = vatFee;
-    }
-
-    public String getAddressCountryId() {
-        return addressCountryId;
-    }
-
-    public void setAddressCountryId(String addressCountryId) {
-        this.addressCountryId = addressCountryId;
+    public void setBalanceDue(BigDecimal balanceDue) {
+        this.balanceDue = balanceDue;
     }
 }
