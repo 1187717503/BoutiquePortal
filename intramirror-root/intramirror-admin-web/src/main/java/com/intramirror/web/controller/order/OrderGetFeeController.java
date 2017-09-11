@@ -103,8 +103,8 @@ public class OrderGetFeeController extends BaseController {
         String productIds = null;
         String geographyId = null;
         String countryId = null;
-        String shopProductSkuIds = null;
-        String categoryIds = null;
+        String[] shopProductSkuIds = null;
+        String[] categoryIds = null;
 
         if (map.get("product_ids") != null && StringUtils.isNotBlank(map.get("product_ids").toString())) {
             productIds = map.get("product_ids").toString();
@@ -119,22 +119,26 @@ public class OrderGetFeeController extends BaseController {
         }
 
         if (map.get("shop_product_sku_ids") != null && StringUtils.isNotBlank(map.get("shop_product_sku_ids").toString())) {
-            shopProductSkuIds = map.get("shop_product_sku_ids").toString();
+            shopProductSkuIds = map.get("shop_product_sku_ids").toString().split(",");
         }
 
         if (map.get("category_ids") != null && StringUtils.isNotBlank(map.get("category_ids").toString())) {
-            categoryIds = map.get("category_ids").toString();
+            categoryIds = map.get("category_ids").toString().split(",");
         }
 
         try {
              /*获取Vat增值税费*/
+            List<Map<String, Object>> taxFeeMapList = new ArrayList<>();
             Map taxFeeMap = new HashMap();
-            if (("3").equals(geographyId)) {
-                taxFeeMap = this.getTaxFeeBySku(categoryIds, shopProductSkuIds, geographyId);
-            } else {
-                taxFeeMap.put("taxFees", 0);
+            for (int i = 0; i < shopProductSkuIds.length; i++) {
+                if (("3").equals(geographyId)) {
+                    taxFeeMap = this.getTaxFeeBySku(categoryIds[i], shopProductSkuIds[i], geographyId);
+                } else {
+                    taxFeeMap.put("taxFees", 0);
+                }
+                taxFeeMapList.add(taxFeeMap);
             }
-            results.put("taxFeeMap", taxFeeMap);
+            results.put("taxFeeMapList", taxFeeMapList);
 
             /*获取运费*/
             List<Map<String, Object>> shipFeeListMap = getShippingFee(productIds, countryId);
@@ -243,7 +247,7 @@ public class OrderGetFeeController extends BaseController {
         return resultList;
     }
 
-    public Map<String, Object> getTaxFeeBySku(String categoryIds, String shopProductSkuIds, String geographyId) {
+    public Map<String, Object> getTaxFeeBySku(String categoryIds, String shopProductSkuId, String geographyId) {
         Map<String, Object> result = new HashMap<String, Object>();
 
         try {
@@ -265,13 +269,13 @@ public class OrderGetFeeController extends BaseController {
                     case "3":// 欧盟计算税费（增值税）
                         String taxTypeVAT = "1";// 1.表示增值税
                         BigDecimal fee = new BigDecimal(0.0);
-                        Map<String, String> vendorIdMap = vendorService.getProductSkuVendorIdMap(shopProductSkuIds.split(","));
-                        String vendorIds = vendorIdMap.get(shopProductSkuIds);
+                        Map<String, String> vendorIdMap = vendorService.getProductSkuVendorIdMap(shopProductSkuId.split(","));
+                        String vendorIds = vendorIdMap.get(shopProductSkuId);
                         List<Map<String, Object>> fromCountryId = vendorService.getAllVendorCountryById(vendorIds.split(","));
                         List<Map<String, Object>> taxRatelist = taxService.getTaxRateListById(
                                 fromCountryId.get(0).get("address_country_id").toString(), taxTypeVAT);
 
-                        Map<String, BigDecimal> prices = skuService.getSkuInfoBySkuId(shopProductSkuIds);
+                        Map<String, BigDecimal> prices = skuService.getSkuInfoBySkuId(shopProductSkuId);
 
                         BigDecimal taxRate = new BigDecimal(taxRatelist.get(0).get("tax_rate").toString());
                         BigDecimal markupRate = new BigDecimal(taxRatelist.get(0).get("markup_rate").toString());
