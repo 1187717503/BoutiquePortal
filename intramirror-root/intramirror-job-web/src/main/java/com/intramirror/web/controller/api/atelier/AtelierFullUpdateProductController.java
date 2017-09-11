@@ -1,4 +1,4 @@
-package com.intramirror.web.controller.api;
+package com.intramirror.web.controller.api.atelier;
 
 import com.alibaba.fastjson15.JSON;
 import com.alibaba.fastjson15.JSONObject;
@@ -7,15 +7,14 @@ import com.intramirror.product.api.service.IApiMqService;
 import com.intramirror.web.enums.QueueNameJobEnum;
 import com.intramirror.web.util.QueueNameEnumUtils;
 import com.intramirror.web.util.QueueUtils;
-import com.intramirror.web.util.StreamUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpRequest;
-import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.mq.enums.QueueTypeEnum;
 import pk.shoplus.util.ExceptionUtils;
