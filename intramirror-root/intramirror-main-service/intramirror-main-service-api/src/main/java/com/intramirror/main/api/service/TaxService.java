@@ -8,5 +8,5 @@ public interface TaxService {
 
     List<Map<String, Object>> getTaxRateListById(String fromCountryId, String taxType);
 
-    List<Map<String, Object>> getTaxByCategoryId(String taxType, String categoryId);
+    List<Map<String, Object>> getTaxByCategoryId(String taxType, String categoryIds);
 }

@@ -104,7 +104,7 @@ public class OrderGetFeeController extends BaseController {
         String geographyId = null;
         String countryId = null;
         String shopProductSkuIds = null;
-        String categoryId = null;
+        String categoryIds = null;
 
         if (map.get("product_ids") != null && StringUtils.isNotBlank(map.get("product_ids").toString())) {
             productIds = map.get("product_ids").toString();
@@ -122,15 +122,15 @@ public class OrderGetFeeController extends BaseController {
             shopProductSkuIds = map.get("shop_product_sku_ids").toString();
         }
 
-        if (map.get("category_id") != null && StringUtils.isNotBlank(map.get("category_id").toString())) {
-            categoryId = map.get("category_id").toString();
+        if (map.get("category_ids") != null && StringUtils.isNotBlank(map.get("category_ids").toString())) {
+            categoryIds = map.get("category_ids").toString();
         }
 
         try {
              /*获取Vat增值税费*/
             Map taxFeeMap = new HashMap();
             if (("3").equals(geographyId)) {
-                taxFeeMap = this.getTaxFeeBySku(categoryId, shopProductSkuIds, geographyId);
+                taxFeeMap = this.getTaxFeeBySku(categoryIds, shopProductSkuIds, geographyId);
             } else {
                 taxFeeMap.put("taxFees", 0);
             }
@@ -243,7 +243,7 @@ public class OrderGetFeeController extends BaseController {
         return resultList;
     }
 
-    public Map<String, Object> getTaxFeeBySku(String categoryId, String shopProductSkuIds, String geographyId) {
+    public Map<String, Object> getTaxFeeBySku(String categoryIds, String shopProductSkuIds, String geographyId) {
         Map<String, Object> result = new HashMap<String, Object>();
 
         try {
@@ -256,7 +256,7 @@ public class OrderGetFeeController extends BaseController {
                 switch (geographyId) {
                     case "1":
                         String taxType = "2";// 在tax表中，tax-type为2，为关税，大陆，默认显示关税
-                        List<Map<String, Object>> list = taxService.getTaxByCategoryId(taxType, categoryId);
+                        List<Map<String, Object>> list = taxService.getTaxByCategoryId(taxType, categoryIds);
                         result.put("customDuty", list);
                         break;
                     case "2":
