@@ -82,7 +82,6 @@ public class OrderInputCreateOrderController extends BaseController {
         }
 
         try {
-//            BigDecimal fee = new BigDecimal(inputCreateOrder.totalFee);
             // Coupons Price
             BigDecimal coupon_fee = new BigDecimal(0);
 
@@ -109,6 +108,8 @@ public class OrderInputCreateOrderController extends BaseController {
             order.setEnabled(EnabledType.USED);
             order.setWechat(inputCreateOrder.buyerWechat);
             order.setContactPhone(inputCreateOrder.buyerPhone);
+            order.setBuyerName(inputCreateOrder.buyerName);
+            order.setRemainingRmb(String.valueOf(inputCreateOrder.getBalanceDue().multiply(order.getCurrentRate())));
             order.setAreaCode("");
 
             List<Map<String, Object>> exchangerRate = exchangeRateService.getShipFeeByCityId(null, null);

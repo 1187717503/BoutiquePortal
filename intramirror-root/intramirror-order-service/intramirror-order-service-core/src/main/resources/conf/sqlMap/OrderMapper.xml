@@ -499,8 +499,8 @@ and t1.order_num =  #{orderId,jdbcType=BIGINT}
         confirmed_at, status, cancel_type,
         created_at, updated_at, enabled,
         tax_fee, current_rate, total_sale_price_rmb,
-        total_shipping_fee_rmb, total_tax_rmb, total_rmb,
-        wechat, contact_phone, area_code
+        total_shipping_fee_rmb, total_tax_rmb, total_rmb,remaining_rmb,
+        wechat, contact_phone,buyer_name, area_code
         )
         values (#{orderId,jdbcType=BIGINT}, #{orderNum,jdbcType=VARCHAR}, #{userId,jdbcType=BIGINT},
         #{fee,jdbcType=DECIMAL}, #{coupon,jdbcType=VARCHAR}, #{couponFee,jdbcType=DECIMAL},
@@ -509,8 +509,8 @@ and t1.order_num =  #{orderId,jdbcType=BIGINT}
         #{confirmedAt,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER}, #{cancelType,jdbcType=TINYINT},
         #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}, #{enabled,jdbcType=BIT},
         #{taxFee,jdbcType=DECIMAL}, #{currentRate,jdbcType=DECIMAL}, #{totalSalePriceRmb,jdbcType=DECIMAL},
-        #{totalShippingFeeRmb,jdbcType=DECIMAL}, #{totalTaxRmb,jdbcType=DECIMAL}, #{totalRmb,jdbcType=VARCHAR},
-        #{wechat,jdbcType=VARCHAR}, #{contactPhone,jdbcType=VARCHAR}, #{areaCode,jdbcType=VARCHAR}
+        #{totalShippingFeeRmb,jdbcType=DECIMAL}, #{totalTaxRmb,jdbcType=DECIMAL}, #{totalRmb,jdbcType=VARCHAR}, #{remainingRmb,jdbcType=VARCHAR},
+        #{wechat,jdbcType=VARCHAR}, #{contactPhone,jdbcType=VARCHAR}, #{buyerName,jdbcType=VARCHAR}, #{areaCode,jdbcType=VARCHAR}
         )
     </insert>
 
@@ -588,6 +588,9 @@ and t1.order_num =  #{orderId,jdbcType=BIGINT}
             </if>
             <if test="contactPhone != null">
                 contact_phone = #{contactPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="buyerName != null">
+                buyer_name = #{buyerName,jdbcType=VARCHAR},
             </if>
             <if test="areaCode != null">
                 area_code = #{areaCode,jdbcType=VARCHAR}
