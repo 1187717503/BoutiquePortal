@@ -23,6 +23,8 @@ public class LogisticsProduct{
 	private Long vendor_id;
 	private BigDecimal shipping_fee;
 	private BigDecimal tax_fee;
+	private Long tax_id;
+	private BigDecimal tax_input_amt;
 	private String tracking_num;
 	private String vat_num;
 	private Long container_id;
@@ -196,7 +198,21 @@ public class LogisticsProduct{
 		this.invoice_id = invoice_id;
 	}
 
-	
-	
+
+	public Long getTax_id() {
+		return tax_id;
+	}
+
+	public void setTax_id(Long tax_id) {
+		this.tax_id = tax_id;
+	}
+
+	public BigDecimal getTax_input_amt() {
+		return tax_input_amt;
+	}
+
+	public void setTax_input_amt(BigDecimal tax_input_amt) {
+		this.tax_input_amt = tax_input_amt;
+	}
 }
 

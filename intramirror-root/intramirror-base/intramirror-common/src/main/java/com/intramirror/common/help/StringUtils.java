@@ -1,5 +1,7 @@
 package com.intramirror.common.help;
 
+import java.util.UUID;
+
 /**
  * Created by dingyifan on 2017/7/17.
  */
@@ -47,4 +49,18 @@ public class StringUtils {
         return str == null ? null : str.trim();
     }
 
+    /*生成order line num*/
+    public static String getUUID(Integer length) {
+        String uuid = String.valueOf(UUID.randomUUID().toString().hashCode()).replace("-", "");
+        if (uuid.length() > length) {
+            uuid = uuid.substring(0, length - 1);
+        }
+        if (null != length && length.intValue() > 0) {
+            for (int i = uuid.length(); i < length; i++) {
+                uuid += "0";
+            }
+        }
+
+        return uuid;
+    }
 }

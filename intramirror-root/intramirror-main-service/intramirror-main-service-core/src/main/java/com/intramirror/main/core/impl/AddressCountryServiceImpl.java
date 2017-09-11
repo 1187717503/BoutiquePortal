@@ -7,6 +7,9 @@ import com.intramirror.main.core.dao.BaseDao;
 import com.intramirror.main.core.mapper.AddressCountryMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * 服务
  */
@@ -23,5 +26,11 @@ public class AddressCountryServiceImpl extends BaseDao implements AddressCountry
     @Override
     public AddressCountry getAddressCountryByName(String name) {
         return addressCountryMapper.getAddressCountryByName(name);
+    }
+
+    @Override
+    public List<Map<String, Object>> getAddressCountryByGeographyId(Long geographyId) {
+
+        return addressCountryMapper.getAddressCountryByGeographyId(geographyId);
     }
 }

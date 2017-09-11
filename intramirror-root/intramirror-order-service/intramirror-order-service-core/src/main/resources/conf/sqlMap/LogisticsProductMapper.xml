@@ -205,4 +205,27 @@
 <update id="updateContainerById" parameterType="java.lang.Long" >
 	update logistics_product set container_id=0,`status`=2 where logistics_product_id=#{order_logistics_id,jdbcType=BIGINT} 
 </update>
+
+  <insert id="createLogisticsProduct" parameterType="com.intramirror.order.api.model.LogisticsProduct" keyProperty="logisticsProductId">
+    insert into logistics (logistics_product_id, order_logistics_id, shop_product_sku_id,
+    in_price, sale_price, amount,
+    fee, deduct_amount, deduct_fee,
+    remain_amount, remain_fee, status,
+    created_at, updated_at, enabled,
+    order_line_num, vendor_id, shipping_fee,
+    tax_fee, tax_id, tax_input_amt,
+    tracking_num, vat_num, container_id,
+    invoice_id, confirmed_at, est_ship_date,
+    packed_at, shipped_at)
+    values (#{logistics_product_id,jdbcType=BIGINT}, #{order_logistics_id,jdbcType=BIGINT}, #{shop_product_sku_id,jdbcType=BIGINT},
+   #{in_price,jdbcType=DECIMAL}, #{sale_price,jdbcType=DECIMAL},  #{amount,jdbcType=BIGINT},
+    #{fee,jdbcType=DECIMAL}, #{deduct_amount,jdbcType=BIGINT}, #{deduct_fee,jdbcType=DECIMAL},
+    #{remain_amount,jdbcType=BIGINT}, #{remain_fee,jdbcType=DECIMAL}, #{status,jdbcType=BIGINT},
+    #{created_at,jdbcType=TIMESTAMP}, #{updated_at,jdbcType=TIMESTAMP}, #{enabled,jdbcType=BIT},
+     #{order_line_num,jdbcType=LONGVARCHAR}, #{vendor_id,jdbcType=BIGINT}, #{shipping_fee,jdbcType=DECIMAL},
+    #{tax_fee,jdbcType=DECIMAL}, #{tax_id,jdbcType=DECIMAL}, #{tax_input_amt,jdbcType=DECIMAL},
+    #{tracking_num,jdbcType=LONGVARCHAR}, #{vat_num,jdbcType=LONGVARCHAR}, #{container_id,jdbcType=BIGINT},
+    #{invoice_id,jdbcType=TIMESTAMP}, #{confirmed_at,jdbcType=TIMESTAMP}, #{est_ship_date,jdbcType=TIMESTAMP},
+    #{packed_at,jdbcType=TIMESTAMP}, #{shipped_at,jdbcType=TIMESTAMP})
+  </insert>
 </mapper>

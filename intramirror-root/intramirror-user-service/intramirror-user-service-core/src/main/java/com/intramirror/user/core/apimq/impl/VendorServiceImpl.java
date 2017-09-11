@@ -69,4 +69,22 @@ public class VendorServiceImpl extends BaseDao implements VendorService {
             throw e;
         }
     }
+
+    @Override
+    public Map<String, String> getProductSkuVendorIdMap(String[] shopProductSkuIds) {
+        try {
+            return vendorMapper.getProductSkuVendorIdMap(shopProductSkuIds);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
+    public List<Map<String, Object>> getAllVendorCountryById(String[] vendorIds) {
+        try {
+            return vendorMapper.getAllVendorCountryById(vendorIds);
+        } catch (Exception e){
+            throw e;
+        }
+    }
 }

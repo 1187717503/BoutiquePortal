@@ -490,4 +490,58 @@ and t1.order_num =  #{orderId,jdbcType=BIGINT}
 	GROUP BY lp.order_line_num
 	)AS DD
 	</select>
+
+    <insert id="createOrder" parameterType="com.intramirror.order.api.model.Order" keyProperty="orderId">
+        insert into order (order_id, order_num, user_id,
+        fee, coupon, coupon_fee,
+        discount, discount_fee, ship_fee,
+        pay_fee, pay_way, online_payment_id,
+        confirmed_at, status, cancel_type,
+        created_at, updated_at, enabled,
+        tax_fee, current_rate, total_sale_price_rmb,
+        total_shipping_fee_rmb, total_tax_rmb, total_rmb,
+        wechat, contact_phone, area_code
+        )
+        values (#{orderId,jdbcType=BIGINT}, #{orderNum,jdbcType=VARCHAR}, #{userId,jdbcType=BIGINT},
+        #{fee,jdbcType=DECIMAL}, #{coupon,jdbcType=VARCHAR}, #{couponFee,jdbcType=DECIMAL},
+        #{discount,jdbcType=INTEGER}, #{discountFee,jdbcType=DECIMAL}, #{shipFee,jdbcType=DECIMAL},
+        #{payFee,jdbcType=DECIMAL}, #{payWay,jdbcType=TINYINT}, #{onlinePaymentId,jdbcType=BIGINT},
+        #{confirmedAt,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER}, #{cancelType,jdbcType=TINYINT},
+        #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}, #{enabled,jdbcType=BIT},
+        #{taxFee,jdbcType=DECIMAL}, #{currentRate,jdbcType=DECIMAL}, #{totalSalePriceRmb,jdbcType=DECIMAL},
+        #{totalShippingFeeRmb,jdbcType=DECIMAL}, #{totalTaxRmb,jdbcType=DECIMAL}, #{totalRmb,jdbcType=VARCHAR},
+        #{wechat,jdbcType=VARCHAR}, #{contactPhone,jdbcType=VARCHAR}, #{areaCode,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <update id="updateById" parameterType="com.intramirror.order.api.model.Order">
+        update order
+        set order_num = #{orderNum,jdbcType=VARCHAR},
+        user_id = #{userId,jdbcType=BIGINT},
+        fee = #{fee,jdbcType=DECIMAL},
+        coupon = #{coupon,jdbcType=VARCHAR},
+        coupon_fee = #{couponFee,jdbcType=DECIMAL},
+        discount = #{discount,jdbcType=INTEGER},
+        discount_fee = #{discountFee,jdbcType=DECIMAL},
+        ship_fee = #{shipFee,jdbcType=DECIMAL},
+        pay_fee = #{payFee,jdbcType=DECIMAL},
+        pay_way = #{payWay,jdbcType=TINYINT},
+        online_payment_id = #{onlinePaymentId,jdbcType=BIGINT},
+        confirmed_at = #{confirmedAt,jdbcType=TIMESTAMP},
+        status = #{status,jdbcType=INTEGER},
+        cancel_type = #{cancelType,jdbcType=TINYINT},
+        created_at = #{createdAt,jdbcType=TIMESTAMP},
+        updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+        enabled = #{enabled,jdbcType=BIT},
+        tax_fee = #{taxFee,jdbcType=DECIMAL},
+        current_rate = #{currentRate,jdbcType=DECIMAL},
+        total_sale_price_rmb = #{totalSalePriceRmb,jdbcType=DECIMAL},
+        total_shipping_fee_rmb = #{totalShippingFeeRmb,jdbcType=DECIMAL},
+        total_tax_rmb = #{totalTaxRmb,jdbcType=DECIMAL},
+        total_rmb = #{totalRmb,jdbcType=VARCHAR},
+        wechat = #{wechat,jdbcType=VARCHAR},
+        contact_phone = #{contactPhone,jdbcType=VARCHAR},
+        area_code = #{areaCode,jdbcType=VARCHAR}
+        where order_id = #{orderId,jdbcType=BIGINT}
+    </update>
 </mapper>

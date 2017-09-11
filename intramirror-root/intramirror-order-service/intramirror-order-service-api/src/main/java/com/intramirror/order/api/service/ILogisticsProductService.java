@@ -71,6 +71,8 @@ public interface ILogisticsProductService {
 	 * @return
 	 */
 	int updateContainerById(Long order_logistics_id);
-	
+
+
+	LogisticsProduct createLogisticsProduct(LogisticsProduct logisticsProduct);
 }
 

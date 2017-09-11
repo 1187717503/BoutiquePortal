@@ -8,6 +8,9 @@ import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.SkuMapper;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.Map;
+
 /**
  * SKU服务
  */
@@ -22,5 +25,19 @@ public class SkuServiceImpl extends BaseDao implements SkuService {
 
     public Sku getSkuBySkuCode(String skuCode) {
         return skuMapper.getSkuBySkuCodeAndEnabled(skuCode, EnabledType.USED);
+    }
+
+    @Override
+    public Sku getSkuById(Long skuId) {
+        return skuMapper.getSkuById(skuId);
+    }
+
+    @Override
+    public Map<String, BigDecimal> getSkuInfoBySkuId(String shopProductSkuIds) {
+        try {
+            return skuMapper.getSkuInfoBySkuId(shopProductSkuIds);
+        } catch (Exception e){
+            throw e;
+        }
     }
 }

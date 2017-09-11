@@ -47,4 +47,32 @@
         </foreach>
     </select>
 
+    <select id="getProductPropertyValueByBrandIdAndColorCode" resultType="java.util.HashMap">
+        SELECT DISTINCT pp1.product_id,sp.shop_product_id,sp.shop_category_id,p.vendor_id,v.vendor_name,pp1.`value` AS BrandID,pp2.`value` AS ColorCode
+        FROM product_property pp1
+        LEFT JOIN product_property pp2 ON pp2.product_id = pp1.product_id
+        LEFT JOIN product p ON p.product_id=pp1.product_id
+        LEFT JOIN shop_product sp ON sp.product_id =pp1.product_id
+        LEFT JOIN shop s ON s.shop_id=sp.shop_id
+        LEFT JOIN vendor v ON v.vendor_id =p.vendor_id
+        WHERE pp1.enabled = 1 AND pp2.enabled = 1 AND p.enabled = 1 AND v.enabled = 1 AND sp.enabled=1
+        AND pp1.key_name = 'BrandID'
+        AND pp2.key_name = 'ColorCode'
+        <if test="brandID!=null and brandID!=''">
+            AND pp1.`value` LIKE CONCAT('%', #{brandID}, '%')
+        </if>
+        <if test="colorCode!=null and colorCode!=''">
+            AND pp2.`value` LIKE CONCAT('%', #{colorCode}, '%')
+        </if>
+    </select>
+
+
+    <select id="getProductPropertyValueByProductId" resultType="java.util.HashMap">
+        SELECT t_pp.product_id,
+        max(case t_pp.key_name when 'ColorCode' then t_pp.`value` else '' end) as colorCode,
+        max(case t_pp.key_name when 'BrandID' then t_pp.`value` else '' end) as brandID
+        from product_property t_pp
+        where t_pp.enabled = 1 and (t_pp.key_name='BrandID' or t_pp.key_name = 'ColorCode') and t_pp.product_id = #{productId}
+        group by t_pp.product_id
+    </select>
 </mapper>

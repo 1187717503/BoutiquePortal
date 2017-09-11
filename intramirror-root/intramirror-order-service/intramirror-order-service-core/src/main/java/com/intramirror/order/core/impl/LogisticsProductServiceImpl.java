@@ -15,41 +15,39 @@ import com.intramirror.order.core.dao.BaseDao;
 import com.intramirror.order.core.mapper.LogisticsProductMapper;
 
 @Service
-public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsProductService{
-	
+public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsProductService {
+
     private static Logger logger = LoggerFactory.getLogger(LogisticsProductServiceImpl.class);
 
     private LogisticsProductMapper logisticsProductMapper;
 
     public void init() {
-    	logisticsProductMapper = this.getSqlSession().getMapper(LogisticsProductMapper.class);
+        logisticsProductMapper = this.getSqlSession().getMapper(LogisticsProductMapper.class);
     }
 
 
-    
-	/**
-	 * 根据logistics_product_id 修改相关信息
-	 * @param LogisticsProduct
-	 * @return
-	 */
-	public int updateOrderLogisticsStatusById(Long logistics_product_id,int status) {
-		
-    	//根据id获取对象信息
+    /**
+     * 根据logistics_product_id 修改相关信息
+     *
+     * @param logistics_product_id
+     * @return
+     */
+    public int updateOrderLogisticsStatusById(Long logistics_product_id, int status) {
+
+        //根据id获取对象信息
         LogisticsProduct logisticsProduct = this.selectById(logistics_product_id);
-			
-		//修改状态
+
+        //修改状态
         logisticsProduct.setStatus(status);
         //如果修改状态为shipped修改shippedat
-        if (status == 3){
-        	logisticsProduct.setShipped_at(Helper.getCurrentUTCTime());
+        if (status == 3) {
+            logisticsProduct.setShipped_at(Helper.getCurrentUTCTime());
         }
-		return logisticsProductMapper.updateByLogisticsProduct(logisticsProduct);
-      
-        
-		
+        return logisticsProductMapper.updateByLogisticsProduct(logisticsProduct);
 
-	}
-	
+
+    }
+
 //	/**
 //	 * 根据logistics_product_id 修改相关信息
 //	 * @param LogisticsProduct
@@ -92,67 +90,69 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
 //		return resultMap;
 //	}
 
-	
 
-	/**
-	 * 根据 logistics_product_id 查询详情
-	 * @param logistics_product_id
-	 * @return
-	 */
-	public LogisticsProduct selectById(Long logistics_product_id) {
-		return logisticsProductMapper.selectById(logistics_product_id);
-	}
-	
-	/**
-	 * 根据condition map 来获取 OrderLogistics list
-	 * @param conditionMap
-	 * @return 
-	 * @throws Exception
-	 */
-	public List<LogisticsProduct> getLogisticsProductListByCondition(Map<String, Object> conditionMap) {
-		return logisticsProductMapper.getLogisticsProductListByCondition(conditionMap);
-	}
+    /**
+     * 根据 logistics_product_id 查询详情
+     *
+     * @param logistics_product_id
+     * @return
+     */
+    public LogisticsProduct selectById(Long logistics_product_id) {
+        return logisticsProductMapper.selectById(logistics_product_id);
+    }
 
-
-
-	@Override
-	public int updateByLogisticsProduct(LogisticsProduct logisticsProduct) {
-		return logisticsProductMapper.updateByLogisticsProduct(logisticsProduct);
-	}
+    /**
+     * 根据condition map 来获取 OrderLogistics list
+     *
+     * @param conditionMap
+     * @return
+     * @throws Exception
+     */
+    public List<LogisticsProduct> getLogisticsProductListByCondition(Map<String, Object> conditionMap) {
+        return logisticsProductMapper.getLogisticsProductListByCondition(conditionMap);
+    }
 
 
-
-	@Override
-	public List<LogisticsProduct> selectByCondition(
-			Map<String, Object> conditionMap) {
-		
-		return logisticsProductMapper.selectByCondition(conditionMap);
-	}
+    @Override
+    public int updateByLogisticsProduct(LogisticsProduct logisticsProduct) {
+        return logisticsProductMapper.updateByLogisticsProduct(logisticsProduct);
+    }
 
 
+    @Override
+    public List<LogisticsProduct> selectByCondition(
+            Map<String, Object> conditionMap) {
 
-	@Override
-	public int updateByContainerId(Map<String, Object> conditionMap) {
-		
-		return logisticsProductMapper.updateByContainerId(conditionMap);
-	}
-
-
-
-	@Override
-	public Map<String,Object> selectLogisProShipmentById(Long logistics_product_id) {
-		List<Map<String,Object>> map = logisticsProductMapper.selectLogisProShipmentById(logistics_product_id);
-		if(map != null && map.size() > 0){
-			return map.get(0);
-		}
-		return null;
-	}
+        return logisticsProductMapper.selectByCondition(conditionMap);
+    }
 
 
+    @Override
+    public int updateByContainerId(Map<String, Object> conditionMap) {
 
-	@Override
-	public int updateContainerById(Long order_logistics_id) {
-		return logisticsProductMapper.updateContainerById(order_logistics_id);
-	}
-	
+        return logisticsProductMapper.updateByContainerId(conditionMap);
+    }
+
+
+    @Override
+    public Map<String, Object> selectLogisProShipmentById(Long logistics_product_id) {
+        List<Map<String, Object>> map = logisticsProductMapper.selectLogisProShipmentById(logistics_product_id);
+        if (map != null && map.size() > 0) {
+            return map.get(0);
+        }
+        return null;
+    }
+
+
+    @Override
+    public int updateContainerById(Long order_logistics_id) {
+        return logisticsProductMapper.updateContainerById(order_logistics_id);
+    }
+
+    @Override
+    public LogisticsProduct createLogisticsProduct(LogisticsProduct logisticsProduct) {
+        int logisticsProductId = logisticsProductMapper.createLogisticsProduct(logisticsProduct);
+        return logisticsProductMapper.selectById((long) logisticsProductId);
+    }
+
 }

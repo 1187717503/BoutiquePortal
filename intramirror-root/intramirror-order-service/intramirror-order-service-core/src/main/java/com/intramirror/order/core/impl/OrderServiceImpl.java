@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.intramirror.common.help.IPageService;
 import com.intramirror.common.help.Page;
 import com.intramirror.common.help.PageUtils;
+import com.intramirror.order.api.model.Order;
 import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.vo.ShippedParam;
@@ -14,12 +15,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
-public class OrderServiceImpl extends BaseDao implements IOrderService,IPageService {
+public class OrderServiceImpl extends BaseDao implements IOrderService, IPageService {
 
     private static Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
@@ -98,7 +101,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService,IPageServ
     /**
      * 根据 订单状态获取子订单列表
      *
-     * @param  status
+     * @param status
      * @return
      */
     @Override
@@ -115,7 +118,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService,IPageServ
     /**
      * 根据 订单状态获 和 container ID取子订单列表
      *
-     * @param  status
+     * @param status
      * @return
      */
     @Override
@@ -143,33 +146,74 @@ public class OrderServiceImpl extends BaseDao implements IOrderService,IPageServ
         Map<String, Object> conditionMap = new HashMap<String, Object>();
         conditionMap.put("vendorId", vendorId);
         conditionMap.put("shippedParam", shippedParam);
-        PageUtils pageUtils = new PageUtils(page,this,conditionMap);
+        PageUtils pageUtils = new PageUtils(page, this, conditionMap);
         return pageUtils;
     }
 
-	@Override
-	public List<Map<String, Object>> getOrderListByShipmentId(
-			Map<String, Object> conditionMap) {
-		
-		return orderMapper.getOrderListByShipmentId(conditionMap);
-	}
+    @Override
+    public List<Map<String, Object>> getOrderListByShipmentId(
+            Map<String, Object> conditionMap) {
 
-	@Override
-	public Map<String, Object> getShipmentDetails(Map<String, Object> conditionMap) {
-		 List<Map<String, Object>> list = orderMapper.getShipmentDetails(conditionMap);
-	        if (list != null && list.size() > 0) {
-	            return list.get(0);
-	        }
-	        return null;
-	}
+        return orderMapper.getOrderListByShipmentId(conditionMap);
+    }
+
+    @Override
+    public Map<String, Object> getShipmentDetails(Map<String, Object> conditionMap) {
+        List<Map<String, Object>> list = orderMapper.getShipmentDetails(conditionMap);
+        if (list != null && list.size() > 0) {
+            return list.get(0);
+        }
+        return null;
+    }
 
     @Override
     public List<Map<String, Object>> getResult(Map<String, Object> params) {
         return orderMapper.getShippedOrderListByStatus(params);
     }
 
-	@Override
-	public Integer getShippedCount(Map<String, Object> map) {
-		return orderMapper.getShippedCount(map);
-	}
+    @Override
+    public Integer getShippedCount(Map<String, Object> map) {
+        return orderMapper.getShippedCount(map);
+    }
+
+    @Override
+    public Order createOrder(Order order) {
+        Integer orderId = orderMapper.createOrder(order);
+        if (orderId != null) {
+            // 创建订单编号
+            order.setOrderId(Long.valueOf(orderId));
+            String orderNum = generateOrderNum(order.getUserId(), order.getOrderId());
+            order.setOrderNum(orderNum);
+            orderMapper.updateById(order);
+        } else {
+            order = null;
+        }
+        return order;
+    }
+
+    @Override
+    public void updateOrder(Order order) {
+        orderMapper.updateById(order);
+    }
+
+    // 订单号生成规则：
+    // 日期（8位）＋ 用户ID（末3位）＋ 订单order ID（末5位）
+    //
+    // 例如：2014092100400023
+
+    /**
+     * 订单号生成规则：
+     *
+     * @param userId
+     * @param orderId
+     * @return
+     */
+    private String generateOrderNum(Long userId, Long orderId) {
+        String userStr = "000" + userId;
+        String orderStr = "00000" + orderId;
+        userStr = userStr.substring(userStr.length() - 3, userStr.length());
+        orderStr = orderStr.substring(orderStr.length() - 5, orderStr.length());
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+        return simpleDateFormat.format(new Date()) + userStr + orderStr;
+    }
 }

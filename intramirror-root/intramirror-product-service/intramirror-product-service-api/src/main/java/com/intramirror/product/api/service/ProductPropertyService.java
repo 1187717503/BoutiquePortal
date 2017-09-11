@@ -22,4 +22,10 @@ public interface ProductPropertyService {
      * @return
      */
     List<Map<String, Object>> getProductPropertyListByProductId(String productIds);
+
+
+    List<Map<String, Object>> getProductPropertyValueByBrandIdAndColorCode(String brandID, String colorCode);
+
+    Map<String, Object> getProductPropertyValueByProductId(Long productId);
+
 }
