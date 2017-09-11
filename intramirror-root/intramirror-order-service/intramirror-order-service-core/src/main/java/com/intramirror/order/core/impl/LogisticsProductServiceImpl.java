@@ -151,8 +151,8 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
 
     @Override
     public LogisticsProduct createLogisticsProduct(LogisticsProduct logisticsProduct) {
-        int logisticsProductId = logisticsProductMapper.createLogisticsProduct(logisticsProduct);
-        return logisticsProductMapper.selectById((long) logisticsProductId);
+        logisticsProductMapper.createLogisticsProduct(logisticsProduct);
+        return logisticsProductMapper.selectById(logisticsProduct.getLogistics_product_id());
     }
 
 }

@@ -492,16 +492,8 @@ and t1.order_num =  #{orderId,jdbcType=BIGINT}
 	</select>
 
     <insert id="createOrder" parameterType="com.intramirror.order.api.model.Order" keyProperty="orderId">
-        insert into order (order_id, order_num, user_id,
-        fee, coupon, coupon_fee,
-        discount, discount_fee, ship_fee,
-        pay_fee, pay_way, online_payment_id,
-        confirmed_at, status, cancel_type,
-        created_at, updated_at, enabled,
-        tax_fee, current_rate, total_sale_price_rmb,
-        total_shipping_fee_rmb, total_tax_rmb, total_rmb,remaining_rmb,
-        wechat, contact_phone,buyer_name, area_code
-        )
+        insert into `order` (order_id, order_num, user_id, fee, coupon, coupon_fee, discount, discount_fee, ship_fee, pay_fee, pay_way, online_payment_id, confirmed_at, status, cancel_type, created_at, updated_at, enabled,
+        tax_fee, current_rate, total_sale_price_rmb, total_shipping_fee_rmb, total_tax_rmb, total_rmb,remaining_rmb, wechat, contact_phone,buyer_name, area_code )
         values (#{orderId,jdbcType=BIGINT}, #{orderNum,jdbcType=VARCHAR}, #{userId,jdbcType=BIGINT},
         #{fee,jdbcType=DECIMAL}, #{coupon,jdbcType=VARCHAR}, #{couponFee,jdbcType=DECIMAL},
         #{discount,jdbcType=INTEGER}, #{discountFee,jdbcType=DECIMAL}, #{shipFee,jdbcType=DECIMAL},
@@ -515,12 +507,12 @@ and t1.order_num =  #{orderId,jdbcType=BIGINT}
     </insert>
 
     <update id="updateById" parameterType="com.intramirror.order.api.model.Order">
-        update order
+        update `order`
         <set>
-            <if test="order_num != null">
+            <if test="orderNum != null">
                 order_num = #{orderNum,jdbcType=VARCHAR},
             </if>
-            <if test="user_id != null">
+            <if test="userId != null">
                 user_id = #{userId,jdbcType=BIGINT},
             </if>
             <if test="fee != null">

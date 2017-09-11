@@ -35,8 +35,8 @@ public class OrderLogisticsServiceImpl extends BaseDao implements OrderLogistics
 
     @Override
     public OrderLogistics createOrderLogistics(OrderLogistics orderLogistics) {
-        int orderLogisticsId = orderLogisticsMapper.insert(orderLogistics);
-        return orderLogisticsMapper.selectByPrimaryKey((long) orderLogisticsId);
+        orderLogisticsMapper.insert(orderLogistics);
+        return orderLogisticsMapper.selectByPrimaryKey(orderLogistics.getOrderLogisticsId());
     }
 
     @Override

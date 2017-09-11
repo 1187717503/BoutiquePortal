@@ -178,18 +178,13 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
 
     @Override
     public Order createOrder(Order order) {
-        Integer orderId = orderMapper.createOrder(order);
-        if (orderId != null) {
-            // 创建订单编号
-            order.setOrderId(Long.valueOf(orderId));
-            String orderNum = generateOrderNum(order.getUserId(), order.getOrderId());
-            order.setOrderNum(orderNum);
-            orderMapper.updateById(order);
-        } else {
-            order = null;
-        }
+        orderMapper.createOrder(order);
+        // 创建订单编号
+        String orderNum = generateOrderNum(order.getUserId(), order.getOrderId());
+        order.setOrderNum(orderNum);
+        orderMapper.updateById(order);
         return order;
-    }
+}
 
     @Override
     public void updateOrder(Order order) {

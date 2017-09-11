@@ -70,10 +70,14 @@ public class OrderInputCreateOrderController extends BaseController {
      */
     @RequestMapping(value = "/input_create_order", method = RequestMethod.POST)
     @ResponseBody
-    public ResultMessage orderInputCreateOrder(@RequestBody InputCreateOrder inputCreateOrder, HttpServletRequest httpRequest) throws Exception {
+    public ResultMessage orderInputCreateOrder(@RequestBody Map<String, Object> paramMap, HttpServletRequest httpRequest) throws Exception {
         ResultMessage result = new ResultMessage();
         Map<String, Object> results = new HashMap<>();
         result.errorStatus();
+
+        InputCreateOrder inputCreateOrder = new Gson().fromJson(paramMap.get("inputCreateOrder").toString(), InputCreateOrder.class);
+
+        System.out.println("+++++++++" + paramMap.get("inputCreateOrder").toString());
 
         User user = this.getUserInfo(httpRequest);
         if (user == null) {
@@ -109,11 +113,12 @@ public class OrderInputCreateOrderController extends BaseController {
             order.setWechat(inputCreateOrder.buyerWechat);
             order.setContactPhone(inputCreateOrder.buyerPhone);
             order.setBuyerName(inputCreateOrder.buyerName);
-            order.setRemainingRmb(String.valueOf(inputCreateOrder.getBalanceDue().multiply(order.getCurrentRate())));
-            order.setAreaCode("");
 
             List<Map<String, Object>> exchangerRate = exchangeRateService.getShipFeeByCityId(null, null);
             order.setCurrentRate(BigDecimal.valueOf(Double.valueOf(exchangerRate.get(0).get("exchange_rate").toString())));
+
+            order.setRemainingRmb(String.valueOf(inputCreateOrder.getBalanceDue().multiply(order.getCurrentRate()).setScale(2, RoundingMode.HALF_UP)));
+            order.setAreaCode("");
 
             order.setTotalTaxRmb(order.getTaxFee().multiply(order.getCurrentRate()).setScale(2, RoundingMode.HALF_UP));
             order.setTotalSalePriceRmb(order.getFee().multiply(order.getCurrentRate()).setScale(2, RoundingMode.HALF_UP));
@@ -145,7 +150,7 @@ public class OrderInputCreateOrderController extends BaseController {
                 orderLogistics.setCreatedAt(new Date());
                 orderLogistics.setUpdatedAt(new Date());
                 orderLogistics.setEnabled(EnabledType.USED);
-
+                orderLogistics.setIsShipFee(false);
                 orderLogistics = orderLogisticsService.createOrderLogistics(orderLogistics);
                 results.put("orderLogistics", orderLogistics);
 
@@ -230,7 +235,6 @@ public class OrderInputCreateOrderController extends BaseController {
                 // 5. 把新增logistics_填入order_logistics中
                 OrderLogistics updateOrderLogistics = new OrderLogistics();
                 updateOrderLogistics.setOrderLogisticsId(orderLogistics.getOrderLogisticsId());
-
                 updateOrderLogistics.setLogisticsId(logistics.getLogisticsId());
                 logger.info("订单" + order.getOrderId() + "创建订单后更新运费 orderLogistics 入参" + JSON.toJSON(updateOrderLogistics));
                 orderLogisticsService.updateOrderLogistics(updateOrderLogistics);

@@ -34,8 +34,8 @@ public class LogisticsServiceImpl extends BaseDao implements LogisticsService {
     }
 
     @Override
-    public Logistics createLogistics(Logistics logistics){
-        int logisticsId = logisticsMapper.insert(logistics);
-        return logisticsMapper.selectByPrimaryKey((long) logisticsId);
+    public Logistics createLogistics(Logistics logistics) {
+        logisticsMapper.insert(logistics);
+        return logisticsMapper.selectByPrimaryKey(logistics.getLogisticsId());
     }
 }

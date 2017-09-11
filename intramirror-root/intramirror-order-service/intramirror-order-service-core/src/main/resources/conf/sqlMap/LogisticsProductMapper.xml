@@ -207,7 +207,7 @@
 </update>
 
   <insert id="createLogisticsProduct" parameterType="com.intramirror.order.api.model.LogisticsProduct" keyProperty="logisticsProductId">
-    insert into logistics (logistics_product_id, order_logistics_id, shop_product_sku_id,
+    insert into logistics_product (logistics_product_id, order_logistics_id, shop_product_sku_id,
     in_price, sale_price, amount,
     fee, deduct_amount, deduct_fee,
     remain_amount, remain_fee, status,
