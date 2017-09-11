@@ -374,7 +374,7 @@ public class OrderController extends BaseController{
 	
 	
 	/**
-	 * 状态机借口
+	 * 状态机接口
 	 * @param map
 	 * @return
 	 */
@@ -407,8 +407,19 @@ public class OrderController extends BaseController{
 			int status =Integer.parseInt(map.get("status").toString());
 			
 			//调用修改订单状态
-			resultMap = logisticsProductService.updateOrderLogisticsStatusById(logisProductId, status);
+			//根据id获取当前数据库旧的对象信息
+			LogisticsProduct oldLogisticsProduct = logisticsProductService.selectById(logisProductId);
+			resultMap = logisticsProductService.updateOrderLogisticsStatusById(oldLogisticsProduct, status);
 			if (StatusType.SUCCESS == Integer.parseInt(resultMap.get("status").toString())){
+				//更新confirm库存
+				if (2 == status) {
+					if (null != oldLogisticsProduct) {
+						Long shopProductSkuId = oldLogisticsProduct.getShop_product_sku_id();
+						logger.info("订单 "+shopProductSkuId+" confirm操作, 修改confirm库存开始");
+						skuStoreService.updateConfirmStoreByShopProductSkuId(shopProductSkuId);
+						logger.info("订单 " + shopProductSkuId + " confirm操作, 修改confirm库存成功");
+					}
+				}
 				message.successStatus().putMsg("Info", "SUCCESS").setData(resultMap);
 				return message;
 			}
@@ -901,7 +912,9 @@ public class OrderController extends BaseController{
 	    		return message;
 			}
 	    	logger.info(logisProductId +"： 进入退款回调流程!!");
-	    	Map<String, Object> resultMap = logisticsProductService.updateOrderLogisticsStatusById(logisProductId, status);
+			LogisticsProduct logisticsProduct = new LogisticsProduct();
+			logisticsProduct.setLogistics_product_id(logisProductId);
+	    	Map<String, Object> resultMap = logisticsProductService.updateOrderLogisticsStatusById(logisticsProduct, status);
 	    	//获取SKU
 	    	LogisticsProduct oldLogisticsProduct = iLogisticsProductService.selectById(logisProductId);
 	    	//开始修改库存

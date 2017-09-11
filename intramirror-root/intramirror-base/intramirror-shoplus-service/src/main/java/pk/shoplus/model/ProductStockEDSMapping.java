@@ -71,6 +71,7 @@ public class ProductStockEDSMapping implements IMapping{
 					stockOptions.setQuantity(skuStore.getStore().toString());
 					stockOptions.setVendor_id(resultMessage.getDesc());
 					stockOptions.setReserved(skuStore.getReserved().toString());
+					stockOptions.setConfirmed(skuStore.getConfirmed().toString());
 				} else {
 					resultMap.put("info",resultMessage.getMsg());
 					resultMap.put("sku_size",stockOptions.getSizeValue());

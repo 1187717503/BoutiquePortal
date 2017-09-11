@@ -65,6 +65,7 @@ public class XmagAllStockMapping implements IMapping{
                     stockOptions.setVendor_id(resultMessage.getDesc());
                     stockOptions.setQuantity(skuStore.getStore().toString());
                     stockOptions.setReserved(skuStore.getReserved().toString());
+                    stockOptions.setConfirmed(skuStore.getConfirmed().toString());
                 } else {
                     return mapUtils.putData("status",StatusType.FAILURE)
                             .putData("error_enum",handle_stock_rule_error)

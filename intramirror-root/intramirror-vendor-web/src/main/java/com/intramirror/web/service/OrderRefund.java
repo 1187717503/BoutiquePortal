@@ -1,20 +1,6 @@
 package com.intramirror.web.service;
 
 
-import java.io.InputStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -32,6 +18,15 @@ import com.intramirror.payment.api.model.ResultMsg;
 import com.intramirror.payment.api.service.IPaymentResultService;
 import com.intramirror.payment.api.service.IPaymentService;
 import com.intramirror.product.api.service.ISkuStoreService;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 /**
@@ -88,7 +83,7 @@ public class OrderRefund{
 
     /**
      * 根据logisProductId 退款
-     * @param String logisProductId
+     * @param logisProductId
      * @return
      */
 	public Map<String, Object> orderRefund(Long logisProductId){
@@ -212,14 +207,21 @@ public class OrderRefund{
         	if(Contants.REFUND_QUERY_STATUS_SUCCESS.equals(data.getString("status"))) {
         		// 修改状态
             	try {
-            		logisticsProductService.updateOrderLogisticsStatusById(Long.parseLong(refundMap.get("request_id").toString()),Contants.LOGISTICSPRODUCT_CANCELED_STATUS);
-            		Map<String, Object> resultMap = logisticsProductService.updateOrderLogisticsStatusById(Long.parseLong(refundMap.get("request_id").toString()),Contants.LOGISTICSPRODUCT_CANCELED_STATUS);
+					Object logisticProductId = refundMap.get("request_id");
+					LogisticsProduct logisticsProduct = null;
+					if (null != logisticProductId) {
+						logisticsProduct = new LogisticsProduct();
+						logisticsProduct.setLogistics_product_id(Long.valueOf(logisticProductId.toString()));
+					}
+            		logisticsProductService.updateOrderLogisticsStatusById(logisticsProduct,Contants.LOGISTICSPRODUCT_CANCELED_STATUS);
+            		Map<String, Object> resultMap = logisticsProductService.updateOrderLogisticsStatusById(logisticsProduct, Contants.LOGISTICSPRODUCT_CANCELED_STATUS);
         	    	//获取SKU
         	    	LogisticsProduct oldLogisticsProduct = iLogisticsProductService.selectById(Long.parseLong(refundMap.get("request_id").toString()));
             		if (StatusType.SUCCESS == Integer.parseInt(resultMap.get("status").toString())){
         				//如果成功，释放库存
-        				Long skuId = skuStoreService.selectSkuIdByShopProductSkuId(oldLogisticsProduct.getShop_product_sku_id());
-        				int result = skuStoreService.updateBySkuId(OrderStatusType.REFUND, skuId);
+        				/*Long skuId = skuStoreService.selectSkuIdByShopProductSkuId(oldLogisticsProduct.getShop_product_sku_id());
+        				int result = skuStoreService.updateBySkuId(OrderStatusType.REFUND, skuId);*/
+						int result = skuStoreService.cancelSkuStore(oldLogisticsProduct.getShop_product_sku_id());
         				LOGGER.info(Long.parseLong(refundMap.get("request_id").toString()) + "===========>>>>>释放库存 : " + result);
         			}
             	} catch (Exception e) {
@@ -284,7 +286,9 @@ public class OrderRefund{
 						//退款成功修改订单状态为-4
 						if (isUpdateflag) {
 							 //调用修改订单状态
-							 Map<String, Object> result = logisticsProductService.updateOrderLogisticsStatusById(Long.valueOf(logisticsid), orderStatus);
+							LogisticsProduct logisticsProduct = new LogisticsProduct();
+							logisticsProduct.setLogistics_product_id(Long.valueOf(logisticsid));
+							 Map<String, Object> result = logisticsProductService.updateOrderLogisticsStatusById(logisticsProduct, orderStatus);
 							 if(Integer.parseInt(result.get("status").toString()) == StatusType.FAILURE){
 			                 	status = StatusType.FAILURE;
 			                 	LOGGER.info(result.get("info").toString());
@@ -349,7 +353,7 @@ public class OrderRefund{
                         	 LOGGER.info(logisticsProductList.get(0).getTracking_num());
                         	 LogisticsProduct logisticsProduct = logisticsProductList.get(j);
                              logisticsProduct.setStatus(orderStatus);
-                             Map<String, Object> result = logisticsProductService.updateOrderLogisticsStatusById(logisticsProduct.getLogistics_product_id(), orderStatus);
+                             Map<String, Object> result = logisticsProductService.updateOrderLogisticsStatusById(logisticsProduct, orderStatus);
 							 if(Integer.parseInt(result.get("status").toString()) == StatusType.FAILURE){
 			                 	status = StatusType.FAILURE;
 			                 	LOGGER.info(result.get("info").toString());

@@ -82,6 +82,7 @@ public class CloudStoreGetEventsMapping implements IMapping{
 
             } else if(type == Contants.EVENTS_TYPE_1){
                 skuStore.store = 0L;
+                skuStore.confirmed = 0L;
                 stockOptions.setType(Contants.EVENTS_TYPE_1+"");
             } else {
                 resultMap.put("info"," Type类型有误!!!");
@@ -94,6 +95,8 @@ public class CloudStoreGetEventsMapping implements IMapping{
             stockOptions.setQuantity(skuStore.getStore().toString());
             stockOptions.setReserved(skuStore.getReserved() == null ? "" : skuStore.getReserved().toString());
             stockOptions.setPrice(stock_price);
+            stockOptions.setConfirmed(skuStore.getConfirmed().toString());
+
             Connection conn = null;
             try {
                 conn = DBConnector.sql2o.open();

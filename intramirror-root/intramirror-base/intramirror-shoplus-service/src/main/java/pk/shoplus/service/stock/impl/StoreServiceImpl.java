@@ -32,7 +32,8 @@ public class StoreServiceImpl implements IStoreService{
         Connection conn = null;
         try {
         	conn = DBConnector.sql2o.open();
-            int store = 0,reserved = 0,rs = 0;
+            int store = 0,reserved = 0, rs = 0;
+            Long confirmed = 0l;
             long sku_store_id = 0;
 
             if(StringUtils.isBlank(queueNameEnum)) {
@@ -63,12 +64,14 @@ public class StoreServiceImpl implements IStoreService{
                 logger.info("StoreServiceImplHandleApiStockRule,getSkuStoreByID,skuStore:"+new Gson().toJson(skuStore));
                 store = skuStore.getStore() == null ? 0 : skuStore.getStore().intValue();
                 reserved = skuStore.getReserved() == null ? 0 : skuStore.getReserved().intValue();
+                confirmed = skuStore.getConfirmed() == null ? 0l : skuStore.getConfirmed();
                 sku_store_id = skuStore.getSku_store_id();
             } else {
                 logger.info("StoreServiceImplHandleApiStockRule,skuInfoIsNull,size:"+size+",productCode:"+productCode);
                 SkuStore skuStore = new SkuStore();
                 skuStore.store = Long.valueOf(qtyDiff);
                 skuStore.reserved = 0L;
+                skuStore.confirmed = 0L;
                 skuStore.sku_store_id = sku_store_id;
                 logger.info("StoreServiceImplHandleApiStockRule,skuInfoIsNull,skuStore:"+new Gson().toJson(skuStore));
                 if(conn != null) {conn.close();}
@@ -79,7 +82,7 @@ public class StoreServiceImpl implements IStoreService{
 
             // get qty_diff
             if(Contants.STOCK_QTY == qtyType) {
-                rs = qtyDiff - (store + reserved);
+                rs = qtyDiff - (store + reserved + confirmed.intValue());
             } else if(Contants.STOCK_QTY_DIFF == qtyType) {
                 rs = qtyDiff;
             } else {
@@ -90,21 +93,21 @@ public class StoreServiceImpl implements IStoreService{
             if(rs >= 0) {
                 store = store + rs;
             } else {
-                store = store - Math.abs(rs);
-            }
-
-            if(store < 0) {
-                reserved = reserved - Math.abs(store);
-
-                if(reserved < 0) {
-                    reserved = 0;
+                if (confirmed > 0) {
+                    confirmed = confirmed + rs;
+                    if (confirmed < 0) {
+                        store = store + confirmed.intValue();
+                        confirmed = 0l;
+                    }
+                } else {
+                    store = store + rs;
                 }
-                store = 0;
             }
 
             SkuStore skuStore = new SkuStore();
             skuStore.store = Long.valueOf(store);
             skuStore.reserved = Long.valueOf(reserved);
+            skuStore.confirmed = confirmed;
             skuStore.sku_store_id = sku_store_id;
             logger.info("StoreServiceImplHandleApiStockRule,outputParams,skuStore:"+new Gson().toJson(skuStore));
             if(conn != null) {conn.close();}

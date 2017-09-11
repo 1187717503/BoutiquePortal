@@ -29,10 +29,11 @@ public class LogisticsProductService{
 	
 	/**
 	 * 根据logistics_product_id 修改相关信息
-	 * @param LogisticsProduct
+	 * @param logisticsProduct
 	 * @return
 	 */
-	public Map<String, Object> updateOrderLogisticsStatusById(Long logistics_product_id,int status) {
+	public Map<String, Object> updateOrderLogisticsStatusById(LogisticsProduct logisticsProduct,int status) {
+		Long logistics_product_id = logisticsProduct.getLogistics_product_id();
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 		resultMap.put("status",StatusType.FAILURE);
 		
@@ -75,8 +76,7 @@ public class LogisticsProductService{
 	}
 
 	public LogisticsProduct selectById(Long logisProductId) {
-		// TODO Auto-generated method stub
-		return null;
+		return logisticsProductService.selectById(logisProductId);
 	}
 
 	

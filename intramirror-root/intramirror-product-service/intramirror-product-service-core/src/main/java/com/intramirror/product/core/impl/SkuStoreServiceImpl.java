@@ -1,10 +1,13 @@
 package com.intramirror.product.core.impl;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.intramirror.product.api.model.SkuStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.intramirror.product.api.service.ISkuStoreService;
@@ -34,6 +37,36 @@ public class SkuStoreServiceImpl extends BaseDao implements ISkuStoreService{
     	param.put("statusType", statusType);
     	param.put("skuId", skuid);
 		return skuStoreMapper.updateBySkuId(param);
+	}
+
+	public int cancelSkuStore (Long shopProductSkuId) {
+		return skuStoreMapper.cancelSkuStore(shopProductSkuId);
+	}
+	/**
+	 * 根据skuId修改确认库存
+	 * @param shopProductSkuId
+	 * @return
+	 */
+	public void updateConfirmStoreByShopProductSkuId (Long shopProductSkuId) throws Exception {
+
+		List<SkuStore> skuStoreList = skuStoreMapper.selectSkuStoreByShopProductSkuId(shopProductSkuId);
+		SkuStore skuStore = null;
+		if (null != skuStoreList && skuStoreList.size() > 0) {
+			skuStore = skuStoreList.get(0);
+		}
+
+		try {
+			if (null != skuStore) {
+				Long skuStoreId = skuStore.getSkuStoreId();
+				skuStoreMapper.confirmSkuStore(skuStoreId);
+				if (skuStore.getStore() < 0) {
+					skuStoreMapper.confirmSkuStoreByNegativeStore(skuStoreId);
+				}
+			}
+		} catch (DataIntegrityViolationException e) {
+			logger.error("店铺商品SKU "+shopProductSkuId+" 扣减库存异常,reserved,confirmed不可为负数!");
+			throw e;
+		}
 	}
 
 
