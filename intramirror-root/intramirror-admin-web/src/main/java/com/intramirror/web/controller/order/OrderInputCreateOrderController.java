@@ -75,9 +75,9 @@ public class OrderInputCreateOrderController extends BaseController {
         Map<String, Object> results = new HashMap<>();
         result.errorStatus();
 
-        InputCreateOrder inputCreateOrder = new Gson().fromJson(paramMap.get("inputCreateOrder").toString(), InputCreateOrder.class);
+        InputCreateOrder inputCreateOrder = new Gson().fromJson(paramMap.toString(), InputCreateOrder.class);
 
-        System.out.println("+++++++++" + paramMap.get("inputCreateOrder").toString());
+        System.out.println("+++++++++" + paramMap.toString());
 
         User user = this.getUserInfo(httpRequest);
         if (user == null) {
@@ -90,12 +90,12 @@ public class OrderInputCreateOrderController extends BaseController {
             BigDecimal coupon_fee = new BigDecimal(0);
 
             //总支付的金额
-            BigDecimal pay_fee = inputCreateOrder.getSubTotalPrice().subtract(coupon_fee).add(inputCreateOrder.getTotalShipFee()).add(inputCreateOrder.getTotalTaxFee()).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal pay_fee = inputCreateOrder.getSubtotalPrice().subtract(coupon_fee).add(inputCreateOrder.getTotalShipFee()).add(inputCreateOrder.getTotalTaxFee()).setScale(2, RoundingMode.HALF_UP);
 
             // 1. 创建 order
             Order order = new Order();
             order.setUserId(user.getUserId());
-            order.setFee(inputCreateOrder.getSubTotalPrice());
+            order.setFee(inputCreateOrder.getSubtotalPrice());
             order.setCoupon("");
             order.setCouponFee(coupon_fee);
             order.setDiscount(0);
@@ -139,7 +139,7 @@ public class OrderInputCreateOrderController extends BaseController {
                 orderLogistics.setType((byte) 0); // 暂无
                 orderLogistics.setShipPayer((byte) 0);// 默认用户支付
                 orderLogistics.setShipFee(inputCreateOrder.getTotalShipFee());
-                orderLogistics.setFee(inputCreateOrder.getSubTotalPrice());
+                orderLogistics.setFee(inputCreateOrder.getSubtotalPrice());
                 orderLogistics.setDeductFee(coupon_fee);
                 orderLogistics.setRemainFee(pay_fee);
                 orderLogistics.setReceiveFee(new BigDecimal(0));

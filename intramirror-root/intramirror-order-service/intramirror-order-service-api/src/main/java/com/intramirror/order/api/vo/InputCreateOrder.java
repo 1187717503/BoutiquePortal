@@ -20,7 +20,7 @@ public class InputCreateOrder {
     public List<JsonObject> checkoutListStr;
 
     //金额（不包括运费和增值税）
-    public BigDecimal subTotalPrice;
+    public BigDecimal subtotalPrice;
 
     //总运费
     public BigDecimal totalShipFee;
@@ -80,12 +80,12 @@ public class InputCreateOrder {
         this.checkoutListStr = checkoutListStr;
     }
 
-    public BigDecimal getSubTotalPrice() {
-        return subTotalPrice;
+    public BigDecimal getSubtotalPrice() {
+        return subtotalPrice;
     }
 
-    public void setSubTotalPrice(BigDecimal subTotalPrice) {
-        this.subTotalPrice = subTotalPrice;
+    public void setSubtotalPrice(BigDecimal subtotalPrice) {
+        this.subtotalPrice = subtotalPrice;
     }
 
     public BigDecimal getTotalShipFee() {
