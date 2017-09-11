@@ -1,6 +1,7 @@
 package com.intramirror.main.core.mapper;
 
 import com.intramirror.main.api.model.Tax;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -56,5 +57,5 @@ public interface TaxMapper {
 
     List<Map<String, Object>> getTaxByCategoryId(String taxType, String categoryIds);
 
-    List<Map<String, Object>> getTaxRateListById(String fromCountryid, String taxType);
+    List<Map<String, Object>> getTaxRateListById(@Param("fromCountryId") String fromCountryId,@Param("taxType") String taxType);
 }

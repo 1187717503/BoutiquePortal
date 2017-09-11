@@ -10,6 +10,7 @@ import com.intramirror.user.core.mapper.VendorApplicationMapper;
 import com.intramirror.user.core.mapper.VendorMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -72,18 +73,25 @@ public class VendorServiceImpl extends BaseDao implements VendorService {
 
     @Override
     public Map<String, String> getProductSkuVendorIdMap(String[] shopProductSkuIds) {
+        Map<String, String> map = new HashMap<String, String>();
         try {
-            return vendorMapper.getProductSkuVendorIdMap(shopProductSkuIds);
+            List<Map<String, Object>> list = vendorMapper.getProductSkuVendorIdMap(shopProductSkuIds);
+            for (Map<String, Object> m : list) {
+                String vendorId = m.get("vendor_id").toString();
+                String skuId = m.get("shop_product_sku_id").toString();
+                map.put(skuId, vendorId);
+            }
         } catch (Exception e) {
             throw e;
         }
+        return map;
     }
 
     @Override
     public List<Map<String, Object>> getAllVendorCountryById(String[] vendorIds) {
         try {
             return vendorMapper.getAllVendorCountryById(vendorIds);
-        } catch (Exception e){
+        } catch (Exception e) {
             throw e;
         }
     }

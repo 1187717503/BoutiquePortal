@@ -15,7 +15,7 @@ public interface VendorMapper {
 
     Vendor queryVendorByVendorId(Map<String, Object> params);
 
-    Map<String, String> getProductSkuVendorIdMap(@Param("skuIds") String[] skuIds);
+    List<Map<String, Object>> getProductSkuVendorIdMap(@Param("skuIds") String[] skuIds);
 
     List<Map<String, Object>> getAllVendorCountryById(@Param("vendorIds") String[] vendorIds);
 }

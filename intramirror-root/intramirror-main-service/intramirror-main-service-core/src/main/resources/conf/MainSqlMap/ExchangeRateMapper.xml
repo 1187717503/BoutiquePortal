@@ -113,8 +113,13 @@
     </update>
 
     <select id="getShipFeeByCityId" resultType="java.util.HashMap">
-    SELECT current_rate as exchange_rate
-    FROM exchange_rate
-    WHERE from_country = #{from_country} AND to_country =  #{to_country}
-  </select>
+        SELECT current_rate as exchange_rate
+        FROM exchange_rate
+        <if test="from_country != null">
+            WHERE from_country = #{from_country}
+        </if>
+        <if test="to_country != null">
+            AND to_country = #{to_country}
+        </if>
+    </select>
 </mapper>

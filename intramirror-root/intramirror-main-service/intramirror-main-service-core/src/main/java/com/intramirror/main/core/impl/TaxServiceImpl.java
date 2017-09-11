@@ -30,8 +30,8 @@ public class TaxServiceImpl extends BaseDao implements TaxService {
 
 
     @Override
-    public List<Map<String, Object>> getTaxRateListById(String fromCountryid, String taxType) {
-        return taxMapper.getTaxRateListById(fromCountryid, taxType);
+    public List<Map<String, Object>> getTaxRateListById(String fromCountryId, String taxType) {
+        return taxMapper.getTaxRateListById(fromCountryId, taxType);
     }
 
     @Override

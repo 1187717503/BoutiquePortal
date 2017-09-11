@@ -1,6 +1,7 @@
 package com.intramirror.main.core.mapper;
 
 import com.intramirror.main.api.model.AddressCountryCoefficient;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -54,5 +55,5 @@ public interface AddressCountryCoefficientMapper {
      */
     int updateByPrimaryKey(AddressCountryCoefficient record);
 
-    List<Map<String, Object>> getAddressCountryCoefficientByCountry(Integer fromCountry, Integer toCountry);
+    List<Map<String, Object>> getAddressCountryCoefficientByCountry(@Param("fromCountry")Integer fromCountry,@Param("toCountry") Integer toCountry);
 }
