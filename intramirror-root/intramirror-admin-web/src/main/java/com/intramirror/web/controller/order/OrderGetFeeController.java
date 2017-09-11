@@ -135,6 +135,7 @@ public class OrderGetFeeController extends BaseController {
                     taxFeeMap = this.getTaxFeeBySku(categoryIds[i], shopProductSkuIds[i], geographyId);
                 } else {
                     taxFeeMap.put("taxFees", 0);
+                    taxFeeMap.put("tax_id", 0);
                 }
                 taxFeeMapList.add(taxFeeMap);
             }
