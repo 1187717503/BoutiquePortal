@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson15.JSONObject;
 import com.google.gson.Gson;
 import com.intramirror.main.api.service.ApiParameterService;
+import com.intramirror.order.api.service.IOrderExceptionService;
 import com.intramirror.product.api.service.IApiMqService;
 
 import pk.shoplus.model.OrderManagement;
@@ -38,6 +39,9 @@ public class AlDucaOrderMapping implements IMapping{
     @Autowired
     private IApiMqService apiMqService;
     
+    @Autowired
+    private IOrderExceptionService orderExceptionService;
+    
     @Override
     public Map<String, Object> handleMappingAndExecute(String mqData) {
     	logger.info(" start AiDucacheckOrderMapping.handleMappingAndExecute();");
@@ -63,7 +67,7 @@ public class AlDucaOrderMapping implements IMapping{
         			JSONObject jsonOjbect = JSONObject.parseObject(json);
         			String result = jsonOjbect.get("result").toString();
         			logger.info("job AiDucacheckOrderMapping result:"+result);
-        			if (!"OK".equals(result)){
+        			if ("Fail! No Stock".equals(result)){
         				//没有库存执行退款
         				OrderRefund orderRefund = new OrderRefund();
         				String logisProductId = mqDataMap.get("logisticsProductId").toString();
@@ -74,6 +78,19 @@ public class AlDucaOrderMapping implements IMapping{
         					mapUtils.putData("status", StatusType.SUCCESS).putData("info","AiDucacheckOrderMapping orderRefund SUCCESS :" + logisProductId);
         				}
         			}
+        			
+        			if ("Fail! Invalid SKU".equals(result)){//如果返回Fail! Invalid SKU 保存异常信息
+        				String logisProductId = mqDataMap.get("logisticsProductId").toString();
+        				Map<String, Object> map = new HashMap<>();
+        				map.put("logistics_product_id", logisProductId);
+        				map.put("order_exception_type_id", 3);
+        				map.put("created_by_user_id", 0);//系统处理用户为0
+        				map.put("comments", result);
+        				logger.info("orderExceptionService START=================>>>> " + new Gson().toJson(map));
+        				int saveResult = orderExceptionService.saveOrderComments(map);
+        				logger.info("orderExceptionService END=================>>>> result" + saveResult);
+        			}
+        			logger.info("AiDucacheckOrderMapping OK======>>");
         		}
          	}else{
          		logger.info(" apiEndpointList is null");
@@ -167,5 +184,21 @@ public class AlDucaOrderMapping implements IMapping{
         return map;
     }
     
+    
+    public String createOrder(Long vendorId, Long logisticsProductId) throws Exception {
+        logger.info("买手店: "+vendorId +" 通过MGT系统创建订单: " +logisticsProductId);
+
+        
+        String result = "SUCCESS";
+        try {
+            //TODO
+        } catch (Exception e) {
+            logger.error("买手店: "+vendorId +" 通过MGT系统创建订单: " +logisticsProductId +" 异常:" + e.toString());
+            result = "ERROR";
+            throw e;
+        }
+
+        return result;
+    }
   
 }
