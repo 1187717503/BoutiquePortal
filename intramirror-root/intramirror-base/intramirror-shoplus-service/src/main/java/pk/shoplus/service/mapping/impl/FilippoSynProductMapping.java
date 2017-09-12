@@ -136,7 +136,6 @@ public class FilippoSynProductMapping implements IMapping{
 
             conn = DBConnector.sql2o.open();
             MappingCategoryService mappingCategoryService = new MappingCategoryService(conn);
-            Object [] object = new Object[]{vendorOptions.getStoreCode(), firstCategory,secondCategory,threeCategory};
 
             /*// -- test
             String sql = "insert into `intra-mirror-prd`.`api_category_map` ( `boutique_third_category`, `boutique_second_category`, `category_id`, `second_category`, `boutique_first_category`, `third_category`, `enabled`, `api_configuration_id`, `first_category`, `created_at`, `updated_at`) \n" +

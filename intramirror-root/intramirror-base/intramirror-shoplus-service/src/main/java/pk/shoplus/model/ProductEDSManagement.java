@@ -48,7 +48,7 @@ public class ProductEDSManagement {
 
 		// ProductOptions转换成List对象
 		List<String> productList = this.convertProductList(productOptions);
-		this.populateResult(productOptions,productList, vendorOptions.getVendorId(), resultMap, vendorOptions.getStoreCode(), vendorOptions.getApiConfigurationId());
+		this.populateResult(productOptions,productList, vendorOptions.getVendorId(), resultMap);
 		return resultMap;
 	}
 	
@@ -60,7 +60,7 @@ public class ProductEDSManagement {
      * @param vendorId
      * @return
      */
-	protected boolean populateResult(ProductOptions productOptions,List<String> columnDataList, Long vendorId, Map<String, Object> result, String storeCode, Long apiConfigurationId) {
+	protected boolean populateResult(ProductOptions productOptions,List<String> columnDataList, Long vendorId, Map<String, Object> result) {
         Connection conn = null ;
         try {
             conn = DBConnector.sql2o.beginTransaction();
@@ -140,17 +140,11 @@ public class ProductEDSManagement {
             }
 
             if(brand != null) {
-                Map<String,Object> getApiBrandMaps = new HashMap<>();
-                getApiBrandMaps.put("api_configuration_id",apiConfigurationId.toString());
-                getApiBrandMaps.put("enabled",EnabledType.USED);
-                getApiBrandMaps.put("no_img",EnabledType.USED);
-                getApiBrandMaps.put("brand_id",brandId);
-                List<ApiBrandMap> apiBrandMapList = apiBrandMapService.getApiBrandMapListByCondition(getApiBrandMaps);
+                List<Map<String, Object>> apiBrandMapList = apiBrandMapService.getApiBrandMapListByCondition(englishName,vendorId.toString());
                 if(apiBrandMapList != null &&  apiBrandMapList.size() > 0) {
                     no_img = true;
                 }
             }
-
             /** end update by dingyifan 2017-06-15 */
 
             // Save to product table and get result product_id
@@ -1624,14 +1618,12 @@ public class ProductEDSManagement {
         public void setSizeid(String sizeid) {
             this.sizeid = sizeid;
         }
+
     }
-	
+
 	public class VendorOptions{
-		public String storeCode;
-		
+
 		public Long vendorId;
-		
-		public Long apiConfigurationId;
 
 		public Long getVendorId() {
 			return vendorId;
@@ -1641,21 +1633,5 @@ public class ProductEDSManagement {
 			this.vendorId = vendorId;
 		}
 
-		public Long getApiConfigurationId() {
-			return apiConfigurationId;
-		}
-
-		public void setApiConfigurationId(Long apiConfigurationId) {
-			this.apiConfigurationId = apiConfigurationId;
-		}
-
-		public String getStoreCode() {
-			return storeCode;
-		}
-
-		public void setStoreCode(String storeCode) {
-			this.storeCode = storeCode;
-		}
-		
 	}
 }

@@ -157,8 +157,6 @@ public class ProductEDSMapping implements IMapping {
 				api = "http://baseblu.edstema.it/";
 			}
 
-			vendorOptions.setApiConfigurationId(Long.parseLong(mqDataMap.get("api_configuration_id").toString()));
-			vendorOptions.setStoreCode(mqDataMap.get("store_code").toString());
 			vendorOptions.setVendorId(Long.parseLong(vendor_id));
 
 			// 调用Service创建商品

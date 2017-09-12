@@ -151,12 +151,7 @@ public class ProductServiceImpl implements IProductService{
             }
 
             if(brand != null) {
-                Map<String,Object> getApiBrandMaps = new HashMap<>();
-                getApiBrandMaps.put("api_configuration_id",vendorOptions.apiConfigurationId.toString());
-                getApiBrandMaps.put("enabled",EnabledType.USED);
-                getApiBrandMaps.put("no_img",EnabledType.USED);
-                getApiBrandMaps.put("brand_id",brandId);
-                List<ApiBrandMap> apiBrandMapList = apiBrandMapService.getApiBrandMapListByCondition(getApiBrandMaps);
+                List<Map<String, Object>> apiBrandMapList = apiBrandMapService.getApiBrandMapListByCondition(englishName,vendorOptions.getVendorId().toString());
                 if(apiBrandMapList != null && apiBrandMapList.size() > 0) {
                     no_img = true;
                 }

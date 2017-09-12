@@ -3,11 +3,9 @@ package com.intramirror.web.mapping.impl.cloudstore;
 import com.alibaba.fastjson15.JSONArray;
 import com.alibaba.fastjson15.JSONObject;
 import com.google.gson.Gson;
-import com.intramirror.common.parameter.StatusType;
 import com.intramirror.web.mapping.api.IDataMapping;
-import com.intramirror.web.mq.MqName;
 import com.intramirror.web.mq.producer.ProducerUtils;
-import org.apache.commons.lang.StringUtils;
+import com.intramirror.web.mq.vo.Region;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,14 +14,10 @@ import pk.shoplus.DBConnector;
 import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.service.MappingCategoryService;
 import pk.shoplus.util.ExceptionUtils;
-import pk.shoplus.util.MapUtils;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.Data_can_not_find_mapping;
 
 /**
  * Created by dingyifan on 2017/9/11.
@@ -37,7 +31,7 @@ public class CloudStoreProductMapping implements IDataMapping {
     private ProducerUtils producerUtils;
 
     @Autowired
-    private MqName mqName;
+    private Region region;
 
     @Override
     public ProductEDSManagement.ProductOptions mapping(Map<String,Object> bodyDataMap) {
@@ -97,7 +91,6 @@ public class CloudStoreProductMapping implements IDataMapping {
             sku.setStock((int)douqty+"");
             productOptions.getSkus().add(sku);
 
-            producerUtils.sendMessage("nugnes_product_delta_test",mqName.getProducerId(),new Gson().toJson(productOptions),productOptions.getCode());
             if(conn != null) {conn.close();}
             return productOptions;
         } catch (Exception e) {

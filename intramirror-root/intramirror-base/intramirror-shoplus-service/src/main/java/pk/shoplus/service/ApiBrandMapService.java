@@ -44,6 +44,21 @@ public class ApiBrandMapService {
 			throw e;
 		}
 	}
+
+	public List<Map<String, Object>> getApiBrandMapListByCondition(String brandName,String vendor_id) throws Exception {
+		try {
+			if(StringUtils.isNotBlank(brandName)) {
+				String sql = "select * from api_brand_map abm\n" +
+						"inner join api_configuration ac on(ac.api_configuration_id = abm.api_configuration_id)\n" +
+						"where abm.enabled = 1 and ac.enabled = 1 and ac.vendor_id ="+vendor_id+"\n"+
+						" and abm.no_img = 1 and lower(boutique_brand_name) = lower('"+pk.shoplus.util.StringUtils.escapeStr(brandName)+"')";
+				return apiBrandMapEntityDao.executeBySql(sql, null);
+			}
+		} catch (Exception e) {
+			throw e;
+		}
+		return null;
+	}
 	
 	public String getApiBrandMapListByCondition(String brandName) throws Exception {
 		try {

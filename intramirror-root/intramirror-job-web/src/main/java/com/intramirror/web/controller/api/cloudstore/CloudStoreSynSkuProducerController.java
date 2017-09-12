@@ -77,8 +77,6 @@ public class CloudStoreSynSkuProducerController {
                 }
 
                 ProductEDSManagement.VendorOptions vendorOption = new ProductEDSManagement().getVendorOptions();
-                vendorOption.setApiConfigurationId(Long.parseLong(apiEndPointMap.get("api_configuration_id").toString()));
-                vendorOption.setStoreCode(apiEndPointMap.get("store_code").toString());
                 vendorOption.setVendorId(Long.parseLong(apiEndPointMap.get("vendor_id").toString()));
 
                 if(conn != null) {conn.close();}

@@ -64,8 +64,6 @@ public class QuadraSynProductMapping implements IMapping{
             
             //封装vendorOptions 对象消息
             ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
-            vendorOptions.setStoreCode(mqDataMap.get("store_code").toString());
-            vendorOptions.setApiConfigurationId(Long.parseLong(mqDataMap.get("api_configuration_id").toString()));
             vendorOptions.setVendorId(Long.parseLong(mqDataMap.get("vendor_id").toString()));
             
             //封装ProductOptions 对象消息

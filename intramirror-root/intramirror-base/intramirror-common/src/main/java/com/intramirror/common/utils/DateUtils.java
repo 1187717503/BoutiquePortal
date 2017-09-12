@@ -13,6 +13,11 @@ public class DateUtils {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         return simpleDateFormat.format(date);
     }
+
+    public static String getStrDate(Date date,String format){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
+        return simpleDateFormat.format(date);
+    }
     
 	public static String getTimeByHour(int hour) {
         Calendar calendar = Calendar.getInstance();

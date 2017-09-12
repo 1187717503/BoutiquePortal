@@ -114,8 +114,6 @@ public class AtelierFullUpdateProductController {
 
 
             ProductEDSManagement.VendorOptions vendorOptions = new ProductEDSManagement().getVendorOptions();
-            vendorOptions.setApiConfigurationId(Long.parseLong(api_configuration_id));
-            vendorOptions.setStoreCode(storeID);
             vendorOptions.setVendorId(Long.parseLong(vendor_id));
 
             Map<String,Object> mqDataMap = new HashMap<String,Object>();

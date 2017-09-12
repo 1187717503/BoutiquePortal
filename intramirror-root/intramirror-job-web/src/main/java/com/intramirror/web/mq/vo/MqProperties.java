@@ -1,6 +1,4 @@
-package com.intramirror.web.mq;
-
-import org.springframework.stereotype.Component;
+package com.intramirror.web.mq.vo;
 
 import java.util.List;
 
@@ -10,9 +8,8 @@ import java.util.List;
 public class MqProperties {
     private String accessKey;
     private String secretKey;
-    private String topic;
     private String ONSAddr;
-    private List<MqName> mqNames;
+    private List<Region> regions;
 
     public String getAccessKey() {
         return accessKey;
@@ -30,14 +27,6 @@ public class MqProperties {
         this.secretKey = secretKey;
     }
 
-    public String getTopic() {
-        return topic;
-    }
-
-    public void setTopic(String topic) {
-        this.topic = topic;
-    }
-
     public String getONSAddr() {
         return ONSAddr;
     }
@@ -46,12 +35,11 @@ public class MqProperties {
         this.ONSAddr = ONSAddr;
     }
 
-    public List<MqName> getMqNames() {
-        return mqNames;
+    public List<Region> getRegions() {
+        return regions;
     }
 
-    public void setMqNames(List<MqName> mqNames) {
-        this.mqNames = mqNames;
+    public void setRegions(List<Region> regions) {
+        this.regions = regions;
     }
-
 }

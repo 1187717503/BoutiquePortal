@@ -65,6 +65,11 @@
 	<!-- 初始化基础配置 -->
 	<util:properties id="common" location="classpath:/properties/common/common.properties" />
 
+    <bean class="com.intramirror.web.mq.vo.Tag" name="edsUpdateAllProductNugnes">
+        <property name="code" value="edsUpdateAllProductNugnes"/>
+        <property name="desc" value="eds nugnus 全量更新"/>
+    </bean>
+
     <beans profile="prd">
 
     </beans>
@@ -77,25 +82,31 @@
     </beans>
 
     <beans profile="sit">
-        <bean class="com.intramirror.web.mq.MqProperties" >
-            <!--<constructor-arg name="accessKey" value="LTAIaFAG0DNogI0N"></constructor-arg>
-            <constructor-arg name="secretKey" value="KtrOrRvgxeOy34jPCphpMzkgsxfv7n"></constructor-arg>
-            <constructor-arg name="topic" value="nugnes_product_delta_test"></constructor-arg>
-            <constructor-arg name="ONSAddr" value="http://onsaddr-internet.aliyun.com/rocketmq/nsaddr4client-internet"></constructor-arg>
-            <constructor-arg name="mqNames" ref=""></constructor-arg>-->
+        <bean class="com.intramirror.web.mq.vo.MqProperties" >
             <property name="accessKey" value="LTAIaFAG0DNogI0N"></property>
             <property name="secretKey" value="KtrOrRvgxeOy34jPCphpMzkgsxfv7n"></property>
-            <property name="topic" value="nugnes_product_delta_test"></property>
             <property name="ONSAddr" value="http://onsaddr-internet.aliyun.com/rocketmq/nsaddr4client-internet"></property>
-            <property name="mqNames">
+            <property name="regions">
                 <list>
                     <ref bean="updateProduct"></ref>
                 </list>
             </property>
         </bean>
-        <bean class="com.intramirror.web.mq.MqName" name="updateProduct">
+
+        <bean class="com.intramirror.web.mq.vo.Region" name="updateProduct">
             <property name="consumerId" value="CID_UpdateProductTest"></property>
             <property name="producerId" value="PID_UpdateProductTest"></property>
+            <property name="topic" value="nugnes_product_delta_test"></property>
+            <property name="tags">
+                <list>
+                    <ref bean="edsUpdateAllProductNugnes"></ref>
+                </list>
+            </property>
         </bean>
+
     </beans>
+
+
+
+
 </beans>
