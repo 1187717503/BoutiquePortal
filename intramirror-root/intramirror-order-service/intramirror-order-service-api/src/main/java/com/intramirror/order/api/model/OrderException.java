@@ -24,7 +24,7 @@ public class OrderException {
 	/**
 	 * @Fields 物流订单的商品记录ID
 	 */
-	private String logistics_product_id;
+	private Long logistics_product_id;
 	
 	/**
 	 * @Fields 评论内容
@@ -77,11 +77,11 @@ public class OrderException {
 		this.order_exception_type_id = order_exception_type_id;
 	}
 
-	public String getLogistics_product_id() {
+	public Long getLogistics_product_id() {
 		return logistics_product_id;
 	}
 
-	public void setLogistics_product_id(String logistics_product_id) {
+	public void setLogistics_product_id(Long logistics_product_id) {
 		this.logistics_product_id = logistics_product_id;
 	}
 
