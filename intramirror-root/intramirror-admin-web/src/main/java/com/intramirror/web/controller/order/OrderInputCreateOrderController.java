@@ -117,7 +117,7 @@ public class OrderInputCreateOrderController extends BaseController {
             List<Map<String, Object>> exchangerRate = exchangeRateService.getShipFeeByCityId(null, null);
             order.setCurrentRate(BigDecimal.valueOf(Double.valueOf(exchangerRate.get(0).get("exchange_rate").toString())));
 
-            order.setRemainingRmb(String.valueOf(inputCreateOrder.getBalanceDue().multiply(order.getCurrentRate()).setScale(2, RoundingMode.HALF_UP)));
+            order.setRemainingRmb(String.valueOf(inputCreateOrder.getBalanceDue().setScale(2, RoundingMode.HALF_UP)));
             order.setAreaCode("");
 
             order.setTotalTaxRmb(order.getTaxFee().multiply(order.getCurrentRate()).setScale(2, RoundingMode.HALF_UP));
