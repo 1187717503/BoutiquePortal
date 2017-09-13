@@ -1,7 +1,12 @@
 package com.intramirror.web.thread;
 
+import com.intramirror.common.utils.DateUtils;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
+import pk.shoplus.model.ProductEDSManagement;
+import pk.shoplus.model.Vendor;
 
+import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -14,6 +19,27 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Service
 public class CommonThreadPool {
 
+    private static final Logger logger = Logger.getLogger(CommonThreadPool.class);
+
+    public static void executeProduct(ThreadPoolExecutor executor,int threadNum,UpdateProductThread updateProductThread){
+        try {
+            System.out.printf("service:pool执行器中线程中实际的线程数量:%d，执行器中正在执行任务的线程数量：%d，执行器中已经完成的任务数量:%d\n",executor.getPoolSize(),executor.getActiveCount(),executor.getCompletedTaskCount());
+            logger.info("CommonThreadPoolExecuteProduct,start");
+            if(executor.getActiveCount() <= threadNum) {
+                executor.execute(updateProductThread);
+                logger.info("CommonThreadPoolExecuteProduct,end");
+            } else {
+                logger.info("CommonThreadPoolExecuteProduct,startSleep,date:"+ DateUtils.getStrDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
+                Thread.sleep(1000);
+                logger.info("CommonThreadPoolExecuteProduct,endSleep,date:"+ DateUtils.getStrDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
+                executeProduct(executor,threadNum,updateProductThread);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+/*
     // 定义可缓存线程池
     private static ThreadPoolExecutor executor;
 
@@ -45,10 +71,10 @@ public class CommonThreadPool {
 //            System.out.println(executor);
             System.out.println(executor2);
         }
-    }
+    }*/
 }
 
-
+/*
 
 class testThread implements Runnable {
 
@@ -67,4 +93,4 @@ class testThread implements Runnable {
     public testThread(String code) {
         this.code = code;
     }
-}
+}*/

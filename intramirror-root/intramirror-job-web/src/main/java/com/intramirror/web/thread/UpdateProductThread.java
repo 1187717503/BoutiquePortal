@@ -2,12 +2,14 @@ package com.intramirror.web.thread;
 
 import com.alibaba.fastjson15.JSONObject;
 import com.google.gson.Gson;
+import com.intramirror.common.utils.DateUtils;
 import org.apache.log4j.Logger;
 import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.parameter.StatusType;
 import pk.shoplus.service.product.api.IProductService;
 import pk.shoplus.service.product.impl.ProductServiceImpl;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -30,7 +32,12 @@ public class UpdateProductThread implements Runnable{
         try {
             logger.info("UpdateProductThreadRun,createProduct,productOptions:"+new Gson().toJson(productOptions)
                     +",vendorOptions:"+new Gson().toJson(vendorOptions));
+
+            logger.info("EdsProductAllProducerControllerExecute,executeProduct,startDate:"+ DateUtils.getStrDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
             Map<String,Object> resultMap = productEDSManagement.createProduct(productOptions,vendorOptions);
+            logger.info("EdsProductAllProducerControllerExecute,executeProduct,startDate:"+ DateUtils.getStrDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
+
+
             logger.info("UpdateProductThreadRun,createProduct,resultMap:"+ JSONObject.toJSONString(resultMap)+",productOptions:"+new Gson().toJson(productOptions)
                     +",vendorOptions:"+new Gson().toJson(vendorOptions));
 

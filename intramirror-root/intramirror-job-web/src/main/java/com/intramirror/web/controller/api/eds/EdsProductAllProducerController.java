@@ -3,7 +3,10 @@ package com.intramirror.web.controller.api.eds;
 import com.alibaba.fastjson15.JSONObject;
 import com.google.gson.Gson;
 import com.intramirror.common.parameter.StatusType;
+import com.intramirror.common.utils.DateUtils;
 import com.intramirror.web.mapping.api.IDataMapping;
+import com.intramirror.web.thread.CommonThreadPool;
+import com.intramirror.web.thread.UpdateProductThread;
 import com.intramirror.web.util.GetPostRequestUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.Param;
@@ -106,7 +109,11 @@ public class EdsProductAllProducerController implements InitializingBean {
                     logger.info("EdsProductAllProducerControllerExecute,initParam,productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions));
 
                     if(productOptions != null) {
-
+                        String startDate = DateUtils.getStrDate(new Date(),"yyyy-MM-dd HH:mm:ss");
+                        logger.info("EdsProductAllProducerControllerExecute,executeProduct,startDate:"+startDate+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions));
+                        CommonThreadPool.executeProduct(nugnesExecutor,threadNum,new UpdateProductThread(productOptions,vendorOptions));
+                        String endDate = DateUtils.getStrDate(new Date(),"yyyy-MM-dd HH:mm:ss");
+                        logger.info("EdsProductAllProducerControllerExecute,executeProduct,startDate:"+endDate+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions));
                     } else {
                         // TODO
                         logger.info("EdsProductAllProducerControllerExecute,errorInitParam,productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions));
@@ -114,6 +121,7 @@ public class EdsProductAllProducerController implements InitializingBean {
                 }
 
                 offset = offset + limit;
+                break;
             }
             logger.info("EdsProductAllProducerControllerExecute,executeEnd,offset:"+offset+",limit:"+limit+",url:"+url+",store_code:"+store_code);
             mapUtils.putData("status",StatusType.SUCCESS).putData("info","success");
@@ -134,7 +142,7 @@ public class EdsProductAllProducerController implements InitializingBean {
         object.put("url","http://nugnes.edstema.it/api/v3.0/products/condensed");
         object.put("vendor_id","9");
         object.put("store_code","X3ZMV");
-        object.put("limit","100");
+        object.put("limit","500");
         object.put("offset","0");
         object.put("threadNum","30");
         object.put("nugnesExecutor",nugnesExecutor);
