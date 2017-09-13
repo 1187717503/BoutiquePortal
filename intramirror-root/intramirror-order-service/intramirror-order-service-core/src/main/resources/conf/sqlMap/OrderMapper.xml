@@ -293,7 +293,7 @@
 		        vendor_address_country_id,p.cover_img,lp.logistics_product_id
 		        FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
 		        INNER JOIN `order` o ON ol.order_id = o.order_id
-		        INNER JOIN user_ship_address usa ON o.user_id = usa.user_id
+		        LEFT JOIN user_ship_address usa ON o.user_id = usa.user_id
 		        LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
 		        INNER JOIN geography g on l.geography_id = g.geography_id
 		        INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
@@ -368,7 +368,7 @@ and t1.order_num =  #{orderId,jdbcType=BIGINT}
 
         FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
         INNER JOIN `order` o ON ol.order_id = o.order_id
-        INNER JOIN user_ship_address usa ON o.user_id = usa.user_id
+        LEFT JOIN user_ship_address usa ON o.user_id = usa.user_id
         LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
         INNER JOIN geography g on l.geography_id = g.geography_id
         INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
@@ -432,7 +432,7 @@ and t1.order_num =  #{orderId,jdbcType=BIGINT}
 				INNER JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id   
 				INNER JOIN geography g on l.geography_id = g.geography_id
 				INNER JOIN `user` u on o.user_id= u.user_id
-				INNER JOIN user_ship_address us on (us.user_id = u.user_id)  
+				LEFT JOIN user_ship_address us on (us.user_id = u.user_id)
 				INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id  
 				INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id   
 				INNER JOIN product p ON (sp.product_id = p.product_id ) 
@@ -465,7 +465,7 @@ and t1.order_num =  #{orderId,jdbcType=BIGINT}
 	SELECT  lp.order_line_num
 	FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
 	INNER JOIN `order` o ON ol.order_id = o.order_id
-	INNER JOIN user_ship_address usa ON o.user_id = usa.user_id
+	LEFT JOIN user_ship_address usa ON o.user_id = usa.user_id
 	LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
 	INNER JOIN geography g on l.geography_id = g.geography_id
 	INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id

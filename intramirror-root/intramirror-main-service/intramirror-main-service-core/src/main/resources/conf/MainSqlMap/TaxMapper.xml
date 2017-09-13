@@ -199,4 +199,11 @@
         FROM tax
         WHERE address_country_id = #{fromCountryId} AND tax_type = #{taxType}
     </select>
+
+    <select id="getTaxByAddressCountryId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from tax
+        where address_country_id = #{addressCountryId,jdbcType=BIGINT}
+    </select>
 </mapper>

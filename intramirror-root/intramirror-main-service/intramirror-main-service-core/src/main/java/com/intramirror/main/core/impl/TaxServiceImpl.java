@@ -2,6 +2,7 @@ package com.intramirror.main.core.impl;
 
 
 import com.intramirror.common.Helper;
+import com.intramirror.main.api.model.Tax;
 import com.intramirror.main.api.service.TaxService;
 import com.intramirror.main.core.dao.BaseDao;
 import com.intramirror.main.core.mapper.TaxMapper;
@@ -37,5 +38,10 @@ public class TaxServiceImpl extends BaseDao implements TaxService {
     @Override
     public List<Map<String, Object>> getTaxByCategoryId(String taxType, String[] categoryIds) {
         return taxMapper.getTaxByCategoryId(taxType, categoryIds);
+    }
+
+    @Override
+    public Tax getTaxByAddressCountryId(Long addressCountryId) {
+        return taxMapper.getTaxByAddressCountryId(addressCountryId);
     }
 }
