@@ -1,18 +1,18 @@
 package com.intramirror.product.core.impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.alibaba.fastjson.JSON;
 import com.intramirror.product.api.model.SkuStore;
+import com.intramirror.product.api.service.ISkuStoreService;
+import com.intramirror.product.core.dao.BaseDao;
+import com.intramirror.product.core.mapper.SkuStoreMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
-import com.intramirror.product.api.service.ISkuStoreService;
-import com.intramirror.product.core.dao.BaseDao;
-import com.intramirror.product.core.mapper.SkuStoreMapper;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -53,14 +53,17 @@ public class SkuStoreServiceImpl extends BaseDao implements ISkuStoreService{
 		SkuStore skuStore = null;
 		if (null != skuStoreList && skuStoreList.size() > 0) {
 			skuStore = skuStoreList.get(0);
+			logger.info("订单商品 "+ shopProductSkuId+" 确认库存前库存情况 :"+ JSON.toJSONString(skuStore));
 		}
 
 		try {
 			if (null != skuStore) {
 				Long skuStoreId = skuStore.getSkuStoreId();
 				skuStoreMapper.confirmSkuStore(skuStoreId);
+				logger.info("订单商品 "+ shopProductSkuId+" 确认库存执行 : s.store = s.store + 1,s.confirmed = s.confirmed - 1");
 				if (skuStore.getStore() < 0) {
 					skuStoreMapper.confirmSkuStoreByNegativeStore(skuStoreId);
+					logger.info("订单商品 "+ shopProductSkuId+" 确认库存,展示库存小于零时执行 : s.store = s.store + 1,s.confirmed = s.confirmed - 1");
 				}
 			}
 		} catch (DataIntegrityViolationException e) {

@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -380,8 +381,10 @@ public class OrderController extends BaseController{
 	 */
 	@RequestMapping(value="/updateOrderStatus", method=RequestMethod.POST)
 	@ResponseBody
-	public ResultMessage updateOrderStatus(@RequestBody Map<String, Object> map){
+	public ResultMessage updateOrderStatus(@RequestBody Map<String, Object> map, HttpServletRequest httpServletRequest){
 		logger.info(MessageFormat.format("updateOrderStatus param:{0}",new Gson().toJson(map)));
+
+		User user = getUser(httpServletRequest);
 		ResultMessage message = ResultMessage.getInstance();
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 		resultMap.put("status", StatusType.FAILURE);
@@ -415,7 +418,7 @@ public class OrderController extends BaseController{
 				if (2 == status) {
 					if (null != oldLogisticsProduct) {
 						Long shopProductSkuId = oldLogisticsProduct.getShop_product_sku_id();
-						logger.info("订单 "+shopProductSkuId+" confirm操作, 修改confirm库存开始");
+						logger.info("订单 "+shopProductSkuId+" , 用户 "+ JSON.toJSONString(user.getUsername()) +" confirm操作, 修改confirm库存开始");
 						skuStoreService.updateConfirmStoreByShopProductSkuId(shopProductSkuId);
 						logger.info("订单 " + shopProductSkuId + " confirm操作, 修改confirm库存成功");
 					}
