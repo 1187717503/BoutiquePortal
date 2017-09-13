@@ -34,7 +34,7 @@ public class QueueUtils {
     }
 
     public static void putMessage(Object mqDataMap,QueueNameJobEnum queueNameEnum,QueueTypeEnum queueTypeEnum) {
-        logger.info("start putMessage by : " + queueNameEnum.getCode() + queueTypeEnum.getCode());
+        logger.info("QueueUtilsPutMessage,queueNameEnum:" + queueNameEnum.getCode() + queueTypeEnum.getCode());
         MessageInfo messageInfo = new MessageInfo();
         messageInfo.setBody(mqDataMap);
         messageInfo.setQueueName(queueNameEnum.getMqCode());
@@ -43,7 +43,7 @@ public class QueueUtils {
         messageRequestVo.setQueueName(queueNameEnum.getMqCode()+queueTypeEnum.getCode());
         messageRequestVo.setRequestBody(new Gson().toJson(messageInfo));
         MessageHelper.putMessage(messageRequestVo);
-        logger.info("end putMessage by : " + queueNameEnum.getCode() + queueTypeEnum.getCode());
+        logger.info("QueueUtilsPutMessage,messageRequestVo: "+new Gson().toJson(messageRequestVo));
     }
 
 }

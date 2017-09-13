@@ -243,14 +243,14 @@ public class ProductServiceImpl implements IProductService{
                         .putData("key","season_code")
                         .putData("value","null");
                 warningMaps.add(mapUtils.getMap());
-            } else {
-                if(StringUtils.isNotBlank(season_code)) {
-                    product.season_code = season_code;
-                } else if(StringUtils.isNotBlank(productOptions.getSeasonCode())) {
-                    product.season_code = productOptions.getSeasonCode();
-                }
-
             }
+
+            if(StringUtils.isNotBlank(season_code)) {
+                product.season_code = season_code;
+            } else if(StringUtils.isNotBlank(productOptions.getSeasonCode())) {
+                product.season_code = productOptions.getSeasonCode();
+            }
+
             product.updated_at = new Date();
             productService.updateProduct(product);
 

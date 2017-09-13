@@ -1,7 +1,8 @@
 package com.intramirror.web.enums;
 
 import com.intramirror.web.mapping.impl.QuadraSynProductMapping;
-//import com.intramirror.web.mapping.impl.XmagAllStockMapping;
+import com.intramirror.web.mapping.impl.XmagAllStockMapping;
+import com.intramirror.web.mapping.impl.XmagOrderMapping;
 import com.intramirror.web.mapping.impl.XmagSynProductMapping;
 
 import pk.shoplus.DBConnector;
@@ -19,11 +20,16 @@ public enum QueueNameJobEnum {
 	EdsCreateOrder("EdsCreateOrder",new OrderEDSMapping(),"调用EDS接口创建订单"),
 	EdsGetOrderStatus("EdsGetOrderStatus",new OrderEdsUpdateStatusMapping(),"调用EDS接口获取订单状态"),
 
+	// nugnes
 	EdsCreateProduct("EdsCreateProduct",new ProductEDSMapping(),"调用EDS接口创建商品"),
-	EdsUpdateProductByDay("EdsUpdateProductByDay",new ProductEDSMapping(),"调用EDS接口修改商品"),
 	EdsUpdateAllProduct("EdsUpdateAllProduct",new ProductEDSMapping(),"调用EDS接口创建商品-全量"),
-
 	EdsUpdateStock("EdsUpdateStock",new ProductStockEDSMapping(),"调用EDS接口修改库存"),
+	EdsUpdateProductByDayNugnes("EdsUpdateProductByDayNugnes",new ProductEDSMapping(),"调用EDS接口修改商品"),
+
+	// base.blu
+	EdsCreateProductBaseBlu("EdsCreateProductBaseBlu",new ProductEDSMapping(),"调用EDS接口创建商品"),
+	EdsUpdateStockBaseBlu("EdsUpdateStockBaseBlu",new ProductStockEDSMapping(),"调用EDS接口修改库存"),
+	EdsUpdateProductByDay("EdsUpdateProductByDay",new ProductEDSMapping(),"调用EDS接口修改商品"),
 
 	AtelierCreateProductLucianaBari("AtelierCreateProductLucianaBari",new ProductAtelierMapping(),"Atelier调用IM接口创建商品"),
 	AtelierCreateProductDante("AtelierCreateProductDante",new ProductAtelierMapping(),"Atelier调用IM接口创建商品"),
@@ -49,6 +55,8 @@ public enum QueueNameJobEnum {
 	AtelierUpdateProductGisaBoutique("AtelierUpdateProductGisaBoutique",new UpdateProductMapping(),"Atelier调用IM接口修改商品信息"),
 	AtelierUpdateProductWiseBoutique("AtelierUpdateProductWiseBoutique",new UpdateProductMapping(),"Atelier调用IM接口修改商品信息"),
 
+	AtelierFullUpdateProductDante("AtelierFullUpdateProductDante",new UpdateProductMapping(),"Atelier调用IM接口修改商品信息"),
+
 	CloudStoreSynProduct("CloudStoreSynProduct",new CloudStoreGetInventoryMapping(),"IM调用cloudstore getInventory更新商品信息"),
 	CloudStoreSynStock("CloudStoreSynStock",new CloudStoreGetEventsMapping(),"IM调用cloudstore getEvents更新库存信息"),
 
@@ -63,7 +71,9 @@ public enum QueueNameJobEnum {
 	
 	XmagSynProductByDate("XmagSynProductByDate",new XmagSynProductMapping(),"IM调用Xmag 接口更新商品信息"),
 	
-//	XmagAllStock("XmagAllStock",new XmagAllStockMapping(),"IM调用Xmag 接口更新商品信息"),
+	XmagAllStock("XmagAllStock",new XmagAllStockMapping(),"IM调用Xmag 接口更新商品信息"),
+	
+	OrderSetCheck("OrderSetCheck",new XmagOrderMapping(),"IM调用Xmag setOrder 接口更新订单信息"),
 	
 	QuadraSynDayProduct("QuadraSynDayProduct",new QuadraSynProductMapping(),"IM调用quadra 接口更新商品信息");
 	

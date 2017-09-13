@@ -32,6 +32,12 @@
             </properties>
         </profile>
         <profile>
+            <id>shenv</id>
+            <properties>
+                <profiles.active>shenv</profiles.active>
+            </properties>
+        </profile>
+        <profile>
             <id>prd</id>
             <properties>
                 <profiles.active>prd</profiles.active>

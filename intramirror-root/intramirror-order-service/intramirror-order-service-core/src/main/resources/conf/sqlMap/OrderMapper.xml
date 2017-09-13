@@ -78,7 +78,9 @@
         brandName,
         l.user_rec_name,l.user_rec_province,l.user_rec_city,l.user_rec_area,l.user_rec_addr,l.user_rec_country,l.geography_id,
         v.vendor_name,v.vendor_id,g.english_name as geography_name,v.address_country_id as
-        vendor_address_country_id,p.cover_img,lp.logistics_product_id
+        vendor_address_country_id,p.cover_img,lp.logistics_product_id,
+        oe.created_at as oeCreatedAt,oet.description as oeDescription,oe.comments as oeComments,u.email as oeCreatedByuser,
+        oe.modified_at as oeModified,oe.`status` as oeStatus,oe.resolution as oeResolution, uu.email as Resolved
         FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
         INNER JOIN `order` o ON ol.order_id = o.order_id
         LEFT JOIN user_ship_address usa ON o.user_id = usa.user_id
@@ -107,6 +109,10 @@
         where t_pp.enabled = 1 and (t_pp.key_name='BrandID' or t_pp.key_name = 'ColorCode')
         group by t_pp.product_id
         ) pp ON p.product_id = pp.product_id
+        LEFT JOIN order_exception oe ON(oe.logistics_product_id=lp.logistics_product_id)
+		LEFT JOIN order_exception_type oet ON(oet.order_exception_type_id=oe.order_exception_type_id)
+		LEFT JOIN `user` u ON(u.user_id=oe.created_by_user_id)
+		LEFT JOIN  `user` uu on(uu.user_id=oe.modified_by_user_id)
         where pspk.`name` = 'Size' and lp.`status` = #{status,jdbcType=BIGINT}
         and v.vendor_id = #{vendorId,jdbcType=BIGINT}
         GROUP BY lp.order_line_num

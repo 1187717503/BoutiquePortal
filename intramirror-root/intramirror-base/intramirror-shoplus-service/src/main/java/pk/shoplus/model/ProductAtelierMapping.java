@@ -96,6 +96,9 @@ public class ProductAtelierMapping implements IMapping {
 					.setWidth(jsonObjectData.getString("width"))
 					.setHeigit(jsonObjectData.getString("height"))
 					.setSalePrice(jsonObjectData.getString("sale_price"));
+			String full_update_product = bodyDataMap.get("full_update_product") == null ? "0" : bodyDataMap.get("full_update_product").toString();
+			productOptions.setFullUpdateProductFlag(full_update_product);
+
 			JSONArray skus = JSONArray.parseArray(jsonObjectData.getString("sku"));
 			for (Object it : skus) {
 				JSONObject item = (JSONObject) it;

@@ -12,17 +12,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 import com.intramirror.order.api.model.ApiMq;
-import com.intramirror.web.mapping.api.IMapping;
+import com.intramirror.web.mapping.impl.AlDucaOrderMapping;
 import com.intramirror.web.mapping.impl.QuadraSynProductMapping;
+import com.intramirror.web.mapping.impl.XmagAllStockMapping;
+import com.intramirror.web.mapping.impl.XmagOrderMapping;
 import com.intramirror.web.mapping.impl.XmagSynProductMapping;
 
-import org.sql2o.Connection;
-
-import pk.shoplus.DBConnector;
 import pk.shoplus.model.Product;
 import pk.shoplus.model.ProductEDSManagement;
-import pk.shoplus.service.ProductService;
-import pk.shoplus.util.RedisUtils;
 
 /**
  * 
@@ -38,6 +35,16 @@ public class DemoController {
 	
 	@Autowired
 	private XmagSynProductMapping xmagProductMapperService;
+	
+	@Autowired
+	private XmagAllStockMapping xmagAllStockMapping;
+	
+	@Autowired
+	private XmagOrderMapping xmagOrderMapping;
+	
+	@Autowired
+	private AlDucaOrderMapping alDucaOrderMapping;
+	
 	
 	/** 测试返回对象转换JSON !!! */
 	@RequestMapping(value = "/get_api_mq",method = RequestMethod.GET)
@@ -81,6 +88,24 @@ public class DemoController {
 	@ResponseBody
 	public void xmagAddProduct(@RequestBody Map<String,Object> mqData) throws Exception {
 		xmagProductMapperService.handleMappingAndExecute(new Gson().toJson(mqData));
+	}
+	
+	@RequestMapping(value = "/xmagAllProduct")
+	@ResponseBody
+	public void xmagAllProduct(@RequestBody Map<String,Object> mqData) throws Exception {
+		xmagAllStockMapping.handleMappingAndExecute(new Gson().toJson(mqData));
+	}
+	
+	@RequestMapping(value = "/xmagOrder")
+	@ResponseBody
+	public void xmagOrder(@RequestBody Map<String,Object> mqData) throws Exception {
+		xmagOrderMapping.handleMappingAndExecute(new Gson().toJson(mqData));
+	}
+	
+	@RequestMapping(value = "/alDucaCreateOrder")
+	@ResponseBody
+	public void alDucaCreateOrder(@RequestBody Map<String,Object> mqData) throws Exception {
+		alDucaOrderMapping.handleMappingAndExecute(new Gson().toJson(mqData));
 	}
 	
 	

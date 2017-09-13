@@ -26,13 +26,13 @@ import com.google.gson.JsonParser;
 import com.intramirror.common.Helper;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.parameter.StatusType;
-import com.intramirror.order.api.common.ContainerType;
 import com.intramirror.order.api.common.OrderStatusType;
-import com.intramirror.order.api.model.Container;
 import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.service.IContainerService;
 import com.intramirror.order.api.service.ILogisticProductShipmentService;
 import com.intramirror.order.api.service.ILogisticsProductService;
+import com.intramirror.order.api.service.IOrderExceptionService;
+import com.intramirror.order.api.service.IOrderExceptionTypeService;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.service.IShipmentService;
 import com.intramirror.order.api.service.ISubShipmentService;
@@ -41,7 +41,6 @@ import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.VendorService;
-import com.intramirror.web.common.BarcodeUtil;
 import com.intramirror.web.controller.BaseController;
 import com.intramirror.web.service.LogisticsProductService;
 import com.intramirror.web.service.OrderRefund;
@@ -96,7 +95,11 @@ public class OrderController extends BaseController{
 	@Autowired
 	private ILogisticProductShipmentService logisticProductShipmentService;
 	
+	@Autowired
+	private IOrderExceptionService orderExceptionService;
 	
+	@Autowired
+	private IOrderExceptionTypeService orderExceptionTypeService;
 	
 	/**
 	 * 获取订单列表
@@ -1006,4 +1009,122 @@ public class OrderController extends BaseController{
 		result.setInfoMap(info);
 		return result;
 	}
+	
+	@RequestMapping(value="/saveUserComment", method=RequestMethod.POST)
+	@ResponseBody
+	public ResultMessage saveUserComment(@RequestBody Map<String,Object> map,HttpServletRequest httpRequest){
+		logger.info("order saveUserComment Param : " + new Gson().toJson(map));
+		ResultMessage message= new ResultMessage();
+		try{
+			if (null == map || 0 == map.size()){
+				logger.info("parameter cannot be null");
+				message.errorStatus().putMsg("info", "Parameter cannot be null");
+				return message;
+			}
+			if(map.get("logistics_product_id") == null || StringUtils.isBlank(map.get("logistics_product_id").toString())){
+				logger.info("logistics_product_id cannot be null");
+				message.errorStatus().putMsg("info", "logistics_product_id cannot be null");
+				return message;
+			}
+			if(map.get("comments") == null || StringUtils.isBlank(map.get("comments").toString())){
+				logger.info("comments cannot be null");
+				message.errorStatus().putMsg("info", "comments cannot be null");
+				return message;
+			}
+			if(map.get("reason") == null || StringUtils.isBlank(map.get("reason").toString())){
+				logger.info("reason cannot be null");
+				message.errorStatus().putMsg("info", "reason cannot be null");
+				return message;
+			}
+			User user = this.getUser(httpRequest);
+			if(user == null){
+				logger.info("user cannot be null");
+				message.errorStatus().putMsg("info", "user cannot be null");
+				return message;
+			}
+			map.put("created_by_user_id", user.getUserId());
+			System.out.println(user.getEmail());
+			int result = orderExceptionService.saveOrderComments(map);
+			if (result == 1){
+				message.successStatus().putMsg("SUCCESS", "result " +result);
+				return message;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.info("errorMsg : "+e.getMessage());
+			message.errorStatus().putMsg("errorMsg", e.getMessage());
+		}
+	return message;
+	}
+	
+	@RequestMapping(value="/getExceptionType", method=RequestMethod.GET)
+	@ResponseBody
+	public ResultMessage getExceptionType(){
+		logger.info("order getExceptionType ");
+		ResultMessage message= new ResultMessage();
+		try{
+			List<Map<String, Object>> list = orderExceptionTypeService.getExceptionType(null);
+			if (null != list && 0 < list.size()){
+				message.successStatus().putMsg("INFO", "SUCCESS").setData(list);
+				return message;
+			}
+			message.errorStatus().putMsg("INFO", "SUCCESS").setData(null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.info("errorMsg : "+e.getMessage());
+			message.errorStatus().putMsg("errorMsg", e.getMessage());
+		}
+		return message;
+	}
+	
+	@RequestMapping(value="/updateException", method=RequestMethod.POST)
+	@ResponseBody
+	public ResultMessage updateException(@RequestBody Map<String, Object> map){
+		logger.info("order updateException Param : " +new Gson().toJson(map));
+		ResultMessage message= new ResultMessage();
+		try{
+			if(null == map || 0 == map.size()){
+				logger.info("parameter cannot be null");
+				message.errorStatus().putMsg("info", "Parameter cannot be null");
+				return message;
+			}
+			if(map.get("status") == null || StringUtils.isBlank(map.get("status").toString())){
+				logger.info("status cannot be null");
+				message.errorStatus().putMsg("info", "status cannot be null");
+				return message;
+			}
+			if(map.get("modified_at") == null || StringUtils.isBlank(map.get("modified_at").toString())){
+				logger.info("modified_at cannot be null");
+				message.errorStatus().putMsg("info", "modified_at cannot be null");
+				return message;
+			}
+			if(map.get("modified_by_user_id") == null || StringUtils.isBlank(map.get("modified_by_user_id").toString())){
+				logger.info("modified_by_user_id cannot be null");
+				message.errorStatus().putMsg("info", "modified_by_user_id cannot be null");
+				return message;
+			}
+			if(map.get("resolution") == null || StringUtils.isBlank(map.get("resolution").toString())){
+				logger.info("resolution cannot be null");
+				message.errorStatus().putMsg("info", "resolution cannot be null");
+				return message;
+			}
+			if(map.get("order_exception_id") == null || StringUtils.isBlank(map.get("order_exception_id").toString())){
+				logger.info("order_exception_id cannot be null");
+				message.errorStatus().putMsg("info", "order_exception_id cannot be null");
+				return message;
+			}
+			int result = orderExceptionService.updateOrderExceptionById(map);
+			if (1==result){
+				message.successStatus().putMsg("INFO", "SUCCESS").setData(result);
+				return message;
+			}
+			message.errorStatus().putMsg("INFO", "SUCCESS").setData(-1);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.info("errorMsg : "+e.getMessage());
+			message.errorStatus().putMsg("errorMsg", e.getMessage());
+		}
+		return message;
+	}
+	
 }

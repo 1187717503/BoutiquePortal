@@ -37,6 +37,27 @@ public final class ContainerType {
 	 */
 	public static final int SUBDELIVERED = 6;
 	
+	
+	/**
+	 * @Fields 待审核
+	 */
+	public static final int PENDINGAUDIT = 1;
+	
+	/**
+	 * @Fields 审核中
+	 */
+	public static final int INAUDIT = 2;
+	
+	/**
+	 * @Fields 审核通过
+	 */
+	public static final int PASSED = 3;
+	
+	/**
+	 * @Fields 审核失败
+	 */
+	public static final int AUDITFAILURE = 4;
+	
 	/**
 	 * 根据传入的container状态，获取流转的前一个状态
 	 * @param status

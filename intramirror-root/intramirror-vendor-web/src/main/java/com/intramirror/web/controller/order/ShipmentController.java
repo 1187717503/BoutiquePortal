@@ -79,6 +79,10 @@ public class ShipmentController extends BaseController{
 				return message;
 			}	
 			Map<String, Object> orderResult = orderService.getShipmentDetails(map);
+			if (null == orderResult || 0==orderResult.size()){
+				message.errorStatus().putMsg("info", "order result null");
+				return message;
+			}
 			orderResult.put("shipmentId", map.get("shipmentId").toString());
 			//新的入参
 			String result = iShipmentService.saveShipmentByOrderId(orderResult);
@@ -259,22 +263,29 @@ public class ShipmentController extends BaseController{
 			}
 			List<LogisticsProduct> list  = logisticsProductService.selectByCondition(map);
 			Map<String, Object> paramMap = new HashMap<>();
-			paramMap.put("orderNumber", list.get(0).getOrder_line_num());
-			paramMap.put("shipmentId", "");
-			Map<String, Object> orderResult = orderService.getShipmentDetails(paramMap);
-			Long shipmentId = iShipmentService.newShipment(orderResult);
-			if (shipmentId != null){
-				Map<String, Object> containerMap = new HashMap<>();
-				containerMap.put("shipment_id", shipmentId);
-				containerMap.put("container_id", Long.parseLong(map.get("container_id").toString()));
-				containerService.updateContainerShipment(containerMap);
-				containerMap = new HashMap<>();
-				containerMap.put("shipmentId", shipmentId);
-				containerMap.put("shipment_id", Long.parseLong(map.get("shipmentId").toString()));
-				subShipmentService.updateSubShipment(containerMap);
-				message.successStatus().putMsg("Info", "SUCCESS").setData(1);
+			if (null == list || list.isEmpty()){
+				logger.info("LogisticsProductlist cannot be null");
+				message.errorStatus().putMsg("Info", "LogisticsProductlist result cannot be null");
+				return message;
+			}else{
+				paramMap.put("orderNumber", list.get(0).getOrder_line_num());
+				paramMap.put("shipmentId", "");
+				Map<String, Object> orderResult = orderService.getShipmentDetails(paramMap);
+				Long shipmentId = iShipmentService.newShipment(orderResult);
+				if (shipmentId != null){
+					Map<String, Object> containerMap = new HashMap<>();
+					containerMap.put("shipment_id", shipmentId);
+					containerMap.put("container_id", Long.parseLong(map.get("container_id").toString()));
+					containerService.updateContainerShipment(containerMap);
+					containerMap = new HashMap<>();
+					containerMap.put("shipmentId", shipmentId);
+					containerMap.put("shipment_id", Long.parseLong(map.get("shipmentId").toString()));
+					subShipmentService.updateSubShipment(containerMap);
+					message.successStatus().putMsg("Info", "SUCCESS").setData(1);
+					return message;
+				}
+				message.successStatus().putMsg("Info", "SUCCESS").setData(-1);
 			}
-			message.successStatus().putMsg("Info", "SUCCESS").setData(-1);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.info("Error Message : " + e.getMessage());
