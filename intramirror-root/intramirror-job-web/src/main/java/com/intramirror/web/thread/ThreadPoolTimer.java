@@ -22,15 +22,13 @@ public class ThreadPoolTimer {
 	
 	public static ThreadPoolTimer threadPoolTimer;
 	
-	private static final Long initialDelay = 5L;// 10L;
+	private static final Long initialDelay = 1L;
 	
-	private static final Long period = 3L;// ;
-
-
+	private static final Long period = 1L;
 
 	public static ThreadPoolTimer getInstance(){
 		if(scheduExec.isShutdown()) {
-			scheduExec = Executors.newScheduledThreadPool(3);
+			scheduExec = Executors.newScheduledThreadPool(10);
 		}
 
 		if(threadPoolTimer == null || scheduExec.isShutdown()){
@@ -76,5 +74,24 @@ public class ThreadPoolTimer {
 	public void destory(){
 		if (scheduExec != null)
 			scheduExec.shutdown();
+	}
+
+	public static void main(String[] args) {
+		ThreadPoolTimer threadPoolTimer = ThreadPoolTimer.getInstance();
+		threadPoolTimer.executeTask(new Consume("数据A"));
+		threadPoolTimer.destory();
+	}
+}
+
+class Consume implements Runnable {
+
+	private String code ;
+	@Override
+	public void run() {
+		System.out.println(Thread.currentThread().getName()+code);
+	}
+
+	public Consume(String code) {
+		this.code = code;
 	}
 }

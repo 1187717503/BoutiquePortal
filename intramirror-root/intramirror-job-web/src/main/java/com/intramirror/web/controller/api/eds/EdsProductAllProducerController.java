@@ -2,32 +2,20 @@ package com.intramirror.web.controller.api.eds;
 
 import com.alibaba.fastjson15.JSONObject;
 import com.google.gson.Gson;
-import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.parameter.StatusType;
-import com.intramirror.common.utils.DateUtils;
-import com.intramirror.web.controller.api.service.UpdateProductThreadPool;
 import com.intramirror.web.mapping.api.IDataMapping;
-import com.intramirror.web.mq.producer.ProducerUtils;
-import com.intramirror.web.mq.vo.Region;
-import com.intramirror.web.mq.vo.Tag;
 import com.intramirror.web.util.GetPostRequestUtil;
 import com.intramirror.web.vo.ApiProductVo;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.sql2o.Connection;
-import pk.shoplus.DBConnector;
 import pk.shoplus.model.EDSProduct;
 import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.model.Result;
-import pk.shoplus.service.ApiEndpointService;
-import pk.shoplus.service.request.api.IGetPostRequest;
 import pk.shoplus.service.request.impl.GetPostRequestService;
 import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.util.MapUtils;
@@ -36,21 +24,26 @@ import javax.annotation.Resource;
 import java.util.*;
 
 /**
- * Created by dingyifan on 2017/9/11.
+ * eds all update product
  */
 @Controller
 @RequestMapping("/eds")
 public class EdsProductAllProducerController implements InitializingBean {
 
+    // logger
     private final Logger logger = Logger.getLogger(EdsProductAllProducerController.class);
 
+    // getpost util
     private static GetPostRequestUtil getPostRequestUtil = new GetPostRequestUtil();
 
+    // create product
     public static ProductEDSManagement productEDSManagement = new ProductEDSManagement();
 
+    // mapping
     @Resource(name = "edsProductMapping")
     private IDataMapping iDataMapping;
 
+    // init params
     private Map<String,Object> paramsMap;
 
     @RequestMapping("/syn_all_product_producer")
@@ -59,25 +52,30 @@ public class EdsProductAllProducerController implements InitializingBean {
         MapUtils mapUtils = new MapUtils(new HashMap<String, Object>());
         logger.info("EdsProductAllProducerControllerExecute,startExecute,name:"+name);
 
+        // check name
         if(StringUtils.isBlank(name)) {
             return mapUtils.putData("status",StatusType.FAILURE).putData("info","name is null !!!").getMap();
         }
 
+        // get params
         Map<String,Object> param = (Map<String, Object>) paramsMap.get("nugnes");
-        try {
-            String url = param.get("url").toString();
-            String store_code = param.get("store_code").toString();
-            String vendor_id = param.get("vendor_id").toString();
-            int limit = Integer.parseInt(param.get("limit").toString());
-            int offset = Integer.parseInt(param.get("offset").toString());
-            int threadNum = Integer.parseInt(param.get("threadNum").toString());
+        String url = param.get("url").toString();
+        String store_code = param.get("store_code").toString();
+        String vendor_id = param.get("vendor_id").toString();
+        int limit = Integer.parseInt(param.get("limit").toString());
+        int offset = Integer.parseInt(param.get("offset").toString());
+        int threadNum = Integer.parseInt(param.get("threadNum").toString());
 
+        try {
             while (true) {
                 String appendUrl = url + "?storeCode=" + store_code + "&limit=" + limit +"&offset=" + offset;
 
                 logger.info("EdsProductAllProducerControllerExecute,startRequestMethod,appendUrl:"+appendUrl);
                 String responseData = getPostRequestUtil.requestMethod(GetPostRequestService.HTTP_GET,appendUrl,null);
-                if(StringUtils.isBlank(responseData)) {break;}
+                if(StringUtils.isBlank(responseData)) {
+                    logger.info("EdsProductAllProducerControllerExecute,");
+                    break;
+                }
                 logger.info("EdsProductAllProducerControllerExecute,endRequestMethod,appendUrl:"+appendUrl+",responseData:"+responseData);
 
                 Map<String, Result> map = (Map<String, Result>) JSONObject.parse(responseData);
@@ -103,7 +101,6 @@ public class EdsProductAllProducerController implements InitializingBean {
 
                     if(productOptions != null) {
                         if(apiProductVos.size() == threadNum) {
-                            UpdateProductThreadPool.startThreadPool(apiProductVos);
                             apiProductVos = new ArrayList<>();
                         }
 
@@ -118,7 +115,7 @@ public class EdsProductAllProducerController implements InitializingBean {
                 }
 
                 if(apiProductVos.size() > 0 && apiProductVos.size() <= threadNum){
-                    UpdateProductThreadPool.startThreadPool(apiProductVos);
+
                 } else {
                     logger.info("EdsProductAllProducerControllerExecute,apiProductVos length is error !!!" + new Gson().toJson(apiProductVos));
                 }
