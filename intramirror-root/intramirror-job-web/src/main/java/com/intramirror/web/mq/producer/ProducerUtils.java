@@ -8,7 +8,6 @@ import com.intramirror.common.help.ResultMessage;
 import com.intramirror.web.mq.vo.Region;
 import com.intramirror.web.mq.vo.Tag;
 import com.intramirror.web.util.RandomUtils;
-import com.intramirror.web.vo.ApiProductVo;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +70,7 @@ public class ProducerUtils {
         return true;
     }
 
+/*
     public ResultMessage sendMessage(Region region, Tag tag , ProductEDSManagement.ProductOptions productOptions, ProductEDSManagement.VendorOptions vendorOptions){
         ResultMessage resultMessage = new ResultMessage();
         try {
@@ -97,6 +97,6 @@ public class ProducerUtils {
             e.printStackTrace();
         }
         return resultMessage;
-    }
+    }*/
 
 }

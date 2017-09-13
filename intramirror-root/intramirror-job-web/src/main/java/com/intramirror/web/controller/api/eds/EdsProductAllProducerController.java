@@ -5,7 +5,6 @@ import com.google.gson.Gson;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.web.mapping.api.IDataMapping;
 import com.intramirror.web.util.GetPostRequestUtil;
-import com.intramirror.web.vo.ApiProductVo;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
@@ -22,6 +21,8 @@ import pk.shoplus.util.MapUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * eds all update product
@@ -65,25 +66,30 @@ public class EdsProductAllProducerController implements InitializingBean {
         int limit = Integer.parseInt(param.get("limit").toString());
         int offset = Integer.parseInt(param.get("offset").toString());
         int threadNum = Integer.parseInt(param.get("threadNum").toString());
-
+        ThreadPoolExecutor nugnesExecutor = (ThreadPoolExecutor) param.get("nugnesExecutor");
         try {
             while (true) {
+                // 拼接URL
                 String appendUrl = url + "?storeCode=" + store_code + "&limit=" + limit +"&offset=" + offset;
 
+                // 获取数据
                 logger.info("EdsProductAllProducerControllerExecute,startRequestMethod,appendUrl:"+appendUrl);
                 String responseData = getPostRequestUtil.requestMethod(GetPostRequestService.HTTP_GET,appendUrl,null);
                 if(StringUtils.isBlank(responseData)) {
-                    logger.info("EdsProductAllProducerControllerExecute,");
+                    logger.info("EdsProductAllProducerControllerExecute,whileEnd,responseData is null,appendUrl:"+appendUrl);
                     break;
                 }
                 logger.info("EdsProductAllProducerControllerExecute,endRequestMethod,appendUrl:"+appendUrl+",responseData:"+responseData);
 
+                // 解析数据
                 Map<String, Result> map = (Map<String, Result>) JSONObject.parse(responseData);
                 Map<String, Object> mapResult = (Map<String, Object>) map.get("results");
                 List<EDSProduct> edsProductList = (List<EDSProduct>) mapResult.get("items");
-                if(edsProductList == null || edsProductList.size() == 0) {break;}
+                if(edsProductList == null || edsProductList.size() == 0) {
+                    logger.info("EdsProductAllProducerControllerExecute,whileEnd,edsProductList is null,appendUrl:"+appendUrl);
+                    break;
+                }
 
-                List<ApiProductVo> apiProductVos = new ArrayList<>();
                 for(int i = 0,len = edsProductList.size();i<len;i++){
                     Map<String,Object> mqDataMap = new HashMap<String,Object>();
                     mqDataMap.put("reqCode", mapResult.get("reqCode"));
@@ -100,28 +106,14 @@ public class EdsProductAllProducerController implements InitializingBean {
                     logger.info("EdsProductAllProducerControllerExecute,initParam,productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions));
 
                     if(productOptions != null) {
-                        if(apiProductVos.size() == threadNum) {
-                            apiProductVos = new ArrayList<>();
-                        }
 
-                        ApiProductVo apiProductVo = new ApiProductVo();
-                        apiProductVo.setProductOptions(productOptions);
-                        apiProductVo.setVendorOptions(vendorOptions);
-                        apiProductVos.add(apiProductVo);
                     } else {
                         // TODO
                         logger.info("EdsProductAllProducerControllerExecute,errorInitParam,productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions));
                     }
                 }
 
-                if(apiProductVos.size() > 0 && apiProductVos.size() <= threadNum){
-
-                } else {
-                    logger.info("EdsProductAllProducerControllerExecute,apiProductVos length is error !!!" + new Gson().toJson(apiProductVos));
-                }
-
                 offset = offset + limit;
-                break;
             }
             logger.info("EdsProductAllProducerControllerExecute,executeEnd,offset:"+offset+",limit:"+limit+",url:"+url+",store_code:"+store_code);
             mapUtils.putData("status",StatusType.SUCCESS).putData("info","success");
@@ -137,6 +129,7 @@ public class EdsProductAllProducerController implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         // nugnes
+        ThreadPoolExecutor nugnesExecutor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
         Map<String,Object> object = new HashMap<>();
         object.put("url","http://nugnes.edstema.it/api/v3.0/products/condensed");
         object.put("vendor_id","9");
@@ -144,6 +137,7 @@ public class EdsProductAllProducerController implements InitializingBean {
         object.put("limit","100");
         object.put("offset","0");
         object.put("threadNum","30");
+        object.put("nugnesExecutor",nugnesExecutor);
 
         // put data
         paramsMap = new HashMap<>();

@@ -2,7 +2,6 @@ package com.intramirror.web.thread;
 
 import com.alibaba.fastjson15.JSONObject;
 import com.google.gson.Gson;
-import com.intramirror.web.controller.api.service.*;
 import org.apache.log4j.Logger;
 import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.parameter.StatusType;
