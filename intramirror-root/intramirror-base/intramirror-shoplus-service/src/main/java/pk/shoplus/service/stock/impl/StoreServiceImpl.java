@@ -29,10 +29,26 @@ public class StoreServiceImpl implements IStoreService{
     @Override
     public ResultMessage handleApiStockRule(int qtyType,int qtyDiff, String size, String productCode,String queueNameEnum) throws Exception {
         logger.info("StoreServiceImplHandleApiStockRule,inputParams,qtyType :"+qtyType+",qtyDiff :"+qtyDiff+",size :"+size+",productCode :"+productCode+",queueNameEnum :"+queueNameEnum);
-        ResultMessage resultMessage = new ResultMessage();
         Connection conn = null;
         try {
-        	conn = DBConnector.sql2o.open();
+            conn = DBConnector.sql2o.open();
+            ResultMessage resultMessage = this.handle(conn,qtyType,qtyDiff,size,productCode,queueNameEnum);
+            if(conn != null) {conn.close();}
+            return resultMessage;
+        } catch (Exception e) {
+            if(conn != null) {conn.close();}
+            throw e;
+        }
+    }
+
+    @Override
+    public ResultMessage handleApiStockRuleService(Connection conn, int qtyType, int qtyDiff, String size, String productCode, String queueNameEnum) throws Exception {
+        return this.handle(conn,qtyType,qtyDiff,size,productCode,queueNameEnum);
+    }
+
+    private ResultMessage handle(Connection conn,int qtyType,int qtyDiff, String size, String productCode,String queueNameEnum) throws Exception{
+        ResultMessage resultMessage = new ResultMessage();
+        try {
             int store = 0,reserved = 0, rs = 0;
             Long confirmed = 0l;
             long sku_store_id = 0;
@@ -47,7 +63,6 @@ public class StoreServiceImpl implements IStoreService{
             // checked
             if(StringUtils.isBlank(size) || StringUtils.isBlank(productCode)) {
                 logger.info("StoreServiceImplHandleApiStockRule,inputParamsIsNull,size:"+size+",productCode:"+productCode);
-                if(conn != null) {conn.close();}
                 return resultMessage.sStatus(false).sMsg("handleApiStockRule size或者productCode为空。size:"+size+",productCode:"+productCode);
             }
 
@@ -79,7 +94,6 @@ public class StoreServiceImpl implements IStoreService{
                 skuStore.confirmed = 0L;
                 skuStore.sku_store_id = sku_store_id;
                 logger.info("StoreServiceImplHandleApiStockRule,skuInfoIsNull,skuStore:"+new Gson().toJson(skuStore));
-                if(conn != null) {conn.close();}
                 resultMessage.sStatus(true).sMsg("SUCCESS").sData(skuStore).setDesc(vendor_id);
                 logger.info("StoreServiceImplHandleApiStockRule,resultMessage:"+new Gson().toJson(resultMessage));
                 return resultMessage;
@@ -122,16 +136,12 @@ public class StoreServiceImpl implements IStoreService{
             skuStore.confirmed = confirmed;
             skuStore.sku_store_id = sku_store_id;
             logger.info("StoreServiceImplHandleApiStockRule,outputParams,skuStore:"+new Gson().toJson(skuStore));
-            if(conn != null) {conn.close();}
             resultMessage.sStatus(true).sMsg("SUCCESS").sData(skuStore).setDesc(vendor_id);
             logger.info("StoreServiceImplHandleApiStockRule,resultMessage:"+new Gson().toJson(resultMessage));
             return resultMessage;
         } catch (Exception e) {
             logger.error(" errorMessage  : " + e.getMessage());
-            if(conn != null) {conn.close();}
             throw e;
-        } finally {
-            if(conn != null) {conn.close();}
         }
     }
 
