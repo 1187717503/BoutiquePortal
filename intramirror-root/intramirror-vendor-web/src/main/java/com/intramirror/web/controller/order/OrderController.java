@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -374,14 +375,16 @@ public class OrderController extends BaseController{
 	
 	
 	/**
-	 * 状态机借口
+	 * 状态机接口
 	 * @param map
 	 * @return
 	 */
 	@RequestMapping(value="/updateOrderStatus", method=RequestMethod.POST)
 	@ResponseBody
-	public ResultMessage updateOrderStatus(@RequestBody Map<String, Object> map){
+	public ResultMessage updateOrderStatus(@RequestBody Map<String, Object> map, HttpServletRequest httpServletRequest){
 		logger.info(MessageFormat.format("updateOrderStatus param:{0}",new Gson().toJson(map)));
+
+		User user = getUser(httpServletRequest);
 		ResultMessage message = ResultMessage.getInstance();
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 		resultMap.put("status", StatusType.FAILURE);
@@ -407,8 +410,19 @@ public class OrderController extends BaseController{
 			int status =Integer.parseInt(map.get("status").toString());
 			
 			//调用修改订单状态
-			resultMap = logisticsProductService.updateOrderLogisticsStatusById(logisProductId, status);
+			//根据id获取当前数据库旧的对象信息
+			LogisticsProduct oldLogisticsProduct = logisticsProductService.selectById(logisProductId);
+			resultMap = logisticsProductService.updateOrderLogisticsStatusById(oldLogisticsProduct, status);
 			if (StatusType.SUCCESS == Integer.parseInt(resultMap.get("status").toString())){
+				//更新confirm库存
+				if (2 == status) {
+					if (null != oldLogisticsProduct) {
+						Long shopProductSkuId = oldLogisticsProduct.getShop_product_sku_id();
+						logger.info("订单 "+shopProductSkuId+" , 用户 "+ JSON.toJSONString(user.getUsername()) +" confirm操作, 修改confirm库存开始");
+						skuStoreService.updateConfirmStoreByShopProductSkuId(shopProductSkuId);
+						logger.info("订单 " + shopProductSkuId + " confirm操作, 修改confirm库存成功");
+					}
+				}
 				message.successStatus().putMsg("Info", "SUCCESS").setData(resultMap);
 				return message;
 			}
@@ -901,7 +915,9 @@ public class OrderController extends BaseController{
 	    		return message;
 			}
 	    	logger.info(logisProductId +"： 进入退款回调流程!!");
-	    	Map<String, Object> resultMap = logisticsProductService.updateOrderLogisticsStatusById(logisProductId, status);
+			LogisticsProduct logisticsProduct = new LogisticsProduct();
+			logisticsProduct.setLogistics_product_id(logisProductId);
+	    	Map<String, Object> resultMap = logisticsProductService.updateOrderLogisticsStatusById(logisticsProduct, status);
 	    	//获取SKU
 	    	LogisticsProduct oldLogisticsProduct = iLogisticsProductService.selectById(logisProductId);
 	    	//开始修改库存

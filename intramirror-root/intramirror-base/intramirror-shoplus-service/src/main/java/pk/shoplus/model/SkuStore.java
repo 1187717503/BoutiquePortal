@@ -93,6 +93,17 @@ public class SkuStore {
 	@Column
 	public Long reserved;
 
+	@Column
+	public Long confirmed;
+
+	public Long getConfirmed() {
+		return confirmed;
+	}
+
+	public void setConfirmed(Long confirmed) {
+		this.confirmed = confirmed;
+	}
+
 	public Long getSku_store_id() {
 		return sku_store_id;
 	}

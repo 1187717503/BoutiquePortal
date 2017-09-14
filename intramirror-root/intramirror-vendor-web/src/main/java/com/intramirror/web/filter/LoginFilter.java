@@ -1,10 +1,12 @@
 package com.intramirror.web.filter;
 
+import com.intramirror.common.Helper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.impl.Base64Codec;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -13,6 +15,7 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Date;
 
 @Component
 public class LoginFilter implements Filter{
@@ -55,7 +58,7 @@ public class LoginFilter implements Filter{
              
         } else {
         	
-           /* Long userId = null;
+            Long userId = null;
 
             try {
                 String jwt = request.getHeader("token");
@@ -80,7 +83,7 @@ public class LoginFilter implements Filter{
                 }
             } catch (Exception e) {
             	status =  false;
-            }*/
+            }
             
         }
         if(!status){

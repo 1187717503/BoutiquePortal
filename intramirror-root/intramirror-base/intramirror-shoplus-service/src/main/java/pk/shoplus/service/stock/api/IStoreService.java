@@ -18,5 +18,8 @@ public interface IStoreService {
      * @return
      * @throws Exception
      */
-    public ResultMessage handleApiStockRule(int qtyType, int qtyDiff, String size, String productCode,String handleApiStockRule) throws Exception;
+    public ResultMessage handleApiStockRule(int qtyType, int qtyDiff, String size, String productCode,String queueNameEnum) throws Exception;
+
+    public ResultMessage handleApiStockRuleService(Connection conn,int qtyType, int qtyDiff, String size, String productCode,String queueNameEnum) throws Exception;
+
 }

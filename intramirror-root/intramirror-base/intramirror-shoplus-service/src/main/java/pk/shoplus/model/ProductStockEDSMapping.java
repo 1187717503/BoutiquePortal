@@ -1,10 +1,12 @@
 package pk.shoplus.model;
 
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.DateUtils;
 import org.apache.log4j.Logger;
 
 import com.alibaba.fastjson15.JSONObject;
@@ -71,6 +73,7 @@ public class ProductStockEDSMapping implements IMapping{
 					stockOptions.setQuantity(skuStore.getStore().toString());
 					stockOptions.setVendor_id(resultMessage.getDesc());
 					stockOptions.setReserved(skuStore.getReserved().toString());
+					stockOptions.setConfirmed(skuStore.getConfirmed().toString());
 				} else {
 					resultMap.put("info",resultMessage.getMsg());
 					resultMap.put("sku_size",stockOptions.getSizeValue());
@@ -80,9 +83,9 @@ public class ProductStockEDSMapping implements IMapping{
 				}
 			}
 			
-			logger.info("开始调用EDS库存更新Service,stockOptions:"+new Gson().toJson(stockOptions));
+			logger.info("开始调用EDS库存更新Service,stockOptions:"+"date:"+ DateUtils.formatDate(new Date())+new Gson().toJson(stockOptions));
 			Map<String, Object> serviceResultMap = productStockEDSManagement.updateStock(stockOptions);
-			logger.info("结束调用EDS库存更新Service,serviceResultMap:"+new Gson().toJson(serviceResultMap)+",stockOptions:"+new Gson().toJson(stockOptions));
+			logger.info("结束调用EDS库存更新Service,serviceResultMap:"+"date:"+ DateUtils.formatDate(new Date())+new Gson().toJson(serviceResultMap)+",stockOptions:"+new Gson().toJson(stockOptions));
 			serviceResultMap.put("product_code",stockOptions.getProductCode());
 			serviceResultMap.put("sku_size",stockOptions.getSizeValue());
 			return serviceResultMap;

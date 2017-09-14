@@ -41,6 +41,29 @@ public class FileUtil {
         logger.info("end FileUtil.CompareTxt();");
         return changeRows;
     }
+    
+    
+    public static List<DiffRow> CompareTxtByType(String originalPath,String revisedPath) throws IOException {
+        logger.info("start FileUtil.CompareTxtByType();originalPath:"+originalPath+",revisedPath:"+revisedPath);
+        List<DiffRow> changeRows = new ArrayList<>();
+        List<String> original = FileUtils.readLines(new File(originalPath),"windows-1252");
+        List<String> revised = FileUtils.readLines(new File(revisedPath),"windows-1252");
+
+        Patch patch = DiffUtils.diff(original, revised);
+        DiffRowGenerator.Builder builder = new DiffRowGenerator.Builder();
+        builder.showInlineDiffs(false);
+        DiffRowGenerator generator = builder.build();
+
+        for (Delta delta :  patch.getDeltas()) {
+            List<DiffRow> generateDiffRows = generator.generateDiffRows((List<String>) delta.getOriginal().getLines(), (List<String>) delta
+                    .getRevised().getLines());
+            for (DiffRow row : generateDiffRows) {
+                changeRows.add(row);
+            }
+        }
+        logger.info("end FileUtil.CompareTxtByType();");
+        return changeRows;
+    }
 
 
     public static String readFile(String path){
@@ -139,6 +162,24 @@ public class FileUtil {
         }
 
     }
+    
+    
+    public static void createFileByType(String filePath,String fileName,String filecontent){
+        try {
+            File f1 = new File(filePath);
+            File f2 = new File(filePath+fileName);
+            if(!f1.exists()) {
+                f1.mkdirs();
+            }
+            if(!f2.exists()) {
+                f2.createNewFile();
+            }
+            writeFileContentByType(filePath + fileName, filecontent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 
     /**
      * 判断文件是否存在
@@ -182,6 +223,55 @@ public class FileUtil {
 
             fos = new FileOutputStream(file);
             pw = new PrintWriter(fos);
+            pw.write(buffer.toString().toCharArray());
+            pw.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            //不要忘记关闭
+            if (pw != null) {
+                pw.close();
+            }
+            if (fos != null) {
+                fos.close();
+            }
+            if (br != null) {
+                br.close();
+            }
+            if (isr != null) {
+                isr.close();
+            }
+            if (fis != null) {
+                fis.close();
+            }
+        }
+    }
+    
+    
+    public static void writeFileContentByType(String filepath,String newstr) throws IOException {
+        FileInputStream fis = null;
+        InputStreamReader isr = null;
+        BufferedReader br = null;
+        FileOutputStream fos  = null;
+        OutputStreamWriter pw = null;
+        try {
+            File file = new File(filepath);//文件路径(包括文件名称)
+            //将文件读入输入流
+            fis = new FileInputStream(file);
+            isr = new InputStreamReader(fis,"windows-1252");
+            br = new BufferedReader(isr);
+            StringBuffer buffer = new StringBuffer();
+
+            /*//文件原有内容
+            for(int i=0;(temp =br.readLine())!=null;i++){
+                buffer.append(temp);
+                // 行与行之间的分隔符 相当于“\n”
+                buffer = buffer.append(System.getProperty("line.separator"));
+            }*/
+            buffer.append(newstr);
+
+            fos = new FileOutputStream(file);
+            pw = new OutputStreamWriter(fos,"windows-1252");
             pw.write(buffer.toString().toCharArray());
             pw.flush();
         } catch (Exception e) {

@@ -1,5 +1,6 @@
 package pk.shoplus.service.stock.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -27,16 +28,34 @@ public class StoreServiceImpl implements IStoreService{
 
     @Override
     public ResultMessage handleApiStockRule(int qtyType,int qtyDiff, String size, String productCode,String queueNameEnum) throws Exception {
-        logger.info("StoreServiceImplHandleApiStockRule,inputParams,qtyType:"+qtyType+",qtyDiff:"+qtyDiff+",size:"+size+",productCode:"+productCode+",queueNameEnum:"+queueNameEnum);
-        ResultMessage resultMessage = new ResultMessage();
+        logger.info("StoreServiceImplHandleApiStockRule,inputParams,qtyType :"+qtyType+",qtyDiff :"+qtyDiff+",size :"+size+",productCode :"+productCode+",queueNameEnum :"+queueNameEnum);
         Connection conn = null;
         try {
-        	conn = DBConnector.sql2o.open();
-            int store = 0,reserved = 0,rs = 0;
+            conn = DBConnector.sql2o.open();
+            ResultMessage resultMessage = this.handle(conn,qtyType,qtyDiff,size,productCode,queueNameEnum);
+            if(conn != null) {conn.close();}
+            return resultMessage;
+        } catch (Exception e) {
+            if(conn != null) {conn.close();}
+            throw e;
+        }
+    }
+
+    @Override
+    public ResultMessage handleApiStockRuleService(Connection conn, int qtyType, int qtyDiff, String size, String productCode, String queueNameEnum) throws Exception {
+        return this.handle(conn,qtyType,qtyDiff,size,productCode,queueNameEnum);
+    }
+
+    private ResultMessage handle(Connection conn,int qtyType,int qtyDiff, String size, String productCode,String queueNameEnum) throws Exception{
+        ResultMessage resultMessage = new ResultMessage();
+        try {
+            int store = 0,reserved = 0, rs = 0;
+            Long confirmed = 0l;
             long sku_store_id = 0;
+            Long skuId = 0l;
 
             if(StringUtils.isBlank(queueNameEnum)) {
-                return resultMessage.sStatus(false).sMsg("handleApiStockRule 枚举类型为空。size:"+size+",productCode:"+productCode+",queueNameEnum:"+queueNameEnum);
+                return resultMessage.sStatus(false).sMsg("handleApiStockRule 枚举类型为空。size : "+size+",productCode :"+productCode+",queueNameEnum :"+queueNameEnum);
             }
 
             String vendor_id = this.getVendor_id(queueNameEnum,conn);
@@ -44,7 +63,6 @@ public class StoreServiceImpl implements IStoreService{
             // checked
             if(StringUtils.isBlank(size) || StringUtils.isBlank(productCode)) {
                 logger.info("StoreServiceImplHandleApiStockRule,inputParamsIsNull,size:"+size+",productCode:"+productCode);
-                if(conn != null) {conn.close();}
                 return resultMessage.sStatus(false).sMsg("handleApiStockRule size或者productCode为空。size:"+size+",productCode:"+productCode);
             }
 
@@ -61,62 +79,69 @@ public class StoreServiceImpl implements IStoreService{
                 logger.info("StoreServiceImplHandleApiStockRule,getSkuStoreByID,skuStoreIdList:"+new Gson().toJson(skuStoreIdList));
                 SkuStore skuStore = skuStoreService.getSkuStoreByID(skuStoreIdList.get(0).get("sku_store_id").toString());
                 logger.info("StoreServiceImplHandleApiStockRule,getSkuStoreByID,skuStore:"+new Gson().toJson(skuStore));
+                logger.info("sku: "+skuStore.getSku_id()+" 用户 System 操作系统同步,买手店 "+vendor_id+" 扣减库存前库存情况 : "+ JSON.toJSONString(skuStore));
+
                 store = skuStore.getStore() == null ? 0 : skuStore.getStore().intValue();
                 reserved = skuStore.getReserved() == null ? 0 : skuStore.getReserved().intValue();
+                confirmed = skuStore.getConfirmed() == null ? 0l : skuStore.getConfirmed();
                 sku_store_id = skuStore.getSku_store_id();
+                skuId = skuStore.getSku_id();
             } else {
                 logger.info("StoreServiceImplHandleApiStockRule,skuInfoIsNull,size:"+size+",productCode:"+productCode);
                 SkuStore skuStore = new SkuStore();
                 skuStore.store = Long.valueOf(qtyDiff);
                 skuStore.reserved = 0L;
+                skuStore.confirmed = 0L;
                 skuStore.sku_store_id = sku_store_id;
                 logger.info("StoreServiceImplHandleApiStockRule,skuInfoIsNull,skuStore:"+new Gson().toJson(skuStore));
-                if(conn != null) {conn.close();}
                 resultMessage.sStatus(true).sMsg("SUCCESS").sData(skuStore).setDesc(vendor_id);
                 logger.info("StoreServiceImplHandleApiStockRule,resultMessage:"+new Gson().toJson(resultMessage));
                 return resultMessage;
             }
 
+
             // get qty_diff
             if(Contants.STOCK_QTY == qtyType) {
-                rs = qtyDiff - (store + reserved);
+                logger.info("sku: "+JSON.toJSONString(skuId)+" 用户 System 操作系统同步,买手店 "+vendor_id+" 系统库存值 : "+ JSON.toJSONString(qtyDiff));
+                rs = qtyDiff - (store + reserved + confirmed.intValue());
             } else if(Contants.STOCK_QTY_DIFF == qtyType) {
                 rs = qtyDiff;
             } else {
                 return  resultMessage.sStatus(false).sMsg("handleApiStockRule 入参qtyType有误。qtyType:"+qtyType);
             }
+            logger.info("sku: "+JSON.toJSONString(skuId)+" 用户 System 操作系统同步,买手店 "+vendor_id+" 扣减库存的差异值 : "+ JSON.toJSONString(rs));
 
             // 开始计算
             if(rs >= 0) {
+                logger.info("sku: "+JSON.toJSONString(skuId)+" 用户 System 操作系统同步,买手店 "+vendor_id+" 扣减库存的rs(差异值)>=0时执行 store = store + rs");
                 store = store + rs;
             } else {
-                store = store - Math.abs(rs);
-            }
-
-            if(store < 0) {
-                reserved = reserved - Math.abs(store);
-
-                if(reserved < 0) {
-                    reserved = 0;
+                if (confirmed > 0) {
+                    confirmed = confirmed + rs;
+                    logger.info("sku: "+JSON.toJSONString(skuId)+" 用户 System 操作系统同步,买手店 "+vendor_id+" 扣减库存的rs(差异值)<0 && confirmed > 0时执行 confirmed = confirmed + rs");
+                    if (confirmed < 0) {
+                        store = store + confirmed.intValue();
+                        confirmed = 0l;
+                        logger.info("sku: "+JSON.toJSONString(skuId)+" 用户 System 操作系统同步,买手店 "+vendor_id+" 扣减库存的rs(差异值)<0 && confirmed > 0 && (confirmed + rs) <0时执行 store = store + confirmed;confirmed = 0");
+                    }
+                } else {
+                    store = store + rs;
+                    logger.info("sku: "+JSON.toJSONString(skuId)+" 用户 System 操作系统同步,买手店 "+vendor_id+" 扣减库存的rs(差异值)<0 && confirmed <0 时执行 store = store + rs");
                 }
-                store = 0;
             }
 
             SkuStore skuStore = new SkuStore();
             skuStore.store = Long.valueOf(store);
             skuStore.reserved = Long.valueOf(reserved);
+            skuStore.confirmed = confirmed;
             skuStore.sku_store_id = sku_store_id;
             logger.info("StoreServiceImplHandleApiStockRule,outputParams,skuStore:"+new Gson().toJson(skuStore));
-            if(conn != null) {conn.close();}
             resultMessage.sStatus(true).sMsg("SUCCESS").sData(skuStore).setDesc(vendor_id);
             logger.info("StoreServiceImplHandleApiStockRule,resultMessage:"+new Gson().toJson(resultMessage));
             return resultMessage;
         } catch (Exception e) {
             logger.error(" errorMessage  : " + e.getMessage());
-            if(conn != null) {conn.close();}
             throw e;
-        } finally {
-            if(conn != null) {conn.close();}
         }
     }
 

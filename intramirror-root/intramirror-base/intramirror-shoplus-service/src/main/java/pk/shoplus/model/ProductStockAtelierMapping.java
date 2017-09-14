@@ -71,6 +71,7 @@ public class ProductStockAtelierMapping implements IMapping {
 					stockOptions.setQuantity(skuStore.getStore().toString());
 					stockOptions.setReserved(skuStore.getReserved().toString());
 					stockOptions.setVendor_id(resultMessage.getDesc());
+					stockOptions.setConfirmed(skuStore.getConfirmed().toString());
 				} else {
 					resultMap.put("status", StatusType.FAILURE);
 					resultMap.put("info",resultMessage.getMsg());

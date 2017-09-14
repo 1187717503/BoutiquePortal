@@ -24,4 +24,9 @@ public class DateUtils {
         calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY) - hour);
         return new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime());
     }
+
+    public static String getformatDate(Date date){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return simpleDateFormat.format(date);
+    }
 }

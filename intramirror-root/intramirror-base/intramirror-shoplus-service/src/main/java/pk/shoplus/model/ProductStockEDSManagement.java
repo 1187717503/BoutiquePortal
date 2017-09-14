@@ -80,6 +80,7 @@ public class ProductStockEDSManagement {
                     SkuStore skuStore = new SkuStore();
                     skuStore.sku_store_id = skuStoreId;
                     skuStore.store = Long.valueOf(stockOptions.getQuantity());
+                    skuStore.confirmed = Long.valueOf(stockOptions.getConfirmed());
                     if(StringUtils.isBlank(stockOptions.getType()) || !stockOptions.getType().equals(Contants.EVENTS_TYPE_1+"")) {
                         skuStore.reserved = reserved;
                     }
@@ -370,9 +371,18 @@ public class ProductStockEDSManagement {
 		public String sizeValue;
         public String quantity;
         public String reserved;
+        public String confirmed;
 		public String type;
 		public String vendor_id;
 		public String price;
+
+        public String getConfirmed() {
+            return confirmed;
+        }
+
+        public void setConfirmed(String confirmed) {
+            this.confirmed = confirmed;
+        }
 
         public String getPrice() {
             return price;

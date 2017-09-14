@@ -1,6 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.intramirror.product.core.mapper.SkuStoreMapper">
+    <resultMap id="BaseResultMap" type="com.intramirror.product.api.model.SkuStore">
+
+        <id column="sku_store_id" property="skuStoreId" jdbcType="BIGINT"/>
+        <result column="sku_id" property="skuId" jdbcType="BIGINT"/>
+        <result column="product_id" property="productId" jdbcType="BIGINT"/>
+        <result column="store" property="store" jdbcType="BIGINT"/>
+        <result column="remind" property="remind" jdbcType="INTEGER"/>
+        <result column="ordered" property="ordered" jdbcType="INTEGER"/>
+        <result column="confirm" property="confirm" jdbcType="INTEGER"/>
+        <result column="ship" property="ship" jdbcType="INTEGER"/>
+        <result column="finished" property="finished" jdbcType="INTEGER"/>
+        <result column="returned" property="returned" jdbcType="INTEGER"/>
+        <result column="changed" property="changed" jdbcType="INTEGER"/>
+        <result column="clear" property="clear" jdbcType="INTEGER"/>
+        <result column="agree_return_rate" property="agreeReturnRate" jdbcType="DECIMAL"/>
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP"/>
+        <result column="enabled" property="enabled" jdbcType="BIT"/>
+        <result column="reserved" property="reserved" jdbcType="BIGINT"/>
+        <result column="confirmed" property="confirmed" jdbcType="BIGINT"/>
+    </resultMap>
 
    <update id="updateBySkuId" parameterType="java.util.Map" >
    
@@ -24,17 +45,45 @@
      <!-- 待收货 -->
       <if test="statusType == 3 ">  
         set ss.confirm = ss.confirm - 1,ss.ship = ss.ship + 1 
-     </if> 
+     </if>
     where ss.sku_id = #{skuId,jdbcType=BIGINT}
     
   </update>
-  
-  
+
+    <update id="confirmSkuStore" parameterType="java.lang.Long">
+        update sku_store s
+        set s.reserved = s.reserved - 1,
+            s.confirmed = s.confirmed + 1
+        where sku_store_id = #{skuStoreId,jdbcType=BIGINT}
+    </update>
+
+    <update id="confirmSkuStoreByNegativeStore" parameterType="java.lang.Long">
+        update sku_store s
+        set s.store = s.store + 1,
+        s.confirmed = s.confirmed - 1
+        where sku_store_id = #{skuStoreId,jdbcType=BIGINT}
+    </update>
+
+    <update id="cancelSkuStore" parameterType="java.lang.Long">
+        update sku_store ss , sku s, shop_product_sku sps
+        set ss.confirmed = ss.confirmed - 1,ss.store = 0
+        where ss.enabled = 1 and ss.sku_id = s.sku_id
+        and s.enabled = 1 and s.sku_id = sps.sku_id
+        and sps.enabled = 1 and sps.shop_product_sku_id = #{shopProductSkuId,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectSkuStoreByShopProductSkuId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select ss.* from sku_store ss
+        inner join sku s on (ss.sku_id = s.sku_id and s.enabled = 1)
+        inner join shop_product_sku sps on (s.sku_id = sps.sku_id and sps.enabled = 1)
+        where sps.enabled = 1 and sps.shop_product_sku_id = #{shopProductSkuId,jdbcType=BIGINT}
+    </select>
+
   <select id="selectSkuIdByShopProductSkuId" resultType="java.lang.Long" parameterType="java.lang.Long" >
     select sps.sku_id from shop_product_sku  sps where sps.shop_product_sku_id =  #{shopProductSkuId,jdbcType=BIGINT}
   </select>
-  
-  
+
+
   
 
 </mapper>
