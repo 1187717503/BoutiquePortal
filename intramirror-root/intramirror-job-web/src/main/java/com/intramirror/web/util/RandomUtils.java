@@ -1,7 +1,5 @@
 package com.intramirror.web.util;
 
-import com.intramirror.web.mq.producer.ProducerUtils;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 

@@ -21,21 +21,17 @@ import pk.shoplus.model.Result;
 import pk.shoplus.service.request.impl.GetPostRequestService;
 import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.util.MapUtils;
-
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
-/**
- * eds all update product
- */
 @Controller
 @RequestMapping("/eds")
-public class EdsProductAllProducerController implements InitializingBean {
+public class EdsAllUpdateByProductController implements InitializingBean {
 
     // logger
-    private final Logger logger = Logger.getLogger(EdsProductAllProducerController.class);
+    private final Logger logger = Logger.getLogger(EdsAllUpdateByProductController.class);
 
     // getpost util
     private static GetPostRequestUtil getPostRequestUtil = new GetPostRequestUtil();
@@ -98,7 +94,6 @@ public class EdsProductAllProducerController implements InitializingBean {
                     mqDataMap.put("reqCode", mapResult.get("reqCode"));
                     mqDataMap.put("count", mapResult.get("count"));
                     mqDataMap.put("product", edsProductList.get(i));
-                    mqDataMap.put("store_code", store_code);
                     mqDataMap.put("vendor_id", vendor_id);
                     mqDataMap.put("full_update_product","1");
 
@@ -109,13 +104,10 @@ public class EdsProductAllProducerController implements InitializingBean {
                     logger.info("EdsProductAllProducerControllerExecute,initParam,productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions));
 
                     if(productOptions != null) {
-                        String startDate = DateUtils.getStrDate(new Date(),"yyyy-MM-dd HH:mm:ss");
-                        logger.info("EdsProductAllProducerControllerExecute,executeProduct,startDate:"+startDate+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions));
+                        logger.info("EdsProductAllProducerControllerExecute,executeProduct,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions));
                         CommonThreadPool.executeProduct(nugnesExecutor,threadNum,new UpdateProductThread(productOptions,vendorOptions));
-                        String endDate = DateUtils.getStrDate(new Date(),"yyyy-MM-dd HH:mm:ss");
-                        logger.info("EdsProductAllProducerControllerExecute,executeProduct,startDate:"+endDate+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions));
+                        logger.info("EdsProductAllProducerControllerExecute,executeProduct,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions));
                     } else {
-                        // TODO
                         logger.info("EdsProductAllProducerControllerExecute,errorInitParam,productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions));
                     }
                 }
