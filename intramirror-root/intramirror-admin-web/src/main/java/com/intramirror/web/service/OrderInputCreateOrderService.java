@@ -66,7 +66,6 @@ public class OrderInputCreateOrderService {
 
 
     /**
-     *
      * @param paramMap
      * @param user
      * @return
@@ -194,7 +193,7 @@ public class OrderInputCreateOrderService {
 
                 logisticsProduct = logisticsProductService.createLogisticsProduct(logisticsProduct);
 
-                results.put("logisticsProduct", logisticsProduct);
+                results.put("logisticsProduct" + j, logisticsProduct);
                 skuStoreSkuIdList.add(obj.get("shop_product_sku_id").getAsLong());
                 // end 写默认值，为了生成订单
             }
