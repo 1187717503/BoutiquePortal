@@ -48,9 +48,9 @@ public class XmagAllStockJunitTest extends BaseJunit4Test {
         System.out.println("Test assume");  
         System.out.println(new Gson().toJson(mqData));
         System.out.println(new Gson().toJson(data));
-        Map<String,Object> resultMap = xmagAllStockMapping.handleMappingAndExecute(new Gson().toJson(data));
-        System.out.println("-----------"+new Gson().toJson(resultMap));
-        Assert.assertEquals(StatusType.SUCCESS,resultMap.get("status"));
+//        Map<String,Object> resultMap = xmagAllStockMapping.handleMappingAndExecute(new Gson().toJson(data));
+//        System.out.println("-----------"+new Gson().toJson(resultMap));
+//        Assert.assertEquals(StatusType.SUCCESS,resultMap.get("status"));
         
         controller.getProductByDate("XmagSynProductByDate");
         controller.getProducts("XmagSynProduct");

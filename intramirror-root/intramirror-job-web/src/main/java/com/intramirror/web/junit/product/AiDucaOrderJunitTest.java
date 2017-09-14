@@ -38,8 +38,8 @@ public class AiDucaOrderJunitTest extends BaseJunit4Test {
     	data.put("logisticsProductId", "100");
     	data.put("mqName", "AiDucaCreateOrder");
         System.out.println(new Gson().toJson(data));
-        Map<String,Object> resultMap = alDucaOrderMapping.handleMappingAndExecute(new Gson().toJson(data));
-        System.out.println(resultMap);
+//        Map<String,Object> resultMap = alDucaOrderMapping.handleMappingAndExecute(new Gson().toJson(data));
+//        System.out.println(resultMap);
 //        Assert.assertEquals(StatusType.SUCCESS,resultMap.get("status"));
     }  
     

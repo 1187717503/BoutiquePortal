@@ -105,7 +105,7 @@ public class DemoController {
 	@RequestMapping(value = "/alDucaCreateOrder")
 	@ResponseBody
 	public void alDucaCreateOrder(@RequestBody Map<String,Object> mqData) throws Exception {
-		alDucaOrderMapping.handleMappingAndExecute(new Gson().toJson(mqData));
+//		alDucaOrderMapping.handleMappingAndExecute(new Gson().toJson(mqData));
 	}
 	
 	
