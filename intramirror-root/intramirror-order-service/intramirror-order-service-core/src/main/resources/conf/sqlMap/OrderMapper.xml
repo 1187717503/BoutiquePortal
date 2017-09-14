@@ -425,7 +425,8 @@ and t1.order_num =  #{orderId,jdbcType=BIGINT}
 
     <select id="getShipmentDetails" resultType="java.util.HashMap" parameterType="java.util.Map">
 		SELECT  o.order_num,lp.vendor_id,l.user_rec_name AS consignee,l.user_rec_addr AS shipToAddr,l.user_rec_area AS shipToDistrict
-	,l.user_rec_city AS shipToCity,l.user_rec_province AS shipToProvince,l.user_rec_country AS shipToCountry,v.address_country_id AS consigner_country_id,us.address_country_id AS consignee_country_id,g.english_name AS shipToGeography,lp.logistics_product_id
+	,l.user_rec_city AS shipToCity,l.user_rec_province AS shipToProvince,l.user_rec_country AS shipToCountry,
+	v.address_country_id AS consigner_country_id,(SELECT addc.address_country_id FROM address_country addc where addc.`name`=l.user_rec_country) AS consignee_country_id,g.english_name AS shipToGeography,lp.logistics_product_id
 				FROM logistics_product lp  
 				INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id  
 				INNER JOIN `order` o ON ol.order_id = o.order_id   
