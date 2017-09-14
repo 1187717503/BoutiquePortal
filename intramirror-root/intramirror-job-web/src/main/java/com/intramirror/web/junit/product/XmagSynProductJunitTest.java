@@ -83,8 +83,8 @@ public class XmagSynProductJunitTest extends BaseJunit4Test {
         System.out.println("Test assume");  
         System.out.println(new Gson().toJson(mqData));
         System.out.println(new Gson().toJson(data));
-        Map<String,Object> resultMap = XmagSynProductMapping.handleMappingAndExecute(new Gson().toJson(data));
-        System.out.println("-----------"+new Gson().toJson(resultMap));
+//        Map<String,Object> resultMap = XmagSynProductMapping.handleMappingAndExecute(new Gson().toJson(data));
+//        System.out.println("-----------"+new Gson().toJson(resultMap));
 //        Assert.assertEquals(StatusType.SUCCESS,resultMap.get("status"));
 //        throw new RuntimeException("error create product fail");
     }  

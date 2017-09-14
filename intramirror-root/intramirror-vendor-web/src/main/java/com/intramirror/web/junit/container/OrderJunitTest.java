@@ -43,8 +43,8 @@ public class OrderJunitTest extends BaseJunit4Test{
 		Map<String, Object> map = new HashMap<>();
 		map.put("logisProductId", "123");
 		map.put("status", "1");
-		ResultMessage message = orderController.updateOrderStatus(map);
-		System.out.println("updateOrderStatus=============>> result  : " +new Gson().toJson(message));
+//		ResultMessage message = orderController.updateOrderStatus(map);
+//		System.out.println("updateOrderStatus=============>> result  : " +new Gson().toJson(message));
 		
 		HttpServletRequest httpRequest = null;
 		ResultMessage message1 = orderController.getOrderCount(httpRequest);

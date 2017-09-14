@@ -140,6 +140,10 @@
             <artifactId>junit</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.intramirror</groupId>
+            <artifactId>intramirror-vendor-web</artifactId>
+        </dependency>
 
     </dependencies>
     <build>

@@ -46,9 +46,9 @@ public class XmagProductJunitTest extends BaseJunit4Test {
     	data.put("mqName", "OrderSetCheck");
         System.out.println("Test assume");  
         System.out.println(new Gson().toJson(data));
-        Map<String,Object> resultMap = xmagOrderMapping.handleMappingAndExecute(new Gson().toJson(data));
-        System.out.println(resultMap);
-        Assert.assertEquals(StatusType.SUCCESS,resultMap.get("status"));
+//        Map<String,Object> resultMap = xmagOrderMapping.handleMappingAndExecute(new Gson().toJson(data));
+//        System.out.println(resultMap);
+//        Assert.assertEquals(StatusType.SUCCESS,resultMap.get("status"));
 //        throw new RuntimeException("error create product fail");
     }  
     
