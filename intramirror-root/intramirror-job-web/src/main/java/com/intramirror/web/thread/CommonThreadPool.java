@@ -22,9 +22,19 @@ public class CommonThreadPool {
 
     private static final Logger logger = Logger.getLogger(CommonThreadPool.class);
 
-    public static void executeProduct(ThreadPoolExecutor executor,int threadNum,UpdateProductThread updateProductThread){
+    /**
+     * @param eventName 需要处理的事情
+     * @param executor 线程池
+     * @param threadNum 线程数量
+     * @param updateProductThread 线程
+     */
+    public static void executeProduct(String eventName,ThreadPoolExecutor executor,int threadNum,UpdateProductThread updateProductThread){
         try {
-            logger.info("CommonThreadPoolExecuteProduct,threadInfo,执行器中线程中实际的线程数量:"+executor.getPoolSize()+"，执行器中正在执行任务的线程数量："+executor.getActiveCount()+"，执行器中已经完成的任务数量:%d"+executor.getCompletedTaskCount());
+            logger.info("CommonThreadPoolExecuteProduct,threadInfo,执行器中线程中实际的线程数量:"+executor.getPoolSize()+"，执行器中正在执行任务的线程数量："
+                    +executor.getActiveCount()
+                    +"，执行器中已经完成的任务数量:"
+                    +executor.getCompletedTaskCount()
+                    +",eventName:"+eventName);
             logger.info("CommonThreadPoolExecuteProduct,start");
             if(executor.getActiveCount() <= threadNum) {
                 executor.execute(updateProductThread);
@@ -33,7 +43,7 @@ public class CommonThreadPool {
                 logger.info("CommonThreadPoolExecuteProduct,startSleep,date:"+ DateUtils.getStrDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
                 Thread.sleep(1000);
                 logger.info("CommonThreadPoolExecuteProduct,endSleep,date:"+ DateUtils.getStrDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
-                executeProduct(executor,threadNum,updateProductThread);
+                executeProduct(eventName,executor,threadNum,updateProductThread);
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -65,6 +65,7 @@ public class EdsAllUpdateByProductController implements InitializingBean {
         int limit = Integer.parseInt(param.get("limit").toString());
         int offset = Integer.parseInt(param.get("offset").toString());
         int threadNum = Integer.parseInt(param.get("threadNum").toString());
+        String eventName = param.get("eventName").toString();
         ThreadPoolExecutor nugnesExecutor = (ThreadPoolExecutor) param.get("nugnesExecutor");
         try {
             while (true) {
@@ -105,7 +106,7 @@ public class EdsAllUpdateByProductController implements InitializingBean {
 
                     if(productOptions != null) {
                         logger.info("EdsProductAllProducerControllerExecute,executeProduct,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions));
-                        CommonThreadPool.executeProduct(nugnesExecutor,threadNum,new UpdateProductThread(productOptions,vendorOptions));
+                        CommonThreadPool.executeProduct(eventName,nugnesExecutor,threadNum,new UpdateProductThread(productOptions,vendorOptions));
                         logger.info("EdsProductAllProducerControllerExecute,executeProduct,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions));
                     } else {
                         logger.info("EdsProductAllProducerControllerExecute,errorInitParam,productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions));
@@ -137,6 +138,7 @@ public class EdsAllUpdateByProductController implements InitializingBean {
         object.put("offset","0");
         object.put("threadNum","5");
         object.put("nugnesExecutor",nugnesExecutor);
+        object.put("eventName","nugnes全量更新商品");
 
         // put data
         paramsMap = new HashMap<>();
