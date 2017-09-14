@@ -4,7 +4,7 @@ import com.alibaba.fastjson15.JSONObject;
 import com.google.gson.Gson;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.common.utils.DateUtils;
-import com.intramirror.web.mapping.api.IDataMapping;
+import com.intramirror.web.mapping.api.IProductMapping;
 import com.intramirror.web.thread.CommonThreadPool;
 import com.intramirror.web.thread.UpdateProductThread;
 import com.intramirror.web.util.GetPostRequestUtil;
@@ -27,11 +27,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @Controller
-@RequestMapping("/eds")
+@RequestMapping("/eds_product")
 public class EdsAllUpdateByProductController implements InitializingBean {
 
     // logger
-    private final Logger logger = Logger.getLogger(EdsAllUpdateByProductController.class);
+    private static final Logger logger = Logger.getLogger(EdsAllUpdateByProductController.class);
 
     // getpost util
     private static GetPostRequestUtil getPostRequestUtil = new GetPostRequestUtil();
@@ -40,8 +40,8 @@ public class EdsAllUpdateByProductController implements InitializingBean {
     public static ProductEDSManagement productEDSManagement = new ProductEDSManagement();
 
     // mapping
-    @Resource(name = "edsProductMapping")
-    private IDataMapping iDataMapping;
+    @Resource(name = "edsAllUpdateByProductMapping")
+    private IProductMapping iProductMapping;
 
     // init params
     private Map<String,Object> paramsMap;
@@ -58,7 +58,7 @@ public class EdsAllUpdateByProductController implements InitializingBean {
         }
 
         // get params
-        Map<String,Object> param = (Map<String, Object>) paramsMap.get("nugnes");
+        Map<String,Object> param = (Map<String, Object>) paramsMap.get(name);
         String url = param.get("url").toString();
         String store_code = param.get("store_code").toString();
         String vendor_id = param.get("vendor_id").toString();
@@ -67,6 +67,7 @@ public class EdsAllUpdateByProductController implements InitializingBean {
         int threadNum = Integer.parseInt(param.get("threadNum").toString());
         String eventName = param.get("eventName").toString();
         ThreadPoolExecutor nugnesExecutor = (ThreadPoolExecutor) param.get("nugnesExecutor");
+
         try {
             while (true) {
                 // 拼接URL
@@ -91,26 +92,26 @@ public class EdsAllUpdateByProductController implements InitializingBean {
                 }
 
                 for(int i = 0,len = edsProductList.size();i<len;i++){
+
+                    // 获取数据
                     Map<String,Object> mqDataMap = new HashMap<String,Object>();
                     mqDataMap.put("reqCode", mapResult.get("reqCode"));
                     mqDataMap.put("count", mapResult.get("count"));
                     mqDataMap.put("product", edsProductList.get(i));
                     mqDataMap.put("vendor_id", vendor_id);
                     mqDataMap.put("full_update_product","1");
+                    logger.info("EdsProductAllProducerControllerExecute,mqDataMap:"+new Gson().toJson(mqDataMap)+",eventName:"+eventName);
 
-                    ProductEDSManagement.ProductOptions productOptions = iDataMapping.mapping(mqDataMap);
+                    // 映射数据 封装VO
+                    ProductEDSManagement.ProductOptions productOptions = iProductMapping.mapping(mqDataMap);
                     ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
                     vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                    logger.info("EdsProductAllProducerControllerExecute,initParam,productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
 
-                    logger.info("EdsProductAllProducerControllerExecute,initParam,productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions));
-
-                    if(productOptions != null) {
-                        logger.info("EdsProductAllProducerControllerExecute,executeProduct,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions));
-                        CommonThreadPool.executeProduct(eventName,nugnesExecutor,threadNum,new UpdateProductThread(productOptions,vendorOptions));
-                        logger.info("EdsProductAllProducerControllerExecute,executeProduct,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions));
-                    } else {
-                        logger.info("EdsProductAllProducerControllerExecute,errorInitParam,productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions));
-                    }
+                    // 线程池
+                    logger.info("EdsProductAllProducerControllerExecute,execute,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
+                    CommonThreadPool.execute(eventName,nugnesExecutor,threadNum,new UpdateProductThread(productOptions,vendorOptions));
+                    logger.info("EdsProductAllProducerControllerExecute,execute,endDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
                 }
 
                 offset = offset + limit;

@@ -3,12 +3,9 @@ package com.intramirror.web.thread;
 import com.intramirror.common.utils.DateUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
-import pk.shoplus.model.ProductEDSManagement;
-import pk.shoplus.model.Vendor;
 import pk.shoplus.util.ExceptionUtils;
 
 import java.util.Date;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -26,9 +23,9 @@ public class CommonThreadPool {
      * @param eventName 需要处理的事情
      * @param executor 线程池
      * @param threadNum 线程数量
-     * @param updateProductThread 线程
+     * @param runnable 线程
      */
-    public static void executeProduct(String eventName,ThreadPoolExecutor executor,int threadNum,UpdateProductThread updateProductThread){
+    public static void execute(String eventName, ThreadPoolExecutor executor, int threadNum, Runnable runnable){
         try {
             logger.info("CommonThreadPoolExecuteProduct,threadInfo,执行器中线程中实际的线程数量:"+executor.getPoolSize()+"，执行器中正在执行任务的线程数量："
                     +executor.getActiveCount()
@@ -38,13 +35,13 @@ public class CommonThreadPool {
 
             logger.info("CommonThreadPoolExecuteProduct,start");
             if(executor.getActiveCount() <= threadNum) {
-                executor.execute(updateProductThread);
+                executor.execute(runnable);
                 logger.info("CommonThreadPoolExecuteProduct,end");
             } else {
                 logger.info("CommonThreadPoolExecuteProduct,startSleep,date:"+ DateUtils.getStrDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
                 Thread.sleep(1000);
                 logger.info("CommonThreadPoolExecuteProduct,endSleep,date:"+ DateUtils.getStrDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
-                executeProduct(eventName,executor,threadNum,updateProductThread);
+                execute(eventName,executor,threadNum,runnable);
             }
         } catch (Exception e) {
             e.printStackTrace();

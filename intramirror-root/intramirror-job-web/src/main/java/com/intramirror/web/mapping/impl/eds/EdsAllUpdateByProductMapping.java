@@ -3,38 +3,34 @@ package com.intramirror.web.mapping.impl.eds;
 import com.alibaba.fastjson15.JSONArray;
 import com.alibaba.fastjson15.JSONObject;
 import com.google.gson.Gson;
-import com.intramirror.web.mapping.api.IDataMapping;
+import com.intramirror.web.mapping.api.IProductMapping;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.sql2o.Connection;
 import pk.shoplus.DBConnector;
-import pk.shoplus.model.Category;
 import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.model.SuiTable;
 import pk.shoplus.model.TechnicalInfo;
-import pk.shoplus.service.CategoryService;
 import pk.shoplus.service.MappingCategoryService;
 import pk.shoplus.util.ExceptionUtils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Service(value = "edsProductMapping")
-public class EdsProductMapping implements IDataMapping{
+@Service(value = "edsAllUpdateByProductMapping")
+public class EdsAllUpdateByProductMapping implements IProductMapping {
 
-    private final static Logger logger = Logger.getLogger(EdsProductMapping.class);
+    private final static Logger logger = Logger.getLogger(EdsAllUpdateByProductMapping.class);
 
     public static ProductEDSManagement productEDSManagement = new ProductEDSManagement();
 
     @Override
     public ProductEDSManagement.ProductOptions mapping(Map<String, Object> bodyDataMap) {
-        logger.info("EdsProductMapping,inputParams,bodyDataMap:"+new Gson().toJson(bodyDataMap));
+        logger.info("EdsAllUpdateByProductMapping,inputParams,bodyDataMap:"+new Gson().toJson(bodyDataMap));
         Connection conn = null;
+        ProductEDSManagement.ProductOptions productOptions = productEDSManagement.getProductOptions();
         try {
-            ProductEDSManagement.ProductOptions productOptions = productEDSManagement.getProductOptions();
-
             JSONObject productMap = com.alibaba.fastjson15.JSON.parseObject(bodyDataMap.get("product").toString());
             String full_update_product = bodyDataMap.get("full_update_product") == null ? "0" : bodyDataMap.get("full_update_product").toString();
             String vendor_id = bodyDataMap.get("vendor_id").toString();
@@ -53,7 +49,7 @@ public class EdsProductMapping implements IDataMapping{
                 }
                 if(conn != null) {conn.close();}
             } catch (Exception e) {
-                logger.info("EdsProductMapping,convertCategory,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+
+                logger.info("EdsAllUpdateByProductMapping,convertCategory,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+
                         ",productMap:"+new Gson().toJson(productMap));
                 e.printStackTrace();
             }
@@ -67,7 +63,7 @@ public class EdsProductMapping implements IDataMapping{
                     technicalInfoString += mapTechnicalInfo.get("name").toString() + mapTechnicalInfo.get("percentage").toString();
                 }
             } catch (Exception e) {
-                logger.info("EdsProductMapping,convertComposition,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+
+                logger.info("EdsAllUpdateByProductMapping,convertComposition,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+
                 ",productMap:"+new Gson().toJson(productMap));
                 e.printStackTrace();
             }
@@ -81,7 +77,7 @@ public class EdsProductMapping implements IDataMapping{
                     sizeFitValue += map.get("name").toString()+":"+map.get("value").toString()+",";
                 }
             } catch (Exception e) {
-                logger.info("EdsProductMapping,convertSizeFit,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+
+                logger.info("EdsAllUpdateByProductMapping,convertSizeFit,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+
                         ",productMap:"+new Gson().toJson(productMap));
                 e.printStackTrace();
             }
@@ -94,7 +90,7 @@ public class EdsProductMapping implements IDataMapping{
                 productOptions.setDescImg(stringListMap.get("full").toString());
             } catch(Exception e) {
                 stringListMap = new HashMap<>();
-                logger.info("EdsProductMapping,convertImg,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+
+                logger.info("EdsAllUpdateByProductMapping,convertImg,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+
                 ",productMap:"+new Gson().toJson(productMap));
             }
 
@@ -135,16 +131,15 @@ public class EdsProductMapping implements IDataMapping{
             }
 
             if(conn != null){conn.close();}
-            logger.info("EdsProductMapping,outParams,productOptions:"+new Gson().toJson(productOptions));
-            return productOptions;
+            logger.info("EdsAllUpdateByProductMapping,outParams,productOptions:"+new Gson().toJson(productOptions));
         } catch (Exception e) {
-            logger.info("EdsProductMapping,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)
+            logger.info("EdsAllUpdateByProductMapping,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)
             +",bodyDataMap:"+new Gson().toJson(bodyDataMap));
             if(conn != null){conn.close();}
             e.printStackTrace();
         } finally {
             if(conn != null){conn.close();}
         }
-        return null;
+        return productOptions;
     }
 }

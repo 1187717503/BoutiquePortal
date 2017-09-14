@@ -30,27 +30,22 @@ public class UpdateProductThread implements Runnable{
     @Override
     public void run() {
         try {
-            logger.info("UpdateProductThreadRun,createProduct,productOptions:"+new Gson().toJson(productOptions)
+            logger.info("UpdateProductThreadRun,createProduct,start,roductOptions:"+new Gson().toJson(productOptions)
                     +",vendorOptions:"+new Gson().toJson(vendorOptions));
-
-            logger.info("EdsProductAllProducerControllerExecute,executeProduct,startDate:"+ DateUtils.getStrDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
             Map<String,Object> resultMap = productEDSManagement.createProduct(productOptions,vendorOptions);
-            logger.info("EdsProductAllProducerControllerExecute,executeProduct,startDate:"+ DateUtils.getStrDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
-
-
-            logger.info("UpdateProductThreadRun,createProduct,resultMap:"+ JSONObject.toJSONString(resultMap)+",productOptions:"+new Gson().toJson(productOptions)
+            logger.info("UpdateProductThreadRun,createProduct,end,resultMap:"+ JSONObject.toJSONString(resultMap)+",productOptions:"+new Gson().toJson(productOptions)
                     +",vendorOptions:"+new Gson().toJson(vendorOptions));
 
             if(resultMap != null && resultMap.get("status").equals(StatusType.PRODUCT_ALREADY_EXISTS)) {
-                logger.info("UpdateProductThreadRun,updateProduct,productOptions:" + new Gson().toJson(productOptions)
+                logger.info("UpdateProductThreadRun,updateProduct,start,productOptions:" + new Gson().toJson(productOptions)
                         + ",vendorOptions:" + new Gson().toJson(vendorOptions));
                 resultMap = productServie.updateProduct(productOptions, vendorOptions);
-                logger.info("UpdateProductThreadRun,updateProduct,resultMap:" + JSONObject.toJSONString(resultMap) + ",productOptions:" + new Gson().toJson(productOptions)
+                logger.info("UpdateProductThreadRun,updateProduct,end,resultMap:" + JSONObject.toJSONString(resultMap) + ",productOptions:" + new Gson().toJson(productOptions)
                         + ",vendorOptions:" + new Gson().toJson(vendorOptions));
             }
         } catch (Exception e) {
             e.printStackTrace();
-            logger.info("UpdateProductThreadPoolStartThreadPoolConsumeRun,productOptions:"+new Gson().toJson(productOptions)
+            logger.info("UpdateProductThreadRun,productOptions:"+new Gson().toJson(productOptions)
                     +",vendorOptions:"+new Gson().toJson(vendorOptions));
         }
     }
