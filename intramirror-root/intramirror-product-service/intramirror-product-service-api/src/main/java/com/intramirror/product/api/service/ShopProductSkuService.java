@@ -14,4 +14,6 @@ public interface ShopProductSkuService {
 
     Map<String, Object> getSkuBySkuId(Long skuId);
 
+    List<Map<String, Object>> getSkuIdByShopProductSkuId(String[] shopProductSkuIds);
+
 }

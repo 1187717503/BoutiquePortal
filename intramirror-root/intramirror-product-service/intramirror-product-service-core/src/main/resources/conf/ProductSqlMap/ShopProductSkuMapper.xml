@@ -245,4 +245,14 @@
         left join sku_store t_ss on (sku.sku_id = t_ss.sku_id and t_ss.enabled = 1)
         where sku.enabled = 1 and sku.sku_id= #{skuId,jdbcType=BIGINT}
     </select>
+
+
+    <select id="getSkuIdByShopProductSkuId" resultType="java.util.HashMap">
+       SELECT sku_id FROM `shop_product_sku`
+       where shop_product_sku_id in
+        <foreach collection="shopProductSkuIds" item="shopProductSkuId" index="index"
+                 open="(" close=")" separator=",">
+            #{shopProductSkuId}
+        </foreach>
+    </select>
 </mapper>

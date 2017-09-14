@@ -1,6 +1,7 @@
 package com.intramirror.product.core.mapper;
 
 import com.intramirror.product.api.model.ShopProductSku;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -65,4 +66,6 @@ public interface ShopProductSkuMapper {
     List<Map<String, Object>> getSkuByShopProductId(Long shopProductId);
 
     Map<String, Object> getSkuBySkuId(Long skuId);
+
+    List<Map<String, Object>> getSkuIdByShopProductSkuId(@Param("shopProductSkuIds") String[] shopProductSkuIds);
 }

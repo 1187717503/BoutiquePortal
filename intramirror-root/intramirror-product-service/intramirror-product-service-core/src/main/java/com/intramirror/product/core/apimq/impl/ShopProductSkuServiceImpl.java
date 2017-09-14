@@ -40,4 +40,9 @@ public class ShopProductSkuServiceImpl extends BaseDao implements ShopProductSku
     public Map<String, Object> getSkuBySkuId(Long skuId) {
          return shopProductSkuMapper.getSkuBySkuId(skuId);
     }
+
+    @Override
+    public List<Map<String, Object>> getSkuIdByShopProductSkuId(String[] shopProductSkuIds) {
+        return shopProductSkuMapper.getSkuIdByShopProductSkuId(shopProductSkuIds);
+    }
 }

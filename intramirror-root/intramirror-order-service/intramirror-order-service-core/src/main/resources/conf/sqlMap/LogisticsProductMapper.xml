@@ -206,7 +206,7 @@
 	update logistics_product set container_id=0,`status`=2 where logistics_product_id=#{order_logistics_id,jdbcType=BIGINT} 
 </update>
 
-  <insert id="createLogisticsProduct" parameterType="com.intramirror.order.api.model.LogisticsProduct" keyProperty="logisticsProductId">
+  <insert id="createLogisticsProduct" parameterType="com.intramirror.order.api.model.LogisticsProduct" keyProperty="logistics_product_id">
     insert into logistics_product (logistics_product_id, order_logistics_id, shop_product_sku_id,
     in_price, sale_price, amount,
     fee, deduct_amount, deduct_fee,

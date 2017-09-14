@@ -1,6 +1,8 @@
 package com.intramirror.product.api.service;
 
 
+import java.util.List;
+
 public interface ISkuStoreService {
 	
 	/**
@@ -25,4 +27,6 @@ public interface ISkuStoreService {
 	 * @return
 	 */
 	Long selectSkuIdByShopProductSkuId(Long shopProductSkuId);
+
+	void updateSkuStoreReserved(List<String> reservedList , String[] skuIdString, List<Long> skuIds) throws Exception;
 }
