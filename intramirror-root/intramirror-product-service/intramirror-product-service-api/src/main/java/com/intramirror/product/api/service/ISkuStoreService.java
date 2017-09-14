@@ -9,7 +9,16 @@ public interface ISkuStoreService {
 	 * @return
 	 */
 	int updateBySkuId(int statusType,long skuid);
-	
+
+	int cancelSkuStore(Long shopProductSkuId);
+
+	/**
+	 * 根据skuId修改确认库存
+	 * @param shopProductSkuId
+	 * @return
+	 */
+	void updateConfirmStoreByShopProductSkuId (Long shopProductSkuId) throws Exception;
+
 	/**
 	 * 根据shopProductSkuId 查询SKUid
 	 * @param shopProductSkuId

@@ -1,5 +1,6 @@
 package pk.shoplus.model;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -23,12 +24,14 @@ import pk.shoplus.service.SkuService;
 import pk.shoplus.service.SkuStoreService;
 import pk.shoplus.service.price.api.IPriceService;
 import pk.shoplus.service.price.impl.PriceServiceImpl;
+import pk.shoplus.service.product.impl.ProductServiceImpl;
 import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.util.MapUtils;
 import pk.shoplus.vo.ResultMessage;
 
 import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.Runtime_exception;
 import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.updateStock_params_is_error;
+import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.warning_price_out_of_range;
 
 /**
  * 更新库存接口
@@ -39,11 +42,11 @@ public class ProductStockEDSManagement {
 
 	private static Logger logger = Logger.getLogger(ProductStockEDSManagement.class);
 
-	private final String method_updateStock = "ProductStockEDSManagement.updateStock()";
+    private IPriceService priceService = new PriceServiceImpl();
 
-	public Map<String, Object> updateStock(StockOptions stockOptions){
-	    logger.info("start updateStock service stockOptions : " + new Gson().toJson(stockOptions));
 
+    public Map<String, Object> updateStock(StockOptions stockOptions){
+        logger.info("ProductStockEDSManagementUpdateStock,inputParams,stockOptions:"+new Gson().toJson(stockOptions));
         MapUtils mapUtils = new MapUtils(new HashMap<>());
         Connection connection = null;
 		try{
@@ -52,14 +55,18 @@ public class ProductStockEDSManagement {
 			SkuPropertyService skuPropertyService = new SkuPropertyService(connection);
 			SkuStoreService skuStoreService = new SkuStoreService(connection);
 
+			logger.info("ProductStockEDSManagementUpdateStock,validateParam,stockOptions:"+new Gson().toJson(stockOptions));
 			ResultMessage resultMessage = this.validateParam(stockOptions,connection);
-			if(resultMessage.getStatus()) {
+            logger.info("ProductStockEDSManagementUpdateStock,validateParam,resultMessage:"+new Gson().toJson(resultMessage));
+            if(resultMessage.getStatus()) {
 
 			    // get product
 			    Product product = (Product) resultMessage.getData();
 
+			    logger.info("ProductStockEDSManagementUpdateStock,getSkuPropertyListWithSizeAndProductCode,skuOptions:"+new Gson().toJson(stockOptions));
                 List<Map<String, Object>> skuStoreIdList = skuPropertyService
-                        .getSkuPropertyListWithSizeAndProductCode(stockOptions.getSizeValue(), stockOptions.getProductCode());
+                        .getSkuPropertyListWithSizeAndProductCode(stockOptions.getSizeValue(), stockOptions.getProductCode(),stockOptions.getVendor_id());
+                logger.info("ProductStockEDSManagementUpdateStock,getSkuPropertyListWithSizeAndProductCode,skuStoreIdList:"+new Gson().toJson(skuStoreIdList));
 
                 Long reserved = 0L;
                 if(org.apache.commons.lang.StringUtils.isNotBlank(stockOptions.getReserved())) {
@@ -69,21 +76,59 @@ public class ProductStockEDSManagement {
                 if(skuStoreIdList != null && skuStoreIdList.size() > 0) {
                     // update sku_store
                     Object skuStoreIdObj = skuStoreIdList.get(0).get("sku_store_id");
-                    if (skuStoreIdObj != null) {
-                        Long skuStoreId = (Long) skuStoreIdObj;
-                        SkuStore skuStore = new SkuStore();
-                        skuStore.sku_store_id = skuStoreId;
-                        skuStore.store = Long.valueOf(stockOptions.getQuantity());
-                        if(StringUtils.isBlank(stockOptions.getType()) || !stockOptions.getType().equals(Contants.EVENTS_TYPE_1+"")) {
-                            skuStore.reserved = reserved;
-                        }
-                        logger.info("updateSkuStore skuStore : " + new Gson().toJson(skuStore));
-                        skuStoreService.updateSkuStore(skuStore);
+                    Long skuStoreId = (Long) skuStoreIdObj;
+                    SkuStore skuStore = new SkuStore();
+                    skuStore.sku_store_id = skuStoreId;
+                    skuStore.store = Long.valueOf(stockOptions.getQuantity());
+                    skuStore.confirmed = Long.valueOf(stockOptions.getConfirmed());
+                    if(StringUtils.isBlank(stockOptions.getType()) || !stockOptions.getType().equals(Contants.EVENTS_TYPE_1+"")) {
+                        skuStore.reserved = reserved;
                     }
+                    logger.info("ProductStockEDSManagementUpdateStock,updateSkuStore,skuStore:" + new Gson().toJson(skuStore));
+                    skuStoreService.updateSkuStore(skuStore);
                 } else {
 
                     // create sku_store
                     this.createSkuInfo(product, connection, stockOptions.getQuantity(),reserved, stockOptions.getSizeValue(), skuPropertyService, skuStoreService);
+                }
+
+                // update price
+                if(StringUtils.isNotBlank(stockOptions.getPrice())) {
+                    logger.info("ProductStockEDSManagementUpdateStock,startUpdatePricem,stockOptions:"+new Gson().toJson(stockOptions));
+                    BigDecimal price = BigDecimal.valueOf(Double.parseDouble(stockOptions.getPrice()));
+
+                    Map<String,Object> skuConditions = new HashMap<>();
+                    skuConditions.put("product_id",product.product_id);
+                    skuConditions.put("enabled",EnabledType.USED);
+                    SkuService skuService = new SkuService(connection);
+                    List<Sku> skuList = skuService.getSkuListByCondition(skuConditions);
+
+                    BigDecimal oldPrice = skuList.get(0).getPrice();
+                    boolean flag = ProductServiceImpl.isPrice(oldPrice,price);
+                    if(flag) {
+                        Sku skuPrice = priceService.getPriceByRule(product,Long.parseLong(stockOptions.getVendor_id()),price,connection);
+                        BigDecimal inPrice = skuPrice.getIn_price();
+                        for(Sku sku : skuList){
+                            logger.info("ProductStockEDSManagementUpdateStock,updateSkuPrice,originSku:"+new Gson().toJson(sku));
+                            sku.price = price;
+                            sku.in_price = inPrice;
+                            sku.im_price = skuPrice.getIm_price();
+                            sku.updated_at = new Date();
+                            skuService.updateSku(sku);
+                            logger.info("ProductStockEDSManagementUpdateStock,updateSkuPrice,updateSku:"+new Gson().toJson(sku));
+                        }
+                    } else {
+                         mapUtils.putData("status",StatusType.FAILURE)
+                                .putData("info","update stock - " + warning_price_out_of_range.getDesc() + " price:" + price)
+                                .putData("sku_size",stockOptions.getSizeValue())
+                                .putData("product_code",stockOptions.getProductCode())
+                                .putData("key","retail_price")
+                                .putData("value",price)
+                                .putData("error_enum",warning_price_out_of_range);
+                        logger.info("ProductStockEDSManagementUpdateStock,outputParams,mapUtils:"+new Gson().toJson(mapUtils));
+                        if(connection!=null) {connection.commit();connection.close();}
+                        return mapUtils.getMap();
+                    }
                 }
                 mapUtils.putData("status",StatusType.SUCCESS).putData("info","SUCCESS");
             } else {
@@ -104,10 +149,12 @@ public class ProductStockEDSManagement {
                     .putData("key","exception")
                     .putData("value",ExceptionUtils.getExceptionDetail(e))
             .putData("error_enum", Runtime_exception);
-		} finally {
+            logger.info("ProductStockEDSManagementUpdateStock,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
+        } finally {
            if(connection != null) {connection.close();}
         }
-		return mapUtils.getMap();
+        logger.info("ProductStockEDSManagementUpdateStock,outputParams,mapUtils:"+new Gson().toJson(mapUtils));
+        return mapUtils.getMap();
 	}
 	
 	/**
@@ -130,8 +177,6 @@ public class ProductStockEDSManagement {
             sku.coverpic = product.cover_img;
             sku.introduction = product.getDescription();
 
-
-
             Map condition = new HashMap<>();
             condition.put("product_id", product.getProduct_id());
             condition.put("enabled", 1);
@@ -148,6 +193,7 @@ public class ProductStockEDSManagement {
             sku.updated_at = new Date();
             sku.enabled = EnabledType.USED;
             Sku newSku = skuService.createSku(sku);
+            logger.info("ProductStockEDSManagementCreateSkuInfo,createSku,sku:"+new Gson().toJson(sku));
 
             //创建sku_store
             SkuStore skuStore = new SkuStore();
@@ -167,6 +213,7 @@ public class ProductStockEDSManagement {
             skuStore.updated_at = new Date();
             skuStore.enabled = EnabledType.USED;
             skuStoreService.createSkuStore(skuStore);
+            logger.info("ProductStockEDSManagementCreateSkuInfo,createSkuStore,skuStore:"+new Gson().toJson(skuStore));
 
             //创建product_sku_property_key
             ProductPropertyKeyService productPropertyKeyService = new ProductPropertyKeyService(connection);
@@ -190,6 +237,7 @@ public class ProductStockEDSManagement {
             productSkuPropertyValue.updated_at = new Date();
             productSkuPropertyValue.enabled = EnabledType.USED;
             ProductSkuPropertyValue pspv = productPropertyValueService.createProductPropertyValue(productSkuPropertyValue);
+            logger.info("ProductStockEDSManagementCreateSkuInfo,createProductPropertyValue,pspv:"+new Gson().toJson(pspv));
 
             //创建sku_property
             SkuProperty skuProperty = new SkuProperty();
@@ -202,6 +250,7 @@ public class ProductStockEDSManagement {
             skuProperty.updated_at = new Date();
             skuProperty.enabled = EnabledType.USED;
             skuPropertyService.createSkuProperty(skuProperty);
+            logger.info("ProductStockEDSManagementCreateSkuInfo,createSkuProperty,skuProperty:"+new Gson().toJson(skuProperty));
 
         }
     }
@@ -212,40 +261,40 @@ public class ProductStockEDSManagement {
      * @return
      */
     public ResultMessage validateParam(StockOptions stockOptions, Connection conn) throws Exception {
-        // init resultMap
+        logger.info("ProductStockEDSManagementValidateParam,inputParams,stockOptions:"+new Gson().toJson(stockOptions));
         ResultMessage resultMessage = new ResultMessage();
-
-        // get params
+        resultMessage.setStatus(true);
         String productCode = stockOptions.getProductCode();
         String sizeValue = stockOptions.getSizeValue();
         String quantity = stockOptions.getQuantity();
-//        String reserved = stockOptions.getReserved();
         Product product = null;
 
-        // checked productCode
         if(org.apache.commons.lang.StringUtils.isNotBlank(productCode)) {
 
             ProductService productService = new ProductService(conn);
             Map<String, Object> condition = new HashMap<>();
             condition.put("product_code", productCode);
             condition.put("enabled", EnabledType.USED);
+            condition.put("vendor_id",stockOptions.getVendor_id());
             product = productService.getProductByCondition(condition, null);
             if(product == null){
-                return resultMessage.sStatus(false).sMsg("update stock - 找不到这个商品 。");
+                 resultMessage.sStatus(false).sMsg("update stock - 找不到这个商品 。");
             }
-        } else {
-            return resultMessage.sStatus(false).sMsg("update stock - productCode is null 。");
         }
 
-        // checked sizeValue
-        if(org.apache.commons.lang.StringUtils.isBlank(sizeValue))
-            return resultMessage.sStatus(false).sMsg("update stock - sizeValue is null 。");
+        if(StringUtils.isBlank(productCode)) {
+            resultMessage.sStatus(false).sMsg("update stock - productCode is null 。");
+        } else if(org.apache.commons.lang.StringUtils.isBlank(sizeValue))
+            resultMessage.sStatus(false).sMsg("update stock - sizeValue is null 。");
+        else if(org.apache.commons.lang.StringUtils.isBlank(quantity)){
+            resultMessage.sStatus(false).sMsg("update stock - quantity is null 。");
+        }
 
-        // checked quantity
-        if(org.apache.commons.lang.StringUtils.isBlank(quantity))
-            return resultMessage.sStatus(false).sMsg("update stock - quantity is null 。");
-
-        return resultMessage.sStatus(true).sMsg("SUCCESS").sData(product);
+        if(resultMessage.getStatus()) {
+            resultMessage.sStatus(true).sMsg("SUCCESS").sData(product);
+        }
+        logger.info("ProductStockEDSManagementValidateParam,outputParams,resultMessage:"+new Gson().toJson(resultMessage));
+        return resultMessage;
     }
 
     /**
@@ -320,11 +369,30 @@ public class ProductStockEDSManagement {
 	public class StockOptions{
 		public String productCode;
 		public String sizeValue;
-		public String quantity;
-		public String reserved;
+        public String quantity;
+        public String reserved;
+        public String confirmed;
 		public String type;
-		
-		public String getProductCode() {
+		public String vendor_id;
+		public String price;
+
+        public String getConfirmed() {
+            return confirmed;
+        }
+
+        public void setConfirmed(String confirmed) {
+            this.confirmed = confirmed;
+        }
+
+        public String getPrice() {
+            return price;
+        }
+
+        public void setPrice(String price) {
+            this.price = price;
+        }
+
+        public String getProductCode() {
 			return productCode;
 		}
 		public void setProductCode(String productCode) {
@@ -357,6 +425,14 @@ public class ProductStockEDSManagement {
 
         public void setType(String type) {
             this.type = type;
+        }
+
+        public String getVendor_id() {
+            return vendor_id;
+        }
+
+        public void setVendor_id(String vendor_id) {
+            this.vendor_id = vendor_id;
         }
     }
 }

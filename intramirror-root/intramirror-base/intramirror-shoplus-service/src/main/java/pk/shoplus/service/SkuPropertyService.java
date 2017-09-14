@@ -1,5 +1,7 @@
 package pk.shoplus.service;
 
+import com.google.gson.Gson;
+import org.apache.log4j.Logger;
 import org.sql2o.Connection;
 import pk.shoplus.common.Helper;
 import pk.shoplus.dao.DaoHelper;
@@ -17,6 +19,8 @@ public class SkuPropertyService {
 	 * 获取数据库连接
 	 */
 	private EntityDao<SkuProperty> skuPropertyDao = null;
+
+	private static Logger logger = Logger.getLogger(SkuPropertyService.class);
 
 	/**
 	 * @param conn
@@ -258,7 +262,7 @@ public class SkuPropertyService {
 		return result;
 	}
 
-	public List<Map<String, Object>> getSkuPropertyListWithSizeAndProductCode(String size, String productCode) throws Exception {
+	public List<Map<String, Object>> getSkuPropertyListWithSizeAndProductCode(String size, String productCode,String vendor_id) throws Exception {
 		List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
 		try {
 			StringBuilder sql = new StringBuilder("");
@@ -270,10 +274,13 @@ public class SkuPropertyService {
 			sql.append(" pspk.product_sku_property_key_id = sp.product_sku_property_key_id and ");
 			sql.append(" pspk.`name` = 'Size' and ");
 			sql.append(" s.sku_id = ss.sku_id and ");
-			sql.append(" ss.enabled = 1 and p.enabled = 1 and sp.enabled = 1 and pspk.enabled = 1 and pspv.enabled = 1 and ");
+			sql.append(" s.enabled = 1 and ss.enabled = 1 and p.enabled = 1 and sp.enabled = 1 and pspk.enabled = 1 and pspv.enabled = 1 and ");
 			sql.append(" pspv.`value` = :p1 and ");
-			sql.append(" p.product_code = :p2 ");
-			result = skuPropertyDao.executeBySql(sql.toString(), new Object[] {size, productCode });
+			sql.append(" p.product_code = :p2 and ");
+			sql.append(" p.vendor_id = :p3 ");
+			Object[] objects = new Object[] {size, productCode,vendor_id};
+			result = skuPropertyDao.executeBySql(sql.toString(), objects);
+			logger.info("SkuPropertyServiceGetSkuPropertyListWithSizeAndProductCode,sql:"+sql+",objects:"+new Gson().toJson(objects));
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;

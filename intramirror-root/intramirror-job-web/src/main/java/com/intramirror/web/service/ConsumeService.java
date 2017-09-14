@@ -82,7 +82,7 @@ public class ConsumeService {
             MessageInfo messageInfo = new Gson().fromJson(message.getMessageBody(), MessageInfo.class);
             for(QueueNameJobEnum queueNameEnum : QueueNameJobEnum.values()) {
                 if(queueNameEnum.getCode().equalsIgnoreCase(apiMq.getName())) {
-                    Map<String,Object> resultMap = queueNameEnum.getMapping().handleMappingAndExecute(new Gson().toJson(messageInfo.getBody()));
+                    Map<String,Object> resultMap = queueNameEnum.getMapping().handleMappingAndExecute(new Gson().toJson(messageInfo.getBody()),queueNameEnum.getCode());
                     consumeResult(resultMap,mqName,messageInfo,queueNameEnum,apiMq);
                 }
             }

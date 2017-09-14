@@ -68,7 +68,7 @@ public class ProductEDSManagement {
             result.put("status",StatusType.FAILURE);
 
             //check params
-            boolean b = validateParam(conn, columnDataList, result);
+            boolean b = validateParam(conn, columnDataList, result,vendorId);
             if (b) {
                 return b;
             }
@@ -222,6 +222,7 @@ public class ProductEDSManagement {
             // TODO: commit过程中的发生的不一致性也需要处理
             Map<String, Object> condition = new HashMap<String,Object>();
             condition.put("product_code", product.product_code);
+            condition.put("vendor_id",vendorId);
             condition.put("enabled", 1);
             long pcount = productService.countProductByCondition(condition);
             logger.info(" create product service by product : " + new Gson().toJson(product));
@@ -988,38 +989,7 @@ public class ProductEDSManagement {
 
         return converImgPathList;
     }
-	
-	/**
-     * 查询类目
-     *
-     * @param columnDataList
-     * @param categoryService
-     * @return
-     */
-    /*public Category getCategory(List<String> columnDataList, CategoryService categoryService, MappingCategoryService mappingCategoryService, Map<String, Object> result, String storeCode) throws Exception {
-        String firstCategoryName = columnDataList.get(8).toString();
-        String secondCategoryName = columnDataList.get(9).toString();
-        String thirdCategoryName = columnDataList.get(10).toString();
-        Category category = null;
 
-        Object [] object = new Object[]{storeCode, firstCategoryName, secondCategoryName, thirdCategoryName};
-
-        List<Map<String, Object>> apiCategoryMap = null;
-        apiCategoryMap = mappingCategoryService.getMappingCategoryInfoByCondition(object);
-        if (null != apiCategoryMap && apiCategoryMap.size() > 0) {
-            if (apiCategoryMap.size() > 1) {
-                result.put("info", "  json_data[ 11 ] find multiple same category!!!");
-                result.put("status", StatusType.FAILURE);
-            } else {
-                category = categoryService.convertMapToCategory(apiCategoryMap.get(0));
-            }
-        } else {
-            result.put("info", " json_data[ 8,9,10 ] can not find category to map!!!");
-            result.put("status", StatusType.FAILURE);
-        }
-        return category;
-    }*/
-	
 	 public boolean checkVendorAcitived(Vendor vendor, Map<String, Object> result) {
 	        boolean b = false;
 	        if (vendor.status != VendorStatus.ACTIVED) {
@@ -1097,7 +1067,7 @@ public class ProductEDSManagement {
      * @param result
      * @return
      */
-    public boolean validateParam(Connection conn, List<String> columnDataList, Map<String, Object> result) {
+    public boolean validateParam(Connection conn, List<String> columnDataList, Map<String, Object> result,Long vendorId) {
         /*String productName = columnDataList.get(0);
         if (StringUtils.isBlank(productName)) {
             result.put("info","create product - "+ ApiErrorTypeEnum.errorType.boutique_name_is_null.getDesc()+"boutique_name:null");
@@ -1119,8 +1089,11 @@ public class ProductEDSManagement {
             Map<String, Object> condition = new HashMap<>();
             condition.put("product_code", boutiqueId);
             condition.put("enabled", 1);
+            condition.put("vendor_id",vendorId);
             try {
+                logger.info("ProductEDSManagementValidateParam,getProductByCondition,condition:"+new Gson().toJson(condition));
                 Product product = productService.getProductByCondition(condition, null);
+                logger.info("ProductEDSManagementValidateParam,getProductByCondition,product:"+new Gson().toJson(product));
                 if (null != product) {
                     result.put("status",StatusType.PRODUCT_ALREADY_EXISTS);
                     result.put("info","create product - "+ ApiErrorTypeEnum.errorType.boutique_id_already_exist.getDesc()+"boutique_id:"+boutiqueId);

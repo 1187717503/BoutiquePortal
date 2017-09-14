@@ -128,7 +128,7 @@ public class SeasonService {
             if(StringUtils.isBlank(boutiqueCode)) {
                 return "";
             }
-            String sql = "select season_code from season_mapping where boutique_season_code = '" + StringUtils.trim(boutiqueCode) + "'";
+            String sql = "select season_code from season_mapping where boutique_season_code = '" + StringUtils.trim(boutiqueCode) + "' and enabled = 1";
             List<Map<String,Object>> mapList  = seasonDao.executeBySql(sql,null);
 
             if(mapList != null && mapList.size() > 0) {

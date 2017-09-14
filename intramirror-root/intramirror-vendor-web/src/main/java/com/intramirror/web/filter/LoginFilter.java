@@ -6,6 +6,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.impl.Base64Codec;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -59,7 +60,6 @@ public class LoginFilter implements Filter {
         } else if (request.getMethod().equals("OPTIONS") && !reqUrl.contains("/login")) {
 
         } else {
-
             Long userId = null;
 
             try {
@@ -84,9 +84,9 @@ public class LoginFilter implements Filter {
                     status = false;
                 }
             } catch (Exception e) {
-                status = false;
-            }
 
+            	status =  false;
+            }
         }
         if (!status) {
             logger.info("LoginFilter: User not logged in");

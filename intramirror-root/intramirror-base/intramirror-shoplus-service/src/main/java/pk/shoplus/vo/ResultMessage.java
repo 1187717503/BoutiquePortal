@@ -18,6 +18,8 @@ public class ResultMessage {
 	// 响应数据
 	public Object data = null;
 
+	public String desc = null;
+
 	public Boolean getStatus() {
 		return status;
 	}
@@ -72,6 +74,15 @@ public class ResultMessage {
 		super();
 		this.status = status;
 		this.msg = msg;
+	}
+
+	public String getDesc() {
+		return desc;
+	}
+
+	public ResultMessage setDesc(String desc) {
+		this.desc = desc;
+		return this;
 	}
 
 	public ResultMessage() {

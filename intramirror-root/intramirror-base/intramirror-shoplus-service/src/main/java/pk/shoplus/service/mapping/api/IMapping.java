@@ -14,6 +14,6 @@ public interface IMapping {
 	 * @param mqData
 	 * @return 响应结果
 	 */
-	public Map<String, Object> handleMappingAndExecute(String mqData);
+	public Map<String, Object> handleMappingAndExecute(String mqData,String queueNameEnum);
 	
 }

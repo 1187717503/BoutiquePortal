@@ -45,7 +45,7 @@ public class OrderEDSMapping implements IMapping {
      * @return
      */
     @Override
-	public Map<String, Object> handleMappingAndExecute(String mqData){
+	public Map<String, Object> handleMappingAndExecute(String mqData,String queueNameEnum){
         Map<String, Object> dataMap = new HashMap<String, Object>();
     	dataMap.put("status", StatusType.FAILURE);
     	

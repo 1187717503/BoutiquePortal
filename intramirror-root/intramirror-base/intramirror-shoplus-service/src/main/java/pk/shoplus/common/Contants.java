@@ -112,6 +112,19 @@ public class Contants {
     public static final String qty_change_filippo = "getqty_change_filippo";
     public static final String qty_origin_filippo_product = "getqty_origin_filippo_product";
     public static final String qty_revised_filippo_product = "getqty_revised_filippo_product";
+    
+    
+    
+    /**
+     * Quadra 接口
+     */
+    public static final String quadra_file_path = "/opt/data/quadra/";
+    public static final String quadra_file_type = ".txt";
+    public static final String quadra_origin_product_day = "quadra_origin_product_day";
+    public static final String quadra_revised_product_day = "quadra_revised_product_day";
+    public static final String quadra_change_product_day = "quadra_change_product_day";
+
+    
 
 
     //	public static final String download_excel_path = "D:/";

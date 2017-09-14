@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -365,62 +366,75 @@ public class OrderController extends BaseController {
 //		}
 
 
+
         result.successStatus();
         result.setData(orderInfo);
         return result;
     }
+	
+	/**
+	 * 状态机接口
+	 * @param map
+	 * @return
+	 */
+	@RequestMapping(value="/updateOrderStatus", method=RequestMethod.POST)
+	@ResponseBody
+	public ResultMessage updateOrderStatus(@RequestBody Map<String, Object> map, HttpServletRequest httpServletRequest){
+		logger.info(MessageFormat.format("updateOrderStatus param:{0}",new Gson().toJson(map)));
 
-
-    /**
-     * 状态机借口
-     *
-     * @param map
-     * @return
-     */
-    @RequestMapping(value = "/updateOrderStatus", method = RequestMethod.POST)
-    @ResponseBody
-    public ResultMessage updateOrderStatus(@RequestBody Map<String, Object> map) {
-        logger.info(MessageFormat.format("updateOrderStatus param:{0}", new Gson().toJson(map)));
-        ResultMessage message = ResultMessage.getInstance();
-        Map<String, Object> resultMap = new HashMap<String, Object>();
-        resultMap.put("status", StatusType.FAILURE);
-        try {
-            //参数不能为空
-            if (map == null || map.size() == 0) {
-                message.successStatus().putMsg("info", "Parameter cannot be null");
-                return message;
-            }
-
-            if (map.get("logisProductId") == null || StringUtils.isBlank(map.get("logisProductId").toString())) {
-                message.successStatus().putMsg("info", "logisProductId cannot be null");
-                return message;
-            }
-
-            if (map.get("status") == null || StringUtils.isBlank(map.get("status").toString())) {
-                message.successStatus().putMsg("info", "status cannot be null");
-                return message;
-            }
-
-
-            Long logisProductId = Long.parseLong(map.get("logisProductId").toString());
-            int status = Integer.parseInt(map.get("status").toString());
-
-            //调用修改订单状态
-            resultMap = logisticsProductService.updateOrderLogisticsStatusById(logisProductId, status);
-            if (StatusType.SUCCESS == Integer.parseInt(resultMap.get("status").toString())) {
-                message.successStatus().putMsg("Info", "SUCCESS").setData(resultMap);
-                return message;
-            }
-            message.successStatus().putMsg("Info", "" + StatusType.FAILURE).setData(resultMap);
-            return message;
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("errorMsg : " + e.getMessage());
-            message.errorStatus().putMsg("errorMsg", e.getMessage());
-        }
-
-        return message;
-    }
+		User user = getUser(httpServletRequest);
+		ResultMessage message = ResultMessage.getInstance();
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		resultMap.put("status", StatusType.FAILURE);
+		try {
+			//参数不能为空
+			if(map == null || map.size() == 0){
+				message.successStatus().putMsg("info", "Parameter cannot be null");
+				return message;
+			}
+			
+			if(map.get("logisProductId") == null || StringUtils.isBlank(map.get("logisProductId").toString())){
+				message.successStatus().putMsg("info", "logisProductId cannot be null");
+				return message;
+			}
+			
+			if(map.get("status") == null || StringUtils.isBlank(map.get("status").toString())){
+				message.successStatus().putMsg("info", "status cannot be null");
+				return message;
+			}
+			
+			
+			Long logisProductId =Long.parseLong(map.get("logisProductId").toString());
+			int status =Integer.parseInt(map.get("status").toString());
+			
+			//调用修改订单状态
+			//根据id获取当前数据库旧的对象信息
+			LogisticsProduct oldLogisticsProduct = logisticsProductService.selectById(logisProductId);
+			resultMap = logisticsProductService.updateOrderLogisticsStatusById(oldLogisticsProduct, status);
+			if (StatusType.SUCCESS == Integer.parseInt(resultMap.get("status").toString())){
+				//更新confirm库存
+				if (2 == status) {
+					if (null != oldLogisticsProduct) {
+						Long shopProductSkuId = oldLogisticsProduct.getShop_product_sku_id();
+						logger.info("订单 "+shopProductSkuId+" , 用户 "+ JSON.toJSONString(user.getUsername()) +" confirm操作, 修改confirm库存开始");
+						skuStoreService.updateConfirmStoreByShopProductSkuId(shopProductSkuId);
+						logger.info("订单 " + shopProductSkuId + " confirm操作, 修改confirm库存成功");
+					}
+				}
+				message.successStatus().putMsg("Info", "SUCCESS").setData(resultMap);
+				return message;
+			}
+			message.successStatus().putMsg("Info", ""+StatusType.FAILURE).setData(resultMap);
+			return message;
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.info("errorMsg : " +e.getMessage());
+			message.errorStatus().putMsg("errorMsg", e.getMessage());
+		}
+		
+		return message;
+	}
+	
 
     /**
      * 根据不同订单状态统计数量
@@ -858,63 +872,119 @@ public class OrderController extends BaseController {
     }
 
 
-    /**
-     * 回调接口
-     *
-     * @return
-     */
-    @RequestMapping(value = "/orderRefundCallback")
-    @ResponseBody
-    public ResultMessage orderRefundCallback(@RequestBody Map<String, Object> map) {
-        logger.info("info parameter :" + new Gson().toJson(map));
-        ResultMessage message = ResultMessage.getInstance();
-        try {
-            //校验入参
-            if (null == map || 0 == map.size()) {
-                message.successStatus().putMsg("info", "Parameter cannot be null");
-                logger.info("info parameter cannot be null");
-                return message;
-            }
-            if (null == map.get("logisProductId") || StringUtils.isBlank(map.get("logisProductId").toString())) {
-                message.successStatus().putMsg("info", "logisProductId cannot be null");
-                logger.info("info logisProductId  cannot be null");
-                return message;
-            }
-            if (null == map.get("status") || StringUtils.isBlank(map.get("status").toString())) {
-                message.successStatus().putMsg("info", "status cannot be null");
-                logger.info("info status  cannot be null");
-                return message;
-            }
-            Long logisProductId = Long.parseLong(map.get("logisProductId").toString());
-            int status = Integer.parseInt(map.get("status").toString());
-
-            //回调接口只支持取消
-            if (OrderStatusType.CANCELED != status) {
-                message.successStatus().putMsg("info", "status not is 6");
-                logger.info("info status not is 6");
-                return message;
-            }
-            logger.info(logisProductId + "： 进入退款回调流程!!");
-            Map<String, Object> resultMap = logisticsProductService.updateOrderLogisticsStatusById(logisProductId, status);
-            //获取SKU
-            LogisticsProduct oldLogisticsProduct = iLogisticsProductService.selectById(logisProductId);
-            //开始修改库存
-            if (StatusType.SUCCESS == Integer.parseInt(resultMap.get("status").toString())) {
-                //如果成功，释放库存
-                Long skuId = skuStoreService.selectSkuIdByShopProductSkuId(oldLogisticsProduct.getShop_product_sku_id());
-                int result = skuStoreService.updateBySkuId(OrderStatusType.REFUND, skuId);
-                message.successStatus().putMsg("Info", "SUCCESS").setData(result);
-                logger.info(logisProductId + "===========>>>>>释放库存");
-                return message;
-            }
-            message.successStatus().putMsg("Info", "当前状态不符合状态机扭转请检查");
-            logger.info("退款回调结束!!");
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("errorMsg : " + e.getMessage());
-            message.errorStatus().putMsg("errorMsg", e.getMessage());
-        }
-        return message;
+//    /**
+//     * 回调接口
+//     *
+//     * @return
+//     */
+//<<<<<<< HEAD
+//    @RequestMapping(value = "/orderRefundCallback")
+//    @ResponseBody
+//    public ResultMessage orderRefundCallback(@RequestBody Map<String, Object> map) {
+//        logger.info("info parameter :" + new Gson().toJson(map));
+//        ResultMessage message = ResultMessage.getInstance();
+//        try {
+//            //校验入参
+//            if (null == map || 0 == map.size()) {
+//                message.successStatus().putMsg("info", "Parameter cannot be null");
+//                logger.info("info parameter cannot be null");
+//                return message;
+//            }
+//            if (null == map.get("logisProductId") || StringUtils.isBlank(map.get("logisProductId").toString())) {
+//                message.successStatus().putMsg("info", "logisProductId cannot be null");
+//                logger.info("info logisProductId  cannot be null");
+//                return message;
+//            }
+//            if (null == map.get("status") || StringUtils.isBlank(map.get("status").toString())) {
+//                message.successStatus().putMsg("info", "status cannot be null");
+//                logger.info("info status  cannot be null");
+//                return message;
+//            }
+//            Long logisProductId = Long.parseLong(map.get("logisProductId").toString());
+//            int status = Integer.parseInt(map.get("status").toString());
+//
+//            //回调接口只支持取消
+//            if (OrderStatusType.CANCELED != status) {
+//                message.successStatus().putMsg("info", "status not is 6");
+//                logger.info("info status not is 6");
+//                return message;
+//            }
+//            logger.info(logisProductId + "： 进入退款回调流程!!");
+//            Map<String, Object> resultMap = logisticsProductService.updateOrderLogisticsStatusById(logisProductId, status);
+//            //获取SKU
+//            LogisticsProduct oldLogisticsProduct = iLogisticsProductService.selectById(logisProductId);
+//            //开始修改库存
+//            if (StatusType.SUCCESS == Integer.parseInt(resultMap.get("status").toString())) {
+//                //如果成功，释放库存
+//                Long skuId = skuStoreService.selectSkuIdByShopProductSkuId(oldLogisticsProduct.getShop_product_sku_id());
+//                int result = skuStoreService.updateBySkuId(OrderStatusType.REFUND, skuId);
+//                message.successStatus().putMsg("Info", "SUCCESS").setData(result);
+//                logger.info(logisProductId + "===========>>>>>释放库存");
+//                return message;
+//            }
+//            message.successStatus().putMsg("Info", "当前状态不符合状态机扭转请检查");
+//            logger.info("退款回调结束!!");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            logger.info("errorMsg : " + e.getMessage());
+//            message.errorStatus().putMsg("errorMsg", e.getMessage());
+//        }
+//        return message;
+//=======
+    @RequestMapping(value="/orderRefundCallback")
+	@ResponseBody
+    public ResultMessage orderRefundCallback(@RequestBody Map<String,Object> map){
+		logger.info("info parameter :"+ new Gson().toJson(map));
+		ResultMessage message= ResultMessage.getInstance();
+		try {
+			//校验入参
+	    	if (null == map || 0 == map.size()){
+	    		message.successStatus().putMsg("info", "Parameter cannot be null");
+	    		logger.info("info parameter cannot be null");
+	    		return message;
+	    	}
+	    	if (null == map.get("logisProductId") || StringUtils.isBlank(map.get("logisProductId").toString())){
+	    		message.successStatus().putMsg("info", "logisProductId cannot be null");
+	    		logger.info("info logisProductId  cannot be null");
+	    		return message;
+	    	}
+	    	if (null == map.get("status") || StringUtils.isBlank(map.get("status").toString())){
+	    		message.successStatus().putMsg("info", "status cannot be null");
+	    		logger.info("info status  cannot be null");
+	    		return message;
+	    	}
+	    	Long logisProductId =Long.parseLong(map.get("logisProductId").toString());
+			int status =Integer.parseInt(map.get("status").toString());
+			
+			//回调接口只支持取消
+			if (OrderStatusType.CANCELED != status){
+				message.successStatus().putMsg("info", "status not is 6");
+	    		logger.info("info status not is 6");
+	    		return message;
+			}
+	    	logger.info(logisProductId +"： 进入退款回调流程!!");
+			LogisticsProduct logisticsProduct = new LogisticsProduct();
+			logisticsProduct.setLogistics_product_id(logisProductId);
+	    	Map<String, Object> resultMap = logisticsProductService.updateOrderLogisticsStatusById(logisticsProduct, status);
+	    	//获取SKU
+	    	LogisticsProduct oldLogisticsProduct = iLogisticsProductService.selectById(logisProductId);
+	    	//开始修改库存
+			if (StatusType.SUCCESS == Integer.parseInt(resultMap.get("status").toString())){
+				//如果成功，释放库存
+				Long skuId = skuStoreService.selectSkuIdByShopProductSkuId(oldLogisticsProduct.getShop_product_sku_id());
+				int result = skuStoreService.updateBySkuId(OrderStatusType.REFUND, skuId);
+				message.successStatus().putMsg("Info", "SUCCESS").setData(result);
+				logger.info(logisProductId + "===========>>>>>释放库存");
+				return message;
+			}
+			message.successStatus().putMsg("Info", "当前状态不符合状态机扭转请检查");
+			logger.info("退款回调结束!!");
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.info("errorMsg : "+e.getMessage());
+			message.errorStatus().putMsg("errorMsg", e.getMessage());
+		}
+    	return message;
     }
 
 

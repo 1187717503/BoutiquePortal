@@ -41,7 +41,7 @@ public class CloudStoreGetInventoryMapping implements IMapping{
     private IProductService iProductService = new ProductServiceImpl();
 
     @Override
-    public Map<String, Object> handleMappingAndExecute(String mqData) {
+    public Map<String, Object> handleMappingAndExecute(String mqData,String queueNameEnum) {
         logger.info("CloudStoreGetInventoryMapping.handleMappingAndExecute();");
         MapUtils mapUtils = new MapUtils(new HashMap<>());
         try {

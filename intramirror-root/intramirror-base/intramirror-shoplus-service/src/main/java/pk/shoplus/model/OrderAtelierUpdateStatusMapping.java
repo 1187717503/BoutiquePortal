@@ -29,7 +29,7 @@ public class OrderAtelierUpdateStatusMapping implements IMapping{
      * @return
      */
     @Override
-	public Map<String, Object> handleMappingAndExecute(String mqData){
+	public Map<String, Object> handleMappingAndExecute(String mqData,String queueNameEnum){
 		LOGGER.info("Atelier mapping 更新订单状态入参:"+mqData);
         Map<String, Object> dataMap = new HashMap<String, Object>();
     	dataMap.put("status", StatusType.FAILURE);

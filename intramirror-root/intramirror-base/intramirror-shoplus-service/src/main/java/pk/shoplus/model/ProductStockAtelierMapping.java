@@ -36,7 +36,7 @@ public class ProductStockAtelierMapping implements IMapping {
 	private ProductStockEDSManagement productStockEDSManagement = new ProductStockEDSManagement();
 	
 	@Override
-	public Map<String, Object> handleMappingAndExecute(String mqData){
+	public Map<String, Object> handleMappingAndExecute(String mqData,String queueNameEnum){
 		logger.info("------------------------------------------start ProductStockAtelierMapping.handleMappingAndExecuteUpdate,mqData:" + mqData);
 		Map<String,Object> resultMap = new HashMap<String,Object>();
 		try {
@@ -61,12 +61,17 @@ public class ProductStockAtelierMapping implements IMapping {
 					resultMap.put("product_code",stockOptions.getProductCode());
 					return resultMap;
 				}
-				int qty = Integer.parseInt(stock);
-				ResultMessage resultMessage = storeService.handleApiStockRule(Contants.STOCK_QTY,qty,stockOptions.getSizeValue(),stockOptions.getProductCode());
+				logger.info("ProductStockAtelierMappingHandleMappingAndExecute,covertStock,stock:"+new Gson().toJson(stock));
+				Double doubleStock = Double.parseDouble(stock);
+				int qty = doubleStock.intValue();
+				logger.info("ProductStockAtelierMappingHandleMappingAndExecute,covertStock,qty:"+qty);
+				ResultMessage resultMessage = storeService.handleApiStockRule(Contants.STOCK_QTY,qty,stockOptions.getSizeValue(),stockOptions.getProductCode(),queueNameEnum);
 				if(resultMessage.getStatus()) {
 					SkuStore skuStore = (SkuStore) resultMessage.getData();
 					stockOptions.setQuantity(skuStore.getStore().toString());
 					stockOptions.setReserved(skuStore.getReserved().toString());
+					stockOptions.setVendor_id(resultMessage.getDesc());
+					stockOptions.setConfirmed(skuStore.getConfirmed().toString());
 				} else {
 					resultMap.put("status", StatusType.FAILURE);
 					resultMap.put("info",resultMessage.getMsg());

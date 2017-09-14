@@ -22,7 +22,7 @@ public class PriceServiceImpl implements IPriceService{
 
     @Override
     public Sku getPriceByRule(Product product, Long vendorId, BigDecimal price,Connection connection) throws Exception{
-        logger.info("start .getPriceByRule,product:"+new Gson().toJson(product)+",vendorId:"+vendorId+",price:"+price);
+        logger.info("PriceServiceImplGetPriceByRule,inputParams,product:"+new Gson().toJson(product)+",vendorId:"+vendorId+",price:"+price);
         PriceChangeRuleService priceChangeRuleService = new PriceChangeRuleService(connection);
 
         // query 折扣率
@@ -46,7 +46,7 @@ public class PriceServiceImpl implements IPriceService{
         sku.price = price;
         sku.in_price = new BigDecimal(sku.price.doubleValue() * vendorDiscount / ((1 + 0.22) * 100));
         sku.im_price = new BigDecimal(sku.price.doubleValue() * adminDiscount / ((1) * 100));
-        logger.info("end .getPriceByRule,sku:"+new Gson().toJson(sku));
+        logger.info("PriceServiceImplGetPriceByRule,outputParams,sku:"+new Gson().toJson(sku));
         return sku;
     }
 

@@ -1,10 +1,12 @@
 package pk.shoplus.model;
 
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.DateUtils;
 import org.apache.log4j.Logger;
 
 import com.alibaba.fastjson15.JSONObject;
@@ -36,7 +38,7 @@ public class ProductStockEDSMapping implements IMapping{
 	private static final String handleMappingAndExecute = " ProductStockEDSMapping.handleMappingAndExecute ";
 
 	@Override
-	public Map<String, Object> handleMappingAndExecute(String mqData){
+	public Map<String, Object> handleMappingAndExecute(String mqData,String queueNameEnum){
 		logger.info(handleMappingAndExecute + " mqData.length : " + mqData == null ? 0 : mqData.length());
 
 		Map<String,Object> resultMap = new HashMap<String,Object>();
@@ -61,12 +63,17 @@ public class ProductStockEDSMapping implements IMapping{
 				return resultMap;
 			} else {
 				IStoreService storeService = new StoreServiceImpl();
-				int qty = Integer.parseInt(stockOptions.getQuantity());
-				ResultMessage resultMessage = storeService.handleApiStockRule(Contants.STOCK_QTY,qty,stockOptions.getSizeValue(),stockOptions.getProductCode());
+				logger.info("ProductStockEDSMappingHandleMappingAndExecute,covertStock,stockOptions:"+new Gson().toJson(stockOptions));
+				Double doubleStock = Double.parseDouble(stockOptions.getQuantity());
+				int qty = doubleStock.intValue();
+				logger.info("ProductStockEDSMappingHandleMappingAndExecute,covertStock,qty:"+qty);
+				ResultMessage resultMessage = storeService.handleApiStockRule(Contants.STOCK_QTY,qty,stockOptions.getSizeValue(),stockOptions.getProductCode(),queueNameEnum);
 				if(resultMessage.getStatus()) {
 						SkuStore skuStore = (SkuStore) resultMessage.getData();
 					stockOptions.setQuantity(skuStore.getStore().toString());
+					stockOptions.setVendor_id(resultMessage.getDesc());
 					stockOptions.setReserved(skuStore.getReserved().toString());
+					stockOptions.setConfirmed(skuStore.getConfirmed().toString());
 				} else {
 					resultMap.put("info",resultMessage.getMsg());
 					resultMap.put("sku_size",stockOptions.getSizeValue());
@@ -76,9 +83,9 @@ public class ProductStockEDSMapping implements IMapping{
 				}
 			}
 			
-			logger.info("开始调用EDS库存更新Service,stockOptions:"+new Gson().toJson(stockOptions));
+			logger.info("开始调用EDS库存更新Service,stockOptions:"+"date:"+ DateUtils.formatDate(new Date())+new Gson().toJson(stockOptions));
 			Map<String, Object> serviceResultMap = productStockEDSManagement.updateStock(stockOptions);
-			logger.info("结束调用EDS库存更新Service,serviceResultMap:"+new Gson().toJson(serviceResultMap)+",stockOptions:"+new Gson().toJson(stockOptions));
+			logger.info("结束调用EDS库存更新Service,serviceResultMap:"+"date:"+ DateUtils.formatDate(new Date())+new Gson().toJson(serviceResultMap)+",stockOptions:"+new Gson().toJson(stockOptions));
 			serviceResultMap.put("product_code",stockOptions.getProductCode());
 			serviceResultMap.put("sku_size",stockOptions.getSizeValue());
 			return serviceResultMap;

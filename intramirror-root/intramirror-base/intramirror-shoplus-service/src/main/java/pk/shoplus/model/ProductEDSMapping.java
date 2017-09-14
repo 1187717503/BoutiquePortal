@@ -6,6 +6,7 @@ import com.alibaba.fastjson15.JSONArray;
 import com.alibaba.fastjson15.JSONObject;
 import com.google.gson.Gson;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.DateUtils;
 import org.apache.log4j.Logger;
 import org.sql2o.Connection;
 import pk.shoplus.DBConnector;
@@ -18,10 +19,7 @@ import pk.shoplus.service.product.impl.ProductServiceImpl;
 import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.util.MapUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.Runtime_exception;
 
@@ -38,7 +36,7 @@ public class ProductEDSMapping implements IMapping {
 	private static IProductService productServie = new ProductServiceImpl();
 
 	@Override
-	public Map<String, Object> handleMappingAndExecute(String mqData){
+	public Map<String, Object> handleMappingAndExecute(String mqData,String queueNameEnum){
 		logger.info("ProductEDSMappingHandleMappingAndExecute,mqData:"+mqData);
 		MapUtils mapUtils = new MapUtils(new HashMap<>());
 		try {
@@ -162,14 +160,14 @@ public class ProductEDSMapping implements IMapping {
 			vendorOptions.setVendorId(Long.parseLong(vendor_id));
 
 			// 调用Service创建商品
-			logger.info("开始调用EDS商品创建Service,productOptions:"+",api:"+api+"," + new Gson().toJson(productOptions) + " , vendorOptions:" + new Gson().toJson(vendorOptions));
+			logger.info("开始调用EDS商品创建Service,productOptions:"+"date:"+ DateUtils.formatDate(new Date())+",api:"+api+"," + new Gson().toJson(productOptions) + " , vendorOptions:" + new Gson().toJson(vendorOptions));
 			Map<String,Object> serviceResultMap = productEDSManagement.createProduct(productOptions, vendorOptions);
-			logger.info("结束调用EDS商品创建Service,serviceResultMap:"+",api:"+api+"," + new Gson().toJson(serviceResultMap)+",productOptions:" + new Gson().toJson(productOptions) + " , vendorOptions:" + new Gson().toJson(vendorOptions));
+			logger.info("结束调用EDS商品创建Service,serviceResultMap:"+"date:"+ DateUtils.formatDate(new Date())+",api:"+api+"," + new Gson().toJson(serviceResultMap)+",productOptions:" + new Gson().toJson(productOptions) + " , vendorOptions:" + new Gson().toJson(vendorOptions));
 
 			if(serviceResultMap != null && serviceResultMap.get("status").equals(StatusType.PRODUCT_ALREADY_EXISTS)) {
-				logger.info("调用eds商品修改ServiceByEds,productOptions:"+",api:"+api+"," + new Gson().toJson(productOptions) + " , vendorOptions:" + new Gson().toJson(vendorOptions));
+				logger.info("调用eds商品修改ServiceByEds,productOptions:"+"date:"+ DateUtils.formatDate(new Date())+",api:"+api+"," + new Gson().toJson(productOptions) + " , vendorOptions:" + new Gson().toJson(vendorOptions));
 				serviceResultMap = productServie.updateProduct(productOptions,vendorOptions);
-				logger.info("调用eds商品修改ServiceByEds,serviceResultMap:"+",api:"+api+"," + JSON.toJSONString(serviceResultMap)+",productOptions:" + JSON.toJSONString(productOptions) + " , vendorOptions:" + JSON.toJSONString(vendorOptions));
+				logger.info("调用eds商品修改ServiceByEds,serviceResultMap:"+"date:"+ DateUtils.formatDate(new Date())+",api:"+api+"," + JSON.toJSONString(serviceResultMap)+",productOptions:" + JSON.toJSONString(productOptions) + " , vendorOptions:" + JSON.toJSONString(vendorOptions));
 			}
 
 			serviceResultMap.put("product_code",productOptions.getCode());

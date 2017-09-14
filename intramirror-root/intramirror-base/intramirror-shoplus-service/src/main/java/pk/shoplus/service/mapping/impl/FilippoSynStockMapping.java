@@ -35,8 +35,8 @@ public class FilippoSynStockMapping implements IMapping{
     private ProductStockEDSManagement productStockEDSManagement = new ProductStockEDSManagement();
 
     @Override
-    public Map<String, Object> handleMappingAndExecute(String mqData) {
-        logger.info(" start FilippoSynStockMapping.handleMappingAndExecute();");
+    public Map<String, Object> handleMappingAndExecute(String mqData,String queueNameEnum) {
+        logger.info("FilippoSynStockMappingHandleMappingAndExecute,inputParams,mqData"+mqData);
         MapUtils mapUtils = new MapUtils(new HashMap<>());
         try {
             Map<String,Object> mqDataMap = JSONObject.parseObject(mqData);
@@ -47,12 +47,17 @@ public class FilippoSynStockMapping implements IMapping{
                 return mapUtils.putData("status", StatusType.FAILURE).putData("key","stock").putData("value","null").putData("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null).putData("info","FilippoSynStockMapping.handleMappingAndExecute() quantity is null !!!").getMap();
             } else {
                 IStoreService storeService = new StoreServiceImpl();
-                int qty = Integer.parseInt(stockOptions.getQuantity());
-                ResultMessage resultMessage = storeService.handleApiStockRule(Contants.STOCK_QTY,qty,stockOptions.getSizeValue(),stockOptions.getProductCode());
+                logger.info("FilippoSynStockMappingHandleMappingAndExecute,covertStock,stockOptions:"+new Gson().toJson(stockOptions));
+                Double doubleStock = Double.parseDouble(stockOptions.getQuantity());
+                int qty = doubleStock.intValue();
+                logger.info("FilippoSynStockMappingHandleMappingAndExecute,covertStock,qty:"+qty);
+                ResultMessage resultMessage = storeService.handleApiStockRule(Contants.STOCK_QTY,qty,stockOptions.getSizeValue(),stockOptions.getProductCode(),queueNameEnum);
                 if(resultMessage.getStatus()) {
                     SkuStore skuStore = (SkuStore) resultMessage.getData();
                     stockOptions.setQuantity(skuStore.getStore().toString());
+                    stockOptions.setVendor_id(resultMessage.getDesc());
                     stockOptions.setReserved(skuStore.getReserved().toString());
+                    stockOptions.setConfirmed(skuStore.getConfirmed().toString());
                 } else {
                     return mapUtils.putData("status",StatusType.FAILURE)
                             .putData("error_enum",handle_stock_rule_error)
@@ -77,6 +82,7 @@ public class FilippoSynStockMapping implements IMapping{
             mapUtils.putData("value",ExceptionUtils.getExceptionDetail(e));
             mapUtils.putData("error_enum", Runtime_exception);
             mapUtils.putData("status", StatusType.FAILURE).putData("info","FilippoSynStockMapping error message : " + ExceptionUtils.getExceptionDetail(e));
+            logger.info("FilippoSynStockMappingHandleMappingAndExecute,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+",mqData:"+mqData);
         }
         logger.info(" end FilippoSynStockMapping.handleMappingAndExecute();");
         return mapUtils.getMap();
@@ -105,6 +111,8 @@ public class FilippoSynStockMapping implements IMapping{
             }
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println(propertyValue);
+            logger.info("FilippoSynStockMappingHandleMappingData,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+",propertyValue:"+propertyValue);
             throw e;
         }
         return stockOptions;

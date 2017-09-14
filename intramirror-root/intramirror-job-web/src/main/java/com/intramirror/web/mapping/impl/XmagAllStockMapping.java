@@ -41,7 +41,7 @@ public class XmagAllStockMapping implements IMapping{
     @Autowired
     private SkuPropertyService skuPropertyService;
     @Override
-    public Map<String, Object> handleMappingAndExecute(String mqData) {
+    public Map<String, Object> handleMappingAndExecute(String mqData,String queueNameEnum) {
         logger.info(" start XmagAllStockMapping.handleMappingAndExecute();");
         MapUtils mapUtils = new MapUtils(new HashMap<String, Object>());
         try {
@@ -64,11 +64,13 @@ public class XmagAllStockMapping implements IMapping{
             } else {
                 IStoreService storeService = new StoreServiceImpl();
                 int qty = Integer.parseInt(stockOptions.getQuantity());
-                ResultMessage resultMessage = storeService.handleApiStockRule(Contants.STOCK_QTY,qty,stockOptions.getSizeValue(),stockOptions.getProductCode());
+                ResultMessage resultMessage = storeService.handleApiStockRule(Contants.STOCK_QTY,qty,stockOptions.getSizeValue(),stockOptions.getProductCode(),queueNameEnum);
                 if(resultMessage.getStatus()) {
                     SkuStore skuStore = (SkuStore) resultMessage.getData();
+                    stockOptions.setVendor_id(resultMessage.getDesc());
                     stockOptions.setQuantity(skuStore.getStore().toString());
                     stockOptions.setReserved(skuStore.getReserved().toString());
+                    stockOptions.setConfirmed(skuStore.getConfirmed().toString());
                 } else {
                     return mapUtils.putData("status",StatusType.FAILURE)
                             .putData("error_enum",handle_stock_rule_error)

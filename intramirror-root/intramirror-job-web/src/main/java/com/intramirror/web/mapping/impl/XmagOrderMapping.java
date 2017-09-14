@@ -39,7 +39,7 @@ public class XmagOrderMapping implements IMapping{
     private IApiMqService apiMqService;
     
     @Override
-    public Map<String, Object> handleMappingAndExecute(String mqData) {
+    public Map<String, Object> handleMappingAndExecute(String mqData,String queueNameEnum) {
         logger.info(" start XmagOrderMapping.handleMappingAndExecute();");
         MapUtils mapUtils = new MapUtils(new HashMap<String, Object>());
         try {
