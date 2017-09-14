@@ -35,6 +35,7 @@ public class CommonThreadPool {
                     +"，执行器中已经完成的任务数量:"
                     +executor.getCompletedTaskCount()
                     +",eventName:"+eventName);
+
             logger.info("CommonThreadPoolExecuteProduct,start");
             if(executor.getActiveCount() <= threadNum) {
                 executor.execute(updateProductThread);
