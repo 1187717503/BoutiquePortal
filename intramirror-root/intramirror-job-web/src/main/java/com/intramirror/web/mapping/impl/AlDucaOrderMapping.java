@@ -43,7 +43,7 @@ public class AlDucaOrderMapping implements IMapping{
     private IOrderExceptionService orderExceptionService;
     
     @Override
-    public Map<String, Object> handleMappingAndExecute(String mqData) {
+    public Map<String, Object> handleMappingAndExecute(String mqData,String queueNameEnum) {
     	logger.info(" start AiDucacheckOrderMapping.handleMappingAndExecute();");
         MapUtils mapUtils = new MapUtils(new HashMap<String, Object>());
         try {
