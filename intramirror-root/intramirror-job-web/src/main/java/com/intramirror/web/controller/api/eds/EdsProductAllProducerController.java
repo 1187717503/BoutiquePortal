@@ -121,7 +121,6 @@ public class EdsProductAllProducerController implements InitializingBean {
                 }
 
                 offset = offset + limit;
-                break;
             }
             logger.info("EdsProductAllProducerControllerExecute,executeEnd,offset:"+offset+",limit:"+limit+",url:"+url+",store_code:"+store_code);
             mapUtils.putData("status",StatusType.SUCCESS).putData("info","success");
@@ -144,7 +143,7 @@ public class EdsProductAllProducerController implements InitializingBean {
         object.put("store_code","X3ZMV");
         object.put("limit","500");
         object.put("offset","0");
-        object.put("threadNum","30");
+        object.put("threadNum","5");
         object.put("nugnesExecutor",nugnesExecutor);
 
         // put data

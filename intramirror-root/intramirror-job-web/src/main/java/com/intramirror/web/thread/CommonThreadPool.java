@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.model.Vendor;
+import pk.shoplus.util.ExceptionUtils;
 
 import java.util.Date;
 import java.util.concurrent.Executors;
@@ -23,7 +24,7 @@ public class CommonThreadPool {
 
     public static void executeProduct(ThreadPoolExecutor executor,int threadNum,UpdateProductThread updateProductThread){
         try {
-            System.out.printf("service:pool执行器中线程中实际的线程数量:%d，执行器中正在执行任务的线程数量：%d，执行器中已经完成的任务数量:%d\n",executor.getPoolSize(),executor.getActiveCount(),executor.getCompletedTaskCount());
+            logger.info("CommonThreadPoolExecuteProduct,threadInfo,执行器中线程中实际的线程数量:"+executor.getPoolSize()+"，执行器中正在执行任务的线程数量："+executor.getActiveCount()+"，执行器中已经完成的任务数量:%d"+executor.getCompletedTaskCount());
             logger.info("CommonThreadPoolExecuteProduct,start");
             if(executor.getActiveCount() <= threadNum) {
                 executor.execute(updateProductThread);
@@ -36,6 +37,7 @@ public class CommonThreadPool {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            logger.info("CommonThreadPoolExecuteProduct,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
         }
     }
 

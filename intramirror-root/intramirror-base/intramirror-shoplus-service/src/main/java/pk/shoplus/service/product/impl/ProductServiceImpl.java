@@ -380,7 +380,7 @@ public class ProductServiceImpl implements IProductService{
                         warningMaps.add(mapUtils.getMap());
                     }
                     skuStoreService.updateSkuStore(skuStore);
-
+                    logger.info("ProductServiceImplUpdateProduct,updateSkuStore,skuStore:"+new Gson().toJson(skuStore));
                     if(org.apache.commons.lang.StringUtils.isNotBlank(productOptions.getFullUpdateProductFlag()) &&
                             productOptions.getFullUpdateProductFlag().equals("1")){
                         if(StringUtils.isNotBlank(sku_id)) {
