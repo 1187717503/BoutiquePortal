@@ -175,7 +175,12 @@ public class ProductEDSManagement {
 
             // 4. 根据sku_list，在sku表,sku_store表以及sku_property表中插入相关数据
             // 4.1) 把sku_list 转换成 array
-            this.createSku(conn, columnDataList, product, propertyKeyIdArr, result, vendor,productOptions);
+            if(productOptions.getSkus()==null ||productOptions.getSkus().size()==0){
+                result.put("info","sku is null");
+                return true;
+            } else {
+                this.createSku(conn, columnDataList, product, propertyKeyIdArr, result, vendor,productOptions);
+            }
 
             // 5. 在vendor_product_cashback表中加入cash_back_list数据
             // 5.1) 把cash_back_list 转换成 jsonarray
@@ -1230,7 +1235,7 @@ public class ProductEDSManagement {
 		productList.add(6,productOptions.getColorCode()); // color_reference
 		
 		productList.add(7,productOptions.getColorDesc()); // color
-		if(productOptions.getSkus() != null) {
+		if(productOptions.getSkus() != null&& productOptions.getSkus().size()!=0) {
             productList.add(8,productOptions.getSkus().get(0).getSizeid()); // 注意 - sizeid for filippo
         } else {
             productList.add(8,"");

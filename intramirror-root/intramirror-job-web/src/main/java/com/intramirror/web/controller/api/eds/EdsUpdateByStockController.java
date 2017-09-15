@@ -35,22 +35,22 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 @Controller
 @RequestMapping(value = "/eds_stock")
-public class EdsAllUpdateByStockController implements InitializingBean {
+public class EdsUpdateByStockController implements InitializingBean {
 
     // logger
-    private static final Logger logger = Logger.getLogger(EdsAllUpdateByStockController.class);
+    private static final Logger logger = Logger.getLogger(EdsUpdateByStockController.class);
 
     // getpost util
     private static GetPostRequestUtil getPostRequestUtil = new GetPostRequestUtil();
 
     // mapping
-    @Resource(name = "edsAllUpdateByStockMapping")
+    @Resource(name = "edsUpdateByStockMapping")
     private IStockMapping iStockMapping;
 
     // init params
     private Map<String,Object> paramsMap;
 
-    @RequestMapping("/syn_all_stock_producer")
+    @RequestMapping("/syn_stock")
     @ResponseBody
     public Map<String,Object> execute(@Param(value = "name")String name){
         MapUtils mapUtils = new MapUtils(new HashMap<String, Object>());
@@ -73,6 +73,7 @@ public class EdsAllUpdateByStockController implements InitializingBean {
         ThreadPoolExecutor nugnesExecutor = (ThreadPoolExecutor) param.get("nugnesExecutor");
 
         try {
+            int sum = 0;
             while (true) {
                 // 拼接URL
                 String appendUrl = url + "?storeCode=" + store_code + "&limit=" + limit +"&offset=" + offset;
@@ -96,6 +97,7 @@ public class EdsAllUpdateByStockController implements InitializingBean {
                 }
 
                 for(Map stockMap : stockMapList){
+                    sum++;
                     logger.info("EdsAllUpdateByStockControllerExecute,stockMap:"+new Gson().toJson(stockMap)+",eventName:"+eventName);
                     stockMap.put("vendor_id",vendor_id);
 
@@ -111,9 +113,12 @@ public class EdsAllUpdateByStockController implements InitializingBean {
                 }
                 offset = offset + limit;
             }
+            logger.info("EdsAllUpdateByStockControllerExecute,executeEnd,offset:"+offset+",limit:"+limit+",url:"+url+",store_code:"+store_code+",sum:"+sum+",param:"+new Gson().toJson(param)+",eventName:"+eventName);
+            mapUtils.putData("status",StatusType.SUCCESS).putData("info","success");
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("EdsAllUpdateByStockControllerExecute,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
+            mapUtils.putData("status",StatusType.FAILURE).putData("info",ExceptionUtils.getExceptionDetail(e));
         }
         logger.info("EdsAllUpdateByStockControllerExecute,endExecute,mapUtils:"+new Gson().toJson(mapUtils));
         return mapUtils.getMap();
@@ -135,6 +140,6 @@ public class EdsAllUpdateByStockController implements InitializingBean {
 
         // put data
         paramsMap = new HashMap<>();
-        paramsMap.put("nugnes",object);
+        paramsMap.put("nugnes_all_updatestock",object);
     }
 }

@@ -29,9 +29,13 @@ public class UpdateStockThread implements Runnable{
     @Override
     public void run() {
         try {
-            logger.info("UpdateStockThreadRun,updateStock,start,stockOption:"+new Gson().toJson(stockOption));
+            logger.info("UpdateStockThreadRun,updateStock,start,stockOption:"+JSONObject.toJSONString(stockOption));
             Map<String, Object> resultMap = apiUpdateStockService.updateStock(stockOption);
-            logger.info("UpdateStockThreadRun,updateStock,end,resultMap:"+new Gson().toJson(resultMap)+",stockOption:"+new Gson().toJson(stockOption));
+            logger.info("UpdateStockThreadRun,updateStock,end,resultMap:"+JSONObject.toJSONString(resultMap)+",stockOption:"+JSONObject.toJSONString(stockOption));
+
+            if( !resultMap.get("status").toString().equals("1")) {
+                logger.info("UpdateProductThreadRun,FAILUREMessage:"+JSONObject.toJSONString(resultMap)+",stockOption:"+JSONObject.toJSONString(stockOption));
+            }
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("UpdateStockThreadRun,updateStock,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",stockOption:"+new Gson().toJson(stockOption));

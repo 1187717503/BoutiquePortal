@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import pk.shoplus.util.ExceptionUtils;
 
 import java.util.Date;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -48,9 +49,7 @@ public class CommonThreadPool {
             logger.info("CommonThreadPoolExecuteProduct,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
         }
     }
-
-/*
-    // 定义可缓存线程池
+    /*// 定义可缓存线程池
     private static ThreadPoolExecutor executor;
 
     private static CommonThreadPool commonThreadPool;
@@ -63,27 +62,31 @@ public class CommonThreadPool {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        ThreadPoolExecutor executor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
-        ThreadPoolExecutor executor2 = (ThreadPoolExecutor) Executors.newCachedThreadPool();
+         executor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
 
         System.out.println(executor);
-        System.out.println(executor2);
 
-        executor.execute(new testThread("ABC"));
 
-        for(int i =1;i<100;i++){
-//            executor.execute(new testThread("ABC"));
+        for(int i =1;i<10;i++){
+            executor.execute(new testThread("ABC1"));
         }
-        for (int i = 0;i<100;i++){
-//            Thread.sleep(1000L);
+        logger.info("CommonThreadPoolExecuteProduct,threadInfo,执行器中线程中实际的线程数量:"+executor.getPoolSize()+"，执行器中正在执行任务的线程数量："
+                +executor.getActiveCount()
+                +"，执行器中已经完成的任务数量:"
+                +executor.getCompletedTaskCount());
 
-//            System.out.printf(i+"service:pool执行器中线程中实际的线程数量:%d，执行器中正在执行任务的线程数量：%d，执行器中已经完成的任务数量:%d\n",executor.getPoolSize(),executor.getActiveCount(),executor.getCompletedTaskCount());
-//            System.out.println(executor);
-            System.out.println(executor2);
+        executor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
+        Thread.sleep(5000L);
+        for(int i =1;i<10;i++){
+            executor.execute(new testThread("ABC2"));
         }
+        logger.info("CommonThreadPoolExecuteProduct,threadInfo,执行器中线程中实际的线程数量:"+executor.getPoolSize()+"，执行器中正在执行任务的线程数量："
+                +executor.getActiveCount()
+                +"，执行器中已经完成的任务数量:"
+                +executor.getCompletedTaskCount());
+
     }*/
 }
-
 /*
 
 class testThread implements Runnable {
@@ -92,12 +95,11 @@ class testThread implements Runnable {
     @Override
     public void run() {
         try {
-            Thread.sleep(6000L);
-        } catch (InterruptedException e) {
+            System.out.println(code);
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-        System.out.println(Thread.currentThread().getName()+code);
     }
 
     public testThread(String code) {

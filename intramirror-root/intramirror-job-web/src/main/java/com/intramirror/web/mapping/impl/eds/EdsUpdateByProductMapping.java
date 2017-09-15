@@ -18,16 +18,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Service(value = "edsAllUpdateByProductMapping")
-public class EdsAllUpdateByProductMapping implements IProductMapping {
+@Service(value = "edsUpdateByProductMapping")
+public class EdsUpdateByProductMapping implements IProductMapping {
 
-    private final static Logger logger = Logger.getLogger(EdsAllUpdateByProductMapping.class);
+    private final static Logger logger = Logger.getLogger(EdsUpdateByProductMapping.class);
 
     public static ProductEDSManagement productEDSManagement = new ProductEDSManagement();
 
     @Override
     public ProductEDSManagement.ProductOptions mapping(Map<String, Object> bodyDataMap) {
-        logger.info("EdsAllUpdateByProductMapping,inputParams,bodyDataMap:"+new Gson().toJson(bodyDataMap));
+        logger.info("EdsUpdateByProductMapping,inputParams,bodyDataMap:"+new Gson().toJson(bodyDataMap));
         Connection conn = null;
         ProductEDSManagement.ProductOptions productOptions = productEDSManagement.getProductOptions();
         try {
@@ -49,7 +49,7 @@ public class EdsAllUpdateByProductMapping implements IProductMapping {
                 }
                 if(conn != null) {conn.close();}
             } catch (Exception e) {
-                logger.info("EdsAllUpdateByProductMapping,convertCategory,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+
+                logger.info("EdsUpdateByProductMapping,convertCategory,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+
                         ",productMap:"+new Gson().toJson(productMap));
                 e.printStackTrace();
             }
@@ -63,7 +63,7 @@ public class EdsAllUpdateByProductMapping implements IProductMapping {
                     technicalInfoString += mapTechnicalInfo.get("name").toString() + mapTechnicalInfo.get("percentage").toString();
                 }
             } catch (Exception e) {
-                logger.info("EdsAllUpdateByProductMapping,convertComposition,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+
+                logger.info("EdsUpdateByProductMapping,convertComposition,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+
                 ",productMap:"+new Gson().toJson(productMap));
                 e.printStackTrace();
             }
@@ -77,7 +77,7 @@ public class EdsAllUpdateByProductMapping implements IProductMapping {
                     sizeFitValue += map.get("name").toString()+":"+map.get("value").toString()+",";
                 }
             } catch (Exception e) {
-                logger.info("EdsAllUpdateByProductMapping,convertSizeFit,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+
+                logger.info("EdsUpdateByProductMapping,convertSizeFit,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+
                         ",productMap:"+new Gson().toJson(productMap));
                 e.printStackTrace();
             }
@@ -90,7 +90,7 @@ public class EdsAllUpdateByProductMapping implements IProductMapping {
                 productOptions.setDescImg(stringListMap.get("full").toString());
             } catch(Exception e) {
                 stringListMap = new HashMap<>();
-                logger.info("EdsAllUpdateByProductMapping,convertImg,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+
+                logger.info("EdsUpdateByProductMapping,convertImg,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+
                 ",productMap:"+new Gson().toJson(productMap));
             }
 
@@ -128,12 +128,19 @@ public class EdsAllUpdateByProductMapping implements IProductMapping {
                     sku.setStock(item.getString("quantity"));
                     productOptions.getSkus().add(sku);
                 }
+            } else {
+                String size = productMap.getString("size");
+                String quantity = productMap.getString("quantity");
+                ProductEDSManagement.SkuOptions skuOptions = productEDSManagement.getSkuOptions();
+                skuOptions.setSize(size);
+                skuOptions.setStock(quantity);
+                productOptions.getSkus().add(skuOptions);
             }
 
             if(conn != null){conn.close();}
-            logger.info("EdsAllUpdateByProductMapping,outParams,productOptions:"+new Gson().toJson(productOptions));
+            logger.info("EdsUpdateByProductMapping,outParams,productOptions:"+new Gson().toJson(productOptions));
         } catch (Exception e) {
-            logger.info("EdsAllUpdateByProductMapping,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)
+            logger.info("EdsUpdateByProductMapping,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)
             +",bodyDataMap:"+new Gson().toJson(bodyDataMap));
             if(conn != null){conn.close();}
             e.printStackTrace();

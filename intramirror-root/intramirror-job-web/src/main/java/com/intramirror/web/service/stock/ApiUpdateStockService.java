@@ -39,9 +39,9 @@ public class ApiUpdateStockService {
         try {
 
             // 校验参数
-            logger.info("ApiUpdateStockServiceUpdateStock,startCheckedParams,stockOption:"+new Gson().toJson(stockOption));
+            logger.info("ApiUpdateStockServiceUpdateStock,checkedParams,start,stockOption:"+new Gson().toJson(stockOption));
             String checkMsg = this.checkedParams(stockOption);
-            logger.info("ApiUpdateStockServiceUpdateStock,endCheckedParams,stockOption:"+new Gson().toJson(stockOption)+",checkMsg:"+checkMsg);
+            logger.info("ApiUpdateStockServiceUpdateStock,checkedParams,end,stockOption:"+new Gson().toJson(stockOption)+",checkMsg:"+checkMsg);
 
             if(StringUtils.isNotBlank(checkMsg)) {
                 return mapUtils.putData("status",StatusType.FAILURE).putData("info",checkMsg).getMap();

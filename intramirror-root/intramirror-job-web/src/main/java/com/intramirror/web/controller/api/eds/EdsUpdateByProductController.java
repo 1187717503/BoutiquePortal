@@ -28,10 +28,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 @Controller
 @RequestMapping("/eds_product")
-public class EdsAllUpdateByProductController implements InitializingBean {
+public class EdsUpdateByProductController implements InitializingBean {
 
     // logger
-    private static final Logger logger = Logger.getLogger(EdsAllUpdateByProductController.class);
+    private static final Logger logger = Logger.getLogger(EdsUpdateByProductController.class);
 
     // getpost util
     private static GetPostRequestUtil getPostRequestUtil = new GetPostRequestUtil();
@@ -40,13 +40,13 @@ public class EdsAllUpdateByProductController implements InitializingBean {
     public static ProductEDSManagement productEDSManagement = new ProductEDSManagement();
 
     // mapping
-    @Resource(name = "edsAllUpdateByProductMapping")
+    @Resource(name = "edsUpdateByProductMapping")
     private IProductMapping iProductMapping;
 
     // init params
     private Map<String,Object> paramsMap;
 
-    @RequestMapping("/syn_all_product_producer")
+    @RequestMapping("/syn_eds_product")
     @ResponseBody
     public Map<String,Object> execute(@Param(value = "name")String name) {
         MapUtils mapUtils = new MapUtils(new HashMap<String, Object>());
@@ -67,11 +67,14 @@ public class EdsAllUpdateByProductController implements InitializingBean {
         int threadNum = Integer.parseInt(param.get("threadNum").toString());
         String eventName = param.get("eventName").toString();
         ThreadPoolExecutor nugnesExecutor = (ThreadPoolExecutor) param.get("nugnesExecutor");
+        String datetime = param.get("datetime")==null?"":param.get("datetime").toString();
 
         try {
+            int sum = 0;
             while (true) {
                 // 拼接URL
                 String appendUrl = url + "?storeCode=" + store_code + "&limit=" + limit +"&offset=" + offset;
+                if(StringUtils.isNotBlank(datetime)){appendUrl+="&datetime="+DateUtils.getStrDate(new Date());}
 
                 // 获取数据
                 logger.info("EdsProductAllProducerControllerExecute,startRequestMethod,appendUrl:"+appendUrl);
@@ -92,7 +95,7 @@ public class EdsAllUpdateByProductController implements InitializingBean {
                 }
 
                 for(int i = 0,len = edsProductList.size();i<len;i++){
-
+                    sum++;
                     // 获取数据
                     Map<String,Object> mqDataMap = new HashMap<String,Object>();
                     mqDataMap.put("reqCode", mapResult.get("reqCode"));
@@ -116,11 +119,12 @@ public class EdsAllUpdateByProductController implements InitializingBean {
 
                 offset = offset + limit;
             }
-            logger.info("EdsProductAllProducerControllerExecute,executeEnd,offset:"+offset+",limit:"+limit+",url:"+url+",store_code:"+store_code);
+            logger.info("EdsProductAllProducerControllerExecute,executeEnd,offset:"+offset+",limit:"+limit+",url:"+url+",store_code:"+store_code+",sum:"+sum+",param:"+new Gson().toJson(param)+",eventName:"+eventName);
             mapUtils.putData("status",StatusType.SUCCESS).putData("info","success");
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("EdsProductAllProducerControllerExecute,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
+            mapUtils.putData("status",StatusType.FAILURE).putData("info",ExceptionUtils.getExceptionDetail(e));
         }
 
         logger.info("EdsProductAllProducerControllerExecute,endExecute,mapUtils:"+new Gson().toJson(mapUtils));
@@ -129,20 +133,34 @@ public class EdsAllUpdateByProductController implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        // nugnes
-        ThreadPoolExecutor nugnesExecutor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
-        Map<String,Object> object = new HashMap<>();
-        object.put("url","http://nugnes.edstema.it/api/v3.0/products/condensed");
-        object.put("vendor_id","9");
-        object.put("store_code","X3ZMV");
-        object.put("limit","500");
-        object.put("offset","0");
-        object.put("threadNum","5");
-        object.put("nugnesExecutor",nugnesExecutor);
-        object.put("eventName","nugnes全量更新商品");
+        // nugnes_all_updateproduct
+        ThreadPoolExecutor nugnes_all_updateproduct_executor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
+        Map<String,Object> nugnes_all_updateproduct = new HashMap<>();
+        nugnes_all_updateproduct.put("url","http://nugnes.edstema.it/api/v3.0/products/condensed");
+        nugnes_all_updateproduct.put("vendor_id","9");
+        nugnes_all_updateproduct.put("store_code","X3ZMV");
+        nugnes_all_updateproduct.put("limit","500");
+        nugnes_all_updateproduct.put("offset","0");
+        nugnes_all_updateproduct.put("threadNum","5");
+        nugnes_all_updateproduct.put("nugnesExecutor",nugnes_all_updateproduct_executor);
+        nugnes_all_updateproduct.put("eventName","nugnes全量更新商品");
+
+        // nugnes_day_updateproduct
+        ThreadPoolExecutor nugnes_day_updateproduct_executor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
+        Map<String,Object> nugnes_day_updateproduct = new HashMap<>();
+        nugnes_day_updateproduct.put("url","http://nugnes.edstema.it/api/v3.0/products/date");
+        nugnes_day_updateproduct.put("vendor_id","9");
+        nugnes_day_updateproduct.put("store_code","X3ZMV");
+        nugnes_day_updateproduct.put("limit","500");
+        nugnes_day_updateproduct.put("offset","0");
+        nugnes_day_updateproduct.put("threadNum","5");
+        nugnes_day_updateproduct.put("nugnesExecutor",nugnes_day_updateproduct_executor);
+        nugnes_day_updateproduct.put("eventName","nugnes更新当日商品");
+        nugnes_day_updateproduct.put("datetime",DateUtils.getStrDate(new Date()));
 
         // put data
         paramsMap = new HashMap<>();
-        paramsMap.put("nugnes",object);
+        paramsMap.put("nugnes_all_updateproduct",nugnes_all_updateproduct);
+        paramsMap.put("nugnes_day_updateproduct",nugnes_day_updateproduct);
     }
 }

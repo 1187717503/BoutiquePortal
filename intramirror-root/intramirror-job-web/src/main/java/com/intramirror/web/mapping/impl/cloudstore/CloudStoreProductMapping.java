@@ -14,6 +14,7 @@ public class CloudStoreProductMapping implements IProductMapping {
 
     @Override
     public ProductEDSManagement.ProductOptions mapping(Map<String,Object> bodyDataMap) {
+
         return null;
     }
 }
