@@ -27,8 +27,8 @@ public class SkuPropertyMappingServiceImpl extends BaseDao implements SkuPropert
 	}
 	
 	@Override
-	public Map<String, Object> getSizeValue(String skuCode) {
-		List<Map<String, Object>> list = skuPropertyMapping.getSizeValue(skuCode);
+	public Map<String, Object> getSizeValue(Map<String, Object> map) {
+		List<Map<String, Object>> list = skuPropertyMapping.getSizeValue(map);
 		if (null != list && 0 < list.size()){
 			return list.get(0);
 		}

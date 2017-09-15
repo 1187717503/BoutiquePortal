@@ -385,5 +385,78 @@ public class ContainerController {
 		return message;
 	}
 	
+	/**
+	 * 根据shipmentId查询所有Container
+	 * @return
+	 */
+	@RequestMapping(value="/getAllByShipmentId", method=RequestMethod.POST)
+	@ResponseBody
+	public ResultMessage getContainersByShipmentId(@RequestBody Map<String, Object> map){
+		logger.info("getAllByShipmentId param" + new Gson().toJson(map));
+		ResultMessage message = ResultMessage.getInstance();
+		try {
+			if (null == map || 0 == map.size()){
+				message.errorStatus().putMsg("info", "parameter cannot be null");
+				return message;
+			}
+			if (null == map.get("shipmentId") || StringUtils.isBlank(map.get("shipmentId").toString())){
+				message.errorStatus().putMsg("info", "shipmentId cannot be null");
+				return message;
+			}
+			List<Map<String, Object>> list = containerService.getListByShipmentId(map);
+			if (null != list && 0 < list.size()){
+				message.successStatus().putMsg("info", "success").setData(list);
+				return message;
+			}
+			message.successStatus().putMsg("info", "success").setData("null");
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(" error Message : "+ e.getMessage());
+			message.errorStatus().putMsg("info", "error Message :" + e.getMessage());
+		}
+		return message;
+	}
+	
+	
+	/**
+	 * 根据ContainerId修改Container尺寸
+	 * @return
+	 */
+	@RequestMapping(value="/updateAllContainer", method=RequestMethod.POST)
+	@ResponseBody
+	public ResultMessage updateAllContainer(@RequestBody Map<String, Object> map){
+		logger.info("updateAllContainer param" + new Gson().toJson(map));
+		ResultMessage message = ResultMessage.getInstance();
+		List<Map<String, Object>> list = null;
+		try {
+			if (null == map || 0 == map.size()){
+				message.errorStatus().putMsg("info", "parameter cannot be null");
+				return message;
+			}
+			if (null == map.get("containerList") || StringUtils.isBlank(map.get("containerList").toString())){
+				message.errorStatus().putMsg("info", "containerList cannot be null");
+				return message;
+			}
+			list = (List<Map<String, Object>>) map.get("containerList");
+			logger.info("updateContainerById Start");
+			int result = 0;
+			for (Map<String, Object> map2 : list) {
+				result = containerService.updateContainerById(map2);
+			}
+			if (result == 1){
+				message.successStatus().putMsg("info", "SUCCESS").setData(result);
+				return message;
+			}
+			message.errorStatus().putMsg("info", "SUCCESS").setData(-1);
+			logger.info("updateContainerById end");
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(" error Message : "+ e.getMessage());
+			message.errorStatus().putMsg("info", "error Message :" + e.getMessage());
+		}
+		return message;
+	}
+	
+	
 	
 }

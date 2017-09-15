@@ -55,7 +55,7 @@
         AND
         v.enabled=#{enabled}
     </select>
-    
+
     <select id="queryAllVendor" resultType="java.util.Map" parameterType="java.util.Map">
 
         select vendor_id,vendor_name,user_id from vendor v where v.enabled = 1
@@ -71,7 +71,30 @@
 
     <select id="queryVendorByVendorId" resultMap="BaseResultMap" parameterType="java.util.Map">
 
-        select <include refid="selectColumn"/> from vendor v where v.enabled = 1 and v.vendor_id = #{vendor_id,jdbcType=INTEGER}
+        select
+        <include refid="selectColumn"/>
+        from vendor v where v.enabled = 1 and v.vendor_id = #{vendor_id,jdbcType=INTEGER}
     </select>
 
+    <select id="getProductSkuVendorIdMap" resultType="java.util.HashMap">
+        select sps.shop_product_sku_id, v.vendor_id
+        from shop_product_sku sps
+        inner join shop_product sp on sps.shop_product_id = sp.shop_product_id
+        inner join product p on sp.product_id = p.product_id
+        inner join vendor v
+        on p.vendor_id = v.vendor_id
+        where sps.shop_product_sku_id in
+        <foreach collection="skuIds" item="skuId" index="index"
+                 open="(" close=")" separator=",">
+            #{skuId}
+        </foreach>
+    </select>
+
+    <select id="getAllVendorCountryById" resultType="java.util.HashMap">
+        select address_country_id from vendor where vendor_id IN
+        <foreach collection="vendorIds" item="vendorId" index="index"
+                 open="(" close=")" separator=",">
+            #{vendorId}
+        </foreach>
+    </select>
 </mapper>

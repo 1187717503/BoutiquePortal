@@ -18,17 +18,22 @@ import java.util.Map;
  * Created by dingyifan on 2017/7/19.
  */
 @Service(value = "productBrandServiceImpl")
-public class BrandServiceImpl extends BaseDao implements IBrandService{
+public class BrandServiceImpl extends BaseDao implements IBrandService {
 
     private static Logger logger = LoggerFactory.getLogger(BrandServiceImpl.class);
 
     private BrandMapper brandMapper;
 
     @Override
-    public List<Map<String,Object>> queryActiveBrand() {
+    public void init() {
+        brandMapper = this.getSqlSession().getMapper(BrandMapper.class);
+    }
+
+    @Override
+    public List<Map<String, Object>> queryActiveBrand() {
         Brand brand = new Brand();
         brand.setEnabled(EnabledType.USED);
-        List<Map<String,Object>> brands = brandMapper.selBrandByConditions(brand);
+        List<Map<String, Object>> brands = brandMapper.selBrandByConditions(brand);
         Collections.sort(brands, new Comparator() {
             @Override
             public int compare(Object o1, Object o2) {
@@ -43,7 +48,8 @@ public class BrandServiceImpl extends BaseDao implements IBrandService{
     }
 
     @Override
-    public void init() {
-        brandMapper = this.getSqlSession().getMapper(BrandMapper.class);
+    public Brand getBrandById(Long brandId) {
+        return brandMapper.selectByPrimaryKey(brandId);
     }
+
 }

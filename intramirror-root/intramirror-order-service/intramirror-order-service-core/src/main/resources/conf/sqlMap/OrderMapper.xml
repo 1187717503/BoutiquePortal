@@ -78,10 +78,12 @@
         brandName,
         l.user_rec_name,l.user_rec_province,l.user_rec_city,l.user_rec_area,l.user_rec_addr,l.user_rec_country,l.geography_id,
         v.vendor_name,v.vendor_id,g.english_name as geography_name,v.address_country_id as
-        vendor_address_country_id,p.cover_img,lp.logistics_product_id
+        vendor_address_country_id,p.cover_img,lp.logistics_product_id,
+        oe.created_at as oeCreatedAt,oet.description as oeDescription,oe.comments as oeComments,u.email as oeCreatedByuser,
+        oe.modified_at as oeModified,oe.`status` as oeStatus,oe.resolution as oeResolution, uu.email as Resolved
         FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
         INNER JOIN `order` o ON ol.order_id = o.order_id
-        INNER JOIN user_ship_address usa ON o.user_id = usa.user_id
+        LEFT JOIN user_ship_address usa ON o.user_id = usa.user_id
         LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
         INNER JOIN geography g on l.geography_id = g.geography_id
         INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
@@ -107,6 +109,10 @@
         where t_pp.enabled = 1 and (t_pp.key_name='BrandID' or t_pp.key_name = 'ColorCode')
         group by t_pp.product_id
         ) pp ON p.product_id = pp.product_id
+        LEFT JOIN order_exception oe ON(oe.logistics_product_id=lp.logistics_product_id)
+		LEFT JOIN order_exception_type oet ON(oet.order_exception_type_id=oe.order_exception_type_id)
+		LEFT JOIN `user` u ON(u.user_id=oe.created_by_user_id)
+		LEFT JOIN  `user` uu on(uu.user_id=oe.modified_by_user_id)
         where pspk.`name` = 'Size' and lp.`status` = #{status,jdbcType=BIGINT}
         and v.vendor_id = #{vendorId,jdbcType=BIGINT}
         GROUP BY lp.order_line_num
@@ -287,7 +293,7 @@
 		        vendor_address_country_id,p.cover_img,lp.logistics_product_id
 		        FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
 		        INNER JOIN `order` o ON ol.order_id = o.order_id
-		        INNER JOIN user_ship_address usa ON o.user_id = usa.user_id
+		        LEFT JOIN user_ship_address usa ON o.user_id = usa.user_id
 		        LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
 		        INNER JOIN geography g on l.geography_id = g.geography_id
 		        INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
@@ -362,7 +368,7 @@ and t1.order_num =  #{orderId,jdbcType=BIGINT}
 
         FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
         INNER JOIN `order` o ON ol.order_id = o.order_id
-        INNER JOIN user_ship_address usa ON o.user_id = usa.user_id
+        LEFT JOIN user_ship_address usa ON o.user_id = usa.user_id
         LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
         INNER JOIN geography g on l.geography_id = g.geography_id
         INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
@@ -419,14 +425,15 @@ and t1.order_num =  #{orderId,jdbcType=BIGINT}
 
     <select id="getShipmentDetails" resultType="java.util.HashMap" parameterType="java.util.Map">
 		SELECT  o.order_num,lp.vendor_id,l.user_rec_name AS consignee,l.user_rec_addr AS shipToAddr,l.user_rec_area AS shipToDistrict
-	,l.user_rec_city AS shipToCity,l.user_rec_province AS shipToProvince,l.user_rec_country AS shipToCountry,v.address_country_id AS consigner_country_id,us.address_country_id AS consignee_country_id,g.english_name AS shipToGeography,lp.logistics_product_id
+	,l.user_rec_city AS shipToCity,l.user_rec_province AS shipToProvince,l.user_rec_country AS shipToCountry,
+	v.address_country_id AS consigner_country_id,(SELECT addc.address_country_id FROM address_country addc where addc.`name`=l.user_rec_country) AS consignee_country_id,g.english_name AS shipToGeography,lp.logistics_product_id
 				FROM logistics_product lp  
 				INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id  
 				INNER JOIN `order` o ON ol.order_id = o.order_id   
 				INNER JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id   
 				INNER JOIN geography g on l.geography_id = g.geography_id
 				INNER JOIN `user` u on o.user_id= u.user_id
-				INNER JOIN user_ship_address us on (us.user_id = u.user_id)  
+				LEFT JOIN user_ship_address us on (us.user_id = u.user_id)
 				INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id  
 				INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id   
 				INNER JOIN product p ON (sp.product_id = p.product_id ) 
@@ -459,7 +466,7 @@ and t1.order_num =  #{orderId,jdbcType=BIGINT}
 	SELECT  lp.order_line_num
 	FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
 	INNER JOIN `order` o ON ol.order_id = o.order_id
-	INNER JOIN user_ship_address usa ON o.user_id = usa.user_id
+	LEFT JOIN user_ship_address usa ON o.user_id = usa.user_id
 	LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
 	INNER JOIN geography g on l.geography_id = g.geography_id
 	INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
@@ -490,4 +497,104 @@ and t1.order_num =  #{orderId,jdbcType=BIGINT}
 	GROUP BY lp.order_line_num
 	)AS DD
 	</select>
+
+    <insert id="createOrder" parameterType="com.intramirror.order.api.model.Order" keyProperty="orderId">
+        insert into `order` (order_id, order_num, user_id, fee, coupon, coupon_fee, discount, discount_fee, ship_fee, pay_fee, pay_way, online_payment_id, confirmed_at, status, cancel_type, created_at, updated_at, enabled,
+        tax_fee, current_rate, total_sale_price_rmb, total_shipping_fee_rmb, total_tax_rmb, total_rmb,remaining_rmb, wechat, contact_phone,buyer_name, area_code )
+        values (#{orderId,jdbcType=BIGINT}, #{orderNum,jdbcType=VARCHAR}, #{userId,jdbcType=BIGINT},
+        #{fee,jdbcType=DECIMAL}, #{coupon,jdbcType=VARCHAR}, #{couponFee,jdbcType=DECIMAL},
+        #{discount,jdbcType=INTEGER}, #{discountFee,jdbcType=DECIMAL}, #{shipFee,jdbcType=DECIMAL},
+        #{payFee,jdbcType=DECIMAL}, #{payWay,jdbcType=TINYINT}, #{onlinePaymentId,jdbcType=BIGINT},
+        #{confirmedAt,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER}, #{cancelType,jdbcType=TINYINT},
+        #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}, #{enabled,jdbcType=BIT},
+        #{taxFee,jdbcType=DECIMAL}, #{currentRate,jdbcType=DECIMAL}, #{totalSalePriceRmb,jdbcType=DECIMAL},
+        #{totalShippingFeeRmb,jdbcType=DECIMAL}, #{totalTaxRmb,jdbcType=DECIMAL}, #{totalRmb,jdbcType=VARCHAR}, #{remainingRmb,jdbcType=VARCHAR},
+        #{wechat,jdbcType=VARCHAR}, #{contactPhone,jdbcType=VARCHAR}, #{buyerName,jdbcType=VARCHAR}, #{areaCode,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <update id="updateById" parameterType="com.intramirror.order.api.model.Order">
+        update `order`
+        <set>
+            <if test="orderNum != null">
+                order_num = #{orderNum,jdbcType=VARCHAR},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="fee != null">
+                fee = #{fee,jdbcType=DECIMAL},
+            </if>
+            <if test="coupon != null">
+                coupon = #{coupon,jdbcType=VARCHAR},
+            </if>
+            <if test="couponFee != null">
+                coupon_fee = #{couponFee,jdbcType=DECIMAL},
+            </if>
+            <if test="discount != null">
+                discount = #{discount,jdbcType=INTEGER},
+            </if>
+            <if test="discountFee != null">
+                discount_fee = #{discountFee,jdbcType=DECIMAL},
+            </if>
+            <if test="shipFee != null">
+                ship_fee = #{shipFee,jdbcType=DECIMAL},
+            </if>
+            <if test="payFee != null">
+                pay_fee = #{payFee,jdbcType=DECIMAL},
+            </if>
+            <if test="onlinePaymentId != null">
+                online_payment_id = #{onlinePaymentId,jdbcType=BIGINT},
+            </if>
+            <if test="confirmedAt != null">
+                confirmed_at = #{confirmedAt,jdbcType=TIMESTAMP},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="cancelType != null">
+                cancel_type = #{cancelType,jdbcType=TINYINT},
+            </if>
+            <if test="createdAt != null">
+                created_at = #{createdAt,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updatedAt != null">
+                updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+            </if>
+            <if test="enabled != null">
+                enabled = #{enabled,jdbcType=BIT},
+            </if>
+            <if test="taxFee != null">
+                tax_fee = #{taxFee,jdbcType=DECIMAL},
+            </if>
+            <if test="currentRate != null">
+                current_rate = #{currentRate,jdbcType=DECIMAL},
+            </if>
+            <if test="totalSalePriceRmb != null">
+                total_sale_price_rmb = #{totalSalePriceRmb,jdbcType=DECIMAL},
+            </if>
+            <if test="totalShippingFeeRmb != null">
+                total_shipping_fee_rmb = #{totalShippingFeeRmb,jdbcType=DECIMAL},
+            </if>
+            <if test="totalTaxRmb != null">
+                total_tax_rmb = #{totalTaxRmb,jdbcType=DECIMAL},
+            </if>
+            <if test="totalRmb != null">
+                total_rmb = #{totalRmb,jdbcType=VARCHAR},
+            </if>
+            <if test="wechat != null">
+                wechat = #{wechat,jdbcType=VARCHAR},
+            </if>
+            <if test="contactPhone != null">
+                contact_phone = #{contactPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="buyerName != null">
+                buyer_name = #{buyerName,jdbcType=VARCHAR},
+            </if>
+            <if test="areaCode != null">
+                area_code = #{areaCode,jdbcType=VARCHAR}
+            </if>
+        </set>
+        where order_id = #{orderId,jdbcType=BIGINT}
+    </update>
 </mapper>

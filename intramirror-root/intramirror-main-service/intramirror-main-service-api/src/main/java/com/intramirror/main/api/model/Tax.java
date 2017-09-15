@@ -1,4 +1,4 @@
-package com.intramirror.logistics.api.model;
+package com.intramirror.main.api.model;
 
 import java.math.BigDecimal;
 

@@ -11,8 +11,9 @@ import java.util.Map;
 public interface IBrandService {
 
     /**
-     *
      * @return 获取有效品牌数据
      */
-    List<Map<String,Object>> queryActiveBrand() throws Exception;
+    List<Map<String, Object>> queryActiveBrand() throws Exception;
+
+    Brand getBrandById(Long brandId);
 }

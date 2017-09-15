@@ -466,4 +466,11 @@
     where product_id = #{productId,jdbcType=BIGINT}
   </update>
 
+  <select id="getVendorCodeBySku" resultType="java.util.HashMap">
+    select v.vendor_id,v.vendor_name,v.vendor_code
+    from shop_product_sku sps inner join sku s on sps.sku_id = s.sku_id
+    inner join product p on s.product_id = p.product_id
+    inner join vendor v on v.vendor_id = p.vendor_id
+    where sps.shop_product_sku_id = #{shopProductSkuId}
+  </select>
 </mapper>

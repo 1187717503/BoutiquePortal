@@ -1,18 +1,21 @@
 package com.intramirror.product.core.impl;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.alibaba.fastjson.JSON;
+import com.intramirror.common.Helper;
 import com.intramirror.product.api.model.SkuStore;
-import com.intramirror.product.api.service.ISkuStoreService;
-import com.intramirror.product.core.dao.BaseDao;
-import com.intramirror.product.core.mapper.SkuStoreMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.intramirror.product.api.service.ISkuStoreService;
+import com.intramirror.product.core.dao.BaseDao;
+import com.intramirror.product.core.mapper.SkuStoreMapper;
 
 
 @Service
@@ -73,12 +76,29 @@ public class SkuStoreServiceImpl extends BaseDao implements ISkuStoreService{
 	}
 
 
-	/**
-	 * 根据shopProductSkuId 查询SKUid
-	 * @param shopProductSkuId
-	 * @return
-	 */
-	public Long selectSkuIdByShopProductSkuId(Long shopProductSkuId) {
-		return skuStoreMapper.selectSkuIdByShopProductSkuId(shopProductSkuId);
-	}
+    /**
+     * 根据shopProductSkuId 查询SKUid
+     *
+     * @param shopProductSkuId
+     * @return
+     */
+    public Long selectSkuIdByShopProductSkuId(Long shopProductSkuId) {
+        return skuStoreMapper.selectSkuIdByShopProductSkuId(shopProductSkuId);
+    }
+
+    @Override
+    public void updateSkuStoreReserved(List<String> reservedList, String[] skuIdString, List<Long> skuIds) throws Exception {
+        List<Map<String, Object>> skuIdList = skuStoreMapper.getSkuStoreBySkuId(skuIdString);
+        if (skuIdList.size() > 0 && Helper.checkNotNull(skuIdList.get(0))) {
+            for (int i = 0; i < skuIds.size(); i++) {
+                BigDecimal store = new BigDecimal(skuIdList.get(i).get("store").toString());
+                BigDecimal reservedTwo = new BigDecimal(reservedList.get(i));
+                if (store.compareTo(reservedTwo) == -1) {
+                    throw new RuntimeException("Lack of stock.");
+                }
+                Long skuId = skuIds.get(i);
+                skuStoreMapper.batchExecuteBySql(reservedTwo, skuId);
+            }
+        }
+    }
 }

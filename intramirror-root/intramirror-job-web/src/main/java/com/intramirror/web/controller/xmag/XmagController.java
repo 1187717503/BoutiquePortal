@@ -48,19 +48,17 @@ public class XmagController {
     @RequestMapping(value="/getProducts", method=RequestMethod.GET)
     @ResponseBody
 	public Map<String, Object> getProducts(String mqName){
+    	logger.info("getProducts start===========>>");
     	//返回参数MAP
     	Map<String, Object> resultMap = new HashMap<>();
 		try {
-//			Map<String, Object> param = new HashMap<String, Object>();
-//	    	param.put("system", "xmag");
-//	    	param.put("name", "GetAllDbcontext");
-//	    	logger.info("job updateProduct 获取apiEndpointList 入参:"+new Gson().toJson(param));
 			List<Map<String, Object>> apiEndpointList = apiMqService.selectMqByName(mqName);
 			if(null ==apiEndpointList || 0 == apiEndpointList.size()){
 				logger.info("job getProudcts apiEndpointList is null ");
 				resultMap.put("getProductsMassage", "job getProudcts result null");
 				return resultMap;
 			}
+			logger.info("apiEndpointList result===========>>"+ new Gson().toJson(apiEndpointList));
 //	    	List<Map<String, Object>> apiEndpointList = apiEndPointService.getapiEndpointInfoByCondition(param);
 	    	//循环处理数据，知道处理结束
 	    	while(true){
@@ -132,12 +130,14 @@ public class XmagController {
 			logger.error(" error message : " + e.getMessage());
 			resultMap.put("error", e.getMessage());
 		}
+		logger.info("getProducts end===========>>");
 		return resultMap;
 	}
     
     @RequestMapping(value="/getProductByDate", method=RequestMethod.GET)
     @ResponseBody
 	public Map<String, Object> getProductByDate(String mqName){
+    	logger.info("job getProductByDate start========>>");
     	//返回参数MAP
     	Map<String, Object> resultMap = new HashMap<>();
 		try {
@@ -220,6 +220,7 @@ public class XmagController {
 			logger.error(" error message : " + e.getMessage());
 			resultMap.put("error", e.getMessage());
 		}
+		logger.info("job getProductByDate end========>>");
 		return resultMap;
     }
     
@@ -227,6 +228,7 @@ public class XmagController {
     @RequestMapping(value="/getAllStock", method=RequestMethod.GET)
     @ResponseBody
 	public Map<String, Object> getAllStock(String mqName){
+    	logger.info("job getAllStock start========>>");
     	//返回参数MAP
     	Map<String, Object> resultMap = new HashMap<>();
 		try {
@@ -294,6 +296,7 @@ public class XmagController {
 			logger.error(" error message : " + e.getMessage());
 			resultMap.put("error", e.getMessage());
 		}
+		logger.info("job getAllStock end========>>");
 		return resultMap;
     }
 	
@@ -410,14 +413,6 @@ public class XmagController {
                 }
                 if ("EndIndex".equals(paramKey)){
                 	EndIndex = paramValue;
-                }
-                if ("DateStart".equals(paramKey)){
-                	urlBuffer.append(paramKey+"="+paramValue+"&");
-                	continue;
-                }
-                if ("DateEnd".equals(paramKey)){
-                	urlBuffer.append(paramKey+"="+paramValue+"&");
-                	continue;
                 }
                 if ("SeasonCode".equals(paramKey)){
                 	continue;

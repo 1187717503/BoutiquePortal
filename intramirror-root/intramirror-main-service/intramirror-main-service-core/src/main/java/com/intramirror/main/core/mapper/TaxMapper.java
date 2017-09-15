@@ -1,6 +1,10 @@
-package com.intramirror.logistics.core.mapper;
+package com.intramirror.main.core.mapper;
 
-import com.intramirror.logistics.api.model.Tax;
+import com.intramirror.main.api.model.Tax;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.Map;
 
 public interface TaxMapper {
     /**
@@ -50,6 +54,10 @@ public interface TaxMapper {
      * @mbggenerated
      */
     int updateByPrimaryKey(Tax record);
+
+    List<Map<String, Object>> getTaxByCategoryId(@Param("taxType") String taxType,@Param("categoryIds") String[] categoryIds);
+
+    List<Map<String, Object>> getTaxRateListById(@Param("fromCountryId") String fromCountryId,@Param("taxType") String taxType);
 
     Tax getTaxByAddressCountryId(Long addressCountryId);
 }

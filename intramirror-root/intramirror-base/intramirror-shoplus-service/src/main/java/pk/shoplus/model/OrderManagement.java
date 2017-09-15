@@ -247,6 +247,8 @@ public class OrderManagement {
 			orderResult.setMobilePhone(map.get("user_rec_mobile").toString());
 			orderResult.setOrderLineId(map.get("order_line_num").toString());
 			orderResult.setBarcode(map.get("sku_code").toString());
+			//添加boutiqueSkuId
+			orderResult.setBoutiqueSkuId(map.get("boutique_sku_id")==null?"":map.get("boutique_sku_id").toString());
 		}
 		return orderResult;
 	}
@@ -326,6 +328,8 @@ public class OrderManagement {
 		/** sku.sku_code **/
 		public String barcode;
 		
+		/** sku.boutique_sku_id **/
+		public String boutiqueSkuId;
 		
 		public String getOrderNumber() {
 			return orderNumber;
@@ -465,7 +469,12 @@ public class OrderManagement {
 		public void setSku(String sku) {
 			this.sku = sku;
 		}
-
-
+		public String getBoutiqueSkuId() {
+			return boutiqueSkuId;
+		}
+		public void setBoutiqueSkuId(String boutiqueSkuId) {
+			this.boutiqueSkuId = boutiqueSkuId;
+		}
+		
 	}
 }
