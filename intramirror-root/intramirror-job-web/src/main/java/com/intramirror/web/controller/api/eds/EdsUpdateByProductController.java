@@ -141,7 +141,7 @@ public class EdsUpdateByProductController implements InitializingBean {
         nugnes_all_updateproduct.put("store_code","X3ZMV");
         nugnes_all_updateproduct.put("limit","500");
         nugnes_all_updateproduct.put("offset","0");
-        nugnes_all_updateproduct.put("threadNum","5");
+        nugnes_all_updateproduct.put("threadNum","10");
         nugnes_all_updateproduct.put("nugnesExecutor",nugnes_all_updateproduct_executor);
         nugnes_all_updateproduct.put("eventName","nugnes全量更新商品");
 
@@ -153,7 +153,7 @@ public class EdsUpdateByProductController implements InitializingBean {
         nugnes_day_updateproduct.put("store_code","X3ZMV");
         nugnes_day_updateproduct.put("limit","500");
         nugnes_day_updateproduct.put("offset","0");
-        nugnes_day_updateproduct.put("threadNum","5");
+        nugnes_day_updateproduct.put("threadNum","10");
         nugnes_day_updateproduct.put("nugnesExecutor",nugnes_day_updateproduct_executor);
         nugnes_day_updateproduct.put("eventName","nugnes更新当日商品");
         nugnes_day_updateproduct.put("datetime",DateUtils.getStrDate(new Date()));

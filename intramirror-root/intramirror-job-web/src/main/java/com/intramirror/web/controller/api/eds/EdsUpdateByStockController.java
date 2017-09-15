@@ -134,7 +134,7 @@ public class EdsUpdateByStockController implements InitializingBean {
         object.put("store_code","X3ZMV");
         object.put("limit","500");
         object.put("offset","0");
-        object.put("threadNum","5");
+        object.put("threadNum","10");
         object.put("nugnesExecutor",nugnesExecutor);
         object.put("eventName","nugnes全量更新库存");
 
