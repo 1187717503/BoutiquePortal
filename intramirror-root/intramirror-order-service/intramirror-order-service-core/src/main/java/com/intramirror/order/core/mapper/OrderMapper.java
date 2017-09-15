@@ -83,6 +83,17 @@ public interface OrderMapper {
      * @return
      */
     List<Map<String, Object>> getOrderListByStatusAndContainerId(Map<String, Object> conditionMap);
+    
+    
+    
+    /**
+     * 根据 logisticsProductId 获取订单详情
+     *
+     * @param logisticsProductId
+     * @return
+     */
+     Map<String, Object> getOrderLogisticsInfoByIdWithSql(Long logisticsProductId);
+
 
 
     /**

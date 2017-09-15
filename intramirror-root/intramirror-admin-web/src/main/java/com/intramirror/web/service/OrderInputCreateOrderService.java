@@ -21,6 +21,8 @@ import com.intramirror.order.api.vo.InputCreateOrder;
 import com.intramirror.product.api.service.*;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.service.VendorService;
+import com.intramirror.web.common.OrderMail;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -150,6 +152,7 @@ public class OrderInputCreateOrderService {
             List<Long> skuStoreSkuIdList = new ArrayList<>();
             List<Long> skuIdList = new ArrayList<>();
 
+            List<LogisticsProduct> sendEmailList = new ArrayList<LogisticsProduct>();
             for (int j = 0; j < inputCreateOrder.checkoutListStr.size(); j++) {
                 JsonObject obj = inputCreateOrder.checkoutListStr.get(j);
                 logger.info("checkout:" + obj);
@@ -196,6 +199,8 @@ public class OrderInputCreateOrderService {
                 results.put("logisticsProduct" + j, logisticsProduct);
                 skuStoreSkuIdList.add(obj.get("shop_product_sku_id").getAsLong());
                 // end 写默认值，为了生成订单
+                
+                sendEmailList.add(logisticsProduct);
             }
 
             List<List<String>> listSkuIdInfo = setArray(skuStoreSkuIdList);
@@ -252,6 +257,26 @@ public class OrderInputCreateOrderService {
             updateOrderLogistics.setLogisticsId(logistics.getLogisticsId());
             logger.info("订单" + order.getOrderId() + "创建订单后更新运费 orderLogistics 入参" + JSON.toJSON(updateOrderLogistics));
             orderLogisticsService.updateOrderLogistics(updateOrderLogistics);
+            
+            
+    		/**-----------------------------start send mail-------------------------------**/
+            //遍历发送邮件
+            if(sendEmailList != null && sendEmailList.size() > 0 ){
+            	for(LogisticsProduct logisticsProduct : sendEmailList){
+            		try{
+                    	logger.info("start send mail logisticsProductId:"+logisticsProduct.getLogistics_product_id());
+            			Map<String, Object> map = orderService.getOrderLogisticsInfoByIdWithSql(logisticsProduct.getLogistics_product_id());
+            			OrderMail.sendOrderMail(map);
+            			
+            		}catch(Exception e){
+            			e.printStackTrace();
+            		}
+
+            	}
+
+            }
+    		/**-----------------------------end send mail-------------------------------**/
+
         }
 
         results.put("status", StatusType.SUCCESS);
