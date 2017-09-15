@@ -211,7 +211,7 @@
 			group by t_pp.product_id 
 			) pp ON p.product_id = pp.product_id   
 			where pspk.`name` = 'Size' 
-			and ol.order_logistics_id = #{logisticsProductId,jdbcType=BIGINT}
+			and lp.logistics_product_id = #{logisticsProductId,jdbcType=BIGINT}
   </select>
 
 

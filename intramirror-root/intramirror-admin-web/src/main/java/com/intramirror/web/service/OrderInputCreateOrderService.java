@@ -260,6 +260,7 @@ public class OrderInputCreateOrderService {
             
             
     		/**-----------------------------start send mail-------------------------------**/
+            logger.info("start send mail sendEmailList.size:"+sendEmailList.size());
             //遍历发送邮件
             if(sendEmailList != null && sendEmailList.size() > 0 ){
             	for(LogisticsProduct logisticsProduct : sendEmailList){
