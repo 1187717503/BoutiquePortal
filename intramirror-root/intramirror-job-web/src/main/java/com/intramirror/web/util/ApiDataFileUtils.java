@@ -21,8 +21,6 @@ public class ApiDataFileUtils {
 
     private static final String bak_file = "bak_file";
 
-    private static final String error_file = "error_file";
-
     private String vendorName; // 不同vendor名称
 
     public ApiDataFileUtils(String vendorName) {
