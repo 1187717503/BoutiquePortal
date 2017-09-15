@@ -34,7 +34,7 @@ public class UpdateStockThread implements Runnable{
             logger.info("UpdateStockThreadRun,updateStock,end,resultMap:"+JSONObject.toJSONString(resultMap)+",stockOption:"+JSONObject.toJSONString(stockOption));
 
             if( !resultMap.get("status").toString().equals("1")) {
-                logger.info("UpdateProductThreadRun,FAILUREMessage:"+JSONObject.toJSONString(resultMap)+",stockOption:"+JSONObject.toJSONString(stockOption));
+                logger.info("UpdateStockThreadRun,FAILUREMessage:"+JSONObject.toJSONString(resultMap)+",stockOption:"+JSONObject.toJSONString(stockOption));
             }
         } catch (Exception e) {
             e.printStackTrace();
