@@ -2,6 +2,7 @@ package pk.shoplus.service;
 
 import com.alibaba.fastjson.JSON;
 
+import com.alibaba.fastjson.JSONArray;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.redisson.Config;
@@ -11,13 +12,8 @@ import org.redisson.core.RMap;
 import pk.shoplus.util.RedisUtils;
 
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
 
 public class RedisService {
 	private static final Logger LOGGER = Logger.getLogger(RedisService.class);
@@ -91,7 +87,26 @@ public class RedisService {
 		return redisson;
 	}
 
-    
+	public boolean setKey(String key,String value) throws Exception{
+		Redisson redisson = getRedisson();
+		Set set = redisson.getSet(key);
+		set.clear();
+		set.add(value);
+		return true;
+	}
+
+	public String getKey(String key) throws Exception{
+		String value = null;
+		Redisson redisson = getRedisson();
+		Set<String> set = redisson.getSet(key);
+
+		if(set.size() > 0) {
+			List<String> setList = new ArrayList<String>(set);
+			value = setList.get(0);
+		}
+		return value;
+	}
+
 	/**
 	 * 获取redis内容
 	 * @param key

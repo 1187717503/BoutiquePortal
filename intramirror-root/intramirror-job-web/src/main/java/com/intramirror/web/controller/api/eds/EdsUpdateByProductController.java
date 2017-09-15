@@ -4,6 +4,7 @@ import com.alibaba.fastjson15.JSONObject;
 import com.google.gson.Gson;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.common.utils.DateUtils;
+import com.intramirror.web.contants.RedisKeyContants;
 import com.intramirror.web.mapping.api.IProductMapping;
 import com.intramirror.web.thread.CommonThreadPool;
 import com.intramirror.web.thread.UpdateProductThread;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import pk.shoplus.model.EDSProduct;
 import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.model.Result;
+import pk.shoplus.service.RedisService;
 import pk.shoplus.service.request.impl.GetPostRequestService;
 import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.util.MapUtils;
@@ -38,6 +40,9 @@ public class EdsUpdateByProductController implements InitializingBean {
 
     // create product
     public static ProductEDSManagement productEDSManagement = new ProductEDSManagement();
+
+    // redis
+    private static RedisService redisService = RedisService.getInstance();
 
     // mapping
     @Resource(name = "edsUpdateByProductMapping")
@@ -68,8 +73,20 @@ public class EdsUpdateByProductController implements InitializingBean {
         String eventName = param.get("eventName").toString();
         ThreadPoolExecutor nugnesExecutor = (ThreadPoolExecutor) param.get("nugnesExecutor");
         String datetime = param.get("datetime")==null?"":param.get("datetime").toString();
+        String nugnes_product_offset = param.get(RedisKeyContants.nugnes_product_offset)==null?"":param.get(RedisKeyContants.nugnes_product_offset).toString();
 
         try {
+            // start 获取增量更新offset
+            if(StringUtils.isNotBlank(nugnes_product_offset)) {
+                String redis_nugnes_product_offset = redisService.getKey(RedisKeyContants.nugnes_product_offset);
+                logger.info("EdsProductAllProducerControllerExecute,redis_nugnes_product_offset:"+redis_nugnes_product_offset);
+                if(StringUtils.isNotBlank(redis_nugnes_product_offset)){
+                    offset = Integer.parseInt(redis_nugnes_product_offset);
+                    logger.info("EdsProductAllProducerControllerExecute,offset,nugnes_product_offset:"+offset);
+                }
+            }
+            // end 获取增量更新offset
+
             int sum = 0;
             while (true) {
                 // 拼接URL
@@ -117,8 +134,17 @@ public class EdsUpdateByProductController implements InitializingBean {
                     logger.info("EdsProductAllProducerControllerExecute,execute,endDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
                 }
 
-                offset = offset + limit;
+                offset = offset + edsProductList.size();
             }
+
+            // start 记录增量更新offset
+            if(StringUtils.isNotBlank(nugnes_product_offset)) {
+                logger.info("EdsProductAllProducerControllerExecute,currentOffset:"+offset+",sum:"+sum);
+                redisService.setKey(RedisKeyContants.nugnes_product_offset,offset+"");
+                logger.info("EdsProductAllProducerControllerExecute,putAfterOffset:"+offset+",sum:"+sum);
+            }
+            // end 记录增量更新offset
+
             logger.info("EdsProductAllProducerControllerExecute,executeEnd,offset:"+offset+",limit:"+limit+",url:"+url+",store_code:"+store_code+",sum:"+sum+",param:"+new Gson().toJson(param)+",eventName:"+eventName);
             mapUtils.putData("status",StatusType.SUCCESS).putData("info","success");
         } catch (Exception e) {
@@ -158,9 +184,23 @@ public class EdsUpdateByProductController implements InitializingBean {
         nugnes_day_updateproduct.put("eventName","nugnes更新当日商品");
         nugnes_day_updateproduct.put("datetime",DateUtils.getStrDate(new Date()));
 
+        // nugnes_increment_updateproduct
+        ThreadPoolExecutor nugnes_increment_updateproduct_executor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
+        Map<String,Object> nugnes_increment_updateproduct = new HashMap<>();
+        nugnes_increment_updateproduct.put("url","http://nugnes.edstema.it/api/v3.0/products/condensed");
+        nugnes_increment_updateproduct.put("vendor_id","9");
+        nugnes_increment_updateproduct.put("store_code","X3ZMV");
+        nugnes_increment_updateproduct.put("limit","500");
+        nugnes_increment_updateproduct.put("offset","0");
+        nugnes_increment_updateproduct.put("threadNum","10");
+        nugnes_increment_updateproduct.put("nugnesExecutor",nugnes_increment_updateproduct_executor);
+        nugnes_increment_updateproduct.put("eventName","nugnes增量更新商品");
+        nugnes_increment_updateproduct.put(RedisKeyContants.nugnes_product_offset,"0");
+
         // put data
         paramsMap = new HashMap<>();
         paramsMap.put("nugnes_all_updateproduct",nugnes_all_updateproduct);
         paramsMap.put("nugnes_day_updateproduct",nugnes_day_updateproduct);
+        paramsMap.put("nugnes_increment_updateproduct",nugnes_increment_updateproduct);
     }
 }
