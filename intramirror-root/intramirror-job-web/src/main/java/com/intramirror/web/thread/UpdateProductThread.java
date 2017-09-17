@@ -31,7 +31,7 @@ public class UpdateProductThread implements Runnable{
     @Override
     public void run() {
         try {
-            logger.info("UpdateProductThreadRun,createProduct,start,roductOptions:"+new Gson().toJson(productOptions)
+            logger.info("UpdateProductThreadRun,createProduct,start,productOptions:"+new Gson().toJson(productOptions)
                     +",vendorOptions:"+JSONObject.toJSONString(vendorOptions));
             Map<String,Object> resultMap = productEDSManagement.createProduct(productOptions,vendorOptions);
             logger.info("UpdateProductThreadRun,createProduct,end,resultMap:"+ JSONObject.toJSONString(resultMap)+",productOptions:"+JSONObject.toJSONString(productOptions)

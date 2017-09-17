@@ -429,8 +429,8 @@ public class ProductServiceImpl implements IProductService{
                         } else {
                             mapUtils = new MapUtils(new HashMap<>());
                             mapUtils.putData("status",StatusType.WARNING)
-                                    .putData("info","update product - " + warning_price_out_of_range.getDesc() + " retail_price:" + productOptions.getSalePrice())
-                                    .putData("error_enum",warning_price_out_of_range)
+                                    .putData("info","update product - " + error_price_out_of_range.getDesc() + " retail_price:" + productOptions.getSalePrice())
+                                    .putData("error_enum", error_price_out_of_range)
                                     .putData("key","retail_price")
                                     .putData("value",productOptions.getSalePrice()).getMap();
                             warningMaps.add(mapUtils.getMap());
@@ -800,7 +800,7 @@ public class ProductServiceImpl implements IProductService{
 
 
     public static boolean isPrice(BigDecimal oldPrice,BigDecimal newPrice){
-        BigDecimal rangePrice = oldPrice.multiply(new BigDecimal(0.05));
+        BigDecimal rangePrice = oldPrice.multiply(new BigDecimal(0.2));
 
         BigDecimal minPrice = oldPrice.subtract(rangePrice);
         BigDecimal maxPrice = oldPrice.add(rangePrice);

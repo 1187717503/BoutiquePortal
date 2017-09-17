@@ -31,7 +31,7 @@ import pk.shoplus.vo.ResultMessage;
 
 import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.Runtime_exception;
 import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.updateStock_params_is_error;
-import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.warning_price_out_of_range;
+import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.error_price_out_of_range;
 
 /**
  * 更新库存接口
@@ -119,12 +119,12 @@ public class ProductStockEDSManagement {
                         }
                     } else {
                          mapUtils.putData("status",StatusType.FAILURE)
-                                .putData("info","update stock - " + warning_price_out_of_range.getDesc() + " price:" + price)
+                                .putData("info","update stock - " + error_price_out_of_range.getDesc() + " price:" + price)
                                 .putData("sku_size",stockOptions.getSizeValue())
                                 .putData("product_code",stockOptions.getProductCode())
                                 .putData("key","retail_price")
                                 .putData("value",price)
-                                .putData("error_enum",warning_price_out_of_range);
+                                .putData("error_enum", error_price_out_of_range);
                         logger.info("ProductStockEDSManagementUpdateStock,outputParams,mapUtils:"+new Gson().toJson(mapUtils));
                         if(connection!=null) {connection.commit();connection.close();}
                         return mapUtils.getMap();
