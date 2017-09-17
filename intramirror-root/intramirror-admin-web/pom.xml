@@ -26,15 +26,21 @@
             </activation>
         </profile>
         <profile>
-            <id>pre</id>
+            <id>staging</id>
             <properties>
-                <profiles.active>pre</profiles.active>
+                <profiles.active>staging</profiles.active>
             </properties>
         </profile>
         <profile>
             <id>shenv</id>
             <properties>
                 <profiles.active>shenv</profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>shprd</id>
+            <properties>
+                <profiles.active>shprd</profiles.active>
             </properties>
         </profile>
         <profile>
