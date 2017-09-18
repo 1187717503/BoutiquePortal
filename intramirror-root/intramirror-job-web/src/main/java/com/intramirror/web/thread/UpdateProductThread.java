@@ -3,6 +3,7 @@ package com.intramirror.web.thread;
 import com.alibaba.fastjson15.JSONObject;
 import com.google.gson.Gson;
 import com.intramirror.common.utils.DateUtils;
+import com.intramirror.web.util.ApiDataFileUtils;
 import org.apache.log4j.Logger;
 import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.parameter.StatusType;
@@ -11,6 +12,7 @@ import pk.shoplus.service.product.impl.ProductServiceImpl;
 import pk.shoplus.util.ExceptionUtils;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -27,6 +29,8 @@ public class UpdateProductThread implements Runnable{
     private ProductEDSManagement.ProductOptions productOptions;
 
     private ProductEDSManagement.VendorOptions vendorOptions;
+
+    private ApiDataFileUtils apiDataFileUtils;
 
     @Override
     public void run() {
@@ -48,6 +52,12 @@ public class UpdateProductThread implements Runnable{
             if( !resultMap.get("status").toString().equals("1")) {
                 logger.info("UpdateProductThreadRun,FAILUREMessage:"+JSONObject.toJSONString(resultMap)+ ",productOptions:" + JSONObject.toJSONString(productOptions)
                         + ",vendorOptions:" + JSONObject.toJSONString(vendorOptions));
+
+                Map<String,Object> map = new HashMap<>();
+                map.put("productOptions",productOptions);
+                map.put("vendorOptions",vendorOptions);
+                map.put("resultMap",resultMap);
+                apiDataFileUtils.bakErrorFile(resultMap.get("error_enum").toString(),JSONObject.toJSONString(map));
             }
 
         } catch (Exception e) {
@@ -57,8 +67,9 @@ public class UpdateProductThread implements Runnable{
         }
     }
 
-    public UpdateProductThread(ProductEDSManagement.ProductOptions productOptions, ProductEDSManagement.VendorOptions vendorOptions) {
+    public UpdateProductThread(ProductEDSManagement.ProductOptions productOptions, ProductEDSManagement.VendorOptions vendorOptions,ApiDataFileUtils apiDataFileUtils) {
         this.productOptions = productOptions;
         this.vendorOptions = vendorOptions;
+        this.apiDataFileUtils = apiDataFileUtils;
     }
 }

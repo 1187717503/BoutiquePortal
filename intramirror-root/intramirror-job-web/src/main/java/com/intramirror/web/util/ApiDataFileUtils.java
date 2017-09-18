@@ -19,25 +19,40 @@ public class ApiDataFileUtils {
 
     private static final String baseUrl = "/Users/dingyifan/Documents/fileTest";
 
-    private static final String bak_file = "bak_file";
+    private static final String bak_file = "backup";
+
+    private static final String error_file = "error";
 
     private String vendorName; // 不同vendor名称
 
-    public ApiDataFileUtils(String vendorName) {
+    private String eventName; // 处理事件名称
+
+    public ApiDataFileUtils(String vendorName,String eventName) {
         this.vendorName = vendorName;
+        this.eventName = eventName;
     }
 
-    private boolean bakFile(String fileName, String content){
+    public boolean bakPendingFile(String fileName, String content){
+        // 获取文件夹路径
+        String strDate = DateUtils.getStrDate(new Date());
+        String bakUrl = baseUrl+"/"+vendorName+"/"+eventName+"/"+strDate+"/"+bak_file;
+        return this.writeFile(bakUrl,fileName,content);
+    }
+
+    public boolean bakErrorFile(String fileName, String content){
+        // 获取文件夹路径
+        String strDate = DateUtils.getStrDate(new Date());
+        String bakUrl = baseUrl+"/"+vendorName+"/"+eventName+"/"+strDate+"/"+error_file;
+        return this.writeFile(bakUrl,fileName,content);
+    }
+
+    private boolean writeFile(String bakUrl,String fileName, String content) {
         try {
             // 校验参数
             if(StringUtils.isBlank(fileName) || StringUtils.isBlank(content)) {
                 logger.info("ApiDataFileUtilsBakFile,checkParams,fileName:"+fileName+",content:"+content);
                 return false;
             }
-
-            // 获取文件夹路径
-            String strDate = DateUtils.getStrDate(new Date());
-            String bakUrl = baseUrl+"/"+vendorName+"/"+strDate+"/"+bak_file;
 
             // 检查文件夹是否创建
             File fileFolder = new File(bakUrl);
@@ -47,8 +62,8 @@ public class ApiDataFileUtils {
             }
 
             // 创建文件
-            String formatDate = DateUtils.getformatDate(new Date());
-            fileName = formatDate + " ---- " + fileName;
+            String formatDate = DateUtils.getStrDate(new Date(),"yyyyMMddHHmmss");
+            fileName = fileName + "" + formatDate;
             String fileUrl = bakUrl+"/"+fileName+".txt";
             File file = new File(fileUrl);
             file.createNewFile();
@@ -71,6 +86,6 @@ public class ApiDataFileUtils {
     }
 
     public static void main(String[] args) {
-        new ApiDataFileUtils("nugnes").bakFile("test","casijiadsja");
+        new ApiDataFileUtils("ding","testo").bakErrorFile("123","000");
     }
 }

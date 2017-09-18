@@ -9,6 +9,7 @@ import com.intramirror.web.mapping.api.IStockMapping;
 import com.intramirror.web.mapping.vo.StockOption;
 import com.intramirror.web.thread.CommonThreadPool;
 import com.intramirror.web.thread.UpdateStockThread;
+import com.intramirror.web.util.ApiDataFileUtils;
 import com.intramirror.web.util.GetPostRequestUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.Param;
@@ -71,6 +72,7 @@ public class EdsUpdateByStockController implements InitializingBean {
         int threadNum = Integer.parseInt(param.get("threadNum").toString());
         String eventName = param.get("eventName").toString();
         ThreadPoolExecutor nugnesExecutor = (ThreadPoolExecutor) param.get("nugnesExecutor");
+        ApiDataFileUtils fileUtils = (ApiDataFileUtils) param.get("fileUtils");
 
         try {
             int sum = 0;
@@ -94,6 +96,8 @@ public class EdsUpdateByStockController implements InitializingBean {
                 if(stockMapList == null || stockMapList.size() == 0) {
                     logger.info("EdsAllUpdateByStockControllerExecute,whileEnd,edsProductList is null,appendUrl:"+appendUrl);
                     break;
+                } else {
+                    fileUtils.bakPendingFile("offset"+offset+"limit"+limit,responseData);
                 }
 
                 for(Map stockMap : stockMapList){
@@ -108,7 +112,7 @@ public class EdsUpdateByStockController implements InitializingBean {
 
                     // 线程池
                     logger.info("EdsAllUpdateByStockControllerExecute,execute,startDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(stockMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
-                    CommonThreadPool.execute(eventName,nugnesExecutor,threadNum,new UpdateStockThread(stockOption));
+                    CommonThreadPool.execute(eventName,nugnesExecutor,threadNum,new UpdateStockThread(stockOption,fileUtils));
                     logger.info("EdsAllUpdateByStockControllerExecute,execute,endDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(stockMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
                 }
                 offset = offset + limit;
@@ -132,11 +136,12 @@ public class EdsUpdateByStockController implements InitializingBean {
         object.put("url","http://nugnes.edstema.it/api/v3.0/skus/stock");
         object.put("vendor_id","9");
         object.put("store_code","X3ZMV");
-        object.put("limit","500");
+        object.put("limit","10");
         object.put("offset","0");
         object.put("threadNum","10");
         object.put("nugnesExecutor",nugnesExecutor);
         object.put("eventName","nugnes全量更新库存");
+        object.put("fileUtils",new ApiDataFileUtils("nugnes","nugnes全量更新库存"));
 
         // put data
         paramsMap = new HashMap<>();
