@@ -29,9 +29,7 @@ import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.util.MapUtils;
 import pk.shoplus.vo.ResultMessage;
 
-import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.Runtime_exception;
-import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.updateStock_params_is_error;
-import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.error_price_out_of_range;
+import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.*;
 
 /**
  * 更新库存接口
@@ -138,7 +136,7 @@ public class ProductStockEDSManagement {
                         .putData("product_code",stockOptions.getProductCode())
                         .putData("key","info")
                         .putData("value",resultMessage.getMsg())
-                        .putData("error_enum",updateStock_params_is_error);
+                        .putData("error_enum",resultMessage.getData());
             }
             connection.commit();
 		}catch (Exception e) {
@@ -278,16 +276,16 @@ public class ProductStockEDSManagement {
             condition.put("vendor_id",stockOptions.getVendor_id());
             product = productService.getProductByCondition(condition, null);
             if(product == null){
-                 resultMessage.sStatus(false).sMsg("update stock - 找不到这个商品 。");
+                 resultMessage.sStatus(false).sMsg("update stock - 找不到这个商品 。").setData(boutique_id_is_null);
             }
         }
 
         if(StringUtils.isBlank(productCode)) {
-            resultMessage.sStatus(false).sMsg("update stock - productCode is null 。");
+            resultMessage.sStatus(false).sMsg("update stock - productCode is null 。").setData(boutique_id_is_null);
         } else if(org.apache.commons.lang.StringUtils.isBlank(sizeValue))
-            resultMessage.sStatus(false).sMsg("update stock - sizeValue is null 。");
+            resultMessage.sStatus(false).sMsg("update stock - sizeValue is null 。").setData(skuSize_is_null);
         else if(org.apache.commons.lang.StringUtils.isBlank(quantity)){
-            resultMessage.sStatus(false).sMsg("update stock - quantity is null 。");
+            resultMessage.sStatus(false).sMsg("update stock - quantity is null 。").setData(stock_is_null);
         }
 
         if(resultMessage.getStatus()) {
