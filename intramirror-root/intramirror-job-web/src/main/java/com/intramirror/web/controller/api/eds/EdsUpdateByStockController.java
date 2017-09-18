@@ -113,7 +113,7 @@ public class EdsUpdateByStockController implements InitializingBean {
                 }
                 offset = offset + limit;
             }
-            logger.info("EdsAllUpdateByStockControllerExecute,executeEnd,offset:"+offset+",limit:"+limit+",url:"+url+",store_code:"+store_code+",sum:"+sum+",param:"+new Gson().toJson(param)+",eventName:"+eventName);
+            logger.info("EdsAllUpdateByStockControllerExecute,executeEnd,offset:"+offset+",limit:"+limit+",url:"+url+",store_code:"+store_code+",sum:"+sum+",param:"+JSONObject.toJSONString(param)+",eventName:"+eventName);
             mapUtils.putData("status",StatusType.SUCCESS).putData("info","success");
         } catch (Exception e) {
             e.printStackTrace();

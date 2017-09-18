@@ -8,5 +8,7 @@ public class RedisKeyContants {
     /** nugnes增量更新商品记录的offset */
     public static final String nugnes_product_offset = "nugnes_product_offset";
 
+    /** nugnes增量更新当日商品记录的offset */
+    public static final String nugnes_product_day_offset = "nugnes_product_day_offset";
 
 }
