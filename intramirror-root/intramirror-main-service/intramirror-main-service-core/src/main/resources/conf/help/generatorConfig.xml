@@ -5,7 +5,7 @@
 
     <!-- mybatis-generator:generate -->
     <classPathEntry
-            location="C:\Users\56996\.m2\repository\mysql\mysql-connector-java\5.1.39\mysql-connector-java-5.1.39.jar"/> <!-- 配置JAR驱动 -->
+            location="C:\Users\Admin\.m2\repository\mysql\mysql-connector-java\5.1.39\mysql-connector-java-5.1.39.jar"/> <!-- 配置JAR驱动 -->
 
     <context id="context1" targetRuntime="MyBatis3">
         <commentGenerator>
@@ -23,37 +23,37 @@
         </javaTypeResolver>
 
         <javaModelGenerator targetPackage="com.intramirror.main.api.model"
-                            targetProject="D:\MyWork\shoplus\BoutiquePortal\BoutiquePortal\intramirror-root\intramirror-main-service\intramirror-main-service-api\src\main\java"> <!-- 生成实体地址 -->
+                            targetProject="D:\Work\BoutiquePortal\intramirror-root\intramirror-main-service\intramirror-main-service-api\src\main\java"> <!-- 生成实体地址 -->
             <property name="trimStrings" value="true"/> <!-- 设置string时是否使用trim调用 -->
         </javaModelGenerator>
 
         <sqlMapGenerator targetPackage="conf.MainSqlMap"
-                         targetProject="D:\MyWork\shoplus\BoutiquePortal\BoutiquePortal\intramirror-root\intramirror-main-service\intramirror-main-service-core\src\main\resources"/> <!-- 生成MapXML文件 -->
+                         targetProject="D:\Work\BoutiquePortal\intramirror-root\intramirror-main-service\intramirror-main-service-core\src\main\resources"/> <!-- 生成MapXML文件 -->
 
         <!-- XMLMAPPER,ANNOTATEDMAPPER -->
         <javaClientGenerator targetPackage="com.intramirror.main.core.mapper"
-                             targetProject="D:\MyWork\shoplus\BoutiquePortal\BoutiquePortal\intramirror-root\intramirror-main-service\intramirror-main-service-core\src\main\java"
+                             targetProject="D:\Work\BoutiquePortal\intramirror-root\intramirror-main-service\intramirror-main-service-core\src\main\java"
                              type="XMLMAPPER"/> <!-- 生成MAP对应Client -->
 
-        <table schema="intra-mirror-prd" tableName="api_parameter" domainObjectName="ApiParameter"
+        <table schema="intra-mirror-prd" tableName="shipping_rule" domainObjectName="ShippingRule"
                enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
                enableSelectByExample="false" selectByExampleQueryId="false">
             <property name="useActualColumnNames" value="false"/>
         </table>
 
-        <table schema="intra-mirror-prd" tableName="api_mq" domainObjectName="ApiMq"
+        <table schema="intra-mirror-prd" tableName="address_country_coefficient" domainObjectName="AddressCountryCoefficient"
                enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
                enableSelectByExample="false" selectByExampleQueryId="false">
             <property name="useActualColumnNames" value="false"/>
         </table>
 
-        <table schema="intra-mirror-prd" tableName="api_end_point" domainObjectName="ApiEndPoint"
+        <table schema="intra-mirror-prd" tableName="exchange_rate" domainObjectName="ExchangeRate"
                enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
                enableSelectByExample="false" selectByExampleQueryId="false">
             <property name="useActualColumnNames" value="false"/>
         </table>
 
-        <table schema="intra-mirror-prd" tableName="api_configuration" domainObjectName="ApiConfiguration"
+        <table schema="intra-mirror-prd" tableName="tax" domainObjectName="Tax"
                enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
                enableSelectByExample="false" selectByExampleQueryId="false">
             <property name="useActualColumnNames" value="false"/>

@@ -42,10 +42,13 @@
 		<context:property-placeholder location="classpath:/sit/databases.properties"/>
 	</beans>
 	<beans profile="pre">
-		<context:property-placeholder location="classpath:/pre/databases.properties"/>
+		<context:property-placeholder location="classpath:/staging/databases.properties"/>
 	</beans>
-	<beans profile="shenv">
+	<beans profile="staging">
 		<context:property-placeholder location="classpath:/shenv/databases.properties"/>
+	</beans>
+	<beans profile="shprd">
+		<context:property-placeholder location="classpath:/shprd/databases.properties"/>
 	</beans>
 	<beans profile="prd">
 		<context:property-placeholder location="classpath:/prd/databases.properties"/>

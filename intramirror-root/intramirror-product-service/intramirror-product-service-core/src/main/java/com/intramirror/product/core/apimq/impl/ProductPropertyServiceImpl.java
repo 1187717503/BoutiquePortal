@@ -34,12 +34,30 @@ public class ProductPropertyServiceImpl extends BaseDao implements ProductProper
         return result;
     }
 
-	public List<Map<String, Object>> getProductPropertyListByProductId(String productIds) {
-    	Map<String,Object> param = new HashMap<String, Object>();
-    	param.put("productIds", productIds.split(","));
-    	
+    public List<Map<String, Object>> getProductPropertyListByProductId(String productIds) {
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("productIds", productIds.split(","));
+
         List<Map<String, Object>> result = productPropertyMapper.selectByProductId(param);
         logger.info("result:{}", new Gson().toJson(result));
         return result;
-	}
+    }
+
+    @Override
+    public List<Map<String, Object>> getProductPropertyValueByBrandIdAndColorCode(String brandID, String colorCode) {
+        List<Map<String, Object>> result = productPropertyMapper.getProductPropertyValueByBrandIdAndColorCode(brandID, colorCode);
+        logger.info("result:{}", new Gson().toJson(result));
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> getProductPropertyValueByProductId(Long productId) {
+        List<Map<String, Object>> mapResult = productPropertyMapper.getProductPropertyValueByProductId(productId);
+        logger.info("result:{}", new Gson().toJson(mapResult));
+        Map<String, Object> result = null;
+        if (mapResult.size() > 0) {
+            result = mapResult.get(0);
+        }
+        return result;
+    }
 }

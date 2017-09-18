@@ -34,4 +34,21 @@
         AND
         s.enabled=#{enabled}
     </select>
+
+    <select id="getSkuInfoBySkuId" resultType="java.util.HashMap">
+        SELECT s.in_price,s.price, sps.sale_price, s.im_price
+        FROM sku s LEFT JOIN shop_product_sku sps ON sps.sku_id = s.sku_id
+        WHERE sps.shop_product_sku_id = #{shopProductSkuId}
+    </select>
+
+    <select id="getSkuById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="selectColumn"/>
+        FROM
+        <include refid="selectTable"/>
+        WHERE
+        s.sku_id=#{skuId}
+        AND
+        s.enabled=1
+    </select>
 </mapper>

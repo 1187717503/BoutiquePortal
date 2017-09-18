@@ -42,10 +42,10 @@ public class ConfirmCheckOrderController {
 
     @Autowired
     private ProductPropertyService productPropertyService;
-    
+
     @Autowired
     ILogisticsProductService logisticsProductServiceImpl;
-    
+
 
     /**
      * Wang
@@ -57,9 +57,9 @@ public class ConfirmCheckOrderController {
      */
     @RequestMapping(value = "/confirmCheckOrder", method = RequestMethod.POST)
     @ResponseBody
-    public ResultMessage confirmCheckOrder(@RequestBody Map<String,Object> map, HttpServletRequest httpRequest) throws Exception {
-		ResultMessage result= new ResultMessage();
-		result.errorStatus();
+    public ResultMessage confirmCheckOrder(@RequestBody Map<String, Object> map, HttpServletRequest httpRequest) throws Exception {
+        ResultMessage result = new ResultMessage();
+        result.errorStatus();
 
         String jwt = httpRequest.getHeader("token");
         if (StringUtils.isEmpty(jwt)) {
@@ -71,7 +71,7 @@ public class ConfirmCheckOrderController {
         Date expireation = claims.getIssuedAt();
         //如果信息过期则提示重新登录。
         if (System.currentTimeMillis() > expireation.getTime()) {
-        	result.addMsg("1000002");
+            result.addMsg("1000002");
             return result;
         }
         //获取用户详情
@@ -79,37 +79,37 @@ public class ConfirmCheckOrderController {
 
         //如果匿名访问则跳过
         if (!Helper.checkNotNull(userId)) {
-        	result.addMsg("1000003");
+            result.addMsg("1000003");
             return result;
         }
-        
+
         String barCode = null;
-        String brandId = null; 
-        String colorCode = null; 
+        String brandId = null;
+        String colorCode = null;
         String estShipDate = null;
         String logisticsProductId = null;
-        
-        if(map.get("barCode") != null &&StringUtils.isNotBlank(map.get("barCode").toString()) && !map.get("barCode").toString().equals("#")){
-        	barCode = map.get("barCode").toString(); 
+
+        if (map.get("barCode") != null && StringUtils.isNotBlank(map.get("barCode").toString()) && !map.get("barCode").toString().equals("#")) {
+            barCode = map.get("barCode").toString();
         }
-        
-        if(map.get("brandId") != null &&StringUtils.isNotBlank(map.get("brandId").toString())){
-        	brandId = map.get("brandId").toString(); 
+
+        if (map.get("brandId") != null && StringUtils.isNotBlank(map.get("brandId").toString())) {
+            brandId = map.get("brandId").toString();
         }
-        
-        if(map.get("colorCode") != null &&StringUtils.isNotBlank(map.get("colorCode").toString())){
-        	colorCode = map.get("colorCode").toString(); 
+
+        if (map.get("colorCode") != null && StringUtils.isNotBlank(map.get("colorCode").toString())) {
+            colorCode = map.get("colorCode").toString();
         }
-        
-        if(map.get("estShipDate") != null &&StringUtils.isNotBlank(map.get("estShipDate").toString())){
-        	estShipDate = map.get("estShipDate").toString(); 
+
+        if (map.get("estShipDate") != null && StringUtils.isNotBlank(map.get("estShipDate").toString())) {
+            estShipDate = map.get("estShipDate").toString();
         }
-        
-        if(map.get("logisticsProductId") != null &&StringUtils.isNotBlank(map.get("logisticsProductId").toString())){
-        	logisticsProductId = map.get("logisticsProductId").toString(); 
+
+        if (map.get("logisticsProductId") != null && StringUtils.isNotBlank(map.get("logisticsProductId").toString())) {
+            logisticsProductId = map.get("logisticsProductId").toString();
         }
-        
-        
+
+
         Sku sku = null;
         List<Map<String, Object>> mapList = new ArrayList<Map<String, Object>>();
         if (barCode != null) {
@@ -119,34 +119,35 @@ public class ConfirmCheckOrderController {
             mapList = productPropertyService.getProductPropertyByBrandIDAndColorCode(brandId, colorCode);
 //            result.put("mapList", mapList);
         }
-        
-        if (sku != null || (mapList != null && mapList.size() > 0)) {
-        	result.successStatus();
-        	
-        	try {
-            	if(logisticsProductId != null && estShipDate != null ){
-                  	SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-                  	
-            		LogisticsProduct logis = logisticsProductServiceImpl.selectById(Long.parseLong(logisticsProductId));
-            		if(logis != null){
-                		LogisticsProduct upLogis = new LogisticsProduct();
-                		upLogis.setLogistics_product_id(logis.getLogistics_product_id());
-                		
-                		upLogis.setEst_ship_date(sdf.parse(estShipDate));
-                		upLogis.setConfirmed_at(Helper.getCurrentUTCTime());
-                		logisticsProductServiceImpl.updateByLogisticsProduct(upLogis);
-            		}else{
-            			result.setMsg("Order does not exist,logisticsProductId:"+logisticsProductId);
-            		}
 
-            	}
-            	
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+        if (sku != null || (mapList != null && mapList.size() > 0)) {
+            result.successStatus();
+
+            try {
+                if (logisticsProductId != null) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+                    LogisticsProduct logis = logisticsProductServiceImpl.selectById(Long.parseLong(logisticsProductId));
+                    if (logis != null) {
+                        LogisticsProduct upLogis = new LogisticsProduct();
+                        upLogis.setLogistics_product_id(logis.getLogistics_product_id());
+                        if (estShipDate != null) {
+                            upLogis.setEst_ship_date(sdf.parse(estShipDate));
+                        }
+                        upLogis.setConfirmed_at(Helper.getCurrentUTCTime());
+                        logisticsProductServiceImpl.updateByLogisticsProduct(upLogis);
+                    } else {
+                        result.setMsg("Order does not exist,logisticsProductId:" + logisticsProductId);
+                    }
+
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
         }
-        
+
         return result;
     }
 

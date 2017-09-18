@@ -49,7 +49,12 @@ public class XmagAllStockMapping implements IMapping{
             Map<String,Object> mqDataMap = JSONObject.parseObject(mqData);
             Map<String,Object> productMap = JSONObject.parseObject(mqDataMap.get("product").toString());
             logger.info("sizeValue param :" + new Gson().toJson(productMap.get("Barcode").toString()));
-            Map<String, Object> sizeValue = skuPropertyService.getSizeValue(productMap.get("Barcode").toString());
+            Map<String, Object> param = new HashMap<>();
+            param.put("skuCode", productMap.get("Barcode").toString());
+            param.put("vendor_id", Long.parseLong(mqDataMap.get("vendor_id")==null?"0":
+            	mqDataMap.get("vendor_id").toString().toString()));
+            logger.info("sizeValue param :" + new Gson().toJson(param));
+            Map<String, Object> sizeValue = skuPropertyService.getSizeValue(param);
             logger.info("sizeValue result :" + new Gson().toJson(sizeValue));
             
             ProductStockEDSManagement.StockOptions stockOptions = this.handleMappingData1(productMap,sizeValue);
@@ -76,9 +81,9 @@ public class XmagAllStockMapping implements IMapping{
                             .putData("info",resultMessage.getMsg()).getMap();
                 }
 
-                logger.info("Xmag开始调用filippo库存更新Service,stockOptions:"+new Gson().toJson(stockOptions));
+                logger.info("Xmag开始调用库存更新Service,stockOptions:"+new Gson().toJson(stockOptions));
                 Map<String, Object> serviceResultMap = productStockEDSManagement.updateStock(stockOptions);
-                logger.info("Xmag结束调用filippo库存更新Service,serviceResultMap:"+new Gson().toJson(serviceResultMap)+",stockOptions:"+new Gson().toJson(stockOptions));
+                logger.info("Xmag结束调用库存更新Service,serviceResultMap:"+new Gson().toJson(serviceResultMap)+",stockOptions:"+new Gson().toJson(stockOptions));
                 serviceResultMap.put("product_code",stockOptions.getProductCode());
                 serviceResultMap.put("size",sizeValue);
                 return serviceResultMap;

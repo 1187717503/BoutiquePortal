@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.intramirror.common.utils.DateUtils;
 import com.intramirror.web.mapping.vo.StockOption;
 import com.intramirror.web.service.stock.ApiUpdateStockService;
+import com.intramirror.web.util.ApiDataFileUtils;
 import org.apache.log4j.Logger;
 import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.parameter.StatusType;
@@ -13,6 +14,7 @@ import pk.shoplus.service.product.impl.ProductServiceImpl;
 import pk.shoplus.util.ExceptionUtils;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -26,6 +28,8 @@ public class UpdateStockThread implements Runnable{
 
     private static final ApiUpdateStockService apiUpdateStockService = new ApiUpdateStockService();
 
+    private ApiDataFileUtils apiDataFileUtils;
+
     @Override
     public void run() {
         try {
@@ -34,7 +38,12 @@ public class UpdateStockThread implements Runnable{
             logger.info("UpdateStockThreadRun,updateStock,end,resultMap:"+JSONObject.toJSONString(resultMap)+",stockOption:"+JSONObject.toJSONString(stockOption));
 
             if( !resultMap.get("status").toString().equals("1")) {
-                logger.info("UpdateProductThreadRun,FAILUREMessage:"+JSONObject.toJSONString(resultMap)+",stockOption:"+JSONObject.toJSONString(stockOption));
+                logger.info("UpdateStockThreadRun,FAILUREMessage:"+JSONObject.toJSONString(resultMap)+",stockOption:"+JSONObject.toJSONString(stockOption));
+
+                Map<String,Object> map = new HashMap<>();
+                map.put("stockOption",stockOption);
+                map.put("resultMap",resultMap);
+                apiDataFileUtils.bakErrorFile(resultMap.get("error_enum").toString(),JSONObject.toJSONString(map));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -42,7 +51,8 @@ public class UpdateStockThread implements Runnable{
         }
     }
 
-    public UpdateStockThread(StockOption stockOption) {
+    public UpdateStockThread(StockOption stockOption,ApiDataFileUtils apiDataFileUtils) {
         this.stockOption = stockOption;
+        this.apiDataFileUtils = apiDataFileUtils;
     }
 }

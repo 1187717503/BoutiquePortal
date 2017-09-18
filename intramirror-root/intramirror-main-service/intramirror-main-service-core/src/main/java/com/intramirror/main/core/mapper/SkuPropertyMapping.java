@@ -17,5 +17,5 @@ public interface SkuPropertyMapping {
 	 * @param skuCode
 	 * @return
 	 */
-	List<Map<String, Object>> getSizeValue(String skuCode);
+	List<Map<String, Object>> getSizeValue(Map<String, Object> map);
 }

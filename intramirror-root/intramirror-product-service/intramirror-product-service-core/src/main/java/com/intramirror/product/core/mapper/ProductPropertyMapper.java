@@ -15,4 +15,8 @@ public interface ProductPropertyMapper {
      * @return
      */
     List<Map<String, Object>> selectByProductId(Map<String,Object> param);
+
+    List<Map<String, Object>> getProductPropertyValueByBrandIdAndColorCode(@Param("brandID") String brandID, @Param("colorCode") String colorCode);
+
+    List<Map<String, Object>> getProductPropertyValueByProductId(Long productId);
 }

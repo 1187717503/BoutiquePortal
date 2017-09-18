@@ -97,4 +97,19 @@ public interface IContainerService {
 	 * @return
 	 */
 	int updateContainerShipment(Map<String, Object> map);
+	
+	/**
+	 * 
+	 * @param map
+	 * @return
+	 */
+	int updateContainerById(Map<String, Object> map);
+	
+	/**
+	 * 根据shipmentid获取Container 列表
+	 * @param map
+	 * @return
+	 */
+	List<Map<String,Object>> getListByShipmentId(Map<String, Object> map);
+	
 }

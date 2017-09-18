@@ -1,0 +1,91 @@
+package com.intramirror.web.util;
+
+import com.intramirror.common.utils.DateUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import pk.shoplus.util.ExceptionUtils;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.util.Date;
+
+/**
+ * Created by dingyifan on 2017/9/15.
+ */
+public class ApiDataFileUtils {
+
+    private static final Logger logger = Logger.getLogger(ApiDataFileUtils.class);
+
+    private static final String baseUrl = "/mnt";
+
+    private static final String bak_file = "backup";
+
+    private static final String error_file = "error";
+
+    private String vendorName; // 不同vendor名称
+
+    private String eventName; // 处理事件名称
+
+    public ApiDataFileUtils(String vendorName,String eventName) {
+        this.vendorName = vendorName;
+        this.eventName = eventName;
+    }
+
+    public boolean bakPendingFile(String fileName, String content){
+        // 获取文件夹路径
+        String strDate = DateUtils.getStrDate(new Date());
+        String bakUrl = baseUrl+"/"+vendorName+"/"+eventName+"/"+strDate+"/"+bak_file;
+        return this.writeFile(bakUrl,fileName,content);
+    }
+
+    public boolean bakErrorFile(String fileName, String content){
+        // 获取文件夹路径
+        String strDate = DateUtils.getStrDate(new Date());
+        String bakUrl = baseUrl+"/"+vendorName+"/"+eventName+"/"+strDate+"/"+error_file;
+        return this.writeFile(bakUrl,fileName,content);
+    }
+
+    private boolean writeFile(String bakUrl,String fileName, String content) {
+        try {
+            // 校验参数
+            if(StringUtils.isBlank(fileName) || StringUtils.isBlank(content)) {
+                logger.info("ApiDataFileUtilsBakFile,checkParams,fileName:"+fileName+",content:"+content);
+                return false;
+            }
+
+            // 检查文件夹是否创建
+            File fileFolder = new File(bakUrl);
+            if(!fileFolder.exists()) {
+                fileFolder.mkdirs();
+                logger.info("ApiDataFileUtilsBakFile,createNewFile,bakUrl:"+bakUrl);
+            }
+
+            // 创建文件
+            String formatDate = DateUtils.getStrDate(new Date(),"yyyyMMddHHmmss");
+            fileName = fileName + "" + formatDate;
+            String fileUrl = bakUrl+"/"+fileName+".txt";
+            File file = new File(fileUrl);
+            file.createNewFile();
+
+            // 写入文件
+            FileWriter fileWriter = new FileWriter(file);
+            try {
+                fileWriter.write(content,0,content.length());
+                fileWriter.flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.info("ApiDataFileUtilsBakFile,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",fileName:"+fileName+",content:"+content);
+                fileWriter.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("ApiDataFileUtilsBakFile,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",fileName:"+fileName+",content:"+content);
+        }
+        return true;
+    }
+
+    public static void main(String[] args) {
+        new ApiDataFileUtils("ding","testo").bakErrorFile("123","000");
+    }
+}

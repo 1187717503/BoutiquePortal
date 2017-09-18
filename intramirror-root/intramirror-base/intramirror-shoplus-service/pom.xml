@@ -19,9 +19,15 @@
             </properties>
         </profile>
         <profile>
-            <id>pre</id>
+            <id>shprd</id>
             <properties>
-                <profiles.active>pre</profiles.active>
+                <profiles.active>shprd</profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>staging</id>
+            <properties>
+                <profiles.active>staging</profiles.active>
             </properties>
         </profile>
         <profile>
@@ -185,7 +191,8 @@
                 <directory>src/main/resources</directory>
                 <excludes>
                     <exclude>prd/*</exclude>
-                    <exclude>pre/*</exclude>
+                    <exclude>shprd/*</exclude>
+                    <exclude>staging/*</exclude>
                     <exclude>sit/*</exclude>
                     <exclude>shenv/*</exclude>
                 </excludes>

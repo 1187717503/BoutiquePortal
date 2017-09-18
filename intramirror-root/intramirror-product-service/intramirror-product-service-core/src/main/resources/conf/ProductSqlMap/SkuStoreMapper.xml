@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.intramirror.product.core.mapper.SkuStoreMapper">
+
     <resultMap id="BaseResultMap" type="com.intramirror.product.api.model.SkuStore">
 
         <id column="sku_store_id" property="skuStoreId" jdbcType="BIGINT"/>
@@ -23,32 +24,32 @@
         <result column="confirmed" property="confirmed" jdbcType="BIGINT"/>
     </resultMap>
 
-   <update id="updateBySkuId" parameterType="java.util.Map" >
-   
-    update sku_store ss 
-     <!-- 取消 -->
-     <if test="statusType == -4 ">  
-<!--         set ss.ordered = ss.ordered - 1  -->
-			set ss.ordered = 0 
-     </if> 
-     
-     <!-- 关闭 -->
-     <if test="statusType == 5 ">  
-        set ss.ship = ss.ship - 1, ss.finished = ss.finished + 1 
-     </if> 
-     
-     <!-- 待发货 -->
-      <if test="statusType == 2 ">  
-        set ss.ordered = ss.ordered - 1,ss.confirm = ss.confirm + 1 
-     </if> 
-     
-     <!-- 待收货 -->
-      <if test="statusType == 3 ">  
-        set ss.confirm = ss.confirm - 1,ss.ship = ss.ship + 1 
-     </if>
-    where ss.sku_id = #{skuId,jdbcType=BIGINT}
-    
-  </update>
+    <update id="updateBySkuId" parameterType="java.util.Map">
+
+        update sku_store ss
+        <!-- 取消 -->
+        <if test="statusType == -4 ">
+            <!--         set ss.ordered = ss.ordered - 1  -->
+            set ss.ordered = 0
+        </if>
+
+        <!-- 关闭 -->
+        <if test="statusType == 5 ">
+            set ss.ship = ss.ship - 1, ss.finished = ss.finished + 1
+        </if>
+
+        <!-- 待发货 -->
+        <if test="statusType == 2 ">
+            set ss.ordered = ss.ordered - 1,ss.confirm = ss.confirm + 1
+        </if>
+
+        <!-- 待收货 -->
+        <if test="statusType == 3 ">
+            set ss.confirm = ss.confirm - 1,ss.ship = ss.ship + 1
+        </if>
+        where ss.sku_id = #{skuId,jdbcType=BIGINT}
+
+    </update>
 
     <update id="confirmSkuStore" parameterType="java.lang.Long">
         update sku_store s
@@ -79,11 +80,19 @@
         where sps.enabled = 1 and sps.shop_product_sku_id = #{shopProductSkuId,jdbcType=BIGINT}
     </select>
 
-  <select id="selectSkuIdByShopProductSkuId" resultType="java.lang.Long" parameterType="java.lang.Long" >
+    <select id="selectSkuIdByShopProductSkuId" resultType="java.lang.Long" parameterType="java.lang.Long">
     select sps.sku_id from shop_product_sku  sps where sps.shop_product_sku_id =  #{shopProductSkuId,jdbcType=BIGINT}
   </select>
 
+    <select id="getSkuStoreBySkuId" resultType="java.util.HashMap">
+        SELECT * FROM sku_store WHERE sku_id in
+        <foreach collection="skuIdString" item="skuId" index="index"
+                 open="(" close=")" separator=",">
+            #{skuId}
+        </foreach>
+    </select>
 
-  
-
+    <update id="batchExecuteBySql">
+        UPDATE sku_store SET reserved = reserved + #{reservedTwo} , store = store - #{reservedTwo} WHERE sku_id = #{skuId}
+    </update>
 </mapper>

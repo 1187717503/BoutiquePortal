@@ -185,7 +185,6 @@ public class ProductServiceImpl implements IProductService{
                     || this.imgIsNull(product.cover_img)) {
                 if(!no_img) {
                     List<String> coverImg = productEDSManagement.convertImgPathList(productOptions.getCoverImg());
-                    List<String> descImg = productEDSManagement.convertImgPathList(productOptions.getDescImg());
 
                     /** start update by dingyifan 2017-07-31 */
                     // 记录上传图片出错日志
@@ -211,14 +210,11 @@ public class ProductServiceImpl implements IProductService{
                             List<String> coverImgStringList = JSONArray.parseArray(product.cover_img,String.class);
                             coverImgStringList.addAll(coverImg);
                             product.cover_img  = JSON.toJSONString(coverImgStringList);
-
-                            List<String> descImgStringList = JSONArray.parseArray(product.description_img,String.class);
-                            descImgStringList.addAll(descImg);
-                            product.description_img  = JSON.toJSONString(descImgStringList);
+                            product.description_img  = JSON.toJSONString(coverImgStringList);
 
                         } else {
                             product.cover_img  = JSON.toJSONString(coverImg);
-                            product.description_img  = JSON.toJSONString(descImg);
+                            product.description_img  = JSON.toJSONString(coverImg);
                         }
 
                         apiLogBatchService.createApiLogBatch(productOptions.getCode(),productOptions.getImgByFilippo());
@@ -429,8 +425,8 @@ public class ProductServiceImpl implements IProductService{
                         } else {
                             mapUtils = new MapUtils(new HashMap<>());
                             mapUtils.putData("status",StatusType.WARNING)
-                                    .putData("info","update product - " + warning_price_out_of_range.getDesc() + " retail_price:" + productOptions.getSalePrice())
-                                    .putData("error_enum",warning_price_out_of_range)
+                                    .putData("info","update product - " + error_price_out_of_range.getDesc() + " retail_price:" + productOptions.getSalePrice())
+                                    .putData("error_enum", error_price_out_of_range)
                                     .putData("key","retail_price")
                                     .putData("value",productOptions.getSalePrice()).getMap();
                             warningMaps.add(mapUtils.getMap());
@@ -800,7 +796,7 @@ public class ProductServiceImpl implements IProductService{
 
 
     public static boolean isPrice(BigDecimal oldPrice,BigDecimal newPrice){
-        BigDecimal rangePrice = oldPrice.multiply(new BigDecimal(0.05));
+        BigDecimal rangePrice = oldPrice.multiply(new BigDecimal(0.2));
 
         BigDecimal minPrice = oldPrice.subtract(rangePrice);
         BigDecimal maxPrice = oldPrice.add(rangePrice);

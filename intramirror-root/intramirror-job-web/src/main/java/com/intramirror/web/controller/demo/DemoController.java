@@ -12,19 +12,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 import com.intramirror.order.api.model.ApiMq;
-import com.intramirror.web.mapping.api.IMapping;
+import com.intramirror.web.mapping.impl.AlDucaOrderMapping;
 import com.intramirror.web.mapping.impl.QuadraSynProductMapping;
 import com.intramirror.web.mapping.impl.XmagAllStockMapping;
 import com.intramirror.web.mapping.impl.XmagOrderMapping;
 import com.intramirror.web.mapping.impl.XmagSynProductMapping;
 
-import org.sql2o.Connection;
-
-import pk.shoplus.DBConnector;
 import pk.shoplus.model.Product;
 import pk.shoplus.model.ProductEDSManagement;
-import pk.shoplus.service.ProductService;
-import pk.shoplus.util.RedisUtils;
 
 /**
  * 
@@ -46,6 +41,9 @@ public class DemoController {
 	
 	@Autowired
 	private XmagOrderMapping xmagOrderMapping;
+	
+	@Autowired
+	private AlDucaOrderMapping alDucaOrderMapping;
 	
 	
 	/** 测试返回对象转换JSON !!! */
@@ -103,6 +101,12 @@ public class DemoController {
 	public void xmagOrder(@RequestBody Map<String,Object> mqData) throws Exception {
 		xmagOrderMapping.handleMappingAndExecute(new Gson().toJson(mqData));
 	}*/
+	
+	@RequestMapping(value = "/alDucaCreateOrder")
+	@ResponseBody
+	public void alDucaCreateOrder(@RequestBody Map<String,Object> mqData) throws Exception {
+//		alDucaOrderMapping.handleMappingAndExecute(new Gson().toJson(mqData));
+	}
 	
 	
 }

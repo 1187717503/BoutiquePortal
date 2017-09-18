@@ -2,6 +2,7 @@ package com.intramirror.order.api.service;
 
 import com.intramirror.common.help.Page;
 import com.intramirror.common.help.PageUtils;
+import com.intramirror.order.api.model.Order;
 import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.vo.ShippedParam;
 
@@ -68,7 +69,7 @@ public interface IOrderService {
     /**
      * 根据 订单状态获取子订单列表
      *
-     * @param  status
+     * @param status
      * @return
      */
     List<Map<String, Object>> getOrderListByStatus(int status, Long vendorId, String sortByName);
@@ -76,18 +77,19 @@ public interface IOrderService {
     /**
      * 根据 订单状态获取子订单列表
      *
-     * @param  status
+     * @param status
      * @return
      */
     List<Map<String, Object>> getOrderListByStatusAndContainerId(int containerId, int status, Long vendorId);
-    
-    
-	/**
-	 * 根据 ShipmentId 查询箱子跟订单信息
-	 * @param
-	 * @return
-	 */
-	List<Map<String,Object>> getOrderListByShipmentId(Map<String, Object> conditionMap);
+
+
+    /**
+     * 根据 ShipmentId 查询箱子跟订单信息
+     *
+     * @param
+     * @return
+     */
+    List<Map<String, Object>> getOrderListByShipmentId(Map<String, Object> conditionMap);
 
 
     /**
@@ -105,19 +107,25 @@ public interface IOrderService {
      * @return
      */
     PageUtils getShippedOrderListByStatus(Page page, Long vendorId, ShippedParam shippedParam);
-    
+
     /**
-	 * 根据条件查询订单信息
-	 * @param conditionMap
-	 * @return
-	 */
+     * 根据条件查询订单信息
+     *
+     * @param conditionMap
+     * @return
+     */
     Map<String, Object> getShipmentDetails(Map<String, Object> conditionMap);
-    
+
     /**
      * 统计shipped数量
+     *
      * @param map
      * @return
      */
-    Integer getShippedCount(Map<String,Object> map); 
+    Integer getShippedCount(Map<String, Object> map);
+
+    Order createOrder(Order order);
+
+    void updateOrder(Order order);
 
 }
