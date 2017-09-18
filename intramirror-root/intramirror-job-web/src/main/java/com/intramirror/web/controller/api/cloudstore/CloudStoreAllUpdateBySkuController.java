@@ -24,6 +24,7 @@ import com.intramirror.common.utils.DateUtils;
 import com.intramirror.web.mapping.api.IProductMapping;
 import com.intramirror.web.thread.CommonThreadPool;
 import com.intramirror.web.thread.UpdateProductThread;
+import com.intramirror.web.util.ApiDataFileUtils;
 import com.intramirror.web.util.GetPostRequestUtil;
 
 import pk.shoplus.model.ProductEDSManagement;
@@ -76,6 +77,7 @@ public class CloudStoreAllUpdateBySkuController implements InitializingBean{
             String eventName = param.get("eventName").toString();
             int threadNum = Integer.parseInt(param.get("threadNum").toString());
             ThreadPoolExecutor nugnesExecutor = (ThreadPoolExecutor) param.get("nugnesExecutor");
+            ApiDataFileUtils fileUtils = (ApiDataFileUtils) param.get("fileUtils");
 
             Map<String, Object> params = new HashMap<>();
             params.put("token", token);
@@ -99,7 +101,12 @@ public class CloudStoreAllUpdateBySkuController implements InitializingBean{
                     logger.info("cloudStoreProductAllProducerControllerExecute,whileEnd,ProductList is null,appendUrl:"+url);
                     break;
                 }
-                
+                if(StringUtils.isBlank(responseData)) {
+                    logger.info("cloudStoreProductAllProducerControllerExecute,whileEnd,edsProductList is null,appendUrl:"+url);
+                    break;
+                } else {
+                    fileUtils.bakPendingFile("step"+step,responseData);
+                }
                 while(it.hasNext()) {
                 	index++;
                     JSONObject inventory = (JSONObject) it.next();
@@ -115,7 +122,7 @@ public class CloudStoreAllUpdateBySkuController implements InitializingBean{
                
                     // 线程池
                     logger.info("cloudStoreProductAllProducerControllerExecute,execute,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
-                    CommonThreadPool.execute(eventName,nugnesExecutor,threadNum,new UpdateProductThread(productOptions,vendorOptions));
+                    CommonThreadPool.execute(eventName,nugnesExecutor,threadNum,new UpdateProductThread(productOptions,vendorOptions,fileUtils));
                     logger.info("cloudStoreProductAllProducerControllerExecute,execute,endDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
                 }
                 
@@ -151,7 +158,8 @@ public class CloudStoreAllUpdateBySkuController implements InitializingBean{
         tony_all_updateProduct.put("nugnesExecutor",nugnesExecutor);
         tony_all_updateProduct.put("vendor_id","16");
         tony_all_updateProduct.put("threadNum","5");
-        tony_all_updateProduct.put("eventName","tony全量更新商品");
+        tony_all_updateProduct.put("eventName","tony全量更新库存");
+        tony_all_updateProduct.put("fileUtils",new ApiDataFileUtils("tony","tony全量更新库存"));
         // put data
         paramsMap = new HashMap<>();
         paramsMap.put("tony_all_updateProduct",tony_all_updateProduct);
