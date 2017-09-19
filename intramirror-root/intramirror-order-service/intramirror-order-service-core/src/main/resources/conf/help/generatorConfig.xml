@@ -43,23 +43,23 @@
 			    <property name="useActualColumnNames" value="false"/>
 			</table>-->
 
-		<table schema="intra-mirror-prd" tableName="order" domainObjectName="Order"
+		<table schema="intra-mirror-prd" tableName="payment_offline" domainObjectName="PaymentOffline"
 			   enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
 			   enableSelectByExample="false" selectByExampleQueryId="false" >
 			<property name="useActualColumnNames" value="false"/>
 		</table>
 
-		<table schema="intra-mirror-prd" tableName="order_logistics" domainObjectName="OrderLogistics"
-			   enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
-			   enableSelectByExample="false" selectByExampleQueryId="false" >
-			<property name="useActualColumnNames" value="false"/>
-		</table>
+		<!--<table schema="intra-mirror-prd" tableName="order_logistics" domainObjectName="OrderLogistics"-->
+			   <!--enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"-->
+			   <!--enableSelectByExample="false" selectByExampleQueryId="false" >-->
+			<!--<property name="useActualColumnNames" value="false"/>-->
+		<!--</table>-->
 
 
-		<table schema="intra-mirror-prd" tableName="logistics" domainObjectName="Logistics"
-			   enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
-			   enableSelectByExample="false" selectByExampleQueryId="false" >
-			<property name="useActualColumnNames" value="false"/>
-		</table>
+		<!--<table schema="intra-mirror-prd" tableName="logistics" domainObjectName="Logistics"-->
+			   <!--enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"-->
+			   <!--enableSelectByExample="false" selectByExampleQueryId="false" >-->
+			<!--<property name="useActualColumnNames" value="false"/>-->
+		<!--</table>-->
     </context>
 </generatorConfiguration>

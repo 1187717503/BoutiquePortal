@@ -3,6 +3,7 @@ package com.intramirror.order.api.vo;
 import com.google.gson.JsonObject;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,18 @@ public class InputCreateOrder {
 
     //尚未支付的钱
     public BigDecimal balanceDue;
+
+    //支付方式 1: Wechat  2: Bank card   3: Alipay
+    public String paymentMethod;
+
+    //支付金额
+    public BigDecimal amt;
+
+    //支付时间
+    public String paidAt;
+
+    //买家姓名
+    public String paymentBuyerName;
 
 
     public String getBuyerName() {
@@ -110,5 +123,37 @@ public class InputCreateOrder {
 
     public void setBalanceDue(BigDecimal balanceDue) {
         this.balanceDue = balanceDue;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public BigDecimal getAmt() {
+        return amt;
+    }
+
+    public void setAmt(BigDecimal amt) {
+        this.amt = amt;
+    }
+
+    public String getPaidAt() {
+        return paidAt;
+    }
+
+    public void setPaidAt(String paidAt) {
+        this.paidAt = paidAt;
+    }
+
+    public String getPaymentBuyerName() {
+        return paymentBuyerName;
+    }
+
+    public void setPaymentBuyerName(String paymentBuyerName) {
+        this.paymentBuyerName = paymentBuyerName;
     }
 }

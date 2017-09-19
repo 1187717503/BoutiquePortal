@@ -1,5 +1,6 @@
 package com.intramirror.common.utils;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -23,5 +24,18 @@ public class DateUtils {
     public static String getformatDate(Date date){
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return simpleDateFormat.format(date);
+    }
+
+    public static String getDateByString(String date){
+        SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyy-MM-dd");
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date formatDate = null;
+        try {
+            formatDate = simpleDateFormat.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return simpleDateFormat2.format(formatDate);
     }
 }
