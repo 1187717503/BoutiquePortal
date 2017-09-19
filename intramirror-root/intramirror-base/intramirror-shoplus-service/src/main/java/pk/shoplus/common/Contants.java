@@ -118,7 +118,7 @@ public class Contants {
     /**
      * Quadra 接口
      */
-    public static final String quadra_file_path = "/opt/data/quadra/";
+    public static final String quadra_file_path = "/mnt/quadra/compare/";
     public static final String quadra_file_type = ".txt";
     public static final String quadra_origin_product_day = "quadra_origin_product_day";
     public static final String quadra_revised_product_day = "quadra_revised_product_day";
