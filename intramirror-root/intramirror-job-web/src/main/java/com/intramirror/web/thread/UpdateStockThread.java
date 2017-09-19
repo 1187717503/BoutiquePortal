@@ -43,7 +43,7 @@ public class UpdateStockThread implements Runnable{
                 Map<String,Object> map = new HashMap<>();
                 map.put("stockOption",stockOption);
                 map.put("resultMap",resultMap);
-                apiDataFileUtils.bakErrorFile(resultMap.get("error_enum").toString(),JSONObject.toJSONString(map));
+                apiDataFileUtils.bakErrorFile(resultMap.get("error_enum") ==null?"waraning":resultMap.get("error_enum").toString(),JSONObject.toJSONString(map));
             }
         } catch (Exception e) {
             e.printStackTrace();

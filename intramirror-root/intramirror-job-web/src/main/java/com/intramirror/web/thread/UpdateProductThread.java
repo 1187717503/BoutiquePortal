@@ -57,7 +57,7 @@ public class UpdateProductThread implements Runnable{
                 map.put("productOptions",productOptions);
                 map.put("vendorOptions",vendorOptions);
                 map.put("resultMap",resultMap);
-                apiDataFileUtils.bakErrorFile(resultMap.get("error_enum").toString(),JSONObject.toJSONString(map));
+                apiDataFileUtils.bakErrorFile(resultMap.get("error_enum") ==null?"waraning":resultMap.get("error_enum").toString(),JSONObject.toJSONString(map));
             }
 
         } catch (Exception e) {

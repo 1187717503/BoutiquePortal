@@ -94,6 +94,34 @@ public class ApiDataFileUtils {
         }
     }
 
+    public static String getBaseUrl() {
+        return baseUrl;
+    }
+
+    public static String getBak_file() {
+        return bak_file;
+    }
+
+    public static String getError_file() {
+        return error_file;
+    }
+
+    public String getVendorName() {
+        return vendorName;
+    }
+
+    public void setVendorName(String vendorName) {
+        this.vendorName = vendorName;
+    }
+
+    public String getEventName() {
+        return eventName;
+    }
+
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
+    }
+
     public static void main(String[] args) {
         new ApiDataFileUtils("ding","testo").bakErrorFile("123","000");
     }
