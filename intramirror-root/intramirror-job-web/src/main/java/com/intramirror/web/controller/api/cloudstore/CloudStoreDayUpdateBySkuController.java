@@ -16,7 +16,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.sql2o.Connection;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -31,7 +30,6 @@ import com.intramirror.web.thread.UpdateStockThread;
 import com.intramirror.web.util.ApiDataFileUtils;
 import com.intramirror.web.util.GetPostRequestUtil;
 
-import pk.shoplus.DBConnector;
 import pk.shoplus.common.Contants;
 import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.parameter.StatusType;
@@ -42,7 +40,7 @@ import pk.shoplus.util.MapUtils;
 import pk.shoplus.vo.ResultMessage;
 
 @Controller
-@RequestMapping("/cloudStoreDay")
+@RequestMapping("/cloudstore_day")
 public class CloudStoreDayUpdateBySkuController implements InitializingBean{
 
     private final Logger logger = Logger.getLogger(CloudStoreDayUpdateBySkuController.class);
@@ -66,14 +64,13 @@ public class CloudStoreDayUpdateBySkuController implements InitializingBean{
     
     Integer index = 0;
     Integer step = 0;
-    @RequestMapping("/syn_sku_producer_day")
+    @RequestMapping("/syn_sku")
     @ResponseBody
     public Map<String,Object> execute(@Param(value = "name")String name){
     	Map<String, Object> dataMap = new HashMap<String, Object>();
-    	Connection conn = null ;
+//    	Connection conn = null ;
     	MapUtils mapUtils = new MapUtils(new HashMap<String, Object>());
     	try {
-    		conn = DBConnector.sql2o.beginTransaction();
     		IGetPostRequest getPostRequestService = new GetPostRequestService();
     		 // check name
             if(StringUtils.isBlank(name)) {
@@ -119,7 +116,8 @@ public class CloudStoreDayUpdateBySkuController implements InitializingBean{
             }
 //            test data
 //            result = "{\"status\":\"ok\",\"data\":{\"events\":[{\"_id\":{\"$id\":\"5937c45d8b674caa2d3232e2\"},\"shop_id\":{\"$id\":\"590ecdf225c9fe7f4e1980c4\"},\"type\":0,\"date\":{\"sec\":1494581557,\"usec\":462000},\"additional_info\":{\"qty_diff\":-1,\"shop_from\":{\"$id\":\"561121e328499f880b0041a7\"},\"qty\":3,\"from\":\"shop\",\"sku\":\"A055F200_6685-L\",\"order_id\":{\"$id\":\"59158135e4b09f20a1de9919\"}}},{\"_id\":{\"$id\":\"5937c45d8b674caa2d3232e3\"},\"shop_id\":{\"$id\":\"590ecdf225c9fe7f4e1980c4\"},\"type\":0,\"date\":{\"sec\":1494594997,\"usec\":655000},\"additional_info\":{\"qty_diff\":1,\"shop_from\":{\"$id\":\"561121e328499f880b0041a7\"},\"qty\":2,\"from\":\"shop\",\"sku\":\"A055F200_6685-L\",\"order_id\":{\"$id\":\"5915b5b5e4b09f20a1de9bee\"}}},{\"_id\":{\"$id\":\"5937c45d8b674caa2d3232f0\"},\"shop_id\":{\"$id\":\"590ecdf225c9fe7f4e1980c4\"},\"type\":1,\"date\":{\"sec\":1494602807,\"usec\":634000},\"additional_info\":{\"qty_diff\":-1,\"shop_from\":{\"$id\":\"561121e328499f880b0041a7\"},\"from\":\"shop\",\"sku\":\"H6269720CR_1100-S\",\"order_id\":{\"$id\":\"5915d437e4b09f20a1de9eca\"}}}]}}";
-          //返回的events集合
+          result = "{\"status\":\"ok\",\"data\":{\"events\":[{\"_id\":{\"$id\":\"5937c45d8b674caa2d3232fd\"},\"shop_id\":{\"$id\":\"590ecdf225c9fe7f4e1980c4\"},\"type\":3,\"date\":{\"sec\":1488886056,\"usec\":830000},\"additional_info\":{\"item\":{\"_id\":{\"$id\":\"58be99a5d32af78734767811\"},\"sku\":\"16060_001-40\",\"title\":\"Maglia oversize con micro-paillettes\",\"desc\":\"Maglia oversize con micro-paillettes\",\"cur\":\"1\",\"brand\":\"Snobby Sheep\",\"qty\":0,\"stock_price\":268,\"price\":268,\"cat_ids\":[{\"$id\":\"561d7300b49dbb9c2c551c2f\"}],\"color_en\":\"panna\",\"mnf_code\":\"16060_001\",\"dim_h\":\"0\",\"color\":\"panna\",\"material_en\":\"Polyester\",\"color_shop\":\"panna\",\"sku_parent\":\"16060_001\",\"care_en\":\"Product Care: Hand wash\",\"season_shop\":\"SS17\",\"season\":\"SS17\",\"desc_en\":\"Sequined oversize sweater\",\"barcode\":\"4000001895045\",\"sex_shop\":\"Female\",\"dim_d\":\"0\",\"made\":\"Designed in Italy\",\"sex\":\"Female\",\"weight\":\"00.01\",\"made_en\":\"Designed in Italy\",\"size_shop\":\"40\",\"dim_w\":\"0\",\"size\":\"40\",\"material\":\"Cotone, Poliestere\",\"title_en\":\"Sequined oversize sweater\",\"age\":\"Adult\",\"care\":\"Product Care: Lavare a mano\",\"images\":[\"http://185.54.173.11/docs/reposImages/POTSS17_Shang0014_D/16060_001/16060_001-1.jpg\",\"http://185.54.173.11/docs/reposImages/POTSS17_Shang0014_D/16060_001/16060_001-2.jpg\"]}}},{\"_id\":{\"$id\":\"5937c45d8b674caa2d3232fc\"},\"shop_id\":{\"$id\":\"590ecdf225c9fe7f4e1980c4\"},\"type\":3,\"date\":{\"sec\":1488886056,\"usec\":830000},\"additional_info\":{\"item\":{\"_id\":{\"$id\":\"58be99a5d32af78734767812\"},\"sku\":\"16060_001-38\",\"title\":\"Maglia oversize con micro-paillettes\",\"desc\":\"Maglia oversize con micro-paillettes\",\"cur\":\"1\",\"brand\":\"Snobby Sheep\",\"qty\":0,\"stock_price\":268,\"price\":268,\"cat_ids\":[{\"$id\":\"561d7300b49dbb9c2c551c2f\"}],\"color_en\":\"panna\",\"mnf_code\":\"16060_001\",\"dim_h\":\"0\",\"color\":\"panna\",\"material_en\":\"Polyester\",\"color_shop\":\"panna\",\"sku_parent\":\"16060_001\",\"care_en\":\"Product Care: Hand wash\",\"season_shop\":\"SS17\",\"season\":\"SS17\",\"desc_en\":\"Sequined oversize sweater\",\"barcode\":\"4000001895038\",\"sex_shop\":\"Female\",\"dim_d\":\"0\",\"made\":\"Designed in Italy\",\"sex\":\"Female\",\"weight\":\"00.01\",\"made_en\":\"Designed in Italy\",\"size_shop\":\"38\",\"dim_w\":\"0\",\"size\":\"38\",\"material\":\"Cotone, Poliestere\",\"title_en\":\"Sequined oversize sweater\",\"age\":\"Adult\",\"care\":\"Product Care: Lavare a mano\",\"images\":[\"http://185.54.173.11/docs/reposImages/POTSS17_Shang0014_D/16060_001/16060_001-1.jpg\",\"http://185.54.173.11/docs/reposImages/POTSS17_Shang0014_D/16060_001/16060_001-2.jpg\"]}}},{\"_id\":{\"$id\":\"5937c45d8b674caa2d3232ff\"},\"shop_id\":{\"$id\":\"590ecdf225c9fe7f4e1980c4\"},\"type\":3,\"date\":{\"sec\":1488886056,\"usec\":831000},\"additional_info\":{\"item\":{\"_id\":{\"$id\":\"58be99a5d32af78734767814\"},\"sku\":\"16060_001-44\",\"title\":\"Maglia oversize con micro-paillettes\",\"desc\":\"Maglia oversize con micro-paillettes\",\"cur\":\"1\",\"brand\":\"Snobby Sheep\",\"qty\":0,\"stock_price\":268,\"price\":268,\"cat_ids\":[{\"$id\":\"561d7300b49dbb9c2c551c2f\"}],\"color_en\":\"panna\",\"mnf_code\":\"16060_001\",\"dim_h\":\"0\",\"color\":\"panna\",\"material_en\":\"Polyester\",\"color_shop\":\"panna\",\"sku_parent\":\"16060_001\",\"care_en\":\"Product Care: Hand wash\",\"season_shop\":\"SS17\",\"season\":\"SS17\",\"desc_en\":\"Sequined oversize sweater Ribbed neckline, cuffs and hem Asymmetric hemline Product Care: Hand wash 88%, 12%, Polyester maniche: Short Sleeves Scollo/scollatura: Round-neckedTaglia del capo indossato nella foto: SConversione taglie: ITColore: Silver, Cream\",\"barcode\":\"4000001895069\",\"sex_shop\":\"Female\",\"dim_d\":\"0\",\"made\":\"Designed in Italy\",\"sex\":\"Female\",\"weight\":\"00.01\",\"made_en\":\"Designed in Italy\",\"size_shop\":\"44\",\"dim_w\":\"0\",\"size\":\"44\",\"material\":\"Cotone, Poliestere\",\"title_en\":\"Sequined oversize sweater\",\"age\":\"Adult\",\"care\":\"Product Care: Lavare a mano\",\"images\":[\"http://185.54.173.11/docs/reposImages/POTSS17_Shang0014_D/16060_001/16060_001-1.jpg\",\"http://185.54.173.11/docs/reposImages/POTSS17_Shang0014_D/16060_001/16060_001-2.jpg\"]}}}]}}";
+            //返回的events集合
 			JSONArray eventsArray = null;
             if(check){
 				//转换成json格式，处理结果
@@ -150,28 +148,22 @@ public class CloudStoreDayUpdateBySkuController implements InitializingBean{
 				logger.info("CloudStoreGetEventsControllerHandleSplitData,eventsArray:"+eventsArray.toJSONString());
 				for(int i = 0;i<eventsArray.size();i++){
 					JSONObject eventsInfo = eventsArray.getJSONObject(i);
-					ResultMessage resultMessage = this.putGetEventsData(eventsInfo,conn,vendor_id,
+					ResultMessage resultMessage = this.putGetEventsData(eventsInfo,vendor_id,
 							eventName, nugnesExecutor,threadNum,fileUtils);
 					logger.info("resultMessage : " + new Gson().toJson(resultMessage));
 				}
 			}
-			conn.commit();
             
 		} catch (Exception e) {
-			if(conn != null) {conn.rollback();conn.close();}
 			dataMap.put("status", StatusType.FAILURE);
 			dataMap.put("info", "系统异常: "+e.getMessage());
 			logger.info("CloudStoreGetEventsControllerPopulateResult,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
             e.printStackTrace();
-        } finally {
-        	if(conn != null) {
-				conn.close();
-			}
-		}
+        }
     	return dataMap;
     }
     
-    public ResultMessage putGetEventsData(JSONObject jsonObject,Connection conn,String vendor_id,
+    public ResultMessage putGetEventsData(JSONObject jsonObject,String vendor_id,
     		String eventName,ThreadPoolExecutor nugnesExecutor,int threadNum,ApiDataFileUtils fileUtils) {
 		ResultMessage resultMessage = new ResultMessage();
 		resultMessage.sStatus(true).sMsg("SUCCESS");
@@ -280,9 +272,9 @@ public class CloudStoreDayUpdateBySkuController implements InitializingBean{
         tony_day_updateProduct.put("nugnesExecutor",nugnesExecutor);
         tony_day_updateProduct.put("vendor_id","16");
         tony_day_updateProduct.put("threadNum","5");
-        tony_day_updateProduct.put("eventName","tony按天更新商品");
+        tony_day_updateProduct.put("eventName","tony增量更新商品ByDay");
         tony_day_updateProduct.put("datetime",DateUtils.getStrDate(new Date()));
-        tony_day_updateProduct.put("fileUtils",new ApiDataFileUtils("tony","tony按天更新商品"));
+        tony_day_updateProduct.put("fileUtils",new ApiDataFileUtils("tony","tony增量更新商品ByDay"));
         // put data
         paramsMap = new HashMap<>();
         paramsMap.put("tony_day_updateProduct",tony_day_updateProduct);

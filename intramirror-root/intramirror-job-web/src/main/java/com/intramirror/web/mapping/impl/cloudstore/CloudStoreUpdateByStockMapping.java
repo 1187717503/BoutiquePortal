@@ -38,6 +38,8 @@ public class CloudStoreUpdateByStockMapping implements IStockMapping{
 
             if(type == Contants.EVENTS_TYPE_4) {
                 qtyDiff = additionalInfo.getInteger("qty");
+                String stock_price = additionalInfo.getString("stock_price");
+                stockOption.setPrice(stock_price);
             } else if(type == Contants.EVENTS_TYPE_0){
                 qtyDiff = additionalInfo.getInteger("qty_diff");
             }
