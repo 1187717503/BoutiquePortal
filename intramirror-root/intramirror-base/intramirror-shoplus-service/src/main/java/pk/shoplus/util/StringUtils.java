@@ -16,7 +16,8 @@ public class StringUtils {
         if(org.apache.commons.lang.StringUtils.isNotBlank(str)) {
             str = str
             .replace("\\","\\\\")
-            .replace("\"","\\\"");
+            .replace("\"","\\\"")
+            .replace("'","\\'");
 //            .replace("'","\\'")
         }
         return str;

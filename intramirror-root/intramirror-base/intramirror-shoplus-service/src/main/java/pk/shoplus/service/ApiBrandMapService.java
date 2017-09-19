@@ -52,6 +52,7 @@ public class ApiBrandMapService {
 						"inner join api_configuration ac on(ac.api_configuration_id = abm.api_configuration_id)\n" +
 						"where abm.enabled = 1 and ac.enabled = 1 and ac.vendor_id ="+vendor_id+"\n"+
 						" and abm.no_img = 1 and lower(boutique_brand_name) = lower('"+pk.shoplus.util.StringUtils.escapeStr(brandName)+"')";
+				System.out.println(sql);
 				return apiBrandMapEntityDao.executeBySql(sql, null);
 			}
 		} catch (Exception e) {
@@ -66,6 +67,7 @@ public class ApiBrandMapService {
 //				logger.info(" .getApiBrandMapListByCondition brandName  before escape : " + brandName);
 				String sql = "select boutique_brand_name as brandName from api_brand_map where lower(boutique_brand_name) = lower('" + pk.shoplus.util.StringUtils.escapeStr(brandName) + "') and enabled = 1";
 //				logger.info(" .getApiBrandMapListByCondition brandName  before escape : " + sql);
+				System.out.println(sql);
 				List<Map<String, Object>> list = apiBrandMapEntityDao.executeBySql(sql, null);
 				if(list != null && list.size() > 0) {
 					return list.get(0).get("brandName").toString();
