@@ -124,6 +124,7 @@ public class CloudStoreAllUpdateBySkuController implements InitializingBean{
                     logger.info("cloudStoreProductAllProducerControllerExecute,execute,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+JSONObject.toJSONString(productOptions)+",vendorOptions:"+JSONObject.toJSONString(vendorOptions)+",eventName:"+eventName);
                     CommonThreadPool.execute(eventName,nugnesExecutor,threadNum,new UpdateProductThread(productOptions,vendorOptions,fileUtils));
                     logger.info("cloudStoreProductAllProducerControllerExecute,execute,endDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+JSONObject.toJSONString(productOptions)+",vendorOptions:"+JSONObject.toJSONString(vendorOptions)+",eventName:"+eventName);
+                    logger.info("cloudStoreProductAllProducerControllerExecute"+"共请求数据"+index+"条");
                 }
                 
                 if(jsonObject.get("next_step") != null) {
@@ -132,8 +133,8 @@ public class CloudStoreAllUpdateBySkuController implements InitializingBean{
                 } else {
                     break;
                 }
+                logger.info("cloudStoreProductAllProducerControllerExecute"+"共请求数据"+index+"条;共请求"+step+"批;");
             }
-            logger.info("cloudStoreProductAllProducerControllerExecute"+"共请求数据"+index+"条;共请求"+step+"批;");
             logger.info("cloudStoreProductAllProducerControllerExecute,executeEnd,url:"+url+",index:"+index+",param:"+JSONObject.toJSONString(param)+",eventName:"+eventName);
         } catch (Exception e) {
         	e.printStackTrace();

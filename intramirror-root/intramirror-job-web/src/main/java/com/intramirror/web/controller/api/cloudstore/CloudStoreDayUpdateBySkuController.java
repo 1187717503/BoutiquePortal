@@ -151,6 +151,7 @@ public class CloudStoreDayUpdateBySkuController implements InitializingBean{
 					ResultMessage resultMessage = this.putGetEventsData(eventsInfo,vendor_id,
 							eventName, nugnesExecutor,threadNum,fileUtils);
 					logger.info("resultMessage : " + new Gson().toJson(resultMessage));
+					logger.info("CloudStoreGetEventsControllerHandleSplitData Index :"+i);
 				}
 			}
             
