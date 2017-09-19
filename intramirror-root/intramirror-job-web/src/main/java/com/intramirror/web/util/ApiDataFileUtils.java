@@ -5,9 +5,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import pk.shoplus.util.ExceptionUtils;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
+import java.io.*;
 import java.util.Date;
 
 /**
@@ -17,7 +15,9 @@ public class ApiDataFileUtils {
 
     private static final Logger logger = Logger.getLogger(ApiDataFileUtils.class);
 
-    private static final String baseUrl = "/mnt";
+//    private static final String baseUrl = "/mnt";
+
+    private static final String baseUrl = "/Users/dingyifan/Documents/fileTest";
 
     private static final String bak_file = "backup";
 
@@ -65,24 +65,33 @@ public class ApiDataFileUtils {
             String formatDate = DateUtils.getStrDate(new Date(),"yyyyMMddHHmmss");
             fileName = fileName + "" + formatDate;
             String fileUrl = bakUrl+"/"+fileName+".txt";
-            File file = new File(fileUrl);
-            file.createNewFile();
-
-            // 写入文件
-            FileWriter fileWriter = new FileWriter(file);
-            try {
-                fileWriter.write(content,0,content.length());
-                fileWriter.flush();
-            } catch (Exception e) {
-                e.printStackTrace();
-                logger.info("ApiDataFileUtilsBakFile,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",fileName:"+fileName+",content:"+content);
-                fileWriter.close();
-            }
+            this.writeFileContent(fileUrl,content);
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("ApiDataFileUtilsBakFile,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",fileName:"+fileName+",content:"+content);
         }
         return true;
+    }
+
+    private void writeFileContent(String fileUrl,String content) throws IOException {
+        FileWriter fileWriter = null;
+        try {
+            // 创建文件
+            File file = new File(fileUrl);
+            if(!file.exists()) {
+                file.createNewFile();
+            }
+
+            // 写入文件
+            fileWriter = new FileWriter(file);
+            fileWriter.write(content,0,content.length());
+            fileWriter.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("ApiDataFileUtilsWriteFileContent,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
+        } finally {
+            if(fileWriter != null) {fileWriter.close();}
+        }
     }
 
     public static void main(String[] args) {

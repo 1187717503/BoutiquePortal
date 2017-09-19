@@ -98,7 +98,6 @@ public class AtelierFullUpdateProductController {
             }
 
             String mqName = apiCfgMaps.get(0).get("name").toString();
-            String api_configuration_id = apiCfgMaps.get(0).get("api_configuration_id").toString();
             String vendor_id = apiCfgMaps.get(0).get("vendor_id").toString();
             logger.info("AtelierFullUpdateProductControllerExecute,mqName:"+mqName);
             QueueNameJobEnum queueNameJobEnum =  QueueNameEnumUtils.searchQueue(mqName);
