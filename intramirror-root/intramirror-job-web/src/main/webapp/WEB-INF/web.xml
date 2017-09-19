@@ -72,6 +72,6 @@
 	
 	<servlet-mapping>
 		<servlet-name>intramirror-job-web</servlet-name>
-		<url-pattern>*.htm</url-pattern>
+		<url-pattern>/*</url-pattern>
 	</servlet-mapping>
 </web-app>

@@ -36,7 +36,7 @@ public class GetPostRequestUtil{
     public static final int SEND_REQUEST_TIME_OUT = 500000;
 
     // 将读超时时间
-    public static final int READ_TIME_OUT = 50000;
+    public static final int READ_TIME_OUT = 500000;
 
     /**
      *
