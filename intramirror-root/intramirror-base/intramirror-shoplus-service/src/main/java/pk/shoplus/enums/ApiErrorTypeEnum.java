@@ -31,7 +31,7 @@ public class ApiErrorTypeEnum {
         updateStock_params_is_error("updateStock_params_is_error","修改库存时入参传递有误。"),
 
 // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-        error_price_out_of_range("error_price_out_of_range","价格不能超过正负5%"),
+        error_price_out_of_range("error_price_out_of_range","价格不能超过正负20%"),
         Data_can_not_be_null("Data_can_not_be_null","数据不能为null。"),
 
         Data_is_duplicated("Data_is_duplicated","数据发生重复。"),
