@@ -14,6 +14,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +62,13 @@ public class OrderGetProductController extends BaseController {
         try {
 
             List<Map<String, Object>> mapList = productPropertyService.getProductPropertyValueByBrandIdAndColorCode(brandID, colorCode);
+            for (Map maps : mapList) {
+                Double price = Double.parseDouble(maps.get("price").toString());
+                Double inPrice = Double.parseDouble(maps.get("in_price").toString());
+                BigDecimal discount = new BigDecimal((inPrice * (1 + 0.22) / price) * 100);
+                maps.put("discount", (100 - discount.setScale(2, BigDecimal.ROUND_HALF_UP).intValue()) + " %");
+            }
+
             results.put("mapList", mapList);
 
             result.successStatus();

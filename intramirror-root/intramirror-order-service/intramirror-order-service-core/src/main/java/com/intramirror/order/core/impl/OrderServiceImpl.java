@@ -10,6 +10,7 @@ import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.vo.ShippedParam;
 import com.intramirror.order.core.dao.BaseDao;
 import com.intramirror.order.core.mapper.OrderMapper;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -211,4 +212,10 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
         return simpleDateFormat.format(new Date()) + userStr + orderStr;
     }
+
+	@Override
+	public Map<String, Object> getOrderLogisticsInfoByIdWithSql(
+			Long logisticsProductId) {
+		return orderMapper.getOrderLogisticsInfoByIdWithSql(logisticsProductId);
+	}
 }

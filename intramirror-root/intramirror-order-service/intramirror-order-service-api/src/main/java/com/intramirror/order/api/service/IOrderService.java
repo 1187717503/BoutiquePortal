@@ -74,6 +74,7 @@ public interface IOrderService {
      */
     List<Map<String, Object>> getOrderListByStatus(int status, Long vendorId, String sortByName);
 
+    
     /**
      * 根据 订单状态获取子订单列表
      *
@@ -81,6 +82,17 @@ public interface IOrderService {
      * @return
      */
     List<Map<String, Object>> getOrderListByStatusAndContainerId(int containerId, int status, Long vendorId);
+    
+    
+    
+    /**
+     * 根据 logisticsProductId 获取订单详情
+     *
+     * @param logisticsProductId
+     * @return
+     */
+     Map<String, Object> getOrderLogisticsInfoByIdWithSql(Long logisticsProductId);
+     
 
 
     /**

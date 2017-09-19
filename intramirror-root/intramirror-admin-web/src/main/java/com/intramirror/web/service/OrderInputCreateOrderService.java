@@ -6,21 +6,20 @@ import com.google.gson.JsonObject;
 import com.intramirror.common.Helper;
 import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.common.parameter.StatusType;
+import com.intramirror.common.utils.DateUtils;
 import com.intramirror.main.api.service.ExchangeRateService;
 import com.intramirror.order.api.common.OrderCancelType;
 import com.intramirror.order.api.common.OrderStatusType;
-import com.intramirror.order.api.model.Logistics;
-import com.intramirror.order.api.model.LogisticsProduct;
-import com.intramirror.order.api.model.Order;
-import com.intramirror.order.api.model.OrderLogistics;
-import com.intramirror.order.api.service.ILogisticsProductService;
-import com.intramirror.order.api.service.IOrderService;
-import com.intramirror.order.api.service.LogisticsService;
-import com.intramirror.order.api.service.OrderLogisticsService;
+import com.intramirror.order.api.common.PaymentMethodType;
+import com.intramirror.order.api.common.PaymentType;
+import com.intramirror.order.api.model.*;
+import com.intramirror.order.api.service.*;
 import com.intramirror.order.api.vo.InputCreateOrder;
 import com.intramirror.product.api.service.*;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.service.VendorService;
+import com.intramirror.web.common.OrderMail;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -64,6 +64,8 @@ public class OrderInputCreateOrderService {
     @Autowired
     private ISkuStoreService skuStoreService;
 
+    @Autowired
+    private PaymentOfflineService paymentOfflineService;
 
     /**
      * @param paramMap
@@ -71,14 +73,18 @@ public class OrderInputCreateOrderService {
      * @return
      * @throws Exception
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> orderInputCreateOrder(Map<String, Object> paramMap, User user) throws Exception {
         Map<String, Object> results = new HashMap<String, Object>();
         results.put("status", StatusType.FAILURE);
 
+        System.out.println("+++++++++" + paramMap.toString());
+
+        paramMap.put("paidAt", DateUtils.getDateByString(paramMap.get("paidAt").toString()));
+
         InputCreateOrder inputCreateOrder = new Gson().fromJson(paramMap.toString(), InputCreateOrder.class);
 
-        System.out.println("+++++++++" + paramMap.toString());
+
         // Coupons Price
         BigDecimal coupon_fee = new BigDecimal(0);
 
@@ -150,6 +156,7 @@ public class OrderInputCreateOrderService {
             List<Long> skuStoreSkuIdList = new ArrayList<>();
             List<Long> skuIdList = new ArrayList<>();
 
+            List<LogisticsProduct> sendEmailList = new ArrayList<LogisticsProduct>();
             for (int j = 0; j < inputCreateOrder.checkoutListStr.size(); j++) {
                 JsonObject obj = inputCreateOrder.checkoutListStr.get(j);
                 logger.info("checkout:" + obj);
@@ -196,6 +203,8 @@ public class OrderInputCreateOrderService {
                 results.put("logisticsProduct" + j, logisticsProduct);
                 skuStoreSkuIdList.add(obj.get("shop_product_sku_id").getAsLong());
                 // end 写默认值，为了生成订单
+
+                sendEmailList.add(logisticsProduct);
             }
 
             List<List<String>> listSkuIdInfo = setArray(skuStoreSkuIdList);
@@ -252,6 +261,45 @@ public class OrderInputCreateOrderService {
             updateOrderLogistics.setLogisticsId(logistics.getLogisticsId());
             logger.info("订单" + order.getOrderId() + "创建订单后更新运费 orderLogistics 入参" + JSON.toJSON(updateOrderLogistics));
             orderLogisticsService.updateOrderLogistics(updateOrderLogistics);
+
+            //6.存入支付信息
+            PaymentOffline paymentOffline = new PaymentOffline();
+            paymentOffline.setOrderId(order.getOrderId());
+            paymentOffline.setPaymentType((byte) PaymentType.PAYMENT);
+            if ("1".equals(inputCreateOrder.getPaymentMethod())) {
+                paymentOffline.setPaymentMethod((byte) PaymentMethodType.WECHAT);
+            } else if ("2".equals(inputCreateOrder.getPaymentMethod())) {
+                paymentOffline.setPaymentMethod((byte) PaymentMethodType.BANKCARD);
+            } else if ("3".equals(inputCreateOrder.getPaymentMethod())) {
+                paymentOffline.setPaymentMethod((byte) PaymentMethodType.ALIPAY);
+            }
+            paymentOffline.setAmt(inputCreateOrder.getAmt());
+            java.text.SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            Date date = formatter.parse(inputCreateOrder.getPaidAt());
+            paymentOffline.setPaidAt(date);
+            paymentOffline.setBuyerName(inputCreateOrder.getPaymentBuyerName());
+            paymentOffline = paymentOfflineService.createPaymentOffline(paymentOffline);
+            results.put("paymentOffline", paymentOffline);
+
+            /**-----------------------------start send mail-------------------------------**/
+            logger.info("start send mail sendEmailList.size:" + sendEmailList.size());
+            //遍历发送邮件
+            if (sendEmailList != null && sendEmailList.size() > 0) {
+                for (LogisticsProduct logisticsProduct : sendEmailList) {
+                    try {
+                        logger.info("start send mail logisticsProductId:" + logisticsProduct.getLogistics_product_id());
+                        Map<String, Object> map = orderService.getOrderLogisticsInfoByIdWithSql(logisticsProduct.getLogistics_product_id());
+                        OrderMail.sendOrderMail(map);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+            }
+            /**-----------------------------end send mail-------------------------------**/
+
         }
 
         results.put("status", StatusType.SUCCESS);
