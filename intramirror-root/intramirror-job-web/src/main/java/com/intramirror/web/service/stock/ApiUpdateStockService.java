@@ -20,6 +20,10 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
+import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.Runtime_exception;
+import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.error_price_out_of_range;
+import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.updateStock_params_is_error;
+
 /**
  * Created by dingyifan on 2017/9/14.
  *
@@ -44,7 +48,11 @@ public class ApiUpdateStockService {
             logger.info("ApiUpdateStockServiceUpdateStock,checkedParams,end,stockOption:"+new Gson().toJson(stockOption)+",checkMsg:"+checkMsg);
 
             if(StringUtils.isNotBlank(checkMsg)) {
-                return mapUtils.putData("status",StatusType.FAILURE).putData("info",checkMsg).getMap();
+                return mapUtils.putData("status", StatusType.FAILURE)
+                        .putData("info","update stock - " + updateStock_params_is_error.getDesc())
+                        .putData("key","info")
+                        .putData("value",checkMsg)
+                        .putData("error_enum", updateStock_params_is_error).getMap();
             }
 
             // 处理库存规则
@@ -55,7 +63,11 @@ public class ApiUpdateStockService {
             logger.info("ApiUpdateStockServiceUpdateStock,handleApiStockRule,end,resultMessage:"+new Gson().toJson(resultMessage)+",stockOption:"+new Gson().toJson(stockOption));
 
             if(!resultMessage.getStatus()) {
-                return mapUtils.putData("status",StatusType.FAILURE).putData("info",resultMessage.getMsg()).getMap();
+                return mapUtils.putData("status", StatusType.FAILURE)
+                        .putData("info","update stock - " + updateStock_params_is_error.getDesc())
+                        .putData("key","info")
+                        .putData("value",resultMessage.getMsg())
+                        .putData("error_enum", updateStock_params_is_error).getMap();
             }
 
             // 修改库存
@@ -78,7 +90,11 @@ public class ApiUpdateStockService {
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("ApiUpdateStockServiceUpdateStock,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",stockOption:"+new Gson().toJson(stockOption));
-            mapUtils.putData("status",StatusType.FAILURE).putData("info",ExceptionUtils.getExceptionDetail(e));
+            mapUtils.putData("status", pk.shoplus.parameter.StatusType.FAILURE)
+                    .putData("info","update stock - " + Runtime_exception.getDesc()+"error message : " + ExceptionUtils.getExceptionDetail(e))
+                    .putData("key","exception")
+                    .putData("value",ExceptionUtils.getExceptionDetail(e))
+                    .putData("error_enum", Runtime_exception);
         }
         return mapUtils.getMap();
     }
