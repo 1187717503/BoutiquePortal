@@ -42,6 +42,14 @@ public interface LogisticsProductMapper {
      * @return
      */
     List<Map<String, Object>> selectLogisProShipmentById(Long logistics_product_id);
+    
+    
+	/**
+	 * 根据 logistics_product_id vendorID查询关联logistic_product详情
+	 * @param logistics_product_id vendorId
+	 * @return
+	 */
+	Map<String,Object> getOrderInfoByVendorId(Map<String, Object> conditionMap);
 
 
     /**

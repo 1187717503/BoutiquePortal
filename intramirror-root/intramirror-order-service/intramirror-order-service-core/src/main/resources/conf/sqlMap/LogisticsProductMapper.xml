@@ -228,4 +228,41 @@
     #{invoice_id,jdbcType=TIMESTAMP}, #{confirmed_at,jdbcType=TIMESTAMP}, #{est_ship_date,jdbcType=TIMESTAMP},
     #{packed_at,jdbcType=TIMESTAMP}, #{shipped_at,jdbcType=TIMESTAMP})
   </insert>
+  
+  
+ 
+    <select id=" getOrderInfoByVendorId" resultType="java.util.HashMap" parameterType="java.util.Map">
+ 		SELECT distinct a.logistics_product_id,a.amount,a.order_line_num,a.fee,a.vendor_id,a.`status`,a.updated_at,a.created_at,c.order_id,c.order_num,
+		p.product_code,p.product_id,s.sku_id,s.in_price,s.sku_code,pspk.`name`,pspv.`value` as size,
+		l.user_rec_name,l.user_rec_province,l.user_rec_city,l.user_rec_area,l.user_rec_addr,
+		l.user_rec_mobile,l.user_rec_country,l.user_rec_code,pp.ColorCode,pp.BrandID 
+		from logistics_product a  
+		INNER JOIN order_logistics b ON a.order_logistics_id = b.order_logistics_id 
+		INNER JOIN `order` c ON b.order_id = c.order_id 
+		INNER JOIN shop_product_sku d ON a.shop_product_sku_id = d.shop_product_sku_id 
+		INNER JOIN shop_product e ON d.shop_product_id = e.shop_product_id 
+		INNER JOIN product p ON e.product_id = p.product_id 
+		INNER JOIN sku s ON d.sku_id = s.sku_id 
+		INNER JOIN sku_property sp on s.sku_id = sp.sku_id 
+		INNER JOIN product_sku_property_key pspk  
+		on sp.product_sku_property_key_id = pspk.product_sku_property_key_id 
+		INNER JOIN product_sku_property_value pspv  
+		on sp.product_sku_property_value_id = pspv.product_sku_property_value_id  
+		INNER JOIN vendor v ON a.vendor_id = v.vendor_id 
+		INNER JOIN logistics l ON l.order_logistics_id = b.order_logistics_id 
+		
+		LEFT JOIN ( 
+		SELECT t_pp.product_id, 
+		max(case t_pp.key_name when 'ColorCode' then t_pp.`value` else '' end) as ColorCode, 
+		max(case t_pp.key_name when 'BrandID' then t_pp.`value` else '' end) as BrandID 
+		from product_property t_pp 
+		where t_pp.enabled = 1 and (t_pp.key_name='BrandID' or t_pp.key_name = 'ColorCode') 
+		group by t_pp.product_id 
+		) pp ON p.product_id = pp.product_id 
+		WHERE pspk.name = 'Size' and a.`status` = 1 
+		and a.enabled=1 and a.vendor_id = #{vendor_id,jdbcType=BIGINT} and a.logistics_product_id = #{logistics_product_id,jdbcType=BIGINT}
+		order by a.logistics_product_id 
+		limit 1
+ </select>
+			  
 </mapper>
