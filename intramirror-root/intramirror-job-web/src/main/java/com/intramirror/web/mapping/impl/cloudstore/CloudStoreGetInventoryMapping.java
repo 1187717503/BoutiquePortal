@@ -94,6 +94,7 @@ public class CloudStoreGetInventoryMapping implements IProductMapping {
                     .setCode(jsonObjectData.getString("mnf_code").trim())
                     .setSeasonCode(jsonObjectData.getString("season"))
                     .setBrandCode(brandID)
+                    .setCategory_name(jsonArray.toJSONString())
                     .setBrandName(jsonObjectData.getString("brand").trim())
                     .setColorCode(colorCode)
                     .setColorDesc(jsonObjectData.getString("color_en"))

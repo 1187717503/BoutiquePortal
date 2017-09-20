@@ -66,6 +66,7 @@ public class CloudStoreProductMapping implements IProductMapping {
 	                .setColorCode(colorCode)
 	                .setColorDesc(jsonObjectData.getString("color_en"))
 	                .setCategoryId(category_id)
+					.setCategory_name(jsonArray.toJSONString())
 	                .setDesc(jsonObjectData.getString("desc_en"))
 	                .setComposition(jsonObjectData.getString("material_en"))
 	                .setCoverImg(jsonObjectData.getString("images"))
