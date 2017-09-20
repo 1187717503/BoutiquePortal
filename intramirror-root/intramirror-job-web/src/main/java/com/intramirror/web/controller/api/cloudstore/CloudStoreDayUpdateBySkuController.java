@@ -264,11 +264,11 @@ public class CloudStoreDayUpdateBySkuController implements InitializingBean{
         // nugnes
         ThreadPoolExecutor nugnesExecutor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
         Map<String,Object> tony_day_updateProduct = new HashMap<>();
-        tony_day_updateProduct.put("url","http://sandbox.cloudstore.srl/ws/getEvents");
+        tony_day_updateProduct.put("url","http://www.cloudstore.srl/ws/getEvents");
         tony_day_updateProduct.put("limit","500");
         tony_day_updateProduct.put("offset","0");
         tony_day_updateProduct.put("merchantId","55f707f6b49dbbe14ec6354d");
-        tony_day_updateProduct.put("token","018513a51480a5fd0f456ee543b7c78a");
+        tony_day_updateProduct.put("token","e00eb67a3799a9688072d72d76887395");
         tony_day_updateProduct.put("store_code","daiqueren");
         tony_day_updateProduct.put("nugnesExecutor",nugnesExecutor);
         tony_day_updateProduct.put("vendor_id","16");

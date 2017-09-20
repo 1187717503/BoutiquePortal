@@ -149,11 +149,11 @@ public class CloudStoreAllUpdateBySkuController implements InitializingBean{
         // nugnes
         ThreadPoolExecutor nugnesExecutor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
         Map<String,Object> tony_all_updateProduct = new HashMap<>();
-        tony_all_updateProduct.put("url","http://sandbox.cloudstore.srl/ws/getInventory");
+        tony_all_updateProduct.put("url","http://www.cloudstore.srl/ws/getInventory");
         tony_all_updateProduct.put("limit","5");
         tony_all_updateProduct.put("offset","0");
         tony_all_updateProduct.put("merchantId","55f707f6b49dbbe14ec6354d");
-        tony_all_updateProduct.put("token","018513a51480a5fd0f456ee543b7c78a");
+        tony_all_updateProduct.put("token","e00eb67a3799a9688072d72d76887395");
         tony_all_updateProduct.put("nugnesExecutor",nugnesExecutor);
         tony_all_updateProduct.put("vendor_id","16");
         tony_all_updateProduct.put("threadNum","5");
