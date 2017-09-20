@@ -30,6 +30,8 @@ public class UpdateProductThread implements Runnable{
 
     private ProductEDSManagement.VendorOptions vendorOptions;
 
+    private Object originData;
+
     private ApiDataFileUtils apiDataFileUtils;
 
     @Override
@@ -67,9 +69,10 @@ public class UpdateProductThread implements Runnable{
         }
     }
 
-    public UpdateProductThread(ProductEDSManagement.ProductOptions productOptions, ProductEDSManagement.VendorOptions vendorOptions,ApiDataFileUtils apiDataFileUtils) {
+    public UpdateProductThread(ProductEDSManagement.ProductOptions productOptions, ProductEDSManagement.VendorOptions vendorOptions,ApiDataFileUtils apiDataFileUtils,Object originData) {
         this.productOptions = productOptions;
         this.vendorOptions = vendorOptions;
         this.apiDataFileUtils = apiDataFileUtils;
+        this.originData = originData;
     }
 }

@@ -110,7 +110,7 @@ public class AtelierUpdateByProductService implements InitializingBean {
             vendorOptions.setVendorId(Long.parseLong(vendor_id));
 
             logger.info("AtelierUpdateByProductServiceUpdateProduct,executeThreadTool,eventName:"+eventName+",productOptions:"+JSONObject.toJSONString(productOptions)+",vendorOptions:"+JSONObject.toJSONString(vendorOptions)+",fileUtils:"+JSONObject.toJSONString(fileUtils));
-            CommonThreadPool.execute(eventName,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,fileUtils));
+            CommonThreadPool.execute(eventName,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,fileUtils,bodyDataMap));
             logger.info("AtelierUpdateByProductServiceUpdateProduct,executeThreadTool,eventName:"+eventName+",productOptions:"+JSONObject.toJSONString(productOptions)+",vendorOptions:"+JSONObject.toJSONString(vendorOptions)+",fileUtils:"+JSONObject.toJSONString(fileUtils));
             mapUtils.putData("ResponseStatus","1000");
         } catch (Exception e) {

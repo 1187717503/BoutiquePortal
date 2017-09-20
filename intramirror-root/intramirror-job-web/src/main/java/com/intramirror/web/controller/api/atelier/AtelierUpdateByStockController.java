@@ -106,7 +106,7 @@ public class AtelierUpdateByStockController  implements InitializingBean {
                 logger.info("AtelierUpdateByStockControllerExecute,mapping,stockOption:"+JSONObject.toJSONString(stockOption));
 
                 logger.info("AtelierUpdateByStockControllerExecute,threadTool,stockOption:"+JSONObject.toJSONString(stockOption)+",fileUtils:"+JSONObject.toJSONString(fileUtils)+",eventName:"+eventName);
-                CommonThreadPool.execute(eventName,executor,threadNum,new UpdateStockThread(stockOption,fileUtils));
+                CommonThreadPool.execute(eventName,executor,threadNum,new UpdateStockThread(stockOption,fileUtils,bodyDataMap));
             }
             logger.info("AtelierUpdateByStockControllerExecute,executeEnd,storeID:"+storeID+",version:"+version+",body:"+body);
             mapUtils.putData("ResponseStatus","1000");

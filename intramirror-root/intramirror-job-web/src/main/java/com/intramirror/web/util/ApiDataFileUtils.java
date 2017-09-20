@@ -32,26 +32,26 @@ public class ApiDataFileUtils {
         this.eventName = eventName;
     }
 
-    public boolean bakPendingFile(String fileName, String content){
+    public String bakPendingFile(String fileName, String content){
         // 获取文件夹路径
         String strDate = DateUtils.getStrDate(new Date());
         String bakUrl = baseUrl+"/"+vendorName+"/"+bak_file+"/"+eventName+"/"+strDate;
         return this.writeFile(bakUrl,fileName,content);
     }
 
-    public boolean bakErrorFile(String fileName, String content){
+    public String bakErrorFile(String fileName, String content){
         // 获取文件夹路径
         String strDate = DateUtils.getStrDate(new Date());
         String bakUrl = baseUrl+"/"+vendorName+"/"+error_file+"/"+eventName+"/"+strDate;
         return this.writeFile(bakUrl,fileName,content);
     }
 
-    private boolean writeFile(String bakUrl,String fileName, String content) {
+    private String writeFile(String bakUrl,String fileName, String content) {
         try {
             // 校验参数
             if(StringUtils.isBlank(fileName) || StringUtils.isBlank(content)) {
                 logger.info("ApiDataFileUtilsBakFile,checkParams,fileName:"+fileName+",content:"+content);
-                return false;
+                return "fileName_or_content_error";
             }
 
             // 检查文件夹是否创建
@@ -65,15 +65,15 @@ public class ApiDataFileUtils {
             String formatDate = DateUtils.getStrDate(new Date(),"yyyyMMddHHmmss");
             fileName = fileName + "" + formatDate;
             String fileUrl = bakUrl+"/"+fileName+".txt";
-            this.writeFileContent(fileUrl,content);
+            return this.writeFileContent(fileUrl,content);
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("ApiDataFileUtilsBakFile,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",fileName:"+fileName+",content:"+content);
         }
-        return true;
+        return "writeFile_error";
     }
 
-    private void writeFileContent(String fileUrl,String content) throws IOException {
+    private String writeFileContent(String fileUrl,String content) throws IOException {
         FileWriter fileWriter = null;
         try {
             // 创建文件
@@ -92,6 +92,7 @@ public class ApiDataFileUtils {
         } finally {
             if(fileWriter != null) {fileWriter.close();}
         }
+        return fileUrl;
     }
 
     public static String getBaseUrl() {

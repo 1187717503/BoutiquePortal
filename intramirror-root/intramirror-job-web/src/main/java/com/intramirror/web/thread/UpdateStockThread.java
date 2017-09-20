@@ -30,6 +30,8 @@ public class UpdateStockThread implements Runnable{
 
     private ApiDataFileUtils apiDataFileUtils;
 
+    private Object originData;
+
     @Override
     public void run() {
         try {
@@ -51,8 +53,9 @@ public class UpdateStockThread implements Runnable{
         }
     }
 
-    public UpdateStockThread(StockOption stockOption,ApiDataFileUtils apiDataFileUtils) {
+    public UpdateStockThread(StockOption stockOption,ApiDataFileUtils apiDataFileUtils,Object originData) {
         this.stockOption = stockOption;
         this.apiDataFileUtils = apiDataFileUtils;
+        this.originData = originData;
     }
 }

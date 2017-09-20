@@ -121,9 +121,9 @@ public class CloudStoreAllUpdateBySkuController implements InitializingBean{
                     logger.info("cloudStoreProductAllProducerControllerExecute,initParam,productOptions:"+JSONObject.toJSONString(productOptions)+",vendorOptions:"+JSONObject.toJSONString(vendorOptions)+",eventName:"+eventName);
                
                     // 线程池
-                    logger.info("cloudStoreProductAllProducerControllerExecute,execute,start,productOptions:"+JSONObject.toJSONString(productOptions)+",vendorOptions:"+JSONObject.toJSONString(vendorOptions)+",eventName:"+eventName+",index:"+index);
-                    CommonThreadPool.execute(eventName,nugnesExecutor,threadNum,new UpdateProductThread(productOptions,vendorOptions,fileUtils));
-                    logger.info("cloudStoreProductAllProducerControllerExecute,execute,end,productOptions:"+JSONObject.toJSONString(productOptions)+",vendorOptions:"+JSONObject.toJSONString(vendorOptions)+",eventName:"+eventName+",index:"+index);
+                    logger.info("cloudStoreProductAllProducerControllerExecute,execute,start,mqMap:"+JSONObject.toJSONString(mqMap)+",productOptions:"+JSONObject.toJSONString(productOptions)+",vendorOptions:"+JSONObject.toJSONString(vendorOptions)+",eventName:"+eventName+",index:"+index);
+                    CommonThreadPool.execute(eventName,nugnesExecutor,threadNum,new UpdateProductThread(productOptions,vendorOptions,fileUtils,mqMap));
+                    logger.info("cloudStoreProductAllProducerControllerExecute,execute,end,mqMap:"+JSONObject.toJSONString(mqMap)+",productOptions:"+JSONObject.toJSONString(productOptions)+",vendorOptions:"+JSONObject.toJSONString(vendorOptions)+",eventName:"+eventName+",index:"+index);
                 }
                 
                 if(jsonObject.get("next_step") != null) {

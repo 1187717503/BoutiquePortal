@@ -105,7 +105,7 @@ public class QuadraProductController implements InitializingBean{
 
                             // 线程池
                             logger.info("job quadra updateProduct,execute,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
-                            CommonThreadPool.execute(eventName,quadraExecutor,Integer.parseInt(param.get("threadNum").toString()),new UpdateProductThread(productOptions,vendorOptions,fileUtils));
+                            CommonThreadPool.execute(eventName,quadraExecutor,Integer.parseInt(param.get("threadNum").toString()),new UpdateProductThread(productOptions,vendorOptions,fileUtils,mqDataMap));
                             logger.info("job quadra updateProduct,execute,endDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
                             
                             //跳出循环,测试用
@@ -194,7 +194,7 @@ public class QuadraProductController implements InitializingBean{
 
 	                            // 线程池
 	                            logger.info("job quadra updateProductDay,execute,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
-	                            CommonThreadPool.execute(eventName,quadraExecutor,Integer.parseInt(param.get("threadNum").toString()),new UpdateProductThread(productOptions,vendorOptions,fileUtils));
+	                            CommonThreadPool.execute(eventName,quadraExecutor,Integer.parseInt(param.get("threadNum").toString()),new UpdateProductThread(productOptions,vendorOptions,fileUtils,mqDataMap));
 	                            logger.info("job quadra updateProductDay,execute,endDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
 	                            
 //	                            //跳出循环,测试用
@@ -237,7 +237,7 @@ public class QuadraProductController implements InitializingBean{
 
 	                            // 线程池
 	                            logger.info("job quadra updateProductDay,execute,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
-	                            CommonThreadPool.execute(eventName,quadraExecutor,Integer.parseInt(param.get("threadNum").toString()),new UpdateProductThread(productOptions,vendorOptions,fileUtils));
+	                            CommonThreadPool.execute(eventName,quadraExecutor,Integer.parseInt(param.get("threadNum").toString()),new UpdateProductThread(productOptions,vendorOptions,fileUtils,mqDataMap));
 	                            logger.info("job quadra updateProductDay,execute,endDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
 	                            
 	                            //跳出循环,测试用
