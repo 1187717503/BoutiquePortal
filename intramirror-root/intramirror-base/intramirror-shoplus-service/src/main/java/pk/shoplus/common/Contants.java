@@ -125,6 +125,21 @@ public class Contants {
     public static final String quadra_change_product_day = "quadra_change_product_day";
 
     
+    
+    /**
+     * Aiduca 接口
+     */
+    public static final String aiduca_file_path = "/mnt/aiduca/compare/";
+    public static final String aiduca_file_type = ".txt";
+    
+    public static final String aiduca_origin_product_all = "aiduca_origin_product_all";
+    public static final String aiduca_revised_product_all = "aiduca_revised_product_all";
+    public static final String aiduca_change_product_all = "aiduca_change_product_all";
+
+    public static final String aiduca_origin_stock_all = "aiduca_origin_stock_all";
+    public static final String aiduca_revised_stock_all = "aiduca_revised_stock_all";
+    public static final String aiduca_change_stock_all = "aiduca_change_stock_all";
+    
 
 
     //	public static final String download_excel_path = "D:/";
