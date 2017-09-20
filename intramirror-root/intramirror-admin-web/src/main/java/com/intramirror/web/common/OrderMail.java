@@ -159,7 +159,7 @@ public class OrderMail {
 		
 //		String orderNumberUrl = "Barcode-"+map.get("order_line_num").toString()+".png";
 //		String skuBarcodeUrl = "Barcode-"+map.get("sku_code").toString()+".png";
-		
+
 		content.append("<div style='margin: 0 auto;width:400px;background: #fff;font-family: Roboto-Bold, Arial, sans-serif, border-collapse;'>");
 		
 		content.append("<table width='100%' cellpadding='0' cellspacing='0' border='0'>");
@@ -189,7 +189,7 @@ public class OrderMail {
         content.append("<table width='100%' style='border-collapse:collapse;font-size:12px;'>");
         content.append("<tr><td colspan='3' style='padding:10px 0 19px 26px;'>");
         System.out.println("cover_img:"+map.get("cover_img").toString());
-        content.append("<img src="+map.get("cover_img").toString()+"?x-oss-process=image/resize,m_fill,w_125,h_159' alt=''>");
+        content.append("<img src='"+map.get("cover_img").toString()+"?x-oss-process=image/resize,m_fill,w_125,h_159' alt=''>");
         content.append("</td></tr>");
         content.append("<tr>");
         content.append("<td style='padding-left:26px;width:120px'>Product ID</td>");
@@ -207,7 +207,7 @@ public class OrderMail {
         content.append("</tr>");
         content.append("<tr>");
         content.append("<td style='padding-left:26px;font-size:18px'>"+map.get("brandName").toString()+"</td>");
-        content.append("<td colspan='2' style='font-size:18px'>"+map.get("vendor_id").toString()+"</td>");
+        content.append("<td colspan='2' style='font-size:18px'>"+map.get("product_code").toString()+"</td>");
         content.append("</tr>");
         content.append("<tr><td colspan='3' style='padding-left:26px;padding-top:16px;'>Name</td></tr>");
         content.append("<tr><td colspan='3' style='padding-left:26px;font-size:18px;'>"+map.get("name").toString()+"</td></tr>");
@@ -226,7 +226,7 @@ public class OrderMail {
         content.append("</table>");
         
         content.append("</div>");
-		        
+
 		        
 		        
 		        

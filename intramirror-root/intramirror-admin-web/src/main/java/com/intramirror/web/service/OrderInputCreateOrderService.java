@@ -278,6 +278,7 @@ public class OrderInputCreateOrderService {
             Date date = formatter.parse(inputCreateOrder.getPaidAt());
             paymentOffline.setPaidAt(date);
             paymentOffline.setBuyerName(inputCreateOrder.getPaymentBuyerName());
+            paymentOffline.setEnabled(EnabledType.USED);
             paymentOffline = paymentOfflineService.createPaymentOffline(paymentOffline);
             results.put("paymentOffline", paymentOffline);
 
@@ -289,7 +290,12 @@ public class OrderInputCreateOrderService {
                     try {
                         logger.info("start send mail logisticsProductId:" + logisticsProduct.getLogistics_product_id());
                         Map<String, Object> map = orderService.getOrderLogisticsInfoByIdWithSql(logisticsProduct.getLogistics_product_id());
-                        OrderMail.sendOrderMail(map);
+//                        String[] addressList = map.get("contact").toString().split(",");
+//                        for (int i = 0; i < addressList.length; i++) {
+//                            String address = addressList[i];
+//                            map.put("contact", address);
+                            OrderMail.sendOrderMail(map);
+//                        }
 
                     } catch (Exception e) {
                         e.printStackTrace();
