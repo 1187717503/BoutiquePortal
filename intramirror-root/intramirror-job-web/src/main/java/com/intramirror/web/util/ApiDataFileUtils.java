@@ -15,9 +15,9 @@ public class ApiDataFileUtils {
 
     private static final Logger logger = Logger.getLogger(ApiDataFileUtils.class);
 
-//    private static final String baseUrl = "/mnt";
+//    public static final String baseUrl = "/mnt";
 
-    private static final String baseUrl = "/Users/dingyifan/Documents/fileTest";
+    public static final String baseUrl = "/Users/dingyifan/Documents/fileTest";
 
     private static final String bak_file = "backup";
 
@@ -27,6 +27,8 @@ public class ApiDataFileUtils {
 
     private String eventName; // 处理事件名称
 
+    private String fileName ;
+
     public ApiDataFileUtils(String vendorName,String eventName) {
         this.vendorName = vendorName;
         this.eventName = eventName;
@@ -34,14 +36,14 @@ public class ApiDataFileUtils {
 
     public String bakPendingFile(String fileName, String content){
         // 获取文件夹路径
-        String strDate = DateUtils.getStrDate(new Date());
+        String strDate = DateUtils.getStrDate(new Date(),"yyyyMMdd");
         String bakUrl = baseUrl+"/"+vendorName+"/"+bak_file+"/"+eventName+"/"+strDate;
         return this.writeFile(bakUrl,fileName,content);
     }
 
     public String bakErrorFile(String fileName, String content){
         // 获取文件夹路径
-        String strDate = DateUtils.getStrDate(new Date());
+        String strDate = DateUtils.getStrDate(new Date(),"yyyyMMdd");
         String bakUrl = baseUrl+"/"+vendorName+"/"+error_file+"/"+eventName+"/"+strDate;
         return this.writeFile(bakUrl,fileName,content);
     }
@@ -64,6 +66,7 @@ public class ApiDataFileUtils {
             // 创建文件
             String formatDate = DateUtils.getStrDate(new Date(),"yyyyMMddHHmmss");
             fileName = fileName + "" + formatDate;
+            this.setFileName(fileName);
             String fileUrl = bakUrl+"/"+fileName+".txt";
             return this.writeFileContent(fileUrl,content);
         } catch (Exception e) {
@@ -121,6 +124,14 @@ public class ApiDataFileUtils {
 
     public void setEventName(String eventName) {
         this.eventName = eventName;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public static void main(String[] args) {
