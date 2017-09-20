@@ -157,8 +157,9 @@ public class CloudStoreAllUpdateBySkuController implements InitializingBean{
         tony_all_updateProduct.put("nugnesExecutor",nugnesExecutor);
         tony_all_updateProduct.put("vendor_id","16");
         tony_all_updateProduct.put("threadNum","5");
-        tony_all_updateProduct.put("eventName","tony全量更新sku");
-        tony_all_updateProduct.put("fileUtils",new ApiDataFileUtils("tony","tony全量更新sku"));
+        tony_all_updateProduct.put("eventName","product_all_update");
+        tony_all_updateProduct.put("fileUtils",new ApiDataFileUtils("tony","product_all_update"));
+
         // put data
         paramsMap = new HashMap<>();
         paramsMap.put("tony_all_updateProduct",tony_all_updateProduct);

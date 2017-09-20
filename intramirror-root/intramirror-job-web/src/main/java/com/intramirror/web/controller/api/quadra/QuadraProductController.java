@@ -302,8 +302,8 @@ public class QuadraProductController implements InitializingBean{
         quadraAllUpdateproduct.put("store_code","QUADRA");
         quadraAllUpdateproduct.put("threadNum","10");
         quadraAllUpdateproduct.put("quadraExecutor",quadraAllProductExecutor);
-        quadraAllUpdateproduct.put("eventName","quadra全量更新商品");
-        quadraAllUpdateproduct.put("fileUtils",new ApiDataFileUtils("quadra","quadra全量更新商品"));
+        quadraAllUpdateproduct.put("eventName","product_all_update");
+        quadraAllUpdateproduct.put("fileUtils",new ApiDataFileUtils("quadra","product_all_update"));
 
         // QuadraSynDayProduct
         ThreadPoolExecutor quadraDayUpdateproductExecutor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
@@ -313,9 +313,9 @@ public class QuadraProductController implements InitializingBean{
         quadraDayUpdateproduct.put("store_code","QUADRA");
         quadraDayUpdateproduct.put("threadNum","10");
         quadraDayUpdateproduct.put("quadraExecutor",quadraDayUpdateproductExecutor);
-        quadraDayUpdateproduct.put("eventName","quadra增量更新当日商品");
+        quadraDayUpdateproduct.put("eventName","product_delta_update_bydate");
         quadraDayUpdateproduct.put("datetime",DateUtils.getStrDate(new Date()));
-        quadraDayUpdateproduct.put("fileUtils",new ApiDataFileUtils("quadra","quadr增量更新当日商品"));
+        quadraDayUpdateproduct.put("fileUtils",new ApiDataFileUtils("quadra","product_delta_update_bydate"));
 
         // put data
         paramsMap = new HashMap<>();

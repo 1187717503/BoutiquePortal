@@ -15,9 +15,9 @@ public class ApiDataFileUtils {
 
     private static final Logger logger = Logger.getLogger(ApiDataFileUtils.class);
 
-    private static final String baseUrl = "/mnt";
+//    private static final String baseUrl = "/mnt";
 
-//    private static final String baseUrl = "/Users/dingyifan/Documents/fileTest";
+    private static final String baseUrl = "/Users/dingyifan/Documents/fileTest";
 
     private static final String bak_file = "backup";
 
@@ -35,14 +35,14 @@ public class ApiDataFileUtils {
     public boolean bakPendingFile(String fileName, String content){
         // 获取文件夹路径
         String strDate = DateUtils.getStrDate(new Date());
-        String bakUrl = baseUrl+"/"+vendorName+"/"+eventName+"/"+strDate+"/"+bak_file;
+        String bakUrl = baseUrl+"/"+vendorName+"/"+bak_file+"/"+eventName+"/"+strDate;
         return this.writeFile(bakUrl,fileName,content);
     }
 
     public boolean bakErrorFile(String fileName, String content){
         // 获取文件夹路径
         String strDate = DateUtils.getStrDate(new Date());
-        String bakUrl = baseUrl+"/"+vendorName+"/"+eventName+"/"+strDate+"/"+error_file;
+        String bakUrl = baseUrl+"/"+vendorName+"/"+error_file+"/"+eventName+"/"+strDate;
         return this.writeFile(bakUrl,fileName,content);
     }
 

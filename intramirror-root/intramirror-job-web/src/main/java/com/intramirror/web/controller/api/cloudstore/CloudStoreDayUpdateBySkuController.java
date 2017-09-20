@@ -273,9 +273,9 @@ public class CloudStoreDayUpdateBySkuController implements InitializingBean{
         tony_day_updateProduct.put("nugnesExecutor",nugnesExecutor);
         tony_day_updateProduct.put("vendor_id","16");
         tony_day_updateProduct.put("threadNum","5");
-        tony_day_updateProduct.put("eventName","tony增量更新商品ByDay");
+        tony_day_updateProduct.put("eventName","product_delta_update");
         tony_day_updateProduct.put("datetime",DateUtils.getStrDate(new Date()));
-        tony_day_updateProduct.put("fileUtils",new ApiDataFileUtils("tony","tony增量更新商品ByDay"));
+        tony_day_updateProduct.put("fileUtils",new ApiDataFileUtils("tony","product_delta_update"));
         // put data
         paramsMap = new HashMap<>();
         paramsMap.put("tony_day_updateProduct",tony_day_updateProduct);

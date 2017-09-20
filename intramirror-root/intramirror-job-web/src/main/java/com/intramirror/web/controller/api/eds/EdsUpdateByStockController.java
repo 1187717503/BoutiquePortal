@@ -140,8 +140,8 @@ public class EdsUpdateByStockController implements InitializingBean {
         object.put("offset","0");
         object.put("threadNum","5");
         object.put("nugnesExecutor",nugnesExecutor);
-        object.put("eventName","nugnes全量更新库存");
-        object.put("fileUtils",new ApiDataFileUtils("nugnes","nugnes全量更新库存"));
+        object.put("eventName","stock_all_update");
+        object.put("fileUtils",new ApiDataFileUtils("nugnes","stock_all_update"));
 
         // put data
         paramsMap = new HashMap<>();
