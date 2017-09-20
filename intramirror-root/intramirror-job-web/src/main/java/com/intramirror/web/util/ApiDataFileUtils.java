@@ -15,9 +15,9 @@ public class ApiDataFileUtils {
 
     private static final Logger logger = Logger.getLogger(ApiDataFileUtils.class);
 
-//    public static final String baseUrl = "/mnt";
+    public static final String baseUrl = "/mnt";
 
-    public static final String baseUrl = "/Users/dingyifan/Documents/fileTest";
+//    public static final String baseUrl = "/Users/dingyifan/Documents/fileTest";
 
     private static final String bak_file = "backup";
 
