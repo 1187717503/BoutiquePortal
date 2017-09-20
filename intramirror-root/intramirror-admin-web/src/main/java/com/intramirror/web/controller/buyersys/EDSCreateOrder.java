@@ -23,6 +23,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import pk.shoplus.model.OrderRefund;
 
@@ -40,10 +41,11 @@ import com.intramirror.order.api.service.IOrderExceptionService;
  * <一句话功能简述>
  * <功能详细描述>
  *
- * @auth:jerry
+ * @auth:wzh
  * @see: [相关类/方法]（可选）
  * @since [产品/模块版本] （可选）
  */
+@Service
 public class EDSCreateOrder extends BuyerSystemCall {
     private static Logger logger = Logger.getLogger(EDSCreateOrder.class);
 

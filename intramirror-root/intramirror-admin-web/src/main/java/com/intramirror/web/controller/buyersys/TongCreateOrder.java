@@ -15,6 +15,7 @@ import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -36,6 +37,7 @@ import pk.shoplus.service.request.impl.GetPostRequestService;
  * @date 17-09-12
  *
  */
+@Service
 public class TongCreateOrder extends BuyerSystemCall{
 	
     private static Logger logger = Logger.getLogger(TongCreateOrder.class);

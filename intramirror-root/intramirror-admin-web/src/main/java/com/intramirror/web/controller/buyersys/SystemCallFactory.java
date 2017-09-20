@@ -3,68 +3,60 @@ package com.intramirror.web.controller.buyersys;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
+import com.intramirror.web.common.SpringContextUtils;
+
+
 /**
  * <一句话功能简述>
  * <功能详细描述>
  *
- * @auth:jerry
+ * @auth:wzh
  * @see: [相关类/方法]（可选）
  * @since [产品/模块版本] （可选）
  */
 public class SystemCallFactory {
-
-    private static Map nameMap = new HashMap<Long, String>();
+    private static Logger logger = Logger.getLogger(SystemCallFactory.class);
+    private static Map<Long,String> nameMap = new HashMap<Long, String>();
 
     public SystemCallFactory () {
-        //nameMap.put(7L, "eds");
-        nameMap.put(8L, "intramirror");
-        nameMap.put(9L, "eds");
-        nameMap.put(10L, "intramirror");
-        nameMap.put(11L, "intramirror");
-        nameMap.put(12L, "intramirror");
-        nameMap.put(13L, "intramirror");
-        nameMap.put(14L, "intramirror");
-        //nameMap.put(15L, "eds");
-        nameMap.put(16L, "cloudstore");
-        nameMap.put(17L, "filippo");
-        nameMap.put(18L, "intramirror");
-        nameMap.put(19L, "quadra");
-        nameMap.put(20L, "xmag");
-        nameMap.put(21L, "eds");
+        nameMap.put(9L, "eDSCreateOrder");
+        nameMap.put(16L, "TongCreateOrder");
+        nameMap.put(21L, "eDSCreateOrder");
     }
 
-    public static BuyerSystemCall createOrder (Long vendorId) {
-        BuyerSystemCall buyerSystemCall = null;
+    public static String createOrder (Long vendorId,Long logisticsProductId) {
+    	logger.info("create order SystemCallFactory createOrder 入参 vendorId:"+vendorId+",logisticsProductId:"+logisticsProductId);
+    	String result = "";
+    	
+    	//参数校验
+    	if(vendorId == null || logisticsProductId == null || vendorId == 0 || logisticsProductId == 0){
+    		result = "create order SystemCallFactory  参数校验失败   参数不能为null";
+    		logger.info("create order SystemCallFactory  参数校验失败   参数不能为null");
+    		return result;
+    	}
+    	
 
         String className = nameMap.get(vendorId).toString();
+        logger.info("create order SystemCallFactory createOrder 获取到的实例名称   className:"+className);
+        
+        //通过spring应用上下文容器,根据名称获取bean
+        BuyerSystemCall buyerSystemCall =(BuyerSystemCall) SpringContextUtils.getContext().getBean(className);
+        
+        //调用对应的实例执行下单操作
+        try {
+        	if(buyerSystemCall != null){
+            	result = buyerSystemCall.createOrder(vendorId, logisticsProductId);
+        	}else{
+        		result = "获取对应的实例失败,bean 名称:"+className;
+        		logger.info("create order SystemCallFactory 获取对应的实例失败,bean 名称:"+className);
+        	}
 
-        /*if ("OPS".equals(VendorEnum.OPS.getValue())) {
-            buyerSystemCall = new Bu
-        } else if ("LUC".equals(VendorEnum.LUC)) {
-
-        } else if ("NUG".equals(VendorEnum.NUG)) {
-
-        } else if ("DNT".equals(VendorEnum.DNT)) {
-
-        } else if ("ICF".equals(VendorEnum.ICF)) {
-
-        } else if ("MIA".equals(VendorEnum.MIA)) {
-
-        } else if ("DIP".equals(VendorEnum.DIP)) {
-
-        } else if ("GIS".equals(VendorEnum.GIS)) {
-
-        } else if ("AVR".equals(VendorEnum.AVR)) {
-
-        } else if ("TON".equals(VendorEnum.TON)) {
-
-        } else if ("FPM".equals(VendorEnum.FPM)) {
-
-        } else if ("WIS".equals(VendorEnum.WIS)) {
-
-        } else if ("APR".equals(VendorEnum.APR)) {
-
-        }*/
-        return null;
+		} catch (Exception e) {
+			logger.error("create order SystemCallFactory error:"+e.getMessage());
+			e.printStackTrace();
+		}
+        return result;
     }
 }
