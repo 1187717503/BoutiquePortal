@@ -23,7 +23,7 @@ public class SystemCallFactory {
     public SystemCallFactory () {
         nameMap.put(9L, "edsCreateOrder");
         nameMap.put(16L, "tongCreateOrder");
-        nameMap.put(21L, "edsCreateOrder");
+//        nameMap.put(21L, "edsCreateOrder");
     }
 
     public String createOrder (Long vendorId,Long logisticsProductId) {
