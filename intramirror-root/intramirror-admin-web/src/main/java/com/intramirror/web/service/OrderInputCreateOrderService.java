@@ -291,13 +291,9 @@ public class OrderInputCreateOrderService {
                     try {
                         logger.info("start send mail logisticsProductId:" + logisticsProduct.getLogistics_product_id());
                         Map<String, Object> map = orderService.getOrderLogisticsInfoByIdWithSql(logisticsProduct.getLogistics_product_id());
-//                        String[] addressList = map.get("contact").toString().split(",");
-//                        for (int i = 0; i < addressList.length; i++) {
-//                            String address = addressList[i];
-//                            map.put("contact", address);
+                        if (map != null) {
                             OrderMail.sendOrderMail(map);
-//                        }
-
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

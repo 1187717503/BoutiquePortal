@@ -156,10 +156,17 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
     }
 
 
+
 	@Override
 	public Map<String, Object> getOrderInfoByVendorId(
 			Map<String, Object> conditionMap) {
 		return logisticsProductMapper.getOrderInfoByVendorId(conditionMap);
 	}
+
+    @Override
+    public int invalidOrderById(Long logisticsProductId) {
+        return  logisticsProductMapper.invalidOrderById(logisticsProductId);
+    }
+
 
 }

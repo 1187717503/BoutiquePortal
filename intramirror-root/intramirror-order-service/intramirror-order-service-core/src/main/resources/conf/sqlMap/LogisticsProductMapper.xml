@@ -264,5 +264,13 @@
 		order by a.logistics_product_id 
 		limit 1
  </select>
-			  
+
+
+  <update id="invalidOrderById" parameterType="java.lang.Long">
+    update logistics_product
+      set status = -2
+    where enabled = 1 and
+      status = -1 and
+      logistics_product_id = #{logisticsProductId,jdbcType=BIGINT}
+  </update>
 </mapper>
