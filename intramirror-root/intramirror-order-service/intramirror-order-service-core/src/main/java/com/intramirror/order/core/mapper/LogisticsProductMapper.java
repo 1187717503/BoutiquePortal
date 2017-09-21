@@ -72,4 +72,11 @@ public interface LogisticsProductMapper {
     int updateContainerById(Long order_logistics_id);
 
     int createLogisticsProduct(LogisticsProduct logisticsProduct);
+
+    /**
+     * 更新订单状态为失效
+     * @param logisticsProductId
+     * @return
+     */
+    int invalidOrderById(Long logisticsProductId);
 }

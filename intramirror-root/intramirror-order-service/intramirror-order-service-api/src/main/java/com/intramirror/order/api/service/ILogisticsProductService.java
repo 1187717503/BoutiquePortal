@@ -74,5 +74,7 @@ public interface ILogisticsProductService {
 
 
 	LogisticsProduct createLogisticsProduct(LogisticsProduct logisticsProduct);
+
+	int invalidOrderById(Long logisticsProductId);
 }
 
