@@ -33,7 +33,7 @@ import com.intramirror.order.api.common.ConverMapToOrderMager;
 import com.intramirror.order.api.model.OrderMager;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderExceptionService;
-import com.intramirror.web.common.GetPostRequestUtil;
+//import com.intramirror.web.common.GetPostRequestUtil;
 
 import pk.shoplus.DBConnector;
 import pk.shoplus.enums.ApiParamterEnum;
@@ -139,7 +139,7 @@ public class TongCreateOrder extends BuyerSystemCall{
 			
 			//调用http请求,创建订单，返回状态
 			logger.info("buyersys Tong createOrder 调用tong 接口下单  URL:"+url+",入参:"+orderJSON.toJSONString());
-			GetPostRequestUtil requestGet = new GetPostRequestUtil();
+//			GetPostRequestUtil requestGet = new GetPostRequestUtil();
 //			String json = requestGet.requestMethod("POST", url, orderJSON.toJSONString());
 			Map<String, Object> resultMap = this.httpPost(url,orderJSON.toJSONString());
 			
