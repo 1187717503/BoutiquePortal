@@ -161,7 +161,7 @@ public class UpdateProductThread implements Runnable{
             categoryService.updateBySQL(insertApiErrorProcessingSQL);
             conn.commit();
         } catch (Exception e) {
-            logger.info("UpdateProductThreadSaveErrorMsg,insertApiErrorProcessing,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
+            logger.info("UpdateProductThreadSaveErrorMsg,insertApiErrorProcessing,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+",resultMap:"+JSONObject.toJSON(resultMap));
             e.printStackTrace();
             if(conn!=null) {conn.rollback();conn.close();}
             return false;
