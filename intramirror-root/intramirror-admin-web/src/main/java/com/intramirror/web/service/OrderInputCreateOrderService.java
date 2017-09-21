@@ -19,6 +19,7 @@ import com.intramirror.product.api.service.*;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.service.VendorService;
 import com.intramirror.web.common.OrderMail;
+import com.intramirror.web.controller.buyersys.SystemCallFactory;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -305,6 +306,19 @@ public class OrderInputCreateOrderService {
 
             }
             /**-----------------------------end send mail-------------------------------**/
+            
+            
+            
+            /**-----------------------------同步订单   start---------------------------------------**/
+            if (sendEmailList != null && sendEmailList.size() > 0) {
+                for (LogisticsProduct logisticsProduct : sendEmailList) {
+                	logger.info("调用接口同步订单,入参  LogisticsProduct:"+new Gson().toJson(logisticsProduct));
+                	SystemCallFactory systemCallFactory = new SystemCallFactory();
+                	systemCallFactory.createOrder(logisticsProduct.getVendor_id(), logisticsProduct.getLogistics_product_id());
+                }
+            }
+            /**-----------------------------同步订单    end-----------------------------------------**/
+            
 
         }
 

@@ -49,7 +49,7 @@ public interface LogisticsProductMapper {
 	 * @param logistics_product_id vendorId
 	 * @return
 	 */
-	Map<String,Object> getOrderInfoByVendorId(Map<String, Object> conditionMap);
+    Map<String,Object> getOrderInfoByVendorId(Map<String, Object> conditionMap);
 
 
     /**

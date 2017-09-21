@@ -21,12 +21,12 @@ public class SystemCallFactory {
     private static Map<Long,String> nameMap = new HashMap<Long, String>();
 
     public SystemCallFactory () {
-        nameMap.put(9L, "eDSCreateOrder");
-        nameMap.put(16L, "TongCreateOrder");
-        nameMap.put(21L, "eDSCreateOrder");
+        nameMap.put(9L, "edsCreateOrder");
+        nameMap.put(16L, "tongCreateOrder");
+        nameMap.put(21L, "edsCreateOrder");
     }
 
-    public static String createOrder (Long vendorId,Long logisticsProductId) {
+    public String createOrder (Long vendorId,Long logisticsProductId) {
     	logger.info("create order SystemCallFactory createOrder 入参 vendorId:"+vendorId+",logisticsProductId:"+logisticsProductId);
     	String result = "";
     	
@@ -41,7 +41,7 @@ public class SystemCallFactory {
         String className = nameMap.get(vendorId).toString();
         logger.info("create order SystemCallFactory createOrder 获取到的实例名称   className:"+className);
         
-        //通过spring应用上下文容器,根据名称获取bean
+        //根据名称获取bean
         BuyerSystemCall buyerSystemCall =(BuyerSystemCall) SpringContextUtils.getContext().getBean(className);
         
         //调用对应的实例执行下单操作

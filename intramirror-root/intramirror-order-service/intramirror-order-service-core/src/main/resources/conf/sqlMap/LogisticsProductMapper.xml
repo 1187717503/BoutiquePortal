@@ -231,7 +231,7 @@
   
   
  
-    <select id=" getOrderInfoByVendorId" resultType="java.util.HashMap" parameterType="java.util.Map">
+    <select id="getOrderInfoByVendorId" resultType="java.util.HashMap" parameterType="java.util.Map">
  		SELECT distinct a.logistics_product_id,a.amount,a.order_line_num,a.fee,a.vendor_id,a.`status`,a.updated_at,a.created_at,c.order_id,c.order_num,
 		p.product_code,p.product_id,s.sku_id,s.in_price,s.sku_code,pspk.`name`,pspv.`value` as size,
 		l.user_rec_name,l.user_rec_province,l.user_rec_city,l.user_rec_area,l.user_rec_addr,

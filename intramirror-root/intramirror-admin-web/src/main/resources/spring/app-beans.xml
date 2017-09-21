@@ -28,6 +28,9 @@
 	</bean>  
 	 <!-- 开启事务控制的注解支持 -->  
     <tx:annotation-driven transaction-manager="transactionManager"/> 
+    
+     <!--Spring中bean获取的工具类-->
+	<bean id="springContextUtils" class="com.intramirror.web.common.SpringContextUtils" />
 
 	<!-- start spring 自动注解,及解决ReponseBody中文乱码问题 -->
 	<mvc:annotation-driven>

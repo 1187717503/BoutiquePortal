@@ -24,20 +24,20 @@ import com.intramirror.order.api.common.ConverMapToOrderMager;
 import com.intramirror.order.api.model.OrderMager;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderExceptionService;
+import com.intramirror.web.common.GetPostRequestUtil;
 
 import pk.shoplus.DBConnector;
 import pk.shoplus.enums.ApiParamterEnum;
 import pk.shoplus.enums.CloudStoreEnum;
 import pk.shoplus.model.OrderRefund;
 import pk.shoplus.parameter.StatusType;
-import pk.shoplus.service.request.impl.GetPostRequestService;
 
 /**
  * @author wzh 
  * @date 17-09-12
  *
  */
-@Service
+@Service("tongCreateOrder")
 public class TongCreateOrder extends BuyerSystemCall{
 	
     private static Logger logger = Logger.getLogger(TongCreateOrder.class);
@@ -128,8 +128,8 @@ public class TongCreateOrder extends BuyerSystemCall{
 			
 			//调用http请求,创建订单，返回状态
 			logger.info("buyersys Tong createOrder 调用tong 接口下单  URL:"+url+",入参:"+orderJSON.toJSONString());
-			GetPostRequestService RequestService = new GetPostRequestService();
-			String json = RequestService.requestMethod("POST", url, orderJSON.toJSONString());
+			GetPostRequestUtil requestGet = new GetPostRequestUtil();
+			String json = requestGet.requestMethod("POST", url, orderJSON.toJSONString());
 			
 			if(StringUtils.isBlank(json)){
 				logger.info(MessageFormat.format("buyersys Tong createOrder 推送订单  调用接口下单返回结果为空  入参:{0}",new Gson().toJson(orderJSON)));

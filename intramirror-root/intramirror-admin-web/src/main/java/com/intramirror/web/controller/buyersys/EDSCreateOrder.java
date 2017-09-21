@@ -45,7 +45,7 @@ import com.intramirror.order.api.service.IOrderExceptionService;
  * @see: [相关类/方法]（可选）
  * @since [产品/模块版本] （可选）
  */
-@Service
+@Service("edsCreateOrder")
 public class EDSCreateOrder extends BuyerSystemCall {
     private static Logger logger = Logger.getLogger(EDSCreateOrder.class);
 
@@ -116,7 +116,7 @@ public class EDSCreateOrder extends BuyerSystemCall {
     			JSONObject jsonOjbect = JSONObject.parseObject(json);
     			String getResult = jsonOjbect.get("result").toString();
     			logger.info("buyersys eds createOrder result:"+getResult);
-    			if ("Error ! Quantity Not Availble".equals(getResult)){
+    			if (StringUtils.isNoneBlank(getResult) && getResult.contains("Quantity is not available")){
     				//没有库存执行退款
     				OrderRefund orderRefund = new OrderRefund();
     				if (orderRefund != null){
@@ -135,8 +135,8 @@ public class EDSCreateOrder extends BuyerSystemCall {
     				result = "ERROR";
     			}
     			
-    			//如果返回Fail! Invalid SKU 保存异常信息
-    			if ("Error !! Barcode Not Exist.".equals(getResult)){
+    			//如果返回Fail 保存异常信息
+    			if (StatusType.FAILURE == Integer.parseInt(resultApi.get("status").toString())){
     				
     				Map<String, Object> exception = new HashMap<String, Object>();
     				exception.put("logistics_product_id", logisticsProductId);
@@ -213,6 +213,10 @@ public class EDSCreateOrder extends BuyerSystemCall {
             
         } catch (IOException e) {
         	logger.info("buyersys eds createOrder post请求提交失败:" + url, e);
+        	resultMap.put("status", StatusType.FAILURE);
+        	resultMap.put("resultMeesage", e.getMessage());
+        	logger.error("buyersys eds createOrder 下单失败,result:"+e.getMessage());
+        	logger.error("buyersys eds createOrder 入参:"+jsonParam);
         }
         return resultMap;
     }
