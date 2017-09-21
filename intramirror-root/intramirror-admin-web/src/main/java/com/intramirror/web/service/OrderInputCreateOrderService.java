@@ -290,7 +290,9 @@ public class OrderInputCreateOrderService {
                     try {
                         logger.info("start send mail logisticsProductId:" + logisticsProduct.getLogistics_product_id());
                         Map<String, Object> map = orderService.getOrderLogisticsInfoByIdWithSql(logisticsProduct.getLogistics_product_id());
-                        OrderMail.sendOrderMail(map);
+                        if (map != null) {
+                            OrderMail.sendOrderMail(map);
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
