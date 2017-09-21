@@ -3,7 +3,10 @@
  */
 package com.intramirror.web.controller.buyersys;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
@@ -12,7 +15,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import jodd.util.URLDecoder;
+
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -129,15 +138,17 @@ public class TongCreateOrder extends BuyerSystemCall{
 			//调用http请求,创建订单，返回状态
 			logger.info("buyersys Tong createOrder 调用tong 接口下单  URL:"+url+",入参:"+orderJSON.toJSONString());
 			GetPostRequestUtil requestGet = new GetPostRequestUtil();
-			String json = requestGet.requestMethod("POST", url, orderJSON.toJSONString());
+//			String json = requestGet.requestMethod("POST", url, orderJSON.toJSONString());
+			Map<String, Object> resultMap = this.httpPost(url,orderJSON.toJSONString());
 			
-			if(StringUtils.isBlank(json)){
+//			if(StringUtils.isBlank(json)){
+			if(resultMap == null || resultMap.size() == 0 ){
 				logger.info(MessageFormat.format("buyersys Tong createOrder 推送订单  调用接口下单返回结果为空  入参:{0}",new Gson().toJson(orderJSON)));
 				return "ERROR";
 			}
         	
 			//转换成json格式，处理结果
-			JSONObject resultJson = JSONObject.parseObject(json);
+			JSONObject resultJson = JSONObject.parseObject(resultMap.get("resultMeesage").toString());
 			if(resultJson != null && "ok".equals(resultJson.getString("status"))){
 				logger.info(MessageFormat.format("buyersys Tong createOrder 推送订单成功 ,返回的结果:{0}",resultJson.toString()));
 			}else if(resultJson != null && "ko".equals(resultJson.getString("status"))){
@@ -190,6 +201,85 @@ public class TongCreateOrder extends BuyerSystemCall{
         return result;
     }
 
+	 
+	    /**
+	     * post请求
+	     * @param url         url地址
+	     * @param jsonParam     参数
+	     * @return
+	     */
+	    public Map<String, Object> httpPost(String url,String jsonParam){
+	        DefaultHttpClient httpClient = new DefaultHttpClient();
+	        HttpPost method = new HttpPost(url);
+	        Map<String, Object> resultMap = new HashMap<>();
+	        //post请求返回结果
+	        try {
+	        	
+	            if (null != jsonParam) {
+	                //解决中文乱码问题
+	                StringEntity entity = new StringEntity(jsonParam.toString(), "utf-8");
+	                entity.setContentEncoding("UTF-8");
+	                entity.setContentType("application/x-www-form-urlencoded");
+	                method.setEntity(entity);
+	            }
+	            HttpResponse result = httpClient.execute(method);
+	            url = URLDecoder.decode(url, "UTF-8");
+
+	            //请求发送成功，并得到响应
+	            if (result.getStatusLine().getStatusCode() == 200) {
+	                //标识状态为成功
+	            	resultMap.put("status", StatusType.SUCCESS);
+	                try {
+	                	InputStream is = result.getEntity().getContent();
+	                	String resultMeesage = convertStreamToString(is);
+	                    logger.info(resultMeesage);
+	                    resultMap.put("resultMeesage", resultMeesage);
+	                } catch (Exception e) {
+	                	logger.error("buyersys Tong createOrder post请求提交失败:" + url, e);
+	                }
+	                
+	            }else{
+	            	InputStream is = result.getEntity().getContent();
+	            	String resultMeesage = convertStreamToString(is);
+	            	
+	            	resultMap.put("status", StatusType.FAILURE);
+	            	resultMap.put("resultMeesage", resultMeesage);
+	            	logger.error("buyersys Tong createOrder 下单失败,result:"+resultMeesage);
+	            	logger.error("buyersys Tong createOrder 入参:"+jsonParam);
+	            }
+	            
+	        } catch (IOException e) {
+	        	logger.info("buyersys Tong createOrder post请求提交失败:" + url, e);
+	        	resultMap.put("status", StatusType.FAILURE);
+	        	resultMap.put("resultMeesage", e.getMessage());
+	        	logger.error("buyersys Tong createOrder 下单失败,result:"+e.getMessage());
+	        	logger.error("buyersys Tong createOrder 入参:"+jsonParam);
+	        }
+	        return resultMap;
+	    }
+	    
+	    
+	    public String convertStreamToString(InputStream is) {      
+	         BufferedReader reader = new BufferedReader(new InputStreamReader(is));      
+	         StringBuilder sb = new StringBuilder();      
+	     
+	         String line = null;      
+	        try {      
+	            while ((line = reader.readLine()) != null) {      
+	                 sb.append(line + "\n");      
+	             }      
+	         } catch (IOException e) {      
+	             e.printStackTrace();      
+	         } finally {      
+	            try {      
+	                 is.close();      
+	             } catch (IOException e) {      
+	                 e.printStackTrace();      
+	             }      
+	         }      
+	     
+	        return sb.toString();      
+	     } 
 
 	
 }
