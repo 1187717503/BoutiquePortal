@@ -41,6 +41,7 @@ public class AtelierUpdateByProductMapping implements IProductMapping{
                     .setColorCode(jsonObjectData.getString("color_code"))
                     .setColorDesc(jsonObjectData.getString("color_description"))
                     .setCategoryId(jsonObjectData.getString("category_id"))
+                    .setCategory_name(jsonObjectData.getString("category_id"))
                     .setDesc(jsonObjectData.getString("product_description"))
                     .setComposition(jsonObjectData.getString("composition"))
                     .setMadeIn(jsonObjectData.getString("made_in"))

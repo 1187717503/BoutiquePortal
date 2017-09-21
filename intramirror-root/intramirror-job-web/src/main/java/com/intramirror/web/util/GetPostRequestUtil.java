@@ -1,6 +1,7 @@
 package com.intramirror.web.util;
 
 import org.apache.log4j.Logger;
+import pk.shoplus.util.ExceptionUtils;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -116,15 +117,9 @@ public class GetPostRequestUtil{
                 }
             }
 
-        } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            logger.info("GetPostRequestUtilRequestMethod,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
         } finally {// 关闭流
 
             try {
