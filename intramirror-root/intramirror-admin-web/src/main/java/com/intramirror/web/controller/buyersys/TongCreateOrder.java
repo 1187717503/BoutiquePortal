@@ -72,12 +72,14 @@ public class TongCreateOrder extends BuyerSystemCall{
         	Map<String, Object> conditionMap = new HashMap<String, Object>();
         	conditionMap.put("vendor_id", vendorId);
         	conditionMap.put("logistics_product_id", logisticsProductId);
+        	
+        	logger.info(MessageFormat.format("buyersys Tong createOrder 获取需要处理的订单   入参:{0}", new Gson().toJson(conditionMap)));
         	Map<String, Object> orderInfoMap= logisticsProductServiceImpl.getOrderInfoByVendorId(conditionMap);
         	
         	//获取需要处理的订单
-            logger.info(MessageFormat.format("buyersys Tong createOrder 获取需要处理的订单:{0}", new Gson().toJson(orderInfoMap)));
+            logger.info(MessageFormat.format("buyersys Tong createOrder 获取需要处理的订单   result:{0}", new Gson().toJson(orderInfoMap)));
             if (orderInfoMap == null || orderInfoMap.size() == 0){
-            	logger.info("buyersys Tong createOrder 获取到的订单信息为空 ");
+            	logger.info("buyersys Tong createOrder 获取到的订单信息为空    入参:"+new Gson().toJson(conditionMap));
             	return "ERROR";
             }
             
