@@ -62,6 +62,42 @@
 	<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
 	</context:component-scan>
 
-	<!-- 初始化基础配置 -->
+
+    <!-- 初始化基础配置 -->
 	<util:properties id="common" location="classpath:/properties/common/common.properties" />
+
+    <!-- RackteMQ Consumer -->
+    <bean id="msgListener" class="com.intramirror.web.mq.RocketMessageListener"></bean> <!--Listener配置-->
+    <!-- 多CID订阅同一个Topic，可以创建多个ConsumerBean-->
+    <bean id="consumer" class="com.aliyun.openservices.ons.api.bean.ConsumerBean" init-method="start" destroy-method="shutdown">
+        <property name="properties">
+            <map>
+                <!--<entry key="ConsumerId" value="${ons.consumerid}"/>
+                <entry key="AccessKey" value="${ons.accesskeyid}"/>
+                <entry key="SecretKey" value="${ons.accesskeysecret}"/>
+                <entry key="ONSAddr" value="${ons.address}"/>-->
+
+                <entry key="ConsumerId" value="CID_ORDER_INVALID_TEST"/>
+                <entry key="AccessKey" value="LTAIaFAG0DNogI0N"/>
+                <entry key="SecretKey" value="KtrOrRvgxeOy34jPCphpMzkgsxfv7n"/>
+                <entry key="ONSAddr" value="http://onsaddr-internet.aliyun.com/rocketmq/nsaddr4client-internet"/>
+            </map>
+        </property>
+
+        <property name="subscriptionTable">
+            <map>
+                <entry value-ref="msgListener">
+                    <key>
+                        <bean class="com.aliyun.openservices.ons.api.bean.Subscription">
+                            <!--<property name="topic" value="${ons.topic}"/>-->
+                            <property name="topic" value="order_invalid_test"/>
+                            <property name="expression" value="*"/><!-- MessageType名: 多个messageType 用 “||”分割 -->
+                        </bean>
+                    </key>
+                </entry>
+            </map>
+
+        </property>
+    </bean>
+
 </beans>

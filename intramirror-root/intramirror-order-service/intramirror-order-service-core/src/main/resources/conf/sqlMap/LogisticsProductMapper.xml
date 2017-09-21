@@ -228,4 +228,12 @@
     #{invoice_id,jdbcType=TIMESTAMP}, #{confirmed_at,jdbcType=TIMESTAMP}, #{est_ship_date,jdbcType=TIMESTAMP},
     #{packed_at,jdbcType=TIMESTAMP}, #{shipped_at,jdbcType=TIMESTAMP})
   </insert>
+
+  <update id="invalidOrderById" parameterType="java.lang.Long">
+    update logistics_product
+      set status = -2
+    where enabled = 1 and
+      status = -1 and
+      logistics_product_id = #{logisticsProductId,jdbcType=BIGINT}
+  </update>
 </mapper>

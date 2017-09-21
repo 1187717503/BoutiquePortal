@@ -45,4 +45,17 @@
     <context:component-scan base-package="com.intramirror">
           <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service" /> 
     </context:component-scan>
+
+    <beans profile="sit">
+        <context:property-placeholder location="classpath:/sit/rocketmq.properties"/>
+    </beans>
+    <beans profile="shenv">
+        <context:property-placeholder location="classpath:/shenv/rocketmq.properties"/>
+    </beans>
+    <beans profile="prd">
+        <context:property-placeholder location="classpath:/prd/rocketmq.properties"/>
+    </beans>
+    <beans profile="shprd">
+        <context:property-placeholder location="classpath:/shprd/rocketmq.properties"/>
+    </beans>
 </beans>
