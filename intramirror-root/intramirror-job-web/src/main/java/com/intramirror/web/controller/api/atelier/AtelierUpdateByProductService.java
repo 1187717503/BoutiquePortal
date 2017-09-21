@@ -42,11 +42,11 @@ public class AtelierUpdateByProductService implements InitializingBean {
     @Resource(name = "atelierUpdateByProductMapping")
     private AtelierUpdateByProductMapping atelierUpdateByProductMapping;
 
-    public String all_update_product = "全量更新商品";
+    public String all_update_product = "product_all_update";
 
-    public String update_product = "更新商品";
+    public String update_product = "product_delta_update";
 
-    public String create_product = "创建商品";
+    public String create_product = "product_delta_create";
 
     // thread num
     private static final int threadNum = 10;
@@ -95,7 +95,7 @@ public class AtelierUpdateByProductService implements InitializingBean {
             logger.info("AtelierUpdateByStockControllerExecute,getBaseData,paramMap:"+JSONObject.toJSONString(paramMap));
             String vendor_id = paramMap.get("vendor_id").toString();
             String eventName = paramMap.get("eventName").toString();
-            ApiDataFileUtils fileUtils = new ApiDataFileUtils(eventName,eventName+type);
+            ApiDataFileUtils fileUtils = new ApiDataFileUtils(eventName,type);
             fileUtils.bakPendingFile(boutique_id+"storeCode"+storeID+"vension"+version,body);
 
             // mapping

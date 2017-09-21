@@ -47,7 +47,7 @@ public class CloudStoreDayUpdateBySkuController implements InitializingBean{
     
     // init params
     private Map<String,Object> paramsMap;
-    
+
     // getpost util
     private static GetPostRequestUtil getPostRequestUtil = new GetPostRequestUtil();
     
@@ -55,7 +55,7 @@ public class CloudStoreDayUpdateBySkuController implements InitializingBean{
     public static ProductEDSManagement productEDSManagement = new ProductEDSManagement();
     
     // mapping
-    @Resource(name = "cloudStoreGetInventoryMapping")
+    @Resource(name = "cloudStoreProductMapping")
     private IProductMapping iProductMapping;
 
     // mapping

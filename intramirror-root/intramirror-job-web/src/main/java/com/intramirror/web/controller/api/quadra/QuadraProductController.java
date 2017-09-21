@@ -47,7 +47,7 @@ public class QuadraProductController implements InitializingBean{
 	private QuadraSynProductMapping productMappingService ;
     
     // init params
-    private Map<String,Object> paramsMap;
+    public Map<String,Object> paramsMap;
     
     @RequestMapping(value = "/updateProductAll",method = RequestMethod.GET)
     @ResponseBody

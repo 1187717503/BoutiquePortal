@@ -136,6 +136,9 @@ public class ApiDataFileUtils {
         this.fileName = fileName;
     }
 
+    public ApiDataFileUtils() {
+    }
+
     public static void main(String[] args) {
         new ApiDataFileUtils("ding","testo").bakErrorFile("123","000");
     }
