@@ -108,7 +108,7 @@ public class UpdateProductThread implements Runnable{
             String vendorName = apiDataFileUtils.getVendorName();
             String evnetName = apiDataFileUtils.getEventName();
             String fileName = apiDataFileUtils.getFileName();
-            String file_location = ApiDataFileUtils.baseUrl+"/"+vendorName+"/"+evnetName;
+            String file_location = ApiDataFileUtils.baseUrl+"/"+vendorName+"/"+ApiDataFileUtils.error_file+"/"+evnetName;
             String product_code = resultMap.get("product_code") == null ? "" : resultMap.get("product_code").toString();
             String color_code = resultMap.get("color_code") == null ? "" : resultMap.get("color_code").toString();
             String brand_id = resultMap.get("brand_id") == null ? "" : resultMap.get("brand_id").toString();
@@ -161,7 +161,7 @@ public class UpdateProductThread implements Runnable{
             categoryService.updateBySQL(insertApiErrorProcessingSQL);
             conn.commit();
         } catch (Exception e) {
-            logger.info("UpdateProductThreadSaveErrorMsg,insertApiErrorProcessing,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
+            logger.info("UpdateProductThreadSaveErrorMsg,insertApiErrorProcessing,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+",resultMap:"+JSONObject.toJSON(resultMap));
             e.printStackTrace();
             if(conn!=null) {conn.rollback();conn.close();}
             return false;

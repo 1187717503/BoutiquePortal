@@ -131,7 +131,7 @@ public class AtelierUpdateByStockController  implements InitializingBean {
         X4ZMP.put("vendor_id","8");
         X4ZMP.put("vendor_name","Luciana Bari");
         X4ZMP.put("eventName","luciana更新库存");
-        X4ZMP.put("fileUtils",new ApiDataFileUtils("luciana","luciana更新库存"));
+        X4ZMP.put("fileUtils",new ApiDataFileUtils("luciana","stock_delta_stock"));
         paramsMap.put("X4ZMP",X4ZMP);
 
         Map<String,Object> XIW2E = new HashMap<>();
@@ -139,7 +139,7 @@ public class AtelierUpdateByStockController  implements InitializingBean {
         XIW2E.put("vendor_id","10");
         XIW2E.put("vendor_name","Dante 5");
         XIW2E.put("eventName","dante更新库存");
-        XIW2E.put("fileUtils",new ApiDataFileUtils("dante","dante更新库存"));
+        XIW2E.put("fileUtils",new ApiDataFileUtils("dante","stock_delta_stock"));
         paramsMap.put("XIW2E",XIW2E);
 
         Map<String,Object> UIWK2 = new HashMap<>();
@@ -147,7 +147,7 @@ public class AtelierUpdateByStockController  implements InitializingBean {
         UIWK2.put("vendor_id","11");
         UIWK2.put("vendor_name","I Cinque Fiori");
         UIWK2.put("eventName","iCinque更新库存");
-        UIWK2.put("fileUtils",new ApiDataFileUtils("iCinque","iCinque更新库存"));
+        UIWK2.put("fileUtils",new ApiDataFileUtils("iCinque","stock_delta_stock"));
         paramsMap.put("UIWK2",UIWK2);
 
         Map<String,Object> ERS4S = new HashMap<>();
@@ -155,7 +155,7 @@ public class AtelierUpdateByStockController  implements InitializingBean {
         ERS4S.put("vendor_id","12");
         ERS4S.put("vendor_name","Mimma Ninni");
         ERS4S.put("eventName","mimma更新库存");
-        ERS4S.put("fileUtils",new ApiDataFileUtils("mimma","mimma更新库存"));
+        ERS4S.put("fileUtils",new ApiDataFileUtils("mimma","stock_delta_stock"));
         paramsMap.put("ERS4S",ERS4S);
 
         Map<String,Object> UEYHD = new HashMap<>();
@@ -163,7 +163,7 @@ public class AtelierUpdateByStockController  implements InitializingBean {
         UEYHD.put("vendor_id","13");
         UEYHD.put("vendor_name","Di Pierro");
         UEYHD.put("eventName","diPierro更新库存");
-        UEYHD.put("fileUtils",new ApiDataFileUtils("diPierro","diPierro更新库存"));
+        UEYHD.put("fileUtils",new ApiDataFileUtils("diPierro","stock_delta_stock"));
         paramsMap.put("UEYHD",UEYHD);
 
         Map<String,Object> IEK7W = new HashMap<>();
@@ -171,7 +171,7 @@ public class AtelierUpdateByStockController  implements InitializingBean {
         IEK7W.put("vendor_id","14");
         IEK7W.put("vendor_name","Gisa Boutique");
         IEK7W.put("eventName","gisa更新库存");
-        IEK7W.put("fileUtils",new ApiDataFileUtils("gisa","gisa更新库存"));
+        IEK7W.put("fileUtils",new ApiDataFileUtils("gisa","stock_delta_stock"));
         paramsMap.put("IEK7W",IEK7W);
 
         Map<String,Object> WISE = new HashMap<>();
@@ -179,7 +179,7 @@ public class AtelierUpdateByStockController  implements InitializingBean {
         WISE.put("vendor_id","18");
         WISE.put("vendor_name","Wise Boutique");
         WISE.put("eventName","wise更新库存");
-        WISE.put("fileUtils",new ApiDataFileUtils("wise","wise更新库存"));
+        WISE.put("fileUtils",new ApiDataFileUtils("wise","stock_delta_stock"));
         paramsMap.put("WISE",WISE);
     }
 }

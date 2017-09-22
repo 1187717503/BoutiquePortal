@@ -84,7 +84,7 @@ public class CloudStoreAllUpdateBySkuController implements InitializingBean{
             params.put("merchantId", merchantId);
             while (true) {
                 // 获取数据
-                logger.info("cloudStoreProductAllProducerControllerExecute,startRequestMethod,appendUrl:"+url);
+                logger.info("cloudStoreProductAllProducerControllerExecute,startRequestMethod,appendUrl:"+url+",index:"+index);
                 String responseData = getPostRequestUtil.requestMethod(GetPostRequestService.HTTP_POST,url,JSONObject.toJSONString(params));
                 if(StringUtils.isBlank(responseData)) {
                     logger.info("cloudStoreProductAllProducerControllerExecute,whileEnd,responseData is null,appendUrl:"+url);
@@ -98,7 +98,7 @@ public class CloudStoreAllUpdateBySkuController implements InitializingBean{
                 Iterator<Object> it = inventorys.iterator();
                
                 if(inventorys == null || inventorys.size() == 0) {
-                    logger.info("cloudStoreProductAllProducerControllerExecute,whileEnd,ProductList is null,appendUrl:"+url);
+                    logger.info("cloudStoreProductAllProducerControllerExecute,whileEnd,ProductList is null,appendUrl:"+url+",index:"+index);
                     break;
                 }
                 if(StringUtils.isBlank(responseData)) {

@@ -3,6 +3,7 @@ package com.intramirror.web.util;
 import com.intramirror.common.utils.DateUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import pk.shoplus.common.utils.FileUtils;
 import pk.shoplus.util.ExceptionUtils;
 
 import java.io.*;
@@ -15,13 +16,13 @@ public class ApiDataFileUtils {
 
     private static final Logger logger = Logger.getLogger(ApiDataFileUtils.class);
 
-//    public static final String baseUrl = "/mnt";
+    public static final String baseUrl = "/mnt";
 
-    public static final String baseUrl = "/Users/dingyifan/Documents/fileTest";
+//    public static final String baseUrl = "/Users/dingyifan/Documents/fileTest";
 
-    private static final String bak_file = "backup";
+    public static final String bak_file = "backup";
 
-    private static final String error_file = "error";
+    public static final String error_file = "error";
 
     private String vendorName; // 不同vendor名称
 
@@ -68,6 +69,7 @@ public class ApiDataFileUtils {
             fileName = fileName + "" + formatDate;
             this.setFileName(fileName);
             String fileUrl = bakUrl+"/"+fileName+".txt";
+            FileUtils.serialize(content,fileUrl);
             return this.writeFileContent(fileUrl,content);
         } catch (Exception e) {
             e.printStackTrace();
@@ -132,6 +134,9 @@ public class ApiDataFileUtils {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public ApiDataFileUtils() {
     }
 
     public static void main(String[] args) {
