@@ -117,4 +117,11 @@ public interface ContainerMapper {
 	 */
 	List<Map<String,Object>> getListByShipmentId(Map<String, Object> map);
 	
+	/**
+	 * 根据containerId查询container
+	 * @param map
+	 * @return
+	 */
+	Map<String,Object> getContainerById(Map<String, Object> map);
+	
 }
