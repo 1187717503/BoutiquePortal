@@ -160,7 +160,7 @@ public class OrderMail {
 //		String orderNumberUrl = "Barcode-"+map.get("order_line_num").toString()+".png";
 //		String skuBarcodeUrl = "Barcode-"+map.get("sku_code").toString()+".png";
 
-        content.append("<div style='margin: 0 auto;width:400px;background: #fff;font-family: Roboto-Bold, Arial, sans-serif, border-collapse;'>");
+        content.append("<div style='margin: 0 auto;width:400px;background: #fff;font-family:Roboto'>");
 
         content.append("<table width='100%' cellpadding='0' cellspacing='0' border='0'>");
         content.append("<tr style='height:64px'>");
