@@ -25,6 +25,8 @@ public class OrderMail {
 
     private static String host;
 
+    private static String port;
+
     private static String userName;
 
     private static String passWord;
@@ -37,6 +39,7 @@ public class OrderMail {
             props.load(in);
 
             host = props.getProperty("host");
+            port = props.getProperty("port");
             userName = props.getProperty("userName");
             passWord = props.getProperty("passWord");
 
@@ -129,23 +132,26 @@ public class OrderMail {
             e.printStackTrace();
         }
 
-
+        System.out.println(orderInfo.get("contact").toString());
         if (orderInfo.get("contact") != null && StringUtils.isNotBlank(orderInfo.get("contact").toString())) {
             String[] addressList = orderInfo.get("contact").toString().split(",");
 
             try {
+                System.out.println("-----------Send Email Start---------------");
                 for (int i = 0; i < addressList.length; i++) {
                     String address = addressList[i];
                     orderInfo.put("contact", address);
-                    
+
                     SendEmailVo vo = new SendEmailVo();
                     vo.setHost(host);
+                    vo.setPort(port);
                     vo.setUserName(userName);
                     vo.setPassWord(passWord);
                     vo.setTitle("IntraMirror- Order information");
                     vo.setContent(getContent(orderInfo));
                     vo.setAddressee(orderInfo.get("contact").toString());
                     SendMailUtil.sendMail(vo);
+                    System.out.println("-----------Send Email End---------------");
                 }
             } catch (Exception e) {
                 e.printStackTrace();

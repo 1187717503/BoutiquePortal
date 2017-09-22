@@ -10,6 +10,9 @@ public class SendEmailVo {
 	/** 设置邮件服务器地址 */
 	private String host;
 
+	/** 邮件的端口*/
+	private String port;
+
 	/** 邮件的用户名 */
 	private String userName;
 
@@ -46,6 +49,14 @@ public class SendEmailVo {
 		return userName;
 	}
 
+	public String getPort() {
+		return port;
+	}
+
+	public void setPort(String port) {
+		this.port = port;
+	}
+
 	public void setAddressee(String addressee) {
 		this.addressee = addressee;
 	}
@@ -61,7 +72,7 @@ public class SendEmailVo {
 	public void setPassWord(String passWord) {
 		this.passWord = passWord;
 	}
-	
+
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
