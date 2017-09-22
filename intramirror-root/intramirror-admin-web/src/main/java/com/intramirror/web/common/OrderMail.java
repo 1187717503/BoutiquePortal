@@ -174,8 +174,8 @@ public class OrderMail {
         content.append("<table width='100%' style='border-collapse:collapse;border-top:1px solid #d3d3d3;border-bottom:1px solid #d3d3d3;font-size:12px;'>");
         content.append("<tr>");
         content.append("<td colspan='2' style='padding-left:24px;padding-top:11px'>");
-        content.append("Order Number</td></tr>");
-        content.append("<tr><td style='padding-left:24px;font-size:18px;letter-spacing: 1px;'>" + map.get("order_num").toString());
+        content.append("Order Line Number</td></tr>");
+        content.append("<tr><td style='padding-left:24px;font-size:18px;letter-spacing: 1px;'>" + map.get("order_line_num").toString());
         content.append("</td>");
         content.append("<td style='	font-size:18px;	letter-spacing:1px;text-align:right;padding-right:20px;'>" + map.get("geography_name").toString());
         content.append("</td></tr>");
