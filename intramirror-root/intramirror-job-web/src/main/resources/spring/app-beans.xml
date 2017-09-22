@@ -77,10 +77,10 @@
                 <entry key="SecretKey" value="${ons.accesskeysecret}"/>
                 <entry key="ONSAddr" value="${ons.address}"/>-->
 
-                <entry key="ConsumerId" value="CID_ORDER_INVALID_TEST"/>
+                <entry key="ConsumerId" value="CID_ORDER_INVALID"/>
                 <entry key="AccessKey" value="LTAIaFAG0DNogI0N"/>
                 <entry key="SecretKey" value="KtrOrRvgxeOy34jPCphpMzkgsxfv7n"/>
-                <entry key="ONSAddr" value="http://onsaddr-internet.aliyun.com/rocketmq/nsaddr4client-internet"/>
+                <entry key="ONSAddr" value="http://onsaddr-internal.aliyun.com:8080/rocketmq/nsaddr4client-internal"/>
             </map>
         </property>
 
