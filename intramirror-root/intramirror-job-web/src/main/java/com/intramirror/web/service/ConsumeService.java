@@ -104,7 +104,9 @@ public class ConsumeService {
                 MessageHelper.putMessage(mrv);
                 logger.info("consumeResultPutMessageBySuccess:"+new Gson().toJson(mrv));
             } else {
-                Object obj = resultMap.get("warningMaps");
+                logger.info("ErrorConsumeResultResultMap:"+new Gson().toJson(resultMap));
+
+                /*Object obj = resultMap.get("warningMaps");
                 if(obj != null){
                     resultMap.remove("warningMaps");
                     resultMap.put("warning",obj);
@@ -124,14 +126,14 @@ public class ConsumeService {
                         map.put("brand_id",resultMap.get("brand_id"));
                         this.putErrorMessage(map,queueNameEnum,redisKey,apiMq);
                     }
-                }
+                }*/
             }
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("consumeResult errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
         }
     }
-
+/*
     public void putErrorMessage(Map<String,Object> resultMap,QueueNameJobEnum queueNameEnum,String redisKey,ApiMq apiMq){
         try {
             String product_code = resultMap.get("product_code") == null ? "" : resultMap.get("product_code").toString();
@@ -182,5 +184,5 @@ public class ConsumeService {
             e.printStackTrace();
             logger.info("putErrorMessage errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
         }
-    }
+    }*/
 }
