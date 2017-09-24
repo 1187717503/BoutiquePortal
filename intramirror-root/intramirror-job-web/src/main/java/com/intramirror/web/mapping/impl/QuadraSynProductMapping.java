@@ -49,8 +49,7 @@ public class QuadraSynProductMapping implements IProductMapping{
     
     /**
      * 封装商品对象
-     * @param product
-     * @param vendorOptions
+     * @param dataMap
      * @return
      * @throws Exception
      */
@@ -167,7 +166,7 @@ public class QuadraSynProductMapping implements IProductMapping{
             }
 
 
-            
+            productOptions.setCategory_name(JSONObject.toJSONString(categoryMap));
     		logger.info("job quadra product mapping getMappingCategoryInfoByCondition param:"+ new Gson().toJson(categoryMap));
             List<Map<String, Object>> apiCategoryMap = categoryService.getMappingCategoryInfoByCondition(categoryMap);
             if(apiCategoryMap != null && apiCategoryMap.size() > 0) {

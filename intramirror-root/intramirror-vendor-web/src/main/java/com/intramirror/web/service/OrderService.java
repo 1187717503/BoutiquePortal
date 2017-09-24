@@ -420,7 +420,6 @@ public class OrderService {
 			return result;
 		}
 		
-		
 		//取消订单跟箱子的关联,并修改状态为CONFIRMED
 		LogisticsProduct logisticsProduct = new LogisticsProduct();
 		logisticsProduct.setLogistics_product_id(Long.parseLong(map.get("logistics_product_id").toString()));
@@ -440,6 +439,19 @@ public class OrderService {
 
 				logger.info("order deleteOrder 删除订单相关联的 logisticProductShipment 调用接口  logisticProductShipmentService.deleteById sub_shipment_id:"+logisProShipmentInfo.get("sub_shipment_id").toString());
 				logisticProductShipmentService.deleteById(Long.parseLong(logisProShipmentInfo.get("sub_shipment_id").toString()));
+			}
+			//如果当前数据为container里面的最后一个商品删除container与shipment关联
+			
+			int containerId = Integer.parseInt(map.get("container_id").toString());
+			Long vendor_id = list.get(0).getVendor_id();
+			int status = OrderStatusType.READYTOSHIP;
+			List<Map<String, Object>> orderMap = orderService.getOrderListByStatusAndContainerId(containerId, status, vendor_id);
+			if (orderMap == null || orderMap.size() == 0){
+				Map<String, Object> uMap = new HashMap<>();
+				uMap.put("container_id", containerId);
+				uMap.put("shipment_id", 0);
+				int isfalse = containerService.updateContainerShipment(uMap);
+				logger.info("update container shipment Relation:"+isfalse);
 			}
 			result.successStatus();
 		}else{

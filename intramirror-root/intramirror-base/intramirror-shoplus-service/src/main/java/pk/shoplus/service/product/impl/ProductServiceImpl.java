@@ -75,6 +75,7 @@ public class ProductServiceImpl implements IProductService{
             Product product = productService.getProductByCondition(productConditions,null);
             logger.info("ProductServiceImplUpdateProduct,getProductByCondition,product:"+new Gson().toJson(product));
             if(product == null) {
+                if(conn != null) {conn.rollback();conn.close();}
                 return mapUtils.putData("status",StatusType.FAILURE)
                                .putData("info","update product - "+ ApiErrorTypeEnum.errorType.boutique_id_not_exist.getDesc()+" boutique_id:"+productOptions.getCode())
                                .putData("error_enum",ApiErrorTypeEnum.errorType.Data_not_exist)
@@ -90,7 +91,7 @@ public class ProductServiceImpl implements IProductService{
                         .putData("info","update product - " + ApiErrorTypeEnum.errorType.category_is_null.getDesc()+" category_id:null")
                         .putData("error_enum",warning_data_can_not_find_mapping)
                         .putData("key","category_id")
-                        .putData("value","null");
+                        .putData("value",productOptions.getCategory_name());
                 warningMaps.add(mapUtils.getMap());
             } else {
                 category = categoryService.getCategoryById(Long.parseLong(productOptions.getCategoryId()));
@@ -100,7 +101,7 @@ public class ProductServiceImpl implements IProductService{
                             .putData("info","update product - "+ ApiErrorTypeEnum.errorType.category_not_exist.getDesc()+" category_id:"+productOptions.getCategoryId())
                             .putData("error_enum",warning_data_can_not_find_mapping)
                             .putData("key","category_id")
-                            .putData("value",productOptions.getCategoryId());
+                            .putData("value",productOptions.getCategory_name());
                     warningMaps.add(mapUtils.getMap());
                 }
             }
@@ -111,7 +112,7 @@ public class ProductServiceImpl implements IProductService{
                         .putData("info","update product - "+ ApiErrorTypeEnum.errorType.category_is_not_three.getDesc()+" category_id:"+productOptions.getCategoryId())
                         .putData("error_enum",warning_data_can_not_find_mapping)
                         .putData("key","category_id")
-                        .putData("value",category.getCategory_id());
+                        .putData("value",productOptions.getCategory_name());
                 warningMaps.add(mapUtils.getMap());
             } else if(category != null) {
                 product.category_id = category.getCategory_id();
@@ -122,7 +123,7 @@ public class ProductServiceImpl implements IProductService{
                 mapUtils.putData("status",StatusType.WARNING)
                         .putData("info","update product - "+ ApiErrorTypeEnum.errorType.retail_price_is_zero.getDesc()+" retail_price:"+productOptions.getSalePrice())
                         .putData("error_enum",warning_retail_price_is_zero)
-                        .putData("key","retail_price")
+                        .putData("key","price")
                         .putData("value",productOptions.getSalePrice());
                 warningMaps.add(mapUtils.getMap());
             }
@@ -427,7 +428,7 @@ public class ProductServiceImpl implements IProductService{
                             mapUtils.putData("status",StatusType.WARNING)
                                     .putData("info","update product - " + error_price_out_of_range.getDesc() + " retail_price:" + productOptions.getSalePrice())
                                     .putData("error_enum", error_price_out_of_range)
-                                    .putData("key","retail_price")
+                                    .putData("key","price")
                                     .putData("value",productOptions.getSalePrice()).getMap();
                             warningMaps.add(mapUtils.getMap());
                         }
@@ -436,7 +437,7 @@ public class ProductServiceImpl implements IProductService{
                         mapUtils.putData("status",StatusType.WARNING)
                                 .putData("info","update product - " + warning_data_is_negative.getDesc() + " retail_price:" + productOptions.getSalePrice())
                                 .putData("error_enum",warning_data_is_negative)
-                                .putData("key","retail_price")
+                                .putData("key","price")
                                 .putData("value",productOptions.getSalePrice()).getMap();
                         warningMaps.add(mapUtils.getMap());
                     }

@@ -119,7 +119,7 @@ public class XmagSynProductAllController implements InitializingBean {
 									+ new Gson().toJson(productOptions) + ",vendorOptions:"
 									+ new Gson().toJson(vendorOptions) + ",eventName:" + eventName);
 							CommonThreadPool.execute(eventName, nugnesExecutor, threadNum,
-									new UpdateProductThread(productOptions, vendorOptions, fileUtils));
+									new UpdateProductThread(productOptions, vendorOptions, fileUtils,mqDataMap));
 							logger.info("XmagProductAllProducerControllerExecute,execute,endDate:"
 									+ DateUtils.getStrDate(new Date()) + ",productOptions:"
 									+ new Gson().toJson(productOptions) + ",vendorOptions:"

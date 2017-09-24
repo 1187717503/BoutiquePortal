@@ -202,6 +202,11 @@ public class ContainerServiceImpl extends BaseDao implements IContainerService{
 	public List<Map<String, Object>> getListByShipmentId(Map<String, Object> map) {
 		return containerMapper.getListByShipmentId(map);
 	}
+
+	@Override
+	public Map<String, Object> getContainerById(Map<String, Object> map) {
+		return containerMapper.getContainerById(map);
+	}
 	
 	
 

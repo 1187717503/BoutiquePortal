@@ -47,7 +47,7 @@ public class CloudStoreDayUpdateBySkuController implements InitializingBean{
     
     // init params
     private Map<String,Object> paramsMap;
-    
+
     // getpost util
     private static GetPostRequestUtil getPostRequestUtil = new GetPostRequestUtil();
     
@@ -55,7 +55,7 @@ public class CloudStoreDayUpdateBySkuController implements InitializingBean{
     public static ProductEDSManagement productEDSManagement = new ProductEDSManagement();
     
     // mapping
-    @Resource(name = "cloudStoreGetInventoryMapping")
+    @Resource(name = "cloudStoreProductMapping")
     private IProductMapping iProductMapping;
 
     // mapping
@@ -182,7 +182,7 @@ public class CloudStoreDayUpdateBySkuController implements InitializingBean{
 
                 // 线程池
                 logger.info("EdsAllUpdateByStockControllerExecute,execute,startDate:"+ DateUtils.getStrDate(new Date())+",jsonObject:"+new Gson().toJson(jsonObject)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
-                CommonThreadPool.execute(eventName,nugnesExecutor,threadNum,new UpdateStockThread(stockOption,fileUtils));
+                CommonThreadPool.execute(eventName,nugnesExecutor,threadNum,new UpdateStockThread(stockOption,fileUtils,jsonObject));
                 logger.info("EdsAllUpdateByStockControllerExecute,execute,endDate:"+ DateUtils.getStrDate(new Date())+",jsonObject:"+new Gson().toJson(jsonObject)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
 			} else if(type == Contants.EVENTS_TYPE_2) {
 
@@ -210,9 +210,9 @@ public class CloudStoreDayUpdateBySkuController implements InitializingBean{
                     logger.info("cloudStoreProductDAYProducerControllerExecute,initParam,productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
                
                     // 线程池
-                    logger.info("cloudStoreProductDAYProducerControllerExecute,execute,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
-                    CommonThreadPool.execute(eventName,nugnesExecutor,threadNum,new UpdateProductThread(productOptions,vendorOptions,fileUtils));
-                    logger.info("cloudStoreProductDAYProducerControllerExecute,execute,endDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
+                    logger.info("cloudStoreProductDAYProducerControllerExecute,execute,mqMap:"+JSONObject.toJSONString(mqMap)+",startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
+                    CommonThreadPool.execute(eventName,nugnesExecutor,threadNum,new UpdateProductThread(productOptions,vendorOptions,fileUtils,mqMap));
+                    logger.info("cloudStoreProductDAYProducerControllerExecute,execute,mqMap:"+JSONObject.toJSONString(mqMap)+",endDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
                
 				}
 
@@ -239,7 +239,7 @@ public class CloudStoreDayUpdateBySkuController implements InitializingBean{
            
                 // 线程池
                 logger.info("cloudStoreProductDAYProducerControllerExecute,execute,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
-                CommonThreadPool.execute(eventName,nugnesExecutor,threadNum,new UpdateProductThread(productOptions,vendorOptions,fileUtils));
+                CommonThreadPool.execute(eventName,nugnesExecutor,threadNum,new UpdateProductThread(productOptions,vendorOptions,fileUtils,mqMap));
                 logger.info("cloudStoreProductDAYProducerControllerExecute,execute,endDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
            
 			} else if(type == Contants.EVENTS_TYPE_5){
@@ -273,9 +273,9 @@ public class CloudStoreDayUpdateBySkuController implements InitializingBean{
         tony_day_updateProduct.put("nugnesExecutor",nugnesExecutor);
         tony_day_updateProduct.put("vendor_id","16");
         tony_day_updateProduct.put("threadNum","5");
-        tony_day_updateProduct.put("eventName","tony增量更新商品ByDay");
+        tony_day_updateProduct.put("eventName","product_delta_update");
         tony_day_updateProduct.put("datetime",DateUtils.getStrDate(new Date()));
-        tony_day_updateProduct.put("fileUtils",new ApiDataFileUtils("tony","tony增量更新商品ByDay"));
+        tony_day_updateProduct.put("fileUtils",new ApiDataFileUtils("tony","product_delta_update"));
         // put data
         paramsMap = new HashMap<>();
         paramsMap.put("tony_day_updateProduct",tony_day_updateProduct);

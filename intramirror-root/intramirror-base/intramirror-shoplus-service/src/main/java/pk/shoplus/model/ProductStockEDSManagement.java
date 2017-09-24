@@ -276,7 +276,7 @@ public class ProductStockEDSManagement {
             condition.put("vendor_id",stockOptions.getVendor_id());
             product = productService.getProductByCondition(condition, null);
             if(product == null){
-                 resultMessage.sStatus(false).sMsg("update stock - 找不到这个商品 。").setData(boutique_id_is_null);
+                 resultMessage.sStatus(false).sMsg("update stock - 找不到这个商品 。").setData(boutique_id_already_exists);
             }
         }
 

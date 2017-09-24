@@ -106,6 +106,7 @@ public class EdsUpdateByProductMapping implements IProductMapping {
                     .setCategoryId(category_id)
                     .setMadeIn(productMap.getString("made_in"))
                     .setComposition(technicalInfoString)
+                    .setCategory_name(oneCategory+"-"+twoCategory+"-"+threeCategory)
                     .setSizeFit(sizeFitValue)
                     .setWeight(stringListMap.get("weight") == null ? "" : stringListMap.get("weight").toString())
                     .setLength(stringListMap.get("length") == null ? "" : stringListMap.get("length").toString())

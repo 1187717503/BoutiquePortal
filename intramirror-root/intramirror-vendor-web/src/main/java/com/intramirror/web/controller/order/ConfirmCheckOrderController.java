@@ -5,6 +5,7 @@ import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.service.ILogisticsProductService;
+import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.product.api.model.Sku;
 import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.product.api.service.SkuService;
@@ -46,7 +47,8 @@ public class ConfirmCheckOrderController {
     @Autowired
     ILogisticsProductService logisticsProductServiceImpl;
 
-
+    @Autowired
+    IOrderService orderService;
     /**
      * Wang
      *
@@ -128,16 +130,26 @@ public class ConfirmCheckOrderController {
                     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
                     LogisticsProduct logis = logisticsProductServiceImpl.selectById(Long.parseLong(logisticsProductId));
-                    if (logis != null) {
-                        LogisticsProduct upLogis = new LogisticsProduct();
-                        upLogis.setLogistics_product_id(logis.getLogistics_product_id());
-                        if (estShipDate != null) {
-                            upLogis.setEst_ship_date(sdf.parse(estShipDate));
-                        }
-                        upLogis.setConfirmed_at(Helper.getCurrentUTCTime());
-                        logisticsProductServiceImpl.updateByLogisticsProduct(upLogis);
-                    } else {
-                        result.setMsg("Order does not exist,logisticsProductId:" + logisticsProductId);
+                    Map<String, Object> maps = orderService.getOrderLogisticsInfoByIdWithSql(Long.parseLong(logisticsProductId));
+                    String mapBrandId = maps.get("brandID")==null?"":maps.get("brandID").toString();
+                    String mapColorCode = maps.get("colorCode")==null?"":maps.get("colorCode").toString();
+                    
+                    //如果是当前自己的brandId喝colorCode保存
+                    if (mapBrandId.equals(brandId) && mapColorCode.equals(mapColorCode)){
+	                    if (logis != null) {
+	                        LogisticsProduct upLogis = new LogisticsProduct();
+	                        upLogis.setLogistics_product_id(logis.getLogistics_product_id());
+	                        if (estShipDate != null) {
+	                            upLogis.setEst_ship_date(sdf.parse(estShipDate));
+	                        }
+	                        upLogis.setConfirmed_at(Helper.getCurrentUTCTime());
+	                        logisticsProductServiceImpl.updateByLogisticsProduct(upLogis);
+	                    } else {
+	                        result.setMsg("Order does not exist,logisticsProductId:" + logisticsProductId);
+	                    }
+                    }else{
+                    	result.errorStatus().putMsg("error", "noMatching parm").setData("noMatching parm");
+                    	return result;
                     }
 
                 }
