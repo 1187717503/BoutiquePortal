@@ -65,7 +65,8 @@ public class ApiDataFileUtils {
             }
 
             // 创建文件
-            String formatDate = DateUtils.getStrDate(new Date(),"yyyyMMddHHmmss");
+//            String formatDate = DateUtils.getStrDate(new Date(),"yyyyMMddHHmmss");
+            String formatDate = RandomUtils.getDateRandom();
             fileName = fileName + "" + formatDate;
             this.setFileName(fileName);
             String fileUrl = bakUrl+"/"+fileName+".txt";
@@ -140,6 +141,6 @@ public class ApiDataFileUtils {
     }
 
     public static void main(String[] args) {
-        new ApiDataFileUtils("ding","testo").bakErrorFile("123","000");
+
     }
 }
