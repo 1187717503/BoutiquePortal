@@ -238,6 +238,7 @@ public class ProductEDSManagement {
                 result.put("info","create product -- " + ApiErrorTypeEnum.errorType.boutique_create_error.getDesc() + "boutique_id:"+productOptions.getCode() );
                 result.put("error_enum", ApiErrorTypeEnum.errorType.boutique_create_error);
                 result.put("key","info");
+                result.put("status",StatusType.SUCCESS);
                 result.put("value","product already exists.");
                 if(conn != null) {conn.rollback();conn.close();}
             } else {
