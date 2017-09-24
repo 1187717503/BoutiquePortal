@@ -44,6 +44,7 @@ public class ProductStockEDSManagement {
 
 
     public Map<String, Object> updateStock(StockOptions stockOptions){
+        if(stockOptions.getLast_check() == null) {stockOptions.setLast_check(new Date());}
         logger.info("ProductStockEDSManagementUpdateStock,inputParams,stockOptions:"+new Gson().toJson(stockOptions));
         MapUtils mapUtils = new MapUtils(new HashMap<>());
         Connection connection = null;
@@ -82,6 +83,7 @@ public class ProductStockEDSManagement {
                     if(StringUtils.isBlank(stockOptions.getType()) || !stockOptions.getType().equals(Contants.EVENTS_TYPE_1+"")) {
                         skuStore.reserved = reserved;
                     }
+                    skuStore.setLast_check(stockOptions.getLast_check());
                     logger.info("ProductStockEDSManagementUpdateStock,updateSkuStore,skuStore:" + new Gson().toJson(skuStore));
                     skuStoreService.updateSkuStore(skuStore);
                 } else {
@@ -112,6 +114,7 @@ public class ProductStockEDSManagement {
                             sku.in_price = inPrice;
                             sku.im_price = skuPrice.getIm_price();
                             sku.updated_at = new Date();
+                            sku.last_check = new Date();
                             skuService.updateSku(sku);
                             logger.info("ProductStockEDSManagementUpdateStock,updateSkuPrice,updateSku:"+new Gson().toJson(sku));
                         }
@@ -210,6 +213,7 @@ public class ProductStockEDSManagement {
             skuStore.created_at = new Date();
             skuStore.updated_at = new Date();
             skuStore.enabled = EnabledType.USED;
+            skuStore.setLast_check(new Date());
             skuStoreService.createSkuStore(skuStore);
             logger.info("ProductStockEDSManagementCreateSkuInfo,createSkuStore,skuStore:"+new Gson().toJson(skuStore));
 
@@ -373,6 +377,7 @@ public class ProductStockEDSManagement {
 		public String type;
 		public String vendor_id;
 		public String price;
+		public Date last_check;
 
         public String getConfirmed() {
             return confirmed;
@@ -431,6 +436,14 @@ public class ProductStockEDSManagement {
 
         public void setVendor_id(String vendor_id) {
             this.vendor_id = vendor_id;
+        }
+
+        public Date getLast_check() {
+            return last_check;
+        }
+
+        public void setLast_check(Date last_check) {
+            this.last_check = last_check;
         }
     }
 }

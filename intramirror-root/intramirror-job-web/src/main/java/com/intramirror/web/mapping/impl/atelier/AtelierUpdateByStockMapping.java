@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 import pk.shoplus.util.ExceptionUtils;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -38,6 +39,7 @@ public class AtelierUpdateByStockMapping implements IStockMapping{
             stockOption.setType(type);
             stockOption.setProductCode(boutique_id);
             stockOption.setSizeValue(size);
+            stockOption.setLast_check(new Date());
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("AtelierUpdateByStockMapping,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));

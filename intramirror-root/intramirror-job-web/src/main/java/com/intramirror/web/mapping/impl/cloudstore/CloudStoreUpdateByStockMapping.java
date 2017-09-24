@@ -1,5 +1,6 @@
 package com.intramirror.web.mapping.impl.cloudstore;
 
+import java.util.Date;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -60,6 +61,7 @@ public class CloudStoreUpdateByStockMapping implements IStockMapping{
             stockOption.setProductCode(productCode);
             stockOption.setSizeValue(size);
             stockOption.setQuantity(qtyDiff+"");
+            stockOption.setLast_check(new Date());
             logger.info("CloudStoreGetEventsMappingHandleMapping stockOptions : " + new Gson().toJson(stockOption));
             return stockOption;
         } catch (Exception e) {

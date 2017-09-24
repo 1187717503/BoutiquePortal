@@ -243,6 +243,7 @@ public class ProductEDSManagement {
             } else {
                 result.put("product", product);
                 result.put("status", StatusType.SUCCESS);
+                result.put("info","success");
                 if(conn != null) {conn.commit();conn.close();}
             }
             return false;
@@ -1374,6 +1375,8 @@ public class ProductEDSManagement {
 
 		public String category_name = "";
 
+        public Date last_check;
+
         public String getCategory_name() {
             return category_name;
         }
@@ -1591,6 +1594,14 @@ public class ProductEDSManagement {
 			this.skus = skus;
 			return this;
 		}
+
+        public Date getLast_check() {
+            return last_check;
+        }
+
+        public void setLast_check(Date last_check) {
+            this.last_check = last_check;
+        }
 
         public String getImgByFilippo() {
             return imgByFilippo;

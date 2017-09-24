@@ -16,6 +16,7 @@ import pk.shoplus.service.stock.api.IStoreService;
 import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.vo.ResultMessage;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +54,7 @@ public class StoreServiceImpl implements IStoreService{
             Long confirmed = 0l;
             long sku_store_id = 0;
             Long skuId = 0l;
+            Date last_check = null;
 
             if(StringUtils.isBlank(queueNameEnum)) {
                 return resultMessage.sStatus(false).sMsg("handleApiStockRule 枚举类型为空。size : "+size+",productCode :"+productCode+",queueNameEnum :"+queueNameEnum);
@@ -86,6 +88,7 @@ public class StoreServiceImpl implements IStoreService{
                 confirmed = skuStore.getConfirmed() == null ? 0l : skuStore.getConfirmed();
                 sku_store_id = skuStore.getSku_store_id();
                 skuId = skuStore.getSku_id();
+                last_check = skuStore.getLast_check();
             } else {
                 logger.info("StoreServiceImplHandleApiStockRule,skuInfoIsNull,size:"+size+",productCode:"+productCode);
                 SkuStore skuStore = new SkuStore();
@@ -135,6 +138,7 @@ public class StoreServiceImpl implements IStoreService{
             skuStore.reserved = Long.valueOf(reserved);
             skuStore.confirmed = confirmed;
             skuStore.sku_store_id = sku_store_id;
+            skuStore.setLast_check(last_check);
             logger.info("StoreServiceImplHandleApiStockRule,outputParams,skuStore:"+new Gson().toJson(skuStore));
             resultMessage.sStatus(true).sMsg("SUCCESS").sData(skuStore).setDesc(vendor_id);
             logger.info("StoreServiceImplHandleApiStockRule,resultMessage:"+new Gson().toJson(resultMessage));

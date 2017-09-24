@@ -1,4 +1,4 @@
-package com.intramirror.common.utils;
+package pk.shoplus.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -52,10 +52,11 @@ public class DateUtils {
      * @return
      */
     public static boolean compareDate(Date date1,Date date2){
-        System.out.println(date1+"---"+date2);
-        if(date1.getTime() > date2.getTime()) {
+        if(date1.getTime() > date2.getTime() || date1.getTime() == date2.getTime()) {
+            System.out.println(date1+"---"+date2+"true");
             return true;
         }
+        System.out.println(date1+"---"+date2+"false");
         return false;
         /*Sun Sep 24 10:54:09 CST 2017---Sun Sep 24 10:54:10 CST 2017
         false*/

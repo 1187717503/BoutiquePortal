@@ -1,5 +1,6 @@
 package com.intramirror.web.mapping.impl.filippo;
 
+import java.util.Date;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -38,7 +39,8 @@ public class FilippoSynStockMapping implements IStockMapping{
             stockOption.setProductCode(stockOptions.getProductCode()==null?"":stockOptions.getProductCode());
             stockOption.setQuantity(stockOptions.getQuantity()==null?"":stockOptions.getQuantity());
             stockOption.setVendor_id(vendor_id);
-            stockOption.setType(StockContants.absolute_qty); // 库存绝对值
+            stockOption.setType(StockContants.absolute_qty);
+            stockOption.setLast_check(new Date());
             logger.info("FilippoSynStockMappingHandleMappingAndExecute,result:"+JSONObject.toJSONString(stockOption));
         } catch (Exception e) {
             e.printStackTrace();

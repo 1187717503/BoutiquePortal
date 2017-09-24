@@ -23,10 +23,7 @@ import pk.shoplus.service.product.api.IProductService;
 import pk.shoplus.service.product.impl.ProductServiceImpl;
 import pk.shoplus.util.MapUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -167,6 +164,7 @@ public class QuadraSynProductMapping implements IProductMapping{
 
 
             productOptions.setCategory_name(JSONObject.toJSONString(categoryMap));
+            productOptions.setLast_check(new Date());
     		logger.info("job quadra product mapping getMappingCategoryInfoByCondition param:"+ new Gson().toJson(categoryMap));
             List<Map<String, Object>> apiCategoryMap = categoryService.getMappingCategoryInfoByCondition(categoryMap);
             if(apiCategoryMap != null && apiCategoryMap.size() > 0) {

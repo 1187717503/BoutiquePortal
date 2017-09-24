@@ -101,7 +101,6 @@ public class AtelierUpdateByProductService implements InitializingBean {
             // mapping
             Map<String,Object> bodyDataMap = new HashMap<>();
             bodyDataMap.put("Data",jsonObjectBody);
-            bodyDataMap.put("full_update_product","1");
             logger.info("AtelierUpdateByProductServiceUpdateProduct,mapping,bodyDataMap:"+JSONObject.toJSONString(bodyDataMap)+",eventName:"+eventName);
             ProductEDSManagement.ProductOptions productOptions = atelierUpdateByProductMapping.mapping(bodyDataMap);
             logger.info("AtelierUpdateByProductServiceUpdateProduct,mapping,productOptions:"+JSONObject.toJSONString(productOptions)+",bodyDataMap:"+JSONObject.toJSONString(bodyDataMap)+",eventName:"+eventName);

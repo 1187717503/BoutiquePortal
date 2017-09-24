@@ -1,5 +1,6 @@
 package com.intramirror.web.mapping.impl;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,6 +58,7 @@ public class XmagSynAllStockMapping implements IStockMapping{
 	            }
 	            stockOptions.setVendor_id(vendor_id);
                 stockOption.setType(StockContants.absolute_qty); // 库存绝对值
+				stockOption.setLast_check(new Date());
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	            logger.info("XmagAllStockMapping error message : " + ExceptionUtils.getExceptionDetail(e));

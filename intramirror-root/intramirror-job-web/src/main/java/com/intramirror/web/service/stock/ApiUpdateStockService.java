@@ -1,5 +1,6 @@
 package com.intramirror.web.service.stock;
 
+import com.alibaba.fastjson15.JSONObject;
 import com.google.gson.Gson;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.web.mapping.vo.StockOption;
@@ -12,11 +13,13 @@ import pk.shoplus.model.ProductStockEDSManagement;
 import pk.shoplus.model.SkuStore;
 import pk.shoplus.service.stock.api.IStoreService;
 import pk.shoplus.service.stock.impl.StoreServiceImpl;
+import pk.shoplus.util.DateUtils;
 import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.util.MapUtils;
 import pk.shoplus.vo.ResultMessage;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -82,11 +85,24 @@ public class ApiUpdateStockService {
             stockOptions.setQuantity(skuStore.getStore().toString());
             stockOptions.setReserved(skuStore.getReserved().toString());
             stockOptions.setConfirmed(skuStore.getConfirmed().toString());
-            logger.info("ApiUpdateStockServiceUpdateStock,updateStock,start,stockOptions:"+new Gson().toJson(stockOptions));
-            Map<String, Object> serviceResultMap = productStockEDSManagement.updateStock(stockOptions);
-            logger.info("ApiUpdateStockServiceUpdateStock,updateStock,start,serviceResultMap:"+new Gson().toJson(serviceResultMap)+",stockOptions:"+new Gson().toJson(stockOptions));
 
-            return serviceResultMap;
+            // last_check
+            if(skuStore.getLast_check() == null) {
+                skuStore.setLast_check(stockOption.getLast_check());
+            }
+
+            Date date1 = stockOption.getLast_check();
+            Date date2 = skuStore.getLast_check();
+            if (DateUtils.compareDate(date1, date2)) {
+                stockOptions.setLast_check(stockOption.getLast_check());
+                logger.info("ApiUpdateStockServiceUpdateStock,updateStock,start,stockOptions:"+new Gson().toJson(stockOptions));
+                Map<String, Object> serviceResultMap = productStockEDSManagement.updateStock(stockOptions);
+                logger.info("ApiUpdateStockServiceUpdateStock,updateStock,start,serviceResultMap:"+new Gson().toJson(serviceResultMap)+",stockOptions:"+new Gson().toJson(stockOptions));
+                return serviceResultMap;
+            } else {
+                logger.info("ApiUpdateStockServiceUpdateStock,updateStock,rollback,sku_store:"+ JSONObject.toJSONString(skuStore)+",stockOption:"+JSONObject.toJSONString(stockOption));
+                return mapUtils.putData("status",StatusType.SUCCESS).putData("info","rollback").getMap();
+            }
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("ApiUpdateStockServiceUpdateStock,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",stockOption:"+new Gson().toJson(stockOption));

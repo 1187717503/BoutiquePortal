@@ -10,6 +10,7 @@ import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.parameter.StatusType;
 import pk.shoplus.util.ExceptionUtils;
 
+import java.util.Date;
 import java.util.Map;
 
 import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.Runtime_exception;
@@ -52,7 +53,8 @@ public class AtelierUpdateByProductMapping implements IProductMapping{
                     .setLength(jsonObjectData.getString("length"))
                     .setWidth(jsonObjectData.getString("width"))
                     .setHeigit(jsonObjectData.getString("height"))
-                    .setSalePrice(jsonObjectData.getString("sale_price"));
+                    .setSalePrice(jsonObjectData.getString("sale_price"))
+                    .setLast_check(new Date());
             String full_update_product = bodyDataMap.get("full_update_product") == null ? "0" : bodyDataMap.get("full_update_product").toString();
             productOptions.setFullUpdateProductFlag(full_update_product);
 
