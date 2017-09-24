@@ -37,7 +37,13 @@ public class SystemCallFactory {
     		return result;
     	}
     	
-
+    	//判断vendorId 是否有配置同步订单接口
+    	if(nameMap.get(vendorId) == null){
+    		result = "create order SystemCallFactory  参数校验失败   根据vendorId 获取到同步订单的接口为空  null  vendorId:"+vendorId;
+    		logger.info("create order SystemCallFactory  参数校验失败   根据vendorId 获取到同步订单的接口为空  null  vendorId:"+vendorId);
+    		return result;
+    	}
+    	
         String className = nameMap.get(vendorId).toString();
         logger.info("create order SystemCallFactory createOrder 获取到的实例名称   className:"+className);
         
