@@ -15,7 +15,7 @@ public class ApiErrorTypeEnum {
         weight_is_null("weight_is_null","接口传递过来的weight为null。"),
 
         boutique_id_already_exist("boutique_id_already_exist","查询到这个boutique_id。"),
-        boutique_id_already_exists("boutique_id_already_exists","boutique_id不存在。"),
+        boutique_id_not_exists("boutique_id_not_exists","boutique_id不存在。"),
         boutique_name_is_null("boutique_name_is_null","接口传递过来的boutique_name为null。"),
         boutique_id_is_null("boutique_id_is_null","接口传递过来的boutique_id为null。"),
         boutique_create_error("boutique_create_error","创建product表记录失败。"),
