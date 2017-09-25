@@ -80,7 +80,7 @@ public class UpdateProductThread implements Runnable{
                 String path = apiDataFileUtils.bakErrorFile("error",fileDataContent);
                 logger.info("UpdateProductThreadRun,bakErrorFile,end,path:"+path+",fileDataContent:"+fileDataContent);
 
-                this.saveErrorMsg(fileDataContent,vendorOptions.getVendorId().toString(),apiDataFileUtils,resultMap);
+                this.saveErrorMsg(fileDataContent,vendorOptions.getVendorId().toString(),apiDataFileUtils,resultMap,path);
             }
 
         } catch (Exception e) {
@@ -98,8 +98,8 @@ public class UpdateProductThread implements Runnable{
     }
 
     // 错误消息存库
-    public static boolean saveErrorMsg(String fileDataContent,String vendor_id,ApiDataFileUtils apiDataFileUtils,Map<String,Object> resultMap){
-        logger.info("UpdateProductThreadSaveErrorMsg,inputParams,fileDataContent:"+fileDataContent+",vendor_id:"+vendor_id+",apiDataFileUtils:"+JSONObject.toJSONString(apiDataFileUtils)+",resultMap:"+JSONObject.toJSONString(resultMap));
+    public static boolean saveErrorMsg(String fileDataContent,String vendor_id,ApiDataFileUtils apiDataFileUtils,Map<String,Object> resultMap,String fileName){
+        logger.info("UpdateProductThreadSaveErrorMsg,inputParams,fileDataContent:"+fileDataContent+",vendor_id:"+vendor_id+",apiDataFileUtils:"+JSONObject.toJSONString(apiDataFileUtils)+",resultMap:"+JSONObject.toJSONString(resultMap)+",fileName:"+fileName);
         Connection conn = null;
         try {
             conn = DBConnector.sql2o.beginTransaction();
@@ -107,7 +107,6 @@ public class UpdateProductThread implements Runnable{
 
             String vendorName = apiDataFileUtils.getVendorName();
             String evnetName = apiDataFileUtils.getEventName();
-            String fileName = apiDataFileUtils.getFileName();
             String file_location = ApiDataFileUtils.baseUrl+"/"+vendorName+"/"+ApiDataFileUtils.error_file+"/"+evnetName;
             String product_code = resultMap.get("product_code") == null ? "" : resultMap.get("product_code").toString();
             String color_code = resultMap.get("color_code") == null ? "" : resultMap.get("color_code").toString();

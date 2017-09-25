@@ -26,4 +26,9 @@ public class RandomUtils {
         return temp+"_"+currentTimeMillis+random;
     }
 
+    public static void main(String[] args) {
+        System.out.println(getDateRandom());
+        System.out.println(getDateRandom());
+
+    }
 }

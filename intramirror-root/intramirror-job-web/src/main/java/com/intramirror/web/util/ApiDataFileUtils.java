@@ -71,7 +71,8 @@ public class ApiDataFileUtils {
             this.setFileName(fileName);
             String fileUrl = bakUrl+"/"+fileName+".txt";
             FileUtils.serialize(content,fileUrl);
-            return this.writeFileContent(fileUrl,content);
+             this.writeFileContent(fileUrl,content);
+             return fileName;
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("ApiDataFileUtilsBakFile,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",fileName:"+fileName+",content:"+content);
