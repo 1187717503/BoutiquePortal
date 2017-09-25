@@ -39,7 +39,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 /**
  * Created by dingyifan on 2017/9/20.
  */
-@CrossOrigin
 @Controller
 @RequestMapping("/errormessage")
 public class ErrorMessageController {
@@ -47,6 +46,7 @@ public class ErrorMessageController {
     // logger
     private static final Logger logger = Logger.getLogger(ErrorMessageController.class);
 
+    @CrossOrigin
     @ResponseBody
     @RequestMapping("/select")
     public JSONObject getMessage(@Param("api_error_processing_id")String api_error_processing_id){
@@ -86,6 +86,7 @@ public class ErrorMessageController {
 
     private ThreadPoolExecutor executor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
 
+    @CrossOrigin
     @ResponseBody
     @RequestMapping("/processing")
     public Map<String,Object> processing(@Param(value = "data")String data){
