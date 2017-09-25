@@ -17,6 +17,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.sql2o.Connection;
@@ -38,6 +39,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 /**
  * Created by dingyifan on 2017/9/20.
  */
+@CrossOrigin
 @Controller
 @RequestMapping("/errormessage")
 public class ErrorMessageController {
