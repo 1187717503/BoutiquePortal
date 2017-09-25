@@ -1,7 +1,5 @@
 package com.intramirror.web.controller.api.filippo;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +27,6 @@ import com.intramirror.web.util.ApiDataFileUtils;
 import com.intramirror.web.util.GetPostRequestUtil;
 
 import difflib.DiffRow;
-import pk.shoplus.common.Contants;
 import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.parameter.StatusType;
 import pk.shoplus.service.request.impl.GetPostRequestService;
@@ -53,9 +50,11 @@ public class FilippoUpdateByStockController  implements InitializingBean {
     // getpost util
     private static GetPostRequestUtil getPostRequestUtil = new GetPostRequestUtil();
 
-    private static final String origin = "D:/filippo/origin.txt";
-
-	private static final String revised = "D:/filippo/revised.txt";
+    private static final String revised = "revised";
+	
+	private static final String origin = "origin";
+	
+	private static final String type = ".txt";
 
     // mapping
     @Resource(name = "filippoSynStockMapping")
@@ -71,10 +70,6 @@ public class FilippoUpdateByStockController  implements InitializingBean {
         if(StringUtils.isBlank(name)) {
             return mapUtils.putData("status", StatusType.FAILURE).putData("info","name is null").getMap();
         }
-
-        Date date = new Date();
-        DateFormat format1 = new SimpleDateFormat("yyyyMMddHHmmss");
-        String strDate = format1.format(date);
         
         // get param
         Map<String,Object> param = (Map<String, Object>) paramsMap.get(name);
@@ -88,15 +83,10 @@ public class FilippoUpdateByStockController  implements InitializingBean {
         int threadNum = Integer.parseInt(param.get("threadNum").toString());
         ThreadPoolExecutor filippoExecutor = (ThreadPoolExecutor) param.get("filippoExecutor");
 
-        // file path
-        
-        String originProductPath = Contants.file_filippo_path + Contants.qty_origin_filippo_product + Contants.file_filippo_type;
-        String revisedProductPath = Contants.file_filippo_path + Contants.qty_revised_filippo_product + Contants.file_filippo_type;
-
         try {
         	ProductEDSManagement.VendorOptions vendorOption = new ProductEDSManagement().getVendorOptions();
         	vendorOption.setVendorId(Long.parseLong(vendor_id));
-        	String getResponse ="json";// getPostRequestUtil.requestMethod(GetPostRequestService.HTTP_GET,url,null);
+        	String getResponse = getPostRequestUtil.requestMethod(GetPostRequestService.HTTP_GET,url,null);
         	
         	Map<String,Object> mqMap = new HashMap<>();
             mqMap.put("vendorOptions",vendorOption);
@@ -104,21 +94,22 @@ public class FilippoUpdateByStockController  implements InitializingBean {
             if (StringUtils.isNotBlank(getResponse)){
             	fileUtils.bakPendingFile("stock_vendor_id_"+vendor_id,getResponse);
 	        	// 1.如果第一次触发此接口,origin file不存在则创建,用作下次调用对比
-            	if (!FileUtil.fileExists(origin)) {
-					FileUtil.createFile("D:/filippo/", "origin.txt", getResponse);
+            	if (!FileUtil.fileExists(filippo_compare_path+origin+type)) {
+					FileUtil.createFile(filippo_compare_path,origin+type, getResponse);
 				}
 	            	
-            	FileUtil.createFile("D:/filippo/", "revised.txt", getResponse);
+            	FileUtil.createFile(filippo_compare_path, revised+type, getResponse);
                 // 2.处理文件,筛选出product所在行的数据
-				String originContent = FileUtil.readFileByFilippo(origin);
-				String revisedContent = FileUtil.readFileByFilippo(revised);
+				String originContent = FileUtil.readFileByFilippo(filippo_compare_path+origin+type);
+				String revisedContent = FileUtil.readFileByFilippo(filippo_compare_path+revised+type);
 
                 // 3.写入文件,将筛选出的product数据写入文件
-				FileUtil.createFile("D:/", "filippo/compare_origin.txt", originContent);
-				FileUtil.createFile("D:/", "filippo/compare_revised.txt", revisedContent);
+				FileUtil.createFile(filippo_compare_path, "compare_origin.txt", originContent);
+				FileUtil.createFile(filippo_compare_path, "compare_revised.txt", revisedContent);
 
                 // 4.文件进行对比
-                List<DiffRow> diffRows = FileUtil.CompareTxt("D:/filippo/compare_origin.txt","D:/filippo/compare_revised.txt");
+                List<DiffRow> diffRows = FileUtil.CompareTxt(filippo_compare_path+"compare_origin.txt"
+                		,filippo_compare_path+"compare_revised.txt");
 
                 // 5.消息筛入MQ
                 StringBuffer stringBuffer = new StringBuffer();
@@ -128,6 +119,9 @@ public class FilippoUpdateByStockController  implements InitializingBean {
                     if(tag == DiffRow.Tag.INSERT || tag == DiffRow.Tag.CHANGE) {
                         logger.info("change -------" + diffRow.getNewLine());
                         stringBuffer.append(diffRow.getNewLine()+"\n");
+                        if (!StringUtils.isNotBlank(diffRow.getOldLine())){
+							break;
+						}
                         mqMap.put("product_data",diffRow.getOldLine());
                         mqMap.put("vendor_id",vendor_id);
 	                    iStockMapping.mapping(mqMap);
@@ -144,8 +138,8 @@ public class FilippoUpdateByStockController  implements InitializingBean {
                 }  
 
                 // 6.处理结束后备份origin,并重置origin
-				String originContentAll = FileUtil.readFile(revised);
-				FileUtil.createFile("D:/filippoo/", "origin.txt", originContentAll);
+				String originContentAll = FileUtil.readFile(filippo_compare_path+revised+type);
+				FileUtil.createFile(filippo_compare_path, origin+type, originContentAll);
 				mapUtils.putData("status",StatusType.SUCCESS).putData("info","SUCCESS !!!");
 
 	            logger.info("FilippoUpdateByStockControllerExecute,getUrlResult SUCCESS");
@@ -168,7 +162,7 @@ public class FilippoUpdateByStockController  implements InitializingBean {
         Map<String,Object> filippo_increment_stock = new HashMap<>();
         filippo_increment_stock.put("url","http://stat.filippomarchesani.net:2060/gw/collect.php/?p=1n3r4&o=intra&q=getqty");
         filippo_increment_stock.put("vendor_id","17");
-        filippo_increment_stock.put("filippo_compare_path","D:/filippo");
+        filippo_increment_stock.put("filippo_compare_path","D:/mnt/compare/filippo/stock/");
         filippo_increment_stock.put("fileUtils",new ApiDataFileUtils("filippo","filippo增量更新库存"));
         filippo_increment_stock.put("eventName","filippo_increment_updateproduct");
         filippo_increment_stock.put("filippoExecutor",filippoExecutor);

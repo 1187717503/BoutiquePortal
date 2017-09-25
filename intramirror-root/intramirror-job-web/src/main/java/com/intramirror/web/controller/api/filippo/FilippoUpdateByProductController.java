@@ -1,7 +1,5 @@
 package com.intramirror.web.controller.api.filippo;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +27,6 @@ import com.intramirror.web.util.ApiDataFileUtils;
 import com.intramirror.web.util.GetPostRequestUtil;
 
 import difflib.DiffRow;
-import pk.shoplus.common.Contants;
 import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.parameter.StatusType;
 import pk.shoplus.service.request.impl.GetPostRequestService;
@@ -53,9 +50,12 @@ public class FilippoUpdateByProductController implements InitializingBean {
 	// init params
 	private Map<String, Object> paramsMap;
 
-	private static final String origin = "D:/mnt/compare/filippo/origin.txt";
 
-	private static final String revised = "D:/mnt/compare/filippo/revised.txt";
+	private static final String revised = "revised";
+	
+	private static final String origin = "origin";
+	
+	private static final String type = ".txt";
 
 	// mapping
 	@Resource(name = "filippoSynProductMapping")
@@ -71,10 +71,6 @@ public class FilippoUpdateByProductController implements InitializingBean {
 		if (StringUtils.isBlank(name)) {
 			return mapUtils.putData("status", StatusType.FAILURE).putData("info", "name is null").getMap();
 		}
-
-		Date date = new Date();
-		DateFormat format1 = new SimpleDateFormat("yyyyMMddHHmmss");
-		String strDate = format1.format(date);
 
 		// get param
 		Map<String, Object> param = (Map<String, Object>) paramsMap.get(name);
@@ -92,34 +88,26 @@ public class FilippoUpdateByProductController implements InitializingBean {
 
 		Map<String, Object> mqMap = new HashMap<>();
 		mqMap.put("vendorOptions", vendorOption);
-		// file path
-
-		String originProductPath = Contants.file_filippo_path + Contants.qty_origin_filippo_product
-				+ Contants.file_filippo_type;
-		String revisedProductPath = Contants.file_filippo_path + Contants.qty_revised_filippo_product
-				+ Contants.file_filippo_type;
-
 		try {
 			logger.info(" start invoke filippo api !" + url);
-//			String getResponse = getPostRequestUtil.requestMethod(GetPostRequestService.HTTP_GET, url, null);
-			String getResponse = "sss";
+			String getResponse = getPostRequestUtil.requestMethod(GetPostRequestService.HTTP_GET, url, null);
 			logger.info(" end invoke filippo api !");
 			if (StringUtils.isNotBlank(getResponse)) {
 				fileUtils.bakPendingFile("product_vendor_id_"+vendor_id,getResponse);
 				// origin 不存在创建
 				// 1.如果第一次触发此接口,origin file不存在则创建,用作下次调用对比
-				if (!FileUtil.fileExists(origin)) {
-					FileUtil.createFile("D:/mnt/compare/filippo/", "origin.txt", getResponse);
+				if (!FileUtil.fileExists(filippo_compare_path+origin+type)) {
+					FileUtil.createFile(filippo_compare_path, origin+type, getResponse);
 				}
-				FileUtil.createFile("D:/mnt/compare/filippo/", "revised.txt", getResponse);
+				FileUtil.createFile(filippo_compare_path, revised+type, getResponse);
 				// 备份
-				String originContent = FileUtil.readFileByFilippo(origin);
-				String revisedContent = FileUtil.readFileByFilippo(revised);
+				String originContent = FileUtil.readFileByFilippo(filippo_compare_path+origin+type);
+				String revisedContent = FileUtil.readFileByFilippo(filippo_compare_path+revised+type);
 
-				FileUtil.createFile("D:/", "mnt/compare/filippo/compare_origin.txt", originContent);
-				FileUtil.createFile("D:/", "mnt/compare/filippo/compare_revised.txt", revisedContent);
-				List<DiffRow> diffRows = FileUtil.CompareTxt("D:/mnt/compare/filippo/compare_origin.txt",
-						"D:/mnt/compare/filippo/compare_revised.txt");
+				FileUtil.createFile(filippo_compare_path, "compare_origin.txt", originContent);
+				FileUtil.createFile(filippo_compare_path, "compare_revised.txt", revisedContent);
+				List<DiffRow> diffRows = FileUtil.CompareTxt(filippo_compare_path+"compare_origin.txt",
+						filippo_compare_path+"compare_revised.txt");
 
 				// 对比文件处理
 				int sum = 0;
@@ -128,9 +116,12 @@ public class FilippoUpdateByProductController implements InitializingBean {
 					DiffRow.Tag tag = diffRow.getTag();
 					if (tag == DiffRow.Tag.INSERT || tag == DiffRow.Tag.CHANGE) {
 						sum++;
-						logger.info("change -------" + diffRow.getNewLine());
+						logger.info("FilippoUpdateByproductControllerExecute,change -------" + diffRow.getNewLine());
 						stringBuffer.append(diffRow.getNewLine() + "\n");
-						mqMap.put("product_data", diffRow);
+						if (!StringUtils.isNotBlank(diffRow.getOldLine())){
+							break;
+						}
+						mqMap.put("product_data", diffRow.getOldLine());
 						mqMap.put("vendor_id", vendor_id);
 						ProductEDSManagement.ProductOptions productOptions = iProductMapping.mapping(mqMap);
 						// 线程池
@@ -148,8 +139,9 @@ public class FilippoUpdateByProductController implements InitializingBean {
 					}
 				}
 				// 6.处理结束后备份origin,并重置origin
-				String originContentAll = FileUtil.readFile(revised);
-				FileUtil.createFile("D:/mnt/compare/filippoo/", "origin.txt", originContentAll);
+				String originContentAll = FileUtil.readFile(filippo_compare_path+revised+type);
+				logger.info("FilippoUpdateByproductControllerExecute,origin : "+originContentAll);
+				FileUtil.createFile(filippo_compare_path, origin+type, originContentAll);
 				mapUtils.putData("status",StatusType.SUCCESS).putData("info","SUCCESS !!!");
 			} else {
 				// 日志
@@ -172,9 +164,9 @@ public class FilippoUpdateByProductController implements InitializingBean {
 		ThreadPoolExecutor filippoExecutor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 		Map<String, Object> filippo_increment_updateproduct = new HashMap<>();
 		filippo_increment_updateproduct.put("url",
-				"http://stat.filippomarchesani.net:2060/gw/collect.php/?p=1n3r4&o=intra&q=getqty");
+				"http://stat.filippomarchesani.net:2060/gw/collect.php/?p=1n3r4&o=intra&q=getall");
 		filippo_increment_updateproduct.put("vendor_id", "17");
-		filippo_increment_updateproduct.put("filippo_compare_path", "D:/mnt/compare/filippo");
+		filippo_increment_updateproduct.put("filippo_compare_path", "/mnt/compare/filippo/product/");
 		filippo_increment_updateproduct.put("fileUtils", new ApiDataFileUtils("filippo", "filippo增量更新库存"));
 		filippo_increment_updateproduct.put("eventName", "filippo_increment_updateproduct");
 		filippo_increment_updateproduct.put("filippoExecutor", filippoExecutor);

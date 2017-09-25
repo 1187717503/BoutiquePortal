@@ -98,7 +98,7 @@ public class Contants {
     /**
      * filippo 接口
      */
-    public static final String file_filippo_path = "D:/opt/data/filippo/";
+    public static final String file_filippo_path = "/opt/data/filippo/";
     public static final String all_filippo = "all_filippo";
     public static final String origin_filippo = "getall_origin_filippo";
     public static final String revised_filippo = "getall_revised_filippo";

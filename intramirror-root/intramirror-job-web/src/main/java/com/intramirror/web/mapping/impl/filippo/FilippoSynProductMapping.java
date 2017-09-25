@@ -71,6 +71,7 @@ public class FilippoSynProductMapping implements IProductMapping {
                     pv = pv.replace("<br>","");
                     pv = pv.replace("??","");
                     pv = pv.replace("×","");
+                    pv = pv.replace("��", "");
                     if(pn.equals("VAR_ID")) {productOptions.setCode(pv);}
                     else if(pn.equals("STG")) {productOptions.setSeasonCode(pv);}
                     else if(pn.equals("BND_NAME")){productOptions.setBrandName(pv);}
