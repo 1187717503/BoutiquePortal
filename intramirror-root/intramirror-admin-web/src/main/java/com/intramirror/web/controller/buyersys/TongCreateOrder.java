@@ -214,6 +214,7 @@ public class TongCreateOrder extends BuyerSystemCall{
 	        DefaultHttpClient httpClient = new DefaultHttpClient();
 	        HttpPost method = new HttpPost(url);
 	        Map<String, Object> resultMap = new HashMap<>();
+	        resultMap.put("resultMeesage", "");
 	        //post请求返回结果
 	        try {
 	        	
@@ -238,6 +239,7 @@ public class TongCreateOrder extends BuyerSystemCall{
 	                    resultMap.put("resultMeesage", resultMeesage);
 	                } catch (Exception e) {
 	                	logger.error("buyersys Tong createOrder post请求提交失败:" + url, e);
+	                	resultMap.put("resultMeesage", "error");
 	                }
 	                
 	            }else{
