@@ -66,7 +66,7 @@ public class TongCreateOrder extends BuyerSystemCall{
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         try {
         	Properties props = new Properties();
-        	InputStream in = DBConnector.class.getResourceAsStream("/orderapi-cofig.properties");
+        	InputStream in = TongCreateOrder.class.getResourceAsStream("/orderapi-cofig.properties");
         	props.load(in);
         	
         	Map<String, Object> conditionMap = new HashMap<String, Object>();
