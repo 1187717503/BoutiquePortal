@@ -124,7 +124,7 @@ public class EDSCreateOrder extends BuyerSystemCall {
     					//调用退款
     					logger.info(MessageFormat.format("buyersys eds createOrder 推送订单失败 ,返回的结果:{0}",getResult));
     					Map<String, Object> refundMap = orderRefund.orderRefund(logisticsProductId+"");
-    					logger.info(MessageFormat.format("buyersys Tong createOrder 推送订单失败,调用退款 接口,返回的结果:{0}",new Gson().toJson(refundMap)));
+    					logger.info(MessageFormat.format("buyersys eds createOrder 推送订单失败,调用退款 接口,返回的结果:{0}",new Gson().toJson(refundMap)));
     					
     					//如果退款失败，记录失败信息
     					Integer refundStatus = Integer.parseInt(refundMap.get("status").toString());
