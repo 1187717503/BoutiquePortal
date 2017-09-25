@@ -116,6 +116,33 @@ public class UpdateProductThread implements Runnable{
             String value = resultMap.get("value") == null ? "" : resultMap.get("value").toString();
             ApiErrorTypeEnum.errorType errorType = resultMap.get("error_enum") == null ? null : (ApiErrorTypeEnum.errorType)resultMap.get("error_enum");
 
+            if(errorType == null) {
+                List<Map<String,Object>> warningMap = (List<Map<String, Object>>) resultMap.get("warningMaps");
+
+                for(Map<String,Object> map : warningMap) {
+                    key = map.get("key") == null ? "" : map.get("key").toString();
+                    value = map.get("value") == null ? "" : map.get("value").toString();
+                    errorType = map.get("error_enum") == null ? null : (ApiErrorTypeEnum.errorType)map.get("error_enum");
+                    insertErrorMsg(conn,categoryService,vendor_id,evnetName,file_location,errorType,fileName,product_code,sku_size,brand_id,color_code,key,value);
+                }
+            } else {
+                insertErrorMsg(conn,categoryService,vendor_id,evnetName,file_location,errorType,fileName,product_code,sku_size,brand_id,color_code,key,value);
+            }
+            conn.commit();
+        } catch (Exception e) {
+            logger.info("UpdateProductThreadSaveErrorMsg,insertApiErrorProcessing,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+",resultMap:"+JSONObject.toJSON(resultMap));
+            e.printStackTrace();
+            if(conn!=null) {conn.rollback();conn.close();}
+            return false;
+        } finally {
+            if(conn!=null){conn.close();}
+        }
+        return true;
+    }
+
+    public static boolean insertErrorMsg(Connection conn,CategoryService categoryService,String vendor_id,String evnetName,String file_location,ApiErrorTypeEnum.errorType errorType
+    ,String fileName,String product_code,String sku_size,String brand_id,String color_code,String key,String value) throws Exception{
+        try {
             // 获取vendor_api
             String selectVendorApiSQL = "select * from vendor_api vp where vp.vendor_id = '"+vendor_id+"' and vp.`name` = '"+evnetName+"' and enabled = 1";
             logger.info("UpdateProductThreadSaveErrorMsg,selectVendorApi,selectVendorApiSQL:"+selectVendorApiSQL);
@@ -158,14 +185,8 @@ public class UpdateProductThread implements Runnable{
 
             logger.info("UpdateProductThreadSaveErrorMsg,insertApiErrorProcessing,insertApiErrorProcessingSQL:"+insertApiErrorProcessingSQL);
             categoryService.updateBySQL(insertApiErrorProcessingSQL);
-            conn.commit();
         } catch (Exception e) {
-            logger.info("UpdateProductThreadSaveErrorMsg,insertApiErrorProcessing,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+",resultMap:"+JSONObject.toJSON(resultMap));
-            e.printStackTrace();
-            if(conn!=null) {conn.rollback();conn.close();}
-            return false;
-        } finally {
-            if(conn!=null){conn.close();}
+            throw e;
         }
         return true;
     }
