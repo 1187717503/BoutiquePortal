@@ -60,7 +60,7 @@ public class UpdateStockThread implements Runnable{
                 String path = apiDataFileUtils.bakErrorFile("error",fileDataContent);
                 logger.info("UpdateStockThreadRun,bakErrorFile,end,path:"+path+",fileDataContent:"+fileDataContent);
 
-                UpdateProductThread.saveErrorMsg(fileDataContent,stockOption.getVendor_id().toString(),apiDataFileUtils,resultMap);
+                UpdateProductThread.saveErrorMsg(fileDataContent,stockOption.getVendor_id().toString(),apiDataFileUtils,resultMap,path);
             }
         } catch (Exception e) {
             e.printStackTrace();
