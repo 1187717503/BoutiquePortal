@@ -128,7 +128,7 @@ public class UpdateProductThread implements Runnable{
             } else {
                 insertErrorMsg(conn,categoryService,vendor_id,evnetName,file_location,errorType,fileName,product_code,sku_size,brand_id,color_code,key,value);
             }
-            conn.commit();
+            if(conn != null){conn.commit();}
         } catch (Exception e) {
             logger.info("UpdateProductThreadSaveErrorMsg,insertApiErrorProcessing,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+",resultMap:"+JSONObject.toJSON(resultMap));
             e.printStackTrace();
