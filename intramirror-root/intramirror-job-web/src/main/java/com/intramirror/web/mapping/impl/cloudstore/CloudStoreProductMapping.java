@@ -1,5 +1,6 @@
 package com.intramirror.web.mapping.impl.cloudstore;
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -66,12 +67,14 @@ public class CloudStoreProductMapping implements IProductMapping {
 	                .setColorCode(colorCode)
 	                .setColorDesc(jsonObjectData.getString("color_en"))
 	                .setCategoryId(category_id)
+					.setCategory_name(jsonArray.toJSONString())
 	                .setDesc(jsonObjectData.getString("desc_en"))
 	                .setComposition(jsonObjectData.getString("material_en"))
 	                .setCoverImg(jsonObjectData.getString("images"))
 	                .setDescImg(jsonObjectData.getString("images"))
 	                .setSalePrice(jsonObjectData.getString("stock_price"))
-	                .setFullUpdateProductFlag(full_update_product);
+	                .setFullUpdateProductFlag(full_update_product)
+					.setLast_check(new Date());
 	
 	        // handle sku
 	        ProductEDSManagement.SkuOptions sku = productEDSManagement.getSkuOptions();

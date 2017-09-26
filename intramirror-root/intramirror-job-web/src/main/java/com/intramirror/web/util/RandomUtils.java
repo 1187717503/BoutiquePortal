@@ -23,6 +23,12 @@ public class RandomUtils {
         // 随机数
         int random=(int) ((Math.random()+1)*100000);
 
-        return temp+currentTimeMillis+random;
+        return temp+"_"+currentTimeMillis+random;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(getDateRandom());
+        System.out.println(getDateRandom());
+
     }
 }

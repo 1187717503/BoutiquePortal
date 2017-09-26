@@ -14,6 +14,7 @@ import pk.shoplus.model.TechnicalInfo;
 import pk.shoplus.service.MappingCategoryService;
 import pk.shoplus.util.ExceptionUtils;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,13 +107,15 @@ public class EdsUpdateByProductMapping implements IProductMapping {
                     .setCategoryId(category_id)
                     .setMadeIn(productMap.getString("made_in"))
                     .setComposition(technicalInfoString)
+                    .setCategory_name(oneCategory+"-"+twoCategory+"-"+threeCategory)
                     .setSizeFit(sizeFitValue)
                     .setWeight(stringListMap.get("weight") == null ? "" : stringListMap.get("weight").toString())
                     .setLength(stringListMap.get("length") == null ? "" : stringListMap.get("length").toString())
                     .setWidth(stringListMap.get("width") == null ? "" : stringListMap.get("width").toString())
                     .setHeigit(stringListMap.get("height") == null ? "" : stringListMap.get("height").toString())
                     .setSalePrice(productMap.getString("retail_price"))
-                    .setFullUpdateProductFlag(full_update_product);
+                    .setFullUpdateProductFlag(full_update_product)
+                    .setLast_check(new Date());
 
             // set get skus
             JSONArray skus = JSONArray.parseArray(productMap.getString("variants"));

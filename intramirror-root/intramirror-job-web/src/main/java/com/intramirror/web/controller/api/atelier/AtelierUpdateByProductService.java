@@ -42,11 +42,11 @@ public class AtelierUpdateByProductService implements InitializingBean {
     @Resource(name = "atelierUpdateByProductMapping")
     private AtelierUpdateByProductMapping atelierUpdateByProductMapping;
 
-    public String all_update_product = "全量更新商品";
+    public String all_update_product = "product_all_update";
 
-    public String update_product = "更新商品";
+    public String update_product = "product_delta_update";
 
-    public String create_product = "创建商品";
+    public String create_product = "product_delta_create";
 
     // thread num
     private static final int threadNum = 10;
@@ -95,13 +95,12 @@ public class AtelierUpdateByProductService implements InitializingBean {
             logger.info("AtelierUpdateByStockControllerExecute,getBaseData,paramMap:"+JSONObject.toJSONString(paramMap));
             String vendor_id = paramMap.get("vendor_id").toString();
             String eventName = paramMap.get("eventName").toString();
-            ApiDataFileUtils fileUtils = new ApiDataFileUtils(eventName,eventName+type);
+            ApiDataFileUtils fileUtils = new ApiDataFileUtils(eventName,type);
             fileUtils.bakPendingFile(boutique_id+"storeCode"+storeID+"vension"+version,body);
 
             // mapping
             Map<String,Object> bodyDataMap = new HashMap<>();
             bodyDataMap.put("Data",jsonObjectBody);
-            bodyDataMap.put("full_update_product","1");
             logger.info("AtelierUpdateByProductServiceUpdateProduct,mapping,bodyDataMap:"+JSONObject.toJSONString(bodyDataMap)+",eventName:"+eventName);
             ProductEDSManagement.ProductOptions productOptions = atelierUpdateByProductMapping.mapping(bodyDataMap);
             logger.info("AtelierUpdateByProductServiceUpdateProduct,mapping,productOptions:"+JSONObject.toJSONString(productOptions)+",bodyDataMap:"+JSONObject.toJSONString(bodyDataMap)+",eventName:"+eventName);
@@ -110,7 +109,7 @@ public class AtelierUpdateByProductService implements InitializingBean {
             vendorOptions.setVendorId(Long.parseLong(vendor_id));
 
             logger.info("AtelierUpdateByProductServiceUpdateProduct,executeThreadTool,eventName:"+eventName+",productOptions:"+JSONObject.toJSONString(productOptions)+",vendorOptions:"+JSONObject.toJSONString(vendorOptions)+",fileUtils:"+JSONObject.toJSONString(fileUtils));
-            CommonThreadPool.execute(eventName,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,fileUtils));
+            CommonThreadPool.execute(eventName,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,fileUtils,bodyDataMap));
             logger.info("AtelierUpdateByProductServiceUpdateProduct,executeThreadTool,eventName:"+eventName+",productOptions:"+JSONObject.toJSONString(productOptions)+",vendorOptions:"+JSONObject.toJSONString(vendorOptions)+",fileUtils:"+JSONObject.toJSONString(fileUtils));
             mapUtils.putData("ResponseStatus","1000");
         } catch (Exception e) {

@@ -112,7 +112,7 @@ public class EdsUpdateByStockController implements InitializingBean {
 
                     // 线程池
                     logger.info("EdsAllUpdateByStockControllerExecute,execute,startDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(stockMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
-                    CommonThreadPool.execute(eventName,nugnesExecutor,threadNum,new UpdateStockThread(stockOption,fileUtils));
+                    CommonThreadPool.execute(eventName,nugnesExecutor,threadNum,new UpdateStockThread(stockOption,fileUtils,stockMap));
                     logger.info("EdsAllUpdateByStockControllerExecute,execute,endDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(stockMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
                 }
                 offset = offset + limit;
@@ -136,12 +136,12 @@ public class EdsUpdateByStockController implements InitializingBean {
         object.put("url","http://nugnes.edstema.it/api/v3.0/skus/stock");
         object.put("vendor_id","9");
         object.put("store_code","X3ZMV");
-        object.put("limit","10");
+        object.put("limit","500");
         object.put("offset","0");
-        object.put("threadNum","10");
+        object.put("threadNum","5");
         object.put("nugnesExecutor",nugnesExecutor);
-        object.put("eventName","nugnes全量更新库存");
-        object.put("fileUtils",new ApiDataFileUtils("nugnes","nugnes全量更新库存"));
+        object.put("eventName","stock_all_update");
+        object.put("fileUtils",new ApiDataFileUtils("nugnes","stock_all_update"));
 
         // put data
         paramsMap = new HashMap<>();

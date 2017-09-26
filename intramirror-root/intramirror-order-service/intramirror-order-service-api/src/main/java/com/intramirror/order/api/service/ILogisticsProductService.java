@@ -42,6 +42,15 @@ public interface ILogisticsProductService {
 	
 	
 	/**
+	 * 根据 logistics_product_id vendorID查询关联logistic_product详情
+	 * @param logistics_product_id vendorId
+	 * @return
+	 */
+	Map<String,Object> getOrderInfoByVendorId(Map<String, Object> conditionMap);
+	
+	
+	
+	/**
 	 * 根据condition map 查询详情
 	 * @param conditionMap
 	 * @return  
@@ -74,5 +83,7 @@ public interface ILogisticsProductService {
 
 
 	LogisticsProduct createLogisticsProduct(LogisticsProduct logisticsProduct);
+
+	int invalidOrderById(Long logisticsProductId);
 }
 

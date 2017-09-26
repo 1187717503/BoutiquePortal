@@ -1,5 +1,7 @@
 package com.intramirror.web.mapping.vo;
 
+import java.util.Date;
+
 /**
  * Created by dingyifan on 2017/9/14.
  * 定时job接口修改库存定义的VO
@@ -11,6 +13,15 @@ public class StockOption {
     public String vendor_id; // vendor
     public String price; // 价格
     public String type; // 库存类型
+    public Date last_check; // 消息时间
+
+    public Date getLast_check() {
+        return last_check;
+    }
+
+    public void setLast_check(Date last_check) {
+        this.last_check = last_check;
+    }
 
     public String getProductCode() {
         return productCode;

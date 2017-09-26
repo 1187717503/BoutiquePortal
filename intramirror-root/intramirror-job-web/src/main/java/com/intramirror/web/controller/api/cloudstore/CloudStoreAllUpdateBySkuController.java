@@ -84,7 +84,7 @@ public class CloudStoreAllUpdateBySkuController implements InitializingBean{
             params.put("merchantId", merchantId);
             while (true) {
                 // 获取数据
-                logger.info("cloudStoreProductAllProducerControllerExecute,startRequestMethod,appendUrl:"+url);
+                logger.info("cloudStoreProductAllProducerControllerExecute,startRequestMethod,appendUrl:"+url+",index:"+index);
                 String responseData = getPostRequestUtil.requestMethod(GetPostRequestService.HTTP_POST,url,JSONObject.toJSONString(params));
                 if(StringUtils.isBlank(responseData)) {
                     logger.info("cloudStoreProductAllProducerControllerExecute,whileEnd,responseData is null,appendUrl:"+url);
@@ -98,7 +98,7 @@ public class CloudStoreAllUpdateBySkuController implements InitializingBean{
                 Iterator<Object> it = inventorys.iterator();
                
                 if(inventorys == null || inventorys.size() == 0) {
-                    logger.info("cloudStoreProductAllProducerControllerExecute,whileEnd,ProductList is null,appendUrl:"+url);
+                    logger.info("cloudStoreProductAllProducerControllerExecute,whileEnd,ProductList is null,appendUrl:"+url+",index:"+index);
                     break;
                 }
                 if(StringUtils.isBlank(responseData)) {
@@ -121,10 +121,9 @@ public class CloudStoreAllUpdateBySkuController implements InitializingBean{
                     logger.info("cloudStoreProductAllProducerControllerExecute,initParam,productOptions:"+JSONObject.toJSONString(productOptions)+",vendorOptions:"+JSONObject.toJSONString(vendorOptions)+",eventName:"+eventName);
                
                     // 线程池
-                    logger.info("cloudStoreProductAllProducerControllerExecute,execute,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+JSONObject.toJSONString(productOptions)+",vendorOptions:"+JSONObject.toJSONString(vendorOptions)+",eventName:"+eventName);
-                    CommonThreadPool.execute(eventName,nugnesExecutor,threadNum,new UpdateProductThread(productOptions,vendorOptions,fileUtils));
-                    logger.info("cloudStoreProductAllProducerControllerExecute,execute,endDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+JSONObject.toJSONString(productOptions)+",vendorOptions:"+JSONObject.toJSONString(vendorOptions)+",eventName:"+eventName);
-                    logger.info("cloudStoreProductAllProducerControllerExecute"+"共请求数据"+index+"条");
+                    logger.info("cloudStoreProductAllProducerControllerExecute,execute,start,mqMap:"+JSONObject.toJSONString(mqMap)+",productOptions:"+JSONObject.toJSONString(productOptions)+",vendorOptions:"+JSONObject.toJSONString(vendorOptions)+",eventName:"+eventName+",index:"+index);
+                    CommonThreadPool.execute(eventName,nugnesExecutor,threadNum,new UpdateProductThread(productOptions,vendorOptions,fileUtils,mqMap));
+                    logger.info("cloudStoreProductAllProducerControllerExecute,execute,end,mqMap:"+JSONObject.toJSONString(mqMap)+",productOptions:"+JSONObject.toJSONString(productOptions)+",vendorOptions:"+JSONObject.toJSONString(vendorOptions)+",eventName:"+eventName+",index:"+index);
                 }
                 
                 if(jsonObject.get("next_step") != null) {
@@ -133,7 +132,7 @@ public class CloudStoreAllUpdateBySkuController implements InitializingBean{
                 } else {
                     break;
                 }
-                logger.info("cloudStoreProductAllProducerControllerExecute"+"共请求数据"+index+"条;共请求"+step+"批;");
+                logger.info("cloudStoreProductAllProducerControllerExecute,stepEnd,step:"+step+",index:"+index);
             }
             logger.info("cloudStoreProductAllProducerControllerExecute,executeEnd,url:"+url+",index:"+index+",param:"+JSONObject.toJSONString(param)+",eventName:"+eventName);
         } catch (Exception e) {
@@ -150,16 +149,17 @@ public class CloudStoreAllUpdateBySkuController implements InitializingBean{
         // nugnes
         ThreadPoolExecutor nugnesExecutor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
         Map<String,Object> tony_all_updateProduct = new HashMap<>();
-        tony_all_updateProduct.put("url","http://sandbox.cloudstore.srl/ws/getInventory");
+        tony_all_updateProduct.put("url","http://www.cloudstore.srl/ws/getInventory");
         tony_all_updateProduct.put("limit","5");
         tony_all_updateProduct.put("offset","0");
         tony_all_updateProduct.put("merchantId","55f707f6b49dbbe14ec6354d");
-        tony_all_updateProduct.put("token","018513a51480a5fd0f456ee543b7c78a");
+        tony_all_updateProduct.put("token","e00eb67a3799a9688072d72d76887395");
         tony_all_updateProduct.put("nugnesExecutor",nugnesExecutor);
         tony_all_updateProduct.put("vendor_id","16");
         tony_all_updateProduct.put("threadNum","5");
-        tony_all_updateProduct.put("eventName","tony全量更新sku");
-        tony_all_updateProduct.put("fileUtils",new ApiDataFileUtils("tony","tony全量更新sku"));
+        tony_all_updateProduct.put("eventName","product_all_update");
+        tony_all_updateProduct.put("fileUtils",new ApiDataFileUtils("tony","product_all_update"));
+
         // put data
         paramsMap = new HashMap<>();
         paramsMap.put("tony_all_updateProduct",tony_all_updateProduct);

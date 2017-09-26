@@ -3,6 +3,7 @@ package com.intramirror.web.util;
 import com.intramirror.common.utils.DateUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import pk.shoplus.common.utils.FileUtils;
 import pk.shoplus.util.ExceptionUtils;
 
 import java.io.*;
@@ -15,43 +16,45 @@ public class ApiDataFileUtils {
 
     private static final Logger logger = Logger.getLogger(ApiDataFileUtils.class);
 
-    private static final String baseUrl = "/mnt";
+    public static final String baseUrl = "/mnt";
 
-//    private static final String baseUrl = "/Users/dingyifan/Documents/fileTest";
+//    public static final String baseUrl = "/Users/dingyifan/Documents/fileTest";
 
-    private static final String bak_file = "backup";
+    public static final String bak_file = "backup";
 
-    private static final String error_file = "error";
+    public static final String error_file = "error";
 
     private String vendorName; // 不同vendor名称
 
     private String eventName; // 处理事件名称
+
+    private String fileName ;
 
     public ApiDataFileUtils(String vendorName,String eventName) {
         this.vendorName = vendorName;
         this.eventName = eventName;
     }
 
-    public boolean bakPendingFile(String fileName, String content){
+    public String bakPendingFile(String fileName, String content){
         // 获取文件夹路径
-        String strDate = DateUtils.getStrDate(new Date());
-        String bakUrl = baseUrl+"/"+vendorName+"/"+eventName+"/"+strDate+"/"+bak_file;
+        String strDate = DateUtils.getStrDate(new Date(),"yyyyMMdd");
+        String bakUrl = baseUrl+"/"+vendorName+"/"+bak_file+"/"+eventName+"/"+strDate;
         return this.writeFile(bakUrl,fileName,content);
     }
 
-    public boolean bakErrorFile(String fileName, String content){
+    public String bakErrorFile(String fileName, String content){
         // 获取文件夹路径
-        String strDate = DateUtils.getStrDate(new Date());
-        String bakUrl = baseUrl+"/"+vendorName+"/"+eventName+"/"+strDate+"/"+error_file;
+        String strDate = DateUtils.getStrDate(new Date(),"yyyyMMdd");
+        String bakUrl = baseUrl+"/"+vendorName+"/"+error_file+"/"+eventName+"/"+strDate;
         return this.writeFile(bakUrl,fileName,content);
     }
 
-    private boolean writeFile(String bakUrl,String fileName, String content) {
+    private String writeFile(String bakUrl,String fileName, String content) {
         try {
             // 校验参数
             if(StringUtils.isBlank(fileName) || StringUtils.isBlank(content)) {
                 logger.info("ApiDataFileUtilsBakFile,checkParams,fileName:"+fileName+",content:"+content);
-                return false;
+                return "fileName_or_content_error";
             }
 
             // 检查文件夹是否创建
@@ -62,18 +65,22 @@ public class ApiDataFileUtils {
             }
 
             // 创建文件
-            String formatDate = DateUtils.getStrDate(new Date(),"yyyyMMddHHmmss");
+//            String formatDate = DateUtils.getStrDate(new Date(),"yyyyMMddHHmmss");
+            String formatDate = RandomUtils.getDateRandom();
             fileName = fileName + "" + formatDate;
+            this.setFileName(fileName);
             String fileUrl = bakUrl+"/"+fileName+".txt";
-            this.writeFileContent(fileUrl,content);
+            FileUtils.serialize(content,fileUrl);
+             this.writeFileContent(fileUrl,content);
+             return fileName;
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("ApiDataFileUtilsBakFile,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",fileName:"+fileName+",content:"+content);
         }
-        return true;
+        return "writeFile_error";
     }
 
-    private void writeFileContent(String fileUrl,String content) throws IOException {
+    private String writeFileContent(String fileUrl,String content) throws IOException {
         FileWriter fileWriter = null;
         try {
             // 创建文件
@@ -92,6 +99,7 @@ public class ApiDataFileUtils {
         } finally {
             if(fileWriter != null) {fileWriter.close();}
         }
+        return fileUrl;
     }
 
     public static String getBaseUrl() {
@@ -122,7 +130,18 @@ public class ApiDataFileUtils {
         this.eventName = eventName;
     }
 
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public ApiDataFileUtils() {
+    }
+
     public static void main(String[] args) {
-        new ApiDataFileUtils("ding","testo").bakErrorFile("123","000");
+
     }
 }

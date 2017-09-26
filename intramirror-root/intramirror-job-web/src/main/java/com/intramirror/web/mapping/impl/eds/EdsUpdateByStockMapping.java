@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 import pk.shoplus.util.ExceptionUtils;
 
+import java.util.Date;
 import java.util.Map;
 
 @Service(value = "edsUpdateByStockMapping")
@@ -26,6 +27,7 @@ public class EdsUpdateByStockMapping implements IStockMapping{
             stockOption.setQuantity(bodyDataMap.get("quantity")==null?"":bodyDataMap.get("quantity").toString());
             stockOption.setVendor_id(bodyDataMap.get("vendor_id")==null?"":bodyDataMap.get("vendor_id").toString());
             stockOption.setType(StockContants.absolute_qty); // 库存绝对值
+            stockOption.setLast_check(new Date());
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("EdsUpdateByStockMapping,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));

@@ -62,6 +62,8 @@ public class Sku{
    * 14:im_price
    */
  @Column	public BigDecimal im_price;
+
+ @Column public Date last_check;
  
 	public Long getSku_id(){
 		return sku_id;
@@ -162,6 +164,14 @@ public class Sku{
 
 	   public void setRetail_price(BigDecimal retail_price) {
 		   this.retail_price = retail_price;
+	   }
+
+	   public Date getLast_check() {
+		   return last_check;
+	   }
+
+	   public void setLast_check(Date last_check) {
+		   this.last_check = last_check;
 	   }
    }
 

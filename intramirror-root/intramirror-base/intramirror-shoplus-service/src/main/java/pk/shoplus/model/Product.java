@@ -119,6 +119,8 @@ public class Product{
 		*/
 	   @Column	public String season_code;
 
+	   @Column public Date last_check;
+
 	public Long getProduct_id(){
 		return product_id;
 	}
@@ -302,6 +304,14 @@ public class Product{
 
 	   public void setSeason_code(String season_code) {
 		   this.season_code = season_code;
+	   }
+
+	   public Date getLast_check() {
+		   return last_check;
+	   }
+
+	   public void setLast_check(Date last_check) {
+		   this.last_check = last_check;
 	   }
    }
 

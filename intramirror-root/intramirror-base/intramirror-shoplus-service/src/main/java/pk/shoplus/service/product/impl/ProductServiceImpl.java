@@ -2,6 +2,7 @@ package pk.shoplus.service.product.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson15.JSONArray;
+import com.alibaba.fastjson15.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
@@ -25,6 +26,7 @@ import pk.shoplus.service.product.api.IProductService;
 import pk.shoplus.service.product.api.IProductStatusService;
 import pk.shoplus.service.stock.api.IStoreService;
 import pk.shoplus.service.stock.impl.StoreServiceImpl;
+import pk.shoplus.util.DateUtils;
 import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.util.MapUtils;
 import pk.shoplus.vo.ResultMessage;
@@ -53,6 +55,7 @@ public class ProductServiceImpl implements IProductService{
 
     @Override
     public Map<String, Object> updateProduct(ProductEDSManagement.ProductOptions productOptions, ProductEDSManagement.VendorOptions vendorOptions) {
+        if(productOptions.getLast_check() == null) {productOptions.setLast_check(new Date());}
         logger.info("ProductServiceImplUpdateProduct,inputParams,productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions));
         List<Map<String,Object>> warningMaps = new ArrayList<>();
         MapUtils mapUtils = new MapUtils(new HashMap<>());
@@ -75,6 +78,7 @@ public class ProductServiceImpl implements IProductService{
             Product product = productService.getProductByCondition(productConditions,null);
             logger.info("ProductServiceImplUpdateProduct,getProductByCondition,product:"+new Gson().toJson(product));
             if(product == null) {
+                if(conn != null) {conn.rollback();conn.close();}
                 return mapUtils.putData("status",StatusType.FAILURE)
                                .putData("info","update product - "+ ApiErrorTypeEnum.errorType.boutique_id_not_exist.getDesc()+" boutique_id:"+productOptions.getCode())
                                .putData("error_enum",ApiErrorTypeEnum.errorType.Data_not_exist)
@@ -90,7 +94,7 @@ public class ProductServiceImpl implements IProductService{
                         .putData("info","update product - " + ApiErrorTypeEnum.errorType.category_is_null.getDesc()+" category_id:null")
                         .putData("error_enum",warning_data_can_not_find_mapping)
                         .putData("key","category_id")
-                        .putData("value","null");
+                        .putData("value",productOptions.getCategory_name());
                 warningMaps.add(mapUtils.getMap());
             } else {
                 category = categoryService.getCategoryById(Long.parseLong(productOptions.getCategoryId()));
@@ -100,7 +104,7 @@ public class ProductServiceImpl implements IProductService{
                             .putData("info","update product - "+ ApiErrorTypeEnum.errorType.category_not_exist.getDesc()+" category_id:"+productOptions.getCategoryId())
                             .putData("error_enum",warning_data_can_not_find_mapping)
                             .putData("key","category_id")
-                            .putData("value",productOptions.getCategoryId());
+                            .putData("value",productOptions.getCategory_name());
                     warningMaps.add(mapUtils.getMap());
                 }
             }
@@ -111,7 +115,7 @@ public class ProductServiceImpl implements IProductService{
                         .putData("info","update product - "+ ApiErrorTypeEnum.errorType.category_is_not_three.getDesc()+" category_id:"+productOptions.getCategoryId())
                         .putData("error_enum",warning_data_can_not_find_mapping)
                         .putData("key","category_id")
-                        .putData("value",category.getCategory_id());
+                        .putData("value",productOptions.getCategory_name());
                 warningMaps.add(mapUtils.getMap());
             } else if(category != null) {
                 product.category_id = category.getCategory_id();
@@ -122,7 +126,7 @@ public class ProductServiceImpl implements IProductService{
                 mapUtils.putData("status",StatusType.WARNING)
                         .putData("info","update product - "+ ApiErrorTypeEnum.errorType.retail_price_is_zero.getDesc()+" retail_price:"+productOptions.getSalePrice())
                         .putData("error_enum",warning_retail_price_is_zero)
-                        .putData("key","retail_price")
+                        .putData("key","price")
                         .putData("value",productOptions.getSalePrice());
                 warningMaps.add(mapUtils.getMap());
             }
@@ -342,7 +346,6 @@ public class ProductServiceImpl implements IProductService{
                         logger.info("productServiceImplCatgeoryIsNull."+new Gson().toJson(product));
                     }
                 } else {
-                    ProductStockEDSManagement.StockOptions stockOptions = productStockEDSManagement.getStockOptions();
                     IStoreService storeService = new StoreServiceImpl();
                     BigDecimal bigDecimal = new BigDecimal(skuOption.getStock());
                     ResultMessage resultMessage = storeService.handleApiStockRuleService(conn,Contants.STOCK_QTY,bigDecimal.intValue(),skuOption.getSize(),product.getProduct_code(),vendorOptions.getVendorId().toString());
@@ -383,6 +386,7 @@ public class ProductServiceImpl implements IProductService{
                             Sku sku = new Sku();
                             sku.sku_id = Long.parseLong(sku_id);
                             sku.full_modify_date = new Date();
+                            sku.last_check = new Date();
                             skuService.updateSku(sku);
                             logger.info("updateProduct set full modify date sku : " + new Gson().toJson(sku));
                         }
@@ -419,6 +423,7 @@ public class ProductServiceImpl implements IProductService{
                                 sku.in_price = inPrice;
                                 sku.im_price = skuPrice.getIm_price();
                                 sku.updated_at = new Date();
+                                sku.last_check = new Date();
                                 skuService.updateSku(sku);
                                 logger.info("update sku by productServiceImpl sku : "+new Gson().toJson(sku));
                             }
@@ -427,7 +432,7 @@ public class ProductServiceImpl implements IProductService{
                             mapUtils.putData("status",StatusType.WARNING)
                                     .putData("info","update product - " + error_price_out_of_range.getDesc() + " retail_price:" + productOptions.getSalePrice())
                                     .putData("error_enum", error_price_out_of_range)
-                                    .putData("key","retail_price")
+                                    .putData("key","price")
                                     .putData("value",productOptions.getSalePrice()).getMap();
                             warningMaps.add(mapUtils.getMap());
                         }
@@ -436,7 +441,7 @@ public class ProductServiceImpl implements IProductService{
                         mapUtils.putData("status",StatusType.WARNING)
                                 .putData("info","update product - " + warning_data_is_negative.getDesc() + " retail_price:" + productOptions.getSalePrice())
                                 .putData("error_enum",warning_data_is_negative)
-                                .putData("key","retail_price")
+                                .putData("key","price")
                                 .putData("value",productOptions.getSalePrice()).getMap();
                         warningMaps.add(mapUtils.getMap());
                     }
@@ -446,20 +451,34 @@ public class ProductServiceImpl implements IProductService{
                 /** update by dingyifan 2017-08-16 */
             }
 
-            mapUtils.putData("handle_type","updateProduct");
-            if(mapUtils.getMap().get("status") == null) {
+            // last check
+            Date date1 = productOptions.getLast_check();
+            Date date2 = product.getLast_check();
+            if(date2 == null) {
+                date2 = date1;
+                product.setLast_check(date1);
+            }
+            if(DateUtils.compareDate(date1,date2)) {
+                mapUtils.putData("handle_type","updateProduct");
+                if(mapUtils.getMap().get("status") == null) {
+                    mapUtils.putData("status",StatusType.SUCCESS)
+                            .putData("info","success");
+                }
+
+                // warning
+                if(warningMaps != null && warningMaps.size() > 0) {
+                    mapUtils =  new MapUtils(new HashMap<>());
+                    mapUtils.putData("warningMaps",warningMaps);
+                    mapUtils.putData("status",StatusType.WARNING);
+                }
+                logger.info("ProductServiceImplUpdateProduct,outputParams,commit,product:"+new Gson().toJson(product)+",productOptions:"+JSONObject.toJSONString(productOptions));
+                conn.commit();
+            } else {
+                if(conn != null) {conn.rollback();conn.close();}
+                logger.info("ProductServiceImplUpdateProduct,outputParams,rollback,product:"+new Gson().toJson(product)+",productOptions:"+JSONObject.toJSONString(productOptions));
                 mapUtils.putData("status",StatusType.SUCCESS)
-                        .putData("info","success");
+                        .putData("info","rollback");
             }
-
-            if(warningMaps != null && warningMaps.size() > 0) {
-                mapUtils =  new MapUtils(new HashMap<>());
-                mapUtils.putData("warningMaps",warningMaps);
-                mapUtils.putData("status",StatusType.WARNING);
-            }
-
-            logger.info("ProductServiceImplUpdateProduct,outputParams,product:"+new Gson().toJson(product));
-            conn.commit();
         } catch (Exception e) {
             if(conn != null) {conn.rollback();conn.close();}
             e.printStackTrace();

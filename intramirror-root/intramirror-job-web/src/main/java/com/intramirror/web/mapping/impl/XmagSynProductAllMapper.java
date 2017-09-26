@@ -1,11 +1,6 @@
 package com.intramirror.web.mapping.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -54,6 +49,7 @@ public class XmagSynProductAllMapper implements IProductMapping {
             //封装ProductOptions 对象消息 .substring(1, (mqDataMap.get("product").toString().length()-1)
             Map<String,Object> productMap = JSONObject.parseObject(bodyDataMap.get("product").toString());
             productOptions = this.handleMappingData(productMap,vendorOptions);
+            productOptions.setLast_check(new Date());
             if(conn != null){conn.close();}
             logger.info("cloidStoreUpdateByProductMapping,outParams,productOptions:"+new Gson().toJson(productOptions));
 	    } catch (Exception e) {

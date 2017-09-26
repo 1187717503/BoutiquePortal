@@ -68,8 +68,9 @@ public class ProductEDSManagement {
             result.put("status",StatusType.FAILURE);
 
             //check params
-            boolean b = validateParam(conn, columnDataList, result,vendorId);
+            boolean b = validateParam(conn, columnDataList, result,vendorId,productOptions);
             if (b) {
+                if(conn != null) {conn.rollback();conn.close();}
                 return b;
             }
 
@@ -79,6 +80,7 @@ public class ProductEDSManagement {
                 result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null);
                 result.put("key","vendor_id");
                 result.put("value",vendorId);
+                if(conn != null) {conn.rollback();conn.close();}
                 return true;
             }
 
@@ -89,7 +91,8 @@ public class ProductEDSManagement {
                 result.put("info","create product - " + ApiErrorTypeEnum.errorType.category_not_exist.getDesc() + "category_id:"+categoryId );
                 result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_find_mapping);
                 result.put("key","category_id");
-                result.put("value",categoryId);
+                result.put("value",productOptions.getCategory_name());
+                if(conn != null) {conn.rollback();conn.close();}
                 return true;
             }
 
@@ -98,7 +101,8 @@ public class ProductEDSManagement {
                 result.put("info","create product - " + ApiErrorTypeEnum.errorType.category_not_exist.getDesc() + "category_id:"+categoryId );
                 result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_find_mapping);
                 result.put("key","category_id");
-                result.put("value",categoryId);
+                result.put("value",productOptions.getCategory_name());
+                if(conn != null) {conn.rollback();conn.close();}
                 return true;
             }
 
@@ -107,7 +111,8 @@ public class ProductEDSManagement {
                 result.put("info","create product - " + ApiErrorTypeEnum.errorType.category_not_exist.getDesc() + "category_id:"+categoryId );
                 result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_find_mapping);
                 result.put("key","category_id");
-                result.put("value",categoryId);
+                result.put("value",productOptions.getCategory_name());
+                if(conn != null) {conn.rollback();conn.close();}
                 return true;
             }
 
@@ -123,6 +128,7 @@ public class ProductEDSManagement {
                     result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_find_mapping);
                     result.put("key","brand_name");
                     result.put("value",englishName);
+                    if(conn != null) {conn.rollback();conn.close();}
                     return true;
                 }
 
@@ -136,6 +142,7 @@ public class ProductEDSManagement {
                 result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_find_mapping);
                 result.put("key","brand_name");
                 result.put("value",englishName);
+                if(conn != null) {conn.rollback();conn.close();}
                 return true;
             }
 
@@ -160,6 +167,7 @@ public class ProductEDSManagement {
                 result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_find_mapping);
                 result.put("key","season_code");
                 result.put("value",productOptions.getSeasonCode());
+                if(conn != null) {conn.rollback();conn.close();}
                 return true;
             }
 
@@ -228,14 +236,16 @@ public class ProductEDSManagement {
 
             if (pcount > 1) {
                 result.put("info","create product -- " + ApiErrorTypeEnum.errorType.boutique_create_error.getDesc() + "boutique_id:"+productOptions.getCode() );
-                result.put("error_enum", ApiErrorTypeEnum.errorType.Runtime_exception);
-                result.put("key","create product error!");
-                result.put("value","null");
-                conn.rollback();
+                result.put("error_enum", ApiErrorTypeEnum.errorType.boutique_create_error);
+                result.put("key","info");
+//                result.put("status",StatusType.SUCCESS);
+                result.put("value","product already exists.");
+                if(conn != null) {conn.rollback();conn.close();}
             } else {
                 result.put("product", product);
                 result.put("status", StatusType.SUCCESS);
-                conn.commit();
+                result.put("info","success");
+                if(conn != null) {conn.commit();conn.close();}
             }
             return false;
         } catch (Exception e) {
@@ -1066,7 +1076,7 @@ public class ProductEDSManagement {
      * @param result
      * @return
      */
-    public boolean validateParam(Connection conn, List<String> columnDataList, Map<String, Object> result,Long vendorId) {
+    public boolean validateParam(Connection conn, List<String> columnDataList, Map<String, Object> result,Long vendorId,ProductOptions productOptions) {
         /*String productName = columnDataList.get(0);
         if (StringUtils.isBlank(productName)) {
             result.put("info","create product - "+ ApiErrorTypeEnum.errorType.boutique_name_is_null.getDesc()+"boutique_name:null");
@@ -1120,7 +1130,7 @@ public class ProductEDSManagement {
             result.put("info","create product - "+ ApiErrorTypeEnum.errorType.brand_name_is_null.getDesc()+"brand_name:null");
             result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null);
             result.put("key","brand");
-            result.put("value",null);
+            result.put("value","null");
             return true;
         }
 
@@ -1138,7 +1148,7 @@ public class ProductEDSManagement {
             result.put("info","create product - "+ ApiErrorTypeEnum.errorType.category_is_null.getDesc()+"category_id:null");
             result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_find_mapping);
             result.put("key","category_id");
-            result.put("value","null");
+            result.put("value",productOptions.getCategory_name());
             return true;
         }
 
@@ -1173,7 +1183,7 @@ public class ProductEDSManagement {
         if (StringUtils.isBlank(salePrice) || "0".equals(StringUtils.trim(salePrice))) {
             result.put("info","create product - "+ ApiErrorTypeEnum.errorType.retail_price_is_zero.getDesc()+"salePrice:"+salePrice);
             result.put("error_enum", ApiErrorTypeEnum.errorType.retail_price_is_zero);
-            result.put("key","retail_price");
+            result.put("key","price");
             result.put("value",salePrice);
             return true;
         }
@@ -1363,6 +1373,19 @@ public class ProductEDSManagement {
 		public String imgByFilippo;
 
 		public String fullUpdateProductFlag = "";
+
+		public String category_name = "";
+
+        public Date last_check;
+
+        public String getCategory_name() {
+            return category_name;
+        }
+
+        public ProductOptions setCategory_name(String category_name) {
+            this.category_name = category_name;
+            return this;
+        }
 
         public String getFullUpdateProductFlag() {
             return fullUpdateProductFlag;
@@ -1572,6 +1595,14 @@ public class ProductEDSManagement {
 			this.skus = skus;
 			return this;
 		}
+
+        public Date getLast_check() {
+            return last_check;
+        }
+
+        public void setLast_check(Date last_check) {
+            this.last_check = last_check;
+        }
 
         public String getImgByFilippo() {
             return imgByFilippo;
