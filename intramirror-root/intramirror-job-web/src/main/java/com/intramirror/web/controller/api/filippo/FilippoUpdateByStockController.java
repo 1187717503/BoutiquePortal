@@ -112,16 +112,14 @@ public class FilippoUpdateByStockController  implements InitializingBean {
                 		,filippo_compare_path+"compare_revised.txt");
 
                 // 5.消息筛入MQ
-                StringBuffer stringBuffer = new StringBuffer();
                 int index = 0;
                 for(DiffRow diffRow : diffRows) {
                     DiffRow.Tag tag = diffRow.getTag();
                     if(tag == DiffRow.Tag.INSERT || tag == DiffRow.Tag.CHANGE) {
-                        stringBuffer.append(diffRow.getNewLine()+"\n");
-                        if (!StringUtils.isNotBlank(diffRow.getOldLine())){
+                        if (!StringUtils.isNotBlank(diffRow.getNewLine())){
 							break;
 						}
-                        mqMap.put("product_data",diffRow.getOldLine());
+                        mqMap.put("product_data",diffRow.getNewLine());
                         mqMap.put("vendor_id",vendor_id);
 	                    // 映射数据 封装VO
 	                    logger.info("FilippoUpdateByStockControllerExecute,mapping,start,jsonObject:"+JSONObject.toJSONString(mqMap)+",eventName:"+eventName+"index:"+index);
@@ -167,6 +165,6 @@ public class FilippoUpdateByStockController  implements InitializingBean {
         filippo_increment_stock.put("threadNum","5");
         // put initData
         paramsMap = new HashMap<>();
-        paramsMap.put("filippo_increment_stock",filippo_increment_stock);
+        paramsMap.put("stock_delta_update",filippo_increment_stock);
     }
 }
