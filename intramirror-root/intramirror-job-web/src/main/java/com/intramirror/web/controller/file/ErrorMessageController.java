@@ -216,7 +216,7 @@ public class ErrorMessageController {
             conn = DBConnector.sql2o.beginTransaction();
             CategoryService categoryService = new CategoryService(conn);
             // update processing
-            String updateProcessingSQL = "update api_error_processing aep set no_process = 0 where aep.enabled = 1 and aep.api_error_processing_id in("+api_error_processing_id+")";
+            String updateProcessingSQL = "update api_error_processing aep set no_process = 0,`process_time` = now() where aep.enabled = 1 and aep.api_error_processing_id in("+api_error_processing_id+")";
             logger.info("ErrorMessageControllerProcessing,start,updateProcessingSQL:"+updateProcessingSQL);
             categoryService.updateBySQL(updateProcessingSQL);
             logger.info("ErrorMessageControllerProcessing,end,updateProcessingSQL:"+updateProcessingSQL);
