@@ -117,19 +117,17 @@ public class FilippoUpdateByStockController  implements InitializingBean {
                 for(DiffRow diffRow : diffRows) {
                     DiffRow.Tag tag = diffRow.getTag();
                     if(tag == DiffRow.Tag.INSERT || tag == DiffRow.Tag.CHANGE) {
-                        logger.info("change -------" + diffRow.getNewLine());
                         stringBuffer.append(diffRow.getNewLine()+"\n");
                         if (!StringUtils.isNotBlank(diffRow.getOldLine())){
 							break;
 						}
                         mqMap.put("product_data",diffRow.getOldLine());
                         mqMap.put("vendor_id",vendor_id);
-	                    iStockMapping.mapping(mqMap);
 	                    // 映射数据 封装VO
 	                    logger.info("FilippoUpdateByStockControllerExecute,mapping,start,jsonObject:"+JSONObject.toJSONString(mqMap)+",eventName:"+eventName+"index:"+index);
 	                    StockOption stockOption = iStockMapping.mapping(mqMap);
 	                    logger.info("FilippoUpdateByStockControllerExecute,mapping,end,jsonObject:"+JSONObject.toJSONString(mqMap)+",stockOption:"+JSONObject.toJSONString(stockOption)+",eventName:"+eventName+"index:"+index);
-
+	                    logger.info("FilippoUpdateByStockControllerExecute,NewLine: " + diffRow.getNewLine()+"stockOption,"+JSONObject.toJSONString(stockOption));
 	                    // 线程池
 	                    logger.info("EdsAllUpdateByStockControllerExecute,execute,startDate:"+ DateUtils.getStrDate(new Date())+",jsonObject:"+JSONObject.toJSONString(stockOption)+",stockOption:"+JSONObject.toJSONString(stockOption)+",eventName:"+eventName+"index:"+index);
 	                    CommonThreadPool.execute(eventName,filippoExecutor,threadNum,new UpdateStockThread(stockOption,fileUtils,mqMap));
