@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson15.JSONObject;
 import com.google.gson.Gson;
 import com.intramirror.main.api.service.SkuPropertyService;
+import com.intramirror.product.api.model.Sku;
 import com.intramirror.product.api.service.SkuService;
 import com.intramirror.product.api.service.category.ICategoryService;
 import com.intramirror.web.mapping.api.IStockMapping;
@@ -60,17 +61,18 @@ public class AiDucaSynAllStockMapping implements IStockMapping{
 
         Map<String,Object> productMap = JSONObject.parseObject(mqDataMap.get("product").toString());
         
-        Map<String, Object> skuParam = new HashMap<String, Object>();
-        skuParam.put("vendorId", mqDataMap.get("vendor_id"));
-        skuParam.put("boutiqueSkuId", productMap.get("SKU").toString());
+//        Map<String, Object> skuParam = new HashMap<String, Object>();
+//        skuParam.put("vendorId", mqDataMap.get("vendor_id"));
+//        skuParam.put("boutiqueSkuId", productMap.get("SKU").toString());
+        String skuCode = productMap.get("SKU").toString();
         
-        logger.info("job mapping AiDuca  根据vendorId boutiqueSkuId获取 product 相关信息       入参:"+ new Gson().toJson(skuParam));
-        Map<String,Object> skuInfo = null;//skuService.getSkuInfoByBoutiqueSkuId(skuParam);
-        logger.info("job mapping AiDuca  根据vendorId boutiqueSkuId获取 product 相关信息       结果:"+ new Gson().toJson(skuInfo));
+        logger.info("job mapping AiDuca  根据skuCode 获取 product 相关信息       入参:"+ skuCode);
+        Sku skuInfo = skuService.getSkuBySkuCode(skuCode);
+        logger.info("job mapping AiDuca  根据skuCode 获取 product 相关信息       结果:"+ skuCode);
         
         //为空校验
         if(skuInfo == null) {
-            logger.info("job mapping AiDuca 根据vendorId boutiqueSkuId获取 product 结果为空  参数: "+ new Gson().toJson(skuParam));
+            logger.info("job mapping AiDuca 根据skuCode 获取 product 结果为空  参数: "+ skuCode);
             return stockOption;
         }
         
@@ -81,16 +83,14 @@ public class AiDucaSynAllStockMapping implements IStockMapping{
         		stockOption.setQuantity(productMap.get("Stock").toString());
         	}
         	
-        	//设置size product_code
-        	if (skuInfo != null && skuInfo.size() > 0 ){
-        		
-	        	if (checkValue(skuInfo.get("product_code"))){
-	        		stockOption.setProductCode(skuInfo.get("product_code").toString());
-	        	}
-	        	if (checkValue(skuInfo.get("size"))){
-	        		stockOption.setSizeValue(skuInfo.get("size").toString());
-	        	}
-        	}
+//        	//设置size product_code
+//        	if (checkValue(skuInfo.getp get("product_code"))){
+//        		stockOption.setProductCode(skuInfo.get("product_code").toString());
+//        	}
+//        	if (checkValue(skuInfo.get("size"))){
+//        		stockOption.setSizeValue(skuInfo.get("size").toString());
+//        	}
+        	
         } catch (Exception e) {
             e.printStackTrace();
             throw e;

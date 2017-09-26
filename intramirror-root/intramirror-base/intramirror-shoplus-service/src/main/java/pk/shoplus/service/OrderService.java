@@ -462,7 +462,7 @@ public class OrderService {
 			sql.append("SELECT distinct a.logistics_product_id,a.amount,a.order_line_num,a.fee,a.vendor_id,a.`status`,a.updated_at,a.created_at,c.order_id,c.order_num,");
 			sql.append("p.product_code,p.product_id,s.sku_id,s.product_id,s.in_price,s.sku_code,pspk.`name`,pspv.`value` as size,");
 			sql.append("l.user_rec_name,l.user_rec_province,l.user_rec_city,l.user_rec_area,l.user_rec_addr,");
-			sql.append("l.user_rec_mobile,l.user_rec_country,l.user_rec_code,s.boutique_sku_id ");
+			sql.append("l.user_rec_mobile,l.user_rec_country,l.user_rec_code ");
 			sql.append("from logistics_product a  ");
 			sql.append("INNER JOIN order_logistics b ON a.order_logistics_id = b.order_logistics_id ");
 			sql.append("INNER JOIN `order` c ON b.order_id = c.order_id ");

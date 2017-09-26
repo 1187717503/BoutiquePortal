@@ -122,7 +122,7 @@ public class AiDucaSynProductMapping implements IProductMapping{
 
             List<ProductEDSManagement.SkuOptions> skuOptionsList = new ArrayList<>();
             ProductEDSManagement.SkuOptions skuOptions = productEDSManagement.getSkuOptions();
-            skuOptions.setBarcodes("#");
+   
             
             if(product.get("stock") != null ){
                 skuOptions.setStock(product.get("stock").toString());
@@ -135,6 +135,9 @@ public class AiDucaSynProductMapping implements IProductMapping{
             
             if(product.get("sku_id") != null ){
 //                skuOptions.setBoutique_sku_id(product.get("sku_id").toString());
+            	skuOptions.setBarcodes(product.get("sku_id").toString());
+            }else{
+                skuOptions.setBarcodes("#");
             }
 
             skuOptionsList.add(skuOptions);

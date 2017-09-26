@@ -328,9 +328,6 @@ public class OrderManagement {
 		/** sku.sku_code **/
 		public String barcode;
 		
-		/** sku.boutique_sku_id **/
-		public String boutiqueSkuId;
-		
 		public String getOrderNumber() {
 			return orderNumber;
 		}
@@ -468,12 +465,6 @@ public class OrderManagement {
 		}
 		public void setSku(String sku) {
 			this.sku = sku;
-		}
-		public String getBoutiqueSkuId() {
-			return boutiqueSkuId;
-		}
-		public void setBoutiqueSkuId(String boutiqueSkuId) {
-			this.boutiqueSkuId = boutiqueSkuId;
 		}
 		
 	}
