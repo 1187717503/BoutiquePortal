@@ -114,7 +114,15 @@ public class EDSCreateOrder extends BuyerSystemCall {
 			String json = resultApi.get("resultMeesage").toString();
 			if (StringUtils.isNotBlank(json)){
     			JSONObject jsonOjbect = JSONObject.parseObject(json);
-    			String getResult = jsonOjbect.get("results").toString();
+    			
+    			String getResult = "";
+    			if(jsonOjbect.get("results") != null){
+    				getResult = jsonOjbect.get("results").toString();
+    			}
+    			if(jsonOjbect.get("result") != null){
+    				getResult = jsonOjbect.get("result").toString();
+    			}
+    			
     			logger.info("buyersys eds createOrder results:"+getResult);
     			if (StringUtils.isNoneBlank(getResult) && getResult.contains("Quantity is not available")){
     				//没有库存执行退款
