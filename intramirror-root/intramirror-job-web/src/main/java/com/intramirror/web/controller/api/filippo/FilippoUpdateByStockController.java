@@ -161,8 +161,8 @@ public class FilippoUpdateByStockController  implements InitializingBean {
         filippo_increment_stock.put("url","http://stat.filippomarchesani.net:2060/gw/collect.php/?p=1n3r4&o=intra&q=getqty");
         filippo_increment_stock.put("vendor_id","17");
         filippo_increment_stock.put("filippo_compare_path","/mnt/compare/filippo/stock/");
-        filippo_increment_stock.put("fileUtils",new ApiDataFileUtils("filippo","filippo增量更新库存"));
-        filippo_increment_stock.put("eventName","filippo_increment_updateproduct");
+        filippo_increment_stock.put("fileUtils",new ApiDataFileUtils("filippo","stock_delta_update"));
+        filippo_increment_stock.put("eventName","stock_delta_update");
         filippo_increment_stock.put("filippoExecutor",filippoExecutor);
         filippo_increment_stock.put("threadNum","5");
         // put initData
