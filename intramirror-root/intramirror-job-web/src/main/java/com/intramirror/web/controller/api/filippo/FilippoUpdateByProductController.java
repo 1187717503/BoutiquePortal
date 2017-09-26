@@ -165,7 +165,7 @@ public class FilippoUpdateByProductController implements InitializingBean {
 		filippo_increment_updateproduct.put("url",
 				"http://stat.filippomarchesani.net:2060/gw/collect.php/?p=1n3r4&o=intra&q=getall");
 		filippo_increment_updateproduct.put("vendor_id", "17");
-		filippo_increment_updateproduct.put("filippo_compare_path", "/mnt/compare/filippo/product/");
+		filippo_increment_updateproduct.put("filippo_compare_path", "/mnt/filippo/compare/product/");
 		filippo_increment_updateproduct.put("fileUtils", new ApiDataFileUtils("filippo", "product_delta_update"));
 		filippo_increment_updateproduct.put("eventName", "product_delta_update");
 		filippo_increment_updateproduct.put("filippoExecutor", filippoExecutor);
