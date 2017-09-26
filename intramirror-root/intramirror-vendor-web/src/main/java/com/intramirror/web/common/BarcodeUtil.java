@@ -130,7 +130,7 @@ public class BarcodeUtil {
 //        final int dpi = 200;
         final int dpi = 150;
         // module宽度
-        final double moduleWidth = UnitConv.in2mm(1.0f / dpi);
+        final double moduleWidth = UnitConv.in2mm(1.3f / dpi);
  
         // 配置对象
         bean.setModuleWidth(moduleWidth);
