@@ -116,7 +116,6 @@ public class FilippoUpdateByProductController implements InitializingBean {
 					DiffRow.Tag tag = diffRow.getTag();
 					if (tag == DiffRow.Tag.INSERT || tag == DiffRow.Tag.CHANGE) {
 						sum++;
-						logger.info("FilippoUpdateByproductControllerExecute,change -------" + diffRow.getNewLine());
 						stringBuffer.append(diffRow.getNewLine() + "\n");
 						if (!StringUtils.isNotBlank(diffRow.getOldLine())){
 							break;
@@ -124,6 +123,8 @@ public class FilippoUpdateByProductController implements InitializingBean {
 						mqMap.put("product_data", diffRow.getOldLine());
 						mqMap.put("vendor_id", vendor_id);
 						ProductEDSManagement.ProductOptions productOptions = iProductMapping.mapping(mqMap);
+						logger.info("FilippoUpdateByproductControllerExecute,change -------" + diffRow.getNewLine()
+						+"productOptions,"+JSONObject.toJSONString(productOptions));
 						// 线程池
 						logger.info("FilippoUpdateByproductControllerExecute,execute,startDate:"
 								+ DateUtils.getStrDate(new Date()) + ",productOptions:"
