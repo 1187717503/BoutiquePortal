@@ -61,7 +61,7 @@ public class FilippoUpdateByStockController  implements InitializingBean {
     private IStockMapping iStockMapping;
     
     @ResponseBody
-    @RequestMapping("/syn_product")
+    @RequestMapping("/syn_stock")
     public Map<String,Object> execute(@Param(value = "name")String name){
         MapUtils mapUtils = new MapUtils(new HashMap<String, Object>());
         logger.info("FilippoUpdateByStockControllerExecute,inputParams,name:"+name);
