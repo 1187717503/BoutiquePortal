@@ -63,11 +63,15 @@ public class FilippoSynAllUpdateByProductController implements InitializingBean 
 	@Resource(name = "filippoSynProductMapping")
 	private IProductMapping iProductMapping;
 
+	private static final String filippo_compare_path = "/mnt/filippo/compare/all/";
+
+//	private static final String filippo_compare_path = "/Users/dingyifan/Documents/fileTest/filippo/compare/all/";
+
 	@ResponseBody
 	@RequestMapping("/syn_product")
 	public Map<String, Object> execute(@Param(value = "name") String name) {
 		MapUtils mapUtils = new MapUtils(new HashMap<String, Object>());
-		logger.info("start FilippoUpdateByStockControllerExecute,inputParams,name:" + name);
+		logger.info("FilippoUpdateByStockControllerExecute,inputParams,name:" + name);
 
 		// check name
 		if (StringUtils.isBlank(name)) {
@@ -78,10 +82,7 @@ public class FilippoSynAllUpdateByProductController implements InitializingBean 
 		Map<String, Object> param = (Map<String, Object>) paramsMap.get(name);
 		String vendor_id = param.get("vendor_id").toString();
 		String url = param.get("url").toString();
-		String filippo_compare_path = param.get("filippo_compare_path").toString();
 		ApiDataFileUtils fileUtils = (ApiDataFileUtils) param.get("fileUtils");
-		String nugnes_product_day_offset = param.get(RedisKeyContants.nugnes_product_day_offset)==null?"":param.get(RedisKeyContants.nugnes_product_day_offset).toString();
-
 		String eventName = param.get("eventName").toString();
 		int threadNum = Integer.parseInt(param.get("threadNum").toString());
 		ThreadPoolExecutor filippoExecutor = (ThreadPoolExecutor) param.get("filippoExecutor");
@@ -91,22 +92,26 @@ public class FilippoSynAllUpdateByProductController implements InitializingBean 
 
 		Map<String, Object> mqMap = new HashMap<>();
 		mqMap.put("vendorOptions", vendorOption);
-		// file path
 
 		try {
-			logger.info(" start invoke filippo api !" + url);
+			logger.info("FilippoUpdateByStockControllerExecute,requestMethod,url:"+url);
 			String getResponse = getPostRequestUtil.requestMethod(GetPostRequestService.HTTP_GET, url, null);
-			logger.info(" end invoke filippo api !");
+			logger.info("FilippoUpdateByStockControllerExecute,requestMethod,getResponse:"+getResponse);
+
 			if (StringUtils.isNotBlank(getResponse)) {
+
 				fileUtils.bakPendingFile("product_vendor_id_"+vendor_id,getResponse);
-				// origin 
+
 				FileUtil.createFile(filippo_compare_path, origin+type, getResponse);
 				String pathNameUrl = filippo_compare_path + origin+type;
-				logger.info("pathNameUrl : " +pathNameUrl);
+				logger.info("FilippoUpdateByStockControllerExecute,pathNameUrl:" +pathNameUrl);
+
 				int sum = 0;
+
 				//保存源文件
                 List<String> mqLists = FileUtil.readFileByFilippoList(pathNameUrl);
                 logger.info("pathNameUrl : " +pathNameUrl);
+
                 int index = 0;
         		if (mqLists.size()%10==0){
         			index = mqLists.size()/10;
@@ -127,17 +132,20 @@ public class FilippoSynAllUpdateByProductController implements InitializingBean 
         			}
         			comments.append(src +"\n");
         		}
+
         		if (StringUtils.isNotBlank(comments.toString())){
         			FileUtil.createFile(filippo_compare_path, origin+(pageSize+1)+type, comments.toString());
         		}
+
         		String data = DateUtils.getStrDate(new Date(), "yyyyMMdd");
-        		String fileValue = redisService.getKey(data)==null?"":redisService.get(data);
+        		String fileValue = redisService.getKey("FM"+data)==null?"":redisService.get("FM"+data);
         		if (StringUtils.isNotBlank(fileValue)){
         			if (10!=Integer.parseInt(fileValue)){
         				for (int i = Integer.parseInt(fileValue); i <= 10; i++) {
                 			String path = filippo_compare_path + origin+i+type;
-                			redisService.put(data, i+"");
+                			redisService.put("FM"+data, i+"");
                 			if (FileUtil.fileExists(path)){
+                				logger.info("FilippoUpdateByproductControllerExecute,path:"+path);
                 				List<String> list = FileUtil.readFileByFilippoList(path);
                 				for (String mqStr : list) {
         	            			sum++;
@@ -145,6 +153,8 @@ public class FilippoSynAllUpdateByProductController implements InitializingBean 
         	    					mqMap.put("full_update_product","1");
         	    					mqMap.put("vendor_id", vendor_id);
         	    					ProductEDSManagement.ProductOptions productOptions = iProductMapping.mapping(mqMap);
+    								logger.info("FilippoUpdateByproductControllerExecute,mqStr:"+mqStr+",productOptions:"+JSONObject.toJSONString(productOptions));
+
         	    					// 线程池
         	    					logger.info("FilippoUpdateByproductControllerExecute,execute,startDate:"
         	    							+ DateUtils.getStrDate(new Date()) + ",productOptions:"
@@ -164,15 +174,18 @@ public class FilippoSynAllUpdateByProductController implements InitializingBean 
         		}else{
         			for (int i = 1; i <= 10; i++) {
             			String path = filippo_compare_path + origin+i+type;
-            			redisService.put(data, i+"");
+            			redisService.put("FM"+data, i+"");
             			if (FileUtil.fileExists(path)){
+            				logger.info("FilippoUpdateByproductControllerExecute,path:"+path);
             				List<String> list = FileUtil.readFileByFilippoList(path);
             				for (String mqStr : list) {
-    	            			sum++;
+								sum++;
     	    					mqMap.put("product_data", mqStr);
     	    					mqMap.put("full_update_product","1");
     	    					mqMap.put("vendor_id", vendor_id);
     	    					ProductEDSManagement.ProductOptions productOptions = iProductMapping.mapping(mqMap);
+								logger.info("FilippoUpdateByproductControllerExecute,mqStr:"+mqStr+",productOptions:"+JSONObject.toJSONString(productOptions));
+
     	    					// 线程池
     	    					logger.info("FilippoUpdateByproductControllerExecute,execute,startDate:"
     	    							+ DateUtils.getStrDate(new Date()) + ",productOptions:"
@@ -215,12 +228,13 @@ public class FilippoSynAllUpdateByProductController implements InitializingBean 
 				"http://stat.filippomarchesani.net:2060/gw/collect.php/?p=1n3r4&o=intra&q=getall");
 		filippo_all_updateproduct.put("vendor_id", "17");
 		filippo_all_updateproduct.put("filippo_compare_path", "/mnt/filippo/compare/all/");
-		filippo_all_updateproduct.put("fileUtils", new ApiDataFileUtils("filippo", "filippo全量更新库存"));
-		filippo_all_updateproduct.put("eventName", "filippo_all_updateproduct");
+		filippo_all_updateproduct.put("fileUtils", new ApiDataFileUtils("filippo", "product_all_update"));
+		filippo_all_updateproduct.put("eventName", "product_all_update");
 		filippo_all_updateproduct.put("filippoExecutor", filippoExecutor);
 		filippo_all_updateproduct.put("threadNum", "5");
+
 		// put initData
 		paramsMap = new HashMap<>();
-		paramsMap.put("filippo_all_updateproduct", filippo_all_updateproduct);
+		paramsMap.put("product_all_update", filippo_all_updateproduct);
 	}
 }
