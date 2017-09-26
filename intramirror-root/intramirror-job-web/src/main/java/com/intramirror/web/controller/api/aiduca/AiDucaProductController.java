@@ -137,7 +137,7 @@ public class AiDucaProductController implements InitializingBean{
 
                             // 线程池
                             logger.info("job aiDuca getAllSKU,execute,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
-                            CommonThreadPool.execute(eventName,aiducaExecutor,Integer.parseInt(param.get("threadNum").toString()),new UpdateProductThread(productOptions,vendorOptions,fileUtils));
+                            CommonThreadPool.execute(eventName,aiducaExecutor,Integer.parseInt(param.get("threadNum").toString()),new UpdateProductThread(productOptions,vendorOptions,fileUtils,mqDataMap));
                             logger.info("job aiDuca getAllSKU,execute,endDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
                             
                             //跳出循环,测试用
@@ -185,7 +185,7 @@ public class AiDucaProductController implements InitializingBean{
 
 	                            // 线程池
 	                            logger.info("job aiDuca getAllSKU,execute,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
-	                            CommonThreadPool.execute(eventName,aiducaExecutor,Integer.parseInt(param.get("threadNum").toString()),new UpdateProductThread(productOptions,vendorOptions,fileUtils));
+	                            CommonThreadPool.execute(eventName,aiducaExecutor,Integer.parseInt(param.get("threadNum").toString()),new UpdateProductThread(productOptions,vendorOptions,fileUtils,mqDataMap));
 	                            logger.info("job aiDuca getAllSKU,execute,endDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
 	                            
 //	                            //跳出循环,测试用
@@ -296,7 +296,7 @@ public class AiDucaProductController implements InitializingBean{
 
                             // 线程池
                             logger.info("job aiDuca getAllStock,execute,startDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(mqDataMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
-                            CommonThreadPool.execute(eventName,aiducaExecutor,Integer.parseInt(param.get("threadNum").toString()),new UpdateStockThread(stockOption,fileUtils));
+                            CommonThreadPool.execute(eventName,aiducaExecutor,Integer.parseInt(param.get("threadNum").toString()),new UpdateStockThread(stockOption,fileUtils,mqDataMap));
                             logger.info("job aiDuca getAllStock,execute,endDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(mqDataMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
                             
                             //跳出循环,测试用
@@ -343,7 +343,7 @@ public class AiDucaProductController implements InitializingBean{
 
 	                            // 线程池
 	                            logger.info("job aiDuca getAllStock,execute,startDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(mqDataMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
-	                            CommonThreadPool.execute(eventName,aiducaExecutor,Integer.parseInt(param.get("threadNum").toString()),new UpdateStockThread(stockOption,fileUtils));
+	                            CommonThreadPool.execute(eventName,aiducaExecutor,Integer.parseInt(param.get("threadNum").toString()),new UpdateStockThread(stockOption,fileUtils,mqDataMap));
 	                            logger.info("job aiDuca getAllStock,execute,endDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(mqDataMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
 	                            
 //	                            //跳出循环,测试用
