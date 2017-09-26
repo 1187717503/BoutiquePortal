@@ -235,6 +235,6 @@ public class FilippoSynAllUpdateByProductController implements InitializingBean 
 
 		// put initData
 		paramsMap = new HashMap<>();
-		paramsMap.put("filippo_all_updateproduct", filippo_all_updateproduct);
+		paramsMap.put("product_all_update", filippo_all_updateproduct);
 	}
 }

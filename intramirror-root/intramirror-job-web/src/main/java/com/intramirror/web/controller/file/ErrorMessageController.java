@@ -80,6 +80,12 @@ public class ErrorMessageController {
     @Resource(name = "atelierUpdateByStockMapping")
     private IStockMapping atelierUpdateByStockMapping;
 
+    @Resource(name = "filippoSynStockMapping")
+    private IStockMapping filippoSynStockMapping;
+
+    @Resource(name = "filippoSynProductMapping")
+    private IProductMapping filippoSynProductMapping;
+
     private static final int threadNum = 5;
 
     private ProductEDSManagement productEDSManagement = new ProductEDSManagement();
@@ -179,6 +185,20 @@ public class ErrorMessageController {
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
                     }
                 }
+
+                // filippo
+                if(vendor_id.equals("17")) {
+                    if(name.equals("stock_delta_update")) {
+                        StockOption stockOption = filippoSynStockMapping.mapping(originDataMap);
+                        CommonThreadPool.execute(name,executor,threadNum,new UpdateStockThread(stockOption,apiDataFileUtils,originDataMap));
+                    } else if(name.equals("product_delta_update")||name.equals("product_all_update")){
+                        ProductEDSManagement.ProductOptions productOptions = filippoSynProductMapping.mapping(originDataMap);
+                        ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
+                        vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                        CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
+                    }
+                }
+
                 this.updateProcessing(api_error_processing_id);
             }
             mapUtils.putData("status",StatusType.SUCCESS).putData("info","success");
