@@ -138,21 +138,23 @@ public class FilippoSynAllUpdateByProductController implements InitializingBean 
         		}
 
         		String data = DateUtils.getStrDate(new Date(), "yyyyMMdd");
-        		String fileValue = redisService.getKey(data)==null?"":redisService.get(data);
+        		String fileValue = redisService.getKey("FM"+data)==null?"":redisService.get("FM"+data);
         		if (StringUtils.isNotBlank(fileValue)){
         			if (10!=Integer.parseInt(fileValue)){
         				for (int i = Integer.parseInt(fileValue); i <= 10; i++) {
                 			String path = filippo_compare_path + origin+i+type;
-                			redisService.put(data, i+"");
+                			redisService.put("FM"+data, i+"");
                 			if (FileUtil.fileExists(path)){
+                				logger.info("FilippoUpdateByproductControllerExecute,path:"+path);
                 				List<String> list = FileUtil.readFileByFilippoList(path);
                 				for (String mqStr : list) {
-                					logger.info("FilippoUpdateByproductControllerExecute,mqStr:"+mqStr);
         	            			sum++;
         	    					mqMap.put("product_data", mqStr);
         	    					mqMap.put("full_update_product","1");
         	    					mqMap.put("vendor_id", vendor_id);
         	    					ProductEDSManagement.ProductOptions productOptions = iProductMapping.mapping(mqMap);
+    								logger.info("FilippoUpdateByproductControllerExecute,mqStr:"+mqStr+",productOptions:"+JSONObject.toJSONString(productOptions));
+
         	    					// 线程池
         	    					logger.info("FilippoUpdateByproductControllerExecute,execute,startDate:"
         	    							+ DateUtils.getStrDate(new Date()) + ",productOptions:"
@@ -172,16 +174,17 @@ public class FilippoSynAllUpdateByProductController implements InitializingBean 
         		}else{
         			for (int i = 1; i <= 10; i++) {
             			String path = filippo_compare_path + origin+i+type;
-            			redisService.put(data, i+"");
+            			redisService.put("FM"+data, i+"");
             			if (FileUtil.fileExists(path)){
+            				logger.info("FilippoUpdateByproductControllerExecute,path:"+path);
             				List<String> list = FileUtil.readFileByFilippoList(path);
             				for (String mqStr : list) {
-								logger.info("FilippoUpdateByproductControllerExecute,mqStr:"+mqStr);
 								sum++;
     	    					mqMap.put("product_data", mqStr);
     	    					mqMap.put("full_update_product","1");
     	    					mqMap.put("vendor_id", vendor_id);
     	    					ProductEDSManagement.ProductOptions productOptions = iProductMapping.mapping(mqMap);
+								logger.info("FilippoUpdateByproductControllerExecute,mqStr:"+mqStr+",productOptions:"+JSONObject.toJSONString(productOptions));
 
     	    					// 线程池
     	    					logger.info("FilippoUpdateByproductControllerExecute,execute,startDate:"
