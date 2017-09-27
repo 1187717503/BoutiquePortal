@@ -84,7 +84,7 @@ public class BarcodeUtil {
 //        File file = new File(path);
         MediaStorangeRespVo mediaStorangeRespVo;
 		try {
-			mediaStorangeRespVo=mediaStorageService.storageMediaWithPath(new ByteArrayInputStream(generate(msg,show)) ,path);
+			mediaStorangeRespVo=mediaStorageService.storageMediaWithPath(new ByteArrayInputStream(generate(msg,show,1)) ,path);
 			System.out.println(new Gson().toJson(mediaStorangeRespVo));
 			return mediaStorangeRespVo.getHttpUrl();
 		} catch (MediaStorageFailException e1) {
@@ -106,19 +106,72 @@ public class BarcodeUtil {
      * @param msg
      * @return
      */
-    public static byte[] generate(String msg,Boolean show) {
+    public static byte[] generate(String msg,Boolean show,int type) {
         ByteArrayOutputStream ous = new ByteArrayOutputStream();
-        generate(msg, ous,show);
+        if(type == 2){
+            generate2(msg, ous,show);
+        }else{
+            generate(msg, ous,show);
+        }
+
         return ous.toByteArray();
     }
  
     /**
-     * 生成到流
+     * 生成到流 Code128Bean
      *
      * @param msg
      * @param ous
      */
     public static void generate(String msg, OutputStream ous,Boolean show) {
+        if (StringUtils.isBlank(msg) || ous == null) {
+            return;
+        }
+ 
+//        Code39Bean bean = new Code39Bean();
+        Code128Bean bean = new Code128Bean();
+ 
+        // 精细度
+//        final int dpi = 200;
+        final int dpi = 150;
+        // module宽度
+        final double moduleWidth = UnitConv.in2mm(1.5f / dpi);
+ 
+        // 配置对象
+        bean.setModuleWidth(moduleWidth);
+//        bean.setWideFactor(3);
+        bean.doQuietZone(true);
+        if(!show){
+            bean.setMsgPosition(HumanReadablePlacement.HRP_NONE);
+        }
+
+        
+ 
+        String format = "image/png";
+        try {
+ 
+            // 输出到流
+            BitmapCanvasProvider canvas = new BitmapCanvasProvider(ous, format, dpi,
+                    BufferedImage.TYPE_BYTE_BINARY, false, 0);
+ 
+            // 生成条形码
+            bean.generateBarcode(canvas, msg);
+ 
+            // 结束绘制
+            canvas.finish();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    
+    /**
+     * 生成到流  Code39Bean
+     *
+     * @param msg
+     * @param ous
+     */
+    public static void generate2(String msg, OutputStream ous,Boolean show) {
         if (StringUtils.isBlank(msg) || ous == null) {
             return;
         }
