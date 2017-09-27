@@ -3,6 +3,7 @@ import pk.shoplus.model.annotation.Column;
 import pk.shoplus.model.annotation.Entity;
 import pk.shoplus.model.annotation.Id;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
    /**
@@ -68,7 +69,83 @@ public class ShopProduct{
 * 14:product_group_id
 */
 	@Column	public Long product_group_id;
-	public Long getShop_product_id(){
+
+	   @Column public BigDecimal min_sale_price;
+	   @Column public BigDecimal max_sale_price;
+
+	   public void setShop_product_id(Long shop_product_id) {
+		   this.shop_product_id = shop_product_id;
+	   }
+
+	   public void setShop_id(Long shop_id) {
+		   this.shop_id = shop_id;
+	   }
+
+	   public void setShop_category_id(Long shop_category_id) {
+		   this.shop_category_id = shop_category_id;
+	   }
+
+	   public void setProduct_id(Long product_id) {
+		   this.product_id = product_id;
+	   }
+
+	   public void setName(String name) {
+		   this.name = name;
+	   }
+
+	   public void setCoverpic(String coverpic) {
+		   this.coverpic = coverpic;
+	   }
+
+	   public void setIntroduction(String introduction) {
+		   this.introduction = introduction;
+	   }
+
+	   public void setSales_amount(Integer sales_amount) {
+		   this.sales_amount = sales_amount;
+	   }
+
+	   public void setStatus(Integer status) {
+		   this.status = status;
+	   }
+
+	   public void setSale_at(Date sale_at) {
+		   this.sale_at = sale_at;
+	   }
+
+	   public void setCreated_at(Date created_at) {
+		   this.created_at = created_at;
+	   }
+
+	   public void setUpdated_at(Date updated_at) {
+		   this.updated_at = updated_at;
+	   }
+
+	   public void setEnabled(Boolean enabled) {
+		   this.enabled = enabled;
+	   }
+
+	   public void setProduct_group_id(Long product_group_id) {
+		   this.product_group_id = product_group_id;
+	   }
+
+	   public BigDecimal getMin_sale_price() {
+		   return min_sale_price;
+	   }
+
+	   public void setMin_sale_price(BigDecimal min_sale_price) {
+		   this.min_sale_price = min_sale_price;
+	   }
+
+	   public BigDecimal getMax_sale_price() {
+		   return max_sale_price;
+	   }
+
+	   public void setMax_sale_price(BigDecimal max_sale_price) {
+		   this.max_sale_price = max_sale_price;
+	   }
+
+	   public Long getShop_product_id(){
 		return shop_product_id;
 	}
 	public Long getShop_id(){
