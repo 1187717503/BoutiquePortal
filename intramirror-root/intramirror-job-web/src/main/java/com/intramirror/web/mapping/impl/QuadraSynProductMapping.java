@@ -41,7 +41,8 @@ public class QuadraSynProductMapping implements IProductMapping{
 
     private IProductService iProductService = new ProductServiceImpl();
     
-	private static final String BASEIMGURL = "http://apiquadra.teknosis.link:89/images/";
+//	private static final String BASEIMGURL = "http://apiquadra.teknosis.link:89/images/";
+    private static final String BASEIMGURL = "http://apiquadra.teknosis.link:444/foto?";
     
     
     /**
