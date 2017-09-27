@@ -142,5 +142,9 @@ public class ShopProductSkuService {
 		}
 		return result;
 	}
+
+	public void create(ShopProductSku shopProductSku) throws Exception {
+		shopProductSkuDao.create(shopProductSku);
+	}
 	
 }
