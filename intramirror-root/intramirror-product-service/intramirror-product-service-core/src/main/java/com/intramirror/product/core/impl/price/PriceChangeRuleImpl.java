@@ -221,6 +221,18 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         return true;
     }
 
+    @Override
+    public boolean updateShopProductSalePrice() throws Exception {
+        priceChangeRuleMapper.updateShopProductSalePrice();
+        return true;
+    }
+
+    @Override
+    public boolean updateProductRetailPrice() throws Exception {
+        priceChangeRuleMapper.updateProductRetailPrice();
+        return true;
+    }
+
     private int getDeafultDisscount(PriceChangeRuleEnum.PriceType priceType){
         List<Map<String,Object>> mapList = systemPropertyMapper.selectSystemProperty();
         if(mapList != null && mapList.size() > 0) {

@@ -121,6 +121,8 @@ public class Product{
 
 	   @Column public Date last_check;
 
+	   @Column public BigDecimal retail_price;
+
 	public Long getProduct_id(){
 		return product_id;
 	}
@@ -312,6 +314,14 @@ public class Product{
 
 	   public void setLast_check(Date last_check) {
 		   this.last_check = last_check;
+	   }
+
+	   public BigDecimal getRetail_price() {
+		   return retail_price;
+	   }
+
+	   public void setRetail_price(BigDecimal retail_price) {
+		   this.retail_price = retail_price;
 	   }
    }
 
