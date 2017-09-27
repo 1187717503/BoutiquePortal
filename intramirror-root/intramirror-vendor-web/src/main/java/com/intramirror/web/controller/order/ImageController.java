@@ -33,7 +33,7 @@ public class ImageController extends BaseController{
 	 * @return
 	 */
     @RequestMapping(value = "/getImage", method = RequestMethod.GET)
-	public void getOrderList(@RequestParam("message") String message,@RequestParam("type") String type,
+	public void getOrderList(@RequestParam("message") String message,@RequestParam("type") String type,@RequestParam(value = "width", required = false) String width,
 			HttpServletRequest httpRequest,HttpServletResponse response){
     	logger.info(MessageFormat.format("order getImage 生成条形码入参:{0}", new Gson().toJson(message)));
 		
@@ -42,7 +42,14 @@ public class ImageController extends BaseController{
     		show = false;
     	}
     	
-        byte[] data = BarcodeUtil.generate(message, show);
+    	//width 生成类型,宽度不同的条形码
+    	byte[] data = null;
+    	if(width != null && StringUtils.isNotBlank(width) && width.equals("2")){
+    		data = BarcodeUtil.generate(message, show,2);
+    	}else{
+    		data = BarcodeUtil.generate(message, show,1);
+    	}
+    	
 
         response.setContentType("image/png");
 

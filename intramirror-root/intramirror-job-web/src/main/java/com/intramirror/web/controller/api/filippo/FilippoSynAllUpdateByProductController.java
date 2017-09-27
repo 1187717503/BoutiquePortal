@@ -228,13 +228,13 @@ public class FilippoSynAllUpdateByProductController implements InitializingBean 
 				"http://stat.filippomarchesani.net:2060/gw/collect.php/?p=1n3r4&o=intra&q=getall");
 		filippo_all_updateproduct.put("vendor_id", "17");
 		filippo_all_updateproduct.put("filippo_compare_path", "/mnt/filippo/compare/all/");
-		filippo_all_updateproduct.put("fileUtils", new ApiDataFileUtils("filippo", "filippo_all_updateproduct"));
-		filippo_all_updateproduct.put("eventName", "filippo_all_updateproduct");
+		filippo_all_updateproduct.put("fileUtils", new ApiDataFileUtils("filippo", "product_all_update"));
+		filippo_all_updateproduct.put("eventName", "product_all_update");
 		filippo_all_updateproduct.put("filippoExecutor", filippoExecutor);
 		filippo_all_updateproduct.put("threadNum", "5");
 
 		// put initData
 		paramsMap = new HashMap<>();
-		paramsMap.put("filippo_all_updateproduct", filippo_all_updateproduct);
+		paramsMap.put("product_all_update", filippo_all_updateproduct);
 	}
 }

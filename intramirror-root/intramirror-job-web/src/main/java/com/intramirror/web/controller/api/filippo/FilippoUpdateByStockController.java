@@ -112,16 +112,14 @@ public class FilippoUpdateByStockController  implements InitializingBean {
                 		,filippo_compare_path+"compare_revised.txt");
 
                 // 5.消息筛入MQ
-                StringBuffer stringBuffer = new StringBuffer();
                 int index = 0;
                 for(DiffRow diffRow : diffRows) {
                     DiffRow.Tag tag = diffRow.getTag();
                     if(tag == DiffRow.Tag.INSERT || tag == DiffRow.Tag.CHANGE) {
-                        stringBuffer.append(diffRow.getNewLine()+"\n");
-                        if (!StringUtils.isNotBlank(diffRow.getOldLine())){
+                        if (!StringUtils.isNotBlank(diffRow.getNewLine())){
 							break;
 						}
-                        mqMap.put("product_data",diffRow.getOldLine());
+                        mqMap.put("product_data",diffRow.getNewLine());
                         mqMap.put("vendor_id",vendor_id);
 	                    // 映射数据 封装VO
 	                    logger.info("FilippoUpdateByStockControllerExecute,mapping,start,jsonObject:"+JSONObject.toJSONString(mqMap)+",eventName:"+eventName+"index:"+index);
@@ -160,13 +158,13 @@ public class FilippoUpdateByStockController  implements InitializingBean {
         Map<String,Object> filippo_increment_stock = new HashMap<>();
         filippo_increment_stock.put("url","http://stat.filippomarchesani.net:2060/gw/collect.php/?p=1n3r4&o=intra&q=getqty");
         filippo_increment_stock.put("vendor_id","17");
-        filippo_increment_stock.put("filippo_compare_path","/mnt/compare/filippo/stock/");
-        filippo_increment_stock.put("fileUtils",new ApiDataFileUtils("filippo","filippo增量更新库存"));
-        filippo_increment_stock.put("eventName","filippo_increment_updateproduct");
+        filippo_increment_stock.put("filippo_compare_path","/mnt/filippo/compare/stock/");
+        filippo_increment_stock.put("fileUtils",new ApiDataFileUtils("filippo","stock_delta_update"));
+        filippo_increment_stock.put("eventName","stock_delta_update");
         filippo_increment_stock.put("filippoExecutor",filippoExecutor);
         filippo_increment_stock.put("threadNum","5");
         // put initData
         paramsMap = new HashMap<>();
-        paramsMap.put("filippo_increment_stock",filippo_increment_stock);
+        paramsMap.put("stock_delta_update",filippo_increment_stock);
     }
 }
