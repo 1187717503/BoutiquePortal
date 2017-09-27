@@ -12,25 +12,39 @@ import java.util.Map;
 public interface IPriceChangeRule {
 
     /**
-     * 定时job修改vendor价格
+     * 定时job修改vendor价格  update in_price
      * @return true,false
      * @throws Exception
      */
     boolean updateVendorPrice() throws Exception;
 
     /**
-     * 定时job修改shop价格
+     * 定时job修改shop价格 update im_price -> shop_product_sku.sale_price
      * @return true,false
      * @throws Exception
      */
     boolean updateShopPrice() throws Exception;
 
     /**
-     * 定时job修改admin价格
+     * 定时job修改admin价格 update im_price
      * @return true,false
      * @throws Exception
      */
     boolean updateAdminPrice() throws Exception;
+
+    /**
+     * 定时job修改shop_product.max_sale_price,shop_product.min_sale_price
+     * @return
+     * @throws Exception
+     */
+    boolean updateShopProductSalePrice() throws Exception;
+
+    /**
+     * 定时job修改product.retail_price
+     * @return
+     * @throws Exception
+     */
+    boolean updateProductRetailPrice() throws Exception;
 
     int deleteByPrimaryKey(Long priceChangeRuleId);
 

@@ -624,5 +624,17 @@
         where sku.enabled = 1 and sps.enabled = 1 and sku.sku_id = sps.sku_id
     </update>
 
+
+    <update id="updateShopProductSalePrice" >
+
+        update `shop_product`  sp,`shop_product_sku`  sps set sp.`max_sale_price` = sps.`sale_price`,sp.`min_sale_price` = sps.`sale_price`
+        where sp.`enabled`  = 1 and sps.`enabled`  = 1 and sps.`shop_product_id`  = sp.`shop_product_id`
+    </update>
+
+    <update id="updateProductRetailPrice" >
+
+        update `product`  p,sku set p.`retail_price` = sku.`price`  where p.`enabled`  = 1 and sku.`enabled`  = 1 and p.`product_id`  = sku.`product_id`
+    </update>
+
     <!-- end dingyifan -->
 </mapper>

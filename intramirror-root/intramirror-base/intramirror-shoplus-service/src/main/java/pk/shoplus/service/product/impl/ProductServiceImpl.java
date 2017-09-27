@@ -426,6 +426,12 @@ public class ProductServiceImpl implements IProductService{
                                 sku.last_check = new Date();
                                 skuService.updateSku(sku);
                                 logger.info("update sku by productServiceImpl sku : "+new Gson().toJson(sku));
+
+                                /*
+                                logger.info("ProductServiceImplUpdateProduct,updateRetailPrice,start,product:"+JSONObject.toJSONString(product));
+                                product.setRetail_price(price);
+                                productService.updateProduct(product);
+                                logger.info("ProductServiceImplUpdateProduct,updateRetailPrice,end,product:"+JSONObject.toJSONString(product));*/
                             }
                         } else {
                             mapUtils = new MapUtils(new HashMap<>());
@@ -450,6 +456,18 @@ public class ProductServiceImpl implements IProductService{
                 }
                 /** update by dingyifan 2017-08-16 */
             }
+
+
+            // 同步shop_product.min_sale_price,shop_product.max_sale_price
+            String updateShopProductSalePriceSQL = "update `shop_product`  sp,`shop_product_sku`  sps set sp.`max_sale_price` = sps.`sale_price`,sp.`min_sale_price` = sps.`sale_price`\n" +
+                    "where sp.`enabled`  = 1 and sps.`enabled`  = 1 and sps.`shop_product_id`  = sp.`shop_product_id` and sp.product_id ="+product.getProduct_id();
+
+            // 同步product.retail_price
+            String updateProductRetailPrice = "update `product`  p,sku set p.`retail_price` = sku.`price`  where p.`enabled`  = 1 and sku.`enabled`  = 1 and p.`product_id`  = sku.`product_id` and p.product_id="+product.getProduct_id();
+            logger.info("ProductServiceImplUpdateProduct,updateShopProductSalePriceSQL:"+updateShopProductSalePriceSQL);
+            logger.info("ProductServiceImplUpdateProduct,updateProductRetailPrice:"+updateProductRetailPrice);
+            categoryService.updateBySQL(updateShopProductSalePriceSQL);
+            categoryService.updateBySQL(updateProductRetailPrice);
 
             // last check
             Date date1 = productOptions.getLast_check();

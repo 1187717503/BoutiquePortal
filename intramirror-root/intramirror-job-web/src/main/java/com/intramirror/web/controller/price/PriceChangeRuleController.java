@@ -62,8 +62,10 @@ public class PriceChangeRuleController {
 
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
-            iPriceChangeRule.updateAdminPrice();
-            iPriceChangeRule.updateShopPrice();
+//            iPriceChangeRule.updateAdminPrice();
+//            iPriceChangeRule.updateShopPrice();
+            iPriceChangeRule.updateShopProductSalePrice();
+            iPriceChangeRule.updateProductRetailPrice();
             resultMessage.successStatus().addMsg("SUCCESS");
         } catch (Exception e) {
             e.printStackTrace();

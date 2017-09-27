@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.fastjson15.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
@@ -176,6 +177,7 @@ public class ProductEDSManagement {
             } else {
                 product.season_code = productOptions.getSeasonCode();
             }
+            product.setRetail_price(BigDecimal.valueOf(Double.parseDouble(productOptions.getSalePrice())));
             product = productService.createProduct(product);
 
             // 在category上增加数据
@@ -256,6 +258,7 @@ public class ProductEDSManagement {
             result.put("value",ExceptionUtils.getExceptionDetail(e));
             result.put("info","create product - " + ApiErrorTypeEnum.errorType.Runtime_exception.getDesc() + " error message:" + ExceptionUtils.getExceptionDetail(e));
             result.put("error_enum", ApiErrorTypeEnum.errorType.Runtime_exception);
+            logger.info("ProductEDSManagementCreateProduct,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+",productOptions:"+ JSONObject.toJSONString(productOptions));
             return true;
         } finally {
             if(conn != null) {conn.close();}
