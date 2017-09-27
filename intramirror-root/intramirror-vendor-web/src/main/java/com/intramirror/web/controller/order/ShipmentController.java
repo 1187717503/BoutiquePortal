@@ -3,6 +3,7 @@
  */
 package com.intramirror.web.controller.order;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,8 +20,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 import com.intramirror.common.help.ResultMessage;
+import com.intramirror.order.api.common.ContainerType;
 import com.intramirror.order.api.model.LogisticsProduct;
+import com.intramirror.order.api.model.SubShipment;
 import com.intramirror.order.api.service.IContainerService;
+import com.intramirror.order.api.service.ILogisticProductShipmentService;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.service.IShipmentService;
@@ -52,6 +56,9 @@ public class ShipmentController extends BaseController{
 	
 	@Autowired
 	private ISubShipmentService subShipmentService;
+	
+	@Autowired
+	private ILogisticProductShipmentService logisticProductShipmentService;
 	
 	/**
 	 * 保存shipment
@@ -274,13 +281,52 @@ public class ShipmentController extends BaseController{
 				Long shipmentId = iShipmentService.newShipment(orderResult);
 				if (shipmentId != null){
 					Map<String, Object> containerMap = new HashMap<>();
+					//获取当前container关联的subShipment 
+					containerMap.put("containerId", Long.parseLong(map.get("container_id").toString()));
+					List<SubShipment> subList = subShipmentService.getSubShipmentIdByContainerId(containerMap);
+					if (null != subList && 0 < subList.size()){
+						for (SubShipment subShipment : subList) {
+							containerMap = new HashMap<>();
+							containerMap.put("consignee", subShipment.getConsignee());
+							containerMap.put("segmentSequence", subShipment.getSegmentSequence());
+							containerMap.put("shippingSegmentId", subShipment.getShippingSegmentId());
+							containerMap.put("shipToAddr", subShipment.getShipToAddr());
+							containerMap.put("shipToCity", subShipment.getShipToCity());
+							containerMap.put("shipToCountry", subShipment.getShipToCountry());
+							containerMap.put("shipToDistrict", subShipment.getShipToDistrict());
+							containerMap.put("shipToProvince", subShipment.getShipToProvince());
+							containerMap.put("shipmentId", shipmentId);
+							containerMap.put("status", ContainerType.RECEIVED);
+							Date currentDate = new Date();
+							containerMap.put("updatedAt", currentDate);
+							containerMap.put("createdAt", currentDate);
+							containerMap.put("newShipment", 1);
+							subShipmentService.insertSubshipment(containerMap);
+						}
+					}
+					
+					//修改container关联
+					containerMap = new HashMap<>();
 					containerMap.put("shipment_id", shipmentId);
 					containerMap.put("container_id", Long.parseLong(map.get("container_id").toString()));
 					containerService.updateContainerShipment(containerMap);
+					
 					containerMap = new HashMap<>();
-					containerMap.put("shipmentId", shipmentId);
-					containerMap.put("shipment_id", Long.parseLong(map.get("shipmentId").toString()));
-					subShipmentService.updateSubShipment(containerMap);
+					//获取修改之后container关联的subShipment 
+					containerMap.put("containerId", Long.parseLong(map.get("container_id").toString()));
+					List<SubShipment> newsubList = subShipmentService.getSubShipmentIdByContainerId(containerMap);
+					if (null != subList && 0 < subList.size()){
+						//修改logistic_product_shipment关联
+						int index = 0;
+						for (SubShipment subShipment : newsubList) {
+							subShipment.getSubShipmentId();
+							containerMap = new HashMap<>();
+							containerMap.put("subShipmentId", subShipment.getSubShipmentId());
+							containerMap.put("subShipmentId1", subList.get(index)==null?0:subList.get(index).getSubShipmentId());
+							index++;
+							logisticProductShipmentService.updateBysubShipmentId(containerMap);
+						}
+					}
 					message.successStatus().putMsg("Info", "SUCCESS").setData(1);
 					return message;
 				}

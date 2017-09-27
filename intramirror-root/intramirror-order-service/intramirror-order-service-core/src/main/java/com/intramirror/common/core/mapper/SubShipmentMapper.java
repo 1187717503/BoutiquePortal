@@ -87,4 +87,19 @@ public interface SubShipmentMapper {
      * @return
      */
     int updateSubShipment(Map<String, Object> map);
+    
+    /**
+	 * 根据containerId查询subShipmentIdList
+	 * @param map
+	 * @return
+	 */
+    List<SubShipment> getSubShipmentIdByContainerId(Map<String, Object> map);
+    
+    /**
+     * 根据SubShipmentId修改subshipment关联
+     * @param map
+     * @return
+     */
+    int updateSubShipmentById(Map<String, Object> map);
+    
 }

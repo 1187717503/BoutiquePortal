@@ -34,4 +34,7 @@ public interface ILogisticProductShipmentService {
 	 * @return
 	 */
 	int deleteById(Long subShipmentId);
+	
+	
+	int updateBysubShipmentId(Map<String, Object> map);
 }

@@ -168,7 +168,7 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 	SELECT sub_shipment_id FROM sub_shipment
 WHERE  shipping_segment_id = #{shippingSegmentId,jdbcType=BIGINT} AND segment_sequence=#{segmentSequence,jdbcType=BIGINT} AND consignee=#{consignee,jdbcType=VARCHAR} 
 AND ship_to_addr=#{shipToAddr,jdbcType=VARCHAR} AND ship_to_district =#{shipToDistrict,jdbcType=VARCHAR} AND ship_to_city = #{shipToCity,jdbcType=VARCHAR}
-AND ship_to_province= #{shipToProvince,jdbcType=VARCHAR} AND ship_to_country=#{shipToCountry,jdbcType=VARCHAR} AND `status` = #{status,jdbcType=BIGINT}  LIMIT 1;
+AND ship_to_province= #{shipToProvince,jdbcType=VARCHAR} AND ship_to_country=#{shipToCountry,jdbcType=VARCHAR} AND `status` = #{status,jdbcType=BIGINT} ORDER BY created_at DESC LIMIT 1;
 </select>
 
     <delete id="deleteSubShipmentByShipmentId" parameterType="java.util.Map">
@@ -183,9 +183,22 @@ AND ship_to_province= #{shipToProvince,jdbcType=VARCHAR} AND ship_to_country=#{s
         where shipment_id = #{shipmentId,jdbcType=BIGINT}
     </select>
     
-    <update id="updateSubShipment">
+    <update id="updateSubShipment" parameterType="java.util.Map">
     	update sub_shipment
 		set shipment_id = #{shipmentId,jdbcType=BIGINT}
 		where shipment_id = #{shipment_id,jdbcType=BIGINT}
+    </update>
+    
+    <select id="getSubShipmentIdByContainerId" resultMap="BaseResultMap" parameterType="java.util.Map">
+    	SELECT ss.* FROM container c
+		INNER JOIN shipment spt ON c.shipment_id=spt.shipment_id
+		INNER JOIN sub_shipment ss ON ss.shipment_id= spt.shipment_id
+		where c.container_id=#{containerId,jdbcType=BIGINT}
+    </select>
+    
+     <update id="updateSubShipmentById" parameterType="java.util.Map">
+    	update sub_shipment
+		set shipment_id = #{shipmentId,jdbcType=BIGINT}
+		where shipment_id = #{shipment_id,jdbcType=BIGINT} and sub_shipment_id=#{subShipmentId,jdbcType=BIGINT} 
     </update>
 </mapper>
