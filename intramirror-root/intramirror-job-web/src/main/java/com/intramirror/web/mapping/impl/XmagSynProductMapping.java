@@ -121,15 +121,17 @@ public class XmagSynProductMapping implements IMapping{
         	}
         	String type = product.get("type")==null?" ":product.get("type").toString(); //查询二级
         	String category = product.get("category")==null?" ":product.get("category").toString(); //查询三级
-        	
+        	String SubCategory = product.get("SubCategory")==null?" ":product.get("SubCategory").toString(); //查询三级
+
         	//根据传过来的类目   获取映射的类目信息
             Map<String, Object> categoryMap = new HashMap<String, Object>();
             categoryMap.put("vendor_id", vendorOptions.getVendorId());
             //字符转小写
             categoryMap.put("boutique_second_category", type.toLowerCase());
             categoryMap.put("boutique_third_category", category.toLowerCase());
+            categoryMap.put("boutique_first_category", SubCategory);
             logger.info("categoryService param " + new Gson().toJson(categoryMap));
-        	List<Map<String, Object>> apiCategoryMap = categoryService.getCategoryInfoByCondition(categoryMap);
+        	List<Map<String, Object>> apiCategoryMap = categoryService.getCategoryByCondition(categoryMap);
         	 logger.info("categoryService result " + new Gson().toJson(apiCategoryMap));
         	if(null != apiCategoryMap && 0 < apiCategoryMap.size()) {
                 productOptions.setCategoryId(apiCategoryMap.get(0).get("category_id").toString());
