@@ -95,4 +95,9 @@ public interface PriceChangeRuleMapper {
 
     int updateSkuPriceByImPrice();
 
+    /** 修改shop_product.min_sale_price,shop_product.max_sale_price*/
+    int updateShopProductSalePrice();
+
+    /** 修改product.retail_price*/
+    int updateProductRetailPrice();
 }
