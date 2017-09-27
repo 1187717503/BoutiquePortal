@@ -14,4 +14,6 @@ public interface SkuMapper {
     List<Map<String, Object>> getSkuInfoBySkuId(String shopProductSkuId);
 
     Sku getSkuById(@Param("skuId") Long skuId);
+    
+    Map<String, Object> getSkuInfoBySkuCode(Map<String, Object> condition);
 }

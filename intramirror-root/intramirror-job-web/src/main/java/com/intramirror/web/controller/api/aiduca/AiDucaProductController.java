@@ -24,8 +24,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import pk.shoplus.common.Contants;
 import pk.shoplus.model.ProductEDSManagement;
-import pk.shoplus.service.request.api.IGetPostRequest;
-import pk.shoplus.service.request.impl.GetPostRequestService;
 import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.util.FileUtil;
 import pk.shoplus.util.MapUtils;
@@ -35,12 +33,7 @@ import com.google.gson.Gson;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.common.utils.DateUtils;
-import com.intramirror.main.api.service.ApiEndPointService;
-import com.intramirror.main.api.service.ApiParameterService;
-import com.intramirror.product.api.service.IApiMqService;
-import com.intramirror.web.enums.QueueNameJobEnum;
 import com.intramirror.web.mapping.api.IStockMapping;
-import com.intramirror.web.mapping.impl.QuadraSynProductMapping;
 import com.intramirror.web.mapping.impl.aiduca.AiDucaSynProductMapping;
 import com.intramirror.web.mapping.vo.StockOption;
 import com.intramirror.web.thread.CommonThreadPool;
@@ -48,7 +41,6 @@ import com.intramirror.web.thread.UpdateProductThread;
 import com.intramirror.web.thread.UpdateStockThread;
 import com.intramirror.web.util.ApiDataFileUtils;
 import com.intramirror.web.util.GetPostRequestUtil;
-import com.intramirror.web.util.QueueUtils;
 
 import difflib.DiffRow;
 
@@ -105,7 +97,7 @@ public class AiDucaProductController implements InitializingBean{
 	                String originProductPath = Contants.aiduca_file_path + Contants.aiduca_origin_product_all + Contants.aiduca_file_type;
 	                String revisedProductPath = Contants.aiduca_file_path + Contants.aiduca_revised_product_all + Contants.aiduca_file_type;
 	                
-	                //如果第一次更新,全部添加到MQ 不需要比较
+	                //如果第一次更新,全部添加到线程池  不需要比较
 	                if(!FileUtil.fileExists(originProductPath)) {
 	                	logger.info("job aiDuca getAllSKU  第一次更新,全部添加到MQ 不需要比较  ");
 	                	FileUtil.createFileByType(Contants.aiduca_file_path,Contants.aiduca_origin_product_all + Contants.aiduca_file_type,converString(List));
@@ -124,7 +116,7 @@ public class AiDucaProductController implements InitializingBean{
                             mqDataMap.put("vendor_id", param.get("vendor_id").toString());
                             mqDataMap.put("api_configuration_id", param.get("api_configuration_id").toString());
                             
-                            // 放入MQ
+                            // 放入线程池
                 			System.out.println(i++);
                 			logger.info("job aiDuca getAllSKU 商品信息存入线程池生成商品    mqDataMap:"+new Gson().toJson(mqDataMap));
 //                            QueueUtils.putMessage(mqDataMap, "",urlMap.get("url").toString(), QueueNameJobEnum.AiDucaSynAllProduct);
@@ -141,15 +133,15 @@ public class AiDucaProductController implements InitializingBean{
                             logger.info("job aiDuca getAllSKU,execute,endDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
                             
                             //跳出循环,测试用
-//                            if(i>120){
-//                            	break;
-//                            }
+                            if(i>120){
+                            	break;
+                            }
                 		}
                 	  }
 
 	                }else{
 	                	
-	                	logger.info("job aiDuca getAllSKU  比较文件差异,获取修改的增量加入MQ  ");
+	                	logger.info("job aiDuca getAllSKU  比较文件差异,获取修改的增量加入线程池  ");
 		            	// 1.创建
 		                FileUtil.createFileByType(Contants.aiduca_file_path,Contants.aiduca_revised_product_all+ Contants.aiduca_file_type,converString(List));
 		
@@ -157,7 +149,7 @@ public class AiDucaProductController implements InitializingBean{
 		                List<DiffRow> diffRows = FileUtil.CompareTxtByType(originProductPath,revisedProductPath);
 		                logger.info("job aiDuca getAllSKU  比较文件差异,差异数量为: "+diffRows.size());
 		
-		                // 3.消息筛入MQ
+		                // 3.消息筛入线程池
 //		                StringBuffer stringBuffer = new StringBuffer();
 		                int i = 0;
 		                for(DiffRow diffRow : diffRows) {
@@ -174,7 +166,7 @@ public class AiDucaProductController implements InitializingBean{
 	                            mqDataMap.put("api_configuration_id", param.get("api_configuration_id").toString());
 	                            
 	                            i++;
-	                            // 放入MQ
+	                            // 放入线程池
 	                			logger.info("job aiDuca getAllSKU 商品信息存入线程池生成商品    mqDataMap:"+new Gson().toJson(mqDataMap));
 	                            
 	                            // 映射数据 封装VO
@@ -189,9 +181,9 @@ public class AiDucaProductController implements InitializingBean{
 	                            logger.info("job aiDuca getAllSKU,execute,endDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
 	                            
 //	                            //跳出循环,测试用
-//	                            if(i>200){
-//	                            	break;
-//	                            }
+	                            if(i>120){
+	                            	break;
+	                            }
 		                    } 
 		                }
 		                
@@ -249,8 +241,7 @@ public class AiDucaProductController implements InitializingBean{
         		//获取初始化参数
         		ThreadPoolExecutor aiducaExecutor = (ThreadPoolExecutor) param.get("aiducaStockExecutor");
         	    String eventName = param.get("eventName").toString();
-        	    ProductEDSManagement productEDSManagement = new ProductEDSManagement();
-                String currentDate = DateUtils.getStrDate(new Date(),"yyyyMMddHHmmss");
+//                String currentDate = DateUtils.getStrDate(new Date(),"yyyyMMddHHmmss");
                 ApiDataFileUtils fileUtils = (ApiDataFileUtils) param.get("fileUtils");
                 
                 //http 请求获取数据
@@ -260,7 +251,7 @@ public class AiDucaProductController implements InitializingBean{
                 
                 if(StringUtils.isNotBlank(json)) {
                 	
-                    // aiDuca 拆分接口返回的product放入mq
+                    // aiDuca 拆分接口返回的product放入线程池
                     logger.info("job aiDuca getAllStock 返回的json 数据转换成对象");
                 	List<Map<String, Object>> List = (List<Map<String, Object>>) JSONObject.parse(json);
                 	
@@ -268,14 +259,14 @@ public class AiDucaProductController implements InitializingBean{
 	                String revisedProductPath = Contants.aiduca_file_path + Contants.aiduca_revised_stock_all + Contants.aiduca_file_type;
 	                
 	                
-	                //如果第一次更新,全部添加到MQ 不需要比较
+	                //如果第一次更新,全部添加到线程池 不需要比较
 	                if(!FileUtil.fileExists(originProductPath)) {
-	                	logger.info("job aiDuca getAllStock  第一次更新,全部添加到MQ 不需要比较  ");
+	                	logger.info("job aiDuca getAllStock  第一次更新,全部添加到线程池 不需要比较  ");
 	                	FileUtil.createFileByType(Contants.aiduca_file_path,Contants.aiduca_origin_stock_all + Contants.aiduca_file_type,converString(List));
 	                	
 	                	if(List !=null && List.size() > 0 ){
                 		
-                        logger.info("job aiDuca getAllStock  遍历解析Stock列表   存入MQ队列    List Size:"+List.size());
+                        logger.info("job aiDuca getAllStock  遍历解析Stock列表   商品库存信息存入线程池修改库存    List Size:"+List.size());
                         int i = 0;
                 		for(Map<String, Object> productInfo :List ){
                 			
@@ -284,9 +275,9 @@ public class AiDucaProductController implements InitializingBean{
                             mqDataMap.put("store_code", param.get("store_code").toString());
                             mqDataMap.put("vendor_id", param.get("vendor_id").toString());
                             
-                            // 放入MQ
+                            // 放入线程池
                 			System.out.println(i++);
-                			logger.info("job aiDuca getAllStock 库存信息存入MQ队列    mqDataMap:"+new Gson().toJson(mqDataMap));
+                			logger.info("job aiDuca getAllStock 库存信息存入线程池    mqDataMap:"+new Gson().toJson(mqDataMap));
 //                            QueueUtils.putMessage(mqDataMap, "",param.get("url").toString(), QueueNameJobEnum.AiDucaSynAllStock);
                             
                             // 映射数据 封装VO
@@ -308,7 +299,7 @@ public class AiDucaProductController implements InitializingBean{
 
 	                }else{
 	                	
-	                	logger.info("job aiDuca getAllStock  比较文件差异,获取修改的增量加入MQ  ");
+	                	logger.info("job aiDuca getAllStock  比较文件差异,获取修改的增量加入线程池消费  ");
 		            	// 1.创建
 		                FileUtil.createFileByType(Contants.aiduca_file_path,Contants.aiduca_revised_stock_all+ Contants.aiduca_file_type,converString(List));
 		
@@ -316,7 +307,7 @@ public class AiDucaProductController implements InitializingBean{
 		                List<DiffRow> diffRows = FileUtil.CompareTxtByType(originProductPath,revisedProductPath);
 		                logger.info("job aiDuca getAllStock  比较文件差异,差异数量为: "+diffRows.size());
 		
-		                // 3.消息筛入MQ
+		                // 3.消息筛入线程池
 //		                StringBuffer stringBuffer = new StringBuffer();
 		                int i = 0;
 		                for(DiffRow diffRow : diffRows) {
@@ -332,8 +323,8 @@ public class AiDucaProductController implements InitializingBean{
 	                            mqDataMap.put("vendor_id", param.get("vendor_id").toString());
 	                            
 	                            i++;
-	                            // 放入MQ
-	                			logger.info("job aiDuca getAllStock 库存信息存入MQ队列    mqDataMap:"+new Gson().toJson(mqDataMap));
+	                            // 放入线程池
+	                			logger.info("job aiDuca getAllStock 商品库存信息存入线程池修改库存    mqDataMap:"+new Gson().toJson(mqDataMap));
 //	                            QueueUtils.putMessage(mqDataMap, "",param.get("url").toString(), QueueNameJobEnum.AiDucaSynAllStock);
 	                			
 	                            // 映射数据 封装VO

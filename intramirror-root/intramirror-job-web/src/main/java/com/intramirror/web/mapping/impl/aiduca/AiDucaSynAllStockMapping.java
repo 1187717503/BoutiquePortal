@@ -3,6 +3,7 @@ package com.intramirror.web.mapping.impl.aiduca;
 import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.Runtime_exception;
 import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.handle_stock_rule_error;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,6 +19,7 @@ import com.intramirror.product.api.model.Sku;
 import com.intramirror.product.api.service.SkuService;
 import com.intramirror.product.api.service.category.ICategoryService;
 import com.intramirror.web.mapping.api.IStockMapping;
+import com.intramirror.web.mapping.vo.StockContants;
 import com.intramirror.web.mapping.vo.StockOption;
 import com.intramirror.web.util.SpringContextUtils;
 
@@ -61,18 +63,17 @@ public class AiDucaSynAllStockMapping implements IStockMapping{
 
         Map<String,Object> productMap = JSONObject.parseObject(mqDataMap.get("product").toString());
         
-//        Map<String, Object> skuParam = new HashMap<String, Object>();
-//        skuParam.put("vendorId", mqDataMap.get("vendor_id"));
-//        skuParam.put("boutiqueSkuId", productMap.get("SKU").toString());
-        String skuCode = productMap.get("SKU").toString();
+        Map<String, Object> skuParam = new HashMap<String, Object>();
+        skuParam.put("vendorId", mqDataMap.get("vendor_id"));
+        skuParam.put("skuCode", productMap.get("SKU").toString());
         
-        logger.info("job mapping AiDuca  根据skuCode 获取 product 相关信息       入参:"+ skuCode);
-        Sku skuInfo = skuService.getSkuBySkuCode(skuCode);
-        logger.info("job mapping AiDuca  根据skuCode 获取 product 相关信息       结果:"+ skuCode);
+        logger.info("job mapping AiDuca  根据skuCode 获取 product 相关信息       入参:"+new Gson().toJson(skuParam) );
+        Map<String, Object> skuInfo = skuService.getSkuInfoBySkuCode(skuParam);
+        logger.info("job mapping AiDuca  根据skuCode 获取 product 相关信息       结果:"+ new Gson().toJson(skuParam));
         
         //为空校验
-        if(skuInfo == null) {
-            logger.info("job mapping AiDuca 根据skuCode 获取 product 结果为空  参数: "+ skuCode);
+        if(skuInfo == null || skuInfo.size() == 0) {
+            logger.info("job mapping AiDuca 根据skuCode 获取 product 结果为空  参数: "+ new Gson().toJson(skuParam));
             return stockOption;
         }
         
@@ -83,13 +84,11 @@ public class AiDucaSynAllStockMapping implements IStockMapping{
         		stockOption.setQuantity(productMap.get("Stock").toString());
         	}
         	
-//        	//设置size product_code
-//        	if (checkValue(skuInfo.getp get("product_code"))){
-//        		stockOption.setProductCode(skuInfo.get("product_code").toString());
-//        	}
-//        	if (checkValue(skuInfo.get("size"))){
-//        		stockOption.setSizeValue(skuInfo.get("size").toString());
-//        	}
+            stockOption.setProductCode(skuInfo.get("product_code").toString());
+            stockOption.setSizeValue(skuInfo.get("size")==null?"":skuInfo.get("size").toString());
+            stockOption.setVendor_id(mqDataMap.get("vendor_id")==null?"":mqDataMap.get("vendor_id").toString());
+            stockOption.setType(StockContants.absolute_qty); // 库存绝对值
+            stockOption.setLast_check(new Date());
         	
         } catch (Exception e) {
             e.printStackTrace();

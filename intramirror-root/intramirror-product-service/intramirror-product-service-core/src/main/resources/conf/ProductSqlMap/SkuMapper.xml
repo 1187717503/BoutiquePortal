@@ -51,4 +51,27 @@
         AND
         s.enabled=1
     </select>
+    
+
+    <select id="getSkuInfoBySkuCode" resultType="java.util.HashMap" parameterType="java.util.Map">
+    SELECT s.sku_id,s.sku_code,p.product_id,p.product_code,pspv.`value` as size 
+	FROM sku s
+	INNER JOIN sku_property skup on (skup.sku_id = s.sku_id and skup.enabled = 1)
+	INNER JOIN product p ON (s.product_id = p.product_id and p.enabled = 1)
+	INNER JOIN product_sku_property_key pspk ON (
+	pspk.product_id = p.product_id
+	and pspk.product_sku_property_key_id = skup.product_sku_property_key_id
+	and pspk.enabled = 1
+	) 
+	INNER JOIN product_sku_property_value pspv ON (
+	pspv.product_sku_property_key_id = skup.product_sku_property_key_id
+	and pspv.product_sku_property_value_id = skup.product_sku_property_value_id
+	and pspv.enabled = 1
+	) 
+	INNER JOIN vendor v ON (p.vendor_id = v.vendor_id and v.enabled = 1)
+	
+	WHERE v.vendor_id = #{vendorId,jdbcType=BIGINT}  AND s.sku_code =#{skuCode};
+
+</select>
+
 </mapper>
