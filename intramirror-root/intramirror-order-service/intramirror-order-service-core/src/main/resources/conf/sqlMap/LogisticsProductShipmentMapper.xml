@@ -37,6 +37,10 @@
 			where sub_shipment_id = #{subShipmentId,jdbcType=BIGINT}
  </delete>
  
+  <delete id="deleteBylogisticProductId" parameterType="java.lang.Long">
+  DELETE FROM logistic_product_shipment WHERE logistic_product_id=#{logisticProductId,jdbcType=BIGINT}
+ </delete>
+ 
  <update id="updateBysubShipmentId" parameterType="java.util.Map">
  update logistic_product_shipment
 	set sub_shipment_id=#{subShipmentId,jdbcType=BIGINT} where sub_shipment_id=#{subShipmentId1,jdbcType=BIGINT} 

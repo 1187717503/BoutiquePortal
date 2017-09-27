@@ -51,5 +51,10 @@ public class LogisticProductShipmentServiceImpl extends BaseDao implements ILogi
 	public int updateBysubShipmentId(Map<String, Object> map) {
 		return logisticProductShipmentMapper.updateBysubShipmentId(map);
 	}
+
+	@Override
+	public int deleteBylogisticProductId(Map<String, Object> map) {
+		return logisticProductShipmentMapper.deleteBylogisticProductId(map);
+	}
 	
 }

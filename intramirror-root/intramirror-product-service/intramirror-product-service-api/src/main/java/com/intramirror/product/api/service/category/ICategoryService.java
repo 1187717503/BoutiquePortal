@@ -28,5 +28,10 @@ public interface ICategoryService {
 	 */
 	List<Map<String,Object>> getCategoryInfoByCondition(Map<String, Object> map);
 	
-    
+	/**
+	 * 根据条件查询商品信息
+	 * @param map
+	 * @return
+	 */
+	List<Map<String,Object>> getCategoryByCondition(Map<String, Object> map);
 }

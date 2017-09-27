@@ -37,4 +37,6 @@ public interface ILogisticProductShipmentService {
 	
 	
 	int updateBysubShipmentId(Map<String, Object> map);
+	
+	int deleteBylogisticProductId(Map<String, Object> map);
 }
