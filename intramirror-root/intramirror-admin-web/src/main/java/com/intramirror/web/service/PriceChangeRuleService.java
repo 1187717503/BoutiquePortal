@@ -86,7 +86,7 @@ public class PriceChangeRuleService {
 	 * @return
 	 * @throws ParseException 
 	 */
-	@Transactional  
+	@Transactional(rollbackFor = Exception.class)
 	public Map<String,Object> initPriceChangeRule(Map<String,Object> map) throws Exception{
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
@@ -203,7 +203,7 @@ public class PriceChangeRuleService {
 	 * @param map
 	 * @return
 	 */
-	@Transactional  
+	@Transactional(rollbackFor = Exception.class)
 	public Map<String, Object> createPriceChangeRuleCategoryBrandBatch(Map<String, Object> map) throws Exception{
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
@@ -256,7 +256,7 @@ public class PriceChangeRuleService {
 	 * @param map
 	 * @return
 	 */
-	@Transactional  
+	@Transactional(rollbackFor = Exception.class)
 	public Map<String, Object> deletePriceChangeRuleCategoryBrandBatch(Map<String, Object> map) throws Exception{
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
@@ -332,7 +332,7 @@ public class PriceChangeRuleService {
 	 * @param map
 	 * @return
 	 */
-	@Transactional  
+	@Transactional(rollbackFor = Exception.class)
 	public Map<String, Object> updateSystemPropertyByName(Map<String, Object> map) throws Exception{
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
@@ -382,7 +382,7 @@ public class PriceChangeRuleService {
 	 * @return
 	 * @throws Exception
 	 */
-	@Transactional  
+	@Transactional(rollbackFor = Exception.class)
 	public Map<String,Object> deletePriceChangeRule(Map<String,Object> map) throws Exception{
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
@@ -515,7 +515,7 @@ public class PriceChangeRuleService {
 	 * @return
 	 * @throws ParseException 
 	 */
-	@Transactional  
+	@Transactional(rollbackFor = Exception.class)
 	public Map<String,Object> createPriceChangeRule(Map<String,Object> map) throws Exception{
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
@@ -635,7 +635,7 @@ public class PriceChangeRuleService {
 	 * @return
 	 * @throws Exception
 	 */
-	@Transactional  
+	@Transactional(rollbackFor = Exception.class)
 	public Map<String,Object> updatePriceChangeRule(Map<String,Object> map) throws Exception{
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
