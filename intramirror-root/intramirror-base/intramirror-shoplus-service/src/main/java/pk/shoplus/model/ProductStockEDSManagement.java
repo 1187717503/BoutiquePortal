@@ -42,6 +42,7 @@ public class ProductStockEDSManagement {
 
     private IPriceService priceService = new PriceServiceImpl();
 
+    private ProductServiceImpl productService = new ProductServiceImpl();
 
     public Map<String, Object> updateStock(StockOptions stockOptions){
         if(stockOptions.getLast_check() == null) {stockOptions.setLast_check(new Date());}
@@ -91,6 +92,8 @@ public class ProductStockEDSManagement {
                     // create sku_store
                     this.createSkuInfo(product, connection, stockOptions.getQuantity(),reserved, stockOptions.getSizeValue(), skuPropertyService, skuStoreService);
                 }
+
+                productService.synShopProductSku(connection,product.getProduct_id().toString());
 
                 // update price
                 if(StringUtils.isNotBlank(stockOptions.getPrice())) {
