@@ -310,17 +310,28 @@ public class ContainerController {
 					}
 					shipmentService.deleteShipmentById(setShipment);
 				}else{
-					List<SubShipment> subList = subShipmentService.getSubShipmentByShipmentId(container.getShipmentId());
+//					List<SubShipment> subList = subShipmentService.getSubShipmentByShipmentId(container.getShipmentId());
+//					Map<String, Object> submap = new HashMap<>();
+//					for (SubShipment subShipment : subList) {
+//						submap.put("sub_shipment_id", subShipment.getSubShipmentId());
+//						List<LogisticProductShipment> lpsList = logisticProductShipmentService.selectById(submap);
+//						if (null != lpsList && 0 < lpsList.size()){
+//							for (LogisticProductShipment lps : lpsList) {
+//								subShipmentService.deleteByPrimaryKey(lps.getSubShipmentId());
+//								logisticProductShipmentService.deleteById(lps.getSubShipmentId());
+//								logisticProductService.updateContainerById(lps.getLogisticProductId());
+//							}
+//						}
+//					}
 					Map<String, Object> submap = new HashMap<>();
-					for (SubShipment subShipment : subList) {
-						submap.put("sub_shipment_id", subShipment.getSubShipmentId());
-						List<LogisticProductShipment> lpsList = logisticProductShipmentService.selectById(submap);
-						if (null != lpsList && 0 < lpsList.size()){
-							for (LogisticProductShipment lps : lpsList) {
-								subShipmentService.deleteByPrimaryKey(lps.getSubShipmentId());
-								logisticProductShipmentService.deleteById(lps.getSubShipmentId());
-								logisticProductService.updateContainerById(lps.getLogisticProductId());
-							}
+					submap.put("container_id", Long.parseLong(map.get("containerId").toString()));
+					List<LogisticsProduct> lpList = logisticProductService.selectByCondition(submap);
+					if (null != lpList && 0 < lpList.size()){
+						for (LogisticsProduct logisticsProduct : lpList) {
+							submap = new HashMap<>();
+							submap.put("logisticProductId", logisticsProduct.getLogistics_product_id());
+							logisticProductShipmentService.deleteBylogisticProductId(submap);
+							logisticProductService.updateContainerById(logisticsProduct.getLogistics_product_id());
 						}
 					}
 				}

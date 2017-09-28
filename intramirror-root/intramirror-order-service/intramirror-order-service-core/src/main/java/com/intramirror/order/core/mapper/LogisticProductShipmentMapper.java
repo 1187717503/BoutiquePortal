@@ -30,4 +30,6 @@ public interface LogisticProductShipmentMapper {
 	int deleteById(Map<String, Object> map);
 	
 	int updateBysubShipmentId(Map<String, Object> map);
+	
+	int deleteBylogisticProductId(Map<String, Object> map);
 }
