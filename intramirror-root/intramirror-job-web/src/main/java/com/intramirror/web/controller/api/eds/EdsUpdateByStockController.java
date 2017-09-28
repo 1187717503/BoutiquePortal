@@ -143,8 +143,22 @@ public class EdsUpdateByStockController implements InitializingBean {
         object.put("eventName","stock_all_update");
         object.put("fileUtils",new ApiDataFileUtils("nugnes","stock_all_update"));
 
+        // baseblu
+        ThreadPoolExecutor basebluExecutor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
+        Map<String,Object> basebluMap = new HashMap<>();
+        basebluMap.put("url","http://baseblu.edstema.it/api/v3.0/skus/stock");
+        basebluMap.put("vendor_id","21");
+        basebluMap.put("store_code","PI702");
+        basebluMap.put("limit","500");
+        basebluMap.put("offset","0");
+        basebluMap.put("threadNum","5");
+        basebluMap.put("nugnesExecutor",basebluExecutor);
+        basebluMap.put("eventName","stock_all_update");
+        basebluMap.put("fileUtils",new ApiDataFileUtils("baseblu","stock_all_update"));
+
         // put data
         paramsMap = new HashMap<>();
         paramsMap.put("nugnes_all_updatestock",object);
+        paramsMap.put("baseblu_all_updatestock",basebluMap);
     }
 }
