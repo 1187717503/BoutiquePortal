@@ -15,13 +15,7 @@ import pk.shoplus.DBConnector;
 import pk.shoplus.common.Contants;
 import pk.shoplus.parameter.EnabledType;
 import pk.shoplus.parameter.StatusType;
-import pk.shoplus.service.ApiParameterService;
-import pk.shoplus.service.ProductPropertyKeyService;
-import pk.shoplus.service.ProductPropertyValueService;
-import pk.shoplus.service.ProductService;
-import pk.shoplus.service.SkuPropertyService;
-import pk.shoplus.service.SkuService;
-import pk.shoplus.service.SkuStoreService;
+import pk.shoplus.service.*;
 import pk.shoplus.service.price.api.IPriceService;
 import pk.shoplus.service.price.impl.PriceServiceImpl;
 import pk.shoplus.service.product.api.IProductService;
@@ -93,8 +87,6 @@ public class ProductStockEDSManagement {
                     this.createSkuInfo(product, connection, stockOptions.getQuantity(),reserved, stockOptions.getSizeValue(), skuPropertyService, skuStoreService);
                 }
 
-                productService.synShopProductSku(connection,product.getProduct_id().toString());
-
                 // update price
                 if(StringUtils.isNotBlank(stockOptions.getPrice())) {
                     logger.info("ProductStockEDSManagementUpdateStock,startUpdatePricem,stockOptions:"+new Gson().toJson(stockOptions));
@@ -134,6 +126,11 @@ public class ProductStockEDSManagement {
                         return mapUtils.getMap();
                     }
                 }
+                productService.synShopProductSku(connection,product.getProduct_id().toString());
+                String updateProductRetailPrice = "update `product`  p,sku set p.`max_retail_price` = sku.`price`,p.`min_retail_price` = sku.`price`  where p.`enabled`  = 1 and sku.`enabled`  = 1 and p.`product_id`  = sku.`product_id` and p.product_id="+product.getProduct_id();
+                logger.info("ProductStockEDSManagementUpdateStock,updateProductRetailPrice:"+updateProductRetailPrice);
+                CategoryService categoryService = new CategoryService(connection);
+                categoryService.updateBySQL(updateProductRetailPrice);
                 mapUtils.putData("status",StatusType.SUCCESS).putData("info","SUCCESS");
             } else {
                 mapUtils.putData("status",StatusType.FAILURE)

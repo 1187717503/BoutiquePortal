@@ -633,7 +633,7 @@
 
     <update id="updateProductRetailPrice" >
 
-        update `product`  p,sku set p.`retail_price` = sku.`price`  where p.`enabled`  = 1 and sku.`enabled`  = 1 and p.`product_id`  = sku.`product_id`
+        update `product`  p,sku set p.`min_retail_price` = sku.`price`,p.`max_retail_price` = sku.`price`  where p.`enabled`  = 1 and sku.`enabled`  = 1 and p.`product_id`  = sku.`product_id`
     </update>
 
     <!-- end dingyifan -->
