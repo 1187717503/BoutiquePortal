@@ -465,7 +465,7 @@ public class ProductServiceImpl implements IProductService{
                     "where sp.`enabled`  = 1 and sps.`enabled`  = 1 and sps.`shop_product_id`  = sp.`shop_product_id` and sp.product_id ="+product.getProduct_id();
 
             // 同步product.retail_price
-            String updateProductRetailPrice = "update `product`  p,sku set p.`retail_price` = sku.`price`  where p.`enabled`  = 1 and sku.`enabled`  = 1 and p.`product_id`  = sku.`product_id` and p.product_id="+product.getProduct_id();
+            String updateProductRetailPrice = "update `product`  p,sku set p.`max_retail_price` = sku.`price`,p.`min_retail_price` = sku.`price`  where p.`enabled`  = 1 and sku.`enabled`  = 1 and p.`product_id`  = sku.`product_id` and p.product_id="+product.getProduct_id();
             logger.info("ProductServiceImplUpdateProduct,updateShopProductSalePriceSQL:"+updateShopProductSalePriceSQL);
             logger.info("ProductServiceImplUpdateProduct,updateProductRetailPrice:"+updateProductRetailPrice);
             categoryService.updateBySQL(updateShopProductSalePriceSQL);

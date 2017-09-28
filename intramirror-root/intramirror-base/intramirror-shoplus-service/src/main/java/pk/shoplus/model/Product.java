@@ -121,9 +121,12 @@ public class Product{
 
 	   @Column public Date last_check;
 
-	   @Column public BigDecimal retail_price;
+	   @Column public BigDecimal min_retail_price;
 
-	public Long getProduct_id(){
+	   @Column public BigDecimal max_retail_price;
+
+
+	   public Long getProduct_id(){
 		return product_id;
 	}
 	public Long getCategory_id(){
@@ -316,12 +319,20 @@ public class Product{
 		   this.last_check = last_check;
 	   }
 
-	   public BigDecimal getRetail_price() {
-		   return retail_price;
+	   public BigDecimal getMin_retail_price() {
+		   return min_retail_price;
 	   }
 
-	   public void setRetail_price(BigDecimal retail_price) {
-		   this.retail_price = retail_price;
+	   public void setMin_retail_price(BigDecimal min_retail_price) {
+		   this.min_retail_price = min_retail_price;
+	   }
+
+	   public BigDecimal getMax_retail_price() {
+		   return max_retail_price;
+	   }
+
+	   public void setMax_retail_price(BigDecimal max_retail_price) {
+		   this.max_retail_price = max_retail_price;
 	   }
    }
 

@@ -177,7 +177,8 @@ public class ProductEDSManagement {
             } else {
                 product.season_code = productOptions.getSeasonCode();
             }
-            product.setRetail_price(BigDecimal.valueOf(Double.parseDouble(productOptions.getSalePrice())));
+            product.setMax_retail_price(BigDecimal.valueOf(Double.parseDouble(productOptions.getSalePrice())));
+            product.setMin_retail_price(BigDecimal.valueOf(Double.parseDouble(productOptions.getSalePrice())));
             product = productService.createProduct(product);
 
             // 在category上增加数据
