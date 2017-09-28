@@ -553,9 +553,9 @@ public class ProductServiceImpl implements IProductService{
 
                             // 存在
                             if(sku_id.equals(shop_sku_id)) {
-                                String updateShopProductSkuSalePriceSQL = "update `shop_product_sku`  sps set sps.`sale_price`  = "+sku.get("im_price")+" where sps.`enabled`  = 1 and sps.`shop_product_id`  ="+shop_product_id;
+                                /*String updateShopProductSkuSalePriceSQL = "update `shop_product_sku`  sps set sps.`sale_price`  = "+sku.get("im_price")+" where sps.`enabled`  = 1 and sps.`shop_product_id`  ="+shop_product_id;
                                 categoryService.updateBySQL(updateShopProductSkuSalePriceSQL);
-                                logger.info("synShopProductSku,updateShopProductSkuSalePriceSQL:"+updateShopProductSkuSalePriceSQL);
+                                logger.info("synShopProductSku,updateShopProductSkuSalePriceSQL:"+updateShopProductSkuSalePriceSQL);*/
                                 insertShopProductSkuFlag = false;
                                 break;
                             }
