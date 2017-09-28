@@ -1,7 +1,5 @@
 package com.intramirror.web.mapping.impl.aiduca;
 
-import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.Runtime_exception;
-import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.handle_stock_rule_error;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -14,26 +12,12 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson15.JSONObject;
 import com.google.gson.Gson;
-import com.intramirror.main.api.service.SkuPropertyService;
-import com.intramirror.product.api.model.Sku;
 import com.intramirror.product.api.service.SkuService;
-import com.intramirror.product.api.service.category.ICategoryService;
 import com.intramirror.web.mapping.api.IStockMapping;
 import com.intramirror.web.mapping.vo.StockContants;
 import com.intramirror.web.mapping.vo.StockOption;
 import com.intramirror.web.util.SpringContextUtils;
 
-import pk.shoplus.common.Contants;
-import pk.shoplus.enums.ApiErrorTypeEnum;
-import pk.shoplus.model.ProductStockEDSManagement;
-import pk.shoplus.model.SkuStore;
-import pk.shoplus.parameter.StatusType;
-import pk.shoplus.service.mapping.api.IMapping;
-import pk.shoplus.service.stock.api.IStoreService;
-import pk.shoplus.service.stock.impl.StoreServiceImpl;
-import pk.shoplus.util.ExceptionUtils;
-import pk.shoplus.util.MapUtils;
-import pk.shoplus.vo.ResultMessage;
 
 /**
  * @author wzh
@@ -43,8 +27,6 @@ import pk.shoplus.vo.ResultMessage;
 public class AiDucaSynAllStockMapping implements IStockMapping{
 
     private static Logger logger = Logger.getLogger(AiDucaSynAllStockMapping.class);
-    
-    private ProductStockEDSManagement productStockEDSManagement = new ProductStockEDSManagement();
     
     @Autowired
     private SkuService skuService;
