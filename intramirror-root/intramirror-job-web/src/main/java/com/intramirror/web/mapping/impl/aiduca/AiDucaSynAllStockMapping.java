@@ -67,6 +67,12 @@ public class AiDucaSynAllStockMapping implements IStockMapping{
         skuParam.put("vendorId", mqDataMap.get("vendor_id"));
         skuParam.put("skuCode", productMap.get("SKU").toString());
         
+        //skuCode不能为# 否则会查询出多条数据  导致库存修改出错
+        if("#".equals(productMap.get("SKU").toString())){
+            logger.info("job mapping AiDuca 根据skuCode修改库存  获取 product时 skuCode不能为# 否则会查询出多条数据  导致库存修改出错 参数: "+ new Gson().toJson(skuParam));
+            return stockOption;
+        }
+        
         logger.info("job mapping AiDuca  根据skuCode 获取 product 相关信息       入参:"+new Gson().toJson(skuParam) );
         Map<String, Object> skuInfo = skuService.getSkuInfoBySkuCode(skuParam);
         logger.info("job mapping AiDuca  根据skuCode 获取 product 相关信息       结果:"+ new Gson().toJson(skuParam));
