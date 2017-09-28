@@ -132,8 +132,21 @@ public class ErrorMessageController {
                     }
                 }
 
-                // eds
+                // eds nugnes
                 if(vendor_id.equals("9")) {
+                    if(name.equals("stock_all_update")) {
+                        StockOption stockOption = edsUpdateByStockMapping.mapping(originDataMap);
+                        CommonThreadPool.execute(name,executor,threadNum,new UpdateStockThread(stockOption,apiDataFileUtils,originDataMap));
+                    } else if(name.equals("product_delta_create") || name.equals("product_delta_create_bydate") || name.equals("product_all_update")) {
+                        ProductEDSManagement.ProductOptions productOptions = edsUpdateByProductMapping.mapping(originDataMap);
+                        ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
+                        vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                        CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
+                    }
+                }
+
+                // eds baseblu
+                if(vendor_id.equals("21")) {
                     if(name.equals("stock_all_update")) {
                         StockOption stockOption = edsUpdateByStockMapping.mapping(originDataMap);
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateStockThread(stockOption,apiDataFileUtils,originDataMap));
