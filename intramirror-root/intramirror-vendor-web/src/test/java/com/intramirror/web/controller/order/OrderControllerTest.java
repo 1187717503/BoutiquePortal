@@ -3,6 +3,7 @@ package com.intramirror.web.controller.order;
 import com.alibaba.fastjson.JSON;
 import org.hamcrest.Matchers;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,7 @@ public class OrderControllerTest {
      * 状态机接口测试
      * @throws Exception
      */
+    @Ignore
     @Test
     public void updateOrderStatusTest() throws Exception {
 
