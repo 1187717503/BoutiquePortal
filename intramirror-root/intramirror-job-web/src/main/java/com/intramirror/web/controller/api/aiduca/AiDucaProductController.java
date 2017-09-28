@@ -34,6 +34,7 @@ import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.common.utils.DateUtils;
 import com.intramirror.web.mapping.api.IStockMapping;
+import com.intramirror.web.mapping.impl.aiduca.AiDucaSynAllStockMapping;
 import com.intramirror.web.mapping.impl.aiduca.AiDucaSynProductMapping;
 import com.intramirror.web.mapping.vo.StockOption;
 import com.intramirror.web.thread.CommonThreadPool;
@@ -51,7 +52,11 @@ public class AiDucaProductController implements InitializingBean{
     private static Logger logger = LoggerFactory.getLogger(AiDucaProductController.class);
     
 	@Autowired
-	private AiDucaSynProductMapping aiDucaSynProductMapping ;
+	private AiDucaSynProductMapping aiDucaSynProductMapping;
+	
+	@Autowired
+	private AiDucaSynAllStockMapping aiDucaSynAllStockMapping;
+	
 	
     // mapping
     @Resource(name = "edsUpdateByStockMapping")
@@ -114,7 +119,6 @@ public class AiDucaProductController implements InitializingBean{
                             mqDataMap.put("product", productInfo.toString());
                             mqDataMap.put("store_code", param.get("store_code").toString());
                             mqDataMap.put("vendor_id", param.get("vendor_id").toString());
-                            mqDataMap.put("api_configuration_id", param.get("api_configuration_id").toString());
                             
                             // 放入线程池
                 			System.out.println(i++);
@@ -133,9 +137,9 @@ public class AiDucaProductController implements InitializingBean{
                             logger.info("job aiDuca getAllSKU,execute,endDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
                             
                             //跳出循环,测试用
-                            if(i>120){
-                            	break;
-                            }
+//                            if(i>120){
+//                            	break;
+//                            }
                 		}
                 	  }
 
@@ -163,7 +167,6 @@ public class AiDucaProductController implements InitializingBean{
 	                            mqDataMap.put("product", diffRow.getNewLine().replace("<br>", ""));
 	                            mqDataMap.put("store_code", param.get("store_code").toString());
 	                            mqDataMap.put("vendor_id", param.get("vendor_id").toString());
-	                            mqDataMap.put("api_configuration_id", param.get("api_configuration_id").toString());
 	                            
 	                            i++;
 	                            // 放入线程池
@@ -181,9 +184,9 @@ public class AiDucaProductController implements InitializingBean{
 	                            logger.info("job aiDuca getAllSKU,execute,endDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
 	                            
 //	                            //跳出循环,测试用
-	                            if(i>120){
-	                            	break;
-	                            }
+//	                            if(i>120){
+//	                            	break;
+//	                            }
 		                    } 
 		                }
 		                
@@ -282,7 +285,7 @@ public class AiDucaProductController implements InitializingBean{
                             
                             // 映射数据 封装VO
                             logger.info("job aiDuca getAllStock,mapping,start,stockMap:"+new Gson().toJson(mqDataMap)+",eventName:"+eventName);
-                            StockOption stockOption = iStockMapping.mapping(mqDataMap);
+                            StockOption stockOption = aiDucaSynAllStockMapping.mapping(mqDataMap);
                             logger.info("job aiDuca getAllStock,mapping,end,stockMap:"+new Gson().toJson(mqDataMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
 
                             // 线程池
@@ -291,7 +294,7 @@ public class AiDucaProductController implements InitializingBean{
                             logger.info("job aiDuca getAllStock,execute,endDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(mqDataMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
                             
                             //跳出循环,测试用
-//                            if(i>100){
+//                            if(i>120){
 //                            	break;
 //                            }
                 		}
@@ -329,7 +332,7 @@ public class AiDucaProductController implements InitializingBean{
 	                			
 	                            // 映射数据 封装VO
 	                            logger.info("job aiDuca getAllStock,mapping,start,stockMap:"+new Gson().toJson(mqDataMap)+",eventName:"+eventName);
-	                            StockOption stockOption = iStockMapping.mapping(mqDataMap);
+	                            StockOption stockOption = aiDucaSynAllStockMapping.mapping(mqDataMap);
 	                            logger.info("job aiDuca getAllStock,mapping,end,stockMap:"+new Gson().toJson(mqDataMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
 
 	                            // 线程池
@@ -338,7 +341,7 @@ public class AiDucaProductController implements InitializingBean{
 	                            logger.info("job aiDuca getAllStock,execute,endDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(mqDataMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
 	                            
 //	                            //跳出循环,测试用
-//	                            if(i>100){
+//	                            if(i>120){
 //	                            	break;
 //	                            }
 		                    } 
@@ -400,7 +403,7 @@ public class AiDucaProductController implements InitializingBean{
         ThreadPoolExecutor aiducaAllProductExecutor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
         Map<String,Object> aiducaAllUpdateproduct = new HashMap<>();
         aiducaAllUpdateproduct.put("url","http://rest.alducadaosta.com/api/Catalog/Sku4Platform?Username=IntraMirror&Password=%2B%2BInt%3DMir%2B%2B");
-        aiducaAllUpdateproduct.put("vendor_id","14");
+        aiducaAllUpdateproduct.put("vendor_id","20");
         aiducaAllUpdateproduct.put("store_code","AIDUCA");
         aiducaAllUpdateproduct.put("threadNum","10");
         aiducaAllUpdateproduct.put("aiducaProductExecutor",aiducaAllProductExecutor);
@@ -411,7 +414,7 @@ public class AiDucaProductController implements InitializingBean{
         ThreadPoolExecutor aiducaStockExecutor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
         Map<String,Object> aiducaUpdateStock = new HashMap<>();
         aiducaUpdateStock.put("url","http://rest.alducadaosta.com/api/stock/Stock4sku/all?Username=IntraMirror&Password=%2B%2BInt%3DMir%2B%2B");
-        aiducaUpdateStock.put("vendor_id","14");
+        aiducaUpdateStock.put("vendor_id","20");
         aiducaUpdateStock.put("store_code","AIDUCA");
         aiducaUpdateStock.put("threadNum","10");
         aiducaUpdateStock.put("aiducaStockExecutor",aiducaStockExecutor);
