@@ -329,7 +329,7 @@ public class ProductServiceImpl implements IProductService{
                 String sku_id = "";
                 if(sizeValues != null && sizeValues.size() > 0) {
                     for(Map<String,Object> sizeValue : sizeValues) {
-                        if(sizeValue.get("value").toString().equals(skuOption.getSize())) {
+                        if(sizeValue.get("value").toString().equalsIgnoreCase(skuOption.getSize())) {
                             ifFlag = true;
                             sku_id = sizeValue.get("sku_id").toString();
                             break;
@@ -457,6 +457,8 @@ public class ProductServiceImpl implements IProductService{
                 /** update by dingyifan 2017-08-16 */
             }
 
+            // 同步shop_product_sku
+            synShopProductSku(conn,product.getProduct_id().toString());
 
             // 同步shop_product.min_sale_price,shop_product.max_sale_price
             String updateShopProductSalePriceSQL = "update `shop_product`  sp,`shop_product_sku`  sps set sp.`max_sale_price` = sps.`sale_price`,sp.`min_sale_price` = sps.`sale_price`\n" +
@@ -511,6 +513,79 @@ public class ProductServiceImpl implements IProductService{
         return mapUtils.getMap();
     }
 
+    public void synShopProductSku(Connection conn,String product_id) throws Exception {
+        try {
+            // select shop_product
+            CategoryService categoryService = new CategoryService(conn);
+            ShopProductSkuService shopProductSkuService = new ShopProductSkuService(conn);
+
+            String selectShopProductSQL = "select  * from `shop_product`  sp where sp.`enabled`  = 1 and sp.`product_id`  = "+product_id;
+            logger.info("synShopProductSku,selectShopProductSQL:"+selectShopProductSQL);
+            List<Map<String,Object>> shopProductMap = categoryService.executeSQL(selectShopProductSQL);
+
+            if(shopProductMap!=null && shopProductMap.size()!=0){
+                String shop_product_id = shopProductMap.get(0).get("shop_product_id").toString();
+                String shop_id = shopProductMap.get(0).get("shop_id").toString();
+
+                // select sku
+                String selectSkuSQL = "select * from `sku`  where `enabled`  = 1 and`product_id`  = "+product_id;
+                logger.info("synShopProductSku,selectSkuSQL:"+selectSkuSQL);
+                List<Map<String,Object>> skuMap = categoryService.executeSQL(selectSkuSQL);
+
+                // select shop_product_sku
+                String selectShopProductSku = "select * from `shop_product_sku`  sps where sps.`enabled`  = 1 and sps.`shop_product_id`  = "+shop_product_id;
+                logger.info("synShopProductSku,selectShopProductSku:"+selectShopProductSku);
+                List<Map<String,Object>> shopProductSkuMap = categoryService.executeSQL(selectShopProductSku);
+
+                if(skuMap == null || skuMap.size() == 0) {
+                    logger.info("synShopProductSku,skuIsNull,product_id:"+product_id);
+                    return;
+                }
+
+                // 查看shop_product_sku 完整性
+                boolean insertShopProductSkuFlag = false;
+                for(Map<String,Object> sku : skuMap) {
+                    insertShopProductSkuFlag = true;
+                    String sku_id = sku.get("sku_id").toString();
+                    if(shopProductSkuMap != null && shopProductSkuMap.size() != 0) {
+                        for(Map<String,Object> shopProductSku : shopProductSkuMap) {
+                            String shop_sku_id = shopProductSku.get("sku_id").toString();
+
+                            // 存在
+                            if(sku_id.equals(shop_sku_id)) {
+                                String updateShopProductSkuSalePriceSQL = "update `shop_product_sku`  sps set sps.`sale_price`  = "+sku.get("im_price")+" where sps.`enabled`  = 1 and sps.`shop_product_id`  ="+shop_product_id;
+                                categoryService.updateBySQL(updateShopProductSkuSalePriceSQL);
+                                logger.info("synShopProductSku,updateShopProductSkuSalePriceSQL:"+updateShopProductSkuSalePriceSQL);
+                                insertShopProductSkuFlag = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    // insert shop_product_sku
+                    if(insertShopProductSkuFlag) {
+                        ShopProductSku sps = new ShopProductSku();
+                        sps.created_at = Helper.getCurrentTimeToUTCWithDate();
+                        sps.updated_at = Helper.getCurrentTimeToUTCWithDate();
+                        sps.enabled = EnabledType.USED;
+                        sps.shop_product_id = Long.parseLong(shop_product_id);
+                        sps.sku_id = Long.parseLong(sku_id);
+                        sps.name = sku.get("name").toString();
+                        sps.coverpic = sku.get("coverpic").toString();
+                        sps.introduction = sku.get("introduction").toString();
+                        sps.sale_price = new BigDecimal(Double.parseDouble(sku.get("im_price").toString()));
+                        sps.shop_id = Long.parseLong(shop_id);
+                        shopProductSkuService.create(sps);
+                        logger.info("synShopProductSku,createShopProductSku,sps:"+JSONObject.toJSONString(sps));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("synShopProductSku,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
+            throw e;
+        }
+    }
 
     @Override
     public void updateProductByAddSku(Connection conn, Product product, Category category, ProductEDSManagement.SkuOptions skuOption, String salePrice, Long vendorId, ProductEDSManagement.ProductOptions productOptions) throws Exception {

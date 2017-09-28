@@ -24,6 +24,7 @@ import pk.shoplus.service.SkuService;
 import pk.shoplus.service.SkuStoreService;
 import pk.shoplus.service.price.api.IPriceService;
 import pk.shoplus.service.price.impl.PriceServiceImpl;
+import pk.shoplus.service.product.api.IProductService;
 import pk.shoplus.service.product.impl.ProductServiceImpl;
 import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.util.MapUtils;
@@ -42,7 +43,6 @@ public class ProductStockEDSManagement {
 
     private IPriceService priceService = new PriceServiceImpl();
 
-
     public Map<String, Object> updateStock(StockOptions stockOptions){
         if(stockOptions.getLast_check() == null) {stockOptions.setLast_check(new Date());}
         logger.info("ProductStockEDSManagementUpdateStock,inputParams,stockOptions:"+new Gson().toJson(stockOptions));
@@ -53,6 +53,7 @@ public class ProductStockEDSManagement {
 
 			SkuPropertyService skuPropertyService = new SkuPropertyService(connection);
 			SkuStoreService skuStoreService = new SkuStoreService(connection);
+            IProductService productService = new ProductServiceImpl();
 
 			logger.info("ProductStockEDSManagementUpdateStock,validateParam,stockOptions:"+new Gson().toJson(stockOptions));
 			ResultMessage resultMessage = this.validateParam(stockOptions,connection);
@@ -91,6 +92,8 @@ public class ProductStockEDSManagement {
                     // create sku_store
                     this.createSkuInfo(product, connection, stockOptions.getQuantity(),reserved, stockOptions.getSizeValue(), skuPropertyService, skuStoreService);
                 }
+
+                productService.synShopProductSku(connection,product.getProduct_id().toString());
 
                 // update price
                 if(StringUtils.isNotBlank(stockOptions.getPrice())) {

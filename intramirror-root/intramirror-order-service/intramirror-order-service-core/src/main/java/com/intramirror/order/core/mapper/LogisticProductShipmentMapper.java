@@ -28,4 +28,8 @@ public interface LogisticProductShipmentMapper {
 	 * @return
 	 */
 	int deleteById(Map<String, Object> map);
+	
+	int updateBysubShipmentId(Map<String, Object> map);
+	
+	int deleteBylogisticProductId(Map<String, Object> map);
 }

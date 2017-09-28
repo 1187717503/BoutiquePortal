@@ -3,21 +3,21 @@
  */
 package com.intramirror.order.core.impl;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
 import com.google.gson.Gson;
 import com.intramirror.common.core.mapper.SubShipmentMapper;
 import com.intramirror.order.api.common.ContainerType;
 import com.intramirror.order.api.model.SubShipment;
 import com.intramirror.order.api.service.ISubShipmentService;
 import com.intramirror.order.core.dao.BaseDao;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 订单装箱service
@@ -51,7 +51,11 @@ public class SubShipmentServiceImpl extends BaseDao implements ISubShipmentServi
 		beanMap.put("shipToCountry", map.get("shipToCountry").toString());
 		beanMap.put("shipToDistrict", map.get("shipToDistrict").toString());
 		beanMap.put("shipToProvince", map.get("shipToProvince").toString());
-		beanMap.put("shipmentId", 1);
+		if (null != map.get("newShipment")){
+			beanMap.put("shipmentId", Long.parseLong(map.get("shipmentId").toString()));
+		}else{
+			beanMap.put("shipmentId", 1);
+		}
 		beanMap.put("status", ContainerType.RECEIVED);
 		Date currentDate = new Date();
 		beanMap.put("updatedAt", currentDate);
@@ -85,6 +89,20 @@ public class SubShipmentServiceImpl extends BaseDao implements ISubShipmentServi
 	@Override
 	public int updateSubShipment(Map<String, Object> map) {
 		return subShipmentMapper.updateSubShipment(map);
+	}
+	
+	/**
+	 * 根据containerId查询subShipmentIdList
+	 * @param map
+	 * @return
+	 */
+	public List<SubShipment> getSubShipmentIdByContainerId(Map<String, Object> map){
+		return subShipmentMapper.getSubShipmentIdByContainerId(map);
+	}
+
+	@Override
+	public int updateSubShipmentById(Map<String, Object> map) {
+		return subShipmentMapper.updateSubShipmentById(map);
 	}
 
 

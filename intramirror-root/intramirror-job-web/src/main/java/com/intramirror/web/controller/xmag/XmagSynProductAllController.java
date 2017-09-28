@@ -91,9 +91,9 @@ public class XmagSynProductAllController implements InitializingBean {
 				if (StringUtils.isNotBlank(json)) {
 					jsonOjbect = JSONObject.parseObject(json);
 					List<Map<String, Object>> list = (List<Map<String, Object>>) jsonOjbect.get("product");
-					logger.info("product list size:" + list.size());
 
 					if (list != null && list.size() > 0) {
+						logger.info("product list size:" + list.size());
 						fileUtils.bakPendingFile("StartIndex" + StartIndex + "_EndIndex" + EndIndex, json);
 						int index = 1;
 						for (Map<String, Object> product : list) {

@@ -295,4 +295,15 @@
                     and acm.boutique_second_category = #{boutique_second_category,jdbcType=VARCHAR}
                     and acm.boutique_third_category = #{boutique_third_category,jdbcType=VARCHAR}  and c.category_id is not null;
   </select>
+  
+  <select id="getCategoryByCondition" resultType="java.util.HashMap" parameterType="java.util.Map">
+              select distinct c.* from api_category_map acm
+                    left join api_configuration ac on(ac.enabled = 1 and ac.api_configuration_id = acm.api_configuration_id)
+                    left join category c on(c.enabled = 1 and c.category_id = acm.category_id)
+                    where acm.enabled = 1 and ac.vendor_id = #{vendor_id,jdbcType=VARCHAR}
+                    and acm.boutique_second_category = #{boutique_second_category,jdbcType=VARCHAR}
+                    and acm.boutique_third_category = #{boutique_third_category,jdbcType=VARCHAR} 
+                    and acm.boutique_first_category = #{boutique_first_category,jdbcType=VARCHAR}
+                    and c.category_id is not null;
+  </select>
 </mapper>

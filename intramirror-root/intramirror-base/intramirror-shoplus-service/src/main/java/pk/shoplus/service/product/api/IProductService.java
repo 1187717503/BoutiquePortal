@@ -36,4 +36,6 @@ public interface IProductService {
      * @throws Exception
      */
     public void updateProductByAddSku(Connection conn, Product product, Category category, ProductEDSManagement.SkuOptions skuOption, String salePrice, Long vendorId, ProductEDSManagement.ProductOptions productOptions) throws Exception ;
+
+    public void synShopProductSku(Connection conn,String product_id) throws Exception;
 }
