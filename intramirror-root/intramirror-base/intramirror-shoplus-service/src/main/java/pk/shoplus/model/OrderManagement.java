@@ -248,7 +248,7 @@ public class OrderManagement {
 			orderResult.setOrderLineId(map.get("order_line_num").toString());
 			orderResult.setBarcode(map.get("sku_code").toString());
 			//添加boutiqueSkuId
-			orderResult.setBoutiqueSkuId(map.get("boutique_sku_id")==null?"":map.get("boutique_sku_id").toString());
+//			orderResult.setBoutiqueSkuId(map.get("boutique_sku_id")==null?"":map.get("boutique_sku_id").toString());
 		}
 		return orderResult;
 	}
