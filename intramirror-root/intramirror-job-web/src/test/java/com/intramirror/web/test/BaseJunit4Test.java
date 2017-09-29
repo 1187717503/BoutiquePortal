@@ -12,7 +12,7 @@
 //@ContextConfiguration
 //({"/freemarker/spring-servlet.xml","/spring/app-beans.xml"})
 //
-//@ActiveProfiles({"spring.profiles.active","sit"})
+//@ActiveProfiles({"spring.profiles.active","test"})
 //
 ////@Transactional(transactionManager = "transactionManager")
 //public class BaseJunit4Test {

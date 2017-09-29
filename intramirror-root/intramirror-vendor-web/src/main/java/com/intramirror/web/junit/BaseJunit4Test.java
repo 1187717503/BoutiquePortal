@@ -4,8 +4,6 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 
 //使用junit4进行测试  
 @RunWith(SpringJUnit4ClassRunner.class) 
@@ -14,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration
 ({"*:/freemarker/spring-servlet.xml","/spring/app-beans.xml"}) 
 
-@ActiveProfiles({"spring.profiles.active","sit"})
+@ActiveProfiles({"spring.profiles.active", "test"})
 
 //@Transactional(transactionManager = "transactionManager")
 public class BaseJunit4Test {

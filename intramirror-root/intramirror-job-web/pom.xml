@@ -17,9 +17,9 @@
 
     <profiles>
         <profile>
-            <id>sit</id>
+            <id>test</id>
             <properties>
-                <profiles.active>sit</profiles.active>
+                <profiles.active>test</profiles.active>
             </properties>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -29,18 +29,6 @@
             <id>staging</id>
             <properties>
                 <profiles.active>staging</profiles.active>
-            </properties>
-        </profile>
-        <profile>
-            <id>shenv</id>
-            <properties>
-                <profiles.active>shenv</profiles.active>
-            </properties>
-        </profile>
-        <profile>
-            <id>shprd</id>
-            <properties>
-                <profiles.active>shprd</profiles.active>
             </properties>
         </profile>
         <profile>

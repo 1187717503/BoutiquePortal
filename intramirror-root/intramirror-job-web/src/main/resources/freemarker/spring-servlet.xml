@@ -47,7 +47,7 @@
     </context:component-scan>
 
     <beans profile="sit">
-        <context:property-placeholder location="classpath:/sit/rocketmq.properties"/>
+        <context:property-placeholder location="classpath:/test/rocketmq.properties"/>
     </beans>
     <beans profile="shenv">
         <context:property-placeholder location="classpath:/shenv/rocketmq.properties"/>
@@ -56,6 +56,6 @@
         <context:property-placeholder location="classpath:/prd/rocketmq.properties"/>
     </beans>
     <beans profile="shprd">
-        <context:property-placeholder location="classpath:/shprd/rocketmq.properties"/>
+        <context:property-placeholder location="classpath:/prd/rocketmq.properties"/>
     </beans>
 </beans>

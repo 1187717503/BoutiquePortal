@@ -36,7 +36,7 @@ import java.util.Map;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ActiveProfiles({"spring.profiles.active","sit"})
+@ActiveProfiles({"spring.profiles.active", "test"})
 @ContextHierarchy({
         @ContextConfiguration(locations = {"classpath:spring/app-beans.xml"}),
         @ContextConfiguration(locations = {"classpath:freemarker/spring-servlet.xml"}),

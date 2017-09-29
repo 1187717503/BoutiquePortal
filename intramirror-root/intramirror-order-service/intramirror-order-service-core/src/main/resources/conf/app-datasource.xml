@@ -38,17 +38,11 @@
    		<constructor-arg index="1" value="SIMPLE" />
   	</bean>
 
-	<beans profile="sit">
-		<context:property-placeholder location="classpath:/sit/databases.properties"/>
+	<beans profile="test">
+		<context:property-placeholder location="classpath:/test/databases.properties"/>
 	</beans>
 	<beans profile="staging">
 		<context:property-placeholder location="classpath:/staging/databases.properties"/>
-	</beans>
-	<beans profile="shenv">
-		<context:property-placeholder location="classpath:/shenv/databases.properties"/>
-	</beans>
-	<beans profile="shprd">
-		<context:property-placeholder location="classpath:/shprd/databases.properties"/>
 	</beans>
 	<beans profile="prd">
 		<context:property-placeholder location="classpath:/prd/databases.properties"/>

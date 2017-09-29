@@ -19,27 +19,15 @@
             </properties>
         </profile>
         <profile>
-            <id>shprd</id>
-            <properties>
-                <profiles.active>shprd</profiles.active>
-            </properties>
-        </profile>
-        <profile>
             <id>staging</id>
             <properties>
                 <profiles.active>staging</profiles.active>
             </properties>
         </profile>
         <profile>
-            <id>shenv</id>
+            <id>test</id>
             <properties>
-                <profiles.active>shenv</profiles.active>
-            </properties>
-        </profile>
-        <profile>
-            <id>sit</id>
-            <properties>
-                <profiles.active>sit</profiles.active>
+                <profiles.active>test</profiles.active>
             </properties>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -191,10 +179,8 @@
                 <directory>src/main/resources</directory>
                 <excludes>
                     <exclude>prd/*</exclude>
-                    <exclude>shprd/*</exclude>
                     <exclude>staging/*</exclude>
-                    <exclude>sit/*</exclude>
-                    <exclude>shenv/*</exclude>
+                    <exclude>test/*</exclude>
                 </excludes>
             </resource>
             <resource>
