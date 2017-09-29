@@ -415,9 +415,10 @@ public class ProductServiceImpl implements IProductService{
                         BigDecimal oldPrice = skuList.get(0).getPrice();
 
                         boolean flag = ProductServiceImpl.isPrice(oldPrice,price);
-                        if(flag) {
+                        if(flag || productOptions.getModifyPrice().equals("1")) {
                             Sku skuPrice = priceService.getPriceByRule(product,vendorOptions.getVendorId(),price,conn);
                             BigDecimal inPrice = skuPrice.getIn_price();
+                            logger.info("ProductServiceImplUpdateProductPrice,product:"+JSONObject.toJSONString(product)+",ProductOptions:"+JSONObject.toJSONString(productOptions)+",skuPrice:"+JSONObject.toJSONString(skuPrice));
                             for(Sku sku : skuList){
                                 sku.price = price;
                                 sku.in_price = inPrice;

@@ -128,6 +128,7 @@ public class ErrorMessageController {
                         ProductEDSManagement.ProductOptions productOptions = quadraSynProductMapping.mapping(originDataMap);
                         ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
                         vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                        productOptions.setModifyPrice("1");
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
                     }
                 }
@@ -141,6 +142,7 @@ public class ErrorMessageController {
                         ProductEDSManagement.ProductOptions productOptions = edsUpdateByProductMapping.mapping(originDataMap);
                         ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
                         vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                        productOptions.setModifyPrice("1");
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
                     }
                 }
@@ -154,6 +156,7 @@ public class ErrorMessageController {
                         ProductEDSManagement.ProductOptions productOptions = edsUpdateByProductMapping.mapping(originDataMap);
                         ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
                         vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                        productOptions.setModifyPrice("1");
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
                     }
                 }
@@ -164,12 +167,14 @@ public class ErrorMessageController {
                         ProductEDSManagement.ProductOptions productOptions = cloudStoreProductMapping.mapping(originDataMap);
                         ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
                         vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                        productOptions.setModifyPrice("1");
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
                     }else if(name.equals("product_delta_update")) {
                         if(jsonObject.get("stockOption") == null) {
                             ProductEDSManagement.ProductOptions productOptions = cloudStoreProductMapping.mapping(originDataMap);
                             ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
                             vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                            productOptions.setModifyPrice("1");
                             CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
                         } else {
                             StockOption stockOption = cloudStoreUpdateByStockMapping.mapping(originDataMap);
@@ -195,6 +200,7 @@ public class ErrorMessageController {
                         ProductEDSManagement.ProductOptions productOptions = atelierUpdateByProductMapping.mapping(originDataMap);
                         ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
                         vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                        productOptions.setModifyPrice("1");
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
                     }
                 }
@@ -208,6 +214,7 @@ public class ErrorMessageController {
                         ProductEDSManagement.ProductOptions productOptions = filippoSynProductMapping.mapping(originDataMap);
                         ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
                         vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                        productOptions.setModifyPrice("1");
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
                     }
                 }
