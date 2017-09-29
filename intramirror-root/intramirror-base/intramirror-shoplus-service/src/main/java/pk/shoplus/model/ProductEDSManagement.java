@@ -1386,6 +1386,16 @@ public class ProductEDSManagement {
             return category_name;
         }
 
+        public String modifyPrice = "0";
+
+        public String getModifyPrice() {
+            return modifyPrice;
+        }
+
+        public void setModifyPrice(String modifyPrice) {
+            this.modifyPrice = modifyPrice;
+        }
+
         public ProductOptions setCategory_name(String category_name) {
             this.category_name = category_name;
             return this;
@@ -1658,6 +1668,7 @@ public class ProductEDSManagement {
         public void setSizeid(String sizeid) {
             this.sizeid = sizeid;
         }
+
 
     }
 
