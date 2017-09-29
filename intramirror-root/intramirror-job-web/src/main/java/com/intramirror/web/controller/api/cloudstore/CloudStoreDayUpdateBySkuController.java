@@ -175,15 +175,15 @@ public class CloudStoreDayUpdateBySkuController implements InitializingBean{
 
 				// update stock
 				 // 映射数据 封装VO
-                logger.info("EdsAllUpdateByStockControllerExecute,mapping,start,jsonObject:"+new Gson().toJson(jsonObject)+",eventName:"+eventName);
+                logger.info("cloudStoreProductDAYProducerControllerExecute,mapping,start,jsonObject:"+new Gson().toJson(jsonObject)+",eventName:"+eventName);
                 StockOption stockOption = iStockMapping.mapping(jsonObject);
 				stockOption.setVendor_id(vendor_id);
-                logger.info("EdsAllUpdateByStockControllerExecute,mapping,end,jsonObject:"+new Gson().toJson(jsonObject)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
+                logger.info("cloudStoreProductDAYProducerControllerExecute,mapping,end,jsonObject:"+new Gson().toJson(jsonObject)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
 
                 // 线程池
-                logger.info("EdsAllUpdateByStockControllerExecute,execute,startDate:"+ DateUtils.getStrDate(new Date())+",jsonObject:"+new Gson().toJson(jsonObject)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
+                logger.info("cloudStoreProductDAYProducerControllerExecute,execute,startDate:"+ DateUtils.getStrDate(new Date())+",jsonObject:"+new Gson().toJson(jsonObject)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
                 CommonThreadPool.execute(eventName,nugnesExecutor,threadNum,new UpdateStockThread(stockOption,fileUtils,jsonObject));
-                logger.info("EdsAllUpdateByStockControllerExecute,execute,endDate:"+ DateUtils.getStrDate(new Date())+",jsonObject:"+new Gson().toJson(jsonObject)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
+                logger.info("cloudStoreProductDAYProducerControllerExecute,execute,endDate:"+ DateUtils.getStrDate(new Date())+",jsonObject:"+new Gson().toJson(jsonObject)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
 			} else if(type == Contants.EVENTS_TYPE_2) {
 
 				// get vendor
