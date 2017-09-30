@@ -1,26 +1,6 @@
 package com.intramirror.web.controller.order;
 
-import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
-import java.net.URLDecoder;
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
 import com.alibaba.fastjson.JSON;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
@@ -37,6 +17,8 @@ import com.intramirror.order.api.service.IOrderExceptionTypeService;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.service.IShipmentService;
 import com.intramirror.order.api.service.ISubShipmentService;
+import com.intramirror.product.api.model.Product;
+import com.intramirror.product.api.service.IProductService;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.user.api.model.User;
@@ -46,7 +28,23 @@ import com.intramirror.web.controller.BaseController;
 import com.intramirror.web.service.LogisticsProductService;
 import com.intramirror.web.service.OrderRefund;
 import com.intramirror.web.service.OrderService;
-
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.net.URLDecoder;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @CrossOrigin
 @Controller
@@ -74,7 +72,6 @@ public class OrderController extends BaseController {
     @Autowired
     private OrderService orderServiceImpl;
 
-
     @Autowired
     private ISkuStoreService skuStoreService;
 
@@ -99,10 +96,12 @@ public class OrderController extends BaseController {
     @Autowired
     private IOrderExceptionTypeService orderExceptionTypeService;
 
+    @Autowired
+    private IProductService productService;
+
     /**
      * 获取订单列表
-     *
-     * @param status
+     * @param map
      * @param httpRequest
      * @return
      */
@@ -142,43 +141,43 @@ public class OrderController extends BaseController {
             sortByName = "created_at";
         }
 
-
         Long vendorId = vendor.getVendorId();
         //根据订单状态查询订单
-        logger.info(MessageFormat.format("order getOrderList 调用接口 orderService.getOrderListByStatus 查询订单信息  入参 status:{0},vendorId:{1},sortByName:{2}", map.get("status").toString(), vendorId, sortByName));
+        logger.info(MessageFormat.format("order getOrderList 调用接口 orderService.getOrderListByStatus 查询订单信息  入参 status:{0},vendorId:{1},sortByName:{2}",
+                map.get("status").toString(), vendorId, sortByName));
         List<Map<String, Object>> orderList = orderService.getOrderListByStatus(Integer.parseInt(map.get("status").toString()), vendorId, sortByName);
 
         if (orderList != null && orderList.size() > 0) {
 
-//			/**------------------------------------优化----------------------------------------*/
-//			//遍历获取所有商品ID
-//			String productIds = "";
-//			for(Map<String, Object> info : orderList){
-//				productIds +=info.get("product_id").toString()+",";
-//			}
-//			
-//			if(StringUtils.isNoneBlank(productIds)){
-//				productIds = productIds.substring(0,productIds.length() -1);
-//			}
-//			
-//			//根据ID列表获取商品属性
-//			List<Map<String, Object>> productPropertyList = productPropertyService.getProductPropertyListByProductId(productIds);
-//			Map<String, Map<String, String>> productPropertyResult= new HashMap<String, Map<String, String>>();
-//			
-//			for(Map<String, Object> productProperty : productPropertyList){
-//				
-//				//如果存在
-//				if(productPropertyResult.containsKey(productProperty.get("product_id").toString())){
-//					Map<String, String> info = productPropertyResult.get(productProperty.get("product_id").toString());
-//				    info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
-//				}else{
-//					Map<String, String> info = new HashMap<String, String>();
-//					info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
-//					productPropertyResult.put(productProperty.get("product_id").toString(), info);
-//				}
-//				
-//			}
-//			/**------------------------------------优化end----------------------------------------*/
+            //			/**------------------------------------优化----------------------------------------*/
+            //			//遍历获取所有商品ID
+            //			String productIds = "";
+            //			for(Map<String, Object> info : orderList){
+            //				productIds +=info.get("product_id").toString()+",";
+            //			}
+            //
+            //			if(StringUtils.isNoneBlank(productIds)){
+            //				productIds = productIds.substring(0,productIds.length() -1);
+            //			}
+            //
+            //			//根据ID列表获取商品属性
+            //			List<Map<String, Object>> productPropertyList = productPropertyService.getProductPropertyListByProductId(productIds);
+            //			Map<String, Map<String, String>> productPropertyResult= new HashMap<String, Map<String, String>>();
+            //
+            //			for(Map<String, Object> productProperty : productPropertyList){
+            //
+            //				//如果存在
+            //				if(productPropertyResult.containsKey(productProperty.get("product_id").toString())){
+            //					Map<String, String> info = productPropertyResult.get(productProperty.get("product_id").toString());
+            //				    info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
+            //				}else{
+            //					Map<String, String> info = new HashMap<String, String>();
+            //					info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
+            //					productPropertyResult.put(productProperty.get("product_id").toString(), info);
+            //				}
+            //
+            //			}
+            //			/**------------------------------------优化end----------------------------------------*/
 
             logger.info("order getOrderList 解析订单列表信息  ");
             for (Map<String, Object> info : orderList) {
@@ -194,14 +193,13 @@ public class OrderController extends BaseController {
                     info.put("supply_price_discount", (100 - supply_price_discount.setScale(0, BigDecimal.ROUND_HALF_UP).intValue()) + " %");
                 }
 
-
-//				//添加商品对应的属性
-//				if(productPropertyResult.size() > 0 ){
-//					if(productPropertyResult.get(info.get("product_id").toString()) != null){
-//						info.put("brandID", productPropertyResult.get(info.get("product_id").toString()).get("BrandID"));
-//						info.put("colorCode", productPropertyResult.get(info.get("product_id").toString()).get("ColorCode"));
-//					}
-//				}
+                //				//添加商品对应的属性
+                //				if(productPropertyResult.size() > 0 ){
+                //					if(productPropertyResult.get(info.get("product_id").toString()) != null){
+                //						info.put("brandID", productPropertyResult.get(info.get("product_id").toString()).get("BrandID"));
+                //						info.put("colorCode", productPropertyResult.get(info.get("product_id").toString()).get("ColorCode"));
+                //					}
+                //				}
 
             }
 
@@ -212,11 +210,8 @@ public class OrderController extends BaseController {
         return result;
     }
 
-
     /**
      * 获取订单详情
-     *
-     * @param status      orderNumber
      * @param httpRequest
      * @return
      */
@@ -227,7 +222,8 @@ public class OrderController extends BaseController {
         ResultMessage result = new ResultMessage();
         result.errorStatus();
 
-        if (map == null || map.size() == 0 || map.get("status") == null || StringUtils.isBlank(map.get("status").toString()) || map.get("orderNumber") == null) {
+        if (map == null || map.size() == 0 || map.get("status") == null || StringUtils.isBlank(map.get("status").toString()) || map.get("orderNumber")
+                == null) {
             result.setMsg("Parameter cannot be empty");
             return result;
         }
@@ -259,6 +255,7 @@ public class OrderController extends BaseController {
         //根据订单orderLineNumber 查询订单详情
         logger.info(MessageFormat.format("order getOrderDetail 调用 orderService.getOrderInfoByCondition接口获取详情 入参:{0}", new Gson().toJson(conditionMap)));
         Map<String, Object> orderInfo = orderService.getOrderInfoByCondition(conditionMap);
+        System.out.println("==Jain==orderInfo1:" + orderInfo.toString());
         if (orderInfo == null || orderInfo.size() == 0) {
             result.setMsg("Order does not exist");
             return result;
@@ -284,162 +281,112 @@ public class OrderController extends BaseController {
             Double inPrice = Double.parseDouble(orderInfo.get("in_price").toString());
 
             BigDecimal sale_price_discount = new BigDecimal((salePrice / price) * 100);
-//				info.put("sale_price_discount",sale_price_discount.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() +" %");
+            //				info.put("sale_price_discount",sale_price_discount.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() +" %");
             orderInfo.put("sale_price_discount", (100 - sale_price_discount.setScale(0, BigDecimal.ROUND_HALF_UP).intValue()) + " %");
 
             BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + 0.22) / price) * 100);
-//			orderInfo.put("supply_price_discount", (100 -supply_price_discount.setScale(0,BigDecimal.ROUND_HALF_UP).intValue())+" %");
+            //			orderInfo.put("supply_price_discount", (100 -supply_price_discount.setScale(0,BigDecimal.ROUND_HALF_UP).intValue())+" %");
             if (supply_price_discount.intValue() > 100 || supply_price_discount.intValue() < 0) {
                 orderInfo.put("supply_price_discount", 0 + " %");
             } else {
                 orderInfo.put("supply_price_discount", (100 - supply_price_discount.setScale(0, BigDecimal.ROUND_HALF_UP).intValue()) + " %");
             }
 
-//			//根据ID列表获取商品属性
-//			List<Map<String, Object>> productPropertyList = productPropertyService.getProductPropertyListByProductId(orderInfo.get("product_id").toString());
-//			Map<String, Map<String, String>> productPropertyResult= new HashMap<String, Map<String, String>>();
-//			
-//			for(Map<String, Object> productProperty : productPropertyList){
-//				
-//				//如果存在
-//				if(productPropertyResult.containsKey(productProperty.get("product_id").toString())){
-//					Map<String, String> info = productPropertyResult.get(productProperty.get("product_id").toString());
-//				    info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
-//				}else{
-//					Map<String, String> info = new HashMap<String, String>();
-//					info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
-//					productPropertyResult.put(productProperty.get("product_id").toString(), info);
-//				}
-//				
-//			}
-//			
-//			
-//
-//			//汇率
-//			Double rate =  Double.parseDouble(orderInfo.get("current_rate").toString());
-//			
-//			//按汇率计算人民币价钱
-//			Double sale_price2 = Double.parseDouble(orderInfo.get("sale_price").toString()) * rate;
-//			orderInfo.put("sale_price2", sale_price2);
-//			//计算利润
-//			Double profit = Double.parseDouble(orderInfo.get("sale_price").toString()) - Double.parseDouble(orderInfo.get("in_price").toString());
-//			BigDecimal b = new BigDecimal(profit);  
-//			profit = b.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();  
-//			orderInfo.put("profit", profit * rate);
-//			
-//			//计算折扣 
-//			Double salePrice = Double.parseDouble(orderInfo.get("sale_price").toString());
-//			Double price = Double.parseDouble(orderInfo.get("price").toString());
-//			Double inPrice = Double.parseDouble(orderInfo.get("in_price").toString());
-//			
-//			BigDecimal sale_price_discount = new BigDecimal((salePrice / price)*100);  
-////				info.put("sale_price_discount",sale_price_discount.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() +" %");
-//			orderInfo.put("sale_price_discount",(100 - sale_price_discount.intValue()) +" %");
-//			
-//			BigDecimal supply_price_discount = new BigDecimal((inPrice*(1+0.22)/price)*100);
-//			orderInfo.put("supply_price_discount", (100 -supply_price_discount.intValue())+" %");
-//			
-//			
-//			//添加商品对应的属性
-//			if(productPropertyResult.size() > 0 ){
-//				if(productPropertyResult.get(orderInfo.get("product_id").toString()) != null){
-//					orderInfo.put("brandID", productPropertyResult.get(orderInfo.get("product_id").toString()).get("BrandID"));
-//					orderInfo.put("colorCode", productPropertyResult.get(orderInfo.get("product_id").toString()).get("ColorCode"));
-//				}
-//			}
+            /*
+         * 2017-9-30 add by Jain
+         * The boutique id in the print page should not be the vendor_id but the product_code
+        * */
 
+            Long productId = Long.parseLong(orderInfo.get("product_id").toString());
+            Product product = productService.selectByPrimaryKey(productId);
+            String sProductCode = product.getProductCode();
+            orderInfo.put("ProductCode", sProductCode);
         }
 
-
-//		logger.info("order getOrderDetail 生成条形码  返回URL");
-//		String orderNumberUrl = "Barcode-"+orderInfo.get("order_line_num").toString()+".png";
-//		orderNumberUrl = BarcodeUtil.generateFile(orderInfo.get("order_line_num").toString(), orderNumberUrl,false);
-//		orderInfo.put("orderNumberUrl", orderNumberUrl);
-//		
-//		//如果包含#号  则不生成条形码
-//		String skuBarcodeUrl = "Barcode-"+orderInfo.get("sku_code").toString()+".png";
-//		if(!skuBarcodeUrl.contains("#")){
-//			skuBarcodeUrl = BarcodeUtil.generateFile(orderInfo.get("sku_code").toString(), skuBarcodeUrl,true);
-//			orderInfo.put("skuBarcodeUrl", skuBarcodeUrl);
-//		}else{
-//			orderInfo.put("skuBarcodeUrl", null);
-//		}
-
-
+        //		logger.info("order getOrderDetail 生成条形码  返回URL");
+        //		String orderNumberUrl = "Barcode-"+orderInfo.get("order_line_num").toString()+".png";
+        //		orderNumberUrl = BarcodeUtil.generateFile(orderInfo.get("order_line_num").toString(), orderNumberUrl,false);
+        //		orderInfo.put("orderNumberUrl", orderNumberUrl);
+        //
+        //		//如果包含#号  则不生成条形码
+        //		String skuBarcodeUrl = "Barcode-"+orderInfo.get("sku_code").toString()+".png";
+        //		if(!skuBarcodeUrl.contains("#")){
+        //			skuBarcodeUrl = BarcodeUtil.generateFile(orderInfo.get("sku_code").toString(), skuBarcodeUrl,true);
+        //			orderInfo.put("skuBarcodeUrl", skuBarcodeUrl);
+        //		}else{
+        //			orderInfo.put("skuBarcodeUrl", null);
+        //		}
 
         result.successStatus();
         result.setData(orderInfo);
         return result;
     }
-	
-	/**
-	 * 状态机接口
-	 * @param map
-	 * @return
-	 */
-	@RequestMapping(value="/updateOrderStatus", method=RequestMethod.POST)
-	@ResponseBody
-	public ResultMessage updateOrderStatus(@RequestBody Map<String, Object> map, HttpServletRequest httpServletRequest){
-		logger.info(MessageFormat.format("updateOrderStatus param:{0}",new Gson().toJson(map)));
 
-		User user = getUser(httpServletRequest);
-		ResultMessage message = ResultMessage.getInstance();
-		Map<String, Object> resultMap = new HashMap<String, Object>();
-		resultMap.put("status", StatusType.FAILURE);
-		try {
-			//参数不能为空
-			if(map == null || map.size() == 0){
-				message.successStatus().putMsg("info", "Parameter cannot be null");
-				return message;
-			}
-			
-			if(map.get("logisProductId") == null || StringUtils.isBlank(map.get("logisProductId").toString())){
-				message.successStatus().putMsg("info", "logisProductId cannot be null");
-				return message;
-			}
-			
-			if(map.get("status") == null || StringUtils.isBlank(map.get("status").toString())){
-				message.successStatus().putMsg("info", "status cannot be null");
-				return message;
-			}
-			
-			
-			Long logisProductId =Long.parseLong(map.get("logisProductId").toString());
-			int status =Integer.parseInt(map.get("status").toString());
-			
-			//调用修改订单状态
-			//根据id获取当前数据库旧的对象信息
-			LogisticsProduct oldLogisticsProduct = logisticsProductService.selectById(logisProductId);
-			resultMap = logisticsProductService.updateOrderLogisticsStatusById(oldLogisticsProduct, status);
-			if (StatusType.SUCCESS == Integer.parseInt(resultMap.get("status").toString())){
-				//更新confirm库存
-				if (2 == status) {
-					if (null != oldLogisticsProduct) {
-						Long shopProductSkuId = oldLogisticsProduct.getShop_product_sku_id();
-						logger.info("订单 "+shopProductSkuId+" , 用户 "+ JSON.toJSONString(user.getUsername()) +" confirm操作, 修改confirm库存开始");
-						skuStoreService.updateConfirmStoreByShopProductSkuId(shopProductSkuId);
-						logger.info("订单 " + shopProductSkuId + " confirm操作, 修改confirm库存成功");
-					}
-				}
-				message.successStatus().putMsg("Info", "SUCCESS").setData(resultMap);
-				return message;
-			}
-			message.successStatus().putMsg("Info", ""+StatusType.FAILURE).setData(resultMap);
-			return message;
-		} catch (Exception e) {
-			e.printStackTrace();
-			logger.info("errorMsg : " +e.getMessage());
-			message.errorStatus().putMsg("errorMsg", e.getMessage());
-		}
-		
-		return message;
-	}
-	
+    /**
+     * 状态机接口
+     * @param map
+     * @return
+     */
+    @RequestMapping(value = "/updateOrderStatus", method = RequestMethod.POST)
+    @ResponseBody
+    public ResultMessage updateOrderStatus(@RequestBody Map<String, Object> map, HttpServletRequest httpServletRequest) {
+        logger.info(MessageFormat.format("updateOrderStatus param:{0}", new Gson().toJson(map)));
+
+        User user = getUser(httpServletRequest);
+        ResultMessage message = ResultMessage.getInstance();
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        resultMap.put("status", StatusType.FAILURE);
+        try {
+            //参数不能为空
+            if (map == null || map.size() == 0) {
+                message.successStatus().putMsg("info", "Parameter cannot be null");
+                return message;
+            }
+
+            if (map.get("logisProductId") == null || StringUtils.isBlank(map.get("logisProductId").toString())) {
+                message.successStatus().putMsg("info", "logisProductId cannot be null");
+                return message;
+            }
+
+            if (map.get("status") == null || StringUtils.isBlank(map.get("status").toString())) {
+                message.successStatus().putMsg("info", "status cannot be null");
+                return message;
+            }
+
+            Long logisProductId = Long.parseLong(map.get("logisProductId").toString());
+            int status = Integer.parseInt(map.get("status").toString());
+
+            //调用修改订单状态
+            //根据id获取当前数据库旧的对象信息
+            LogisticsProduct oldLogisticsProduct = logisticsProductService.selectById(logisProductId);
+            resultMap = logisticsProductService.updateOrderLogisticsStatusById(oldLogisticsProduct, status);
+            if (StatusType.SUCCESS == Integer.parseInt(resultMap.get("status").toString())) {
+                //更新confirm库存
+                if (2 == status) {
+                    if (null != oldLogisticsProduct) {
+                        Long shopProductSkuId = oldLogisticsProduct.getShop_product_sku_id();
+                        logger.info("订单 " + shopProductSkuId + " , 用户 " + JSON.toJSONString(user.getUsername()) + " confirm操作, 修改confirm库存开始");
+                        skuStoreService.updateConfirmStoreByShopProductSkuId(shopProductSkuId);
+                        logger.info("订单 " + shopProductSkuId + " confirm操作, 修改confirm库存成功");
+                    }
+                }
+                message.successStatus().putMsg("Info", "SUCCESS").setData(resultMap);
+                return message;
+            }
+            message.successStatus().putMsg("Info", "" + StatusType.FAILURE).setData(resultMap);
+            return message;
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("errorMsg : " + e.getMessage());
+            message.errorStatus().putMsg("errorMsg", e.getMessage());
+        }
+
+        return message;
+    }
 
     /**
      * 根据不同订单状态统计数量
-     *
-     * @param map
+     * @param httpRequest
      * @return
      */
     @RequestMapping(value = "/getOrderCount", method = RequestMethod.GET)
@@ -465,7 +412,7 @@ public class OrderController extends BaseController {
                 return resultMessage;
             }
             Long vendorId = vendor.getVendorId();
-            int[] item = {OrderStatusType.PENDING, OrderStatusType.COMFIRMED};
+            int[] item = { OrderStatusType.PENDING, OrderStatusType.COMFIRMED };
             Map<String, Object> resultMap = new HashMap<>();
             for (int i = 0; i < item.length; i++) {
                 map = new HashMap<>();
@@ -500,7 +447,6 @@ public class OrderController extends BaseController {
 
     /**
      * 退款接口
-     *
      * @param map
      * @return
      */
@@ -568,10 +514,9 @@ public class OrderController extends BaseController {
         return message;
     }
 
-
     /***
      * 获取箱子里面的订单信息
-     * @param status containerId
+     * @param map
      * @param httpRequest
      * @return
      */
@@ -604,43 +549,43 @@ public class OrderController extends BaseController {
             return result;
         }
 
-
         try {
             //获取PackOrderorder列表
-            logger.info(MessageFormat.format("order getPackOrderList 调用接口getOrderListByStatusAndContainerId 获取箱子内订单列表 入参 containerId:{0},containerId:{1},containerId:{2}", map.get("containerId").toString(), map.get("status").toString(), vendor.getVendorId()));
-            List<Map<String, Object>> packList = orderService.getOrderListByStatusAndContainerId(Integer.parseInt(map.get("containerId").toString()), Integer.parseInt(map.get("status").toString()), vendor.getVendorId());
+            logger.info(MessageFormat
+                    .format("order getPackOrderList 调用接口getOrderListByStatusAndContainerId 获取箱子内订单列表 入参 containerId:{0},containerId:{1},containerId:{2}",
+                            map.get("containerId").toString(), map.get("status").toString(), vendor.getVendorId()));
+            List<Map<String, Object>> packList = orderService.getOrderListByStatusAndContainerId(Integer.parseInt(map.get("containerId").toString()),
+                    Integer.parseInt(map.get("status").toString()), vendor.getVendorId());
 
-
-//			if(packList != null && packList.size() > 0){
-//				//遍历获取所有商品ID
-//				String productIds = "";
-//				for(Map<String, Object> info : packList){
-//					productIds +=info.get("product_id").toString()+",";
-//				}
-//				
-//				if(StringUtils.isNoneBlank(productIds)){
-//					productIds = productIds.substring(0,productIds.length() -1);
-//				}
-//				
-//				//根据ID列表获取商品属性
-//				List<Map<String, Object>> productPropertyList = productPropertyService.getProductPropertyListByProductId(productIds);
-//				Map<String, Map<String, String>> productPropertyResult= new HashMap<String, Map<String, String>>();
-//				
-//				for(Map<String, Object> productProperty : productPropertyList){
-//					
-//					//如果存在
-//					if(productPropertyResult.containsKey(productProperty.get("product_id").toString())){
-//						Map<String, String> info = productPropertyResult.get(productProperty.get("product_id").toString());
-//					    info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
-//					}else{
-//						Map<String, String> info = new HashMap<String, String>();
-//						info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
-//						productPropertyResult.put(productProperty.get("product_id").toString(), info);
-//					}
-//					
-//				}
-//			}
-
+            //			if(packList != null && packList.size() > 0){
+            //				//遍历获取所有商品ID
+            //				String productIds = "";
+            //				for(Map<String, Object> info : packList){
+            //					productIds +=info.get("product_id").toString()+",";
+            //				}
+            //
+            //				if(StringUtils.isNoneBlank(productIds)){
+            //					productIds = productIds.substring(0,productIds.length() -1);
+            //				}
+            //
+            //				//根据ID列表获取商品属性
+            //				List<Map<String, Object>> productPropertyList = productPropertyService.getProductPropertyListByProductId(productIds);
+            //				Map<String, Map<String, String>> productPropertyResult= new HashMap<String, Map<String, String>>();
+            //
+            //				for(Map<String, Object> productProperty : productPropertyList){
+            //
+            //					//如果存在
+            //					if(productPropertyResult.containsKey(productProperty.get("product_id").toString())){
+            //						Map<String, String> info = productPropertyResult.get(productProperty.get("product_id").toString());
+            //					    info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
+            //					}else{
+            //						Map<String, String> info = new HashMap<String, String>();
+            //						info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
+            //						productPropertyResult.put(productProperty.get("product_id").toString(), info);
+            //					}
+            //
+            //				}
+            //			}
 
             result.successStatus();
             result.setData(packList);
@@ -651,14 +596,11 @@ public class OrderController extends BaseController {
             return result;
         }
 
-
         return result;
     }
 
-
     /**
      * 装箱验证
-     *
      * @param map
      * @param httpRequest
      * @return
@@ -672,7 +614,6 @@ public class OrderController extends BaseController {
         Map<String, Object> infoMap = new HashMap<String, Object>();
         //0 校验   2返回shipment列表  3箱子为空时  4不为空时
         infoMap.put("statusType", StatusType.ORDER_CHECK_ORDER);
-
 
         if (checkParamsBypackingCheckOrder(map)) {
             result.setMsg("Parameter cannot be empty");
@@ -704,7 +645,6 @@ public class OrderController extends BaseController {
 
         map.put("vendorId", vendor.getVendorId());
 
-
         //订单装箱
         try {
             result = orderServiceImpl.packingOrder(map);
@@ -716,14 +656,11 @@ public class OrderController extends BaseController {
             return result;
         }
 
-
         return result;
     }
 
-
     /**
      * 删除箱子中的订单
-     *
      * @param map
      * @param httpRequest
      * @return
@@ -751,10 +688,8 @@ public class OrderController extends BaseController {
         return result;
     }
 
-
     /**
      * 获取请求参数
-     *
      * @param req
      * @return
      * @throws UnsupportedEncodingException
@@ -811,7 +746,6 @@ public class OrderController extends BaseController {
 
     /**
      * 判断是否是合法
-     *
      * @param params
      * @return
      */
@@ -845,10 +779,8 @@ public class OrderController extends BaseController {
         return StatusType.SUCCESS;
     }
 
-
     /**
      * packingCheckOrder 接口的参数校验
-     *
      * @return
      */
     public boolean checkParamsBypackingCheckOrder(Map<String, Object> map) {
@@ -871,131 +803,130 @@ public class OrderController extends BaseController {
         return false;
     }
 
+    //    /**
+    //     * 回调接口
+    //     *
+    //     * @return
+    //     */
+    //<<<<<<< HEAD
+    //    @RequestMapping(value = "/orderRefundCallback")
+    //    @ResponseBody
+    //    public ResultMessage orderRefundCallback(@RequestBody Map<String, Object> map) {
+    //        logger.info("info parameter :" + new Gson().toJson(map));
+    //        ResultMessage message = ResultMessage.getInstance();
+    //        try {
+    //            //校验入参
+    //            if (null == map || 0 == map.size()) {
+    //                message.successStatus().putMsg("info", "Parameter cannot be null");
+    //                logger.info("info parameter cannot be null");
+    //                return message;
+    //            }
+    //            if (null == map.get("logisProductId") || StringUtils.isBlank(map.get("logisProductId").toString())) {
+    //                message.successStatus().putMsg("info", "logisProductId cannot be null");
+    //                logger.info("info logisProductId  cannot be null");
+    //                return message;
+    //            }
+    //            if (null == map.get("status") || StringUtils.isBlank(map.get("status").toString())) {
+    //                message.successStatus().putMsg("info", "status cannot be null");
+    //                logger.info("info status  cannot be null");
+    //                return message;
+    //            }
+    //            Long logisProductId = Long.parseLong(map.get("logisProductId").toString());
+    //            int status = Integer.parseInt(map.get("status").toString());
+    //
+    //            //回调接口只支持取消
+    //            if (OrderStatusType.CANCELED != status) {
+    //                message.successStatus().putMsg("info", "status not is 6");
+    //                logger.info("info status not is 6");
+    //                return message;
+    //            }
+    //            logger.info(logisProductId + "： 进入退款回调流程!!");
+    //            Map<String, Object> resultMap = logisticsProductService.updateOrderLogisticsStatusById(logisProductId, status);
+    //            //获取SKU
+    //            LogisticsProduct oldLogisticsProduct = iLogisticsProductService.selectById(logisProductId);
+    //            //开始修改库存
+    //            if (StatusType.SUCCESS == Integer.parseInt(resultMap.get("status").toString())) {
+    //                //如果成功，释放库存
+    //                Long skuId = skuStoreService.selectSkuIdByShopProductSkuId(oldLogisticsProduct.getShop_product_sku_id());
+    //                int result = skuStoreService.updateBySkuId(OrderStatusType.REFUND, skuId);
+    //                message.successStatus().putMsg("Info", "SUCCESS").setData(result);
+    //                logger.info(logisProductId + "===========>>>>>释放库存");
+    //                return message;
+    //            }
+    //            message.successStatus().putMsg("Info", "当前状态不符合状态机扭转请检查");
+    //            logger.info("退款回调结束!!");
+    //        } catch (Exception e) {
+    //            e.printStackTrace();
+    //            logger.info("errorMsg : " + e.getMessage());
+    //            message.errorStatus().putMsg("errorMsg", e.getMessage());
+    //        }
+    //        return message;
+    //=======
+    @RequestMapping(value = "/orderRefundCallback")
+    @ResponseBody
+    public ResultMessage orderRefundCallback(@RequestBody Map<String, Object> map) {
+        logger.info("info parameter :" + new Gson().toJson(map));
+        ResultMessage message = ResultMessage.getInstance();
+        try {
+            //校验入参
+            if (null == map || 0 == map.size()) {
+                message.successStatus().putMsg("info", "Parameter cannot be null");
+                logger.info("info parameter cannot be null");
+                return message;
+            }
+            if (null == map.get("logisProductId") || StringUtils.isBlank(map.get("logisProductId").toString())) {
+                message.successStatus().putMsg("info", "logisProductId cannot be null");
+                logger.info("info logisProductId  cannot be null");
+                return message;
+            }
+            if (null == map.get("status") || StringUtils.isBlank(map.get("status").toString())) {
+                message.successStatus().putMsg("info", "status cannot be null");
+                logger.info("info status  cannot be null");
+                return message;
+            }
+            Long logisProductId = Long.parseLong(map.get("logisProductId").toString());
+            int status = Integer.parseInt(map.get("status").toString());
 
-//    /**
-//     * 回调接口
-//     *
-//     * @return
-//     */
-//<<<<<<< HEAD
-//    @RequestMapping(value = "/orderRefundCallback")
-//    @ResponseBody
-//    public ResultMessage orderRefundCallback(@RequestBody Map<String, Object> map) {
-//        logger.info("info parameter :" + new Gson().toJson(map));
-//        ResultMessage message = ResultMessage.getInstance();
-//        try {
-//            //校验入参
-//            if (null == map || 0 == map.size()) {
-//                message.successStatus().putMsg("info", "Parameter cannot be null");
-//                logger.info("info parameter cannot be null");
-//                return message;
-//            }
-//            if (null == map.get("logisProductId") || StringUtils.isBlank(map.get("logisProductId").toString())) {
-//                message.successStatus().putMsg("info", "logisProductId cannot be null");
-//                logger.info("info logisProductId  cannot be null");
-//                return message;
-//            }
-//            if (null == map.get("status") || StringUtils.isBlank(map.get("status").toString())) {
-//                message.successStatus().putMsg("info", "status cannot be null");
-//                logger.info("info status  cannot be null");
-//                return message;
-//            }
-//            Long logisProductId = Long.parseLong(map.get("logisProductId").toString());
-//            int status = Integer.parseInt(map.get("status").toString());
-//
-//            //回调接口只支持取消
-//            if (OrderStatusType.CANCELED != status) {
-//                message.successStatus().putMsg("info", "status not is 6");
-//                logger.info("info status not is 6");
-//                return message;
-//            }
-//            logger.info(logisProductId + "： 进入退款回调流程!!");
-//            Map<String, Object> resultMap = logisticsProductService.updateOrderLogisticsStatusById(logisProductId, status);
-//            //获取SKU
-//            LogisticsProduct oldLogisticsProduct = iLogisticsProductService.selectById(logisProductId);
-//            //开始修改库存
-//            if (StatusType.SUCCESS == Integer.parseInt(resultMap.get("status").toString())) {
-//                //如果成功，释放库存
-//                Long skuId = skuStoreService.selectSkuIdByShopProductSkuId(oldLogisticsProduct.getShop_product_sku_id());
-//                int result = skuStoreService.updateBySkuId(OrderStatusType.REFUND, skuId);
-//                message.successStatus().putMsg("Info", "SUCCESS").setData(result);
-//                logger.info(logisProductId + "===========>>>>>释放库存");
-//                return message;
-//            }
-//            message.successStatus().putMsg("Info", "当前状态不符合状态机扭转请检查");
-//            logger.info("退款回调结束!!");
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            logger.info("errorMsg : " + e.getMessage());
-//            message.errorStatus().putMsg("errorMsg", e.getMessage());
-//        }
-//        return message;
-//=======
-    @RequestMapping(value="/orderRefundCallback")
-	@ResponseBody
-    public ResultMessage orderRefundCallback(@RequestBody Map<String,Object> map){
-		logger.info("info parameter :"+ new Gson().toJson(map));
-		ResultMessage message= ResultMessage.getInstance();
-		try {
-			//校验入参
-	    	if (null == map || 0 == map.size()){
-	    		message.successStatus().putMsg("info", "Parameter cannot be null");
-	    		logger.info("info parameter cannot be null");
-	    		return message;
-	    	}
-	    	if (null == map.get("logisProductId") || StringUtils.isBlank(map.get("logisProductId").toString())){
-	    		message.successStatus().putMsg("info", "logisProductId cannot be null");
-	    		logger.info("info logisProductId  cannot be null");
-	    		return message;
-	    	}
-	    	if (null == map.get("status") || StringUtils.isBlank(map.get("status").toString())){
-	    		message.successStatus().putMsg("info", "status cannot be null");
-	    		logger.info("info status  cannot be null");
-	    		return message;
-	    	}
-	    	Long logisProductId =Long.parseLong(map.get("logisProductId").toString());
-			int status =Integer.parseInt(map.get("status").toString());
-			
-			//回调接口只支持取消
-			if (OrderStatusType.CANCELED != status){
-				message.successStatus().putMsg("info", "status not is 6");
-	    		logger.info("info status not is 6");
-	    		return message;
-			}
-	    	logger.info(logisProductId +"： 进入退款回调流程!!");
-			LogisticsProduct logisticsProduct = new LogisticsProduct();
-			logisticsProduct.setLogistics_product_id(logisProductId);
-	    	Map<String, Object> resultMap = logisticsProductService.updateOrderLogisticsStatusById(logisticsProduct, status);
-	    	//获取SKU
-	    	LogisticsProduct oldLogisticsProduct = iLogisticsProductService.selectById(logisProductId);
-	    	//开始修改库存
-			if (StatusType.SUCCESS == Integer.parseInt(resultMap.get("status").toString())){
-				//如果成功，释放库存
-				Long skuId = skuStoreService.selectSkuIdByShopProductSkuId(oldLogisticsProduct.getShop_product_sku_id());
-				int result = skuStoreService.updateBySkuId(OrderStatusType.REFUND, skuId);
-				message.successStatus().putMsg("Info", "SUCCESS").setData(result);
-				logger.info(logisProductId + "===========>>>>>释放库存");
-				return message;
-			}
-			message.successStatus().putMsg("Info", "当前状态不符合状态机扭转请检查");
-			logger.info("退款回调结束!!");
-		} catch (Exception e) {
-			e.printStackTrace();
-			logger.info("errorMsg : "+e.getMessage());
-			message.errorStatus().putMsg("errorMsg", e.getMessage());
-		}
-    	return message;
+            //回调接口只支持取消
+            if (OrderStatusType.CANCELED != status) {
+                message.successStatus().putMsg("info", "status not is 6");
+                logger.info("info status not is 6");
+                return message;
+            }
+            logger.info(logisProductId + "： 进入退款回调流程!!");
+            LogisticsProduct logisticsProduct = new LogisticsProduct();
+            logisticsProduct.setLogistics_product_id(logisProductId);
+            Map<String, Object> resultMap = logisticsProductService.updateOrderLogisticsStatusById(logisticsProduct, status);
+            //获取SKU
+            LogisticsProduct oldLogisticsProduct = iLogisticsProductService.selectById(logisProductId);
+            //开始修改库存
+            if (StatusType.SUCCESS == Integer.parseInt(resultMap.get("status").toString())) {
+                //如果成功，释放库存
+                Long skuId = skuStoreService.selectSkuIdByShopProductSkuId(oldLogisticsProduct.getShop_product_sku_id());
+                int result = skuStoreService.updateBySkuId(OrderStatusType.REFUND, skuId);
+                message.successStatus().putMsg("Info", "SUCCESS").setData(result);
+                logger.info(logisProductId + "===========>>>>>释放库存");
+                return message;
+            }
+            message.successStatus().putMsg("Info", "当前状态不符合状态机扭转请检查");
+            logger.info("退款回调结束!!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("errorMsg : " + e.getMessage());
+            message.errorStatus().putMsg("errorMsg", e.getMessage());
+        }
+        return message;
     }
-
 
     /**
      * 订单装箱
-     *
-     * @param map
+     * @param orderMap
      * @return
      */
     public ResultMessage updateLogisticsProduct(Map<String, Object> orderMap, Map<String, Object> shipMentMap, boolean ischeck, boolean isSaveSubShipment) {
-        logger.info(MessageFormat.format("order updateLogisticsProduct 订单装箱 入参信息   orderMap:{0},shipMentMap:{1},ischeck:{2},isSaveSubShipment:{3}", new Gson().toJson(orderMap), new Gson().toJson(shipMentMap), ischeck, isSaveSubShipment));
+        logger.info(MessageFormat
+                .format("order updateLogisticsProduct 订单装箱 入参信息   orderMap:{0},shipMentMap:{1},ischeck:{2},isSaveSubShipment:{3}", new Gson().toJson(orderMap),
+                        new Gson().toJson(shipMentMap), ischeck, isSaveSubShipment));
         ResultMessage result = new ResultMessage();
         Map<String, Object> info = new HashMap<String, Object>();
         if (ischeck) {
@@ -1027,17 +958,15 @@ public class OrderController extends BaseController {
                 return result;
             }
 
-//			//比较具体地址 省市区
-//			}else if(shipMentMap.get("shipment_type_id").toString().equals("2")){
-//				
-//
-//			}else if(shipMentMap.get("shipment_type_id").toString().equals("3")){
-//				
-//			}
-
+            //			//比较具体地址 省市区
+            //			}else if(shipMentMap.get("shipment_type_id").toString().equals("2")){
+            //
+            //
+            //			}else if(shipMentMap.get("shipment_type_id").toString().equals("3")){
+            //
+            //			}
 
         }
-
 
         //添加订单跟箱子的关联,并修改状态为READYTOSHIP
         logger.info("order updateLogisticsProduct 添加订单与箱子的关联  ");
@@ -1046,7 +975,8 @@ public class OrderController extends BaseController {
         logisticsProduct.setContainer_id(Long.parseLong(orderMap.get("containerId").toString()));
         logisticsProduct.setStatus(OrderStatusType.READYTOSHIP);
         logisticsProduct.setPacked_at(Helper.getCurrentUTCTime());
-        logger.info("order updateLogisticsProduct 添加订单与箱子的关联 并修改状态  调用接口iLogisticsProductService.updateByLogisticsProduct 订单修改前状态:" + orderMap.get("status").toString() + "  入参:" + new Gson().toJson(logisticsProduct));
+        logger.info("order updateLogisticsProduct 添加订单与箱子的关联 并修改状态  调用接口iLogisticsProductService.updateByLogisticsProduct 订单修改前状态:" + orderMap.get("status")
+                .toString() + "  入参:" + new Gson().toJson(logisticsProduct));
         int row = iLogisticsProductService.updateByLogisticsProduct(logisticsProduct);
 
         if (row > 0) {
@@ -1060,10 +990,10 @@ public class OrderController extends BaseController {
 
             if (isSaveSubShipment) {
                 //添加第三段物流
-                logger.info("order updateLogisticsProduct 添加sub_shipment物流信息   调用接口   iShipmentService.saveShipmentByOrderId 入参:" + new Gson().toJson(orderResult));
+                logger.info(
+                        "order updateLogisticsProduct 添加sub_shipment物流信息   调用接口   iShipmentService.saveShipmentByOrderId 入参:" + new Gson().toJson(orderResult));
                 iShipmentService.saveShipmentByOrderId(orderResult);
             }
-
 
         } else {
             info.put("code", StatusType.ORDER_ERROR_CODE);
