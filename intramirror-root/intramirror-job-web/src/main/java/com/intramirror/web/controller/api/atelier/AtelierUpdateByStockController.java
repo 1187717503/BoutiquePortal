@@ -101,11 +101,11 @@ public class AtelierUpdateByStockController  implements InitializingBean {
                 bodyDataMap.put("type", StockContants.absolute_qty);
                 bodyDataMap.put("sku",sku);
 
-                logger.info("AtelierUpdateByStockControllerExecute,mapping,bodyDataMap:"+JSONObject.toJSONString(bodyDataMap));
+                logger.info("AtelierUpdateByStockControllerExecute,mapping,bodyDataMap:"+JSONObject.toJSONString(bodyDataMap)+",storeCode:"+storeID);
                 StockOption stockOption = iStockMapping.mapping(bodyDataMap);
-                logger.info("AtelierUpdateByStockControllerExecute,mapping,stockOption:"+JSONObject.toJSONString(stockOption));
+                logger.info("AtelierUpdateByStockControllerExecute,mapping,stockOption:"+JSONObject.toJSONString(stockOption)+",storeCode:"+storeID);
 
-                logger.info("AtelierUpdateByStockControllerExecute,threadTool,stockOption:"+JSONObject.toJSONString(stockOption)+",fileUtils:"+JSONObject.toJSONString(fileUtils)+",eventName:"+eventName);
+                logger.info("AtelierUpdateByStockControllerExecute,threadTool,stockOption:"+JSONObject.toJSONString(stockOption)+",fileUtils:"+JSONObject.toJSONString(fileUtils)+",eventName:"+eventName+",storeCode:"+storeID);
                 CommonThreadPool.execute(eventName,executor,threadNum,new UpdateStockThread(stockOption,fileUtils,bodyDataMap));
             }
             logger.info("AtelierUpdateByStockControllerExecute,executeEnd,storeID:"+storeID+",version:"+version+",body:"+body);
