@@ -36,35 +36,35 @@ public class XmagSynAllStockMapping implements IStockMapping{
     
     @Override
 	public StockOption mapping(Map<String, Object> bodyDataMap) {
-		 logger.info(" start XmagAllStockMapping.handleMappingAndExecute();");
+    	logger.info("XmagSynAllStockMappingMapping,inputParams,bodyDataMap:"+JSONObject.toJSONString(bodyDataMap));
     	StockOption stockOption = new StockOption();
-	        try {
-	        	logger.info("mqData : ===========>>>>>>" +bodyDataMap);
-	            Map<String,Object> productMap = JSONObject.parseObject(bodyDataMap.get("product").toString());
-	            logger.info("sizeValue param :" + new Gson().toJson(productMap.get("Barcode").toString()));
-	            Map<String, Object> param = new HashMap<>();
-	            param.put("skuCode", productMap.get("Barcode").toString());
-	            String vendor_id = bodyDataMap.get("vendor_id")==null?"0":
-		            bodyDataMap.get("vendor_id").toString().toString();
-	            param.put("vendor_id", vendor_id);
-	            logger.info("sizeValue param :" + new Gson().toJson(param));
-	            Map<String, Object> sizeValue = skuPropertyService.getSizeValue(param);
-	            logger.info("sizeValue result :" + new Gson().toJson(sizeValue));
-	            
-	            ProductStockEDSManagement.StockOptions stockOptions = this.handleMappingData1(productMap,sizeValue);
+		try {
+			Map<String,Object> productMap = JSONObject.parseObject(bodyDataMap.get("product").toString());
+			Map<String, Object> param = new HashMap<>();
+			param.put("skuCode", productMap.get("Barcode").toString());
+			String vendor_id = bodyDataMap.get("vendor_id")==null?"0":
+				bodyDataMap.get("vendor_id").toString().toString();
+			param.put("vendor_id", vendor_id);
+			String qty = productMap.get("Qty").toString();
 
-	            if(StringUtils.isBlank(stockOptions.getQuantity())) {
-	                return stockOption;
-	            }
-	            stockOptions.setVendor_id(vendor_id);
-                stockOption.setType(StockContants.absolute_qty); // 库存绝对值
-				stockOption.setLast_check(new Date());
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	            logger.info("XmagAllStockMapping error message : " + ExceptionUtils.getExceptionDetail(e));
-	        }
-	        logger.info(" end XmagAllStockMapping.handleMappingAndExecute();");
-	        return stockOption;
+			logger.info("XmagSynAllStockMappingMapping,getSizeValue,param:" + new Gson().toJson(param));
+			Map<String, Object> sizeValue = skuPropertyService.getSizeValue(param);
+			logger.info("XmagSynAllStockMappingMapping,getSizeValue,param:" + new Gson().toJson(param)+",sizeValue:"+JSONObject.toJSONString(sizeValue));
+
+			if(sizeValue!=null && sizeValue.size() > 0) {
+				stockOption.setSizeValue(sizeValue.get("value").toString());
+				stockOption.setProductCode(sizeValue.get("product_code").toString());
+			}
+			stockOption.setQuantity(qty);
+			stockOption.setVendor_id(vendor_id);
+			stockOption.setType(StockContants.absolute_qty); // 库存绝对值
+			stockOption.setLast_check(new Date());
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.info("XmagSynAllStockMappingMapping,errorMessage: " + ExceptionUtils.getExceptionDetail(e));
+		}
+		logger.info("XmagSynAllStockMappingMapping,outputParams,stockOption:"+JSONObject.toJSONString(stockOption));
+		return stockOption;
 	}
     
     

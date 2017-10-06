@@ -8,6 +8,6 @@
 	INNER JOIN product_sku_property_value sv ON (sv.product_sku_property_value_id = sp.product_sku_property_value_id)
 	INNER JOIN product_sku_property_key sk ON (sk.product_sku_property_key_id = sp.product_sku_property_key_id)
 	INNER JOIN product p ON(s.product_id = p.product_id)
-	where s.sku_code=#{skuCode,jdbcType=VARCHAR} AND vendor_id=#{vendor_id,jdbcType=VARCHAR};
+	where s.sku_code=#{skuCode,jdbcType=VARCHAR} AND vendor_id=#{vendor_id,jdbcType=VARCHAR} and s.enabled = 1 and sv.enabled = 1 and sk.enabled = 1 and p.enabled = 1;
  </select>
 </mapper>

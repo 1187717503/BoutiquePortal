@@ -2,6 +2,7 @@ package com.intramirror.web.mapping.impl;
 
 import java.util.*;
 
+import com.alibaba.fastjson15.JSONArray;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +84,7 @@ public class XmagSynProductAllMapper implements IProductMapping {
         	if (checkValue(product.get("product_name"))){
         		String supplierId = product.get("product_name").toString();
         		productOptions.setBrandCode(supplierId);
+				productOptions.setName(supplierId);
         	}
         	if (checkValue(product.get("producer_id"))){
         		String brand = product.get("producer_id").toString();
@@ -108,7 +110,8 @@ public class XmagSynProductAllMapper implements IProductMapping {
             categoryMap.put("boutique_third_category", category.toLowerCase());
             categoryMap.put("boutique_first_category", SubCategory);
             logger.info("categoryService param " + new Gson().toJson(categoryMap));
-        	List<Map<String, Object>> apiCategoryMap = categoryService.getCategoryByCondition(categoryMap);
+			productOptions.setCategory_name(JSONObject.toJSONString(categoryMap));
+			List<Map<String, Object>> apiCategoryMap = categoryService.getCategoryByCondition(categoryMap);
         	 logger.info("categoryService result " + new Gson().toJson(apiCategoryMap));
         	if(null != apiCategoryMap && 0 < apiCategoryMap.size()) {
                 productOptions.setCategoryId(apiCategoryMap.get(0).get("category_id").toString());
@@ -128,7 +131,7 @@ public class XmagSynProductAllMapper implements IProductMapping {
         	}
         	if (checkValue(product.get("supply_price"))){
         		String retailPrice = product.get("supply_price").toString();
-        		productOptions.setRetailPrice(retailPrice);
+        		productOptions.setSalePrice(retailPrice);
         	}
         	
         	List<SkuOptions> skus = new ArrayList<SkuOptions>();
@@ -148,24 +151,28 @@ public class XmagSynProductAllMapper implements IProductMapping {
 			        		sku.setBarcodes(items.get(i).get("barcode").toString());
 			        		sku.setStock(items.get(i).get("stock").toString());
 			        		productOptions.setColorCode(items.get(i).get("color").toString());
-			        		pic.add(items.get(i).get("pictures").toString());
+//
+							try {
+								JSONArray skuImages = JSONArray.parseArray(items.get(i).get("pictures").toString());
+								for(Object image : skuImages) {
+									pic.add(image.toString());
+								}
+							} catch (Exception e) {
+								e.printStackTrace();
+								logger.info("XmagSynProductAllMapperhandleMappingData,convertImage:"+JSONObject.toJSONString(items));
+							}
 			        		skus.add(sku);
 						}
-			        	int index = 1;
-			        	for (String img : pic) {
-			        		if (pic.size() > index)
-			        			pictures = img+",";
-			        		else
-			        			pictures = pictures+img;
-			        		index++;
-						}
-			        	productOptions.setCoverImg(pictures);
+			        	productOptions.setCoverImg(JSONObject.toJSONString(pic));
 		        	}
 	        	}
         	}
         	productOptions.setSkus(skus);
         }
         logger.info(" productOptions filippo : " + new Gson().toJson(productOptions));
+		productOptions.setCategoryId("1646");
+		productOptions.setBrandName("Gucci");
+		productOptions.setSeasonCode("078");
         return productOptions;
     }
     

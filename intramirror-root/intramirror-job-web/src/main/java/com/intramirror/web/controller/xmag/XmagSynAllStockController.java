@@ -35,38 +35,41 @@ import pk.shoplus.service.request.impl.GetPostRequestService;
 import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.util.MapUtils;
 
+/**
+ * @author dingyifan
+ */
 @Controller
-@RequestMapping("/xmagSynAllStock")
+@RequestMapping("/xmag_stock")
 public class XmagSynAllStockController implements InitializingBean {
 
+	// logger
 	private final Logger logger = Logger.getLogger(XmagSynAllStockController.class);
-	
+
 	public static ProductEDSManagement productEDSManagement = new ProductEDSManagement();
 
 	@Autowired
     private SeasonMappingService seasonMappingService;
-	
-	 // mapping
+
     @Resource(name = "xmagSynAllStockMapping")
     private IStockMapping iStockMapping;
-	/**
-	 * parm Map
-	 */
+
 	private Map<String,Object> paramsMap;
 	
-	@RequestMapping("/syn_stock_all")
+	@RequestMapping("/syn_stock")
 	@ResponseBody
-	public Map<String, Object> execute(@Param(value = "name") String name) {
-		logger.info("------------------------------------------start xmagSynstockAll.populateResult");
+	public Map<String, Object> syn_stock(@Param(value = "name") String name) {
+		logger.info("XmagSynAllStockControllerSyn_stock,inputParams,name:"+name);
 		MapUtils mapUtils = new MapUtils(new HashMap<String, Object>());
 		
 		 // check name
         if(StringUtils.isBlank(name)) {
             return mapUtils.putData("status",StatusType.FAILURE).putData("info","name is null !!!").getMap();
         }
+
         try{
-	        // get params
+        	// get init params
 	        Map<String,Object> param = (Map<String, Object>) paramsMap.get(name);
+	        logger.info("XmagSynAllStockControllerSyn_stock,getInitParam:"+JSONObject.toJSONString(param));
 	        String url = param.get("url").toString();
 	        String DBContext = param.get("DBContext").toString();
 	        String SeasonCode = param.get("SeasonCode").toString();
@@ -78,66 +81,58 @@ public class XmagSynAllStockController implements InitializingBean {
 	        int threadNum = Integer.parseInt(param.get("threadNum").toString());
 	        ThreadPoolExecutor nugnesExecutor = (ThreadPoolExecutor) param.get("nugnesExecutor");
 	        ApiDataFileUtils fileUtils = (ApiDataFileUtils) param.get("fileUtils");
-	        
-	        //获取当前vendor下面的所有BoutiqueSeasonCode
-			logger.info("xmagSynstockAllMappingService param :" +vendor_id);
+
+			logger.info("XmagSynAllStockControllerSyn_stock,getBoutiqueSeasonCode,vendor_id:" +vendor_id);
 			List<Map<String, Object>> code = seasonMappingService.getBoutiqueSeasonCode(vendor_id);
-			logger.info("xmagSynstockAllMappingService result :" + new Gson().toJson(code) );
+			logger.info("XmagSynAllStockControllerSyn_stock,getBoutiqueSeasonCode,code:"+JSONObject.toJSONString(code)+",vendor_id:" +vendor_id);
+
 			if (null != code && 0 < code.size()){
 				for (Map<String, Object> map : code) {
 					String appendUrl = url+"?DBContext="+DBContext + "&typeSync="+typeSync +"&Key="+Key+
 							"&SeasonCode="+map.get("boutique_season_code").toString();
-					String json = "";
-			    	//获取数据
+
+					logger.info("XmagSynAllStockControllerSyn_stock,requestMethod,start,appendUrl:"+appendUrl);
 		    		IGetPostRequest requestGet = new GetPostRequestService();
-		    		logger.info("job XmagAllStock  Call the interface to get the data    url:"+appendUrl);
-		    		json = requestGet.requestMethod(GetPostRequestService.HTTP_GET, appendUrl, null);
-		    		logger.info("job XmagAllStock result:"+json);
-			    	//如果请求数据不为空，放入MQ队列
+		    		String json = requestGet.requestMethod(GetPostRequestService.HTTP_GET, appendUrl, null);
+					logger.info("XmagSynAllStockControllerSyn_stock,requestMethod,end,appendUrl:"+appendUrl+",json:"+json);
+
 			    	JSONObject jsonOjbect = JSONObject.parseObject(json);
 			    	if (StringUtils.isNotBlank(json)){
 			    		fileUtils.bakPendingFile("SeasonCode" + SeasonCode + "_typeSync" + typeSync, json);
-			    		List<Map<String, Object>> list = (List<Map<String, Object>>) jsonOjbect.get("listStockData");
-			    		logger.info("XmagAllStock list size:"+list.size());
-			    		if(list !=null && list.size() > 0 ){
-			    			int index = 1;
-			    			for(Map<String, Object> product :list ){
+			    		List<Map<String, Object>> stockList = (List<Map<String, Object>>) jsonOjbect.get("listStockData");
+			    		logger.info("XmagSynAllStockControllerSyn_stock,conventJsonObjectToList,stockListSize:"+stockList.size()+",stockList:"+JSONObject.toJSONString(stockList));
+
+			    		if(stockList !=null && stockList.size() > 0 ){
+
+			    			for(Map<String, Object> product :stockList ){
 		                        Map<String,Object> mqDataMap = new HashMap<String,Object>();
 		                        mqDataMap.put("product", product);
 		                        mqDataMap.put("vendor_id", vendor_id);
-		                        logger.info("Push Index" + index);
-		                        String src = new Gson().toJson(mqDataMap);
-		                        logger.info("Push data" + src);
-		                        // 映射数据 封装VO
-		                        logger.info("EdsAllUpdateByStockControllerExecute,mapping,start,stockMap:"+new Gson().toJson(mqDataMap)+",eventName:"+eventName);
-		                        StockOption stockOption = iStockMapping.mapping(mqDataMap);
-		                        logger.info("EdsAllUpdateByStockControllerExecute,mapping,end,stockMap:"+new Gson().toJson(mqDataMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
 
-		                        // 线程池
-		                        logger.info("EdsAllUpdateByStockControllerExecute,execute,startDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(mqDataMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
+		                        logger.info("XmagSynAllStockControllerSyn_stock,mapping,start,stockMap:"+new Gson().toJson(mqDataMap)+",eventName:"+eventName);
+		                        StockOption stockOption = iStockMapping.mapping(mqDataMap);
+		                        logger.info("XmagSynAllStockControllerSyn_stock,mapping,end,stockMap:"+new Gson().toJson(mqDataMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
+
+		                        logger.info("EdsAllUpdateByStockControllerExecute,execute,stockMap:"+new Gson().toJson(mqDataMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
 		                        CommonThreadPool.execute(eventName,nugnesExecutor,threadNum,new UpdateStockThread(stockOption,fileUtils,mqDataMap));
-		                        logger.info("EdsAllUpdateByStockControllerExecute,execute,endDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(mqDataMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
-		                        index++;
+		                        logger.info("EdsAllUpdateByStockControllerExecute,execute,stockMap:"+new Gson().toJson(mqDataMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
 		            		}
 			    		}
-			    	}else{
-			    		logger.info("job XmagAllStock result null ");
 			    	}
-			    	appendUrl = "";
 				}
 				mapUtils.putData("status", StatusType.SUCCESS);
 			}else{
 				mapUtils.putData("status", StatusType.FAILURE);
-				logger.info("job XmagAllStock seasonMappingService result null ");
+				logger.info("XmagSynAllStockControllerSyn_stock,seasonMappingIsNull,param:"+JSONObject.toJSONString(param));
 			}
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			logger.error("xmagSynstockAllExceptions : " + ExceptionUtils.getExceptionDetail(e));
+			logger.error("XmagSynAllStockControllerSyn_stock,errorMessage:" + ExceptionUtils.getExceptionDetail(e));
 			mapUtils.putData("status", StatusType.FAILURE).putData("info", "error message : " + e.getMessage());
 		}
         
-        logger.info("------------------------------------------end xmagSynstockAll.populateResult mapUtils : " + new Gson().toJson(mapUtils));
+        logger.info("XmagSynAllStockControllerSyn_stock,outputParams,mapUtils:" + new Gson().toJson(mapUtils));
         return mapUtils.getMap();
 	}
 
@@ -151,16 +146,16 @@ public class XmagSynAllStockController implements InitializingBean {
         xmag_all_stock.put("SeasonCode","080");
         xmag_all_stock.put("typeSync","api");
         xmag_all_stock.put("Key","RTs7g634sH");
-       
         xmag_all_stock.put("nugnesExecutor",nugnesExecutor);
-        xmag_all_stock.put("vendor_id","19");
+        xmag_all_stock.put("vendor_id","19"); // 20
         xmag_all_stock.put("threadNum","5");
-        xmag_all_stock.put("eventName","Xmag全量更新库存");
-        xmag_all_stock.put("fileUtils",new ApiDataFileUtils("xmag","xmag全量更新库存"));
+        xmag_all_stock.put("vendorName","The Apartment Cosenza");
+        xmag_all_stock.put("eventName","apartment_stock_all_update");
+        xmag_all_stock.put("fileUtils",new ApiDataFileUtils("xmag","apartment_stock_all_update"));
         
         // put data
         paramsMap = new HashMap<>();
-        paramsMap.put("xmag_all_stock",xmag_all_stock);
+        paramsMap.put("apartment_stock_all_update",xmag_all_stock);
 
 	}
 
