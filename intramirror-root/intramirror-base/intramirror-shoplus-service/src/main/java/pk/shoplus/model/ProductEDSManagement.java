@@ -952,8 +952,9 @@ public class ProductEDSManagement {
     public String convertImgPath (String imgPaths) {
         List<String> converImgPathList = null;
         if (StringUtils.isNotBlank(imgPaths)) {
-            List<String> imgList = JSONArray.parseArray(imgPaths, String.class);
+
             try {
+                List<String> imgList = JSONArray.parseArray(imgPaths, String.class);
                 if (null != imgList && imgList.size() > 0) {
                     converImgPathList = new ArrayList<>(imgList.size());
                     for (String imgPath: imgList) {
@@ -970,6 +971,7 @@ public class ProductEDSManagement {
             } catch (Exception e) {
                 e.printStackTrace();
                 converImgPathList = new ArrayList<>();
+                logger.info("convertImgPath,errorMessage:"+imgPaths);
             }
         }
 

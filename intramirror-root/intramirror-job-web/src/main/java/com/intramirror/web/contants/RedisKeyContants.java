@@ -16,4 +16,10 @@ public class RedisKeyContants {
 
     /** baseblu增量更新当日商品记录的offset */
     public static final String baseblu_product_day_offset = "baseblu_product_day_offset";
+
+    /** apartment 增量更新当日商品记录的startIndex */
+    public static final String apartment_start_index_bydate = "apartment_start_index_bydate";
+
+    /** apartment 增量更新当日商品记录的endIndex */
+    public static final String apartment_end_index_bydate = "apartment_end_index_bydate";
 }

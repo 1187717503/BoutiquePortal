@@ -13,4 +13,6 @@ public interface SkuService {
     Sku getSkuById(Long skuId);
 
     Map<String, BigDecimal> getSkuInfoBySkuId(String shopProductSkuIds);
+    
+    Map<String, Object> getSkuInfoBySkuCode(Map<String, Object> condition);
 }

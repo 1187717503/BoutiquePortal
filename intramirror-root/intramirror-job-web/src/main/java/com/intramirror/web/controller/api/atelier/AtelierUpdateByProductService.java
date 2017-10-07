@@ -108,9 +108,9 @@ public class AtelierUpdateByProductService implements InitializingBean {
             ProductEDSManagement.VendorOptions vendorOptions = new ProductEDSManagement().getVendorOptions();
             vendorOptions.setVendorId(Long.parseLong(vendor_id));
 
-            logger.info("AtelierUpdateByProductServiceUpdateProduct,executeThreadTool,eventName:"+eventName+",productOptions:"+JSONObject.toJSONString(productOptions)+",vendorOptions:"+JSONObject.toJSONString(vendorOptions)+",fileUtils:"+JSONObject.toJSONString(fileUtils));
+            logger.info("AtelierUpdateByProductServiceUpdateProduct,executeThreadTool,eventName:"+eventName+",productOptions:"+JSONObject.toJSONString(productOptions)+",vendorOptions:"+JSONObject.toJSONString(vendorOptions)+",fileUtils:"+JSONObject.toJSONString(fileUtils)+",storeCode:"+storeID);
             CommonThreadPool.execute(eventName,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,fileUtils,bodyDataMap));
-            logger.info("AtelierUpdateByProductServiceUpdateProduct,executeThreadTool,eventName:"+eventName+",productOptions:"+JSONObject.toJSONString(productOptions)+",vendorOptions:"+JSONObject.toJSONString(vendorOptions)+",fileUtils:"+JSONObject.toJSONString(fileUtils));
+            logger.info("AtelierUpdateByProductServiceUpdateProduct,executeThreadTool,eventName:"+eventName+",productOptions:"+JSONObject.toJSONString(productOptions)+",vendorOptions:"+JSONObject.toJSONString(vendorOptions)+",fileUtils:"+JSONObject.toJSONString(fileUtils)+",storeCode:"+storeID);
             mapUtils.putData("ResponseStatus","1000");
         } catch (Exception e) {
             e.printStackTrace();
