@@ -73,7 +73,6 @@ public class XmagSynProductController implements InitializingBean {
 			String url = param.get("url").toString();
 			String DBContext = param.get("DBContext").toString();
 			String BrandId = param.get("BrandId").toString();
-			String SeasonCode = param.get("SeasonCode").toString();
 			String Key = param.get("Key").toString();
 			String CategoryId = param.get("CategoryId").toString();
 			String vendor_id = param.get("vendor_id").toString();
@@ -87,18 +86,18 @@ public class XmagSynProductController implements InitializingBean {
 			ThreadPoolExecutor nugnesExecutor = (ThreadPoolExecutor) param.get("executor");
 			ApiDataFileUtils fileUtils = (ApiDataFileUtils) param.get("fileUtils");
 
-			logger.info("XmagSynProductAllControllerSynProduct,getBoutiqueSeasonCode,vendor_id:" +vendor_id);
+			/*logger.info("XmagSynProductAllControllerSynProduct,getBoutiqueSeasonCode,vendor_id:" +vendor_id);
 			List<Map<String, Object>> boutiqueSeasonCodes = seasonMappingService.getBoutiqueSeasonCode(vendor_id);
-			logger.info("XmagSynProductAllControllerSynProduct,getBoutiqueSeasonCode,code:"+JSONObject.toJSONString(boutiqueSeasonCodes)+",vendor_id:" +vendor_id);
+			logger.info("XmagSynProductAllControllerSynProduct,getBoutiqueSeasonCode,code:"+JSONObject.toJSONString(boutiqueSeasonCodes)+",vendor_id:" +vendor_id);*/
 
-			for(Map<String,Object> boutiqueSeasonCode : boutiqueSeasonCodes) {
-				SeasonCode = boutiqueSeasonCode.get("boutique_season_code").toString();
+//			for(Map<String,Object> boutiqueSeasonCode : boutiqueSeasonCodes) {
+//				SeasonCode = boutiqueSeasonCode.get("boutique_season_code").toString();
 
 				// start 增量更新
 				String byDate = "";
 				if(StringUtils.isNotBlank(redisStartIndex) && StringUtils.isNotBlank(redisEndIndex)) {
-					String rStartIndex = redisService.getKey(redisStartIndex+SeasonCode+currentDate);
-					String rEndIndex = redisService.getKey(redisEndIndex+SeasonCode+currentDate);
+					String rStartIndex = redisService.getKey(redisStartIndex+currentDate);
+					String rEndIndex = redisService.getKey(redisEndIndex+currentDate);
 					logger.info("XmagSynProductAllControllerSynProduct,index,startIndex:"+rStartIndex+",endIndex:"+rEndIndex+",name:"+name);
 
 					if(StringUtils.isNotBlank(rStartIndex) || StringUtils.isNotBlank(rEndIndex)) {
@@ -111,7 +110,7 @@ public class XmagSynProductController implements InitializingBean {
 
 
 				while (true) {
-					String appendUrl = url + "?DBContext=" + DBContext + "&BrandId=" + BrandId + "&SeasonCode=" + SeasonCode
+					String appendUrl = url + "?DBContext=" + DBContext + "&BrandId=" + BrandId + "&SeasonCode="
 							+ "&StartIndex=" + StartIndex + "&EndIndex=" + EndIndex + "&Key=" + Key + "&CategoryId="
 							+ CategoryId;
 					if(StringUtils.isNotBlank(byDate)) {appendUrl = appendUrl + byDate;}
@@ -166,18 +165,18 @@ public class XmagSynProductController implements InitializingBean {
 				}
 				// start 增量更新
 				if(StringUtils.isNotBlank(redisEndIndex) && StringUtils.isNotBlank(redisStartIndex)) {
-					redisService.setKey(redisStartIndex+SeasonCode+currentDate,StartIndex+"");
-					redisService.setKey(redisEndIndex+SeasonCode+currentDate,EndIndex+"");
+					redisService.setKey(redisStartIndex+currentDate,StartIndex+"");
+					redisService.setKey(redisEndIndex+currentDate,EndIndex+"");
 					logger.info("XmagSynProductAllControllerSynProduct,index,setKey,startIndex:"+StartIndex+",endIndex:"+EndIndex+",name:"+name);
 
 				}
 				// end 增量更新
-			}
+//			}
 
 			mapUtils.putData("status", StatusType.SUCCESS);
 		} catch (Exception e) {
 			e.printStackTrace();
-			logger.error("XmagSynProductAllControllerSynProduct,errorMessage:" + ExceptionUtils.getExceptionDetail(e));
+			logger.info("XmagSynProductAllControllerSynProduct,errorMessage:" + ExceptionUtils.getExceptionDetail(e));
 			mapUtils.putData("status", StatusType.FAILURE).putData("info", "error message : " + e.getMessage());
 		}
 		return mapUtils.getMap();
@@ -190,13 +189,12 @@ public class XmagSynProductController implements InitializingBean {
 		xmag_all_updateProduct.put("url", "http://net13server2.net/TheApartmentAPI/MyApi/Productslist/GetProducts");
 		xmag_all_updateProduct.put("DBContext", "Default");
 		xmag_all_updateProduct.put("BrandId", "");
-		xmag_all_updateProduct.put("SeasonCode", "079");
 		xmag_all_updateProduct.put("StartIndex", "1");
 		xmag_all_updateProduct.put("EndIndex", "50");
 		xmag_all_updateProduct.put("Key", "RTs7g634sH");
 		xmag_all_updateProduct.put("CategoryId", "");
 		xmag_all_updateProduct.put("executor", xmag_all_updateProduct_executor);
-		xmag_all_updateProduct.put("vendor_id", "19");
+		xmag_all_updateProduct.put("vendor_id", "20");
 		xmag_all_updateProduct.put("threadNum", "5");
 		xmag_all_updateProduct.put("eventName", "apartment_product_all_update");
 		xmag_all_updateProduct.put("fileUtils", new ApiDataFileUtils("xmag", "apartment_product_all_update"));
@@ -206,13 +204,12 @@ public class XmagSynProductController implements InitializingBean {
 		apartment_product_delta_update.put("url", "http://net13server2.net/TheApartmentAPI/MyApi/Productslist/GetProducts");
 		apartment_product_delta_update.put("DBContext", "Default");
 		apartment_product_delta_update.put("BrandId", "");
-		apartment_product_delta_update.put("SeasonCode", "079");
 		apartment_product_delta_update.put("StartIndex", "1");
-		apartment_product_delta_update.put("EndIndex", "10");
+		apartment_product_delta_update.put("EndIndex", "50");
 		apartment_product_delta_update.put("Key", "RTs7g634sH");
 		apartment_product_delta_update.put("CategoryId", "");
 		apartment_product_delta_update.put("executor", apartment_product_delta_update_executor);
-		apartment_product_delta_update.put("vendor_id", "19");
+		apartment_product_delta_update.put("vendor_id", "20");
 		apartment_product_delta_update.put("threadNum", "5");
 		apartment_product_delta_update.put("redisStartIndex", RedisKeyContants.apartment_start_index_bydate);
 		apartment_product_delta_update.put("redisEndIndex",RedisKeyContants.apartment_end_index_bydate);

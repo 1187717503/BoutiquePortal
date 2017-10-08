@@ -1,6 +1,7 @@
 package pk.shoplus.model;
 
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -958,6 +959,7 @@ public class ProductEDSManagement {
                 if (null != imgList && imgList.size() > 0) {
                     converImgPathList = new ArrayList<>(imgList.size());
                     for (String imgPath: imgList) {
+                        imgPath = imgPath.replace(" ","%20");
                         List<String> list = FileUploadHelper.uploadFileByImgUrl2(imgPath);
                         imgPath = list.get(0);
                         if(StringUtils.isNotBlank(imgPath)) {

@@ -147,7 +147,7 @@ public class XmagSynAllStockController implements InitializingBean {
         xmag_all_stock.put("typeSync","api");
         xmag_all_stock.put("Key","RTs7g634sH");
         xmag_all_stock.put("nugnesExecutor",nugnesExecutor);
-        xmag_all_stock.put("vendor_id","19"); // 20
+        xmag_all_stock.put("vendor_id","20"); // 20
         xmag_all_stock.put("threadNum","5");
         xmag_all_stock.put("vendorName","The Apartment Cosenza");
         xmag_all_stock.put("eventName","apartment_stock_all_update");
