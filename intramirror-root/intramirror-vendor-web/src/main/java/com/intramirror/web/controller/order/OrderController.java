@@ -37,7 +37,8 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -51,8 +52,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/order")
 public class OrderController extends BaseController {
 
-    //	private static Logger logger = LoggerFactory.getLogger(OrderController.class);
-    private static Logger logger = Logger.getLogger(OrderController.class);
+    private static Logger logger = LoggerFactory.getLogger(OrderController.class);
 
     @Autowired
     private IOrderService orderService;
@@ -108,7 +108,7 @@ public class OrderController extends BaseController {
     @RequestMapping(value = "/getOrderList", method = RequestMethod.POST)
     @ResponseBody
     public ResultMessage getOrderList(@RequestBody Map<String, Object> map, HttpServletRequest httpRequest) {
-        logger.info(MessageFormat.format("order getOrderList 入参:{0}", new Gson().toJson(map)));
+        logger.info("order getOrderList parameters: {}", new Gson().toJson(map));
         ResultMessage result = new ResultMessage();
         result.errorStatus();
 
@@ -255,7 +255,6 @@ public class OrderController extends BaseController {
         //根据订单orderLineNumber 查询订单详情
         logger.info(MessageFormat.format("order getOrderDetail 调用 orderService.getOrderInfoByCondition接口获取详情 入参:{0}", new Gson().toJson(conditionMap)));
         Map<String, Object> orderInfo = orderService.getOrderInfoByCondition(conditionMap);
-        System.out.println("==Jain==orderInfo1:" + orderInfo.toString());
         if (orderInfo == null || orderInfo.size() == 0) {
             result.setMsg("Order does not exist");
             return result;
