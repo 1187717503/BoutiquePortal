@@ -232,7 +232,7 @@
           num: null,
           vid: null
         },
-        confirmProductId: null,
+        logisticsProductId: null,
         confirmBarCode: null,
         confirmBrandId: null,
         confirmColorCode: null,
@@ -305,7 +305,7 @@
       confirmOrder(id, num) {
         this.showPopup.configm = true;
         this.showShade = true;
-        this.confirmProductId = id;
+        this.logisticsProductId = id;
         this.orderLineNum = num;
       },
       updateOrder() {
@@ -318,7 +318,7 @@
           return false
         }
         let data = {
-          "logisticsProductId": this.confirmProductId,
+          "logisticsProductId": this.logisticsProductId,
           "barCode": this.confirmBarCode,
           "brandId": this.confirmBrandId,
           "colorCode": this.confirmColorCode,
@@ -328,14 +328,13 @@
           if (res.data.status === 1) {
             this.showPopup.configm = false;
             this.showPopup.sucessorder = true;
-            this.updateStatus(this.confirmProductId);
+            this.updateStatus(this.logisticsProductId);
             this.confirmBarCode = null;
             this.confirmBrandId = null;
             this.confirmColorCode = null;
             this.confirmDate = null;
           } else {
             this.showPopup.configm = false;
-            this.confirmProductId = null;
             this.confirmBarCode = null;
             this.confirmBrandId = null;
             this.confirmColorCode = null;
@@ -412,7 +411,7 @@
         switch (type) {
           case 'configm':
             this.showPopup.configm = false;
-            this.confirmProductId = null;
+            this.logisticsProductId = null;
             this.confirmBarCode = null;
             this.confirmBrandId = null;
             this.confirmColorCode = null;
