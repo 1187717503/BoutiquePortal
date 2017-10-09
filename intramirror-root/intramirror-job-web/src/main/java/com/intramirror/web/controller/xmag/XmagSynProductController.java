@@ -139,7 +139,7 @@ public class XmagSynProductController implements InitializingBean {
 
 								logger.info("XmagSynProductAllControllerSynProduct,initParam,productOptions:"
 										+ new Gson().toJson(productOptions) + ",vendorOptions:"
-										+ new Gson().toJson(vendorOptions) + ",eventName:" + eventName);
+										+ new Gson().toJson(vendorOptions) + ",eventName:" + eventName+",mqDataMap:"+JSONObject.toJSONString(mqDataMap));
 
 								// 线程池
 								logger.info("XmagSynProductAllControllerSynProduct,execute,start,productOptions:"
