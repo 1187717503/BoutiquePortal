@@ -144,8 +144,9 @@ public class XmagSynProductAllMapper implements IProductMapping {
 		        	String pictures = "";
 		        	Set<String> pic = new HashSet<>();
 		        	if (null != items && 0< items.size()){
-		        		SkuOptions sku = management.getSkuOptions();
+
 			        	for (int i = 0; i < items.size(); i++) {
+							SkuOptions sku = management.getSkuOptions();
 			        		sku.setSize(items.get(i).get("item_size").toString());
 			        		sku.setBarcodes(items.get(i).get("barcode").toString());
 			        		sku.setStock(items.get(i).get("stock").toString());
