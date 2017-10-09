@@ -33,8 +33,7 @@ public class XmagSynProductAllMapper implements IProductMapping {
 	
 	@Override
 	public ProductOptions mapping(Map<String, Object> bodyDataMap) {
-		logger.info("start XmagSynProductMapping.handleMappingAndExecute();");
-		logger.info("bodyDataMap:"+new Gson().toJson(bodyDataMap));
+		logger.info("XmagSynProductAllMapperMapping,inputParams,bodyDataMap:"+new Gson().toJson(bodyDataMap));
         Connection conn = null;
         ProductEDSManagement.ProductOptions productOptions = productEDSManagement.getProductOptions();
         try {
@@ -52,9 +51,9 @@ public class XmagSynProductAllMapper implements IProductMapping {
             productOptions = this.handleMappingData(productMap,vendorOptions);
             productOptions.setLast_check(new Date());
             if(conn != null){conn.close();}
-            logger.info("cloidStoreUpdateByProductMapping,outParams,productOptions:"+new Gson().toJson(productOptions));
+            logger.info("XmagSynProductAllMapperMapping,outParams,productOptions:"+new Gson().toJson(productOptions));
 	    } catch (Exception e) {
-            logger.info("cloidStoreUpdateByProductMapping,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)
+            logger.info("XmagSynProductAllMapperMapping,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)
             +",bodyDataMap:"+new Gson().toJson(bodyDataMap));
             if(conn != null){conn.close();}
             e.printStackTrace();
