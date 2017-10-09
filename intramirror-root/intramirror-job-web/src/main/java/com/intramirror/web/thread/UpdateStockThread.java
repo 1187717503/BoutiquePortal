@@ -35,6 +35,7 @@ public class UpdateStockThread implements Runnable{
     @Override
     public void run() {
         try {
+            System.out.println(JSONObject.toJSON(apiDataFileUtils));
             logger.info("UpdateStockThreadRun,updateStock,start,stockOption:"+JSONObject.toJSONString(stockOption));
             Map<String, Object> resultMap = apiUpdateStockService.updateStock(stockOption);
             logger.info("UpdateStockThreadRun,updateStock,end,resultMap:"+JSONObject.toJSONString(resultMap)+",stockOption:"+JSONObject.toJSONString(stockOption));

@@ -45,6 +45,7 @@ public class UpdateProductThread implements Runnable{
     @Override
     public void run() {
         try {
+            System.out.println(JSONObject.toJSON(apiDataFileUtils));
             logger.info("UpdateProductThreadRun,createProduct,start,productOptions:"+new Gson().toJson(productOptions)
                     +",vendorOptions:"+JSONObject.toJSONString(vendorOptions));
             Map<String,Object> resultMap = productEDSManagement.createProduct(productOptions,vendorOptions);
