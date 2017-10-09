@@ -1610,9 +1610,28 @@ public class ProductEDSManagement {
 		}
 
 		public ProductOptions setSkus(List<SkuOptions> skus) {
-			this.skus = skus;
-			return this;
+		    List<SkuOptions> newSkus = new ArrayList<>();
+			List<String> stringList = new ArrayList<>();
+			for(SkuOptions skuOptions : skus) {
+                if(StringUtils.isNotBlank(skuOptions.getSize())) {
+                    boolean ifSave = false;
+                    for(String str : stringList) {
+                        if(str.equals(skuOptions.getSize())) {
+                            ifSave = true;
+                        }
+                    }
+
+                    if(ifSave == false) {
+                        newSkus.add(skuOptions);
+                        stringList.add(skuOptions.getSize());
+                    }
+                }
+            }
+            this.skus = newSkus;
+            return this;
 		}
+
+
 
         public Date getLast_check() {
             return last_check;
