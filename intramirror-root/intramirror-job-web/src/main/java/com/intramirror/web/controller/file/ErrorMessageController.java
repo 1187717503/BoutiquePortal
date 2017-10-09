@@ -86,6 +86,12 @@ public class ErrorMessageController {
     @Resource(name = "filippoSynProductMapping")
     private IProductMapping filippoSynProductMapping;
 
+    @Resource(name = "xmagSynProductAllMapper")
+    private IProductMapping xmagSynProductAllMapper;
+
+    @Resource(name = "xmagSynAllStockMapping")
+    private IStockMapping xmagSynAllStockMapping;
+
     private static final int threadNum = 5;
 
     private ProductEDSManagement productEDSManagement = new ProductEDSManagement();
@@ -216,6 +222,20 @@ public class ErrorMessageController {
                         vendorOptions.setVendorId(Long.parseLong(vendor_id));
                         productOptions.setModifyPrice("1");
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
+                    }
+                }
+
+                // xmag
+                if(vendor_id.equals("20")) {
+                    if(name.equals("apartment_product_all_update") || name.equals("apartment_product_delta_update")) {
+                        ProductEDSManagement.ProductOptions productOptions = xmagSynProductAllMapper.mapping(originDataMap);
+                        ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
+                        vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                        productOptions.setModifyPrice("1");
+                        CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
+                    } else if(name.equals("apartment_stock_all_update")){
+                        StockOption stockOption = xmagSynAllStockMapping.mapping(originDataMap);
+                        CommonThreadPool.execute(name,executor,threadNum,new UpdateStockThread(stockOption,apiDataFileUtils,originDataMap));
                     }
                 }
 
