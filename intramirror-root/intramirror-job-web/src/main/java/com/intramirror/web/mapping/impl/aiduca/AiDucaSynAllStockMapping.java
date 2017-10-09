@@ -17,6 +17,7 @@ import com.intramirror.web.mapping.api.IStockMapping;
 import com.intramirror.web.mapping.vo.StockContants;
 import com.intramirror.web.mapping.vo.StockOption;
 import com.intramirror.web.util.SpringContextUtils;
+import pk.shoplus.util.ExceptionUtils;
 
 
 /**
@@ -34,7 +35,7 @@ public class AiDucaSynAllStockMapping implements IStockMapping{
 
 	@Override
 	public StockOption mapping(Map<String, Object> mqDataMap) {
-        logger.info("job mapping AiDuca start mapping.handleMappingAndExecute 入参:"+mqDataMap);
+        logger.info("AiDucaSynAllStockMappingMapping,inputParams,mqDataMap:"+mqDataMap);
         
         //如果未注入进来,手动获取bean
         if(skuService == null){
@@ -48,10 +49,13 @@ public class AiDucaSynAllStockMapping implements IStockMapping{
         Map<String, Object> skuParam = new HashMap<String, Object>();
         skuParam.put("vendorId", mqDataMap.get("vendor_id"));
         skuParam.put("skuCode", productMap.get("SKU").toString());
-        
+        String vendor_id  = mqDataMap.get("vendor_id")==null?"":mqDataMap.get("vendor_id").toString();
+
+
         //skuCode不能为# 否则会查询出多条数据  导致库存修改出错
         if("#".equals(productMap.get("SKU").toString())){
             logger.info("job mapping AiDuca 根据skuCode修改库存  获取 product时 skuCode不能为# 否则会查询出多条数据  导致库存修改出错 参数: "+ new Gson().toJson(skuParam));
+            stockOption.setVendor_id(vendor_id);
             return stockOption;
         }
         
@@ -62,6 +66,7 @@ public class AiDucaSynAllStockMapping implements IStockMapping{
         //为空校验
         if(skuInfo == null || skuInfo.size() == 0) {
             logger.info("job mapping AiDuca 根据skuCode 获取 product 结果为空  参数: "+ new Gson().toJson(skuParam));
+            stockOption.setVendor_id(vendor_id);
             return stockOption;
         }
         
@@ -74,14 +79,15 @@ public class AiDucaSynAllStockMapping implements IStockMapping{
         	
             stockOption.setProductCode(skuInfo.get("product_code").toString());
             stockOption.setSizeValue(skuInfo.get("size")==null?"":skuInfo.get("size").toString());
-            stockOption.setVendor_id(mqDataMap.get("vendor_id")==null?"":mqDataMap.get("vendor_id").toString());
+            stockOption.setVendor_id(vendor_id);
             stockOption.setType(StockContants.absolute_qty); // 库存绝对值
             stockOption.setLast_check(new Date());
         	
         } catch (Exception e) {
             e.printStackTrace();
-            throw e;
+            logger.info("AiDucaSynAllStockMappingMapping,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
         }
+        logger.info("AiDucaSynAllStockMappingMapping,outputParams,stockOption:"+mqDataMap);
         return stockOption;
 	}
 	

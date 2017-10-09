@@ -47,6 +47,8 @@ public class ApiErrorTypeEnum {
             brand_not_exist("brand_not_exist","通过映射找不到对应品牌。"),
             season_not_exist("season_not_exist","通过映射找不到对应season_code。"),
 
+        warning_duplicated_skusize("warning_duplicated_skusize","重复的sku size"),
+
         Data_is_negative("Data_is_negative","数据为负数。"),
         warning_data_is_negative("warning_data_is_negative","警告，数据为负数。"),
         Data_is_not_number("Data_is_not_number","数据不是数字。"),

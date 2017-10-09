@@ -117,7 +117,7 @@ public class AiDucaProductController implements InitializingBean{
 								ProductEDSManagement.ProductOptions productOptions = aiDucaSynProductMapping.mapping(mqDataMap);
 								ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
 								vendorOptions.setVendorId(Long.parseLong(param.get("vendor_id").toString()));
-								logger.info("AiDucaProductControllerSyn_product,initParam,productOptions:"+JSONObject.toJSONString(productOptions)+",vendorOptions:"+JSONObject.toJSONString(vendorOptions)+",eventName:"+eventName+",param:"+JSONObject.toJSONString(param));
+								logger.info("AiDucaProductControllerSyn_product,initParam,productOptions:"+JSONObject.toJSONString(productOptions)+",vendorOptions:"+JSONObject.toJSONString(vendorOptions)+",eventName:"+eventName+",param:"+JSONObject.toJSONString(param)+",mqDataMap:"+JSONObject.toJSONString(mqDataMap));
 
 								logger.info("AiDucaProductControllerSyn_product,execute,start,productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName+",mqDataMap:"+JSONObject.toJSONString(mqDataMap)+",param:"+JSONObject.toJSONString(param));
 								CommonThreadPool.execute(eventName,aiducaExecutor,Integer.parseInt(param.get("threadNum").toString()),new UpdateProductThread(productOptions,vendorOptions,fileUtils,mqDataMap));
@@ -150,7 +150,7 @@ public class AiDucaProductController implements InitializingBean{
 	                            ProductEDSManagement.ProductOptions productOptions = aiDucaSynProductMapping.mapping(mqDataMap);
 	                            ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
 	                            vendorOptions.setVendorId(Long.parseLong(param.get("vendor_id").toString()));
-	                            logger.info("AiDucaProductControllerSyn_product,initParam,productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName+",param:"+JSONObject.toJSONString(param));
+	                            logger.info("AiDucaProductControllerSyn_product,initParam,productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName+",param:"+JSONObject.toJSONString(param)+",mqDataMap:"+JSONObject.toJSONString(mqDataMap));
 
 	                            // 线程池
 	                            logger.info("AiDucaProductControllerSyn_product,execute,start,productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName+",mqDataMap:"+JSONObject.toJSONString(mqDataMap)+",param:"+JSONObject.toJSONString(param));
@@ -304,15 +304,15 @@ public class AiDucaProductController implements InitializingBean{
 	public void afterPropertiesSet() throws Exception {
         // AiDucaSynAllProduct
         ThreadPoolExecutor aiducaAllProductExecutor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
-        Map<String,Object> aiducaAllUpdateproduct = new HashMap<>();
-        aiducaAllUpdateproduct.put("url","http://rest.alducadaosta.com/api/Catalog/Sku4Platform?Username=IntraMirror&Password=%2B%2BInt%3DMir%2B%2B");
-        aiducaAllUpdateproduct.put("vendor_id","19");
-        aiducaAllUpdateproduct.put("store_code","AIDUCA");
-        aiducaAllUpdateproduct.put("threadNum","5");
-        aiducaAllUpdateproduct.put("vendorName","Al Duca Daosta");
-        aiducaAllUpdateproduct.put("aiducaProductExecutor",aiducaAllProductExecutor);
-        aiducaAllUpdateproduct.put("eventName","product_all_update");
-        aiducaAllUpdateproduct.put("fileUtils",new ApiDataFileUtils("aiduca","product_all_update"));
+        Map<String,Object> aiduca_product_delta_update = new HashMap<>();
+		aiduca_product_delta_update.put("url","http://rest.alducadaosta.com/api/Catalog/Sku4Platform?Username=IntraMirror&Password=%2B%2BInt%3DMir%2B%2B");
+		aiduca_product_delta_update.put("vendor_id","19");
+		aiduca_product_delta_update.put("store_code","AIDUCA");
+		aiduca_product_delta_update.put("threadNum","5");
+		aiduca_product_delta_update.put("vendorName","Al Duca Daosta");
+		aiduca_product_delta_update.put("aiducaProductExecutor",aiducaAllProductExecutor);
+		aiduca_product_delta_update.put("eventName","product_all_update");
+		aiduca_product_delta_update.put("fileUtils",new ApiDataFileUtils("aiduca","product_all_update"));
 
         // AiDucaSynAllStock
         ThreadPoolExecutor aiducaStockExecutor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
@@ -329,7 +329,7 @@ public class AiDucaProductController implements InitializingBean{
 
         // put data
         paramsMap = new HashMap<>();
-        paramsMap.put("aiduca_product_all_update",aiducaAllUpdateproduct);
-        paramsMap.put("aiduca_stock_delta_update_bydate",aiducaUpdateStock);
+		paramsMap.put("aiduca_product_delta_update",aiduca_product_delta_update);
+		paramsMap.put("aiduca_stock_delta_update_bydate",aiducaUpdateStock);
 	}
 }

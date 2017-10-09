@@ -1617,6 +1617,7 @@ public class ProductEDSManagement {
                     boolean ifSave = false;
                     for(String str : stringList) {
                         if(str.equals(skuOptions.getSize())) {
+                            this.duplicateSkus = skus;
                             ifSave = true;
                         }
                     }
@@ -1631,7 +1632,15 @@ public class ProductEDSManagement {
             return this;
 		}
 
+		private List<SkuOptions> duplicateSkus;
 
+        public List<SkuOptions> getDuplicateSkus() {
+            return duplicateSkus;
+        }
+
+        public void setDuplicateSkus(List<SkuOptions> duplicateSkus) {
+            this.duplicateSkus = duplicateSkus;
+        }
 
         public Date getLast_check() {
             return last_check;

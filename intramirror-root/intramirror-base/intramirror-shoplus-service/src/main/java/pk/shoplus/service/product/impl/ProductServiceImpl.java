@@ -109,6 +109,17 @@ public class ProductServiceImpl implements IProductService{
                 }
             }
 
+
+            if(productOptions.getDuplicateSkus() != null && productOptions.getDuplicateSkus().size() > 0) {
+                mapUtils = new MapUtils(new HashMap<>());
+                mapUtils.putData("status",StatusType.WARNING)
+                        .putData("info","update product - "+ ApiErrorTypeEnum.errorType.warning_duplicated_skusize.getDesc()+" sku:"+productOptions.getDuplicateSkus())
+                        .putData("error_enum",warning_duplicated_skusize)
+                        .putData("key","sku")
+                        .putData("value",productOptions.getDuplicateSkus());
+                warningMaps.add(mapUtils.getMap());
+            }
+
             if(category != null && !categoryService.isLastNode(category.getCategory_id())) {
                 mapUtils = new MapUtils(new HashMap<>());
                 mapUtils.putData("status",StatusType.WARNING)
