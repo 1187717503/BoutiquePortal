@@ -73,4 +73,7 @@ public interface ProductMapper {
     int updateByPrimaryKey(Product record);
 
     List<Map<String, Object>> getVendorCodeBySku(Long shopProductSkuId);
+
+    List<Map<String, Object>> selectProductByVendor(Long vendorId);
+
 }

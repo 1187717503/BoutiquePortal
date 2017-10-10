@@ -473,4 +473,10 @@
     inner join vendor v on v.vendor_id = p.vendor_id
     where sps.shop_product_sku_id = #{shopProductSkuId}
   </select>
+
+  <select id="selectProductByVendor" resultType="java.util.HashMap">
+      select product_id,product_code from product where enabled = 1 and vendor_id = #{vendorId,jdbcType=BIGINT}
+  </select>
+
+
 </mapper>

@@ -37,4 +37,6 @@ public interface SkuStoreMapper {
     List<SkuStore> selectSkuStoreByShopProductSkuId(@Param("shopProductSkuId") Long shopProductSkuId);
 
     void batchExecuteBySql(@Param("reservedTwo") BigDecimal reservedTwo, @Param("skuId") Long skuId);
+
+    void zeroClearing(Map<String,Object> map);
 }

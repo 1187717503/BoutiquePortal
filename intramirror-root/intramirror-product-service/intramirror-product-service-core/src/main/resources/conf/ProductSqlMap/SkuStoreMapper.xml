@@ -95,4 +95,17 @@
     <update id="batchExecuteBySql">
         UPDATE sku_store SET reserved = reserved + #{reservedTwo} , store = store - #{reservedTwo} WHERE sku_id = #{skuId}
     </update>
+
+    <update id="zeroClearing" parameterType="java.util.Map">
+
+        update `sku_store` ss set ss.`store`  = 0
+        where ss.`enabled`  = 1
+        and ss.`product_id`  in
+            <foreach collection="productIds" item="productId" index="index"
+                     open="(" close=")" separator=",">
+                #{productId}
+            </foreach>
+        <![CDATA[ and ss.`last_check` <= #{date,jdbcType=VARCHAR} ]]>
+
+    </update>
 </mapper>
