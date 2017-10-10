@@ -120,6 +120,12 @@ public class Vendor{
 * 27:score
 */
 	 @Column	public BigDecimal score;
+
+	   @Column
+	   public String edd_desc;
+
+	   @Column
+	   public String edd_title;
 //@Column public String vendor_code;
 
 	   public String getVendor_code() {
@@ -237,8 +243,32 @@ public class Vendor{
 	public String getContact() {
 		return contact;
 	}
-	
-//	public String getVendor_code() {
+
+	   public String getEdd_desc() {
+		   return edd_desc;
+	   }
+
+	   public void setEdd_desc(String edd_desc) {
+		   this.edd_desc = edd_desc;
+	   }
+
+	   public String getEdd_title() {
+		   return edd_title;
+	   }
+
+	   public void setEdd_title(String edd_title) {
+		   this.edd_title = edd_title;
+	   }
+
+	   public void setContact(String contact) {
+		   this.contact = contact;
+	   }
+
+	   public void setVendor_code(String vendor_code) {
+		   this.vendor_code = vendor_code;
+	   }
+
+	   //	public String getVendor_code() {
 //		return vendor_code;
 //	}
 	
