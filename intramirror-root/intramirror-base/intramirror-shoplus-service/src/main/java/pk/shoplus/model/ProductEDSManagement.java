@@ -180,6 +180,7 @@ public class ProductEDSManagement {
             }
             product.setMax_retail_price(BigDecimal.valueOf(Double.parseDouble(productOptions.getSalePrice())));
             product.setMin_retail_price(BigDecimal.valueOf(Double.parseDouble(productOptions.getSalePrice())));
+            product.setLast_check(new Date());
             product = productService.createProduct(product);
 
             // 在category上增加数据
@@ -661,6 +662,7 @@ public class ProductEDSManagement {
             sku.created_at = Helper.getCurrentTimeToUTCWithDate();
             sku.updated_at = Helper.getCurrentTimeToUTCWithDate();
             sku.enabled = EnabledType.USED;
+            sku.last_check = new Date();
 
             if(StringUtils.isNotBlank(productOptions.getFullUpdateProductFlag())){
                 if(productOptions.getFullUpdateProductFlag().equals("1")) {
@@ -717,6 +719,7 @@ public class ProductEDSManagement {
             skuStore.created_at = Helper.getCurrentTimeToUTCWithDate();
             skuStore.updated_at = Helper.getCurrentTimeToUTCWithDate();
             skuStore.enabled = EnabledType.USED;
+            skuStore.setLast_check(new Date());
 
             SkuStoreService skuStoreService = new SkuStoreService(conn);
             skuStore = skuStoreService.createSkuStore(skuStore);

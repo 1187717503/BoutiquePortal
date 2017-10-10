@@ -193,6 +193,7 @@ public class ProductStockEDSManagement {
             sku.created_at = new Date();
             sku.updated_at = new Date();
             sku.enabled = EnabledType.USED;
+            sku.last_check = new Date();
             Sku newSku = skuService.createSku(sku);
             logger.info("ProductStockEDSManagementCreateSkuInfo,createSku,sku:"+new Gson().toJson(sku));
 

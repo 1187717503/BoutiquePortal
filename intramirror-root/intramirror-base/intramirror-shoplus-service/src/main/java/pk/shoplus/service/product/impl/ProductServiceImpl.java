@@ -389,6 +389,7 @@ public class ProductServiceImpl implements IProductService{
                                 .putData("value",bigDecimal);
                         warningMaps.add(mapUtils.getMap());
                     }
+                    skuStore.setLast_check(new Date());
                     skuStoreService.updateSkuStore(skuStore);
                     logger.info("ProductServiceImplUpdateProduct,updateSkuStore,skuStore:"+new Gson().toJson(skuStore));
                     if(org.apache.commons.lang.StringUtils.isNotBlank(productOptions.getFullUpdateProductFlag()) &&
@@ -489,6 +490,7 @@ public class ProductServiceImpl implements IProductService{
             if(date2 == null) {
                 date2 = date1;
                 product.setLast_check(date1);
+                productService.updateProduct(product);
             }
             if(DateUtils.compareDate(date1,date2)) {
                 mapUtils.putData("handle_type","updateProduct");
@@ -673,6 +675,7 @@ public class ProductServiceImpl implements IProductService{
             sku.created_at = Helper.getCurrentTimeToUTCWithDate();
             sku.updated_at = Helper.getCurrentTimeToUTCWithDate();
             sku.enabled = EnabledType.USED;
+            sku.last_check = new Date();
             if(org.apache.commons.lang.StringUtils.isNotBlank(productOptions.getFullUpdateProductFlag())){
                 if(productOptions.getFullUpdateProductFlag().equals("1")) {
                     sku.full_modify_date = new Date();
@@ -709,6 +712,7 @@ public class ProductServiceImpl implements IProductService{
             skuStore.created_at = Helper.getCurrentTimeToUTCWithDate();
             skuStore.updated_at = Helper.getCurrentTimeToUTCWithDate();
             skuStore.enabled = EnabledType.USED;
+            skuStore.last_check = new Date();
             skuStoreService.createSkuStore(skuStore);
 
             SkuProperty skuProperty = new SkuProperty();
