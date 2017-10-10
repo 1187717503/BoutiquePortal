@@ -148,7 +148,7 @@ public class AiDucaSynProductMapping implements IProductMapping{
 				}else{
 					categoryMap.put("boutique_third_category", "");
 				}
-
+				productOptions.setCategory_name(JSONObject.toJSONString(categoryMap));
 				logger.info("job mapping AiDuca product handleMappingData getMappingCategoryInfoByCondition param:"+ new Gson().toJson(categoryMap));
 				List<Map<String, Object>> apiCategoryMap = categoryService.getMappingCategoryInfoByCondition(categoryMap);
 				if(apiCategoryMap != null && apiCategoryMap.size() > 0) {
@@ -160,6 +160,9 @@ public class AiDucaSynProductMapping implements IProductMapping{
 			logger.info("AiDucaSynProductMapping,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
 		}
 		logger.info("AiDucaSynProductMapping,outputParams,productOptions:"+JSONObject.toJSONString(productOptions));
+//		productOptions.setCategoryId("1646");
+//		productOptions.setBrandName("Gucci");
+//		productOptions.setSeasonCode("078");
 		return productOptions;
 	}
 

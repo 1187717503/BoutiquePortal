@@ -129,8 +129,8 @@ public class Contants {
     /**
      * Aiduca 接口
      */
-    public static final String aiduca_file_path = "/mnt/aiduca/compare/";
-//    public static final String aiduca_file_path = "/Users/dingyifan/Documents/fileTest/aiduca/compare/";
+    public static final String aiduca_file_path = "/mnt/alduca/compare/";
+//    public static final String aiduca_file_path = "/Users/dingyifan/Documents/fileTest/alduca/compare/";
     public static final String aiduca_file_type = ".txt";
     
     public static final String aiduca_origin_product_all = "aiduca_origin_product_all";

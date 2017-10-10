@@ -46,7 +46,7 @@ import com.intramirror.web.util.GetPostRequestUtil;
 import difflib.DiffRow;
 
 @Controller
-@RequestMapping("/aiduca_product")
+@RequestMapping("/alduca_product")
 public class AiDucaProductController implements InitializingBean{
 
 	// logger
@@ -96,16 +96,16 @@ public class AiDucaProductController implements InitializingBean{
 	                String originProductPath = Contants.aiduca_file_path + Contants.aiduca_origin_product_all + Contants.aiduca_file_type;
 	                String revisedProductPath = Contants.aiduca_file_path + Contants.aiduca_revised_product_all + Contants.aiduca_file_type;
 	                
-	                if(!FileUtil.fileExists(originProductPath)) {
-	                	logger.info("AiDucaProductControllerSyn_product,first,originProductPath:"+originProductPath);
-	                	FileUtil.createFileByType(Contants.aiduca_file_path,Contants.aiduca_origin_product_all + Contants.aiduca_file_type,converString(productList));
-	                	
+	                if(!FileUtil.fileExists(originProductPath) || eventName.contains("all")) {
+	                	if(!eventName.contains("all")) {
+							logger.info("AiDucaProductControllerSyn_product,first,originProductPath:"+originProductPath);
+							FileUtil.createFileByType(Contants.aiduca_file_path,Contants.aiduca_origin_product_all + Contants.aiduca_file_type,converString(productList));
+						}
 	                	if(productList !=null && productList.size() > 0 ){
 
 	                		fileUtils.bakPendingFile("aiduca-"+currentDate,json);
 							logger.info("AiDucaProductControllerSyn_product,bakPendingFile,listSize:"+productList.size());
 
-							int i = 0;
 							for(Map<String, Object> productInfo :productList ){
 
 								Map<String,Object> mqDataMap = new HashMap<String,Object>();
@@ -130,7 +130,6 @@ public class AiDucaProductController implements InitializingBean{
 		                List<DiffRow> diffRows = FileUtil.CompareTxtByType(originProductPath,revisedProductPath);
 		                logger.info("AiDucaProductControllerSyn_product,CompareTxtByType,diffRowsSize: "+diffRows.size());
 
-		                int i = 0;
 		                for(DiffRow diffRow : diffRows) {
 		                    DiffRow.Tag tag = diffRow.getTag();
 		                    if(tag == DiffRow.Tag.INSERT || tag == DiffRow.Tag.CHANGE) {
@@ -142,7 +141,6 @@ public class AiDucaProductController implements InitializingBean{
 	                            mqDataMap.put("store_code", param.get("store_code").toString());
 	                            mqDataMap.put("vendor_id", param.get("vendor_id").toString());
 	                            
-	                            i++;
 	                            // 放入线程池
 	                			logger.info("jAiDucaProductControllerSyn_product,mqDataMap:"+JSONObject.toJSONString(mqDataMap));
 	                            
@@ -302,34 +300,47 @@ public class AiDucaProductController implements InitializingBean{
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-        // AiDucaSynAllProduct
-        ThreadPoolExecutor aiducaAllProductExecutor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
-        Map<String,Object> aiduca_product_delta_update = new HashMap<>();
-		aiduca_product_delta_update.put("url","http://rest.alducadaosta.com/api/Catalog/Sku4Platform?Username=IntraMirror&Password=%2B%2BInt%3DMir%2B%2B");
-		aiduca_product_delta_update.put("vendor_id","19");
-		aiduca_product_delta_update.put("store_code","AIDUCA");
-		aiduca_product_delta_update.put("threadNum","5");
-		aiduca_product_delta_update.put("vendorName","Al Duca Daosta");
-		aiduca_product_delta_update.put("aiducaProductExecutor",aiducaAllProductExecutor);
-		aiduca_product_delta_update.put("eventName","product_all_update");
-		aiduca_product_delta_update.put("fileUtils",new ApiDataFileUtils("aiduca","product_all_update"));
+        // alduca_product_delta_update
+        ThreadPoolExecutor alducaDeltaProductExecutor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
+        Map<String,Object> alduca_product_delta_update = new HashMap<>();
+		alduca_product_delta_update.put("url","http://rest.alducadaosta.com/api/Catalog/Sku4Platform?Username=IntraMirror&Password=%2B%2BInt%3DMir%2B%2B");
+		alduca_product_delta_update.put("vendor_id","19");
+		alduca_product_delta_update.put("store_code","AIDUCA");
+		alduca_product_delta_update.put("threadNum","5");
+		alduca_product_delta_update.put("vendorName","Al Duca Daosta");
+		alduca_product_delta_update.put("aiducaProductExecutor",alducaDeltaProductExecutor);
+		alduca_product_delta_update.put("eventName","alduca_product_delta_update");
+		alduca_product_delta_update.put("fileUtils",new ApiDataFileUtils("alduca","alduca_product_delta_update"));
 
-        // AiDucaSynAllStock
-        ThreadPoolExecutor aiducaStockExecutor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
-        Map<String,Object> aiducaUpdateStock = new HashMap<>();
-        aiducaUpdateStock.put("url","http://rest.alducadaosta.com/api/stock/Stock4sku/all?Username=IntraMirror&Password=%2B%2BInt%3DMir%2B%2B");
-        aiducaUpdateStock.put("vendor_id","19");
-        aiducaUpdateStock.put("store_code","AIDUCA");
-        aiducaUpdateStock.put("threadNum","5");
-        aiducaUpdateStock.put("vendorName","Al Duca Daosta");
-        aiducaUpdateStock.put("aiducaStockExecutor",aiducaStockExecutor);
-        aiducaUpdateStock.put("eventName","stock_delta_update_bydate");
-        aiducaUpdateStock.put("datetime",DateUtils.getStrDate(new Date()));
-        aiducaUpdateStock.put("fileUtils",new ApiDataFileUtils("aiduca","stock_delta_update_bydate"));
+		// alduca_product_all_update
+		ThreadPoolExecutor alducaAllProductExecutor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
+		Map<String,Object> alduca_product_all_update = new HashMap<>();
+		alduca_product_all_update.put("url","http://rest.alducadaosta.com/api/Catalog/Sku4Platform?Username=IntraMirror&Password=%2B%2BInt%3DMir%2B%2B");
+		alduca_product_all_update.put("vendor_id","19");
+		alduca_product_all_update.put("store_code","AIDUCA");
+		alduca_product_all_update.put("threadNum","5");
+		alduca_product_all_update.put("vendorName","Al Duca Daosta");
+		alduca_product_all_update.put("aiducaProductExecutor",alducaAllProductExecutor);
+		alduca_product_all_update.put("eventName","alduca_product_all_update");
+		alduca_product_all_update.put("fileUtils",new ApiDataFileUtils("alduca","alduca_product_all_update"));
+
+        // alduca_stock_all_update
+        ThreadPoolExecutor alducaAllStockExecutor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
+        Map<String,Object> alduca_stock_all_update = new HashMap<>();
+		alduca_stock_all_update.put("url","http://rest.alducadaosta.com/api/stock/Stock4sku/all?Username=IntraMirror&Password=%2B%2BInt%3DMir%2B%2B");
+		alduca_stock_all_update.put("vendor_id","19");
+		alduca_stock_all_update.put("store_code","AIDUCA");
+		alduca_stock_all_update.put("threadNum","5");
+		alduca_stock_all_update.put("vendorName","Al Duca Daosta");
+		alduca_stock_all_update.put("aiducaStockExecutor",alducaAllStockExecutor);
+		alduca_stock_all_update.put("eventName","alduca_stock_all_update");
+		alduca_stock_all_update.put("datetime",DateUtils.getStrDate(new Date()));
+		alduca_stock_all_update.put("fileUtils",new ApiDataFileUtils("alduca","alduca_stock_all_update"));
 
         // put data
         paramsMap = new HashMap<>();
-		paramsMap.put("aiduca_product_delta_update",aiduca_product_delta_update);
-		paramsMap.put("aiduca_stock_delta_update_bydate",aiducaUpdateStock);
+		paramsMap.put("alduca_product_all_update",alduca_product_all_update);
+		paramsMap.put("alduca_product_delta_update",alduca_product_delta_update);
+		paramsMap.put("alduca_stock_all_update",alduca_stock_all_update);
 	}
 }
