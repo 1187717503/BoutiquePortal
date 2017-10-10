@@ -304,7 +304,7 @@ public class AiDucaProductController implements InitializingBean{
         ThreadPoolExecutor alducaDeltaProductExecutor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
         Map<String,Object> alduca_product_delta_update = new HashMap<>();
 		alduca_product_delta_update.put("url","http://rest.alducadaosta.com/api/Catalog/Sku4Platform?Username=IntraMirror&Password=%2B%2BInt%3DMir%2B%2B");
-		alduca_product_delta_update.put("vendor_id","19");
+		alduca_product_delta_update.put("vendor_id","22");
 		alduca_product_delta_update.put("store_code","AIDUCA");
 		alduca_product_delta_update.put("threadNum","5");
 		alduca_product_delta_update.put("vendorName","Al Duca Daosta");
@@ -316,7 +316,7 @@ public class AiDucaProductController implements InitializingBean{
 		ThreadPoolExecutor alducaAllProductExecutor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
 		Map<String,Object> alduca_product_all_update = new HashMap<>();
 		alduca_product_all_update.put("url","http://rest.alducadaosta.com/api/Catalog/Sku4Platform?Username=IntraMirror&Password=%2B%2BInt%3DMir%2B%2B");
-		alduca_product_all_update.put("vendor_id","19");
+		alduca_product_all_update.put("vendor_id","22");
 		alduca_product_all_update.put("store_code","AIDUCA");
 		alduca_product_all_update.put("threadNum","5");
 		alduca_product_all_update.put("vendorName","Al Duca Daosta");
@@ -328,7 +328,7 @@ public class AiDucaProductController implements InitializingBean{
         ThreadPoolExecutor alducaAllStockExecutor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
         Map<String,Object> alduca_stock_all_update = new HashMap<>();
 		alduca_stock_all_update.put("url","http://rest.alducadaosta.com/api/stock/Stock4sku/all?Username=IntraMirror&Password=%2B%2BInt%3DMir%2B%2B");
-		alduca_stock_all_update.put("vendor_id","19");
+		alduca_stock_all_update.put("vendor_id","22");
 		alduca_stock_all_update.put("store_code","AIDUCA");
 		alduca_stock_all_update.put("threadNum","5");
 		alduca_stock_all_update.put("vendorName","Al Duca Daosta");
