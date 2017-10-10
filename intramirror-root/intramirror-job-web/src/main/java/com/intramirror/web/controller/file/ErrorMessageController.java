@@ -6,6 +6,8 @@ import com.intramirror.web.controller.api.quadra.QuadraProductController;
 import com.intramirror.web.mapping.api.IProductMapping;
 import com.intramirror.web.mapping.api.IStockMapping;
 import com.intramirror.web.mapping.impl.QuadraSynProductMapping;
+import com.intramirror.web.mapping.impl.aiduca.AiDucaSynAllStockMapping;
+import com.intramirror.web.mapping.impl.aiduca.AiDucaSynProductMapping;
 import com.intramirror.web.mapping.impl.atelier.AtelierUpdateByProductMapping;
 import com.intramirror.web.mapping.vo.StockOption;
 import com.intramirror.web.thread.CommonThreadPool;
@@ -91,6 +93,12 @@ public class ErrorMessageController {
 
     @Resource(name = "xmagSynAllStockMapping")
     private IStockMapping xmagSynAllStockMapping;
+
+    @Autowired
+    private AiDucaSynAllStockMapping aiDucaSynAllStockMapping;
+
+    @Autowired
+    private AiDucaSynProductMapping aiDucaSynProductMapping;
 
     private static final int threadNum = 5;
 
@@ -225,7 +233,7 @@ public class ErrorMessageController {
                     }
                 }
 
-                // xmag
+                // xmag apartment
                 if(vendor_id.equals("20")) {
                     if(name.equals("apartment_product_all_update") || name.equals("apartment_product_delta_update")) {
                         ProductEDSManagement.ProductOptions productOptions = xmagSynProductAllMapper.mapping(originDataMap);
@@ -239,6 +247,19 @@ public class ErrorMessageController {
                     }
                 }
 
+                // alduca
+                if(vendor_id.equals("22")) {
+                    if(name.equals("alduca_product_delta_update") || name.equals("alduca_product_all_update")) {
+                        ProductEDSManagement.ProductOptions productOptions = aiDucaSynProductMapping.mapping(originDataMap);
+                        ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
+                        vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                        productOptions.setModifyPrice("1");
+                        CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
+                    } else if(name.equals("alduca_stock_all_update")){
+                        StockOption stockOption = aiDucaSynAllStockMapping.mapping(originDataMap);
+                        CommonThreadPool.execute(name,executor,threadNum,new UpdateStockThread(stockOption,apiDataFileUtils,originDataMap));
+                    }
+                }
                 this.updateProcessing(api_error_processing_id);
             }
             mapUtils.putData("status",StatusType.SUCCESS).putData("info","success");
