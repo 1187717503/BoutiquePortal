@@ -126,7 +126,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
                 List<Map<String,Object>> maps = new ArrayList<>();
                 maps.add(paramsList.get(i));
                 priceChangeRuleMapper.updateSkuPriceByVendor(maps);
-                logger.info(" vendor maps"+i+" :" + maps +"----" + paramsList.size());
+                logger.info("updatePriceByVendor,i:"+i+" :" + maps +"----" + paramsList.size());
             }
         }
         logger.info("update vendor price success num : "+0);
@@ -140,7 +140,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
                 List<Map<String,Object>> maps = new ArrayList<>();
                 maps.add(paramsList.get(i));
                 priceChangeRuleMapper.updateSkuPriceByAdmin(maps);
-                logger.info(" admin maps"+i+" :" + maps +"----" + paramsList.size());
+                logger.info("updatePriceByAdmin,i:"+i+" :" + maps +"----" + paramsList.size());
             }
         }
         logger.info("update admin price success num : "+0);
