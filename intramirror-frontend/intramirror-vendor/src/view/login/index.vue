@@ -44,6 +44,7 @@
 
 <script>
   import loading from '../component/loading.vue'
+  import md5 from 'js-md5'
 
   export default {
     data() {
@@ -70,6 +71,11 @@
           Materialize.toast('请输入密码', 4000);
           return false
         } else {
+
+          console.log("==Jain==Before md5:"+this.loginForm.password);
+          this.loginForm.password = md5(this.loginForm.password);
+          console.log("==Jain==end md5:"+this.loginForm.password);
+
           this.isLoading = true;
           this.$store.dispatch('login', this.loginForm).then(res => {
             if (res.data.status === 1) {
