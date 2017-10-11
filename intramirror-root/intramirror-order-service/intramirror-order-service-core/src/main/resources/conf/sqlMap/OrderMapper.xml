@@ -77,7 +77,7 @@
         lp.confirmed_at,lp.est_ship_date,lp.packed_at,lp.shipped_at,s.sku_code,usa.address_country_id,b.english_name as
         brandName,
         l.user_rec_name,l.user_rec_province,l.user_rec_city,l.user_rec_area,l.user_rec_addr,l.user_rec_country,l.geography_id,
-        v.vendor_name,v.vendor_id,g.english_name as geography_name,v.address_country_id as
+        v.vendor_name,v.vendor_id,v.skip_confirm,g.english_name as geography_name,v.address_country_id as
         vendor_address_country_id,p.cover_img,lp.logistics_product_id,
         oe.created_at as oeCreatedAt,oet.description as oeDescription,oe.comments as oeComments,u.email as
         oeCreatedByuser,
