@@ -9,6 +9,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.annotation.Resource;
 
+import com.intramirror.product.api.service.stock.IUpdateStockService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
@@ -52,6 +53,8 @@ public class CloudStoreAllUpdateBySkuController implements InitializingBean{
     @Resource(name = "cloudStoreProductMapping")
     private IProductMapping iProductMapping;
 
+    @Resource(name = "updateStockService")
+    private IUpdateStockService iUpdateStockService;
     
     Integer index = 0;
     Integer step = 0;
@@ -82,6 +85,7 @@ public class CloudStoreAllUpdateBySkuController implements InitializingBean{
             Map<String, Object> params = new HashMap<>();
             params.put("token", token);
             params.put("merchantId", merchantId);
+            int flag = 0;
             while (true) {
                 // 获取数据
                 logger.info("cloudStoreProductAllProducerControllerExecute,startRequestMethod,appendUrl:"+url+",index:"+index);
@@ -109,6 +113,7 @@ public class CloudStoreAllUpdateBySkuController implements InitializingBean{
                 }
                 while(it.hasNext()) {
                 	index++;
+                    flag ++;
                     JSONObject inventory = (JSONObject) it.next();
                     Map<String,Object> mqMap = new HashMap<>();
                     mqMap.put("vendor_id", vendor_id);
@@ -133,6 +138,13 @@ public class CloudStoreAllUpdateBySkuController implements InitializingBean{
                     break;
                 }
                 logger.info("cloudStoreProductAllProducerControllerExecute,stepEnd,step:"+step+",index:"+index);
+            }
+
+            logger.info("cloudStoreProductAllProducerControllerExecute,zeroClearing,flag:"+flag);
+            if(eventName.equals("product_all_update") && flag > 100 ) {
+                logger.info("cloudStoreProductAllProducerControllerExecute,zeroClearing,start,vendor_id:"+vendor_id);
+                iUpdateStockService.zeroClearing(Long.parseLong(vendor_id));
+                logger.info("cloudStoreProductAllProducerControllerExecute,zeroClearing,end,vendor_id:"+vendor_id);
             }
             logger.info("cloudStoreProductAllProducerControllerExecute,executeEnd,url:"+url+",index:"+index+",param:"+JSONObject.toJSONString(param)+",eventName:"+eventName);
         } catch (Exception e) {
