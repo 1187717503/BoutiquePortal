@@ -2,6 +2,7 @@
 
 package com.intramirror.product.core.impl.price;
 
+import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import com.intramirror.common.Contants;
 import com.intramirror.common.enums.PriceChangeRuleEnum;
@@ -120,7 +121,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     }
 
     private int updatePriceByVendor(List<Map<String,Object>> paramsList,Map<String,Object> paramsMap){
-        if(paramsList != null && paramsList.size() > 0) {
+        /*if(paramsList != null && paramsList.size() > 0) {
             logger.info("update vendor price success paramsList:"+new Gson().toJson(paramsList));
             for(int i = 0;i<paramsList.size();i++) {
                 List<Map<String,Object>> maps = new ArrayList<>();
@@ -130,11 +131,20 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             }
         }
         logger.info("update vendor price success num : "+0);
+        return 0;*/
+
+        // update by dingyifan 2017-10-11
+        logger.info("PriceChangeRuleImplUpdatePriceByVendor,updateSkuPriceByVendor,start,paramsList:"+ JSONObject.toJSONString(paramsList)+",size:"+paramsList==null?0:paramsList.size());
+        if(paramsList != null && paramsList.size() > 0){
+            priceChangeRuleMapper.updateSkuPriceByVendor(paramsList);
+        }
+        logger.info("PriceChangeRuleImplUpdatePriceByVendor,updateSkuPriceByVendor,end,paramsList:"+JSONObject.toJSONString(paramsList)+",size:"+paramsList==null?0:paramsList.size());
+        // update by dingyifan 2017-10-11
         return 0;
     }
 
     private int updatePriceByAdmin(List<Map<String,Object>> paramsList,Map<String,Object> paramsMap){
-        if(paramsList != null && paramsList.size() > 0) {
+        /*if(paramsList != null && paramsList.size() > 0) {
             logger.info("update admin price success paramsList:"+new Gson().toJson(paramsList));
             for(int i = 0;i<paramsList.size();i++) {
                 List<Map<String,Object>> maps = new ArrayList<>();
@@ -144,6 +154,15 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             }
         }
         logger.info("update admin price success num : "+0);
+        return 0;*/
+
+        // update by dingyifan 2017-10-11
+        logger.info("PriceChangeRuleImplUpdatePriceByAdmin,updateSkuPriceByAdmin,start,paramsList:"+JSONObject.toJSONString(paramsList)+",size:"+paramsList==null?0:paramsList.size());
+        if(paramsList != null && paramsList.size() > 0) {
+            priceChangeRuleMapper.updateSkuPriceByAdmin(paramsList);
+        }
+        logger.info("PriceChangeRuleImplUpdatePriceByAdmin,updateSkuPriceByAdmin,end,paramsList:"+JSONObject.toJSONString(paramsList)+",size:"+paramsList==null?0:paramsList.size());
+        // update by dingyifan 2017-10-11
         return 0;
     }
 
