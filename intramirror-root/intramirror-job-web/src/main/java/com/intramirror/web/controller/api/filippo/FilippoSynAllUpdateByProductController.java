@@ -28,6 +28,7 @@ import com.intramirror.web.thread.UpdateProductThread;
 import com.intramirror.web.util.ApiDataFileUtils;
 import com.intramirror.web.util.GetPostRequestUtil;
 
+import pk.shoplus.common.utils.FileUtils;
 import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.parameter.StatusType;
 import pk.shoplus.service.RedisService;
@@ -63,7 +64,7 @@ public class FilippoSynAllUpdateByProductController implements InitializingBean 
 	@Resource(name = "filippoSynProductMapping")
 	private IProductMapping iProductMapping;
 
-	private static final String filippo_compare_path = "/mnt/filippo/compare/all/";
+	private static String filippo_compare_path = "/mnt/filippo/compare/all/";
 
 //	private static final String filippo_compare_path = "/Users/dingyifan/Documents/fileTest/filippo/compare/all/";
 
@@ -92,7 +93,7 @@ public class FilippoSynAllUpdateByProductController implements InitializingBean 
 
 		Map<String, Object> mqMap = new HashMap<>();
 		mqMap.put("vendorOptions", vendorOption);
-
+		filippo_compare_path = filippo_compare_path+DateUtils.getStrDate(new Date(),"yyyyMMdd")+"/";
 		try {
 			logger.info("FilippoUpdateByStockControllerExecute,requestMethod,url:"+url);
 			String getResponse = getPostRequestUtil.requestMethod(GetPostRequestService.HTTP_GET, url, null);
