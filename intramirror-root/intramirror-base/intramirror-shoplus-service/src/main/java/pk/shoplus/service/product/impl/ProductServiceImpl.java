@@ -489,7 +489,7 @@ public class ProductServiceImpl implements IProductService{
             Date date2 = product.getLast_check();
             if(date2 == null) {
                 date2 = date1;
-                product.setLast_check(date1);
+                product.setLast_check(new Date());
                 productService.updateProduct(product);
             }
             if(DateUtils.compareDate(date1,date2)) {
