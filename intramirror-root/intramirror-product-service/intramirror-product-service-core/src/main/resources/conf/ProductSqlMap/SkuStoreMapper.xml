@@ -102,10 +102,10 @@
         where ss.`enabled`  = 1
         and ss.`product_id`  in
             <foreach collection="productIds" item="productId" index="index"
-                     open="(" close=")" separator=",">
+                     open="(" close =")" separator=",">
                 #{productId}
             </foreach>
-        <![CDATA[ and ss.`last_check` <= #{date,jdbcType=VARCHAR} ]]>
+        <![CDATA[ and (ss.`last_check` <= #{date,jdbcType=VARCHAR} or ss.`last_check` is null )]]>
 
     </update>
 </mapper>

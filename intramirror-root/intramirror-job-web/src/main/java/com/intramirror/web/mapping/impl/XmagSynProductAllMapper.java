@@ -83,20 +83,26 @@ public class XmagSynProductAllMapper implements IProductMapping {
         	if (checkValue(product.get("product_name"))){
         		String supplierId = product.get("product_name").toString();
         		productOptions.setBrandCode(supplierId);
-				productOptions.setName(supplierId);
         	}
         	if (checkValue(product.get("producer_id"))){
         		String brand = product.get("producer_id").toString();
         		productOptions.setBrandName(brand);
         	}
+
         	if (checkValue(product.get("season"))){
         		String seasonCode = product.get("season").toString();
         		productOptions.setSeasonCode(seasonCode);
         	}
+
         	if (checkValue(product.get("description"))){
         		String productDescription = product.get("description").toString();
-        		productOptions.setDesc(productDescription);
+        		productOptions.setName(productDescription);
         	}
+
+        	if(checkValue(product.get("product_Note"))){
+        		String productNote = product.get("product_Note").toString();
+        		productOptions.setDesc(productNote);
+			}
         	
         	String type = product.get("type")==null?" ":product.get("type").toString(); //查询一级
         	String category = product.get("category")==null?" ":product.get("category").toString(); //查询三级
@@ -127,6 +133,10 @@ public class XmagSynProductAllMapper implements IProductMapping {
         	if (checkValue(product.get("CarryOver"))){
         		String carryover = product.get("CarryOver").toString();
         		productOptions.setCarryOver(carryover);
+
+        		if(carryover.equals("CO")){
+        		    productOptions.setSeasonCode("CO");
+                }
         	}
         	if (checkValue(product.get("supply_price"))){
         		String retailPrice = product.get("supply_price").toString();

@@ -16,7 +16,7 @@ import java.util.*;
 /**
  * Created by dingyifan on 2017/8/2.
  */
-@Service
+@Service(value = "updateStockService")
 public class UpdateStockServiceImpl extends BaseDao implements IUpdateStockService{
 
     private static final Logger logger = Logger.getLogger(UpdateStockServiceImpl.class);
