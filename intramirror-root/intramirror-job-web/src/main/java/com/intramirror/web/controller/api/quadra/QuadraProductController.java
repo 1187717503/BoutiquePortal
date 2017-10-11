@@ -11,6 +11,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import com.intramirror.common.help.ExceptionUtils;
 
+import com.intramirror.product.api.service.stock.IUpdateStockService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
@@ -37,6 +38,8 @@ import com.intramirror.web.util.GetPostRequestUtil;
 
 import difflib.DiffRow;
 
+import javax.annotation.Resource;
+
 @Controller
 @RequestMapping("/job/product")
 public class QuadraProductController implements InitializingBean{
@@ -48,6 +51,9 @@ public class QuadraProductController implements InitializingBean{
     
     // init params
     public Map<String,Object> paramsMap;
+
+    @Resource(name = "updateStockService")
+    private IUpdateStockService iUpdateStockService;
     
     @RequestMapping(value = "/updateProductAll",method = RequestMethod.GET)
     @ResponseBody
@@ -61,8 +67,8 @@ public class QuadraProductController implements InitializingBean{
 //            logger.info("job quadra updateProductAll 初始化参数:"+new Gson().toJson(param));
             
         	if(param != null && param.size() > 0 ){
-        		
-        		ThreadPoolExecutor quadraExecutor = (ThreadPoolExecutor) param.get("quadraExecutor");
+                int flag = 0;
+                ThreadPoolExecutor quadraExecutor = (ThreadPoolExecutor) param.get("quadraExecutor");
         	    String eventName = param.get("eventName").toString();
         	    ProductEDSManagement productEDSManagement = new ProductEDSManagement();
                 String currentDate = DateUtils.getStrDate(new Date(),"yyyyMMddHHmmss");
@@ -83,20 +89,14 @@ public class QuadraProductController implements InitializingBean{
                 		fileUtils.bakPendingFile("quadra-"+currentDate,json);
                         logger.info("job quadra updateProduct  遍历解析商品列表   存入线程池消费    productList Size:"+List.size());
                         
-                        int i = 0;
                 		for(Map<String, Object> productInfo :List ){
-                			
+                            flag++;
                             Map<String,Object> mqDataMap = new HashMap<String,Object>();
                             mqDataMap.put("product", productInfo.toString());
                             mqDataMap.put("store_code", param.get("store_code").toString());
                             mqDataMap.put("vendor_id", param.get("vendor_id").toString());
                             mqDataMap.put("full_update_product","1");
-                            
-                            // 放入线程池
-                			System.out.println(i++);
-//                            logger.info("job quadra UpdateProductAll,putMessage,mqDateMap:"+new Gson().toJson(mqDataMap)+",urlMap:"+new Gson().toJson(param));
-//                            QueueUtils.putMessage(mqDataMap, "",param.get("url").toString(), QueueNameJobEnum.QuadraSynAllProduct);
-                            
+
                             // 映射数据 封装VO
                             ProductEDSManagement.ProductOptions productOptions = productMappingService.mapping(mqDataMap);
                             ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
@@ -104,15 +104,18 @@ public class QuadraProductController implements InitializingBean{
                             logger.info("job quadra updateProduct,initParam,productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
 
                             // 线程池
-                            logger.info("job quadra updateProduct,execute,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
+                            logger.info("job quadra updateProduct,execute,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName+",index:"+flag);
                             CommonThreadPool.execute(eventName,quadraExecutor,Integer.parseInt(param.get("threadNum").toString()),new UpdateProductThread(productOptions,vendorOptions,fileUtils,mqDataMap));
-                            logger.info("job quadra updateProduct,execute,endDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
-                            
-                            //跳出循环,测试用
-//                            if(i>150){
-//                            	break;
-//                            }
+                            logger.info("job quadra updateProduct,execute,endDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName+",index:"+flag);
+
                 		}
+
+                        logger.info("QuadraProductControllerUpdateProductAll,zeroClearing,flag:"+flag);
+                        if(eventName.equals("product_all_update") && flag > 100 ) {
+                            logger.info("QuadraProductControllerUpdateProductAll,zeroClearing,start,vendor_id:"+param.get("vendor_id").toString());
+                            iUpdateStockService.zeroClearing(Long.parseLong(param.get("vendor_id").toString()));
+                            logger.info("QuadraProductControllerUpdateProductAll,zeroClearing,end,vendor_id:"+param.get("vendor_id").toString());
+                        }
                 	}
                     
 

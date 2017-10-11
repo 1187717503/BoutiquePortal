@@ -10,6 +10,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.annotation.Resource;
 
+import com.intramirror.product.api.service.stock.IUpdateStockService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
@@ -66,6 +67,9 @@ public class FilippoSynAllUpdateByProductController implements InitializingBean 
 
 	private static String filippo_compare_path = "/mnt/filippo/compare/all/";
 
+	@Resource(name = "updateStockService")
+	private IUpdateStockService iUpdateStockService;
+
 //	private static final String filippo_compare_path = "/Users/dingyifan/Documents/fileTest/filippo/compare/all/";
 
 	@ResponseBody
@@ -98,7 +102,7 @@ public class FilippoSynAllUpdateByProductController implements InitializingBean 
 			logger.info("FilippoUpdateByStockControllerExecute,requestMethod,url:"+url);
 			String getResponse = getPostRequestUtil.requestMethod(GetPostRequestService.HTTP_GET, url, null);
 			logger.info("FilippoUpdateByStockControllerExecute,requestMethod,getResponse:"+getResponse);
-
+			int sum = 0;
 			if (StringUtils.isNotBlank(getResponse)) {
 
 				fileUtils.bakPendingFile("product_vendor_id_"+vendor_id,getResponse);
@@ -107,7 +111,7 @@ public class FilippoSynAllUpdateByProductController implements InitializingBean 
 				String pathNameUrl = filippo_compare_path + origin+type;
 				logger.info("FilippoUpdateByStockControllerExecute,pathNameUrl:" +pathNameUrl);
 
-				int sum = 0;
+
 
 				//保存源文件
                 List<String> mqLists = FileUtil.readFileByFilippoList(pathNameUrl);
@@ -211,6 +215,12 @@ public class FilippoSynAllUpdateByProductController implements InitializingBean 
 				mapUtils.putData("status", StatusType.FAILURE).putData("info","getUrlResult is null !!!");
 			}
 
+			logger.info("FilippoUpdateByproductControllerExecute,zeroClearing,flag:"+sum);
+			if(eventName.equals("product_all_update") && sum > 100 ) {
+				logger.info("FilippoUpdateByproductControllerExecute,zeroClearing,start,vendor_id:"+vendor_id);
+				iUpdateStockService.zeroClearing(Long.parseLong(vendor_id));
+				logger.info("FilippoUpdateByproductControllerExecute,zeroClearing,end,vendor_id:"+vendor_id);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.info("SynSkuProducerByFilippoController,errorMessage:" + ExceptionUtils.getExceptionDetail(e));

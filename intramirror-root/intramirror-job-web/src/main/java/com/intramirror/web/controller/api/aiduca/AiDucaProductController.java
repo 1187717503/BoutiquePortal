@@ -11,6 +11,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.annotation.Resource;
 
+import com.intramirror.product.api.service.stock.IUpdateStockService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
@@ -66,6 +67,9 @@ public class AiDucaProductController implements InitializingBean{
     
     // init params
     private Map<String,Object> paramsMap;
+
+	@Resource(name = "updateStockService")
+	private IUpdateStockService iUpdateStockService;
     
     @RequestMapping(value = "/syn_product",method = RequestMethod.GET)
     @ResponseBody
@@ -105,9 +109,9 @@ public class AiDucaProductController implements InitializingBean{
 
 	                		fileUtils.bakPendingFile("aiduca-"+currentDate,json);
 							logger.info("AiDucaProductControllerSyn_product,bakPendingFile,listSize:"+productList.size());
-
+							int flag = 0;
 							for(Map<String, Object> productInfo :productList ){
-
+								flag ++;
 								Map<String,Object> mqDataMap = new HashMap<String,Object>();
 								mqDataMap.put("product", productInfo.toString());
 								mqDataMap.put("store_code", param.get("store_code").toString());
@@ -119,11 +123,23 @@ public class AiDucaProductController implements InitializingBean{
 								vendorOptions.setVendorId(Long.parseLong(param.get("vendor_id").toString()));
 								logger.info("AiDucaProductControllerSyn_product,initParam,productOptions:"+JSONObject.toJSONString(productOptions)+",vendorOptions:"+JSONObject.toJSONString(vendorOptions)+",eventName:"+eventName+",param:"+JSONObject.toJSONString(param)+",mqDataMap:"+JSONObject.toJSONString(mqDataMap));
 
-								logger.info("AiDucaProductControllerSyn_product,execute,start,productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName+",mqDataMap:"+JSONObject.toJSONString(mqDataMap)+",param:"+JSONObject.toJSONString(param));
+								logger.info("AiDucaProductControllerSyn_product,execute,start,productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName+",mqDataMap:"+JSONObject.toJSONString(mqDataMap)+",param:"+JSONObject.toJSONString(param)+",index:"+flag);
 								CommonThreadPool.execute(eventName,aiducaExecutor,Integer.parseInt(param.get("threadNum").toString()),new UpdateProductThread(productOptions,vendorOptions,fileUtils,mqDataMap));
-								logger.info("AiDucaProductControllerSyn_product,execute,end,productOptions::"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName+",mqDataMap:"+JSONObject.toJSONString(mqDataMap)+",param:"+JSONObject.toJSONString(param));
+								logger.info("AiDucaProductControllerSyn_product,execute,end,productOptions::"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName+",mqDataMap:"+JSONObject.toJSONString(mqDataMap)+",param:"+JSONObject.toJSONString(param)+",index:"+flag);
 							}
+
+							if(eventName.contains("all")) {
+								logger.info("AiDucaProductControllerSyn_product,zeroClearing,flag:"+flag);
+								if(eventName.equals("alduca_product_all_update") && flag > 100 ) {
+									logger.info("AiDucaProductControllerSyn_product,zeroClearing,start,vendor_id:"+param.get("vendor_id").toString());
+									iUpdateStockService.zeroClearing(Long.parseLong(param.get("vendor_id").toString()));
+									logger.info("AiDucaProductControllerSyn_product,zeroClearing,end,vendor_id:"+param.get("vendor_id").toString());
+								}
+							}
+
                 	  }
+
+
 	                } else {
 		                FileUtil.createFileByType(Contants.aiduca_file_path,Contants.aiduca_revised_product_all+ Contants.aiduca_file_type,converString(productList));
 		

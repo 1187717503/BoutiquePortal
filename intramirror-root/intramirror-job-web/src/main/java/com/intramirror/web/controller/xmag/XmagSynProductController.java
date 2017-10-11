@@ -10,6 +10,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import javax.annotation.Resource;
 
 import com.intramirror.main.api.service.SeasonMappingService;
+import com.intramirror.product.api.service.stock.IUpdateStockService;
 import com.intramirror.web.contants.RedisKeyContants;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.Param;
@@ -55,6 +56,9 @@ public class XmagSynProductController implements InitializingBean {
 	@Autowired
 	private SeasonMappingService seasonMappingService;
 
+	@Resource(name = "updateStockService")
+	private IUpdateStockService iUpdateStockService;
+
 	private static RedisService redisService = RedisService.getInstance();
 
 	@RequestMapping("/syn_product")
@@ -85,6 +89,7 @@ public class XmagSynProductController implements InitializingBean {
 			int threadNum = Integer.parseInt(param.get("threadNum").toString());
 			ThreadPoolExecutor nugnesExecutor = (ThreadPoolExecutor) param.get("executor");
 			ApiDataFileUtils fileUtils = (ApiDataFileUtils) param.get("fileUtils");
+			int flag = 0;
 
 			/*logger.info("XmagSynProductAllControllerSynProduct,getBoutiqueSeasonCode,vendor_id:" +vendor_id);
 			List<Map<String, Object>> boutiqueSeasonCodes = seasonMappingService.getBoutiqueSeasonCode(vendor_id);
@@ -144,7 +149,7 @@ public class XmagSynProductController implements InitializingBean {
 								// 线程池
 								logger.info("XmagSynProductAllControllerSynProduct,execute,start,productOptions:"
 										+ new Gson().toJson(productOptions) + ",vendorOptions:"
-										+ new Gson().toJson(vendorOptions) + ",eventName:" + eventName);
+										+ new Gson().toJson(vendorOptions) + ",eventName:" + eventName+",index:"+flag);
 								CommonThreadPool.execute(eventName, nugnesExecutor, threadNum,
 										new UpdateProductThread(productOptions, vendorOptions, fileUtils,mqDataMap));
 								logger.info("XmagProductAllProducerControllerExecute,execute,end,productOptions:"
@@ -153,6 +158,7 @@ public class XmagSynProductController implements InitializingBean {
 
 								StartIndex++;
 								EndIndex++;
+								flag ++;
 							}
 						} else {
 							logger.info("XmagSynProductAllControllerSynProduct,productIsNull");
@@ -172,6 +178,13 @@ public class XmagSynProductController implements InitializingBean {
 				}
 				// end 增量更新
 //			}
+
+			logger.info("XmagSynProductAllControllerSynProduct,zeroClearing,flag:"+flag);
+			if(eventName.equals("apartment_product_all_update") && flag > 100 ) {
+				logger.info("XmagSynProductAllControllerSynProduct,zeroClearing,start,vendor_id:"+vendor_id);
+				iUpdateStockService.zeroClearing(Long.parseLong(vendor_id));
+				logger.info("XmagSynProductAllControllerSynProduct,zeroClearing,end,vendor_id:"+vendor_id);
+			}
 
 			mapUtils.putData("status", StatusType.SUCCESS);
 		} catch (Exception e) {
