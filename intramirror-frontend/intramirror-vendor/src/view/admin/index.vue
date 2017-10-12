@@ -45,7 +45,7 @@
               <p>PRINT ORDER</p>
             </div>
             <div v-if="!item.oeComments || item.oeStatus!==1">
-              <i class="mdi mdi-check" @click="confirmOrder(item.logistics_product_id,item.order_line_num)"></i>
+              <i class="mdi mdi-check" @click="confirmOrder(item)"></i>
               <p>CONFIRM</p>
             </div>
             <div v-if="!item.oeComments || item.oeStatus!==1">
@@ -302,11 +302,30 @@
           }
         })
       },
-      confirmOrder(id, num) {
-        this.showPopup.configm = true;
+      confirmOrder(item) {
+        if (item.skip_confirm === 1) {
+          this.showPopup.configm = false;
+          let data = {
+            "logisticsProductId": item.logistics_product_id,
+            "brandId": item.brandID,
+            "colorCode": item.colorCode
+          };
+
+          confirmCheckOrder(data).then(res => {
+            if (res.data.status === 1) {
+              this.showPopup.configm = false;
+              this.showPopup.sucessorder = true;
+              this.updateStatus(item.logistics_product_id);
+            } 
+          });
+          
+        } else {
+          this.showPopup.configm = true;
+        }
+        
         this.showShade = true;
-        this.logisticsProductId = id;
-        this.orderLineNum = num;
+        this.logisticsProductId = item.logistics_product_id;
+        this.orderLineNum = item.order_line_num;
       },
       updateOrder() {
 
