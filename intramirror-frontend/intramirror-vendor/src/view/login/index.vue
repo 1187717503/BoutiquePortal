@@ -72,10 +72,7 @@
           return false
         } else {
 
-          console.log("==Jain==Before md5:"+this.loginForm.password);
           this.loginForm.password = md5(this.loginForm.password);
-          console.log("==Jain==end md5:"+this.loginForm.password);
-
           this.isLoading = true;
           this.$store.dispatch('login', this.loginForm).then(res => {
             if (res.data.status === 1) {
