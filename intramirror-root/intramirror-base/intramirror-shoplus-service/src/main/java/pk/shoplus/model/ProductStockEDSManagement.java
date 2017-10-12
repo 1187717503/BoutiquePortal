@@ -78,7 +78,7 @@ public class ProductStockEDSManagement {
                     if(StringUtils.isBlank(stockOptions.getType()) || !stockOptions.getType().equals(Contants.EVENTS_TYPE_1+"")) {
                         skuStore.reserved = reserved;
                     }
-                    skuStore.setLast_check(stockOptions.getLast_check());
+                    skuStore.last_check = new Date();
                     logger.info("ProductStockEDSManagementUpdateStock,updateSkuStore,skuStore:" + new Gson().toJson(skuStore));
                     skuStoreService.updateSkuStore(skuStore);
                 } else {

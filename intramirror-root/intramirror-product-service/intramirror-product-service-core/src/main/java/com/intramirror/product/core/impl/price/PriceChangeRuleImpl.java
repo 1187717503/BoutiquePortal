@@ -134,11 +134,11 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         return 0;*/
 
         // update by dingyifan 2017-10-11
-        logger.info("PriceChangeRuleImplUpdatePriceByVendor,updateSkuPriceByVendor,start,paramsList:"+ JSONObject.toJSONString(paramsList)+",size:"+paramsList==null?0:paramsList.size());
+        logger.info("PriceChangeRuleImplUpdatePriceByVendor,updateSkuPriceByVendor,start,paramsList:"+ JSONObject.toJSONString(paramsList));
         if(paramsList != null && paramsList.size() > 0){
             priceChangeRuleMapper.updateSkuPriceByVendor(paramsList);
         }
-        logger.info("PriceChangeRuleImplUpdatePriceByVendor,updateSkuPriceByVendor,end,paramsList:"+JSONObject.toJSONString(paramsList)+",size:"+paramsList==null?0:paramsList.size());
+        logger.info("PriceChangeRuleImplUpdatePriceByVendor,updateSkuPriceByVendor,end,paramsList:"+JSONObject.toJSONString(paramsList));
         // update by dingyifan 2017-10-11
         return 0;
     }
@@ -157,11 +157,11 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         return 0;*/
 
         // update by dingyifan 2017-10-11
-        logger.info("PriceChangeRuleImplUpdatePriceByAdmin,updateSkuPriceByAdmin,start,paramsList:"+JSONObject.toJSONString(paramsList)+",size:"+paramsList==null?0:paramsList.size());
+        logger.info("PriceChangeRuleImplUpdatePriceByAdmin,updateSkuPriceByAdmin,start,paramsList:"+JSONObject.toJSONString(paramsList));
         if(paramsList != null && paramsList.size() > 0) {
             priceChangeRuleMapper.updateSkuPriceByAdmin(paramsList);
         }
-        logger.info("PriceChangeRuleImplUpdatePriceByAdmin,updateSkuPriceByAdmin,end,paramsList:"+JSONObject.toJSONString(paramsList)+",size:"+paramsList==null?0:paramsList.size());
+        logger.info("PriceChangeRuleImplUpdatePriceByAdmin,updateSkuPriceByAdmin,end,paramsList:"+JSONObject.toJSONString(paramsList));
         // update by dingyifan 2017-10-11
         return 0;
     }
