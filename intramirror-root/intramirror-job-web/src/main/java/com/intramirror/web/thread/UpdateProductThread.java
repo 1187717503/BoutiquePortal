@@ -182,7 +182,7 @@ public class UpdateProductThread implements Runnable{
             // insert api_error_processing
             String insertApiErrorProcessingSQL = "insert into api_error_processing" +
                     "(api_mq_id,api_error_type_id,error_id,boutique_id,sku_size,brand_id,color_code,data_field,boutique_data,create_time,no_process,enabled,vendor_api_id)\n" +
-                    "values('0','"+api_error_type_id+"','"+fileName+"','"+product_code+"','"+sku_size+"','"+brand_id+"','"+color_code+"','"+key+"','"+value+"',now(),1,1,'"+vendor_api_id+"')";
+                    "values('0','"+api_error_type_id+"','"+fileName+"','"+product_code+"','"+sku_size+"','"+brand_id+"','"+color_code+"','"+key+"','"+pk.shoplus.util.StringUtils.escapeStr(value)+"',now(),1,1,'"+vendor_api_id+"')";
 
             logger.info("UpdateProductThreadSaveErrorMsg,insertApiErrorProcessing,insertApiErrorProcessingSQL:"+insertApiErrorProcessingSQL);
             categoryService.updateBySQL(insertApiErrorProcessingSQL);
