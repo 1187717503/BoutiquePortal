@@ -1338,7 +1338,7 @@ public class ProductEDSManagement {
 		return new VendorOptions();
 	}
 	
-	public class ProductOptions{
+	public static class ProductOptions{
 		public String name = ""; 
 		
 		public String code = "";
@@ -1660,9 +1660,12 @@ public class ProductEDSManagement {
         public void setImgByFilippo(String imgByFilippo) {
             this.imgByFilippo = imgByFilippo;
         }
+
+        public ProductOptions() {
+        }
     }
 	
-	public class SkuOptions{
+	public static class SkuOptions{
 		
 		public String size;
 		
@@ -1704,10 +1707,11 @@ public class ProductEDSManagement {
             this.sizeid = sizeid;
         }
 
-
+        public SkuOptions() {
+        }
     }
 
-	public class VendorOptions{
+	public static class VendorOptions{
 
 		public Long vendorId;
 
@@ -1719,5 +1723,11 @@ public class ProductEDSManagement {
 			this.vendorId = vendorId;
 		}
 
-	}
+        public VendorOptions(Long vendorId) {
+            this.vendorId = vendorId;
+        }
+
+        public VendorOptions() {
+        }
+    }
 }
