@@ -32,6 +32,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.text.MessageFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1024,9 +1025,9 @@ public class OrderController extends BaseController {
                 message.errorStatus().putMsg("info", "comments cannot be null");
                 return message;
             }
-            if (map.get("reason") == null || StringUtils.isBlank(map.get("reason").toString())) {
-                logger.info("reason cannot be null");
-                message.errorStatus().putMsg("info", "reason cannot be null");
+            if (map.get("order_exception_type_id") == null || StringUtils.isBlank(map.get("order_exception_type_id").toString())) {
+                logger.info("order_exception_type_id cannot be null");
+                message.errorStatus().putMsg("order_exception_type_id", "reason cannot be null");
                 return message;
             }
             User user = this.getUser(httpRequest);
@@ -1036,6 +1037,10 @@ public class OrderController extends BaseController {
                 return message;
             }
             map.put("created_by_user_id", user.getUserId());
+            map.put("status", 1);
+            Date currentDate = Helper.getCurrentTimeToUTCWithDate();
+            map.put("created_at", currentDate);
+
             System.out.println(user.getEmail());
             int result = orderExceptionService.saveOrderComments(map);
             if (result == 1) {
