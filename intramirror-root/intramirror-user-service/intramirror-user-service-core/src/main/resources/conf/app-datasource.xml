@@ -37,12 +37,12 @@
   	</bean>
 
 	<beans profile="test">
-		<context:property-placeholder location="classpath:/test/databases.properties"/>
+		<context:property-placeholder location="classpath:/test/databases.properties" ignore-unresolvable="true" />
 	</beans>
 	<beans profile="staging">
-		<context:property-placeholder location="classpath:/staging/databases.properties"/>
+		<context:property-placeholder location="classpath:/staging/databases.properties" ignore-unresolvable="true" />
 	</beans>
 	<beans profile="prd">
-		<context:property-placeholder location="classpath:/prd/databases.properties"/>
+		<context:property-placeholder location="classpath:/prd/databases.properties" ignore-unresolvable="true" />
 	</beans>
 </beans>

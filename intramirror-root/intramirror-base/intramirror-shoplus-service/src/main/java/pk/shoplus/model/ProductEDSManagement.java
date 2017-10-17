@@ -1390,41 +1390,41 @@ public class ProductEDSManagement {
         public Date last_check;
 
         public String getCategory_name() {
-            return category_name;
+            return StringUtils.trim(category_name);
         }
 
         public String modifyPrice = "0";
 
         public String getModifyPrice() {
-            return modifyPrice;
+            return StringUtils.trim(modifyPrice);
         }
 
         public void setModifyPrice(String modifyPrice) {
-            this.modifyPrice = modifyPrice;
+            this.modifyPrice = StringUtils.trim(modifyPrice);
         }
 
         public ProductOptions setCategory_name(String category_name) {
-            this.category_name = category_name;
+            this.category_name = StringUtils.trim(category_name);
             return this;
         }
 
         public String getFullUpdateProductFlag() {
-            return fullUpdateProductFlag;
+            return StringUtils.trim(fullUpdateProductFlag);
         }
 
         public ProductOptions setFullUpdateProductFlag(String fullUpdateProductFlag) {
-            this.fullUpdateProductFlag = fullUpdateProductFlag;
+            this.fullUpdateProductFlag = StringUtils.trim(fullUpdateProductFlag);
             return this;
         }
 
         public List<SkuOptions> skus = new ArrayList<>();
 		
 		public String getName() {
-			return name;
+			return StringUtils.trim(name);
 		}
 
 		public ProductOptions setName(String name) {
-			this.name = name;
+			this.name = StringUtils.trim(name);
 			return this;
 		}
 
@@ -1433,7 +1433,7 @@ public class ProductEDSManagement {
 		}
 
 		public ProductOptions setCode(String code) {
-			this.code = code;
+			this.code = StringUtils.trim(code);
 			return this;
 		}
 
@@ -1442,52 +1442,52 @@ public class ProductEDSManagement {
 		}
 
 		public ProductOptions setBrandCode(String brandCode) {
-			this.brandCode = brandCode;
+			this.brandCode = StringUtils.trim(brandCode);
 			return this;
 		}
 
 		public String getSeasonCode() {
-			return seasonCode;
+			return StringUtils.trim(seasonCode);
 		}
 
 		public ProductOptions setSeasonCode(String seasonCode) {
-			this.seasonCode = seasonCode;
+			this.seasonCode = StringUtils.trim(seasonCode);
 			return this;
 		}
 
 		public String getCarryOver() {
-			return carryOver;
+			return StringUtils.trim(carryOver);
 		}
 
 		public ProductOptions setCarryOver(String carryOver) {
-			this.carryOver = carryOver;
+			this.carryOver = StringUtils.trim(carryOver);
 			return this;
 		}
 
 		public String getBrandName() {
-			return brandName;
+			return StringUtils.trim(brandName);
 		}
 
 		public ProductOptions setBrandName(String brandName) {
-			this.brandName = brandName;
+			this.brandName = StringUtils.trim(brandName);
 			return this;
 		}
 
 		public String getColorCode() {
-			return colorCode;
+			return StringUtils.trim(colorCode);
 		}
 
 		public ProductOptions setColorCode(String colorCode) {
-			this.colorCode = colorCode;
+			this.colorCode = StringUtils.trim(colorCode);
 			return this;
 		}
 
 		public String getColorDesc() {
-			return colorDesc;
+			return StringUtils.trim(colorDesc);
 		}
 
 		public ProductOptions setColorDesc(String colorDesc) {
-			this.colorDesc = colorDesc;
+			this.colorDesc = StringUtils.trim(colorDesc);
 			return this;
 		}
 
@@ -1496,106 +1496,106 @@ public class ProductEDSManagement {
 		}
 
 		public ProductOptions setCategoryId(String categoryId) {
-			this.categoryId = categoryId;
+			this.categoryId = StringUtils.trim(categoryId);
 			return this;
 		}
 
 		public String getDesc() {
-			return desc;
+			return StringUtils.trim(desc);
 		}
 
 		public ProductOptions setDesc(String desc) {
-			this.desc = desc;
+			this.desc = StringUtils.trim(desc);
 			return this;
 		}
 
 		public String getComposition() {
-			return composition;
+			return StringUtils.trim(composition);
 		}
 
 		public ProductOptions setComposition(String composition) {
-			this.composition = composition;
+			this.composition = StringUtils.trim(composition);
 			return this;
 		}
 
 		public String getMadeIn() {
-			return madeIn;
+			return StringUtils.trim(madeIn);
 		}
 
 		public ProductOptions setMadeIn(String madeIn) {
-			this.madeIn = madeIn;
+			this.madeIn = StringUtils.trim(madeIn);
 			return this;
 		}
 
 		public String getSizeFit() {
-			return sizeFit;
+			return StringUtils.trim(sizeFit);
 		}
 
 		public ProductOptions setSizeFit(String sizeFit) {
-			this.sizeFit = sizeFit;
+			this.sizeFit = StringUtils.trim(sizeFit);
 			return this;
 		}
 
 		public String getCoverImg() {
-			return coverImg;
+			return StringUtils.trim(coverImg);
 		}
 
 		public ProductOptions setCoverImg(String coverImg) {
-			this.coverImg = coverImg;
+			this.coverImg = StringUtils.trim(coverImg);
 			return this;
 		}
 
 		public String getDescImg() {
-			return descImg;
+			return StringUtils.trim(descImg);
 		}
 
 		public ProductOptions setDescImg(String descImg) {
-			this.descImg = descImg;
+			this.descImg = StringUtils.trim(descImg);
 			return this;
 		}
 
 		public String getWeight() {
-			return weight;
+			return StringUtils.trim(weight);
 		}
 
 		public ProductOptions setWeight(String weight) {
-			this.weight = weight;
+			this.weight = StringUtils.trim(weight);
 			return this;
 		}
 
 		public String getLength() {
-			return length;
+			return StringUtils.trim(length);
 		}
 
 		public ProductOptions setLength(String length) {
-			this.length = length;
+			this.length = StringUtils.trim(length);
 			return this;
 		}
 
 		public String getWidth() {
-			return width;
+			return StringUtils.trim(width);
 		}
 
 		public ProductOptions setWidth(String width) {
-			this.width = width;
+			this.width = StringUtils.trim(width);
 			return this;
 		}
 
 		public String getHeigit() {
-			return heigit;
+			return StringUtils.trim(heigit);
 		}
 
 		public ProductOptions setHeigit(String heigit) {
-			this.heigit = heigit;
+			this.heigit = StringUtils.trim(heigit);
 			return this;
 		}
 
 		public String getRetailPrice() {
-			return retailPrice;
+			return StringUtils.trim(retailPrice);
 		}
 
 		public ProductOptions setRetailPrice(String retailPrice) {
-			this.retailPrice = retailPrice;
+			this.retailPrice = StringUtils.trim(retailPrice);
 			return this;
 		}
 
@@ -1604,7 +1604,7 @@ public class ProductEDSManagement {
 		}
 
 		public ProductOptions setSalePrice(String salePrice) {
-			this.salePrice = salePrice;
+			this.salePrice = StringUtils.trim(salePrice);
 			return this;
 		}
 
@@ -1654,11 +1654,11 @@ public class ProductEDSManagement {
         }
 
         public String getImgByFilippo() {
-            return imgByFilippo;
+            return StringUtils.trim(imgByFilippo);
         }
 
         public void setImgByFilippo(String imgByFilippo) {
-            this.imgByFilippo = imgByFilippo;
+            this.imgByFilippo = StringUtils.trim(imgByFilippo);
         }
 
         public ProductOptions() {
@@ -1676,35 +1676,35 @@ public class ProductEDSManagement {
 		public String sizeid; // filippo
 
 		public String getSize() {
-			return size;
+			return StringUtils.trim(size);
 		}
 
 		public void setSize(String size) {
-			this.size = size;
+			this.size = StringUtils.trim(size);
 		}
 
 		public String getStock() {
-			return stock;
+			return StringUtils.trim(stock);
 		}
 
 		public void setStock(String stock) {
-			this.stock = stock;
+			this.stock = StringUtils.trim(stock);
 		}
 
 		public String getBarcodes() {
-			return barcodes;
+			return StringUtils.trim(barcodes);
 		}
 
 		public void setBarcodes(String barcodes) {
-			this.barcodes = barcodes;
+			this.barcodes = StringUtils.trim(barcodes);
 		}
 
         public String getSizeid() {
-            return sizeid;
+            return StringUtils.trim(sizeid);
         }
 
         public void setSizeid(String sizeid) {
-            this.sizeid = sizeid;
+            this.sizeid = StringUtils.trim(sizeid);
         }
 
         public SkuOptions() {
