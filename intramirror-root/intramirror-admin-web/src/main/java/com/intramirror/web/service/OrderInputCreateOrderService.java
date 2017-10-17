@@ -83,8 +83,6 @@ public class OrderInputCreateOrderService {
 	@Autowired
 	private PaymentOfflineService paymentOfflineService;
 
-	@Autowired
-	private CommonProperties commonProperties;
 
 	/**
 	 * @param user
@@ -335,22 +333,23 @@ public class OrderInputCreateOrderService {
 			 * start---------------------------------------
 			 **/
 			if (sendEmailList != null && sendEmailList.size() > 0) {
-				for (LogisticsProduct logisticsProduct : sendEmailList) {
-					/*logger.info("调用接口同步订单,入参  LogisticsProduct:" + new Gson().toJson(logisticsProduct));
+				/*for (LogisticsProduct logisticsProduct : sendEmailList) {
+					*//*logger.info("调用接口同步订单,入参  LogisticsProduct:" + new Gson().toJson(logisticsProduct));
 					SystemCallFactory systemCallFactory = new SystemCallFactory();
 					systemCallFactory.createOrder(logisticsProduct.getVendor_id(),
-							logisticsProduct.getLogistics_product_id());*/
+							logisticsProduct.getLogistics_product_id());*//*
 
-					/** start update by dingyifan 20171017 */
+					*//** start update by dingyifan 20171017 *//*
 					GetPostRequestService getPostRequestService = new GetPostRequestService();
 					String url = commonProperties.getAppOrderUrl()+"?logisticProductId="+logisticsProduct.getLogistics_product_id();
 					logger.info("OrderInputCreateOrderServiceOrderInputCreateOrder,start,requestMethod,url:"+url);
 					String response = getPostRequestService.requestMethod(GetPostRequestService.HTTP_POST,url,null);
 					logger.info("OrderInputCreateOrderServiceOrderInputCreateOrder,end,requestMethod,url:"+url+",response:"+response);
 
-					/** end update by dingyifan 20171017 */
+					*//** end update by dingyifan 20171017 *//*
 
-				}
+				}*/
+				results.put("sendEmailList",sendEmailList);
 			}
 			/**
 			 * -----------------------------同步订单
@@ -360,7 +359,6 @@ public class OrderInputCreateOrderService {
 
 
 		}
-
 		results.put("status", StatusType.SUCCESS);
 		return results;
 	}
