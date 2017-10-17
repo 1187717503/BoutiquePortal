@@ -53,8 +53,10 @@
             <mvc:mapping path="/*/*.htm" />   
             <bean class="com.intramirror.web.interceptor.LoginInterceptor"/>  
         </mvc:interceptor>  
-    </mvc:interceptors> --> 
-    
+    </mvc:interceptors> -->
+	<context:property-placeholder location="classpath:/commons.properties"/>
+
+
 	<!-- 配置转义符 -->
 	<bean id="fmXmlEscape" class="freemarker.template.utility.XmlEscape" />
 	
@@ -65,9 +67,9 @@
 		<property name="freemarkerVariables">
 			<map>
 				<entry key="xml_escape" value-ref="fmXmlEscape" />
-				<!--<entry key="css_suffix" value="${css_suffix}"/>
+				<entry key="css_suffix" value="${css_suffix}"/>
 				<entry key="js_suffix" value="${js_suffix}"/>
-				<entry key="baseUrl" value="${baseUrl}"/>-->
+				<entry key="baseUrl" value="${baseUrl}"/>
 				<entry key="jscssdate_format" value="yymmdd"></entry>
 			</map>
 		</property>
