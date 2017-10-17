@@ -64,6 +64,18 @@
 	<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
 	</context:component-scan>
 
-	<!-- 初始化基础配置 -->
-	<util:properties id="commons" location="classpath:/commons.properties" />
+    <bean name="orderProperties" class="com.intramirror.web.common.CommonProperties">
+        <property name="appOrderUrl" value="${app.order.url}"></property>
+    </bean>
+    <beans profile="test">
+        <context:property-placeholder location="classpath:test/common.properties" ignore-unresolvable="true" />
+    </beans>
+
+    <beans profile="staging">
+        <context:property-placeholder location="classpath:staging/common.properties" ignore-unresolvable="true" />
+    </beans>
+
+    <beans profile="prd">
+        <context:property-placeholder location="classpath:prd/common.properties" ignore-unresolvable="true" />
+    </beans>
 </beans>

@@ -58,9 +58,6 @@
 	<!-- 配置转义符 -->
 	<bean id="fmXmlEscape" class="freemarker.template.utility.XmlEscape" />
 	
-	<!--引入属性文件 -->
-    <context:property-placeholder location="classpath:/commons.properties"/>
-
 	<bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
 		<description>freemarker config</description>
 		<property name="templateLoaderPath" value="/WEB-INF/views/" />
@@ -68,9 +65,9 @@
 		<property name="freemarkerVariables">
 			<map>
 				<entry key="xml_escape" value-ref="fmXmlEscape" />
-				<entry key="css_suffix" value="${css_suffix}"/>
+				<!--<entry key="css_suffix" value="${css_suffix}"/>
 				<entry key="js_suffix" value="${js_suffix}"/>
-				<entry key="baseUrl" value="${baseUrl}"/>
+				<entry key="baseUrl" value="${baseUrl}"/>-->
 				<entry key="jscssdate_format" value="yymmdd"></entry>
 			</map>
 		</property>
