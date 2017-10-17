@@ -213,7 +213,7 @@
         showShade: false,//遮罩是否显示
         selectReason: [],
         cancelDataText: {
-          type: 0,
+          type: 1,
           text: ''
         },
         showPopup: {//弹出框是否显示
@@ -249,9 +249,6 @@
     },
     mounted() {
       this.loadList();
-      $('#cancelType').change((e) => {
-        this.cancelDataText.type = e.target.value;
-      });
       this.loadReason()
     },
     methods: {
@@ -376,6 +373,9 @@
         };
         setTimeout(() => {
           $('select').material_select();//初始化select
+          $('#cancelType').change((e) => {
+              this.cancelDataText.type = e.target.value;
+          });
         }, 0);
       },
       exceptionAlert(a, b, c, d, e, f, g, h) {
@@ -401,10 +401,11 @@
           };
           return false
         }
+
         let data = {
           logistics_product_id: this.cancelData.pid,
           comments: this.cancelDataText.text,
-          reason: this.cancelDataText.type,
+          order_exception_type_id: this.cancelDataText.type,
         };
         saveUserComment(data).then(res => {
           if (res.data.status === 1) {
