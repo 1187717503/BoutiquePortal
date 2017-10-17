@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.intramirror.web.common.CommonProperties;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,7 @@ import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.service.VendorService;
 import com.intramirror.web.common.OrderMail;
 import com.intramirror.web.controller.buyersys.SystemCallFactory;
+import pk.shoplus.service.request.impl.GetPostRequestService;
 
 @Service
 public class OrderInputCreateOrderService {
@@ -81,8 +83,8 @@ public class OrderInputCreateOrderService {
 	@Autowired
 	private PaymentOfflineService paymentOfflineService;
 
+
 	/**
-	 * @param paramMap
 	 * @param user
 	 * @return
 	 * @throws Exception
@@ -331,20 +333,32 @@ public class OrderInputCreateOrderService {
 			 * start---------------------------------------
 			 **/
 			if (sendEmailList != null && sendEmailList.size() > 0) {
-				for (LogisticsProduct logisticsProduct : sendEmailList) {
-					logger.info("调用接口同步订单,入参  LogisticsProduct:" + new Gson().toJson(logisticsProduct));
+				/*for (LogisticsProduct logisticsProduct : sendEmailList) {
+					*//*logger.info("调用接口同步订单,入参  LogisticsProduct:" + new Gson().toJson(logisticsProduct));
 					SystemCallFactory systemCallFactory = new SystemCallFactory();
 					systemCallFactory.createOrder(logisticsProduct.getVendor_id(),
-							logisticsProduct.getLogistics_product_id());
-				}
+							logisticsProduct.getLogistics_product_id());*//*
+
+					*//** start update by dingyifan 20171017 *//*
+					GetPostRequestService getPostRequestService = new GetPostRequestService();
+					String url = commonProperties.getAppOrderUrl()+"?logisticProductId="+logisticsProduct.getLogistics_product_id();
+					logger.info("OrderInputCreateOrderServiceOrderInputCreateOrder,start,requestMethod,url:"+url);
+					String response = getPostRequestService.requestMethod(GetPostRequestService.HTTP_POST,url,null);
+					logger.info("OrderInputCreateOrderServiceOrderInputCreateOrder,end,requestMethod,url:"+url+",response:"+response);
+
+					*//** end update by dingyifan 20171017 *//*
+
+				}*/
+				results.put("sendEmailList",sendEmailList);
 			}
 			/**
 			 * -----------------------------同步订单
 			 * end-----------------------------------------
 			 **/
 
-		}
 
+
+		}
 		results.put("status", StatusType.SUCCESS);
 		return results;
 	}

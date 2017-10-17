@@ -1038,7 +1038,7 @@ public class OrderController extends BaseController {
             }
             map.put("created_by_user_id", user.getUserId());
             map.put("status", 1);
-            Date currentDate = Helper.getCurrentTimeToUTCWithDate();
+            Date currentDate = new Date();
             map.put("created_at", currentDate);
 
             System.out.println(user.getEmail());

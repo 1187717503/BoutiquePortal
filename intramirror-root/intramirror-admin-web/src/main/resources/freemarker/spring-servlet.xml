@@ -53,14 +53,13 @@
             <mvc:mapping path="/*/*.htm" />   
             <bean class="com.intramirror.web.interceptor.LoginInterceptor"/>  
         </mvc:interceptor>  
-    </mvc:interceptors> --> 
-    
+    </mvc:interceptors> -->
+	<context:property-placeholder location="classpath:/commons.properties"/>
+
+
 	<!-- 配置转义符 -->
 	<bean id="fmXmlEscape" class="freemarker.template.utility.XmlEscape" />
 	
-	<!--引入属性文件 -->
-    <context:property-placeholder location="classpath:/commons.properties"/>
-
 	<bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
 		<description>freemarker config</description>
 		<property name="templateLoaderPath" value="/WEB-INF/views/" />

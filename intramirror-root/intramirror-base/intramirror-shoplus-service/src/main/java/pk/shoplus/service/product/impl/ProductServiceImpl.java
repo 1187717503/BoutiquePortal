@@ -473,15 +473,21 @@ public class ProductServiceImpl implements IProductService{
             // 同步shop_product_sku
             synShopProductSku(conn,product.getProduct_id().toString());
 
+            String updateShopProductSalePriceSQL = "update sku,shop_product_sku sps set sps.sale_price = sku.im_price " +
+                    "where sku.enabled = 1 and sps.enabled = 1 and sku.sku_id = sps.sku_id and sku.product_id = " +product.getProduct_id();
+
             // 同步shop_product.min_sale_price,shop_product.max_sale_price
-            String updateShopProductSalePriceSQL = "update `shop_product`  sp,`shop_product_sku`  sps set sp.`max_sale_price` = sps.`sale_price`,sp.`min_sale_price` = sps.`sale_price`\n" +
+            String updateShopProductmSalePriceSQL = "update `shop_product`  sp,`shop_product_sku`  sps set sp.`max_sale_price` = sps.`sale_price`,sp.`min_sale_price` = sps.`sale_price`\n" +
                     "where sp.`enabled`  = 1 and sps.`enabled`  = 1 and sps.`shop_product_id`  = sp.`shop_product_id` and sp.product_id ="+product.getProduct_id();
 
             // 同步product.retail_price
             String updateProductRetailPrice = "update `product`  p,sku set p.`max_retail_price` = sku.`price`,p.`min_retail_price` = sku.`price`  where p.`enabled`  = 1 and sku.`enabled`  = 1 and p.`product_id`  = sku.`product_id` and p.product_id="+product.getProduct_id();
+
             logger.info("ProductServiceImplUpdateProduct,updateShopProductSalePriceSQL:"+updateShopProductSalePriceSQL);
+            logger.info("ProductServiceImplUpdateProduct,updateShopProductmSalePriceSQL:"+updateShopProductmSalePriceSQL);
             logger.info("ProductServiceImplUpdateProduct,updateProductRetailPrice:"+updateProductRetailPrice);
             categoryService.updateBySQL(updateShopProductSalePriceSQL);
+            categoryService.updateBySQL(updateShopProductmSalePriceSQL);
             categoryService.updateBySQL(updateProductRetailPrice);
 
             // last check

@@ -213,7 +213,7 @@
         showShade: false,//遮罩是否显示
         selectReason: [],
         cancelDataText: {
-          type: 0,
+          type: 1,
           text: ''
         },
         showPopup: {//弹出框是否显示
@@ -374,7 +374,7 @@
         setTimeout(() => {
           $('select').material_select();//初始化select
           $('#cancelType').change((e) => {
-            this.cancelDataText.type = e.target.value;
+              this.cancelDataText.type = e.target.value;
           });
         }, 0);
       },
@@ -401,6 +401,7 @@
           };
           return false
         }
+
         let data = {
           logistics_product_id: this.cancelData.pid,
           comments: this.cancelDataText.text,
