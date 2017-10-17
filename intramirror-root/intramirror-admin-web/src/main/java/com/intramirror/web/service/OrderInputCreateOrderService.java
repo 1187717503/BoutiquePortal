@@ -343,7 +343,7 @@ public class OrderInputCreateOrderService {
 
 					/** start update by dingyifan 20171017 */
 					GetPostRequestService getPostRequestService = new GetPostRequestService();
-					String url = commonProperties.getAppOrderUrl()+"?"+logisticsProduct.getLogistics_product_id();
+					String url = commonProperties.getAppOrderUrl()+"?logisticProductId="+logisticsProduct.getLogistics_product_id();
 					logger.info("OrderInputCreateOrderServiceOrderInputCreateOrder,start,requestMethod,url:"+url);
 					String response = getPostRequestService.requestMethod(GetPostRequestService.HTTP_POST,url,null);
 					logger.info("OrderInputCreateOrderServiceOrderInputCreateOrder,end,requestMethod,url:"+url+",response:"+response);
