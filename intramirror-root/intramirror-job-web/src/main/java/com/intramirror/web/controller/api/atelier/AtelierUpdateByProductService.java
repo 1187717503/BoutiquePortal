@@ -123,6 +123,10 @@ public class AtelierUpdateByProductService implements InitializingBean {
         return mapUtils.getMap();
     }
 
+    public Map<String, Object> getParamsMap() {
+        return paramsMap;
+    }
+
     @Override
     public void afterPropertiesSet() throws Exception {
         paramsMap = new HashMap<>();
