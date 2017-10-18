@@ -173,25 +173,30 @@ public class ProductServiceImpl implements IProductService{
                 product.brand_id = brand.brand_id;
             }
 
-            // update brand_id,season_code,carry_over,color_code,color_description,composition,made_in,size_fit
-            this.updateProductPropertyByBrandIDColorCode(conn,product.getProduct_id(),ProductPropertyEnumKeyName.BrandID.getCode(),productOptions.getBrandCode(),warningMaps,mapUtils);
-            this.updateProductPropertyByBrandIDColorCode(conn,product.getProduct_id(),ProductPropertyEnumKeyName.ColorCode.getCode(),productOptions.getColorCode(),warningMaps,mapUtils);
+            if(productOptions.getModifyPrice().equals("1")){
+                logger.info("ProductServiceImplUpdateProduct,updateBrandID,andColorCode,ProductOptions:"+JSONObject.toJSONString(productOptions));
+                this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.BrandID.getCode(),productOptions.getBrandCode());
+                this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.ColorCode.getCode(),productOptions.getColorCode());
+            } else {
+                this.updateProductPropertyByBrandIDColorCode(conn,product.getProduct_id(),ProductPropertyEnumKeyName.BrandID.getCode(),productOptions.getBrandCode(),warningMaps,mapUtils);
+                this.updateProductPropertyByBrandIDColorCode(conn,product.getProduct_id(),ProductPropertyEnumKeyName.ColorCode.getCode(),productOptions.getColorCode(),warningMaps,mapUtils);
+            }
 
             /** BrandID,ColorCode值与原来不一致 下架商品 warning */
             this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.CarryOver.getCode(),productOptions.getCarryOver());
-            this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.ColorCode.getCode(),productOptions.getColorCode());
-            this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.ColorDescription.getCode(),productOptions.getColorDesc());
-            this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.MadeIn.getCode(),productOptions.getMadeIn());
-            this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.SizeFit.getCode(),productOptions.getSizeFit());
-            this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.Composition.getCode(),productOptions.getComposition());
+//            this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.ColorCode.getCode(),productOptions.getColorCode());
+//            this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.ColorDescription.getCode(),productOptions.getColorDesc());
+//            this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.MadeIn.getCode(),productOptions.getMadeIn());
+//            this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.SizeFit.getCode(),productOptions.getSizeFit());
+//            this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.Composition.getCode(),productOptions.getComposition());
 
-            if(StringUtils.isNotBlank(productOptions.getName())) {
+            /*if(StringUtils.isNotBlank(productOptions.getName())) {
                 product.name = productOptions.getName();
-            }
+            }*/
 
-            if(StringUtils.isNotBlank(productOptions.getDesc())) {
+            /*if(StringUtils.isNotBlank(productOptions.getDesc())) {
                 product.description = productOptions.getDesc();
-            }
+            }*/
 
             ApiLogBatchService apiLogBatchService = new ApiLogBatchService(conn);
             String images = apiLogBatchService.selApiLogBatch(productOptions.getCode());
@@ -897,7 +902,7 @@ public class ProductServiceImpl implements IProductService{
                             .putData("value",value);
                     maps.add(mapUtils.getMap());
                     logger.info("warning_ColorCode_changeProductProperty,value:"+value+",list:"+new Gson().toJson(list));
-                    shopProductService.changeShopProductStopByProduct(productId.toString());
+//                    shopProductService.changeShopProductStopByProduct(productId.toString());
                 } else if(keyName.equals(ProductPropertyEnumKeyName.BrandID.getCode())) {
                     mapUtils = new MapUtils(new HashMap<>());
                     mapUtils.putData("status",StatusType.WARNING)
@@ -907,7 +912,7 @@ public class ProductServiceImpl implements IProductService{
                             .putData("value",value);
                     maps.add(mapUtils.getMap());
                     logger.info("warning_BrandID_changeProductProperty,value:"+value+",list:"+new Gson().toJson(list));
-                    shopProductService.changeShopProductStopByProduct(productId.toString());
+//                    shopProductService.changeShopProductStopByProduct(productId.toString());
                 }
             }
         }
