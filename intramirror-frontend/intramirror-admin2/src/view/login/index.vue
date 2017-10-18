@@ -45,6 +45,8 @@
 
 <script>
   import loading from '../component/loading.vue'
+  import md5 from 'js-md5'
+
   export default {
     data(){
       return {
@@ -73,6 +75,7 @@
           return false
         } else {
           this.isLoading = true;
+          this.loginForm.password = md5(this.loginForm.password);
           this.$store.dispatch('login', this.loginForm).then(res => {
             if (res.data.status === 1) {
               window.location.href = '/admin/default';
