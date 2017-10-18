@@ -2,7 +2,7 @@
   "name": "AdminPricingRule",
   "version": "1.0.0",
   "description": "A Vue.js project",
-  "author": "Well <1350612656@qq.com>",
+  "author": "Arthur <arthur.chen@intramirror.com>",
   "private": true,
   "scripts": {
     "dev": "cross-env WEB_ENV=loca node build/dev-server.js",
