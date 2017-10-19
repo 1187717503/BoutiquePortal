@@ -210,14 +210,14 @@ public class AiDucaProductController implements InitializingBean{
 		try {
 
 			// 获取基础配置
-			Map<String,Object> baseMap = (Map<String, Object>) paramsMap.get("name");
+			Map<String,Object> baseMap = (Map<String, Object>) paramsMap.get(name);
 			logger.info("AlducaProductControllerSyn_stock,getMap,baseMap:"+JSONObject.toJSONString(baseMap));
 
 			// 获取基础配置中数据
 			String url = baseMap.get("url").toString();
 			Long vendor_id = Long.parseLong(baseMap.get("vendor_id").toString());
-			int thread_num = Integer.parseInt(baseMap.get("thread_num").toString());
-			String event_name = baseMap.get("event_name").toString();
+			int thread_num = Integer.parseInt(baseMap.get("threadNum").toString());
+			String event_name = baseMap.get("eventName").toString();
 			ApiDataFileUtils apiDataFileUtils = (ApiDataFileUtils) baseMap.get("fileUtils");
 			ThreadPoolExecutor executor = (ThreadPoolExecutor) baseMap.get("aiducaStockExecutor");
 
@@ -229,14 +229,22 @@ public class AiDucaProductController implements InitializingBean{
 			apiDataFileUtils.bakPendingFile(RandomUtils.getDateRandom(),responseBody);
 
 			// 转换格式
-			List<Map<String, Object>> stockObjList = new ArrayList<>();
-			stockObjList = (List<Map<String, Object>>) JSONObject.parse(responseBody);
+			List<Map<String, Object>> stockObjList = (List<Map<String, Object>>) JSONObject.parse(responseBody);
 			logger.info("AlducaProductControllerSyn_stock,JsonParse,stockObjList.Size:"+stockObjList.size()+",stockObjList:"+JSONObject.toJSONString(stockObjList));
 
 			// 请求数据
 			String originProductPath = Contants.aiduca_file_path + Contants.aiduca_origin_stock_all + Contants.aiduca_file_type;
 			String revisedProductPath = Contants.aiduca_file_path + Contants.aiduca_revised_stock_all + Contants.aiduca_file_type;
-			if(event_name.contains("all") || !FileUtil.fileExists(originProductPath)) {
+			if(event_name.contains("all")) {
+				this.handleStock(stockObjList,vendor_id,event_name,executor,thread_num,apiDataFileUtils,false);
+
+				logger.info("AiDucaProductControllerSyn_product,zeroClearing,flag:"+stockObjList.size());
+				if(stockObjList.size() > 100 ) {
+					logger.info("AiDucaProductControllerSyn_product,zeroClearing,start,vendor_id:"+vendor_id+",size:"+stockObjList.size());
+					iUpdateStockService.zeroClearing(vendor_id);
+					logger.info("AiDucaProductControllerSyn_product,zeroClearing,end,vendor_id:"+vendor_id+",size:"+stockObjList.size());
+				}
+			} else if(!FileUtil.fileExists(originProductPath)) {
 				FileUtil.createFileByType(Contants.aiduca_file_path,Contants.aiduca_origin_stock_all + Contants.aiduca_file_type,converString(stockObjList));
 			} else {
 				FileUtil.createFileByType(Contants.aiduca_file_path,Contants.aiduca_revised_stock_all+ Contants.aiduca_file_type,converString(stockObjList));
@@ -244,6 +252,8 @@ public class AiDucaProductController implements InitializingBean{
 				List<DiffRow> diffRows = FileUtil.CompareTxtByType(originProductPath,revisedProductPath);
 				logger.info("AlducaProductControllerSyn_stock,CompareTxtByType,diffRowsSize:"+diffRows.size()+",diffRows:"+JSONObject.toJSONString(diffRows));
 
+				List<Map<String,Object>> changeData = new ArrayList<>();
+				List<Map<String,Object>> deleteData = new ArrayList<>();
 				for(DiffRow diffRow : diffRows) {
 					DiffRow.Tag tag = diffRow.getTag();
 					if(tag == DiffRow.Tag.INSERT || tag == DiffRow.Tag.CHANGE) {
@@ -251,12 +261,19 @@ public class AiDucaProductController implements InitializingBean{
 						logger.info("AlducaProductControllerSyn_stock,insertandchange,diffRow:"+JSONObject.toJSONString(diffRow));
 						String stockMapStr = diffRow.getNewLine().replace("<br>","");
 						Map<String,Object> stockMap = JSONObject.parseObject(stockMapStr);
+						changeData.add(stockMap);
+					} else if(tag == DiffRow.Tag.DELETE){
+
+						logger.info("AlducaProductControllerSyn_stock,delete,diffRow:"+JSONObject.toJSONString(diffRow));
+						String stockMapStr = diffRow.getOldLine().replace("<br>","");
+						Map<String,Object> stockMap = JSONObject.parseObject(stockMapStr);
+						deleteData.add(stockMap);
 					}
 				}
+				this.handleStock(changeData,vendor_id,event_name,executor,thread_num,apiDataFileUtils,false);
+				this.handleStock(deleteData,vendor_id,event_name,executor,thread_num,apiDataFileUtils,true);
+				FileUtil.createFileByType(Contants.aiduca_file_path,Contants.aiduca_origin_stock_all + Contants.aiduca_file_type,converString(stockObjList));
 			}
-
-			// 处理数据
-			this.handleStock(stockObjList,vendor_id,event_name,executor,thread_num,apiDataFileUtils);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.info("AlducaProductControllerSyn_stock,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
@@ -264,7 +281,11 @@ public class AiDucaProductController implements InitializingBean{
     	return null;
 	}
 
-	private void handleStock(List<Map<String, Object>> stockObjList, Long vendor_id, String eventName, ThreadPoolExecutor executor, int threadNum, ApiDataFileUtils fileUtils){
+	private void handleStock(List<Map<String, Object>> stockObjList, Long vendor_id, String eventName, ThreadPoolExecutor executor, int threadNum, ApiDataFileUtils fileUtils,boolean stockZero){
+		if(stockObjList == null || stockObjList.size() == 0) {
+			return;
+		}
+
 		for(int i = 0,len=stockObjList.size();i<len;i++) {
 			Map<String,Object> stockObj = stockObjList.get(i);
 
@@ -274,6 +295,7 @@ public class AiDucaProductController implements InitializingBean{
 
 			logger.info("AlducaProductController,start,mapping,mqDataMap:"+JSONObject.toJSONString(mqDataMap)+",i:"+i);
 			StockOption stockOption = aiDucaSynAllStockMapping.mapping(mqDataMap);
+			if(stockZero) {stockOption.setQuantity("0");}
 			logger.info("AlducaProductController,end,mapping,mqDataMap:"+JSONObject.toJSONString(mqDataMap)+",i:"+i+",stockOption:"+JSONObject.toJSONString(stockOption));
 
 			logger.info("AlducaProductControllerSyn_stock,execute,mqDataMap:"+JSONObject.toJSONString(mqDataMap)+",i:"+i+",stockOption:"+JSONObject.toJSONString(stockOption)+",eventName:"+eventName);
