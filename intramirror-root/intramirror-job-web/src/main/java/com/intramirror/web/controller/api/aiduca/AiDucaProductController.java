@@ -2,16 +2,14 @@ package com.intramirror.web.controller.api.aiduca;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.annotation.Resource;
 
 import com.intramirror.product.api.service.stock.IUpdateStockService;
+import com.intramirror.web.util.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
@@ -23,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import pk.shoplus.common.Contants;
+import pk.shoplus.common.utils.FileUtils;
 import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.util.FileUtil;
@@ -193,115 +192,6 @@ public class AiDucaProductController implements InitializingBean{
         return resultMessage;
     }
 
-    @RequestMapping(value = "/syn_stock",method = RequestMethod.GET)
-    @ResponseBody
-    public Map<String,Object> getAllStock(@Param(value = "name")String name){
-    	logger.info("AiDucaProductControllerGetAllStock,inputParams,name:"+name);
-        MapUtils mapUtils = new MapUtils(new HashMap<String, Object>());
-
-        // check name
-        if(StringUtils.isBlank(name)) {
-            return mapUtils.putData("status", StatusType.FAILURE).putData("info","name is null !!!").getMap();
-        }
-    	
-        try {
-
-        	// get initParam
-        	Map<String,Object> param = (Map<String, Object>) paramsMap.get(name);
-            logger.info("AiDucaProductControllerGetAllStock,initParam,param:"+JSONObject.toJSONString(param));
-			ThreadPoolExecutor aiducaExecutor = (ThreadPoolExecutor) param.get("aiducaStockExecutor");
-			String eventName = param.get("eventName").toString();
-			ApiDataFileUtils fileUtils = (ApiDataFileUtils) param.get("fileUtils");
-
-			// invoke api
-			GetPostRequestUtil requestGet = new GetPostRequestUtil();
-			String json = requestGet.requestMethodType(GetPostRequestUtil.HTTP_GET,param.get("url").toString(),null);
-			logger.info("AiDucaProductControllerGetAllStock,requestMethodType,json:"+json);
-
-			if(StringUtils.isNotBlank(json)) {
-
-				List<Map<String, Object>> stockList = (List<Map<String, Object>>) JSONObject.parse(json);
-				logger.info("AiDucaProductControllerGetAllStock,convertStringToList,stockListSize:"+stockList.size()+",stockList:"+JSONObject.toJSONString(stockList));
-
-				String originProductPath = Contants.aiduca_file_path + Contants.aiduca_origin_stock_all + Contants.aiduca_file_type;
-				String revisedProductPath = Contants.aiduca_file_path + Contants.aiduca_revised_stock_all + Contants.aiduca_file_type;
-
-				if(!FileUtil.fileExists(originProductPath)) {
-					FileUtil.createFileByType(Contants.aiduca_file_path,Contants.aiduca_origin_stock_all + Contants.aiduca_file_type,converString(stockList));
-					for(Map<String, Object> productInfo :stockList ){
-
-						Map<String,Object> mqDataMap = new HashMap<String,Object>();
-						mqDataMap.put("product", productInfo.toString());
-						mqDataMap.put("store_code", param.get("store_code").toString());
-						mqDataMap.put("vendor_id", param.get("vendor_id").toString());
-
-						logger.info("AiDucaProductControllerGetAllStock,mapping,start,mqDataMap:"+new Gson().toJson(mqDataMap)+",eventName:"+eventName+",param:"+JSONObject.toJSONString(param));
-						StockOption stockOption = aiDucaSynAllStockMapping.mapping(mqDataMap);
-						logger.info("AiDucaProductControllerGetAllStock,mapping,end,mqDataMap:"+new Gson().toJson(mqDataMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName+",param:"+JSONObject.toJSONString(param));
-
-						logger.info("AiDucaProductControllerGetAllStock,execute,start,mqDataMap:"+new Gson().toJson(mqDataMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName+",param:"+JSONObject.toJSONString(param));
-						CommonThreadPool.execute(eventName,aiducaExecutor,Integer.parseInt(param.get("threadNum").toString()),new UpdateStockThread(stockOption,fileUtils,mqDataMap));
-						logger.info("AiDucaProductControllerGetAllStock,execute,end,mqDataMap:"+new Gson().toJson(mqDataMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName+",param:"+JSONObject.toJSONString(param));
-					}
-
-				}else{
-
-					FileUtil.createFileByType(Contants.aiduca_file_path,Contants.aiduca_revised_stock_all+ Contants.aiduca_file_type,converString(stockList));
-
-					List<DiffRow> diffRows = FileUtil.CompareTxtByType(originProductPath,revisedProductPath);
-					logger.info("AiDucaProductControllerGetAllStock,diffRowsSize:"+diffRows.size()+",diffRows:"+JSONObject.toJSONString(diffRows));
-
-					for(DiffRow diffRow : diffRows) {
-						DiffRow.Tag tag = diffRow.getTag();
-						if(tag == DiffRow.Tag.INSERT || tag == DiffRow.Tag.CHANGE) {
-							logger.info("AiDucaProductControllerGetAllStock,change,diffRows:"+JSONObject.toJSONString(diffRow));
-
-							Map<String,Object> mqDataMap = new HashMap<String,Object>();
-							//读取出来会自动带换行符,需要转换
-							mqDataMap.put("product", diffRow.getNewLine().replace("<br>", ""));
-							mqDataMap.put("store_code", param.get("store_code").toString());
-							mqDataMap.put("vendor_id", param.get("vendor_id").toString());
-
-							// 映射数据 封装VO
-							logger.info("AiDucaProductControllerGetAllStock,mapping,start,mqDataMap:"+new Gson().toJson(mqDataMap)+",eventName:"+eventName);
-							StockOption stockOption = aiDucaSynAllStockMapping.mapping(mqDataMap);
-							logger.info("AiDucaProductControllerGetAllStock,mapping,end,mqDataMap:"+new Gson().toJson(mqDataMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName+",param:"+JSONObject.toJSONString(param));
-
-							// 线程池
-							logger.info("AiDucaProductControllerGetAllStock,execute,start,mqDataMap:"+new Gson().toJson(mqDataMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName+",param:"+JSONObject.toJSONString(param));
-							CommonThreadPool.execute(eventName,aiducaExecutor,Integer.parseInt(param.get("threadNum").toString()),new UpdateStockThread(stockOption,fileUtils,mqDataMap));
-							logger.info("AiDucaProductControllerGetAllStock,execute,end,mqDataMap:"+new Gson().toJson(mqDataMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName+",param:"+JSONObject.toJSONString(param));
-
-						}
-					}
-
-					// 4.处理结束后备份origin,并重置origin
-					String originContentAll = FileUtil.readFile(originProductPath);
-					FileUtil.createFileByType(Contants.aiduca_file_path,"bak_"+Contants.aiduca_origin_stock_all + Contants.aiduca_file_type,originContentAll);
-					FileUtil.createFileByType(Contants.aiduca_file_path,"bak_"+Contants.aiduca_revised_stock_all  + Contants.aiduca_file_type,converString(stockList));
-					FileUtil.createFileByType(Contants.aiduca_file_path,Contants.aiduca_origin_stock_all + Contants.aiduca_file_type,converString(stockList));
-				}
-
-
-			}else{
-				logger.info("AiDucaProductControllerGetAllStock,paramIsNull,name:"+name);
-				 mapUtils.putData("status",StatusType.FAILURE).putData("info","job aiDuca getAllStock 请求接口获取的商品对象   返回数据为空    url:"+param.get("url").toString());
-				 return mapUtils.getMap();
-			}
-			mapUtils.putData("status",StatusType.SUCCESS).putData("info","success");
-        } catch (Exception e) {
-            e.printStackTrace();
-			logger.info("AiDucaProductControllerGetAllStock,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
-            mapUtils.putData("status",StatusType.FAILURE).putData("info",ExceptionUtils.getExceptionDetail(e));
-        }
-        return mapUtils.getMap();
-    }
-
-    /**
-     * 转换类型
-     * @param list
-     * @return
-     */
     public String converString(List<Map<String, Object>> list){
     	 StringBuffer stringBuffer = new StringBuffer();
     	 
@@ -312,6 +202,84 @@ public class AiDucaProductController implements InitializingBean{
     	 }
     	return stringBuffer.toString();
     }
+
+	@RequestMapping(value = "/syn_stock",method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String,Object> syn_stock(@Param(value = "name")String name){
+    	logger.info("AlducaProductControllerSyn_stock,inputParams,name:"+name);
+		try {
+
+			// 获取基础配置
+			Map<String,Object> baseMap = (Map<String, Object>) paramsMap.get("name");
+			logger.info("AlducaProductControllerSyn_stock,getMap,baseMap:"+JSONObject.toJSONString(baseMap));
+
+			// 获取基础配置中数据
+			String url = baseMap.get("url").toString();
+			Long vendor_id = Long.parseLong(baseMap.get("vendor_id").toString());
+			int thread_num = Integer.parseInt(baseMap.get("thread_num").toString());
+			String event_name = baseMap.get("event_name").toString();
+			ApiDataFileUtils apiDataFileUtils = (ApiDataFileUtils) baseMap.get("fileUtils");
+			ThreadPoolExecutor executor = (ThreadPoolExecutor) baseMap.get("aiducaStockExecutor");
+
+			// 调用Alduca接口
+			GetPostRequestUtil requestGET = new GetPostRequestUtil();
+			logger.info("AlducaProductControllerSyn_stock,start,requestMethodType,url:"+url);
+			String responseBody = requestGET.requestMethodType(GetPostRequestUtil.HTTP_GET,url,null);
+			logger.info("AlducaProductControllerSyn_stock,end,requestMethodType,url:"+url+",responseBody:"+responseBody);
+			apiDataFileUtils.bakPendingFile(RandomUtils.getDateRandom(),responseBody);
+
+			// 转换格式
+			List<Map<String, Object>> stockObjList = new ArrayList<>();
+			stockObjList = (List<Map<String, Object>>) JSONObject.parse(responseBody);
+			logger.info("AlducaProductControllerSyn_stock,JsonParse,stockObjList.Size:"+stockObjList.size()+",stockObjList:"+JSONObject.toJSONString(stockObjList));
+
+			// 请求数据
+			String originProductPath = Contants.aiduca_file_path + Contants.aiduca_origin_stock_all + Contants.aiduca_file_type;
+			String revisedProductPath = Contants.aiduca_file_path + Contants.aiduca_revised_stock_all + Contants.aiduca_file_type;
+			if(event_name.contains("all") || !FileUtil.fileExists(originProductPath)) {
+				FileUtil.createFileByType(Contants.aiduca_file_path,Contants.aiduca_origin_stock_all + Contants.aiduca_file_type,converString(stockObjList));
+			} else {
+				FileUtil.createFileByType(Contants.aiduca_file_path,Contants.aiduca_revised_stock_all+ Contants.aiduca_file_type,converString(stockObjList));
+
+				List<DiffRow> diffRows = FileUtil.CompareTxtByType(originProductPath,revisedProductPath);
+				logger.info("AlducaProductControllerSyn_stock,CompareTxtByType,diffRowsSize:"+diffRows.size()+",diffRows:"+JSONObject.toJSONString(diffRows));
+
+				for(DiffRow diffRow : diffRows) {
+					DiffRow.Tag tag = diffRow.getTag();
+					if(tag == DiffRow.Tag.INSERT || tag == DiffRow.Tag.CHANGE) {
+
+						logger.info("AlducaProductControllerSyn_stock,insertandchange,diffRow:"+JSONObject.toJSONString(diffRow));
+						String stockMapStr = diffRow.getNewLine().replace("<br>","");
+						Map<String,Object> stockMap = JSONObject.parseObject(stockMapStr);
+					}
+				}
+			}
+
+			// 处理数据
+			this.handleStock(stockObjList,vendor_id,event_name,executor,thread_num,apiDataFileUtils);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.info("AlducaProductControllerSyn_stock,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
+		}
+    	return null;
+	}
+
+	private void handleStock(List<Map<String, Object>> stockObjList, Long vendor_id, String eventName, ThreadPoolExecutor executor, int threadNum, ApiDataFileUtils fileUtils){
+		for(int i = 0,len=stockObjList.size();i<len;i++) {
+			Map<String,Object> stockObj = stockObjList.get(i);
+
+			Map<String,Object> mqDataMap = new HashMap<String,Object>();
+			mqDataMap.put("product", stockObj);
+			mqDataMap.put("vendor_id", vendor_id);
+
+			logger.info("AlducaProductController,start,mapping,mqDataMap:"+JSONObject.toJSONString(mqDataMap)+",i:"+i);
+			StockOption stockOption = aiDucaSynAllStockMapping.mapping(mqDataMap);
+			logger.info("AlducaProductController,end,mapping,mqDataMap:"+JSONObject.toJSONString(mqDataMap)+",i:"+i+",stockOption:"+JSONObject.toJSONString(stockOption));
+
+			logger.info("AlducaProductControllerSyn_stock,execute,mqDataMap:"+JSONObject.toJSONString(mqDataMap)+",i:"+i+",stockOption:"+JSONObject.toJSONString(stockOption)+",eventName:"+eventName);
+			CommonThreadPool.execute(eventName,executor,threadNum,new UpdateStockThread(stockOption,fileUtils,mqDataMap));
+		}
+	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -349,13 +317,26 @@ public class AiDucaProductController implements InitializingBean{
 		alduca_stock_all_update.put("vendorName","Al Duca Daosta");
 		alduca_stock_all_update.put("aiducaStockExecutor",alducaAllStockExecutor);
 		alduca_stock_all_update.put("eventName","alduca_stock_all_update");
-		alduca_stock_all_update.put("datetime",DateUtils.getStrDate(new Date()));
-		alduca_stock_all_update.put("fileUtils",new ApiDataFileUtils("alduca","alduca_stock_all_update"));
+		alduca_stock_all_update.put("fileUtils",new ApiDataFileUtils("alduca","stock_all_update"));
+
+		// alduca_stock_all_update
+		ThreadPoolExecutor alducaDeltaStockExecutor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
+		Map<String,Object> alduca_stock_delta_update = new HashMap<>();
+		alduca_stock_delta_update.put("url","http://rest.alducadaosta.com/api/stock/Stock4sku/all?Username=IntraMirror&Password=%2B%2BInt%3DMir%2B%2B");
+		alduca_stock_delta_update.put("vendor_id","22");
+		alduca_stock_delta_update.put("store_code","AIDUCA");
+		alduca_stock_delta_update.put("threadNum","5");
+		alduca_stock_delta_update.put("vendorName","Al Duca Daosta");
+		alduca_stock_delta_update.put("aiducaStockExecutor",alducaDeltaStockExecutor);
+		alduca_stock_delta_update.put("eventName","alduca_stock_delta_update");
+		alduca_stock_delta_update.put("fileUtils",new ApiDataFileUtils("alduca","stock_delta_update"));
 
         // put data
         paramsMap = new HashMap<>();
 		paramsMap.put("alduca_product_all_update",alduca_product_all_update);
 		paramsMap.put("alduca_product_delta_update",alduca_product_delta_update);
 		paramsMap.put("alduca_stock_all_update",alduca_stock_all_update);
+		paramsMap.put("alduca_stock_delta_update",alduca_stock_delta_update);
+
 	}
 }
