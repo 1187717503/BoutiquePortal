@@ -32,6 +32,12 @@ public class AtelierOrderController {
 
     private static final String atelier_success = "SUCCESS";
 
+    private static final String atelier_confirmed = "confirmed";
+
+    private static final String atelier_cancelled = "cancelled";
+
+    private static final String atelier_shipped = "shipped";
+
     @Resource(name = "atelierUpdateByProductService")
     private AtelierUpdateByProductService atelierUpdateByProductService;
 
@@ -77,6 +83,7 @@ public class AtelierOrderController {
         }
         return result;
     }
+
 
     @RequestMapping("/updateOrderStatus")
     @ResponseBody
