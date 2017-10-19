@@ -1164,14 +1164,14 @@ public class ProductEDSManagement {
             return true;
         }
 
-        String threeCategoryId = columnDataList.get(10);
-        if (StringUtils.isBlank(threeCategoryId)) {
-            result.put("info","create product - "+ ApiErrorTypeEnum.errorType.category_is_null.getDesc()+"category_id:null");
-            result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_find_mapping);
-            result.put("key","category_id");
-            result.put("value",productOptions.getCategory_name());
-            return true;
-        }
+//        String threeCategoryId = columnDataList.get(10);
+//        if (StringUtils.isBlank(threeCategoryId)) {
+//            result.put("info","create product - "+ ApiErrorTypeEnum.errorType.category_is_null.getDesc()+"category_id:null");
+//            result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_find_mapping);
+//            result.put("key","category_id");
+//            result.put("value",productOptions.getCategory_name());
+//            return true;
+//        }
 
         String coverImage = columnDataList.get(15);
         if (StringUtils.isBlank(coverImage)) {
