@@ -13,6 +13,7 @@ import VendorPending from '../view/vendor/pending.vue'
 import ApiError from '../view/error/index.vue'
 
 import CreateOrder from '../view/order/createOrder.vue'
+import ProductMgnt from '../view/merchandise/productMgnt.vue'
 
 import Notfound from '../view/404.vue'
 
@@ -84,6 +85,14 @@ const routes = [
         },
         component: CreateOrder
       },
+      {
+        path: 'merchandise/product',
+        name: 'ProductManagement',
+        meta: {
+          title: 'Merchandise Management - Product Management'
+        },
+        component: ProductMgnt
+      }
 
     ]
   },

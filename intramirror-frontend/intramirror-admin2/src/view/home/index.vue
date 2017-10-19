@@ -43,6 +43,13 @@
             <router-link to="/create/order" active-class="hover">Create Order</router-link>
           </div>
         </div>
+        <div class="item">
+          <i class="mdi mdi-tag"></i>
+          <span>Merchandise Management</span>
+          <div class="tow-nav">
+            <router-link to="/merchandise/product" active-class="hover">Product Management</router-link>
+          </div>
+        </div>
       </div>
     </div>
     <router-view class="main"></router-view>
