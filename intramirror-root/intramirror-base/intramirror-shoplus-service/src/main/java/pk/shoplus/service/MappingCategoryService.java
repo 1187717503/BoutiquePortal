@@ -73,7 +73,7 @@ public class MappingCategoryService {
         logger.info("getMappingCategoryInfoByCondition sql:"+sql);
         List<Map<String,Object>> dataMap = mappingCategoryDao.executeBySql(sql,null);
 
-        if(dataMap != null || dataMap.size() > 0) {
+        if(dataMap != null && dataMap.size() > 0) {
             return dataMap.get(0).get("category_id").toString();
         }
         return null;
