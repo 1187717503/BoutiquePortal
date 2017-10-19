@@ -14,8 +14,7 @@ import javax.annotation.Resource;
 import com.intramirror.product.api.service.stock.IUpdateStockService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -51,7 +50,7 @@ import difflib.DiffRow;
 public class AiDucaProductController implements InitializingBean{
 
 	// logger
-    private static Logger logger = LoggerFactory.getLogger(AiDucaProductController.class);
+    private static Logger logger = Logger.getLogger(AiDucaProductController.class);
 
     // product mapping
 	@Autowired
