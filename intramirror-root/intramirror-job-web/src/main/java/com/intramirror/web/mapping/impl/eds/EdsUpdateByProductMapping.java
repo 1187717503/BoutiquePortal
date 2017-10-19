@@ -48,6 +48,9 @@ public class EdsUpdateByProductMapping implements IProductMapping {
                 if (null != apiCategoryMap && apiCategoryMap.size() > 0) {
                     category_id = apiCategoryMap.get(0).get("category_id").toString();
                 }
+                productOptions.setCategory1(oneCategory);
+                productOptions.setCategory2(twoCategory);
+                productOptions.setCategory3(threeCategory);
                 if(conn != null) {conn.close();}
             } catch (Exception e) {
                 logger.info("EdsUpdateByProductMapping,convertCategory,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+

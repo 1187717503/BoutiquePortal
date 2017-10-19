@@ -86,9 +86,19 @@ public class ProductEDSManagement {
                 return true;
             }
 
+            // start update by dingyifan 20171019
+            MappingCategoryService mappingCategoryService = new MappingCategoryService(conn);
+            logger.info("ProductEDSManagementCreateProduct,start,selectCategory,productOptions:"+JSONObject.toJSONString(productOptions));
+            String cId = mappingCategoryService.getMappingCategoryInfoByCondition(productOptions.getCategory1(),productOptions.getCategory2(),productOptions.getCategory3());
+            logger.info("ProductEDSManagementCreateProduct,end,selectCategory,productOptions:"+JSONObject.toJSONString(productOptions)+",categoryId:"+cId);
+            if(StringUtils.isNotBlank(cId)) {
+                productOptions.setCategoryId(cId);
+            }
+            // end update by dingyifan 20171019
+
             //get category id
             CategoryService categoryService = new CategoryService(conn);
-            String categoryId = columnDataList.get(10).toString();
+            String categoryId = productOptions.getCategoryId();
             if(StringUtils.isBlank(categoryId)) {
                 result.put("info","create product - " + ApiErrorTypeEnum.errorType.category_not_exist.getDesc() + "category_id:"+categoryId );
                 result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_find_mapping);
@@ -1395,6 +1405,10 @@ public class ProductEDSManagement {
 
         public String modifyPrice = "0";
 
+        public String category1;
+        public String category2;
+        public String category3;
+
         public String getModifyPrice() {
             return StringUtils.trim(modifyPrice);
         }
@@ -1554,7 +1568,31 @@ public class ProductEDSManagement {
 			return this;
 		}
 
-		public String getWeight() {
+        public String getCategory1() {
+            return StringUtils.trim(category1);
+        }
+
+        public void setCategory1(String category1) {
+            this.category1 = StringUtils.trim(category1);
+        }
+
+        public String getCategory2() {
+            return StringUtils.trim(category2);
+        }
+
+        public void setCategory2(String category2) {
+            this.category2 = StringUtils.trim(category2);
+        }
+
+        public String getCategory3() {
+            return StringUtils.trim(category3);
+        }
+
+        public void setCategory3(String category3) {
+            this.category3 = StringUtils.trim(category3);
+        }
+
+        public String getWeight() {
 			return StringUtils.trim(weight);
 		}
 

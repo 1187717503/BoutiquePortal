@@ -114,6 +114,9 @@ public class XmagSynProductAllMapper implements IProductMapping {
             categoryMap.put("boutique_second_category", category.toLowerCase());
             categoryMap.put("boutique_third_category", SubCategory);
             categoryMap.put("boutique_first_category", type.toLowerCase());
+			productOptions.setCategory1(type.toLowerCase());
+			productOptions.setCategory2(category.toLowerCase());
+			productOptions.setCategory3(SubCategory);
             logger.info("categoryService param " + new Gson().toJson(categoryMap));
 			productOptions.setCategory_name(JSONObject.toJSONString(categoryMap));
 			List<Map<String, Object>> apiCategoryMap = categoryService.getCategoryByCondition(categoryMap);
