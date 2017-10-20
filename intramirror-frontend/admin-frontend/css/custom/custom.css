@@ -1,0 +1,38 @@
+/*================================================================================
+	Item Name: Materialize - Material Design Admin Template
+	Version: 3.1
+	Author: GeeksLabs
+	Author URL: http://www.themeforest.net/user/geekslabs
+================================================================================
+
+NOTE:
+------
+PLACE HERE YOUR OWN CSS CODES AND IF NEEDED, OVERRIDE THE STYLES FROM THE OTHER STYLESHEETS.
+WE WILL RELEASE FUTURE UPDATES SO IN ORDER TO NOT OVERWRITE YOUR STYLES IT'S BETTER LIKE THIS.  */
+#main {
+	padding-left: 0;
+}
+
+ .btn {
+	background-color: #871b55;
+	box-shadow: 0 0 2px 0 rgba(0,0,0,.12), 0 2px 2px 0 rgba(0,0,0,.24);
+	border-radius: 2px;
+	width: 135.98px;
+	height: 36px;
+}
+
+.input-field input {
+	border-bottom: 2px solid #871b55;
+    margin: 0;
+    box-shadow: none;
+}
+
+.select-wrapper input.select-dropdown {
+	border-bottom: 2px solid #871b55;
+    margin: 0;
+    box-shadow: none;
+}
+
+.input-field input:hover {
+	border-bottom: 2px solid #871b55;
+}
