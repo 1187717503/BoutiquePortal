@@ -214,8 +214,8 @@ export function selectDefaultDiscount() {
     url: 'priceChangeRule/selectDefaultDiscount.htm'
   })
 }
-export function copyRule(vendouid, type) {
+export function copyRule( vendouid, type, discount = 0) {
   return HTTP({
-    url: '/rule/copy/copyRule.htm?vendor_id=' + vendouid + '&price_type=' + type
+    url: '/rule/copy/copyRule.htm?vendor_id=' + vendouid + '&price_type=' + type + '&discount=' + discount
   })
 }

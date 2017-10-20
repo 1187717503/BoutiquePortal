@@ -1050,7 +1050,7 @@
         }
         if (this.pricingRule === 2) {
 
-          copyRule(this.boutiqueVendorid, 3).then(res => {
+          copyRule(this.boutiqueVendorid, 3, this.discount === null ? 0 : this.discount).then(res => {
             if (res.data.status === 1) {
               this.getTablenav(this.boutiqueVendorid)
               this.showCopy = false;
