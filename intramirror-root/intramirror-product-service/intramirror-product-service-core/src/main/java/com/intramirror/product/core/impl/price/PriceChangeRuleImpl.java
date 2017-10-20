@@ -42,6 +42,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
 
     @Override
     public boolean updateVendorPrice() {
+        logger.info("updateVendorPrice start");
         Map<String,Object> paramsMap = new HashMap<>();
         List<Map<String,Object>> paramsList = new ArrayList<>();
         paramsMap.put("price_type", PriceChangeRuleEnum.PriceType.SUPPLY_PRICE.getCode());
@@ -125,9 +126,9 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             for(int i = 0,len = paramsList.size();i<len;i++) {
                 Map<String,Object> executeMap = paramsList.get(i);
 
-                logger.info("updatePriceByVendor,start,updateSkuPriceByVendor,executeMap:"+JSONObject.toJSONString(executeMap)+",i:"+i+","+len);
+                logger.info("updatePriceByVendor,updateSkuPriceByVendor,start,executeMap:"+JSONObject.toJSONString(executeMap)+",i:"+i+","+len);
                 priceChangeRuleMapper.updateSkuPriceByVendor(executeMap);
-                logger.info("updatePriceByVendor,end,updateSkuPriceByVendor,executeMap:"+JSONObject.toJSONString(executeMap)+",i:"+i+","+len);
+                logger.info("updatePriceByVendor,updateSkuPriceByVendor,end,executeMap:"+JSONObject.toJSONString(executeMap)+",i:"+i+","+len);
 
             }
         }
@@ -147,9 +148,9 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             for(int i = 0,len = paramsList.size();i<len;i++) {
 
                 Map<String,Object> executeMap = paramsList.get(i);
-                logger.info("updatePriceByAdmin,start,updateSkuPriceByAdmin,executeMap:"+JSONObject.toJSONString(executeMap)+",i:"+i+","+len);
+                logger.info("updatePriceByAdmin,updateSkuPriceByAdmin,start,executeMap:"+JSONObject.toJSONString(executeMap)+",i:"+i+","+len);
                 priceChangeRuleMapper.updateSkuPriceByAdmin(executeMap);
-                logger.info("updatePriceByAdmin,end,updateSkuPriceByAdmin,executeMap:"+JSONObject.toJSONString(executeMap)+",i:"+i+","+len);
+                logger.info("updatePriceByAdmin,updateSkuPriceByAdmin,end,executeMap:"+JSONObject.toJSONString(executeMap)+",i:"+i+","+len);
             }
         }
         return 0;
@@ -197,6 +198,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
 
     @Override
     public boolean updateAdminPrice() {
+        logger.info("updateAdminPrice start");
         Map<String,Object> paramsMap = new HashMap<>();
         List<Map<String,Object>> paramsList = new ArrayList<>();
         paramsMap.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
