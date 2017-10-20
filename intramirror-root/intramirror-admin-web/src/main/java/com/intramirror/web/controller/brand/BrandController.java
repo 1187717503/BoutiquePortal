@@ -29,15 +29,15 @@ public class BrandController {
     @CrossOrigin
     @RequestMapping("/selectActiveBrands")
     @ResponseBody
-    public ResultMessage queryActiveBrands(){
+    public ResultMessage queryActiveBrands() {
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
-            List<Map<String,Object>> brands = iBrandService.queryActiveBrand();
-            resultMessage.successStatus().putMsg("info","SUCCESS").setData(brands);
+            List<Map<String, Object>> brands = iBrandService.queryActiveBrand();
+            resultMessage.successStatus().putMsg("info", "SUCCESS").setData(brands);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(" error message : {}", e.getMessage());
-            resultMessage.errorStatus().putMsg("info","error message : " + e.getMessage());
+            resultMessage.errorStatus().putMsg("info", "error message : " + e.getMessage());
         }
         return resultMessage;
     }
