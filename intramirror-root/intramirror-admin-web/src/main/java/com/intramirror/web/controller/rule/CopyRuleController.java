@@ -3,13 +3,14 @@ package com.intramirror.web.controller.rule;
 import com.intramirror.common.enums.PriceChangeRuleEnum;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.help.StringUtils;
-import com.intramirror.product.api.model.PriceChangeRule;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
-import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.vendor.IQueryVendorService;
 import com.intramirror.web.controller.BaseController;
-
+import java.util.HashMap;
+import java.util.Map;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,19 +19,13 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Created by dingyifan on 2017/7/20.
  */
 @CrossOrigin
 @Controller
 @RequestMapping("/rule/copy")
-public class CopyRuleController extends BaseController{
+public class CopyRuleController extends BaseController {
     private static Logger logger = LoggerFactory.getLogger(CopyRuleController.class);
 
     @Resource(name = "productPriceChangeRule")
@@ -41,127 +36,128 @@ public class CopyRuleController extends BaseController{
 
     @RequestMapping("/activeVendor")
     @ResponseBody
-    public ResultMessage activeVendor(@Param("discount")String discount,@Param("to_vendor_id")String to_vendor_id,HttpServletRequest httpRequest){
+    public ResultMessage activeVendor(@Param("discount") String discount, @Param("to_vendor_id") String to_vendor_id, HttpServletRequest httpRequest) {
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
-            if( !this.checkParams(to_vendor_id)) {
-                return resultMessage.errorStatus().putMsg("info","params is error !!!");
+            if (!this.checkParams(to_vendor_id)) {
+                return resultMessage.errorStatus().putMsg("info", "params is error !!!");
             }
 
-            Map<String,Object> params = new HashMap<>();
-            params.put("vendor_id",to_vendor_id);
-            params.put("discount",discount);
+            Map<String, Object> params = new HashMap<>();
+            params.put("vendor_id", to_vendor_id);
+            params.put("discount", discount);
             params.put("status", PriceChangeRuleEnum.Status.ACTIVE.getCode());
-            params.put("to_vendor_id",to_vendor_id);
+            params.put("to_vendor_id", to_vendor_id);
 
             // select user_id
             Vendor vendor = iQueryVendorService.queryVendorByVendorId(params);
-            if(vendor == null) {
-                return resultMessage.errorStatus().putMsg("info"," vendor is null !!!");
+            if (vendor == null) {
+                return resultMessage.errorStatus().putMsg("info", " vendor is null !!!");
             }
-            params.put("user_id",vendor.getUserId());
+            params.put("user_id", vendor.getUserId());
             return iPriceChangeRule.copyRuleByVendor(params);
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("error message : {}",e.getMessage());
-            resultMessage.errorStatus().putMsg("info","error message : " + e.getMessage());
+            logger.error("error message : {}", e.getMessage());
+            resultMessage.errorStatus().putMsg("info", "error message : " + e.getMessage());
         }
         return resultMessage;
     }
 
     @RequestMapping("/pengingVendor")
     @ResponseBody
-    public ResultMessage pengingVendor(@Param("discount")String discount,@Param("to_vendor_id")String to_vendor_id,HttpServletRequest httpRequest){
+    public ResultMessage pengingVendor(@Param("discount") String discount, @Param("to_vendor_id") String to_vendor_id, HttpServletRequest httpRequest) {
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
-            if(!this.checkParams(to_vendor_id)) {
-                return resultMessage.errorStatus().putMsg("info","params is error !!!");
+            if (!this.checkParams(to_vendor_id)) {
+                return resultMessage.errorStatus().putMsg("info", "params is error !!!");
             }
 
-            Map<String,Object> params = new HashMap<>();
-            params.put("vendor_id",to_vendor_id);
-            params.put("discount",discount);
-            params.put("to_vendor_id",to_vendor_id);
+            Map<String, Object> params = new HashMap<>();
+            params.put("vendor_id", to_vendor_id);
+            params.put("discount", discount);
+            params.put("to_vendor_id", to_vendor_id);
             params.put("status", PriceChangeRuleEnum.Status.PENDING.getCode());
 
             // select user_id
             Vendor vendor = iQueryVendorService.queryVendorByVendorId(params);
-            if(vendor == null) {
-                return resultMessage.errorStatus().putMsg("info"," vendor is null !!!");
+            if (vendor == null) {
+                return resultMessage.errorStatus().putMsg("info", " vendor is null !!!");
             }
-            params.put("user_id",vendor.getUserId());
+            params.put("user_id", vendor.getUserId());
 
             return iPriceChangeRule.copyRuleByVendor(params);
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("error message : {}",e.getMessage());
-            resultMessage.errorStatus().putMsg("info","error message : " + e.getMessage());
+            logger.error("error message : {}", e.getMessage());
+            resultMessage.errorStatus().putMsg("info", "error message : " + e.getMessage());
         }
         return resultMessage;
     }
 
     @RequestMapping("/seasonVendor")
     @ResponseBody
-    public ResultMessage seasonVendor(@Param("price_change_rule_id")String price_change_rule_id,@Param("seasons")String seasons,@Param("vendor_id")String vendor_id,@Param("price_type")String price_type,HttpServletRequest httpRequest){
+    public ResultMessage seasonVendor(@Param("price_change_rule_id") String price_change_rule_id, @Param("seasons") String seasons,
+            @Param("vendor_id") String vendor_id, @Param("price_type") String price_type, HttpServletRequest httpRequest) {
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
-            if(StringUtils.isBlank(price_change_rule_id) || seasons == null || seasons.length() == 0) {
-                return resultMessage.errorStatus().putMsg("info","params is error !!!");
+            if (StringUtils.isBlank(price_change_rule_id) || seasons == null || seasons.length() == 0) {
+                return resultMessage.errorStatus().putMsg("info", "params is error !!!");
             }
 
-            Map<String,Object> params = new HashMap<>();
-            params.put("price_change_rule_id",price_change_rule_id);
-            params.put("seasons",seasons);
-            params.put("vendor_id",vendor_id);
-            params.put("price_type",price_type);
-            
+            Map<String, Object> params = new HashMap<>();
+            params.put("price_change_rule_id", price_change_rule_id);
+            params.put("seasons", seasons);
+            params.put("vendor_id", vendor_id);
+            params.put("price_type", price_type);
 
             // select user_id
             Vendor vendor = iQueryVendorService.queryVendorByVendorId(params);
-            if(vendor == null) {
-                return resultMessage.errorStatus().putMsg("info"," vendor is null !!!");
+            if (vendor == null) {
+                return resultMessage.errorStatus().putMsg("info", " vendor is null !!!");
             }
-            params.put("user_id",vendor.getUserId());
+            params.put("user_id", vendor.getUserId());
 
             return iPriceChangeRule.copyRuleBySeason(params);
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("error message : {}",e.getMessage());
-            resultMessage.errorStatus().putMsg("info","error message : " + e.getMessage());
+            logger.error("error message : {}", e.getMessage());
+            resultMessage.errorStatus().putMsg("info", "error message : " + e.getMessage());
         }
         return resultMessage;
     }
 
     @RequestMapping("/copyRule")
     @ResponseBody
-    public ResultMessage copyRule(@Param("vendor_id")String vendor_id,@Param("price_type")String price_type){
+    public ResultMessage copyRule(@Param("vendor_id") String vendor_id, @Param("price_type") String price_type, @Param("discount") String discount) {
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
-            if(StringUtils.isBlank(vendor_id) || StringUtils.isBlank(price_type)) {
-                return resultMessage.errorStatus().putMsg("info"," params is null !!!");
+            if (StringUtils.isBlank(vendor_id) || StringUtils.isBlank(price_type)) {
+                return resultMessage.errorStatus().putMsg("info", " params is null !!!");
             }
-            Map<String,Object> params = new HashMap<>();
-            params.put("vendor_id",vendor_id);
-            params.put("price_type",price_type);
+            Map<String, Object> params = new HashMap<>();
+            params.put("vendor_id", vendor_id);
+            params.put("price_type", price_type);
+            params.put("discount", discount == null ? "0" : discount);
 
             // select user_id
             Vendor vendor = iQueryVendorService.queryVendorByVendorId(params);
-            if(vendor == null) {
-                return resultMessage.errorStatus().putMsg("info"," vendor is null !!!");
+            if (vendor == null) {
+                return resultMessage.errorStatus().putMsg("info", " vendor is null !!!");
             }
-            params.put("user_id",vendor.getUserId());
+            params.put("user_id", vendor.getUserId());
 
             return iPriceChangeRule.copyRule(params);
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("error message : {}",e.getMessage());
-            resultMessage.errorStatus().putMsg("info","error message : " + e.getMessage());
+            logger.error("error message : {}", e.getMessage());
+            resultMessage.errorStatus().putMsg("info", "error message : " + e.getMessage());
         }
         return resultMessage;
     }
 
-    private boolean checkParams(String vendor_id){
-        if(StringUtils.isBlank(vendor_id) )
+    private boolean checkParams(String vendor_id) {
+        if (StringUtils.isBlank(vendor_id))
             return false;
         return true;
     }
