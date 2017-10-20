@@ -13,6 +13,7 @@
           v-for="(item, i) in items"
           :key="i"
           value="true"
+          @click=""
         >
           <v-list-tile-action>
             <v-icon light v-html="item.icon"></v-icon>
@@ -31,26 +32,9 @@
       >
         <v-icon v-html="miniVariant ? 'chevron_right' : 'chevron_left'"></v-icon>
       </v-btn>
-      <v-btn
-        icon
-        @click.stop="clipped = !clipped"
-      >
-        <v-icon>web</v-icon>
-      </v-btn>
-      <v-btn
-        icon
-        @click.stop="fixed = !fixed"
-      >
-        <v-icon>remove</v-icon>
-      </v-btn>
       <v-toolbar-title v-text="title"></v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn
-        icon
-        @click.stop="rightDrawer = !rightDrawer"
-      >
-        <v-icon>menu</v-icon>
-      </v-btn>
+      
     </v-toolbar>
     <main>
       <v-content>
@@ -97,15 +81,16 @@
     data () {
       return {
         clipped: false,
-        drawer: true,
+        drawer: false,
         fixed: false,
         items: [
-          { icon: 'bubble_chart', title: 'Inspire' }
+          { icon: 'bubble_chart', title: 'Home' },
+          {icon: 'toll', title: 'Product Management'}
         ],
         miniVariant: false,
         right: true,
         rightDrawer: false,
-        title: 'Vuetify.js'
+        title: 'Product Management'
       }
     }
   }
