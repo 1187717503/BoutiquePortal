@@ -390,115 +390,82 @@
         and  date_format(pcr.valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d')
     </select>
 
-    <update id="updateSkuPriceByVendor" parameterType="java.util.List">
-        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
-            update sku set sku.in_price = sku.price * #{item.discount_percentage,jdbcType=BIGINT}/((1+0.22)*100) where
-            sku.enabled = 1 and sku.product_id in
-            (
-            select p.product_id from product p where p.enabled = 1
-
-            <!--sittest="item.handle_level == 1">
-                and p.category_id in (
-                select category_id from category c where c.enabled = 1 and c.`level` = 2 and c.parent_id =
-                #{item.category_id,jdbcType=BIGINT}
-                )
-            </if>-->
-
-            <if test="item.handle_level == 2">
-                <if test="item.level == 1">
-                    and p.category_id in (
-                    select category_id from category c where c.enabled = 1 and c.`level` = 3 and c.parent_id in
-                        (
-                            select category_id from category c2 where c2.enabled = 1 and c2.`level` = 2 and c2.parent_id =
-                            #{item.category_id,jdbcType=BIGINT}
-                        )
-                    )
+    <update id="updateSkuPriceByVendor" parameterType="java.util.Map">
+            update sku s
+            inner join `product`  p on(
+                s.`product_id` = p.`product_id`
+                and p.`enabled`  = 1
+                and s.`enabled`  = 1
+                and p.`vendor_id`  = #{vendor_id,jdbcType=BIGINT}
+                <if test="handle_level == 2">
+                    <if test="brand_id != null and brand_id != ''">
+                        and p.`brand_id` = #{brand_id,jdbcType=BIGINT}
+                    </if>
                 </if>
 
-                <if test="item.level == 2">
-                    and p.category_id in (
-                        select category_id from category c where c.enabled = 1 and c.`level` = 3 and c.parent_id =
-                        #{item.category_id,jdbcType=BIGINT}
-                    )
+                <if test="handle_level == 3">
+                    and p.`product_group_id`  = #{product_group_id,jdbcType=BIGINT}
                 </if>
 
-                <if test="item.level == 3">
-                    and p.category_id = #{item.category_id,jdbcType=BIGINT}
+                <if test="handle_level == 4">
+                    and p.`product_id`  = #{product_id,jdbcType=BIGINT}
                 </if>
 
-                <if test="item.brand_id != null and item.brand_id != ''">
-                    and p.brand_id = #{item.brand_id,jdbcType=BIGINT}
-                </if>
-            </if>
-
-            <if test="item.handle_level == 3">
-                and p.product_group_id = #{item.product_group_id,jdbcType=BIGINT}
-            </if>
-
-            <if test="item.handle_level == 4">
-                and p.product_id = #{item.product_id,jdbcType=BIGINT}
-            </if>
-            and vendor_id = #{item.vendor_id,jdbcType=BIGINT}
-            and p.season_code in
-            <foreach item="item" index="index" collection="item.season_codes" open="(" separator="," close=")">
-                #{item}
-            </foreach>
+                and p.`season_code` in
+                <foreach item="item" index="index" collection="season_codes" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
             )
-        </foreach>
+            inner join `category`  c on(
+                    p.`category_id` = c.`category_id`
+                    and c.`enabled`  = 1
+                    <if test="level == 2">
+                        and c.`level` = 3 and c.parent_id = #{category_id,jdbcType=BIGINT}
+                    </if>
+                    <if test="level == 3">
+                        and c.`level` = 3 and c.category_id = #{category_id,jdbcType=BIGINT}
+                    </if>
+            )
+            set s.in_price = s.price * #{discount_percentage,jdbcType=BIGINT}/((1+0.22)*100)
     </update>
 
-    <update id="updateSkuPriceByAdmin" parameterType="java.util.List">
-        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
-            update sku set sku.im_price = sku.price * #{item.discount_percentage,jdbcType=BIGINT}/100 where sku.enabled
-            = 1 and sku.product_id in
-            (
-            select p.product_id from product p where p.enabled = 1
-
-            <!--sittest="item.handle_level == 1">
-                and p.category_id in (
-                select category_id from category c where c.enabled = 1 and c.`level` = 2 and c.parent_id =
-                #{item.category_id,jdbcType=BIGINT}
-                )
-            </if>-->
-
-            <if test="item.handle_level == 2">
-                <if test="item.level == 1">
-                    and p.category_id in (
-                    select category_id from category c where c.enabled = 1 and c.`level` = 3 and c.parent_id in
-                    (
-                    select category_id from category c2 where c2.enabled = 1 and c2.`level` = 2 and c2.parent_id =
-                    #{item.category_id,jdbcType=BIGINT}
-                    )
-                    )
-                </if>
-                <if test="item.level == 2">
-                    and p.category_id in (
-                    select category_id from category c where c.enabled = 1 and c.`level` = 3 and c.parent_id =
-                    #{item.category_id,jdbcType=BIGINT}
-                    )
-                </if>
-                <if test="item.level == 3">
-                    and p.category_id = #{item.category_id,jdbcType=BIGINT}
-                </if>
-                <if test="item.brand_id != null and item.brand_id != ''">
-                    and p.brand_id = #{item.brand_id,jdbcType=BIGINT}
+    <update id="updateSkuPriceByAdmin" parameterType="java.util.Map">
+            update sku s
+            inner join `product`  p on(
+            s.`product_id` = p.`product_id`
+            and p.`enabled`  = 1
+            and s.`enabled`  = 1
+            and p.`vendor_id`  = #{vendor_id,jdbcType=BIGINT}
+            <if test="handle_level == 2">
+                <if test="brand_id != null and brand_id != ''">
+                    and p.`brand_id` = #{brand_id,jdbcType=BIGINT}
                 </if>
             </if>
 
-            <if test="item.handle_level == 3">
-                and p.product_group_id = #{item.product_group_id,jdbcType=BIGINT}
+            <if test="handle_level == 3">
+                and p.`product_group_id`  = #{product_group_id,jdbcType=BIGINT}
             </if>
 
-            <if test="item.handle_level == 4">
-                and p.product_id = #{item.product_id,jdbcType=BIGINT}
+            <if test="handle_level == 4">
+                and p.`product_id`  = #{product_id,jdbcType=BIGINT}
             </if>
-            and vendor_id = #{item.vendor_id,jdbcType=BIGINT}
-            and p.season_code in
-            <foreach item="item" index="index" collection="item.season_codes" open="(" separator="," close=")">
+
+            and p.`season_code` in
+            <foreach item="item" index="index" collection="season_codes" open="(" separator="," close=")">
                 #{item}
             </foreach>
             )
-        </foreach>
+            inner join `category`  c on(
+            p.`category_id` = c.`category_id`
+            and c.`enabled`  = 1
+            <if test="level == 2">
+                and c.`level` = 3 and c.parent_id = #{category_id,jdbcType=BIGINT}
+            </if>
+            <if test="level == 3">
+                and c.`level` = 3 and c.category_id = #{category_id,jdbcType=BIGINT}
+            </if>
+            )
+            set s.im_price = s.price * #{discount_percentage,jdbcType=BIGINT}/100
     </update>
 
     <update id="updateSkuPriceByShop" parameterType="java.util.List">

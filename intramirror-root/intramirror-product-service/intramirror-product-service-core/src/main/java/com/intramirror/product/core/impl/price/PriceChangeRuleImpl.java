@@ -121,49 +121,46 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     }
 
     private int updatePriceByVendor(List<Map<String,Object>> paramsList,Map<String,Object> paramsMap){
-        /*if(paramsList != null && paramsList.size() > 0) {
-            logger.info("update vendor price success paramsList:"+new Gson().toJson(paramsList));
-            for(int i = 0;i<paramsList.size();i++) {
-                List<Map<String,Object>> maps = new ArrayList<>();
-                maps.add(paramsList.get(i));
-                priceChangeRuleMapper.updateSkuPriceByVendor(maps);
-                logger.info("updatePriceByVendor,i:"+i+" :" + maps +"----" + paramsList.size());
+        if(paramsList != null && paramsList.size() > 0) {
+            for(int i = 0,len = paramsList.size();i<len;i++) {
+                Map<String,Object> executeMap = paramsList.get(i);
+
+                logger.info("updatePriceByVendor,start,updateSkuPriceByVendor,executeMap:"+JSONObject.toJSONString(executeMap)+",i:"+i+","+len);
+                priceChangeRuleMapper.updateSkuPriceByVendor(executeMap);
+                logger.info("updatePriceByVendor,end,updateSkuPriceByVendor,executeMap:"+JSONObject.toJSONString(executeMap)+",i:"+i+","+len);
+
             }
         }
-        logger.info("update vendor price success num : "+0);
-        return 0;*/
+        return 0;
 
-        // update by dingyifan 2017-10-11
+        /*// update by dingyifan 2017-10-11
         logger.info("PriceChangeRuleImplUpdatePriceByVendor,updateSkuPriceByVendor,start,paramsList:"+ JSONObject.toJSONString(paramsList));
         if(paramsList != null && paramsList.size() > 0){
             priceChangeRuleMapper.updateSkuPriceByVendor(paramsList);
         }
         logger.info("PriceChangeRuleImplUpdatePriceByVendor,updateSkuPriceByVendor,end,paramsList:"+JSONObject.toJSONString(paramsList));
-        // update by dingyifan 2017-10-11
-        return 0;
+        // update by dingyifan 2017-10-11*/
     }
 
     private int updatePriceByAdmin(List<Map<String,Object>> paramsList,Map<String,Object> paramsMap){
-        /*if(paramsList != null && paramsList.size() > 0) {
-            logger.info("update admin price success paramsList:"+new Gson().toJson(paramsList));
-            for(int i = 0;i<paramsList.size();i++) {
-                List<Map<String,Object>> maps = new ArrayList<>();
-                maps.add(paramsList.get(i));
-                priceChangeRuleMapper.updateSkuPriceByAdmin(maps);
-                logger.info("updatePriceByAdmin,i:"+i+" :" + maps +"----" + paramsList.size());
+        if(paramsList != null && paramsList.size() > 0) {
+            for(int i = 0,len = paramsList.size();i<len;i++) {
+
+                Map<String,Object> executeMap = paramsList.get(i);
+                logger.info("updatePriceByAdmin,start,updateSkuPriceByAdmin,executeMap:"+JSONObject.toJSONString(executeMap)+",i:"+i+","+len);
+                priceChangeRuleMapper.updateSkuPriceByAdmin(executeMap);
+                logger.info("updatePriceByAdmin,end,updateSkuPriceByAdmin,executeMap:"+JSONObject.toJSONString(executeMap)+",i:"+i+","+len);
             }
         }
-        logger.info("update admin price success num : "+0);
-        return 0;*/
+        return 0;
 
-        // update by dingyifan 2017-10-11
+        /*// update by dingyifan 2017-10-11
         logger.info("PriceChangeRuleImplUpdatePriceByAdmin,updateSkuPriceByAdmin,start,paramsList:"+JSONObject.toJSONString(paramsList));
         if(paramsList != null && paramsList.size() > 0) {
             priceChangeRuleMapper.updateSkuPriceByAdmin(paramsList);
         }
         logger.info("PriceChangeRuleImplUpdatePriceByAdmin,updateSkuPriceByAdmin,end,paramsList:"+JSONObject.toJSONString(paramsList));
-        // update by dingyifan 2017-10-11
-        return 0;
+        // update by dingyifan 2017-10-11*/
     }
 
     @Override
