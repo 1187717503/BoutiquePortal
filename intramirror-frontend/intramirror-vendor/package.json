@@ -7,9 +7,7 @@
   "scripts": {
     "dev": "cross-env WEB_ENV=loca node build/dev-server.js",
     "dev:test": "cross-env WEB_ENV=test node build/dev-server.js",
-    "build:test": "cross-env WEB_ENV=test node build/build.js",
-    "build:stag": "cross-env WEB_ENV=stag node build/build.js",
-    "build:prd": "cross-env WEB_ENV=prd node build/build.js"
+    "build": "node build/build.js"
   },
   "dependencies": {
     "axios": "^0.16.2",

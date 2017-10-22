@@ -362,14 +362,14 @@
               };
               Materialize.toast('Status change success', 4000);
               this.getList();
-              window.open('/readyshipprint?sid=' + this.sid);
+              window.open('/#/readyshipprint?sid=' + this.sid);
             } else {
               Materialize.toast('Status change failed', 4000);
               return false
             }
           })
         } else {
-          window.open('/readyshipprint?sid=' + this.sid);
+          window.open('/#/readyshipprint?sid=' + this.sid);
         }
       },
       getList() {
