@@ -361,7 +361,7 @@
         })
       },
       printOrder(sta, num) {
-        window.open('/confirmprint?num=' + num + '&sta=' + sta);
+        window.open('/#/confirmprint?num=' + num + '&sta=' + sta);
       },
       cancelOrder(pid, num, vid) {
         this.showPopup.iscancel = true;
@@ -438,7 +438,7 @@
             this.confirmDate = null;
             break;
           case 'sucessorder':
-            window.open('/confirmprint2?num='+this.orderLineNum+'&sta=2');
+            window.open('/#/confirmprint2?num='+this.orderLineNum+'&sta=2');
             this.showPopup.sucessorder = false;
             this.loadList();
             break;

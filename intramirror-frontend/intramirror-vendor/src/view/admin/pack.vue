@@ -103,7 +103,7 @@
         'GET_ORDER'
       ]),
       rePrintOrder(num) {
-        var rePrintPage = window.open('/confirmprint2?num=' + num + '&sta=2');
+        var rePrintPage = window.open('/#/confirmprint2?num=' + num + '&sta=2');
       },
       loadList(sort){
         let data = {

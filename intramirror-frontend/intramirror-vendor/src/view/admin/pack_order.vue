@@ -351,6 +351,7 @@
             };
             return
           } else if (this.selectGeography === '' && cent) {
+            this.loadGeography(); 
             this.isNewCase = true;
             this.showShade = true;
             return
@@ -362,7 +363,7 @@
       },
 //      获取箱子码
       newCase() {
-        this.openGeography('cloes');
+        this.openGeography('close');
         this.isLoading = true;
         getBarcode().then(res => {
           if (res.data.status === 1) {
@@ -512,7 +513,7 @@
           return
         }*/
         this.saveContainer();
-        window.open('/packprint?barcode=' + this.cartonData.barcode + '&length=' + this.cartonData.length + '&width=' + this.cartonData.width + '&height=' + this.cartonData.height + '&shipToGeography=' + this.cartonData.shipToGeography);
+        window.open('/#/packprint?barcode=' + this.cartonData.barcode + '&length=' + this.cartonData.length + '&width=' + this.cartonData.width + '&height=' + this.cartonData.height + '&shipToGeography=' + this.cartonData.shipToGeography);
       }
     },
     components: {
