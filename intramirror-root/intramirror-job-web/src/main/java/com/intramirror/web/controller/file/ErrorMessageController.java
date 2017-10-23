@@ -2,7 +2,6 @@ package com.intramirror.web.controller.file;
 
 import com.alibaba.fastjson15.JSONObject;
 import com.intramirror.common.parameter.StatusType;
-import com.intramirror.web.controller.api.quadra.QuadraProductController;
 import com.intramirror.web.mapping.api.IProductMapping;
 import com.intramirror.web.mapping.api.IStockMapping;
 import com.intramirror.web.mapping.impl.QuadraSynProductMapping;
@@ -14,6 +13,13 @@ import com.intramirror.web.thread.CommonThreadPool;
 import com.intramirror.web.thread.UpdateProductThread;
 import com.intramirror.web.thread.UpdateStockThread;
 import com.intramirror.web.util.ApiDataFileUtils;
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import javax.annotation.Resource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
@@ -29,14 +35,6 @@ import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.service.CategoryService;
 import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.util.MapUtils;
-
-import javax.annotation.Resource;
-import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Created by dingyifan on 2017/9/20.
@@ -211,6 +209,7 @@ public class ErrorMessageController {
                     } else if(name.equals("product_all_update")
                             ||name.equals("product_delta_update")
                             ||name.equals("product_delta_create")) {
+                        originDataMap.put("vendor_id",vendor_id);
                         ProductEDSManagement.ProductOptions productOptions = atelierUpdateByProductMapping.mapping(originDataMap);
                         ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
                         vendorOptions.setVendorId(Long.parseLong(vendor_id));
