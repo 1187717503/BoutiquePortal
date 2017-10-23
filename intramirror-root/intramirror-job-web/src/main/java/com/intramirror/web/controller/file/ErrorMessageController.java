@@ -176,6 +176,7 @@ public class ErrorMessageController {
                 // cloud_store
                 if(vendor_id.equals("16")) {
                     if(name.equals("product_all_update")) {
+                        originDataMap.put("vendor_id",vendor_id);
                         ProductEDSManagement.ProductOptions productOptions = cloudStoreProductMapping.mapping(originDataMap);
                         ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
                         vendorOptions.setVendorId(Long.parseLong(vendor_id));
