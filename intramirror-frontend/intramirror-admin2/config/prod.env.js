@@ -14,9 +14,9 @@ switch (process.env.WEB_ENV){
     baseConfig.ERROR_URL2 = '"http://test.api.intramirror.com/"';
     break;
   case "stag":
-    baseConfig.BASE_URL = '"http://sha.staging.admin2.intramirror.com:8096/"';
-    baseConfig.ERROR_URL = '"http://sh.vendor.intramirror.com/"';
-    baseConfig.ERROR_URL2 = '"http://sh.api.intramirror.com/"';
+  baseConfig.BASE_URL = '"http://sha.staging.admin2.intramirror.com:8096/"';
+  baseConfig.ERROR_URL = '"http://sha.staging.vendor.intramirror.com/"';
+  baseConfig.ERROR_URL2 = '"http://101.132.132.34:8095"';
     break;
   case "prd":
     baseConfig.BASE_URL = '"http://admin2.intramirror.com:8085/"';
