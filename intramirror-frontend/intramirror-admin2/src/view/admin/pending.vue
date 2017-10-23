@@ -1729,7 +1729,7 @@
 </style>
 <style lang="less">
   @import "../../assets/css/googlefont.css";
-  @import "../../assets/css/vuetify.css";
+  @import "../../../node_modules/vuetify/dist/vuetify.min.css";
 
   .toast {
     position: relative;

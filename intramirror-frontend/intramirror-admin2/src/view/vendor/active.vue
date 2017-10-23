@@ -266,7 +266,7 @@
 </script>
 <style lang="less">
   @import "../../assets/css/googlefont.css";
-  @import "../../assets/css/vuetify.css";
+  @import "../../../node_modules/vuetify/dist/vuetify.min.css";
   @import "../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css";
 
   .multiselect__tags {
