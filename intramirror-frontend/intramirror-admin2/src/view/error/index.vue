@@ -758,7 +758,7 @@
 <style lang="less">
   @import "../../../node_modules/flatpickr/dist/flatpickr.min.css";
   @import "../../assets/css/googlefont.css";
-  @import "../../assets/css/vuetify.css";
+  @import "../../../node_modules/vuetify/dist/vuetify.min.css";
 
   .btn {
     padding: 0;
