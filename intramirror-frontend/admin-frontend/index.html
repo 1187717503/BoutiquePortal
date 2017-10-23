@@ -22,6 +22,8 @@
     <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection">
     <!-- Custome CSS-->    
     <link href="css/custom/custom.css" type="text/css" rel="stylesheet" media="screen,projection">
+    <link href="css/index.css" type="text/css" rel="stylesheet" media="screen,projection">
+
 </head>
 
 <body>
@@ -58,25 +60,21 @@
                             <div class="col s9">
                                 <div class="row">
                                     <div class="input-field col s3">
-                                        <select>
+                                        <select id="select-boutique">
                                             <option value="-1" disabled selected>Boutique</option>
-                                            <option value="1">Option 1</option>
-                                            <option value="2">Option 2</option>
-                                            <option value="3">Option 3</option>
                                         </select>
                                     </div>
                                     <div class="input-field col s3">
-                                        <input id="first_name2" type="text" class="validate" placeholder="Designer ID/Color Code">
+                                        <input id="text-designer" type="text" class="validate">
+                                        <label for="text-designer">Designer ID/Color Code</label>
                                     </div>
                                     <div class="input-field col s3">
-                                        <input id="first_name2" type="text" class="validate" placeholder="Boutique ID">
+                                        <input id="text-boutique" type="text" class="validate">
+                                        <label for="text-boutique">Boutique ID</label>
                                     </div>
                                     <div class="input-field col s3">
-                                        <select>
+                                        <select id="select-brand">
                                             <option value="-1" disabled selected>Brand</option>
-                                            <option value="1">Option 1</option>
-                                            <option value="2">Option 2</option>
-                                            <option value="3">Option 3</option>
                                         </select>
                                     </div>
                                 </div>
@@ -90,7 +88,7 @@
                                             <option value="3">Option 3</option>
                                         </select>
                                     </div>
-                                    <div class="input-field col s1">
+                                    <div class="input-field col s2">
                                         <select>
                                             <option value="-1" disabled selected>Season</option>
                                             <option value="1">Option 1</option>
@@ -98,42 +96,38 @@
                                             <option value="3">Option 3</option>
                                         </select>
                                     </div>
-                                    <div class="input-field col s1">
+                                    <div class="input-field col s2">
                                         <select>
-                                            <option value="-1" disabled selected>Image All</option>
-                                            <option value="1">Option 1</option>
-                                            <option value="2">Option 2</option>
-                                            <option value="3">Option 3</option>
+                                            <option value="-1" selected>Image All</option>
+                                            <option value="1">YES</option>
+                                            <option value="2">NO</option>
                                         </select>
                                     </div>
                                     <div class="input-field col s2">
                                         <select>
-                                            <option value="-1" disabled selected>Model Image All</option>
-                                            <option value="1">Option 1</option>
-                                            <option value="2">Option 2</option>
-                                            <option value="3">Option 3</option>
+                                            <option value="-1" selected>Model Image All</option>
+                                            <option value="1">YES</option>
+                                            <option value="2">NO</option>
                                         </select>
                                     </div>
                                     <div class="input-field col s2">
                                         <select>
-                                            <option value="-1" disabled selected>Street Image All</option>
-                                            <option value="1">Option 1</option>
-                                            <option value="2">Option 2</option>
-                                            <option value="3">Option 3</option>
+                                            <option value="-1" selected>Street Image All</option>
+                                            <option value="1">YES</option>
+                                            <option value="2">NO</option>
                                         </select>
                                     </div>
-                                    <div class="input-field col s1">
+                                    <div class="input-field col s2">
                                         <select>
-                                            <option value="-1" disabled selected>Stock All</option>
-                                            <option value="1">Option 1</option>
-                                            <option value="2">Option 2</option>
-                                            <option value="3">Option 3</option>
+                                            <option value="-1" selected>Stock All</option>
+                                            <option value="1">YES</option>
+                                            <option value="2">NO</option>
                                         </select>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="col s3">
+                            <div class="col s3 search-btns">
                                 <a class="waves-effect waves-light btn">Search</a>
                                 <a class="waves-effect waves-light btn">Reset</a>
                             </div>
@@ -141,6 +135,26 @@
                         </div>
 
                     </div>
+                    <!--end filter-->
+
+                    <!-- tabs -->
+                    <div class="row status-tabs">
+                        <div class="col s12">
+                            <ul class="tabs">
+                                <li class="tab col"><a class="active" href="#test1">NEW</a></li>
+                                <li class="tab col"><a href="#test2">PROCESSING</a></li>
+                                <li class="tab col"><a href="#test3">OK</a></li>
+                                <li class="tab col"><a href="#test4">SHOP_OFFSALE</a></li>
+                                <li class="tab col"><a href="#test2">SHOP_ONSALE</a></li>
+                                <li class="tab col"><a href="#test3">SHOP_SOLDOUT</a></li>
+                                <li class="tab col"><a href="#test4">TARSH</a></li>
+                            </ul>
+                        </div>
+
+                        <div id="test1" class="col s12">Test 1</div>
+
+                    </div>
+                    <!-- end tabs -->
                 </div>
                 <!--end container-->
             </section>
@@ -152,15 +166,17 @@
     </div>
     <!-- END MAIN -->
 
-
-
     <!-- ================================================
     Scripts
     ================================================ -->
-    
+    <script type="text/javascript" src="js/base.js"></script>
+
+    <script type="text/javascript" src="js/index.js"></script>
+
     <!-- jQuery Library -->
     <script type="text/javascript" src="js/plugins/jquery-1.11.2.min.js"></script>
 
+    <script type="text/javascript" src="js/plugins/jquery-tmpl/jquery.tmpl.js"></script>
     <!--materialize js-->
     <script type="text/javascript" src="js/materialize.js"></script>
 
@@ -172,13 +188,31 @@
 
     <!--custom-script.js - Add your own theme custom JS-->
     <script type="text/javascript" src="js/custom-script.js"></script>
-    <!-- Toast Notification -->
+
+    <script id="tmpl-brand-select" type="text/x-jquery-tmpl">
+        <option value="-1" disabled selected>Brand</option>
+        {%each(i, brand) list%}
+        <option value="${i}" selected>${brand}</option>
+        {%/each%}
+    </script>
+    <script id="tmpl-boutique-select" type="text/x-jquery-tmpl">
+        <option value="-1" disabled selected>Boutique</option>
+        {%each(i, boutique) list%}
+        <option value="${i}" selected>${boutique}</option>
+        {%/each%}
+    </script>
+
     <script type="text/javascript">
 
-    // Toast Notification
-    $(window).load(function() {
-        
+    $(function() {
+
+        // initialize brand select
+        var brandList = getBrand();
+        initSelectItems('select-brand', 'tmpl-brand-select', brandList);
+        initSelectItems('select-boutique', 'tmpl-boutique-select', brandList);
+
     });
+
     </script>
 </body>
 

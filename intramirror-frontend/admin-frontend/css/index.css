@@ -1,0 +1,15 @@
+#main {
+	padding-left: 0;
+}
+
+.status-tabs {
+	margin-top: 20px;
+}
+
+.search-btns {
+	height: 152px;
+	line-height: 152px;
+}
+.container {
+	min-width: 1080px;
+}
