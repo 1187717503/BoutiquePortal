@@ -87,6 +87,16 @@ public class ProductServiceImpl implements IProductService{
                                .getMap();
             }
 
+            // start update by dingyifan 20171019
+            MappingCategoryService mappingCategoryService = new MappingCategoryService(conn);
+            logger.info("ProductEDSManagementCreateProduct,start,selectCategory,productOptions:"+JSONObject.toJSONString(productOptions));
+            String cId = mappingCategoryService.getMappingCategoryInfoByCondition(productOptions.getCategory1(),productOptions.getCategory2(),productOptions.getCategory3());
+            logger.info("ProductEDSManagementCreateProduct,end,selectCategory,productOptions:"+JSONObject.toJSONString(productOptions)+",categoryId:"+cId);
+            if(org.apache.commons.lang.StringUtils.isNotBlank(cId)) {
+                productOptions.setCategoryId(cId);
+            }
+            // end update by dingyifan 20171019
+
             Category category = null ;
             if(StringUtils.isBlank(productOptions.getCategoryId())) {
                 mapUtils = new MapUtils(new HashMap<>());

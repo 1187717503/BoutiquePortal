@@ -80,8 +80,8 @@ public interface PriceChangeRuleMapper {
     List<Map<String,Object>> selectProductGroupRule(Map<String,Object> params);
     List<Map<String,Object>> selectProductRule(Map<String,Object> params);
 
-    int updateSkuPriceByVendor(List<Map<String,Object>> paramsList);
-    int updateSkuPriceByAdmin(List<Map<String,Object>> paramsList);
+    int updateSkuPriceByVendor(Map<String,Object> map);
+    int updateSkuPriceByAdmin(Map<String,Object> map);
     int updateSkuPriceByShop(List<Map<String,Object>> paramsList);
 
 

@@ -139,4 +139,6 @@ public interface OrderMapper {
     int createOrder(Order order);
 
     void updateById(Order order);
+    
+    List<Map<String,Object>> atelierSelectOrder(Map<String,Object> conditionMap);
 }

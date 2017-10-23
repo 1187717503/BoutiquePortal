@@ -123,16 +123,22 @@ public class SeasonService {
         }
     }
 
-    public String selSeasonCodeByBoutiqueCode(String boutiqueCode) throws Exception{
+    public String selSeasonCodeByBoutiqueCode(String seasonCode) throws Exception{
         try {
-            if(StringUtils.isBlank(boutiqueCode)) {
+            if(StringUtils.isBlank(seasonCode)) {
                 return "";
             }
-            String sql = "select season_code from season_mapping where boutique_season_code = '" + StringUtils.trim(boutiqueCode) + "' and enabled = 1";
+            String sql = "select season_code from season_mapping where boutique_season_code = '" + StringUtils.trim(seasonCode) + "' and enabled = 1";
             List<Map<String,Object>> mapList  = seasonDao.executeBySql(sql,null);
 
             if(mapList != null && mapList.size() > 0) {
                 return mapList.get(0).get("season_code").toString();
+            } else {
+                String selectSeasonCodeSQL = "select season_code from season_mapping where season_code = '" + StringUtils.trim(seasonCode) + "' and enabled = 1";
+                mapList  = seasonDao.executeBySql(selectSeasonCodeSQL,null);
+                if(mapList != null && mapList.size() >0) {
+                    return mapList.get(0).get("season_code").toString();
+                }
             }
             return null;
         } catch (Exception e) {

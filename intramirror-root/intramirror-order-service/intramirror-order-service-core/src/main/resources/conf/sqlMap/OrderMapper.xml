@@ -551,6 +551,18 @@ and t1.order_num =  #{orderId,jdbcType=BIGINT}
         #{wechat,jdbcType=VARCHAR}, #{contactPhone,jdbcType=VARCHAR}, #{buyerName,jdbcType=VARCHAR}, #{areaCode,jdbcType=VARCHAR}
         )
     </insert>
+    
+    <select id="atelierSelectOrder" parameterType="java.util.Map" resultType="java.util.Map">
+
+        select distinct lp.`order_line_num`,DATE_FORMAT(lp.`created_at`,'%Y-%m-%d %h:%i:%s') as created_at,p.`product_code` ,pspv.`value` ,ss.`store` ,sku.`in_price` from `logistics_product` lp
+        inner join `shop_product_sku` sps on(lp.`shop_product_sku_id` = sps.`shop_product_sku_id`  and sps.`enabled`  = 1)
+        inner join `sku`  on(sps.`sku_id` = sku.`sku_id`  and sku.`enabled`  = 1)
+        inner join `sku_property` sk on(sku.`sku_id` = sk.`sku_id`  and sk.`enabled`  = 1)
+        inner join `product_sku_property_value`  pspv on(sk.`product_sku_property_value_id` = pspv.`product_sku_property_value_id` )
+        inner join `sku_store`  ss on(sku.`sku_id` = ss.`sku_id` and ss.`enabled`  = 1)
+        inner join `product` p on(sku.`product_id` = p.`product_id`  and p.`enabled`  = 1)
+        where DATE_FORMAT(lp.`created_at`,'%Y-%m-%d')  = #{create_at,jdbcType=VARCHAR} and p.`vendor_id`  = #{vendor_id,jdbcType=VARCHAR} and lp.`enabled`  = 1 limit #{offset,jdbcType=INTEGER},#{limit,jdbcType=INTEGER}
+    </select>
 
     <update id="updateById" parameterType="com.intramirror.order.api.model.Order">
         update `order`
