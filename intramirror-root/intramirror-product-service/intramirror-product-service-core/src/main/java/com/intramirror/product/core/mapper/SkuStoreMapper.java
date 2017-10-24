@@ -11,22 +11,22 @@ public interface SkuStoreMapper {
 
     /**
      * 根据SkuId修改库存相关信息
-     *
-     * @param statusType-订单的状态 skuid
+     * @param statusType-订单的状态
+     *         skuid
      * @return
      */
     int updateBySkuId(Map<String, Object> param);
 
     /**
      * 根据shopProductSkuId 查询SKUid
-     *
      * @param shopProductSkuId
      * @return
      */
     Long selectSkuIdByShopProductSkuId(Long shopProductSkuId);
 
-    List<Map<String, Object>> getSkuStoreBySkuId(@Param("skuIdString") String[] skuIdString);
+    List<Map<String, Object>> listSkuStoreByProductId(Long productId);
 
+    List<Map<String, Object>> getSkuStoreBySkuId(@Param("skuIdString") String[] skuIdString);
 
     int confirmSkuStore(@Param("skuStoreId") Long skuStoreId);
 
@@ -38,5 +38,5 @@ public interface SkuStoreMapper {
 
     void batchExecuteBySql(@Param("reservedTwo") BigDecimal reservedTwo, @Param("skuId") Long skuId);
 
-    void zeroClearing(Map<String,Object> map);
+    void zeroClearing(Map<String, Object> map);
 }

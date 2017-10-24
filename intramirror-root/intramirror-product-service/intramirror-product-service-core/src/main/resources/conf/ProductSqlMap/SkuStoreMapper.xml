@@ -80,6 +80,26 @@
         where sps.enabled = 1 and sps.shop_product_sku_id = #{shopProductSkuId,jdbcType=BIGINT}
     </select>
 
+    <select id="listSkuStoreByProductId" resultType="java.util.HashMap" parameterType="java.lang.Long">
+        SELECT
+          sku_store.sku_id,
+          sku_store.sku_store_id,
+          sku_store.store,
+          sku_store.reserved,
+          sku_store.confirmed,
+          product_sku_property_value.value AS size
+        FROM sku_store
+          INNER JOIN sku_property ON (sku_property.sku_id = sku_store.sku_id AND sku_property.enabled = 1)
+          INNER JOIN product_sku_property_key
+            ON (sku_property.product_sku_property_key_id = product_sku_property_key.product_sku_property_key_id AND sku_property.enabled = 1 AND
+                product_sku_property_key.name = "Size")
+          INNER JOIN product_sku_property_value
+            ON (product_sku_property_key.product_sku_property_key_id = product_sku_property_value.product_sku_property_value_id AND
+                product_sku_property_value.enabled = 1)
+        WHERE sku_store.product_id = #{productId} AND sku_store.enabled = 1;
+    </select>
+
+
     <select id="selectSkuIdByShopProductSkuId" resultType="java.lang.Long" parameterType="java.lang.Long">
     select sps.sku_id from shop_product_sku  sps where sps.shop_product_sku_id =  #{shopProductSkuId,jdbcType=BIGINT}
   </select>
@@ -98,13 +118,13 @@
 
     <update id="zeroClearing" parameterType="java.util.Map">
 
-        update `sku_store` ss set ss.`confirmed`  = 0,ss.`store`  = (0 - abs(cast(ss.`reserved` as signed)))
-        where ss.`enabled`  = 1
-        and ss.`product_id`  in
-            <foreach collection="productIds" item="productId" index="index"
-                     open="(" close =")" separator=",">
-                #{productId}
-            </foreach>
+        update `sku_store` ss set ss.`confirmed` = 0,ss.`store` = (0 - abs(cast(ss.`reserved` as signed)))
+        where ss.`enabled` = 1
+        and ss.`product_id` in
+        <foreach collection="productIds" item="productId" index="index"
+                 open="(" close=")" separator=",">
+            #{productId}
+        </foreach>
         <![CDATA[ and (ss.`last_check` <= #{date,jdbcType=VARCHAR} or ss.`last_check` is null )]]>
 
     </update>

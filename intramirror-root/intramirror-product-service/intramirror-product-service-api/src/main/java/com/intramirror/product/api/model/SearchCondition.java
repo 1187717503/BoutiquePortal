@@ -1,4 +1,4 @@
-package com.intramirror.web.controller.product;
+package com.intramirror.product.api.model;
 
 /**
  * Created on 2017/10/20.
@@ -16,20 +16,23 @@ public class SearchCondition {
     private String modelimage;
     private String streetimage;
     private String stock;
+    private int start;
+    private int count;
 
     public String getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     @Override
     public String toString() {
-        return "SearchCondition {" + "status='" + status + '\'' + ", boutique='" + boutique + '\'' + ", boutiqueid='" + boutiqueid + '\'' + ", brand='" + brand
+        return "SearchCondition{" + "status='" + status + '\'' + ", boutique='" + boutique + '\'' + ", boutiqueid='" + boutiqueid + '\'' + ", brand='" + brand
                 + '\'' + ", category='" + category + '\'' + ", season='" + season + '\'' + ", designerid_colorcode='" + designerid_colorcode + '\''
-                + ", image='" + image + '\'' + ", modelimage='" + modelimage + '\'' + ", streetimage='" + streetimage + '\'' + ", stock='" + stock + '\'' + '}';
+                + ", image='" + image + '\'' + ", modelimage='" + modelimage + '\'' + ", streetimage='" + streetimage + '\'' + ", stock='" + stock + '\''
+                + ", start='" + start + '\'' + ", count='" + count + '\'' + '}';
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getBoutique() {
@@ -110,6 +113,22 @@ public class SearchCondition {
 
     public void setStock(String stock) {
         this.stock = stock;
+    }
+
+    public int getStart() {
+        return start;
+    }
+
+    public void setStart(int start) {
+        this.start = start;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
     }
 
 }

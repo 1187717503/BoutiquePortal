@@ -29,26 +29,33 @@ public class CategoryServiceImpl extends BaseDao implements ICategoryService {
     public List<Category> queryActiveCategorys() {
         Category category = new Category();
         category.setEnabled(EnabledType.USED);
-        List<Map<String,Object>> categoryMaps = categoryMapper.selCategoryByConditions(category);
-        List<Category> categories = this.convertMapToCategory(categoryMaps,new ArrayList<Category>(),-1L);
+        List<Map<String, Object>> categoryMaps = categoryMapper.selCategoryByConditions(category);
+        List<Category> categories = this.convertMapToCategory(categoryMaps, new ArrayList<Category>(), -1L);
         return categories;
     }
 
+    @Override
+    public List<Category> listAllCategoryByConditions() {
+        Category category = new Category();
+        category.setEnabled(EnabledType.USED);
+        return categoryMapper.listAllCategoryByConditions(category);
+    }
+
     // 封装Category
-    private List<Category> convertMapToCategory(List<Map<String,Object>> mapList,List<Category> categorys,Long bl_parentId){
-        for(int i = 0;i < mapList.size();i++) {
-            Map<String,Object> map = mapList.get(i);
+    private List<Category> convertMapToCategory(List<Map<String, Object>> mapList, List<Category> categorys, Long bl_parentId) {
+        for (int i = 0; i < mapList.size(); i++) {
+            Map<String, Object> map = mapList.get(i);
             Long parentId = Long.parseLong(map.get("parent_id").toString());
             String name = map.get("name").toString();
             Long categoryId = Long.parseLong(map.get("category_id").toString());
             int level = Integer.parseInt(map.get("level").toString());
 
-            if(bl_parentId.equals(parentId)) {
+            if (bl_parentId.equals(parentId)) {
                 Category category = new Category();
                 category.setName(name);
                 category.setCategoryId(categoryId);
 
-//				mapList.remove(i);
+                //				mapList.remove(i);
                 category.setChildren(this.convertMapToCategory(mapList, new ArrayList<Category>(), categoryId));
                 categorys.add(category);
             }
@@ -56,26 +63,24 @@ public class CategoryServiceImpl extends BaseDao implements ICategoryService {
         return categorys;
     }
 
-	@Override
-	public List<Map<String,Object>> queryCategoryListByConditions(Category category)
-			throws Exception {
-		return categoryMapper.selCategoryByConditions(category);
-	}
+    @Override
+    public List<Map<String, Object>> queryCategoryListByConditions(Category category) throws Exception {
+        return categoryMapper.selCategoryByConditions(category);
+    }
 
-	@Override
-	public List<Map<String, Object>> getMappingCategoryInfoByCondition(
-			Map<String, Object> param) {
-		
-		return categoryMapper.getMappingCategoryInfoByCondition(param);
-	}
+    @Override
+    public List<Map<String, Object>> getMappingCategoryInfoByCondition(Map<String, Object> param) {
 
-	@Override
-	public List<Map<String, Object>> getCategoryInfoByCondition(Map<String, Object> map) {
-		return categoryMapper.getCategoryInfoByCondition(map);
-	}
+        return categoryMapper.getMappingCategoryInfoByCondition(param);
+    }
 
-	@Override
-	public List<Map<String, Object>> getCategoryByCondition(Map<String, Object> map) {
-		return categoryMapper.getCategoryByCondition(map);
-	}
+    @Override
+    public List<Map<String, Object>> getCategoryInfoByCondition(Map<String, Object> map) {
+        return categoryMapper.getCategoryInfoByCondition(map);
+    }
+
+    @Override
+    public List<Map<String, Object>> getCategoryByCondition(Map<String, Object> map) {
+        return categoryMapper.getCategoryByCondition(map);
+    }
 }
