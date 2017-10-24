@@ -76,7 +76,7 @@
           this.isLoading = true;
           this.$store.dispatch('login', this.loginForm).then(res => {
             if (res.data.status === 1) {
-              window.location.href="/";
+              window.location.href = '/admin/confirm';
             } else {
               Materialize.toast(this.errorInfo(res.data.status), 4000);
             }
