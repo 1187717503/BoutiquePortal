@@ -135,16 +135,19 @@ public class AiDucaSynProductMapping implements IProductMapping{
 				categoryMap.put("vendor_id", Long.parseLong(dataMap.get("vendor_id").toString()));
 				if(product.get("suitable") != null ){
 					categoryMap.put("boutique_first_category", product.get("suitable").toString().toLowerCase());
+					productOptions.setCategory1(product.get("suitable").toString().toLowerCase());
 				}else{
 					categoryMap.put("boutique_first_category", "");
 				}
 				if(product.get("category_1") != null ){
 					categoryMap.put("boutique_second_category", product.get("category_1").toString().toLowerCase());
+					productOptions.setCategory2(product.get("category_1").toString().toLowerCase());
 				}else{
 					categoryMap.put("boutique_second_category", "");
 				}
 				if(product.get("category_3") != null ){
 					categoryMap.put("boutique_third_category", product.get("category_3").toString().toLowerCase());
+					productOptions.setCategory3(product.get("category_3").toString().toLowerCase());
 				}else{
 					categoryMap.put("boutique_third_category", "");
 				}

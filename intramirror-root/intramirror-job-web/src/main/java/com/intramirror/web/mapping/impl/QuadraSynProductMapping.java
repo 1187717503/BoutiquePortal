@@ -149,17 +149,20 @@ public class QuadraSynProductMapping implements IProductMapping{
             categoryMap.put("vendor_id", Long.parseLong(dataMap.get("vendor_id").toString()));
             if(product.get("SESSO_ENG") != null ){
                 categoryMap.put("boutique_first_category", product.get("SESSO_ENG").toString().toLowerCase());
+				productOptions.setCategory1(product.get("SESSO_ENG").toString().toLowerCase());
             }else{
             	categoryMap.put("boutique_first_category", "");
             }
             if(product.get("GRMODELLO_ITA") != null ){
                 categoryMap.put("boutique_second_category", product.get("GRMODELLO_ITA").toString().toLowerCase());
-            }else{
+				productOptions.setCategory2(product.get("GRMODELLO_ITA").toString().toLowerCase());
+			}else{
             	categoryMap.put("boutique_second_category", "");
             }
             if(product.get("MODELLO_ITA") != null ){
                 categoryMap.put("boutique_third_category", product.get("MODELLO_ITA").toString().toLowerCase());
-            }else{
+				productOptions.setCategory3(product.get("MODELLO_ITA").toString().toLowerCase());
+			}else{
             	categoryMap.put("boutique_third_category", "");
             }
 

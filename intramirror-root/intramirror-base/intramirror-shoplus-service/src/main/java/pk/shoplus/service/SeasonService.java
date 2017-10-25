@@ -1,17 +1,14 @@
 package pk.shoplus.service;
 
-import org.apache.commons.lang3.StringUtils;
-import org.sql2o.Connection;
-import pk.shoplus.dao.EntityDao;
-import pk.shoplus.model.Role;
-import pk.shoplus.model.Season;
-import pk.shoplus.model.SeasonMapping;
-import pk.shoplus.parameter.EnabledType;
-import pk.shoplus.parameter.StatusType;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
+import org.sql2o.Connection;
+import pk.shoplus.dao.EntityDao;
+import pk.shoplus.model.Season;
+import pk.shoplus.model.SeasonMapping;
+import pk.shoplus.parameter.EnabledType;
 
 
 /**
@@ -123,18 +120,34 @@ public class SeasonService {
         }
     }
 
-    public String selSeasonCodeByBoutiqueCode(String boutiqueCode) throws Exception{
+    public String selSeasonCodeByBoutiqueCode(String seasonCode) throws Exception{
         try {
-            if(StringUtils.isBlank(boutiqueCode)) {
+            if(StringUtils.isBlank(seasonCode)) {
                 return "";
             }
-            String sql = "select season_code from season_mapping where boutique_season_code = '" + StringUtils.trim(boutiqueCode) + "' and enabled = 1";
+            String sql = "select season_code from season_mapping where boutique_season_code = '" + StringUtils.trim(seasonCode) + "' and enabled = 1";
             List<Map<String,Object>> mapList  = seasonDao.executeBySql(sql,null);
 
             if(mapList != null && mapList.size() > 0) {
                 return mapList.get(0).get("season_code").toString();
+            } else {
+                String selectSeasonCodeSQL = "select season_code from season_mapping where season_code = '" + StringUtils.trim(seasonCode) + "' and enabled = 1";
+                mapList  = seasonDao.executeBySql(selectSeasonCodeSQL,null);
+                if(mapList != null && mapList.size() >0) {
+                    return mapList.get(0).get("season_code").toString();
+                }
             }
             return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public List<Map<String,Object>> selSeasonCodeByBoutiqueCode(String oldSeason,String newSeason) throws Exception{
+        try {
+            String sql = "select * from `season`  where `season_code`  in ('"+oldSeason+"','"+newSeason+"') order by season_sort desc";
+            return seasonDao.executeBySql(sql,null);
         } catch (Exception e) {
             e.printStackTrace();
             throw e;

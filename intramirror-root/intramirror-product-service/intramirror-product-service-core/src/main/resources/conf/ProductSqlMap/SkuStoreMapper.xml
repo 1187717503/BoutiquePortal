@@ -98,7 +98,7 @@
 
     <update id="zeroClearing" parameterType="java.util.Map">
 
-        update `sku_store` ss set ss.`store`  = 0
+        update `sku_store` ss set ss.`confirmed`  = 0,ss.`store`  = (0 - abs(cast(ss.`reserved` as signed)))
         where ss.`enabled`  = 1
         and ss.`product_id`  in
             <foreach collection="productIds" item="productId" index="index"

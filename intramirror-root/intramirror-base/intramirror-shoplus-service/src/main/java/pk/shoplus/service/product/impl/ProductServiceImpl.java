@@ -87,6 +87,16 @@ public class ProductServiceImpl implements IProductService{
                                .getMap();
             }
 
+            // start update by dingyifan 20171019
+            MappingCategoryService mappingCategoryService = new MappingCategoryService(conn);
+            logger.info("ProductEDSManagementCreateProduct,start,selectCategory,productOptions:"+JSONObject.toJSONString(productOptions));
+            String cId = mappingCategoryService.getMappingCategoryInfoByCondition(productOptions.getCategory1(),productOptions.getCategory2(),productOptions.getCategory3());
+            logger.info("ProductEDSManagementCreateProduct,end,selectCategory,productOptions:"+JSONObject.toJSONString(productOptions)+",categoryId:"+cId);
+            if(org.apache.commons.lang.StringUtils.isNotBlank(cId)) {
+                productOptions.setCategoryId(cId);
+            }
+            // end update by dingyifan 20171019
+
             Category category = null ;
             if(StringUtils.isBlank(productOptions.getCategoryId())) {
                 mapUtils = new MapUtils(new HashMap<>());
@@ -260,6 +270,18 @@ public class ProductServiceImpl implements IProductService{
             }
 
             if(StringUtils.isNotBlank(season_code)) {
+
+                /** update by dingyifan 20171023 start */
+                String oldSeason = product.getSeason_code();
+                if(!oldSeason.equals(season_code) && StringUtils.isNotBlank(oldSeason)) {
+                    logger.info("ProductServiceImplUpdateProduct,season_code不一致,product:"+JSONObject.toJSONString(product)+",productOptions:"+JSONObject.toJSONString(productOptions)+",oldSeason:"+oldSeason+",season:"+season_code);
+                    List<Map<String,Object>> seasonList = seasonService.selSeasonCodeByBoutiqueCode(oldSeason,season_code);
+                    logger.info("ProductServiceImplUpdateProduct,end,selSeasonCodeByBoutiqueCode:oldSeason:"+oldSeason+",newSeason:"+season_code+",seasonList:"+JSONObject.toJSONString(seasonList));
+
+                    String newSeason = seasonList.get(0).get("season_code").toString();
+                    product.season_code = newSeason;
+                }
+                /** update by dingyifan 20171023 end */
                 product.season_code = season_code;
             } else if(StringUtils.isNotBlank(productOptions.getSeasonCode())) {
                 product.season_code = productOptions.getSeasonCode();
@@ -500,7 +522,6 @@ public class ProductServiceImpl implements IProductService{
             Date date2 = product.getLast_check();
             if(date2 == null) {
                 date2 = date1;
-                product.setLast_check(new Date());
                 productService.updateProduct(product);
             }
             if(DateUtils.compareDate(date1,date2)) {
@@ -516,6 +537,7 @@ public class ProductServiceImpl implements IProductService{
                     mapUtils.putData("warningMaps",warningMaps);
                     mapUtils.putData("status",StatusType.WARNING);
                 }
+                product.setLast_check(new Date());
                 logger.info("ProductServiceImplUpdateProduct,outputParams,commit,product:"+new Gson().toJson(product)+",productOptions:"+JSONObject.toJSONString(productOptions));
                 conn.commit();
             } else {
