@@ -6,11 +6,15 @@ import com.google.gson.Gson;
 import com.intramirror.web.mapping.api.IProductMapping;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
+import org.sql2o.Connection;
+import pk.shoplus.DBConnector;
 import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.parameter.StatusType;
+import pk.shoplus.service.MappingCategoryService;
 import pk.shoplus.util.ExceptionUtils;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.Runtime_exception;
@@ -31,6 +35,7 @@ public class AtelierUpdateByProductMapping implements IProductMapping{
     public ProductEDSManagement.ProductOptions mapping(Map<String, Object> bodyDataMap) {
         logger.info("AtelierUpdateByProductMapping,inputParams,bodyDataMap:"+JSONObject.toJSONString(bodyDataMap));
         ProductEDSManagement.ProductOptions productOptions = productEDSManagement.getProductOptions();
+        Connection conn = null;
         try {
             JSONObject jsonObjectData =  JSONObject.parseObject(bodyDataMap.get("Data").toString()) ;
             productOptions.setName(jsonObjectData.getString("product_name"))
@@ -67,9 +72,21 @@ public class AtelierUpdateByProductMapping implements IProductMapping{
                 sku.setStock(item.getString("stock"));
                 productOptions.getSkus().add(sku);
             }
+
+            conn = DBConnector.sql2o.beginTransaction();
+            MappingCategoryService mappingCategoryService = new MappingCategoryService(conn);
+            String vendor_id = bodyDataMap.get("vendor_id").toString();
+            logger.info("AtelierUpdateByProductMapping,getMappingCategoryInfoByCondition,start,vendor_id:"+vendor_id+",productOptions:"+JSONObject.toJSONString(productOptions));
+            List<Map<String,Object>> categoryMaps = mappingCategoryService.getMappingCategoryInfoByCondition(vendor_id,productOptions.getCategoryId());
+            logger.info("AtelierUpdateByProductMapping,getMappingCategoryInfoByCondition,end,vendor_id:"+vendor_id+",productOptions:"+JSONObject.toJSONString(productOptions)+",categoryMaps:"+JSONObject.toJSONString(categoryMaps));
+            if(categoryMaps != null && categoryMaps.size() >0){
+                productOptions.setCategoryId(categoryMaps.get(0).get("category_id").toString());
+            }
+            if(conn != null) {conn.commit();conn.close();}
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("AtelierUpdateByProductMapping,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
+            if(conn != null) {conn.rollback();conn.close();}
         }
         logger.info("AtelierUpdateByProductMapping,outputParams,productOptions:"+JSONObject.toJSONString(productOptions));
         return productOptions;

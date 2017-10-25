@@ -1,5 +1,6 @@
 package com.intramirror.web.controller.price;
 
+import com.intramirror.common.help.ExceptionUtils;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
 import org.slf4j.Logger;
@@ -34,7 +35,7 @@ public class PriceChangeRuleController {
             resultMessage.successStatus().addMsg("SUCCESS");
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error(" error message : {}",e.getMessage());
+            logger.info("PriceChangeRuleController,updatePriceByVendor,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
             resultMessage.errorStatus().addMsg("error message : " + e.getMessage());
         }
         return resultMessage;
@@ -69,7 +70,7 @@ public class PriceChangeRuleController {
             resultMessage.successStatus().addMsg("SUCCESS");
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error(" error message : {}",e.getMessage());
+            logger.info("PriceChangeRuleController,updatePriceByAdmin,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
             resultMessage.errorStatus().addMsg("error message : " + e.getMessage());
         }
         return resultMessage;

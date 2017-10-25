@@ -26,6 +26,9 @@ public class Season {
     @Column
     public Date updated_at;
 
+    @Column
+    public int season_sort;
+
     public String getSeason_code() {
         return season_code;
     }
@@ -64,5 +67,13 @@ public class Season {
 
     public void setUpdated_at(Date updated_at) {
         this.updated_at = updated_at;
+    }
+
+    public int getSeason_sort() {
+        return season_sort;
+    }
+
+    public void setSeason_sort(int season_sort) {
+        this.season_sort = season_sort;
     }
 }
