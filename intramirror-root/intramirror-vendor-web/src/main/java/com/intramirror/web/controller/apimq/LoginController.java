@@ -43,7 +43,6 @@ public class LoginController {
 
     /**
      * Wang
-     *
      * @param map
      * @return
      * @throws Exception
@@ -73,12 +72,13 @@ public class LoginController {
         if (Helper.checkNotNull(user)) {
             VendorApplication vendorApplication = vendorService.getVendorApplicationByUserId(user.getUserId());
             if (Helper.checkNotNull(vendorApplication)) {
-                if (user.getPassword().equals(Helper.md5Jdk(map.get("userPwd").toString()))) {
+                if (user.getPassword().equals(map.get("userPwd").toString())) {
                     Vendor vendor = vendorService.getVendorByUserId(user.getUserId());
                     if (Helper.checkNotNull(vendor)) {
                         //计算过期时间
                         DateTime dateTime = DateTime.now().plusSeconds(jwtExpireIn);
-                        String token = Jwts.builder().setSubject(String.valueOf(user.getUserId())).setIssuedAt(dateTime.toDate()).signWith(SignatureAlgorithm.HS512, getJwtBase64Key()).compact();
+                        String token = Jwts.builder().setSubject(String.valueOf(user.getUserId())).setIssuedAt(dateTime.toDate()).signWith(
+                                SignatureAlgorithm.HS512, getJwtBase64Key()).compact();
                         stringObjectMap.put("token", token);
                         status = StatusType.SUCCESS;
                     }

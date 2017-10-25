@@ -76,12 +76,13 @@ public class LoginController {
         if (userRole == null) {
             stringObjectMap.put("status", StatusType.ADMIN_USER_ROLE_NOT_EXIST);
             return stringObjectMap;
-        } else if (user.getPassword().equals(Helper.md5Jdk(map.get("userPwd").toString()))) {
+        } else if (user.getPassword().equals(map.get("userPwd").toString())) {
             Role role = roleService.getRoleById(userRole.getRoleId());
             if (role != null) {
                 //计算过期时间生成token
                 DateTime dateTime = DateTime.now().plusSeconds(jwtExpireIn);
-                String token = Jwts.builder().setSubject(String.valueOf(user.getUserId())).setIssuedAt(dateTime.toDate()).signWith(SignatureAlgorithm.HS512, getJwtBase64Key()).compact();
+                String token = Jwts.builder().setSubject(String.valueOf(user.getUserId())).setIssuedAt(dateTime.toDate()).signWith(SignatureAlgorithm.HS512,
+                        getJwtBase64Key()).compact();
                 stringObjectMap.put("token", token);
                 status = StatusType.SUCCESS;
             } else {

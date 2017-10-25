@@ -1,25 +1,6 @@
 package com.intramirror.web.service;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import com.intramirror.web.common.CommonProperties;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.alibaba.fastjson.JSON;
-import com.google.gson.Gson;
 import com.intramirror.common.Helper;
 import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.common.parameter.StatusType;
@@ -45,9 +26,21 @@ import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ShopProductSkuService;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.service.VendorService;
-import com.intramirror.web.common.OrderMail;
-import com.intramirror.web.controller.buyersys.SystemCallFactory;
-import pk.shoplus.service.request.impl.GetPostRequestService;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class OrderInputCreateOrderService {
@@ -306,7 +299,7 @@ public class OrderInputCreateOrderService {
 			 * mail-------------------------------
 			 **/
 			logger.info("start send mail sendEmailList.size:" + sendEmailList.size());
-			// 遍历发送邮件
+			/*// 遍历发送邮件
 			if (sendEmailList != null && sendEmailList.size() > 0) {
 				for (LogisticsProduct logisticsProduct : sendEmailList) {
 					try {
@@ -322,7 +315,7 @@ public class OrderInputCreateOrderService {
 
 				}
 
-			}
+			}*/
 			/**
 			 * -----------------------------end send
 			 * mail-------------------------------
