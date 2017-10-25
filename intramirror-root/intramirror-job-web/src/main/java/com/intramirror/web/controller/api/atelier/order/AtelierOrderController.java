@@ -1,22 +1,30 @@
 package com.intramirror.web.controller.api.atelier.order;
 
+import com.alibaba.fastjson15.JSON;
 import com.alibaba.fastjson15.JSONObject;
 import com.intramirror.common.help.ExceptionUtils;
+import com.intramirror.common.utils.DateUtils;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.web.controller.api.atelier.AtelierUpdateByProductService;
+import com.intramirror.web.service.order.OrderState;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.annotation.Resource;
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 /**
  * Created by dingyifan on 2017/10/18.
@@ -32,17 +40,24 @@ public class AtelierOrderController {
 
     private static final String atelier_success = "SUCCESS";
 
-    private static final String atelier_confirmed = "confirmed";
+    private static final String response_error = "1000";
 
-    private static final String atelier_cancelled = "cancelled";
+    private static final String response_success = "2000";
 
-    private static final String atelier_shipped = "shipped";
+    private static final String error_code_1 = "1";
+    private static final String error_desc_1 ="E001: Order Number doesn't exist.";
+
+    private static final String error_code_2 = "2";
+    private static final String error_desc_2 ="E002: ";
 
     @Resource(name = "atelierUpdateByProductService")
     private AtelierUpdateByProductService atelierUpdateByProductService;
 
     @Autowired
     private IOrderService iOrderService;
+
+    @Autowired
+    private OrderState orderState;
 
     @RequestMapping("/getOrderByDate")
     @ResponseBody
@@ -81,15 +96,52 @@ public class AtelierOrderController {
             e.printStackTrace();
             logger.info("AtelierOrderControllerGetOrderByDate,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
         }
+        logger.info("AtelierOrderControllerGetOrderByDate,outputParams,result:"+JSONObject.toJSONString(result));
         return result;
     }
 
 
     @RequestMapping("/updateOrderStatus")
     @ResponseBody
-    public UpdateOrderStatusResultVO updateOrderStatus(){
-        UpdateOrderStatusResultVO result = new UpdateOrderStatusResultVO();
+    public Map<String,Object> updateOrderStatus(HttpServletRequest request){
+        Map<String,Object> result = new HashMap<>();
+        try {
+            InputStream is = request.getInputStream();
+            String body = IOUtils.toString(is, "utf-8");
+            String storeID = request.getParameter("StoreID");
+            String version = request.getParameter("Version");
+            logger.info("AtelierOrderControllerUpdateOrderStatus,inputParams,body:"+body+",storeID:"+storeID+",version:"+version);
 
+            UpdateOrderStatusVO updateOrderStatusVO = new UpdateOrderStatusVO();
+            String checkResult = updateOrderStatusVO.checkUpdateOrderStatusParams(body,storeID,version);
+            logger.info("AtelierOrderControllerUpdateOrderStatus,checkUpdateOrderStatusParams,updateOrderStatusVO:"+JSONObject.toJSONString(
+                    updateOrderStatusVO));
+
+            if(atelier_success.equals(checkResult)) {
+                String status = updateOrderStatusVO.getStatus();
+
+                OrderState.StatusEnum statusEnum = null;
+                OrderState.StateParams stateParams = new OrderState().getStateParams();
+                stateParams.setExceptionTypeEnum(OrderState.ExceptionTypeEnum.INCORRECT_SYSTEM_INVENTORY);
+                stateParams.setOrder_line_num(updateOrderStatusVO.getOrder_number());
+                stateParams.setComments("Incorrect system inventory");
+
+                if(status.equals(OrderState.StatusEnum.Confirmed.getCode())) {
+                    statusEnum = OrderState.StatusEnum.Confirmed;
+                } else if(status.equals(OrderState.StatusEnum.Cancelled.getCode())){
+                    statusEnum = OrderState.StatusEnum.Cancelled;
+                } else if(status.equals(OrderState.StatusEnum.Shipped.getCode())){
+                    statusEnum = OrderState.StatusEnum.Shipped;
+                }
+                orderState.change(statusEnum,stateParams).execute();
+            } else {
+                result = this.result(response_error,error_code_2,error_desc_2+checkResult);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("AtelierOrderControllerUpdateOrderStatus,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
+        }
+        logger.info("AtelierOrderControllerUpdateOrderStatus,outputParams,result:"+JSONObject.toJSONString(result));
         return result;
     }
 
@@ -115,6 +167,22 @@ public class AtelierOrderController {
             }
         }
         return result;
+    }
+
+    private Map<String,Object> result(String responseCode,String errorCode,String errorMsg){
+        Map<String,Object> responseMap = new HashMap<>();
+        Map<String,Object> errorMap = new HashMap<>();
+
+        responseMap.put("responseCode",responseCode);
+
+        if(responseCode.equals(response_error)) {
+            errorMap.put("errorCode",errorCode);
+            errorMap.put("errorMsg",errorMsg);
+            errorMap.put("TimeStamp", DateUtils.getStrDate(new Date(),"yyyy-MM -hh HH:mm:ss"));
+
+            responseMap.put("Error",errorMap);
+        }
+        return responseMap;
     }
 
     class ApiInputParam{
@@ -307,11 +375,14 @@ public class AtelierOrderController {
             this.purchase_price = purchase_price;
         }
     }
-    class UpdateOrderStatusResultVO{
+    class UpdateOrderStatusVO {
+        private String Version;
+        private String StoreID;
         private String order_number;
         private String status;
         private String tracking_number;
         private String invoice_number;
+        private Long vendorId;
 
         public String getOrder_number() {
             return order_number;
@@ -343,6 +414,73 @@ public class AtelierOrderController {
 
         public void setInvoice_number(String invoice_number) {
             this.invoice_number = invoice_number;
+        }
+
+        public String getVersion() {
+            return Version;
+        }
+
+        public void setVersion(String version) {
+            Version = version;
+        }
+
+        public String getStoreID() {
+            return StoreID;
+        }
+
+        public void setStoreID(String storeID) {
+            StoreID = storeID;
+        }
+
+        public Long getVendorId() {
+            return vendorId;
+        }
+
+        public void setVendorId(Long vendorId) {
+            this.vendorId = vendorId;
+        }
+
+        public String checkUpdateOrderStatusParams(String body,String storeId,String version){
+            if(StringUtils.isBlank(body)) {
+                return "body is null.";
+            }
+
+            if(StringUtils.isBlank(storeId)){
+                return "StoreID is null.";
+            }
+
+            if(StringUtils.isBlank(version)) {
+                return "version is null.";
+            }
+
+            Map<String,Object> paramMap = atelierUpdateByProductService.getParamsMap();
+            if(paramMap.get(storeId) == null) {
+                return "StoreID error.";
+            }
+
+            Map<String,Object> dataMap = (Map<String, Object>) paramMap.get(storeId);
+            this.vendorId = Long.parseLong(dataMap.get("vendor_id").toString());
+
+            JSONObject jsonObjectBody = JSON.parseObject(body);
+            this.order_number = jsonObjectBody.getString("order_number");
+            this.status = jsonObjectBody.getString("status");
+
+            if(StringUtils.isBlank(this.order_number)) {
+                return "order_number is null.";
+            }
+
+            if(StringUtils.isBlank(this.status)) {
+                return "status is null.";
+            }
+
+            if(!(OrderState.StatusEnum.Cancelled.getCode().equals(this.status) || OrderState.StatusEnum.Confirmed.getCode().equals(this.status) || OrderState.StatusEnum.Shipped.getCode().equals(this.status))) {
+                return "status is error.";
+            }
+
+            this.tracking_number = jsonObjectBody.getString("tracking_number");
+            this.invoice_number = jsonObjectBody.getString("invoice_number");
+
+            return atelier_success;
         }
     }
 }
