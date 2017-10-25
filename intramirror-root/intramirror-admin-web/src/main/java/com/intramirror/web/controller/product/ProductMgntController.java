@@ -4,13 +4,15 @@ import com.intramirror.product.api.model.SearchCondition;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.product.api.service.product.IListProductService;
+import com.intramirror.product.api.service.season.SeasonService;
+import com.intramirror.product.api.model.ProductStatusEnum;
 import com.intramirror.web.controller.cache.CategoryCache;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,15 +22,31 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created on 2017/10/20.
+ *
  * @author YouFeng.Zhu
  */
 @RestController
 @RequestMapping("/product")
-public class ProductMgnt {
-    private final static Logger LOGGER = LoggerFactory.getLogger(ProductMgnt.class);
+public class ProductMgntController {
+    private final static Logger LOGGER = LoggerFactory.getLogger(ProductMgntController.class);
+
+    private final static Map<String, ProductStatusEnum> statusEnumMap = new HashMap<>();
+
+    static {
+        statusEnumMap.put("new", ProductStatusEnum.NEW);
+        statusEnumMap.put("processing", ProductStatusEnum.PROCESSING);
+        statusEnumMap.put("trash", ProductStatusEnum.TRASH);
+        statusEnumMap.put("readytosell", ProductStatusEnum.READY_TO_SELL);
+        //TODO: how to handle old processing
+        statusEnumMap.put("oldprocessing", ProductStatusEnum.OLD_PROCESSING);
+        statusEnumMap.put("shopprocessing", ProductStatusEnum.SHOP_PROCESSING);
+        statusEnumMap.put("shopsoldout", ProductStatusEnum.SHOP_SOLD_OUT);
+        statusEnumMap.put("shopreadytosale", ProductStatusEnum.SHOP_READY_TO_SALE);
+        statusEnumMap.put("shoponsale", ProductStatusEnum.SHOP_ON_SALE);
+        statusEnumMap.put("shopremoved", ProductStatusEnum.SHOP_REMOVED);
+    }
 
     @Autowired
-    @Qualifier("listProductService")
     private IListProductService iListProductService;
 
     @Autowired
@@ -40,6 +58,14 @@ public class ProductMgnt {
     @Autowired
     private ISkuStoreService iSkuStoreService;
 
+    @Autowired
+    private SeasonService seasonService;
+
+    @GetMapping(value = "/season/listcode")
+    public List<String> listSeasonCode() {
+        return seasonService.listAllSeasonCode();
+    }
+
     @GetMapping(value = "/list/{status}")
     // @formatter:off
     public List<Map<String, Object>> listProductByFilter(@PathVariable(value = "status") String status,
@@ -47,8 +73,9 @@ public class ProductMgnt {
             @RequestParam(value = "boutiqueid", required = false) String boutiqueid,
             @RequestParam(value = "brand", required = false) String brand,
             @RequestParam(value = "category", required = false) String category,
-            @RequestParam(value = "season", required = false) String season,
-            @RequestParam(value = "designerid_colorcode", required = false) String designerid_colorcode,
+            @RequestParam(value = "SeasonServiceImpl", required = false) String season,
+            @RequestParam(value = "designerid", required = false) String designerid,
+            @RequestParam(value = "colorcode", required = false) String colorcode,
             @RequestParam(value = "image", required = false) String image,
             @RequestParam(value = "modelimage", required = false) String modelimage,
             @RequestParam(value = "streetimage", required = false) String streetimage,
@@ -61,26 +88,29 @@ public class ProductMgnt {
         searchCondition.setBoutiqueid(boutiqueid);
         searchCondition.setBrand(brand);
         searchCondition.setCategory(category);
-        searchCondition.setDesignerid_colorcode(designerid_colorcode);
+        searchCondition.setDesignerid(designerid);
+        searchCondition.setColorcode(colorcode);
         searchCondition.setImage(image);
         searchCondition.setModelimage(modelimage);
         searchCondition.setSeason(season);
-        searchCondition.setStatus(status);
+        searchCondition.setStatus(getStatusEnum(status));
         searchCondition.setStock(stock);
         searchCondition.setStreetimage(streetimage);
         searchCondition.setStart((pageNo == null || pageNo < 0) ? 0 : (pageNo - 1) * pageSize);
         searchCondition.setCount((pageSize == null || pageSize < 0) ? 25 : pageSize);
         LOGGER.info("{}", searchCondition);
         List<Map<String, Object>> productList = null;
-        try {
-            productList = iListProductService.listProductService(searchCondition);
-            setCategoryPath(productList);
-            //setBrandIdAndColorCode(productList);
-            setSkuInfo(productList);
-        } catch (Exception e) {
-            LOGGER.error("Unexcepted exception: \n", e);
-        }
+
+        productList = iListProductService.listProductService(searchCondition);
+        setCategoryPath(productList);
+        //setBrandIdAndColorCode(productList);
+        setSkuInfo(productList);
+
         return productList;
+    }
+
+    private ProductStatusEnum getStatusEnum(String status) {
+        return statusEnumMap.get(status) == null ? ProductStatusEnum.ALL : statusEnumMap.get(status);
     }
 
     private void setCategoryPath(List<Map<String, Object>> productList) {
@@ -89,7 +119,16 @@ public class ProductMgnt {
         }
     }
 
+    private Map<String, Object> list2Map(List<Map<String, Object>> productList) {
+        Map<String, Object> map = new HashMap<>();
+        for (Map<String, Object> product : productList) {
+            map.put(product.get("product_id").toString(), product);
+        }
+        return map;
+    }
+
     private void setSkuInfo(List<Map<String, Object>> productList) {
+        //        Map<String, Object> productMap = list2Map(productList);
         for (Map<String, Object> product : productList) {
             List<Map<String, Object>> skuStoreList = iSkuStoreService.listSkuStoreByProductId(Long.parseLong(product.get("product_id").toString()));
             product.put("skuDetail", skuStoreList);
@@ -112,7 +151,7 @@ public class ProductMgnt {
     }
 
     @RequestMapping(value = "/operate/{action}", method = RequestMethod.PUT)
-    public Object operateProduct(@PathVariable(value = "action") String action) {
+    public Object operateProduct(@PathVariable(value = "action") String action, @RequestParam(value = "currentStatus") String status) {
         return null;
     }
 

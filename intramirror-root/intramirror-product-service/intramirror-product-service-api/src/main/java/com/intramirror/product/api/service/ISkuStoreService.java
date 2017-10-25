@@ -7,6 +7,7 @@ public interface ISkuStoreService {
 
     /**
      * 根据SkuId修改库存相关信息
+     *
      * @param statusType-订单的状态
      *         skuid
      * @return
@@ -17,6 +18,7 @@ public interface ISkuStoreService {
 
     /**
      * 根据skuId修改确认库存
+     *
      * @param shopProductSkuId
      * @return
      */
@@ -24,6 +26,7 @@ public interface ISkuStoreService {
 
     /**
      * 根据shopProductSkuId 查询SKUid
+     *
      * @param shopProductSkuId
      * @return
      */
@@ -32,4 +35,6 @@ public interface ISkuStoreService {
     void updateSkuStoreReserved(List<String> reservedList, String[] skuIdString, List<Long> skuIds) throws Exception;
 
     List<Map<String, Object>> listSkuStoreByProductId(Long productId);
+    //    List<Map<String, Object>> listSkuStoreByProductList(List<Map<String, Object>> products);
+
 }

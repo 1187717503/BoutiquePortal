@@ -138,6 +138,11 @@
             ) and pcrsg.enabled = 1
     )
   </select>
+    <select id="listAllSeasonCode" resultType="string">
+        SELECT season_code
+        FROM season
+        WHERE season.enabled = 1;
+    </select>
 
     <select id="queryRuleByBrandZero" resultType="java.util.Map" parameterType="java.util.Map">
 
@@ -240,6 +245,7 @@
     and exists (select brand_id from brand b where (b.brand_id = pcrcb.brand_id and b.enabled = 1) or pcrcb.brand_id = 0)
     and exists (select category_id from category c where (c.category_id = pcrcb.category_id and c.enabled = 1) or pcrcb.brand_id = 0)
   </insert>
+
 
     <insert id="copyPriceChangeRuleGroup" parameterType="java.util.Map">
 

@@ -495,41 +495,49 @@
             bc.brandID,
             bc.colorCode
         FROM product
-        INNER JOIN vendor ON product.vendor_id = vendor.vendor_id
-        INNER JOIN brand ON brand.brand_id = product.brand_id
-        INNER JOIN (SELECT
-        sku_id,
-        price,
-        in_price,
-        product_id
-        FROM sku
-        GROUP BY product_id) t_sku ON t_sku.product_id = product.product_id
-        INNER JOIN (SELECT
-        sum(sku_store.store) AS stock,
-        sku_store.product_id
-        FROM sku_store
-        GROUP BY sku_store.product_id) sum_stock ON sum_stock.product_id = product.product_id
-        LEFT JOIN shop_product_sku ON (shop_product_sku.sku_id = t_sku.sku_id AND shop_product_sku.enabled = 1)
-        <!-- if test="designerid_colorcode != null" -->
-        LEFT JOIN (SELECT
-        product_property.product_id,
-        MAX(CASE product_property.key_name
-        WHEN 'ColorCode'
-        THEN product_property.`value`
-        ELSE '' END) AS colorCode,
-        MAX(CASE product_property.key_name
-        WHEN 'BrandID'
-        THEN product_property.`value`
-        ELSE '' END) AS brandID,
-        product_property.enabled,
-        product_property.key_name,
-        product_property.product_id AS ppid
-        FROM product_property
-        GROUP BY product_property.product_id) bc
-        ON (bc.enabled = 1 AND (bc.key_name = 'BrandID' OR bc.key_name = 'ColorCode') AND
-        bc.product_id = product.product_id)
-        <!--/if -->
+            INNER JOIN shop_product ON shop_product.product_id = product.product_id
+            INNER JOIN vendor ON product.vendor_id = vendor.vendor_id
+            INNER JOIN brand ON brand.brand_id = product.brand_id
+            INNER JOIN (SELECT
+                            sku_id,
+                            price,
+                            in_price,
+                            product_id
+                        FROM sku
+                        GROUP BY product_id) t_sku ON t_sku.product_id = product.product_id
+            INNER JOIN (SELECT
+                            sum(sku_store.store) AS stock,
+                            sku_store.product_id
+                        FROM sku_store
+                        GROUP BY sku_store.product_id) sum_stock ON sum_stock.product_id = product.product_id
+            LEFT JOIN shop_product_sku ON (shop_product_sku.sku_id = t_sku.sku_id AND shop_product_sku.enabled = 1)
+            <!-- if test="designerid_colorcode != null" -->
+            LEFT JOIN (SELECT
+                        product_property.product_id,
+                        MAX(CASE product_property.key_name
+                              WHEN 'ColorCode'
+                              THEN product_property.`value`
+                              ELSE ''
+                              END) AS colorCode,
+                        MAX(CASE product_property.key_name
+                            WHEN 'BrandID'
+                            THEN product_property.`value`
+                            ELSE ''
+                            END) AS brandID,
+                        product_property.enabled,
+                        product_property.key_name,
+                        product_property.product_id AS ppid
+                      FROM product_property
+                      GROUP BY product_property.product_id) bc
+                      ON (bc.enabled = 1 AND (bc.key_name = 'BrandID' OR bc.key_name = 'ColorCode') AND
+                        bc.product_id = product.product_id)
+            <!--/if -->
         WHERE product.status = #{status,jdbcType=TINYINT}
+        <if test="shopStatus != -1">
+            AND shop_product.status = #{shopStatus,jdbcType=TINYINT}
+            AND shop_product.enabled = 1
+        </if>
+        AND product.enabled = 1
         <choose>
             <when test="stock == null or stock == 0">
 
@@ -589,8 +597,11 @@
                 AND product.img_modified = 0
             </otherwise>
         </choose>
-        <if test="designerid_colorcode != null">
-            AND (bc.brandID = #{designerid_colorcode} OR bc.colorCode = #{designerid_colorcode})
+        <if test="designerid != null">
+            AND bc.brandID = #{designerid}
+        </if>
+        <if test="colorcode != null">
+            AND bc.colorCode = #{colorcode}
         </if>
 
         LIMIT #{start}, #{count};
