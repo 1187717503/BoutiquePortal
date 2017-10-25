@@ -3,6 +3,7 @@ package com.intramirror.web.controller.api.atelier.order;
 import com.alibaba.fastjson15.JSON;
 import com.alibaba.fastjson15.JSONObject;
 import com.intramirror.common.help.ExceptionUtils;
+import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.utils.DateUtils;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.web.controller.api.atelier.AtelierUpdateByProductService;
@@ -133,7 +134,11 @@ public class AtelierOrderController {
                 } else if(status.equals(OrderState.StatusEnum.Shipped.getCode())){
                     statusEnum = OrderState.StatusEnum.Shipped;
                 }
-                orderState.change(statusEnum,stateParams).execute();
+
+                logger.info("AtelierOrderControllerUpdateOrderStatus,OrderStateChange,start,status:"+status+",stateParams:"+JSONObject.toJSONString(stateParams));
+                ResultMessage resultMessage = orderState.change(statusEnum,stateParams).execute();
+                logger.info("AtelierOrderControllerUpdateOrderStatus,OrderStateChange,end,status:"+status+",stateParams:"+JSONObject.toJSONString(stateParams)+",resultMessage:"+JSONObject.toJSONString(resultMessage));
+
             } else {
                 result = this.result(response_error,error_code_2,error_desc_2+checkResult);
             }

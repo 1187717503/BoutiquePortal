@@ -72,7 +72,7 @@ public class OrderState {
         } else if(statusEnum.getCode().equals(StatusEnum.Cancelled.getCode())) {
             return cancelled();
         } else if(statusEnum.getCode().equals(StatusEnum.Shipped.getCode())) {
-            return cancelled();
+            return Shipped();
         }
 
         return resultMessage.errorStatus().addMsg("Number doesn't exist!");
@@ -92,6 +92,7 @@ public class OrderState {
             insertMap.put("created_by_user_id",stateParams.getUser_id());
             logger.info("OrderState,cancelled,insertMap:"+JSONObject.toJSONString(insertMap));
             orderExceptionService.saveOrderComments(insertMap);
+            return ResultMessage.getInstance().successStatus();
         }
 
         return ResultMessage.getInstance().errorStatus().addMsg("cancelled. Status is not allowed to flow!").setData(dataMap);
@@ -114,6 +115,22 @@ public class OrderState {
             order.setOrderId(Long.parseLong(orderId));
             order.setStatus(Integer.parseInt(StatusEnum.Confirmed.getCode()));
             iOrderService.updateOrder(order);
+            return ResultMessage.getInstance().successStatus();
+        }
+        return ResultMessage.getInstance().errorStatus().addMsg("confirmed. Status is not allowed to flow!").setData(dataMap);
+    }
+
+    private ResultMessage Shipped() throws Exception{
+        String logisStatus = dataMap.get("logis_status").toString();
+        String logistics_product_id = dataMap.get("logistics_product_id").toString();
+        if(logisStatus.equals(StatusEnum.Confirmed.getValue())) {
+
+            LogisticsProduct logisticsProduct = new LogisticsProduct();
+            logisticsProduct.setLogistics_product_id(Long.parseLong(logistics_product_id));
+            logisticsProduct.setTracking_num(stateParams.getTracking_num());
+            logisticsProduct.setVat_num(stateParams.getVat_num());
+            logisticsProduct.setStatus(Integer.parseInt(StatusEnum.Shipped.getCode()));
+            iLogisticsProductService.updateByLogisticsProduct(logisticsProduct);
         }
         return ResultMessage.getInstance().errorStatus().addMsg("confirmed. Status is not allowed to flow!").setData(dataMap);
     }
@@ -218,6 +235,12 @@ public class OrderState {
         // required(Cancelled)
         private Long user_id;
 
+        // required(Shiped)
+        private String tracking_num;
+
+        // required(Shiped)
+        private String vat_num;
+
         public String getOrder_line_num() {
             return order_line_num;
         }
@@ -248,6 +271,22 @@ public class OrderState {
 
         public void setUser_id(Long user_id) {
             this.user_id = user_id;
+        }
+
+        public String getTracking_num() {
+            return tracking_num;
+        }
+
+        public void setTracking_num(String tracking_num) {
+            this.tracking_num = tracking_num;
+        }
+
+        public String getVat_num() {
+            return vat_num;
+        }
+
+        public void setVat_num(String vat_num) {
+            this.vat_num = vat_num;
         }
     }
 }
