@@ -94,7 +94,7 @@
             ON (sku_property.product_sku_property_key_id = product_sku_property_key.product_sku_property_key_id AND sku_property.enabled = 1 AND
                 product_sku_property_key.name = "Size")
           INNER JOIN product_sku_property_value
-            ON (product_sku_property_key.product_sku_property_key_id = product_sku_property_value.product_sku_property_value_id AND
+            ON (sku_property.product_sku_property_value_id = product_sku_property_value.product_sku_property_value_id AND
                 product_sku_property_value.enabled = 1)
         WHERE sku_store.product_id = #{productId} AND sku_store.enabled = 1;
     </select>

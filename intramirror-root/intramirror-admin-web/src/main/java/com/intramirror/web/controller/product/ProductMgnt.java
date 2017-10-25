@@ -75,7 +75,7 @@ public class ProductMgnt {
         try {
             productList = iListProductService.listProductService(searchCondition);
             setCategoryPath(productList);
-            setBrandIdAndColorCode(productList);
+            //setBrandIdAndColorCode(productList);
             setSkuInfo(productList);
         } catch (Exception e) {
             LOGGER.error("Unexcepted exception: \n", e);
@@ -91,8 +91,18 @@ public class ProductMgnt {
 
     private void setSkuInfo(List<Map<String, Object>> productList) {
         for (Map<String, Object> product : productList) {
-            product.put("skuDetail", iSkuStoreService.listSkuStoreByProductId(Long.parseLong(product.get("product_id").toString())));
+            List<Map<String, Object>> skuStoreList = iSkuStoreService.listSkuStoreByProductId(Long.parseLong(product.get("product_id").toString()));
+            product.put("skuDetail", skuStoreList);
+            //product.put("totalStore", sumStock(skuStoreList));
         }
+    }
+
+    private Long sumStock(List<Map<String, Object>> skuStoreList) {
+        Long total = 0L;
+        for (Map<String, Object> skuStore : skuStoreList) {
+            total += Long.parseLong(skuStore.get("store").toString());
+        }
+        return total;
     }
 
     private void setBrandIdAndColorCode(List<Map<String, Object>> productList) {

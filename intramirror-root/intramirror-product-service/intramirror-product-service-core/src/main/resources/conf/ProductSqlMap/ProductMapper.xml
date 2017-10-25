@@ -480,29 +480,119 @@
 
     <select id="listProductDetailInfo" parameterType="com.intramirror.product.api.model.SearchCondition" resultType="java.util.HashMap">
         SELECT
-          product.product_id,
-          brand.english_name          AS brand,
-          vendor.vendor_name          AS boutique,
-          product.product_code,
-          product.season_code         AS season_code,
-          product.category_id,
-          t_sku.sku_id,
-          t_sku.price                 AS retail_price,
-          t_sku.in_price              AS boutique_price,
-          shop_product_sku.sale_price AS im_price,
-          shop_product_sku.enabled
+            product.product_id,
+            brand.english_name AS brand_name,
+            vendor.vendor_name AS boutique,
+            product.product_code AS boutique_id,
+            product.season_code AS season_code,
+            product.category_id,
+            t_sku.sku_id,
+            t_sku.price AS retail_price,
+            t_sku.in_price AS boutique_price,
+            shop_product_sku.sale_price AS im_price,
+            shop_product_sku.enabled,
+            sum_stock.stock AS total_stock,
+            bc.brandID,
+            bc.colorCode
         FROM product
-          INNER JOIN vendor ON product.vendor_id = vendor.vendor_id
-          INNER JOIN brand ON brand.brand_id = product.brand_id
-          INNER JOIN (SELECT
-                        sku_id,
-                        price,
-                        in_price,
-                        product_id
-                      FROM sku
-                      GROUP BY product_id) t_sku ON t_sku.product_id = product.product_id
-          LEFT JOIN shop_product_sku ON (shop_product_sku.sku_id = t_sku.sku_id AND shop_product_sku.enabled = 1)
+        INNER JOIN vendor ON product.vendor_id = vendor.vendor_id
+        INNER JOIN brand ON brand.brand_id = product.brand_id
+        INNER JOIN (SELECT
+        sku_id,
+        price,
+        in_price,
+        product_id
+        FROM sku
+        GROUP BY product_id) t_sku ON t_sku.product_id = product.product_id
+        INNER JOIN (SELECT
+        sum(sku_store.store) AS stock,
+        sku_store.product_id
+        FROM sku_store
+        GROUP BY sku_store.product_id) sum_stock ON sum_stock.product_id = product.product_id
+        LEFT JOIN shop_product_sku ON (shop_product_sku.sku_id = t_sku.sku_id AND shop_product_sku.enabled = 1)
+        <!-- if test="designerid_colorcode != null" -->
+        LEFT JOIN (SELECT
+        product_property.product_id,
+        MAX(CASE product_property.key_name
+        WHEN 'ColorCode'
+        THEN product_property.`value`
+        ELSE '' END) AS colorCode,
+        MAX(CASE product_property.key_name
+        WHEN 'BrandID'
+        THEN product_property.`value`
+        ELSE '' END) AS brandID,
+        product_property.enabled,
+        product_property.key_name,
+        product_property.product_id AS ppid
+        FROM product_property
+        GROUP BY product_property.product_id) bc
+        ON (bc.enabled = 1 AND (bc.key_name = 'BrandID' OR bc.key_name = 'ColorCode') AND
+        bc.product_id = product.product_id)
+        <!--/if -->
         WHERE product.status = #{status,jdbcType=TINYINT}
+        <choose>
+            <when test="stock == null or stock == 0">
+
+            </when>
+            <when test="stock == 1">
+                AND sum_stock.stock &gt; 0
+            </when>
+            <otherwise>
+                AND sum_stock.stock &lt;= 0
+            </otherwise>
+        </choose>
+        <if test="brand != null">
+            AND brand.english_name = #{brand}
+        </if>
+        <if test="category != null">
+            AND product.category_id = #{category}
+        </if>
+        <if test="season != null">
+            AND product.season_code = #{season}
+        </if>
+        <if test="boutiqueid != null">
+            AND product.product_code = #{boutiqueid}
+        </if>
+        <if test="boutique != null">
+            AND vendor.vendor_name = #{boutique}
+        </if>
+        <choose>
+            <when test="image == null or image == 0">
+
+            </when>
+            <when test="image == 1">
+                AND (product.cover_img != NULL AND product.description_img != NULL )
+            </when>
+            <otherwise>
+                AND (product.cover_img == NULL OR product.description_img == NULL )
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="modelimage == null or modelimage == 0">
+
+            </when>
+            <when test="modelimage == 1">
+
+            </when>
+            <otherwise>
+
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="streetimage == null or streetimage == 0">
+
+            </when>
+            <when test="streetimage == 1">
+                AND product.img_modified = 1
+            </when>
+            <otherwise>
+                AND product.img_modified = 0
+            </otherwise>
+        </choose>
+        <if test="designerid_colorcode != null">
+            AND (bc.brandID = #{designerid_colorcode} OR bc.colorCode = #{designerid_colorcode})
+        </if>
+
         LIMIT #{start}, #{count};
     </select>
 
