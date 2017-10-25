@@ -481,6 +481,8 @@
     <select id="listProductDetailInfo" parameterType="com.intramirror.product.api.model.SearchCondition" resultType="java.util.HashMap">
         SELECT
             product.product_id,
+            product.status AS product_status,
+            shop_product.status AS shop_product_status,
             brand.english_name AS brand_name,
             vendor.vendor_name AS boutique,
             product.product_code AS boutique_id,
@@ -489,19 +491,27 @@
             t_sku.sku_id,
             t_sku.price AS retail_price,
             t_sku.in_price AS boutique_price,
-            shop_product_sku.sale_price AS im_price,
-            shop_product_sku.enabled,
+            <choose>
+                <when test="shopStatus != -1">
+                    shop_product_sku.sale_price AS sale_price,
+                    shop_product_sku.enabled AS shop_product_sku_enabled,
+                </when>
+                <otherwise>
+                    t_sku.im_price AS im_price,
+                </otherwise>
+            </choose>
             sum_stock.stock AS total_stock,
             bc.brandID,
             bc.colorCode
         FROM product
-            INNER JOIN shop_product ON shop_product.product_id = product.product_id
-            INNER JOIN vendor ON product.vendor_id = vendor.vendor_id
+            LEFT JOIN shop_product ON shop_product.product_id = product.product_id
+            INNER JOIN vendor ON product.vendor_id = vendor.vendor_id AND product.enabled = 1
             INNER JOIN brand ON brand.brand_id = product.brand_id
             INNER JOIN (SELECT
                             sku_id,
                             price,
                             in_price,
+                            im_price,
                             product_id
                         FROM sku
                         GROUP BY product_id) t_sku ON t_sku.product_id = product.product_id
@@ -510,15 +520,16 @@
                             sku_store.product_id
                         FROM sku_store
                         GROUP BY sku_store.product_id) sum_stock ON sum_stock.product_id = product.product_id
-            LEFT JOIN shop_product_sku ON (shop_product_sku.sku_id = t_sku.sku_id AND shop_product_sku.enabled = 1)
-            <!-- if test="designerid_colorcode != null" -->
+        <if test="shopStatus != -1">
+            INNER JOIN shop_product_sku ON (shop_product_sku.sku_id = t_sku.sku_id AND shop_product_sku.enabled = 1)
+        </if>
             LEFT JOIN (SELECT
                         product_property.product_id,
                         MAX(CASE product_property.key_name
-                              WHEN 'ColorCode'
-                              THEN product_property.`value`
-                              ELSE ''
-                              END) AS colorCode,
+                            WHEN 'ColorCode'
+                            THEN product_property.`value`
+                            ELSE ''
+                            END) AS colorCode,
                         MAX(CASE product_property.key_name
                             WHEN 'BrandID'
                             THEN product_property.`value`
@@ -528,16 +539,27 @@
                         product_property.key_name,
                         product_property.product_id AS ppid
                       FROM product_property
-                      GROUP BY product_property.product_id) bc
-                      ON (bc.enabled = 1 AND (bc.key_name = 'BrandID' OR bc.key_name = 'ColorCode') AND
+                        GROUP BY product_property.product_id) bc
+                        ON (bc.enabled = 1 AND (bc.key_name = 'BrandID' OR bc.key_name = 'ColorCode') AND
                         bc.product_id = product.product_id)
-            <!--/if -->
-        WHERE product.status = #{status,jdbcType=TINYINT}
-        <if test="shopStatus != -1">
-            AND shop_product.status = #{shopStatus,jdbcType=TINYINT}
-            AND shop_product.enabled = 1
-        </if>
-        AND product.enabled = 1
+        WHERE
+        <choose>
+            <when test="shopStatus == -1">
+                <choose>
+                    <when test="status == 4">
+                        product.status = 4 OR product.status = 2
+                    </when>
+                    <otherwise>
+                        product.status = #{status}
+                    </otherwise>
+                </choose>
+                AND (shop_product.enabled = 0 OR shop_product.enabled IS NULL)
+            </when>
+            <otherwise>
+                product.status = #{status} AND shop_product.status = #{shopStatus}
+                AND shop_product.enabled = 1
+            </otherwise>
+        </choose>
         <choose>
             <when test="stock == null or stock == 0">
 
@@ -606,6 +628,4 @@
 
         LIMIT #{start}, #{count};
     </select>
-
-
 </mapper>

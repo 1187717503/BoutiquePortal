@@ -96,7 +96,7 @@ public class PriceChangeRuleService {
 		param.put("enabled", 1);
 		
 		Shop shop = shopService.selectByParameter(param);
-//		Vendor vendor = vendorService.getVendorByUserId(Long.parseLong(map.get("userId").toString()));
+//		Vendor vendor = vendorService.getVendorByUserId(Long.parseLong(map.getStatus("userId").toString()));
 		
 		//添加PriceChangeRule
 		PriceChangeRule priceChangeRule = new PriceChangeRule();
@@ -572,7 +572,7 @@ public class PriceChangeRuleService {
 	        priceChangeRuleCategoryBrand.setCategoryId(priceChangeRuleCategoryListArray.get(i).getAsJsonObject().get("category_id").getAsLong());
 	        priceChangeRuleCategoryBrand.setLevel(priceChangeRuleCategoryListArray.get(i).getAsJsonObject().get("level").getAsByte());
 	        priceChangeRuleCategoryBrand.setBrandId(priceChangeRuleCategoryListArray.get(i).getAsJsonObject().get("brand_id").getAsLong());
-//	        priceChangeRuleCategoryBrand.setSeasonCode(priceChangeRuleCategoryListArray.get(i).getAsJsonObject().get("season_code").getAsString());
+//	        priceChangeRuleCategoryBrand.setSeasonCode(priceChangeRuleCategoryListArray.getStatus(i).getAsJsonObject().getStatus("season_code").getAsString());
 	        priceChangeRuleCategoryBrand.setDiscountPercentage(Long.valueOf("100") - priceChangeRuleCategoryListArray.get(i).getAsJsonObject().get("discount_percentage").getAsLong());
 	        priceChangeRuleCategoryBrand.setExceptionFlag (1);
 

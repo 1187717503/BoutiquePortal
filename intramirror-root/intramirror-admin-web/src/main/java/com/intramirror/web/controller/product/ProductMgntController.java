@@ -1,11 +1,10 @@
 package com.intramirror.web.controller.product;
 
+import com.intramirror.product.api.model.ProductStatusEnum;
 import com.intramirror.product.api.model.SearchCondition;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.product.api.service.product.IListProductService;
-import com.intramirror.product.api.service.season.SeasonService;
-import com.intramirror.product.api.model.ProductStatusEnum;
 import com.intramirror.web.controller.cache.CategoryCache;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,25 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
  * @author YouFeng.Zhu
  */
 @RestController
-@RequestMapping("/product")
+@RequestMapping("/product/fetch")
 public class ProductMgntController {
     private final static Logger LOGGER = LoggerFactory.getLogger(ProductMgntController.class);
-
-    private final static Map<String, ProductStatusEnum> statusEnumMap = new HashMap<>();
-
-    static {
-        statusEnumMap.put("new", ProductStatusEnum.NEW);
-        statusEnumMap.put("processing", ProductStatusEnum.PROCESSING);
-        statusEnumMap.put("trash", ProductStatusEnum.TRASH);
-        statusEnumMap.put("readytosell", ProductStatusEnum.READY_TO_SELL);
-        //TODO: how to handle old processing
-        statusEnumMap.put("oldprocessing", ProductStatusEnum.OLD_PROCESSING);
-        statusEnumMap.put("shopprocessing", ProductStatusEnum.SHOP_PROCESSING);
-        statusEnumMap.put("shopsoldout", ProductStatusEnum.SHOP_SOLD_OUT);
-        statusEnumMap.put("shopreadytosale", ProductStatusEnum.SHOP_READY_TO_SALE);
-        statusEnumMap.put("shoponsale", ProductStatusEnum.SHOP_ON_SALE);
-        statusEnumMap.put("shopremoved", ProductStatusEnum.SHOP_REMOVED);
-    }
 
     @Autowired
     private IListProductService iListProductService;
@@ -57,14 +39,6 @@ public class ProductMgntController {
 
     @Autowired
     private ISkuStoreService iSkuStoreService;
-
-    @Autowired
-    private SeasonService seasonService;
-
-    @GetMapping(value = "/season/listcode")
-    public List<String> listSeasonCode() {
-        return seasonService.listAllSeasonCode();
-    }
 
     @GetMapping(value = "/list/{status}")
     // @formatter:off
@@ -110,7 +84,7 @@ public class ProductMgntController {
     }
 
     private ProductStatusEnum getStatusEnum(String status) {
-        return statusEnumMap.get(status) == null ? ProductStatusEnum.ALL : statusEnumMap.get(status);
+        return ProductStateMap.getStatus(status);
     }
 
     private void setCategoryPath(List<Map<String, Object>> productList) {
@@ -148,11 +122,6 @@ public class ProductMgntController {
         for (Map<String, Object> product : productList) {
             product.putAll(productPropertyService.getProductPropertyValueByProductId(Long.parseLong(product.get("product_id").toString())));
         }
-    }
-
-    @RequestMapping(value = "/operate/{action}", method = RequestMethod.PUT)
-    public Object operateProduct(@PathVariable(value = "action") String action, @RequestParam(value = "currentStatus") String status) {
-        return null;
     }
 
 }
