@@ -72,7 +72,7 @@ public class OrderState {
         } else if(statusEnum.getCode().equals(StatusEnum.Cancelled.getCode())) {
             return cancelled();
         } else if(statusEnum.getCode().equals(StatusEnum.Shipped.getCode())) {
-            return Shipped();
+            return shipped();
         }
 
         return resultMessage.errorStatus().addMsg("Number doesn't exist!");
@@ -108,29 +108,36 @@ public class OrderState {
 
             LogisticsProduct logisticsProduct = new LogisticsProduct();
             logisticsProduct.setLogistics_product_id(Long.parseLong(logistics_product_id));
-            logisticsProduct.setStatus(Integer.parseInt(StatusEnum.Confirmed.getCode()));
+            logisticsProduct.setStatus(Integer.parseInt(StatusEnum.Confirmed.getValue()));
             iLogisticsProductService.updateByLogisticsProduct(logisticsProduct);
 
             Order order = new Order();
             order.setOrderId(Long.parseLong(orderId));
-            order.setStatus(Integer.parseInt(StatusEnum.Confirmed.getCode()));
+            order.setStatus(Integer.parseInt(StatusEnum.Confirmed.getValue()));
             iOrderService.updateOrder(order);
             return ResultMessage.getInstance().successStatus();
         }
         return ResultMessage.getInstance().errorStatus().addMsg("confirmed. Status is not allowed to flow!").setData(dataMap);
     }
 
-    private ResultMessage Shipped() throws Exception{
+    private ResultMessage shipped() throws Exception{
         String logisStatus = dataMap.get("logis_status").toString();
         String logistics_product_id = dataMap.get("logistics_product_id").toString();
+        String orderId = dataMap.get("order_id").toString();
         if(logisStatus.equals(StatusEnum.Confirmed.getValue())) {
 
             LogisticsProduct logisticsProduct = new LogisticsProduct();
             logisticsProduct.setLogistics_product_id(Long.parseLong(logistics_product_id));
             logisticsProduct.setTracking_num(stateParams.getTracking_num());
             logisticsProduct.setVat_num(stateParams.getVat_num());
-            logisticsProduct.setStatus(Integer.parseInt(StatusEnum.Shipped.getCode()));
+            logisticsProduct.setStatus(Integer.parseInt(StatusEnum.Shipped.getValue()));
             iLogisticsProductService.updateByLogisticsProduct(logisticsProduct);
+
+            Order order = new Order();
+            order.setOrderId(Long.parseLong(orderId));
+            order.setStatus(Integer.parseInt(StatusEnum.Shipped.getValue()));
+            iOrderService.updateOrder(order);
+            return ResultMessage.getInstance().successStatus();
         }
         return ResultMessage.getInstance().errorStatus().addMsg("confirmed. Status is not allowed to flow!").setData(dataMap);
     }

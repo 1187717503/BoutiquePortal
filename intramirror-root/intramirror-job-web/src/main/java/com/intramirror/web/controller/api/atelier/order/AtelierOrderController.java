@@ -139,11 +139,17 @@ public class AtelierOrderController {
                 ResultMessage resultMessage = orderState.change(statusEnum,stateParams).execute();
                 logger.info("AtelierOrderControllerUpdateOrderStatus,OrderStateChange,end,status:"+status+",stateParams:"+JSONObject.toJSONString(stateParams)+",resultMessage:"+JSONObject.toJSONString(resultMessage));
 
+                if(resultMessage.isSUCCESS()){
+                    result = this.result(response_success,null,null);
+                } else {
+                    result = this.result(response_error,error_code_2,resultMessage.getMsg());
+                }
             } else {
                 result = this.result(response_error,error_code_2,error_desc_2+checkResult);
             }
         } catch (Exception e) {
             e.printStackTrace();
+            result = this.result(response_error,error_code_2,error_desc_2+"ErrorMessage:"+e.getMessage());
             logger.info("AtelierOrderControllerUpdateOrderStatus,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
         }
         logger.info("AtelierOrderControllerUpdateOrderStatus,outputParams,result:"+JSONObject.toJSONString(result));
