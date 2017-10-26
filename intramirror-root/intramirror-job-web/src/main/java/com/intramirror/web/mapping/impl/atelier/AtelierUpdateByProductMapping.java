@@ -2,22 +2,21 @@ package com.intramirror.web.mapping.impl.atelier;
 
 import com.alibaba.fastjson15.JSONArray;
 import com.alibaba.fastjson15.JSONObject;
-import com.google.gson.Gson;
+import com.intramirror.product.api.service.category.ICategoryService;
 import com.intramirror.web.mapping.api.IProductMapping;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.sql2o.Connection;
 import pk.shoplus.DBConnector;
 import pk.shoplus.model.ProductEDSManagement;
-import pk.shoplus.parameter.StatusType;
 import pk.shoplus.service.MappingCategoryService;
 import pk.shoplus.util.ExceptionUtils;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import static pk.shoplus.enums.ApiErrorTypeEnum.errorType.Runtime_exception;
 
 /**
  * Created by dingyifan on 2017/9/19.
@@ -30,6 +29,9 @@ public class AtelierUpdateByProductMapping implements IProductMapping{
 
     // productEDSManagement
     private static ProductEDSManagement productEDSManagement = new ProductEDSManagement();
+
+    @Autowired
+    private ICategoryService categoryService;
 
     @Override
     public ProductEDSManagement.ProductOptions mapping(Map<String, Object> bodyDataMap) {
@@ -83,6 +85,28 @@ public class AtelierUpdateByProductMapping implements IProductMapping{
                 productOptions.setCategoryId(categoryMaps.get(0).get("category_id").toString());
             }
             if(conn != null) {conn.commit();conn.close();}
+
+            if(StringUtils.isBlank(productOptions.getCategoryId()) && StringUtils.isBlank(jsonObjectData.getString("category_id"))) {
+                String category_l1 = jsonObjectData.getString("category_l1")==null?"":jsonObjectData.getString("category_l1");
+                String category_l2 = jsonObjectData.getString("category_l2")==null?"":jsonObjectData.getString("category_l1");
+                String category_l3 = jsonObjectData.getString("category_l3")==null?"":jsonObjectData.getString("category_l1");
+
+                Map<String, Object> categoryMap = new HashMap<String, Object>();
+                categoryMap.put("vendor_id", bodyDataMap.get("vendor_id"));
+                categoryMap.put("boutique_second_category", category_l1);
+                categoryMap.put("boutique_third_category", category_l2);
+                categoryMap.put("boutique_first_category", category_l3);
+                productOptions.setCategory_name(JSONObject.toJSONString(categoryMap));
+                productOptions.setCategory1(category_l1);
+                productOptions.setCategory2(category_l2);
+                productOptions.setCategory3(category_l3);
+                logger.info("AtelierUpdateByProductMapping,getCategoryByCondition,categoryMap:"+JSONObject.toJSONString(categoryMap));
+                List<Map<String, Object>> apiCategoryMap = categoryService.getCategoryByCondition(categoryMap);
+                logger.info("AtelierUpdateByProductMapping,getCategoryByCondition,apiCategoryMap:"+JSONObject.toJSONString(apiCategoryMap)+",categoryMap:"+JSONObject.toJSONString(categoryMap));
+                if(null != apiCategoryMap && 0 < apiCategoryMap.size()) {
+                    productOptions.setCategoryId(apiCategoryMap.get(0).get("category_id").toString());
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("AtelierUpdateByProductMapping,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
