@@ -62,7 +62,7 @@ public class AtelierOrderController {
 
     @RequestMapping("/getOrderByDate")
     @ResponseBody
-    public List<GetOrderByDateResultVO> getOrderByDate(
+    public Object getOrderByDate(
             @Param(value = "Version")String Version,
             @Param(value = "StoreID")String StoreID,
             @Param(value = "offset")String offset,
@@ -91,8 +91,10 @@ public class AtelierOrderController {
                 logger.info("AtelierOrderControllerGetOrderByDate,start,convertByGetDate,dataMap:"+JSONObject.toJSONString(dataMap));
                 result = this.convertByGetDate(dataMap);
                 logger.info("AtelierOrderControllerGetOrderByDate,end,convertByGetDate,result:"+JSONObject.toJSONString(result)+",dataMap:"+JSONObject.toJSONString(dataMap));
+                return result;
             }
 
+            return this.result(response_error,error_code_2,error_desc_2+checkResult);
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("AtelierOrderControllerGetOrderByDate,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
