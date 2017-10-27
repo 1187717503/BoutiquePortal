@@ -2,9 +2,12 @@ package com.intramirror.web.controller.product;
 
 import com.intramirror.product.api.model.ProductWithBLOBs;
 import com.intramirror.product.api.model.ShopProduct;
+import com.intramirror.product.api.model.ShopProductSku;
+import com.intramirror.product.api.model.ShopProductWithBLOBs;
 import com.intramirror.product.api.model.Sku;
 import com.intramirror.product.api.service.IProductService;
 import com.intramirror.product.api.service.ShopProductService;
+import com.intramirror.product.api.service.ShopProductSkuService;
 import com.intramirror.product.api.service.SkuService;
 import com.intramirror.web.common.Response;
 import java.util.List;
@@ -14,11 +17,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import pk.shoplus.model.StatisticsShopYesterday;
 
 /**
  * Created on 2017/10/25.
@@ -40,17 +43,21 @@ public class StateMachineController {
     @Autowired
     private SkuService skuService;
 
-    @RequestMapping(value = "/{action}", method = RequestMethod.PUT)
-    public Response operateProduct(@PathVariable(value = "action") String action, @RequestParam(value = "product_id") String productId) {
+    @Autowired
+    private ShopProductSkuService shopProductSkuService;
+
+    @PutMapping(value = "/{action}")
+    public Response operateProduct(@PathVariable(value = "action") String action, @RequestParam(value = "product_id") String productId,
+            @RequestParam(value = "shop_product_id", required = false) String shopProductId) {
         Map<String, Object> currentState = productService.getProductStateByProductId(Long.parseLong(productId));
         LOGGER.info("[{}] product with [{}]", action, currentState);
         StateMachineCoreRule.validate(currentState, action);
-        updateProductState(currentState, action, Long.parseLong(productId));
+        updateProductState(currentState, action, Long.parseLong(productId), Long.parseLong(shopProductId));
         return Response.success();
     }
 
     @Transactional
-    private void updateProductState(Map<String, Object> currentState, String action, Long productId) {
+    private void updateProductState(Map<String, Object> currentState, String action, Long productId, Long shopProductId) {
         OperationEnum operation = ProductStateOperationMap.getOperation(action);
         StateEnum currentStateEnum = StateMachineCoreRule.map2StateEnum(currentState);
         StateEnum newStateEnum = StateMachineCoreRule.getNewState(currentStateEnum, operation);
@@ -67,7 +74,7 @@ public class StateMachineController {
             updateShopProductStatus(newStateEnum.getProductStatus(), productId);
         } else {
             //shop product -> product
-            disableShopProduct(newStateEnum.getProductStatus(), productId);
+            disableShopProductStatus(newStateEnum.getProductStatus(), productId, shopProductId);
         }
 
     }
@@ -86,22 +93,65 @@ public class StateMachineController {
         shopProductService.updateShopProductByProductId(shopProduct);
     }
 
-    private void disableShopProduct(int status, Long productId) {
-        //        ShopProduct shopProduct = new ShopProduct();
-        //        shopProduct.setEnabled(false);
-        //        shopProduct.setProductId(productId);
-        //        shopProductService.updateShopProductByProductId(shopProduct);
+    private void disableShopProductStatus(int status, Long productId, Long shopProductId) {
+        disableShopProductSku(status, shopProductId);
+        disableShopProduct(status, shopProductId);
+    }
 
+    private void disableShopProductSku(int status, Long shopProductId) {
+        ShopProductSku shopProductSku = new ShopProductSku();
+        shopProductSku.setEnabled(false);
+        shopProductSku.setShopProductId(shopProductId);
+        shopProductSkuService.updateByShopProductId(shopProductSku);
+    }
+
+    private void disableShopProduct(int status, Long shopProductId) {
+        ShopProduct shopProduct = new ShopProduct();
+        shopProduct.setEnabled(false);
+        shopProduct.setShopProductId(shopProductId);
+        shopProductService.updateByPrimaryKey(shopProduct);
     }
 
     private void createShopProductStatus(int status, Long productId) {
+        ProductWithBLOBs product = productService.selectByPrimaryKey(productId);
         List<Sku> skuList = skuService.listSkuInfoByProductId(productId);
         if (skuList.isEmpty()) {
             LOGGER.error("Fail to get sku of product_id [{}]", productId);
             // throw exception?
         }
-        ShopProduct shopProduct = new ShopProduct();
+        Long shopProductId = createShopProduct(status, product, skuList.get(0));
+        insertShopProductSkus(skuList, shopProductId);
+
+    }
+
+    private Long createShopProduct(int status, ProductWithBLOBs product, Sku sku) {
+        ShopProductWithBLOBs shopProduct = new ShopProductWithBLOBs();
         shopProduct.setEnabled(true);
         shopProduct.setShopId(shopId);
+        shopProduct.setStatus((byte) status);
+        shopProduct.setProductId(product.getProductId());
+        shopProduct.setName(product.getName());
+        shopProduct.setShopCategoryId(product.getCategoryId());
+        shopProduct.setCoverpic(product.getCoverImg());
+        shopProduct.setIntroduction(product.getDescription());
+        shopProduct.setMinSalePrice(sku.getImPrice());
+        shopProduct.setMaxSalePrice(sku.getImPrice());
+        return shopProductService.insertAndGetId(shopProduct);
+    }
+
+    private void insertShopProductSkus(List<Sku> skuList, Long shopProductId) {
+        for (Sku sku : skuList) {
+            ShopProductSku shopProductSku = new ShopProductSku();
+            shopProductSku.setEnabled(true);
+            shopProductSku.setShopProductId(shopProductId);
+            shopProductSku.setSkuId(sku.getSkuId());
+            shopProductSku.setName(sku.getName());
+            shopProductSku.setCoverpic(sku.getCoverpic());
+            shopProductSku.setIntroduction(sku.getIntroduction());
+            shopProductSku.setSalePrice(sku.getImPrice());
+            shopProductSku.setShopId(shopId);
+            shopProductSkuService.insertSelective(shopProductSku);
+        }
+
     }
 }

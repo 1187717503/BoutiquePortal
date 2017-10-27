@@ -40,11 +40,6 @@
             <property name="useActualColumnNames" value="false"/>
         </table>
 
-        <table schema="intra-mirror-prd" tableName="sku" domainObjectName="Sku"
-               enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
-               enableSelectByExample="false" selectByExampleQueryId="false">
-            <property name="useActualColumnNames" value="false"/>
-        </table>
 
     </context>
 </generatorConfiguration>

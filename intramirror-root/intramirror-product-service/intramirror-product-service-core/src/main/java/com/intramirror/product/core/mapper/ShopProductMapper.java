@@ -61,4 +61,6 @@ public interface ShopProductMapper {
     int updateByPrimaryKey(ShopProduct record);
 
     int updateShopProductByProductId(ShopProduct record);
+
+    Long insertAndGetId(ShopProduct shopProduct);
 }

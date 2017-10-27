@@ -68,4 +68,7 @@ public interface ShopProductSkuMapper {
     Map<String, Object> getSkuBySkuId(Long skuId);
 
     List<Map<String, Object>> getSkuIdByShopProductSkuId(@Param("shopProductSkuIds") String[] shopProductSkuIds);
+
+    int updateByShopProductId(ShopProductSku record);
+
 }

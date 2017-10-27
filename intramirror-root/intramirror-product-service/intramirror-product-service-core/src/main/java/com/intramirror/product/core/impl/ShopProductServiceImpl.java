@@ -60,4 +60,11 @@ public class ShopProductServiceImpl extends BaseDao implements ShopProductServic
         return shopProductMapper.updateShopProductByProductId(record);
     }
 
+    @Override
+    public Long insertAndGetId(ShopProduct shopProduct) {
+        return shopProductMapper.insertAndGetId(shopProduct);
+    }
+
+
+
 }

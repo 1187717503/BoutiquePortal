@@ -1,18 +1,12 @@
 package com.intramirror.product.core.apimq.impl;
 
-
-import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.product.api.model.ShopProductSku;
-import com.intramirror.product.api.model.Sku;
 import com.intramirror.product.api.service.ShopProductSkuService;
-import com.intramirror.product.api.service.SkuService;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.ShopProductSkuMapper;
-import com.intramirror.product.core.mapper.SkuMapper;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Map;
+import org.springframework.stereotype.Service;
 
 /**
  * SKU服务
@@ -38,11 +32,21 @@ public class ShopProductSkuServiceImpl extends BaseDao implements ShopProductSku
 
     @Override
     public Map<String, Object> getSkuBySkuId(Long skuId) {
-         return shopProductSkuMapper.getSkuBySkuId(skuId);
+        return shopProductSkuMapper.getSkuBySkuId(skuId);
     }
 
     @Override
     public List<Map<String, Object>> getSkuIdByShopProductSkuId(String[] shopProductSkuIds) {
         return shopProductSkuMapper.getSkuIdByShopProductSkuId(shopProductSkuIds);
+    }
+
+    @Override
+    public int insertSelective(ShopProductSku shopProductSku) {
+        return shopProductSkuMapper.insertSelective(shopProductSku);
+    }
+
+    @Override
+    public int updateByShopProductId(ShopProductSku record) {
+        return shopProductSkuMapper.updateByShopProductId(record);
     }
 }
