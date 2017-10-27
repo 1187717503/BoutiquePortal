@@ -88,8 +88,8 @@ public class AtelierUpdateByProductMapping implements IProductMapping{
 
             if(StringUtils.isBlank(productOptions.getCategoryId()) && StringUtils.isBlank(jsonObjectData.getString("category_id"))) {
                 String category_l1 = jsonObjectData.getString("category_l1")==null?"":jsonObjectData.getString("category_l1");
-                String category_l2 = jsonObjectData.getString("category_l2")==null?"":jsonObjectData.getString("category_l1");
-                String category_l3 = jsonObjectData.getString("category_l3")==null?"":jsonObjectData.getString("category_l1");
+                String category_l2 = jsonObjectData.getString("category_l2")==null?"":jsonObjectData.getString("category_l2");
+                String category_l3 = jsonObjectData.getString("category_l3")==null?"":jsonObjectData.getString("category_l3");
 
                 Map<String, Object> categoryMap = new HashMap<String, Object>();
                 categoryMap.put("vendor_id", bodyDataMap.get("vendor_id"));
