@@ -202,6 +202,7 @@ public class CloudStoreDayUpdateBySkuController implements InitializingBean{
 					Map<String,Object> mqMap = new HashMap<>();
 					mqMap.put("vendorOption",vendorOption);
 					mqMap.put("responseBody",item.toJSONString());
+					mqMap.put("vendor_id",vendor_id);
 					logger.info("CloudStoreGetEventsControllerPutGetEventsData,CloudStoreSynProduct,jsonObject:"+jsonObject.toJSONString());
 					 // 映射数据 封装VO
                     ProductEDSManagement.ProductOptions productOptions = iProductMapping.mapping(mqMap);
@@ -229,6 +230,7 @@ public class CloudStoreDayUpdateBySkuController implements InitializingBean{
 				Map<String,Object> mqMap = new HashMap<>();
 				mqMap.put("vendorOption",vendorOption);
 				mqMap.put("responseBody",item.toJSONString());
+                mqMap.put("vendor_id",vendor_id);
 				logger.info("CloudStoreGetEventsControllerPutGetEventsData,CloudStoreSynProduct,jsonObject:"+jsonObject.toJSONString());
 				 // 映射数据 封装VO
 				logger.info("CloudStoreGetEventsControllerPutGetEventsData,CloudStoreSynProduct,mqMap:"+new Gson().toJson(mqMap));

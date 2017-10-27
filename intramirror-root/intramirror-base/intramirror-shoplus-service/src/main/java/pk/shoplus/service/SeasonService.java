@@ -1,17 +1,14 @@
 package pk.shoplus.service;
 
-import org.apache.commons.lang3.StringUtils;
-import org.sql2o.Connection;
-import pk.shoplus.dao.EntityDao;
-import pk.shoplus.model.Role;
-import pk.shoplus.model.Season;
-import pk.shoplus.model.SeasonMapping;
-import pk.shoplus.parameter.EnabledType;
-import pk.shoplus.parameter.StatusType;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
+import org.sql2o.Connection;
+import pk.shoplus.dao.EntityDao;
+import pk.shoplus.model.Season;
+import pk.shoplus.model.SeasonMapping;
+import pk.shoplus.parameter.EnabledType;
 
 
 /**
@@ -141,6 +138,16 @@ public class SeasonService {
                 }
             }
             return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public List<Map<String,Object>> selSeasonCodeByBoutiqueCode(String oldSeason,String newSeason) throws Exception{
+        try {
+            String sql = "select * from `season`  where `season_code`  in ('"+oldSeason+"','"+newSeason+"') order by season_sort desc";
+            return seasonDao.executeBySql(sql,null);
         } catch (Exception e) {
             e.printStackTrace();
             throw e;

@@ -246,7 +246,6 @@
     and exists (select category_id from category c where (c.category_id = pcrcb.category_id and c.enabled = 1) or pcrcb.brand_id = 0)
   </insert>
 
-
     <insert id="copyPriceChangeRuleGroup" parameterType="java.util.Map">
 
     insert price_change_rule_group(price_change_rule_id,product_group_id,discount_percentage)
