@@ -17,203 +17,340 @@
     <!-- For Windows Phone -->
 
 
-    <!-- CORE CSS-->    
+    <!-- CORE CSS-->
     <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection">
     <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection">
-    <!-- Custome CSS-->    
+    <!-- Customer CSS-->
     <link href="css/custom/custom.css" type="text/css" rel="stylesheet" media="screen,projection">
     <link href="css/index.css" type="text/css" rel="stylesheet" media="screen,projection">
 
 </head>
 
 <body>
-    <div id="loader-wrapper">
-        <div id="loader"></div>        
-        <div class="loader-section section-left"></div>
-        <div class="loader-section section-right"></div>
+<div id="loader-wrapper">
+    <div id="loader"></div>
+    <div class="loader-section section-left"></div>
+    <div class="loader-section section-right"></div>
+</div>
+
+<header id="header" class="page-topbar">
+    <div class="navbar-fixed">
+        <nav class="navbar-color">
+            <div class="nav-wrapper">
+                <ul class="left">
+                    <li><h1 class="logo-wrapper"><a href="index.html" class="brand-logo darken-1">Intra Mirror</a> <span class="logo-text">Intra Mirror</span>
+                    </h1></li>
+                </ul>
+
+            </div>
+        </nav>
     </div>
-
-    <header id="header" class="page-topbar">
-        <div class="navbar-fixed">
-            <nav class="navbar-color">
-                <div class="nav-wrapper">
-                    <ul class="left">                      
-                      <li><h1 class="logo-wrapper"><a href="index.html" class="brand-logo darken-1">Intra Mirror</a> <span class="logo-text">Intra Mirror</span></h1></li>
-                    </ul>
-
-                </div>
-            </nav>
-        </div>
-    </header>
+</header>
 
 
-    <!-- START MAIN -->
-    <div id="main">
-        <!-- START WRAPPER -->
-        <div class="wrapper">
-            <!-- START CONTENT -->
-            <section id="content">
-                <!--start container-->
-                <div class="container">
-                    <div class="filter">
-                        <div class="row">
-                            <div class="col s9">
-                                <div class="row">
-                                    <div class="input-field col s3">
-                                        <select id="select-boutique">
-                                            <option value="-1" disabled selected>Boutique</option>
-                                        </select>
-                                    </div>
-                                    <div class="input-field col s3">
-                                        <input id="text-designer" type="text" class="validate">
-                                        <label for="text-designer">Designer ID/Color Code</label>
-                                    </div>
-                                    <div class="input-field col s3">
-                                        <input id="text-boutique" type="text" class="validate">
-                                        <label for="text-boutique">Boutique ID</label>
-                                    </div>
-                                    <div class="input-field col s3">
-                                        <select id="select-brand">
-                                            <option value="-1" disabled selected>Brand</option>
-                                        </select>
-                                    </div>
+<!-- START MAIN -->
+<div id="main" class="z-depth-2">
+    <!-- START WRAPPER -->
+    <div class="wrapper">
+        <!-- START CONTENT -->
+        <section id="content">
+            <!--start container-->
+            <div class="container">
+                <div class="filter">
+                    <div class="row">
+                        <div class="col s9">
+                            <div class="row">
+                                <div class="input-field col s3">
+                                    <select id="select-boutique"></select>
                                 </div>
-
-                                <div class="row">
-                                    <div class="input-field col s2">
-                                        <select>
-                                            <option value="-1" disabled selected>Category</option>
-                                            <option value="1">Option 1</option>
-                                            <option value="2">Option 2</option>
-                                            <option value="3">Option 3</option>
-                                        </select>
-                                    </div>
-                                    <div class="input-field col s2">
-                                        <select>
-                                            <option value="-1" disabled selected>Season</option>
-                                            <option value="1">Option 1</option>
-                                            <option value="2">Option 2</option>
-                                            <option value="3">Option 3</option>
-                                        </select>
-                                    </div>
-                                    <div class="input-field col s2">
-                                        <select>
-                                            <option value="-1" selected>Image All</option>
-                                            <option value="1">YES</option>
-                                            <option value="2">NO</option>
-                                        </select>
-                                    </div>
-                                    <div class="input-field col s2">
-                                        <select>
-                                            <option value="-1" selected>Model Image All</option>
-                                            <option value="1">YES</option>
-                                            <option value="2">NO</option>
-                                        </select>
-                                    </div>
-                                    <div class="input-field col s2">
-                                        <select>
-                                            <option value="-1" selected>Street Image All</option>
-                                            <option value="1">YES</option>
-                                            <option value="2">NO</option>
-                                        </select>
-                                    </div>
-                                    <div class="input-field col s2">
-                                        <select>
-                                            <option value="-1" selected>Stock All</option>
-                                            <option value="1">YES</option>
-                                            <option value="2">NO</option>
-                                        </select>
-                                    </div>
+                                <div class="input-field col s3">
+                                    <input id="text-designer" type="text" class="validate">
+                                    <label for="text-designer">Designer ID/Color Code</label>
+                                </div>
+                                <div class="input-field col s3">
+                                    <input id="text-boutique" type="text" class="validate">
+                                    <label for="text-boutique">Boutique ID</label>
+                                </div>
+                                <div class="input-field col s3">
+                                    <select id="select-brand"></select>
                                 </div>
                             </div>
 
-                            <div class="col s3 search-btns">
-                                <a class="waves-effect waves-light btn">Search</a>
-                                <a class="waves-effect waves-light btn">Reset</a>
+                            <div class="row">
+                                <div class="input-field col s4">
+                                    <select id="select-category"></select>
+                                </div>
+                                <div class="input-field col s1">
+                                    <select id="select-season"></select>
+                                </div>
+                                <div class="input-field col s1">
+                                    <select>
+                                        <option value="-1" selected>Image All</option>
+                                        <option value="1">YES</option>
+                                        <option value="2">NO</option>
+                                    </select>
+                                </div>
+                                <div class="input-field col s2">
+                                    <select>
+                                        <option value="-1" selected>Model Image All</option>
+                                        <option value="1">YES</option>
+                                        <option value="2">NO</option>
+                                    </select>
+                                </div>
+                                <div class="input-field col s2">
+                                    <select>
+                                        <option value="-1" selected>Street Image All</option>
+                                        <option value="1">YES</option>
+                                        <option value="2">NO</option>
+                                    </select>
+                                </div>
+                                <div class="input-field col s2">
+                                    <select>
+                                        <option value="-1" selected>Stock All</option>
+                                        <option value="1">YES</option>
+                                        <option value="2">NO</option>
+                                    </select>
+                                </div>
                             </div>
-                            
+                        </div>
+
+                        <div class="col s3 search-btns">
+                            <a class="waves-effect waves-light btn ">Search</a>
+                            <a class="waves-effect waves-light btn btn-gray">Reset</a>
                         </div>
 
                     </div>
-                    <!--end filter-->
 
-                    <!-- tabs -->
-                    <div class="row status-tabs">
-                        <div class="col s12">
-                            <ul class="tabs">
-                                <li class="tab col"><a class="active" href="#test1">NEW</a></li>
-                                <li class="tab col"><a href="#test2">PROCESSING</a></li>
-                                <li class="tab col"><a href="#test3">OK</a></li>
-                                <li class="tab col"><a href="#test4">SHOP_OFFSALE</a></li>
-                                <li class="tab col"><a href="#test2">SHOP_ONSALE</a></li>
-                                <li class="tab col"><a href="#test3">SHOP_SOLDOUT</a></li>
-                                <li class="tab col"><a href="#test4">TARSH</a></li>
-                            </ul>
-                        </div>
-
-                        <div id="test1" class="col s12">Test 1</div>
-
-                    </div>
-                    <!-- end tabs -->
                 </div>
-                <!--end container-->
-            </section>
-            <!-- END CONTENT -->
+                <!--end filter-->
 
-        </div>
-        <!-- END WRAPPER -->
+                <!-- tabs -->
+                <div class="row status-tabs">
+                    <div class="col s12">
+                        <ul class="tabs">
+                            <li id="tab_new" class="tab col"><a class="active" href="#"><div>NEW<span>(0)</span></div></a></li>
+                            <li id="tab_processing" class="tab col"><a href="#"><div>PROCESSING<span>(0)</span></div></a></li>
+                            <li id="tab_ok" class="tab col"><a href="#"><div>OK<span>(0)</span></div></a></li>
+                            <li id="tab_offsale" class="tab col"><a href="#"><div>SHOP_OFFSALE<span>(0)</span></div></a></li>
+                            <li id="tab_offsale" class="tab col"><a href="#"><div>SHOP_OFFSALE<span>(0)</span></div></a></li>
+                            <li id="tab_offsale" class="tab col"><a href="#"><div>SHOP_OFFSALE<span>(0)</span></div></a></li>
+                            <li id="tab_onsale" class="tab col"><a href="#"><div>SHOP_ONSALE<span>(0)</span></div></a></li>
+                            <li id="tab_soldout" class="tab col"><a href="#"><div>SHOP_SOLDOUT<span>(0)</span></div></a></li>
+                            <li id="tab_trash" class="tab col"><a href="#"><div>TRASH<span>(0)</span></div></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="control-pannel">
+                    <div>
+                        <a class="waves-effect waves-light btn">PROCESS</a>
+                        <a class="waves-effect waves-light btn">APPROVE</a>
+                    </div>
+                    <div class="remove">
+                        <a class="waves-effect waves-light btn btn-gray">REMOVE</a>
+                    </div>
+                </div>
+                <div id="test1" class="col s12">
+                    <div class="order-head style-scope page-order">
+                        <div class="row style-scope page-order">
+                            <div class="item style-scope page-order">
+                                <input type="checkbox" class="filled-in" id="order-head-cbx"/>
+                                <label for="order-head-cbx"></label>
+                            </div>
+                            <div class="item style-scope page-order"><span class="mdi-hardware-keyboard-arrow-right head-hide-icon"></span></div>
+                            <div class="item style-scope page-order">Designer ID-Color Code</div>
+                            <div class="item style-scope page-order">Brand</div>
+                            <div class="item style-scope page-order">Boutique</div>
+                            <div class="item style-scope page-order">Boutique ID</div>
+                            <div class="item style-scope page-order">Season</div>
+                            <div class="item style-scope page-order">Category</div>
+                            <div class="item style-scope page-order">Stock</div>
+                            <div class="item style-scope page-order">Retail Price</div>
+                            <div class="item style-scope page-order">Boutique Price</div>
+                            <div class="item style-scope page-order">IM Price</div>
+                            <div class="item style-scope page-order">Action</div>
+                        </div>
+                    </div>
+                    <div class="order-list style-scope page-order">
+                        <div id="order-list" class="style-scope page-order">
+
+                        </div>
+                    </div>
+                </div>
+                <ul class="pagination">
+                    <li class="disabled"><a href="#!"><i class="mdi-av-skip-previous"></i></a></li>
+                    <li class="disabled"><a href="#!"><i class="mdi-navigation-chevron-left"></i></a></li>
+                    <li class="active"><a href="#!">1</a></li>
+                    <li class="waves-effect"><a href="#!">2</a></li>
+                    <li class="waves-effect"><a href="#!">3</a></li>
+                    <li class="waves-effect"><a href="#!">4</a></li>
+                    <li class="waves-effect"><a href="#!">5</a></li>
+                    <li class="waves-effect"><a href="#!"><i class="mdi-navigation-chevron-right"></i></a></li>
+                    <li class="waves-effect"><a href="#!"><i class="mdi-av-skip-next"></i></a></li>
+                </ul>
+                <!-- end tabs -->
+            </div>
+            <!--end container-->
+        </section>
+        <!-- END CONTENT -->
 
     </div>
-    <!-- END MAIN -->
+    <!-- END WRAPPER -->
 
-    <!-- ================================================
-    Scripts
-    ================================================ -->
-    <script type="text/javascript" src="js/base.js"></script>
+</div>
+<!-- END MAIN -->
 
-    <script type="text/javascript" src="js/index.js"></script>
+<!-- ================================================
+Scripts
+================================================ -->
+<script type="text/javascript" src="js/base.js"></script>
 
-    <!-- jQuery Library -->
-    <script type="text/javascript" src="js/plugins/jquery-1.11.2.min.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
 
-    <script type="text/javascript" src="js/plugins/jquery-tmpl/jquery.tmpl.js"></script>
-    <!--materialize js-->
-    <script type="text/javascript" src="js/materialize.js"></script>
+<!-- jQuery Library -->
+<script type="text/javascript" src="js/plugins/jquery-1.11.2.min.js"></script>
 
-    <!--scrollbar-->
-    <script type="text/javascript" src="js/plugins/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+<script type="text/javascript" src="js/plugins/jquery-tmpl/jquery.tmpl.js"></script>
+<!--materialize js-->
+ <script type="text/javascript" src="js/materialize.js"></script> 
 
-        <!--plugins.js - Some Specific JS codes for Plugin Settings-->
-    <script type="text/javascript" src="js/plugins.js"></script>
+<!--scrollbar-->
+<script type="text/javascript" src="js/plugins/perfect-scrollbar/perfect-scrollbar.min.js"></script>
 
-    <!--custom-script.js - Add your own theme custom JS-->
-    <script type="text/javascript" src="js/custom-script.js"></script>
+<!--plugins.js - Some Specific JS codes for Plugin Settings-->
+<script type="text/javascript" src="js/plugins.js"></script>
 
-    <script id="tmpl-brand-select" type="text/x-jquery-tmpl">
-        <option value="-1" disabled selected>Brand</option>
-        {%each(i, brand) list%}
-        <option value="${i}" selected>${brand}</option>
+<!--custom-script.js - Add your own theme custom JS-->
+<script type="text/javascript" src="js/custom-script.js"></script>
+
+<script id="tmpl-brand-select" type="text/x-jquery-tmpl">
+    <option value="-1" selected>Brand</option>
+    {%each(i, brand) list%}
+    <option value="${brand.brand_id}">${brand.english_name}</option>
+    {%/each%}
+</script>
+
+<script id="tmpl-boutique-select" type="text/x-jquery-tmpl">
+    <option value="-1" selected>Boutique</option>
+    {%each(i, boutique) list%}
+    <option value="${boutique.vendor_id}">${boutique.vendor_name}</option>
+    {%/each%}
+</script>
+
+<script id="tmpl-category-select" type="text/x-jquery-tmpl">
+    <option value="-1" selected>Category</option>
+    {%each(i, category) list%}
+    <option value="${category.categoryId}">${category.name}</option>
+    {%/each%}
+</script>
+
+<script id="tmpl-season-select" type="text/x-jquery-tmpl">
+    <option value="-1" selected>Season</option>
+    {%each(i, season) list%}
+    <option value="${season}">${season}</option>
+    {%/each%}
+</script>
+
+
+<script id="tmpl-order-list" type="text/x-jquery-tmpl">
+    {%each(i, order) list%}
+    <div class="product-list">
+    <div class="row style-scope page-order">
+        <div class="item style-scope page-order">
+            <input type="checkbox" class="filled-in" id="order-id-${order.order_id}"/>
+            <label for="order-id-${order.order_id}"></label>
+        </div>
+        <div class="item style-scope page-order"><span class="mdi-hardware-keyboard-arrow-right hide-icon"></span><img src="images/02000a.jpg" width="49" height="63"></div>
+        <div class="item style-scope page-order"><strong>${order.designer_id}</strong></div>
+        <div class="item style-scope page-order"><strong>${order.brand}</strong></div>
+        <div class="item style-scope page-order"><strong>${order.Boutique}</strong></div>
+        <div class="item style-scope page-order"><strong>${order.boutique_id}</strong></div>
+        <div class="item style-scope page-order"><strong>${order.Season}</strong></div>
+        <div class="item style-scope page-order"><strong>${order.Category}</strong></div>
+        <div class="item style-scope page-order"><strong>${order.Stock}</strong></div>
+        <div class="item style-scope page-order"><strong>¥${order.Retail_Price}</strong></div>
+        <div class="item style-scope page-order"><strong>¥${order.Boutique_Price}</strong></div>
+        <div class="item style-scope page-order"><strong>¥${order.IM_Price}</strong></div>
+    </div>
+    <div class="goods show-detail">
+        <div class="row head-detail-row">
+            <div class="list-detail-item">SKU ID</div>
+            <div class="list-detail-item">Size</div>
+            <div class="list-detail-item">Barcode</div>
+            <div class="list-detail-item">Available Stock</div>
+            <div class="list-detail-item">Reserverd Stock</div>
+            <div class="list-detail-item">Confirmed Stock</div>
+        </div>
+        {%each(j, detail) order.details%}
+            <div class="row list-detail-row">
+                <div class="list-detail-item">${detail.sku_id}</div>
+                <div class="list-detail-item">${detail.size}</div>
+                <div class="list-detail-item">${detail.barcode}</div>
+                <div class="list-detail-item">${detail.available_stock}</div>
+                <div class="list-detail-item">${detail.reserverd_stock}</div>
+                <div class="list-detail-item">${detail.confirmed_stock}</div>
+            </div>
         {%/each%}
-    </script>
-    <script id="tmpl-boutique-select" type="text/x-jquery-tmpl">
-        <option value="-1" disabled selected>Boutique</option>
-        {%each(i, boutique) list%}
-        <option value="${i}" selected>${boutique}</option>
-        {%/each%}
-    </script>
+    </div>
+    </div>
+    {%/each%}
+</script>
 
-    <script type="text/javascript">
+<script type="text/javascript">
 
-    $(function() {
-
+    $(function () {
+        $('ul.tabs').tabs();
         // initialize brand select
-        var brandList = getBrand();
-        initSelectItems('select-brand', 'tmpl-brand-select', brandList);
-        initSelectItems('select-boutique', 'tmpl-boutique-select', brandList);
+        initBrand();
+        initVendor();
+        initCategory();
+
+        $("#tmpl-order-list").tmpl({list: getProdcutList()}).appendTo("#order-list");
+
+        $(".hide-icon, .head-hide-icon").click(showDetail);
+
+        
+        $(".tabs .tab").click(function() {
+            console.log($(this).attr("id"));
+        });
+
+        $("#order-head-cbx").change(function() {
+            if ($(this).prop('checked') === true) {
+                $(".product-list .page-order [type='checkbox']").prop('checked', true);
+            } else {
+                $(".product-list .page-order [type='checkbox']").prop('checked', false);
+            }
+
+            console.log(localStorage.getItem('token'));
+        })
 
     });
 
-    </script>
+
+    function showDetail() {
+        if ($(this).hasClass("head-hide-icon")) {
+            $(this).toggleClass("mdi-hardware-keyboard-arrow-down");
+            $(this).toggleClass("mdi-hardware-keyboard-arrow-right");
+
+            if ($(this).hasClass("mdi-hardware-keyboard-arrow-right")) {
+                // 隐藏
+                $(".product-list .hide-icon").removeClass("mdi-hardware-keyboard-arrow-down");
+                $(".product-list .hide-icon").addClass("mdi-hardware-keyboard-arrow-right");
+                $(".product-list .goods").addClass("show-detail");
+            } else {
+                // 显示
+                $(".product-list .hide-icon").removeClass("mdi-hardware-keyboard-arrow-right");
+                $(".product-list .hide-icon").addClass("mdi-hardware-keyboard-arrow-down");
+                $(".product-list .goods").removeClass("show-detail");
+            }
+            
+        } else {
+            $(this).toggleClass("mdi-hardware-keyboard-arrow-down");
+            $(this).toggleClass("mdi-hardware-keyboard-arrow-right");
+            $(this).parent().parent().next().toggleClass("show-detail");
+        }
+    }
+
+</script>
 </body>
 
 </html>

@@ -10,16 +10,20 @@ NOTE:
 PLACE HERE YOUR OWN CSS CODES AND IF NEEDED, OVERRIDE THE STYLES FROM THE OTHER STYLESHEETS.
 WE WILL RELEASE FUTURE UPDATES SO IN ORDER TO NOT OVERWRITE YOUR STYLES IT'S BETTER LIKE THIS.  */
 
-/*
- .btn {
-	background-color: #871b55;
+
+ .btn-gray {
+	background-color: #9b9b9b;
 	box-shadow: 0 0 2px 0 rgba(0,0,0,.12), 0 2px 2px 0 rgba(0,0,0,.24);
 	border-radius: 2px;
-	width: 135.98px;
-	height: 36px;
 }
 
-.input-field input {
+ .btn-gray:hover {
+	background-color: #9b9b9b;
+	
+	box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15)
+}
+
+/*.input-field input {
 	border-bottom: 2px solid #871b55;
     margin: 0;
     box-shadow: none;
