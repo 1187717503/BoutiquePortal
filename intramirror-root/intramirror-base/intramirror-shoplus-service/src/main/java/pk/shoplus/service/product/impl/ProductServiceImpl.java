@@ -187,6 +187,15 @@ public class ProductServiceImpl implements IProductService{
                 logger.info("ProductServiceImplUpdateProduct,updateBrandID,andColorCode,ProductOptions:"+JSONObject.toJSONString(productOptions));
                 this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.BrandID.getCode(),productOptions.getBrandCode());
                 this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.ColorCode.getCode(),productOptions.getColorCode());
+
+                if(StringUtils.isNotBlank(productOptions.getBrandCode())) {
+                    product.setDesigner_id(productOptions.getBrandCode());
+                }
+
+                if(StringUtils.isNotBlank(productOptions.getColorCode())) {
+                    product.setColor_code(productOptions.getColorCode());
+                }
+
             } else {
                 this.updateProductPropertyByBrandIDColorCode(conn,product.getProduct_id(),ProductPropertyEnumKeyName.BrandID.getCode(),productOptions.getBrandCode(),warningMaps,mapUtils);
                 this.updateProductPropertyByBrandIDColorCode(conn,product.getProduct_id(),ProductPropertyEnumKeyName.ColorCode.getCode(),productOptions.getColorCode(),warningMaps,mapUtils);
@@ -516,6 +525,7 @@ public class ProductServiceImpl implements IProductService{
             categoryService.updateBySQL(updateShopProductSalePriceSQL);
             categoryService.updateBySQL(updateShopProductmSalePriceSQL);
             categoryService.updateBySQL(updateProductRetailPrice);
+            skuService.updateSize(product.getProduct_id().toString());
 
             // last check
             Date date1 = productOptions.getLast_check();

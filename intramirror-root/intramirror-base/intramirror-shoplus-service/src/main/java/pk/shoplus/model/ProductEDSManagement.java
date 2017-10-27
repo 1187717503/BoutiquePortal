@@ -1,7 +1,14 @@
 package pk.shoplus.model;
 
+import com.alibaba.fastjson15.JSON;
+import com.alibaba.fastjson15.JSONArray;
+import com.alibaba.fastjson15.JSONObject;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.math.BigDecimal;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -9,21 +16,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.alibaba.fastjson15.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.sql2o.Connection;
-
-import com.alibaba.fastjson15.JSON;
-import com.alibaba.fastjson15.JSONArray;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 import pk.shoplus.DBConnector;
 import pk.shoplus.common.FileUploadHelper;
 import pk.shoplus.common.Helper;
@@ -191,6 +187,8 @@ public class ProductEDSManagement {
             product.setMax_retail_price(BigDecimal.valueOf(Double.parseDouble(productOptions.getSalePrice())));
             product.setMin_retail_price(BigDecimal.valueOf(Double.parseDouble(productOptions.getSalePrice())));
             product.setLast_check(new Date());
+            product.setDesigner_id(productOptions.getBrandCode());
+            product.setColor_code(productOptions.getColorCode());
             product = productService.createProduct(product);
 
             // 在category上增加数据
@@ -239,6 +237,9 @@ public class ProductEDSManagement {
             // 7.创建productproperty信息
             List<CategoryProductProperty> cppList = this.getCategoryProductProperty(conn, category);
             createProductProperty(conn, cppList, columnDataList, product, result);
+
+            SkuService skuService = new SkuService(conn);
+            skuService.updateSize(product.getProduct_id().toString());
 
             // 为了减少并发情况下当前product已经被其他进程插入，在commit前再做一次校验
             // TODO: commit过程中的发生的不一致性也需要处理

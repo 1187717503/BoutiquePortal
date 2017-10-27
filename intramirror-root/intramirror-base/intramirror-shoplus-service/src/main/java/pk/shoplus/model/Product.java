@@ -125,6 +125,9 @@ public class Product{
 
 	   @Column public BigDecimal max_retail_price;
 
+	   @Column public String color_code;
+
+	   @Column public String designer_id;
 
 	   public Long getProduct_id(){
 		return product_id;
@@ -333,6 +336,22 @@ public class Product{
 
 	   public void setMax_retail_price(BigDecimal max_retail_price) {
 		   this.max_retail_price = max_retail_price;
+	   }
+
+	   public String getColor_code() {
+		   return color_code;
+	   }
+
+	   public void setColor_code(String color_code) {
+		   this.color_code = color_code;
+	   }
+
+	   public String getDesigner_id() {
+		   return designer_id;
+	   }
+
+	   public void setDesigner_id(String designer_id) {
+		   this.designer_id = designer_id;
 	   }
    }
 

@@ -64,6 +64,8 @@ public class Sku{
  @Column	public BigDecimal im_price;
 
  @Column public Date last_check;
+
+ @Column public String size;
  
 	public Long getSku_id(){
 		return sku_id;
@@ -172,6 +174,14 @@ public class Sku{
 
 	   public void setLast_check(Date last_check) {
 		   this.last_check = last_check;
+	   }
+
+	   public String getSize() {
+		   return size;
+	   }
+
+	   public void setSize(String size) {
+		   this.size = size;
 	   }
    }
 

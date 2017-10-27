@@ -71,6 +71,18 @@ public class SkuService {
 		}
 	}
 
+	public void updateSize(String product_id) throws Exception{
+		try {
+			String sql = "update `sku`  \n" + "inner join `sku_property` sp on(sp.`sku_id` = sku.`sku_id` and sku.`enabled`  = 1 and sp.`enabled`  = 1)\n"
+					+ "inner join `product_sku_property_value`  pspv on(pspv.`product_sku_property_value_id` = sp.`product_sku_property_value_id`  and pspv.`enabled`  = 1)\n"
+					+ "set sku.`size`  = pspv.`value` \n" + "where sku.enabled = 1 and sku.`product_id` ="+product_id;
+			logger.info("updateSize:"+sql);
+			skuDao.updateBySQL(sql,null);
+		} catch (Exception e) {
+			throw  e;
+		}
+	}
+
 
 	/**
 	 * 通过sku_id 获取 Sku
