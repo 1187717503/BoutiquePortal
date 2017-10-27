@@ -1,11 +1,9 @@
 package com.intramirror.product.core.mapper;
 
 import com.intramirror.product.api.model.Sku;
-import org.apache.ibatis.annotations.Param;
-
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import org.apache.ibatis.annotations.Param;
 
 public interface SkuMapper {
 
@@ -14,6 +12,8 @@ public interface SkuMapper {
     List<Map<String, Object>> getSkuInfoBySkuId(String shopProductSkuId);
 
     Sku getSkuById(@Param("skuId") Long skuId);
-    
+
     Map<String, Object> getSkuInfoBySkuCode(Map<String, Object> condition);
+
+    List<Sku> listSkuInfoByProductId(Long productId);
 }

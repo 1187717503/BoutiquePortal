@@ -2,9 +2,12 @@ package com.intramirror.web.controller.product;
 
 import com.intramirror.product.api.model.ProductWithBLOBs;
 import com.intramirror.product.api.model.ShopProduct;
+import com.intramirror.product.api.model.Sku;
 import com.intramirror.product.api.service.IProductService;
 import com.intramirror.product.api.service.ShopProductService;
+import com.intramirror.product.api.service.SkuService;
 import com.intramirror.web.common.Response;
+import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import pk.shoplus.model.StatisticsShopYesterday;
 
 /**
  * Created on 2017/10/25.
@@ -25,11 +29,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/product/operate")
 public class StateMachineController {
     private final static Logger LOGGER = LoggerFactory.getLogger(StateMachineController.class);
+
+    private final static long shopId = 65;
     @Autowired
     private IProductService productService;
 
     @Autowired
     private ShopProductService shopProductService;
+
+    @Autowired
+    private SkuService skuService;
 
     @RequestMapping(value = "/{action}", method = RequestMethod.PUT)
     public Response operateProduct(@PathVariable(value = "action") String action, @RequestParam(value = "product_id") String productId) {
@@ -78,14 +87,21 @@ public class StateMachineController {
     }
 
     private void disableShopProduct(int status, Long productId) {
-        ShopProduct shopProduct = new ShopProduct();
-        shopProduct.setEnabled(false);
-        shopProduct.setProductId(productId);
-        shopProductService.updateShopProductByProductId(shopProduct);
+        //        ShopProduct shopProduct = new ShopProduct();
+        //        shopProduct.setEnabled(false);
+        //        shopProduct.setProductId(productId);
+        //        shopProductService.updateShopProductByProductId(shopProduct);
 
     }
 
     private void createShopProductStatus(int status, Long productId) {
-//        shopProductService.in
+        List<Sku> skuList = skuService.listSkuInfoByProductId(productId);
+        if (skuList.isEmpty()) {
+            LOGGER.error("Fail to get sku of product_id [{}]", productId);
+            // throw exception?
+        }
+        ShopProduct shopProduct = new ShopProduct();
+        shopProduct.setEnabled(true);
+        shopProduct.setShopId(shopId);
     }
 }

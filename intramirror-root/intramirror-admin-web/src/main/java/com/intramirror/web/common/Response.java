@@ -10,6 +10,14 @@ public class Response {
 
     private Object data;
 
+    public Object getData() {
+        return data;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
+    }
+
     public Response(int status) {
         this.status = status;
     }
@@ -50,6 +58,11 @@ public class Response {
         public Response data(Object data) {
             return new Response(this.status, data);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Response{" + "status=" + status + ", data=" + data + '}';
     }
 
 }

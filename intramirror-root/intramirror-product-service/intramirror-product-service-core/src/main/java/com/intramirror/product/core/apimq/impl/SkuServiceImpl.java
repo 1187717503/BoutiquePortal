@@ -1,6 +1,5 @@
 package com.intramirror.product.core.apimq.impl;
 
-
 import com.intramirror.common.Helper;
 import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.product.api.model.Sku;
@@ -41,8 +40,7 @@ public class SkuServiceImpl extends BaseDao implements SkuService {
         try {
             List<Map<String, Object>> list = skuMapper.getSkuInfoBySkuId(shopProductSkuIds);
             Map<String, BigDecimal> prices = new HashMap<String, BigDecimal>();
-            if (list.size() > 0 && Helper.checkNotNull(list.get(0).get("in_price"))
-                    && Helper.checkNotNull(list.get(0).get("sale_price"))) {
+            if (list.size() > 0 && Helper.checkNotNull(list.get(0).get("in_price")) && Helper.checkNotNull(list.get(0).get("sale_price"))) {
 
                 BigDecimal inPrice = new BigDecimal(list.get(0).get("in_price").toString());
                 BigDecimal price = new BigDecimal(list.get(0).get("price").toString());
@@ -61,9 +59,14 @@ public class SkuServiceImpl extends BaseDao implements SkuService {
         }
     }
 
-	@Override
-	public Map<String, Object> getSkuInfoBySkuCode(Map<String, Object> condition) {
-		// TODO Auto-generated method stub
-		return skuMapper.getSkuInfoBySkuCode(condition);
-	}
+    @Override
+    public Map<String, Object> getSkuInfoBySkuCode(Map<String, Object> condition) {
+        // TODO Auto-generated method stub
+        return skuMapper.getSkuInfoBySkuCode(condition);
+    }
+
+    @Override
+    public List<Sku> listSkuInfoByProductId(Long productId) {
+        return skuMapper.listSkuInfoByProductId(productId);
+    }
 }
