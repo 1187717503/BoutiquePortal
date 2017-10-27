@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * Created by dingyifan on 2017/7/20.
  */
-@CrossOrigin
+
 @Controller
 @RequestMapping("/vendor")
 public class VendorController {

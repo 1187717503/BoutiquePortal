@@ -28,7 +28,7 @@ public class ProductGroupController extends BaseController {
     @Autowired
     private IProductGroupService productGroupService;
 
-    @CrossOrigin
+
     @SuppressWarnings("unchecked")
     @RequestMapping(value = "/list", method = RequestMethod.POST)
     @ResponseBody

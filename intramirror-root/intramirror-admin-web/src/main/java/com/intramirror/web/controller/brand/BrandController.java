@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * Created by dingyifan on 2017/7/19.
  */
-@CrossOrigin
+
 @Controller
 @RequestMapping("/brand")
 public class BrandController {
@@ -26,7 +26,7 @@ public class BrandController {
     @Resource(name = "productBrandServiceImpl")
     private IBrandService iBrandService;
 
-    @CrossOrigin
+
     @RequestMapping("/selectActiveBrands")
     @ResponseBody
     public ResultMessage queryActiveBrands() {

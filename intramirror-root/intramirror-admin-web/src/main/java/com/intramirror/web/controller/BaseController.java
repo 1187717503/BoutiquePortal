@@ -10,16 +10,14 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.impl.Base64Codec;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/base")
@@ -37,7 +35,7 @@ public class BaseController {
      * @return
      * @throws Exception
      */
-    @CrossOrigin
+
     public Map baseController(HttpServletRequest httpRequest) throws Exception {
         // 返回数据初始化
         int status = StatusType.FAILURE;
@@ -79,7 +77,7 @@ public class BaseController {
         return result;
     }
 
-    @CrossOrigin
+
     public User getUserInfo(HttpServletRequest httpRequest) throws Exception {
         // 返回数据初始化
         int status = StatusType.FAILURE;

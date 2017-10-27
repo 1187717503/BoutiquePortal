@@ -45,7 +45,7 @@ import com.intramirror.web.service.PriceChangeRuleService;
  * @author wzh
  *
  */
-@CrossOrigin
+
 @Controller
 @RequestMapping("/priceChangeRule")
 public class PriceChangeRuleController extends BaseController{
