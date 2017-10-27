@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.HashMap;
 import java.util.Map;
 
-@CrossOrigin
+
 @Controller
 @RequestMapping("/login")
 public class LoginController {

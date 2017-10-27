@@ -26,7 +26,7 @@ import com.intramirror.web.controller.BaseController;
 import com.intramirror.web.service.OrderInputCreateOrderService;
 import pk.shoplus.service.request.impl.GetPostRequestService;
 
-@CrossOrigin
+
 @Controller
 @RequestMapping("/order")
 public class OrderInputCreateOrderController extends BaseController {

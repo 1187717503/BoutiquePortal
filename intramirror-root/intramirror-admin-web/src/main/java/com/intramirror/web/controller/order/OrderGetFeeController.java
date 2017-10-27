@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 
-@CrossOrigin
+
 @Controller
 @RequestMapping("/order")
 public class OrderGetFeeController extends BaseController {

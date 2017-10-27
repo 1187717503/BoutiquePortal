@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin
+
 @Controller
 @RequestMapping("/order")
 public class OrderGetProductController extends BaseController {

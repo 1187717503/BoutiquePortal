@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 /**
  * Created by dingyifan on 2017/7/20.
  */
-@CrossOrigin
+
 @Controller
 @RequestMapping("/rule/copy")
 public class CopyRuleController extends BaseController {
