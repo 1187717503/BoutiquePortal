@@ -1,4 +1,7 @@
-let token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxOTciLCJpYXQiOjE1MDkxNzUzMzF9.dDQME0lwEeov_ub-QFjWhYnUh3IpScQQ4GJR9aqmKR6XqgYoabJQasCw3CBBOnMr8diMcccvDbvyBji-p14_Jw";
+let token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxOTciLCJpYXQiOjE1MDkyNjE3NTZ9.viLTNU46icAE4EkW0VkRuSQNB8FmSwCWazYQiBEoyZyDf-E-WNva_W3Dup2PKcjdQHlHh8OBI7Br7b90ODk2-A";
+
+var searchObj = {}
+searchObj.pageSize=10;
 
 function initBrand() {
 
@@ -35,6 +38,7 @@ function initVendor() {
 }
 
 function initCategory() {
+
     $.ajax({
         type: "GET",
         contentType: "application/json",
@@ -91,76 +95,115 @@ function initSeason() {
     });
 }
 
-function getProdcutList() {
-    var list = [];
-    list.push({
-        "order_id": 1,
-        "designer_id": "IEKOQ819182-101",
-        "brand": "Fendi",
-        "Boutique": "Luciana",
-        "boutique_id": "58383990338KS2",
-        "Season": "14SS",
-        "Category": "Women>Bags>Top handles",
-        "Stock": 1,
-        "Retail_Price": 2100.00,
-        "Boutique_Price": 2100.00,
-        "IM_Price": 2100.00,
-        "details" : [{"sku_id": 1, "size": "39", "barcode": "123981729387192371", "available_stock": 5, "reserverd_stock": 2, "confirmed_stock": 4},
-                     {"sku_id": 2, "size": "40", "barcode": "123981729387192372", "available_stock": 9, "reserverd_stock": 1, "confirmed_stock": 2},
-                     {"sku_id": 3, "size": "41", "barcode": "123981729387192373", "available_stock": 8, "reserverd_stock": 3, "confirmed_stock": 6}]
-    });
 
-    list.push({
-        "order_id": 3,
-        "designer_id": "IEKOQ819182-101",
-        "brand": "Fendi",
-        "Boutique": "Luciana",
-        "boutique_id": "58383990338KS2",
-        "Season": "14SS",
-        "Category": "Women>Bags>Top handles",
-        "Stock": 1,
-        "Retail_Price": 2100.00,
-        "Boutique_Price": 2100.00,
-        "IM_Price": 2100.00,
-        "details" : [{"sku_id": 4, "size": "39", "barcode": "123986729387192371", "available_stock": 5, "reserverd_stock": 2, "confirmed_stock": 4},
-                     {"sku_id": 5, "size": "40", "barcode": "123986729387192372", "available_stock": 9, "reserverd_stock": 1, "confirmed_stock": 2},
-                     {"sku_id": 6, "size": "41", "barcode": "123982729387192373", "available_stock": 8, "reserverd_stock": 3, "confirmed_stock": 6}]
-    });
+function getFilterFromDom() {
+    var boutique = $('#select-boutique').val();
+    if (boutique === '-1') {
+        searchObj.boutique = '';
+    } else {
+        searchObj.boutique = boutique;
+    }
 
-    list.push({
-        "order_id": 4,
-        "designer_id": "IEKOQ819182-102",
-        "brand": "Fendi",
-        "Boutique": "Luciana",
-        "boutique_id": "58383990338KS2",
-        "Season": "15SS",
-        "Category": "Women>Bags>Top handles",
-        "Stock": 1,
-        "Retail_Price": 2100.00,
-        "Boutique_Price": 2100.00,
-        "IM_Price": 2100.00,
-        "details" : [{"sku_id": 14, "size": "41", "barcode": "123986729387192371", "available_stock": 5, "reserverd_stock": 2, "confirmed_stock": 4},
-                     {"sku_id": 15, "size": "42", "barcode": "123986729387192372", "available_stock": 9, "reserverd_stock": 1, "confirmed_stock": 2},
-                     {"sku_id": 26, "size": "43", "barcode": "123982729387192373", "available_stock": 8, "reserverd_stock": 3, "confirmed_stock": 6}]
-    });
+    var category = $('#select-category').val();
+    if (category === '-1') {
+        searchObj.category = '';
+    } else {
+        searchObj.category = category;
+    }
 
-    list.push({
-        "order_id": 5,
-        "designer_id": "IEKOQ819182-103",
-        "brand": "Fendi",
-        "Boutique": "Luciana",
-        "boutique_id": "58383990338KS2",
-        "Season": "17SS",
-        "Category": "Women>Bags>Top handles",
-        "Stock": 1,
-        "Retail_Price": 2900.00,
-        "Boutique_Price": 2900.00,
-        "IM_Price": 3100.00
-    });
+    var season = $('#select-season').val();
+    if (season === '-1') {
+        searchObj.season = '';
+    } else {
+        searchObj.season = season;
+    }
 
-    return list;
+    var brand = $('#select-brand').val();
+    if (brand === '-1') {
+        searchObj.brand = '';
+    } else {
+        searchObj.brand = brand;
+    }
 }
 
+function getProdcutList(status) {
+
+    getFilterFromDom();
+
+    var filter = '?';
+    if (searchObj.boutique) {
+        filter += 'boutique='+ searchObj.boutique + '&';
+    }
+
+    if (searchObj.boutiqueid) {
+        filter += 'boutiqueid='+ searchObj.boutiqueid + '&';
+    }
+
+    if (searchObj.brand) {
+        filter += 'brand='+ searchObj.brand + '&';
+    }
+
+    if (searchObj.category) {
+        filter += 'category='+ searchObj.category + '&';
+    }
+
+    if (searchObj.season) {
+        filter += 'season='+ searchObj.season + '&';
+    }
+
+    if (searchObj.pageSize) {
+        filter += 'pagesize='+ searchObj.pageSize + '&';
+    }
+
+    filter = filter.slice(0, filter.length-1);
+
+
+    console.log(requestURL.search + "/" + status + filter);
+
+
+    $('#order-list').empty();
+    loading();
+    $.ajax({
+        type: "GET",
+        contentType: "application/json",
+        url: requestURL.search + "/" + status + filter,
+        data: {},
+        dataType: 'json',
+        beforeSend: function(request) {
+            request.setRequestHeader("token", token);
+        },
+        success: function(result) {
+            $("#tmpl-order-list").tmpl({list: result.data}).appendTo("#order-list");
+            $(".hide-icon, .head-hide-icon").click(showDetail);
+            updatePagination(10, 2, 35);
+            finishLoading();
+        }
+    });
+}
+
+function showDetail() {
+    if ($(this).hasClass("head-hide-icon")) {
+        $(this).toggleClass("mdi-hardware-keyboard-arrow-down");
+        $(this).toggleClass("mdi-hardware-keyboard-arrow-right");
+
+        if ($(this).hasClass("mdi-hardware-keyboard-arrow-right")) {
+            // 隐藏
+            $(".product-list .hide-icon").removeClass("mdi-hardware-keyboard-arrow-down");
+            $(".product-list .hide-icon").addClass("mdi-hardware-keyboard-arrow-right");
+            $(".product-list .goods").addClass("show-detail");
+        } else {
+            // 显示
+            $(".product-list .hide-icon").removeClass("mdi-hardware-keyboard-arrow-right");
+            $(".product-list .hide-icon").addClass("mdi-hardware-keyboard-arrow-down");
+            $(".product-list .goods").removeClass("show-detail");
+        }
+        
+    } else {
+        $(this).toggleClass("mdi-hardware-keyboard-arrow-down");
+        $(this).toggleClass("mdi-hardware-keyboard-arrow-right");
+        $(this).parent().parent().next().toggleClass("show-detail");
+    }
+}
 
 function initSelectItems(elemId, tmplId, listData) {
     //$('#' + elemId).material_select();
@@ -169,4 +212,46 @@ function initSelectItems(elemId, tmplId, listData) {
 
     $('#' + tmplId).tmpl({list: listData}).appendTo('#' + elemId);
     $('#' + elemId).material_select();
+}
+
+function loading() {
+    $('.load-data-holder').toggleClass("active");
+}
+
+function finishLoading() {
+    $('.load-data-holder').toggleClass("active");
+}
+
+function updatePagination(pagesize, pageno, totalsize) {
+    $('.pagination').empty();
+
+    var pageinfo = {}
+    pageinfo.totalPage = totalsize;
+    pageinfo.currPage = pageno;
+    pageinfo.list = [];
+    var listData = pageinfo.list;
+
+    if (pageno <= 3 ) {
+        listData.push({"no": 1});
+        listData.push({"no": 2});
+        listData.push({"no": 3});
+        listData.push({"no": 4});
+        listData.push({"no": 5});
+        listData[pageno-1].active = 1;
+    } else if (pageno + 2 > totalsize) {
+        listData.push({"no": totalsize - 4});
+        listData.push({"no": totalsize - 3});
+        listData.push({"no": totalsize - 2});
+        listData.push({"no": totalsize - 1});
+        listData.push({"no": totalsize});
+        listData[4-totalsize+pageno].active = 1;
+    } else {
+        listData.push({"no": pageno - 2});
+        listData.push({"no": pageno - 1});
+        listData.push({"no": pageno, "active": 1});
+        listData.push({"no": pageno + 1});
+        listData.push({"no": pageno + 2});
+    }
+    
+    $('#tmpl-pagination').tmpl({page: pageinfo}).appendTo('.pagination');
 }

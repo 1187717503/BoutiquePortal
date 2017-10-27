@@ -23,7 +23,6 @@
     <!-- Customer CSS-->
     <link href="css/custom/custom.css" type="text/css" rel="stylesheet" media="screen,projection">
     <link href="css/index.css" type="text/css" rel="stylesheet" media="screen,projection">
-
 </head>
 
 <body>
@@ -31,6 +30,51 @@
     <div id="loader"></div>
     <div class="loader-section section-left"></div>
     <div class="loader-section section-right"></div>
+</div>
+
+<div class="load-data-holder">
+    <div class="preloader-wrapper big active">
+        <div class="spinner-layer spinner-blue">
+            <div class="circle-clipper left">
+                <div class="circle"></div>
+            </div>
+            <div class="gap-patch">
+                <div class="circle"></div>
+            </div>
+            <div class="circle-clipper right">
+                <div class="circle"></div>
+            </div>
+        </div>
+        <div class="spinner-layer spinner-red">
+            <div class="circle-clipper left">
+                <div class="circle"></div>
+            </div><div class="gap-patch">
+                <div class="circle"></div>
+            </div><div class="circle-clipper right">
+                <div class="circle"></div>
+            </div>
+        </div>
+
+        <div class="spinner-layer spinner-yellow">
+            <div class="circle-clipper left">
+                <div class="circle"></div>
+            </div><div class="gap-patch">
+                <div class="circle"></div>
+            </div><div class="circle-clipper right">
+                <div class="circle"></div>
+            </div>
+        </div>
+
+        <div class="spinner-layer spinner-green">
+            <div class="circle-clipper left">
+                <div class="circle"></div>
+            </div><div class="gap-patch">
+                <div class="circle"></div>
+            </div><div class="circle-clipper right">
+                <div class="circle"></div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <header id="header" class="page-topbar">
@@ -115,8 +159,8 @@
                         </div>
 
                         <div class="col s3 search-btns">
-                            <a class="waves-effect waves-light btn ">Search</a>
-                            <a class="waves-effect waves-light btn btn-gray">Reset</a>
+                            <a id="search-btn" class="waves-effect waves-light btn ">Search</a>
+                            <a id="cancel-btn" class="waves-effect waves-light btn btn-gray">Reset</a>
                         </div>
 
                     </div>
@@ -128,15 +172,15 @@
                 <div class="row status-tabs">
                     <div class="col s12">
                         <ul class="tabs">
-                            <li id="tab_new" class="tab col"><a class="active" href="#"><div>NEW<span>(0)</span></div></a></li>
-                            <li id="tab_processing" class="tab col"><a href="#"><div>PROCESSING<span>(0)</span></div></a></li>
-                            <li id="tab_ok" class="tab col"><a href="#"><div>OK<span>(0)</span></div></a></li>
-                            <li id="tab_offsale" class="tab col"><a href="#"><div>SHOP_OFFSALE<span>(0)</span></div></a></li>
-                            <li id="tab_offsale" class="tab col"><a href="#"><div>SHOP_OFFSALE<span>(0)</span></div></a></li>
-                            <li id="tab_offsale" class="tab col"><a href="#"><div>SHOP_OFFSALE<span>(0)</span></div></a></li>
-                            <li id="tab_onsale" class="tab col"><a href="#"><div>SHOP_ONSALE<span>(0)</span></div></a></li>
-                            <li id="tab_soldout" class="tab col"><a href="#"><div>SHOP_SOLDOUT<span>(0)</span></div></a></li>
-                            <li id="tab_trash" class="tab col"><a href="#"><div>TRASH<span>(0)</span></div></a></li>
+                            <li class="tab col"><a data-status="new" class="active" href="#"><div>NEW<span>(0)</span></div></a></li>
+                            <li class="tab col"><a data-status="processing" href="#"><div>PROCESSING<span>(0)</span></div></a></li>
+                            <li class="tab col"><a data-status="readytosell" href="#"><div>OK<span>(0)</span></div></a></li>
+                            <li class="tab col"><a data-status="shopprocessing" href="#"><div>SHOP_PROCESSING<span>(0)</span></div></a></li>
+                            <li class="tab col"><a data-status="shopreadytosale" href="#"><div>SHOP_READ<span>(0)</span></div></a></li>
+                            <li class="tab col"><a data-status="shopremoved" href="#"><div>SHOP_MOVED<span>(0)</span></div></a></li>
+                            <li class="tab col"><a data-status="shoponsale" href="#"><div>SHOP_ONSALE<span>(0)</span></div></a></li>
+                            <li class="tab col"><a data-status="shopsoldout" href="#"><div>SHOP_SOLDOUT<span>(0)</span></div></a></li>
+                            <li class="tab col"><a data-status="trash" href="#"><div>TRASH<span>(0)</span></div></a></li>
                         </ul>
                     </div>
                 </div>
@@ -149,6 +193,8 @@
                         <a class="waves-effect waves-light btn btn-gray">REMOVE</a>
                     </div>
                 </div>
+
+
                 <div id="test1" class="col s12">
                     <div class="order-head style-scope page-order">
                         <div class="row style-scope page-order">
@@ -177,15 +223,7 @@
                     </div>
                 </div>
                 <ul class="pagination">
-                    <li class="disabled"><a href="#!"><i class="mdi-av-skip-previous"></i></a></li>
-                    <li class="disabled"><a href="#!"><i class="mdi-navigation-chevron-left"></i></a></li>
-                    <li class="active"><a href="#!">1</a></li>
-                    <li class="waves-effect"><a href="#!">2</a></li>
-                    <li class="waves-effect"><a href="#!">3</a></li>
-                    <li class="waves-effect"><a href="#!">4</a></li>
-                    <li class="waves-effect"><a href="#!">5</a></li>
-                    <li class="waves-effect"><a href="#!"><i class="mdi-navigation-chevron-right"></i></a></li>
-                    <li class="waves-effect"><a href="#!"><i class="mdi-av-skip-next"></i></a></li>
+                    
                 </ul>
                 <!-- end tabs -->
             </div>
@@ -256,20 +294,20 @@ Scripts
     <div class="product-list">
     <div class="row style-scope page-order">
         <div class="item style-scope page-order">
-            <input type="checkbox" class="filled-in" id="order-id-${order.order_id}"/>
-            <label for="order-id-${order.order_id}"></label>
+            <input type="checkbox" class="filled-in" id="order-id-${order.product_id}"/>
+            <label for="order-id-${order.product_id}"></label>
         </div>
         <div class="item style-scope page-order"><span class="mdi-hardware-keyboard-arrow-right hide-icon"></span><img src="images/02000a.jpg" width="49" height="63"></div>
-        <div class="item style-scope page-order"><strong>${order.designer_id}</strong></div>
-        <div class="item style-scope page-order"><strong>${order.brand}</strong></div>
-        <div class="item style-scope page-order"><strong>${order.Boutique}</strong></div>
+        <div class="item style-scope page-order"><strong>${order.brandID}-${order.colorCode}</strong></div>
+        <div class="item style-scope page-order"><strong>${order.brand_name}</strong></div>
+        <div class="item style-scope page-order"><strong>${order.boutique}</strong></div>
         <div class="item style-scope page-order"><strong>${order.boutique_id}</strong></div>
-        <div class="item style-scope page-order"><strong>${order.Season}</strong></div>
-        <div class="item style-scope page-order"><strong>${order.Category}</strong></div>
-        <div class="item style-scope page-order"><strong>${order.Stock}</strong></div>
-        <div class="item style-scope page-order"><strong>¥${order.Retail_Price}</strong></div>
-        <div class="item style-scope page-order"><strong>¥${order.Boutique_Price}</strong></div>
-        <div class="item style-scope page-order"><strong>¥${order.IM_Price}</strong></div>
+        <div class="item style-scope page-order"><strong>${order.season_code}</strong></div>
+        <div class="item style-scope page-order"><strong>${order.category}</strong></div>
+        <div class="item style-scope page-order"><strong>${order.total_stock}</strong></div>
+        <div class="item style-scope page-order"><strong>€${order.retail_price}</strong></div>
+        <div class="item style-scope page-order"><strong>€${order.boutique_price}</strong></div>
+        <div class="item style-scope page-order"><strong>€${order.im_price}</strong></div>
     </div>
     <div class="goods show-detail">
         <div class="row head-detail-row">
@@ -280,20 +318,36 @@ Scripts
             <div class="list-detail-item">Reserverd Stock</div>
             <div class="list-detail-item">Confirmed Stock</div>
         </div>
-        {%each(j, detail) order.details%}
+        {%each(j, detail) order.skuDetail%}
             <div class="row list-detail-row">
                 <div class="list-detail-item">${detail.sku_id}</div>
                 <div class="list-detail-item">${detail.size}</div>
-                <div class="list-detail-item">${detail.barcode}</div>
-                <div class="list-detail-item">${detail.available_stock}</div>
-                <div class="list-detail-item">${detail.reserverd_stock}</div>
-                <div class="list-detail-item">${detail.confirmed_stock}</div>
+                <div class="list-detail-item">not found---${detail.barcode}</div>
+                <div class="list-detail-item">${detail.store}</div>
+                <div class="list-detail-item">${detail.reserved}</div>
+                <div class="list-detail-item">${detail.confirmed}</div>
             </div>
         {%/each%}
     </div>
     </div>
     {%/each%}
 </script>
+
+<script id="tmpl-pagination" type="text/x-jquery-tmpl">
+    <li class="pagination-info">Current: ${page.currPage} Total: ${page.totalPage}</li>
+    <li class="waves-effect"><a href="#!"><i class="mdi-av-skip-previous"></i></a></li>
+    <li class="waves-effect"><a href="#!"><i class="mdi-navigation-chevron-left"></i></a></li>
+    {%each(i, pageInfo) page.list%}
+        {%if pageInfo.active %}
+            <li class="waves-effect active"><a href="#!">${pageInfo.no}</a></li>
+        {%else%}
+            <li class="waves-effect"><a href="#!">${pageInfo.no}</a></li>
+        {%/if%}
+    {%/each%}
+    <li class="waves-effect"><a href="#!"><i class="mdi-navigation-chevron-right"></i></a></li>
+    <li class="waves-effect"><a href="#!"><i class="mdi-av-skip-next"></i></a></li>
+</script>
+
 
 <script type="text/javascript">
 
@@ -302,15 +356,13 @@ Scripts
         // initialize brand select
         initBrand();
         initVendor();
+        initSeason();
         initCategory();
-
-        $("#tmpl-order-list").tmpl({list: getProdcutList()}).appendTo("#order-list");
-
-        $(".hide-icon, .head-hide-icon").click(showDetail);
-
         
-        $(".tabs .tab").click(function() {
-            console.log($(this).attr("id"));
+       
+        $(".tabs .tab a").click(function() {
+            var status = $(this).data('status');
+            getProdcutList(status);
         });
 
         $("#order-head-cbx").change(function() {
@@ -323,32 +375,16 @@ Scripts
             console.log(localStorage.getItem('token'));
         })
 
+        $('#search-btn').click(function() {
+            var status = $('.tabs .tab a.active').data('status');
+            getProdcutList(status);
+        })
+
+        $('#cancel-btn').click(function() {
+            console.log($('#select-season').val());
+        })
+
     });
-
-
-    function showDetail() {
-        if ($(this).hasClass("head-hide-icon")) {
-            $(this).toggleClass("mdi-hardware-keyboard-arrow-down");
-            $(this).toggleClass("mdi-hardware-keyboard-arrow-right");
-
-            if ($(this).hasClass("mdi-hardware-keyboard-arrow-right")) {
-                // 隐藏
-                $(".product-list .hide-icon").removeClass("mdi-hardware-keyboard-arrow-down");
-                $(".product-list .hide-icon").addClass("mdi-hardware-keyboard-arrow-right");
-                $(".product-list .goods").addClass("show-detail");
-            } else {
-                // 显示
-                $(".product-list .hide-icon").removeClass("mdi-hardware-keyboard-arrow-right");
-                $(".product-list .hide-icon").addClass("mdi-hardware-keyboard-arrow-down");
-                $(".product-list .goods").removeClass("show-detail");
-            }
-            
-        } else {
-            $(this).toggleClass("mdi-hardware-keyboard-arrow-down");
-            $(this).toggleClass("mdi-hardware-keyboard-arrow-right");
-            $(this).parent().parent().next().toggleClass("show-detail");
-        }
-    }
 
 </script>
 </body>
