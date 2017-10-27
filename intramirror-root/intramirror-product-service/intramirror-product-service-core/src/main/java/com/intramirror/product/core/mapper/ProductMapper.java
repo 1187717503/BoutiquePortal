@@ -68,4 +68,6 @@ public interface ProductMapper {
 
     List<Map<String, Object>> listProductDetailInfo(SearchCondition searchCondition);
 
+    Map<String, Object> getProductStateByProductId(Long product_id);
+
 }

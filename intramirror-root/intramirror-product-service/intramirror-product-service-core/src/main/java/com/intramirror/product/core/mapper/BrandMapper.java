@@ -63,4 +63,6 @@ public interface BrandMapper {
     int updateByPrimaryKey(Brand record);
 
     List<Map<String,Object>> selBrandByConditions(Brand brand);
+
+    List<Map<String,Object>> listActiveBrand();
 }

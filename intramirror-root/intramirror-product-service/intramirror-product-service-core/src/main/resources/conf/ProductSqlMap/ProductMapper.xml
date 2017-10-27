@@ -480,68 +480,68 @@
 
     <select id="listProductDetailInfo" parameterType="com.intramirror.product.api.model.SearchCondition" resultType="java.util.HashMap">
         SELECT
-            product.product_id,
-            product.status AS product_status,
-            shop_product.status AS shop_product_status,
-            brand.english_name AS brand_name,
-            vendor.vendor_name AS boutique,
-            product.product_code AS boutique_id,
-            product.season_code AS season_code,
-            product.category_id,
-            t_sku.sku_id,
-            t_sku.price AS retail_price,
-            t_sku.in_price AS boutique_price,
-            <choose>
-                <when test="shopStatus != -1">
-                    shop_product_sku.sale_price AS sale_price,
-                    shop_product_sku.enabled AS shop_product_sku_enabled,
-                </when>
-                <otherwise>
-                    t_sku.im_price AS im_price,
-                </otherwise>
-            </choose>
-            sum_stock.stock AS total_stock,
-            bc.brandID,
-            bc.colorCode
+        product.product_id,
+        product.status AS product_status,
+        shop_product.status AS shop_product_status,
+        brand.english_name AS brand_name,
+        vendor.vendor_name AS boutique,
+        product.product_code AS boutique_id,
+        product.season_code AS season_code,
+        product.category_id,
+        t_sku.sku_id,
+        t_sku.price AS retail_price,
+        t_sku.in_price AS boutique_price,
+        <choose>
+            <when test="shopStatus != -1">
+                shop_product_sku.sale_price AS sale_price,
+                shop_product_sku.enabled AS shop_product_sku_enabled,
+            </when>
+            <otherwise>
+                t_sku.im_price AS im_price,
+            </otherwise>
+        </choose>
+        sum_stock.stock AS total_stock,
+        bc.brandID,
+        bc.colorCode
         FROM product
-            LEFT JOIN shop_product ON shop_product.product_id = product.product_id
-            INNER JOIN vendor ON product.vendor_id = vendor.vendor_id AND product.enabled = 1
-            INNER JOIN brand ON brand.brand_id = product.brand_id
-            INNER JOIN (SELECT
-                            sku_id,
-                            price,
-                            in_price,
-                            im_price,
-                            product_id
-                        FROM sku
-                        GROUP BY product_id) t_sku ON t_sku.product_id = product.product_id
-            INNER JOIN (SELECT
-                            sum(sku_store.store) AS stock,
-                            sku_store.product_id
-                        FROM sku_store
-                        GROUP BY sku_store.product_id) sum_stock ON sum_stock.product_id = product.product_id
+        LEFT JOIN shop_product ON shop_product.product_id = product.product_id
+        INNER JOIN vendor ON product.vendor_id = vendor.vendor_id AND product.enabled = 1
+        INNER JOIN brand ON brand.brand_id = product.brand_id
+        INNER JOIN (SELECT
+        sku_id,
+        price,
+        in_price,
+        im_price,
+        product_id
+        FROM sku
+        GROUP BY product_id) t_sku ON t_sku.product_id = product.product_id
+        INNER JOIN (SELECT
+        sum(sku_store.store) AS stock,
+        sku_store.product_id
+        FROM sku_store
+        GROUP BY sku_store.product_id) sum_stock ON sum_stock.product_id = product.product_id
         <if test="shopStatus != -1">
             INNER JOIN shop_product_sku ON (shop_product_sku.sku_id = t_sku.sku_id AND shop_product_sku.enabled = 1)
         </if>
-            LEFT JOIN (SELECT
-                        product_property.product_id,
-                        MAX(CASE product_property.key_name
-                            WHEN 'ColorCode'
-                            THEN product_property.`value`
-                            ELSE ''
-                            END) AS colorCode,
-                        MAX(CASE product_property.key_name
-                            WHEN 'BrandID'
-                            THEN product_property.`value`
-                            ELSE ''
-                            END) AS brandID,
-                        product_property.enabled,
-                        product_property.key_name,
-                        product_property.product_id AS ppid
-                      FROM product_property
-                        GROUP BY product_property.product_id) bc
-                        ON (bc.enabled = 1 AND (bc.key_name = 'BrandID' OR bc.key_name = 'ColorCode') AND
-                        bc.product_id = product.product_id)
+        LEFT JOIN (SELECT
+        product_property.product_id,
+        MAX(CASE product_property.key_name
+        WHEN 'ColorCode'
+        THEN product_property.`value`
+        ELSE ''
+        END) AS colorCode,
+        MAX(CASE product_property.key_name
+        WHEN 'BrandID'
+        THEN product_property.`value`
+        ELSE ''
+        END) AS brandID,
+        product_property.enabled,
+        product_property.key_name,
+        product_property.product_id AS ppid
+        FROM product_property
+        GROUP BY product_property.product_id) bc
+        ON (bc.enabled = 1 AND (bc.key_name = 'BrandID' OR bc.key_name = 'ColorCode') AND
+        bc.product_id = product.product_id)
         WHERE
         <choose>
             <when test="shopStatus == -1">
@@ -627,5 +627,15 @@
         </if>
 
         LIMIT #{start}, #{count};
+    </select>
+
+    <select id="getProductStateByProductId" parameterType="Long" resultType="java.util.HashMap">
+        SELECT
+          product.product_id,
+          product.status AS product_status,
+          shop_product.status AS shop_product_status
+        FROM product
+          LEFT JOIN shop_product ON product.product_id = shop_product.product_id  AND shop_product.enabled = 1
+        WHERE product.product_id = #{product_id}
     </select>
 </mapper>

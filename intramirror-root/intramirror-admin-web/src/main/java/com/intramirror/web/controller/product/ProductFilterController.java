@@ -1,7 +1,9 @@
 package com.intramirror.web.controller.product;
 
+import com.intramirror.product.api.service.brand.IBrandService;
 import com.intramirror.product.api.service.season.SeasonService;
-import java.util.List;
+import com.intramirror.web.common.Response;
+import com.intramirror.web.common.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,8 +20,16 @@ public class ProductFilterController {
     @Autowired
     private SeasonService seasonService;
 
-    @GetMapping(value = "/season/listcode")
-    public List<String> listSeasonCode() {
-        return seasonService.listAllSeasonCode();
+    @Autowired
+    private IBrandService brandService;
+
+    @GetMapping(value = "/season/list")
+    public Response listSeasonCode() {
+        return Response.status(StatusCode.SUCCESS).data(seasonService.listAllSeasonCode());
+    }
+
+    @GetMapping(value = "/brand/list")
+    public Response listCategory() {
+        return Response.status(StatusCode.SUCCESS).data(brandService.listActiveBrand());
     }
 }

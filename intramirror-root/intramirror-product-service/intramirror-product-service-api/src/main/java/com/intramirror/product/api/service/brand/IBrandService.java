@@ -16,4 +16,7 @@ public interface IBrandService {
     List<Map<String, Object>> queryActiveBrand() throws Exception;
 
     Brand getBrandById(Long brandId);
+
+    List<Map<String, Object>> listActiveBrand();
+
 }

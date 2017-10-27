@@ -30,13 +30,16 @@ public class SearchCondition {
                 + '\'' + ", stock='" + stock + '\'' + ", start=" + start + ", count=" + count + '}';
     }
 
-    public void setStatus(ProductStatusEnum status) {
-        this.status = status.getProductStatus();
-        this.shopStatus = status.getShopProductStatus();
-    }
-
     public int getStatus() {
         return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public void setShopStatus(int shopStatus) {
+        this.shopStatus = shopStatus;
     }
 
     public int getShopStatus() {

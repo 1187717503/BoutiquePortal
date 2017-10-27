@@ -48,6 +48,11 @@ public class BrandServiceImpl extends BaseDao implements IBrandService {
     }
 
     @Override
+    public List<Map<String, Object>>  listActiveBrand(){
+       return brandMapper.listActiveBrand();
+    }
+
+    @Override
     public Brand getBrandById(Long brandId) {
         return brandMapper.selectByPrimaryKey(brandId);
     }

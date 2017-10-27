@@ -27,10 +27,16 @@ public class ExceptionController {
     //    public void handleHttpSessionRequiredException(HttpSessionRequiredException e) {
     //        LOGGER.debug("Session expired , HttpSessionRequiredException : {}", e.getMessage());
     //    }
+    @ExceptionHandler(ValidateException.class)
+    @ResponseBody
+    public ErrorResponse handleValidateException(ValidateException e) {
+        LOGGER.error("Validate Exception: {}", e.getErrorResponse().getMessage());
+        return e.getErrorResponse();
+    }
 
     @ExceptionHandler(Exception.class)
     @ResponseBody
-    public ErrorResponse handleWiboxException(Exception e) {
+    public ErrorResponse handleException(Exception e) {
         LOGGER.error("Unexcepted exception: \n", e);
         return new ErrorResponse(StatusType.FAILURE, e.getMessage());
     }

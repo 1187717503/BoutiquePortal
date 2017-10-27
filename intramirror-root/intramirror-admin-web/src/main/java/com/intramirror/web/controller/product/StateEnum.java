@@ -1,11 +1,14 @@
-package com.intramirror.product.api.model;
+package com.intramirror.web.controller.product;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created on 2017/10/25.
  *
  * @author YouFeng.Zhu
  */
-public enum ProductStatusEnum {
+public enum StateEnum {
     //1-NEW_PENDING,2-MODIFY_PENDING,3-ON_SALE,4-OFF,5-NEW_REJECTED,6-MODIFY_REJECTED,7-WAITING_SALE,8-UNAVAILABLE
     // @formatter:off
     NEW(1),
@@ -14,7 +17,7 @@ public enum ProductStatusEnum {
     READY_TO_SELL(3),
 
     @Deprecated
-    OLD_PROCESSING(4),
+    OLD_PROCESSING(2),
 
     SHOP_PROCESSING(4,2),
     SHOP_SOLD_OUT(3,1),
@@ -24,17 +27,26 @@ public enum ProductStatusEnum {
 
     ALL(-1,-1);
 
+
 // @formatter:on
 
     private int productStatus;
     private int shopProductStatus;
+    private static Set<StateEnum> stateEnumSet = new HashSet<>();
 
-    ProductStatusEnum(int productStatus) {
+    static {
+
+        for (StateEnum e : StateEnum.values()) {
+            stateEnumSet.add(e);
+        }
+    }
+
+    StateEnum(int productStatus) {
         this.productStatus = productStatus;
         this.shopProductStatus = -1;
     }
 
-    ProductStatusEnum(int productStatus, int shopProductStatus) {
+    StateEnum(int productStatus, int shopProductStatus) {
         this.productStatus = productStatus;
         this.shopProductStatus = shopProductStatus;
     }
@@ -49,6 +61,6 @@ public enum ProductStatusEnum {
 
     @Override
     public String toString() {
-        return "ProductStatusEnum{" + "productStatus=" + productStatus + ", shopProductStatus=" + shopProductStatus + '}';
+        return "StateEnum{" + "productStatus=" + productStatus + ", shopProductStatus=" + (shopProductStatus == -1 ? null : shopProductStatus) + '}';
     }
 }

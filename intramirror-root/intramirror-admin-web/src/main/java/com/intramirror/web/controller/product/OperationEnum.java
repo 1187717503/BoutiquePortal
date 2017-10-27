@@ -5,11 +5,12 @@ package com.intramirror.web.controller.product;
  *
  * @author YouFeng.Zhu
  */
-public enum ProductOperationEnum {
+public enum OperationEnum {
     PROCESS,
     APPROVE,
     REMOVE,
     ADD_TO_SHOP,
     ON_SALE,
-    OFF_SALE;
+    OFF_SALE,
+    REMOVE_FROM_SHOP;
 }

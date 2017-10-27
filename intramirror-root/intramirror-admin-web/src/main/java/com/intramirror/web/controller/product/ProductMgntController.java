@@ -1,10 +1,11 @@
 package com.intramirror.web.controller.product;
 
-import com.intramirror.product.api.model.ProductStatusEnum;
 import com.intramirror.product.api.model.SearchCondition;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.product.api.service.product.IListProductService;
+import com.intramirror.web.common.Response;
+import com.intramirror.web.common.StatusCode;
 import com.intramirror.web.controller.cache.CategoryCache;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +43,7 @@ public class ProductMgntController {
 
     @GetMapping(value = "/list/{status}")
     // @formatter:off
-    public List<Map<String, Object>> listProductByFilter(@PathVariable(value = "status") String status,
+    public Response listProductByFilter(@PathVariable(value = "status") String status,
             @RequestParam(value = "boutique", required = false) String boutique,
             @RequestParam(value = "boutiqueid", required = false) String boutiqueid,
             @RequestParam(value = "brand", required = false) String brand,
@@ -67,12 +68,14 @@ public class ProductMgntController {
         searchCondition.setImage(image);
         searchCondition.setModelimage(modelimage);
         searchCondition.setSeason(season);
-        searchCondition.setStatus(getStatusEnum(status));
+        searchCondition.setStatus(getStatusEnum(status).getProductStatus());
+        searchCondition.setShopStatus(getStatusEnum(status).getShopProductStatus());
         searchCondition.setStock(stock);
         searchCondition.setStreetimage(streetimage);
         searchCondition.setStart((pageNo == null || pageNo < 0) ? 0 : (pageNo - 1) * pageSize);
         searchCondition.setCount((pageSize == null || pageSize < 0) ? 25 : pageSize);
         LOGGER.info("{}", searchCondition);
+        LOGGER.info("status: {}, shop status: {}", getStatusEnum(status).getProductStatus(), getStatusEnum(status).getShopProductStatus());
         List<Map<String, Object>> productList = null;
 
         productList = iListProductService.listProductService(searchCondition);
@@ -80,11 +83,11 @@ public class ProductMgntController {
         //setBrandIdAndColorCode(productList);
         setSkuInfo(productList);
 
-        return productList;
+        return Response.status(StatusCode.SUCCESS).data(productList);
     }
 
-    private ProductStatusEnum getStatusEnum(String status) {
-        return ProductStateMap.getStatus(status);
+    private StateEnum getStatusEnum(String status) {
+        return ProductStateOperationMap.getStatus(status);
     }
 
     private void setCategoryPath(List<Map<String, Object>> productList) {

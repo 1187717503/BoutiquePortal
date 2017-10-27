@@ -59,4 +59,6 @@ public interface ShopProductMapper {
      * @mbggenerated
      */
     int updateByPrimaryKey(ShopProduct record);
+
+    int updateShopProductByProductId(ShopProduct record);
 }

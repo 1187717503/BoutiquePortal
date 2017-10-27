@@ -16,7 +16,7 @@ import java.util.Map;
 @Service
 public class ProductServiceImpl extends BaseDao implements IProductService {
 
-    private static Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     private ProductMapper productMapper;
 
@@ -27,37 +27,31 @@ public class ProductServiceImpl extends BaseDao implements IProductService {
 
     @Override
     public int insert(ProductWithBLOBs record) {
-
         return productMapper.insert(record);
     }
 
     @Override
     public int insertSelective(ProductWithBLOBs record) {
-
         return productMapper.insertSelective(record);
     }
 
     @Override
     public ProductWithBLOBs selectByPrimaryKey(Long productId) {
-
         return productMapper.selectByPrimaryKey(productId);
     }
 
     @Override
     public ProductWithBLOBs selectByParameter(ProductWithBLOBs record) {
-
         return productMapper.selectByParameter(record);
     }
 
     @Override
     public int updateByPrimaryKeySelective(ProductWithBLOBs record) {
-
         return productMapper.updateByPrimaryKeySelective(record);
     }
 
     @Override
     public int updateByPrimaryKeyWithBLOBs(ProductWithBLOBs record) {
-
         return productMapper.updateByPrimaryKeyWithBLOBs(record);
     }
 
@@ -70,6 +64,11 @@ public class ProductServiceImpl extends BaseDao implements IProductService {
     @Override
     public List<Map<String, Object>> getVendorCodeBySku(Long shopProductSkuId) {
         return productMapper.getVendorCodeBySku(shopProductSkuId);
+    }
+
+    @Override
+    public Map<String, Object> getProductStateByProductId(Long productId) {
+        return productMapper.getProductStateByProductId(productId);
     }
 
     @Override

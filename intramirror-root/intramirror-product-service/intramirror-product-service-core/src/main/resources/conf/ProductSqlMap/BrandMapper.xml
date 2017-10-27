@@ -275,4 +275,18 @@
             and enabled = #{enabled,jdbcType=BIT}
         </if>
     </select>
+
+    <select id="listActiveBrand" resultType="java.util.Map">
+        SELECT
+          brand_id,
+          english_name
+        FROM brand
+        WHERE
+          brand.enabled = 1
+          AND brand.brand_id IN (SELECT DISTINCT product.brand_id
+                                 FROM product)
+                                 ORDER BY brand.english_name
+    </select>
+
+
 </mapper>

@@ -7,22 +7,27 @@ package com.intramirror.web.Exception;
  */
 public class ErrorResponse {
 
-    private int code;
+    private int status;
     private String message;
     private String detail;
 
-    public ErrorResponse(int code, String message) {
-        this.code = code;
+    public ErrorResponse(int status, String message) {
+        this.status = status;
         this.message = message;
     }
 
-    public int getCode() {
-
-        return code;
+    public ErrorResponse(String message) {
+        this.status = -1;
+        this.message = message;
     }
 
-    public void setCode(int code) {
-        this.code = code;
+    public int getStatus() {
+
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     public String getMessage() {
