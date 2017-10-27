@@ -93,9 +93,9 @@ public class AtelierUpdateByProductMapping implements IProductMapping{
 
                 Map<String, Object> categoryMap = new HashMap<String, Object>();
                 categoryMap.put("vendor_id", bodyDataMap.get("vendor_id"));
-                categoryMap.put("boutique_second_category", category_l1);
-                categoryMap.put("boutique_third_category", category_l2);
-                categoryMap.put("boutique_first_category", category_l3);
+                categoryMap.put("boutique_second_category", category_l2);
+                categoryMap.put("boutique_third_category", category_l3);
+                categoryMap.put("boutique_first_category", category_l1);
                 productOptions.setCategory_name(JSONObject.toJSONString(categoryMap));
                 productOptions.setCategory1(category_l1);
                 productOptions.setCategory2(category_l2);
