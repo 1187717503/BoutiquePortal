@@ -186,8 +186,8 @@
                 </div>
                 <div class="control-pannel">
                     <div>
-                        <a class="waves-effect waves-light btn">PROCESS</a>
-                        <a class="waves-effect waves-light btn">APPROVE</a>
+                        <a id="processing-btn" class="waves-effect waves-light btn">PROCESS</a>
+                        <a id="approve-btn" class="waves-effect waves-light btn">APPROVE</a>
                     </div>
                     <div class="remove">
                         <a class="waves-effect waves-light btn btn-gray">REMOVE</a>
@@ -294,7 +294,7 @@ Scripts
     <div class="product-list">
     <div class="row style-scope page-order">
         <div class="item style-scope page-order">
-            <input type="checkbox" class="filled-in" id="order-id-${order.product_id}"/>
+            <input type="checkbox" class="filled-in" id="order-id-${order.product_id}" data-product-id="${order.product_id}" />
             <label for="order-id-${order.product_id}"></label>
         </div>
         <div class="item style-scope page-order"><span class="mdi-hardware-keyboard-arrow-right hide-icon"></span><img src="images/02000a.jpg" width="49" height="63"></div>
@@ -335,17 +335,17 @@ Scripts
 
 <script id="tmpl-pagination" type="text/x-jquery-tmpl">
     <li class="pagination-info">Current: ${page.currPage} Total: ${page.totalPage}</li>
-    <li class="waves-effect"><a href="#!"><i class="mdi-av-skip-previous"></i></a></li>
-    <li class="waves-effect"><a href="#!"><i class="mdi-navigation-chevron-left"></i></a></li>
+    <li class="waves-effect pagination-index" data-pageno="0"><a href="#!"><i class="mdi-av-skip-previous"></i></a></li>
+    <li class="waves-effect pagination-index" data-pageno="${page.currPage-2}"><a href="#!"><i class="mdi-navigation-chevron-left"></i></a></li>
     {%each(i, pageInfo) page.list%}
         {%if pageInfo.active %}
-            <li class="waves-effect active"><a href="#!">${pageInfo.no}</a></li>
+            <li class="waves-effect active pagination-index" data-pageno="${pageInfo.no - 1}"><a href="#!">${pageInfo.no}</a></li>
         {%else%}
-            <li class="waves-effect"><a href="#!">${pageInfo.no}</a></li>
+            <li class="waves-effect pagination-index" data-pageno="${pageInfo.no - 1}"><a href="#!">${pageInfo.no}</a></li>
         {%/if%}
     {%/each%}
-    <li class="waves-effect"><a href="#!"><i class="mdi-navigation-chevron-right"></i></a></li>
-    <li class="waves-effect"><a href="#!"><i class="mdi-av-skip-next"></i></a></li>
+    <li class="waves-effect pagination-index" data-pageno="${page.currPage}"><a href="#!"><i class="mdi-navigation-chevron-right"></i></a></li>
+    <li class="waves-effect pagination-index" data-pageno="${page.totalPage - 1}"><a href="#!"><i class="mdi-av-skip-next"></i></a></li>
 </script>
 
 
@@ -362,7 +362,7 @@ Scripts
        
         $(".tabs .tab a").click(function() {
             var status = $(this).data('status');
-            getProdcutList(status);
+            getProdcutList(status, 10, 1, 35);
         });
 
         $("#order-head-cbx").change(function() {
@@ -377,13 +377,26 @@ Scripts
 
         $('#search-btn').click(function() {
             var status = $('.tabs .tab a.active').data('status');
-            getProdcutList(status);
+            getProdcutList(status, 10, 1, 35);
         })
 
         $('#cancel-btn').click(function() {
             console.log($('#select-season').val());
         })
 
+        $('#approve-btn').click(function() {
+            console.log('approve-btn');
+        })
+
+        $(".head-hide-icon").click(showDetail);
+        
+        $('#processing-btn').click(function() {
+            $('.product-list .item input[type=checkbox]').each(function(idx, item) {
+                if ($(item).prop('checked')) {
+                    console.log($(item).data('product-id'));
+                }
+            })
+        })
     });
 
 </script>
