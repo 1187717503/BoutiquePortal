@@ -1,7 +1,14 @@
 package pk.shoplus.model;
 
+import com.alibaba.fastjson15.JSON;
+import com.alibaba.fastjson15.JSONArray;
+import com.alibaba.fastjson15.JSONObject;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.math.BigDecimal;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -9,21 +16,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.alibaba.fastjson15.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.sql2o.Connection;
-
-import com.alibaba.fastjson15.JSON;
-import com.alibaba.fastjson15.JSONArray;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 import pk.shoplus.DBConnector;
 import pk.shoplus.common.FileUploadHelper;
 import pk.shoplus.common.Helper;
@@ -95,6 +91,18 @@ public class ProductEDSManagement {
                 productOptions.setCategoryId(cId);
             }
             // end update by dingyifan 20171019
+
+            // start update by dingyifan 20171029
+            if(StringUtils.isBlank(productOptions.getCategoryId()) && StringUtils.isBlank(productOptions.getCategory3())) {
+                logger.info("ProductEDSManagementCreateProduct,start,getDeafultCategory,productOptions:"+JSONObject.toJSONString(productOptions));
+                cId = mappingCategoryService.getDeafultCategory(vendorId,productOptions.getCategory1(),productOptions.getCategory2());
+                logger.info("ProductEDSManagementCreateProduct,end,getDeafultCategory,productOptions:"+JSONObject.toJSONString(productOptions)+",categoryId:"+cId);
+
+                if(StringUtils.isNotBlank(cId)) {
+                    productOptions.setCategoryId(cId);
+                }
+            }
+            // end update by dingyifan 20171029
 
             //get category id
             CategoryService categoryService = new CategoryService(conn);

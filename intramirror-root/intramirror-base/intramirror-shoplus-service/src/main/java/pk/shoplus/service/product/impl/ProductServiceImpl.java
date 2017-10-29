@@ -89,13 +89,25 @@ public class ProductServiceImpl implements IProductService{
 
             // start update by dingyifan 20171019
             MappingCategoryService mappingCategoryService = new MappingCategoryService(conn);
-            logger.info("ProductEDSManagementCreateProduct,start,selectCategory,productOptions:"+JSONObject.toJSONString(productOptions));
+            logger.info("ProductServiceImplUpdateProduct,start,selectCategory,productOptions:"+JSONObject.toJSONString(productOptions));
             String cId = mappingCategoryService.getMappingCategoryInfoByCondition(productOptions.getCategory1(),productOptions.getCategory2(),productOptions.getCategory3());
-            logger.info("ProductEDSManagementCreateProduct,end,selectCategory,productOptions:"+JSONObject.toJSONString(productOptions)+",categoryId:"+cId);
+            logger.info("ProductServiceImplUpdateProduct,end,selectCategory,productOptions:"+JSONObject.toJSONString(productOptions)+",categoryId:"+cId);
             if(org.apache.commons.lang.StringUtils.isNotBlank(cId)) {
                 productOptions.setCategoryId(cId);
             }
             // end update by dingyifan 20171019
+
+            // start update by dingyifan 20171029
+            if(org.apache.commons.lang.StringUtils.isBlank(productOptions.getCategoryId()) && org.apache.commons.lang.StringUtils.isBlank(productOptions.getCategory3())) {
+                logger.info("ProductServiceImplUpdateProduct,start,getDeafultCategory,productOptions:"+JSONObject.toJSONString(productOptions));
+                cId = mappingCategoryService.getDeafultCategory(vendorOptions.getVendorId(),productOptions.getCategory1(),productOptions.getCategory2());
+                logger.info("ProductServiceImplUpdateProduct,end,getDeafultCategory,productOptions:"+JSONObject.toJSONString(productOptions)+",categoryId:"+cId);
+
+                if(org.apache.commons.lang.StringUtils.isNotBlank(cId)) {
+                    productOptions.setCategoryId(cId);
+                }
+            }
+            // end update by dingyifan 20171029
 
             Category category = null ;
             if(StringUtils.isBlank(productOptions.getCategoryId())) {
