@@ -52,7 +52,7 @@ public class StateMachineController {
         Map<String, Object> currentState = productService.getProductStateByProductId(Long.parseLong(productId));
         LOGGER.info("[{}] product with [{}]", action, currentState);
         StateMachineCoreRule.validate(currentState, action);
-        updateProductState(currentState, action, Long.parseLong(productId), Long.parseLong(shopProductId));
+        updateProductState(currentState, action, Long.parseLong(productId), shopProductId == null ? null : Long.parseLong(shopProductId));
         return Response.success();
     }
 
@@ -68,44 +68,48 @@ public class StateMachineController {
             //product -> product
         } else if (currentStateEnum.getShopProductStatus() == -1 && newStateEnum.getShopProductStatus() != -1) {
             //product -> shop product
-            createShopProductStatus(newStateEnum.getProductStatus(), productId);
+            createShopProductStatus(newStateEnum.getShopProductStatus(), productId);
         } else if (currentStateEnum.getShopProductStatus() != -1 && newStateEnum.getShopProductStatus() != -1) {
             //shop product -> shop product
-            updateShopProductStatus(newStateEnum.getProductStatus(), productId);
+            updateShopProductStatus(newStateEnum.getShopProductStatus(), productId);
         } else {
             //shop product -> product
-            disableShopProductStatus(newStateEnum.getProductStatus(), productId, shopProductId);
+            if (shopProductId == null) {
+                LOGGER.error("shopProductId missed");
+                return;
+            }
+            disableShopProductStatus(shopProductId);
         }
 
     }
 
     private void updateProductStatus(int status, Long productId) {
         ProductWithBLOBs product = new ProductWithBLOBs();
-        product.setStatus((byte) 1);
+        product.setStatus((byte) status);
         product.setProductId(productId);
         productService.updateByPrimaryKeySelective(product);
     }
 
     private void updateShopProductStatus(int status, Long productId) {
         ShopProduct shopProduct = new ShopProduct();
-        shopProduct.setStatus((byte) 1);
+        shopProduct.setStatus((byte) status);
         shopProduct.setProductId(productId);
         shopProductService.updateShopProductByProductId(shopProduct);
     }
 
-    private void disableShopProductStatus(int status, Long productId, Long shopProductId) {
-        disableShopProductSku(status, shopProductId);
-        disableShopProduct(status, shopProductId);
+    private void disableShopProductStatus(Long shopProductId) {
+        disableShopProductSku(shopProductId);
+        disableShopProduct(shopProductId);
     }
 
-    private void disableShopProductSku(int status, Long shopProductId) {
+    private void disableShopProductSku(Long shopProductId) {
         ShopProductSku shopProductSku = new ShopProductSku();
         shopProductSku.setEnabled(false);
         shopProductSku.setShopProductId(shopProductId);
         shopProductSkuService.updateByShopProductId(shopProductSku);
     }
 
-    private void disableShopProduct(int status, Long shopProductId) {
+    private void disableShopProduct(Long shopProductId) {
         ShopProduct shopProduct = new ShopProduct();
         shopProduct.setEnabled(false);
         shopProduct.setShopProductId(shopProductId);

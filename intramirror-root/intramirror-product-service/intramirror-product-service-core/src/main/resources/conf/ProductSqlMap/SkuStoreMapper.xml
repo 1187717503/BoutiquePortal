@@ -52,70 +52,58 @@
     </update>
 
     <update id="confirmSkuStore" parameterType="java.lang.Long">
-        update sku_store s
-        set s.reserved = s.reserved - 1,
+        UPDATE sku_store s
+        SET s.reserved  = s.reserved - 1,
             s.confirmed = s.confirmed + 1
-        where sku_store_id = #{skuStoreId,jdbcType=BIGINT}
+        WHERE sku_store_id = #{skuStoreId,jdbcType=BIGINT}
     </update>
 
     <update id="confirmSkuStoreByNegativeStore" parameterType="java.lang.Long">
-        update sku_store s
-        set s.store = s.store + 1,
-        s.confirmed = s.confirmed - 1
-        where sku_store_id = #{skuStoreId,jdbcType=BIGINT}
+        UPDATE sku_store s
+        SET s.store     = s.store + 1,
+            s.confirmed = s.confirmed - 1
+        WHERE sku_store_id = #{skuStoreId,jdbcType=BIGINT}
     </update>
 
     <update id="cancelSkuStore" parameterType="java.lang.Long">
-        update sku_store ss , sku s, shop_product_sku sps
-        set ss.confirmed = ss.confirmed - 1,ss.store = 0
-        where ss.enabled = 1 and ss.sku_id = s.sku_id
-        and s.enabled = 1 and s.sku_id = sps.sku_id
-        and sps.enabled = 1 and sps.shop_product_sku_id = #{shopProductSkuId,jdbcType=BIGINT}
+        UPDATE sku_store ss, sku s, shop_product_sku sps
+        SET SS.confirmed = SS.confirmed - 1, SS.store = 0
+        WHERE SS.enabled = 1 AND SS.sku_id = s.sku_id
+        AND s.enabled = 1 AND s.sku_id = sps.sku_id
+        AND sps.enabled = 1 AND sps.shop_product_sku_id = #{shopProductSkuId,jdbcType=BIGINT}
     </update>
 
     <select id="selectSkuStoreByShopProductSkuId" resultMap="BaseResultMap" parameterType="java.lang.Long">
-        select ss.* from sku_store ss
-        inner join sku s on (ss.sku_id = s.sku_id and s.enabled = 1)
-        inner join shop_product_sku sps on (s.sku_id = sps.sku_id and sps.enabled = 1)
-        where sps.enabled = 1 and sps.shop_product_sku_id = #{shopProductSkuId,jdbcType=BIGINT}
+        SELECT ss.*
+        FROM sku_store ss
+            INNER JOIN sku s ON (ss.sku_id = s.sku_id AND s.enabled = 1)
+            INNER JOIN shop_product_sku sps ON (s.sku_id = sps.sku_id AND sps.enabled = 1)
+        WHERE sps.enabled = 1 AND sps.shop_product_sku_id = #{shopProductSkuId,jdbcType=BIGINT}
     </select>
 
     <select id="listSkuStoreByProductId" resultType="java.util.HashMap" parameterType="java.lang.Long">
         SELECT
-          sku_store.sku_id,
-          sku_store.sku_store_id,
-          sku_store.store,
-          sku_store.reserved,
-          sku_store.confirmed,
-          product_sku_property_value.value AS size
-
+            sku_store.sku_id,
+            sku_store.sku_store_id,
+            sku_store.store,
+            sku_store.reserved,
+            sku_store.confirmed,
+            sku.`size`
         FROM sku_store
-          INNER JOIN sku_property ON (sku_property.sku_id = sku_store.sku_id AND sku_property.enabled = 1)
-          INNER JOIN product_sku_property_key
-            ON (sku_property.product_sku_property_key_id = product_sku_property_key.product_sku_property_key_id AND sku_property.enabled = 1 AND
-                product_sku_property_key.name = "Size")
-          INNER JOIN product_sku_property_value
-            ON (sku_property.product_sku_property_value_id = product_sku_property_value.product_sku_property_value_id AND
-                product_sku_property_value.enabled = 1)
+            INNER JOIN sku ON sku.sku_id = sku_store.sku_id
         WHERE sku_store.product_id = #{productId} AND sku_store.enabled = 1;
     </select>
 
     <select id="listSkuStoreByProductList" resultType="java.util.HashMap" parameterType="java.util.List">
         SELECT
-          sku_store.sku_id,
-          sku_store.sku_store_id,
-          sku_store.store,
-          sku_store.reserved,
-          sku_store.confirmed,
-          product_sku_property_value.value AS size
+        sku_store.sku_id,
+        sku_store.sku_store_id,
+        sku_store.store,
+        sku_store.reserved,
+        sku_store.confirmed,
+        sku.`size`
         FROM sku_store
-          INNER JOIN sku_property ON (sku_property.sku_id = sku_store.sku_id AND sku_property.enabled = 1)
-          INNER JOIN product_sku_property_key
-            ON (sku_property.product_sku_property_key_id = product_sku_property_key.product_sku_property_key_id AND sku_property.enabled = 1 AND
-                product_sku_property_key.name = "Size")
-          INNER JOIN product_sku_property_value
-            ON (sku_property.product_sku_property_value_id = product_sku_property_value.product_sku_property_value_id AND
-                product_sku_property_value.enabled = 1)
+        INNER JOIN sku ON sku.sku_id = sku_store.sku_id
         WHERE sku_store.product_id IN
         <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
             #{item.product_id}
@@ -126,19 +114,23 @@
 
 
     <select id="selectSkuIdByShopProductSkuId" resultType="java.lang.Long" parameterType="java.lang.Long">
-    select sps.sku_id from shop_product_sku  sps where sps.shop_product_sku_id =  #{shopProductSkuId,jdbcType=BIGINT}
-  </select>
+        SELECT sps.sku_id
+        FROM shop_product_sku sps
+        WHERE sps.shop_product_sku_id = #{shopProductSkuId,jdbcType=BIGINT}
+    </select>
 
     <select id="getSkuStoreBySkuId" resultType="java.util.HashMap">
         SELECT * FROM sku_store WHERE sku_id in
         <foreach collection="skuIdString" item="skuId" index="index"
-                open="(" close=")" separator=",">
+                 open="(" close=")" separator=",">
             #{skuId}
         </foreach>
     </select>
 
     <update id="batchExecuteBySql">
-        UPDATE sku_store SET reserved = reserved + #{reservedTwo} , store = store - #{reservedTwo} WHERE sku_id = #{skuId}
+        UPDATE sku_store
+        SET reserved = reserved + #{reservedTwo}, store = store - #{reservedTwo}
+        WHERE sku_id = #{skuId}
     </update>
 
     <update id="zeroClearing" parameterType="java.util.Map">
@@ -147,7 +139,7 @@
         where ss.`enabled` = 1
         and ss.`product_id` in
         <foreach collection="productIds" item="productId" index="index"
-                open="(" close=")" separator=",">
+                 open="(" close=")" separator=",">
             #{productId}
         </foreach>
         <![CDATA[ and (ss.`last_check` <= #{date,jdbcType=VARCHAR} or ss.`last_check` is null )]]>

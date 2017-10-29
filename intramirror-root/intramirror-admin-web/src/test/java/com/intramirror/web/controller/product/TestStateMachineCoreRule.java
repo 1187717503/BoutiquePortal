@@ -14,7 +14,7 @@ public class TestStateMachineCoreRule {
     @Test
     public void testMapMatchState() {
         for (StateEnum productState : StateEnum.values()) {
-            Map<String, Object> map = new HashMap<String, Object>();
+            Map<String, Object> map = new HashMap<>();
             map.put("product_status", String.valueOf(productState.getProductStatus()));
             map.put("shop_product_status", productState.getShopProductStatus() == -1 ? null : String.valueOf(productState.getShopProductStatus()));
             assertSame(productState.name() + " not match", productState, StateMachineCoreRule.map2StateEnum(map));
@@ -22,7 +22,7 @@ public class TestStateMachineCoreRule {
     }
 
     @Test
-    public void testCheckRule(){
+    public void testCheckRule() {
 
     }
 }

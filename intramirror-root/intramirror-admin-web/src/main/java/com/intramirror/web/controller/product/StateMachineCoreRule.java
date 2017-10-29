@@ -84,7 +84,7 @@ public class StateMachineCoreRule {
         return null;
     }
 
-    private static boolean isMatch(StateEnum currentState, OperationEnum operation) {
+    static boolean isMatch(StateEnum currentState, OperationEnum operation) {
         return stateCoreRule.get(currentState).containsKey(operation);
     }
 
@@ -98,7 +98,7 @@ public class StateMachineCoreRule {
         if (stateEnum == null) {
             throw new ValidateException(new ErrorResponse("Unkown product state : " + currentState.toString()));
         }
-        if (isMatch(stateEnum, operation)) {
+        if (!isMatch(stateEnum, operation)) {
             StringBuilder sb = new StringBuilder();
             sb.append("Product status [").append(stateEnum.name()).append("]").append(" is not allowed to ").append("[").append(operation.name()).append("].");
             ErrorResponse errorResponse = new ErrorResponse(sb.toString());

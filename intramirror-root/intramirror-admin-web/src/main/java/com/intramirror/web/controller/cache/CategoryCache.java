@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Created on 2017/10/23.
+ *
  * @author YouFeng.Zhu
  */
 @Component
@@ -31,7 +32,7 @@ public class CategoryCache {
         try {
             List<Category> categories = iCategoryService.listAllCategoryByConditions();
             mapCategory(categories, categoryHashMap);
-            LOGGER.info("Category Cache : {}", categoryHashMap.toString());
+            isInit = true;
         } catch (Exception e) {
             LOGGER.error("Unexcepted Exception: {}", e.getMessage(), e);
         }
