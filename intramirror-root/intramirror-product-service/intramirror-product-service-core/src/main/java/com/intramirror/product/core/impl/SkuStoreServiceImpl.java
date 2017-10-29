@@ -17,7 +17,6 @@ import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.SkuStoreMapper;
 
-
 @Service
 public class SkuStoreServiceImpl extends BaseDao implements ISkuStoreService {
 
@@ -29,11 +28,11 @@ public class SkuStoreServiceImpl extends BaseDao implements ISkuStoreService {
         skuStoreMapper = this.getSqlSession().getMapper(SkuStoreMapper.class);
     }
 
-
     /**
      * 根据SkuId修改库存相关信息
      *
-     * @param statusType-订单的状态 skuid
+     * @param statusType-订单的状态
+     *         skuid
      * @return
      */
     public int updateBySkuId(int statusType, long skuid) {
@@ -78,7 +77,6 @@ public class SkuStoreServiceImpl extends BaseDao implements ISkuStoreService {
         }
     }
 
-
     /**
      * 根据shopProductSkuId 查询SKUid
      *
@@ -109,4 +107,15 @@ public class SkuStoreServiceImpl extends BaseDao implements ISkuStoreService {
     public List<Map<String, Object>> listSkuStoreByProductId(Long productId) {
         return skuStoreMapper.listSkuStoreByProductId(productId);
     }
+
+    @Override
+    public List<Map<String, Object>> listSkuStoreByProductList(List<Map<String, Object>> products) {
+        return skuStoreMapper.listSkuStoreByProductList(products);
+    }
+
+    @Override
+    public List<Map<String, Object>> listStockByProductList(List<Map<String, Object>> products) {
+        return skuStoreMapper.listStockByProductList(products);
+    }
+
 }

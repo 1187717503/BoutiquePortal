@@ -35,6 +35,7 @@ public interface ISkuStoreService {
     void updateSkuStoreReserved(List<String> reservedList, String[] skuIdString, List<Long> skuIds) throws Exception;
 
     List<Map<String, Object>> listSkuStoreByProductId(Long productId);
-    //    List<Map<String, Object>> listSkuStoreByProductList(List<Map<String, Object>> products);
+    List<Map<String, Object>> listSkuStoreByProductList(List<Map<String, Object>> products);
+    List<Map<String, Object>> listStockByProductList(List<Map<String, Object>> products);
 
 }

@@ -17,4 +17,6 @@ public interface SkuService {
     Map<String, Object> getSkuInfoBySkuCode(Map<String, Object> condition);
 
     List<Sku> listSkuInfoByProductId(Long productId);
+
+    List<Map<String, Object>> listPriceByProductList(List<Map<String, Object>> products);
 }

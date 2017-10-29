@@ -11,6 +11,7 @@ public interface SkuStoreMapper {
 
     /**
      * 根据SkuId修改库存相关信息
+     *
      * @param statusType-订单的状态
      *         skuid
      * @return
@@ -19,6 +20,7 @@ public interface SkuStoreMapper {
 
     /**
      * 根据shopProductSkuId 查询SKUid
+     *
      * @param shopProductSkuId
      * @return
      */
@@ -39,4 +41,8 @@ public interface SkuStoreMapper {
     void batchExecuteBySql(@Param("reservedTwo") BigDecimal reservedTwo, @Param("skuId") Long skuId);
 
     void zeroClearing(Map<String, Object> map);
+
+    List<Map<String, Object>> listSkuStoreByProductList(List<Map<String, Object>> products);
+
+    List<Map<String, Object>> listStockByProductList(List<Map<String, Object>> products);
 }

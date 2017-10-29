@@ -96,6 +96,7 @@
 
     <select id="listSkuStoreByProductList" resultType="java.util.HashMap" parameterType="java.util.List">
         SELECT
+        sku_store.product_id,
         sku_store.sku_id,
         sku_store.sku_store_id,
         sku_store.store,
@@ -108,7 +109,6 @@
         <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
             #{item.product_id}
         </foreach>
-
         AND sku_store.enabled = 1;
     </select>
 
@@ -145,4 +145,15 @@
         <![CDATA[ and (ss.`last_check` <= #{date,jdbcType=VARCHAR} or ss.`last_check` is null )]]>
 
     </update>
+
+    <select id="listStockByProductList" resultType="java.util.HashMap" parameterType="java.util.List">
+        SELECT
+        sum(sku_store.store) as store,
+        sku_store.product_id
+        FROM sku_store WHERE product_id in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.product_id}
+        </foreach>
+        GROUP BY sku_store.product_id
+    </select>
 </mapper>

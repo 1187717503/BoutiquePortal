@@ -3,11 +3,13 @@ package com.intramirror.web.controller.product;
 import com.intramirror.product.api.model.SearchCondition;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ProductPropertyService;
+import com.intramirror.product.api.service.SkuService;
 import com.intramirror.product.api.service.product.IListProductService;
 import com.intramirror.web.common.Response;
 import com.intramirror.web.common.StatusCode;
 import com.intramirror.web.controller.cache.CategoryCache;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -40,6 +42,9 @@ public class ProductMgntController {
 
     @Autowired
     private ISkuStoreService iSkuStoreService;
+
+    @Autowired
+    private SkuService skuService;
 
     @GetMapping(value = "/list/{status}")
     // @formatter:off
@@ -79,11 +84,29 @@ public class ProductMgntController {
         List<Map<String, Object>> productList = null;
 
         productList = iListProductService.listProductService(searchCondition);
-        setCategoryPath(productList);
-        //setBrandIdAndColorCode(productList);
-        setSkuInfo(productList);
-
+        appendInfo(productList);
         return Response.status(StatusCode.SUCCESS).data(productList);
+    }
+
+    private void appendInfo(List<Map<String, Object>> productList) {
+        setCategoryPath(productList);
+        //        List<Map<String, Object>> stocklist = iSkuStoreService.listStockByProductList(productList);
+        List<Map<String, Object>> skuStoreList = iSkuStoreService.listSkuStoreByProductList(productList);
+        List<Map<String, Object>> priceList = skuService.listPriceByProductList(productList);
+        for (Map<String, Object> product : productList) {
+            //            setStock(product, stocklist);
+            setSkuInfo(product, skuStoreList);
+            setPrice(product, priceList);
+        }
+    }
+
+    private void setStock(Map<String, Object> product, List<Map<String, Object>> stocklist) {
+        for (Map<String, Object> productStock : stocklist) {
+            if (product.get("product_id").equals(productStock.get("product_id"))) {
+                product.put("total_stock", productStock.get("store"));
+                break;
+            }
+        }
     }
 
     private StateEnum getStatusEnum(String status) {
@@ -104,13 +127,25 @@ public class ProductMgntController {
         return map;
     }
 
-    private void setSkuInfo(List<Map<String, Object>> productList) {
-        //        Map<String, Object> productMap = list2Map(productList);
-        for (Map<String, Object> product : productList) {
-            List<Map<String, Object>> skuStoreList = iSkuStoreService.listSkuStoreByProductId(Long.parseLong(product.get("product_id").toString()));
-            product.put("skuDetail", skuStoreList);
-            //product.put("totalStore", sumStock(skuStoreList));
+    private void setPrice(Map<String, Object> product, List<Map<String, Object>> priceList) {
+        for (Map<String, Object> price : priceList) {
+            if (product.get("product_id").equals(price.get("product_id"))) {
+                product.putAll(price);
+                break;
+            }
         }
+    }
+
+    private void setSkuInfo(Map<String, Object> product, List<Map<String, Object>> skuStoreList) {
+        //Map<String, Object> productMap = list2Map(productList);
+        List<Map<String, Object>> productSkuStoreList = new LinkedList<>();
+        for (Map<String, Object> skuStore : skuStoreList) {
+            if (product.get("product_id").equals(skuStore.get("product_id"))) {
+                productSkuStoreList.add(skuStore);
+            }
+        }
+        product.put("totalStore", sumStock(productSkuStoreList));
+        product.put("skuDetail", productSkuStoreList);
     }
 
     private Long sumStock(List<Map<String, Object>> skuStoreList) {

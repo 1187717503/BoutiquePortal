@@ -320,4 +320,20 @@
       SELECT * FROM sku WHERE product_id = #{productId} and enabled = FALSE
     </select>
 
+    <select id="listPriceByProductList" parameterType="java.util.List" resultType="java.util.Map">
+        SELECT
+        sku_id,
+        price AS retail_price,
+        in_price AS boutique_price,
+        im_price AS im_price,
+        product_id
+        FROM sku
+        WHERE (sku.product_id IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.product_id}
+        </foreach>
+        AND sku.enabled = 1)
+        GROUP BY sku.product_id
+    </select>
+
 </mapper>
