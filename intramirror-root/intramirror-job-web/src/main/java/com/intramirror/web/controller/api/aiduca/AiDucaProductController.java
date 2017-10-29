@@ -1,37 +1,10 @@
 package com.intramirror.web.controller.api.aiduca;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
-
-import javax.annotation.Resource;
-
-import com.intramirror.product.api.service.stock.IUpdateStockService;
-import com.intramirror.web.util.RandomUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.annotations.Param;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import pk.shoplus.common.Contants;
-import pk.shoplus.common.utils.FileUtils;
-import pk.shoplus.model.ProductEDSManagement;
-import pk.shoplus.util.ExceptionUtils;
-import pk.shoplus.util.FileUtil;
-import pk.shoplus.util.MapUtils;
-
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import com.intramirror.common.help.ResultMessage;
-import com.intramirror.common.parameter.StatusType;
 import com.intramirror.common.utils.DateUtils;
+import com.intramirror.product.api.service.stock.IUpdateStockService;
 import com.intramirror.web.mapping.api.IStockMapping;
 import com.intramirror.web.mapping.impl.aiduca.AiDucaSynAllStockMapping;
 import com.intramirror.web.mapping.impl.aiduca.AiDucaSynProductMapping;
@@ -41,8 +14,29 @@ import com.intramirror.web.thread.UpdateProductThread;
 import com.intramirror.web.thread.UpdateStockThread;
 import com.intramirror.web.util.ApiDataFileUtils;
 import com.intramirror.web.util.GetPostRequestUtil;
-
+import com.intramirror.web.util.RandomUtils;
 import difflib.DiffRow;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import javax.annotation.Resource;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Param;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import pk.shoplus.common.Contants;
+import pk.shoplus.model.ProductEDSManagement;
+import pk.shoplus.util.ExceptionUtils;
+import pk.shoplus.util.FileUtil;
 
 @Controller
 @RequestMapping("/alduca_product")
@@ -260,14 +254,20 @@ public class AiDucaProductController implements InitializingBean{
 
 						logger.info("AlducaProductControllerSyn_stock,insertandchange,diffRow:"+JSONObject.toJSONString(diffRow));
 						String stockMapStr = diffRow.getNewLine().replace("<br>","");
-						Map<String,Object> stockMap = JSONObject.parseObject(stockMapStr);
-						changeData.add(stockMap);
+
+						if(StringUtils.isNotBlank(stockMapStr)) {
+							Map<String,Object> stockMap = JSONObject.parseObject(stockMapStr);
+							changeData.add(stockMap);
+						}
 					} else if(tag == DiffRow.Tag.DELETE){
 
 						logger.info("AlducaProductControllerSyn_stock,delete,diffRow:"+JSONObject.toJSONString(diffRow));
 						String stockMapStr = diffRow.getOldLine().replace("<br>","");
-						Map<String,Object> stockMap = JSONObject.parseObject(stockMapStr);
-						deleteData.add(stockMap);
+
+						if(StringUtils.isNotBlank(stockMapStr)) {
+							Map<String,Object> stockMap = JSONObject.parseObject(stockMapStr);
+							deleteData.add(stockMap);
+						}
 					}
 				}
 				this.handleStock(changeData,vendor_id,event_name,executor,thread_num,apiDataFileUtils,false);

@@ -36,14 +36,13 @@ public class AiDucaSynAllStockMapping implements IStockMapping{
 	@Override
 	public StockOption mapping(Map<String, Object> mqDataMap) {
         logger.info("AiDucaSynAllStockMappingMapping,inputParams,mqDataMap:"+mqDataMap);
-        
+        StockOption stockOption = new StockOption();
+        try {
         //如果未注入进来,手动获取bean
         if(skuService == null){
         	skuService = (SkuService)SpringContextUtils.getContext().getBean("skuServiceImpl");
         }
         
-        StockOption stockOption = new StockOption();
-
         Map<String,Object> productMap = JSONObject.parseObject(mqDataMap.get("product").toString());
         
         Map<String, Object> skuParam = new HashMap<String, Object>();
@@ -70,18 +69,16 @@ public class AiDucaSynAllStockMapping implements IStockMapping{
             return stockOption;
         }
         
-        try {
-        	
-        	//设置库存数量
-        	if (productMap != null && productMap.size() > 0 && checkValue(productMap.get("Stock"))){
-        		stockOption.setQuantity(productMap.get("Stock").toString());
-        	}
-        	
-            stockOption.setProductCode(skuInfo.get("product_code").toString());
-            stockOption.setSizeValue(skuInfo.get("size")==null?"":skuInfo.get("size").toString());
-            stockOption.setVendor_id(vendor_id);
-            stockOption.setType(StockContants.absolute_qty); // 库存绝对值
-            stockOption.setLast_check(new Date());
+        //设置库存数量
+        if (productMap != null && productMap.size() > 0 && checkValue(productMap.get("Stock"))){
+            stockOption.setQuantity(productMap.get("Stock").toString());
+        }
+
+        stockOption.setProductCode(skuInfo.get("product_code").toString());
+        stockOption.setSizeValue(skuInfo.get("size")==null?"":skuInfo.get("size").toString());
+        stockOption.setVendor_id(vendor_id);
+        stockOption.setType(StockContants.absolute_qty); // 库存绝对值
+        stockOption.setLast_check(new Date());
         	
         } catch (Exception e) {
             e.printStackTrace();
