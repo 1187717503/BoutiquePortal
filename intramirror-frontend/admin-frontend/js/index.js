@@ -1,14 +1,11 @@
 let token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxOTciLCJpYXQiOjE1MDk0NDYxNzF9.XE4-XATYwBXPvdOht6RinY099WQ_RsXtRnDP2Mn7vnLck0xRdqMqeKHwyechw9SyXs3wejCxHOeixQdAVhVKEg";
 
-var searchObj = {}
-searchObj.pageSize=10;
-
 function initBrand() {
 
     $.ajax({
-        type: "GET",
+        type: requestURL.getBrand.method,
         contentType: "application/json",
-        url: requestURL.getBrand,
+        url: requestURL.getBrand.url,
         data: {},
         dataType: 'json',
         beforeSend: function(request) {
@@ -23,9 +20,9 @@ function initBrand() {
 function initVendor() {
 
     $.ajax({
-        type: "GET",
+        type: requestURL.getVendor.method,
         contentType: "application/json",
-        url: requestURL.getVendor,
+        url: requestURL.getVendor.url,
         data: {},
         dataType: 'json',
         beforeSend: function(request) {
@@ -40,9 +37,9 @@ function initVendor() {
 function initCategory() {
 
     $.ajax({
-        type: "GET",
+        type: requestURL.getCategory.method,
         contentType: "application/json",
-        url: requestURL.getCategory,
+        url: requestURL.getCategory.url,
         data: {},
         dataType: 'json',
         beforeSend: function(request) {
@@ -81,9 +78,9 @@ function initCategory() {
 function initSeason() {
     
     $.ajax({
-        type: "GET",
+        type: requestURL.getSeason.method,
         contentType: "application/json",
-        url: requestURL.getSeason,
+        url: requestURL.getSeason.url,
         data: {},
         dataType: 'json',
         beforeSend: function(request) {
@@ -97,90 +94,82 @@ function initSeason() {
 
 
 function getFilterFromDom() {
-    var boutique = $('#select-boutique').val();
-    if (boutique === '-1') {
-        searchObj.boutique = '';
-    } else {
-        searchObj.boutique = boutique;
-    }
+    var searchObj = {}
+    searchObj.boutique = $('#select-boutique').val();
+    searchObj.category = $('#select-category').val();
+    searchObj.season = $('#select-season').val();
+    searchObj.brand = $('#select-brand').val();
+    searchObj.stock = $('#select-stock').val();
+    searchObj.image = $('#select-image').val();
+    searchObj.modelImage = $('#select-model-image').val();
+    searchObj.streetImage = $('#select-street-image').val();
 
-    var category = $('#select-category').val();
-    if (category === '-1') {
-        searchObj.category = '';
-    } else {
-        searchObj.category = category;
-    }
-
-    var season = $('#select-season').val();
-    if (season === '-1') {
-        searchObj.season = '';
-    } else {
-        searchObj.season = season;
-    }
-
-    var brand = $('#select-brand').val();
-    if (brand === '-1') {
-        searchObj.brand = '';
-    } else {
-        searchObj.brand = brand;
-    }
+    searchObj.boutiqueId = $('#text-designer').val()
+    return searchObj;
 }
 
 function getProdcutList(status, pagesize, pageno, totalsize) {
 
-    getFilterFromDom();
+    var searchObj = getFilterFromDom();
 
     var filter = '?';
-    if (searchObj.boutique) {
-        filter += 'boutique='+ searchObj.boutique + '&';
+    if (searchObj.boutique !== '-1') {
+        filter += 'vendorId='+ searchObj.boutique + '&';
     }
 
     if (searchObj.boutiqueid) {
-        filter += 'boutiqueid='+ searchObj.boutiqueid + '&';
+        filter += 'boutiqueId='+ searchObj.boutiqueid + '&';
     }
 
-    if (searchObj.brand) {
-        filter += 'brand='+ searchObj.brand + '&';
+    if (searchObj.brand !== '-1') {
+        filter += 'brandId='+ searchObj.brand + '&';
     }
 
-    if (searchObj.category) {
-        filter += 'category='+ searchObj.category + '&';
+    if (searchObj.category !== '-1') {
+        filter += 'categoryId='+ searchObj.category + '&';
     }
 
-    if (searchObj.season) {
+    if (searchObj.season !== '-1') {
         filter += 'season='+ searchObj.season + '&';
     }
 
     if (pagesize) {
-        filter += 'pagesize='+ pagesize + '&';
+        filter += 'pageSize='+ pagesize + '&';
     }
 
     if (pageno) {
-        filter += 'pageno='+ pageno + '&';
+        filter += 'pageNo='+ pageno + '&';
     }
+
+    filter += 'image='+ searchObj.image + '&';
+    filter += 'modelImage='+ searchObj.modelImage + '&';
+    filter += 'streetImage='+ searchObj.streetImage + '&';
 
     filter = filter.slice(0, filter.length-1);
 
-
-    console.log(requestURL.search + "/" + status + filter);
-
-
     $('#order-list').empty();
     $('.pagination').empty();
+    $('.control-pannel').empty();
+    
+    let btnStatus = getBtnStatus(status);
+    $("#tmpl-control-pannel").tmpl({list: btnStatus}).appendTo(".control-pannel");
+   
     loading();
     $.ajax({
-        type: "GET",
+        type: requestURL.search.method,
         contentType: "application/json",
-        url: requestURL.search + "/" + status + filter,
+        url: requestURL.search.url + "/" + status + filter,
         data: {},
         dataType: 'json',
         beforeSend: function(request) {
             request.setRequestHeader("token", token);
         },
         success: function(result) {
-            $("#tmpl-order-list").tmpl({list: result.data}).appendTo("#order-list");
+
+            $("#tmpl-order-list").tmpl({list: result.data, tab_status: status, action: btnStatus}).appendTo("#order-list");
             $(".hide-icon").click(showDetail);
             updatePagination(status, pagesize, pageno, totalsize);
+            initActionEvent();
             finishLoading();
         }
     });
@@ -231,11 +220,11 @@ function finishLoading() {
 function updatePagination(status, pagesize, pageno, totalsize) {
     $('.pagination').empty();
 
-    var pageinfo = {}
+    let pageinfo = {}
     pageinfo.totalPage = totalsize;
     pageinfo.currPage = pageno;
     pageinfo.list = [];
-    var listData = pageinfo.list;
+    let listData = pageinfo.list;
 
     if (pageno <= 3 ) {
         listData.push({"no": 1});
@@ -265,4 +254,86 @@ function updatePagination(status, pagesize, pageno, totalsize) {
         getProdcutList(status, pagesize, $(this).data('pageno')+1, totalsize);
 
     })
+}
+
+
+function getBtnStatus(status) {
+    let btnStatus = {};
+    if (status === 'new') {
+        btnStatus.approve = 1;
+        btnStatus.remove = 1;
+        btnStatus.process = 1;
+    } else if (status === 'processing') {
+        btnStatus.approve = 1;
+        btnStatus.remove = 1;
+    } else if (status === 'trash') {
+        btnStatus.approve = 1;
+        btnStatus.process = 1;
+    } else if (status === 'readytosell') {
+        btnStatus.process = 1;
+        btnStatus.remove = 1;
+        btnStatus.add_to_shop = 1;
+    } else if (status === 'shopreadytosell') {
+        btnStatus.process = 1;
+        btnStatus.remove = 1;
+        btnStatus.remove_from_shop = 1;
+        btnStatus.on_sale = 1
+    } else if (status === 'shopprocessing') {
+        btnStatus.process = 1;
+        btnStatus.remove = 1;
+    } else if (status === 'shopremoved') {
+        btnStatus.approve = 1;
+    } else if (status === 'shopsoldout') {
+        btnStatus.process = 1;
+        btnStatus.remove = 1;
+    } else if (status === 'shoponsale') {
+        btnStatus.process = 1;
+        btnStatus.remove = 1;
+        btnStatus.off_sale = 1;
+    }
+    return btnStatus;
+}
+
+function initActionEvent() {
+
+    $('#approve-btn').click(function() {
+        console.log('approve-btn');
+    })
+
+    $('#processing-btn').click(function() {
+        $('.product-list .item input[type=checkbox]').each(function(idx, item) {
+            if ($(item).prop('checked')) {
+                console.log($(item).data('product-id'));
+
+            }
+        })
+    })
+
+    $('.product-list .action .action-icon').click(function() {
+
+        let productId = $(this).parent().data('product-id');
+        let shopProductId = $(this).parent().data('shop-product-id');
+        let action = $(this).data('action');
+
+        $.ajax({
+            type: requestURL.productAction.method,
+            contentType: "application/json",
+            url: requestURL.productAction.url + "/" + action,
+            data: {},
+            dataType: 'json',
+            beforeSend: function(request) {
+                request.setRequestHeader("token", token);
+            },
+            success: function(result) {
+
+                $("#tmpl-order-list").tmpl({list: result.data, tab_status: status, action: btnStatus}).appendTo("#order-list");
+                $(".hide-icon").click(showDetail);
+                updatePagination(status, pagesize, pageno, totalsize);
+                initActionEvent();
+                
+            }
+        });
+
+        console.log('product-id=' + productId + ',shop_product_id=' + shopProductId + ',action=' + action);
+    });
 }

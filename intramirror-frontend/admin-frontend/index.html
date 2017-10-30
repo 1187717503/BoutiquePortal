@@ -128,29 +128,29 @@
                                     <select id="select-season"></select>
                                 </div>
                                 <div class="input-field col s1">
-                                    <select>
-                                        <option value="-1" selected>Image All</option>
+                                    <select id="select-image">
+                                        <option value="0" selected>Image All</option>
                                         <option value="1">YES</option>
                                         <option value="2">NO</option>
                                     </select>
                                 </div>
                                 <div class="input-field col s2">
-                                    <select>
-                                        <option value="-1" selected>Model Image All</option>
+                                    <select id="select-model-image">
+                                        <option value="0" selected>Model Image All</option>
                                         <option value="1">YES</option>
                                         <option value="2">NO</option>
                                     </select>
                                 </div>
                                 <div class="input-field col s2">
-                                    <select>
-                                        <option value="-1" selected>Street Image All</option>
+                                    <select id="select-street-image">
+                                        <option value="0" selected>Street Image All</option>
                                         <option value="1">YES</option>
                                         <option value="2">NO</option>
                                     </select>
                                 </div>
                                 <div class="input-field col s2">
-                                    <select>
-                                        <option value="-1" selected>Stock All</option>
+                                    <select id="select-stock">
+                                        <option value="0" selected>Stock All</option>
                                         <option value="1">YES</option>
                                         <option value="2">NO</option>
                                     </select>
@@ -176,7 +176,7 @@
                             <li class="tab col"><a data-status="processing" href="#"><div>PROCESSING<span>(0)</span></div></a></li>
                             <li class="tab col"><a data-status="readytosell" href="#"><div>OK<span>(0)</span></div></a></li>
                             <li class="tab col"><a data-status="shopprocessing" href="#"><div>SHOP_PROCESSING<span>(0)</span></div></a></li>
-                            <li class="tab col"><a data-status="shopreadytosale" href="#"><div>SHOP_READ<span>(0)</span></div></a></li>
+                            <li class="tab col"><a data-status="shopreadytosell" href="#"><div>SHOP_READ<span>(0)</span></div></a></li>
                             <li class="tab col"><a data-status="shopremoved" href="#"><div>SHOP_MOVED<span>(0)</span></div></a></li>
                             <li class="tab col"><a data-status="shoponsale" href="#"><div>SHOP_ONSALE<span>(0)</span></div></a></li>
                             <li class="tab col"><a data-status="shopsoldout" href="#"><div>SHOP_SOLDOUT<span>(0)</span></div></a></li>
@@ -190,7 +190,7 @@
                         <a id="approve-btn" class="waves-effect waves-light btn">APPROVE</a>
                     </div>
                     <div class="remove">
-                        <a class="waves-effect waves-light btn btn-gray">REMOVE</a>
+                        <a id="remove-btn" class="waves-effect waves-light btn btn-gray">REMOVE</a>
                     </div>
                 </div>
 
@@ -288,6 +288,34 @@ Scripts
     {%/each%}
 </script>
 
+<script id="tmpl-control-pannel" type="text/x-jquery-tmpl">
+    <div>
+        {%if list.process == 1 %}
+        <a id="processing-btn" class="waves-effect waves-light btn">PROCESS</a>
+        {%/if%}
+        {%if list.approve == 1 %}
+        <a id="approve-btn" class="waves-effect waves-light btn">APPROVE</a>
+        {%/if%}
+        {%if list.add_to_shop == 1 %}
+        <a id="add_to_shop-btn" class="waves-effect waves-light btn">Add to Shop</a>
+        {%/if%}
+        {%if list.remove_from_shop == 1 %}
+        <a id="remove_from_shop-btn" class="waves-effect waves-light btn">Remove from Shop</a>
+        {%/if%}
+        {%if list.off_sale == 1 %}
+        <a id="off_sale-btn" class="waves-effect waves-light btn">Off Sale</a>
+        {%/if%}
+        {%if list.on_sale == 1 %}
+        <a id="on_sale-btn" class="waves-effect waves-light btn">On Sale</a>
+        {%/if%}
+    </div>
+    <div class="remove">
+        {%if list.remove == 1 %}
+        <a id="remove-btn" class="waves-effect waves-light btn btn-gray">REMOVE</a>
+        {%/if%}
+    </div>
+</script>
+
 
 <script id="tmpl-order-list" type="text/x-jquery-tmpl">
     {%each(i, order) list%}
@@ -298,7 +326,7 @@ Scripts
             <label for="order-id-${order.product_id}"></label>
         </div>
         <div class="item style-scope page-order"><span class="mdi-hardware-keyboard-arrow-right hide-icon"></span><img src="images/02000a.jpg" width="49" height="63"></div>
-        <div class="item style-scope page-order"><strong>${order.brandID}-${order.colorCode}</strong></div>
+        <div class="item style-scope page-order"><strong>${order.designer_id}-${order.color_code}</strong></div>
         <div class="item style-scope page-order"><strong>${order.brand_name}</strong></div>
         <div class="item style-scope page-order"><strong>${order.boutique}</strong></div>
         <div class="item style-scope page-order"><strong>${order.boutique_id}</strong></div>
@@ -307,7 +335,35 @@ Scripts
         <div class="item style-scope page-order"><strong>${order.total_stock}</strong></div>
         <div class="item style-scope page-order"><strong>€${order.retail_price}</strong></div>
         <div class="item style-scope page-order"><strong>€${order.boutique_price}</strong></div>
+        {%if tab_status =='new' || tab_status =='processing' || tab_status=='readytosell' || tab_status=='trash' %}
         <div class="item style-scope page-order"><strong>€${order.im_price}</strong></div>
+        {%else%}
+        <div class="item style-scope page-order"><strong>€${order.sale_price}</strong></div>
+        {%/if%}
+        <div class="item style-scope page-order action" data-product-id="${order.product_id}" data-shop-product-id="${order.shop_product_id}">
+            {%if action.process == 1 %}
+            <span title="processing" data-action="process" class="waves-effect mdi-action-settings icon-btn-processing action-icon"></span>
+            {%/if%}
+            {%if action.approve == 1 %}
+            <span title="approve" data-action="approve" class="waves-effect mdi-action-done icon-btn-approve action-icon"></span>
+            {%/if%}
+            {%if action.add_to_shop == 1 %}
+            <span title="add to shop" data-action="add_to_shop" class="waves-effect mdi-content-add action-icon"></span>
+            {%/if%}
+            {%if action.remove_from_shop == 1 %}
+            <span title="remove from shop" data-action="remove_from_shop" class="waves-effect mdi-content-remove action-icon"></span>
+            {%/if%}
+            {%if action.off_sale == 1 %}
+            <span title="off sale" data-action="off_sale" class="waves-effect mdi-hardware-keyboard-arrow-down action-icon"></span>
+            {%/if%}
+            {%if action.on_sale == 1 %}
+            <span title="on sale" data-action="on_sale" class="waves-effect mdi-hardware-keyboard-arrow-up action-icon"></span>
+            {%/if%}
+            {%if action.remove == 1 %}
+            <span title="trash" data-action="trash" class="waves-effect mdi-action-delete icon-btn-delete action-icon"></span>
+            {%/if%}
+
+        </div>
     </div>
     <div class="goods show-detail">
         <div class="row head-detail-row">
@@ -384,19 +440,8 @@ Scripts
             console.log($('#select-season').val());
         })
 
-        $('#approve-btn').click(function() {
-            console.log('approve-btn');
-        })
-
         $(".head-hide-icon").click(showDetail);
-        
-        $('#processing-btn').click(function() {
-            $('.product-list .item input[type=checkbox]').each(function(idx, item) {
-                if ($(item).prop('checked')) {
-                    console.log($(item).data('product-id'));
-                }
-            })
-        })
+
     });
 
 </script>

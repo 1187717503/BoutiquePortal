@@ -181,8 +181,12 @@
 
 .order-list.page-order .item.page-order:nth-child(12) {
     width: 7%;
-}
 
+}
+.order-list.page-order .item.page-order:nth-child(13) {
+
+    font-size: 20px;
+}
 
 
 .head-hide-icon {
@@ -229,13 +233,11 @@
 .head-detail-row .list-detail-item:nth-child(5) {
     width: 10%;
     text-align: center;
-
 }
 .head-detail-row .list-detail-item:nth-child(6) {
     width: 10%;
     text-align: center;
 }
-
 
 .list-detail-row .list-detail-item:nth-child(1) {
     width: 10%;
@@ -318,4 +320,10 @@
 
 .pagination li.pagination-info {
     font-size: 16px;
+}
+
+.product-list .item.action .action-icon {
+    font-size: 20px;
+    margin-left:5px;
+    cursor: pointer;
 }
