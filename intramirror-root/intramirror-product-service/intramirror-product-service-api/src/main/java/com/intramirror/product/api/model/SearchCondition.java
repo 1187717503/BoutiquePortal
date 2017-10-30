@@ -8,25 +8,27 @@ package com.intramirror.product.api.model;
 public class SearchCondition {
     private int status;
     private int shopStatus;
-    private String boutique;
-    private String boutiqueid;
-    private String brand;
-    private String category;
+    private String vendorId;
+    private String boutiqueId;
+    private String brandId;
+    private String categoryId;
     private String season;
-    private String designerid;
-    private String colorcode;
+    private String designerId;
+    private String colorCode;
     private String image;
-    private String modelimage;
-    private String streetimage;
+    private String modelImage;
+    private String streetImage;
     private String stock;
     private int start;
     private int count;
+    private String orderBy;
+    private String desc;
 
     @Override
     public String toString() {
-        return "SearchCondition{" + "status=" + status + ", shopStatus=" + shopStatus + ", boutique='" + boutique + '\'' + ", boutiqueid='" + boutiqueid + '\''
-                + ", brand='" + brand + '\'' + ", category='" + category + '\'' + ", season='" + season + '\'' + ", designerid='" + designerid + '\''
-                + ", colorcode='" + colorcode + '\'' + ", image='" + image + '\'' + ", modelimage='" + modelimage + '\'' + ", streetimage='" + streetimage
+        return "SearchCondition{" + "status=" + status + ", shopStatus=" + shopStatus + ", vendorId='" + vendorId + '\'' + ", boutiqueId='" + boutiqueId + '\''
+                + ", brandId='" + brandId + '\'' + ", categoryId='" + categoryId + '\'' + ", season='" + season + '\'' + ", designerId='" + designerId + '\''
+                + ", colorCode='" + colorCode + '\'' + ", image='" + image + '\'' + ", modelImage='" + modelImage + '\'' + ", streetImage='" + streetImage
                 + '\'' + ", stock='" + stock + '\'' + ", start=" + start + ", count=" + count + '}';
     }
 
@@ -46,52 +48,52 @@ public class SearchCondition {
         return shopStatus;
     }
 
-    public String getBoutique() {
-        return boutique;
+    public String getVendorId() {
+        return vendorId;
     }
 
-    public void setBoutique(String boutique) {
-        this.boutique = boutique;
+    public void setVendorId(String vendorId) {
+        this.vendorId = vendorId;
     }
 
-    public String getBoutiqueid() {
-        return boutiqueid;
+    public String getBoutiqueId() {
+        return boutiqueId;
     }
 
-    public void setBoutiqueid(String boutiqueid) {
-        this.boutiqueid = boutiqueid;
+    public void setBoutiqueId(String boutiqueId) {
+        this.boutiqueId = boutiqueId;
     }
 
-    public String getBrand() {
-        return brand;
+    public String getBrandId() {
+        return brandId;
     }
 
-    public void setBrand(String brand) {
-        this.brand = brand;
+    public void setBrandId(String brandId) {
+        this.brandId = brandId;
     }
 
-    public String getDesignerid() {
-        return designerid;
+    public String getDesignerId() {
+        return designerId;
     }
 
-    public void setDesignerid(String designerid) {
-        this.designerid = designerid;
+    public void setDesignerId(String designerId) {
+        this.designerId = designerId;
     }
 
-    public String getColorcode() {
-        return colorcode;
+    public String getColorCode() {
+        return colorCode;
     }
 
-    public void setColorcode(String colorcode) {
-        this.colorcode = colorcode;
+    public void setColorCode(String colorCode) {
+        this.colorCode = colorCode;
     }
 
-    public String getCategory() {
-        return category;
+    public String getCategoryId() {
+        return categoryId;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public void setCategoryId(String categoryId) {
+        this.categoryId = categoryId;
     }
 
     public String getSeason() {
@@ -110,20 +112,20 @@ public class SearchCondition {
         this.image = image;
     }
 
-    public String getModelimage() {
-        return modelimage;
+    public String getModelImage() {
+        return modelImage;
     }
 
-    public void setModelimage(String modelimage) {
-        this.modelimage = modelimage;
+    public void setModelImage(String modelImage) {
+        this.modelImage = modelImage;
     }
 
-    public String getStreetimage() {
-        return streetimage;
+    public String getStreetImage() {
+        return streetImage;
     }
 
-    public void setStreetimage(String streetimage) {
-        this.streetimage = streetimage;
+    public void setStreetImage(String streetImage) {
+        this.streetImage = streetImage;
     }
 
     public String getStock() {
@@ -148,6 +150,22 @@ public class SearchCondition {
 
     public void setCount(int count) {
         this.count = count;
+    }
+
+    public String getOrderBy() {
+        return orderBy;
+    }
+
+    public void setOrderBy(String orderBy) {
+        this.orderBy = orderBy;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 
 }

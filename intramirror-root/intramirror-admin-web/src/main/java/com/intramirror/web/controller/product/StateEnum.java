@@ -21,7 +21,7 @@ public enum StateEnum {
 
     SHOP_PROCESSING(4,2),
     SHOP_SOLD_OUT(3,1),
-    SHOP_READY_TO_SALE(3,2),
+    SHOP_READY_TO_SELL(3,2),
     SHOP_ON_SALE(3,0),
     SHOP_REMOVED(5,2),
 

@@ -537,26 +537,26 @@
 
             </when>
             <when test="stock == 1">
-                AND sum_stock.stock &gt; 0
+
             </when>
             <otherwise>
-                AND sum_stock.stock &lt;= 0
+
             </otherwise>
         </choose>
-        <if test="brand != null">
-            AND brand.english_name = #{brand}
+        <if test="brandId != null">
+            AND brand.brand_id = #{brandId}
         </if>
-        <if test="category != null">
-            AND product.category_id = #{category}
+        <if test="categoryId != null">
+            AND product.category_id = #{categoryId}
         </if>
         <if test="season != null">
             AND product.season_code = #{season}
         </if>
-        <if test="boutiqueid != null">
-            AND product.product_code = #{boutiqueid}
+        <if test="boutiqueId != null">
+            AND product.product_code = #{boutiqueId}
         </if>
-        <if test="boutique != null">
-            AND vendor.vendor_name = #{boutique}
+        <if test="vendorId != null">
+            AND vendor.vendor_id = #{vendorId}
         </if>
         <choose>
             <when test="image == null or image == 0">
@@ -570,10 +570,10 @@
             </otherwise>
         </choose>
         <choose>
-            <when test="modelimage == null or modelimage == 0">
+            <when test="modelImage == null or modelImage == 0">
 
             </when>
-            <when test="modelimage == 1">
+            <when test="modelImage == 1">
 
             </when>
             <otherwise>
@@ -581,21 +581,45 @@
             </otherwise>
         </choose>
         <choose>
-            <when test="streetimage == null or streetimage == 0">
+            <when test="streetImage == null or streetImage == 0">
 
             </when>
-            <when test="streetimage == 1">
+            <when test="streetImage == 1">
                 AND product.img_modified = 1
             </when>
             <otherwise>
                 AND product.img_modified = 0
             </otherwise>
         </choose>
-        <if test="designerid != null">
-            AND product.designer_id = #{designerid}
+        <if test="designerId != null">
+            AND product.designer_id = #{designerId}
         </if>
-        <if test="colorcode != null">
-            AND product.color_code = #{colorcode}
+        <if test="colorCode != null">
+            AND product.color_code = #{colorCode}
+        </if>
+
+        <if test="orderBy != null">
+            ORDER BY
+            <choose>
+                <when test="orderBy == boutique">
+                    vendor.vendor_name
+                </when>
+                <when test="orderBy == boutiqueId">
+                    product.product_code
+                </when>
+                <when test="orderBy == season">
+                    product.season_code
+                </when>
+                <when test="orderBy == designIdAndColorCode">
+                    product.designer_id, product.color_code
+                </when>
+                <otherwise>
+                    product.product_id
+                </otherwise>
+            </choose>
+            <if test="desc == 1">
+                DESC
+            </if>
         </if>
 
         LIMIT #{start}, #{count};

@@ -2,9 +2,11 @@ package com.intramirror.web.Exception;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import pk.shoplus.parameter.StatusType;
 
 /**
@@ -29,15 +31,19 @@ public class ExceptionController {
     //    }
     @ExceptionHandler(ValidateException.class)
     @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidateException(ValidateException e) {
-        LOGGER.error("Validate Exception: {}", e.getErrorResponse().getMessage());
+        LOGGER.warn("Validate Exception: {}", e.getErrorResponse().getMessage());
         return e.getErrorResponse();
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseBody
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleException(Exception e) {
         LOGGER.error("Unexcepted exception: \n", e);
-        return new ErrorResponse(StatusType.FAILURE, e.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(StatusType.FAILURE, "Unexcepted exception");
+        errorResponse.setDetail(e.getMessage());
+        return errorResponse;
     }
 }

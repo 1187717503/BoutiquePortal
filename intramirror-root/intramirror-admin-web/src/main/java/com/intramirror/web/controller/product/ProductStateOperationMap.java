@@ -22,7 +22,7 @@ public class ProductStateOperationMap {
         statusEnumMap.put("oldprocessing", StateEnum.OLD_PROCESSING);
         statusEnumMap.put("shopprocessing", StateEnum.SHOP_PROCESSING);
         statusEnumMap.put("shopsoldout", StateEnum.SHOP_SOLD_OUT);
-        statusEnumMap.put("shopreadytosale", StateEnum.SHOP_READY_TO_SALE);
+        statusEnumMap.put("shopreadytosell", StateEnum.SHOP_READY_TO_SELL);
         statusEnumMap.put("shoponsale", StateEnum.SHOP_ON_SALE);
         statusEnumMap.put("shopremoved", StateEnum.SHOP_REMOVED);
     }

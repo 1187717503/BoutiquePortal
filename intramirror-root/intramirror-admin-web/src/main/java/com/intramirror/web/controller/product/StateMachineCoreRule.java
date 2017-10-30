@@ -39,10 +39,10 @@ public class StateMachineCoreRule {
         stateCoreRule.put(StateEnum.READY_TO_SELL, readyToSellOperationMap);
         readyToSellOperationMap.put(OperationEnum.REMOVE, StateEnum.TRASH);
         readyToSellOperationMap.put(OperationEnum.PROCESS, StateEnum.PROCESSING);
-        readyToSellOperationMap.put(OperationEnum.ADD_TO_SHOP, StateEnum.SHOP_READY_TO_SALE);
+        readyToSellOperationMap.put(OperationEnum.ADD_TO_SHOP, StateEnum.SHOP_READY_TO_SELL);
 
         Map<OperationEnum, StateEnum> shopReadyToSaleOperationMap = new EnumMap<>(OperationEnum.class);
-        stateCoreRule.put(StateEnum.SHOP_READY_TO_SALE, shopReadyToSaleOperationMap);
+        stateCoreRule.put(StateEnum.SHOP_READY_TO_SELL, shopReadyToSaleOperationMap);
         shopReadyToSaleOperationMap.put(OperationEnum.REMOVE, StateEnum.SHOP_REMOVED);
         shopReadyToSaleOperationMap.put(OperationEnum.REMOVE_FROM_SHOP, StateEnum.READY_TO_SELL);
         shopReadyToSaleOperationMap.put(OperationEnum.PROCESS, StateEnum.SHOP_PROCESSING);
@@ -51,11 +51,11 @@ public class StateMachineCoreRule {
         Map<OperationEnum, StateEnum> shopProcessingOperationMap = new EnumMap<>(OperationEnum.class);
         stateCoreRule.put(StateEnum.SHOP_PROCESSING, shopProcessingOperationMap);
         shopProcessingOperationMap.put(OperationEnum.REMOVE, StateEnum.SHOP_REMOVED);
-        shopProcessingOperationMap.put(OperationEnum.APPROVE, StateEnum.SHOP_READY_TO_SALE);
+        shopProcessingOperationMap.put(OperationEnum.APPROVE, StateEnum.SHOP_READY_TO_SELL);
 
         Map<OperationEnum, StateEnum> shopRemovedOperationMap = new EnumMap<>(OperationEnum.class);
         stateCoreRule.put(StateEnum.SHOP_REMOVED, shopRemovedOperationMap);
-        shopRemovedOperationMap.put(OperationEnum.APPROVE, StateEnum.SHOP_READY_TO_SALE);
+        shopRemovedOperationMap.put(OperationEnum.APPROVE, StateEnum.SHOP_READY_TO_SELL);
 
         Map<OperationEnum, StateEnum> shopSoldOutOperationMap = new EnumMap<>(OperationEnum.class);
         stateCoreRule.put(StateEnum.SHOP_SOLD_OUT, shopSoldOutOperationMap);
@@ -67,7 +67,7 @@ public class StateMachineCoreRule {
         stateCoreRule.put(StateEnum.SHOP_ON_SALE, shopOnSaleOperationMap);
         shopOnSaleOperationMap.put(OperationEnum.PROCESS, StateEnum.SHOP_PROCESSING);
         shopOnSaleOperationMap.put(OperationEnum.REMOVE, StateEnum.SHOP_REMOVED);
-        shopOnSaleOperationMap.put(OperationEnum.OFF_SALE, StateEnum.SHOP_READY_TO_SALE);
+        shopOnSaleOperationMap.put(OperationEnum.OFF_SALE, StateEnum.SHOP_READY_TO_SELL);
         //TODO: auto off sale after  stock <= 0
     }
 

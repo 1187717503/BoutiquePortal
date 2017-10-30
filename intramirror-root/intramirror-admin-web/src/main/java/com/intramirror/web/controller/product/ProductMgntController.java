@@ -49,63 +49,59 @@ public class ProductMgntController {
     @GetMapping(value = "/list/{status}")
     // @formatter:off
     public Response listProductByFilter(@PathVariable(value = "status") String status,
-            @RequestParam(value = "boutique", required = false) String boutique,
-            @RequestParam(value = "boutiqueid", required = false) String boutiqueid,
-            @RequestParam(value = "brand", required = false) String brand,
-            @RequestParam(value = "category", required = false) String category,
-            @RequestParam(value = "SeasonServiceImpl", required = false) String season,
-            @RequestParam(value = "designerid", required = false) String designerid,
-            @RequestParam(value = "colorcode", required = false) String colorcode,
+            @RequestParam(value = "vendorId", required = false) String vendorId,
+            @RequestParam(value = "boutiqueId", required = false) String boutiqueId,
+            @RequestParam(value = "brandId", required = false) String brandId,
+            @RequestParam(value = "categoryId", required = false) String categoryId,
+            @RequestParam(value = "season", required = false) String season,
+            @RequestParam(value = "designerId", required = false) String designerId,
+            @RequestParam(value = "colorCode", required = false) String colorCode,
             @RequestParam(value = "image", required = false) String image,
-            @RequestParam(value = "modelimage", required = false) String modelimage,
-            @RequestParam(value = "streetimage", required = false) String streetimage,
+            //TODO: modelImage filter doesn't work now
+            @RequestParam(value = "modelImage", required = false) String modelImage,
+            @RequestParam(value = "streetImage", required = false) String streetImage,
+            //TODO: stock filter doesn't work now
             @RequestParam(value = "stock", required = false) String stock,
-            @RequestParam(value = "pagesize",required = false) Integer pageSize,
-            @RequestParam(value = "pageno",required = false) Integer pageNo) {
+            @RequestParam(value = "pageSize",required = false) Integer pageSize,
+            @RequestParam(value = "pageNo",required = false) Integer pageNo,
+            @RequestParam(value = "orderBy",required = false) String orderBy,
+            @RequestParam(value = "desc",required = false) String desc) {
     // @formatter:on
         SearchCondition searchCondition = new SearchCondition();
-        searchCondition.setBoutique(boutique);
-        searchCondition.setBoutiqueid(boutiqueid);
-        searchCondition.setBrand(brand);
-        searchCondition.setCategory(category);
-        searchCondition.setDesignerid(designerid);
-        searchCondition.setColorcode(colorcode);
+        searchCondition.setVendorId(vendorId);
+        searchCondition.setBoutiqueId(boutiqueId);
+        searchCondition.setBrandId(brandId);
+        searchCondition.setCategoryId(categoryId);
+        searchCondition.setDesignerId(designerId);
+        searchCondition.setColorCode(colorCode);
         searchCondition.setImage(image);
-        searchCondition.setModelimage(modelimage);
+        searchCondition.setModelImage(modelImage);
         searchCondition.setSeason(season);
         searchCondition.setStatus(getStatusEnum(status).getProductStatus());
         searchCondition.setShopStatus(getStatusEnum(status).getShopProductStatus());
         searchCondition.setStock(stock);
-        searchCondition.setStreetimage(streetimage);
+        searchCondition.setStreetImage(streetImage);
+        searchCondition.setDesc(desc);
         searchCondition.setStart((pageNo == null || pageNo < 0) ? 0 : (pageNo - 1) * pageSize);
         searchCondition.setCount((pageSize == null || pageSize < 0) ? 25 : pageSize);
         LOGGER.info("{}", searchCondition);
         LOGGER.info("status: {}, shop status: {}", getStatusEnum(status).getProductStatus(), getStatusEnum(status).getShopProductStatus());
-        List<Map<String, Object>> productList = null;
+        List<Map<String, Object>> productList;
 
         productList = iListProductService.listProductService(searchCondition);
-        appendInfo(productList);
+        if (productList.size() > 0) {
+            appendInfo(productList);
+        }
         return Response.status(StatusCode.SUCCESS).data(productList);
     }
 
     private void appendInfo(List<Map<String, Object>> productList) {
         setCategoryPath(productList);
-        //        List<Map<String, Object>> stocklist = iSkuStoreService.listStockByProductList(productList);
         List<Map<String, Object>> skuStoreList = iSkuStoreService.listSkuStoreByProductList(productList);
         List<Map<String, Object>> priceList = skuService.listPriceByProductList(productList);
         for (Map<String, Object> product : productList) {
-            //            setStock(product, stocklist);
             setSkuInfo(product, skuStoreList);
             setPrice(product, priceList);
-        }
-    }
-
-    private void setStock(Map<String, Object> product, List<Map<String, Object>> stocklist) {
-        for (Map<String, Object> productStock : stocklist) {
-            if (product.get("product_id").equals(productStock.get("product_id"))) {
-                product.put("total_stock", productStock.get("store"));
-                break;
-            }
         }
     }
 
@@ -119,14 +115,6 @@ public class ProductMgntController {
         }
     }
 
-    private Map<String, Object> list2Map(List<Map<String, Object>> productList) {
-        Map<String, Object> map = new HashMap<>();
-        for (Map<String, Object> product : productList) {
-            map.put(product.get("product_id").toString(), product);
-        }
-        return map;
-    }
-
     private void setPrice(Map<String, Object> product, List<Map<String, Object>> priceList) {
         for (Map<String, Object> price : priceList) {
             if (product.get("product_id").equals(price.get("product_id"))) {
@@ -137,7 +125,6 @@ public class ProductMgntController {
     }
 
     private void setSkuInfo(Map<String, Object> product, List<Map<String, Object>> skuStoreList) {
-        //Map<String, Object> productMap = list2Map(productList);
         List<Map<String, Object>> productSkuStoreList = new LinkedList<>();
         for (Map<String, Object> skuStore : skuStoreList) {
             if (product.get("product_id").equals(skuStore.get("product_id"))) {
@@ -159,6 +146,23 @@ public class ProductMgntController {
     private void setBrandIdAndColorCode(List<Map<String, Object>> productList) {
         for (Map<String, Object> product : productList) {
             product.putAll(productPropertyService.getProductPropertyValueByProductId(Long.parseLong(product.get("product_id").toString())));
+        }
+    }
+
+    private Map<String, Object> list2Map(List<Map<String, Object>> productList) {
+        Map<String, Object> map = new HashMap<>();
+        for (Map<String, Object> product : productList) {
+            map.put(product.get("product_id").toString(), product);
+        }
+        return map;
+    }
+
+    private void setStock(Map<String, Object> product, List<Map<String, Object>> stocklist) {
+        for (Map<String, Object> productStock : stocklist) {
+            if (product.get("product_id").equals(productStock.get("product_id"))) {
+                product.put("total_stock", productStock.get("store"));
+                break;
+            }
         }
     }
 
