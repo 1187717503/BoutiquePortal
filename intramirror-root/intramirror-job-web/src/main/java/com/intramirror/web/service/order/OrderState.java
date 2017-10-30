@@ -63,7 +63,11 @@ public class OrderState {
 
         // checked
         if(dataMap == null || dataMap.size() == 0) {
-            return resultMessage.errorStatus().addMsg("Number doesn't exist!");
+            return resultMessage.errorStatus().addMsg("Order Number doesn't exist");
+        }
+
+        if(stateParams.getVendor_id() != null && Long.parseLong(dataMap.get("vendor_id").toString()) != stateParams.getVendor_id()) {
+            return resultMessage.errorStatus().addMsg("Order Number doesn't exist.");
         }
 
         // 分发请求
@@ -75,7 +79,7 @@ public class OrderState {
             return shipped();
         }
 
-        return resultMessage.errorStatus().addMsg("Number doesn't exist!");
+        return resultMessage.errorStatus().addMsg("State transition failure");
     }
 
     private ResultMessage cancelled() throws Exception{
@@ -248,6 +252,8 @@ public class OrderState {
         // required(Shiped)
         private String vat_num;
 
+        private Long vendor_id;
+
         public String getOrder_line_num() {
             return order_line_num;
         }
@@ -294,6 +300,14 @@ public class OrderState {
 
         public void setVat_num(String vat_num) {
             this.vat_num = vat_num;
+        }
+
+        public Long getVendor_id() {
+            return vendor_id;
+        }
+
+        public void setVendor_id(Long vendor_id) {
+            this.vendor_id = vendor_id;
         }
     }
 }

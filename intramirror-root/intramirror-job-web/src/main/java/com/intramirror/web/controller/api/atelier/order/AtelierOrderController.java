@@ -41,15 +41,12 @@ public class AtelierOrderController {
 
     private static final String atelier_success = "SUCCESS";
 
-    private static final String response_error = "1000";
+    private static final String response_error = "2000";
 
-    private static final String response_success = "2000";
+    private static final String response_success = "1000";
 
     private static final String error_code_1 = "1";
-    private static final String error_desc_1 ="E001: Order Number doesn't exist.";
-
-    private static final String error_code_2 = "2";
-    private static final String error_desc_2 ="E002: ";
+    private static final String error_desc_1 ="E001: ";
 
     @Resource(name = "atelierUpdateByProductService")
     private AtelierUpdateByProductService atelierUpdateByProductService;
@@ -94,7 +91,7 @@ public class AtelierOrderController {
                 return result;
             }
 
-            return this.result(response_error,error_code_2,error_desc_2+checkResult);
+            return this.result(response_error,error_code_1,error_desc_1+checkResult);
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("AtelierOrderControllerGetOrderByDate,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
@@ -128,6 +125,9 @@ public class AtelierOrderController {
                 stateParams.setExceptionTypeEnum(OrderState.ExceptionTypeEnum.INCORRECT_SYSTEM_INVENTORY);
                 stateParams.setOrder_line_num(updateOrderStatusVO.getOrder_number());
                 stateParams.setComments("Incorrect system inventory");
+                stateParams.setVendor_id(updateOrderStatusVO.getVendorId());
+                stateParams.setTracking_num(updateOrderStatusVO.getTracking_number());
+                stateParams.setVat_num(updateOrderStatusVO.getInvoice_number());
 
                 if(status.equals(OrderState.StatusEnum.Confirmed.getCode())) {
                     statusEnum = OrderState.StatusEnum.Confirmed;
@@ -144,14 +144,14 @@ public class AtelierOrderController {
                 if(resultMessage.isSUCCESS()){
                     result = this.result(response_success,null,null);
                 } else {
-                    result = this.result(response_error,error_code_2,resultMessage.getMsg());
+                    result = this.result(response_error,error_code_1,resultMessage.getMsg());
                 }
             } else {
-                result = this.result(response_error,error_code_2,error_desc_2+checkResult);
+                result = this.result(response_error,error_code_1,error_desc_1+checkResult);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            result = this.result(response_error,error_code_2,error_desc_2+"ErrorMessage:"+e.getMessage());
+            result = this.result(response_error,error_code_1,error_desc_1+"ErrorMessage:"+e.getMessage());
             logger.info("AtelierOrderControllerUpdateOrderStatus,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
         }
         logger.info("AtelierOrderControllerUpdateOrderStatus,outputParams,result:"+JSONObject.toJSONString(result));
@@ -186,12 +186,12 @@ public class AtelierOrderController {
         Map<String,Object> responseMap = new HashMap<>();
         Map<String,Object> errorMap = new HashMap<>();
 
-        responseMap.put("responseCode",responseCode);
+        responseMap.put("ResponseStatus",responseCode);
 
         if(responseCode.equals(response_error)) {
-            errorMap.put("errorCode",errorCode);
-            errorMap.put("errorMsg",errorMsg);
-            errorMap.put("TimeStamp", DateUtils.getStrDate(new Date(),"yyyy-MM -hh HH:mm:ss"));
+            errorMap.put("ErrorCode",errorCode);
+            errorMap.put("ErrorMsg",errorMsg);
+            errorMap.put("TimeStamp", DateUtils.getStrDate(new Date(),"yyyy-MM-hh HH:mm:ss"));
 
             responseMap.put("Error",errorMap);
         }
@@ -291,11 +291,23 @@ public class AtelierOrderController {
 
             logger.info("checkGetOrderByDateParams,start,inputParams:"+ JSONObject.toJSONString(this));
             if(StringUtils.isBlank(version) || !atelier_version.equals(version)) {
-                return "Version error";
+                return "Invalid Version";
             }
 
             if(StringUtils.isBlank(storeId)) {
-                return "StoreID error";
+                return "Invalid StoreID";
+            }
+
+            try {
+                Integer.parseInt(offset);
+            } catch (Exception e) {
+                return "Invalid offset";
+            }
+
+            try {
+                Integer.parseInt(limit);
+            } catch (Exception e) {
+                return "Invalid limit";
             }
 
             if(StringUtils.isBlank(offset)) {
@@ -308,8 +320,8 @@ public class AtelierOrderController {
                 this.intLimit = 20;
             } else {
                 this.intLimit = Integer.parseInt(limit);
-                if(this.intLimit > 500) {
-                    this.intLimit = 500;
+                if(this.intLimit > 50) {
+                    this.intLimit = 50;
                 }
             }
 
@@ -319,12 +331,12 @@ public class AtelierOrderController {
             } catch (Exception e) {
                 e.printStackTrace();
                 logger.info("checkGetOrderByDateParams,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
-                return "date error";
+                return "Invalid date";
             }
 
             Map<String,Object> paramMap = atelierUpdateByProductService.getParamsMap();
             if(paramMap.get(storeId) == null) {
-                return "StoreID error";
+                return "Invalid StoreID";
             }
             Map<String,Object> dataMap = (Map<String, Object>) paramMap.get(storeId);
             this.vendorId = Long.parseLong(dataMap.get("vendor_id").toString());
@@ -459,16 +471,16 @@ public class AtelierOrderController {
             }
 
             if(StringUtils.isBlank(storeId)){
-                return "StoreID is null.";
+                return "Invalid StoreID";
             }
 
-            if(StringUtils.isBlank(version)) {
-                return "version is null.";
+            if(StringUtils.isBlank(version) || !atelier_version.equals(version)) {
+                return "Invalid Version";
             }
 
             Map<String,Object> paramMap = atelierUpdateByProductService.getParamsMap();
             if(paramMap.get(storeId) == null) {
-                return "StoreID error.";
+                return "Invalid StoreID";
             }
 
             Map<String,Object> dataMap = (Map<String, Object>) paramMap.get(storeId);
@@ -479,15 +491,15 @@ public class AtelierOrderController {
             this.status = jsonObjectBody.getString("status");
 
             if(StringUtils.isBlank(this.order_number)) {
-                return "order_number is null.";
+                return "Invalid order_number";
             }
 
             if(StringUtils.isBlank(this.status)) {
-                return "status is null.";
+                return "Invalid status";
             }
 
             if(!(OrderState.StatusEnum.Cancelled.getCode().equals(this.status) || OrderState.StatusEnum.Confirmed.getCode().equals(this.status) || OrderState.StatusEnum.Shipped.getCode().equals(this.status))) {
-                return "status is error.";
+                return "Invalid status";
             }
 
             this.tracking_number = jsonObjectBody.getString("tracking_number");
