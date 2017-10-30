@@ -112,22 +112,26 @@ public class StoreServiceImpl implements IStoreService{
             }
             logger.info("sku: "+JSON.toJSONString(skuId)+" 用户 System 操作系统同步,买手店 "+vendor_id+" 扣减库存的差异值 : "+ JSON.toJSONString(rs));
 
-            // 开始计算
-            if(rs >= 0) {
-                logger.info("sku: "+JSON.toJSONString(skuId)+" 用户 System 操作系统同步,买手店 "+vendor_id+" 扣减库存的rs(差异值)>=0时执行 store = store + rs");
-                store = store + rs;
+            if(confirmed.intValue() == 0 && Contants.STOCK_QTY == qtyType) {
+                store = qtyDiff - reserved;
             } else {
-                if (confirmed > 0) {
-                    confirmed = confirmed + rs;
-                    logger.info("sku: "+JSON.toJSONString(skuId)+" 用户 System 操作系统同步,买手店 "+vendor_id+" 扣减库存的rs(差异值)<0 && confirmed > 0时执行 confirmed = confirmed + rs");
-                    if (confirmed < 0) {
-                        store = store + confirmed.intValue();
-                        confirmed = 0l;
-                        logger.info("sku: "+JSON.toJSONString(skuId)+" 用户 System 操作系统同步,买手店 "+vendor_id+" 扣减库存的rs(差异值)<0 && confirmed > 0 && (confirmed + rs) <0时执行 store = store + confirmed;confirmed = 0");
-                    }
-                } else {
+                // 开始计算
+                if(rs >= 0) {
+                    logger.info("sku: "+JSON.toJSONString(skuId)+" 用户 System 操作系统同步,买手店 "+vendor_id+" 扣减库存的rs(差异值)>=0时执行 store = store + rs");
                     store = store + rs;
-                    logger.info("sku: "+JSON.toJSONString(skuId)+" 用户 System 操作系统同步,买手店 "+vendor_id+" 扣减库存的rs(差异值)<0 && confirmed <0 时执行 store = store + rs");
+                } else {
+                    if (confirmed > 0) {
+                        confirmed = confirmed + rs;
+                        logger.info("sku: "+JSON.toJSONString(skuId)+" 用户 System 操作系统同步,买手店 "+vendor_id+" 扣减库存的rs(差异值)<0 && confirmed > 0时执行 confirmed = confirmed + rs");
+                        if (confirmed < 0) {
+                            store = store + confirmed.intValue();
+                            confirmed = 0l;
+                            logger.info("sku: "+JSON.toJSONString(skuId)+" 用户 System 操作系统同步,买手店 "+vendor_id+" 扣减库存的rs(差异值)<0 && confirmed > 0 && (confirmed + rs) <0时执行 store = store + confirmed;confirmed = 0");
+                        }
+                    } else {
+                        store = store + rs;
+                        logger.info("sku: "+JSON.toJSONString(skuId)+" 用户 System 操作系统同步,买手店 "+vendor_id+" 扣减库存的rs(差异值)<0 && confirmed <0 时执行 store = store + rs");
+                    }
                 }
             }
 
