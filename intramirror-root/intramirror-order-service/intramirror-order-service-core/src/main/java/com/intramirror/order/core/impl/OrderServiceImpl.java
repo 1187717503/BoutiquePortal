@@ -197,6 +197,11 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
         return orderMapper.atelierSelectOrder(conditionMap);
     }
 
+    @Override
+    public List<Map<String, Object>> selectOrderInfo(Map<String, Object> conditionMap) {
+        return orderMapper.selectOrderInfo(conditionMap);
+    }
+
     // 订单号生成规则：
     // 日期（8位）＋ 用户ID（末3位）＋ 订单order ID（末5位）
     //

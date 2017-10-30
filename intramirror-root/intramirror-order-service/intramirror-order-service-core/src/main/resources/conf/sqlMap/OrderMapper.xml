@@ -26,6 +26,13 @@
     
   </select>
 
+    <select id="selectOrderInfo" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+
+        select o.`order_id` ,o.`status` as order_status ,lp.`order_line_num` ,lp.`status` as logis_status,lp.`logistics_product_id`   from `order`  o
+        inner join `order_logistics`  ol on (o.`order_id` = ol.`order_id`  and ol.`enabled`  = 1)
+        inner join `logistics_product`  lp on (ol.`order_logistics_id` = lp.`order_logistics_id` and lp.`enabled`  = 1)
+        where  lp.`order_line_num`  = #{order_line_num} and o.`enabled`  = 1
+    </select>
 
     <select id="getOrderListByOrderNumber" resultType="java.util.HashMap" parameterType="java.util.Map">
 

@@ -30,6 +30,7 @@
             <properties>
                 <profiles.active>staging</profiles.active>
             </properties>
+
         </profile>
         <profile>
             <id>prd</id>

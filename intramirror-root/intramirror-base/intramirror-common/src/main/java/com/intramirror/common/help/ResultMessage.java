@@ -26,8 +26,9 @@ public class ResultMessage {
         return data;
     }
 
-    public void setData(Object data) {
+    public ResultMessage setData(Object data) {
         this.data = data;
+        return this;
     }
 
     public String getMsg() {
@@ -84,4 +85,5 @@ public class ResultMessage {
             return true;
         return false;
     }
+
 }

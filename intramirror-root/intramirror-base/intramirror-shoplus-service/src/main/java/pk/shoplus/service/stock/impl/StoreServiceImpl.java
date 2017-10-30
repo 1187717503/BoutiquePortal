@@ -2,12 +2,14 @@ package pk.shoplus.service.stock.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.sql2o.Connection;
 import pk.shoplus.DBConnector;
 import pk.shoplus.common.Contants;
-import pk.shoplus.model.Category;
 import pk.shoplus.model.SkuStore;
 import pk.shoplus.service.CategoryService;
 import pk.shoplus.service.SkuPropertyService;
@@ -15,10 +17,6 @@ import pk.shoplus.service.SkuStoreService;
 import pk.shoplus.service.stock.api.IStoreService;
 import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.vo.ResultMessage;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by dingyifan on 2017/6/9.
@@ -32,7 +30,7 @@ public class StoreServiceImpl implements IStoreService{
         logger.info("StoreServiceImplHandleApiStockRule,inputParams,qtyType :"+qtyType+",qtyDiff :"+qtyDiff+",size :"+size+",productCode :"+productCode+",queueNameEnum :"+queueNameEnum);
         Connection conn = null;
         try {
-            conn = DBConnector.sql2o.open();
+            conn = DBConnector.sql2o.beginTransaction();
             ResultMessage resultMessage = this.handle(conn,qtyType,qtyDiff,size,productCode,queueNameEnum);
             if(conn != null) {conn.close();}
             return resultMessage;
@@ -114,22 +112,26 @@ public class StoreServiceImpl implements IStoreService{
             }
             logger.info("sku: "+JSON.toJSONString(skuId)+" 用户 System 操作系统同步,买手店 "+vendor_id+" 扣减库存的差异值 : "+ JSON.toJSONString(rs));
 
-            // 开始计算
-            if(rs >= 0) {
-                logger.info("sku: "+JSON.toJSONString(skuId)+" 用户 System 操作系统同步,买手店 "+vendor_id+" 扣减库存的rs(差异值)>=0时执行 store = store + rs");
-                store = store + rs;
+            if(confirmed.intValue() == 0 && Contants.STOCK_QTY == qtyType) {
+                store = qtyDiff - reserved;
             } else {
-                if (confirmed > 0) {
-                    confirmed = confirmed + rs;
-                    logger.info("sku: "+JSON.toJSONString(skuId)+" 用户 System 操作系统同步,买手店 "+vendor_id+" 扣减库存的rs(差异值)<0 && confirmed > 0时执行 confirmed = confirmed + rs");
-                    if (confirmed < 0) {
-                        store = store + confirmed.intValue();
-                        confirmed = 0l;
-                        logger.info("sku: "+JSON.toJSONString(skuId)+" 用户 System 操作系统同步,买手店 "+vendor_id+" 扣减库存的rs(差异值)<0 && confirmed > 0 && (confirmed + rs) <0时执行 store = store + confirmed;confirmed = 0");
-                    }
-                } else {
+                // 开始计算
+                if(rs >= 0) {
+                    logger.info("sku: "+JSON.toJSONString(skuId)+" 用户 System 操作系统同步,买手店 "+vendor_id+" 扣减库存的rs(差异值)>=0时执行 store = store + rs");
                     store = store + rs;
-                    logger.info("sku: "+JSON.toJSONString(skuId)+" 用户 System 操作系统同步,买手店 "+vendor_id+" 扣减库存的rs(差异值)<0 && confirmed <0 时执行 store = store + rs");
+                } else {
+                    if (confirmed > 0) {
+                        confirmed = confirmed + rs;
+                        logger.info("sku: "+JSON.toJSONString(skuId)+" 用户 System 操作系统同步,买手店 "+vendor_id+" 扣减库存的rs(差异值)<0 && confirmed > 0时执行 confirmed = confirmed + rs");
+                        if (confirmed < 0) {
+                            store = store + confirmed.intValue();
+                            confirmed = 0l;
+                            logger.info("sku: "+JSON.toJSONString(skuId)+" 用户 System 操作系统同步,买手店 "+vendor_id+" 扣减库存的rs(差异值)<0 && confirmed > 0 && (confirmed + rs) <0时执行 store = store + confirmed;confirmed = 0");
+                        }
+                    } else {
+                        store = store + rs;
+                        logger.info("sku: "+JSON.toJSONString(skuId)+" 用户 System 操作系统同步,买手店 "+vendor_id+" 扣减库存的rs(差异值)<0 && confirmed <0 时执行 store = store + rs");
+                    }
                 }
             }
 

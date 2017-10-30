@@ -92,6 +92,18 @@ public class ProductEDSManagement {
             }
             // end update by dingyifan 20171019
 
+            // start update by dingyifan 20171029
+            if(StringUtils.isBlank(productOptions.getCategoryId()) && StringUtils.isBlank(productOptions.getCategory3())) {
+                logger.info("ProductEDSManagementCreateProduct,start,getDeafultCategory,productOptions:"+JSONObject.toJSONString(productOptions));
+                cId = mappingCategoryService.getDeafultCategory(vendorId,productOptions.getCategory1(),productOptions.getCategory2());
+                logger.info("ProductEDSManagementCreateProduct,end,getDeafultCategory,productOptions:"+JSONObject.toJSONString(productOptions)+",categoryId:"+cId);
+
+                if(StringUtils.isNotBlank(cId)) {
+                    productOptions.setCategoryId(cId);
+                }
+            }
+            // end update by dingyifan 20171029
+
             //get category id
             CategoryService categoryService = new CategoryService(conn);
             String categoryId = productOptions.getCategoryId();

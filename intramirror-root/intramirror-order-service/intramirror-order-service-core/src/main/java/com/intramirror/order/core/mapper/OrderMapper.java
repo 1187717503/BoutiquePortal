@@ -141,4 +141,6 @@ public interface OrderMapper {
     void updateById(Order order);
     
     List<Map<String,Object>> atelierSelectOrder(Map<String,Object> conditionMap);
+    List<Map<String,Object>> selectOrderInfo(Map<String,Object> conditionMap);
+
 }
