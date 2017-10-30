@@ -2122,33 +2122,51 @@ Vel = $ ? $.Velocity : Velocity, function(a) {
                 void 0 !== g.data("beloworigin") && (h.belowOrigin = g.data("beloworigin")), void 0 !== g.data("alignment") && (h.alignment = g.data("alignment"));
             }
             function e() {
-                d(), i.addClass("active"), g.addClass("active"), h.constrain_width === !0 ? i.css("width", g.outerWidth()) : i.css("white-space", "nowrap");
+                var outWidth = g.outerWidth();
+
+                d(), i.addClass("active"), g.addClass("active"), h.constrain_width === !0 ? i.css("width", outWidth) : i.css("white-space", "nowrap");
                 var b = 0;
                 h.belowOrigin === !0 && (b = g.height());
                 var c, e = g.offset().left, f = h.alignment;
+
                 if (e + i.innerWidth() > a(window).width() ? f = "right" : e - i.innerWidth() + g.innerWidth() < 0 && (f = "left"), 
-                "left" === f) c = h.gutter, leftPosition = g.position().left + c; else if ("right" === f) {
-                    var j = g.position().left + g.outerWidth() - i.outerWidth();
+                "left" === f) {
+                    c = h.gutter, 
+                    leftPosition = g.position().left + c; 
+                }
+                else if ("right" === f) {
+                    var j = g.position().left + outWidth - i.outerWidth();
                     c = -h.gutter, leftPosition = j + c;
                 }
+
+
                 i.css({
                     position: "absolute",
                     top: g.position().top + b,
-                    left: leftPosition
-                }), i.stop(!0, !0).css("opacity", 0).slideDown({
-                    queue: !1,
-                    duration: h.inDuration,
-                    easing: "easeOutCubic",
-                    complete: function() {
-                        a(this).css("height", "");
-                    }
-                }).animate({
-                    opacity: 1
-                }, {
-                    queue: !1,
-                    duration: h.inDuration,
-                    easing: "easeOutSine"
-                });
+                    left: leftPosition,
+                    opacity: 1,
+                }), 
+
+                i.show()
+
+
+                // i.stop(!0, !0).css("opacity", 0)
+                // .slideDown({
+                //     queue: !1,
+                //     duration: h.inDuration,
+                //     easing: "easeOutCubic",
+                //     complete: function() {
+                //         a(this).css("height", "");
+                //     }
+                // })
+                // .animate({
+                //     opacity: 1
+                // }, {
+                //     queue: !1,
+                //     duration: h.inDuration,
+                //     easing: "easeOutSine"
+                // });
+               
             }
             function f() {
                 i.fadeOut(h.outDuration), i.removeClass("active"), g.removeClass("active");

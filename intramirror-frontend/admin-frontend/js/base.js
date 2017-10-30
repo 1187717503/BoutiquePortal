@@ -2,7 +2,7 @@
 var baseUrl = "http://localhost:8080/";
 
 var requestURL = {
-    "getBrand" : {"url":baseUrl + "brand/selectActiveBrands.htm", "method": "GET"},
+    "getBrand" : {"url":baseUrl + "product/filter/brand/list", "method": "GET"},
     "getVendor" : {"url":baseUrl + "vendor/select/queryAllVendor.htm", "method": "GET"},
     "getCategory": {"url":baseUrl + "category/selectActiveCategorys.htm", "method": "GET"},
     "getSeason" : {"url":baseUrl + "product/filter/season/list", "method": "GET"},
