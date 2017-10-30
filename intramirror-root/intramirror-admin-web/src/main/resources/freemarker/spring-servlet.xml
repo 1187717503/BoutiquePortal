@@ -93,6 +93,6 @@
     </bean>
 
     <mvc:cors>
-        <mvc:mapping path="/**"/>
+        <mvc:mapping path="/**" allowed-methods="*"/>
     </mvc:cors>
 </beans>

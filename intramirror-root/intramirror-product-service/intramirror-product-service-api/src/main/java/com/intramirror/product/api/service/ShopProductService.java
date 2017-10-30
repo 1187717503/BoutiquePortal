@@ -21,6 +21,6 @@ public interface ShopProductService {
 
     int updateShopProductByProductId(ShopProduct record);
 
-    Long insertAndGetId(ShopProduct shopProduct);
+    Long insertAndGetId(ShopProductWithBLOBs shopProduct);
 
 }

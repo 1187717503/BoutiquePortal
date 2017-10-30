@@ -113,12 +113,9 @@
             <if test="saleAt != null">
                 sale_at,
             </if>
-            <if test="createdAt != null">
-                createdAt,,
-            </if>
-            <if test="updatedAt != null">
+                createdAt,
                 updatedAt,
-            </if>
+
             <if test="enabled != null">
                 enabled,
             </if>
@@ -163,8 +160,8 @@
             <if test="saleAt != null">
                 #{saleAt,jdbcType=TIMESTAMP},
             </if>
-            createdAt=now(),
-            updatedAt=now(),
+            now(),
+            now(),
             <if test="enabled != null">
                 #{enabled,jdbcType=BIT},
             </if>
@@ -367,12 +364,8 @@
             <if test="saleAt != null">
                 sale_at,
             </if>
-            <if test="createdAt != null">
-                createdAt,,
-            </if>
-            <if test="updatedAt != null">
-                updatedAt,
-            </if>
+                created_at,
+                updated_at,
             <if test="enabled != null">
                 enabled,
             </if>
@@ -417,8 +410,8 @@
             <if test="saleAt != null">
                 #{saleAt,jdbcType=TIMESTAMP},
             </if>
-            createdAt=now(),
-            updatedAt=now(),
+            now(),
+            now(),
             <if test="enabled != null">
                 #{enabled,jdbcType=BIT},
             </if>

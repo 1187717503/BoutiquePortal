@@ -317,7 +317,7 @@
     </select>
 
     <select id="listSkuInfoByProductId" resultMap="BaseResultMap">
-      SELECT * FROM sku WHERE product_id = #{productId} and enabled = FALSE
+      SELECT * FROM sku WHERE product_id = #{productId} and enabled = TRUE
     </select>
 
     <select id="listPriceByProductList" parameterType="java.util.List" resultType="java.util.Map">

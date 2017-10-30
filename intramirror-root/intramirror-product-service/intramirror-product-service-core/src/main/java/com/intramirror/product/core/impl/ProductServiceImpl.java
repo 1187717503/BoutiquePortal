@@ -67,11 +67,6 @@ public class ProductServiceImpl extends BaseDao implements IProductService {
     }
 
     @Override
-    public Map<String, Object> getProductStateByProductId(Long productId) {
-        return productMapper.getProductStateByProductId(productId);
-    }
-
-    @Override
     public void init() {
         productMapper = this.getSqlSession().getMapper(ProductMapper.class);
     }

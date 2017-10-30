@@ -4,7 +4,7 @@ import com.intramirror.product.api.model.SearchCondition;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.product.api.service.SkuService;
-import com.intramirror.product.api.service.product.IListProductService;
+import com.intramirror.product.api.service.merchandise.ProductManagementService;
 import com.intramirror.web.common.Response;
 import com.intramirror.web.common.StatusCode;
 import com.intramirror.web.controller.cache.CategoryCache;
@@ -32,7 +32,7 @@ public class ProductMgntController {
     private final static Logger LOGGER = LoggerFactory.getLogger(ProductMgntController.class);
 
     @Autowired
-    private IListProductService iListProductService;
+    private ProductManagementService productManagementService;
 
     @Autowired
     private CategoryCache categoryCache;
@@ -88,7 +88,7 @@ public class ProductMgntController {
         LOGGER.info("status: {}, shop status: {}", getStatusEnum(status).getProductStatus(), getStatusEnum(status).getShopProductStatus());
         List<Map<String, Object>> productList;
 
-        productList = iListProductService.listProductService(searchCondition);
+        productList = productManagementService.listProductService(searchCondition);
         if (productList.size() > 0) {
             appendInfo(productList);
         }

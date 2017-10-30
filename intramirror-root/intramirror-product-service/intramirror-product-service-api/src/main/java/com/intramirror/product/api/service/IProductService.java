@@ -71,5 +71,4 @@ public interface IProductService {
 
     List<Map<String, Object>> getVendorCodeBySku(Long shopProductSkuId);
 
-    Map<String, Object> getProductStateByProductId(Long productId);
 }
