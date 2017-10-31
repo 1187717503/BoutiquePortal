@@ -16,7 +16,6 @@
         product.season_code AS season_code,
         product.cover_img,
         product.description_img,
-        sku.sku_code AS bar_code
         product.category_id,
         product.designer_id AS designer_id,
         product.color_code AS color_code
@@ -24,7 +23,6 @@
         LEFT JOIN shop_product ON shop_product.product_id = product.product_id AND shop_product.shop_id = 65 AND shop_product.enabled = TRUE
         INNER JOIN vendor ON product.vendor_id = vendor.vendor_id AND product.enabled = TRUE
         INNER JOIN brand ON brand.brand_id = product.brand_id AND brand.enabled = TRUE
-        INNER JOIN sku ON sku.product_id = product.product_id AND  sku.enabled = TRUE
         WHERE
         <choose>
             <when test="shopStatus == -1">

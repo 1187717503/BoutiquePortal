@@ -102,7 +102,8 @@
         sku_store.store,
         sku_store.reserved,
         sku_store.confirmed,
-        sku.`size`
+        sku.`size`,
+        sku.sku_code as bar_code
         FROM sku_store
         INNER JOIN sku ON sku.sku_id = sku_store.sku_id
         WHERE sku_store.product_id IN
@@ -155,5 +156,12 @@
             #{item.product_id}
         </foreach>
         GROUP BY sku_store.product_id
+    </select>
+
+    <select id="getTotalStockByProductId" resultType="Long" parameterType="Long">
+        SELECT sum(sku_store.store) AS total_stock
+        FROM sku_store
+        WHERE product_id = #{productId}
+
     </select>
 </mapper>

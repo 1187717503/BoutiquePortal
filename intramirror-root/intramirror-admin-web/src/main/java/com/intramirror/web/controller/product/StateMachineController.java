@@ -6,6 +6,7 @@ import com.intramirror.product.api.model.ShopProductSku;
 import com.intramirror.product.api.model.ShopProductWithBLOBs;
 import com.intramirror.product.api.model.Sku;
 import com.intramirror.product.api.service.IProductService;
+import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ShopProductService;
 import com.intramirror.product.api.service.ShopProductSkuService;
 import com.intramirror.product.api.service.SkuService;
@@ -42,9 +43,11 @@ public class StateMachineController {
     @Autowired
     private ProductManagementService productManagementService;
 
+    @Autowired
+    private ISkuStoreService iSkuStoreService;
+
     @PutMapping(value = "/{action}", consumes = "application/json")
     public Response operateProduct(@PathVariable(value = "action") String action, @RequestBody Map<String, Object> body) {
-        LOGGER.info("Request body : {}", body);
         Long productId = Long.parseLong(body.get("productId").toString());
         Long shopProductId = StringUtils.isEmpty((String) body.get("shopProductId")) ? null : Long.parseLong(body.get("shopProductId").toString());
         Map<String, Object> currentState = productManagementService.getProductStateByProductId(productId);
@@ -70,7 +73,7 @@ public class StateMachineController {
                 //TODO: throw exception
             }
             if (newStateEnum == StateEnum.SHOP_ON_SALE) {
-                checkProductBeforeOnSale(productId, shopProductId);
+                //checkProductBeforeOnSale(productId, shopProductId);
             }
             productManagementService.updateProductAndShopProductStatus(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productId,
                     shopProductId);
@@ -87,6 +90,10 @@ public class StateMachineController {
     }
 
     private void checkProductBeforeOnSale(Long productId, Long shopProductId) {
+        Long totalStock = iSkuStoreService.getTotalStockByProductId(productId);
+        if (totalStock == null || totalStock <= 0) {
+
+        }
         //TODO:implement
     }
 
