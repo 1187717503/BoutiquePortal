@@ -16,20 +16,15 @@
         product.season_code AS season_code,
         product.cover_img,
         product.description_img,
+        sku.sku_code AS bar_code
         product.category_id,
-        <if test="shopStatus != -1">
-            shop_product_sku.sale_price AS sale_price,
-            shop_product_sku.enabled AS shop_product_sku_enabled,
-        </if>
         product.designer_id AS designer_id,
         product.color_code AS color_code
         FROM product
-        LEFT JOIN shop_product ON shop_product.product_id = product.product_id AND shop_product.shop_id = 65
-        INNER JOIN vendor ON product.vendor_id = vendor.vendor_id AND product.enabled = 1
-        INNER JOIN brand ON brand.brand_id = product.brand_id
-        <if test="shopStatus != -1">
-            INNER JOIN shop_product_sku ON (shop_product_sku.sku_id = t_sku.sku_id AND shop_product_sku.enabled = 1)
-        </if>
+        LEFT JOIN shop_product ON shop_product.product_id = product.product_id AND shop_product.shop_id = 65 AND shop_product.enabled = TRUE
+        INNER JOIN vendor ON product.vendor_id = vendor.vendor_id AND product.enabled = TRUE
+        INNER JOIN brand ON brand.brand_id = product.brand_id AND brand.enabled = TRUE
+        INNER JOIN sku ON sku.product_id = product.product_id AND  sku.enabled = TRUE
         WHERE
         <choose>
             <when test="shopStatus == -1">
@@ -41,7 +36,7 @@
                         product.status = #{status}
                     </otherwise>
                 </choose>
-                AND (shop_product.enabled = 0 OR shop_product.enabled IS NULL)
+                AND shop_product.enabled IS NULL
             </when>
             <otherwise>
                 product.status = #{status} AND shop_product.status = #{shopStatus}
@@ -149,6 +144,24 @@
         FROM product
         LEFT JOIN shop_product ON product.product_id = shop_product.product_id AND shop_product.shop_id = 65 AND shop_product.enabled = 1
         WHERE product.product_id = #{product_id}
+    </select>
+
+    <select id="listPriceByProductList" parameterType="java.util.List" resultType="java.util.Map">
+        SELECT
+        sku.sku_id,
+        sku.price AS retail_price,
+        sku.in_price AS boutique_price,
+        sku.im_price AS im_price,
+        shop_product_sku.sale_price AS sale_price,
+        sku.product_id
+        FROM sku
+        LEFT JOIN shop_product_sku ON ( shop_product_sku.sku_id = sku.sku_id AND shop_product_sku.enabled = TRUE )
+        WHERE (sku.product_id IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.product_id}
+        </foreach>
+        AND sku.enabled = 1)
+        GROUP BY sku.product_id
     </select>
 
 </mapper>

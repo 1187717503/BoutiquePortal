@@ -14,4 +14,6 @@ public interface ProductManagementMapper {
     List<Map<String, Object>> listProductDetailInfo(SearchCondition searchCondition);
 
     Map<String, Object> getProductStateByProductId(Long product_id);
+
+    List<Map<String, Object>> listPriceByProductList(List<Map<String, Object>> products);
 }

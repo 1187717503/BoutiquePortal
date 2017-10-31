@@ -98,7 +98,7 @@ public class ProductMgntController {
     private void appendInfo(List<Map<String, Object>> productList) {
         setCategoryPath(productList);
         List<Map<String, Object>> skuStoreList = iSkuStoreService.listSkuStoreByProductList(productList);
-        List<Map<String, Object>> priceList = skuService.listPriceByProductList(productList);
+        List<Map<String, Object>> priceList = productManagementService.listPriceByProductList(productList);
         for (Map<String, Object> product : productList) {
             setSkuInfo(product, skuStoreList);
             setPrice(product, priceList);

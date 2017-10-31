@@ -17,5 +17,4 @@ public interface SkuMapper {
 
     List<Sku> listSkuInfoByProductId(Long productId);
 
-    List<Map<String, Object>> listPriceByProductList(List<Map<String, Object>> products);
 }

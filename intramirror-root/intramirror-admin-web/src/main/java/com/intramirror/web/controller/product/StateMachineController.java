@@ -43,7 +43,7 @@ public class StateMachineController {
 
     @PutMapping(value = "/{action}", consumes = "application/json")
     public Response operateProduct(@PathVariable(value = "action") String action, @RequestBody Map<String, Object> body) {
-        LOGGER.info("body : {}", body);
+        LOGGER.info("Request body : {}", body);
         Long productId = Long.parseLong(body.get("productId").toString());
         Long shopProductId = body.get("shopProductId") == null ? null : Long.parseLong(body.get("shopProductId").toString());
         Map<String, Object> currentState = productManagementService.getProductStateByProductId(productId);
@@ -62,25 +62,31 @@ public class StateMachineController {
         if (currentStateEnum.getShopProductStatus() == -1 && newStateEnum.getShopProductStatus() == -1) {
             productManagementService.updateProductStatus(newStateEnum.getProductStatus(), productId);
         } else if (currentStateEnum.getShopProductStatus() == -1 && newStateEnum.getShopProductStatus() != -1) {
-            //product -> shop product
             productManagementService.updateProductStatusAndNewShopProduct(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productId);
         } else if (currentStateEnum.getShopProductStatus() != -1 && newStateEnum.getShopProductStatus() != -1) {
-            //shop product -> shop product
             if (shopProductId == null) {
                 LOGGER.error("shopProductId missed");
+                //TODO: throw exception
+            }
+            if (newStateEnum == StateEnum.SHOP_ON_SALE) {
+                checkProductBeforeOnSale(productId, shopProductId);
             }
             productManagementService.updateProductAndShopProductStatus(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productId,
                     shopProductId);
         } else {
-            //shop product -> product
             if (shopProductId == null) {
                 LOGGER.error("shopProductId missed");
+                //TODO: throw exception
             }
             productManagementService.updateProductStatusAndDisableShopProduct(newStateEnum.getProductStatus(), productId, shopProductId);
         }
 
         LOGGER.info("Product: [{}]  [{}] -> [{}] -> [{}] SUCCESSFUL", productId, currentStateEnum.name(), operation.name(), newStateEnum.name());
 
+    }
+
+    private void checkProductBeforeOnSale(Long productId, Long shopProductId) {
+        //TODO:implement
     }
 
 }

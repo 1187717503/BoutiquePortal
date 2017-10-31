@@ -34,6 +34,7 @@ public class ProductStateOperationMap {
         operationEnumMap.put("onsale", OperationEnum.ON_SALE);
         operationEnumMap.put("process", OperationEnum.PROCESS);
         operationEnumMap.put("remove", OperationEnum.REMOVE);
+        operationEnumMap.put("removefromshop", OperationEnum.REMOVE_FROM_SHOP);
     }
 
     public static StateEnum getStatus(String status) {

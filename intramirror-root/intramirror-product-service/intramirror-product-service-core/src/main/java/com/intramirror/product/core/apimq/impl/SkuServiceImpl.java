@@ -70,8 +70,4 @@ public class SkuServiceImpl extends BaseDao implements SkuService {
         return skuMapper.listSkuInfoByProductId(productId);
     }
 
-    @Override
-    public List<Map<String, Object>> listPriceByProductList(List<Map<String, Object>> products) {
-        return skuMapper.listPriceByProductList(products);
-    }
 }

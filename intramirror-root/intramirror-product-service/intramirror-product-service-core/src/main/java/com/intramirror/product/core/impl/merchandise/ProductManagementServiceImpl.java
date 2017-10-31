@@ -68,7 +68,7 @@ public class ProductManagementServiceImpl extends BaseDao implements ProductMana
     @Transactional
     public void updateProductStatusAndNewShopProduct(int status, int shopStatus, Long productId) {
         updateProductStatusOnly(status, productId);
-        createShopProductStatus(status, productId);
+        createShopProductStatus(shopStatus, productId);
     }
 
     @Override
@@ -84,6 +84,11 @@ public class ProductManagementServiceImpl extends BaseDao implements ProductMana
     public void updateProductStatusAndDisableShopProduct(int status, Long productId, Long shopProductId) {
         updateProductStatusOnly(status, productId);
         disableShopProductStatus(shopProductId);
+    }
+
+    @Override
+    public List<Map<String, Object>> listPriceByProductList(List<Map<String, Object>> products) {
+        return productManagementMapper.listPriceByProductList(products);
     }
 
     private void updateProductStatusOnly(int status, Long productId) {
@@ -113,10 +118,10 @@ public class ProductManagementServiceImpl extends BaseDao implements ProductMana
     }
 
     private void disableShopProduct(Long shopProductId) {
-        ShopProduct shopProduct = new ShopProduct();
+        ShopProductWithBLOBs shopProduct = new ShopProductWithBLOBs();
         shopProduct.setEnabled(false);
         shopProduct.setShopProductId(shopProductId);
-        shopProductMapper.updateByPrimaryKey(shopProduct);
+        shopProductMapper.updateByPrimaryKeySelective(shopProduct);
     }
 
     private void createShopProductStatus(int status, Long productId) {
@@ -143,7 +148,8 @@ public class ProductManagementServiceImpl extends BaseDao implements ProductMana
         shopProduct.setIntroduction(product.getDescription());
         shopProduct.setMinSalePrice(sku.getImPrice());
         shopProduct.setMaxSalePrice(sku.getImPrice());
-        return shopProductMapper.insertAndGetId(shopProduct);
+        shopProductMapper.insertAndGetId(shopProduct);
+        return shopProduct.getShopProductId();
     }
 
     private void insertShopProductSkus(List<Sku> skuList, Long shopProductId) {
