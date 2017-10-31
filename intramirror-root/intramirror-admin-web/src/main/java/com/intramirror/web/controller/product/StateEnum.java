@@ -1,8 +1,5 @@
 package com.intramirror.web.controller.product;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Created on 2017/10/25.
  *
@@ -25,21 +22,13 @@ public enum StateEnum {
     SHOP_ON_SALE(3,0),
     SHOP_REMOVED(5,2),
 
-    ALL(-1,-1);
+    OTHER(-1,-1);
 
 
 // @formatter:on
 
     private int productStatus;
     private int shopProductStatus;
-    private static Set<StateEnum> stateEnumSet = new HashSet<>();
-
-    static {
-
-        for (StateEnum e : StateEnum.values()) {
-            stateEnumSet.add(e);
-        }
-    }
 
     StateEnum(int productStatus) {
         this.productStatus = productStatus;

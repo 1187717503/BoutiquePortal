@@ -11,6 +11,8 @@ import com.intramirror.product.api.service.ShopProductService;
 import com.intramirror.product.api.service.ShopProductSkuService;
 import com.intramirror.product.api.service.SkuService;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
+import com.intramirror.web.Exception.ErrorResponse;
+import com.intramirror.web.Exception.ValidateException;
 import com.intramirror.web.common.Response;
 import java.util.List;
 import java.util.Map;
@@ -61,40 +63,38 @@ public class StateMachineController {
         OperationEnum operation = ProductStateOperationMap.getOperation(action);
         StateEnum currentStateEnum = StateMachineCoreRule.map2StateEnum(currentState);
         StateEnum newStateEnum = StateMachineCoreRule.getNewState(currentStateEnum, operation);
-        LOGGER.info("Starting [{}] -> [{}] -> [{}]", currentStateEnum.name(), operation.name(), newStateEnum.name());
-
+        LOGGER.info("Product [{}] Start [{}] -> [{}] -> [{}]", productId, currentStateEnum.name(), operation.name(), newStateEnum.name());
+        if (operation == OperationEnum.ON_SALE) {
+            if (!isInStock(productId)) {
+                newStateEnum = StateEnum.SHOP_SOLD_OUT;
+                LOGGER.info("Change Product [{}] as Start [{}] -> [{}] -> [{}]", productId, currentStateEnum.name(), operation.name(), newStateEnum.name());
+            }
+        }
         if (currentStateEnum.getShopProductStatus() == -1 && newStateEnum.getShopProductStatus() == -1) {
             productManagementService.updateProductStatus(newStateEnum.getProductStatus(), productId);
         } else if (currentStateEnum.getShopProductStatus() == -1 && newStateEnum.getShopProductStatus() != -1) {
             productManagementService.updateProductStatusAndNewShopProduct(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productId);
-        } else if (currentStateEnum.getShopProductStatus() != -1 && newStateEnum.getShopProductStatus() != -1) {
+        } else if (currentStateEnum.getShopProductStatus() != -1) {
             if (shopProductId == null) {
-                LOGGER.error("shopProductId missed");
-                //TODO: throw exception
+                LOGGER.error("shopProductId missed.");
+                throw new ValidateException(new ErrorResponse("Parameter shopProductId missed"));
             }
-            if (newStateEnum == StateEnum.SHOP_ON_SALE) {
-                //checkProductBeforeOnSale(productId, shopProductId);
+            if (newStateEnum.getShopProductStatus() != -1) {
+                productManagementService.updateProductAndShopProductStatus(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productId,
+                        shopProductId);
+            } else if (newStateEnum.getShopProductStatus() == -1) {
+                productManagementService.updateProductStatusAndDisableShopProduct(newStateEnum.getProductStatus(), productId, shopProductId);
             }
-            productManagementService.updateProductAndShopProductStatus(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productId,
-                    shopProductId);
-        } else {
-            if (shopProductId == null) {
-                LOGGER.error("shopProductId missed");
-                //TODO: throw exception
-            }
-            productManagementService.updateProductStatusAndDisableShopProduct(newStateEnum.getProductStatus(), productId, shopProductId);
         }
-
         LOGGER.info("Product: [{}]  [{}] -> [{}] -> [{}] SUCCESSFUL", productId, currentStateEnum.name(), operation.name(), newStateEnum.name());
-
     }
 
-    private void checkProductBeforeOnSale(Long productId, Long shopProductId) {
+    private boolean isInStock(Long productId) {
         Long totalStock = iSkuStoreService.getTotalStockByProductId(productId);
         if (totalStock == null || totalStock <= 0) {
-
+            return false;
         }
-        //TODO:implement
+        return true;
     }
 
 }

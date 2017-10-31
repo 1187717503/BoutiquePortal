@@ -7,4 +7,5 @@ package com.intramirror.web.common;
  */
 public final class StatusCode {
     public final static int SUCCESS = 1;
+    public final static int FAILURE = -1;
 }

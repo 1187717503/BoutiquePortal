@@ -38,7 +38,7 @@ public class ProductStateOperationMap {
     }
 
     public static StateEnum getStatus(String status) {
-        return statusEnumMap.get(status) == null ? StateEnum.ALL : statusEnumMap.get(status);
+        return statusEnumMap.get(status) == null ? StateEnum.OTHER : statusEnumMap.get(status);
     }
 
     public static OperationEnum getOperation(String operation) {
