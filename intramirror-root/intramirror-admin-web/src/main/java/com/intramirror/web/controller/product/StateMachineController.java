@@ -13,6 +13,7 @@ import com.intramirror.product.api.service.merchandise.ProductManagementService;
 import com.intramirror.web.common.Response;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,7 @@ public class StateMachineController {
     public Response operateProduct(@PathVariable(value = "action") String action, @RequestBody Map<String, Object> body) {
         LOGGER.info("Request body : {}", body);
         Long productId = Long.parseLong(body.get("productId").toString());
-        Long shopProductId = body.get("shopProductId") == null ? null : Long.parseLong(body.get("shopProductId").toString());
+        Long shopProductId = StringUtils.isEmpty((String) body.get("shopProductId")) ? null : Long.parseLong(body.get("shopProductId").toString());
         Map<String, Object> currentState = productManagementService.getProductStateByProductId(productId);
         LOGGER.info("[{}] product with [{}]", action, currentState);
         StateMachineCoreRule.validate(currentState, action);
