@@ -24,4 +24,6 @@ public interface ProductManagementService {
     void updateProductStatusAndDisableShopProduct(int status, Long productId, Long shopProductId);
 
     List<Map<String, Object>> listPriceByProductList(List<Map<String, Object>> products);
+
+    List<Map<String, Object>> listAllProductCountGounpByState();
 }

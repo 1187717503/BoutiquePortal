@@ -3,7 +3,6 @@ package com.intramirror.web.controller.product;
 import com.intramirror.product.api.model.SearchCondition;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ProductPropertyService;
-import com.intramirror.product.api.service.SkuService;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
 import com.intramirror.web.common.Response;
 import com.intramirror.web.common.StatusCode;
@@ -43,8 +42,20 @@ public class ProductMgntController {
     @Autowired
     private ISkuStoreService iSkuStoreService;
 
-    @Autowired
-    private SkuService skuService;
+    @GetMapping(value = "/state/count")
+    public Response listAllProductStateCount() {
+        List<Map<String, Object>> countList = productManagementService.listAllProductCountGounpByState();
+        Map<StateEnum, Long> productStateCountList = new HashMap<>();
+        for (Map<String, Object> item : countList) {
+            StateEnum stateEnum = StateMachineCoreRule.map2StateEnum(item);
+            if (stateEnum == null) {
+                LOGGER.error("Unknown product state : {}", item);
+                continue;
+            }
+            productStateCountList.put(stateEnum, Long.parseLong(item.get("count").toString()));
+        }
+        return Response.status(StatusCode.SUCCESS).data(productStateCountList);
+    }
 
     @GetMapping(value = "/list/{status}")
     // @formatter:off
@@ -84,6 +95,7 @@ public class ProductMgntController {
         searchCondition.setDesc(desc);
         searchCondition.setStart((pageNo == null || pageNo < 0) ? 0 : (pageNo - 1) * pageSize);
         searchCondition.setCount((pageSize == null || pageSize < 0) ? 25 : pageSize);
+        searchCondition.setOrderBy(orderBy);
         LOGGER.info("{}", searchCondition);
         LOGGER.info("status: {}, shop status: {}", getStatusEnum(status).getProductStatus(), getStatusEnum(status).getShopProductStatus());
         List<Map<String, Object>> productList;

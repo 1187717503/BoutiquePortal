@@ -91,6 +91,11 @@ public class ProductManagementServiceImpl extends BaseDao implements ProductMana
         return productManagementMapper.listPriceByProductList(products);
     }
 
+    @Override
+    public List<Map<String, Object>> listAllProductCountGounpByState() {
+        return productManagementMapper.listAllProductCountGounpByState();
+    }
+
     private void updateProductStatusOnly(int status, Long productId) {
         ProductWithBLOBs product = new ProductWithBLOBs();
         product.setStatus((byte) status);

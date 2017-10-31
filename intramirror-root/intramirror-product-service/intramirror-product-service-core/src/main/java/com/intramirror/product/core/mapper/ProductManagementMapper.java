@@ -16,4 +16,6 @@ public interface ProductManagementMapper {
     Map<String, Object> getProductStateByProductId(Long product_id);
 
     List<Map<String, Object>> listPriceByProductList(List<Map<String, Object>> products);
+
+    List<Map<String, Object>> listAllProductCountGounpByState();
 }
