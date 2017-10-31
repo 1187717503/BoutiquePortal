@@ -29,20 +29,18 @@ public class UpdateStockServiceImpl extends BaseDao implements IUpdateStockServi
     public ResultMessage zeroClearing(Long vendorId) {
         try {
             logger.info("UpdateStockServiceImplZeroClearing,inputParams,vendorId:"+vendorId);
-            List<Map<String, Object>> productList =  productMapper.selectProductByVendor(vendorId);
 
-            List<String> productIds = new ArrayList<>();
-            for(Map<String,Object> productMap : productList) {
-                productIds.add(productMap.get("product_id").toString());
+            if(vendorId == null) {
+                return ResultMessage.getInstance().errorStatus().addMsg("vendor_id is null.");
             }
 
             Map<String,Object> updateStockMap = new HashMap<>();
-            updateStockMap.put("productIds",productIds);
+            updateStockMap.put("vendor_id",vendorId);
             updateStockMap.put("date", DateUtils.getStrDate(new Date())+" 00:00:00");
 
+            logger.info("UpdateStockServiceImplZeroClearing,start,outputParams,vendorId:"+vendorId+",updateStockMap:"+ JSONObject.toJSONString(updateStockMap));
             skuStoreMapper.zeroClearing(updateStockMap);
-
-            logger.info("UpdateStockServiceImplZeroClearing,outputParams,vendorId:"+vendorId+",updateStockMap:"+ JSONObject.toJSONString(updateStockMap));
+            logger.info("UpdateStockServiceImplZeroClearing,end,outputParams,vendorId:"+vendorId+",updateStockMap:"+ JSONObject.toJSONString(updateStockMap));
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("UpdateStockServiceImplZeroClearing,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
