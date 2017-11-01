@@ -1,6 +1,7 @@
 #main {
     padding-left: 0;
     margin: 12px;
+    min-width: 1078px;
 }
 
 .status-tabs {

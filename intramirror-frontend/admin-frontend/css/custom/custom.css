@@ -10,20 +10,12 @@ NOTE:
 PLACE HERE YOUR OWN CSS CODES AND IF NEEDED, OVERRIDE THE STYLES FROM THE OTHER STYLESHEETS.
 WE WILL RELEASE FUTURE UPDATES SO IN ORDER TO NOT OVERWRITE YOUR STYLES IT'S BETTER LIKE THIS.  */
 
-
- .btn-gray {
-	background-color: #9b9b9b;
-	box-shadow: 0 0 2px 0 rgba(0,0,0,.12), 0 2px 2px 0 rgba(0,0,0,.24);
-	border-radius: 2px;
-}
-
- .btn-gray:hover {
-	background-color: #9b9b9b;
+nav {
 	
-	box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15)
+	background-color: #fff;
 }
 
-/*.input-field input {
+.input-field input {
 	border-bottom: 2px solid #871b55;
     margin: 0;
     box-shadow: none;
@@ -37,4 +29,68 @@ WE WILL RELEASE FUTURE UPDATES SO IN ORDER TO NOT OVERWRITE YOUR STYLES IT'S BET
 
 .input-field input:hover {
 	border-bottom: 2px solid #871b55;
-}*/
+}
+
+input[type=text]:focus:not([readonly]) {
+	border-bottom: 1px solid #871b55;
+    box-shadow: 0 1px 0 0 #871b55
+}
+
+.btn, .btn-large {
+	background-color: #871b55
+}
+.btn:hover, .btn-large:hover {
+	background-color: #871b55
+}
+
+ .btn-gray {
+	background-color: #9b9b9b;
+	box-shadow: 0 0 2px 0 rgba(0,0,0,.12), 0 2px 2px 0 rgba(0,0,0,.24);
+	border-radius: 2px;
+}
+
+ .btn-gray:hover {
+	background-color: #9b9b9b;
+	
+	box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15)
+}
+
+.dropdown-content li > a, .dropdown-content li > span {
+	color: #35495e;
+}
+
+ul.tabs {
+	background-color: rgb(0,166,206);
+	box-shadow: 0 0 4px 0 rgba(0,0,0,.12), 0 4px 4px 0 rgba(0,0,0,.24);
+}
+
+.tabs .tab a.active {
+	color: rgba(255,255,255, 1);
+}
+
+.tabs .tab a {
+	color: rgba(255,255,255, 0.7);
+}
+
+.tabs {
+	height: 52px;
+}
+
+nav .brand-logo {
+	color: #871b55;
+	display: flex;
+}
+
+nav .brand-text {
+    color: rgba(0,0,0,.87);
+    font-size: 20px;
+    display: block;
+    justify-content: center;
+    font-weight: 500;
+    margin-left: 12px;
+    font-family: Roboto,sans-serif;
+}
+.tabs .indicator {
+	color: #ffff8c;
+	background-color: #ffff8c;
+}

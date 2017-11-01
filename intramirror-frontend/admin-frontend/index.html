@@ -16,7 +16,6 @@
     <meta name="msapplication-TileImage" content="images/favicon/mstile-144x144.png">
     <!-- For Windows Phone -->
 
-
     <!-- CORE CSS-->
     <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection">
     <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection">
@@ -82,8 +81,11 @@
         <nav class="navbar-color">
             <div class="nav-wrapper">
                 <ul class="left">
-                    <li><h1 class="logo-wrapper"><a href="index.html" class="brand-logo darken-1">Intra Mirror</a> <span class="logo-text">Intra Mirror</span>
-                    </h1></li>
+                    <li>
+                        <h1 class="logo-wrapper">
+                            <a href="index.html" class="brand-logo darken-1 mdi-navigation-menu"><span class="brand-text">Merchandise Management > Product Management</span></a>
+                        </h1>
+                    </li>
                 </ul>
 
             </div>
@@ -107,11 +109,15 @@
                                 <div class="input-field col s3">
                                     <select id="select-boutique"></select>
                                 </div>
-                                <div class="input-field col s3">
-                                    <input id="text-designer" type="text" class="validate">
-                                    <label for="text-designer">Designer ID/Color Code</label>
+                                <div class="input-field col s2">
+                                    <input id="text-designerId" type="text" class="validate">
+                                    <label for="text-designerId">Designer ID</label>
                                 </div>
-                                <div class="input-field col s3">
+                                <div class="input-field col s2">
+                                    <input id="text-color-code" type="text" class="validate">
+                                    <label for="text-color-code">Color Code</label>
+                                </div>
+                                <div class="input-field col s2">
                                     <input id="text-boutique" type="text" class="validate">
                                     <label for="text-boutique">Boutique ID</label>
                                 </div>
@@ -332,7 +338,7 @@ Scripts
         <div class="item style-scope page-order"><strong>${order.boutique_id}</strong></div>
         <div class="item style-scope page-order"><strong>${order.season_code}</strong></div>
         <div class="item style-scope page-order"><strong>${order.category}</strong></div>
-        <div class="item style-scope page-order"><strong>${order.total_stock}</strong></div>
+        <div class="item style-scope page-order"><strong>${order.totalStore}</strong></div>
         <div class="item style-scope page-order"><strong>€${order.retail_price}</strong></div>
         <div class="item style-scope page-order"><strong>€${order.boutique_price}</strong></div>
         {%if tab_status =='new' || tab_status =='processing' || tab_status=='readytosell' || tab_status=='trash' %}
@@ -360,7 +366,7 @@ Scripts
             <span title="on sale" data-action="on_sale" class="waves-effect mdi-hardware-keyboard-arrow-up action-icon"></span>
             {%/if%}
             {%if action.remove == 1 %}
-            <span title="trash" data-action="trash" class="waves-effect mdi-action-delete icon-btn-delete action-icon"></span>
+            <span title="trash" data-action="remove" class="waves-effect mdi-action-delete icon-btn-delete action-icon"></span>
             {%/if%}
 
         </div>
@@ -378,7 +384,7 @@ Scripts
             <div class="row list-detail-row">
                 <div class="list-detail-item">${detail.sku_id}</div>
                 <div class="list-detail-item">${detail.size}</div>
-                <div class="list-detail-item">not found---${detail.barcode}</div>
+                <div class="list-detail-item">${detail.bar_code}</div>
                 <div class="list-detail-item">${detail.store}</div>
                 <div class="list-detail-item">${detail.reserved}</div>
                 <div class="list-detail-item">${detail.confirmed}</div>
@@ -408,18 +414,11 @@ Scripts
 <script type="text/javascript">
 
     $(function () {
-        $('ul.tabs').tabs();
-        // initialize brand select
+        
         initBrand();
         initVendor();
         initSeason();
         initCategory();
-        
-       
-        $(".tabs .tab a").click(function() {
-            var status = $(this).data('status');
-            getProdcutList(status, 10, 1, 35);
-        });
 
         $("#order-head-cbx").change(function() {
             if ($(this).prop('checked') === true) {
@@ -428,13 +427,19 @@ Scripts
                 $(".product-list .page-order [type='checkbox']").prop('checked', false);
             }
 
-            console.log(localStorage.getItem('token'));
+            console.log(sessionStorage.getItem('token'));
         })
 
         $('#search-btn').click(function() {
-            var status = $('.tabs .tab a.active').data('status');
-            getProdcutList(status, 10, 1, 35);
+            let status = $('.tabs .tab a.active').data('status');
+            getProdcutList(status, 25, 1, 35);
         })
+
+        $('.tabs .tab a').click(function() {
+            let status = $(this).data('status');
+            getProdcutList(status, 25, 1, 35);
+        })
+        
 
         $('#cancel-btn').click(function() {
             console.log($('#select-season').val());
@@ -442,6 +447,7 @@ Scripts
 
         $(".head-hide-icon").click(showDetail);
 
+        $('ul.tabs').tabs();
     });
 
 </script>

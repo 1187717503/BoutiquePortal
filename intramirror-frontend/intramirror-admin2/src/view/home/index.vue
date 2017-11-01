@@ -47,7 +47,7 @@
           <i class="mdi mdi-tag"></i>
           <span>Merchandise Management</span>
           <div class="tow-nav">
-            <router-link to="/merchandise/product" active-class="hover">Product Management</router-link>
+            <a href="/admin-frontend/index.html" active-class="hover">Product Management</a>
           </div>
         </div>
       </div>

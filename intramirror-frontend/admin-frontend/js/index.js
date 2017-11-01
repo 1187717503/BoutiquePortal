@@ -1,4 +1,8 @@
-let token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxOTciLCJpYXQiOjE1MDk0NDYxNzF9.XE4-XATYwBXPvdOht6RinY099WQ_RsXtRnDP2Mn7vnLck0xRdqMqeKHwyechw9SyXs3wejCxHOeixQdAVhVKEg";
+let token = sessionStorage.getItem('token');
+if (!token) {
+    token = localStorage.getItem('token');
+}
+// token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxOTciLCJpYXQiOjE1MDk2ODkzODN9.jxIDUBb2q7a_88m4bO98nwUNMPAH-I4E4jlefrGyagx2P8qL7LebgPJVvKZbm4sdWjnpguC447ETIkMLp7dAgw";
 
 function initBrand() {
 
@@ -13,7 +17,12 @@ function initBrand() {
         },
         success: function(result) {
             initSelectItems('select-brand', 'tmpl-brand-select', result.data);
+        },
+        error: function(code, xx) {
+            console.log(code);
+            console.log(xx);
         }
+  
     });
 }
 
@@ -103,8 +112,10 @@ function getFilterFromDom() {
     searchObj.image = $('#select-image').val();
     searchObj.modelImage = $('#select-model-image').val();
     searchObj.streetImage = $('#select-street-image').val();
+    searchObj.designerId = $('#text-designerId').val();
+    searchObj.colorCode = $('#text-color-code').val();
+    searchObj.boutiqueId = $('#text-boutique').val();
 
-    searchObj.boutiqueId = $('#text-designer').val()
     return searchObj;
 }
 
@@ -117,8 +128,8 @@ function getProdcutList(status, pagesize, pageno, totalsize) {
         filter += 'vendorId='+ searchObj.boutique + '&';
     }
 
-    if (searchObj.boutiqueid) {
-        filter += 'boutiqueId='+ searchObj.boutiqueid + '&';
+    if (searchObj.boutiqueId) {
+        filter += 'boutiqueId='+ searchObj.boutiqueId + '&';
     }
 
     if (searchObj.brand !== '-1') {
@@ -133,6 +144,14 @@ function getProdcutList(status, pagesize, pageno, totalsize) {
         filter += 'season='+ searchObj.season + '&';
     }
 
+    if (searchObj.designerId) {
+        filter += 'designerId='+ searchObj.designerId + '&';
+    }
+
+    if (searchObj.colorCode) {
+        filter += 'colorCode='+ searchObj.colorCode + '&';
+    }
+
     if (pagesize) {
         filter += 'pageSize='+ pagesize + '&';
     }
@@ -145,7 +164,7 @@ function getProdcutList(status, pagesize, pageno, totalsize) {
     filter += 'modelImage='+ searchObj.modelImage + '&';
     filter += 'streetImage='+ searchObj.streetImage + '&';
 
-    filter = filter.slice(0, filter.length-1);
+    filter = filter.slice(0, filter.length - 1);
 
     $('#order-list').empty();
     $('.pagination').empty();
@@ -177,7 +196,7 @@ function getProdcutList(status, pagesize, pageno, totalsize) {
 
 function showDetail() {
     if ($(this).hasClass("head-hide-icon")) {
-        console.log('head-hide-icon is click');
+        
         $(this).toggleClass("mdi-hardware-keyboard-arrow-down");
         $(this).toggleClass("mdi-hardware-keyboard-arrow-right");
 
@@ -194,7 +213,7 @@ function showDetail() {
         }
         
     } else {
-        console.log('hide-icon is click');
+        
         $(this).toggleClass("mdi-hardware-keyboard-arrow-down");
         $(this).toggleClass("mdi-hardware-keyboard-arrow-right");
         $(this).parent().parent().next().toggleClass("show-detail");
@@ -315,22 +334,33 @@ function initActionEvent() {
         let shopProductId = $(this).parent().data('shop-product-id');
         let action = $(this).data('action');
 
+        let param = {};
+        param.productId = productId;
+        if (shopProductId.length !== 0) {
+            param.shopProductId = shopProductId;
+        }
+        
         $.ajax({
             type: requestURL.productAction.method,
             contentType: "application/json",
             url: requestURL.productAction.url + "/" + action,
-            data: {},
+            data: JSON.stringify(param),
             dataType: 'json',
             beforeSend: function(request) {
                 request.setRequestHeader("token", token);
             },
             success: function(result) {
-
-                $("#tmpl-order-list").tmpl({list: result.data, tab_status: status, action: btnStatus}).appendTo("#order-list");
-                $(".hide-icon").click(showDetail);
-                updatePagination(status, pagesize, pageno, totalsize);
-                initActionEvent();
+                console.log(result);
+                // $("#tmpl-order-list").tmpl({list: result.data, tab_status: status, action: btnStatus}).appendTo("#order-list");
+                // $(".hide-icon").click(showDetail);
+                let status = $('.tabs .tab a.active').data('status');
+                getProdcutList(status, 25, 1, 35);
+                // initActionEvent();
                 
+            }, error: function(result, resp, par) {
+                console.log(result)
+                console.log(resp)
+                console.log(par)
             }
         });
 
