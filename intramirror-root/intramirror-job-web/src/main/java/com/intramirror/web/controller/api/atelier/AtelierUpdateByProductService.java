@@ -2,13 +2,16 @@ package com.intramirror.web.controller.api.atelier;
 
 import com.alibaba.fastjson15.JSON;
 import com.alibaba.fastjson15.JSONObject;
-import com.google.gson.Gson;
-import com.intramirror.web.enums.QueueNameJobEnum;
 import com.intramirror.web.mapping.impl.atelier.AtelierUpdateByProductMapping;
 import com.intramirror.web.thread.CommonThreadPool;
 import com.intramirror.web.thread.UpdateProductThread;
 import com.intramirror.web.util.ApiDataFileUtils;
-import com.intramirror.web.util.QueueNameEnumUtils;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import javax.annotation.Resource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
@@ -17,14 +20,6 @@ import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.model.ResultHelper;
 import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.util.MapUtils;
-
-import javax.annotation.Resource;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Created by dingyifan on 2017/9/19.
@@ -182,5 +177,12 @@ public class AtelierUpdateByProductService implements InitializingBean {
         WISE.put("vendor_name","Wise Boutique");
         WISE.put("eventName","wise");
         paramsMap.put("WISE",WISE);
+
+        Map<String,Object> JUL = new HashMap<>();
+        JUL.put("store_code","JUL");
+        JUL.put("vendor_id","26");
+        JUL.put("vendor_name","Julian");
+        JUL.put("eventName","julian");
+        paramsMap.put("JUL",JUL);
     }
 }
