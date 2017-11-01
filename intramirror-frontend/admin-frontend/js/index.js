@@ -2,7 +2,7 @@ let token = sessionStorage.getItem('token');
 if (!token) {
     token = localStorage.getItem('token');
 }
-// token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxOTciLCJpYXQiOjE1MDk2ODkzODN9.jxIDUBb2q7a_88m4bO98nwUNMPAH-I4E4jlefrGyagx2P8qL7LebgPJVvKZbm4sdWjnpguC447ETIkMLp7dAgw";
+token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxOTciLCJpYXQiOjE1MDk2ODkzODN9.jxIDUBb2q7a_88m4bO98nwUNMPAH-I4E4jlefrGyagx2P8qL7LebgPJVvKZbm4sdWjnpguC447ETIkMLp7dAgw";
 
 function initBrand() {
 
@@ -97,6 +97,8 @@ function initSeason() {
         },
         success: function(result) {
             initSelectItems('select-season', 'tmpl-season-select', result.data);
+        }, error: function(code, exception) {
+
         }
     });
 }
