@@ -332,19 +332,19 @@ Scripts
             <label for="order-id-${order.product_id}"></label>
         </div>
         <div class="item style-scope page-order"><span class="mdi-hardware-keyboard-arrow-right hide-icon"></span><img src="images/02000a.jpg" width="49" height="63"></div>
-        <div class="item style-scope page-order"><strong>${order.designer_id}-${order.color_code}</strong></div>
-        <div class="item style-scope page-order"><strong>${order.brand_name}</strong></div>
-        <div class="item style-scope page-order"><strong>${order.boutique}</strong></div>
-        <div class="item style-scope page-order"><strong>${order.boutique_id}</strong></div>
-        <div class="item style-scope page-order"><strong>${order.season_code}</strong></div>
-        <div class="item style-scope page-order"><strong>${order.category}</strong></div>
-        <div class="item style-scope page-order"><strong>${order.totalStore}</strong></div>
-        <div class="item style-scope page-order"><strong>€${order.retail_price}</strong></div>
-        <div class="item style-scope page-order"><strong>€${order.boutique_price}</strong></div>
+        <div class="item style-scope page-order">${order.designer_id}-${order.color_code}</div>
+        <div class="item style-scope page-order">${order.brand_name}</div>
+        <div class="item style-scope page-order">${order.boutique}</div>
+        <div class="item style-scope page-order">${order.boutique_id}</div>
+        <div class="item style-scope page-order">${order.season_code}</div>
+        <div class="item style-scope page-order">${order.category}</div>
+        <div class="item style-scope page-order">${order.totalStore}</div>
+        <div class="item style-scope page-order">€${order.retail_price}</div>
+        <div class="item style-scope page-order">€${order.boutique_price}</div>
         {%if tab_status =='new' || tab_status =='processing' || tab_status=='readytosell' || tab_status=='trash' %}
-        <div class="item style-scope page-order"><strong>€${order.im_price}</strong></div>
+        <div class="item style-scope page-order">€${order.im_price}</div>
         {%else%}
-        <div class="item style-scope page-order"><strong>€${order.sale_price}</strong></div>
+        <div class="item style-scope page-order">€${order.sale_price}</div>
         {%/if%}
         <div class="item style-scope page-order action" data-product-id="${order.product_id}" data-shop-product-id="${order.shop_product_id}">
             {%if action.process == 1 %}
