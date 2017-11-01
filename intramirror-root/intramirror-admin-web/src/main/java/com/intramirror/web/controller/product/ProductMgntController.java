@@ -59,13 +59,13 @@ public class ProductMgntController {
             //TODO: stock filter doesn't work now
             @RequestParam(value = "stock", required = false) String stock
             // @formatter:on
-            ) {
+    ) {
 
         SearchCondition searchCondition = new SearchCondition();
         searchCondition.setVendorId(vendorId);
         searchCondition.setBoutiqueId(boutiqueId);
         searchCondition.setBrandId(brandId);
-        searchCondition.setCategoryId(categoryId);
+        searchCondition.setCategoryId(categoryCache.getAllChildCategory(Long.parseLong(categoryId)));
         searchCondition.setDesignerId(designerId);
         searchCondition.setColorCode(colorCode);
         searchCondition.setImage(image);
@@ -111,7 +111,7 @@ public class ProductMgntController {
         searchCondition.setVendorId(vendorId);
         searchCondition.setBoutiqueId(boutiqueId);
         searchCondition.setBrandId(brandId);
-        searchCondition.setCategoryId(categoryId);
+        searchCondition.setCategoryId(categoryCache.getAllChildCategory(Long.parseLong(categoryId)));
         searchCondition.setDesignerId(designerId);
         searchCondition.setColorCode(colorCode);
         searchCondition.setImage(image);
@@ -128,7 +128,6 @@ public class ProductMgntController {
         LOGGER.info("{}", searchCondition);
         LOGGER.info("status: {}, shop status: {}", getStatusEnum(status).getProductStatus(), getStatusEnum(status).getShopProductStatus());
         List<Map<String, Object>> productList;
-
         productList = productManagementService.listProductService(searchCondition);
         if (productList.size() > 0) {
             appendInfo(productList);

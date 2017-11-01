@@ -56,7 +56,10 @@
             AND brand.brand_id = #{brandId}
         </if>
         <if test="categoryId != null">
-            AND product.category_id = #{categoryId}
+            AND product.category_id IN
+            <foreach item="item" index="index" collection="categoryId" open="(" separator="," close=")">
+                #{item}
+            </foreach>
         </if>
         <if test="season != null">
             AND product.season_code = #{season}

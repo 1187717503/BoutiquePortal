@@ -1,5 +1,7 @@
 package com.intramirror.product.api.model;
 
+import java.util.List;
+
 /**
  * Created on 2017/10/20.
  *
@@ -11,7 +13,7 @@ public class SearchCondition {
     private String vendorId;
     private String boutiqueId;
     private String brandId;
-    private String categoryId;
+    private List<Long> categoryId;
     private String season;
     private String designerId;
     private String colorCode;
@@ -88,11 +90,11 @@ public class SearchCondition {
         this.colorCode = colorCode;
     }
 
-    public String getCategoryId() {
+    public List<Long> getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(String categoryId) {
+    public void setCategoryId(List<Long> categoryId) {
         this.categoryId = categoryId;
     }
 
