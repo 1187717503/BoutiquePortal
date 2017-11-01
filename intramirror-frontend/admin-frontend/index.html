@@ -9,8 +9,7 @@
 
     <!-- Favicons-->
     <link rel="icon" href="images/favicon/favicon-32x32.png" sizes="32x32">
-    <!-- Favicons-->
-    <link rel="apple-touch-icon-precomposed" href="images/favicon/apple-touch-icon-152x152.png">
+
     <!-- For iPhone -->
     <meta name="msapplication-TileColor" content="#00bcd4">
     <meta name="msapplication-TileImage" content="images/favicon/mstile-144x144.png">
@@ -83,7 +82,7 @@
                 <ul class="left">
                     <li>
                         <h1 class="logo-wrapper">
-                            <a href="index.html" class="brand-logo darken-1 mdi-navigation-menu"><span class="brand-text">Merchandise Management > Product Management</span></a>
+                            <a href="../admin/default" class="brand-logo darken-1 mdi-navigation-menu"><span class="brand-text">Merchandise Management > Product Management</span></a>
                         </h1>
                     </li>
                 </ul>
@@ -182,7 +181,7 @@
                             <li class="tab col"><a data-status="processing" href="#"><div>PROCESSING<span>(0)</span></div></a></li>
                             <li class="tab col"><a data-status="readytosell" href="#"><div>OK<span>(0)</span></div></a></li>
                             <li class="tab col"><a data-status="shopprocessing" href="#"><div>SHOP_PROCESSING<span>(0)</span></div></a></li>
-                            <li class="tab col"><a data-status="shopreadytosell" href="#"><div>SHOP_READ<span>(0)</span></div></a></li>
+                            <li class="tab col"><a data-status="shopreadytosell" href="#"><div>SHOP_READY<span>(0)</span></div></a></li>
                             <li class="tab col"><a data-status="shopremoved" href="#"><div>SHOP_MOVED<span>(0)</span></div></a></li>
                             <li class="tab col"><a data-status="shoponsale" href="#"><div>SHOP_ONSALE<span>(0)</span></div></a></li>
                             <li class="tab col"><a data-status="shopsoldout" href="#"><div>SHOP_SOLDOUT<span>(0)</span></div></a></li>
@@ -331,7 +330,13 @@ Scripts
             <input type="checkbox" class="filled-in" id="order-id-${order.product_id}" data-product-id="${order.product_id}" />
             <label for="order-id-${order.product_id}"></label>
         </div>
-        <div class="item style-scope page-order"><span class="mdi-hardware-keyboard-arrow-right hide-icon"></span><img src="images/02000a.jpg" width="49" height="63"></div>
+        <div class="item style-scope page-order"><span class="mdi-hardware-keyboard-arrow-right hide-icon"></span>
+            {%if order.display_img %}
+            <div style="width:56px;height:74px;margin-left:20px;background-image:url(${order.display_img});background-size:56px 74px;"></div>
+            {%else%}
+            <div style="width:56px;height:74px;margin-left:20px;background-image:url(images/noimage.gif);background-size:56px 74px;"></div>
+            {%/if%}
+        </div>
         <div class="item style-scope page-order">${order.designer_id}-${order.color_code}</div>
         <div class="item style-scope page-order">${order.brand_name}</div>
         <div class="item style-scope page-order">${order.boutique}</div>
@@ -413,6 +418,10 @@ Scripts
 
 <script type="text/javascript">
 
+    function sss(a) {
+        console.log(a);
+    }
+
     $(function () {
         
         initBrand();
@@ -442,7 +451,20 @@ Scripts
         
 
         $('#cancel-btn').click(function() {
-            console.log($('#select-season').val());
+            $('#select-boutique').val('-1');
+            $('#select-category').val('-1');
+            $('#select-season').val('-1');
+            $('#select-brand').val('-1');
+            $('#select-stock').val('0');
+            $('#select-image').val('0');
+            $('#select-model-image').val('0');
+            $('#select-street-image').val('0');
+            $('#text-designerId').val('');
+            $('#text-color-code').val('');
+            $('#text-boutique').val('');
+            $('select').material_select();
+            let status = $('.tabs .tab a.active').data('status');
+            getProdcutList(status, 25, 1, 35);
         })
 
         $(".head-hide-icon").click(showDetail);

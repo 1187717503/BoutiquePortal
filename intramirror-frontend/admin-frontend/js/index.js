@@ -2,7 +2,7 @@ let token = sessionStorage.getItem('token');
 if (!token) {
     token = localStorage.getItem('token');
 }
-token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxOTciLCJpYXQiOjE1MDk2ODkzODN9.jxIDUBb2q7a_88m4bO98nwUNMPAH-I4E4jlefrGyagx2P8qL7LebgPJVvKZbm4sdWjnpguC447ETIkMLp7dAgw";
+// token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxOTciLCJpYXQiOjE1MDk2ODkzODN9.jxIDUBb2q7a_88m4bO98nwUNMPAH-I4E4jlefrGyagx2P8qL7LebgPJVvKZbm4sdWjnpguC447ETIkMLp7dAgw";
 
 function initBrand() {
 
@@ -122,7 +122,6 @@ function getFilterFromDom() {
 }
 
 function getProdcutList(status, pagesize, pageno, totalsize) {
-
     var searchObj = getFilterFromDom();
 
     var filter = '?';
@@ -186,6 +185,14 @@ function getProdcutList(status, pagesize, pageno, totalsize) {
             request.setRequestHeader("token", token);
         },
         success: function(result) {
+            for (var i = 0; i < result.data.length; i++) {
+                if (result.data[i].cover_img.length > 0) {
+                    let obj = JSON.parse(result.data[i].cover_img);
+                    if (obj.length > 0 && obj[0].length > 0) {
+                        result.data[i].display_img = obj[0];
+                    }
+                }
+            }
 
             $("#tmpl-order-list").tmpl({list: result.data, tab_status: status, action: btnStatus}).appendTo("#order-list");
             $(".hide-icon").click(showDetail);

@@ -11,4 +11,3 @@ var requestURL = {
     "getAllCount": {"url" : baseUrl + "product/fetch/state/count", "method" : "GET"}
 }
 
-console.log(requestURL)
