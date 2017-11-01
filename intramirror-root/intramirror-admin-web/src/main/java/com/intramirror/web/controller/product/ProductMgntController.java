@@ -43,7 +43,36 @@ public class ProductMgntController {
     private ISkuStoreService iSkuStoreService;
 
     @GetMapping(value = "/state/count")
-    public Response listAllProductStateCount() {
+    public Response listAllProductStateCount(
+            // @formatter:off
+            @RequestParam(value = "vendorId", required = false) String vendorId,
+            @RequestParam(value = "boutiqueId", required = false) String boutiqueId,
+            @RequestParam(value = "brandId", required = false) String brandId,
+            @RequestParam(value = "categoryId", required = false) String categoryId,
+            @RequestParam(value = "season", required = false) String season,
+            @RequestParam(value = "designerId", required = false) String designerId,
+            @RequestParam(value = "colorCode", required = false) String colorCode,
+            @RequestParam(value = "image", required = false) String image,
+            //TODO: modelImage filter doesn't work now
+            @RequestParam(value = "modelImage", required = false) String modelImage,
+            @RequestParam(value = "streetImage", required = false) String streetImage,
+            //TODO: stock filter doesn't work now
+            @RequestParam(value = "stock", required = false) String stock
+            // @formatter:on
+            ) {
+
+        SearchCondition searchCondition = new SearchCondition();
+        searchCondition.setVendorId(vendorId);
+        searchCondition.setBoutiqueId(boutiqueId);
+        searchCondition.setBrandId(brandId);
+        searchCondition.setCategoryId(categoryId);
+        searchCondition.setDesignerId(designerId);
+        searchCondition.setColorCode(colorCode);
+        searchCondition.setImage(image);
+        searchCondition.setModelImage(modelImage);
+        searchCondition.setSeason(season);
+        searchCondition.setStock(stock);
+        searchCondition.setStreetImage(streetImage);
         List<Map<String, Object>> countList = productManagementService.listAllProductCountGounpByState();
         Map<StateEnum, Long> productStateCountList = new HashMap<>();
         for (Map<String, Object> item : countList) {
