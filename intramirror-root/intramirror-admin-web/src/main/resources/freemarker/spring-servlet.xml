@@ -54,6 +54,7 @@
             <bean class="com.intramirror.web.interceptor.LoginInterceptor"/>  
         </mvc:interceptor>  
     </mvc:interceptors> -->
+
     <context:property-placeholder location="classpath:/commons.properties"/>
 
 
@@ -92,7 +93,20 @@
         <property name="order" value="1"/>
     </bean>
 
+    <bean id="authenticationInterceptor" class="com.intramirror.web.interceptor.AuthenticationInterceptor"/>
+
+    <!--    <mvc:interceptors>
+
+            <mvc:interceptor>
+                <mvc:mapping path="/**"/>
+                &lt;!&ndash;<mvc:exclude-mapping path="/user/register"/>&ndash;&gt;
+                <mvc:exclude-mapping path="/login"/>
+                <ref bean="authenticationInterceptor"/>
+            </mvc:interceptor>
+        </mvc:interceptors>-->
+
+
     <mvc:cors>
-        <mvc:mapping path="/**" allowed-methods="*"/>
+        <mvc:mapping path="/**" allowed-methods="*" allowed-origins="*" max-age="3600"/>
     </mvc:cors>
 </beans>
