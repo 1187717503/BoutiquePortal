@@ -73,7 +73,7 @@ public class ProductMgntController {
         searchCondition.setSeason(season);
         searchCondition.setStock(stock);
         searchCondition.setStreetImage(streetImage);
-        List<Map<String, Object>> countList = productManagementService.listAllProductCountGounpByState();
+        List<Map<String, Object>> countList = productManagementService.listAllProductCountGounpByState(searchCondition);
         Map<StateEnum, Long> productStateCountList = new HashMap<>();
         for (Map<String, Object> item : countList) {
             StateEnum stateEnum = StateMachineCoreRule.map2StateEnum(item);

@@ -12,18 +12,15 @@ import com.intramirror.user.api.service.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.Base64Codec;
+import java.util.HashMap;
+import java.util.Map;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import java.util.HashMap;
-import java.util.Map;
-
 
 @Controller
 @RequestMapping("/login")
@@ -71,6 +68,11 @@ public class LoginController {
 
         // 根据user_id获取用户数据，如没有，返回状态
         User user = userService.getUserByEmail(map.get("email").toString(), EnabledType.USED);
+        if (user == null) {
+            status = StatusType.EMAIL_ADDRESS_ERROR;
+            stringObjectMap.put("status", status);
+            return stringObjectMap;
+        }
         // 权限验证
         UserRole userRole = userRoleService.getUserRoleByUserId(user.getUserId(), EnabledType.USED);
         if (userRole == null) {

@@ -86,10 +86,10 @@
 
             </when>
             <when test="modelImage == 1">
-
+                AND product.img_modified = 1
             </when>
             <otherwise>
-
+                AND product.img_modified = 0
             </otherwise>
         </choose>
         <choose>
@@ -97,10 +97,10 @@
 
             </when>
             <when test="streetImage == 1">
-                AND product.img_modified = 1
+
             </when>
             <otherwise>
-                AND product.img_modified = 0
+
             </otherwise>
         </choose>
         <if test="designerId != null">
@@ -165,14 +165,86 @@
         GROUP BY sku.product_id
     </select>
 
-    <select id="listAllProductCountGounpByState" resultType="Map">
+    <select id="listAllProductCountGounpByState" parameterType="com.intramirror.product.api.model.SearchCondition" resultType="Map">
         SELECT
-            product.status        AS product_status,
-            shop_product.status   AS shop_product_status,
-            COUNT(product.status) AS count
+        product.status AS product_status,
+        shop_product.status AS shop_product_status,
+        COUNT(product.status) AS count
         FROM product
-            LEFT JOIN shop_product ON shop_product.product_id = product.product_id AND shop_product.enabled = TRUE
+        LEFT JOIN shop_product ON shop_product.product_id = product.product_id AND shop_product.enabled = TRUE
+        <if test="brandId != null">
+            INNER JOIN brand ON brand.brand_id = product.brand_id AND brand.enabled = TRUE
+        </if>
+        <if test="vendorId != null">
+            INNER JOIN vendor ON product.vendor_id = vendor.vendor_id AND product.enabled = TRUE
+        </if>
+
         WHERE product.enabled = TRUE
+        <if test="brandId != null">
+            AND brand.brand_id = #{brandId}
+        </if>
+        <if test="categoryId != null">
+            AND product.category_id = #{categoryId}
+        </if>
+        <if test="season != null">
+            AND product.season_code = #{season}
+        </if>
+        <if test="boutiqueId != null">
+            AND product.product_code = #{boutiqueId}
+        </if>
+        <if test="vendorId != null">
+            AND vendor.vendor_id = #{vendorId}
+        </if>
+        <if test="designerId != null">
+            AND product.designer_id = #{designerId}
+        </if>
+        <if test="colorCode != null">
+            AND product.color_code = #{colorCode}
+        </if>
+        <choose>
+            <when test="image == null or image == 0">
+
+            </when>
+            <when test="image == 1">
+                AND (product.cover_img != NULL AND product.description_img != NULL )
+            </when>
+            <otherwise>
+                AND (product.cover_img == NULL OR product.description_img == NULL )
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="modelImage == null or modelImage == 0">
+
+            </when>
+            <when test="modelImage == 1">
+                AND product.img_modified = 1
+            </when>
+            <otherwise>
+                AND product.img_modified = 0
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="streetImage == null or streetImage == 0">
+
+            </when>
+            <when test="streetImage == 1">
+
+            </when>
+            <otherwise>
+
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="stock == null or stock == 0">
+
+            </when>
+            <when test="stock == 1">
+
+            </when>
+            <otherwise>
+
+            </otherwise>
+        </choose>
         GROUP BY product.status, shop_product.status;
     </select>
 

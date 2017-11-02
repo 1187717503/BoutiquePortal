@@ -6,7 +6,6 @@ import java.util.Map;
 
 /**
  * Created on 2017/10/30.
- *
  * @author YouFeng.Zhu
  */
 public interface ProductManagementService {
@@ -25,5 +24,5 @@ public interface ProductManagementService {
 
     List<Map<String, Object>> listPriceByProductList(List<Map<String, Object>> products);
 
-    List<Map<String, Object>> listAllProductCountGounpByState();
+    List<Map<String, Object>> listAllProductCountGounpByState(SearchCondition searchCondition);
 }

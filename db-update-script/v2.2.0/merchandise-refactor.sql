@@ -13,6 +13,21 @@ SELECT *
 FROM product_sku_property_value pv
 INNER JOIN tmp_duplicate_size_tofix tfix ON (pv.product_sku_property_key_id = tfix.product_sku_property_key_id AND pv.value = tfix.value);
 
+--准备删除多余的value
+DROP TABLE IF EXISTS tmp_psp_vid_todel;
+CREATE TABLE tmp_psp_vid_todel AS (
+SELECT pv.product_sku_property_value_id
+FROM product_sku_property_value pv
+INNER JOIN tmp_valueid_tosave t ON 
+(t.product_sku_property_key_id = pv.product_sku_property_key_id AND t.product_sku_property_value_id <> pv.product_sku_property_value_id AND t.value = pv.value));
+--删除多余的value
+DELETE
+FROM product_sku_property_value
+WHERE product_sku_property_value_id IN(
+SELECT t.product_sku_property_value_id
+FROM tmp_psp_vid_todel t
+);
+
 --把重复的ID中的最大值作为保留
 DROP TABLE IF EXISTS tmp_valueid_tosave;
 CREATE TABLE tmp_valueid_tosave AS(
@@ -58,7 +73,7 @@ FROM (
 SELECT *
 FROM sku s1
 WHERE s1.enabled = 1 AND s1.size = '') AS s
-INNER JOIN product p ON (p.product_id = 90421 AND p.product_id = s.product_id AND p.enabled = 1)
+INNER JOIN product p ON (p.product_id = s.product_id AND p.enabled = 1)
 INNER JOIN sku_property sp ON (sp.sku_id = s.sku_id AND sp.enabled = 1)
 INNER JOIN product_sku_property_value pv ON (sp.product_sku_property_value_id = pv.product_sku_property_value_id AND pv.enabled = 1);
 
@@ -82,3 +97,7 @@ select t.product_id,count(*) from product_property t where t.key_name = 'BrandID
 
 update product p,product_property pp set p.color_code = pp.value where p.product_id = pp.product_id and pp.key_name = 'ColorCode';
 update product p,product_property pp set p.designer_id = pp.value where p.product_id = pp.product_id and pp.key_name = 'BrandID';
+
+/**********************************************************  到此，ColorCode, BrandID字段更新完毕  **************************************************************************/
+
+create or replace view view_prod_store_sum as select `sku_store`.`product_id` AS `product_id`,sum(`sku_store`.`store`) AS `store` from `sku_store` group by `sku_store`.`product_id`;

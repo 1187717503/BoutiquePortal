@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created on 2017/10/30.
- *
  * @author YouFeng.Zhu
  */
 @Service
@@ -92,8 +91,8 @@ public class ProductManagementServiceImpl extends BaseDao implements ProductMana
     }
 
     @Override
-    public List<Map<String, Object>> listAllProductCountGounpByState() {
-        return productManagementMapper.listAllProductCountGounpByState();
+    public List<Map<String, Object>> listAllProductCountGounpByState(SearchCondition searchCondition) {
+        return productManagementMapper.listAllProductCountGounpByState(searchCondition);
     }
 
     private void updateProductStatusOnly(int status, Long productId) {
