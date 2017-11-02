@@ -346,3 +346,28 @@
     font-size: 1.2em;
 }
 
+.multi-menu ul li {
+    z-index: 999;
+    font-size: 16px;
+    padding: 6.5px 16px;
+    line-height: 22px;
+    background-color: #fff;
+    min-width: 132px;
+}
+
+.icon {
+   width: 1em; height: 1em;
+   vertical-align: -0.15em;
+   fill: currentColor;
+   overflow: hidden;
+}
+
+.triangle
+{
+    position: absolute;
+    right: 13px;
+    top: 17px;
+    font-size: 12px;
+}
+
+

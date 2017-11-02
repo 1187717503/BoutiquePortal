@@ -18,18 +18,12 @@
     <!-- CORE CSS-->
     <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection">
     <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection">
+
+    <link href="css/css-multi-level-menu/multi-menu.css" rel="stylesheet">
     <!-- Customer CSS-->
     <link href="css/custom/custom.css" type="text/css" rel="stylesheet" media="screen,projection">
     <link href="css/index.css" type="text/css" rel="stylesheet" media="screen,projection">
 
-    <style type="text/css">
-    .icon {
-       width: 1em; height: 1em;
-       vertical-align: -0.15em;
-       fill: currentColor;
-       overflow: hidden;
-    }
-    </style>
 </head>
 
 <body>
@@ -135,9 +129,12 @@
                             </div>
 
                             <div class="row">
-                                <div class="input-field col s4">
-                                    <select id="select-category"></select>
+                                <div class="input-field col s3" id="category-menu-input" style="position: relative;cursor: pointer;">
+                                    <input id="category-input" type="text" value="Category" data-category-id="-1" placeholder="Category" readonly style="cursor: pointer;">
+                                    <span class="triangle">▼</span>
+                                    <div id="category-menu" style="display: none;"></div>
                                 </div>
+
                                 <div class="input-field col s1">
                                     <select id="select-season"></select>
                                 </div>
@@ -189,7 +186,7 @@
                             <li class="tab col"><a data-status="readytosell" href="#"><div>OK<span>(0)</span></div></a></li>
                             <li class="tab col"><a data-status="shopprocessing" href="#"><div>SHOP_PROCESSING<span>(0)</span></div></a></li>
                             <li class="tab col"><a data-status="shopreadytosell" href="#"><div>SHOP_READY<span>(0)</span></div></a></li>
-                            <li class="tab col"><a data-status="shopremoved" href="#"><div>SHOP_MOVED<span>(0)</span></div></a></li>
+                            <li class="tab col"><a data-status="shopremoved" href="#"><div>SHOP_REMOVED<span>(0)</span></div></a></li>
                             <li class="tab col"><a data-status="shoponsale" href="#"><div>SHOP_ONSALE<span>(0)</span></div></a></li>
                             <li class="tab col"><a data-status="shopsoldout" href="#"><div>SHOP_SOLDOUT<span>(0)</span></div></a></li>
                             <li class="tab col"><a data-status="trash" href="#"><div>TRASH<span>(0)</span></div></a></li>
@@ -304,12 +301,44 @@ Scripts
     {%/each%}
 </script>
 
-<script id="tmpl-category-select" type="text/x-jquery-tmpl">
-    <option value="-1" selected>Category</option>
-    {%each(i, category) list%}
-    <option value="${category.categoryId}">${category.name}</option>
-    {%/each%}
+<script id="tmpl-category-menu" type="text/x-jquery-tmpl">
+    <div class="multi-menu">
+        <ul>
+            {%each(i, category) list%}
+            {%if category.children.length == 0%}
+            <li>
+                <span class="name" data-category-id="${category.categoryId}" data-display-name="${category.name}">${category.name}</span>
+            </li>
+            {%else%}
+            <li class="multi-menu-parent">
+                <span class="name" data-category-id="${category.categoryId}" data-display-name="${category.name}">${category.name}</span>
+                <ul>
+                    {%each(i, leveltwo) category.children%}
+                    {%if leveltwo.children.length == 0%}
+                        <li>
+                            <span class="name" data-category-id="${leveltwo.categoryId}" data-display-name="${category.name}->${leveltwo.name}">${leveltwo.name}</span>
+                        </li>
+                    {%else%}
+                        <li class="multi-menu-parent">
+                        <span class="name" data-category-id="${leveltwo.categoryId}" data-display-name="${category.name}->${leveltwo.name}">${leveltwo.name}</span>
+                        <ul>
+                            {%each(i, levelthree) leveltwo.children%}
+                                <li>
+                                    <span class="name" data-category-id="${levelthree.categoryId}" data-display-name="${category.name}->${leveltwo.name}->${levelthree.name}">${levelthree.name}</span>
+                                </li>
+                            {%/each%}
+                        </ul>
+                        </li>
+                    {%/if%}
+                    {%/each%}
+                </ul>
+            </li>
+            {%/if%}
+            {%/each%}
+        </ul>
+    </div>
 </script>
+
 
 <script id="tmpl-season-select" type="text/x-jquery-tmpl">
     <option value="-1" selected>Season</option>
@@ -477,7 +506,8 @@ Scripts
 
         $('#cancel-btn').click(function() {
             $('#select-boutique').val('-1');
-            $('#select-category').val('-1');
+            $('#category-input').data('category-id', '-1');
+            $('#category-input').val('Category');
             $('#select-season').val('-1');
             $('#select-brand').val('-1');
             $('#select-stock').val('0');
@@ -515,6 +545,16 @@ Scripts
         })
 
         $('ul.tabs').tabs();
+
+        $('#category-menu-input input, #category-menu-input span.triangle').click(function(e) {
+            $('#category-menu .multi-menu').css('min-width', $('#category-input').width() + 'px');
+            $('#category-menu').show();
+            e.stopPropagation();
+        });
+
+        $('html').click(function() {
+            $('#category-menu').hide();
+        })
     });
 
 </script>
