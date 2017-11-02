@@ -8,11 +8,11 @@
     <title>Intra Mirror - Product Management</title>
 
     <!-- Favicons-->
-    <link rel="icon" href="images/favicon/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" href="favicon.ico">
 
     <!-- For iPhone -->
     <meta name="msapplication-TileColor" content="#00bcd4">
-    <meta name="msapplication-TileImage" content="images/favicon/mstile-144x144.png">
+    <meta name="msapplication-TileImage" content="favicon.ico">
     <!-- For Windows Phone -->
 
     <!-- CORE CSS-->
@@ -21,6 +21,15 @@
     <!-- Customer CSS-->
     <link href="css/custom/custom.css" type="text/css" rel="stylesheet" media="screen,projection">
     <link href="css/index.css" type="text/css" rel="stylesheet" media="screen,projection">
+
+    <style type="text/css">
+    .icon {
+       width: 1em; height: 1em;
+       vertical-align: -0.15em;
+       fill: currentColor;
+       overflow: hidden;
+    }
+    </style>
 </head>
 
 <body>
@@ -167,9 +176,7 @@
                             <a id="search-btn" class="waves-effect waves-light btn ">Search</a>
                             <a id="cancel-btn" class="waves-effect waves-light btn btn-gray">Reset</a>
                         </div>
-
                     </div>
-
                 </div>
                 <!--end filter-->
 
@@ -208,11 +215,27 @@
                                 <label for="order-head-cbx"></label>
                             </div>
                             <div class="item style-scope page-order"><span class="mdi-hardware-keyboard-arrow-right head-hide-icon"></span></div>
-                            <div class="item style-scope page-order">Designer ID-Color Code</div>
+                            <div class="item style-scope page-order orderby">Designer ID-Color Code
+                                <svg class="icon" aria-hidden="true">
+                                    <use xlink:href="#icon-paixu-copy" data-order-col="designIdAndColorCode"></use>
+                                </svg>
+                            </div>
                             <div class="item style-scope page-order">Brand</div>
-                            <div class="item style-scope page-order">Boutique</div>
-                            <div class="item style-scope page-order">Boutique ID</div>
-                            <div class="item style-scope page-order">Season</div>
+                            <div class="item style-scope page-order orderby">Boutique
+                                <svg class="icon" aria-hidden="true">
+                                    <use xlink:href="#icon-paixu-copy" data-order-col="boutique"></use>
+                                </svg>
+                            </div>
+                            <div class="item style-scope page-order orderby">Boutique ID
+                                <svg class="icon" aria-hidden="true">
+                                    <use xlink:href="#icon-paixu-copy" data-order-col="boutiqueId"></use>
+                                </svg>
+                            </div>
+                            <div class="item style-scope page-order orderby">Season
+                                <svg class="icon" aria-hidden="true">
+                                    <use xlink:href="#icon-paixu-copy" data-order-col="season"></use>
+                                </svg>
+                            </div>
                             <div class="item style-scope page-order">Category</div>
                             <div class="item style-scope page-order">Stock</div>
                             <div class="item style-scope page-order">Retail Price</div>
@@ -264,6 +287,8 @@ Scripts
 
 <!--custom-script.js - Add your own theme custom JS-->
 <script type="text/javascript" src="js/custom-script.js"></script>
+
+<script type="text/javascript" src="js/plugins/iconfont/iconfont.js"></script>
 
 <script id="tmpl-brand-select" type="text/x-jquery-tmpl">
     <option value="-1" selected>Brand</option>
@@ -468,6 +493,23 @@ Scripts
         })
 
         $(".head-hide-icon").click(showDetail);
+
+        $('.orderby').click(function() {
+            var orderby = $(this).find('.icon use').attr('xlink:href');
+            $('.orderby .icon use').attr('xlink:href', '#icon-paixu-copy');
+            $('.orderby').removeClass('active');
+            if (orderby == '#icon-order-left1') {
+                $(this).find('.icon use').attr('xlink:href', '#icon-order-left');
+                $(this).find('.icon use').attr('data-order-desc', '1');
+            } else {
+                $(this).find('.icon use').attr('xlink:href', '#icon-order-left1');
+                $(this).find('.icon use').attr('data-order-desc', '0');
+            }
+            $(this).addClass('active');
+            
+            let status = $('.tabs .tab a.active').data('status');
+            getProdcutList(status, 25, 1, 35);
+        })
 
         $('ul.tabs').tabs();
     });

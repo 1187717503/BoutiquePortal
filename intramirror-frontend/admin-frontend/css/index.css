@@ -337,3 +337,12 @@
     margin-left:5px;
     cursor: pointer;
 }
+
+.orderby {
+    cursor: pointer;
+}
+
+.orderby svg {
+    font-size: 1.2em;
+}
+

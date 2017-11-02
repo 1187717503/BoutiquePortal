@@ -105,7 +105,7 @@ function initSeason() {
 
 
 function getFilterFromDom() {
-    var searchObj = {}
+    let searchObj = {}
     searchObj.boutique = $('#select-boutique').val();
     searchObj.category = $('#select-category').val();
     searchObj.season = $('#select-season').val();
@@ -118,11 +118,18 @@ function getFilterFromDom() {
     searchObj.colorCode = $('#text-color-code').val();
     searchObj.boutiqueId = $('#text-boutique').val();
 
+    console.log($('.orderby.active'));
+    if ($('.orderby.active').length > 0) {
+        searchObj.orderByColmun = $('.orderby.active use').attr('data-order-col');
+        searchObj.orderByDesc = $('.orderby.active use').attr('data-order-desc');
+        console.log(searchObj);
+    }
+
     return searchObj;
 }
 
 function getProdcutList(status, pagesize, pageno, totalsize) {
-    var searchObj = getFilterFromDom();
+    let searchObj = getFilterFromDom();
 
     var filter = '?';
     if (searchObj.boutique !== '-1') {
@@ -151,6 +158,11 @@ function getProdcutList(status, pagesize, pageno, totalsize) {
 
     if (searchObj.colorCode) {
         filter += 'colorCode='+ searchObj.colorCode + '&';
+    }
+
+    if ( searchObj.orderByColmun) {
+        filter += 'orderBy='+ searchObj.orderByColmun + '&';
+        filter += 'desc='+ searchObj.orderByDesc + '&';
     }
 
     if (pagesize) {
