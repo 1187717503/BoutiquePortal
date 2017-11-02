@@ -506,9 +506,10 @@ Scripts
                 $(this).find('.icon use').attr('data-order-desc', '0');
             }
             $(this).addClass('active');
-            
+
             let status = $('.tabs .tab a.active').data('status');
             getProdcutList(status, 25, 1, 35);
+            
         })
 
         $('ul.tabs').tabs();

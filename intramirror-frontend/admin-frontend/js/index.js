@@ -2,7 +2,6 @@ let token = sessionStorage.getItem('token');
 if (!token) {
     token = localStorage.getItem('token');
 }
-// token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxOTciLCJpYXQiOjE1MDk2ODkzODN9.jxIDUBb2q7a_88m4bO98nwUNMPAH-I4E4jlefrGyagx2P8qL7LebgPJVvKZbm4sdWjnpguC447ETIkMLp7dAgw";
 
 function initBrand() {
 
@@ -211,6 +210,10 @@ function getProdcutList(status, pagesize, pageno, totalsize) {
             updatePagination(status, pagesize, pageno, totalsize);
             initActionEvent();
             finishLoading();
+        }, error: function(result, resp, par) {
+            console.log(result);
+            Materialize.toast(result.responseJSON.message + " : "+ result.responseJSON.detail, 3000);
+            finishLoading();
         }
     });
 }
@@ -338,6 +341,7 @@ function initActionEvent() {
 
     $('#approve-btn').click(function() {
         console.log('approve-btn');
+        Materialize.toast('I am a toast', 4000);
     })
 
     $('#processing-btn').click(function() {
@@ -372,16 +376,15 @@ function initActionEvent() {
             },
             success: function(result) {
                 console.log(result);
-                // $("#tmpl-order-list").tmpl({list: result.data, tab_status: status, action: btnStatus}).appendTo("#order-list");
-                // $(".hide-icon").click(showDetail);
                 let status = $('.tabs .tab a.active').data('status');
-                getProdcutList(status, 25, 1, 35);
-                // initActionEvent();
+                
+                Materialize.toast(action + ' success', 3000,'',function() {
+                    getProdcutList(status, 25, 1, 35);
+                })
                 
             }, error: function(result, resp, par) {
-                console.log(result)
-                console.log(resp)
-                console.log(par)
+                console.log(result);
+                Materialize.toast(result.responseJSON.message + " : "+ result.responseJSON.detail, 3000);
             }
         });
 
