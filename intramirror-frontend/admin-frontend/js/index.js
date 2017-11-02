@@ -3,6 +3,8 @@ if (!token) {
     token = localStorage.getItem('token');
 }
 
+token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNjEiLCJpYXQiOjE1MDk3Nzk5OTB9.kgF0fSmyQSGWsKG3TGhQqfrPPc-2efAgsF53PF3gdnSHa1mh1eDbvOHaGp7sy8k6YlF4ufHv-18HRoEoonSykw";
+
 function initBrand() {
 
     $.ajax({
@@ -18,8 +20,9 @@ function initBrand() {
             initSelectItems('select-brand', 'tmpl-brand-select', result.data);
         },
         error: function(code, xx) {
-            console.log(code);
-            console.log(xx);
+            if (code.status == 401) {
+                window.location.href = '../../login'
+            }
         }
   
     });
@@ -38,6 +41,10 @@ function initVendor() {
         },
         success: function(result) {
             initSelectItems('select-boutique', 'tmpl-boutique-select', result.data);
+        }, error : function (code, exception) {
+            if (code.status == 401) {
+                window.location.href = '../../login'
+            }
         }
     });
 }
@@ -78,6 +85,10 @@ function initCategory() {
             }
 
             initSelectItems('select-category', 'tmpl-category-select', categoryData);
+        }, error : function (code, exception) {
+            if (code.status == 401) {
+                window.location.href = '../../login'
+            }
         }
     });
 }
@@ -97,7 +108,10 @@ function initSeason() {
         success: function(result) {
             initSelectItems('select-season', 'tmpl-season-select', result.data);
         }, error: function(code, exception) {
-
+            console.log(code);
+            if (code.status == 401) {
+                window.location.href = '../../login'
+            }
         }
     });
 }
@@ -127,7 +141,7 @@ function getFilterFromDom() {
     return searchObj;
 }
 
-function getProdcutList(status, pagesize, pageno, totalsize) {
+function getProdcutList(status, pagesize, pageno) {
     let searchObj = getFilterFromDom();
 
     var filter = '?';
@@ -207,13 +221,17 @@ function getProdcutList(status, pagesize, pageno, totalsize) {
 
             $("#tmpl-order-list").tmpl({list: result.data, tab_status: status, action: btnStatus}).appendTo("#order-list");
             $(".hide-icon").click(showDetail);
-            updatePagination(status, pagesize, pageno, totalsize);
+            updatePagination(status, pagesize, pageno, 100);
             initActionEvent();
             finishLoading();
         }, error: function(result, resp, par) {
             console.log(result);
             Materialize.toast(result.responseJSON.message + " : "+ result.responseJSON.detail, 3000);
             finishLoading();
+
+            if (result.status == 401) {
+                window.location.href = '../../login'
+            }
         }
     });
 }
@@ -294,7 +312,7 @@ function updatePagination(status, pagesize, pageno, totalsize) {
     $('#tmpl-pagination').tmpl({page: pageinfo}).appendTo('.pagination');
 
     $('.pagination-index').click(function() {
-        getProdcutList(status, pagesize, $(this).data('pageno')+1, totalsize);
+        getProdcutList(status, pagesize, $(this).data('pageno')+1);
 
     })
 }
@@ -379,12 +397,16 @@ function initActionEvent() {
                 let status = $('.tabs .tab a.active').data('status');
                 
                 Materialize.toast(action + ' success', 3000,'',function() {
-                    getProdcutList(status, 25, 1, 35);
+                    getProdcutList(status, 25, 1);
                 })
                 
             }, error: function(result, resp, par) {
                 console.log(result);
                 Materialize.toast(result.responseJSON.message + " : "+ result.responseJSON.detail, 3000);
+
+                if (result.status == 401) {
+                    window.location.href = '../../login';
+                }
             }
         });
 

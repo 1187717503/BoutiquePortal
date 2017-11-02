@@ -466,12 +466,12 @@ Scripts
 
         $('#search-btn').click(function() {
             let status = $('.tabs .tab a.active').data('status');
-            getProdcutList(status, 25, 1, 35);
+            getProdcutList(status, 25, 1);
         })
 
         $('.tabs .tab a').click(function() {
             let status = $(this).data('status');
-            getProdcutList(status, 25, 1, 35);
+            getProdcutList(status, 25, 1);
         })
         
 
@@ -488,8 +488,10 @@ Scripts
             $('#text-color-code').val('');
             $('#text-boutique').val('');
             $('select').material_select();
+            $('.orderby .icon use').attr('xlink:href', '#icon-paixu-copy');
+            $('.orderby').removeClass('active');
             let status = $('.tabs .tab a.active').data('status');
-            getProdcutList(status, 25, 1, 35);
+            getProdcutList(status, 25, 1);
         })
 
         $(".head-hide-icon").click(showDetail);
@@ -508,7 +510,7 @@ Scripts
             $(this).addClass('active');
 
             let status = $('.tabs .tab a.active').data('status');
-            getProdcutList(status, 25, 1, 35);
+            getProdcutList(status, 25, 1);
             
         })
 
