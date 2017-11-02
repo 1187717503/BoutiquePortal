@@ -113,16 +113,16 @@
         <if test="orderBy != null">
             ORDER BY
             <choose>
-                <when test="orderBy == boutique">
+                <when test="orderBy == 'boutique'">
                     vendor.vendor_name
                 </when>
-                <when test="orderBy == boutiqueId">
+                <when test="orderBy == 'boutiqueId'">
                     product.product_code
                 </when>
-                <when test="orderBy == season">
+                <when test="orderBy == 'season'">
                     product.season_code
                 </when>
-                <when test="orderBy == designIdAndColorCode">
+                <when test="orderBy == 'designIdAndColorCode'">
                     product.designer_id, product.color_code
                 </when>
                 <otherwise>
