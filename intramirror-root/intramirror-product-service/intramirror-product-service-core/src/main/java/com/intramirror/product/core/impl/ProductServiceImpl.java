@@ -67,6 +67,16 @@ public class ProductServiceImpl extends BaseDao implements IProductService {
     }
 
     @Override
+    public int batchUpdateProductStatus(int status , List<Long> productIds) {
+        return productMapper.batchUpdateProductStatus(status,productIds);
+    }
+
+    @Override
+    public List<ProductWithBLOBs> listProductByProductIds(List<Long> productIds) {
+        return productMapper.listProductByProductIds(productIds);
+    }
+
+    @Override
     public void init() {
         productMapper = this.getSqlSession().getMapper(ProductMapper.class);
     }

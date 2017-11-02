@@ -19,4 +19,8 @@ public interface ShopProductSkuService {
 
     int updateByShopProductId(ShopProductSku record);
 
+    int batchDisableByShopProductIds(List<Long> shopProductIds);
+
+    int batchInsertShopProductSku(List<ShopProductSku> shopProductSkus);
+
 }

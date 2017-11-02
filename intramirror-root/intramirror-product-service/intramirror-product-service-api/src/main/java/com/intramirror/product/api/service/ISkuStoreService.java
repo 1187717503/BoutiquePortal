@@ -42,4 +42,6 @@ public interface ISkuStoreService {
 
     Long getTotalStockByProductId(Long productId);
 
+    List<Map<String, Object>> listTotalStockByProductIds(List<Long> productIds);
+
 }

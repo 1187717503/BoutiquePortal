@@ -47,4 +47,6 @@ public interface SkuStoreMapper {
     List<Map<String, Object>> listStockByProductList(List<Map<String, Object>> products);
 
     Long getTotalStockByProductId(Long productId);
+
+    List<Map<String, Object>> listTotalStockByProductIds(List<Long> productIds);
 }

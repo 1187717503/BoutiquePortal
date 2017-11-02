@@ -6,6 +6,7 @@ import java.util.Map;
 
 /**
  * Created on 2017/10/30.
+ *
  * @author YouFeng.Zhu
  */
 public interface ProductManagementService {
@@ -22,7 +23,20 @@ public interface ProductManagementService {
 
     void updateProductStatusAndDisableShopProduct(int status, Long productId, Long shopProductId);
 
+    void batchUpdateProductStatus(int status, List<Long> productIds);
+
+    void batchUpdateProductStatusAndNewShopProduct(int status, int shopStatus, List<Long> productIds);
+
+    void batchUpdateProductAndShopProductStatus(int status, int shopStatus, List<Long> productIds, List<Long> shopProductId);
+
+    void batchUpdateProductStatusAndDisableShopProduct(int status, List<Long> productIds, List<Long> shopProductId);
+
     List<Map<String, Object>> listPriceByProductList(List<Map<String, Object>> products);
 
     List<Map<String, Object>> listAllProductCountGounpByState(SearchCondition searchCondition);
+
+    List<Map<String, Object>> listProductStateByProductIds(List<Long> productIds);
+
+    List<Map<String, Object>> listShopProductIdMappingByProductIds(List<Long> productIds);
+
 }

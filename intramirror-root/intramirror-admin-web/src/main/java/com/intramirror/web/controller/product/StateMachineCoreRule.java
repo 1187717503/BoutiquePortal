@@ -98,11 +98,24 @@ public class StateMachineCoreRule {
         if (stateEnum == null) {
             throw new ValidateException(new ErrorResponse("Unkown product state : " + currentState.toString()));
         }
-        if (!isMatch(stateEnum, operation)) {
+        checkMatch(stateEnum, operation);
+    }
+
+    public static void validate(StateEnum currentState, String action) {
+        OperationEnum operation = ProductStateOperationMap.getOperation(action);
+        if (operation == null) {
+            throw new ValidateException(new ErrorResponse("Unkown operation : " + action));
+        }
+        checkMatch(currentState, operation);
+    }
+
+    private static void checkMatch(StateEnum currentState, OperationEnum operation) {
+        if (!isMatch(currentState, operation)) {
             StringBuilder sb = new StringBuilder();
-            sb.append("Product status [").append(stateEnum.name()).append("]").append(" is not allowed to ").append("[").append(operation.name()).append("].");
+            sb.append("Product status [").append(currentState.name()).append("]").append(" is not allowed to ").append("[").append(operation.name()).append(
+                    "].");
             ErrorResponse errorResponse = new ErrorResponse(sb.toString());
-            errorResponse.setDetail(stateEnum.toString());
+            errorResponse.setDetail(currentState.toString());
             throw new ValidateException(errorResponse);
         }
     }

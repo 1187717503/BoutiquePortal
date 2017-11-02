@@ -13,7 +13,14 @@ import com.intramirror.product.api.service.SkuService;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
 import com.intramirror.web.Exception.ErrorResponse;
 import com.intramirror.web.Exception.ValidateException;
+import com.intramirror.web.common.BatchResponseItem;
+import com.intramirror.web.common.BatchResponseMessage;
 import com.intramirror.web.common.Response;
+import com.intramirror.web.common.StatusCode;
+import static com.intramirror.web.controller.product.StateMachineCoreRule.map2StateEnum;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
@@ -21,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -48,7 +56,7 @@ public class StateMachineController {
     @Autowired
     private ISkuStoreService iSkuStoreService;
 
-    @PutMapping(value = "/{action}", consumes = "application/json")
+    @PutMapping(value = "/single/{action}", consumes = "application/json")
     public Response operateProduct(@PathVariable(value = "action") String action, @RequestBody Map<String, Object> body) {
         Long productId = Long.parseLong(body.get("productId").toString());
         Long shopProductId = StringUtils.isEmpty((String) body.get("shopProductId")) ? null : Long.parseLong(body.get("shopProductId").toString());
@@ -61,7 +69,7 @@ public class StateMachineController {
 
     private void updateProductState(Map<String, Object> currentState, String action, Long productId, Long shopProductId) {
         OperationEnum operation = ProductStateOperationMap.getOperation(action);
-        StateEnum currentStateEnum = StateMachineCoreRule.map2StateEnum(currentState);
+        StateEnum currentStateEnum = map2StateEnum(currentState);
         StateEnum newStateEnum = StateMachineCoreRule.getNewState(currentStateEnum, operation);
         LOGGER.info("Product [{}] Start [{}] -> [{}] -> [{}]", productId, currentStateEnum.name(), operation.name(), newStateEnum.name());
         if (operation == OperationEnum.ON_SALE) {
@@ -96,5 +104,143 @@ public class StateMachineController {
         }
         return true;
     }
+
+    @PutMapping(value = "/batch/{action}", consumes = "application/json")
+    public Response batchOperateProduct(@PathVariable(value = "action") String action, @RequestBody Map<String, Object> body) {
+        if (body.get("ids") == null) {
+            throw new ValidateException(new ErrorResponse("Parameter missed"));
+        }
+        if (body.get("originalState") == null) {
+            throw new ValidateException(new ErrorResponse("Parameter originalState missed"));
+        }
+        StateEnum originalState = ProductStateOperationMap.getStatus(body.get("originalState").toString());
+        if (originalState == null) {
+            throw new ValidateException(new ErrorResponse("Unkown original state : " + body.get("originalState").toString()));
+        }
+        StateMachineCoreRule.validate(originalState, action);
+
+        BatchResponseMessage responseMessage = new BatchResponseMessage();
+        Map<Long, Long> validIdsMap = batchValidate(originalState, (List) body.get("ids"), action, responseMessage);
+
+        batchUpdateProductState(originalState, action, validIdsMap, responseMessage);
+
+        return Response.status(StatusCode.SUCCESS).data(responseMessage);
+    }
+
+    private Map<Long, Long> batchValidate(StateEnum originalState, List<Map<String, Object>> idsList, String action, BatchResponseMessage responseMessage) {
+        Map<Long, Long> idsMap = listMap2Map(idsList);
+
+        List<Map<String, Object>> stateList = productManagementService.listProductStateByProductIds(new LinkedList<Long>(idsMap.keySet()));
+        for (Map<String, Object> state : stateList) {
+            StateEnum productState = map2StateEnum(state);
+            Long productId = Long.parseLong(state.get("product_id").toString());
+            Long shopProductId = state.get("shop_product_id") == null ? null : Long.parseLong(state.get("shop_product_id").toString());
+            if (productState == null) {
+                responseMessage.getFailed().add(new BatchResponseItem(productId, shopProductId, "Unknown state : " + state.toString()));
+                idsMap.remove(productId);
+                continue;
+            }
+            if (productState != originalState) {
+                responseMessage.getFailed().add(new BatchResponseItem(productId, shopProductId, "Product has changed to : " + productState.name()));
+                idsMap.remove(productId);
+                continue;
+            }
+            if (originalState.getShopProductStatus() != -1 && shopProductId == null) {
+                responseMessage.getFailed().add(new BatchResponseItem(productId, shopProductId, "Parameter shopProductId missed"));
+                idsMap.remove(productId);
+                continue;
+            }
+        }
+        return idsMap;
+    }
+
+    private void batchUpdateProductState(StateEnum currentStateEnum, String action, Map<Long, Long> validIdsMap, BatchResponseMessage responseMessage) {
+        if (validIdsMap.size() == 0) {
+            return;
+        }
+
+        OperationEnum operation = ProductStateOperationMap.getOperation(action);
+        StateEnum newStateEnum = StateMachineCoreRule.getNewState(currentStateEnum, operation);
+
+        LOGGER.info("Product [{}] Start [{}] -> [{}] -> [{}]", idsMapToString(validIdsMap), currentStateEnum.name(), operation.name(), newStateEnum.name());
+        if (operation == OperationEnum.ON_SALE) {
+            Map<Long, Long> outOfStockMap = batchCheckInStock(validIdsMap);
+            LOGGER.info("Out of stock : change Product [{}] as Start [{}] -> [{}] -> [{}]", idsMapToString(outOfStockMap), currentStateEnum.name(),
+                    operation.name(), newStateEnum.name());
+            batchUpdateProcess(currentStateEnum, StateEnum.SHOP_SOLD_OUT, outOfStockMap, responseMessage);
+        }
+        batchUpdateProcess(currentStateEnum, newStateEnum, validIdsMap, responseMessage);
+        LOGGER.info("Product: [{}]  [{}] -> [{}] -> [{}] SUCCESSFUL", idsMapToString(validIdsMap), currentStateEnum.name(), operation.name(),
+                newStateEnum.name());
+    }
+
+    private void batchUpdateProcess(StateEnum currentStateEnum, StateEnum newStateEnum, Map<Long, Long> idsMap, BatchResponseMessage responseMessage) {
+        if (idsMap.size() == 0) {
+            return;
+        }
+
+        List<Long> productIds = new LinkedList<>(idsMap.keySet());
+        List<Long> shopProductIds = new LinkedList<>(idsMap.values());
+        if (currentStateEnum.getShopProductStatus() == -1 && newStateEnum.getShopProductStatus() == -1) {
+            productManagementService.batchUpdateProductStatus(newStateEnum.getProductStatus(), productIds);
+        } else if (currentStateEnum.getShopProductStatus() == -1 && newStateEnum.getShopProductStatus() != -1) {
+            productManagementService.batchUpdateProductStatusAndNewShopProduct(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(),
+                    productIds);
+        } else if (currentStateEnum.getShopProductStatus() != -1) {
+
+            if (newStateEnum.getShopProductStatus() != -1) {
+                productManagementService.batchUpdateProductAndShopProductStatus(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(),
+                        productIds, shopProductIds);
+            } else if (newStateEnum.getShopProductStatus() == -1) {
+                productManagementService.batchUpdateProductStatusAndDisableShopProduct(newStateEnum.getProductStatus(), productIds, shopProductIds);
+            }
+        }
+    }
+
+    private Map<Long, Long> batchCheckInStock(Map<Long, Long> idsMap) {
+        List<Long> productIds = new LinkedList<>(idsMap.keySet());
+        List<Map<String, Object>> productStockList = iSkuStoreService.listTotalStockByProductIds(productIds);
+        Map<Long, Long> productOutOfStockMap = new HashMap<>();
+        for (Map<String, Object> productStock : productStockList) {
+            if (productStock.get("total_stock") == null || Long.parseLong(productStock.get("total_stock").toString()) <= 0) {
+                Long productId = Long.parseLong(productStock.get("product_id").toString());
+                productOutOfStockMap.put(productId, idsMap.get(productId));
+                idsMap.remove(productId);
+            }
+        }
+        return productOutOfStockMap;
+    }
+
+    private Map<Long, Long> listMap2Map(List<Map<String, Object>> idsList) {
+        Map<Long, Long> idsMap = new HashMap<>();
+        for (Map<String, Object> ids : idsList) {
+            Long productId = Long.parseLong(ids.get("productId").toString());
+            Long shopProductId = ids.get("shopProductId") == null ? null : Long.parseLong(ids.get("shopProductId").toString());
+            idsMap.put(productId, shopProductId);
+        }
+        return idsMap;
+    }
+
+    private List<Long> listMap2ListProductId(List<Map<String, Object>> idsList) {
+        List<Long> productIdList = new LinkedList<>();
+        for (Map<String, Object> ids : idsList) {
+            productIdList.add(Long.parseLong(ids.get("productId").toString()));
+        }
+        return productIdList;
+    }
+
+    private String idsMapToString(Map<Long, Long> validIdsMap) {
+        StringBuilder sb = new StringBuilder("[");
+        for (Map.Entry<Long, Long> entry : validIdsMap.entrySet()) {
+            sb.append("{ productId:").append(entry.getKey());
+            if (entry.getValue() != null) {
+                sb.append(",shopProductId:").append(entry.getValue());
+            }
+            sb.append("},");
+        }
+        return sb.substring(0, sb.length() - 1);
+    }
+
+    //    private validateParameters()
 
 }

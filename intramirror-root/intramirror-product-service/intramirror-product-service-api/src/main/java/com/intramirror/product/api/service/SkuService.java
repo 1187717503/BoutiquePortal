@@ -18,5 +18,5 @@ public interface SkuService {
 
     List<Sku> listSkuInfoByProductId(Long productId);
 
-
+    List<Sku> listSkuInfoByProductIds(List<Long> productIds);
 }

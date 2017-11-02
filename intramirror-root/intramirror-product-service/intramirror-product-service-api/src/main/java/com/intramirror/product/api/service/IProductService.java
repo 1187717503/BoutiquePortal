@@ -71,4 +71,7 @@ public interface IProductService {
 
     List<Map<String, Object>> getVendorCodeBySku(Long shopProductSkuId);
 
+    int batchUpdateProductStatus(int status, List<Long> productIds);
+
+    List<ProductWithBLOBs> listProductByProductIds(List<Long> productIds);
 }

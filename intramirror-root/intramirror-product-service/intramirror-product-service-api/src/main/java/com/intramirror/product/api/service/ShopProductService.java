@@ -2,6 +2,7 @@ package com.intramirror.product.api.service;
 
 import com.intramirror.product.api.model.ShopProduct;
 import com.intramirror.product.api.model.ShopProductWithBLOBs;
+import java.util.List;
 
 public interface ShopProductService {
 
@@ -22,5 +23,7 @@ public interface ShopProductService {
     int updateShopProductByProductId(ShopProduct record);
 
     Long insertAndGetId(ShopProductWithBLOBs shopProduct);
+
+    int batchUpdateShopProductStatus(int status, List<Long> shopProductIds);
 
 }

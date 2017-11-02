@@ -49,4 +49,14 @@ public class ShopProductSkuServiceImpl extends BaseDao implements ShopProductSku
     public int updateByShopProductId(ShopProductSku record) {
         return shopProductSkuMapper.updateByShopProductId(record);
     }
+
+    @Override
+    public int batchDisableByShopProductIds(List<Long> shopProductIds) {
+        return shopProductSkuMapper.batchDisableByShopProductIds(shopProductIds);
+    }
+
+    @Override
+    public int batchInsertShopProductSku(List<ShopProductSku> shopProductSkus) {
+        return shopProductSkuMapper.batchInsertShopProductSku(shopProductSkus);
+    }
 }

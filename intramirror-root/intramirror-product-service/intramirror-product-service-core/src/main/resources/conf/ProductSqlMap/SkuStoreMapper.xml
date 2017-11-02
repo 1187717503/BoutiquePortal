@@ -69,8 +69,8 @@
         UPDATE sku_store ss, sku s, shop_product_sku sps
         SET SS.confirmed = SS.confirmed - 1, SS.store = 0
         WHERE SS.enabled = 1 AND SS.sku_id = s.sku_id
-        AND s.enabled = 1 AND s.sku_id = sps.sku_id
-        AND sps.enabled = 1 AND sps.shop_product_sku_id = #{shopProductSkuId,jdbcType=BIGINT}
+              AND s.enabled = 1 AND s.sku_id = sps.sku_id
+              AND sps.enabled = 1 AND sps.shop_product_sku_id = #{shopProductSkuId,jdbcType=BIGINT}
     </update>
 
     <select id="selectSkuStoreByShopProductSkuId" resultMap="BaseResultMap" parameterType="java.lang.Long">
@@ -161,7 +161,19 @@
     <select id="getTotalStockByProductId" resultType="Long" parameterType="Long">
         SELECT sum(sku_store.store) AS total_stock
         FROM sku_store
-        WHERE product_id = #{productId}
+        WHERE product_id = #{productId} AND sku_store.enabled = TRUE
 
+    </select>
+
+    <select id="listTotalStockByProductIds" resultType="java.util.HashMap">
+        SELECT
+        product_id,
+        sum(sku_store.store) AS total_stock
+        FROM sku_store
+        WHERE product_id IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND sku_store.enabled = TRUE
     </select>
 </mapper>

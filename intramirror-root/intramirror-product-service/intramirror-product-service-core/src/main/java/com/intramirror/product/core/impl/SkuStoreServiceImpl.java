@@ -123,4 +123,9 @@ public class SkuStoreServiceImpl extends BaseDao implements ISkuStoreService {
         return skuStoreMapper.getTotalStockByProductId(productId);
     }
 
+    @Override
+    public List<Map<String, Object>> listTotalStockByProductIds(List<Long> productIds) {
+        return skuStoreMapper.listTotalStockByProductIds(productIds);
+    }
+
 }

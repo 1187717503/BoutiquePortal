@@ -111,7 +111,7 @@ public class ProductMgntController {
         searchCondition.setVendorId(vendorId);
         searchCondition.setBoutiqueId(boutiqueId);
         searchCondition.setBrandId(brandId);
-        searchCondition.setCategoryId(categoryCache.getAllChildCategory(Long.parseLong(categoryId)));
+        searchCondition.setCategoryId(categoryId == null ? null : categoryCache.getAllChildCategory(Long.parseLong(categoryId)));
         searchCondition.setDesignerId(designerId);
         searchCondition.setColorCode(colorCode);
         searchCondition.setImage(image);

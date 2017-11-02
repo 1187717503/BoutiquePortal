@@ -2,6 +2,8 @@ package com.intramirror.product.core.mapper;
 
 import com.intramirror.product.api.model.ShopProduct;
 import com.intramirror.product.api.model.ShopProductWithBLOBs;
+import java.util.List;
+import org.apache.ibatis.annotations.Param;
 
 public interface ShopProductMapper {
     /**
@@ -63,4 +65,10 @@ public interface ShopProductMapper {
     int updateShopProductByProductId(ShopProduct record);
 
     Long insertAndGetId(ShopProduct shopProduct);
+
+    int batchUpdateShopProductStatus(@Param("status") int status, @Param("shopProductIds") List<Long> shopProductIds);
+
+    int batchDisableShopProductStatus(List<Long> shopProductIds);
+
+    int batchInsertShopProduct(List<ShopProductWithBLOBs> shopProducts);
 }

@@ -5,6 +5,7 @@ import com.intramirror.product.api.model.ShopProductWithBLOBs;
 import com.intramirror.product.api.service.ShopProductService;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.ShopProductMapper;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -65,6 +66,9 @@ public class ShopProductServiceImpl extends BaseDao implements ShopProductServic
         return shopProductMapper.insertAndGetId(shopProduct);
     }
 
-
+    @Override
+    public int batchUpdateShopProductStatus(int status, List<Long> shopProductIds) {
+        return shopProductMapper.batchUpdateShopProductStatus(status, shopProductIds);
+    }
 
 }

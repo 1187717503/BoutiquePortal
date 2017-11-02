@@ -13,6 +13,8 @@ import com.intramirror.product.core.mapper.ProductMapper;
 import com.intramirror.product.core.mapper.ShopProductMapper;
 import com.intramirror.product.core.mapper.ShopProductSkuMapper;
 import com.intramirror.product.core.mapper.SkuMapper;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -86,6 +88,33 @@ public class ProductManagementServiceImpl extends BaseDao implements ProductMana
     }
 
     @Override
+    @Transactional
+    public void batchUpdateProductStatus(int status, List<Long> productIds) {
+        batchUpdateProductStatusOnly(status, productIds);
+    }
+
+    @Override
+    @Transactional
+    public void batchUpdateProductStatusAndNewShopProduct(int status, int shopStatus, List<Long> productIds) {
+        batchUpdateProductStatusOnly(status, productIds);
+        batchCreateShopProductStatus(shopStatus, productIds);
+    }
+
+    @Override
+    @Transactional
+    public void batchUpdateProductAndShopProductStatus(int status, int shopStatus, List<Long> productIds, List<Long> shopProductId) {
+        batchUpdateProductStatusOnly(status, productIds);
+        batchUpdateShopProductStatusOnly(status, productIds);
+    }
+
+    @Override
+    @Transactional
+    public void batchUpdateProductStatusAndDisableShopProduct(int status, List<Long> productIds, List<Long> shopProductIds) {
+        batchUpdateShopProductStatusOnly(status, productIds);
+        batchDisableShopProductStatus(shopProductIds);
+    }
+
+    @Override
     public List<Map<String, Object>> listPriceByProductList(List<Map<String, Object>> products) {
         return productManagementMapper.listPriceByProductList(products);
     }
@@ -95,11 +124,25 @@ public class ProductManagementServiceImpl extends BaseDao implements ProductMana
         return productManagementMapper.listAllProductCountGounpByState(searchCondition);
     }
 
+    @Override
+    public List<Map<String, Object>> listProductStateByProductIds(List<Long> productIds) {
+        return productManagementMapper.listProductStateByProductIds(productIds);
+    }
+
+    @Override
+    public List<Map<String, Object>> listShopProductIdMappingByProductIds(List<Long> productIds) {
+        return productManagementMapper.listShopProductIdMappingByProductIds(productIds);
+    }
+
     private void updateProductStatusOnly(int status, Long productId) {
         ProductWithBLOBs product = new ProductWithBLOBs();
         product.setStatus((byte) status);
         product.setProductId(productId);
         productMapper.updateByPrimaryKeySelective(product);
+    }
+
+    private void batchUpdateProductStatusOnly(int status, List<Long> productIds) {
+        productMapper.batchUpdateProductStatus(status, productIds);
     }
 
     private void updateShopProductStatusOnly(int shopStatus, Long productId) {
@@ -109,9 +152,18 @@ public class ProductManagementServiceImpl extends BaseDao implements ProductMana
         shopProductMapper.updateShopProductByProductId(shopProduct);
     }
 
+    private void batchUpdateShopProductStatusOnly(int status, List<Long> productIds) {
+        shopProductMapper.batchUpdateShopProductStatus(status, productIds);
+    }
+
     private void disableShopProductStatus(Long shopProductId) {
         disableShopProductSku(shopProductId);
         disableShopProduct(shopProductId);
+    }
+
+    private void batchDisableShopProductStatus(List<Long> shopProductIds) {
+        batchDisableShopProductSku(shopProductIds);
+        batchDisableShopProduct(shopProductIds);
     }
 
     private void disableShopProductSku(Long shopProductId) {
@@ -121,11 +173,19 @@ public class ProductManagementServiceImpl extends BaseDao implements ProductMana
         shopProductSkuMapper.updateByShopProductId(shopProductSku);
     }
 
+    private void batchDisableShopProductSku(List<Long> shopProductIds) {
+        shopProductSkuMapper.batchDisableByShopProductIds(shopProductIds);
+    }
+
     private void disableShopProduct(Long shopProductId) {
         ShopProductWithBLOBs shopProduct = new ShopProductWithBLOBs();
         shopProduct.setEnabled(false);
         shopProduct.setShopProductId(shopProductId);
         shopProductMapper.updateByPrimaryKeySelective(shopProduct);
+    }
+
+    private void batchDisableShopProduct(List<Long> shopProductIds) {
+        shopProductMapper.batchDisableShopProductStatus(shopProductIds);
     }
 
     private void createShopProductStatus(int status, Long productId) {
@@ -140,36 +200,101 @@ public class ProductManagementServiceImpl extends BaseDao implements ProductMana
 
     }
 
+    private void batchCreateShopProductStatus(int shopStatus, List<Long> productIds) {
+        List<ProductWithBLOBs> products = productMapper.listProductByProductIds(productIds);
+        List<Sku> skuList = skuMapper.listSkuInfoByProductIds(productIds);
+        Map<Long, List<Sku>> skuMap = skuList2MapByProductId(skuList);
+        batchCreateShopProduct(shopStatus, products, skuMap);
+        List<ShopProductSku> shopProductSkuList = mergeShopProductSkuBatch(skuList, productIds);
+        shopProductSkuMapper.batchInsertShopProductSku(shopProductSkuList);
+    }
+
+    private Map<Long, List<Sku>> skuList2MapByProductId(List<Sku> skuList) {
+        Map<Long, List<Sku>> skuMap = new HashMap<>();
+        for (Sku sku : skuList) {
+            if (skuMap.containsKey(sku.getProductId())) {
+                skuMap.get(sku.getProductId()).add(sku);
+            } else {
+                List<Sku> productSkuList = new LinkedList<>();
+                productSkuList.add(sku);
+                skuMap.put(sku.getProductId(), productSkuList);
+            }
+        }
+        return skuMap;
+    }
+
     private Long createShopProduct(int status, ProductWithBLOBs product, Sku sku) {
-        ShopProductWithBLOBs shopProduct = new ShopProductWithBLOBs();
-        shopProduct.setEnabled(true);
-        shopProduct.setShopId(shopId);
-        shopProduct.setStatus((byte) status);
-        shopProduct.setProductId(product.getProductId());
-        shopProduct.setName(product.getName());
-        shopProduct.setShopCategoryId(product.getCategoryId());
-        shopProduct.setCoverpic(product.getCoverImg());
-        shopProduct.setIntroduction(product.getDescription());
-        shopProduct.setMinSalePrice(sku.getImPrice());
-        shopProduct.setMaxSalePrice(sku.getImPrice());
+        ShopProductWithBLOBs shopProduct = makeInputShopProductWithBLOBs(status, sku, product);
         shopProductMapper.insertAndGetId(shopProduct);
         return shopProduct.getShopProductId();
     }
 
-    private void insertShopProductSkus(List<Sku> skuList, Long shopProductId) {
-        for (Sku sku : skuList) {
-            ShopProductSku shopProductSku = new ShopProductSku();
-            shopProductSku.setEnabled(true);
-            shopProductSku.setShopProductId(shopProductId);
-            shopProductSku.setSkuId(sku.getSkuId());
-            shopProductSku.setName(sku.getName());
-            shopProductSku.setCoverpic(sku.getCoverpic());
-            shopProductSku.setIntroduction(sku.getIntroduction());
-            shopProductSku.setSalePrice(sku.getImPrice());
-            shopProductSku.setShopId(shopId);
-            shopProductSkuMapper.insertSelective(shopProductSku);
+    private void batchCreateShopProduct(int status, List<ProductWithBLOBs> products, Map<Long, List<Sku>> skuMap) {
+        List<ShopProductWithBLOBs> inputShopProductList = new LinkedList<>();
+        for (ProductWithBLOBs product : products) {
+            Sku sku = skuMap.get(product.getProductId()).get(0);
+            ShopProductWithBLOBs shopProduct = makeInputShopProductWithBLOBs(status, sku, product);
+            inputShopProductList.add(shopProduct);
         }
+        shopProductMapper.batchInsertShopProduct(inputShopProductList);
+    }
 
+    private ShopProductWithBLOBs makeInputShopProductWithBLOBs(int status, Sku sku, ProductWithBLOBs product) {
+        ShopProductWithBLOBs shopProduct = new ShopProductWithBLOBs();
+        shopProduct.setShopId(shopId);
+        shopProduct.setShopCategoryId(product.getCategoryId());
+        shopProduct.setProductId(product.getProductId());
+        shopProduct.setName(product.getName());
+        shopProduct.setCoverpic(product.getCoverImg());
+        shopProduct.setStatus((byte) status);
+        shopProduct.setIntroduction(product.getDescription());
+        shopProduct.setEnabled(true);
+        shopProduct.setMinSalePrice(sku.getImPrice());
+        shopProduct.setMaxSalePrice(sku.getImPrice());
+        shopProductMapper.insertAndGetId(shopProduct);
+        return shopProduct;
+    }
+
+    private void insertShopProductSkus(List<Sku> skuList, Long shopProductId) {
+        List<ShopProductSku> inputShopProductSkuList = new LinkedList<>();
+        for (Sku sku : skuList) {
+            ShopProductSku shopProductSku = makeInputShopProductSku(sku, shopProductId);
+            inputShopProductSkuList.add(shopProductSku);
+        }
+        shopProductSkuMapper.batchInsertShopProductSku(inputShopProductSkuList);
+
+    }
+
+    private List<ShopProductSku> mergeShopProductSkuBatch(List<Sku> skuList, List<Long> productIds) {
+        List<Map<String, Object>> productIdMap2ShopProduct = productManagementMapper.listShopProductIdMappingByProductIds(productIds);
+        Map<Long, Long> productMapShopProduct = listMap2Map(productIdMap2ShopProduct);
+        List<ShopProductSku> inputShopProductSkuList = new LinkedList<>();
+        for (Sku sku : skuList) {
+            ShopProductSku shopProductSku = makeInputShopProductSku(sku, productMapShopProduct.get(sku.getProductId()));
+            inputShopProductSkuList.add(shopProductSku);
+        }
+        return inputShopProductSkuList;
+    }
+
+    private ShopProductSku makeInputShopProductSku(Sku sku, Long shopProductId) {
+        ShopProductSku shopProductSku = new ShopProductSku();
+        shopProductSku.setShopId(shopId);
+        shopProductSku.setShopProductId(shopProductId);
+        shopProductSku.setSkuId(sku.getSkuId());
+        shopProductSku.setName(sku.getName());
+        shopProductSku.setCoverpic(sku.getCoverpic());
+        shopProductSku.setIntroduction(sku.getIntroduction());
+        shopProductSku.setSalePrice(sku.getImPrice());
+        shopProductSku.setEnabled(true);
+        return shopProductSku;
+    }
+
+    private Map<Long, Long> listMap2Map(List<Map<String, Object>> idsList) {
+        Map<Long, Long> idsMap = new HashMap<>();
+        for (Map<String, Object> ids : idsList) {
+            idsMap.put(Long.parseLong(ids.get("product_id").toString()), Long.parseLong(ids.get("shop_product_id").toString()));
+        }
+        return idsMap;
     }
 
 }

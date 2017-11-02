@@ -4,6 +4,7 @@ import com.intramirror.product.api.model.Product;
 import com.intramirror.product.api.model.ProductWithBLOBs;
 import java.util.List;
 import java.util.Map;
+import org.apache.ibatis.annotations.Param;
 
 public interface ProductMapper {
     /**
@@ -71,6 +72,7 @@ public interface ProductMapper {
 
     List<Map<String, Object>> selectProductByVendor(Long vendorId);
 
+    int batchUpdateProductStatus(@Param("status") int status, @Param("productIds") List<Long> productIds);
 
-
+    List<ProductWithBLOBs> listProductByProductIds(List<Long> productIds);
 }

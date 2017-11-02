@@ -17,4 +17,6 @@ public interface SkuMapper {
 
     List<Sku> listSkuInfoByProductId(Long productId);
 
+    List<Sku> listSkuInfoByProductIds(List<Long> productIds);
+
 }

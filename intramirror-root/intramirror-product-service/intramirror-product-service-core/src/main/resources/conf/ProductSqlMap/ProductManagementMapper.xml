@@ -144,7 +144,22 @@
             shop_product.status AS shop_product_status
         FROM product
             LEFT JOIN shop_product ON product.product_id = shop_product.product_id AND shop_product.shop_id = 65 AND shop_product.enabled = 1
-        WHERE product.product_id = #{product_id}
+        WHERE product.product_id = #{product_id} AND product.enabled = TRUE;
+    </select>
+
+    <select id="listProductStateByProductIds" resultType="java.util.HashMap">
+        SELECT
+        product.product_id,
+        shop_product.shop_product_id,
+        product.status AS product_status,
+        shop_product.status AS shop_product_status
+        FROM product
+        LEFT JOIN shop_product ON product.product_id = shop_product.product_id AND shop_product.shop_id = 65 AND shop_product.enabled = 1
+        WHERE product.product_id IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND product.enabled = TRUE ;
     </select>
 
     <select id="listPriceByProductList" parameterType="java.util.List" resultType="java.util.Map">
@@ -246,6 +261,20 @@
             </otherwise>
         </choose>
         GROUP BY product.status, shop_product.status;
+    </select>
+
+    <select id="listShopProductIdMappingByProductIds" resultType="Map">
+        SELECT
+        product.status AS product_status,
+        shop_product.status AS shop_product_status,
+        COUNT(product.status) AS count
+        FROM product
+        LEFT JOIN shop_product ON shop_product.product_id = product.product_id AND shop_product.enabled = TRUE
+        WHERE product.product_id IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND product.enabled = TRUE ;
     </select>
 
 </mapper>
