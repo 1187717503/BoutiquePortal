@@ -510,7 +510,7 @@
         AND product.enabled = TRUE;
     </update>
 
-    <select id="listProductByProductIds" resultType="java.util.Map">
+    <select id="listProductByProductIds" resultMap="ResultMapWithBLOBs">
         select
         *
         from product

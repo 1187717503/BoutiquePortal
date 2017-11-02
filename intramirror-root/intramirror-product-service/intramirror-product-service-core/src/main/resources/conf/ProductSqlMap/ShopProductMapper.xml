@@ -435,13 +435,26 @@
             updated_at = now(),
         </set>
         where shop_product_id IN
-        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+        <foreach item="item" index="index" collection="shopProductIds" open="(" separator="," close=")">
             #{item}
         </foreach>
         AND shop_product.enabled = TRUE;
     </update>
 
-    <insert id="batchInsert" parameterType="java.util.List">
+    <update id="batchDisableShopProductStatus">
+        update shop_product
+        <set>
+            enabled = FALSE,
+            updated_at = now(),
+        </set>
+        where shop_product_id IN
+        <foreach item="item" index="index" collection="shopProductIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND shop_product.enabled = TRUE;
+    </update>
+
+    <insert id="batchInsertShopProduct" parameterType="java.util.List">
         INSERT INTO shop_product
         (
         shop_id,

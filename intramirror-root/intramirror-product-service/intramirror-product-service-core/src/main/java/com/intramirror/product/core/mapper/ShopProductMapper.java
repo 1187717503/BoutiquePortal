@@ -68,7 +68,7 @@ public interface ShopProductMapper {
 
     int batchUpdateShopProductStatus(@Param("status") int status, @Param("shopProductIds") List<Long> shopProductIds);
 
-    int batchDisableShopProductStatus(List<Long> shopProductIds);
+    int batchDisableShopProductStatus(@Param("shopProductIds") List<Long> shopProductIds);
 
     int batchInsertShopProduct(List<ShopProductWithBLOBs> shopProducts);
 }

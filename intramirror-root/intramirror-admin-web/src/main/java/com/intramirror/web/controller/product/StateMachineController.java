@@ -59,7 +59,7 @@ public class StateMachineController {
     @PutMapping(value = "/single/{action}", consumes = "application/json")
     public Response operateProduct(@PathVariable(value = "action") String action, @RequestBody Map<String, Object> body) {
         Long productId = Long.parseLong(body.get("productId").toString());
-        Long shopProductId = StringUtils.isEmpty((String) body.get("shopProductId")) ? null : Long.parseLong(body.get("shopProductId").toString());
+        Long shopProductId = body.get("shopProductId") == null ? null : Long.parseLong(body.get("shopProductId").toString());
         Map<String, Object> currentState = productManagementService.getProductStateByProductId(productId);
         LOGGER.info("[{}] product with [{}]", action, currentState);
         StateMachineCoreRule.validate(currentState, action);
@@ -134,7 +134,8 @@ public class StateMachineController {
         for (Map<String, Object> state : stateList) {
             StateEnum productState = map2StateEnum(state);
             Long productId = Long.parseLong(state.get("product_id").toString());
-            Long shopProductId = state.get("shop_product_id") == null ? null : Long.parseLong(state.get("shop_product_id").toString());
+            //Long shopProductId = state.get("shop_product_id") == null ? null : Long.parseLong(state.get("shop_product_id").toString());
+            Long shopProductId = idsMap.get(productId);
             if (productState == null) {
                 responseMessage.getFailed().add(new BatchResponseItem(productId, shopProductId, "Unknown state : " + state.toString()));
                 idsMap.remove(productId);
@@ -146,8 +147,15 @@ public class StateMachineController {
                 continue;
             }
             if (originalState.getShopProductStatus() != -1 && shopProductId == null) {
-                responseMessage.getFailed().add(new BatchResponseItem(productId, shopProductId, "Parameter shopProductId missed"));
-                idsMap.remove(productId);
+                Long realShopProductId = state.get("shop_product_id") == null ? null : Long.parseLong(state.get("shop_product_id").toString());
+                //Maybe this logic is not necessary
+                if (realShopProductId == null) {
+                    responseMessage.getFailed().add(new BatchResponseItem(productId, shopProductId, "Parameter shopProductId missed"));
+                    idsMap.remove(productId);
+                } else {
+                    LOGGER.info("No shop_product_id in body, get it from db by productId [{}].",productId);
+                    idsMap.put(productId, realShopProductId);
+                }
                 continue;
             }
         }

@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created on 2017/10/30.
+ *
  * @author YouFeng.Zhu
  */
 @Service
@@ -251,7 +252,6 @@ public class ProductManagementServiceImpl extends BaseDao implements ProductMana
         shopProduct.setEnabled(true);
         shopProduct.setMinSalePrice(sku.getImPrice());
         shopProduct.setMaxSalePrice(sku.getImPrice());
-        shopProductMapper.insertAndGetId(shopProduct);
         return shopProduct;
     }
 
@@ -266,7 +266,7 @@ public class ProductManagementServiceImpl extends BaseDao implements ProductMana
     }
 
     private List<ShopProductSku> mergeShopProductSkuBatch(List<Sku> skuList, List<Long> productIds) {
-        List<Map<String, Object>> productIdMap2ShopProduct = productManagementMapper.listShopProductIdMappingByProductIds(productIds);
+        List<Map<String, Object>> productIdMap2ShopProduct = productManagementMapper.listProductStateByProductIds(productIds);
         Map<Long, Long> productMapShopProduct = listMap2Map(productIdMap2ShopProduct);
         List<ShopProductSku> inputShopProductSkuList = new LinkedList<>();
         for (Sku sku : skuList) {
