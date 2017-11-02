@@ -3,7 +3,7 @@ if (!token) {
     token = localStorage.getItem('token');
 }
 
-token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNjEiLCJpYXQiOjE1MDk3Nzk5OTB9.kgF0fSmyQSGWsKG3TGhQqfrPPc-2efAgsF53PF3gdnSHa1mh1eDbvOHaGp7sy8k6YlF4ufHv-18HRoEoonSykw";
+//token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNjEiLCJpYXQiOjE1MDk3Nzk5OTB9.kgF0fSmyQSGWsKG3TGhQqfrPPc-2efAgsF53PF3gdnSHa1mh1eDbvOHaGp7sy8k6YlF4ufHv-18HRoEoonSykw";
 
 function initBrand() {
 
