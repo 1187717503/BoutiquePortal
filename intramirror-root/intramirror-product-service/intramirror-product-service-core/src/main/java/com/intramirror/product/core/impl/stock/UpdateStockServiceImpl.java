@@ -40,9 +40,9 @@ public class UpdateStockServiceImpl extends BaseDao implements IUpdateStockServi
             updateStockMap.put("productIds",productIds);
             updateStockMap.put("date", DateUtils.getStrDate(new Date())+" 00:00:00");
 
-            skuStoreMapper.zeroClearing(updateStockMap);
-
             logger.info("UpdateStockServiceImplZeroClearing,outputParams,vendorId:"+vendorId+",updateStockMap:"+ JSONObject.toJSONString(updateStockMap));
+            skuStoreMapper.zeroClearing(updateStockMap);
+            logger.info("UpdateStockServiceImplZeroClearing,end,outputParams,vendorId:"+vendorId+",updateStockMap:"+ JSONObject.toJSONString(updateStockMap));
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("UpdateStockServiceImplZeroClearing,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));

@@ -22,4 +22,7 @@ public class RedisKeyContants {
 
     /** apartment 增量更新当日商品记录的endIndex */
     public static final String apartment_end_index_bydate = "apartment_end_index_bydate";
+
+    /** atelier全量更新商品库存置零的表识 */
+    public static final String atelier_all_product_zero = "atelier_all_product_zero";
 }

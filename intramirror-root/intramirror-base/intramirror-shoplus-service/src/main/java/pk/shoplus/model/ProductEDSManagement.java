@@ -209,8 +209,7 @@ public class ProductEDSManagement {
             // 4. 根据sku_list，在sku表,sku_store表以及sku_property表中插入相关数据
             // 4.1) 把sku_list 转换成 array
             if(productOptions.getSkus()==null ||productOptions.getSkus().size()==0){
-                result.put("info","sku is null");
-                return true;
+                logger.info("ProductEDSManagementCreateProduct,skuIsNull,productOptions:"+JSONObject.toJSONString(productOptions));
             } else {
                 this.createSku(conn, columnDataList, product, propertyKeyIdArr, result, vendor,productOptions);
             }

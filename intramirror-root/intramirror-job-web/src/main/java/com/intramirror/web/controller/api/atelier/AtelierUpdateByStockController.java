@@ -3,14 +3,19 @@ package com.intramirror.web.controller.api.atelier;
 import com.alibaba.fastjson15.JSON;
 import com.alibaba.fastjson15.JSONArray;
 import com.alibaba.fastjson15.JSONObject;
-import com.google.gson.Gson;
-import com.intramirror.common.utils.DateUtils;
 import com.intramirror.web.mapping.api.IStockMapping;
 import com.intramirror.web.mapping.vo.StockContants;
 import com.intramirror.web.mapping.vo.StockOption;
 import com.intramirror.web.thread.CommonThreadPool;
 import com.intramirror.web.thread.UpdateStockThread;
 import com.intramirror.web.util.ApiDataFileUtils;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -21,15 +26,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import pk.shoplus.model.ResultHelper;
 import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.util.MapUtils;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import java.io.InputStream;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Created by dingyifan on 2017/9/19.
@@ -181,6 +177,14 @@ public class AtelierUpdateByStockController  implements InitializingBean {
         WISE.put("eventName","wise更新库存");
         WISE.put("fileUtils",new ApiDataFileUtils("wise","stock_delta_stock"));
         paramsMap.put("WISE",WISE);
+
+        Map<String,Object> JUL = new HashMap<>();
+        JUL.put("store_code","JUL");
+        JUL.put("vendor_id","26");
+        JUL.put("vendor_name","Julian");
+        JUL.put("eventName","julian更新库存");
+        JUL.put("fileUtils",new ApiDataFileUtils("julian","stock_delta_stock"));
+        paramsMap.put("JUL",JUL);
     }
 }
 
