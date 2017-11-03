@@ -75,10 +75,10 @@
 
             </when>
             <when test="image == 1">
-                AND (product.cover_img != NULL AND product.description_img != NULL )
+                AND (product.cover_img IS NOT NULL AND product.description_img != NULL )
             </when>
             <otherwise>
-                AND (product.cover_img == NULL OR product.description_img == NULL )
+                AND (product.cover_img IS NULL OR product.description_img IS NULL )
             </otherwise>
         </choose>
         <choose>
