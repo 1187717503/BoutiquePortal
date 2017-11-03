@@ -161,14 +161,13 @@
         </foreach>
         AND product.enabled = TRUE ;
     </select>
-
     <select id="listPriceByProductList" parameterType="java.util.List" resultType="java.util.Map">
         SELECT
         sku.sku_id,
-        sku.price AS retail_price,
-        sku.in_price AS boutique_price,
-        sku.im_price AS im_price,
-        shop_product_sku.sale_price AS sale_price,
+        CONVERT(sku.price,DECIMAL(10,2)) AS retail_price,
+        CONVERT(sku.in_price,DECIMAL(10,2)) AS boutique_price,
+        CONVERT(sku.im_price,DECIMAL(10,2)) AS im_price,
+        CONVERT(shop_product_sku.sale_price,DECIMAL(10,2)) AS sale_price,
         sku.product_id
         FROM sku
         LEFT JOIN shop_product_sku ON ( shop_product_sku.sku_id = sku.sku_id AND shop_product_sku.enabled = TRUE )

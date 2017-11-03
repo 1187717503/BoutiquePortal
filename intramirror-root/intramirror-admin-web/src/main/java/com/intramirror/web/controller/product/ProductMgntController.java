@@ -4,9 +4,10 @@ import com.intramirror.product.api.model.SearchCondition;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
-import com.intramirror.web.common.response.Response;
 import com.intramirror.web.common.StatusCode;
+import com.intramirror.web.common.response.Response;
 import com.intramirror.web.controller.cache.CategoryCache;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -139,9 +140,37 @@ public class ProductMgntController {
         setCategoryPath(productList);
         List<Map<String, Object>> skuStoreList = iSkuStoreService.listSkuStoreByProductList(productList);
         List<Map<String, Object>> priceList = productManagementService.listPriceByProductList(productList);
+        for (Map<String, Object> price : priceList) {
+            calculateDiscount(price);
+        }
         for (Map<String, Object> product : productList) {
             setSkuInfo(product, skuStoreList);
             setPrice(product, priceList);
+        }
+    }
+
+    private void calculateDiscount(Map<String, Object> price) {
+        if (price.get("retail_price") == null) {
+            return;
+        }
+        Double retailPrice = Double.parseDouble(price.get("retail_price").toString());
+        if (price.get("boutique_price") != null) {
+            Double boutique_price = Double.parseDouble(price.get("boutique_price").toString());
+            BigDecimal b = new BigDecimal(boutique_price / retailPrice);
+            Double discount = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+            price.put("boutique_discount", discount );
+        }
+        if (price.get("im_price") != null) {
+            Double boutique_price = Double.parseDouble(price.get("im_price").toString());
+            BigDecimal b = new BigDecimal(boutique_price / retailPrice);
+            Double discount = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+            price.put("im_discount", discount );
+        }
+        if (price.get("sale_price") != null) {
+            Double boutique_price = Double.parseDouble(price.get("sale_price").toString());
+            BigDecimal b = new BigDecimal(boutique_price / retailPrice);
+            Double discount = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+            price.put("sale_discount", discount);
         }
     }
 
