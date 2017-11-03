@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created on 2017/10/20.
- *
  * @author YouFeng.Zhu
  */
 @RestController

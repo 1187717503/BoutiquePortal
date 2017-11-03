@@ -7,7 +7,6 @@ import java.util.Map;
 
 /**
  * Created on 2017/10/25.
- *
  * @author YouFeng.Zhu
  */
 public class StateMachineCoreRule {
@@ -123,5 +122,4 @@ public class StateMachineCoreRule {
     public static StateEnum getNewState(StateEnum currentState, OperationEnum operation) {
         return stateCoreRule.get(currentState).get(operation);
     }
-
 }

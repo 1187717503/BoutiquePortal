@@ -207,9 +207,10 @@ function getProdcutList(status, pagesize, pageno) {
 
             $("#tmpl-order-list").tmpl({list: result.data, tab_status: status, action: btnStatus}).appendTo("#order-list");
             $(".hide-icon").click(showDetail);
-            updatePagination(status, pagesize, pageno, 100);
             initActionEvent();
             finishLoading();
+            var nCount = getCountWithFilter(filter,status);
+            updatePagination(status, pagesize, pageno, nCount);
         }, error: function(result, resp, par) {
             console.log(result);
             Materialize.toast(result.responseJSON.message + " : "+ result.responseJSON.detail, 3000);
@@ -220,6 +221,75 @@ function getProdcutList(status, pagesize, pageno) {
             }
         }
     });
+}
+
+function getCountWithFilter(filter,tarStatus){
+    var nStatusCount = 0;
+    $.ajax({
+        type: requestURL.getAllCount.method,
+        contentType: "application/json",
+        url: requestURL.getAllCount.url + filter,
+        data: {},
+        dataType: 'json',
+        beforeSend: function(request) {
+            request.setRequestHeader("token", token);
+        },
+        success: function(result) {
+            console.log(result);
+            $(".tabs .tab.col a").each(function(e) {
+                var curStatus = $(this).data('status');
+                switch(curStatus){
+                case 'new':
+                    dealCountWithFilter($(this),result.data.NEW,curStatus,tarStatus,nStatusCount);
+                    break;
+                case 'processing':
+                    dealCountWithFilter($(this),result.data.PROCESSING,curStatus,tarStatus,nStatusCount);
+                    break;
+                case 'readytosell':
+                    dealCountWithFilter($(this),result.data.READY_TO_SELL,curStatus,tarStatus,nStatusCount);
+                    break;
+                case 'shopprocessing':
+                    dealCountWithFilter($(this),result.data.SHOP_PROCESSING,curStatus,tarStatus,nStatusCount);
+                    break;
+                case 'shopreadytosell':
+                    dealCountWithFilter($(this),result.data.SHOP_READY_TO_SELL,curStatus,tarStatus,nStatusCount);
+                    break;
+                case 'shopremoved':
+                    dealCountWithFilter($(this),result.data.SHOP_REMOVED,curStatus,tarStatus,nStatusCount);
+                    break;
+                case 'shoponsale':
+                    dealCountWithFilter($(this),result.data.SHOP_ON_SALE,curStatus,tarStatus,nStatusCount);
+                    break;
+                case 'shopsoldout':
+                    dealCountWithFilter($(this),result.data.SHOP_SOLD_OUT,curStatus,tarStatus,nStatusCount);
+                    break;
+                case 'trash':
+                    dealCountWithFilter($(this),result.data.TRASH,curStatus,tarStatus,nStatusCount);
+                    break;
+                }
+            })
+
+            console.log("==Jain==nStatusCount:"+nStatusCount);
+        }, error: function(result, resp, par) {
+            console.log(result);
+            Materialize.toast(result.responseJSON.message + " : "+ result.responseJSON.detail, 3000);
+
+            if (result.status == 401) {
+                window.location.href = '../../login'
+            }
+        }
+    });
+}
+
+function dealCountWithFilter(handler,data,curStatus,tarStatus,nStatusCount){
+    var nCount = 0;
+    if(undefined != data){
+        nCount = data;
+    }
+    handler.find('span').text('('+nCount+')');
+    if(tarStatus == curStatus){
+        nStatusCount = nCount;
+    }
 }
 
 function showDetail() {
