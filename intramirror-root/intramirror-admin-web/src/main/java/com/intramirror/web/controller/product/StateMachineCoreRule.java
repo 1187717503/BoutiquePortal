@@ -7,6 +7,7 @@ import java.util.Map;
 
 /**
  * Created on 2017/10/25.
+ *
  * @author YouFeng.Zhu
  */
 public class StateMachineCoreRule {
@@ -51,6 +52,11 @@ public class StateMachineCoreRule {
         stateCoreRule.put(StateEnum.SHOP_PROCESSING, shopProcessingOperationMap);
         shopProcessingOperationMap.put(OperationEnum.REMOVE, StateEnum.SHOP_REMOVED);
         shopProcessingOperationMap.put(OperationEnum.APPROVE, StateEnum.SHOP_READY_TO_SELL);
+
+        Map<OperationEnum, StateEnum> oldShopProcessingOperationMap = new EnumMap<>(OperationEnum.class);
+        stateCoreRule.put(StateEnum.OLD_SHOP_PROCESSING, oldShopProcessingOperationMap);
+        oldShopProcessingOperationMap.put(OperationEnum.REMOVE, StateEnum.SHOP_REMOVED);
+        oldShopProcessingOperationMap.put(OperationEnum.APPROVE, StateEnum.SHOP_READY_TO_SELL);
 
         Map<OperationEnum, StateEnum> shopRemovedOperationMap = new EnumMap<>(OperationEnum.class);
         stateCoreRule.put(StateEnum.SHOP_REMOVED, shopRemovedOperationMap);

@@ -125,7 +125,7 @@ public class StateMachineController {
                 idsMap.remove(productId);
                 continue;
             }
-            if (productState != originalState) {
+            if (isStateSame(productState, originalState)) {
                 responseMessage.getFailed().add(new BatchResponseItem(productId, shopProductId, "Product has changed to : " + productState.name()));
                 idsMap.remove(productId);
                 continue;
@@ -144,6 +144,16 @@ public class StateMachineController {
             }
         }
         return idsMap;
+    }
+
+    private boolean isStateSame(StateEnum actual, StateEnum original) {
+        StateEnum tmp = actual;
+        if (StateEnum.OLD_PROCESSING == tmp) {
+            tmp = StateEnum.PROCESSING;
+        } else if (StateEnum.OLD_SHOP_PROCESSING == tmp) {
+            tmp = StateEnum.SHOP_PROCESSING;
+        }
+        return tmp == original ? true : false;
     }
 
     private void batchUpdateProductState(StateEnum currentStateEnum, String action, Map<Long, Long> validIdsMap, BatchResponseMessage responseMessage) {
