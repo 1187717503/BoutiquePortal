@@ -354,27 +354,27 @@ Scripts
 <script id="tmpl-control-pannel" type="text/x-jquery-tmpl">
     <div>
         {%if list.process == 1 %}
-        <a id="processing-btn" class="waves-effect waves-light btn">PROCESS</a>
+        <a data-action="process" class="waves-effect waves-light btn batch-action">PROCESS</a>
         {%/if%}
         {%if list.approve == 1 %}
-        <a id="approve-btn" class="waves-effect waves-light btn">APPROVE</a>
+        <a data-action="approve" class="waves-effect waves-light btn batch-action">APPROVE</a>
         {%/if%}
         {%if list.add_to_shop == 1 %}
-        <a id="add_to_shop-btn" class="waves-effect waves-light btn">Add to Shop</a>
+        <a data-action="addtoshop" class="waves-effect waves-light btn batch-action">Add to Shop</a>
         {%/if%}
         {%if list.remove_from_shop == 1 %}
-        <a id="remove_from_shop-btn" class="waves-effect waves-light btn">Remove from Shop</a>
+        <a data-action="removefromshop" class="waves-effect waves-light btn batch-action">Remove from Shop</a>
         {%/if%}
         {%if list.off_sale == 1 %}
-        <a id="off_sale-btn" class="waves-effect waves-light btn">Off Sale</a>
+        <a data-action="offsale" class="waves-effect waves-light btn batch-action">Off Sale</a>
         {%/if%}
         {%if list.on_sale == 1 %}
-        <a id="on_sale-btn" class="waves-effect waves-light btn">On Sale</a>
+        <a data-action="onsale" class="waves-effect waves-light btn batch-action">On Sale</a>
         {%/if%}
     </div>
     <div class="remove">
         {%if list.remove == 1 %}
-        <a id="remove-btn" class="waves-effect waves-light btn btn-gray">REMOVE</a>
+        <a data-action="remove" class="waves-effect waves-light btn btn-gray batch-action">REMOVE</a>
         {%/if%}
     </div>
 </script>
@@ -417,16 +417,16 @@ Scripts
             <span title="approve" data-action="approve" class="waves-effect mdi-action-done icon-btn-approve action-icon"></span>
             {%/if%}
             {%if action.add_to_shop == 1 %}
-            <span title="add to shop" data-action="add_to_shop" class="waves-effect mdi-content-add action-icon"></span>
+            <span title="add to shop" data-action="addtoshop" class="waves-effect mdi-content-add action-icon"></span>
             {%/if%}
             {%if action.remove_from_shop == 1 %}
-            <span title="remove from shop" data-action="remove_from_shop" class="waves-effect mdi-content-remove action-icon"></span>
+            <span title="remove from shop" data-action="removefromshop" class="waves-effect mdi-content-remove action-icon"></span>
             {%/if%}
             {%if action.off_sale == 1 %}
-            <span title="off sale" data-action="off_sale" class="waves-effect mdi-hardware-keyboard-arrow-down action-icon"></span>
+            <span title="off sale" data-action="offsale" class="waves-effect mdi-hardware-keyboard-arrow-down action-icon"></span>
             {%/if%}
             {%if action.on_sale == 1 %}
-            <span title="on sale" data-action="on_sale" class="waves-effect mdi-hardware-keyboard-arrow-up action-icon"></span>
+            <span title="on sale" data-action="onsale" class="waves-effect mdi-hardware-keyboard-arrow-up action-icon"></span>
             {%/if%}
             {%if action.remove == 1 %}
             <span title="trash" data-action="remove" class="waves-effect mdi-action-delete icon-btn-delete action-icon"></span>

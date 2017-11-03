@@ -3,7 +3,7 @@ if (!token) {
     token = localStorage.getItem('token');
 }
 
-token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxOTciLCJpYXQiOjE1MDk4NjI0NzN9.BfqHN_Ne7epxx5_R1BEsJhYDObjjmBgJfpJO8RZqPdn9scL6jesNITJDUGzmoBxUlyWbWBATzwvNzyAzY8Qc2w";
+// token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNjEiLCJpYXQiOjE1MDk4NjM1ODJ9.wBsNLPNJVLkR2bo9Qy7r1O_d7CUS9b2YV6oDb9xnmO27RUqvWbUeMKLL9J0scJh4mmUuSusT7QFjLuMlM48afQ";
 
 function initBrand() {
 
@@ -116,12 +116,10 @@ function getFilterFromDom() {
     searchObj.designerId = $('#text-designerId').val();
     searchObj.colorCode = $('#text-color-code').val();
     searchObj.boutiqueId = $('#text-boutique').val();
-    
-    //console.log(searchObj);
+
     if ($('.orderby.active').length > 0) {
         searchObj.orderByColmun = $('.orderby.active use').attr('data-order-col');
         searchObj.orderByDesc = $('.orderby.active use').attr('data-order-desc');
-        console.log(searchObj);
     }
 
     return searchObj;
@@ -268,7 +266,8 @@ function getCountWithFilter(filter, tarStatus, pagesize, pageno){
                 }
             })
             //update the page index
-            updatePagination(status, pagesize, pageno, nStatusCount);
+
+            updatePagination(tarStatus, pagesize, pageno, Math.ceil(nStatusCount/pagesize));
         }, error: function(result, resp, par) {
             console.log(result);
             Materialize.toast(result.responseJSON.message + " : "+ result.responseJSON.detail, 3000);
@@ -344,20 +343,23 @@ function updatePagination(status, pagesize, pageno, totalsize) {
     pageinfo.list = [];
     let listData = pageinfo.list;
 
+    if (totalsize == 0) {
+        return;
+    }
+
     if (pageno <= 3 ) {
-        listData.push({"no": 1});
-        listData.push({"no": 2});
-        listData.push({"no": 3});
-        listData.push({"no": 4});
-        listData.push({"no": 5});
-        listData[pageno-1].active = 1;
+        for (let i = 1; i <= totalsize && i <= 5; i++) {
+            listData.push({"no": i});
+        }
+        listData[pageno - 1].active = 1;
+
     } else if (pageno + 2 > totalsize) {
         listData.push({"no": totalsize - 4});
         listData.push({"no": totalsize - 3});
         listData.push({"no": totalsize - 2});
         listData.push({"no": totalsize - 1});
         listData.push({"no": totalsize});
-        listData[4-totalsize+pageno].active = 1;
+        listData[4 - totalsize + pageno].active = 1;
     } else {
         listData.push({"no": pageno - 2});
         listData.push({"no": pageno - 1});
@@ -369,7 +371,7 @@ function updatePagination(status, pagesize, pageno, totalsize) {
     $('#tmpl-pagination').tmpl({page: pageinfo}).appendTo('.pagination');
 
     $('.pagination-index').click(function() {
-        getProdcutList(status, pagesize, $(this).data('pageno')+1);
+        getProdcutList(status, pagesize, $(this).data('pageno') + 1);
 
     })
 }
@@ -414,9 +416,50 @@ function getBtnStatus(status) {
 
 function initActionEvent() {
 
-    $('#approve-btn').click(function() {
-        
-          
+    $('.batch-action').click(function() {
+        let param = {};
+        let action = $(this).data('action');
+        param.originalState = $('.tabs .tab a.active').data('status');
+        param.ids = [];
+        $('.product-list .item input[type=checkbox]').each(function(idx, item) {
+            if ($(item).prop('checked')) {
+                param.ids.push({"productId": $(item).data('product-id'), "shopProductId": $(item).data('shop-product-id')});
+            }
+        })
+
+        $.ajax({
+            type: requestURL.productBatchAction.method,
+            contentType: "application/json",
+            url: requestURL.productBatchAction.url + "/" + action,
+            data: JSON.stringify(param),
+            dataType: 'json',
+            beforeSend: function(request) {
+                request.setRequestHeader("token", token);
+            },
+            success: function(result) {
+                console.log(result);
+                if (result.data.failed.length > 0) {
+                    let msg = '';
+                    for (var i = 0; i < result.data.failed.length; i++) {
+                        msg += result.data.failed[i].productId + ', ';
+                    }
+                    Materialize.toast(msg + ' failed', 3000);
+                } else {
+                    Materialize.toast(action + ' success', 3000);
+                }
+
+                getProdcutList(param.originalState, 25, 1);
+                
+            }, error: function(result, resp, par) {
+                console.log(result);
+                Materialize.toast(result.responseJSON.message + " : "+ result.responseJSON.detail, 3000);
+
+                if (result.status == 401) {
+                    window.location.href = '../../login';
+                }
+            }
+        });
+
     });
 
     // 展示图片
@@ -435,20 +478,11 @@ function initActionEvent() {
             gallery: {
                 enabled: true,
                 navigateByImgClick: true,
-                preload: [0, 1] // Will preload 0 - before current, and 1 after the current image
+                preload: [0, 1]
             },
         }, 0);
     })
 
-
-    $('#processing-btn').click(function() {
-        $('.product-list .item input[type=checkbox]').each(function(idx, item) {
-            if ($(item).prop('checked')) {
-                console.log($(item).data('product-id'));
-
-            }
-        })
-    });
 
     $('.product-list .action .action-icon').click(function() {
 
@@ -487,7 +521,5 @@ function initActionEvent() {
                 }
             }
         });
-
-        console.log('product-id=' + productId + ',shop_product_id=' + shopProductId + ',action=' + action);
     });
 }
