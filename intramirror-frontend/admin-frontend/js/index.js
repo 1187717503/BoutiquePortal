@@ -3,7 +3,7 @@ if (!token) {
     token = localStorage.getItem('token');
 }
 
-// token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNjEiLCJpYXQiOjE1MDk4NTA1MjR9.YlqbQ-B4L1HH9eSl277IXYzL7HF887_-x8QSGWyfkD_-my-MztRU9h6_wFpnzM-Pp5LJiqonnVu7A6DThztq8g";
+token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxOTciLCJpYXQiOjE1MDk4NjI0NzN9.BfqHN_Ne7epxx5_R1BEsJhYDObjjmBgJfpJO8RZqPdn9scL6jesNITJDUGzmoBxUlyWbWBATzwvNzyAzY8Qc2w";
 
 function initBrand() {
 
@@ -117,7 +117,7 @@ function getFilterFromDom() {
     searchObj.colorCode = $('#text-color-code').val();
     searchObj.boutiqueId = $('#text-boutique').val();
     
-    console.log(searchObj);
+    //console.log(searchObj);
     if ($('.orderby.active').length > 0) {
         searchObj.orderByColmun = $('.orderby.active use').attr('data-order-col');
         searchObj.orderByDesc = $('.orderby.active use').attr('data-order-desc');
@@ -209,8 +209,7 @@ function getProdcutList(status, pagesize, pageno) {
             $(".hide-icon").click(showDetail);
             initActionEvent();
             finishLoading();
-            var nCount = getCountWithFilter(filter,status);
-            updatePagination(status, pagesize, pageno, nCount);
+            getCountWithFilter(filter, status, pagesize, pageno);
         }, error: function(result, resp, par) {
             console.log(result);
             Materialize.toast(result.responseJSON.message + " : "+ result.responseJSON.detail, 3000);
@@ -223,7 +222,7 @@ function getProdcutList(status, pagesize, pageno) {
     });
 }
 
-function getCountWithFilter(filter,tarStatus){
+function getCountWithFilter(filter, tarStatus, pagesize, pageno){
     var nStatusCount = 0;
     $.ajax({
         type: requestURL.getAllCount.method,
@@ -235,41 +234,41 @@ function getCountWithFilter(filter,tarStatus){
             request.setRequestHeader("token", token);
         },
         success: function(result) {
-            console.log(result);
+            //console.log(result);
             $(".tabs .tab.col a").each(function(e) {
                 var curStatus = $(this).data('status');
                 switch(curStatus){
                 case 'new':
-                    dealCountWithFilter($(this),result.data.NEW,curStatus,tarStatus,nStatusCount);
+                    nStatusCount += dealCountWithFilter($(this),result.data.NEW,curStatus,tarStatus);
                     break;
                 case 'processing':
-                    dealCountWithFilter($(this),result.data.PROCESSING,curStatus,tarStatus,nStatusCount);
+                    nStatusCount += dealCountWithFilter($(this),result.data.PROCESSING,curStatus,tarStatus);
                     break;
                 case 'readytosell':
-                    dealCountWithFilter($(this),result.data.READY_TO_SELL,curStatus,tarStatus,nStatusCount);
+                    nStatusCount += dealCountWithFilter($(this),result.data.READY_TO_SELL,curStatus,tarStatus);
                     break;
                 case 'shopprocessing':
-                    dealCountWithFilter($(this),result.data.SHOP_PROCESSING,curStatus,tarStatus,nStatusCount);
+                    nStatusCount += dealCountWithFilter($(this),result.data.SHOP_PROCESSING,curStatus,tarStatus);
                     break;
                 case 'shopreadytosell':
-                    dealCountWithFilter($(this),result.data.SHOP_READY_TO_SELL,curStatus,tarStatus,nStatusCount);
+                    nStatusCount += dealCountWithFilter($(this),result.data.SHOP_READY_TO_SELL,curStatus,tarStatus);
                     break;
                 case 'shopremoved':
-                    dealCountWithFilter($(this),result.data.SHOP_REMOVED,curStatus,tarStatus,nStatusCount);
+                    nStatusCount += dealCountWithFilter($(this),result.data.SHOP_REMOVED,curStatus,tarStatus);
                     break;
                 case 'shoponsale':
-                    dealCountWithFilter($(this),result.data.SHOP_ON_SALE,curStatus,tarStatus,nStatusCount);
+                    nStatusCount += dealCountWithFilter($(this),result.data.SHOP_ON_SALE,curStatus,tarStatus);
                     break;
                 case 'shopsoldout':
-                    dealCountWithFilter($(this),result.data.SHOP_SOLD_OUT,curStatus,tarStatus,nStatusCount);
+                    nStatusCount += dealCountWithFilter($(this),result.data.SHOP_SOLD_OUT,curStatus,tarStatus);
                     break;
                 case 'trash':
-                    dealCountWithFilter($(this),result.data.TRASH,curStatus,tarStatus,nStatusCount);
+                    nStatusCount += dealCountWithFilter($(this),result.data.TRASH,curStatus,tarStatus);
                     break;
                 }
             })
-
-            console.log("==Jain==nStatusCount:"+nStatusCount);
+            //update the page index
+            updatePagination(status, pagesize, pageno, nStatusCount);
         }, error: function(result, resp, par) {
             console.log(result);
             Materialize.toast(result.responseJSON.message + " : "+ result.responseJSON.detail, 3000);
@@ -281,14 +280,16 @@ function getCountWithFilter(filter,tarStatus){
     });
 }
 
-function dealCountWithFilter(handler,data,curStatus,tarStatus,nStatusCount){
+function dealCountWithFilter(handler,data,curStatus,tarStatus){
     var nCount = 0;
     if(undefined != data){
         nCount = data;
     }
     handler.find('span').text('('+nCount+')');
-    if(tarStatus == curStatus){
-        nStatusCount = nCount;
+    if(curStatus == tarStatus){
+        return nCount;
+    }else{
+        return 0;
     }
 }
 

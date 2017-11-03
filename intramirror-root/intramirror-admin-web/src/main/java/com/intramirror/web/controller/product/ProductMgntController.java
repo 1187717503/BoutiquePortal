@@ -65,7 +65,7 @@ public class ProductMgntController {
         searchCondition.setVendorId(vendorId);
         searchCondition.setBoutiqueId(boutiqueId);
         searchCondition.setBrandId(brandId);
-        searchCondition.setCategoryId(categoryCache.getAllChildCategory(Long.parseLong(categoryId)));
+        searchCondition.setCategoryId(categoryId == null ? null : categoryCache.getAllChildCategory(Long.parseLong(categoryId)));
         searchCondition.setDesignerId(designerId);
         searchCondition.setColorCode(colorCode);
         searchCondition.setImage(image);
@@ -157,13 +157,13 @@ public class ProductMgntController {
             Double boutique_price = Double.parseDouble(price.get("boutique_price").toString());
             BigDecimal b = new BigDecimal(boutique_price / retailPrice);
             Double discount = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-            price.put("boutique_discount", discount );
+            price.put("boutique_discount", discount);
         }
         if (price.get("im_price") != null) {
             Double boutique_price = Double.parseDouble(price.get("im_price").toString());
             BigDecimal b = new BigDecimal(boutique_price / retailPrice);
             Double discount = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-            price.put("im_discount", discount );
+            price.put("im_discount", discount);
         }
         if (price.get("sale_price") != null) {
             Double boutique_price = Double.parseDouble(price.get("sale_price").toString());
