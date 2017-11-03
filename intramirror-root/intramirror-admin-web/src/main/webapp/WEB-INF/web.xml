@@ -79,6 +79,6 @@
 
     <servlet-mapping>
         <servlet-name>intramirror-admin-web</servlet-name>
-        <url-pattern>/rest/*</url-pattern>
+        <url-pattern>/*</url-pattern>
     </servlet-mapping>
 </web-app>
