@@ -23,7 +23,7 @@
         product.designer_id AS designer_id,
         product.color_code AS color_code
         FROM product
-        LEFT JOIN shop_product ON shop_product.product_id = product.product_id AND shop_product.shop_id = 65 AND shop_product.enabled = TRUE
+        LEFT JOIN shop_product ON shop_product.shop_id = 65 AND shop_product.enabled = TRUE AND shop_product.product_id = product.product_id
         INNER JOIN vendor ON product.vendor_id = vendor.vendor_id AND product.enabled = TRUE
         INNER JOIN brand ON brand.brand_id = product.brand_id AND brand.enabled = TRUE
         <if test="stock != null and stock != 0">
@@ -31,20 +31,19 @@
         </if>
         WHERE
         <choose>
-            <when test="shopStatus == -1">
-                <choose>
-                    <when test="status == 4">
-                        (product.status = 4 OR product.status = 2)
-                    </when>
-                    <otherwise>
-                        product.status = #{status}
-                    </otherwise>
-                </choose>
-                AND shop_product.enabled IS NULL
+            <when test="status == 2 or status == 4">
+                product.status IN (4,2)
             </when>
             <otherwise>
-                product.status = #{status} AND shop_product.status = #{shopStatus}
-                AND shop_product.enabled = 1
+                product.status = #{status}
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="shopStatus == -1">
+                AND shop_product.status IS NULL
+            </when>
+            <otherwise>
+                AND shop_product.status = #{shopStatus}
             </otherwise>
         </choose>
         <choose>
@@ -199,12 +198,42 @@
             INNER JOIN vendor ON product.vendor_id = vendor.vendor_id AND product.enabled = TRUE
         </if>
 
-        WHERE product.enabled = TRUE
+        WHERE product.enabled = TRUE AND
+        <choose>
+            <when test="status == 2 or status == 4">
+                product.status IN (4,2)
+            </when>
+            <otherwise>
+                product.status = #{status}
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="shopStatus == -1">
+                AND shop_product.status IS NULL
+            </when>
+            <otherwise>
+                AND shop_product.status = #{shopStatus}
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="stock == null or stock == 0">
+
+            </when>
+            <when test="stock == 1">
+                AND view_prod_store_sum.store > 0
+            </when>
+            <otherwise>
+                AND view_prod_store_sum.store &lt;= 0
+            </otherwise>
+        </choose>
         <if test="brandId != null">
             AND brand.brand_id = #{brandId}
         </if>
         <if test="categoryId != null">
-            AND product.category_id = #{categoryId}
+            AND product.category_id IN
+            <foreach item="item" index="index" collection="categoryId" open="(" separator="," close=")">
+                #{item}
+            </foreach>
         </if>
         <if test="season != null">
             AND product.season_code = #{season}
@@ -215,21 +244,15 @@
         <if test="vendorId != null">
             AND vendor.vendor_id = #{vendorId}
         </if>
-        <if test="designerId != null">
-            AND product.designer_id = #{designerId}
-        </if>
-        <if test="colorCode != null">
-            AND product.color_code = #{colorCode}
-        </if>
         <choose>
             <when test="image == null or image == 0">
 
             </when>
             <when test="image == 1">
-                AND (product.cover_img != NULL AND product.description_img != NULL )
+                AND (product.cover_img IS NOT NULL AND product.description_img != NULL )
             </when>
             <otherwise>
-                AND (product.cover_img == NULL OR product.description_img == NULL )
+                AND (product.cover_img IS NULL OR product.description_img IS NULL )
             </otherwise>
         </choose>
         <choose>
@@ -254,17 +277,36 @@
 
             </otherwise>
         </choose>
-        <choose>
-            <when test="stock == null or stock == 0">
+        <if test="designerId != null">
+            AND product.designer_id LIKE "%"#{designerId}"%"
+        </if>
+        <if test="colorCode != null">
+            AND product.color_code = #{colorCode}
+        </if>
 
-            </when>
-            <when test="stock == 1">
-
-            </when>
-            <otherwise>
-
-            </otherwise>
-        </choose>
+        <if test="orderBy != null">
+            ORDER BY
+            <choose>
+                <when test="orderBy == 'boutique'">
+                    vendor.vendor_name
+                </when>
+                <when test="orderBy == 'boutiqueId'">
+                    product.product_code
+                </when>
+                <when test="orderBy == 'season'">
+                    product.season_code
+                </when>
+                <when test="orderBy == 'designIdAndColorCode'">
+                    CONCAT(product.designer_id, product.color_code)
+                </when>
+                <otherwise>
+                    product.product_id
+                </otherwise>
+            </choose>
+            <if test="desc == 1">
+                DESC
+            </if>
+        </if>
         GROUP BY product.status, shop_product.status;
     </select>
 

@@ -6,7 +6,6 @@ package com.intramirror.web.controller.product;
  * @author YouFeng.Zhu
  */
 public enum StateEnum {
-    //1-NEW_PENDING,2-MODIFY_PENDING,3-ON_SALE,4-OFF,5-NEW_REJECTED,6-MODIFY_REJECTED,7-WAITING_SALE,8-UNAVAILABLE
     // @formatter:off
     NEW(1),
     PROCESSING(4),
@@ -21,6 +20,10 @@ public enum StateEnum {
     SHOP_READY_TO_SELL(3,2),
     SHOP_ON_SALE(3,0),
     SHOP_REMOVED(5,2),
+
+    @Deprecated
+    OLD_SHOP_PROCESSING(2,2),
+
 
     OTHER(-1,-1);
 
