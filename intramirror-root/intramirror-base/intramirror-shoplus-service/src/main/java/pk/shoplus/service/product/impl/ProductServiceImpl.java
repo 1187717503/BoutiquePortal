@@ -150,9 +150,9 @@ public class ProductServiceImpl implements IProductService{
                         .putData("key","category_id")
                         .putData("value",productOptions.getCategory_name());
                 warningMaps.add(mapUtils.getMap());
-            } else if(category != null) {
+            } /*else if(category != null) {
                 product.category_id = category.getCategory_id();
-            }
+            }*/
 
             if(StringUtils.isBlank(productOptions.getSalePrice()) || "0".equals(StringUtils.trim(productOptions.getSalePrice()))) {
                 mapUtils = new MapUtils(new HashMap<>());
