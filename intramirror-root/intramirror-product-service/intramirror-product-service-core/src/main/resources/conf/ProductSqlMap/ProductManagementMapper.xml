@@ -195,9 +195,11 @@
             INNER JOIN brand ON brand.brand_id = product.brand_id AND brand.enabled = TRUE
         </if>
         <if test="vendorId != null">
-            INNER JOIN vendor ON product.vendor_id = vendor.vendor_id AND product.enabled = TRUE
+            INNER JOIN vendor ON product.vendor_id = vendor.vendor_id AND vendor.enabled = TRUE
         </if>
-
+        <if test="stock != null and stock != 0">
+            INNER JOIN view_prod_store_sum ON view_prod_store_sum.product_id = product.product_id
+        </if>
         WHERE product.enabled = TRUE
         <choose>
             <when test="stock == null or stock == 0">
