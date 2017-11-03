@@ -18,6 +18,7 @@
     <!-- CORE CSS-->
     <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection">
     <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection">
+    <link href="js/plugins/magnific-popup/magnific-popup.css" type="text/css" rel="stylesheet" media="screen,projection">
 
     <link href="css/css-multi-level-menu/multi-menu.css" rel="stylesheet">
     <!-- Customer CSS-->
@@ -135,10 +136,10 @@
                                     <div id="category-menu" style="display: none;"></div>
                                 </div>
 
-                                <div class="input-field col s1">
+                                <div class="input-field col s1" style="padding-right: 0;">
                                     <select id="select-season"></select>
                                 </div>
-                                <div class="input-field col s1">
+                                <div class="input-field col s2">
                                     <select id="select-image">
                                         <option value="0" selected>Image All</option>
                                         <option value="1">YES</option>
@@ -279,6 +280,9 @@ Scripts
 <!--scrollbar-->
 <script type="text/javascript" src="js/plugins/perfect-scrollbar/perfect-scrollbar.min.js"></script>
 
+<!-- magnific-popup -->
+<script type="text/javascript" src="js/plugins/magnific-popup/jquery.magnific-popup.min.js"></script> 
+
 <!--plugins.js - Some Specific JS codes for Plugin Settings-->
 <script type="text/javascript" src="js/plugins.js"></script>
 
@@ -386,9 +390,9 @@ Scripts
         </div>
         <div class="item style-scope page-order"><span class="mdi-hardware-keyboard-arrow-right hide-icon"></span>
             {%if order.display_img %}
-            <div style="width:56px;height:74px;margin-left:20px;background-image:url(${order.display_img});background-size:56px 74px;"></div>
+            <div class="product-cover-img" style="background-image:url(${order.display_img});" data-images="${order.cover_img}"></div>
             {%else%}
-            <div style="width:56px;height:74px;margin-left:20px;background-image:url(images/noimage.gif);background-size:56px 74px;"></div>
+            <div class="product-no-img" style="background-image:url(images/noimage.gif);"></div>
             {%/if%}
         </div>
         <div class="item style-scope page-order">${order.designer_id}-${order.color_code}</div>

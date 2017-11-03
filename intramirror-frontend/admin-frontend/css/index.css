@@ -370,4 +370,17 @@
     font-size: 12px;
 }
 
+.product-cover-img {
+    cursor:pointer;
+    width:56px;
+    height:74px;
+    margin-left:20px;
+    background-size:56px 74px;
+}
 
+.product-no-img {
+    width:56px;
+    height:74px;
+    margin-left:20px;
+    background-size:56px 74px;
+}

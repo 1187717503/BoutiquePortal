@@ -3,7 +3,7 @@ if (!token) {
     token = localStorage.getItem('token');
 }
 
-//token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNjEiLCJpYXQiOjE1MDk3Nzk5OTB9.kgF0fSmyQSGWsKG3TGhQqfrPPc-2efAgsF53PF3gdnSHa1mh1eDbvOHaGp7sy8k6YlF4ufHv-18HRoEoonSykw";
+// token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNjEiLCJpYXQiOjE1MDk4NTA1MjR9.YlqbQ-B4L1HH9eSl277IXYzL7HF887_-x8QSGWyfkD_-my-MztRU9h6_wFpnzM-Pp5LJiqonnVu7A6DThztq8g";
 
 function initBrand() {
 
@@ -24,7 +24,6 @@ function initBrand() {
                 window.location.href = '../../login'
             }
         }
-  
     });
 }
 
@@ -72,31 +71,6 @@ function initCategory() {
                 e.stopPropagation();
             });
 
-
-            // var categoryData = [];
-            // for (var i = 0; i < result.data.length; i++) {
-            //     // level 1
-            //     var firstName = result.data[i].name;
-            //     categoryData.push({"categoryId": result.data[i].categoryId , "name": firstName});
-
-            //     if (result.data[i].children.length > 0) {
-            //         var secondData = result.data[i].children;
-            //         for (var j = 0; j < secondData.length; j++) {
-            //             // level 2
-            //             var secondName = secondData[j].name;
-            //             categoryData.push({"categoryId": secondData[j].categoryId , "name": firstName + "->" +secondData[j].name});
-            //             if (secondData[j].children.length > 0) {
-            //                 var thirdData = secondData[j].children;
-            //                 for (var k = 0; k < thirdData.length; k++) {
-            //                     // level 3
-            //                     categoryData.push({"categoryId": thirdData[k].categoryId , "name": firstName + "->" + secondName + "->" + thirdData[k].name});
-            //                 }
-            //             }
-            //         }
-            //     }
-            // }
-
-            // initSelectItems('select-category', 'tmpl-category-select', categoryData);
         }, error : function (code, exception) {
             if (code.status == 401) {
                 window.location.href = '../../login'
@@ -370,9 +344,31 @@ function getBtnStatus(status) {
 function initActionEvent() {
 
     $('#approve-btn').click(function() {
-        console.log('approve-btn');
-        Materialize.toast('I am a toast', 4000);
+        
+          
+    });
+
+    // 展示图片
+    $('.product-cover-img').click(function() {
+        let images = $(this).data('images');
+
+        let itemsValue = [];
+        for (var i = 0; i < images.length; i++) {
+            itemsValue.push({"src": images[i]});
+        }
+     
+        $.magnificPopup.open({
+            items: itemsValue,
+            type: 'image',
+            fixedContentPos: true,
+            gallery: {
+                enabled: true,
+                navigateByImgClick: true,
+                preload: [0, 1] // Will preload 0 - before current, and 1 after the current image
+            },
+        }, 0);
     })
+
 
     $('#processing-btn').click(function() {
         $('.product-list .item input[type=checkbox]').each(function(idx, item) {
@@ -381,7 +377,7 @@ function initActionEvent() {
 
             }
         })
-    })
+    });
 
     $('.product-list .action .action-icon').click(function() {
 
