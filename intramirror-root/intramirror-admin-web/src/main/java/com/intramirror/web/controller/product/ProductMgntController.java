@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created on 2017/10/20.
+ *
  * @author YouFeng.Zhu
  */
 @RestController
@@ -199,7 +200,9 @@ public class ProductMgntController {
                 productSkuStoreList.add(skuStore);
             }
         }
-        product.put("totalStore", sumStock(productSkuStoreList));
+        if (product.get("totalStore") == null) {
+            product.put("totalStore", sumStock(productSkuStoreList));
+        }
         product.put("skuDetail", productSkuStoreList);
     }
 

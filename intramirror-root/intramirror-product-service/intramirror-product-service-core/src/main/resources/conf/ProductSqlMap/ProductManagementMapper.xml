@@ -17,12 +17,18 @@
         product.cover_img,
         product.description_img,
         product.category_id,
+        <if test="stock != null and stock != 0">
+            view_prod_store_sum.store AS totalStore,
+        </if>
         product.designer_id AS designer_id,
         product.color_code AS color_code
         FROM product
         LEFT JOIN shop_product ON shop_product.product_id = product.product_id AND shop_product.shop_id = 65 AND shop_product.enabled = TRUE
         INNER JOIN vendor ON product.vendor_id = vendor.vendor_id AND product.enabled = TRUE
         INNER JOIN brand ON brand.brand_id = product.brand_id AND brand.enabled = TRUE
+        <if test="stock != null and stock != 0">
+            INNER JOIN view_prod_store_sum ON view_prod_store_sum.product_id = product.product_id
+        </if>
         WHERE
         <choose>
             <when test="shopStatus == -1">
@@ -46,10 +52,10 @@
 
             </when>
             <when test="stock == 1">
-
+                AND view_prod_store_sum.store > 0
             </when>
             <otherwise>
-
+                AND view_prod_store_sum.store &lt;= 0
             </otherwise>
         </choose>
         <if test="brandId != null">
