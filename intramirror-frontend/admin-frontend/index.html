@@ -469,9 +469,26 @@ Scripts
 </script>
 
 <script id="tmpl-pagination" type="text/x-jquery-tmpl">
+
     <li class="pagination-info">Current: ${page.currPage} Total: ${page.totalPage}</li>
+    <li style="width: 100px">
+        <div class="input-field col s1">
+            <select id="page-size">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+    </li>
+    
+    {%if page.currPage <= 1 %}
+    <li class="disabled"><a href="#!"><i class="mdi-av-skip-previous"></i></a></li>
+    <li class="disabled"><a href="#!"><i class="mdi-navigation-chevron-left"></i></a></li>
+    {%else%}
     <li class="waves-effect pagination-index" data-pageno="0"><a href="#!"><i class="mdi-av-skip-previous"></i></a></li>
     <li class="waves-effect pagination-index" data-pageno="${page.currPage-2}"><a href="#!"><i class="mdi-navigation-chevron-left"></i></a></li>
+    {%/if%}
     {%each(i, pageInfo) page.list%}
         {%if pageInfo.active %}
             <li class="waves-effect active pagination-index" data-pageno="${pageInfo.no - 1}"><a href="#!">${pageInfo.no}</a></li>
@@ -479,8 +496,15 @@ Scripts
             <li class="waves-effect pagination-index" data-pageno="${pageInfo.no - 1}"><a href="#!">${pageInfo.no}</a></li>
         {%/if%}
     {%/each%}
+
+    {%if page.currPage <= page.totalPage - 1 %}
     <li class="waves-effect pagination-index" data-pageno="${page.currPage}"><a href="#!"><i class="mdi-navigation-chevron-right"></i></a></li>
     <li class="waves-effect pagination-index" data-pageno="${page.totalPage - 1}"><a href="#!"><i class="mdi-av-skip-next"></i></a></li>
+    {%else%}
+    <li class="disabled"><a href="#!"><i class="mdi-navigation-chevron-right"></i></a></li>
+    <li class="disabled"><a href="#!"><i class="mdi-av-skip-next"></i></a></li>
+    {%/if%}
+
 </script>
 
 
@@ -499,12 +523,12 @@ Scripts
 
         $('#search-btn').click(function() {
             let status = $('.tabs .tab a.active').data('status');
-            getProdcutList(status, 25, 1);
+            getProdcutList(status, 1);
         })
 
         $('.tabs .tab a').click(function() {
             let status = $(this).data('status');
-            getProdcutList(status, 25, 1);
+            getProdcutList(status, 1);
         })
         
 
@@ -525,7 +549,7 @@ Scripts
             $('.orderby .icon use').attr('xlink:href', '#icon-paixu-copy');
             $('.orderby').removeClass('active');
             let status = $('.tabs .tab a.active').data('status');
-            getProdcutList(status, 25, 1);
+            getProdcutList(status, 1);
         })
 
         $('ul.tabs').tabs();

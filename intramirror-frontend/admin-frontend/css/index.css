@@ -384,3 +384,7 @@
     margin-left:20px;
     background-size:56px 74px;
 }
+
+.pagination li .select-wrapper input.select-dropdown {
+    text-align: center;
+}

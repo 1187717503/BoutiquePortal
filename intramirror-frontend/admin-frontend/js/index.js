@@ -94,7 +94,7 @@ function initSeason() {
         success: function(result) {
             initSelectItems('select-season', 'tmpl-season-select', result.data);
         }, error: function(code, exception) {
-            console.log(code);
+
             if (code.status == 401) {
                 window.location.href = '../../login'
             }
@@ -125,7 +125,13 @@ function getFilterFromDom() {
     return searchObj;
 }
 
-function getProdcutList(status, pagesize, pageno) {
+function getProdcutList(status, pageno) {
+    let pagesize = localStorage.getItem('product-page-size');
+
+    if (pagesize == null) {
+        pagesize = 25;
+    }
+
     let searchObj = getFilterFromDom();
     //return console.log(searchObj);
 
@@ -388,8 +394,16 @@ function updatePagination(status, pagesize, pageno, totalsize) {
     
     $('#tmpl-pagination').tmpl({page: pageinfo}).appendTo('.pagination');
 
+    $('#page-size').val(localStorage.getItem('product-page-size'));
+    $('#page-size').material_select();
+
+    $('#page-size').change(function() {
+        localStorage.setItem('product-page-size', $(this).val());
+        getProdcutList(status, 1);
+    }) 
+
     $('.pagination-index').click(function() {
-        getProdcutList(status, pagesize, $(this).data('pageno') + 1);
+        getProdcutList(status, $(this).data('pageno') + 1);
 
     })
 }
@@ -441,7 +455,7 @@ function initActionEvent() {
         }
     })
 
-    $(".head-hide-icon").click(showDetail);
+    $(".head-hide-icon, .hide-icon").click(showDetail);
 
     $('.orderby').click(function() {
 
@@ -460,7 +474,7 @@ function initActionEvent() {
         $(this).addClass('active');
 
         let status = $('.tabs .tab a.active').data('status');
-        getProdcutList(status, 25, 1);
+        getProdcutList(status, 1);
         
     })
 
@@ -506,7 +520,7 @@ function initActionEvent() {
                     Materialize.toast(action + ' success', 3000);
                 }
 
-                getProdcutList(param.originalState, 25, 1);
+                getProdcutList(param.originalState, 1);
                 finishLoading()
                 
             }, error: function(result, resp, par) {
@@ -565,14 +579,13 @@ function initActionEvent() {
                 request.setRequestHeader("token", token);
             },
             success: function(result) {
-                console.log(result);
                 let status = $('.tabs .tab a.active').data('status');
                 
                 Materialize.toast(action + ' success', 3000);
-                getProdcutList(status, 25, 1);
+                getProdcutList(status, 1);
                 
             }, error: function(result, resp, par) {
-                console.log(result);
+
                 Materialize.toast(result.responseJSON.message, 3000);
 
                 if (result.status == 401) {
