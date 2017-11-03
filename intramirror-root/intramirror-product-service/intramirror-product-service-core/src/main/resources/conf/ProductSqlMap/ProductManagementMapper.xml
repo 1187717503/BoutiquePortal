@@ -198,23 +198,7 @@
             INNER JOIN vendor ON product.vendor_id = vendor.vendor_id AND product.enabled = TRUE
         </if>
 
-        WHERE product.enabled = TRUE AND
-        <choose>
-            <when test="status == 2 or status == 4">
-                product.status IN (4,2)
-            </when>
-            <otherwise>
-                product.status = #{status}
-            </otherwise>
-        </choose>
-        <choose>
-            <when test="shopStatus == -1">
-                AND shop_product.status IS NULL
-            </when>
-            <otherwise>
-                AND shop_product.status = #{shopStatus}
-            </otherwise>
-        </choose>
+        WHERE product.enabled = TRUE
         <choose>
             <when test="stock == null or stock == 0">
 
