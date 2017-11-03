@@ -2,7 +2,7 @@ package com.intramirror.web.controller.product;
 
 import com.intramirror.product.api.service.brand.IBrandService;
 import com.intramirror.product.api.service.season.SeasonService;
-import com.intramirror.web.common.Response;
+import com.intramirror.web.common.response.Response;
 import com.intramirror.web.common.StatusCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

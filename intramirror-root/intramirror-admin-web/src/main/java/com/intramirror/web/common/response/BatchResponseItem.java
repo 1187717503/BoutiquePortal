@@ -1,4 +1,4 @@
-package com.intramirror.web.common;
+package com.intramirror.web.common.response;
 
 /**
  * Created on 2017/11/1.

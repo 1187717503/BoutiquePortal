@@ -1,41 +1,25 @@
 package com.intramirror.web.controller.product;
 
-import com.intramirror.product.api.model.ProductWithBLOBs;
-import com.intramirror.product.api.model.ShopProduct;
-import com.intramirror.product.api.model.ShopProductSku;
-import com.intramirror.product.api.model.ShopProductWithBLOBs;
-import com.intramirror.product.api.model.Sku;
-import com.intramirror.product.api.service.IProductService;
 import com.intramirror.product.api.service.ISkuStoreService;
-import com.intramirror.product.api.service.ShopProductService;
-import com.intramirror.product.api.service.ShopProductSkuService;
-import com.intramirror.product.api.service.SkuService;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
 import com.intramirror.web.Exception.ErrorResponse;
 import com.intramirror.web.Exception.ValidateException;
-import com.intramirror.web.common.BatchResponseItem;
-import com.intramirror.web.common.BatchResponseMessage;
-import com.intramirror.web.common.Response;
+import com.intramirror.web.common.response.BatchResponseItem;
+import com.intramirror.web.common.response.BatchResponseMessage;
+import com.intramirror.web.common.response.Response;
 import com.intramirror.web.common.StatusCode;
 import static com.intramirror.web.controller.product.StateMachineCoreRule.map2StateEnum;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -153,7 +137,7 @@ public class StateMachineController {
                     responseMessage.getFailed().add(new BatchResponseItem(productId, shopProductId, "Parameter shopProductId missed"));
                     idsMap.remove(productId);
                 } else {
-                    LOGGER.info("No shop_product_id in body, get it from db by productId [{}].",productId);
+                    LOGGER.info("No shop_product_id in body, get it from db by productId [{}].", productId);
                     idsMap.put(productId, realShopProductId);
                 }
                 continue;
@@ -180,6 +164,8 @@ public class StateMachineController {
         batchUpdateProcess(currentStateEnum, newStateEnum, validIdsMap, responseMessage);
         LOGGER.info("Product: [{}]  [{}] -> [{}] -> [{}] SUCCESSFUL", idsMapToString(validIdsMap), currentStateEnum.name(), operation.name(),
                 newStateEnum.name());
+
+        addSuccessToResponse(validIdsMap, responseMessage);
     }
 
     private void batchUpdateProcess(StateEnum currentStateEnum, StateEnum newStateEnum, Map<Long, Long> idsMap, BatchResponseMessage responseMessage) {
@@ -229,12 +215,10 @@ public class StateMachineController {
         return idsMap;
     }
 
-    private List<Long> listMap2ListProductId(List<Map<String, Object>> idsList) {
-        List<Long> productIdList = new LinkedList<>();
-        for (Map<String, Object> ids : idsList) {
-            productIdList.add(Long.parseLong(ids.get("productId").toString()));
+    private void addSuccessToResponse(Map<Long, Long> successIdsMap, BatchResponseMessage responseMessage) {
+        for (Map.Entry<Long, Long> entry : successIdsMap.entrySet()) {
+            responseMessage.getSuccess().add(new BatchResponseItem(entry.getKey(), entry.getValue()));
         }
-        return productIdList;
     }
 
     private String idsMapToString(Map<Long, Long> validIdsMap) {

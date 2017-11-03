@@ -1,4 +1,6 @@
-package com.intramirror.web.common;
+package com.intramirror.web.common.response;
+
+import com.intramirror.web.common.StatusCode;
 
 /**
  * Created on 2017/10/26.

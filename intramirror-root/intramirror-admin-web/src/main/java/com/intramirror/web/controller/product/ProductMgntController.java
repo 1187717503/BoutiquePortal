@@ -4,7 +4,7 @@ import com.intramirror.product.api.model.SearchCondition;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
-import com.intramirror.web.common.Response;
+import com.intramirror.web.common.response.Response;
 import com.intramirror.web.common.StatusCode;
 import com.intramirror.web.controller.cache.CategoryCache;
 import java.util.HashMap;

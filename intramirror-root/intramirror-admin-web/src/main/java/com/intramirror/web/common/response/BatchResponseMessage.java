@@ -1,4 +1,4 @@
-package com.intramirror.web.common;
+package com.intramirror.web.common.response;
 
 import java.util.ArrayList;
 import java.util.List;
