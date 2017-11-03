@@ -123,7 +123,7 @@
                     product.season_code
                 </when>
                 <when test="orderBy == 'designIdAndColorCode'">
-                    contact(product.designer_id, product.color_code)
+                    CONCAT(product.designer_id, product.color_code)
                 </when>
                 <otherwise>
                     product.product_id

@@ -58,52 +58,17 @@
     <context:property-placeholder location="classpath:/commons.properties"/>
 
 
-    <!-- 配置转义符 -->
-    <bean id="fmXmlEscape" class="freemarker.template.utility.XmlEscape"/>
+    <!--    <bean id="authenticationInterceptor" class="com.intramirror.web.interceptor.AuthenticationInterceptor"/>
 
-    <bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
-        <description>freemarker config</description>
-        <property name="templateLoaderPath" value="/WEB-INF/views/"/>
-        <!-- 配置全局变量 -->
-        <property name="freemarkerVariables">
-            <map>
-                <entry key="xml_escape" value-ref="fmXmlEscape"/>
-                <entry key="css_suffix" value="${css_suffix}"/>
-                <entry key="js_suffix" value="${js_suffix}"/>
-                <entry key="baseUrl" value="${baseUrl}"/>
-                <entry key="jscssdate_format" value="yymmdd"></entry>
-            </map>
-        </property>
-    </bean>
+            <mvc:interceptors>
 
-    <!-- frremarker 视图解析 -->
-    <bean id="freemakerViewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
-        <property name="viewClass" value="org.springframework.web.servlet.view.freemarker.FreeMarkerView"/>
-        <property name="viewNames">
-            <array>
-                <value>*.ftl</value>
-            </array>
-        </property>
-        <property name="contentType" value="text/html; charset=utf-8"/>
-        <property name="exposeRequestAttributes" value="true"/>
-        <property name="exposeSessionAttributes" value="true"/>
-        <property name="exposeSpringMacroHelpers" value="true"/>
-        <property name="requestContextAttribute" value="request"/>
-        <property name="cache" value="true"/>
-        <property name="order" value="1"/>
-    </bean>
-
-    <bean id="authenticationInterceptor" class="com.intramirror.web.interceptor.AuthenticationInterceptor"/>
-
-    <!--    <mvc:interceptors>
-
-            <mvc:interceptor>
-                <mvc:mapping path="/**"/>
-                &lt;!&ndash;<mvc:exclude-mapping path="/user/register"/>&ndash;&gt;
-                <mvc:exclude-mapping path="/login"/>
-                <ref bean="authenticationInterceptor"/>
-            </mvc:interceptor>
-        </mvc:interceptors>-->
+                <mvc:interceptor>
+                    <mvc:mapping path="/**"/>
+                    &lt;!&ndash;<mvc:exclude-mapping path="/user/register"/>&ndash;&gt;
+                    <mvc:exclude-mapping path="/login"/>
+                    <ref bean="authenticationInterceptor"/>
+                </mvc:interceptor>
+            </mvc:interceptors>-->
 
 
     <mvc:cors>
