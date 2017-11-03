@@ -88,7 +88,7 @@ public class AtelierStockController {
         int minutes = (int) ((to - from)/(1000 * 60));
         int absMinutes = Math.abs(minutes);
 
-        if(absMinutes > 10 && absMinutes < 20) {
+        if(absMinutes > 15 && absMinutes < 25) {
             logger.info("AtelierStockControllerSetZero,true,today:"+timeFormat.format(today) +",lastDate:"+timeFormat.format(lastDate));
             return true;
         }
