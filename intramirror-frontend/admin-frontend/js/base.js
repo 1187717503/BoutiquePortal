@@ -1,6 +1,7 @@
 //var baseUrl="http://sha.staging.admin2.intramirror.com:8096/";
 var baseUrl = "http://test.admin.intramirror.com:8085/";
 // var baseUrl = "http://localhost:9999/";
+
 var requestURL = {
     "getBrand" : {"url":baseUrl + "product/filter/brand/list", "method": "GET"},
     "getVendor" : {"url":baseUrl + "vendor/select/queryAllVendor.htm", "method": "GET"},
