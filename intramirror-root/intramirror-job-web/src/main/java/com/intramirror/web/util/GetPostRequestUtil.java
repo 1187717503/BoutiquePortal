@@ -1,15 +1,23 @@
 package com.intramirror.web.util;
 
-import org.apache.log4j.Logger;
-import pk.shoplus.util.ExceptionUtils;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Iterator;
 import java.util.Map;
+import javax.xml.bind.DatatypeConverter;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.log4j.Logger;
+import pk.shoplus.util.ExceptionUtils;
 
 /**
  * Created by dingyifan on 2017/8/28.
@@ -165,11 +173,11 @@ public class GetPostRequestUtil{
         }
         return resultBuffer.toString();
     }
-    
-    
-    
-    
-    
+
+
+
+
+
     /**
     *
     * @param requestType
@@ -302,8 +310,8 @@ public class GetPostRequestUtil{
        }
        return resultBuffer.toString();
    }
-   
-   
+
+
 
     /**
      * 将map集合的键值对转化成：key1=value1&key2=value2 的形式
@@ -333,5 +341,31 @@ public class GetPostRequestUtil{
         }
         return parameterBuffer.toString();
     }
+
+    public String postAuth(String url,String username,String password) throws Exception{
+
+        DefaultHttpClient Client = new DefaultHttpClient();
+
+        HttpPost httpGet = new HttpPost(url);
+        String encoding = DatatypeConverter.printBase64Binary((username+":"+password).getBytes("UTF-8"));
+        httpGet.setHeader("Authorization", "Basic " + encoding);
+
+        HttpResponse response = Client.execute(httpGet);
+
+        System.out.println("response = " + response);
+
+        BufferedReader breader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+        StringBuilder responseString = new StringBuilder();
+        String line = "";
+        while ((line = breader.readLine()) != null) {
+            responseString.append(line);
+        }
+        breader.close();
+        String repsonseStr = responseString.toString();
+
+        System.out.println("repsonseStr = " + repsonseStr);
+        return repsonseStr;
+    }
+
 
 }
