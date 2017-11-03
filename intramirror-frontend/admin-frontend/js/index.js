@@ -179,6 +179,7 @@ function getProdcutList(status, pagesize, pageno) {
     $('#order-list').empty();
     $('.pagination').empty();
     $('.control-pannel').empty();
+    $("#order-head-cbx").prop('checked', false);
     
     let btnStatus = getBtnStatus(status);
     $("#tmpl-control-pannel").tmpl({list: btnStatus}).appendTo(".control-pannel");
@@ -210,7 +211,7 @@ function getProdcutList(status, pagesize, pageno) {
             getCountWithFilter(filter, status, pagesize, pageno);
         }, error: function(result, resp, par) {
             console.log(result);
-            Materialize.toast(result.responseJSON.message + " : "+ result.responseJSON.detail, 3000);
+            Materialize.toast(result.responseJSON.message, 3000);
             finishLoading();
 
             if (result.status == 401) {
@@ -270,7 +271,7 @@ function getCountWithFilter(filter, tarStatus, pagesize, pageno){
             updatePagination(tarStatus, pagesize, pageno, Math.ceil(nStatusCount/pagesize));
         }, error: function(result, resp, par) {
             console.log(result);
-            Materialize.toast(result.responseJSON.message + " : "+ result.responseJSON.detail, 3000);
+            Materialize.toast(result.responseJSON.message, 3000);
 
             if (result.status == 401) {
                 window.location.href = '../../login'
@@ -399,7 +400,7 @@ function getBtnStatus(status) {
         btnStatus.remove_from_shop = 1;
         btnStatus.on_sale = 1
     } else if (status === 'shopprocessing') {
-        btnStatus.process = 1;
+        btnStatus.approve = 1;
         btnStatus.remove = 1;
     } else if (status === 'shopremoved') {
         btnStatus.approve = 1;
@@ -417,6 +418,7 @@ function getBtnStatus(status) {
 function initActionEvent() {
 
     $('.batch-action').click(function() {
+        loading();
         let param = {};
         let action = $(this).data('action');
         param.originalState = $('.tabs .tab a.active').data('status');
@@ -449,11 +451,12 @@ function initActionEvent() {
                 }
 
                 getProdcutList(param.originalState, 25, 1);
+                finishLoading()
                 
             }, error: function(result, resp, par) {
                 console.log(result);
-                Materialize.toast(result.responseJSON.message + " : "+ result.responseJSON.detail, 3000);
-
+                Materialize.toast(result.responseJSON.message, 3000);
+                finishLoading()
                 if (result.status == 401) {
                     window.location.href = '../../login';
                 }
@@ -514,7 +517,7 @@ function initActionEvent() {
                 
             }, error: function(result, resp, par) {
                 console.log(result);
-                Materialize.toast(result.responseJSON.message + " : "+ result.responseJSON.detail, 3000);
+                Materialize.toast(result.responseJSON.message, 3000);
 
                 if (result.status == 401) {
                     window.location.href = '../../login';
