@@ -184,5 +184,19 @@ public class AtelierUpdateByProductService implements InitializingBean {
         JUL.put("vendor_name","Julian");
         JUL.put("eventName","julian");
         paramsMap.put("JUL",JUL);
+
+        Map<String,Object> ANDD = new HashMap<>();
+        ANDD.put("store_code","ANDD");
+        ANDD.put("vendor_id","29");
+        ANDD.put("vendor_name","and");
+        ANDD.put("eventName","and");
+        paramsMap.put("ANDD",ANDD);
+
+        Map<String,Object> DIVO = new HashMap<>();
+        DIVO.put("store_code","DIVO");
+        DIVO.put("vendor_id","28");
+        DIVO.put("vendor_name","divo");
+        DIVO.put("eventName","divo");
+        paramsMap.put("DIVO",DIVO);
     }
 }
