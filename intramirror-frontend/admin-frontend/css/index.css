@@ -186,6 +186,7 @@
 }
 .order-list.page-order .item.page-order:nth-child(13) {
     font-size: 20px;
+    color: #333;
 }
 
 
@@ -387,4 +388,21 @@
 
 .pagination li .select-wrapper input.select-dropdown {
     text-align: center;
+}
+
+.tabs {
+    font-size:12px;
+    letter-spacing: 0.5px;
+}
+
+
+.tabs .tab:nth-child(5),.tabs .tab:nth-child(6),
+.tabs .tab:nth-child(7),.tabs .tab:nth-child(8),.tabs .tab:nth-child(9) {
+    background-color: #0081bf;
+    height: 52px;
+}
+
+input[type=text].valid, input[type=text]:focus.valid {
+    border-bottom: 2px solid #871b55;
+    box-shadow: none;
 }

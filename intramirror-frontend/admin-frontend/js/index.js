@@ -3,7 +3,7 @@ if (!token) {
     token = localStorage.getItem('token');
 }
 
-// token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNjEiLCJpYXQiOjE1MDk4NjM1ODJ9.wBsNLPNJVLkR2bo9Qy7r1O_d7CUS9b2YV6oDb9xnmO27RUqvWbUeMKLL9J0scJh4mmUuSusT7QFjLuMlM48afQ";
+// token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNjEiLCJpYXQiOjE1MTAwMjIxNTZ9.L8kkiepG7qsauGkO5Lg85ut_Y8ztcX0Hxjp6F8lARhJ8nN_TpLgc34lCYmLd4EwltC-sjUYdk6UKA1oHKxyg0w";
 
 function initBrand() {
 
@@ -130,6 +130,7 @@ function getProdcutList(status, pageno) {
 
     if (pagesize == null) {
         pagesize = 25;
+        localStorage.setItem('product-page-size', 25);
     }
 
     let searchObj = getFilterFromDom();
@@ -219,15 +220,15 @@ function getProdcutList(status, pageno) {
             $('.orderby').each(function() {
                 if ($(this).find('.use-icon').data('order-col') == searchObj.orderByColmun) {
                     if (searchObj.orderByDesc == 1) {
-                        $(this).find('.use-icon').attr('xlink:href', '#icon-order-left');
+                        $(this).find('.use-icon').attr('xlink:href', '#icon-desc');
                         $(this).find('.use-icon').attr('data-order-desc', '1');
                     } else {
-                        $(this).find('.use-icon').attr('xlink:href', '#icon-order-left1');
+                        $(this).find('.use-icon').attr('xlink:href', '#icon-asc');
                         $(this).find('.use-icon').attr('data-order-desc', '0');
                     }
                     $(this).addClass('active');
                 } else {
-                    $(this).find('.use-icon').attr('xlink:href', '#icon-paixu-copy');
+                    $(this).find('.use-icon').attr('xlink:href', '#icon-default-order');
                 }
             })
 
@@ -413,11 +414,11 @@ function getBtnStatus(status) {
     let btnStatus = {};
     if (status === 'new') {
         btnStatus.approve = 1;
-        btnStatus.remove = 1;
+        btnStatus.trash = 1;
         btnStatus.process = 1;
     } else if (status === 'processing') {
         btnStatus.approve = 1;
-        btnStatus.remove = 1;
+        btnStatus.trash = 1;
     } else if (status === 'trash') {
         btnStatus.approve = 1;
         btnStatus.process = 1;
@@ -460,14 +461,14 @@ function initActionEvent() {
     $('.orderby').click(function() {
 
         var orderby = $(this).find('use').attr('xlink:href');
-        $('.orderby use').attr('xlink:href', '#icon-paixu-copy');
+        $('.orderby use').attr('xlink:href', '#icon-default-order');
         $('.orderby').removeClass('active');
 
-        if (orderby == '#icon-order-left1') {
-            $(this).find('use').attr('xlink:href', '#icon-order-left');
+        if (orderby == '#icon-asc') {
+            $(this).find('use').attr('xlink:href', '#icon-desc');
             $(this).find('.use-icon').attr('data-order-desc', '1');
         } else {
-            $(this).find('use').attr('xlink:href', '#icon-order-left1');
+            $(this).find('use').attr('xlink:href', '#icon-asc');
             $(this).find('.use-icon').attr('data-order-desc', '0');
         }
 

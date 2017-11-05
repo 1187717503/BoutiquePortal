@@ -183,14 +183,14 @@
                     <div class="col s12">
                         <ul class="tabs">
                             <li class="tab col"><a data-status="new" class="active" href="#"><div>NEW<span>(0)</span></div></a></li>
-                            <li class="tab col"><a data-status="processing" href="#"><div>PROCESSING<span>(0)</span></div></a></li>
-                            <li class="tab col"><a data-status="readytosell" href="#"><div>OK<span>(0)</span></div></a></li>
-                            <li class="tab col"><a data-status="shopprocessing" href="#"><div>SHOP_PROCESSING<span>(0)</span></div></a></li>
-                            <li class="tab col"><a data-status="shopreadytosell" href="#"><div>SHOP_READY<span>(0)</span></div></a></li>
-                            <li class="tab col"><a data-status="shopremoved" href="#"><div>SHOP_REMOVED<span>(0)</span></div></a></li>
-                            <li class="tab col"><a data-status="shoponsale" href="#"><div>SHOP_ONSALE<span>(0)</span></div></a></li>
-                            <li class="tab col"><a data-status="shopsoldout" href="#"><div>SHOP_SOLDOUT<span>(0)</span></div></a></li>
                             <li class="tab col"><a data-status="trash" href="#"><div>TRASH<span>(0)</span></div></a></li>
+                            <li class="tab col"><a data-status="processing" href="#"><div>PROCESSING<span>(0)</span></div></a></li>
+                            <li class="tab col"><a data-status="readytosell" href="#"><div>READY_TO_SELL<span>(0)</span></div></a></li>
+                            <li class="tab col"><a data-status="shopreadytosell" href="#"><div>SHOP_READY<span>(0)</span></div></a></li>
+                            <li class="tab col"><a data-status="shopprocessing" href="#"><div>SHOP_PROCESSING<span>(0)</span></div></a></li>
+                            <li class="tab col"><a data-status="shoponsale" href="#"><div>SHOP_ONSELL<span>(0)</span></div></a></li>
+                            <li class="tab col"><a data-status="shopsoldout" href="#"><div>SHOP_SOLDOUT<span>(0)</span></div></a></li>
+                            <li class="tab col"><a data-status="shopremoved" href="#"><div>SHOP_REMOVED<span>(0)</span></div></a></li>
                         </ul>
                     </div>
                 </div>
@@ -357,23 +357,23 @@ Scripts
         <div class="item style-scope page-order"><span class="mdi-hardware-keyboard-arrow-right head-hide-icon"></span></div>
         <div class="item style-scope page-order orderby">Designer ID-Color Code
             <svg class="icon" aria-hidden="true">
-                <use class="use-icon" xlink:href="#icon-paixu-copy" data-order-col="designIdAndColorCode"></use>
+                <use class="use-icon" xlink:href="#icon-default-order" data-order-col="designIdAndColorCode"></use>
             </svg>
         </div>
         <div class="item style-scope page-order">Brand</div>
         <div class="item style-scope page-order orderby">Boutique
             <svg class="icon" aria-hidden="true">
-                <use class="use-icon" xlink:href="#icon-paixu-copy" data-order-col="boutique"></use>
+                <use class="use-icon" xlink:href="#icon-default-order" data-order-col="boutique"></use>
             </svg>
         </div>
         <div class="item style-scope page-order orderby">Boutique ID
             <svg class="icon" aria-hidden="true">
-                <use class="use-icon" xlink:href="#icon-paixu-copy" data-order-col="boutiqueId"></use>
+                <use class="use-icon" xlink:href="#icon-default-order" data-order-col="boutiqueId"></use>
             </svg>
         </div>
         <div class="item style-scope page-order orderby">Season
             <svg class="icon" aria-hidden="true">
-                <use class="use-icon" xlink:href="#icon-paixu-copy" data-order-col="season"></use>
+                <use class="use-icon" xlink:href="#icon-default-order" data-order-col="season"></use>
             </svg>
         </div>
         <div class="item style-scope page-order">Category</div>
@@ -421,25 +421,53 @@ Scripts
         {%/if%}
         <div class="item style-scope page-order action" data-product-id="${order.product_id}" data-shop-product-id="${order.shop_product_id}">
             {%if action.process == 1 %}
-            <span title="processing" data-action="process" class="waves-effect mdi-action-settings icon-btn-processing action-icon"></span>
+            <span title="Processing" data-action="process" class="waves-effect icon-btn-processing action-icon">
+                <svg class="icon" aria-hidden="true">
+                    <use class="use-icon" xlink:href="#icon-process"></use>
+                </svg>
+            </span>
             {%/if%}
             {%if action.approve == 1 %}
-            <span title="approve" data-action="approve" class="waves-effect mdi-action-done icon-btn-approve action-icon"></span>
+            <span title="Approve" data-action="approve" class="waves-effect icon-btn-approve action-icon">
+                <svg class="icon" aria-hidden="true">
+                    <use class="use-icon" xlink:href="#icon-approve"></use>
+                </svg>
+            </span>
             {%/if%}
             {%if action.add_to_shop == 1 %}
-            <span title="add to shop" data-action="addtoshop" class="waves-effect mdi-content-add action-icon"></span>
+            <span title="Add To Shop" data-action="addtoshop" class="waves-effect mdi-content-add action-icon"></span>
             {%/if%}
             {%if action.remove_from_shop == 1 %}
             <span title="remove from shop" data-action="removefromshop" class="waves-effect mdi-content-remove action-icon"></span>
             {%/if%}
             {%if action.off_sale == 1 %}
-            <span title="off sale" data-action="offsale" class="waves-effect mdi-hardware-keyboard-arrow-down action-icon"></span>
+            <span title="Off Sale" data-action="offsale" class="waves-effect action-icon">
+                <svg class="icon" aria-hidden="true">
+                    <use class="use-icon" xlink:href="#icon-off-sell"></use>
+                </svg>
+            </span>
             {%/if%}
             {%if action.on_sale == 1 %}
-            <span title="on sale" data-action="onsale" class="waves-effect mdi-hardware-keyboard-arrow-up action-icon"></span>
+            <span title="On Sale" data-action="onsale" class="waves-effect action-icon">
+                <svg class="icon" aria-hidden="true">
+                    <use class="use-icon" xlink:href="#icon-on-sell"></use>
+                </svg>
+            </svg>
+            </span>
             {%/if%}
             {%if action.remove == 1 %}
-            <span title="trash" data-action="remove" class="waves-effect mdi-action-delete icon-btn-delete action-icon"></span>
+            <span title="Remove" data-action="remove" class="waves-effect icon-btn-delete action-icon">
+                <svg class="icon" aria-hidden="true">
+                    <use class="use-icon" xlink:href="#icon-shop-remove"></use>
+                </svg>
+            </span>
+            {%/if%}
+            {%if action.trash == 1 %}
+            <span title="Trash" data-action="remove" class="waves-effect icon-btn-delete action-icon">
+                <svg class="icon" aria-hidden="true">
+                    <use class="use-icon" xlink:href="#icon-trash"></use>
+                </svg>
+            </span>
             {%/if%}
 
         </div>
@@ -483,11 +511,15 @@ Scripts
     </li>
     
     {%if page.currPage <= 1 %}
-    <li class="disabled"><a href="#!"><i class="mdi-av-skip-previous"></i></a></li>
-    <li class="disabled"><a href="#!"><i class="mdi-navigation-chevron-left"></i></a></li>
+    <li class="disabled">
+        <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-first-page"></use> </svg> </a> </li>
+    <li class="disabled">
+        <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-left"></use> </svg> </a> </li>
     {%else%}
-    <li class="waves-effect pagination-index" data-pageno="0"><a href="#!"><i class="mdi-av-skip-previous"></i></a></li>
-    <li class="waves-effect pagination-index" data-pageno="${page.currPage-2}"><a href="#!"><i class="mdi-navigation-chevron-left"></i></a></li>
+    <li class="waves-effect pagination-index" data-pageno="0">
+        <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-first-page"></use> </svg> </a> </li>
+    <li class="waves-effect pagination-index" data-pageno="${page.currPage-2}">
+        <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-left"></use> </svg> </a> </li>
     {%/if%}
     {%each(i, pageInfo) page.list%}
         {%if pageInfo.active %}
@@ -498,12 +530,17 @@ Scripts
     {%/each%}
 
     {%if page.currPage <= page.totalPage - 1 %}
-    <li class="waves-effect pagination-index" data-pageno="${page.currPage}"><a href="#!"><i class="mdi-navigation-chevron-right"></i></a></li>
-    <li class="waves-effect pagination-index" data-pageno="${page.totalPage - 1}"><a href="#!"><i class="mdi-av-skip-next"></i></a></li>
+    <li class="waves-effect pagination-index" data-pageno="${page.currPage}">
+        <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-right"></use> </svg> </a>
+    </li>
+    <li class="waves-effect pagination-index" data-pageno="${page.totalPage - 1}">
+        <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-last-page"></use> </svg> </a> </li>
     {%else%}
-    <li class="disabled"><a href="#!"><i class="mdi-navigation-chevron-right"></i></a></li>
-    <li class="disabled"><a href="#!"><i class="mdi-av-skip-next"></i></a></li>
-    {%/if%}
+    <li class="disabled">
+        <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-right"></use> </svg> </a>
+    </li>
+    <li class="disabled">
+        <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-last-page"></use> </svg> </a></li> {%/if%}
 
 </script>
 
