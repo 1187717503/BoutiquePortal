@@ -75,16 +75,40 @@ public class ProductMgntController {
         searchCondition.setStock(stock);
         searchCondition.setStreetImage(streetImage);
         List<Map<String, Object>> countList = productManagementService.listAllProductCountGounpByState(searchCondition);
-        Map<StateEnum, Long> productStateCountList = new HashMap<>();
+        Map<StateEnum, Long> productStateCountMap = initiateCountMap();
         for (Map<String, Object> item : countList) {
             StateEnum stateEnum = StateMachineCoreRule.map2StateEnum(item);
             if (stateEnum == null) {
                 LOGGER.error("Unknown product state : {}", item);
                 continue;
             }
-            productStateCountList.put(stateEnum, Long.parseLong(item.get("count").toString()));
+            productStateCountMap.put(stateEnum, Long.parseLong(item.get("count").toString()));
         }
-        return Response.status(StatusCode.SUCCESS).data(productStateCountList);
+        mergeOldState(productStateCountMap);
+        return Response.status(StatusCode.SUCCESS).data(productStateCountMap);
+    }
+
+    private Map<StateEnum, Long> initiateCountMap() {
+        Map<StateEnum, Long> productStateCountMap = new HashMap<>();
+        for (StateEnum stateEnum : StateEnum.values()) {
+            productStateCountMap.put(stateEnum, 0L);
+        }
+        return productStateCountMap;
+    }
+
+    private void mergeOldState(Map<StateEnum, Long> productStateCountMap) {
+        Long countOldProcessing = productStateCountMap.get(StateEnum.OLD_PROCESSING);
+        Long countProcessing = productStateCountMap.get(StateEnum.PROCESSING);
+        Long countOldShopProcessing = productStateCountMap.get(StateEnum.OLD_SHOP_PROCESSING);
+        Long countShopProcessing = productStateCountMap.get(StateEnum.SHOP_PROCESSING);
+        countOldProcessing = countOldProcessing == null ? 0 : countOldProcessing;
+        countProcessing = countProcessing == null ? 0 : countProcessing;
+        countOldShopProcessing = countOldShopProcessing == null ? 0 : countOldShopProcessing;
+        countShopProcessing = countShopProcessing == null ? 0 : countShopProcessing;
+        productStateCountMap.put(StateEnum.PROCESSING, countProcessing + countOldProcessing);
+        productStateCountMap.put(StateEnum.SHOP_PROCESSING, countOldShopProcessing + countShopProcessing);
+        productStateCountMap.remove(StateEnum.OLD_PROCESSING);
+        productStateCountMap.remove(StateEnum.OLD_SHOP_PROCESSING);
     }
 
     @GetMapping(value = "/list/{status}")

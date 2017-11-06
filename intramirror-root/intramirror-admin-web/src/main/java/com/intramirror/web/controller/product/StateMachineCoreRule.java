@@ -33,7 +33,7 @@ public class StateMachineCoreRule {
         Map<OperationEnum, StateEnum> trashOperationMap = new EnumMap<>(OperationEnum.class);
         stateCoreRule.put(StateEnum.TRASH, trashOperationMap);
         trashOperationMap.put(OperationEnum.APPROVE, StateEnum.READY_TO_SELL);
-        trashOperationMap.put(OperationEnum.PROCESS, StateEnum.PROCESSING);
+        //trashOperationMap.put(OperationEnum.PROCESS, StateEnum.PROCESSING);
 
         Map<OperationEnum, StateEnum> readyToSellOperationMap = new EnumMap<>(OperationEnum.class);
         stateCoreRule.put(StateEnum.READY_TO_SELL, readyToSellOperationMap);

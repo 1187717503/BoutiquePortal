@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -219,7 +220,8 @@ public class StateMachineController {
         Map<Long, Long> idsMap = new HashMap<>();
         for (Map<String, Object> ids : idsList) {
             Long productId = Long.parseLong(ids.get("productId").toString());
-            Long shopProductId = ids.get("shopProductId") == null ? null : Long.parseLong(ids.get("shopProductId").toString());
+            Long shopProductId = (ids.get("shopProductId") == null || StringUtils.isEmpty(ids.get("shopProductId").toString())) ? null : Long.parseLong(
+                    ids.get("shopProductId").toString());
             idsMap.put(productId, shopProductId);
         }
         return idsMap;
