@@ -1,7 +1,9 @@
 package com.intramirror.web.controller.product;
 
 import com.intramirror.common.parameter.StatusType;
+import com.intramirror.product.api.model.Sku;
 import com.intramirror.product.api.service.ISkuStoreService;
+import com.intramirror.product.api.service.SkuService;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
 import com.intramirror.web.Exception.ErrorResponse;
 import com.intramirror.web.Exception.ValidateException;
@@ -41,6 +43,9 @@ public class StateMachineController {
     @Autowired
     private ISkuStoreService iSkuStoreService;
 
+    @Autowired
+    private SkuService skuService;
+
     @PutMapping(value = "/single/{action}", consumes = "application/json")
     public Response operateProduct(@PathVariable(value = "action") String action, @RequestBody Map<String, Object> body) {
         Long productId = Long.parseLong(body.get("productId").toString());
@@ -48,6 +53,13 @@ public class StateMachineController {
         Map<String, Object> currentState = productManagementService.getProductStateByProductId(productId);
         LOGGER.info("[{}] product with [{}]", action, currentState);
         StateMachineCoreRule.validate(currentState, action);
+        StateEnum originalState = map2StateEnum(currentState);
+        if ((originalState == StateEnum.TRASH || originalState == StateEnum.NEW) && ProductStateOperationMap.getOperation(action) != OperationEnum.REMOVE) {
+            List<Sku> skuList = skuService.listSkuInfoByProductId(productId);
+            if (skuList.size() <= 0) {
+                throw new ValidateException(new ErrorResponse("Sku hasn't created."));
+            }
+        }
         updateProductState(currentState, action, productId, shopProductId);
         return Response.success();
     }
@@ -103,30 +115,31 @@ public class StateMachineController {
             throw new ValidateException(new ErrorResponse("Unkown original state : " + body.get("originalState").toString()));
         }
         StateMachineCoreRule.validate(originalState, action);
+        OperationEnum operation = ProductStateOperationMap.getOperation(action);
 
         BatchResponseMessage responseMessage = new BatchResponseMessage();
-        Map<Long, Long> validIdsMap = batchValidate(originalState, (List) body.get("ids"), action, responseMessage);
-
+        Map<Long, Long> validIdsMap = batchValidate(originalState, (List) body.get("ids"), operation, responseMessage);
+        validIdsMap = batchFilterIncompleteProductIds(originalState, validIdsMap, operation, responseMessage);
         batchUpdateProductState(originalState, action, validIdsMap, responseMessage);
 
         return Response.status(StatusType.SUCCESS).data(responseMessage);
     }
 
-    private Map<Long, Long> batchValidate(StateEnum originalState, List<Map<String, Object>> idsList, String action, BatchResponseMessage responseMessage) {
+    private Map<Long, Long> batchValidate(StateEnum originalState, List<Map<String, Object>> idsList, OperationEnum operation,
+            BatchResponseMessage responseMessage) {
         Map<Long, Long> idsMap = listMap2Map(idsList);
 
         List<Map<String, Object>> stateList = productManagementService.listProductStateByProductIds(new LinkedList<Long>(idsMap.keySet()));
         for (Map<String, Object> state : stateList) {
             StateEnum productState = map2StateEnum(state);
             Long productId = Long.parseLong(state.get("product_id").toString());
-            //Long shopProductId = state.get("shop_product_id") == null ? null : Long.parseLong(state.get("shop_product_id").toString());
             Long shopProductId = idsMap.get(productId);
             if (productState == null) {
                 responseMessage.getFailed().add(new BatchResponseItem(productId, shopProductId, "Unknown state : " + state.toString()));
                 idsMap.remove(productId);
                 continue;
             }
-            if (isStateSame(productState, originalState)) {
+            if (!isStateSame(productState, originalState)) {
                 responseMessage.getFailed().add(new BatchResponseItem(productId, shopProductId, "Product has changed to : " + productState.name()));
                 idsMap.remove(productId);
                 continue;
@@ -143,8 +156,31 @@ public class StateMachineController {
                 }
                 continue;
             }
+
         }
         return idsMap;
+    }
+
+    private Map<Long, Long> batchFilterIncompleteProductIds(StateEnum originalState, Map<Long, Long> validIdsMap, OperationEnum operation,
+            BatchResponseMessage responseMessage) {
+        if (validIdsMap.size() <= 0) {
+            return validIdsMap;
+        }
+        if ((originalState == StateEnum.TRASH || originalState == StateEnum.NEW) && operation != OperationEnum.REMOVE) {
+            List<Long> productIds = new LinkedList<>(validIdsMap.keySet());
+            List<Sku> skuList = skuService.listSkuInfoByProductIds(productIds);
+            Map<Long, Sku> skuMap = new HashMap<>();
+            for (Sku sku : skuList) {
+                skuMap.put(sku.getProductId(), sku);
+            }
+            for (Long productId : productIds) {
+                if (!skuMap.containsKey(productId)) {
+                    validIdsMap.remove(productId);
+                    responseMessage.getFailed().add(new BatchResponseItem(productId, null, "Sku hasn't created."));
+                }
+            }
+        }
+        return validIdsMap;
     }
 
     private boolean isStateSame(StateEnum actual, StateEnum original) {
@@ -166,12 +202,17 @@ public class StateMachineController {
         StateEnum newStateEnum = StateMachineCoreRule.getNewState(currentStateEnum, operation);
 
         LOGGER.info("Product [{}] Start [{}] -> [{}] -> [{}]", idsMapToString(validIdsMap), currentStateEnum.name(), operation.name(), newStateEnum.name());
-        if (operation == OperationEnum.ON_SALE) {
+        if (currentStateEnum == StateEnum.NEW || currentStateEnum == StateEnum.TRASH) {
+            //            if()
+        }
+
+        if (/*currentStateEnum == StateEnum.SHOP_READY_TO_SELL &&*/ operation == OperationEnum.ON_SALE) {
             Map<Long, Long> outOfStockMap = batchCheckInStock(validIdsMap);
             LOGGER.info("Out of stock : change Product [{}] as Start [{}] -> [{}] -> [{}]", idsMapToString(outOfStockMap), currentStateEnum.name(),
                     operation.name(), newStateEnum.name());
             batchUpdateProcess(currentStateEnum, StateEnum.SHOP_SOLD_OUT, outOfStockMap, responseMessage);
-        }
+        } //else ?
+
         batchUpdateProcess(currentStateEnum, newStateEnum, validIdsMap, responseMessage);
         LOGGER.info("Product: [{}]  [{}] -> [{}] -> [{}] SUCCESSFUL", idsMapToString(validIdsMap), currentStateEnum.name(), operation.name(),
                 newStateEnum.name());
