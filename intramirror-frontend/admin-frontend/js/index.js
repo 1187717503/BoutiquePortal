@@ -530,7 +530,7 @@ function initActionEvent() {
                     }
                     Materialize.toast(msg, 3000);
                 } else {
-                    Materialize.toast(action + ' success', 3000);
+                    Materialize.toast(getActionMessage(action) + ' success', 3000);
                 }
 
                 getProdcutList(param.originalState, 1);
