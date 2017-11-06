@@ -9,6 +9,8 @@ import com.intramirror.web.thread.CommonThreadPool;
 import com.intramirror.web.thread.UpdateProductThread;
 import com.intramirror.web.util.ApiDataFileUtils;
 import com.intramirror.web.util.GetPostRequestUtil;
+import com.intramirror.web.util.HttpUtils;
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.service.RedisService;
-import pk.shoplus.service.request.impl.GetPostRequestService;
 
 /**
  * Created by dingyifan on 2017/11/1.
@@ -76,14 +77,18 @@ public class ColtoriUpdateByProductController implements InitializingBean {
             get_product_url = get_product_url+"?access_token="+access_token+"&expires_in="+expires_in;
 
             if(!name.contains("all")) {
-                String today = DateUtils.getTimeByHour(0);
-                String tomorrow = DateUtils.getTimeByHour(-24);
-                get_product_url = get_product_url+"&since_updated_at="+today+"&tomorrow="+tomorrow;
+                String since_updated_at = URLEncoder.encode(DateUtils.getTimeByMinute(3600),"utf-8");
+                String until_updated_at = URLEncoder.encode(DateUtils.getTimeByMinute(0),"utf-8");
+                get_product_url = get_product_url+"&since_updated_at="+ since_updated_at+"&until_updated_at="+until_updated_at;
             }
 
             logger.info("ColtoriUpdateByProductController,requestMethod,start,get_product_url:"+get_product_url);
-            String responseData = getPostRequestUtil.requestMethod(GetPostRequestService.HTTP_GET,get_product_url,null);
+            String responseData = HttpUtils.httpGet(get_product_url);
             logger.info("ColtoriUpdateByProductController,requestMethod,end,get_product_url:"+get_product_url+",responseData:"+responseData);
+
+            if(StringUtils.isNotBlank(responseData) && responseData.contains("no results matching your query")) {
+                return null;
+            }
 
             ProductEDSManagement.VendorOptions vendorOptions = new ProductEDSManagement.VendorOptions();
             vendorOptions.setVendorId(vendor_id);
