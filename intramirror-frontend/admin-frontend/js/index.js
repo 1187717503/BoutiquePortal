@@ -177,7 +177,7 @@ function getProdcutList(status, pageno) {
     if (pageno) {
         filter += 'pageNo='+ pageno + '&';
     }
-
+    filter += 'stock=' + searchObj.stock + '&'
     filter += 'image='+ searchObj.image + '&';
     filter += 'modelImage='+ searchObj.modelImage + '&';
     filter += 'streetImage='+ searchObj.streetImage + '&';
