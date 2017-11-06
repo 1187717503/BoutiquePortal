@@ -80,7 +80,7 @@
 
             </when>
             <when test="image == 1">
-                AND (product.cover_img IS NOT NULL AND product.description_img != NULL )
+                AND (product.cover_img IS NOT NULL AND product.description_img IS NOT NULL )
             </when>
             <otherwise>
                 AND (product.cover_img IS NULL OR product.description_img IS NULL )
@@ -131,7 +131,7 @@
                     CONCAT(product.designer_id, product.color_code)
                 </when>
                 <otherwise>
-                    product.product_id
+                    product.updated_at
                 </otherwise>
             </choose>
             <if test="desc == 1">
@@ -198,7 +198,7 @@
             INNER JOIN vendor ON product.vendor_id = vendor.vendor_id AND vendor.enabled = TRUE
         </if>
         <if test="stock != null and stock != 0">
-            INNER JOIN view_prod_store_sum ON view_prod_store_sum.product_id = product.product_id
+            LEFT JOIN view_prod_store_sum ON view_prod_store_sum.product_id = product.product_id
         </if>
         WHERE product.enabled = TRUE
         <choose>
@@ -235,7 +235,7 @@
 
             </when>
             <when test="image == 1">
-                AND (product.cover_img IS NOT NULL AND product.description_img != NULL )
+                AND (product.cover_img IS NOT NULL AND product.description_img IS NOT NULL )
             </when>
             <otherwise>
                 AND (product.cover_img IS NULL OR product.description_img IS NULL )
@@ -270,29 +270,6 @@
             AND product.color_code = #{colorCode}
         </if>
 
-        <if test="orderBy != null">
-            ORDER BY
-            <choose>
-                <when test="orderBy == 'boutique'">
-                    vendor.vendor_name
-                </when>
-                <when test="orderBy == 'boutiqueId'">
-                    product.product_code
-                </when>
-                <when test="orderBy == 'season'">
-                    product.season_code
-                </when>
-                <when test="orderBy == 'designIdAndColorCode'">
-                    CONCAT(product.designer_id, product.color_code)
-                </when>
-                <otherwise>
-                    product.product_id
-                </otherwise>
-            </choose>
-            <if test="desc == 1">
-                DESC
-            </if>
-        </if>
         GROUP BY product.status, shop_product.status;
     </select>
 
