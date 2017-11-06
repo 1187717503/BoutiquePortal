@@ -514,9 +514,9 @@ function initActionEvent() {
                 if (result.data.failed.length > 0) {
                     let msg = '';
                     for (var i = 0; i < result.data.failed.length; i++) {
-                        msg += result.data.failed[i].productId + ', ';
+                        msg += "[" + result.data.failed[i].productId + "] : " + result.data.failed[i].message + "<br/>";
                     }
-                    Materialize.toast(msg + ' failed', 3000);
+                    Materialize.toast(msg, 3000);
                 } else {
                     Materialize.toast(action + ' success', 3000);
                 }
