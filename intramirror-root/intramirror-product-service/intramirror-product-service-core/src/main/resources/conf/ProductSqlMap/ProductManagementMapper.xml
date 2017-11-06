@@ -80,10 +80,10 @@
 
             </when>
             <when test="image == 1">
-                AND (product.cover_img IS NOT NULL AND product.description_img IS NOT NULL )
+                AND (product.cover_img != "" AND product.description_img != "" )
             </when>
             <otherwise>
-                AND (product.cover_img IS NULL OR product.description_img IS NULL )
+                AND (product.cover_img = "" OR product.description_img = "" )
             </otherwise>
         </choose>
         <choose>
@@ -116,26 +116,24 @@
         </if>
 
         ORDER BY
-        <if test="orderBy != null">
-            <choose>
-                <when test="orderBy == 'boutique'">
-                    vendor.vendor_name
-                </when>
-                <when test="orderBy == 'boutiqueId'">
-                    product.product_code
-                </when>
-                <when test="orderBy == 'season'">
-                    product.season_code
-                </when>
-                <when test="orderBy == 'designIdAndColorCode'">
-                    CONCAT(product.designer_id, product.color_code)
-                </when>
-                <otherwise>
+        <choose>
+            <when test="orderBy == 'boutique'">
+                vendor.vendor_name
+            </when>
+            <when test="orderBy == 'boutiqueId'">
+                product.product_code
+            </when>
+            <when test="orderBy == 'season'">
+                product.season_code
+            </when>
+            <when test="orderBy == 'designIdAndColorCode'">
+                CONCAT(product.designer_id, product.color_code)
+            </when>
+            <otherwise>
+                product.updated_at
+            </otherwise>
+        </choose>
 
-                </otherwise>
-            </choose>
-        </if>
-        product.updated_at
         <if test="desc == 1 or desc == null">
             DESC
         </if>
