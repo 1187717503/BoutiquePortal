@@ -1,6 +1,6 @@
 package com.intramirror.web.Exception;
 
-import com.intramirror.web.common.StatusCode;
+import com.intramirror.common.parameter.StatusType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -50,7 +50,7 @@ public class ExceptionController {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleException(Exception e) {
         LOGGER.error("Unexcepted exception: \n", e);
-        ErrorResponse errorResponse = new ErrorResponse(StatusCode.FAILURE, "Unexcepted exception");
+        ErrorResponse errorResponse = new ErrorResponse(StatusType.FAILURE, "Unexcepted exception");
         errorResponse.setDetail(e.getMessage());
         return errorResponse;
     }
