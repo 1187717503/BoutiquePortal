@@ -183,7 +183,7 @@ public class XmagSynProductAllMapper implements IProductMapping {
         	productOptions.setSkus(skus);
         }
 
-		productOptions.setColorCode(productOptions.getCode()+"_"+productOptions.getColorCode());
+		productOptions.setCode(productOptions.getCode()+"_"+productOptions.getColorCode());
         logger.info(" productOptions filippo : " + new Gson().toJson(productOptions));
 //		productOptions.setCategoryId("1646");
 //		productOptions.setBrandName("Gucci");
