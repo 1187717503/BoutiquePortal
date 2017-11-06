@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.intramirror.common.help.ExceptionUtils;
 import com.intramirror.common.help.StringUtils;
 import com.intramirror.common.utils.DateUtils;
+import com.intramirror.web.contants.RedisKeyContants;
 import com.intramirror.web.mapping.api.IProductMapping;
 import com.intramirror.web.thread.CommonThreadPool;
 import com.intramirror.web.thread.UpdateProductThread;
@@ -65,20 +66,24 @@ public class ColtoriUpdateByProductController implements InitializingBean {
             Long vendor_id = Long.parseLong(paramMap.get("vendor_id").toString());
             String eventName = paramMap.get("eventName").toString();
 
-            // get token
-            logger.info("ColtoriUpdateByProductController,postAuth,start,get_token_url:"+get_token_url+",username:"+username+",password:"+password);
-            String getTokenResponse = getPostRequestUtil.postAuth(get_token_url,username,password);
-            logger.info("ColtoriUpdateByProductController,postAuth,end,get_token_url:"+get_token_url+",username:"+username+",password:"+password+",getTokenResponse:"+getTokenResponse);
+            String ct_token_url = redisService.getKey(RedisKeyContants.ct_token_url);
+            if(name.contains("all")) {
+                // get token
+                logger.info("ColtoriUpdateByProductController,postAuth,start,get_token_url:"+get_token_url+",username:"+username+",password:"+password);
+                String getTokenResponse = getPostRequestUtil.postAuth(get_token_url,username,password);
+                logger.info("ColtoriUpdateByProductController,postAuth,end,get_token_url:"+get_token_url+",username:"+username+",password:"+password+",getTokenResponse:"+getTokenResponse);
 
-            JSONObject toKenObject = JSONObject.fromObject(getTokenResponse);
-            String access_token = toKenObject.getString("access_token");
-            String expires_in = toKenObject.getString("expires_in");
+                JSONObject toKenObject = JSONObject.fromObject(getTokenResponse);
+                String access_token = toKenObject.getString("access_token");
+                String expires_in = toKenObject.getString("expires_in");
+                ct_token_url = "?access_token="+access_token+"&expires_in="+expires_in ;
+                redisService.setKey(RedisKeyContants.ct_token_url,ct_token_url);
+            }
 
-            get_product_url = get_product_url+"?access_token="+access_token+"&expires_in="+expires_in;
-
+            get_product_url = get_product_url+ct_token_url;
             if(!name.contains("all")) {
-                String since_updated_at = URLEncoder.encode(DateUtils.getTimeByMinute(3600),"utf-8");
-                String until_updated_at = URLEncoder.encode(DateUtils.getTimeByMinute(0),"utf-8");
+                String since_updated_at = URLEncoder.encode(DateUtils.getTimeByMinute(5));
+                String until_updated_at = URLEncoder.encode(DateUtils.getTimeByMinute(0));
                 get_product_url = get_product_url+"&since_updated_at="+ since_updated_at+"&until_updated_at="+until_updated_at;
             }
 

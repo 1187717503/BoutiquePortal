@@ -1,6 +1,6 @@
 package com.intramirror.web.controller.file;
 
-import com.alibaba.fastjson15.JSONObject;
+import com.alibaba.fastjson.JSONObject;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.web.mapping.api.IProductMapping;
 import com.intramirror.web.mapping.api.IStockMapping;
