@@ -84,6 +84,7 @@ public class AtelierUpdateByProductMapping implements IProductMapping{
             if(categoryMaps != null && categoryMaps.size() >0){
                 productOptions.setCategoryId(categoryMaps.get(0).get("category_id").toString());
             }
+            if(conn != null) {conn.close();}
 
             if(StringUtils.isBlank(productOptions.getCategoryId()) && StringUtils.isBlank(jsonObjectData.getString("category_id"))) {
                 String category_l1 = jsonObjectData.getString("category_l1")==null?"":jsonObjectData.getString("category_l1");
