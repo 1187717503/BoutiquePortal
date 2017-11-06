@@ -115,8 +115,8 @@
             AND product.color_code = #{colorCode}
         </if>
 
+        ORDER BY
         <if test="orderBy != null">
-            ORDER BY
             <choose>
                 <when test="orderBy == 'boutique'">
                     vendor.vendor_name
@@ -131,14 +131,14 @@
                     CONCAT(product.designer_id, product.color_code)
                 </when>
                 <otherwise>
-                    product.updated_at
+
                 </otherwise>
             </choose>
-            <if test="desc == 1">
-                DESC
-            </if>
         </if>
-
+        product.updated_at
+        <if test="desc == 1 or desc == null">
+            DESC
+        </if>
         LIMIT #{start}, #{count};
     </select>
 
