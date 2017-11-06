@@ -275,6 +275,9 @@ Scripts
 <script id="tmpl-category-menu" type="text/x-jquery-tmpl">
     <div class="multi-menu">
         <ul>
+            <li>
+                <span class="name" data-category-id="-1" data-display-name="Category">Category</span>
+            </li>
             {%each(i, category) list%}
             {%if category.children.length == 0%}
             <li>
@@ -422,7 +425,7 @@ Scripts
         {%/if%}
         <div class="item style-scope page-order action" data-product-id="${order.product_id}" data-shop-product-id="${order.shop_product_id}">
             {%if action.process == 1 %}
-            <span title="Processing" data-action="process" class="waves-effect icon-btn-processing action-icon">
+            <span title="Process" data-action="process" class="waves-effect icon-btn-processing action-icon">
                 <svg class="icon" aria-hidden="true">
                     <use class="use-icon" xlink:href="#icon-process"></use>
                 </svg>
@@ -439,7 +442,7 @@ Scripts
             <span title="Add To Shop" data-action="addtoshop" class="waves-effect mdi-content-add action-icon"></span>
             {%/if%}
             {%if action.remove_from_shop == 1 %}
-            <span title="remove from shop" data-action="removefromshop" class="waves-effect mdi-content-remove action-icon"></span>
+            <span title="Remove from shop" data-action="removefromshop" class="waves-effect mdi-content-remove action-icon"></span>
             {%/if%}
             {%if action.off_sale == 1 %}
             <span title="Off Sale" data-action="offsale" class="waves-effect action-icon">
@@ -470,7 +473,6 @@ Scripts
                 </svg>
             </span>
             {%/if%}
-
         </div>
     </div>
     <div class="goods show-detail">

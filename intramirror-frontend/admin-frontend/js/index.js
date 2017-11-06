@@ -409,6 +409,18 @@ function updatePagination(status, pagesize, pageno, totalsize) {
     })
 }
 
+function getActionMessage(action) {
+    let actionDesc = {
+        "process":"Process",
+        "approve":"Approve",
+        "addtoshop":"Add to shop",
+        "removefromshop": "Remove from shop",
+        "offsale": "Off sale",
+        "onsale": "On sale",
+        "remove": "Remove"
+    };
+    return actionDesc[action];
+}
 
 function getBtnStatus(status) {
     let btnStatus = {};
@@ -582,7 +594,7 @@ function initActionEvent() {
             success: function(result) {
                 let status = $('.tabs .tab a.active').data('status');
                 
-                Materialize.toast(action + ' success', 3000);
+                Materialize.toast(getActionMessage(action) + ' success', 3000);
                 getProdcutList(status, 1);
                 
             }, error: function(result, resp, par) {
