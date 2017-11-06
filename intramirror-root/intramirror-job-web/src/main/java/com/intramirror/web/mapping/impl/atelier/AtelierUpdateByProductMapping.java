@@ -75,7 +75,7 @@ public class AtelierUpdateByProductMapping implements IProductMapping{
                 productOptions.getSkus().add(sku);
             }
 
-            conn = DBConnector.sql2o.open();
+            conn = DBConnector.sql2o.beginTransaction();
             MappingCategoryService mappingCategoryService = new MappingCategoryService(conn);
             String vendor_id = bodyDataMap.get("vendor_id").toString();
             logger.info("AtelierUpdateByProductMapping,getMappingCategoryInfoByCondition,start,vendor_id:"+vendor_id+",productOptions:"+JSONObject.toJSONString(productOptions));
