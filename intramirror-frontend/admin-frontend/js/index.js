@@ -211,6 +211,48 @@ function getProdcutList(status, pageno) {
                         result.data[i].display_img = obj[0];
                     }
                 }
+
+                if (!result.data[i].retail_price) {
+                    result.data[i].retail_price = '-';
+                } else {
+                    result.data[i].retail_price = result.data[i].retail_price.toFixed(2);
+                }
+
+                if (!result.data[i].boutique_price) {
+                    result.data[i].boutique_price = '-';
+                } else {
+                    result.data[i].boutique_price = result.data[i].boutique_price.toFixed(2);
+                }
+
+                if (!result.data[i].im_price) {
+                    result.data[i].im_price = '-';
+                } else {
+                    result.data[i].im_price = result.data[i].im_price.toFixed(2);
+                }
+
+                if (!result.data[i].sale_price) {
+                    result.data[i].sale_price = '-';
+                } else {
+                    result.data[i].sale_price = result.data[i].sale_price.toFixed(2);
+                }
+
+                if (!result.data[i].boutique_discount) {
+                    result.data[i].boutique_discount = '';
+                } else {
+                    result.data[i].boutique_discount = Math.round(result.data[i].boutique_discount * 100) + '%';
+                }
+
+                if (!result.data[i].im_discount) {
+                    result.data[i].im_discount = '';
+                } else {
+                    result.data[i].im_discount = Math.round(result.data[i].im_discount * 100) + '%';
+                }
+                
+                if (!result.data[i].sale_discount) {
+                    result.data[i].sale_discount = '';
+                } else {
+                    result.data[i].sale_discount = Math.round(result.data[i].sale_discount * 100) + '%';
+                }
             }
 
             $("#tmpl-order-list").tmpl({list: result.data, tab_status: status, action: btnStatus}).appendTo("#order-list");

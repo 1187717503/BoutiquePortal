@@ -416,12 +416,12 @@ Scripts
         <div class="item style-scope page-order">${order.season_code}</div>
         <div class="item style-scope page-order">${order.category}</div>
         <div class="item style-scope page-order">${order.totalStore}</div>
-        <div class="item style-scope page-order">€${order.retail_price.toFixed(2)}</div>
-        <div class="item style-scope page-order">€${order.boutique_price.toFixed(2)}<span style="display: block;">${Math.round(order.boutique_discount * 100)}%</span></div>
+        <div class="item style-scope page-order">€${order.retail_price}</div>
+        <div class="item style-scope page-order">€${order.boutique_price}<span style="display: block;">${order.boutique_discount}</span></div>
         {%if tab_status =='new' || tab_status =='processing' || tab_status=='readytosell' || tab_status=='trash' %}
-        <div class="item style-scope page-order">€${order.im_price.toFixed(2)}<span style="display: block;">${Math.round(order.im_discount * 100)}%</span></div>
+        <div class="item style-scope page-order">€${order.im_price}<span style="display: block;">${order.im_discount}</span></div>
         {%else%}
-        <div class="item style-scope page-order">€${order.sale_price.toFixed(2)}<span style="display: block;">${Math.round(order.sale_discount * 100)}%</span></div>
+        <div class="item style-scope page-order">€${order.sale_price}<span style="display: block;">${order.sale_discount}</span></div>
         {%/if%}
         <div class="item style-scope page-order action" data-product-id="${order.product_id}" data-shop-product-id="${order.shop_product_id}">
             {%if action.process == 1 %}
