@@ -1,9 +1,9 @@
 package com.intramirror.web.controller.product;
 
+import com.intramirror.common.parameter.StatusType;
 import com.intramirror.product.api.service.brand.IBrandService;
 import com.intramirror.product.api.service.season.SeasonService;
 import com.intramirror.web.common.response.Response;
-import com.intramirror.web.common.StatusCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created on 2017/10/25.
+ *
  * @author YouFeng.Zhu
  */
 @CrossOrigin
@@ -30,11 +31,11 @@ public class ProductFilterController {
 
     @GetMapping(value = "/season/list")
     public Response listSeasonCode() {
-        return Response.status(StatusCode.SUCCESS).data(seasonService.listAllSeasonCode());
+        return Response.status(StatusType.SUCCESS).data(seasonService.listAllSeasonCode());
     }
 
     @GetMapping(value = "/brand/list")
     public Response listCategory() {
-        return Response.status(StatusCode.SUCCESS).data(brandService.listActiveBrand());
+        return Response.status(StatusType.SUCCESS).data(brandService.listActiveBrand());
     }
 }

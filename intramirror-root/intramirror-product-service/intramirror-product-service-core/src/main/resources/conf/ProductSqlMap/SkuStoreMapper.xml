@@ -136,17 +136,18 @@
 
     <update id="zeroClearing" parameterType="java.util.Map">
 
-        update `sku_store`  ss
-        inner join `product`  p on(ss.`product_id` = p.`product_id`  and p.`enabled`  = 1 and ss.`enabled` = 1)
-        set ss.`confirmed`  = 0,ss.`store`  = (0 - abs(cast(ss.`reserved` as signed)))
-        where p.`vendor_id`  = #{vendor_id,jdbcType=VARCHAR}
-        <![CDATA[ and (ss.`last_check` < #{date,jdbcType=VARCHAR} or ss.`last_check` is null )]]>
+        UPDATE `sku_store` ss
+            INNER JOIN `product` p ON (ss.`product_id` = p.`product_id` AND p.`enabled` = 1 AND ss.`enabled` = 1)
+        SET ss.`confirmed` = 0, ss.`store` = (0 - abs(cast(ss.`reserved` AS SIGNED)))
+        WHERE p.`vendor_id` = #{vendor_id,jdbcType=VARCHAR}
+        <![CDATA[ AND (ss.`last_check` < #{date,jdbcType=VARCHAR} OR ss.`last_check` IS NULL)
+        ]]>
 
     </update>
 
     <select id="listStockByProductList" resultType="java.util.HashMap" parameterType="java.util.List">
         SELECT
-        sum(sku_store.store) as store,
+        SUM(IF(sku_store.store &lt; 0,0,sku_store.store)) as store,
         sku_store.product_id
         FROM sku_store WHERE product_id in
         <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
@@ -157,7 +158,7 @@
     </select>
 
     <select id="getTotalStockByProductId" resultType="Long" parameterType="Long">
-        SELECT sum(sku_store.store) AS total_stock
+        SELECT SUM(IF(sku_store.store &lt; 0, 0, sku_store.store)) AS total_stock
         FROM sku_store
         WHERE product_id = #{productId} AND sku_store.enabled = TRUE
 
@@ -166,12 +167,13 @@
     <select id="listTotalStockByProductIds" resultType="java.util.HashMap">
         SELECT
         product_id,
-        sum(sku_store.store) AS total_stock
+        SUM(IF(sku_store.store &lt; 0,0,sku_store.store)) AS total_stock
         FROM sku_store
         WHERE product_id IN
         <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
             #{item}
         </foreach>
         AND sku_store.enabled = TRUE
+        GROUP BY product_id
     </select>
 </mapper>

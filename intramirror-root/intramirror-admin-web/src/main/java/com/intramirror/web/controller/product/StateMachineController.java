@@ -1,5 +1,6 @@
 package com.intramirror.web.controller.product;
 
+import com.intramirror.common.parameter.StatusType;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
 import com.intramirror.web.Exception.ErrorResponse;
@@ -7,7 +8,6 @@ import com.intramirror.web.Exception.ValidateException;
 import com.intramirror.web.common.response.BatchResponseItem;
 import com.intramirror.web.common.response.BatchResponseMessage;
 import com.intramirror.web.common.response.Response;
-import com.intramirror.web.common.StatusCode;
 import static com.intramirror.web.controller.product.StateMachineCoreRule.map2StateEnum;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -109,7 +109,7 @@ public class StateMachineController {
 
         batchUpdateProductState(originalState, action, validIdsMap, responseMessage);
 
-        return Response.status(StatusCode.SUCCESS).data(responseMessage);
+        return Response.status(StatusType.SUCCESS).data(responseMessage);
     }
 
     private Map<Long, Long> batchValidate(StateEnum originalState, List<Map<String, Object>> idsList, String action, BatchResponseMessage responseMessage) {

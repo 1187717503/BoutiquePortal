@@ -1,10 +1,10 @@
 package com.intramirror.web.controller.product;
 
+import com.intramirror.common.parameter.StatusType;
 import com.intramirror.product.api.model.SearchCondition;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
-import com.intramirror.web.common.StatusCode;
 import com.intramirror.web.common.response.Response;
 import com.intramirror.web.controller.cache.CategoryCache;
 import java.math.BigDecimal;
@@ -85,7 +85,7 @@ public class ProductMgntController {
             productStateCountMap.put(stateEnum, Long.parseLong(item.get("count").toString()));
         }
         mergeOldState(productStateCountMap);
-        return Response.status(StatusCode.SUCCESS).data(productStateCountMap);
+        return Response.status(StatusType.SUCCESS).data(productStateCountMap);
     }
 
     private Map<StateEnum, Long> initiateCountMap() {
@@ -157,7 +157,7 @@ public class ProductMgntController {
         if (productList.size() > 0) {
             appendInfo(productList);
         }
-        return Response.status(StatusCode.SUCCESS).data(productList);
+        return Response.status(StatusType.SUCCESS).data(productList);
     }
 
     private void appendInfo(List<Map<String, Object>> productList) {
@@ -233,7 +233,8 @@ public class ProductMgntController {
     private Long sumStock(List<Map<String, Object>> skuStoreList) {
         Long total = 0L;
         for (Map<String, Object> skuStore : skuStoreList) {
-            total += Long.parseLong(skuStore.get("store").toString());
+            Long store = Long.parseLong(skuStore.get("store").toString());
+            total += (store < 0 ? 0 : store);
         }
         return total;
     }
