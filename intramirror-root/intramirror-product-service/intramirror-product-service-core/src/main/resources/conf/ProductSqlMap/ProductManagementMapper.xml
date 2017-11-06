@@ -70,7 +70,7 @@
             AND product.season_code = #{season}
         </if>
         <if test="boutiqueId != null">
-            AND product.product_code = #{boutiqueId}
+            AND product.product_code LIKE "%"#{boutiqueId}"%"
         </if>
         <if test="vendorId != null">
             AND vendor.vendor_id = #{vendorId}
@@ -225,7 +225,7 @@
             AND product.season_code = #{season}
         </if>
         <if test="boutiqueId != null">
-            AND product.product_code = #{boutiqueId}
+            AND product.product_code LIKE "%"#{boutiqueId}"%"
         </if>
         <if test="vendorId != null">
             AND vendor.vendor_id = #{vendorId}

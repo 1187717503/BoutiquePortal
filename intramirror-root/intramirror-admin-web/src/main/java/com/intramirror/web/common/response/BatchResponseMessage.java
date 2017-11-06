@@ -27,5 +27,4 @@ public class BatchResponseMessage {
     public void setFailed(List<BatchResponseItem> failed) {
         this.failed = failed;
     }
-
 }
