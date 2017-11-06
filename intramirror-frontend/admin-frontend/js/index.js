@@ -3,7 +3,7 @@ if (!token) {
     token = localStorage.getItem('token');
 }
 
-// token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNjEiLCJpYXQiOjE1MTAwMjIxNTZ9.L8kkiepG7qsauGkO5Lg85ut_Y8ztcX0Hxjp6F8lARhJ8nN_TpLgc34lCYmLd4EwltC-sjUYdk6UKA1oHKxyg0w";
+// token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNjEiLCJpYXQiOjE1MTAwNDMxNjJ9.VWNnIquVf5dnwijKgLC5Bd2er2wAvOVKZQWq4hcWMc-ddXGL4SFJ3Vq7mPnJx3xt6xZu-G9xRHxgMrgKNYxuoQ";
 
 function initBrand() {
 
@@ -421,7 +421,7 @@ function getBtnStatus(status) {
         btnStatus.trash = 1;
     } else if (status === 'trash') {
         btnStatus.approve = 1;
-        btnStatus.process = 1;
+        // btnStatus.process = 1;
     } else if (status === 'readytosell') {
         btnStatus.process = 1;
         btnStatus.remove = 1;
