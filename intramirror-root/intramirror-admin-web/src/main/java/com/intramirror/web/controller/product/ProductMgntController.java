@@ -177,7 +177,11 @@ public class ProductMgntController {
         if (price.get("retail_price") == null) {
             return;
         }
+
         Double retailPrice = Double.parseDouble(price.get("retail_price").toString());
+        if (retailPrice <= 0) {
+            return;
+        }
         if (price.get("boutique_price") != null) {
             Double boutique_price = Double.parseDouble(price.get("boutique_price").toString());
             BigDecimal b = new BigDecimal(boutique_price / retailPrice);
