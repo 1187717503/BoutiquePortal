@@ -406,3 +406,8 @@ input[type=text].valid, input[type=text]:focus.valid {
     border-bottom: 2px solid #871b55;
     box-shadow: none;
 }
+
+#toast-container {
+    top: 0%;
+    right: 7%;
+}

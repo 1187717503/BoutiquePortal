@@ -2812,36 +2812,36 @@ Vel = $ ? $.Velocity : Velocity, function(a) {
             prevent_default: !1
         });
         return h.on("pan", function(a) {
-            var c = a.deltaX, d = 80;
-            b.classList.contains("panning") || b.classList.add("panning");
-            var e = 1 - Math.abs(c / d);
-            0 > e && (e = 0), Vel(b, {
-                left: c,
-                opacity: e
-            }, {
-                duration: 50,
-                queue: !1,
-                easing: "easeOutQuad"
-            });
+            // var c = a.deltaX, d = 80;
+            // b.classList.contains("panning") || b.classList.add("panning");
+            // var e = 1 - Math.abs(c / d);
+            // 0 > e && (e = 0), Vel(b, {
+            //     left: c,
+            //     opacity: e
+            // }, {
+            //     duration: 50,
+            //     queue: !1,
+            //     easing: "easeOutQuad"
+            // });
         }), h.on("panend", function(a) {
-            var c = a.deltaX, e = 80;
-            Math.abs(c) > e ? Vel(b, {
-                marginTop: "-40px"
-            }, {
-                duration: 375,
-                easing: "easeOutExpo",
-                queue: !1,
-                complete: function() {
-                    "function" == typeof d && d(), b.parentNode.removeChild(b);
-                }
-            }) : (b.classList.remove("panning"), Vel(b, {
-                left: 0,
-                opacity: 1
-            }, {
-                duration: 300,
-                easing: "easeOutExpo",
-                queue: !1
-            }));
+            // var c = a.deltaX, e = 80;
+            // Math.abs(c) > e ? Vel(b, {
+            //     marginTop: "-40px"
+            // }, {
+            //     duration: 375,
+            //     easing: "easeOutExpo",
+            //     queue: !1,
+            //     complete: function() {
+            //         "function" == typeof d && d(), b.parentNode.removeChild(b);
+            //     }
+            // }) : (b.classList.remove("panning"), Vel(b, {
+            //     left: 0,
+            //     opacity: 1
+            // }, {
+            //     duration: 300,
+            //     easing: "easeOutExpo",
+            //     queue: !1
+            // }));
         }), b;
     }
     c = c || "";
