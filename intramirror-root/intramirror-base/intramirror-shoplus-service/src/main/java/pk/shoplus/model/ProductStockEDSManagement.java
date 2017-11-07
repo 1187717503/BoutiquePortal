@@ -189,6 +189,12 @@ public class ProductStockEDSManagement {
                 sku.im_price = sku1.getIm_price();
                 sku.in_price = sku1.getIn_price();
                 sku.price = skuTemp.getPrice();
+            } else {
+                IPriceService iPriceService = new PriceServiceImpl();
+                Sku sku1 = iPriceService.getPriceByRule(product,product.getVendor_id(),product.getMax_retail_price(),connection);
+                sku.im_price = sku1.getIm_price();
+                sku.in_price = sku1.getIn_price();
+                sku.price = product.getMax_retail_price();
             }
             sku.created_at = new Date();
             sku.updated_at = new Date();
