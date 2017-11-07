@@ -74,10 +74,6 @@ public class ColtoriProductMapping implements IProductMapping {
             if(null != apiCategoryMap && 0 < apiCategoryMap.size()) {
                 productOptions.setCategoryId(apiCategoryMap.get(0).get("category_id").toString());
             }
-
-            productOptions.setCategoryId("1523");
-            productOptions.setBrandName("DingTest");
-            productOptions.setSeasonCode("181");
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("ColtoriProductMapping,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",bodyDataMap:"+ JSONObject.fromObject(bodyDataMap));
