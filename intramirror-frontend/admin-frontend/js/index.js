@@ -3,7 +3,7 @@ if (!token) {
     token = localStorage.getItem('token');
 }
 
-// token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNjEiLCJpYXQiOjE1MTAwNDMxNjJ9.VWNnIquVf5dnwijKgLC5Bd2er2wAvOVKZQWq4hcWMc-ddXGL4SFJ3Vq7mPnJx3xt6xZu-G9xRHxgMrgKNYxuoQ";
+token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxOTQiLCJpYXQiOjE1MTAxOTkzOTV9.euNZtH-motorKlYB5IpRcwYwoT_RrdwUs23Z8rUp9T_7rApV06S1HXtZP69rBgSWmjGvOwrA3He6Mmg1IyIUrw";
 
 function initBrand() {
 
@@ -20,6 +20,8 @@ function initBrand() {
             initSelectItems('select-brand', 'tmpl-brand-select', result.data);
         },
         error: function(code, xx) {
+            console.log(code);
+            console.log(xx);
             if (code.status == 401) {
                 window.location.href = '../../login'
             }

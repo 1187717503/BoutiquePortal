@@ -37,26 +37,6 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         LOGGER.info("RequestURI {}", request.getRequestURI());
 
-        //        if (request.getHeader(HttpHeaders.ORIGIN) != null) {
-        //	    response.setHeader("Access-Control-Allow-Origin", "http://192.168.31.250");
-        //        response.setHeader("Access-Control-Allow-Origin", "*");
-        //        response.setHeader("Access-Control-Allow-Headers",
-        //                "token,Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With,userId");
-        //        response.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
-        //
-        //        //设置时间   controller 可以去掉@CrossOrigin注解
-        //        response.addHeader("Access-Control-Max-Age", "3600");
-        //        //        }
-        //        CorsFilter
-        //        if (HttpMethod.OPTIONS.matches(request.getMethod())) {
-        //            response.addHeader("Access-Control-Allow-Origin", "*");
-        //            response.addHeader("Access-Control-Allow-Credentials", "true");
-        //            response.addHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT, HEAD");
-        //            response.addHeader("Access-Control-Allow-Headers", "Content-Type");
-        //            response.addHeader("Access-Control-Max-Age", "3600");
-        //            return true;
-        //        }
-
         if (HttpMethod.OPTIONS.matches(request.getMethod())) {
             return true;
         }
