@@ -14,15 +14,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 
-@Deprecated
 public class CorsFilter implements Filter {
 
-    private String jwtSecret = "qazxswedcvfr543216yhnmju70plmjkiu89";
     private static Logger LOGGER = LoggerFactory.getLogger(CorsFilter.class);
 
     @Override
     public void destroy() {
-        //        CorsFilter
     }
 
     @Override

@@ -190,36 +190,14 @@
 			</dependency>
 			<!-- end util jar -->
 
-			<!-- start Logback and Slf4j -->
-			<dependency>
-				<groupId>ch.qos.logback</groupId>
-				<artifactId>logback-core</artifactId>
-				<version>1.1.7</version>
-			</dependency>
-
-			<dependency>
-				<groupId>ch.qos.logback</groupId>
-				<artifactId>logback-classic</artifactId>
-				<version>1.1.7</version>
-			</dependency>
-
-			<dependency>
-				<groupId>ch.qos.logback</groupId>
-				<artifactId>logback-access</artifactId>
-				<version>1.1.7</version>
-			</dependency>
-
+			<!-- start  Slf4j -->
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
 				<version>1.7.21</version>
 			</dependency>
-			<dependency>
-				<groupId>org.logback-extensions</groupId>
-				<artifactId>logback-ext-spring</artifactId>
-				<version>0.1.2</version>
-			</dependency>
-			<!-- end Logback and Slf4j -->
+
+			<!-- end  Slf4j -->
 
 			<!-- start Mybatis -->
 			<dependency>

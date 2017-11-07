@@ -51,10 +51,10 @@
             <version>3.4</version>
         </dependency>
         <dependency>
-		    <groupId>org.apache.commons</groupId>
-		    <artifactId>commons-io</artifactId>
-		    <version>1.3.2</version>
-		</dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.3.2</version>
+        </dependency>
         <dependency>
             <groupId>com.intramirror</groupId>
             <artifactId>intramirror-product-service-core</artifactId>
@@ -80,7 +80,7 @@
             <groupId>com.intramirror</groupId>
             <artifactId>intramirror-shoplus-service</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>com.intramirror</groupId>
             <artifactId>intramirror-common</artifactId>
@@ -124,12 +124,30 @@
             <version>2.8.0</version>
         </dependency>
         <dependency>
-		    <groupId>org.jodd</groupId>
-		    <artifactId>jodd-core</artifactId>
-		    <version>3.5.2</version>
-		</dependency>
-        
-		
+            <groupId>org.jodd</groupId>
+            <artifactId>jodd-core</artifactId>
+            <version>3.5.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+
+
     </dependencies>
     <build>
         <finalName>intramirror-admin-web</finalName>
