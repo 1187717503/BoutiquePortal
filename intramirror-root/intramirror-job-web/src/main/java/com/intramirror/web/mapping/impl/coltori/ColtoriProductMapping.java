@@ -54,9 +54,9 @@ public class ColtoriProductMapping implements IProductMapping {
                     .setSalePrice(productObj.getString("retail_price"))
                     .setLast_check(new Date());
 
-            String category_l1 = productObj.getString("group_id");
-            String category_l2 = productObj.getString("subgroup_id");
-            String category_l3 = productObj.getString("category_id");
+            String category_l1 = productObj.getString("group_id")==null?"-1":productObj.getString("group_id");
+            String category_l2 = productObj.getString("subgroup_id")==null?"-1":productObj.getString("subgroup_id");
+            String category_l3 = productObj.getString("category_id")==null?"-1":productObj.getString("category_id");
 
             Map<String, Object> categoryMap = new HashMap<String, Object>();
             categoryMap.put("vendor_id", bodyDataMap.get("vendor_id"));
