@@ -92,6 +92,12 @@ public class ErrorMessageController {
     @Resource(name = "xmagSynAllStockMapping")
     private IStockMapping xmagSynAllStockMapping;
 
+    @Resource(name = "coltoriProductMapping")
+    private IProductMapping coltoriProductMapping;
+
+    @Resource(name = "coltoriStockMapping")
+    private IStockMapping coltoriStockMapping;
+
     @Autowired
     private AiDucaSynAllStockMapping aiDucaSynAllStockMapping;
 
@@ -260,6 +266,20 @@ public class ErrorMessageController {
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateStockThread(stockOption,apiDataFileUtils,originDataMap));
                     }
                 }
+
+                // Coltori
+                if(vendor_id.equals("24")) {
+                    if(name.equals("product_all_update") || name.equals("product_delta_update")) {
+                        ProductEDSManagement.ProductOptions productOptions = coltoriProductMapping.mapping(originDataMap);
+                        ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
+                        vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                        productOptions.setModifyPrice("1");
+                    } else if(name.equals("stock_all_update") || name.equals("stock_delta_update")) {
+                        StockOption stockOption = coltoriStockMapping.mapping(originDataMap);
+                        CommonThreadPool.execute(name,executor,threadNum,new UpdateStockThread(stockOption,apiDataFileUtils,originDataMap));
+                    }
+                }
+
                 this.updateProcessing(api_error_processing_id);
             }
             mapUtils.putData("status",StatusType.SUCCESS).putData("info","success");

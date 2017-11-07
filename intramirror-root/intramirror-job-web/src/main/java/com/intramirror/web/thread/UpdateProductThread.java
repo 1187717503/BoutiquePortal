@@ -66,7 +66,7 @@ public class UpdateProductThread implements Runnable{
                 resultMap.put("brand_id",productOptions.getBrandCode());
                 resultMap.put("sku_size",JSONObject.toJSONString(productOptions.getSkus()));
 
-                String fileDataContent = JSONObject.toJSONString(resultMap);
+                String fileDataContent = JSONObject.toJSONString(fileData);
                 logger.info("UpdateProductThreadRun,bakErrorFile,start,fileDataContent:"+fileDataContent);
                 String path = apiDataFileUtils.bakErrorFile("error",fileDataContent);
                 logger.info("UpdateProductThreadRun,bakErrorFile,end,path:"+path+",fileDataContent:"+fileDataContent);
