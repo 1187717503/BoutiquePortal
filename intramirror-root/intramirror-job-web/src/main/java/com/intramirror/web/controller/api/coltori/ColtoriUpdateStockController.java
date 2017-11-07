@@ -4,12 +4,15 @@ import com.google.gson.Gson;
 import com.intramirror.common.help.ExceptionUtils;
 import com.intramirror.common.help.StringUtils;
 import com.intramirror.common.utils.DateUtils;
+import com.intramirror.web.contants.RedisKeyContants;
 import com.intramirror.web.mapping.api.IStockMapping;
 import com.intramirror.web.mapping.vo.StockOption;
 import com.intramirror.web.thread.CommonThreadPool;
 import com.intramirror.web.thread.UpdateStockThread;
 import com.intramirror.web.util.ApiDataFileUtils;
 import com.intramirror.web.util.GetPostRequestUtil;
+import com.intramirror.web.util.HttpUtils;
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,7 +28,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import pk.shoplus.service.RedisService;
-import pk.shoplus.service.request.impl.GetPostRequestService;
 
 /**
  * Created by dingyifan on 2017/11/2.
@@ -64,27 +66,34 @@ public class ColtoriUpdateStockController  implements InitializingBean {
             Long vendor_id = Long.parseLong(paramMap.get("vendor_id").toString());
             String eventName = paramMap.get("eventName").toString();
 
-            // get token
-            logger.info("ColtoriUpdateStockController,postAuth,start,get_token_url:"+get_token_url+",username:"+username+",password:"+password);
-            String getTokenResponse = getPostRequestUtil.postAuth(get_token_url,username,password);
-            logger.info("ColtoriUpdateStockController,postAuth,end,get_token_url:"+get_token_url+",username:"+username+",password:"+password+",getTokenResponse:"+getTokenResponse);
+            String ct_token_url = redisService.getKey(RedisKeyContants.ct_token_url);
+            if(name.contains("all")) {
+                // get token
+                logger.info("ColtoriUpdateStockController,postAuth,start,get_token_url:"+get_token_url+",username:"+username+",password:"+password);
+                String getTokenResponse = getPostRequestUtil.postAuth(get_token_url,username,password);
+                logger.info("ColtoriUpdateStockController,postAuth,end,get_token_url:"+get_token_url+",username:"+username+",password:"+password+",getTokenResponse:"+getTokenResponse);
 
-            JSONObject toKenObject = JSONObject.fromObject(getTokenResponse);
-            String access_token = toKenObject.getString("access_token");
-            String expires_in = toKenObject.getString("expires_in");
+                JSONObject toKenObject = JSONObject.fromObject(getTokenResponse);
+                String access_token = toKenObject.getString("access_token");
+                String expires_in = toKenObject.getString("expires_in");
+                redisService.setKey(RedisKeyContants.ct_token_url,ct_token_url);
+            }
 
-            get_stock_url = get_stock_url+"?access_token="+access_token+"&expires_in="+expires_in;
+            get_stock_url = get_stock_url+ct_token_url;
 
             if(!name.contains("all")) {
-                String today = DateUtils.getTimeByHour(0);
-                String tomorrow = DateUtils.getTimeByHour(-24);
-                get_stock_url = get_stock_url+"&since_updated_at="+today+"&tomorrow="+tomorrow;
+                String since_updated_at = URLEncoder.encode(DateUtils.getTimeByMinute(5));
+                String until_updated_at = URLEncoder.encode(DateUtils.getTimeByMinute(0));
+                get_stock_url = get_stock_url+"&since_updated_at="+ since_updated_at+"&until_updated_at="+until_updated_at;
             }
 
             logger.info("ColtoriUpdateStockController,requestMethod,start,get_stock_url:"+get_stock_url);
-            String responseData = getPostRequestUtil.requestMethod(GetPostRequestService.HTTP_GET,get_stock_url,null);
+            String responseData = HttpUtils.httpGet(get_stock_url);
             logger.info("ColtoriUpdateStockController,requestMethod,end,get_stock_url:"+get_stock_url+",responseData:"+responseData);
-            System.out.println(responseData);
+
+            if(StringUtils.isNotBlank(responseData) && responseData.contains("no results matching your query")) {
+                return null;
+            }
 
             JSONObject productOpj = JSONObject.fromObject(responseData);
             Iterator<String> product = productOpj.keys();

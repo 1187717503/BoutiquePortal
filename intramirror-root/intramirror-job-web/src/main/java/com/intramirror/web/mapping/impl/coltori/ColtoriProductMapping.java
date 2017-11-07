@@ -32,17 +32,17 @@ public class ColtoriProductMapping implements IProductMapping {
             String key = bodyDataMap.get("key").toString();
             JSONObject productObj = (JSONObject) bodyDataMap.get("product");
             System.out.println(productObj.toString());
-            System.out.println(productObj.getJSONObject("name").toString());
-            productOptions.setName(productObj.getJSONObject("name").getString("en"))
+            System.out.println(productObj.getJSONObject("name").get("en") == null?"":productObj.getJSONObject("name").getString("en"));
+            productOptions.setName(productObj.getJSONObject("name").get("en") == null?"":productObj.getJSONObject("name").getString("en"))
                     .setCode(key)
                     .setSeasonCode(productObj.getString("season_id"))
                     .setBrandCode(productObj.getJSONArray("other_ids").getString(1))
                     .setCarryOver("")
                     .setBrandName(productObj.getString("brand_id").trim())
-                    .setColorCode(productObj.getString(" variation_id"))
+                    .setColorCode(productObj.get("variation_id") == null?"":productObj.getString("variation_id"))
                     .setColorDesc("")
-                    .setDesc(productObj.getJSONObject("description").getString("en"))
-                    .setComposition(productObj.getString("notes"))
+                    .setDesc(productObj.getJSONObject("description").get("en") == null?"":productObj.getJSONObject("description").getString("en"))
+                    .setComposition(productObj.get("notes") == null?"":productObj.getString("notes"))
                     .setMadeIn("")
                     .setSizeFit("")
                     .setCoverImg(productObj.getString("images"))
@@ -74,6 +74,10 @@ public class ColtoriProductMapping implements IProductMapping {
             if(null != apiCategoryMap && 0 < apiCategoryMap.size()) {
                 productOptions.setCategoryId(apiCategoryMap.get(0).get("category_id").toString());
             }
+
+            productOptions.setCategoryId("1523");
+            productOptions.setBrandName("DingTest");
+            productOptions.setSeasonCode("181");
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("ColtoriProductMapping,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",bodyDataMap:"+ JSONObject.fromObject(bodyDataMap));

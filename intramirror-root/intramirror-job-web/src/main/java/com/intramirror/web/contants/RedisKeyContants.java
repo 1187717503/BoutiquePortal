@@ -25,4 +25,7 @@ public class RedisKeyContants {
 
     /** atelier全量更新商品库存置零的表识 */
     public static final String atelier_all_product_zero = "atelier_all_product_zero";
+
+    /** Coltori Token */
+    public static final String ct_token_url = "ct_token_url";
 }

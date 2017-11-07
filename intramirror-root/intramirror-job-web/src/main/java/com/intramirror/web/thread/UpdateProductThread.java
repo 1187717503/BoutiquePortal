@@ -1,12 +1,10 @@
 package com.intramirror.web.thread;
 
-import com.alibaba.fastjson15.JSONObject;
-import com.google.gson.Gson;
-import com.intramirror.common.parameter.EnabledType;
-import com.intramirror.common.utils.DateUtils;
-import com.intramirror.product.api.model.ApiErrorProcessing;
-import com.intramirror.product.api.model.ApiErrorType;
+import com.alibaba.fastjson.JSONObject;
 import com.intramirror.web.util.ApiDataFileUtils;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.apache.log4j.Logger;
 import org.sql2o.Connection;
 import pk.shoplus.DBConnector;
@@ -18,14 +16,6 @@ import pk.shoplus.service.product.api.IProductService;
 import pk.shoplus.service.product.impl.ProductServiceImpl;
 import pk.shoplus.util.ExceptionUtils;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-/**
- * Created by dingyifan on 2017/9/13.
- */
 public class UpdateProductThread implements Runnable{
 
     private static final Logger logger = Logger.getLogger(UpdateProductThread.class);
@@ -46,7 +36,7 @@ public class UpdateProductThread implements Runnable{
     public void run() {
         try {
             System.out.println(JSONObject.toJSON(apiDataFileUtils));
-            logger.info("UpdateProductThreadRun,createProduct,start,productOptions:"+new Gson().toJson(productOptions)
+            logger.info("UpdateProductThreadRun,createProduct,start,productOptions:"+JSONObject.toJSONString(productOptions)
                     +",vendorOptions:"+JSONObject.toJSONString(vendorOptions));
             Map<String,Object> resultMap = productEDSManagement.createProduct(productOptions,vendorOptions);
             logger.info("UpdateProductThreadRun,createProduct,end,resultMap:"+ JSONObject.toJSONString(resultMap)+",productOptions:"+JSONObject.toJSONString(productOptions)
@@ -54,7 +44,7 @@ public class UpdateProductThread implements Runnable{
 
             if(resultMap != null && resultMap.get("status").equals(StatusType.PRODUCT_ALREADY_EXISTS)) {
                 logger.info("UpdateProductThreadRun,updateProduct,start,productOptions:" + JSONObject.toJSONString(productOptions)
-                        + ",vendorOptions:" + new Gson().toJson(vendorOptions));
+                        + ",vendorOptions:" + JSONObject.toJSONString(vendorOptions));
                 resultMap = productServie.updateProduct(productOptions, vendorOptions);
                 logger.info("UpdateProductThreadRun,updateProduct,end,resultMap:" + JSONObject.toJSONString(resultMap) + ",productOptions:" + JSONObject.toJSONString(productOptions)
                         + ",vendorOptions:" + JSONObject.toJSONString(vendorOptions));
@@ -74,9 +64,9 @@ public class UpdateProductThread implements Runnable{
                 resultMap.put("product_code",productOptions.getCode());
                 resultMap.put("color_code",productOptions.getColorCode());
                 resultMap.put("brand_id",productOptions.getBrandCode());
-                resultMap.put("sku_size",new Gson().toJson(productOptions.getSkus()));
+                resultMap.put("sku_size",JSONObject.toJSONString(productOptions.getSkus()));
 
-                String fileDataContent = JSONObject.toJSONString(fileData);
+                String fileDataContent = JSONObject.toJSONString(resultMap);
                 logger.info("UpdateProductThreadRun,bakErrorFile,start,fileDataContent:"+fileDataContent);
                 String path = apiDataFileUtils.bakErrorFile("error",fileDataContent);
                 logger.info("UpdateProductThreadRun,bakErrorFile,end,path:"+path+",fileDataContent:"+fileDataContent);

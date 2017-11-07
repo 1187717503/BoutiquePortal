@@ -26,8 +26,14 @@ public class DateUtils {
         return new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime());
     }
 
+    public static String getTimeByMinute(int minute) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.MINUTE, calendar.get(Calendar.MINUTE) - minute);
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(calendar.getTime());
+    }
+
     public static void main(String[] args) {
-        System.out.println(getTimeByHour(-24));;
+        System.out.println(getTimeByMinute(0));;
 
     }
 

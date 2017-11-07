@@ -957,8 +957,8 @@ public class ProductEDSManagement {
             Date date = curr.getTime();
             product.valid_at = (format.parse(DateFormatUtils.format(date, "yyyy-MM-dd")));
 
-            product.created_at = Helper.getCurrentTimeToUTCWithDate();
-            product.updated_at = Helper.getCurrentTimeToUTCWithDate();
+            product.created_at = new Date();
+            product.updated_at = new Date();
             product.enabled = EnabledType.USED;
         } catch (Exception e) {
             e.printStackTrace();
