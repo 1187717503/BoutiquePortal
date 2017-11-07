@@ -135,12 +135,14 @@ public class StateMachineController {
             Long productId = Long.parseLong(state.get("product_id").toString());
             Long shopProductId = idsMap.get(productId);
             if (productState == null) {
-                responseMessage.getFailed().add(new BatchResponseItem(productId, shopProductId, "Unknown state : " + state.toString()));
+                responseMessage.getFailed().add(
+                        new BatchResponseItem(productId, shopProductId, "Product " + state.get("boutique_id") + " has unknown state : " + state.toString()));
                 idsMap.remove(productId);
                 continue;
             }
             if (!isStateSame(productState, originalState)) {
-                responseMessage.getFailed().add(new BatchResponseItem(productId, shopProductId, "Product has changed to : " + productState.name()));
+                responseMessage.getFailed().add(
+                        new BatchResponseItem(productId, shopProductId, "Product " + state.get("boutique_id") + " has changed to : " + productState.name()));
                 idsMap.remove(productId);
                 continue;
             }
@@ -148,7 +150,8 @@ public class StateMachineController {
                 Long realShopProductId = state.get("shop_product_id") == null ? null : Long.parseLong(state.get("shop_product_id").toString());
                 //Maybe this logic is not necessary
                 if (realShopProductId == null) {
-                    responseMessage.getFailed().add(new BatchResponseItem(productId, shopProductId, "Parameter shopProductId missed"));
+                    responseMessage.getFailed().add(
+                            new BatchResponseItem(productId, shopProductId, "Product " + state.get("boutique_id") + " shopProductId parameter missed"));
                     idsMap.remove(productId);
                 } else {
                     LOGGER.info("No shop_product_id in body, get it from db by productId [{}].", productId);

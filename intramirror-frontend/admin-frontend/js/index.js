@@ -2,8 +2,7 @@ let token = sessionStorage.getItem('token');
 if (!token) {
     token = localStorage.getItem('token');
 }
-
-// token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNjEiLCJpYXQiOjE1MTAyMTIwODh9.mB6CjhWhRLIIXiwBH3_jDoSLwSUfQo_OmVN-GF018Z1S2g7GjHxYruzvEF0CD8zJ2A1rufOe5UeOCmkdokgsZg";
+//  token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxOTQiLCJpYXQiOjE1MTAyMjE5MTl9.K0t-EE47ChZf6VFXNaTNmoln65o7kiQvRhc3RHKqFCkhHQ4kAF3J5pMuPIhaaE0Vz1WVxuKw7WG54KFfBTuK-A";
 
 function initBrand() {
 
@@ -569,7 +568,7 @@ function initActionEvent() {
                 if (result.data.failed.length > 0) {
                     let msg = '';
                     for (var i = 0; i < result.data.failed.length; i++) {
-                        msg += "[" + result.data.failed[i].productId + "] : " + result.data.failed[i].message + "<br/>";
+                        msg += result.data.failed[i].message + "<br/>";
                     }
                     toashWithCloseBtn(msg);
                 } else {
