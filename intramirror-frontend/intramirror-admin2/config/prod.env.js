@@ -10,8 +10,8 @@ const baseConfig = {
 switch (process.env.WEB_ENV){
   case "test":
     baseConfig.BASE_URL = '"http://test.admin.intramirror.com:8085/"';
-    baseConfig.ERROR_URL = '"http://test.vendor.intramirror.com/"';
-    baseConfig.ERROR_URL2 = '"http://test.api.intramirror.com/"';
+    baseConfig.ERROR_URL = '"http://test.vendor.intramirror.com:8082/"';
+    baseConfig.ERROR_URL2 = '"http://test.api.intramirror.com:8088/"';
     break;
   case "stag":
   baseConfig.BASE_URL = '"http://sha.staging.admin2.intramirror.com:8096/"';
