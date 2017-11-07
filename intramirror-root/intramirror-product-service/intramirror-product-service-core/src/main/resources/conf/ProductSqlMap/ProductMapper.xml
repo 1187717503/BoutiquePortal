@@ -349,9 +349,8 @@
             <if test="createdAt != null">
                 created_at = #{createdAt,jdbcType=TIMESTAMP},
             </if>
-            <if test="updatedAt != null">
-                updated_at = #{updatedAt,jdbcType=TIMESTAMP},
-            </if>
+            updated_at = now(),
+
             <if test="enabled != null">
                 enabled = #{enabled,jdbcType=BIT},
             </if>

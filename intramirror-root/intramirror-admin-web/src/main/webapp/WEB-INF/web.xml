@@ -37,8 +37,8 @@
         </init-param>
     </filter>
     <filter>
-        <filter-name>cors</filter-name>
-        <filter-class>com.intramirror.web.filter.LoginFilter</filter-class>
+    <filter-name>cors</filter-name>
+    <filter-class>com.intramirror.web.filter.CorsFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>CharacterEncoding</filter-name>
