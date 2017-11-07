@@ -76,6 +76,7 @@ public class ColtoriUpdateStockController  implements InitializingBean {
                 JSONObject toKenObject = JSONObject.fromObject(getTokenResponse);
                 String access_token = toKenObject.getString("access_token");
                 String expires_in = toKenObject.getString("expires_in");
+                ct_token_url = "?access_token="+access_token+"&expires_in="+expires_in ;
                 redisService.setKey(RedisKeyContants.ct_token_url,ct_token_url);
             }
 
