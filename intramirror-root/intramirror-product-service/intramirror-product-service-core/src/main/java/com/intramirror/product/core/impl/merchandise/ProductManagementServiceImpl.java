@@ -111,7 +111,7 @@ public class ProductManagementServiceImpl extends BaseDao implements ProductMana
     @Override
     @Transactional
     public void batchUpdateProductStatusAndDisableShopProduct(int status, List<Long> productIds, List<Long> shopProductIds) {
-        batchUpdateShopProductStatusOnly(status, shopProductIds);
+        batchUpdateProductStatusOnly(status, shopProductIds);
         batchDisableShopProductStatus(shopProductIds);
     }
 

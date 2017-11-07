@@ -202,9 +202,6 @@ public class StateMachineController {
         StateEnum newStateEnum = StateMachineCoreRule.getNewState(currentStateEnum, operation);
 
         LOGGER.info("Product [{}] Start [{}] -> [{}] -> [{}]", idsMapToString(validIdsMap), currentStateEnum.name(), operation.name(), newStateEnum.name());
-        if (currentStateEnum == StateEnum.NEW || currentStateEnum == StateEnum.TRASH) {
-            //            if()
-        }
 
         if (/*currentStateEnum == StateEnum.SHOP_READY_TO_SELL &&*/ operation == OperationEnum.ON_SALE) {
             Map<Long, Long> outOfStockMap = batchCheckInStock(validIdsMap);
