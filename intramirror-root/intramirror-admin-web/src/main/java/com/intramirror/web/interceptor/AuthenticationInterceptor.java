@@ -48,6 +48,15 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
         //        response.addHeader("Access-Control-Max-Age", "3600");
         //        //        }
         //        CorsFilter
+        //        if (HttpMethod.OPTIONS.matches(request.getMethod())) {
+        //            response.addHeader("Access-Control-Allow-Origin", "*");
+        //            response.addHeader("Access-Control-Allow-Credentials", "true");
+        //            response.addHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT, HEAD");
+        //            response.addHeader("Access-Control-Allow-Headers", "Content-Type");
+        //            response.addHeader("Access-Control-Max-Age", "3600");
+        //            return true;
+        //        }
+
         if (HttpMethod.OPTIONS.matches(request.getMethod())) {
             return true;
         }

@@ -14,13 +14,11 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
-import org.springframework.stereotype.Component;
 
-@Component
+@Deprecated
 public class LoginFilter implements Filter {
 
     private String jwtSecret = "qazxswedcvfr543216yhnmju70plmjkiu89";
@@ -39,58 +37,55 @@ public class LoginFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) res;
         HttpServletRequest request = (HttpServletRequest) req;
 
-        response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setHeader("Access-Control-Allow-Headers",
-                "token,Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With,userId");
-        response.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
-
-        response.addHeader("Access-Control-Max-Age", "3600");
-
         LOGGER.info("RequestURI: {} , RequestMethod: {}", request.getRequestURI(), request.getMethod());
         if (HttpMethod.OPTIONS.matches(request.getMethod())) {
-            response.reset();
-            chain.doFilter(request, response);
+            response.setHeader("Access-Control-Allow-Origin", "*");
+            response.setHeader("Access-Control-Allow-Headers",
+                    "token,Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With,userId");
+            response.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
+            response.addHeader("Access-Control-Max-Age", "3600");
+            response.setStatus(HttpServletResponse.SC_OK);
             return;
         }
 
-        if (request.getRequestURI().startsWith("/login")) {
-            response.reset();
-            chain.doFilter(request, response);
-            return;
-        }
-        Long userId = null;
-
-        String jwt = request.getHeader("token");
-        if (StringUtils.isEmpty(jwt)) {
-            response.getWriter().write("token Check failed,Please log in again");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
-
-        Claims claims = null;
-        try {
-            claims = this.parseBody(jwt);
-        } catch (JwtException e) {
-            response.getWriter().write("token Check failed,Please log in again");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
-
-        if (System.currentTimeMillis() > claims.getIssuedAt().getTime()) {
-            response.getWriter().write("token Check failed,Please log in again");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
-
-        userId = Long.valueOf(claims.getSubject());
-
-        if (userId == null) {
-            response.getWriter().write("token Check failed,Please log in again");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
-
-        response.reset();
+        //        if (request.getRequestURI().startsWith("/login")) {
+        //            response.reset();
+        //            chain.doFilter(request, response);
+        //            return;
+        //        }
+        //        Long userId = null;
+        //
+        //        String jwt = request.getHeader("token");
+        //        if (StringUtils.isEmpty(jwt)) {
+        //            response.getWriter().write("token Check failed,Please log in again");
+        //            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        //            return;
+        //        }
+        //
+        //        Claims claims = null;
+        //        try {
+        //            claims = this.parseBody(jwt);
+        //        } catch (JwtException e) {
+        //            response.getWriter().write("token Check failed,Please log in again");
+        //            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        //            return;
+        //        }
+        //
+        //        if (System.currentTimeMillis() > claims.getIssuedAt().getTime()) {
+        //            response.getWriter().write("token Check failed,Please log in again");
+        //            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        //            return;
+        //        }
+        //
+        //        userId = Long.valueOf(claims.getSubject());
+        //
+        //        if (userId == null) {
+        //            response.getWriter().write("token Check failed,Please log in again");
+        //            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        //            return;
+        //        }
+        //
+        //        //response.reset();
         chain.doFilter(request, response);
 
         //        if (!status) {
