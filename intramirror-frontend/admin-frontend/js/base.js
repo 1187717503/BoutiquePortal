@@ -1,4 +1,4 @@
-var baseUrl = "http://localhost:8080/";
+var baseUrl = "http://test.admin.intramirror.com:8085/";
 
 var requestURL = {
     "getBrand" : {"url":baseUrl + "product/filter/brand/list", "method": "GET"},
@@ -10,4 +10,3 @@ var requestURL = {
     "getAllCount": {"url" : baseUrl + "product/fetch/state/count", "method" : "GET"},
     "productBatchAction": {"url": baseUrl + "product/operate/batch" , "method": "PUT"}
 }
-

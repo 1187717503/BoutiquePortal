@@ -2,7 +2,8 @@ let token = sessionStorage.getItem('token');
 if (!token) {
     token = localStorage.getItem('token');
 }
-//  token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxOTQiLCJpYXQiOjE1MTAyMjE5MTl9.K0t-EE47ChZf6VFXNaTNmoln65o7kiQvRhc3RHKqFCkhHQ4kAF3J5pMuPIhaaE0Vz1WVxuKw7WG54KFfBTuK-A";
+
+// token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNjEiLCJpYXQiOjE1MTAyMTIwODh9.mB6CjhWhRLIIXiwBH3_jDoSLwSUfQo_OmVN-GF018Z1S2g7GjHxYruzvEF0CD8zJ2A1rufOe5UeOCmkdokgsZg";
 
 function initBrand() {
 
@@ -478,7 +479,7 @@ function getBtnStatus(status) {
         // btnStatus.process = 1;
     } else if (status === 'readytosell') {
         btnStatus.process = 1;
-        btnStatus.remove = 1;
+        btnStatus.trash = 1;
         btnStatus.add_to_shop = 1;
     } else if (status === 'shopreadytosell') {
         btnStatus.process = 1;
@@ -652,7 +653,7 @@ function initActionEvent() {
 
 function toashWithCloseBtn(message) {
     $('.close-toast').unbind("click");
-    Materialize.toast('<span>' + message + '</span><a class="btn close-toast" href="#">Close<a>', 1800000);
+    Materialize.toast('<span>' + message + '</span><a class="btn close-toast" href="#">Close<a>', 1800000, 'egToast-warn');
     $('.close-toast').click(function() {
         $(this).parent().remove();
     });
