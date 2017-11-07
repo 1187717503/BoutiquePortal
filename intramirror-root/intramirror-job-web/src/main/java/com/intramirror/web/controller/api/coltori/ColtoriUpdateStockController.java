@@ -91,6 +91,7 @@ public class ColtoriUpdateStockController  implements InitializingBean {
             logger.info("ColtoriUpdateStockController,requestMethod,start,get_stock_url:"+get_stock_url);
             String responseData = HttpUtils.httpGet(get_stock_url);
             logger.info("ColtoriUpdateStockController,requestMethod,end,get_stock_url:"+get_stock_url+",responseData:"+responseData);
+            apiDataFileUtils.bakPendingFile("responseData",responseData);
 
             if(StringUtils.isNotBlank(responseData) && responseData.contains("no results matching your query")) {
                 return null;

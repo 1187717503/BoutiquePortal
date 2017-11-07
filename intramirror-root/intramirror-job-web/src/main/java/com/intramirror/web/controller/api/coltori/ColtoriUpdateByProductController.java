@@ -90,6 +90,7 @@ public class ColtoriUpdateByProductController implements InitializingBean {
             logger.info("ColtoriUpdateByProductController,requestMethod,start,get_product_url:"+get_product_url);
             String responseData = HttpUtils.httpGet(get_product_url);
             logger.info("ColtoriUpdateByProductController,requestMethod,end,get_product_url:"+get_product_url+",responseData:"+responseData);
+            apiDataFileUtils.bakPendingFile("responseData",responseData);
 
             if(StringUtils.isNotBlank(responseData) && responseData.contains("no results matching your query")) {
                 return null;
