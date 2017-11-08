@@ -3,7 +3,7 @@ if (!token) {
     token = localStorage.getItem('token');
 }
 
-token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxOTQiLCJpYXQiOjE1MTAxOTkzOTV9.euNZtH-motorKlYB5IpRcwYwoT_RrdwUs23Z8rUp9T_7rApV06S1HXtZP69rBgSWmjGvOwrA3He6Mmg1IyIUrw";
+// token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNjEiLCJpYXQiOjE1MTAyMTIwODh9.mB6CjhWhRLIIXiwBH3_jDoSLwSUfQo_OmVN-GF018Z1S2g7GjHxYruzvEF0CD8zJ2A1rufOe5UeOCmkdokgsZg";
 
 function initBrand() {
 
@@ -20,8 +20,6 @@ function initBrand() {
             initSelectItems('select-brand', 'tmpl-brand-select', result.data);
         },
         error: function(code, xx) {
-            console.log(code);
-            console.log(xx);
             if (code.status == 401) {
                 window.location.href = '../../login'
             }
@@ -280,7 +278,7 @@ function getProdcutList(status, pageno) {
             finishLoading();
             getCountWithFilter(filter, status, pagesize, pageno);
         }, error: function(result, resp, par) {
-            Materialize.toast(result.responseJSON.message, 3000);
+            toashWithCloseBtn(result.responseJSON.message);
             finishLoading();
 
             if (result.status == 401) {
@@ -340,7 +338,8 @@ function getCountWithFilter(filter, tarStatus, pagesize, pageno){
             updatePagination(tarStatus, pagesize, pageno, Math.ceil(nStatusCount/pagesize));
         }, error: function(result, resp, par) {
 
-            Materialize.toast(result.responseJSON.message, 3000);
+            toashWithCloseBtn(result.responseJSON.message);
+
             if (result.status == 401) {
                 window.location.href = '../../login'
             }
@@ -480,7 +479,7 @@ function getBtnStatus(status) {
         // btnStatus.process = 1;
     } else if (status === 'readytosell') {
         btnStatus.process = 1;
-        btnStatus.remove = 1;
+        btnStatus.trash = 1;
         btnStatus.add_to_shop = 1;
     } else if (status === 'shopreadytosell') {
         btnStatus.process = 1;
@@ -570,19 +569,19 @@ function initActionEvent() {
                 if (result.data.failed.length > 0) {
                     let msg = '';
                     for (var i = 0; i < result.data.failed.length; i++) {
-                        msg += "[" + result.data.failed[i].productId + "] : " + result.data.failed[i].message + "<br/>";
+                        msg += result.data.failed[i].message + "<br/>";
                     }
-                    Materialize.toast(msg, 3000);
+                    toashWithCloseBtn(msg);
                 } else {
-                    Materialize.toast(getActionMessage(action) + ' success', 3000);
+                    Materialize.toast(getActionMessage(action) + ' Success', 3000);
                 }
 
                 getProdcutList(param.originalState, 1);
                 finishLoading()
                 
             }, error: function(result, resp, par) {
+                toashWithCloseBtn(result.responseJSON.message);
 
-                Materialize.toast(result.responseJSON.message, 3000);
                 finishLoading()
                 if (result.status == 401) {
                     window.location.href = '../../login';
@@ -638,17 +637,24 @@ function initActionEvent() {
             success: function(result) {
                 let status = $('.tabs .tab a.active').data('status');
                 
-                Materialize.toast(getActionMessage(action) + ' success', 3000);
+                Materialize.toast(getActionMessage(action) + ' Success', 3000);
                 getProdcutList(status, 1);
                 
             }, error: function(result, resp, par) {
-
-                Materialize.toast(result.responseJSON.message, 3000);
+                toashWithCloseBtn(result.responseJSON.message);
 
                 if (result.status == 401) {
                     window.location.href = '../../login';
                 }
             }
         });
+    });
+}
+
+function toashWithCloseBtn(message) {
+    $('.close-toast').unbind("click");
+    Materialize.toast('<span>' + message + '</span><a class="btn close-toast" href="#">Close<a>', 1800000, 'egToast-warn');
+    $('.close-toast').click(function() {
+        $(this).parent().remove();
     });
 }

@@ -80,10 +80,10 @@
 
             </when>
             <when test="image == 1">
-                AND (product.cover_img != "" AND product.description_img != "" )
+                AND (length(product.cover_img) >= 5 AND length(product.description_img ) >= 5)
             </when>
             <otherwise>
-                AND (product.cover_img = "" OR product.description_img = "" )
+                AND (length(product.cover_img) &lt; 5 OR length(product.cover_img) &lt; 5 )
             </otherwise>
         </choose>
         <choose>
@@ -143,8 +143,9 @@
     <select id="getProductStateByProductId" parameterType="Long" resultType="java.util.HashMap">
         SELECT
             product.product_id,
-            product.status      AS product_status,
-            shop_product.status AS shop_product_status
+            product.product_code AS boutique_id,
+            product.status       AS product_status,
+            shop_product.status  AS shop_product_status
         FROM product
             LEFT JOIN shop_product ON product.product_id = shop_product.product_id AND shop_product.shop_id = 65 AND shop_product.enabled = 1
         WHERE product.product_id = #{product_id} AND product.enabled = TRUE;
@@ -154,6 +155,7 @@
         SELECT
         product.product_id,
         shop_product.shop_product_id,
+        product.product_code AS boutique_id,
         product.status AS product_status,
         shop_product.status AS shop_product_status
         FROM product
@@ -233,10 +235,10 @@
 
             </when>
             <when test="image == 1">
-                AND (product.cover_img != "" AND product.description_img != "" )
+                AND (length(product.cover_img) >= 5 AND length(product.description_img ) >= 5)
             </when>
             <otherwise>
-                AND (product.cover_img = "" OR product.description_img = "" )
+                AND (length(product.cover_img)&lt; 5 OR length(product.cover_img) &lt; 5 )
             </otherwise>
         </choose>
         <choose>
