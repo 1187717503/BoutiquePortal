@@ -184,8 +184,8 @@ public class ProductMgntController {
         }
         if (price.get("boutique_price") != null) {
             Double boutique_price = Double.parseDouble(price.get("boutique_price").toString());
-            BigDecimal b = new BigDecimal(boutique_price / retailPrice);
-            Double discount = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue() * 1.22;
+            BigDecimal b = new BigDecimal(boutique_price / retailPrice * 1.22);
+            Double discount = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
             price.put("boutique_discount", 1 - discount);
         }
         if (price.get("im_price") != null) {
