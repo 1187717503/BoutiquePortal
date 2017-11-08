@@ -80,10 +80,10 @@
 
             </when>
             <when test="image == 1">
-                AND (product.cover_img != "" AND product.description_img != "" )
+                AND (length(product.cover_img) >= 5 AND length(product.description_img ) >= 5)
             </when>
             <otherwise>
-                AND (product.cover_img = "" OR product.description_img = "" )
+                AND (length(product.cover_img) &lt; 5 OR length(product.cover_img) &lt; 5 )
             </otherwise>
         </choose>
         <choose>
@@ -235,10 +235,10 @@
 
             </when>
             <when test="image == 1">
-                AND (product.cover_img != "" AND product.description_img != "" )
+                AND (length(product.cover_img) >= 5 AND length(product.description_img ) >= 5)
             </when>
             <otherwise>
-                AND (product.cover_img = "" OR product.description_img = "" )
+                AND (length(product.cover_img)&lt; 5 OR length(product.cover_img) &lt; 5 )
             </otherwise>
         </choose>
         <choose>

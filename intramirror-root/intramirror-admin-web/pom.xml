@@ -79,6 +79,12 @@
         <dependency>
             <groupId>com.intramirror</groupId>
             <artifactId>intramirror-shoplus-service</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
