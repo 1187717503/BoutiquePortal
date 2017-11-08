@@ -5,6 +5,7 @@ import com.intramirror.product.api.model.Sku;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.SkuService;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
+import com.intramirror.user.api.model.User;
 import com.intramirror.web.Exception.ErrorResponse;
 import com.intramirror.web.Exception.ValidateException;
 import com.intramirror.web.common.response.BatchResponseItem;
@@ -15,15 +16,18 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
 /**
  * Created on 2017/10/25.
@@ -47,7 +51,8 @@ public class StateMachineController {
     private SkuService skuService;
 
     @PutMapping(value = "/single/{action}", consumes = "application/json")
-    public Response operateProduct(@PathVariable(value = "action") String action, @RequestBody Map<String, Object> body) {
+    public Response operateProduct(@SessionAttribute(value = "sessionStorage") Long userId, @PathVariable(value = "action") String action,
+            @RequestBody Map<String, Object> body) {
         Long productId = Long.parseLong(body.get("productId").toString());
         Long shopProductId = body.get("shopProductId") == null ? null : Long.parseLong(body.get("shopProductId").toString());
         Map<String, Object> currentState = productManagementService.getProductStateByProductId(productId);
@@ -60,19 +65,20 @@ public class StateMachineController {
                 throw new ValidateException(new ErrorResponse("Sku hasn't created."));
             }
         }
-        updateProductState(currentState, action, productId, shopProductId);
+        updateProductState((Long) userId, currentState, action, productId, shopProductId);
         return Response.success();
     }
 
-    private void updateProductState(Map<String, Object> currentState, String action, Long productId, Long shopProductId) {
+    private void updateProductState(Long userId, Map<String, Object> currentState, String action, Long productId, Long shopProductId) {
         OperationEnum operation = ProductStateOperationMap.getOperation(action);
         StateEnum currentStateEnum = map2StateEnum(currentState);
         StateEnum newStateEnum = StateMachineCoreRule.getNewState(currentStateEnum, operation);
-        LOGGER.info("Product [{}] Start [{}] -> [{}] -> [{}]", productId, currentStateEnum.name(), operation.name(), newStateEnum.name());
+        LOGGER.info("{} : Product [{}] Start [{}] -> [{}] -> [{}]", userId, productId, currentStateEnum.name(), operation.name(), newStateEnum.name());
         if (operation == OperationEnum.ON_SALE) {
             if (!isInStock(productId)) {
                 newStateEnum = StateEnum.SHOP_SOLD_OUT;
-                LOGGER.info("Change Product [{}] as Start [{}] -> [{}] -> [{}]", productId, currentStateEnum.name(), operation.name(), newStateEnum.name());
+                LOGGER.info("Auto change Product [{}] as Start [{}] -> [{}] -> [{}] due to out of stock", productId, currentStateEnum.name(), operation.name(),
+                        newStateEnum.name());
             }
         }
         if (currentStateEnum.getShopProductStatus() == -1 && newStateEnum.getShopProductStatus() == -1) {
@@ -91,7 +97,7 @@ public class StateMachineController {
                 productManagementService.updateProductStatusAndDisableShopProduct(newStateEnum.getProductStatus(), productId, shopProductId);
             }
         }
-        LOGGER.info("Product: [{}]  [{}] -> [{}] -> [{}] SUCCESSFUL", productId, currentStateEnum.name(), operation.name(), newStateEnum.name());
+        LOGGER.info("{} : Product: [{}]  [{}] -> [{}] -> [{}] SUCCESSFUL", userId, productId, currentStateEnum.name(), operation.name(), newStateEnum.name());
     }
 
     private boolean isInStock(Long productId) {
@@ -103,7 +109,9 @@ public class StateMachineController {
     }
 
     @PutMapping(value = "/batch/{action}", consumes = "application/json")
-    public Response batchOperateProduct(@PathVariable(value = "action") String action, @RequestBody Map<String, Object> body) {
+    public Response batchOperateProduct(@SessionAttribute(value = "sessionStorage") Long userId, HttpServletRequest request,
+            @PathVariable(value = "action") String action, @RequestBody Map<String, Object> body) {
+
         if (body.get("ids") == null) {
             throw new ValidateException(new ErrorResponse("Parameter missed"));
         }
@@ -120,7 +128,7 @@ public class StateMachineController {
         BatchResponseMessage responseMessage = new BatchResponseMessage();
         Map<Long, Long> validIdsMap = batchValidate(originalState, (List) body.get("ids"), operation, responseMessage);
         validIdsMap = batchFilterIncompleteProductIds(originalState, validIdsMap, operation, responseMessage);
-        batchUpdateProductState(originalState, action, validIdsMap, responseMessage);
+        batchUpdateProductState(userId, originalState, action, validIdsMap, responseMessage);
 
         return Response.status(StatusType.SUCCESS).data(responseMessage);
     }
@@ -196,7 +204,8 @@ public class StateMachineController {
         return tmp == original ? true : false;
     }
 
-    private void batchUpdateProductState(StateEnum currentStateEnum, String action, Map<Long, Long> validIdsMap, BatchResponseMessage responseMessage) {
+    private void batchUpdateProductState(Long userId, StateEnum currentStateEnum, String action, Map<Long, Long> validIdsMap,
+            BatchResponseMessage responseMessage) {
         if (validIdsMap.size() == 0) {
             return;
         }
@@ -204,17 +213,18 @@ public class StateMachineController {
         OperationEnum operation = ProductStateOperationMap.getOperation(action);
         StateEnum newStateEnum = StateMachineCoreRule.getNewState(currentStateEnum, operation);
 
-        LOGGER.info("Product [{}] Start [{}] -> [{}] -> [{}]", idsMapToString(validIdsMap), currentStateEnum.name(), operation.name(), newStateEnum.name());
+        LOGGER.info("{} : Product [{}] Start [{}] -> [{}] -> [{}]", userId, idsMapToString(validIdsMap), currentStateEnum.name(), operation.name(),
+                newStateEnum.name());
 
         if (/*currentStateEnum == StateEnum.SHOP_READY_TO_SELL &&*/ operation == OperationEnum.ON_SALE) {
             Map<Long, Long> outOfStockMap = batchCheckInStock(validIdsMap);
-            LOGGER.info("Out of stock : change Product [{}] as Start [{}] -> [{}] -> [{}]", idsMapToString(outOfStockMap), currentStateEnum.name(),
+            LOGGER.info("{} : Out of stock : change Product [{}] as Start [{}] -> [{}] -> [{}]", userId, idsMapToString(outOfStockMap), currentStateEnum.name(),
                     operation.name(), newStateEnum.name());
             batchUpdateProcess(currentStateEnum, StateEnum.SHOP_SOLD_OUT, outOfStockMap, responseMessage);
         } //else ?
 
         batchUpdateProcess(currentStateEnum, newStateEnum, validIdsMap, responseMessage);
-        LOGGER.info("Product: [{}]  [{}] -> [{}] -> [{}] SUCCESSFUL", idsMapToString(validIdsMap), currentStateEnum.name(), operation.name(),
+        LOGGER.info("{} : Product: [{}]  [{}] -> [{}] -> [{}] SUCCESSFUL", userId, idsMapToString(validIdsMap), currentStateEnum.name(), operation.name(),
                 newStateEnum.name());
 
         addSuccessToResponse(validIdsMap, responseMessage);
@@ -275,7 +285,7 @@ public class StateMachineController {
     }
 
     private String idsMapToString(Map<Long, Long> validIdsMap) {
-        StringBuilder sb = new StringBuilder("[");
+        StringBuilder sb = new StringBuilder();
         for (Map.Entry<Long, Long> entry : validIdsMap.entrySet()) {
             sb.append("{ productId:").append(entry.getKey());
             if (entry.getValue() != null) {

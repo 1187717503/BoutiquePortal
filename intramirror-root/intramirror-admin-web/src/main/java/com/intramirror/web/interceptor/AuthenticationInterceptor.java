@@ -63,10 +63,11 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
         }
 
         userId = Long.valueOf(claims.getSubject());
-
         if (userId == null) {
             throw StandardExceptions.UNAUTHORIZED;
         }
+
+        request.getSession().setAttribute("sessionStorage", userId);
 
         return true;
     }
