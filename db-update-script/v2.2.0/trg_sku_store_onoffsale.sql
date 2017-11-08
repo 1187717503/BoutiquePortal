@@ -1,3 +1,5 @@
+DROP TRIGGER IF EXISTS `trg_sku_store_onoffsale`; 
+
 delimiter //
 CREATE  TRIGGER `trg_sku_store_onoffsale` 
 AFTER UPDATE  ON `sku_store`
