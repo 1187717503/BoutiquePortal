@@ -64,10 +64,10 @@ public class ProductMgntController {
 
         SearchCondition searchCondition = new SearchCondition();
         searchCondition.setVendorId(vendorId);
-        searchCondition.setBoutiqueId(boutiqueId);
+        searchCondition.setBoutiqueId(escapeLikeParams(boutiqueId));
         searchCondition.setBrandId(brandId);
         searchCondition.setCategoryId(categoryId == null ? null : categoryCache.getAllChildCategory(Long.parseLong(categoryId)));
-        searchCondition.setDesignerId(designerId);
+        searchCondition.setDesignerId(escapeLikeParams(designerId));
         searchCondition.setColorCode(colorCode);
         searchCondition.setImage(image);
         searchCondition.setModelImage(modelImage);
@@ -134,10 +134,10 @@ public class ProductMgntController {
     // @formatter:on
         SearchCondition searchCondition = new SearchCondition();
         searchCondition.setVendorId(vendorId);
-        searchCondition.setBoutiqueId(boutiqueId);
+        searchCondition.setBoutiqueId(escapeLikeParams(boutiqueId));
         searchCondition.setBrandId(brandId);
         searchCondition.setCategoryId(categoryId == null ? null : categoryCache.getAllChildCategory(Long.parseLong(categoryId)));
-        searchCondition.setDesignerId(designerId);
+        searchCondition.setDesignerId(escapeLikeParams(designerId));
         searchCondition.setColorCode(colorCode);
         searchCondition.setImage(image);
         searchCondition.setModelImage(modelImage);
@@ -241,6 +241,13 @@ public class ProductMgntController {
             total += (store < 0 ? 0 : store);
         }
         return total;
+    }
+
+    private String escapeLikeParams(String input) {
+        if (input == null) {
+            return input;
+        }
+        return input.replace("_", "\\_");
     }
 
     private void setBrandIdAndColorCode(List<Map<String, Object>> productList) {
