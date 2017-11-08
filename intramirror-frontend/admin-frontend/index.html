@@ -585,6 +585,11 @@ Scripts
             $('#text-designerId').val('');
             $('#text-color-code').val('');
             $('#text-boutique').val('');
+
+            $('#text-designerId').trigger('blur');
+            $('#text-color-code').trigger('blur');
+            $('#text-boutique').trigger('blur');
+
             $('select').material_select();
             $('.orderby .icon use').attr('xlink:href', '#icon-paixu-copy');
             $('.orderby').removeClass('active');
