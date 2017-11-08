@@ -7,7 +7,6 @@ import com.intramirror.product.api.model.ShopProductSku;
 import com.intramirror.product.api.model.ShopProductWithBLOBs;
 import com.intramirror.product.api.model.Sku;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
-import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.ProductManagementMapper;
 import com.intramirror.product.core.mapper.ProductMapper;
 import com.intramirror.product.core.mapper.ShopProductMapper;
@@ -19,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,27 +28,20 @@ import org.springframework.transaction.annotation.Transactional;
  * @author YouFeng.Zhu
  */
 @Service
-public class ProductManagementServiceImpl extends BaseDao implements ProductManagementService {
+public class ProductManagementServiceImpl implements ProductManagementService {
     private final static Logger LOGGER = LoggerFactory.getLogger(ProductManagementServiceImpl.class);
 
     private final static Long shopId = 65L;
+    @Autowired
     private ProductManagementMapper productManagementMapper;
-
+    @Autowired
     private ProductMapper productMapper;
+    @Autowired
     private ShopProductMapper shopProductMapper;
-
+    @Autowired
     private ShopProductSkuMapper shopProductSkuMapper;
-
+    @Autowired
     private SkuMapper skuMapper;
-
-    @Override
-    public void init() {
-        productManagementMapper = this.getSqlSession().getMapper(ProductManagementMapper.class);
-        productMapper = this.getSqlSession().getMapper(ProductMapper.class);
-        shopProductMapper = this.getSqlSession().getMapper(ShopProductMapper.class);
-        shopProductSkuMapper = this.getSqlSession().getMapper(ShopProductSkuMapper.class);
-        skuMapper = this.getSqlSession().getMapper(SkuMapper.class);
-    }
 
     @Override
     public Map<String, Object> getProductStateByProductId(Long product_id) {
@@ -111,7 +104,7 @@ public class ProductManagementServiceImpl extends BaseDao implements ProductMana
     @Override
     @Transactional
     public void batchUpdateProductStatusAndDisableShopProduct(int status, List<Long> productIds, List<Long> shopProductIds) {
-        batchUpdateProductStatusOnly(status, shopProductIds);
+        batchUpdateProductStatusOnly(status, productIds);
         batchDisableShopProductStatus(shopProductIds);
     }
 
