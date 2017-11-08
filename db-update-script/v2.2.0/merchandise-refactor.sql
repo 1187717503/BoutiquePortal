@@ -1,3 +1,5 @@
+/***************************************************  sku.size 和 product.color_code,product.brandId的处理******************************************************************/
+
 ALTER TABLE `sku` ADD COLUMN `size` VARCHAR(32) NULL DEFAULT NULL COMMENT 'size';
 	
 --清理sku_property中重复数据
@@ -83,8 +85,6 @@ DROP TABLE IF EXISTS tmp_valueid_tosave;
 DROP TABLE IF EXISTS tmp_valueid_todel;
 DROP TABLE IF EXISTS tmp_merchandise_refactor;
 
-/**********************************************************  到此，sku.size字段更新完毕  **************************************************************************/
-	
 ALTER TABLE `product`
 	ADD COLUMN `color_code` VARCHAR(128) NULL DEFAULT NULL COMMENT 'color';
 	
@@ -98,6 +98,100 @@ select t.product_id,count(*) from product_property t where t.key_name = 'BrandID
 update product p,product_property pp set p.color_code = pp.value where p.product_id = pp.product_id and pp.key_name = 'ColorCode';
 update product p,product_property pp set p.designer_id = pp.value where p.product_id = pp.product_id and pp.key_name = 'BrandID';
 
-/**********************************************************  到此，ColorCode, BrandID字段更新完毕  **************************************************************************/
+/**********************************************************  创建 商品-库存总和 的view  **************************************************************************/
 
-create or replace view view_prod_store_sum as select `sku_store`.`product_id` AS `product_id`,sum(`sku_store`.`store`) AS `store` from `sku_store` group by `sku_store`.`product_id`;
+create or replace view view_prod_store_sum as 
+select t.`product_id` AS `product_id`,sum(t.`store`) AS `store` from `sku_store` t where t.store >= 0 and t.enabled = 1 group by t.`product_id`;
+
+/**********************************************************  商品状态机，异常数据状态迁移  **************************************************************************/
+
+/*新建数据处理日志表*/
+
+/*6,1 -> 5,null*/
+drop table tmp_data_migration_log;
+create table tmp_data_migration_log as
+SELECT 
+11 AS act_type,
+p.product_id,
+sp.shop_product_id,
+'UPDATE product p,shop_product sp SET p.`status` = 5,sp.enabled = 0
+WHERE p.product_id = sp.product_id AND p.enabled = 1 AND sp.enabled = 1 AND p.`status` = 6 AND sp.`status` = 1;' AS act_sql,
+'6,1 -> 5,null' as description, 
+now() as cur_date
+FROM product p,shop_product sp
+WHERE p.product_id = sp.product_id AND p.enabled = 1 AND sp.enabled = 0 AND p.`status` = 6 AND sp.`status` = 1;
+
+update product p,shop_product sp set p.`status` = 5,sp.enabled = 0 where p.product_id = sp.product_id and p.enabled = 1 and sp.enabled = 1 and p.`status` = 6 and sp.`status` = 1;
+
+/*4,0 -> 3,2*/
+insert into tmp_data_migration_log 
+SELECT 
+12 AS act_type,
+p.product_id,
+sp.shop_product_id,
+'UPDATE product p,shop_product sp SET p.`status` = 3,sp.`status` = 2
+WHERE p.product_id = sp.product_id AND p.enabled = 1 AND sp.enabled = 1 AND p.`status` = 4 AND sp.`status` = 0;' AS act_sql,
+'4,0 -> 3,2' as description, 
+now() as cur_date
+FROM product p,shop_product sp
+WHERE p.product_id = sp.product_id AND p.enabled = 1 AND sp.enabled = 1 AND p.`status` = 4 AND sp.`status` = 0;
+
+UPDATE product p,shop_product sp SET p.`status` = 3,sp.`status` = 2
+WHERE p.product_id = sp.product_id AND p.enabled = 1 AND sp.enabled = 1 AND p.`status` = 4 AND sp.`status` = 0;
+
+/*6,2 -> 5,2*/
+insert into tmp_data_migration_log 
+SELECT 
+13 AS act_type,
+p.product_id,
+sp.shop_product_id,
+'UPDATE product p,shop_product sp SET p.`status` = 5,sp.`status` = 2
+WHERE p.product_id = sp.product_id AND p.enabled = 1 AND sp.enabled = 1 AND p.`status` = 6 AND sp.`status` = 2;' AS act_sql,
+'6,2 -> 5,2' as description,
+now() as cur_date
+FROM product p,shop_product sp
+WHERE p.product_id = sp.product_id AND p.enabled = 1 AND sp.enabled = 1 AND p.`status` = 6 AND sp.`status` = 2;
+
+UPDATE product p,shop_product sp SET p.`status` = 5,sp.`status` = 2
+WHERE p.product_id = sp.product_id AND p.enabled = 1 AND sp.enabled = 1 AND p.`status` = 6 AND sp.`status` = 2;
+
+/*4,1 -> 3,1*/
+insert into tmp_data_migration_log 
+SELECT 
+14 AS act_type,
+p.product_id,
+sp.shop_product_id,
+'UPDATE product p,shop_product sp SET p.`status` = 3,sp.`status` = 1
+WHERE p.product_id = sp.product_id AND p.enabled = 1 AND sp.enabled = 1 AND p.`status` = 4 AND sp.`status` = 1;' AS act_sql,
+'4,1 -> 3,1' as description,
+now() as cur_date
+FROM product p,shop_product sp
+WHERE p.product_id = sp.product_id AND p.enabled = 1 AND sp.enabled = 1 AND p.`status` = 4 AND sp.`status` = 1;
+
+UPDATE product p,shop_product sp SET p.`status` = 3,sp.`status` = 1
+WHERE p.product_id = sp.product_id AND p.enabled = 1 AND sp.enabled = 1 AND p.`status` = 4 AND sp.`status` = 1;
+
+/*6,null -> 5,null*/
+insert into tmp_data_migration_log 
+SELECT 
+15 AS act_type,
+p.product_id,
+'' as shop_product_id,
+'UPDATE product p SET p.`status` = 5 WHERE p.enabled = 1 AND p.`status` = 6;' AS act_sql,
+'6,null -> 5,null' as description,
+now() as cur_date
+FROM product p
+WHERE p.enabled = 1 AND p.`status` = 6;
+
+UPDATE product p SET p.`status` = 5 WHERE p.enabled = 1 AND p.`status` = 6;
+
+select * from tmp_data_migration_log;
+
+
+/**********************************************************  商品状态机，异常数据状态迁移  **************************************************************************/
+
+SELECT COUNT(*)  FROM `sku` t 
+INNER JOIN `sku_store` ss on(
+t.`product_id` = ss.`product_id` and t.`sku_id` = ss.`sku_id` and t.`enabled` <> ss.`enabled` );  -- 25043
+
+UPDATE `sku_store` ss,`sku` t set ss.`enabled` = t.`enabled` where t.`product_id` = ss.`product_id` and t.`sku_id` = ss.`sku_id` and t.`enabled` <> ss.`enabled`;
