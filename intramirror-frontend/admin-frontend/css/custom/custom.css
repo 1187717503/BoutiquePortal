@@ -80,6 +80,7 @@ ul.tabs {
 nav .brand-logo {
 	color: #871b55;
 	display: flex;
+	font-size: 22px;
 }
 
 nav .brand-text {
@@ -88,7 +89,7 @@ nav .brand-text {
     display: block;
     justify-content: center;
     font-weight: 500;
-    margin-left: 12px;
+    margin-left: 27px;
     font-family: Roboto,sans-serif;
 }
 .tabs .indicator {

@@ -86,7 +86,7 @@
                 <ul class="left">
                     <li>
                         <h1 class="logo-wrapper">
-                            <a href="../admin/default" class="brand-logo darken-1 mdi-navigation-menu"><span class="brand-text">Merchandise Management > Product Management</span></a>
+                            <a href="../admin/default" class="brand-logo darken-1 mdi-navigation-menu"><span class="brand-text">Merchandise Management - Product Management</span></a>
                         </h1>
                     </li>
                 </ul>
@@ -585,6 +585,11 @@ Scripts
             $('#text-designerId').val('');
             $('#text-color-code').val('');
             $('#text-boutique').val('');
+
+            $('#text-designerId').trigger('blur');
+            $('#text-color-code').trigger('blur');
+            $('#text-boutique').trigger('blur');
+
             $('select').material_select();
             $('.orderby .icon use').attr('xlink:href', '#icon-paixu-copy');
             $('.orderby').removeClass('active');

@@ -348,7 +348,7 @@
 }
 
 .multi-menu ul li {
-    z-index: 999;
+    z-index: 998;
     font-size: 16px;
     padding: 6.5px 16px;
     line-height: 22px;

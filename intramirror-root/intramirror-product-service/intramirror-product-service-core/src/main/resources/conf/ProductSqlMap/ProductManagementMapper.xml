@@ -73,7 +73,10 @@
             AND product.product_code LIKE "%"#{boutiqueId}"%"
         </if>
         <if test="vendorId != null">
-            AND vendor.vendor_id = #{vendorId}
+            AND vendor.vendor_id IN
+            <foreach item="item" index="index" collection="vendorId" open="(" separator="," close=")">
+                #{item}
+            </foreach>
         </if>
         <choose>
             <when test="image == null or image == 0">
@@ -228,7 +231,10 @@
             AND product.product_code LIKE "%"#{boutiqueId}"%"
         </if>
         <if test="vendorId != null">
-            AND vendor.vendor_id = #{vendorId}
+            AND vendor.vendor_id IN
+            <foreach item="item" index="index" collection="vendorId" open="(" separator="," close=")">
+                #{item}
+            </foreach>
         </if>
         <choose>
             <when test="image == null or image == 0">

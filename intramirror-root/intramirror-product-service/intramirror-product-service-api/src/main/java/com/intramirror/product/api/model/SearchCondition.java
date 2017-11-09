@@ -10,7 +10,7 @@ import java.util.List;
 public class SearchCondition {
     private int status;
     private int shopStatus;
-    private String vendorId;
+    private String[] vendorId;
     private String boutiqueId;
     private String brandId;
     private List<Long> categoryId;
@@ -50,11 +50,11 @@ public class SearchCondition {
         return shopStatus;
     }
 
-    public String getVendorId() {
+    public String[] getVendorId() {
         return vendorId;
     }
 
-    public void setVendorId(String vendorId) {
+    public void setVendorId(String[] vendorId) {
         this.vendorId = vendorId;
     }
 

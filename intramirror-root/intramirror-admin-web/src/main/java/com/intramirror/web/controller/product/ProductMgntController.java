@@ -46,7 +46,7 @@ public class ProductMgntController {
     @GetMapping(value = "/state/count")
     public Response listAllProductStateCount(
             // @formatter:off
-            @RequestParam(value = "vendorId", required = false) String vendorId,
+            @RequestParam(value = "vendorId", required = false) String[] vendorId,
             @RequestParam(value = "boutiqueId", required = false) String boutiqueId,
             @RequestParam(value = "brandId", required = false) String brandId,
             @RequestParam(value = "categoryId", required = false) String categoryId,
@@ -114,7 +114,7 @@ public class ProductMgntController {
     @GetMapping(value = "/list/{status}")
     // @formatter:off
     public Response listProductByFilter(@PathVariable(value = "status") String status,
-            @RequestParam(value = "vendorId", required = false) String vendorId,
+            @RequestParam(value = "vendorId", required = false) String[] vendorId,
             @RequestParam(value = "boutiqueId", required = false) String boutiqueId,
             @RequestParam(value = "brandId", required = false) String brandId,
             @RequestParam(value = "categoryId", required = false) String categoryId,
@@ -184,8 +184,8 @@ public class ProductMgntController {
         }
         if (price.get("boutique_price") != null) {
             Double boutique_price = Double.parseDouble(price.get("boutique_price").toString());
-            BigDecimal b = new BigDecimal(boutique_price / retailPrice);
-            Double discount = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue() * 1.22;
+            BigDecimal b = new BigDecimal(boutique_price / retailPrice * 1.22);
+            Double discount = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
             price.put("boutique_discount", 1 - discount);
         }
         if (price.get("im_price") != null) {
