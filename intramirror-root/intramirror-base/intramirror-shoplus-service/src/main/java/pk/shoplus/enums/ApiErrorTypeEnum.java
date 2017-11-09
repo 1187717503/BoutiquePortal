@@ -16,6 +16,7 @@ public class ApiErrorTypeEnum {
 
         boutique_id_already_exist("boutique_id_already_exist","查询到这个boutique_id。"),
         boutique_id_not_exists("boutique_id_not_exists","boutique_id不存在。"),
+        sku_code_not_exists("sku_code_not_exists","sku_code不存在。"),
         boutique_name_is_null("boutique_name_is_null","接口传递过来的boutique_name为null。"),
         boutique_id_is_null("boutique_id_is_null","接口传递过来的boutique_id为null。"),
         boutique_create_error("boutique_create_error","创建product表记录失败。"),
@@ -27,7 +28,7 @@ public class ApiErrorTypeEnum {
 
         vendor_is_null("vendor_is_null","接口传递过来的vendor_id查不到。"),
 
-
+        stock_type_is_null("stock_type_is_null","接口传递过来的stock_type为null。"),
         stock_is_null("stock_is_null","接口传递过来的stock为null。"),
         updateStock_params_is_error("updateStock_params_is_error","修改库存时入参传递有误。"),
 
