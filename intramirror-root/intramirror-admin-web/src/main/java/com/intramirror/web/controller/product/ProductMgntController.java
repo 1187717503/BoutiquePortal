@@ -46,7 +46,7 @@ public class ProductMgntController {
     @GetMapping(value = "/state/count")
     public Response listAllProductStateCount(
             // @formatter:off
-            @RequestParam(value = "vendorId", required = false) String vendorId,
+            @RequestParam(value = "vendorId", required = false) String[] vendorId,
             @RequestParam(value = "boutiqueId", required = false) String boutiqueId,
             @RequestParam(value = "brandId", required = false) String brandId,
             @RequestParam(value = "categoryId", required = false) String categoryId,
@@ -114,7 +114,7 @@ public class ProductMgntController {
     @GetMapping(value = "/list/{status}")
     // @formatter:off
     public Response listProductByFilter(@PathVariable(value = "status") String status,
-            @RequestParam(value = "vendorId", required = false) String vendorId,
+            @RequestParam(value = "vendorId", required = false) String[] vendorId,
             @RequestParam(value = "boutiqueId", required = false) String boutiqueId,
             @RequestParam(value = "brandId", required = false) String brandId,
             @RequestParam(value = "categoryId", required = false) String categoryId,
