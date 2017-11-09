@@ -129,6 +129,9 @@
 
     }
     .left-nav {
+      overflow-y:auto;
+      overflow-x:hidden;
+      padding-bottom: 100px;
       position: fixed;
       top: 0;
       left: 0;
@@ -172,6 +175,7 @@
       }
     }
     .nav-list {
+      
       .item {
         width: 260px;
         display: inline-block;
