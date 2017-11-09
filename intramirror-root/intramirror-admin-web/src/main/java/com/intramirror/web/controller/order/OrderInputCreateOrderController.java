@@ -1,29 +1,27 @@
 package com.intramirror.web.controller.order;
 
-import java.util.ArrayList;
+import com.alibaba.fastjson.JSONObject;
+import com.google.gson.Gson;
+import com.intramirror.common.help.StringUtils;
+import com.intramirror.order.api.model.LogisticsProduct;
+import com.intramirror.order.api.vo.CheckoutEntity;
+import com.intramirror.order.api.vo.InputCreateOrder;
+import com.intramirror.product.api.service.ShopProductSkuService;
+import com.intramirror.user.api.model.User;
+import com.intramirror.web.common.CommonProperties;
+import com.intramirror.web.controller.BaseController;
+import com.intramirror.web.service.OrderInputCreateOrderService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
-
-import com.alibaba.fastjson.JSONObject;
-import com.intramirror.order.api.model.LogisticsProduct;
-import com.intramirror.web.common.CommonProperties;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.google.gson.Gson;
-import com.intramirror.order.api.vo.InputCreateOrder;
-import com.intramirror.user.api.model.User;
-import com.intramirror.web.controller.BaseController;
-import com.intramirror.web.service.OrderInputCreateOrderService;
 import pk.shoplus.service.request.impl.GetPostRequestService;
 
 
@@ -38,6 +36,9 @@ public class OrderInputCreateOrderController extends BaseController {
 
 	@Autowired
 	private CommonProperties commonProperties;
+
+	@Autowired
+	private ShopProductSkuService shopProductSkuService;
 
 	/**
 	 * Wang
@@ -61,6 +62,25 @@ public class OrderInputCreateOrderController extends BaseController {
 
 		// 调用service 事物管理
 		try {
+			GetPostRequestService getPostRequestService = new GetPostRequestService();
+			List<CheckoutEntity> checkoutListStr = paramMap.getCheckoutListStr();
+			String[] strings = new String[checkoutListStr.size()];
+			for(int i =0,len=checkoutListStr.size();i<len;i++) {
+				CheckoutEntity checkoutEntity = checkoutListStr.get(i);
+				strings[i] = checkoutEntity.getShop_product_sku_id().toString();
+			}
+			List<Map<String,Object>> skuMap = shopProductSkuService.getSkuIdByShopProductSkuId(strings);
+			for(Map<String,Object> sku : skuMap) {
+				String skuId = sku.get("sku_id").toString();
+				String url = commonProperties.getAppCheckUrl()+"?skuId="+skuId;
+				logger.info("OrderInputCreateOrderServiceOrderInputCheckOrder,start,requestMethod,url:"+url);
+				String response = getPostRequestService.requestMethod(GetPostRequestService.HTTP_POST,url,null);
+				logger.info("OrderInputCreateOrderServiceOrderInputCheckOrder,end,requestMethod,url:"+url+",response:"+response);
+				if(StringUtils.isBlank(response) || response.equals("ERROR")) {
+					results.put("error", "quantity not available in the stock。");
+					return results;
+				}
+			}
 
 			logger.info("OrderInputCreateOrderController,orderInputCreateOrder,start,paramMap:"+ JSONObject.toJSONString(paramMap)+",user:"+JSONObject.toJSONString(user));
 			results = orderInputCreateOrderService.orderInputCreateOrder(paramMap, user);
@@ -72,7 +92,6 @@ public class OrderInputCreateOrderController extends BaseController {
 					List<LogisticsProduct> sendEmailList = (List<LogisticsProduct>)results.get("sendEmailList");
 
 					for(LogisticsProduct logisticsProduct : sendEmailList){
-						GetPostRequestService getPostRequestService = new GetPostRequestService();
 						String url = commonProperties.getAppOrderUrl()+"?logisticProductId="+logisticsProduct.getLogistics_product_id();
 						logger.info("OrderInputCreateOrderServiceOrderInputCreateOrder,start,requestMethod,url:"+url);
 						String response = getPostRequestService.requestMethod(GetPostRequestService.HTTP_POST,url,null);
