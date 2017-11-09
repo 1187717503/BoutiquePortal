@@ -110,7 +110,7 @@
                         <div class="col s9">
                             <div class="row">
                                 <div class="input-field col s3">
-                                    <select id="select-boutique"></select>
+                                    <select id="select-boutique" multiple></select>
                                 </div>
                                 <div class="input-field col s2">
                                     <input id="text-designerId" type="text" class="validate">
@@ -266,7 +266,7 @@ Scripts
 </script>
 
 <script id="tmpl-boutique-select" type="text/x-jquery-tmpl">
-    <option value="-1" selected>Boutique</option>
+    <option value="-1" disabled selected>Boutique</option>
     {%each(i, boutique) list%}
     <option value="${boutique.vendor_id}">${boutique.vendor_name}</option>
     {%/each%}
@@ -549,10 +549,6 @@ Scripts
 
 
 <script type="text/javascript">
-
-    function sss(a) {
-        console.log(a);
-    }
 
     $(function () {
         
