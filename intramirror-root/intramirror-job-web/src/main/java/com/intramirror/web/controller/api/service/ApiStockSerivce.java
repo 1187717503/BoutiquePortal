@@ -53,6 +53,14 @@ public class ApiStockSerivce {
             resultMap = this.executeStockRule(conn);
             if(conn!=null){conn.commit();conn.close();}
 
+            if(stockOption.getStore() < 0) {
+                return errorMap(ApiErrorTypeEnum.errorType.Data_is_negative,"store",stockOption.getStore()+"");
+            }
+
+            if(stockOption.getStore() > 100) {
+                return errorMap(ApiErrorTypeEnum.errorType.Data_stock_out_off,"store",stockOption.getStore()+"");
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("ApiStockSerivce,executeUpdateStock,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+",stockOption:"+JSONObject.toJSONString(stockOption));
@@ -266,8 +274,9 @@ public class ApiStockSerivce {
         }
         try {
             int stock = Integer.parseInt(quantity);
-            if(stock<0 || stock > 100) {
-                return errorMap(ApiErrorTypeEnum.errorType.Data_is_negative,"store",quantity);
+            if(stock < 0 || stock > 100) {
+                stockOption.setStore(stock);
+                stockOption.setQuantity("0");
             }
         } catch (Exception e) {
             e.printStackTrace();

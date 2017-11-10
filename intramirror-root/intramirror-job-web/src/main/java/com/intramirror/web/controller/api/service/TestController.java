@@ -1,6 +1,5 @@
 package com.intramirror.web.controller.api.service;
 
-import com.alibaba.fastjson.JSONObject;
 import com.intramirror.web.mapping.vo.StockOption;
 import java.util.Date;
 import java.util.Map;
@@ -26,14 +25,21 @@ public class TestController {
         ApiStockSerivce apiStockSerivce = new ApiStockSerivce(stockOption);
         stockOption.setSizeValue("AA");
         stockOption.setVendor_id("9");
-        stockOption.setProductCode("587e3'4dafd7955c'0bff4515d");
+        stockOption.setProductCode("587e34dafd7955c0bff4515d");
         stockOption.setSku_code("Ding_s'ku_code");
-        stockOption.setQuantity("1");
+        stockOption.setQuantity("1000");
         stockOption.setType(Contants.STOCK_QTY+"");
-        System.out.println("start:"+new Date().toString());
+        stockOption.setLast_check(new Date());
+        long  start = System.currentTimeMillis();
+        System.out.println("start:"+new Date().toString() +","+start);
         Map<String,Object> map = apiStockSerivce.executeUpdateStock();
-        System.out.println("end:"+new Date().toString());
-        System.out.println("result:"+ JSONObject.toJSONString(map));
+//        ApiUpdateStockService apiUpdateStockService = new ApiUpdateStockService();
+
+//        apiUpdateStockService.updateStock(stockOption);
+        long  end = System.currentTimeMillis();
+        System.out.println("end:"+new Date().toString()+","+end);
+        System.out.println(start-end);
+//        System.out.println("result:"+ JSONObject.toJSONString(map));
 
 
     }
