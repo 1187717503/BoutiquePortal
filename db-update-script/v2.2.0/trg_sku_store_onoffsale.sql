@@ -20,7 +20,6 @@ SET l_sku_id = NEW.sku_id;
 
 IF OLD.store > 0 AND NEW.store <= 0 THEN 
 	-- 加锁防止并发
-	UPDATE shop_product SET updated_at=now() where product_id = l_product_id AND enabled = 1;
 	SELECT product_id INTO l_product_id FROM shop_product WHERE product_id = l_product_id AND enabled = 1 FOR UPDATE;
 	-- 查询最大一个库存是否大于零
     SELECT MAX(store) INTO l_product_store FROM sku_store WHERE product_id = l_product_id AND enabled = 1;
