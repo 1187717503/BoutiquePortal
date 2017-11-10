@@ -3310,15 +3310,19 @@ Vel = $ ? $.Velocity : Velocity, function(a) {
     }), a.fn.material_select = function(b) {
         function c(a, b, c) {
             var e = a.indexOf(b);
-            -1 === e ? a.push(b) : a.splice(e, 1), c.siblings("ul.dropdown-content").find("li").eq(b).toggleClass("active"), 
+            -1 === e ? a.push(b) : a.splice(e, 1), 
+            c.siblings("ul.dropdown-content").find("li").eq(b).toggleClass("active"), 
             c.find("option").eq(b).prop("selected", !0), d(a, c);
         }
         function d(a, b) {
-            for (var c = "", d = 0, e = a.length; e > d; d++) {
+            for (var c = "", v = "", d = 0, e = a.length; e > d; d++) {
                 var f = b.find("option").eq(a[d]).text();
+                var u = b.find("option").eq(a[d]).val();
                 c += 0 === d ? f : ", " + f;
+                v += 0 === d ? u : "," + u;
             }
             "" === c && (c = b.find("option:disabled").eq(0).text()), b.siblings("input.select-dropdown").val(c);
+            b.siblings("input.select-dropdown").data('checked-value', v);
         }
         a(this).each(function() {
             var d = a(this);
