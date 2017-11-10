@@ -44,7 +44,7 @@ public class AtelierUpdateByProductService implements InitializingBean {
     public String create_product = "product_delta_create";
 
     // thread num
-    private static final int threadNum = 10;
+    private static final int threadNum = 20;
 
     public Map<String,Object> updateProduct(String body,String storeID,String version,String type){
         MapUtils mapUtils = new MapUtils(new HashMap<String, Object>());

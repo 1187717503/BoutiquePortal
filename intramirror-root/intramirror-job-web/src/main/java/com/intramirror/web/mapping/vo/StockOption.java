@@ -8,12 +8,14 @@ import java.util.Date;
  */
 public class StockOption {
     public String productCode; // 商品code
+    public String sku_code;
     public String sizeValue; // sku size
     public String quantity; // 库存
     public String vendor_id; // vendor
     public String price; // 价格
     public String type; // 库存类型
     public Date last_check; // 消息时间
+    public int store;
 
     public Date getLast_check() {
         return last_check;
@@ -69,5 +71,21 @@ public class StockOption {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getSku_code() {
+        return sku_code;
+    }
+
+    public void setSku_code(String sku_code) {
+        this.sku_code = sku_code;
+    }
+
+    public int getStore() {
+        return store;
+    }
+
+    public void setStore(int store) {
+        this.store = store;
     }
 }

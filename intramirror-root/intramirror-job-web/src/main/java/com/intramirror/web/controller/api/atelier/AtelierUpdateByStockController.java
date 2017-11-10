@@ -41,7 +41,7 @@ public class AtelierUpdateByStockController  implements InitializingBean {
     private Map<String,Object> paramsMap;
 
     // thread num
-    private static final int threadNum = 10;
+    private static final int threadNum = 20;
 
     // mapping
     @Resource(name = "atelierUpdateByStockMapping")
