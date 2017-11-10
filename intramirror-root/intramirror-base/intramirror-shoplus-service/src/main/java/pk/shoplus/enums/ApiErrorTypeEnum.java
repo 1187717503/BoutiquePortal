@@ -16,6 +16,7 @@ public class ApiErrorTypeEnum {
 
         boutique_id_already_exist("boutique_id_already_exist","查询到这个boutique_id。"),
         boutique_id_not_exists("boutique_id_not_exists","boutique_id不存在。"),
+        sku_code_not_exists("sku_code_not_exists","sku_code不存在。"),
         boutique_name_is_null("boutique_name_is_null","接口传递过来的boutique_name为null。"),
         boutique_id_is_null("boutique_id_is_null","接口传递过来的boutique_id为null。"),
         boutique_create_error("boutique_create_error","创建product表记录失败。"),
@@ -27,7 +28,7 @@ public class ApiErrorTypeEnum {
 
         vendor_is_null("vendor_is_null","接口传递过来的vendor_id查不到。"),
 
-
+        stock_type_is_null("stock_type_is_null","接口传递过来的stock_type为null。"),
         stock_is_null("stock_is_null","接口传递过来的stock为null。"),
         updateStock_params_is_error("updateStock_params_is_error","修改库存时入参传递有误。"),
 
@@ -50,6 +51,7 @@ public class ApiErrorTypeEnum {
         warning_duplicated_skusize("warning_duplicated_skusize","重复的sku size"),
 
         Data_is_negative("Data_is_negative","数据为负数。"),
+        Data_stock_out_off("Data_stock_out_off","库存数据超过100。"),
         warning_data_is_negative("warning_data_is_negative","警告，数据为负数。"),
         Data_is_not_number("Data_is_not_number","数据不是数字。"),
         warning_ColorCode_change("warning_ColorCode_change","警告，ColorCode不允许改变。"),
