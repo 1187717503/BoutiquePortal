@@ -27,6 +27,55 @@ function initBrand() {
     });
 }
 
+
+function selectAll() {
+    $('#select-boutique').siblings('ul.select-dropdown').find('li').each(function() {
+        if (!$(this).find('input').prop('checked')) {
+            $(this).trigger('click');
+        }
+    })
+}
+
+function resetAll() {
+    $('#select-boutique').siblings('ul.select-dropdown').find('li').each(function() {
+        if ($(this).find('input').prop('checked')) {
+            $(this).trigger('click');
+        }
+    })
+    $('#select-boutique').siblings('input').attr('placeholder', "All Boutique");
+}
+
+function initActionforBoutique() {
+    // 反选
+    $('#select-boutique').siblings('ul.select-dropdown').find('li').on('click', function() {
+        if ($(this).index() == 0) {
+            if ($(this).find('input').prop('checked')) {
+                selectAll();
+            } else {
+                resetAll();
+            }
+        }
+        $('#select-boutique').siblings('input').attr('title', getSelectedText());
+    });
+}
+
+function getSelectedText() {
+    let selected = '';
+    $('#select-boutique').siblings('ul.select-dropdown').find('li').each(function() {
+        if ($(this).find('input').prop('checked')) {
+            if (selected !== '') {
+                selected += ',';
+            }
+            let idx = $(this).index() + 1;
+            let t = $('#select-boutique option:nth-child('+idx+')').text();
+            if (t != '-1') {
+                selected += t;
+            }
+        }
+    })
+    return selected;
+}
+
 function initVendor() {
 
     $.ajax({
@@ -40,14 +89,8 @@ function initVendor() {
         },
         success: function(result) {
             initSelectItems('select-boutique', 'tmpl-boutique-select', result.data);
-
-            // 反选
-            $('#select-boutique').siblings('ul.select-dropdown').find('li').on('click', function() {
-                if ($(this).index() == 0) {
-                    $(this).siblings().trigger('click');
-                }
-            });
-
+            $('#select-boutique').siblings('input').attr('title', 'All Boutique');
+            initActionforBoutique();
         }, error : function (code, exception) {
             if (code.status == 401) {
                 window.location.href = '../../login'
@@ -113,7 +156,23 @@ function initSeason() {
 
 function getFilterFromDom() {
     let searchObj = {}
-    searchObj.boutique = $('#select-boutique').siblings("input").data('checked-value');
+    let selected = '';
+
+    $('#select-boutique').siblings('ul.select-dropdown').find('li').each(function() {
+        if ($(this).find('input').prop('checked')) {
+            if (selected !== '') {
+                selected += ',';
+            }
+            let idx = $(this).index() + 1;
+            let t = $('#select-boutique option:nth-child('+idx+')').val();
+            if (t != '-1') {
+                selected += t;
+            }
+        }
+    })
+
+    searchObj.boutique = selected;
+
     searchObj.category = $('#category-input').data('category-id');
     searchObj.season = $('#select-season').val();
     searchObj.brand = $('#select-brand').val();
@@ -492,7 +551,7 @@ function getBtnStatus(status) {
         btnStatus.trash = 1;
         btnStatus.add_to_shop = 1;
     } else if (status === 'shopreadytosell') {
-        btnStatus.process = 1;
+        // btnStatus.process = 1;
         btnStatus.remove = 1;
         btnStatus.remove_from_shop = 1;
         btnStatus.on_sale = 1
