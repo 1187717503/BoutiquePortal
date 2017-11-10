@@ -3,6 +3,7 @@ package pk.shoplus.service;
 import java.util.*;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.log4j.Logger;
 import org.sql2o.Connection;
 
 import org.sql2o.Query;
@@ -215,5 +216,30 @@ public class SkuStoreService {
 		} catch (Exception e) {
 			throw e;
 		}
+	}
+
+/**api------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+	private static final Logger logger = Logger.getLogger(SkuStoreService.class);
+
+	public List<Map<String,Object>> api_select_store(String product_code,String size,String vendor_id) throws Exception{
+		String sql = "select ss.`sku_store_id` ,ss.`confirmed` ,ss.`store` ,ss.`reserved`   from `product` p  \n"
+				+ "inner join `sku` s on(s.`product_id` = p.`product_id`  and s.`enabled`  = 1 and p.`enabled`  = 1)\n"
+				+ "inner join `sku_store`  ss on(s.`sku_id` = ss.`sku_id`  and ss.`enabled`  = 1)\n"
+				+ "inner join `sku_property`  sp on(s.`sku_id` = sp.`sku_id`  and sp.`enabled`  = 1)\n"
+				+ "inner join `product_sku_property_value`  pspv on(sp.`product_sku_property_value_id` = pspv.`product_sku_property_value_id`  and pspv.`enabled`  = 1)\n"
+				+ "where p.`vendor_id`  = "+vendor_id+" and trim(p.`product_code`)  = '"+product_code+"' and trim(pspv.`value`) = '"+size+"'";
+		logger.info("SkuStoreService,api_select_store,sql:"+sql);
+		return skuStoreDao.executeBySql(sql,null);
+	}
+
+	public List<Map<String,Object>> api_select_store(String sku_code,String vendor_id) throws Exception{
+		String sql = "select ss.`sku_store_id` ,ss.`confirmed` ,ss.`store` ,ss.`reserved`   from `product` p  \n"
+				+ "inner join `sku` s on(s.`product_id` = p.`product_id`  and s.`enabled`  = 1 and p.`enabled`  = 1)\n"
+				+ "inner join `sku_store`  ss on(s.`sku_id` = ss.`sku_id`  and ss.`enabled`  = 1)\n"
+				+ "inner join `sku_property`  sp on(s.`sku_id` = sp.`sku_id`  and sp.`enabled`  = 1)\n"
+				+ "inner join `product_sku_property_value`  pspv on(sp.`product_sku_property_value_id` = pspv.`product_sku_property_value_id`  and pspv.`enabled`  = 1)\n"
+				+ "where p.`vendor_id`  = "+vendor_id+" and trim(s.`sku_code`) = '"+sku_code+"'";
+		logger.info("SkuStoreService,api_select_store,sql:"+sql);
+		return skuStoreDao.executeBySql(sql,null);
 	}
 }
