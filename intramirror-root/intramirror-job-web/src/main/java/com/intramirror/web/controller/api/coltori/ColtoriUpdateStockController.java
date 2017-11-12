@@ -88,46 +88,66 @@ public class ColtoriUpdateStockController  implements InitializingBean {
                 get_stock_url = get_stock_url+"&since_updated_at="+ since_updated_at+"&until_updated_at="+until_updated_at;
             }
 
-            logger.info("ColtoriUpdateStockController,requestMethod,start,get_stock_url:"+get_stock_url);
-            String responseData = HttpUtils.httpGet(get_stock_url);
-            logger.info("ColtoriUpdateStockController,requestMethod,end,get_stock_url:"+get_stock_url+",responseData:"+responseData);
-            apiDataFileUtils.bakPendingFile("responseData",responseData);
+            String current = "";
+            String pages = "";
+            String total = "";
+            int sum = 0;
+            int i = 1;
+            while (true) {
+                String new_url = get_stock_url;
+                if(i <= sum || i == 1) {
+                    new_url = new_url + "&page="+i+"&limit=200";
+                }
+                logger.info("ColtoriUpdateStockController,requestMethod,start,get_stock_url:"+new_url);
+                System.out.println(new_url);
+                Map<String,Object> resultMap = HttpUtils.responseAndHeadersGet(new_url);
+                String responseData = resultMap.get("resultMessage").toString();
+                current = resultMap.get("current").toString();
+                pages = resultMap.get("pages").toString();
+                sum = Integer.parseInt(pages);
+                total = resultMap.get("total").toString();
+                logger.info("ColtoriUpdateStockController,requestMethod,end,get_stock_url:"+new_url+",current:"+current+",pages:"+pages+",total:"+total);
+                apiDataFileUtils.bakPendingFile("responseData",responseData);
 
-            if(StringUtils.isNotBlank(responseData) && responseData.contains("no results matching your query")) {
-                return null;
-            }
+                if((StringUtils.isNotBlank(responseData) && responseData.contains("no results matching your query")) || StringUtils.isBlank(responseData)) {
+                    break;
+                }
 
-            JSONObject productOpj = JSONObject.fromObject(responseData);
-            Iterator<String> product = productOpj.keys();
-            while (product.hasNext()) {
-                String product_code = product.next();
-                JSONObject skusObj = productOpj.getJSONObject(product_code);
-                logger.info("ColtoriUpdateStockController,while,skusObj:"+skusObj.toString()+",product_code:"+product_code);
-                JSONObject sizesObj = skusObj.getJSONObject("sizes");
-                Iterator<String> sizes = sizesObj.keys();
-                while(sizes.hasNext()) {
-                    String key = sizes.next();
-                    JSONObject skuObj = sizesObj.getJSONObject(key);
-                    Iterator<String> sku = skuObj.keys();
-                    while(sku.hasNext()){
-                        String size = sku.next();
-                        String stock = skuObj.getString(size);
+                JSONObject productOpj = JSONObject.fromObject(responseData);
+                Iterator<String> product = productOpj.keys();
+                while (product.hasNext()) {
+                    String product_code = product.next();
+                    JSONObject skusObj = productOpj.getJSONObject(product_code);
+                    logger.info("ColtoriUpdateStockController,while,skusObj:"+skusObj.toString()+",product_code:"+product_code);
+                    JSONObject sizesObj = skusObj.getJSONObject("sizes");
+                    Iterator<String> sizes = sizesObj.keys();
+                    while(sizes.hasNext()) {
+                        String key = sizes.next();
+                        JSONObject skuObj = sizesObj.getJSONObject(key);
+                        Iterator<String> sku = skuObj.keys();
+                        while(sku.hasNext()){
+                            String size = sku.next();
+                            String stock = skuObj.getString(size);
 
-                        Map<String,Object> stockMap = new HashMap<>();
-                        stockMap.put("vendor_id",vendor_id);
-                        stockMap.put("product_code",product_code);
-                        stockMap.put("size",size);
-                        stockMap.put("stock",stock);
-                        logger.info("ColtoriUpdateStockController,start,mapping,stockMap:"+JSONObject.fromObject(stockMap));
-                        StockOption stockOption = iStockMapping.mapping(stockMap);
-                        logger.info("ColtoriUpdateStockController,end,mapping,stockMap:"+JSONObject.fromObject(stockMap)+",stockOption:"+JSONObject.fromObject(stockOption));
-                        // 线程池
-                        logger.info("ColtoriUpdateStockController,execute,startDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(stockMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
-                        CommonThreadPool.execute(eventName,executor,5,new UpdateStockThread(stockOption,apiDataFileUtils,stockMap));
-                        logger.info("ColtoriUpdateStockController,execute,endDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(stockMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
+                            Map<String,Object> stockMap = new HashMap<>();
+                            stockMap.put("vendor_id",vendor_id);
+                            stockMap.put("product_code",product_code);
+                            stockMap.put("size",size);
+                            stockMap.put("stock",stock);
+                            logger.info("ColtoriUpdateStockController,start,mapping,stockMap:"+JSONObject.fromObject(stockMap));
+                            StockOption stockOption = iStockMapping.mapping(stockMap);
+                            logger.info("ColtoriUpdateStockController,end,mapping,stockMap:"+JSONObject.fromObject(stockMap)+",stockOption:"+JSONObject.fromObject(stockOption));
+                            // 线程池
+                            logger.info("ColtoriUpdateStockController,execute,startDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(stockMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
+                            CommonThreadPool.execute(eventName,executor,5,new UpdateStockThread(stockOption,apiDataFileUtils,stockMap));
+                            logger.info("ColtoriUpdateStockController,execute,endDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(stockMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
+                        }
                     }
                 }
+                i++;
             }
+
+            System.out.println("end");
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("ColtoriUpdateByProductController,Execute,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));

@@ -1,6 +1,8 @@
 package pk.shoplus.service;
 
+import com.alibaba.fastjson15.JSONObject;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.log4j.Logger;
 import org.sql2o.Connection;
 
 import pk.shoplus.common.Helper;
@@ -1098,5 +1100,193 @@ public class ProductService {
         }
     }
 
+    // --
+
+    private static final Logger logger = Logger.getLogger(ProductService.class);
+
+    public Map<String, Object> getBoutiqueCategory(String vendor_id,String boutique_category_id) throws Exception {
+        try {
+            String sql = "select distinct c.category_id from api_category_map acm\n" +
+                    "inner join api_configuration ac on(ac.enabled = 1 and ac.api_configuration_id = acm.api_configuration_id)\n" +
+                    "inner join category c on(c.enabled = 1 and c.category_id = acm.category_id)\n" +
+                    "where acm.enabled = 1 and ac.vendor_id = '"+vendor_id+"'\n"+
+                    "and LOWER(acm.boutique_category_id) = LOWER('"+boutique_category_id+"')\n"+
+                    " and c.category_id is not null ";
+            logger.info("ProductService,getBoutiqueCategory,sql:"+sql);
+            List<Map<String,Object>> categoryMap = productDao.executeBySql(sql, null);
+            if(categoryMap != null && categoryMap.size() > 0) {
+                return categoryMap.get(0);
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return null;
+    }
+
+    public Map<String, Object> getCategory(String one,String two,String three) throws Exception{
+        try {
+            String sql = "select c3.`category_id` ,c1.`name` ,c2.`name` ,c3.`name`  from `category`  c1\n" +
+                    "inner join `category`  c2 on(c1.`category_id` = c2.`parent_id` ) \n" +
+                    "inner join `category`  c3 on(c2.`category_id` = c3.`parent_id` )\n" +
+                    "where c1.`enabled`  = 1 and c2.`enabled`  = 1 and c3.`enabled`  = 1 \n" +
+                    "and c1.`name`  = '"+one+"' and c2.`name` = '"+two+"' and c3.`name` = '"+three+"'";
+            logger.info("ProductService,getCategory,sql:"+sql);
+            List<Map<String,Object>> categoryMap = productDao.executeBySql(sql, null);
+            if(categoryMap != null && categoryMap.size() > 0) {
+                return categoryMap.get(0);
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return null;
+    }
+
+    public Map<String, Object> getThreeCategory(String vendor_id,String one,String two,String three) throws Exception {
+        try {
+            String sql = "select distinct c.category_id from api_category_map acm\n" +
+                    "inner join api_configuration ac on(ac.enabled = 1 and ac.api_configuration_id = acm.api_configuration_id)\n" +
+                    "inner join category c on(c.enabled = 1 and c.category_id = acm.category_id)\n" +
+                    "where acm.enabled = 1 and ac.vendor_id = '"+vendor_id+"'\n"+
+                    "and LOWER(acm.boutique_first_category) = LOWER('"+one+"')\n"+
+                    "and LOWER(acm.boutique_second_category) = LOWER('"+two+"')\n"+
+                    "and LOWER(acm.boutique_third_category) = LOWER('"+three+"')\n"+
+                    " and c.category_id is not null ";
+            logger.info("ProductService,getThreeCategory,sql:"+sql);
+            List<Map<String,Object>> categoryMap = productDao.executeBySql(sql, null);
+            if(categoryMap != null && categoryMap.size() > 0) {
+                return categoryMap.get(0);
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return null;
+    }
+
+    public Map<String,Object> getBrand(String brandName) throws Exception {
+        try {
+            String sql  = "select b.brand_id from brand b where lower(b.english_name) = lower(\"" + brandName+ "\") and b.enabled = 1";
+            logger.info("ProductService,getThreeCategory,sql:" + sql);
+
+            List<Map<String,Object>> brandMap = productDao.executeBySql(sql, null);
+            if(brandMap != null && brandMap.size() > 0) {
+                return brandMap.get(0);
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return null;
+    }
+
+    public Map<String,Object> getBrandMapping(String brandName) throws Exception {
+        try {
+            String sql  = "select abm.brand_id from `api_brand_map`  abm\n"
+                    + "inner join `api_configuration`  ac on(abm.`api_configuration_id` = ac.`api_configuration_id`  and ac.`enabled`  = 1 and abm.`enabled`  = 1)\n"
+                    + "where ac.`vendor_id`  = and lower(abm.`boutique_brand_name`)  =lower(\"" + brandName + "\")";
+            logger.info("ProductService,getThreeCategory,sql:" + sql);
+
+            List<Map<String,Object>> brandMap = productDao.executeBySql(sql, null);
+            if(brandMap != null && brandMap.size() > 0) {
+                return brandMap.get(0);
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return null;
+    }
+
+    public Map<String,Object> getSeason(String seasonCode) throws Exception {
+        try {
+            String sql  = "select season_code from `season_mapping` where `season_code`  = '"+seasonCode+"' or `boutique_season_code`  = '"+seasonCode+"'";
+            logger.info("ProductService,getSeason,sql:" + sql);
+
+            List<Map<String,Object>> seasonMap = productDao.executeBySql(sql, null);
+            if(seasonMap != null && seasonMap.size() > 0) {
+                return seasonMap.get(0);
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return null;
+    }
+
+    public String getDeafultCategory(Long vendor_id,String one,String two) throws Exception {
+        try {
+            logger.info("ProductService,getDeafultCategory,vendor_id:"+vendor_id+",one:"+one+",two:"+two);
+
+            String rsCategoryId = null;
+
+            String selCategory = "select c3.`category_id` ,c1.`name` ,c2.`name` ,c3.`name`  from `category`  c1\n" +
+                    "inner join `category`  c2 on(c1.`category_id` = c2.`parent_id` ) \n" +
+                    "inner join `category`  c3 on(c2.`category_id` = c3.`parent_id` )\n" +
+                    "where c1.`enabled`  = 1 and c2.`enabled`  = 1 and c3.`enabled`  = 1 \n" +
+                    "and c1.`name`  = '"+one+"' and c2.`name` = '"+two+"'";
+            List<Map<String,Object>> listMap = productDao.executeBySql(selCategory, null);
+
+            if(listMap == null || listMap.size() == 0) {
+                String selApiCategorySQL = "select distinct c.* from api_category_map acm\n" +
+                        "left join api_configuration ac on(ac.enabled = 1 and ac.api_configuration_id = acm.api_configuration_id)\n" +
+                        "left join category c on(c.enabled = 1 and c.category_id = acm.category_id)\n" +
+                        "where acm.enabled = 1 and ac.vendor_id = '"+vendor_id+"'\n"+
+                        "and LOWER(acm.boutique_first_category) = LOWER('"+one+"')\n"+
+                        "and LOWER(acm.boutique_second_category) = LOWER('"+two+"')\n"+
+                        " and c.category_id is not null ";
+                logger.info("ProductService,getDeafultCategory,selApiCategorySQL:"+selApiCategorySQL+",vendor_id:"+vendor_id+",one:"+one+",two:"+two);
+                listMap = productDao.executeBySql(selApiCategorySQL, null);
+                logger.info("ProductService,getDeafultCategory,listMap:"+ JSONObject.toJSONString(listMap)+",sql:"+selApiCategorySQL+",vendor_id:"+vendor_id+",one:"+one+",two:"+two);
+            }
+
+            if(listMap != null && listMap.size() > 0) {
+                String category_id = listMap.get(0).get("category_id").toString();
+                String selCategorySql = "select "
+                        + "c1.`name` as c1Name,c1.`category_id` as c1Category_id,"
+                        + "c2.`name` as c2Name,c2.`category_id` as c2Category_id,"
+                        + "c3.`name` as c3Name,c3.`category_id` as c3Category_id "
+                        + "from `category`  c1\n" +
+                        "inner join `category`  c2 on(c1.`category_id` = c2.`parent_id` ) \n" +
+                        "inner join `category`  c3 on(c2.`category_id` = c3.`parent_id` )\n" +
+                        "where c1.`enabled`  = 1 and c2.`enabled`  = 1 and c3.`enabled`  = 1 \n" +
+                        "and c3.`category_id`  = '"+category_id+"'";
+
+                logger.info("ProductService,getDeafultCategory,selCategory,start,sql:"+selCategorySql+",vendor_id:"+vendor_id+",one:"+one+",two:"+two);
+                List<Map<String,Object>> categoryMap = productDao.executeBySql(selCategorySql, null);
+                logger.info("ProductService,getDeafultCategory,selCategory,end,categoryMap:"+JSONObject.toJSONString(categoryMap)+",selCategorySql:"+selCategorySql+",vendor_id:"+vendor_id+",one:"+one+",two:"+two);
+                if(categoryMap != null && categoryMap.size() > 0) {
+                    String c1Name = categoryMap.get(0).get("c1Name").toString();
+                    String c1Category_id = categoryMap.get(0).get("c1Category_id").toString();
+
+                    String c2Name = categoryMap.get(0).get("c2Name").toString();
+                    String c2Category_id = categoryMap.get(0).get("c2Category_id").toString();
+
+                    if(org.apache.commons.lang3.StringUtils.trim(c1Name).equals("Men") && org.apache.commons.lang3.StringUtils.trim(c1Category_id).equals("1499")) {
+
+                        if(org.apache.commons.lang3.StringUtils.trim(c2Name).equals("Bags") && org.apache.commons.lang3.StringUtils.trim(c2Category_id).equals("1505")) { // 二级为包,放入单肩包
+                            rsCategoryId = "1551";
+                        } else if(org.apache.commons.lang3.StringUtils.trim(c2Name).equals("Accessories") && org.apache.commons.lang3.StringUtils.trim(c2Category_id).equals("1507")){ // 二级为配饰,放入others
+                            rsCategoryId = "1634";
+                        } else if(org.apache.commons.lang3.StringUtils.trim(c2Name).equals("Clothing") && org.apache.commons.lang3.StringUtils.trim(c2Category_id).equals("1504")) { // 二级为衣服，放入Top,上衣
+                            rsCategoryId = "1524";
+                        } else if(org.apache.commons.lang3.StringUtils.trim(c2Name).equals("Shoes") && org.apache.commons.lang3.StringUtils.trim(c2Category_id).equals("1506")) { // 二级为鞋，放入休闲商务鞋
+                            rsCategoryId = "1653";
+                        }
+                    } else if(org.apache.commons.lang3.StringUtils.trim(c1Name).equals("Women") && org.apache.commons.lang3.StringUtils.trim(c1Category_id).equals("1568")) {
+
+                        if(org.apache.commons.lang3.StringUtils.trim(c2Name).equals("Bags") && org.apache.commons.lang3.StringUtils.trim(c2Category_id).equals("1598")) { // 二级为包,放入单肩包
+                            rsCategoryId = "1604";
+                        } else if(org.apache.commons.lang3.StringUtils.trim(c2Name).equals("Accessories") && org.apache.commons.lang3.StringUtils.trim(c2Category_id).equals("1608")){ // 二级为配饰,放入others
+                            rsCategoryId = "1625";
+                        } else if(org.apache.commons.lang3.StringUtils.trim(c2Name).equals("Clothing") && org.apache.commons.lang3.StringUtils.trim(c2Category_id).equals("1569")) { // 二级为衣服，放入Top,上衣
+                            rsCategoryId = "1582";
+                        } else if(org.apache.commons.lang3.StringUtils.trim(c2Name).equals("Shoes") && org.apache.commons.lang3.StringUtils.trim(c2Category_id).equals("1584")) { // 二级为鞋，放入高跟鞋
+                            rsCategoryId = "1594";
+                        }
+                    }
+                }
+            }
+            logger.info("ProductService,outputParams,getDeafultCategory,vendor_id:"+vendor_id+",one:"+one+",two:"+two+",rsCategoryId:"+rsCategoryId);
+            return rsCategoryId;
+        } catch (Exception e) {
+            throw e;
+        }
+    }
 
 }

@@ -222,7 +222,7 @@ public class SkuStoreService {
 	private static final Logger logger = Logger.getLogger(SkuStoreService.class);
 
 	public List<Map<String,Object>> api_select_store(String product_code,String size,String vendor_id) throws Exception{
-		String sql = "select ss.`sku_store_id` ,ss.`confirmed` ,ss.`store` ,ss.`reserved`   from `product` p  \n"
+		String sql = "select ss.`sku_store_id` ,ss.`confirmed` ,ss.`store` ,ss.`reserved`,s.price,p.product_id   from `product` p  \n"
 				+ "inner join `sku` s on(s.`product_id` = p.`product_id`  and s.`enabled`  = 1 and p.`enabled`  = 1)\n"
 				+ "inner join `sku_store`  ss on(s.`sku_id` = ss.`sku_id`  and ss.`enabled`  = 1)\n"
 				+ "inner join `sku_property`  sp on(s.`sku_id` = sp.`sku_id`  and sp.`enabled`  = 1)\n"
@@ -233,7 +233,7 @@ public class SkuStoreService {
 	}
 
 	public List<Map<String,Object>> api_select_store(String sku_code,String vendor_id) throws Exception{
-		String sql = "select ss.`sku_store_id` ,ss.`confirmed` ,ss.`store` ,ss.`reserved`   from `product` p  \n"
+		String sql = "select ss.`sku_store_id` ,ss.`confirmed` ,ss.`store` ,ss.`reserved`,s.price,p.product_id   from `product` p  \n"
 				+ "inner join `sku` s on(s.`product_id` = p.`product_id`  and s.`enabled`  = 1 and p.`enabled`  = 1)\n"
 				+ "inner join `sku_store`  ss on(s.`sku_id` = ss.`sku_id`  and ss.`enabled`  = 1)\n"
 				+ "inner join `sku_property`  sp on(s.`sku_id` = sp.`sku_id`  and sp.`enabled`  = 1)\n"

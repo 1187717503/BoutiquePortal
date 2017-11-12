@@ -66,7 +66,24 @@ public class ApiErrorTypeEnum {
         Data_update_Error("Data_update_Error","数据修改错误。"),
         Runtime_exception("Runtime_exception","异常。"),
         Change_status_error("Change_status_error","状态机变化失败。"),
-        ;
+
+        /** new **/
+        error_stock_is_null("error_stock_is_null","库存字段为NULL"),
+        error_stock_is_not_number("error_stock_is_not_number","库存字段不是数字"),
+        error_vendor_is_null("error_vendor_is_null","VendorId为NULL"),
+        error_stock_type_is_null("error_stock_type_is_null","StockType为NULL"),
+        error_stock_is_negative("error_stock_is_negative","库存为负数"),
+        error_stock_out_off("error_stock_out_off","库存超过100"),
+        error_price_is_not_number("error_price_is_not_number","价格字段不是数字"),
+        error_update_stock_param("error_update_stock_param","修改库存入参有误"),
+        error_price("error_price","价格小于10或者大于10000"),
+        error_size_is_null("error_size_is_null","找不到这个size"),
+        error_runtime_exception("error_runtime_exception","运行时异常"),
+        error_boutique_is_not_exists("error_boutique_is_not_exists","找不到这个商品"),
+        error_price_out_off("error_price_out_off","价格超过+-20%"),
+        error_boutique_id_is_null("error_boutique_id_is_null","product_code为空"),
+        error_boutique_id_already_exist("boutique_id_already_exist","boutique_id已经存在");
+
         private String code;
         private String desc;
 

@@ -1420,6 +1420,24 @@ public class ProductEDSManagement {
         public String category1;
         public String category2;
         public String category3;
+        public String category_boutique_id;
+        public String brandId;
+
+        public String getCategory_boutique_id() {
+            return category_boutique_id;
+        }
+
+        public void setCategory_boutique_id(String category_boutique_id) {
+            this.category_boutique_id = category_boutique_id;
+        }
+
+        public String getBrandId() {
+            return brandId;
+        }
+
+        public void setBrandId(String brandId) {
+            this.brandId = brandId;
+        }
 
         public String getModifyPrice() {
             return StringUtils.trim(modifyPrice);

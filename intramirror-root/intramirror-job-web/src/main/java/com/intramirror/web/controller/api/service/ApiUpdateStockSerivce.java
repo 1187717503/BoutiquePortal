@@ -1,6 +1,11 @@
 package com.intramirror.web.controller.api.service;
 
 import com.alibaba.fastjson.JSONObject;
+import static com.intramirror.web.controller.api.service.ApiCommonUtils.errorMap;
+import static com.intramirror.web.controller.api.service.ApiCommonUtils.escape;
+import static com.intramirror.web.controller.api.service.ApiCommonUtils.ifUpdatePrice;
+import static com.intramirror.web.controller.api.service.ApiCommonUtils.isErrorMap;
+import static com.intramirror.web.controller.api.service.ApiCommonUtils.successMap;
 import com.intramirror.web.mapping.vo.StockOption;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -12,18 +17,22 @@ import org.apache.log4j.Logger;
 import org.sql2o.Connection;
 import pk.shoplus.DBConnector;
 import pk.shoplus.common.Contants;
+import pk.shoplus.common.Helper;
 import pk.shoplus.enums.ApiErrorTypeEnum;
 import pk.shoplus.model.Product;
 import pk.shoplus.model.ProductSkuPropertyKey;
 import pk.shoplus.model.ProductSkuPropertyValue;
+import pk.shoplus.model.ShopProduct;
+import pk.shoplus.model.ShopProductSku;
 import pk.shoplus.model.Sku;
 import pk.shoplus.model.SkuProperty;
 import pk.shoplus.model.SkuStore;
 import pk.shoplus.parameter.EnabledType;
-import pk.shoplus.parameter.StatusType;
 import pk.shoplus.service.ProductPropertyKeyService;
 import pk.shoplus.service.ProductPropertyValueService;
 import pk.shoplus.service.ProductService;
+import pk.shoplus.service.ShopProductService;
+import pk.shoplus.service.ShopProductSkuService;
 import pk.shoplus.service.SkuPropertyService;
 import pk.shoplus.service.SkuService;
 import pk.shoplus.service.SkuStoreService;
@@ -32,65 +41,65 @@ import pk.shoplus.service.price.impl.PriceServiceImpl;
 import pk.shoplus.util.ExceptionUtils;
 
 /**
- * Created by dingyifan on 2017/11/9.
+ * 修改库存Service
  */
-public class ApiStockSerivce {
+public class ApiUpdateStockSerivce {
 
-    private static final Logger logger = Logger.getLogger(ApiStockSerivce.class);
+    private static final Logger logger = Logger.getLogger(ApiUpdateStockSerivce.class);
 
-    public Map<String,Object> executeUpdateStock(){
+    public Map<String,Object> execute(){
         Map<String,Object> resultMap = new HashMap<>();
         Connection conn = null;
         try {
-            /** 1.检查参数 */
-            Map<String,Object> checkParamMap = this.executeCheckParams();
-            if(checkParamMap != null) {
-                return checkParamMap;
-            }
-
-            /** 2.执行库存规则 */
             conn = DBConnector.sql2o.beginTransaction();
             resultMap = this.executeStockRule(conn);
             if(conn!=null){conn.commit();conn.close();}
 
             if(stockOption.getStore() < 0) {
-                return errorMap(ApiErrorTypeEnum.errorType.Data_is_negative,"store",stockOption.getStore()+"");
+                return errorMap(ApiErrorTypeEnum.errorType.error_stock_is_negative,"store",stockOption.getStore()+"");
             }
 
             if(stockOption.getStore() > 100) {
-                return errorMap(ApiErrorTypeEnum.errorType.Data_stock_out_off,"store",stockOption.getStore()+"");
+                return errorMap(ApiErrorTypeEnum.errorType.error_stock_out_off,"store",stockOption.getStore()+"");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            logger.info("ApiStockSerivce,executeUpdateStock,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+",stockOption:"+JSONObject.toJSONString(stockOption));
+            logger.info("ApiUpdateStockSerivce,executeUpdateStock,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+",stockOption:"+JSONObject.toJSONString(stockOption));
             if(conn!=null){conn.rollback();conn.close();}
-            return errorMap(ApiErrorTypeEnum.errorType.Runtime_exception,"errorMessage",ExceptionUtils.getExceptionDetail(e));
+            return errorMap(ApiErrorTypeEnum.errorType.error_runtime_exception,"errorMessage",ExceptionUtils.getExceptionDetail(e));
         }
         return resultMap;
     }
 
-    private Map<String,Object> executeStockRule(Connection conn) throws Exception{
-        SkuStoreService skuStoreService = new SkuStoreService(conn);
+    public Map<String,Object> executeStockRule(Connection conn) throws Exception{
 
-        // 查询sku_store信息
+        /** 1。检查参数 */
+        Map<String,Object> checkParamMap = this.checkParams();
+
+        /** 2。查询SKU信息 */
+        SkuStoreService skuStoreService = new SkuStoreService(conn);
         List<Map<String,Object>> skuStoreMap = null;
         if(StringUtils.isNotBlank(stockOption.getProductCode())) {
             skuStoreMap =skuStoreService.api_select_store(stockOption.getProductCode(),stockOption.getSizeValue(),stockOption.getVendor_id());
         } else {
             skuStoreMap =skuStoreService.api_select_store(stockOption.getSku_code(),stockOption.getVendor_id());
         }
-        logger.info("ApiStockSerivce,executeUpdateStock,updateStockStart,skuStoreMap:"+JSONObject.toJSONString(skuStoreMap));
+        logger.info("ApiUpdateStockSerivce,selectSkuStore,api_select_store,skuStoreMap:"+JSONObject.toJSONString(skuStoreMap));
 
         if(skuStoreMap == null || skuStoreMap.size() == 0) {
             if(StringUtils.isBlank(stockOption.getProductCode()) || StringUtils.isBlank(stockOption.getSizeValue())) {
-                return errorMap(ApiErrorTypeEnum.errorType.skuSize_is_null,"size",stockOption.getSizeValue());
+                return errorMap(ApiErrorTypeEnum.errorType.error_size_is_null,"size",stockOption.getSizeValue());
             } else {
-                return this.executeCreateSku(conn);
+                Map<String,Object> createSkuResult = this.executeCreateSku(conn);
+                if(isErrorMap(createSkuResult)) {
+                    return createSkuResult;
+                }
             }
         } else { // 处理库存规则
             int qty = Integer.parseInt(stockOption.getQuantity());
             int type = Integer.parseInt(stockOption.getType());
+            this.productId = skuStoreMap.get(0).get("product_id").toString();
             int rs;
             int store = 0;
             int reserved = 0;
@@ -133,29 +142,39 @@ public class ApiStockSerivce {
             skuStore.setReserved((long)reserved);
             skuStore.setConfirmed((long)confirmed);
             skuStoreService.updateSkuStore(skuStore);
-            logger.info("ApiStockSerivce,executeUpdateStock,updateStockEnd,skuStoreMap:"+JSONObject.toJSONString(skuStoreMap));
+            logger.info("ApiUpdateStockSerivce,executeUpdateStock,updateStockEnd,skuStoreMap:"+JSONObject.toJSONString(skuStoreMap));
+        }
+
+        // update price
+        if(StringUtils.isNotBlank(stockOption.getPrice())) {
+            IPriceService iPriceService = new PriceServiceImpl();
+            Product getProduct = this.getProduct(conn);
+            BigDecimal newPrice = new BigDecimal(stockOption.getPrice());
+            BigDecimal oldPrice = getProduct.getMax_retail_price();
+
+            int rs = ifUpdatePrice(oldPrice,newPrice);
+            if(rs == 1) {
+                iPriceService.synProductPriceRule(getProduct,newPrice,conn);
+            } else if(rs == 2){
+                return errorMap(ApiErrorTypeEnum.errorType.error_price_out_of_range,"price",stockOption.getPrice());
+            }
         }
         return successMap();
     }
 
     private Map<String,Object> executeCreateSku(Connection conn) throws Exception {
-        return this.createSku(conn,stockOption.getProductCode(),stockOption.getVendor_id(),stockOption.getSku_code(),stockOption.getSizeValue(),stockOption.getQuantity());
+        return this.createSku(conn,stockOption.getProductCode(),stockOption.getSku_code(),stockOption.getSizeValue(),stockOption.getQuantity());
     }
 
-    private Map<String,Object> createSku(Connection conn,String productCode,String vendor_id,String skuCode,String size,String quantity) throws Exception {
+    private Map<String,Object> createSku(Connection conn,String productCode,String skuCode,String size,String quantity) throws Exception {
         if(StringUtils.isBlank(skuCode)) {
             skuCode = "#";
         }
 
         // 查询product
-        ProductService productService = new ProductService(conn);
-        Map<String,Object> productConditionMap = new HashMap<>();
-        productConditionMap.put("enabled", EnabledType.USED);
-        productConditionMap.put("vendor_id",vendor_id);
-        productConditionMap.put("product_code",productCode);
-        Product product = productService.getProductByCondition(productConditionMap,"*");
+        Product product = this.getProduct(conn);
         if(product == null) {
-            return errorMap(ApiErrorTypeEnum.errorType.boutique_id_not_exists,"product_code",productCode);
+            return errorMap(ApiErrorTypeEnum.errorType.error_boutique_is_not_exists,"product_code",productCode);
         }
 
         // 1.create sku
@@ -211,7 +230,7 @@ public class ApiStockSerivce {
         skuStore.setLast_check(new Date());
         skuStoreService.createSkuStore(skuStore);
 
-        // 3.create product_sku_property_key
+        // 3.select product_sku_property_key
         ProductPropertyKeyService productPropertyKeyService = new ProductPropertyKeyService(conn);
         ProductSkuPropertyKey pspk = null;
         Map<String, Object> param = new HashMap<>();
@@ -228,7 +247,7 @@ public class ApiStockSerivce {
         ProductSkuPropertyValue productSkuPropertyValue = new ProductSkuPropertyValue();
         productSkuPropertyValue.product_sku_property_key_id = pspk.getProduct_sku_property_key_id();
         productSkuPropertyValue.value = size;
-        productSkuPropertyValue.remark = "";
+        productSkuPropertyValue.remark = "job";
         productSkuPropertyValue.created_at = new Date();
         productSkuPropertyValue.updated_at = new Date();
         productSkuPropertyValue.enabled = EnabledType.USED;
@@ -241,17 +260,39 @@ public class ApiStockSerivce {
         skuProperty.product_sku_property_key_id = pspk.getProduct_sku_property_key_id();
         skuProperty.product_sku_property_value_id = pspv.getProduct_sku_property_value_id();
         skuProperty.name = product.getName();
-        skuProperty.remark = "";
+        skuProperty.remark = "job";
         skuProperty.created_at = new Date();
         skuProperty.updated_at = new Date();
         skuProperty.enabled = EnabledType.USED;
         skuPropertyService.createSkuProperty(skuProperty);
 
+        // 6.如果商品在shop_product中有,添加这个SKU到SHOP
+        ShopProductService shopProductService = new ShopProductService(conn);
+        ShopProductSkuService shopProductSkuService = new ShopProductSkuService(conn);
+        Map<String,Object> shopConditions = new HashMap<>();
+        shopConditions.put("enabled",EnabledType.USED);
+        shopConditions.put("product_id",product.getProduct_id());
+        List<ShopProduct> shopList = shopProductService.getShopProductListByCondition(shopConditions);
+        if(shopList!=null && shopList.size()>0) {
+            ShopProduct shopProduct = shopList.get(0);
+            ShopProductSku sps = new ShopProductSku();
+            sps.created_at = Helper.getCurrentTimeToUTCWithDate();
+            sps.updated_at = Helper.getCurrentTimeToUTCWithDate();
+            sps.enabled = EnabledType.USED;
+            sps.shop_product_id = shopProduct.getShop_product_id();
+            sps.sku_id = sku.getSku_id();
+            sps.name = sku.getName();
+            sps.coverpic = sku.getCoverpic();
+            sps.introduction = sku.getIntroduction();
+            sps.sale_price = sku.getIm_price();
+            sps.shop_id = shopProduct.getShop_id();
+            shopProductSkuService.create(sps);
+        }
         return successMap();
     }
 
-    private Map<String,Object> executeCheckParams() throws Exception{
-        logger.info("ApiStockSerivce,executeCheckParams,inputParams,stockOption:"+JSONObject.toJSONString(stockOption));
+    private Map<String,Object> checkParams() throws Exception{
+        logger.info("ApiUpdateStockSerivce,checkParams,inputParams,stockOption:"+JSONObject.toJSONString(stockOption));
         String quantity =  StringUtils.trim(stockOption.getQuantity());
         String vendorId = StringUtils.trim(stockOption.getVendor_id());
         String type =StringUtils.trim( stockOption.getType());
@@ -270,8 +311,9 @@ public class ApiStockSerivce {
 
         // check quantity
         if(StringUtils.isBlank(quantity)) {
-            return errorMap(ApiErrorTypeEnum.errorType.stock_is_null,"store",quantity);
+            return errorMap(ApiErrorTypeEnum.errorType.error_stock_is_null,"store",quantity);
         }
+
         try {
             int stock = Integer.parseInt(quantity);
             if(stock < 0 || stock > 100) {
@@ -280,66 +322,65 @@ public class ApiStockSerivce {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            logger.info("ApiStockSerivce,executeCheckParams,stock not parse int,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",stockOption:"+JSONObject.toJSONString(stockOption));
-            return errorMap(ApiErrorTypeEnum.errorType.Data_is_not_number,"store",quantity);
+            logger.info("ApiUpdateStockSerivce,checkParams,stock not parse int,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",stockOption:"+JSONObject.toJSONString(stockOption));
+            return errorMap(ApiErrorTypeEnum.errorType.error_stock_is_not_number,"store",quantity);
         }
 
         // check vendorId
         if(StringUtils.isBlank(vendorId)) {
-            return errorMap(ApiErrorTypeEnum.errorType.vendor_is_null,"vendor_id",vendorId);
+            return errorMap(ApiErrorTypeEnum.errorType.error_vendor_is_null,"vendor_id",vendorId);
         }
 
         // check type
         if(StringUtils.isBlank(type)) {
-            return errorMap(ApiErrorTypeEnum.errorType.stock_type_is_null,"stock_type",type);
+            return errorMap(ApiErrorTypeEnum.errorType.error_stock_type_is_null,"stock_type",type);
         }
 
         // check price
         if(StringUtils.isNotBlank(price)) {
             try {
                 BigDecimal bPrice = new BigDecimal(price);
+                if(bPrice.intValue() < 10 || bPrice.intValue() > 10000 || bPrice.intValue() == 0) {
+                    return errorMap(ApiErrorTypeEnum.errorType.error_price,"price",price);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
-                logger.info("ApiStockSerivce,executeCheckParams,price not parse int,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",stockOption:"+JSONObject.toJSONString(stockOption));
-                return errorMap(ApiErrorTypeEnum.errorType.Data_is_not_number,"price",price);
+                logger.info("ApiUpdateStockSerivce,checkParams,price not parse int,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",stockOption:"+JSONObject.toJSONString(stockOption));
+                return errorMap(ApiErrorTypeEnum.errorType.error_price_is_not_number,"price",price);
             }
         }
 
         if((StringUtils.isNotBlank(productCode) && StringUtils.isNotBlank(sizeValue)) || (StringUtils.isNotBlank(skuCode))) {
-            return null;
+            return successMap();
         } else {
-            return errorMap(ApiErrorTypeEnum.errorType.updateStock_params_is_error,"stockOption",JSONObject.toJSONString(stockOption));
+            return errorMap(ApiErrorTypeEnum.errorType.error_update_stock_param,"stockOption",JSONObject.toJSONString(stockOption));
         }
     }
 
-    private String escape(String str){
-        if(StringUtils.isNotBlank(str)) {
-            str = str.replaceAll("'","\\\\'");
+
+    private Product getProduct(Connection conn) throws Exception {
+        if(this.productObj == null) {
+            ProductService productService = new ProductService(conn);
+            Map<String,Object> productConditionMap = new HashMap<>();
+            productConditionMap.put("enabled", EnabledType.USED);
+            productConditionMap.put("vendor_id",stockOption.getVendor_id());
+
+            if(StringUtils.isNotBlank(stockOption.getProductCode())) {
+                productConditionMap.put("product_code",stockOption.getProductCode());
+                Product product = productService.getProductByCondition(productConditionMap,"*");
+                this.productObj = product;
+            } else if(StringUtils.isNotBlank(stockOption.getSku_code())) {
+                productConditionMap.put("product_id",this.productId);
+                Product product = productService.getProductByCondition(productConditionMap,"*");
+                this.productObj = product;
+            }
         }
-        return str;
-    }
-
-    /** 返回错误消息 */
-    private Map<String,Object> errorMap(ApiErrorTypeEnum.errorType errorType,String key,String value){
-        logger.info("ApiStockSerivce,errorMap,inputParams,errorType:"+errorType.getCode()+",key:"+key+",value:"+value);
-        Map<String,Object> resultMap = new HashMap<>();
-        resultMap.put("status", StatusType.FAILURE);
-        resultMap.put("info","update stock - " + errorType.getDesc());
-        resultMap.put("key",key);
-        resultMap.put("value",value);
-        resultMap.put("error_enum",errorType);
-        logger.info("ApiStockSerivce,errorMap,outputParams,resultMap:" + JSONObject.toJSONString(resultMap));
-        return resultMap;
-    }
-
-    private Map<String,Object> successMap(){
-        Map<String,Object> successMap = new HashMap<>();
-        successMap.put("status",StatusType.SUCCESS);
-        successMap.put("info","success");
-        return successMap;
+        return this.productObj;
     }
 
     private StockOption stockOption;
+    private Product productObj;
+    private String productId;
 
     public StockOption getStockOption() {
         return stockOption;
@@ -349,7 +390,23 @@ public class ApiStockSerivce {
         this.stockOption = stockOption;
     }
 
-    public ApiStockSerivce(StockOption stockOption) {
+    public ApiUpdateStockSerivce(StockOption stockOption) {
         this.stockOption = stockOption;
+    }
+
+    public Product getProductObj() {
+        return productObj;
+    }
+
+    public void setProductObj(Product productObj) {
+        this.productObj = productObj;
+    }
+
+    public String getProductId() {
+        return productId;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
     }
 }

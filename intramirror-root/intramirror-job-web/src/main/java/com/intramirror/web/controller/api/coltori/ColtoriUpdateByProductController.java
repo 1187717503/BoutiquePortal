@@ -29,9 +29,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.service.RedisService;
 
-/**
- * Created by dingyifan on 2017/11/1.
- */
 @Controller
 @RequestMapping("/coltori_product")
 public class ColtoriUpdateByProductController implements InitializingBean {
@@ -51,10 +48,6 @@ public class ColtoriUpdateByProductController implements InitializingBean {
     @ResponseBody
     public Map<String, Object> execute(@Param(value = "name") String name) {
         try {
-            if(StringUtils.isBlank(name) || paramsMap.get(name) == null) {
-                return null;
-            }
-
             Map<String,Object> paramMap = (Map<String, Object>) paramsMap.get(name);
             logger.info("ColtoriUpdateByProductController,Execute,inputParams,name:"+name+",paramsMap:"+ JSONObject.fromObject(paramMap));
             ThreadPoolExecutor executor = (ThreadPoolExecutor) paramMap.get("executor");
@@ -87,35 +80,53 @@ public class ColtoriUpdateByProductController implements InitializingBean {
                 get_product_url = get_product_url+"&since_updated_at="+ since_updated_at+"&until_updated_at="+until_updated_at;
             }
 
-            logger.info("ColtoriUpdateByProductController,requestMethod,start,get_product_url:"+get_product_url);
-            String responseData = HttpUtils.httpGet(get_product_url);
-            logger.info("ColtoriUpdateByProductController,requestMethod,end,get_product_url:"+get_product_url+",responseData:"+responseData);
-            apiDataFileUtils.bakPendingFile("responseData",responseData);
+            String current = "";
+            String pages = "";
+            String total = "";
+            int sum = 0;
+            int i = 1;
+            while (true) {
+                String new_url = get_product_url;
+                if(i <= sum || i == 1) {
+                    new_url = new_url + "&page="+i+"&limit=200";
+                }
+                logger.info("ColtoriUpdateByProductController,requestMethod,start,get_product_url:"+new_url);
+                Map<String, Object> resultMap = HttpUtils.responseAndHeadersGet(new_url);
+                String responseData = resultMap.get("resultMessage").toString();
+                 current = resultMap.get("current").toString();
+                 pages = resultMap.get("pages").toString();
+                sum = Integer.parseInt(pages);
+                 total = resultMap.get("total").toString();
+                logger.info("ColtoriUpdateByProductController,requestMethod,end,get_product_url:"+new_url+",current:"+current+",pages:"+pages+",total:"+total);
+                apiDataFileUtils.bakPendingFile("responseData"+i,responseData);
 
-            if(StringUtils.isNotBlank(responseData) && responseData.contains("no results matching your query")) {
-                return null;
+                if((StringUtils.isNotBlank(responseData) && responseData.contains("no results matching your query")) || StringUtils.isBlank(responseData)) {
+                    break;
+                }
+
+                ProductEDSManagement.VendorOptions vendorOptions = new ProductEDSManagement.VendorOptions();
+                vendorOptions.setVendorId(vendor_id);
+                JSONObject products = JSONObject.fromObject(responseData);
+                Iterator<String> iterator = products.keys();
+                while (iterator.hasNext()) {
+                    String key = iterator.next();
+                    JSONObject product = products.getJSONObject(key);
+                    Map<String,Object> mqDataMap = new HashMap<>();
+                    mqDataMap.put("key",key);
+                    mqDataMap.put("product",product);
+                    mqDataMap.put("vendor_id",vendor_id);
+
+                    logger.info("ColtoriUpdateByProductController,start,mapping,mqDataMap:"+JSONObject.fromObject(mqDataMap));
+                    ProductEDSManagement.ProductOptions productOptions = iProductMapping.mapping(mqDataMap);
+                    logger.info("ColtoriUpdateByProductController,end,mapping,mqDataMap:"+JSONObject.fromObject(mqDataMap)+",productOptions:"+JSONObject.fromObject(productOptions));
+
+                    logger.info("ColtoriUpdateByProductController,execute,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
+                    CommonThreadPool.execute(eventName,executor,5,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,mqDataMap));
+                    logger.info("ColtoriUpdateByProductController,execute,endDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
+                }
+                i++;
             }
 
-            ProductEDSManagement.VendorOptions vendorOptions = new ProductEDSManagement.VendorOptions();
-            vendorOptions.setVendorId(vendor_id);
-            JSONObject products = JSONObject.fromObject(responseData);
-            Iterator<String> iterator = products.keys();
-            while (iterator.hasNext()) {
-                String key = iterator.next();
-                JSONObject product = products.getJSONObject(key);
-                Map<String,Object> mqDataMap = new HashMap<>();
-                mqDataMap.put("key",key);
-                mqDataMap.put("product",product);
-                mqDataMap.put("vendor_id",vendor_id);
-
-                logger.info("ColtoriUpdateByProductController,start,mapping,mqDataMap:"+JSONObject.fromObject(mqDataMap));
-                ProductEDSManagement.ProductOptions productOptions = iProductMapping.mapping(mqDataMap);
-                logger.info("ColtoriUpdateByProductController,end,mapping,mqDataMap:"+JSONObject.fromObject(mqDataMap)+",productOptions:"+JSONObject.fromObject(productOptions));
-
-                logger.info("ColtoriUpdateByProductController,execute,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
-                CommonThreadPool.execute(eventName,executor,5,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,mqDataMap));
-                logger.info("ColtoriUpdateByProductController,execute,endDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
-            }
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("ColtoriUpdateByProductController,Execute,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));

@@ -8,8 +8,12 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.apache.log4j.Logger;
 import pk.shoplus.util.ExceptionUtils;
+import pk.shoplus.util.MapUtils;
 
 /**
  * Created by dingyifan on 2017/11/6.
@@ -31,14 +35,34 @@ public class HttpUtils {
     private static final String CHARSET_UTF_8 = "UTF-8";
 
     public static String httpGet(String url){
-        return request(HTTP_GET,url,CONTENT_FROM_TYPE,null);
+        Map<String,Object> result = request(HTTP_GET,url,CONTENT_FROM_TYPE,null);
+        return result.get("resultMessage").toString();
     }
 
     public static String httpPost(String url,String body){
-        return request(HTTP_POST,url,CONTENT_FROM_TYPE,body);
+        Map<String,Object> result = request(HTTP_POST,url,CONTENT_FROM_TYPE,body);
+        return result.get("resultMessage").toString();
     }
 
-    private static String request(String requestType,String url,String contentType,String body){
+    public static Map<String,Object> responseAndHeadersGet(String url){
+        Map<String,Object> result = request(HTTP_GET,url,CONTENT_FROM_TYPE,null);
+        Map<String,List<String>> headers = (Map<String, List<String>>) result.get("headers");
+        List<String> currentList = headers.get("X-Count-Current");
+        List<String> pagesList = headers.get("X-Count-Pages");
+        List<String> totalList = headers.get("X-Count-Total");
+
+        int current = Integer.parseInt(currentList.get(0));
+        int pages = Integer.parseInt(pagesList.get(0));
+        int total = Integer.parseInt(totalList.get(0));
+
+        result.put("current",current);
+        result.put("pages",pages);
+        result.put("total",total);
+        return result;
+    }
+
+    private static Map<String,Object> request(String requestType,String url,String contentType,String body){
+        MapUtils mapUtils = new MapUtils(new HashMap<String, Object>());
         OutputStream outputStream = null;
         OutputStreamWriter outputStreamWriter = null;
         InputStream inputStream = null;
@@ -64,6 +88,8 @@ public class HttpUtils {
             httpURLConnection.setRequestMethod(requestType);
             httpURLConnection.connect();
 
+            Map<String,List<String>> headers = httpURLConnection.getHeaderFields();
+            mapUtils.putData("headers",headers);
             if(requestType.equals(HTTP_POST)) {
                 outputStream = httpURLConnection.getOutputStream();
                 outputStreamWriter = new OutputStreamWriter(outputStream);
@@ -119,7 +145,8 @@ public class HttpUtils {
                 e.printStackTrace();
             }
         }
-        return resultBuffer.toString();
+        mapUtils.putData("resultMessage",resultBuffer.toString());
+        return mapUtils.getMap();
     }
 
 }

@@ -1,13 +1,14 @@
 package com.intramirror.web.controller.api.service;
 
+import com.google.gson.Gson;
 import com.intramirror.web.mapping.vo.StockOption;
 import java.util.Date;
 import java.util.Map;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import pk.shoplus.common.Contants;
 
 /**
  * Created by dingyifan on 2017/11/9.
@@ -20,27 +21,16 @@ public class TestController {
 
     @RequestMapping("/stock")
     @ResponseBody
-    public void testStock(){
-        StockOption stockOption = new StockOption();
-        ApiStockSerivce apiStockSerivce = new ApiStockSerivce(stockOption);
-        stockOption.setSizeValue("AA");
-        stockOption.setVendor_id("9");
-        stockOption.setProductCode("587e34dafd7955c0bff4515d");
-        stockOption.setSku_code("Ding_s'ku_code");
-        stockOption.setQuantity("1000");
-        stockOption.setType(Contants.STOCK_QTY+"");
+    public Map<String,Object> testStock(@RequestBody StockOption stockOption){
+        System.out.println(new Gson().toJson(stockOption));
+        ApiUpdateStockSerivce apiStockSerivce = new ApiUpdateStockSerivce(stockOption);
         stockOption.setLast_check(new Date());
         long  start = System.currentTimeMillis();
         System.out.println("start:"+new Date().toString() +","+start);
-        Map<String,Object> map = apiStockSerivce.executeUpdateStock();
-//        ApiUpdateStockService apiUpdateStockService = new ApiUpdateStockService();
-
-//        apiUpdateStockService.updateStock(stockOption);
+        Map<String,Object> map = apiStockSerivce.execute();
         long  end = System.currentTimeMillis();
         System.out.println("end:"+new Date().toString()+","+end);
-        System.out.println(start-end);
-//        System.out.println("result:"+ JSONObject.toJSONString(map));
-
-
+        System.out.println(start-end+",map:"+new Gson().toJson(map));
+        return map;
     }
 }
