@@ -4,7 +4,7 @@ const baseConfig = {
 };
 switch (process.env.WEB_ENV){
   case 'test':
-    baseConfig.BASE_URL = '"http://test.vendor.intramirror.com:8087/"';
+    baseConfig.BASE_URL = '"http://test.vendor.intramirror.com:8097/"';
     break;
   case 'stag':
     baseConfig.BASE_URL = '"http://sha.staging.boutique.intramirror.com:8097/"';
