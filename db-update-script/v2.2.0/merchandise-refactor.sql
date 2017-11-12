@@ -15,6 +15,15 @@ SELECT *
 FROM product_sku_property_value pv
 INNER JOIN tmp_duplicate_size_tofix tfix ON (pv.product_sku_property_key_id = tfix.product_sku_property_key_id AND pv.value = tfix.value);
 
+
+--把重复的ID中的最大值作为保留
+DROP TABLE IF EXISTS tmp_valueid_tosave;
+CREATE TABLE tmp_valueid_tosave AS(
+SELECT MAX(pv.product_sku_property_value_id) AS product_sku_property_value_id,pv.product_sku_property_key_id,pv.value
+FROM product_sku_property_value pv
+INNER JOIN tmp_duplicate_size_tofix tfix ON (pv.product_sku_property_key_id = tfix.product_sku_property_key_id AND pv.value = tfix.value AND pv.value IS NOT NULL AND pv.value <> '')
+GROUP BY pv.product_sku_property_key_id);
+
 --准备删除多余的value
 DROP TABLE IF EXISTS tmp_psp_vid_todel;
 CREATE TABLE tmp_psp_vid_todel AS (
@@ -29,14 +38,6 @@ WHERE product_sku_property_value_id IN(
 SELECT t.product_sku_property_value_id
 FROM tmp_psp_vid_todel t
 );
-
---把重复的ID中的最大值作为保留
-DROP TABLE IF EXISTS tmp_valueid_tosave;
-CREATE TABLE tmp_valueid_tosave AS(
-SELECT MAX(pv.product_sku_property_value_id) AS product_sku_property_value_id,pv.product_sku_property_key_id,pv.value
-FROM product_sku_property_value pv
-INNER JOIN tmp_duplicate_size_tofix tfix ON (pv.product_sku_property_key_id = tfix.product_sku_property_key_id AND pv.value = tfix.value AND pv.value IS NOT NULL AND pv.value <> '')
-GROUP BY pv.product_sku_property_key_id);
 
 --把所有要删除的记录保存，原因是mysql的delete不支持in的参数里有复杂的sql
 DROP TABLE IF EXISTS tmp_valueid_todel;
