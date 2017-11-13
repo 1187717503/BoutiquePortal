@@ -489,4 +489,53 @@
         </foreach>
     </insert>
 
+    <update id="batchUpdateShopProductByShopProductIds">
+        update shop_product
+        <set>
+            <if test="shopId != null">
+                shop_id = #{shopProduct.shopId,jdbcType=BIGINT},
+            </if>
+            <if test="shopCategoryId != null">
+                shop_category_id = #{shopProduct.shopCategoryId,jdbcType=BIGINT},
+            </if>
+            <if test="productId != null">
+                product_id = #{shopProduct.productId,jdbcType=BIGINT},
+            </if>
+            <if test="name != null">
+                name = #{shopProduct.name,jdbcType=VARCHAR},
+            </if>
+            <if test="salesAmount != null">
+                sales_amount = #{shopProduct.salesAmount,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                status = #{shopProduct.status,jdbcType=TINYINT},
+            </if>
+            <if test="saleAt != null">
+                sale_at = #{shopProduct.saleAt,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createdAt != null">
+                created_at = #{shopProduct.createdAt,jdbcType=TIMESTAMP},
+            </if>
+            updated_at = now(),
+
+            <if test="enabled != null">
+                enabled = #{shopProduct.enabled,jdbcType=BIT},
+            </if>
+            <if test="productGroupId != null">
+                product_group_id = #{shopProduct.productGroupId,jdbcType=BIGINT},
+            </if>
+            <if test="minSalePrice != null">
+                min_sale_price = #{shopProduct.minSalePrice,jdbcType=DECIMAL},
+            </if>
+            <if test="maxSalePrice != null">
+                max_sale_price = #{shopProduct.maxSalePrice,jdbcType=DECIMAL},
+            </if>
+        </set>
+        WHERE shop_product_id IN
+        <foreach item="item" index="index" collection="shopProductIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND shop_product.enabled = TRUE;
+    </update>
+
 </mapper>

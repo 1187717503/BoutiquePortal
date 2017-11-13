@@ -39,4 +39,8 @@ public interface ProductManagementService {
 
     List<Map<String, Object>> listShopProductIdMappingByProductIds(List<Long> productIds);
 
+    //TODO: refactor try to escope as action like process , approve , on_sale , shop_process , shop_approve
+    void onSale(int status, int shopStatus, Long productId, Long shopProductId);
+
+    void batchOnSale(int status, int shopStatus, List<Long> productIds, List<Long> shopProductId);
 }

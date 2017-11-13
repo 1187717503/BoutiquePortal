@@ -12,6 +12,7 @@ import com.intramirror.product.core.mapper.ProductMapper;
 import com.intramirror.product.core.mapper.ShopProductMapper;
 import com.intramirror.product.core.mapper.ShopProductSkuMapper;
 import com.intramirror.product.core.mapper.SkuMapper;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -109,6 +110,20 @@ public class ProductManagementServiceImpl implements ProductManagementService {
     }
 
     @Override
+    @Transactional
+    public void onSale(int status, int shopStatus, Long productId, Long shopProductId) {
+        updateProductStatusOnly(status, productId);
+        updateShopProductStatusAndSaleAt(shopStatus, productId);
+    }
+
+    @Override
+    @Transactional
+    public void batchOnSale(int status, int shopStatus, List<Long> productIds, List<Long> shopProductId) {
+        batchUpdateProductStatusOnly(status, productIds);
+        batchUpdateShopProductStatusAndSaleAt(shopStatus, shopProductId);
+    }
+
+    @Override
     public List<Map<String, Object>> listPriceByProductList(List<Map<String, Object>> products) {
         return productManagementMapper.listPriceByProductList(products);
     }
@@ -146,8 +161,23 @@ public class ProductManagementServiceImpl implements ProductManagementService {
         shopProductMapper.updateShopProductByProductId(shopProduct);
     }
 
-    private void batchUpdateShopProductStatusOnly(int status, List<Long> productIds) {
-        shopProductMapper.batchUpdateShopProductStatus(status, productIds);
+    private void updateShopProductStatusAndSaleAt(int shopStatus, Long productId) {
+        ShopProduct shopProduct = new ShopProduct();
+        shopProduct.setStatus((byte) shopStatus);
+        shopProduct.setProductId(productId);
+        shopProduct.setSaleAt(new Date());
+        shopProductMapper.updateShopProductByProductId(shopProduct);
+    }
+
+    private void batchUpdateShopProductStatusOnly(int shopStatus, List<Long> shopProductIds) {
+        shopProductMapper.batchUpdateShopProductStatus(shopStatus, shopProductIds);
+    }
+
+    private void batchUpdateShopProductStatusAndSaleAt(int shopStatus, List<Long> shopProductIds) {
+        ShopProductWithBLOBs shopProduct = new ShopProductWithBLOBs();
+        shopProduct.setStatus((byte) shopStatus);
+        shopProduct.setSaleAt(new Date());
+        shopProductMapper.batchUpdateShopProductByShopProductIds(shopProduct, shopProductIds);
     }
 
     private void disableShopProductStatus(Long shopProductId) {

@@ -93,9 +93,15 @@ public class StateMachineController {
                 throw new ValidateException(new ErrorResponse("Parameter shopProductId missed"));
             }
             if (newStateEnum.getShopProductStatus() != -1) {
-                productManagementService.updateProductAndShopProductStatus(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productId,
-                        shopProductId);
+                if (operation == OperationEnum.ON_SALE) {
+                    productManagementService.onSale(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productId, shopProductId);
+                } else {
+                    productManagementService.updateProductAndShopProductStatus(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productId,
+                            shopProductId);
+                }
+
             } else if (newStateEnum.getShopProductStatus() == -1) {
+
                 productManagementService.updateProductStatusAndDisableShopProduct(newStateEnum.getProductStatus(), productId, shopProductId);
             }
         }
@@ -223,18 +229,19 @@ public class StateMachineController {
             if (outOfStockMap.size() > 0) {
                 LOGGER.info("{} : Out of stock : change Product [{}] as Start [{}] -> [{}] -> [{}]", userId, idsMapToString(outOfStockMap),
                         currentStateEnum.name(), operation.name(), newStateEnum.name());
-                batchUpdateProcess(currentStateEnum, StateEnum.SHOP_SOLD_OUT, outOfStockMap, responseMessage);
+                batchUpdateProcess(currentStateEnum, operation, StateEnum.SHOP_SOLD_OUT, outOfStockMap, responseMessage);
             }
         } //else ?
 
-        batchUpdateProcess(currentStateEnum, newStateEnum, validIdsMap, responseMessage);
+        batchUpdateProcess(currentStateEnum, operation, newStateEnum, validIdsMap, responseMessage);
         LOGGER.info("{} : Product: [{}]  [{}] -> [{}] -> [{}] SUCCESSFUL", userId, idsMapToString(validIdsMap), currentStateEnum.name(), operation.name(),
                 newStateEnum.name());
 
         addSuccessToResponse(validIdsMap, responseMessage);
     }
 
-    private void batchUpdateProcess(StateEnum currentStateEnum, StateEnum newStateEnum, Map<Long, Long> idsMap, BatchResponseMessage responseMessage) {
+    private void batchUpdateProcess(StateEnum currentStateEnum, OperationEnum operation, StateEnum newStateEnum, Map<Long, Long> idsMap,
+            BatchResponseMessage responseMessage) {
         if (idsMap.size() == 0) {
             return;
         }
@@ -247,10 +254,13 @@ public class StateMachineController {
             productManagementService.batchUpdateProductStatusAndNewShopProduct(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(),
                     productIds);
         } else if (currentStateEnum.getShopProductStatus() != -1) {
-
             if (newStateEnum.getShopProductStatus() != -1) {
-                productManagementService.batchUpdateProductAndShopProductStatus(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(),
-                        productIds, shopProductIds);
+                if (operation == OperationEnum.ON_SALE) {
+                    productManagementService.batchOnSale(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productIds, shopProductIds);
+                } else {
+                    productManagementService.batchUpdateProductAndShopProductStatus(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(),
+                            productIds, shopProductIds);
+                }
             } else if (newStateEnum.getShopProductStatus() == -1) {
                 productManagementService.batchUpdateProductStatusAndDisableShopProduct(newStateEnum.getProductStatus(), productIds, shopProductIds);
             }
