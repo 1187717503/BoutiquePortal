@@ -3,8 +3,6 @@ if (!token) {
     token = localStorage.getItem('token');
 }
 
-// token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNjEiLCJpYXQiOjE1MTAzODU1MTd9.3pkXFZyMCZsT9znHHLlbcHZX9bJR1YWA_hJtWmQNg30D4vWB1b3ZulNKnkTkN7Ak1f2igOak2QS7lbS-yJSt_w";
-
 function initBrand() {
 
     $.ajax({
@@ -374,31 +372,31 @@ function getCountWithFilter(filter, tarStatus, pagesize, pageno){
                 var curStatus = $(this).data('status');
                 switch(curStatus){
                 case 'new':
-                    nStatusCount += dealCountWithFilter($(this),result.data.NEW,curStatus,tarStatus);
+                    nStatusCount += dealCountWithFilter($(this), result.data.NEW, curStatus, tarStatus);
                     break;
                 case 'processing':
-                    nStatusCount += dealCountWithFilter($(this),result.data.PROCESSING,curStatus,tarStatus);
+                    nStatusCount += dealCountWithFilter($(this), result.data.PROCESSING, curStatus, tarStatus);
                     break;
                 case 'readytosell':
-                    nStatusCount += dealCountWithFilter($(this),result.data.READY_TO_SELL,curStatus,tarStatus);
+                    nStatusCount += dealCountWithFilter($(this), result.data.READY_TO_SELL, curStatus, tarStatus);
                     break;
                 case 'shopprocessing':
-                    nStatusCount += dealCountWithFilter($(this),result.data.SHOP_PROCESSING,curStatus,tarStatus);
+                    nStatusCount += dealCountWithFilter($(this), result.data.SHOP_PROCESSING, curStatus, tarStatus);
                     break;
                 case 'shopreadytosell':
-                    nStatusCount += dealCountWithFilter($(this),result.data.SHOP_READY_TO_SELL,curStatus,tarStatus);
+                    nStatusCount += dealCountWithFilter($(this), result.data.SHOP_READY_TO_SELL, curStatus, tarStatus);
                     break;
                 case 'shopremoved':
-                    nStatusCount += dealCountWithFilter($(this),result.data.SHOP_REMOVED,curStatus,tarStatus);
+                    nStatusCount += dealCountWithFilter($(this), result.data.SHOP_REMOVED, curStatus, tarStatus);
                     break;
                 case 'shoponsale':
-                    nStatusCount += dealCountWithFilter($(this),result.data.SHOP_ON_SALE,curStatus,tarStatus);
+                    nStatusCount += dealCountWithFilter($(this), result.data.SHOP_ON_SALE, curStatus, tarStatus);
                     break;
                 case 'shopsoldout':
-                    nStatusCount += dealCountWithFilter($(this),result.data.SHOP_SOLD_OUT,curStatus,tarStatus);
+                    nStatusCount += dealCountWithFilter($(this), result.data.SHOP_SOLD_OUT, curStatus, tarStatus);
                     break;
                 case 'trash':
-                    nStatusCount += dealCountWithFilter($(this),result.data.TRASH,curStatus,tarStatus);
+                    nStatusCount += dealCountWithFilter($(this), result.data.TRASH, curStatus, tarStatus);
                     break;
                 }
             })
@@ -416,15 +414,16 @@ function getCountWithFilter(filter, tarStatus, pagesize, pageno){
     });
 }
 
-function dealCountWithFilter(handler,data,curStatus,tarStatus){
+function dealCountWithFilter(handler, data, curStatus, tarStatus){
     var nCount = 0;
-    if(undefined != data){
+    if (undefined != data) {
         nCount = data;
     }
+
     handler.find('span').text('('+nCount+')');
-    if(curStatus == tarStatus){
+    if (curStatus == tarStatus) {
         return nCount;
-    }else{
+    } else {
         return 0;
     }
 }
@@ -484,6 +483,14 @@ function updatePagination(status, pagesize, pageno, totalsize) {
         return;
     }
 
+    if (pageno > totalsize + 1) {
+        pageno = totalsize + 1;
+    }
+
+    if (pageno < 0) {
+        pageno = 0;
+    }
+
     if (pageno <= 3 ) {
         for (let i = 1; i <= totalsize && i <= 5; i++) {
             listData.push({"no": i});
@@ -496,7 +503,13 @@ function updatePagination(status, pagesize, pageno, totalsize) {
         listData.push({"no": totalsize - 2});
         listData.push({"no": totalsize - 1});
         listData.push({"no": totalsize});
-        listData[4 - totalsize + pageno].active = 1;
+        if (4 - totalsize + pageno > 4) {
+            listData.push({"no": totalsize + 1});
+            listData[4 - totalsize + pageno].active = 1;
+        } else {
+            listData[4 - totalsize + pageno].active = 1;
+        }
+        
     } else {
         listData.push({"no": pageno - 2});
         listData.push({"no": pageno - 1});
@@ -645,7 +658,10 @@ function initActionEvent() {
                     Materialize.toast(getActionMessage(action) + ' Success', 3000);
                 }
 
-                getProdcutList(param.originalState, 1);
+                // 获取当前页数
+                let current = $('.pagination .active.pagination-index').data('pageno') + 1;
+
+                getProdcutList(param.originalState, current);
                 finishLoading()
                 
             }, error: function(result, resp, par) {
@@ -707,8 +723,9 @@ function initActionEvent() {
                 let status = $('.tabs .tab a.active').data('status');
                 
                 Materialize.toast(getActionMessage(action) + ' Success', 3000);
-                getProdcutList(status, 1);
-                
+                let current = $('.pagination .active.pagination-index').data('pageno') + 1;
+
+                getProdcutList(status, current);
             }, error: function(result, resp, par) {
                 toashWithCloseBtn(result.responseJSON.message);
 

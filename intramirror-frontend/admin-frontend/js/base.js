@@ -1,4 +1,4 @@
-var baseUrl = "http://test.admin.intramirror.com:8085/";
+var baseUrl = "http://test.admin.intramirror.com:8096/";
 
 var requestURL = {
     "getBrand" : {"url":baseUrl + "product/filter/brand/list", "method": "GET"},
