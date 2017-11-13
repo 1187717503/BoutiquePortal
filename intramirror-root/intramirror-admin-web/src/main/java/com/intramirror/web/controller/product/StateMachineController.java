@@ -52,9 +52,8 @@ public class StateMachineController {
     @Autowired
     private SkuService skuService;
 
-
     @PutMapping(value = "/single/{action}", consumes = "application/json")
-    public Response operateProduct(@SessionAttribute(value = "sessionStorage") Long userId, @PathVariable(value = "action") String action,
+    public Response operateProduct(@SessionAttribute(value = "sessionStorage", required = false) Long userId, @PathVariable(value = "action") String action,
             @RequestBody Map<String, Object> body) {
         Long productId = Long.parseLong(body.get("productId").toString());
         Long shopProductId = body.get("shopProductId") == null ? null : Long.parseLong(body.get("shopProductId").toString());
@@ -112,7 +111,7 @@ public class StateMachineController {
     }
 
     @PutMapping(value = "/batch/{action}", consumes = "application/json")
-    public Response batchOperateProduct(@SessionAttribute(value = "sessionStorage") Long userId, HttpServletRequest request,
+    public Response batchOperateProduct(@SessionAttribute(value = "sessionStorage", required = false) Long userId, HttpServletRequest request,
             @PathVariable(value = "action") String action, @RequestBody Map<String, Object> body) {
 
         if (body.get("ids") == null) {
@@ -221,9 +220,11 @@ public class StateMachineController {
 
         if (/*currentStateEnum == StateEnum.SHOP_READY_TO_SELL &&*/ operation == OperationEnum.ON_SALE) {
             Map<Long, Long> outOfStockMap = batchCheckInStock(validIdsMap);
-            LOGGER.info("{} : Out of stock : change Product [{}] as Start [{}] -> [{}] -> [{}]", userId, idsMapToString(outOfStockMap), currentStateEnum.name(),
-                    operation.name(), newStateEnum.name());
-            batchUpdateProcess(currentStateEnum, StateEnum.SHOP_SOLD_OUT, outOfStockMap, responseMessage);
+            if (outOfStockMap.size() > 0) {
+                LOGGER.info("{} : Out of stock : change Product [{}] as Start [{}] -> [{}] -> [{}]", userId, idsMapToString(outOfStockMap),
+                        currentStateEnum.name(), operation.name(), newStateEnum.name());
+                batchUpdateProcess(currentStateEnum, StateEnum.SHOP_SOLD_OUT, outOfStockMap, responseMessage);
+            }
         } //else ?
 
         batchUpdateProcess(currentStateEnum, newStateEnum, validIdsMap, responseMessage);
@@ -296,7 +297,7 @@ public class StateMachineController {
             }
             sb.append("},");
         }
-        return sb.substring(0, sb.length() - 1);
+        return sb.length() > 0 ? sb.substring(0, sb.length() - 1) : "";
     }
 
     //    private validateParameters()
