@@ -83,28 +83,68 @@ public class StateMachineController {
                         newStateEnum.name());
             }
         }
-        if (currentStateEnum.getShopProductStatus() == -1 && newStateEnum.getShopProductStatus() == -1) {
-            productManagementService.updateProductStatus(newStateEnum.getProductStatus(), productId);
-        } else if (currentStateEnum.getShopProductStatus() == -1 && newStateEnum.getShopProductStatus() != -1) {
-            productManagementService.updateProductStatusAndNewShopProduct(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productId);
-        } else if (currentStateEnum.getShopProductStatus() != -1) {
-            if (shopProductId == null) {
-                LOGGER.error("shopProductId missed.");
-                throw new ValidateException(new ErrorResponse("Parameter shopProductId missed"));
-            }
-            if (newStateEnum.getShopProductStatus() != -1) {
-                if (operation == OperationEnum.ON_SALE) {
-                    productManagementService.onSale(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productId, shopProductId);
-                } else {
-                    productManagementService.updateProductAndShopProductStatus(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productId,
-                            shopProductId);
-                }
 
-            } else if (newStateEnum.getShopProductStatus() == -1) {
+        LogicOperationEnum logicOperationEnum = StateMachineCoreRule.mapLogicOperation(currentStateEnum, operation);
 
-                productManagementService.updateProductStatusAndDisableShopProduct(newStateEnum.getProductStatus(), productId, shopProductId);
-            }
+        switch (logicOperationEnum) {
+        case REMOVE:
+            productManagementService.remove(newStateEnum.getProductStatus(), productId);
+            break;
+        case APPROVE:
+            productManagementService.approve(newStateEnum.getProductStatus(), productId);
+            break;
+        case PROCESS:
+            productManagementService.process(newStateEnum.getProductStatus(), productId);
+            break;
+        case ADD_TO_SHOP:
+            productManagementService.addToShop(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productId);
+            break;
+        case REMOVE_FROM_SHOP:
+            productManagementService.removeFromShop(newStateEnum.getProductStatus(), productId, shopProductId);
+            break;
+
+        case ON_SALE:
+            productManagementService.onSale(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productId, shopProductId);
+            break;
+        case OFF_SALE:
+            productManagementService.offSale(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productId, shopProductId);
+            break;
+        case SHOP_APPROVE:
+            productManagementService.shopApprove(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productId, shopProductId);
+            break;
+        case SHOP_PROCESS:
+            productManagementService.shopProcess(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productId, shopProductId);
+            break;
+        case SHOP_REMOVE:
+            productManagementService.shopRemove(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productId, shopProductId);
+            break;
+
+        default:
+            break;
         }
+
+        //        if (currentStateEnum.getShopProductStatus() == -1 && newStateEnum.getShopProductStatus() == -1) {
+        //            productManagementService.updateProductStatus(newStateEnum.getProductStatus(), productId);
+        //        } else if (currentStateEnum.getShopProductStatus() == -1 && newStateEnum.getShopProductStatus() != -1) {
+        //            productManagementService.updateProductStatusAndNewShopProduct(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productId);
+        //        } else if (currentStateEnum.getShopProductStatus() != -1) {
+        //            if (shopProductId == null) {
+        //                LOGGER.error("shopProductId missed.");
+        //                throw new ValidateException(new ErrorResponse("Parameter shopProductId missed"));
+        //            }
+        //            if (newStateEnum.getShopProductStatus() != -1) {
+        //                if (operation == OperationEnum.ON_SALE) {
+        //                    productManagementService.onSale(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productId, shopProductId);
+        //                } else {
+        //                    productManagementService.updateProductAndShopProductStatus(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productId,
+        //                            shopProductId);
+        //                }
+        //
+        //            } else if (newStateEnum.getShopProductStatus() == -1) {
+        //
+        //                productManagementService.updateProductStatusAndDisableShopProduct(newStateEnum.getProductStatus(), productId, shopProductId);
+        //            }
+        //        }
         LOGGER.info("{} : Product: [{}]  [{}] -> [{}] -> [{}] SUCCESSFUL", userId, productId, currentStateEnum.name(), operation.name(), newStateEnum.name());
     }
 
@@ -248,23 +288,63 @@ public class StateMachineController {
 
         List<Long> productIds = new LinkedList<>(idsMap.keySet());
         List<Long> shopProductIds = new LinkedList<>(idsMap.values());
-        if (currentStateEnum.getShopProductStatus() == -1 && newStateEnum.getShopProductStatus() == -1) {
-            productManagementService.batchUpdateProductStatus(newStateEnum.getProductStatus(), productIds);
-        } else if (currentStateEnum.getShopProductStatus() == -1 && newStateEnum.getShopProductStatus() != -1) {
-            productManagementService.batchUpdateProductStatusAndNewShopProduct(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(),
-                    productIds);
-        } else if (currentStateEnum.getShopProductStatus() != -1) {
-            if (newStateEnum.getShopProductStatus() != -1) {
-                if (operation == OperationEnum.ON_SALE) {
-                    productManagementService.batchOnSale(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productIds, shopProductIds);
-                } else {
-                    productManagementService.batchUpdateProductAndShopProductStatus(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(),
-                            productIds, shopProductIds);
-                }
-            } else if (newStateEnum.getShopProductStatus() == -1) {
-                productManagementService.batchUpdateProductStatusAndDisableShopProduct(newStateEnum.getProductStatus(), productIds, shopProductIds);
-            }
+
+        LogicOperationEnum logicOperationEnum = StateMachineCoreRule.mapLogicOperation(currentStateEnum, operation);
+
+        switch (logicOperationEnum) {
+        case REMOVE:
+            productManagementService.batchRemove(newStateEnum.getProductStatus(), productIds);
+            break;
+        case APPROVE:
+            productManagementService.batchApprove(newStateEnum.getProductStatus(), productIds);
+            break;
+        case PROCESS:
+            productManagementService.batchProcess(newStateEnum.getProductStatus(), productIds);
+            break;
+
+        case ADD_TO_SHOP:
+            productManagementService.batchAddToShop(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productIds);
+            break;
+        case REMOVE_FROM_SHOP:
+            productManagementService.batchRemoveFromShop(newStateEnum.getProductStatus(), productIds, shopProductIds);
+            break;
+        case ON_SALE:
+            productManagementService.batchOnSale(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productIds, shopProductIds);
+            break;
+        case OFF_SALE:
+            productManagementService.batchOffSale(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productIds, shopProductIds);
+            break;
+        case SHOP_APPROVE:
+            productManagementService.batchShopRemove(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productIds, shopProductIds);
+            break;
+        case SHOP_PROCESS:
+            productManagementService.batchShopProcess(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productIds, shopProductIds);
+            break;
+        case SHOP_REMOVE:
+            productManagementService.batchShopRemove(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productIds, shopProductIds);
+            break;
+
+        default:
+            break;
         }
+
+        //        if (currentStateEnum.getShopProductStatus() == -1 && newStateEnum.getShopProductStatus() == -1) {
+        //            productManagementService.batchUpdateProductStatus(newStateEnum.getProductStatus(), productIds);
+        //        } else if (currentStateEnum.getShopProductStatus() == -1 && newStateEnum.getShopProductStatus() != -1) {
+        //            productManagementService.batchUpdateProductStatusAndNewShopProduct(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(),
+        //                    productIds);
+        //        } else if (currentStateEnum.getShopProductStatus() != -1) {
+        //            if (newStateEnum.getShopProductStatus() != -1) {
+        //                if (operation == OperationEnum.ON_SALE) {
+        //                    productManagementService.batchOnSale(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productIds, shopProductIds);
+        //                } else {
+        //                    productManagementService.batchUpdateProductAndShopProductStatus(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(),
+        //                            productIds, shopProductIds);
+        //                }
+        //            } else if (newStateEnum.getShopProductStatus() == -1) {
+        //                productManagementService.batchUpdateProductStatusAndDisableShopProduct(newStateEnum.getProductStatus(), productIds, shopProductIds);
+        //            }
+        //        }
     }
 
     private Map<Long, Long> batchCheckInStock(Map<Long, Long> idsMap) {

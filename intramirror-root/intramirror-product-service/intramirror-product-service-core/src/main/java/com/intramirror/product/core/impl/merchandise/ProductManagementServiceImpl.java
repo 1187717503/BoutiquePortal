@@ -54,57 +54,121 @@ public class ProductManagementServiceImpl implements ProductManagementService {
         return productManagementMapper.listProductDetailInfo(searchCondition);
     }
 
+    //    @Override
+    //    @Transactional
+    //    public void updateProductStatus(int status, Long productId) {
+    //        updateProductStatusOnly(status, productId);
+    //    }
+    //
+    //    @Override
+    //    @Transactional
+    //    public void updateProductStatusAndNewShopProduct(int status, int shopStatus, Long productId) {
+    //        updateProductStatusOnly(status, productId);
+    //        createShopProductStatus(shopStatus, productId);
+    //    }
+    //
+    //    @Override
+    //    @Transactional
+    //    public void updateProductAndShopProductStatus(int status, int shopStatus, Long productId, Long shopProductId) {
+    //        updateProductStatusOnly(status, productId);
+    //        updateShopProductStatusOnly(shopStatus, productId);
+    //
+    //    }
+    //
+    //    @Override
+    //    @Transactional
+    //    public void updateProductStatusAndDisableShopProduct(int status, Long productId, Long shopProductId) {
+    //        updateProductStatusOnly(status, productId);
+    //        disableShopProductStatus(shopProductId);
+    //    }
+    //
+    //    @Override
+    //    @Transactional
+    //    public void batchUpdateProductStatus(int status, List<Long> productIds) {
+    //        batchUpdateProductStatusOnly(status, productIds);
+    //    }
+
+    //    @Override
+    //    @Transactional
+    //    public void batchUpdateProductStatusAndNewShopProduct(int status, int shopStatus, List<Long> productIds) {
+    //        batchUpdateProductStatusOnly(status, productIds);
+    //        batchCreateShopProductStatus(shopStatus, productIds);
+    //    }
+
+    //    @Override
+    //    @Transactional
+    //    public void batchUpdateProductAndShopProductStatus(int status, int shopStatus, List<Long> productIds, List<Long> shopProductId) {
+    //        batchUpdateProductStatusOnly(status, productIds);
+    //        batchUpdateShopProductStatusOnly(shopStatus, shopProductId);
+    //    }
+    //
+    //    @Override
+    //    @Transactional
+    //    public void batchUpdateProductStatusAndDisableShopProduct(int status, List<Long> productIds, List<Long> shopProductIds) {
+    //        batchUpdateProductStatusOnly(status, productIds);
+    //        batchDisableShopProductStatus(shopProductIds);
+    //    }
+
     @Override
     @Transactional
-    public void updateProductStatus(int status, Long productId) {
+    public void approve(int status, Long productId) {
         updateProductStatusOnly(status, productId);
     }
 
     @Override
     @Transactional
-    public void updateProductStatusAndNewShopProduct(int status, int shopStatus, Long productId) {
+    public void batchApprove(int status, List<Long> productIds) {
+        batchUpdateProductStatusOnly(status, productIds);
+    }
+
+    @Override
+    @Transactional
+    public void process(int status, Long productId) {
+        updateProductStatusOnly(status, productId);
+    }
+
+    @Override
+    @Transactional
+    public void batchProcess(int status, List<Long> productIds) {
+        batchUpdateProductStatusOnly(status, productIds);
+    }
+
+    @Override
+    @Transactional
+    public void remove(int status, Long productId) {
+        updateProductStatusOnly(status, productId);
+    }
+
+    @Override
+    @Transactional
+    public void batchRemove(int status, List<Long> productIds) {
+        batchUpdateProductStatusOnly(status, productIds);
+    }
+
+    @Override
+    @Transactional
+    public void addToShop(int status, int shopStatus, Long productId) {
         updateProductStatusOnly(status, productId);
         createShopProductStatus(shopStatus, productId);
     }
 
     @Override
     @Transactional
-    public void updateProductAndShopProductStatus(int status, int shopStatus, Long productId, Long shopProductId) {
-        updateProductStatusOnly(status, productId);
-        updateShopProductStatusOnly(shopStatus, productId);
-
-    }
-
-    @Override
-    @Transactional
-    public void updateProductStatusAndDisableShopProduct(int status, Long productId, Long shopProductId) {
-        updateProductStatusOnly(status, productId);
-        disableShopProductStatus(shopProductId);
-    }
-
-    @Override
-    @Transactional
-    public void batchUpdateProductStatus(int status, List<Long> productIds) {
-        batchUpdateProductStatusOnly(status, productIds);
-    }
-
-    @Override
-    @Transactional
-    public void batchUpdateProductStatusAndNewShopProduct(int status, int shopStatus, List<Long> productIds) {
+    public void batchAddToShop(int status, int shopStatus, List<Long> productIds) {
         batchUpdateProductStatusOnly(status, productIds);
         batchCreateShopProductStatus(shopStatus, productIds);
     }
 
     @Override
     @Transactional
-    public void batchUpdateProductAndShopProductStatus(int status, int shopStatus, List<Long> productIds, List<Long> shopProductId) {
-        batchUpdateProductStatusOnly(status, productIds);
-        batchUpdateShopProductStatusOnly(shopStatus, shopProductId);
+    public void removeFromShop(int status, Long productId, Long shopProductId) {
+        updateProductStatusOnly(status, productId);
+        disableShopProductStatus(shopProductId);
     }
 
     @Override
     @Transactional
-    public void batchUpdateProductStatusAndDisableShopProduct(int status, List<Long> productIds, List<Long> shopProductIds) {
+    public void batchRemoveFromShop(int status, List<Long> productIds, List<Long> shopProductIds) {
         batchUpdateProductStatusOnly(status, productIds);
         batchDisableShopProductStatus(shopProductIds);
     }
@@ -118,9 +182,65 @@ public class ProductManagementServiceImpl implements ProductManagementService {
 
     @Override
     @Transactional
-    public void batchOnSale(int status, int shopStatus, List<Long> productIds, List<Long> shopProductId) {
+    public void batchOnSale(int status, int shopStatus, List<Long> productIds, List<Long> shopProductIds) {
         batchUpdateProductStatusOnly(status, productIds);
-        batchUpdateShopProductStatusAndSaleAt(shopStatus, shopProductId);
+        batchUpdateShopProductStatusAndSaleAt(shopStatus, shopProductIds);
+    }
+
+    @Override
+    @Transactional
+    public void offSale(int status, int shopStatus, Long productId, Long shopProductId) {
+        updateProductStatusOnly(status, productId);
+        updateShopProductStatusOnly(shopStatus, productId);
+    }
+
+    @Override
+    @Transactional
+    public void batchOffSale(int status, int shopStatus, List<Long> productIds, List<Long> shopProductIds) {
+        batchUpdateProductStatusOnly(status, productIds);
+        batchUpdateShopProductStatusOnly(shopStatus, shopProductIds);
+    }
+
+    @Override
+    @Transactional
+    public void shopApprove(int status, int shopStatus, Long productId, Long shopProductId) {
+        updateProductStatusOnly(status, productId);
+        updateShopProductStatusOnly(shopStatus, productId);
+    }
+
+    @Override
+    @Transactional
+    public void batchShopApprove(int status, int shopStatus, List<Long> productIds, List<Long> shopProductIds) {
+        batchUpdateProductStatusOnly(status, productIds);
+        batchUpdateShopProductStatusOnly(shopStatus, shopProductIds);
+    }
+
+    @Override
+    @Transactional
+    public void shopProcess(int status, int shopStatus, Long productId, Long shopProductId) {
+        updateProductStatusOnly(status, productId);
+        updateShopProductStatusOnly(shopStatus, productId);
+    }
+
+    @Override
+    @Transactional
+    public void batchShopProcess(int status, int shopStatus, List<Long> productIds, List<Long> shopProductIds) {
+        batchUpdateProductStatusOnly(status, productIds);
+        batchUpdateShopProductStatusOnly(shopStatus, shopProductIds);
+    }
+
+    @Override
+    @Transactional
+    public void shopRemove(int status, int shopStatus, Long productId, Long shopProductId) {
+        updateProductStatusOnly(status, productId);
+        updateShopProductStatusOnly(shopStatus, productId);
+    }
+
+    @Override
+    @Transactional
+    public void batchShopRemove(int status, int shopStatus, List<Long> productIds, List<Long> shopProductIds) {
+        batchUpdateProductStatusOnly(status, productIds);
+        batchUpdateShopProductStatusOnly(shopStatus, shopProductIds);
     }
 
     @Override

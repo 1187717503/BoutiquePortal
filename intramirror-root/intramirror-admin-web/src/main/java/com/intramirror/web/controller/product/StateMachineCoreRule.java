@@ -128,4 +128,68 @@ public class StateMachineCoreRule {
     public static StateEnum getNewState(StateEnum currentState, OperationEnum operation) {
         return stateCoreRule.get(currentState).get(operation);
     }
+
+    public static LogicOperationEnum mapLogicOperation(StateEnum currentState, OperationEnum operation) {
+        LogicOperationEnum ops;
+        switch (operation) {
+        case REMOVE:
+            if (isShopState(currentState)) {
+                ops = LogicOperationEnum.SHOP_REMOVE;
+            } else {
+                ops = LogicOperationEnum.REMOVE;
+            }
+            break;
+        case APPROVE:
+            if (isShopState(currentState)) {
+                ops = LogicOperationEnum.SHOP_APPROVE;
+            } else {
+                ops = LogicOperationEnum.APPROVE;
+            }
+            break;
+        case PROCESS:
+            if (isShopState(currentState)) {
+                ops = LogicOperationEnum.SHOP_PROCESS;
+            } else {
+                ops = LogicOperationEnum.PROCESS;
+            }
+            break;
+        case ON_SALE:
+            ops = LogicOperationEnum.ON_SALE;
+            break;
+        case OFF_SALE:
+            ops = LogicOperationEnum.OFF_SALE;
+            break;
+        case ADD_TO_SHOP:
+            ops = LogicOperationEnum.ADD_TO_SHOP;
+            break;
+        case REMOVE_FROM_SHOP:
+            ops = LogicOperationEnum.REMOVE_FROM_SHOP;
+            break;
+        default:
+            ops = null;
+            break;
+
+        }
+        return ops;
+
+    }
+
+    private static boolean isShopState(StateEnum currentState) {
+        boolean ret;
+        switch (currentState) {
+        case SHOP_ON_SALE:
+        case SHOP_SOLD_OUT:
+        case SHOP_PROCESSING:
+        case SHOP_REMOVED:
+        case SHOP_READY_TO_SELL:
+        case OLD_SHOP_PROCESSING:
+            ret = true;
+            break;
+        default:
+            ret = false;
+            break;
+        }
+        return ret;
+
+    }
 }
