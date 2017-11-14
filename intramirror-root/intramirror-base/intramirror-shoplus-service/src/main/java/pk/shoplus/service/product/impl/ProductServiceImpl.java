@@ -502,6 +502,8 @@ public class ProductServiceImpl implements IProductService{
                                     .putData("key","price")
                                     .putData("value",productOptions.getSalePrice()).getMap();
                             warningMaps.add(mapUtils.getMap());
+                            ShopProductService shopProductService = new ShopProductService(conn);
+                            shopProductService.changeShopProductStopByProduct(product.getProduct_id().toString());
                         }
                     } else {
                         mapUtils = new MapUtils(new HashMap<>());

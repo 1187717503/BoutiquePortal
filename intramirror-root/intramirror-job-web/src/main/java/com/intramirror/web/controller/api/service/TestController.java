@@ -23,11 +23,11 @@ public class TestController {
     @ResponseBody
     public Map<String,Object> testStock(@RequestBody StockOption stockOption){
         System.out.println(new Gson().toJson(stockOption));
-        ApiUpdateStockSerivce apiStockSerivce = new ApiUpdateStockSerivce(stockOption);
+        ApiUpdateStockSerivce apiStockSerivce = new ApiUpdateStockSerivce();
         stockOption.setLast_check(new Date());
         long  start = System.currentTimeMillis();
         System.out.println("start:"+new Date().toString() +","+start);
-        Map<String,Object> map = apiStockSerivce.execute();
+        Map<String,Object> map = apiStockSerivce.updateStock(stockOption);
         long  end = System.currentTimeMillis();
         System.out.println("end:"+new Date().toString()+","+end);
         System.out.println(start-end+",map:"+new Gson().toJson(map));

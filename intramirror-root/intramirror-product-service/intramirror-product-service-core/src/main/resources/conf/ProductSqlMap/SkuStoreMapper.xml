@@ -136,12 +136,14 @@
 
     <update id="zeroClearing" parameterType="java.util.Map">
 
-        UPDATE `sku_store` ss
-            INNER JOIN `product` p ON (ss.`product_id` = p.`product_id` AND p.`enabled` = 1 AND ss.`enabled` = 1)
-        SET ss.`confirmed` = 0, ss.`store` = (0 - abs(cast(ss.`reserved` AS SIGNED)))
-        WHERE p.`vendor_id` = #{vendor_id,jdbcType=VARCHAR}
-        <![CDATA[ AND (ss.`last_check` < #{date,jdbcType=VARCHAR} OR ss.`last_check` IS NULL)
-        ]]>
+        update `sku_store` ss set ss.`confirmed` = 0,ss.`store` = (0 - abs(cast(ss.`reserved` as signed)))
+        where ss.`enabled` = 1
+        and ss.`product_id` in
+        <foreach collection="productIds" item="productId" index="index"
+                 open="(" close=")" separator=",">
+            #{productId}
+        </foreach>
+        <![CDATA[ and (ss.`last_check` <= #{date,jdbcType=VARCHAR} or ss.`last_check` is null )]]>
 
     </update>
 

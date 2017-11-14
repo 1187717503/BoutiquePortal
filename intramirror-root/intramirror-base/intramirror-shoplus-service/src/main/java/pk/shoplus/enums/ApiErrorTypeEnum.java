@@ -78,12 +78,16 @@ public class ApiErrorTypeEnum {
         error_update_stock_param("error_update_stock_param","修改库存入参有误"),
         error_price("error_price","价格小于10或者大于10000"),
         error_size_is_null("error_size_is_null","找不到这个size"),
-        error_runtime_exception("error_runtime_exception","运行时异常"),
         error_boutique_is_not_exists("error_boutique_is_not_exists","找不到这个商品"),
-        error_price_out_off("error_price_out_off","价格超过+-20%"),
         error_boutique_id_is_null("error_boutique_id_is_null","product_code为空"),
-        error_boutique_id_already_exist("boutique_id_already_exist","boutique_id已经存在");
+        error_boutique_id_already_exist("boutique_id_already_exist","boutique_id已经存在"),
 
+        error_data_is_null("error_data_is_null","数据为NULL"),
+        error_data_is_not_number("error_data_is_not_number","数据不是数字"),
+        error_price_out_off("error_price_out_off","价格超过+-20%"),
+        error_size_not_exists("error_size_not_exists","size不存在"),
+        error_runtime_exception("error_runtime_exception","运行时异常"),
+        error_boutique_id_not_exists("error_boutique_id_not_exists","找不到这个boutique_id");
         private String code;
         private String desc;
 

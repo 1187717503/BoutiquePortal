@@ -16,6 +16,7 @@ public class StockOption {
     public String type; // 库存类型
     public Date last_check; // 消息时间
     public int store;
+    public String updated_by; // 根据product_code,size修改,根据sku_code修改
 
     public Date getLast_check() {
         return last_check;
@@ -87,5 +88,13 @@ public class StockOption {
 
     public void setStore(int store) {
         this.store = store;
+    }
+
+    public String getUpdated_by() {
+        return updated_by;
+    }
+
+    public void setUpdated_by(String updated_by) {
+        this.updated_by = updated_by;
     }
 }
