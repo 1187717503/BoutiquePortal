@@ -53,17 +53,17 @@ public class ColtoriProductMapping implements IProductMapping {
                     .setSalePrice(productObj.getString("retail_price"))
                     .setLast_check(new Date());
 
-            String category_l1 = productObj.getString("group_id");
-            String category_l2 = productObj.getString("subgroup_id");
-            String category_l3 = productObj.getString("category_id");
+            String category_l1 = productObj.getString("family_id");
+            String category_l2 = productObj.getString("group_id");
+            String category_l3 = productObj.getString("subgroup_id");
             if(StringUtils.isBlank(category_l1) || "null".equals(category_l1)) {
-                productObj.put("group_id","");
+                productObj.put("family_id","");
             }
             if(StringUtils.isBlank(category_l2) || "null".equals(category_l2)) {
-                productObj.put("subgroup_id","");
+                productObj.put("group_id","");
             }
             if(StringUtils.isBlank(category_l3) || "null".equals(category_l3)) {
-                productObj.put("category_id","");
+                productObj.put("subgroup_id","");
             }
 
             Map<String, Object> categoryMap = new HashMap<String, Object>();
@@ -83,9 +83,6 @@ public class ColtoriProductMapping implements IProductMapping {
                 productOptions.setCategoryId(apiCategoryMap.get(0).get("category_id").toString());
             }
 
-            productOptions.setCategoryId("1613");
-            productOptions.setBrandName("Gucci");
-            productOptions.setSeasonCode("03FW");
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("ColtoriProductMapping,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",bodyDataMap:"+ JSONObject.fromObject(bodyDataMap));
