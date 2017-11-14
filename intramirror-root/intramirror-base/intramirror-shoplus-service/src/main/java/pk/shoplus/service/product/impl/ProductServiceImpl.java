@@ -308,7 +308,7 @@ public class ProductServiceImpl implements IProductService{
                 product.season_code = productOptions.getSeasonCode();
             }
 
-            product.updated_at = new Date();
+//            product.updated_at = new Date();
             productService.updateProduct(product);
 
             CategoryProductInfo categoryProductInfo = this.getCategoryProductInfo(categoryProductInfoService,product.category_id);
