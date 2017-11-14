@@ -11,6 +11,10 @@ import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
 import org.apache.log4j.Logger;
 import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.util.MapUtils;
@@ -35,17 +39,17 @@ public class HttpUtils {
     private static final String CHARSET_UTF_8 = "UTF-8";
 
     public static String httpGet(String url){
-        Map<String,Object> result = request(HTTP_GET,url,CONTENT_FROM_TYPE,null);
+        Map<String,Object> result = requestHttp(HTTP_GET,url,CONTENT_FROM_TYPE,null);
         return result.get("resultMessage").toString();
     }
 
     public static String httpPost(String url,String body){
-        Map<String,Object> result = request(HTTP_POST,url,CONTENT_FROM_TYPE,body);
+        Map<String,Object> result = requestHttp(HTTP_POST,url,CONTENT_FROM_TYPE,body);
         return result.get("resultMessage").toString();
     }
 
     public static Map<String,Object> responseAndHeadersGet(String url){
-        Map<String,Object> result = request(HTTP_GET,url,CONTENT_FROM_TYPE,null);
+        Map<String,Object> result = requestHttps(url,HTTP_GET);
         Map<String,List<String>> headers = (Map<String, List<String>>) result.get("headers");
         List<String> currentList = headers.get("X-Count-Current");
         List<String> pagesList = headers.get("X-Count-Pages");
@@ -61,7 +65,7 @@ public class HttpUtils {
         return result;
     }
 
-    private static Map<String,Object> request(String requestType,String url,String contentType,String body){
+    private static Map<String,Object> requestHttp(String requestType,String url,String contentType,String body){
         MapUtils mapUtils = new MapUtils(new HashMap<String, Object>());
         OutputStream outputStream = null;
         OutputStreamWriter outputStreamWriter = null;
@@ -107,7 +111,7 @@ public class HttpUtils {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            logger.info("HttpUtils,request,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
+            logger.info("HttpUtils,requestHttp,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
         }finally {
             try {
                 if (outputStreamWriter != null) {
@@ -146,6 +150,51 @@ public class HttpUtils {
             }
         }
         mapUtils.putData("resultMessage",resultBuffer.toString());
+        return mapUtils.getMap();
+    }
+
+    public static Map<String,Object> requestHttps(String requestUrl,String requestType) {
+        MapUtils mapUtils = new MapUtils(new HashMap<String, Object>());
+        StringBuffer buffer = null;
+        try {
+            // 创建SSLContext
+            SSLContext sslContext = SSLContext.getInstance("SSL");
+            TrustManager[] tm = { new MyX509TrustManager() };
+            // 初始化
+            sslContext.init(null, tm, new java.security.SecureRandom());
+
+            // 获取SSLSocketFactory对象
+            SSLSocketFactory ssf = sslContext.getSocketFactory();
+            URL url = new URL(requestUrl);
+            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            conn.setUseCaches(false);
+            conn.setRequestMethod(requestType);
+            // 设置当前实例使用的SSLSoctetFactory
+            conn.setSSLSocketFactory(ssf);
+            conn.connect();
+            /*// 往服务器端写内容
+            if (null != outputStr) {
+                OutputStream os = conn.getOutputStream();
+                os.write(outputStr.getBytes("utf-8"));
+                os.close();
+            }*/
+            Map<String,List<String>> headers = conn.getHeaderFields();
+            mapUtils.putData("headers",headers);
+            // 读取服务器端返回的内容
+            InputStream is = conn.getInputStream();
+            InputStreamReader isr = new InputStreamReader(is, "utf-8");
+            BufferedReader br = new BufferedReader(isr);
+            buffer = new StringBuffer();
+            String line = null;
+            while ((line = br.readLine()) != null) {
+                buffer.append(line);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        mapUtils.putData("resultMessage",buffer.toString());
         return mapUtils.getMap();
     }
 

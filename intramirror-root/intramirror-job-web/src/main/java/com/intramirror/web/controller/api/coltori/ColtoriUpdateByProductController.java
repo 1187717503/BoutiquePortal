@@ -63,7 +63,7 @@ public class ColtoriUpdateByProductController implements InitializingBean {
             if(name.contains("all")) {
                 // get token
                 logger.info("ColtoriUpdateByProductController,postAuth,start,get_token_url:"+get_token_url+",username:"+username+",password:"+password);
-                String getTokenResponse = getPostRequestUtil.postAuth(get_token_url,username,password);
+                String getTokenResponse = getPostRequestUtil.httpsRequest(get_token_url,username,password);
                 logger.info("ColtoriUpdateByProductController,postAuth,end,get_token_url:"+get_token_url+",username:"+username+",password:"+password+",getTokenResponse:"+getTokenResponse);
 
                 JSONObject toKenObject = JSONObject.fromObject(getTokenResponse);
@@ -142,7 +142,7 @@ public class ColtoriUpdateByProductController implements InitializingBean {
         product_all_update.put("get_product_url","https://api.orderlink.it/v2/products");
         product_all_update.put("user","TEST");
         product_all_update.put("password","1k0nic");
-        product_all_update.put("vendor_id", "24");
+        product_all_update.put("vendor_id", "7");
         product_all_update.put("eventName","product_all_update");
         product_all_update.put("fileUtils",new ApiDataFileUtils("coltori","product_all_update"));
         product_all_update.put("executor",product_all_update_executor);
@@ -153,7 +153,7 @@ public class ColtoriUpdateByProductController implements InitializingBean {
         product_delta_update.put("get_product_url","https://api.orderlink.it/v2/products");
         product_delta_update.put("user","TEST");
         product_delta_update.put("password","1k0nic");
-        product_delta_update.put("vendor_id", "24");
+        product_delta_update.put("vendor_id", "7");
         product_delta_update.put("eventName","product_delta_update");
         product_delta_update.put("fileUtils",new ApiDataFileUtils("coltori","product_delta_update"));
         product_delta_update.put("executor",product_delta_update_executor);
@@ -161,6 +161,5 @@ public class ColtoriUpdateByProductController implements InitializingBean {
         paramsMap = new HashMap<>();
         paramsMap.put("product_all_update",product_all_update);
         paramsMap.put("product_delta_update",product_delta_update);
-
     }
 }

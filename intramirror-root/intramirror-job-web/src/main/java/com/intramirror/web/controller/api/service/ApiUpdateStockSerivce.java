@@ -51,6 +51,10 @@ public class ApiUpdateStockSerivce {
         Map<String,Object> resultMap = new HashMap<>();
         Connection conn = null;
         try {
+
+            Map<String,Object> checkParamMap = this.checkParams();
+            if(isErrorMap(checkParamMap)) {return checkParamMap;}
+
             conn = DBConnector.sql2o.beginTransaction();
             resultMap = this.executeStockRule(conn);
             if(conn!=null){conn.commit();conn.close();}
@@ -73,11 +77,6 @@ public class ApiUpdateStockSerivce {
     }
 
     public Map<String,Object> executeStockRule(Connection conn) throws Exception{
-
-        /** 1。检查参数 */
-        Map<String,Object> checkParamMap = this.checkParams();
-
-        /** 2。查询SKU信息 */
         SkuStoreService skuStoreService = new SkuStoreService(conn);
         List<Map<String,Object>> skuStoreMap = null;
         if(StringUtils.isNotBlank(stockOption.getProductCode())) {

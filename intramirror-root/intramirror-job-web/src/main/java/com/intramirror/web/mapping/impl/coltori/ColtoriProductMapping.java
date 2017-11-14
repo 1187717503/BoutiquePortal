@@ -32,8 +32,6 @@ public class ColtoriProductMapping implements IProductMapping {
         try {
             String key = bodyDataMap.get("key").toString();
             JSONObject productObj = (JSONObject) bodyDataMap.get("product");
-            System.out.println(productObj.toString());
-            System.out.println(productObj.getJSONObject("name").get("en") == null?"":productObj.getJSONObject("name").getString("en"));
             productOptions.setName(productObj.getJSONObject("name").get("en") == null?"":productObj.getJSONObject("name").getString("en"))
                     .setCode(key)
                     .setSeasonCode(productObj.getString("season_id"))
@@ -84,6 +82,10 @@ public class ColtoriProductMapping implements IProductMapping {
             if(null != apiCategoryMap && 0 < apiCategoryMap.size()) {
                 productOptions.setCategoryId(apiCategoryMap.get(0).get("category_id").toString());
             }
+
+            productOptions.setCategoryId("1613");
+            productOptions.setBrandName("Gucci");
+            productOptions.setSeasonCode("03FW");
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("ColtoriProductMapping,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",bodyDataMap:"+ JSONObject.fromObject(bodyDataMap));
