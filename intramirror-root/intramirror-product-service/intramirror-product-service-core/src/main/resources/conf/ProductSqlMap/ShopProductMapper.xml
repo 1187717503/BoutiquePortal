@@ -492,42 +492,42 @@
     <update id="batchUpdateShopProductByShopProductIds">
         update shop_product
         <set>
-            <if test="shopId != null">
+            <if test="shopProduct.shopId != null">
                 shop_id = #{shopProduct.shopId,jdbcType=BIGINT},
             </if>
-            <if test="shopCategoryId != null">
+            <if test="shopProduct.shopCategoryId != null">
                 shop_category_id = #{shopProduct.shopCategoryId,jdbcType=BIGINT},
             </if>
-            <if test="productId != null">
+            <if test="shopProduct.productId != null">
                 product_id = #{shopProduct.productId,jdbcType=BIGINT},
             </if>
-            <if test="name != null">
+            <if test="shopProduct.name != null">
                 name = #{shopProduct.name,jdbcType=VARCHAR},
             </if>
-            <if test="salesAmount != null">
+            <if test="shopProduct.salesAmount != null">
                 sales_amount = #{shopProduct.salesAmount,jdbcType=INTEGER},
             </if>
-            <if test="status != null">
+            <if test="shopProduct.status != null">
                 status = #{shopProduct.status,jdbcType=TINYINT},
             </if>
-            <if test="saleAt != null">
+            <if test="shopProduct.saleAt != null">
                 sale_at = #{shopProduct.saleAt,jdbcType=TIMESTAMP},
             </if>
-            <if test="createdAt != null">
+            <if test="shopProduct.createdAt != null">
                 created_at = #{shopProduct.createdAt,jdbcType=TIMESTAMP},
             </if>
             updated_at = now(),
 
-            <if test="enabled != null">
+            <if test="shopProduct.enabled != null">
                 enabled = #{shopProduct.enabled,jdbcType=BIT},
             </if>
-            <if test="productGroupId != null">
+            <if test="shopProduct.productGroupId != null">
                 product_group_id = #{shopProduct.productGroupId,jdbcType=BIGINT},
             </if>
-            <if test="minSalePrice != null">
+            <if test="shopProduct.minSalePrice != null">
                 min_sale_price = #{shopProduct.minSalePrice,jdbcType=DECIMAL},
             </if>
-            <if test="maxSalePrice != null">
+            <if test="shopProduct.maxSalePrice != null">
                 max_sale_price = #{shopProduct.maxSalePrice,jdbcType=DECIMAL},
             </if>
         </set>
