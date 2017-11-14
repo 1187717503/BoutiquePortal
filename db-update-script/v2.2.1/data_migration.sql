@@ -67,3 +67,19 @@ WHERE p.product_id = tmp.product_id AND sp.product_id = tmp.product_id AND p.`st
 
 SELECT COUNT(*) FROM `product` p,`shop_product` sp, tmp_product_toupdate tmp
 WHERE p.product_id = tmp.product_id AND sp.product_id = tmp.product_id AND p.`status` = 3 AND sp.`status` = 2 AND p.enabled = 1 AND sp.enabled = 1;
+
+
+
+/* 2017-11-14 on sell状态的商品，没有sale at字段的，全部用同表update_at字段补位 */
+DROP TABLE IF EXISTS tmp_product_toupdate;
+CREATE TABLE tmp_product_toupdate
+SELECT p.product_id
+FROM `product` p,`shop_product` sp
+WHERE p.product_id = sp.product_id AND p.enabled = 1 AND sp.enabled = 1 AND p.`status` = 3 AND sp.`status` = 0 AND sp.sale_at IS NULL;
+
+SELECT COUNT(*)
+FROM `product` p,`shop_product` sp, tmp_product_toupdate tmp
+WHERE p.product_id = tmp.product_id AND sp.product_id = tmp.product_id AND p.`status` = 3 AND sp.`status` = 0 AND p.enabled = 1 AND sp.enabled = 1 AND sp.sale_at IS NULL;
+
+UPDATE `product` p,`shop_product` sp, tmp_product_toupdate tmp SET sp.sale_at = sp.updated_at
+WHERE p.product_id = tmp.product_id AND sp.product_id = tmp.product_id AND p.`status` = 3 AND sp.`status` = 0 AND p.enabled = 1 AND sp.enabled = 1 AND sp.sale_at IS NULL;
