@@ -10,6 +10,7 @@ import com.intramirror.web.controller.api.atelier.AtelierUpdateByProductService;
 import com.intramirror.web.service.order.OrderState;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -191,7 +192,7 @@ public class AtelierOrderController {
         if(responseCode.equals(response_error)) {
             errorMap.put("ErrorCode",errorCode);
             errorMap.put("ErrorMsg",errorMsg);
-            errorMap.put("TimeStamp", DateUtils.getStrDate(new Date(),"yyyy-MM-hh HH:mm:ss"));
+            errorMap.put("TimeStamp", DateUtils.getStrDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
 
             responseMap.put("Error",errorMap);
         }
@@ -320,17 +321,13 @@ public class AtelierOrderController {
                 this.intLimit = 20;
             } else {
                 this.intLimit = Integer.parseInt(limit);
-                if(this.intLimit > 50) {
-                    this.intLimit = 50;
+                if(this.intLimit > 50 || this.intLimit < 0) {
+//                    this.intLimit = 50;
+                    return "Invalid limit";
                 }
             }
 
-            try {
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-                this.paramDate = format.parse(date);
-            } catch (Exception e) {
-                e.printStackTrace();
-                logger.info("checkGetOrderByDateParams,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
+            if(!isValidDate(date)) {
                 return "Invalid date";
             }
 
@@ -342,6 +339,17 @@ public class AtelierOrderController {
             this.vendorId = Long.parseLong(dataMap.get("vendor_id").toString());
             logger.info("checkGetOrderByDateParams,end,inputParams:"+ JSONObject.toJSONString(this));
             return atelier_success;
+        }
+    }
+
+    public boolean isValidDate(String str) {
+        //String str = "2007-01-02";
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        try{
+            Date date = (Date)formatter.parse(str);
+            return str.equals(formatter.format(date));
+        }catch(Exception e){
+            return false;
         }
     }
     class GetOrderByDateResultVO{
