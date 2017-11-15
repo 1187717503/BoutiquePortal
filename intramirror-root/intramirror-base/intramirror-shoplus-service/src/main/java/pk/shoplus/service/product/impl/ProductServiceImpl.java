@@ -503,6 +503,7 @@ public class ProductServiceImpl implements IProductService{
                                     .putData("value",productOptions.getSalePrice()).getMap();
                             warningMaps.add(mapUtils.getMap());
                             ShopProductService shopProductService = new ShopProductService(conn);
+                            product.status = 4;
                             shopProductService.changeShopProductStopByProduct(product.getProduct_id().toString());
                         }
                     } else {

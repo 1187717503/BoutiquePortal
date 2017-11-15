@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.intramirror.common.help.ExceptionUtils;
 import com.intramirror.common.help.StringUtils;
 import com.intramirror.common.utils.DateUtils;
+import com.intramirror.product.api.service.stock.IUpdateStockService;
 import com.intramirror.web.contants.RedisKeyContants;
 import com.intramirror.web.mapping.api.IProductMapping;
 import com.intramirror.web.thread.CommonThreadPool;
@@ -43,6 +44,9 @@ public class ColtoriUpdateByProductController implements InitializingBean {
 
     @Resource(name = "coltoriProductMapping")
     private IProductMapping iProductMapping;
+
+    @Resource(name = "updateStockService")
+    private IUpdateStockService iUpdateStockService;
 
     @RequestMapping("/syn_product")
     @ResponseBody
@@ -85,6 +89,7 @@ public class ColtoriUpdateByProductController implements InitializingBean {
             String total = "";
             int sum = 0;
             int i = 1;
+            int flag = 0;
             while (true) {
                 String new_url = get_product_url;
                 if(i <= sum || i == 1) {
@@ -120,11 +125,40 @@ public class ColtoriUpdateByProductController implements InitializingBean {
                     ProductEDSManagement.ProductOptions productOptions = iProductMapping.mapping(mqDataMap);
                     logger.info("ColtoriUpdateByProductController,end,mapping,mqDataMap:"+JSONObject.fromObject(mqDataMap)+",productOptions:"+JSONObject.fromObject(productOptions));
 
+                    if(StringUtils.isBlank(productOptions.getBrandCode())) {
+                        logger.info("ColtoriUpdateByProductController,BrandID IS NULL,mqDataMap:"+JSONObject.fromObject(mqDataMap)+",productOptions:"+JSONObject.fromObject(productOptions));
+                        continue;
+                    }
+
+                    if(StringUtils.isBlank(productOptions.getCode())) {
+                        logger.info("ColtoriUpdateByProductController,Code IS NULL,mqDataMap:"+JSONObject.fromObject(mqDataMap)+",productOptions:"+JSONObject.fromObject(productOptions));
+                        continue;
+                    }
+
+                    if(StringUtils.isBlank(productOptions.getCategory1())
+                            ||StringUtils.isBlank(productOptions.getCategory2())) {
+                        logger.info("ColtoriUpdateByProductController,Category IS NULL,mqDataMap:"+JSONObject.fromObject(mqDataMap)+",productOptions:"+JSONObject.fromObject(productOptions));
+                        continue;
+                    }
+
+                    if(StringUtils.isBlank(productOptions.getCoverImg())) {
+                        logger.info("ColtoriUpdateByProductController,CoverImg IS NULL,mqDataMap:"+JSONObject.fromObject(mqDataMap)+",productOptions:"+JSONObject.fromObject(productOptions));
+                        continue;
+                    }
+
                     logger.info("ColtoriUpdateByProductController,execute,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
                     CommonThreadPool.execute(eventName,executor,5,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,mqDataMap));
                     logger.info("ColtoriUpdateByProductController,execute,endDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
+                    flag ++;
                 }
                 i++;
+            }
+
+            logger.info("ColtoriUpdateByProductController,zeroClearing,flag:"+flag);
+            if(eventName.equals("product_all_update") && flag > 100 ) {
+                logger.info("ColtoriUpdateByProductController,zeroClearing,start,vendor_id:"+vendor_id);
+                iUpdateStockService.zeroClearing(vendor_id);
+                logger.info("ColtoriUpdateByProductController,zeroClearing,end,vendor_id:"+vendor_id);
             }
 
         } catch (Exception e) {
