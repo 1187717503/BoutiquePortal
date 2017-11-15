@@ -19,7 +19,7 @@ function initBrand() {
         },
         error: function(code, xx) {
             if (code.status == 401) {
-                window.location.href = '../../login'
+                window.location.href = '../../../login'
             }
         }
     });
@@ -91,7 +91,7 @@ function initVendor() {
             initActionforBoutique();
         }, error : function (code, exception) {
             if (code.status == 401) {
-                window.location.href = '../../login'
+                window.location.href = '../../../login'
             }
         }
     });
@@ -122,7 +122,7 @@ function initCategory() {
 
         }, error : function (code, exception) {
             if (code.status == 401) {
-                window.location.href = '../../login'
+                window.location.href = '../../../login'
             }
         }
     });
@@ -145,7 +145,7 @@ function initSeason() {
         }, error: function(code, exception) {
 
             if (code.status == 401) {
-                window.location.href = '../../login'
+                window.location.href = '../../../login'
             }
         }
     });
@@ -349,7 +349,7 @@ function getProdcutList(status, pageno) {
             finishLoading();
 
             if (result.status == 401) {
-                window.location.href = '../../login'
+                window.location.href = '../../../login'
             }
         }
     });
@@ -408,7 +408,7 @@ function getCountWithFilter(filter, tarStatus, pagesize, pageno){
             toashWithCloseBtn(result.responseJSON.message);
 
             if (result.status == 401) {
-                window.location.href = '../../login'
+                window.location.href = '../../../login'
             }
         }
     });
@@ -669,7 +669,7 @@ function initActionEvent() {
 
                 finishLoading()
                 if (result.status == 401) {
-                    window.location.href = '../../login';
+                    window.location.href = '../../../login';
                 }
             }
         });
@@ -730,7 +730,7 @@ function initActionEvent() {
                 toashWithCloseBtn(result.responseJSON.message);
 
                 if (result.status == 401) {
-                    window.location.href = '../../login';
+                    window.location.href = '../../../login';
                 }
             }
         });
