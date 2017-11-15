@@ -18,13 +18,13 @@ public class ProductStateOperationMap {
         statusEnumMap.put("processing", StateEnum.PROCESSING);
         statusEnumMap.put("trash", StateEnum.TRASH);
         statusEnumMap.put("readytosell", StateEnum.READY_TO_SELL);
-        //TODO: how to handle old processing
         statusEnumMap.put("oldprocessing", StateEnum.OLD_PROCESSING);
         statusEnumMap.put("shopprocessing", StateEnum.SHOP_PROCESSING);
         statusEnumMap.put("shopsoldout", StateEnum.SHOP_SOLD_OUT);
         statusEnumMap.put("shopreadytosell", StateEnum.SHOP_READY_TO_SELL);
         statusEnumMap.put("shoponsale", StateEnum.SHOP_ON_SALE);
         statusEnumMap.put("shopremoved", StateEnum.SHOP_REMOVED);
+        statusEnumMap.put("all", StateEnum.ALL);
     }
 
     static {
@@ -38,7 +38,7 @@ public class ProductStateOperationMap {
     }
 
     public static StateEnum getStatus(String status) {
-        return statusEnumMap.get(status) == null ? StateEnum.OTHER : statusEnumMap.get(status);
+        return statusEnumMap.get(status) == null ? StateEnum.ALL : statusEnumMap.get(status);
     }
 
     public static OperationEnum getOperation(String operation) {

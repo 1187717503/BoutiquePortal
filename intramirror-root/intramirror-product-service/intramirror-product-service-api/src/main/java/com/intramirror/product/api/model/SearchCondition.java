@@ -26,6 +26,8 @@ public class SearchCondition {
     private String orderBy;
     private String desc;
 
+    private ContentAdditionalCondition contentAdditionalCondition;
+
     @Override
     public String toString() {
         return "SearchCondition{" + "status=" + status + ", shopStatus=" + shopStatus + ", vendorId='" + vendorId + '\'' + ", boutiqueId='" + boutiqueId + '\''
@@ -168,6 +170,14 @@ public class SearchCondition {
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+
+    public ContentAdditionalCondition getContentAdditionalCondition() {
+        return contentAdditionalCondition;
+    }
+
+    public void setContentAdditionalCondition(ContentAdditionalCondition contentAdditionalCondition) {
+        this.contentAdditionalCondition = contentAdditionalCondition;
     }
 
 }

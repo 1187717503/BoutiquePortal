@@ -29,23 +29,25 @@
         <if test="stock != null and stock != 0">
             LEFT JOIN view_prod_store_sum ON view_prod_store_sum.product_id = product.product_id
         </if>
-        WHERE
-        <choose>
-            <when test="status == 2 or status == 4">
-                product.status IN (4,2)
-            </when>
-            <otherwise>
-                product.status = #{status}
-            </otherwise>
-        </choose>
-        <choose>
-            <when test="shopStatus == -1">
-                AND shop_product.status IS NULL
-            </when>
-            <otherwise>
-                AND shop_product.status = #{shopStatus}
-            </otherwise>
-        </choose>
+        WHERE 1=1
+        <if test="status != -1">
+            <choose>
+                <when test="status == 2 or status == 4">
+                    AND product.status IN (4,2)
+                </when>
+                <otherwise>
+                    AND product.status = #{status}
+                </otherwise>
+            </choose>
+            <choose>
+                <when test="shopStatus == -1">
+                    AND shop_product.status IS NULL
+                </when>
+                <otherwise>
+                    AND shop_product.status = #{shopStatus}
+                </otherwise>
+            </choose>
+        </if>
         <choose>
             <when test="stock == null or stock == 0">
 

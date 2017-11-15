@@ -25,7 +25,7 @@ public enum StateEnum {
     OLD_SHOP_PROCESSING(2,2),
 
 
-    OTHER(-1,-1);
+    ALL(-1,-1);
 
 
 // @formatter:on

@@ -1,6 +1,7 @@
 package com.intramirror.web.controller.product;
 
 import com.intramirror.common.parameter.StatusType;
+import com.intramirror.product.api.model.ContentAdditionalCondition;
 import com.intramirror.product.api.model.SearchCondition;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ProductPropertyService;
@@ -122,16 +123,64 @@ public class ProductMgntController {
             @RequestParam(value = "designerId", required = false) String designerId,
             @RequestParam(value = "colorCode", required = false) String colorCode,
             @RequestParam(value = "image", required = false) String image,
-            //TODO: modelImage filter doesn't work now
             @RequestParam(value = "modelImage", required = false) String modelImage,
             @RequestParam(value = "streetImage", required = false) String streetImage,
-            //TODO: stock filter doesn't work now
             @RequestParam(value = "stock", required = false) String stock,
             @RequestParam(value = "pageSize",required = false) Integer pageSize,
             @RequestParam(value = "pageNo",required = false) Integer pageNo,
             @RequestParam(value = "orderBy",required = false) String orderBy,
-            @RequestParam(value = "desc",required = false) String desc) {
+            @RequestParam(value = "desc",required = false) String desc,
+
+            //Additional
+            @RequestParam(value = "orderBy",required = false) Integer minBoutiqueDiscount,
+            @RequestParam(value = "orderBy",required = false) Integer maxBoutiqueDiscount,
+            @RequestParam(value = "orderBy",required = false) Integer minIMDiscount,
+            @RequestParam(value = "orderBy",required = false) Integer maxIMDiscount,
+            @RequestParam(value = "orderBy",required = false) Long minStock,
+            @RequestParam(value = "orderBy",required = false) Long maxStock,
+            @RequestParam(value = "desc",required = false) String tag) {
     // @formatter:on
+        SearchCondition searchCondition = initCondition(status, vendorId, boutiqueId, brandId, categoryId, season, designerId, colorCode, image, modelImage,
+                streetImage, stock, pageSize, pageNo, orderBy, desc, minBoutiqueDiscount, maxBoutiqueDiscount, minIMDiscount, maxIMDiscount, minStock, maxStock,
+                tag);
+        LOGGER.info("{}", searchCondition);
+        LOGGER.info("status: {}, shop status: {}", getStatusEnum(status).getProductStatus(), getStatusEnum(status).getShopProductStatus());
+        List<Map<String, Object>> productList;
+        productList = productManagementService.listProductService(searchCondition);
+        if (productList.size() > 0) {
+            appendInfo(productList, getStatusEnum(status));
+        }
+        return Response.status(StatusType.SUCCESS).data(productList);
+    }
+
+    private SearchCondition initCondition(
+            // @formatter:off
+             String status,
+             String[] vendorId,
+             String boutiqueId,
+             String brandId,
+             String categoryId,
+             String season,
+             String designerId,
+             String colorCode,
+             String image,
+             String modelImage,
+             String streetImage,
+             String stock,
+             Integer pageSize,
+             Integer pageNo,
+             String orderBy,
+             String desc,
+            //Additional
+             Integer minBoutiqueDiscount,
+             Integer maxBoutiqueDiscount,
+             Integer minIMDiscount,
+             Integer maxIMDiscount,
+             Long minStock,
+             Long maxStock,
+             String tag
+    // @formatter:on
+    ) {
         SearchCondition searchCondition = new SearchCondition();
         searchCondition.setVendorId(vendorId);
         searchCondition.setBoutiqueId(escapeLikeParams(boutiqueId));
@@ -150,17 +199,30 @@ public class ProductMgntController {
         searchCondition.setStart((pageNo == null || pageNo < 0) ? 0 : (pageNo - 1) * pageSize);
         searchCondition.setCount((pageSize == null || pageSize < 0) ? 25 : pageSize);
         searchCondition.setOrderBy(orderBy);
-        LOGGER.info("{}", searchCondition);
-        LOGGER.info("status: {}, shop status: {}", getStatusEnum(status).getProductStatus(), getStatusEnum(status).getShopProductStatus());
-        List<Map<String, Object>> productList;
-        productList = productManagementService.listProductService(searchCondition);
-        if (productList.size() > 0) {
-            appendInfo(productList);
+        if ((minBoutiqueDiscount != null && maxBoutiqueDiscount != null) || (minIMDiscount != null && maxIMDiscount != null) || (minStock != null
+                && maxStock != null) || tag != null) {
+            ContentAdditionalCondition contentAdditionalCondition = new ContentAdditionalCondition();
+            searchCondition.setContentAdditionalCondition(contentAdditionalCondition);
+            if (minBoutiqueDiscount != null && maxBoutiqueDiscount != null) {
+                contentAdditionalCondition.setMinBoutiqueDiscount(minBoutiqueDiscount);
+                contentAdditionalCondition.setMaxBoutiqueDiscount(maxBoutiqueDiscount);
+            }
+            if (minIMDiscount != null && maxIMDiscount != null) {
+                contentAdditionalCondition.setMinIMDiscount(minIMDiscount);
+                contentAdditionalCondition.setMaxIMDiscount(maxIMDiscount);
+            }
+            if (minStock != null && maxStock != null) {
+                contentAdditionalCondition.setMinStock(minStock);
+                contentAdditionalCondition.setMaxStock(maxStock);
+            }
+            if (tag != null) {
+                contentAdditionalCondition.setTag(tag);
+            }
         }
-        return Response.status(StatusType.SUCCESS).data(productList);
+        return searchCondition;
     }
 
-    private void appendInfo(List<Map<String, Object>> productList) {
+    private void appendInfo(List<Map<String, Object>> productList, StateEnum stateEnum) {
         setCategoryPath(productList);
         List<Map<String, Object>> skuStoreList = iSkuStoreService.listSkuStoreByProductList(productList);
         List<Map<String, Object>> priceList = productManagementService.listPriceByProductList(productList);
@@ -170,6 +232,9 @@ public class ProductMgntController {
         for (Map<String, Object> product : productList) {
             setSkuInfo(product, skuStoreList);
             setPrice(product, priceList);
+            if (stateEnum == StateEnum.ALL) {
+                setStatus(product);
+            }
         }
     }
 
@@ -210,6 +275,10 @@ public class ProductMgntController {
         for (Map<String, Object> product : productList) {
             product.put("category", categoryCache.getAbsolutelyCategoryPath(Long.parseLong(product.get("category_id").toString())));
         }
+    }
+
+    private void setStatus(Map<String, Object> product) {
+        product.put("status", StateMachineCoreRule.map2StateEnum(product));
     }
 
     private void setPrice(Map<String, Object> product, List<Map<String, Object>> priceList) {
