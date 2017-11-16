@@ -110,7 +110,8 @@
         sku_store.last_check,
         sku.`size`,
         sku.sku_code as bar_code,
-        product_exception.status as exceptionStatus
+        product_exception.status as exceptionStatus,
+        product_exception.created_at AS exceptionDate
         FROM sku_store
         INNER JOIN sku ON sku.sku_id = sku_store.sku_id
         LEFT JOIN product_exception ON sku.sku_id = product_exception.sku_id AND product_exception.status != 0
