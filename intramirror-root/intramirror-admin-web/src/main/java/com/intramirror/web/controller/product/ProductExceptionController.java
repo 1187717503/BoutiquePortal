@@ -96,25 +96,16 @@ public class ProductExceptionController {
             throw new ValidateException(new ErrorResponse("Parameter could not be null!"));
         }
 
-        String skuIds = "";
-        for (int i = 0; i < skuIdList.size(); i++) {
-            if (i == 0) {
-                skuIds = skuIdList.get(0);
-            } else {
-                skuIds += "," + skuIdList.get(i);
-            }
-        }
-
         Map<String, Object> map = new HashMap<String, Object>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        map.put("skuIds", skuIds);
+        map.put("skuIds", skuIdList);
         map.put("status", 0);
         map.put("modified_at", sdf.format(new Date()));
         map.put("modified_by_user_id", userId);
         LOGGER.info("Condition: [{}]", map);
         try {
             int nCount = productExceptionService.updateProductException(map);
-            LOGGER.info("Condition: [{}], Parameter: [{}]", map, nCount);
+            LOGGER.info("Condition: [{}], nCount: [{}]", map, nCount);
         } catch (Exception e) {
             throw new ValidateException(new ErrorResponse("Failed to batch resolve product exception! ErrorMsg: [" + e.getMessage() + "]"));
         }
