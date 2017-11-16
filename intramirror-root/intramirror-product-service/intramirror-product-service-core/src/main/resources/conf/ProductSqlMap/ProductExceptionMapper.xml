@@ -48,6 +48,6 @@
                 modified_by_user_id = #{modified_by_user_id,jdbcType=BIGINT}
             </if>
         </set>
-        WHERE sku_id in (#{skuIds})
+        WHERE sku_id in (#{skuIds}) and status = 1
     </update>
 </mapper>
