@@ -89,7 +89,7 @@ public class ProductExceptionController {
     }
 
     @PutMapping(value = "/updateProductException", consumes = "application/json")
-    public Response updateProductException(@SessionAttribute(value = "sessionStorage", required = false) Long userId, List<String> skuIdList) {
+    public Response updateProductException(@SessionAttribute(value = "sessionStorage", required = false) Long userId, @RequestBody List<String> skuIdList) {
         if (skuIdList.size() <= 0) {
             throw new ValidateException(new ErrorResponse("入参为空不能操作！"));
         }
