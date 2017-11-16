@@ -1,17 +1,23 @@
 package com.intramirror.web.controller.xmag;
 
+import com.alibaba.fastjson.JSONObject;
+import com.google.gson.Gson;
+import com.intramirror.common.utils.DateUtils;
+import com.intramirror.main.api.service.SeasonMappingService;
+import com.intramirror.product.api.service.stock.IUpdateStockService;
+import com.intramirror.web.contants.RedisKeyContants;
+import com.intramirror.web.mapping.api.IProductMapping;
+import com.intramirror.web.thread.CommonThreadPool;
+import com.intramirror.web.thread.UpdateProductThread;
+import com.intramirror.web.util.ApiDataFileUtils;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
-
 import javax.annotation.Resource;
-
-import com.intramirror.main.api.service.SeasonMappingService;
-import com.intramirror.product.api.service.stock.IUpdateStockService;
-import com.intramirror.web.contants.RedisKeyContants;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
@@ -20,24 +26,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.alibaba.fastjson.JSONObject;
-import com.google.gson.Gson;
-import com.intramirror.common.utils.DateUtils;
-import com.intramirror.web.mapping.api.IProductMapping;
-import com.intramirror.web.thread.CommonThreadPool;
-import com.intramirror.web.thread.UpdateProductThread;
-import com.intramirror.web.util.ApiDataFileUtils;
-
 import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.parameter.StatusType;
 import pk.shoplus.service.RedisService;
 import pk.shoplus.service.request.api.IGetPostRequest;
 import pk.shoplus.service.request.impl.GetPostRequestService;
+import static pk.shoplus.util.DateUtils.getTimeByHour;
 import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.util.MapUtils;
-
-import static pk.shoplus.util.DateUtils.getTimeByHour;
 
 @Controller
 @RequestMapping("/xmag_product")
@@ -134,28 +130,34 @@ public class XmagSynProductController implements InitializingBean {
 							fileUtils.bakPendingFile("StartIndex" + StartIndex + "_EndIndex" + EndIndex, json);
 
 							for (Map<String, Object> product : productList) {
-								Map<String, Object> mqDataMap = new HashMap<String, Object>();
-								mqDataMap.put("product", product);
-								mqDataMap.put("vendor_id", vendor_id);
 
-								ProductEDSManagement.ProductOptions productOptions = iProductMapping.mapping(mqDataMap);
-								ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
-								vendorOptions.setVendorId(Long.parseLong(vendor_id));
+								logger.info("XmagSynProductAllControllerSynProduct,convertJson,start,product:"+JSONObject.toJSONString(product));
+								List<Map<String,Object>> convertProductList = this.convertJson(product);
+								logger.info("XmagSynProductAllControllerSynProduct,convertJson,end,product:"+JSONObject.toJSONString(product)+",convertProductList:"+JSONObject.toJSONString(convertProductList));
 
-								logger.info("XmagSynProductAllControllerSynProduct,initParam,productOptions:"
-										+ new Gson().toJson(productOptions) + ",vendorOptions:"
-										+ new Gson().toJson(vendorOptions) + ",eventName:" + eventName+",mqDataMap:"+JSONObject.toJSONString(mqDataMap));
+								for(Map<String,Object> newProduct : convertProductList) {
+									Map<String, Object> mqDataMap = new HashMap<String, Object>();
+									mqDataMap.put("product", newProduct);
+									mqDataMap.put("vendor_id", vendor_id);
 
-								// 线程池
-								logger.info("XmagSynProductAllControllerSynProduct,execute,start,productOptions:"
-										+ new Gson().toJson(productOptions) + ",vendorOptions:"
-										+ new Gson().toJson(vendorOptions) + ",eventName:" + eventName+",index:"+flag);
-								CommonThreadPool.execute(eventName, nugnesExecutor, threadNum,
-										new UpdateProductThread(productOptions, vendorOptions, fileUtils,mqDataMap));
-								logger.info("XmagProductAllProducerControllerExecute,execute,end,productOptions:"
-										+ new Gson().toJson(productOptions) + ",vendorOptions:"
-										+ new Gson().toJson(vendorOptions) + ",eventName:" + eventName);
+									ProductEDSManagement.ProductOptions productOptions = iProductMapping.mapping(mqDataMap);
+									ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
+									vendorOptions.setVendorId(Long.parseLong(vendor_id));
 
+									logger.info("XmagSynProductAllControllerSynProduct,initParam,productOptions:"
+											+ new Gson().toJson(productOptions) + ",vendorOptions:"
+											+ new Gson().toJson(vendorOptions) + ",eventName:" + eventName+",mqDataMap:"+JSONObject.toJSONString(mqDataMap));
+
+									// 线程池
+									logger.info("XmagSynProductAllControllerSynProduct,execute,start,productOptions:"
+											+ new Gson().toJson(productOptions) + ",vendorOptions:"
+											+ new Gson().toJson(vendorOptions) + ",eventName:" + eventName+",index:"+flag);
+									CommonThreadPool.execute(eventName, nugnesExecutor, threadNum,
+											new UpdateProductThread(productOptions, vendorOptions, fileUtils,mqDataMap));
+									logger.info("XmagProductAllProducerControllerExecute,execute,end,productOptions:"
+											+ new Gson().toJson(productOptions) + ",vendorOptions:"
+											+ new Gson().toJson(vendorOptions) + ",eventName:" + eventName);
+								}
 								StartIndex++;
 								EndIndex++;
 								flag ++;
@@ -193,6 +195,67 @@ public class XmagSynProductController implements InitializingBean {
 			mapUtils.putData("status", StatusType.FAILURE).putData("info", "error message : " + e.getMessage());
 		}
 		return mapUtils.getMap();
+	}
+
+	private List<Map<String,Object>> convertJson(Map<String,Object> product){
+		List<Map<String,Object>> mapList = new ArrayList<>();
+		try {
+			logger.info("XmagSynProductController,convertJson,product:"+JSONObject.toJSONString(product));
+			if(product != null) {
+				if(product.get("items") == null) {
+					mapList.add(product);
+					return mapList;
+				}
+
+				Map<String, Object> itemMap = com.alibaba.fastjson15.JSONObject.parseObject(product.get("items").toString());
+				if(itemMap.get("item") == null) {
+					mapList.add(product);
+					return mapList;
+				}
+
+				List<Map<String, Object>> items = (List<Map<String, Object>>) itemMap.get("item");
+
+				if(items ==  null || items.size() == 0) {
+					mapList.add(product);
+					return mapList;
+				}
+
+				if(items.size() >10) {
+					System.out.println("ass");
+				}
+
+				Map<String,List<Map<String,Object>>> colorMap = new HashMap<>();
+				for (int i = 0; i < items.size(); i++) {
+					String colorCode = items.get(i).get("color").toString() ;
+					if(colorMap.get(colorCode) == null) {
+						List<Map<String,Object>> colorList = new ArrayList<>();
+						colorList.add(items.get(i));
+						colorMap.put(colorCode,colorList);
+					} else {
+						List<Map<String,Object>> colorList =colorMap.get(colorCode);
+						colorList.add(items.get(i));
+						colorMap.put(colorCode,colorList);
+					}
+				}
+
+				if(colorMap == null || colorMap.size() ==0){
+					mapList.add(product);
+					return mapList;
+				}
+
+				for(String key : colorMap.keySet()) {
+					Map<String,Object> newProduct = product;
+					Map<String, Object> newItems = com.alibaba.fastjson15.JSONObject.parseObject(newProduct.get("items").toString());
+					newItems.put("item",colorMap.get(key));
+					newProduct.put("items",newItems);
+					mapList.add(newProduct);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.info("XmagSynProductController,convertJson,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
+		}
+		return mapList;
 	}
 
 	@Override
