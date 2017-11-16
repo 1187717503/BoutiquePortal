@@ -3,6 +3,9 @@ if (!token) {
     token = localStorage.getItem('token');
 }
 
+token="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNjEiLCJpYXQiOjE1MTA4OTEwNjJ9.zKNXfAHqPq-AzbCIicmKJGxTUbJr0vvs9k42gDjqCdXCGqJ78DW3w0gNSQC046WDRwO340xtdXjIXK7Zxu0D9Q";
+
+
 function initBrand() {
 
     $.ajax({
@@ -676,6 +679,67 @@ function initActionEvent() {
 
     });
 
+
+    $('.exception-batch-action').click(function() {
+        let data = [];
+        let count = 0;
+        $('.product-list').each(function(idx, item) {
+            if ($(item).find('.item input[type=checkbox]').prop('checked')) {
+                $(item).find('.goods .exception').each(function(deatilIdx, detailItem){
+                    data.push($(detailItem).data('sku-id'));
+                })
+                count++;
+            }
+        })
+        
+        if (count == 0) {
+            Materialize.toast('Please select at least one', 3000);
+            return;
+        }
+        if (data.length == 0) {
+            Materialize.toast('No exception in selected product.', 3000);
+            return;
+        }
+        console.log(JSON.stringify(data));
+        loading();
+        $.ajax({
+            type: requestURL.updateProductException.method,
+            contentType: "application/json",
+            url: requestURL.updateProductException.url ,
+            data: JSON.stringify(data),
+            dataType: 'json',
+            beforeSend: function(request) {
+                request.setRequestHeader("token", token);
+            },
+            success: function(result) {
+                if (result.data.failed.length > 0) {
+                    let msg = '';
+                    for (var i = 0; i < result.data.failed.length; i++) {
+                        msg += result.data.failed[i].message + "<br/>";
+                    }
+                    toashWithCloseBtn(msg);
+                } else {
+                    Materialize.toast(getActionMessage(action) + ' Success', 3000);
+                }
+
+                // 获取当前页数
+                let current = $('.pagination .active.pagination-index').data('pageno') + 1;
+
+                getProdcutList(data.originalState, current);
+                finishLoading()
+                
+            }, error: function(result, resp, par) {
+                toashWithCloseBtn(result.responseJSON.message);
+
+                finishLoading()
+                if (result.status == 401) {
+                    window.location.href = '../../../login';
+                }
+            }
+        });
+
+    });
+
     // 展示图片
     $('.product-cover-img').click(function() {
         let images = $(this).data('images');
@@ -734,6 +798,65 @@ function initActionEvent() {
                 }
             }
         });
+    });
+
+    $('.product-list .exception-ops ').click(function() {
+        let skuId = $(this).parent().parent().data('sku-id');
+        let productId = $(this).parent().parent().data('product-id');
+        let action = $(this).data('action');
+
+
+
+        if(action === 'set0'){
+            let param = {};
+            param.productId = productId;
+            param.skuId = skuId;
+            $.ajax({
+                type: requestURL.saveProductException.method,
+                contentType: "application/json",
+                url: requestURL.saveProductException.url ,
+                data: JSON.stringify(param),
+                dataType: 'json',
+                beforeSend: function(request) {
+                    request.setRequestHeader("token", token);
+                },            
+                success: function(result) {
+                    Materialize.toast('Save success', 3000);
+                    let current = $('.pagination .active.pagination-index').data('pageno') + 1;
+                    getProdcutList(status, current);
+                }, error: function(result, resp, par) {
+                    toashWithCloseBtn(result.responseJSON.message);
+                    if (result.status == 401) {
+                        window.location.href = '../../../login';
+                    }
+                }
+            });
+        } else if(action === 'resolve'){
+            let param = [];
+            param.push(skuId);
+            $.ajax({
+                type: requestURL.updateProductException.method,
+                contentType: "application/json",
+                url: requestURL.updateProductException.url ,
+                data: JSON.stringify(param),
+                dataType: 'json',
+                beforeSend: function(request) {
+                    request.setRequestHeader("token", token);
+                },            
+                success: function(result) {
+                    Materialize.toast('Resolve success', 3000);
+                    let current = $('.pagination .active.pagination-index').data('pageno') + 1;
+                    getProdcutList(status, current);
+                }, error: function(result, resp, par) {
+                    toashWithCloseBtn(result.responseJSON.message);
+                    if (result.status == 401) {
+                        window.location.href = '../../../login';
+                    }
+                }
+            });
+        }
+        
+        
     });
 }
 
