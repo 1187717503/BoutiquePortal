@@ -109,9 +109,11 @@
         sku_store.confirmed,
         sku_store.last_check,
         sku.`size`,
-        sku.sku_code as bar_code
+        sku.sku_code as bar_code,
+        product_exception.status as exceptionStatus
         FROM sku_store
         INNER JOIN sku ON sku.sku_id = sku_store.sku_id
+        LEFT JOIN product_exception ON sku.sku_id = product_exception.sku_id AND product_exception.status != 0
         WHERE sku_store.product_id IN
         <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
             #{item.product_id}
