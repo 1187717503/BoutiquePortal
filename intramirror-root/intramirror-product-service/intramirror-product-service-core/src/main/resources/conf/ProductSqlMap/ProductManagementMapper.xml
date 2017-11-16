@@ -29,8 +29,8 @@
         <if test="stock != null and stock != 0">
             LEFT JOIN view_prod_store_sum ON view_prod_store_sum.product_id = product.product_id
         </if>
-        <if test="exception == 1">
-            INNER JOIN product_exception ON product_exception.product_id = product.product_id
+        <if test="exception != null and exception != 0">
+            LEFT JOIN product_exception ON product_exception.product_id = product.product_id
         </if>
         WHERE 1=1
         <if test="status != -1">
@@ -130,7 +130,7 @@
                 AND product_exception.status = 1
             </when>
             <otherwise>
-
+                AND (product_exception.status IS NULL or product_exception.status != 1)
             </otherwise>
         </choose>
         <if test="exception == 1">
@@ -221,8 +221,8 @@
         <if test="stock != null and stock != 0">
             LEFT JOIN view_prod_store_sum ON view_prod_store_sum.product_id = product.product_id
         </if>
-        <if test="exception == 1">
-            INNER JOIN (SELECT
+        <if test="exception !=  null and exception != 0">
+            LEFT JOIN (SELECT
             product_id,
             sku_id,
             status
@@ -310,7 +310,7 @@
                 AND exception.status = 1
             </when>
             <otherwise>
-
+                AND (exception.status IS NULL or exception.status != 1)
             </otherwise>
         </choose>
 
