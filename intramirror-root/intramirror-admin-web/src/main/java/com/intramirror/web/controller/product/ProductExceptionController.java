@@ -1,10 +1,12 @@
 package com.intramirror.web.controller.product;
 
+import com.intramirror.common.parameter.StatusType;
 import com.intramirror.product.api.service.IProductExceptionService;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.SkuService;
 import com.intramirror.web.Exception.ErrorResponse;
 import com.intramirror.web.Exception.ValidateException;
+import com.intramirror.web.common.response.BatchResponseMessage;
 import com.intramirror.web.common.response.Response;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -45,44 +47,44 @@ public class ProductExceptionController {
         Long skuId = body.get("skuId") == null ? null : Long.parseLong(body.get("skuId").toString());
 
         if (null == productId || null == skuId) {
-            throw new ValidateException(new ErrorResponse("productId, skuId 参数为空！"));
+            throw new ValidateException(new ErrorResponse("Parameter could not be null!"));
         }
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("product_id", productId);
         map.put("sku_id", skuId);
-        LOGGER.info("查询参数: [{}]", map);
+        LOGGER.info("select parameter: [{}]", map);
         List<Map<String, Object>> list = productExceptionService.selectByProductAndSkuId(map);
         if (list.size() >= 1) {
             throw new ValidateException(
-                    new ErrorResponse("productId: [" + body.get("productId").toString() + "], skuId: [" + body.get("skuId").toString() + "] 记录已存在！"));
+                    new ErrorResponse("productId: [" + body.get("productId").toString() + "], skuId: [" + body.get("skuId").toString() + "] already exists!"));
         } else {
-            //新增
+            //add
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             try {
                 map.put("type_id", 1);
-                map.put("note", "人工处理，库存不匹配，强制清零库存，Job不再同步此库存.");
+                map.put("note", "Set store value to 0, so that Job will never sync this sku store.");
                 map.put("status", 1);
                 map.put("created_at", sdf.format(new Date()));
                 map.put("created_by_user_id", userId);
 
                 productExceptionService.saveProductException(map);
-                LOGGER.info("成功增加商品异常记录: [{}]", map);
+                LOGGER.info("Add product exception successfully: [{}]", map);
 
-                //库存清零
+                //set store 0
                 String[] skuIds = new String[1];
                 skuIds[0] = body.get("skuId").toString();
                 List<Map<String, Object>> listSkuStore = iSkuStoreService.getSkuStoreBySkuId(skuIds);
                 if (listSkuStore.size() <= 0) {
-                    throw new ValidateException(new ErrorResponse("skuId: [" + body.get("skuId").toString() + "] 不存在！"));
+                    throw new ValidateException(new ErrorResponse("skuId: [" + body.get("skuId").toString() + "] not exits!"));
                 } else {
                     int nCount = iSkuStoreService.updateBySkuId(6, skuId);
-                    LOGGER.info("skuId: [{}], 由 [{}] 成功清零库存: [{}]", skuId, userId, nCount);
+                    LOGGER.info("User [{}] set sku store to 0 successfully. skuId: [{}], Count: [{}]", skuId, userId, nCount);
                 }
             } catch (Exception e) {
                 throw new ValidateException(new ErrorResponse(
-                        "productId: [" + body.get("productId").toString() + "], skuId: [" + body.get("skuId").toString() + "] 处理失败！ ErrorMsg: [" + e
-                                .getMessage() + "]"));
+                        "Failed to update productId: [" + body.get("productId").toString() + "], skuId: [" + body.get("skuId").toString() + "] ! ErrorMsg: ["
+                                + e.getMessage() + "]"));
             }
         }
         return Response.success();
@@ -91,7 +93,7 @@ public class ProductExceptionController {
     @PutMapping(value = "/updateProductException", consumes = "application/json")
     public Response updateProductException(@SessionAttribute(value = "sessionStorage", required = false) Long userId, @RequestBody List<String> skuIdList) {
         if (skuIdList.size() <= 0) {
-            throw new ValidateException(new ErrorResponse("入参为空不能操作！"));
+            throw new ValidateException(new ErrorResponse("Parameter could not be null!"));
         }
 
         String skuIds = "";
@@ -109,14 +111,15 @@ public class ProductExceptionController {
         map.put("status", 0);
         map.put("modified_at", sdf.format(new Date()));
         map.put("modified_by_user_id", userId);
-        LOGGER.info("更新条件: [{}]", map);
+        LOGGER.info("Condition: [{}]", map);
         try {
             int nCount = productExceptionService.updateProductException(map);
-            LOGGER.info("更新条件: [{}], 更新行数: [{}]", map, nCount);
+            LOGGER.info("Condition: [{}], Parameter: [{}]", map, nCount);
         } catch (Exception e) {
-            throw new ValidateException(new ErrorResponse("批量resolve商品异常失败！ ErrorMsg: [" + e.getMessage() + "]"));
+            throw new ValidateException(new ErrorResponse("Failed to batch resolve product exception! ErrorMsg: [" + e.getMessage() + "]"));
         }
 
-        return Response.success();
+        BatchResponseMessage responseMessage = new BatchResponseMessage();
+        return Response.status(StatusType.SUCCESS).data(responseMessage);
     }
 }
