@@ -19,6 +19,7 @@ import org.sql2o.Connection;
 import pk.shoplus.DBConnector;
 import pk.shoplus.common.FileUploadHelper;
 import pk.shoplus.enums.ApiErrorTypeEnum;
+import pk.shoplus.model.BrandCategory;
 import pk.shoplus.model.CategoryProductInfo;
 import pk.shoplus.model.CategoryProductProperty;
 import pk.shoplus.model.Product;
@@ -33,6 +34,7 @@ import pk.shoplus.model.SkuStore;
 import pk.shoplus.parameter.EnabledType;
 import pk.shoplus.parameter.ProductFeatureType;
 import pk.shoplus.parameter.ProductStatusType;
+import pk.shoplus.service.BrandCategoryService;
 import pk.shoplus.service.CategoryProductInfoService;
 import pk.shoplus.service.CategoryProductPropertyService;
 import pk.shoplus.service.ProductInfoService;
@@ -90,17 +92,41 @@ public class ApiCreateProductService {
             /** 5.create sku */
             this.setSku(conn);
 
+            /** 6.create brand_catgeory */
+            this.setBrandCategory(conn);
+
             resultMap = ApiCommonUtils.successMap();
         } catch (UpdateException e) {
             resultMap = ApiCommonUtils.errorMap(e.getErrorType(),e.getKey(),e.getValue());
         } catch (Exception e) {
             e.printStackTrace();
             resultMap = ApiCommonUtils.errorMap(ApiErrorTypeEnum.errorType.error_runtime_exception,"errorMessage",ExceptionUtils.getExceptionDetail(e));
+            if(conn != null) {conn.rollback();conn.close();}
         } finally {
             if(conn != null) {conn.commit();conn.close();}
         }
 
         return resultMap;
+    }
+
+    private void setBrandCategory(Connection conn) throws Exception{
+        Map<String, Object> brandCategoryMap = new HashMap<String, Object>();
+        brandCategoryMap.put("brand_id", this.uProduct.getBrand_id());
+        brandCategoryMap.put("category_id", this.uProduct.getCategory_id());
+        brandCategoryMap.put("enabled", EnabledType.USED);
+        BrandCategoryService brandCategoryService = new BrandCategoryService(conn);
+        List<BrandCategory> brandCategoryList = brandCategoryService.getBrandCategoryListByCondition(null,brandCategoryMap);
+
+        if (brandCategoryList == null || brandCategoryList.size() == 0) {
+            BrandCategory brandCategory = new BrandCategory();
+            brandCategory.brand_id = this.uProduct.getBrand_id();
+            brandCategory.category_id = this.uProduct.getCategory_id();
+            brandCategory.created_at = new Date();
+            brandCategory.updated_at = new Date();
+            brandCategory.enabled = EnabledType.USED;
+            brandCategoryService.createBrandCategory(brandCategory);
+            logger.info("ApiCreateProductService,setBrandCategory,brandCategory:"+JSONObject.toJSONString(brandCategory));
+        }
     }
 
     private void setSku(Connection conn) throws Exception {
@@ -128,6 +154,7 @@ public class ApiCreateProductService {
             sku.enabled = EnabledType.USED;
             sku.last_check = new Date();
             skuService.createSku(sku);
+            logger.info("ApiCreateProductService,setSku,sku:"+JSONObject.toJSONString(sku));
 
             SkuStoreService skuStoreService = new SkuStoreService(conn);
             SkuStore skuStore = new SkuStore();
@@ -149,6 +176,7 @@ public class ApiCreateProductService {
             skuStore.enabled = EnabledType.USED;
             skuStore.setLast_check(new Date());
             skuStoreService.createSkuStore(skuStore);
+            logger.info("ApiCreateProductService,setSku,skuStore:"+JSONObject.toJSONString(skuStore));
 
             ProductPropertyValueService productPropertyValueService = new ProductPropertyValueService(conn);
             ProductSkuPropertyValue productSkuPropertyValue = new ProductSkuPropertyValue();
@@ -159,6 +187,7 @@ public class ApiCreateProductService {
             productSkuPropertyValue.updated_at = new Date();
             productSkuPropertyValue.enabled = EnabledType.USED;
             ProductSkuPropertyValue pspv = productPropertyValueService.createProductPropertyValue(productSkuPropertyValue);
+            logger.info("ApiCreateProductService,setSku,pspv:"+JSONObject.toJSONString(pspv));
 
             SkuPropertyService skuPropertyService = new SkuPropertyService(conn);
             SkuProperty skuProperty = new SkuProperty();
@@ -171,6 +200,7 @@ public class ApiCreateProductService {
             skuProperty.updated_at = new Date();
             skuProperty.enabled = EnabledType.USED;
             skuPropertyService.createSkuProperty(skuProperty);
+            logger.info("ApiCreateProductService,setSku,skuProperty:"+JSONObject.toJSONString(skuProperty));
         }
     }
 
@@ -185,7 +215,7 @@ public class ApiCreateProductService {
             ProductInfoService productInfoService = new ProductInfoService(conn);
             ProductInfo productInfo = new ProductInfo();
             productInfo.category_prodcut_info_id = categoryProductInfo.getCategory_product_info_id();
-            productInfo.product_id = productInfo.getProduct_id();
+            productInfo.product_id = this.uProduct.getProduct_id();
             productInfo.created_at = new Date();
             productInfo.updated_at = new Date();
             productInfo.remark = "";
@@ -200,13 +230,14 @@ public class ApiCreateProductService {
             productInfo.width_unit = categoryProductInfo.width_unit;
             productInfo.height_unit = categoryProductInfo.height_unit;
             productInfo.size_unit = categoryProductInfo.size_unit;
-            productInfo.weight_amount = new BigDecimal(1);
-            productInfo.length_amount = new BigDecimal(0);
-            productInfo.width_amount = new BigDecimal(0);
-            productInfo.height_amount = new BigDecimal(0);
+            productInfo.weight_amount = new BigDecimal(productOptions.getWeight());
+            productInfo.length_amount = new BigDecimal(productOptions.getLength());
+            productInfo.width_amount = new BigDecimal(productOptions.getWeight());
+            productInfo.height_amount = new BigDecimal(productOptions.getHeigit());
             productInfo.size_amount = new BigDecimal(0);
-            productInfoService.createProductInfo(productInfo);
             productInfo.other_property = "";
+            productInfoService.createProductInfo(productInfo);
+            logger.info("ApiCreateProductService,setProductInfo,productInfo:"+JSONObject.toJSONString(productInfo));
         }
     }
 
@@ -229,6 +260,7 @@ public class ApiCreateProductService {
             productProperty.remark = "";
             productProperty.enabled = EnabledType.USED;
             productPropertyService.createProductProperty(productProperty);
+            logger.info("ApiCreateProductService,setProductProperty,productProperty:"+JSONObject.toJSONString(productProperty));
         }
     }
 
@@ -272,17 +304,23 @@ public class ApiCreateProductService {
         productSkuPropertyKey.created_at = new Date();
         productSkuPropertyKey.updated_at = new Date();
         productSkuPropertyKey.enabled = EnabledType.USED;
-        productSkuPropertyKey = productPropertyKeyService.createProductPropertyKey(productSkuPropertyKey);
+        uProductSkuPropertyKey = productPropertyKeyService.createProductPropertyKey(productSkuPropertyKey);
+        logger.info("ApiCreateProductService,setProductSkuPropertyKey,productSkuPropertyKey:"+JSONObject.toJSONString(productSkuPropertyKey));
     }
 
     private void setProduct(Connection conn) throws Exception{
+        String name = productOptions.getName();
+        if(StringUtils.isBlank(name)) {
+            name = productOptions.getBrand_name();
+        }
+
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         Product product = new Product();
         product.category_id = Long.parseLong(productOptions.getCategoryId());
         product.vendor_id = vendorOptions.getVendorId();
         product.brand_id = Long.parseLong(productOptions.getBrandId());
         product.product_code = productOptions.getCode();
-        product.name = productOptions.getName();
+        product.name = name;
         product.description = productOptions.getDesc();
         product.remark = "";
         product.status = ProductStatusType.NEW_PENDING;
@@ -310,21 +348,24 @@ public class ApiCreateProductService {
         ProductService productService = new ProductService(conn);
         product = productService.createProduct(product);
         this.uProduct = product;
+        logger.info("ApiCreateProductService,setProduct,product:"+JSONObject.toJSONString(product));
     }
 
     private String downloadImgs (String originImg) {
         List<String> newList = new ArrayList<>();
-        try {
-            List<String> originList = JSONArray.parseArray(originImg, String.class);
-            for (String origin : originList) {
-                List<String> downList = FileUploadHelper.uploadFileByImgUrl2(origin);
-                if(downList != null && downList.size() > 0) {
-                    newList.add(downList.get(0));
+        if(StringUtils.isNotBlank(originImg)) {
+            try {
+                List<String> originList = JSONArray.parseArray(originImg, String.class);
+                for (String origin : originList) {
+                    List<String> downList = FileUploadHelper.uploadFileByImgUrl2(origin);
+                    if(downList != null && downList.size() > 0) {
+                        newList.add(downList.get(0));
+                    }
                 }
+            } catch (Exception e) {
+                logger.info("ApiCreateProductService,downloadImgs,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+",originImg:"+originImg);
+                newList = new ArrayList<>();
             }
-        } catch (Exception e) {
-            logger.info("ApiCreateProductService,downloadImgs,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+",originImg:"+originImg);
-            newList = new ArrayList<>();
         }
         return JSON.toJSONString(newList);
     }
@@ -353,7 +394,6 @@ public class ApiCreateProductService {
                 productOptions.setCategoryId(categoryMap.get("category_id").toString());
             }
         }
-
         if(StringUtils.isNotBlank(productOptions.getCategory1())
                 &&StringUtils.isNotBlank(productOptions.getCategory2())
                 &&StringUtils.isNotBlank(productOptions.getCategory3())) {
@@ -367,7 +407,6 @@ public class ApiCreateProductService {
                 }
             }
         }
-
         if(StringUtils.isBlank(productOptions.getCategoryId())
                 && StringUtils.isBlank(category3)
                 && StringUtils.isNotBlank(productOptions.getCategory1())
@@ -382,10 +421,12 @@ public class ApiCreateProductService {
             Map<String,Object> brandMap = productService.getBrand(brandName);
             if(brandMap != null) {
                 productOptions.setBrandId(brandMap.get("brand_id").toString());
+                productOptions.setBrand_name(brandMap.get("english_name").toString());
             } else {
-                brandMap = productService.getBrandMapping(brandName);
+                brandMap = productService.getBrandMapping(vendorOptions.getVendorId(),brandName);
                 if(brandMap != null) {
                     productOptions.setBrandId(brandMap.get("brand_id").toString());
+                    productOptions.setBrand_name(brandMap.get("english_name").toString());
                 }
             }
         }
@@ -406,15 +447,15 @@ public class ApiCreateProductService {
         mappingCategory.put("category3",category3);
 
         if(StringUtils.isBlank(productOptions.getCategoryId())) {
-            throw new UpdateException("category",JSONObject.toJSONString(mappingCategory), ApiErrorTypeEnum.errorType.warning_data_can_not_find_mapping);
+            throw new UpdateException("category",JSONObject.toJSONString(mappingCategory), ApiErrorTypeEnum.errorType.data_can_not_find_mapping);
         }
 
         if(StringUtils.isBlank(productOptions.getBrandId())) {
-            throw new UpdateException("brand",brandName, ApiErrorTypeEnum.errorType.warning_data_can_not_find_mapping);
+            throw new UpdateException("brand",brandName, ApiErrorTypeEnum.errorType.data_can_not_find_mapping);
         }
 
         if(StringUtils.isBlank(mappingSeason)) {
-            throw new UpdateException("season",seasonCode, ApiErrorTypeEnum.errorType.warning_data_can_not_find_mapping);
+            throw new UpdateException("season",seasonCode, ApiErrorTypeEnum.errorType.data_can_not_find_mapping);
         }
     }
 
@@ -453,11 +494,27 @@ public class ApiCreateProductService {
         productOptions.setComposition(composition);
         productOptions.setMadeIn(madeIn);
         productOptions.setSizeFit(sizeFit);
-        productOptions.setWeight(weight);
-        productOptions.setLength(length);
-        productOptions.setWidth(width);
-        productOptions.setHeigit(height);
-        productOptions.setHeigit(height);
+
+        if(StringUtils.isBlank(weight)) {
+            productOptions.setWeight("1");
+        } else {
+            productOptions.setWeight(weight);
+        }
+        if(StringUtils.isBlank(length)) {
+            productOptions.setLength("0");
+        } else {
+            productOptions.setLength(length);
+        }
+        if(StringUtils.isBlank(width)) {
+            productOptions.setWidth("0");
+        } else {
+            productOptions.setWidth(width);
+        }
+        if(StringUtils.isBlank(height)) {
+            productOptions.setHeigit("0");
+        } else {
+            productOptions.setHeigit(height);
+        }
 
         if(StringUtils.isBlank(product_code)) {
             throw new UpdateException("product_code",product_code, ApiErrorTypeEnum.errorType.error_data_is_null);
@@ -502,6 +559,42 @@ public class ApiCreateProductService {
                 logger.info("ApiUpdateStockSerivce,checkParams,price not parse int,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",productOptions:"+JSONObject.toJSONString(productOptions));
                 throw new UpdateException("price",price,ApiErrorTypeEnum.errorType.error_data_is_not_number);
             }
+        }
+
+        List<ProductEDSManagement.SkuOptions> skuOptions = productOptions.getSkus();
+        if(skuOptions == null || skuOptions.size() == 0) {
+            return;
+        }
+
+        for(ProductEDSManagement.SkuOptions skuOption : skuOptions) {
+            String sku_code = escape(StringUtils.trim(skuOption.getBarcodes()));
+            if(StringUtils.isBlank(sku_code)) {
+                sku_code = "#";
+            }
+
+            String size = escape(StringUtils.trim(skuOption.getSize()));
+            if(StringUtils.isBlank(size)) {
+                throw new UpdateException("size",JSONObject.toJSONString(skuOption),ApiErrorTypeEnum.errorType.error_size_not_exists);
+            }
+
+            String stock = skuOption.getStock();
+            try {
+                int bStock = Integer.parseInt(stock);
+                if(bStock < 0 || bStock > 100 ) {
+                    throw new UpdateException("store",stock,ApiErrorTypeEnum.errorType.error_stock_out_off);
+                }
+            } catch (UpdateException e) {
+                e.printStackTrace();
+                throw new UpdateException(e.getKey(),e.getValue(),e.getErrorType());
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.info("ApiUpdateStockSerivce,checkParams,stock not parse int,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",productOptions:"+JSONObject.toJSONString(productOptions));
+                throw new UpdateException("store",stock,ApiErrorTypeEnum.errorType.error_data_is_not_number);
+            }
+
+            skuOption.setBarcodes(sku_code);
+            skuOption.setStock(stock);
+            skuOption.setSize(size);
         }
 
     }

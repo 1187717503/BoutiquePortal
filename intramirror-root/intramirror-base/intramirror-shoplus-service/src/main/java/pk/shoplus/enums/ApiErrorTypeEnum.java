@@ -72,7 +72,6 @@ public class ApiErrorTypeEnum {
         error_vendor_is_null("error_vendor_is_null","VendorId为NULL"),
         error_stock_type_is_null("error_stock_type_is_null","StockType为NULL"),
         error_stock_is_negative("error_stock_is_negative","库存为负数"),
-        error_stock_out_off("error_stock_out_off","库存超过100"),
         error_price_is_not_number("error_price_is_not_number","价格字段不是数字"),
         error_update_stock_param("error_update_stock_param","修改库存入参有误"),
         error_price("error_price","价格小于10或者大于10000"),
@@ -88,9 +87,11 @@ public class ApiErrorTypeEnum {
         error_boutique_id_not_exists("error_boutique_id_not_exists","找不到这个boutique_id"),
         error_boutique_id_already_exists("error_boutique_id_already_exists","找到这个boutque_id"),
         error_price_out_off("error_price_out_off","价格小于等于0或者高于10000"),
+        error_stock_out_off("error_stock_out_off","库存小于0或者高于100"),
         warning_stock_out_off("warning_stock_out_off","库存小于0或者高于100"),
         warning_price_out_off("warning_price_out_off","价格超过+-20%"),
-        warning_data_can_not_find_mapping("warning_data_can_not_find_mapping","警告，数据不能映射。");
+        warning_data_can_not_find_mapping("warning_data_can_not_find_mapping","警告，数据不能映射。"),
+        data_can_not_find_mapping("data_can_not_find_mapping","报错，数据不能映射。");
 
         private String code;
         private String desc;

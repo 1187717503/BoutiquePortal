@@ -1411,6 +1411,8 @@ public class ProductEDSManagement {
 
         public Date last_check;
 
+        public Long vendor_id;
+
         public String getCategory_name() {
             return StringUtils.trim(category_name);
         }
@@ -1422,6 +1424,8 @@ public class ProductEDSManagement {
         public String category3;
         public String category_boutique_id;
         public String brandId;
+
+        public String brand_name;
 
         public String getCategory_boutique_id() {
             return category_boutique_id;
@@ -1680,7 +1684,15 @@ public class ProductEDSManagement {
 			return skus;
 		}
 
-		public ProductOptions setSkus(List<SkuOptions> skus) {
+        public String getBrand_name() {
+            return brand_name;
+        }
+
+        public void setBrand_name(String brand_name) {
+            this.brand_name = brand_name;
+        }
+
+        public ProductOptions setSkus(List<SkuOptions> skus) {
 		    List<SkuOptions> newSkus = new ArrayList<>();
 			List<String> stringList = new ArrayList<>();
 			for(SkuOptions skuOptions : skus) {
@@ -1730,6 +1742,14 @@ public class ProductEDSManagement {
         }
 
         public ProductOptions() {
+        }
+
+        public Long getVendor_id() {
+            return vendor_id;
+        }
+
+        public void setVendor_id(Long vendor_id) {
+            this.vendor_id = vendor_id;
         }
     }
 	

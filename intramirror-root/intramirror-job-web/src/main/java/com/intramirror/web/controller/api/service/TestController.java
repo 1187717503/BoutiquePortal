@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import pk.shoplus.model.ProductEDSManagement;
 
 /**
  * Created by dingyifan on 2017/11/9.
@@ -33,4 +34,25 @@ public class TestController {
         System.out.println(start-end+",map:"+new Gson().toJson(map));
         return map;
     }
+
+    @RequestMapping("/createProduct")
+    @ResponseBody
+    public Map<String,Object> testStock(@RequestBody ProductEDSManagement.ProductOptions productOptions){
+        System.out.println(new Gson().toJson(productOptions));
+        ApiCreateProductService apiCreateProductService = new ApiCreateProductService();
+        //        stockOption.setLast_check(new Date());
+        long  start = System.currentTimeMillis();
+        System.out.println("start:"+new Date().toString() +","+start);
+        ProductEDSManagement.VendorOptions vendorOptions  = new ProductEDSManagement.VendorOptions();
+        vendorOptions.setVendorId(productOptions.getVendor_id());
+        Map<String,Object> map = apiCreateProductService.createProduct(productOptions,vendorOptions);
+//        ProductEDSManagement productEDSManagement = new ProductEDSManagement();
+//        Map<String,Object> map = productEDSManagement.createProduct(productOptions,vendorOptions);
+        long  end = System.currentTimeMillis();
+        System.out.println("end:"+new Date().toString()+","+end);
+        System.out.println(start-end+",map:"+new Gson().toJson(map));
+        return map;
+    }
+
+
 }
