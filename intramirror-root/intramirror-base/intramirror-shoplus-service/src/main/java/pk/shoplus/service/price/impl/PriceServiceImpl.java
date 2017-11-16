@@ -1,7 +1,9 @@
 package pk.shoplus.service.price.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,14 +68,17 @@ public class PriceServiceImpl implements IPriceService{
         conditions.put("enabled", EnabledType.USED);
         conditions.put("product_id",product.getProduct_id());
         List<Sku> skus = skuService.getSkuListByCondition(conditions);
-        if(skus != null&& skus.size() >0) {
+        if(skus != null && skus.size() >0) {
             BigDecimal im_price = new BigDecimal(0);
             for(Sku sku : skus) {
+                logger.info("IPriceService,synProductPriceRule,updateSkuPrice,start,sku:"+ JSONObject.toJSONString(sku));
                 sku.price = newPrice;
                 sku.in_price = new BigDecimal(newPrice.doubleValue() * vendorDiscount / ((1 + 0.22) * 100));
                 sku.im_price = new BigDecimal(newPrice.doubleValue() * adminDiscount / ((1) * 100));
+                sku.updated_at = new Date();
                 skuService.updateSku(sku);
                 im_price = sku.im_price;
+                logger.info("IPriceService,synProductPriceRule,updateSkuPrice,end,sku:"+ JSONObject.toJSONString(sku));
             }
 
             String updateShopProductSalePrice = "update shop_product set max_sale_price="+im_price+",min_sale_price="+im_price+",updated_at=now() where product_id="+product.getProduct_id();
@@ -85,6 +90,10 @@ public class PriceServiceImpl implements IPriceService{
             skuService.updateBySQL(updateShopProductSalePrice);
             skuService.updateBySQL(updateShopProductSkuImPrice);
             skuService.updateBySQL(updateProductRetailPrice);
+
+            logger.info("IPriceService,synProductPriceRule,updateShopProductSalePrice:"+updateShopProductSalePrice);
+            logger.info("IPriceService,synProductPriceRule,updateShopProductSkuImPrice:"+updateShopProductSkuImPrice);
+            logger.info("IPriceService,synProductPriceRule,updateProductRetailPrice:"+updateProductRetailPrice);
         }
         return true;
     }

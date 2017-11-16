@@ -40,7 +40,6 @@ public class ApiErrorTypeEnum {
         retail_price_is_zero("retail_price_is_zero","接口传递过来的retail_price为null或者为0。"),
         warning_retail_price_is_zero("warning_retail_price_is_zero","警告，接口传递过来的retail_price为null或者为0。"),
 
-        warning_data_can_not_find_mapping("warning_data_can_not_find_mapping","警告，数据不能映射。"),
         Data_can_not_find_mapping("Data_can_not_find_mapping","数据不能映射。"),
             category_is_null("category_is_null","接口传递过来的category_id为null。"),
             category_not_exist("category_not_exist","通过映射找不到对应目录。"),
@@ -84,10 +83,14 @@ public class ApiErrorTypeEnum {
 
         error_data_is_null("error_data_is_null","数据为NULL"),
         error_data_is_not_number("error_data_is_not_number","数据不是数字"),
-        error_price_out_off("error_price_out_off","价格超过+-20%"),
         error_size_not_exists("error_size_not_exists","size不存在"),
         error_runtime_exception("error_runtime_exception","运行时异常"),
-        error_boutique_id_not_exists("error_boutique_id_not_exists","找不到这个boutique_id");
+        error_boutique_id_not_exists("error_boutique_id_not_exists","找不到这个boutique_id"),
+        error_boutique_id_already_exists("error_boutique_id_already_exists","找到这个boutque_id"),
+        warning_stock_out_off("warning_stock_out_off","库存小于0或者高于100"),
+        warning_price_out_off("warning_price_out_off","价格超过+-20%"),
+        warning_data_can_not_find_mapping("warning_data_can_not_find_mapping","警告，数据不能映射。");
+
         private String code;
         private String desc;
 
