@@ -722,7 +722,7 @@ function initActionEvent() {
                     }
                     toashWithCloseBtn(msg);
                 } else {
-                    Materialize.toast(getActionMessage(action) + ' Success', 3000);
+                    Materialize.toast('Resolve Success', 3000);
                 }
 
                 // 获取当前页数
