@@ -143,7 +143,7 @@ public class OrderState {
             iOrderService.updateOrder(order);
             return ResultMessage.getInstance().successStatus();
         }
-        return ResultMessage.getInstance().errorStatus().addMsg("confirmed. Status is not allowed to flow!").setData(dataMap);
+        return ResultMessage.getInstance().errorStatus().addMsg("shipped. Status is not allowed to flow!").setData(dataMap);
     }
 
     public enum StatusEnum {
