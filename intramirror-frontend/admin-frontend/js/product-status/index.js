@@ -685,6 +685,7 @@ function initActionEvent() {
     $('.exception-batch-action').click(function() {
         let data = [];
         let count = 0;
+        data.originalState = $('.tabs .tab a.active').data('status');
         $('.product-list').each(function(idx, item) {
             if ($(item).find('.item input[type=checkbox]').prop('checked')) {
                 $(item).find('.goods .exception').each(function(deatilIdx, detailItem){
@@ -823,6 +824,7 @@ function initActionEvent() {
                     request.setRequestHeader("token", token);
                 },            
                 success: function(result) {
+                    let status = $('.tabs .tab a.active').data('status');
                     Materialize.toast('Save success', 3000);
                     let current = $('.pagination .active.pagination-index').data('pageno') + 1;
                     getProdcutList(status, current);
@@ -846,6 +848,7 @@ function initActionEvent() {
                     request.setRequestHeader("token", token);
                 },            
                 success: function(result) {
+                    let status = $('.tabs .tab a.active').data('status');
                     Materialize.toast('Resolve success', 3000);
                     let current = $('.pagination .active.pagination-index').data('pageno') + 1;
                     getProdcutList(status, current);
