@@ -13,5 +13,4 @@ var requestURL = {
     "productBatchAction": {"url": baseUrl + "product/operate/batch" , "method": "PUT"},
     "saveProductException": {"url": baseUrl + "product/exception/saveProductException" , "method": "POST"},
     "updateProductException": {"url": baseUrl + "/product/exception/updateProductException" , "method": "PUT"}
-
 }
