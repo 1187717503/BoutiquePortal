@@ -26,6 +26,11 @@ public class DateUtils {
         return new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime());
     }
 
+    public static Date getDateByStr(String format,String date) throws ParseException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
+        return simpleDateFormat.parse(date);
+    }
+
     public static String getformatDate(Date date){
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return simpleDateFormat.format(date);
@@ -45,7 +50,7 @@ public class DateUtils {
     }
 
     /**
-     * date1 > date2 return true
+     * date1 > date2 return true date1日期在后,date2日期在前
      * date1 < date2 return false
      * @param date1
      * @param date2

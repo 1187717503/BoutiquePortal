@@ -891,6 +891,19 @@ public class ShopProductService {
         }
     }
 
+    public  List<ShopProduct> getShopProductByProductId(Long product_id) throws Exception {
+        try {
+            Map<String, Object> condition = new HashMap<String, Object>();
+            condition.put("product_id", product_id);
+            condition.put("enabled", true);
+
+            List<ShopProduct> list = shopProductDao.getByCondition(ShopProduct.class, condition);
+            return list;
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
     /**
      * @param shopProduct
      * @return

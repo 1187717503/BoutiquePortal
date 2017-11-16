@@ -32,6 +32,7 @@ import pk.shoplus.service.SkuService;
 import pk.shoplus.service.SkuStoreService;
 import pk.shoplus.service.price.api.IPriceService;
 import pk.shoplus.service.price.impl.PriceServiceImpl;
+import pk.shoplus.util.DateUtils;
 import pk.shoplus.util.ExceptionUtils;
 
 /**
@@ -145,19 +146,25 @@ public class ApiUpdateStockSerivce {
 
     public void toShopProcessing(Connection conn) throws Exception{
         ProductService productService = new ProductService(conn);
-        Product product = this.getProduct(conn);
-        product.setStatus(4);
-
         ShopProductService shopProductService = new ShopProductService(conn);
-        ShopProduct shopProduct = new ShopProduct();
-        shopProduct.setStatus(2);
-        shopProduct.setProduct_id(product.getProduct_id());
+        Product product = this.getProduct(conn);
 
-        productService.updateProduct(product);
-        logger.info("ApiUpdateStockSerivce,toShopProcessing,updateProduct,product:"+JSONObject.toJSONString(product));
+        List<ShopProduct> shopProducts = shopProductService.getShopProductByProductId(product.getProduct_id());
+        logger.info("ApiUpdateStockSerivce,toShopProcessing,shopProducts:"+JSONObject.toJSONString(shopProducts));
+        if(shopProducts != null && shopProducts.size() > 0 && product.getStatus().intValue() == 3) {
+            ShopProduct shopProduct = shopProducts.get(0);
 
-        shopProductService.updateShopProduct(shopProduct);
-        logger.info("ApiUpdateStockSerivce,toShopProcessing,updateProduct,product:"+JSONObject.toJSONString(shopProduct));
+            if(shopProduct.getStatus().intValue() == 0){
+                product.setStatus(4);
+                shopProduct.setStatus(2);
+
+                productService.updateProduct(product);
+                logger.info("ApiUpdateStockSerivce,toShopProcessing,updateProduct,product:"+JSONObject.toJSONString(product));
+
+                shopProductService.updateShopProduct(shopProduct);
+                logger.info("ApiUpdateStockSerivce,toShopProcessing,updateProduct,product:"+JSONObject.toJSONString(shopProduct));
+            }
+        }
     }
 
     private void createSku(Connection conn) throws Exception{
@@ -318,11 +325,20 @@ public class ApiUpdateStockSerivce {
             return;
         }
 
+        // 检查last_check ,判断这条消息是不是最新的,如果sku_store的last_check晚于msgDate,就不更新
+        Date msgDate = stockOption.getLast_check();
+        if(skuStoreMap.get("last_check") != null) {
+            Date date = DateUtils.getDateByStr("yyyy-MM-dd HH:mm:ss",skuStoreMap.get("last_check").toString());
+            boolean flag = DateUtils.compareDate(date,msgDate);
+            logger.info("ApiUpdateStockSerivce,updateStock,inputParams,flag:"+flag+",msgDate:"+DateUtils.getformatDate(msgDate)+",date:"+DateUtils.getformatDate(date));
+            if(flag) {return;}
+        }
+
         logger.info("ApiUpdateStockSerivce,updateStock,inputParams,skuStoreMap:"+JSONObject.toJSONString(skuStoreMap));
         SkuStoreService skuStoreService = new SkuStoreService(conn);
         int qty = Integer.parseInt(stockOption.getQuantity());
         int type = Integer.parseInt(stockOption.getType());
-        int rs;
+        int rs = 0;
         int store = 0;
         int reserved = 0;
         int confirmed = 0;
@@ -333,9 +349,17 @@ public class ApiUpdateStockSerivce {
         sku_store_id = Integer.parseInt(skuStoreMap.get("sku_store_id").toString());
 
         if(Contants.STOCK_QTY == type) {
+            if(qty < 0 || qty > 100) {
+                qty = 0;
+            }
             rs = qty - (store + reserved + confirmed);
         } else {
-            rs = qty;
+            if(qty < -100 || qty > 100) {
+                qty = 0;
+                rs = qty - (store + reserved + confirmed);
+            } else {
+                rs = qty;
+            }
         }
 
         if(confirmed == 0 && Contants.STOCK_QTY == type) {
@@ -367,8 +391,10 @@ public class ApiUpdateStockSerivce {
         logger.info("ApiUpdateStockSerivce,updateStock,outputParams,skuStore:"+JSONObject.toJSONString(skuStore));
 
         // 当库存小于0，或低于100时，库存在这被清零，然后报警告
-        if(stockOption.getStore() < 0 || stockOption.getStore() > 100) {
-            throw new UpdateException("store",stockOption.getStore()+"",ApiErrorTypeEnum.errorType.warning_stock_out_off);
+        if((qty < 0 || qty > 100) && Contants.STOCK_QTY == type) {
+            throw new UpdateException("store",stockOption.getQuantity(),ApiErrorTypeEnum.errorType.warning_stock_out_off);
+        } else if((qty < -100 || qty > 100) && Contants.STOCK_QTY_DIFF == type) {
+            throw new UpdateException("store",stockOption.getQuantity(),ApiErrorTypeEnum.errorType.warning_stock_out_off);
         }
     }
 
@@ -397,10 +423,6 @@ public class ApiUpdateStockSerivce {
         // 检查quantity是否为数字,如果库存数量 store<0 or store>100,库存置0，报警告 updateStock()执行后
         try {
             int stock = Integer.parseInt(quantity);
-            stockOption.setStore(stock);
-            if(stock < 0 || stock > 100) {
-                stockOption.setQuantity("0");
-            }
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("ApiUpdateStockSerivce,checkParams,stock not parse int,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",stockOption:"+ JSONObject.toJSONString(stockOption));

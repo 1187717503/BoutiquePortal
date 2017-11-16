@@ -24,7 +24,7 @@ public class TestController {
     public Map<String,Object> testStock(@RequestBody StockOption stockOption){
         System.out.println(new Gson().toJson(stockOption));
         ApiUpdateStockSerivce apiStockSerivce = new ApiUpdateStockSerivce();
-        stockOption.setLast_check(new Date());
+//        stockOption.setLast_check(new Date());
         long  start = System.currentTimeMillis();
         System.out.println("start:"+new Date().toString() +","+start);
         Map<String,Object> map = apiStockSerivce.updateStock(stockOption);

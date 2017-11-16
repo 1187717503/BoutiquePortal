@@ -427,6 +427,16 @@ public class ApiCreateProductService {
         String price = escape(StringUtils.trim(productOptions.getSalePrice()));
         String product_name = escape(StringUtils.trim(productOptions.getName()));
         String product_desc = escape(StringUtils.trim(productOptions.getDesc()));
+        String carryOver = escape(StringUtils.trim(productOptions.getCarryOver()));
+        String colorDesc = escape(StringUtils.trim(productOptions.getColorDesc()));
+        String desc = escape(StringUtils.trim(productOptions.getDesc()));
+        String composition = escape(StringUtils.trim(productOptions.getComposition()));
+        String madeIn = escape(StringUtils.trim(productOptions.getMadeIn()));
+        String sizeFit = escape(StringUtils.trim(productOptions.getSizeFit()));
+        String weight = escape(StringUtils.trim(productOptions.getWeight()));
+        String length = escape(StringUtils.trim(productOptions.getLength()));
+        String width = escape(StringUtils.trim(productOptions.getWidth()));
+        String height = escape(StringUtils.trim(productOptions.getHeigit()));
 
         Long vendor_id = vendorOptions.getVendorId();
         productOptions.setCode(product_code);
@@ -437,6 +447,17 @@ public class ApiCreateProductService {
         productOptions.setSalePrice(price);
         productOptions.setName(product_name);
         productOptions.setDesc(product_desc);
+        productOptions.setCarryOver(carryOver);
+        productOptions.setColorDesc(colorDesc);
+        productOptions.setDesc(desc);
+        productOptions.setComposition(composition);
+        productOptions.setMadeIn(madeIn);
+        productOptions.setSizeFit(sizeFit);
+        productOptions.setWeight(weight);
+        productOptions.setLength(length);
+        productOptions.setWidth(width);
+        productOptions.setHeigit(height);
+        productOptions.setHeigit(height);
 
         if(StringUtils.isBlank(product_code)) {
             throw new UpdateException("product_code",product_code, ApiErrorTypeEnum.errorType.error_data_is_null);
@@ -461,6 +482,26 @@ public class ApiCreateProductService {
 
         if(StringUtils.isBlank(color_code)) {
             throw new UpdateException("color_code",color_code, ApiErrorTypeEnum.errorType.error_data_is_null);
+        }
+
+        if(StringUtils.isBlank(price)) {
+            throw new UpdateException("price",price, ApiErrorTypeEnum.errorType.error_data_is_null);
+        }
+
+        if(StringUtils.isNotBlank(price)) {
+            try {
+                BigDecimal bPrice = new BigDecimal(price);
+                if(bPrice.intValue() < 10 || bPrice.intValue() > 10000 || bPrice.intValue() == 0) {
+                    throw new UpdateException("price",price,ApiErrorTypeEnum.errorType.error_price_out_off);
+                }
+            } catch (UpdateException e) {
+                e.printStackTrace();
+                throw new UpdateException(e.getKey(),e.getValue(),e.getErrorType());
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.info("ApiUpdateStockSerivce,checkParams,price not parse int,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",productOptions:"+JSONObject.toJSONString(productOptions));
+                throw new UpdateException("price",price,ApiErrorTypeEnum.errorType.error_data_is_not_number);
+            }
         }
 
     }

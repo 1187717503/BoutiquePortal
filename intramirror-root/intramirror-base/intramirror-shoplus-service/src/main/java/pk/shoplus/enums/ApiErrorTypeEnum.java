@@ -87,6 +87,7 @@ public class ApiErrorTypeEnum {
         error_runtime_exception("error_runtime_exception","运行时异常"),
         error_boutique_id_not_exists("error_boutique_id_not_exists","找不到这个boutique_id"),
         error_boutique_id_already_exists("error_boutique_id_already_exists","找到这个boutque_id"),
+        error_price_out_off("error_price_out_off","价格小于等于0或者高于10000"),
         warning_stock_out_off("warning_stock_out_off","库存小于0或者高于100"),
         warning_price_out_off("warning_price_out_off","价格超过+-20%"),
         warning_data_can_not_find_mapping("warning_data_can_not_find_mapping","警告，数据不能映射。");
