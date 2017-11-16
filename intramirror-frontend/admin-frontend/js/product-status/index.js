@@ -181,6 +181,7 @@ function getFilterFromDom() {
     searchObj.image = $('#select-image').val();
     searchObj.modelImage = $('#select-model-image').val();
     searchObj.streetImage = $('#select-street-image').val();
+    searchObj.exception = $('#select-exception').val();
     searchObj.designerId = $('#text-designerId').val();
     searchObj.colorCode = $('#text-color-code').val();
     searchObj.boutiqueId = $('#text-boutique').val();
@@ -251,6 +252,7 @@ function getProdcutList(status, pageno) {
     filter += 'image='+ searchObj.image + '&';
     filter += 'modelImage='+ searchObj.modelImage + '&';
     filter += 'streetImage='+ searchObj.streetImage + '&';
+    filter += 'exception='+ searchObj.exception + '&';
 
     filter = filter.slice(0, filter.length - 1);
 

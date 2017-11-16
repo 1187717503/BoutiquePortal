@@ -168,7 +168,7 @@
                                     </select>
                                 </div>
                                 <div class="input-field col s1">
-                                    <select id="select-stock">
+                                    <select id="select-exception">
                                         <option value="0" selected>Exception</option>
                                         <option value="1">YES</option>
                                         <option value="2">NO</option>
@@ -506,6 +506,9 @@ Scripts
                 <div class="list-detail-item">${detail.confirmed}</div>
                 <div class="list-detail-item">${detail.last_check}</div>
                 <div class="list-detail-item">${detail.exceptionDate}</div>
+                <div class="list-detail-item exception-btn">
+                    <span data-action="set0" class="waves-effect waves-light btn mini-btn exception-ops">Set 0</span>
+                </div>
             {%else%}
                 <div data-sku-id="${detail.sku_id}" data-product-id="${detail.product_id}" class="row list-detail-row exception">
                 <div class="list-detail-item exception-warning">${detail.sku_id}</div>
@@ -611,6 +614,7 @@ Scripts
             $('#select-image').val('0');
             $('#select-model-image').val('0');
             $('#select-street-image').val('0');
+            $('#select-exception').val('0');
             $('#text-designerId').val('');
             $('#text-color-code').val('');
             $('#text-boutique').val('');
