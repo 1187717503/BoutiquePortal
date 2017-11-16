@@ -330,7 +330,7 @@ public class ApiUpdateStockSerivce {
         if(skuStoreMap.get("last_check") != null) {
             Date date = DateUtils.getDateByStr("yyyy-MM-dd HH:mm:ss",skuStoreMap.get("last_check").toString());
             boolean flag = DateUtils.compareDate(date,msgDate);
-            logger.info("ApiUpdateStockSerivce,updateStock,inputParams,flag:"+flag+",msgDate:"+DateUtils.getformatDate(msgDate)+",date:"+DateUtils.getformatDate(date));
+            logger.info("ApiUpdateStockSerivce,updateStock,flag:"+flag+",msgDate:"+DateUtils.getformatDate(msgDate)+",date:"+DateUtils.getformatDate(date));
             if(flag) {return;}
         }
 
@@ -347,6 +347,11 @@ public class ApiUpdateStockSerivce {
         reserved = Integer.parseInt(skuStoreMap.get("reserved").toString());
         confirmed = Integer.parseInt(skuStoreMap.get("confirmed").toString());
         sku_store_id = Integer.parseInt(skuStoreMap.get("sku_store_id").toString());
+
+        if(skuStoreService.ifUpdateStock((long)sku_store_id)) {
+            logger.info("ApiUpdateStockSerivce,updateStock,store不允许更新,sku_store_id:"+sku_store_id);
+            return;
+        }
 
         if(Contants.STOCK_QTY == type) {
             if(qty < 0 || qty > 100) {

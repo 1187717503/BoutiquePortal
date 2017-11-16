@@ -1,5 +1,6 @@
 package pk.shoplus.model;
 
+import com.alibaba.fastjson15.JSONObject;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
@@ -80,7 +81,11 @@ public class ProductStockEDSManagement {
                     }
                     skuStore.last_check = new Date();
                     logger.info("ProductStockEDSManagementUpdateStock,updateSkuStore,skuStore:" + new Gson().toJson(skuStore));
-                    skuStoreService.updateSkuStore(skuStore);
+                    if(skuStoreService.ifUpdateStock(skuStore.getSku_store_id())) {
+                        logger.info("ApiUpdateStockSerivce,updateStock,store不允许更新,skuStore:"+ JSONObject.toJSONString(skuStore));
+                    }else {
+                        skuStoreService.updateSkuStore(skuStore);
+                    }
                 } else {
 
                     // create sku_store

@@ -64,6 +64,18 @@ public class SkuStoreService {
 		}
 	}
 
+	public boolean ifUpdateStock(Long sku_store_id) throws Exception{
+		SkuStore skuStore = this.getSkuStoreByID(sku_store_id.toString());
+		if(skuStore == null) {return  false;}
+
+		String sql = "select pe.id from `product_exception`  pe  where pe.`status`  = 1 and pe.`sku_id`  ="+skuStore.getSku_id();
+		List<Map<String,Object>> mapList = skuStoreDao.executeBySql(sql,null);
+		if(mapList == null || mapList.size() == 0) {
+			return false;
+		}
+		return true;
+	}
+
 
 	/**
 	 * Update sku stock.

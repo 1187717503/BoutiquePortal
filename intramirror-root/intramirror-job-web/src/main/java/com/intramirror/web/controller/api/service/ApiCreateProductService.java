@@ -182,7 +182,7 @@ public class ApiCreateProductService {
             ProductSkuPropertyValue productSkuPropertyValue = new ProductSkuPropertyValue();
             productSkuPropertyValue.product_sku_property_key_id = this.uProductSkuPropertyKey.getProduct_sku_property_key_id();
             productSkuPropertyValue.value = skuOption.getSize();
-            productSkuPropertyValue.remark = "";
+            productSkuPropertyValue.remark = skuOption.getSizeid() == null?"":skuOption.getSizeid();
             productSkuPropertyValue.created_at = new Date();
             productSkuPropertyValue.updated_at = new Date();
             productSkuPropertyValue.enabled = EnabledType.USED;

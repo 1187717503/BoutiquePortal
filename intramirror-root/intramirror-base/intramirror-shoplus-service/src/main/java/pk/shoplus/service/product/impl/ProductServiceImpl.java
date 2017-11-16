@@ -438,7 +438,12 @@ public class ProductServiceImpl implements IProductService{
                         warningMaps.add(mapUtils.getMap());
                     }
                     skuStore.setLast_check(new Date());
-                    skuStoreService.updateSkuStore(skuStore);
+                    if(skuStoreService.ifUpdateStock(skuStore.getSku_store_id())) {
+                        logger.info("ApiUpdateStockSerivce,updateStock,store不允许更新,skuStore:"+JSONObject.toJSONString(skuStore));
+                    }else {
+                        skuStoreService.updateSkuStore(skuStore);
+                    }
+
                     logger.info("ProductServiceImplUpdateProduct,updateSkuStore,skuStore:"+new Gson().toJson(skuStore));
                     if(org.apache.commons.lang.StringUtils.isNotBlank(productOptions.getFullUpdateProductFlag()) &&
                             productOptions.getFullUpdateProductFlag().equals("1")){
