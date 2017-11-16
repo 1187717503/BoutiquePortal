@@ -50,7 +50,7 @@
 
         <!-- 异常商品，强制清零库存 -->
         <if test="statusType == 6 ">
-            set ss.store = 0
+            set ss.`confirmed` = 0,ss.`store` = (0 - abs(cast(ss.`reserved` as signed)))
         </if>
         where ss.sku_id = #{skuId,jdbcType=BIGINT}
 
