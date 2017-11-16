@@ -102,6 +102,7 @@
         sku_store.store,
         sku_store.reserved,
         sku_store.confirmed,
+        sku_store.last_check,
         sku.`size`,
         sku.sku_code as bar_code
         FROM sku_store

@@ -492,10 +492,10 @@ Scripts
             <div class="list-detail-item">Available Stock</div>
             <div class="list-detail-item">Reserverd Stock</div>
             <div class="list-detail-item">Confirmed Stock</div>
+            <div class="list-detail-item">Last Check</div>
             <div class="list-detail-item">Exception Date</div>
         </div>
         {%each(j, detail) order.skuDetail%}
-            
             {%if detail.exceptionStatus == null %}
                 <div data-sku-id="${detail.sku_id}" data-product-id="${detail.product_id}" class="row list-detail-row">
                 <div class="list-detail-item">${detail.sku_id}</div>
@@ -504,6 +504,8 @@ Scripts
                 <div class="list-detail-item">${detail.store}</div>
                 <div class="list-detail-item">${detail.reserved}</div>
                 <div class="list-detail-item">${detail.confirmed}</div>
+                <div class="list-detail-item">${detail.last_check}</div>
+                <div class="list-detail-item">${detail.exceptionDate}</div>
             {%else%}
                 <div data-sku-id="${detail.sku_id}" data-product-id="${detail.product_id}" class="row list-detail-row exception">
                 <div class="list-detail-item exception-warning">${detail.sku_id}</div>
@@ -512,8 +514,9 @@ Scripts
                 <div class="list-detail-item exception-warning">${detail.store}</div>
                 <div class="list-detail-item exception-warning">${detail.reserved}</div>
                 <div class="list-detail-item exception-warning">${detail.confirmed}</div>
-                <div class="list-detail-item exception-warning">2017.01.1</div>
-                <div class="list-detail-item">
+                <div class="list-detail-item exception-warning">${detail.last_check}</div>
+                <div class="list-detail-item exception-warning">${detail.exceptionDate}</div>
+                <div class="list-detail-item exception-btn">
                     <span data-action="set0" class="waves-effect waves-light btn mini-btn exception-ops">Set 0</span>
                     <span data-action="resolve" class="waves-effect waves-light btn mini-long-btn exception-ops">Resolve</span>
                 </div>
