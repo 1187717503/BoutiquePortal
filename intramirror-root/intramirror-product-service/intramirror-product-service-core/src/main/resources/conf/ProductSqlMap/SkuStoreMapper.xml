@@ -47,6 +47,11 @@
         <if test="statusType == 3 ">
             set ss.confirm = ss.confirm - 1,ss.ship = ss.ship + 1
         </if>
+
+        <!-- 异常商品，强制清零库存 -->
+        <if test="statusType == 6 ">
+            set ss.store = 0
+        </if>
         where ss.sku_id = #{skuId,jdbcType=BIGINT}
 
     </update>

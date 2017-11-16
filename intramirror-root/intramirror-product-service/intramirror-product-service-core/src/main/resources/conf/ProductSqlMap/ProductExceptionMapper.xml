@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.intramirror.product.core.mapper.ProductExceptionMapper">
+
+    <insert id="saveProductException" parameterType="java.util.Map">
+        INSERT INTO product_exception(
+                type_id,product_id,
+                sku_id,`note`,
+                `status`,created_at,
+                created_by_user_id,
+                modified_at,modified_by_user_id)
+        VALUES (#{type_id,jdbcType=INTEGER},#{product_id,jdbcType=BIGINT},
+                #{sku_id,jdbcType=BIGINT},#{note,jdbcType=VARCHAR},
+                #{status,jdbcType=INTEGER},#{created_at,jdbcType=TIMESTAMP},
+                #{created_by_user_id,jdbcType=BIGINT},
+                NULL ,
+                NULL )
+    </insert>
+
+    <select id="selectByProductAndSkuId" resultType="java.util.HashMap" parameterType="java.util.Map">
+        SELECT
+        id,type_id,product_id,
+        sku_id,`note`,
+        `status`,created_at,
+        created_by_user_id,
+        modified_at,modified_by_user_id
+        FROM product_exception
+        WHERE
+        <if test="product_id != null">
+            product_id = #{product_id} AND
+        </if>
+        <if test="sku_id != null">
+            sku_id = #{sku_id} AND
+        </if>
+        status = 1
+    </select>
+
+    <update id="updateProductException" parameterType="java.util.Map">
+        UPDATE product_exception
+        <set>
+            <if test="status != null">
+                status = #{status,jdbcType=BIGINT},
+            </if>
+            <if test="modified_at != null">
+                modified_at = #{modified_at,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modified_by_user_id != null">
+                modified_by_user_id = #{modified_by_user_id,jdbcType=BIGINT}
+            </if>
+        </set>
+        WHERE sku_id in (#{skuIds})
+    </update>
+</mapper>
