@@ -3,6 +3,7 @@ package com.intramirror.web.controller.api.service;
 import com.alibaba.fastjson.JSONObject;
 import com.intramirror.web.mapping.vo.StockOption;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +23,7 @@ import pk.shoplus.model.Sku;
 import pk.shoplus.model.SkuProperty;
 import pk.shoplus.model.SkuStore;
 import pk.shoplus.parameter.EnabledType;
+import pk.shoplus.parameter.StatusType;
 import pk.shoplus.service.ProductPropertyKeyService;
 import pk.shoplus.service.ProductPropertyValueService;
 import pk.shoplus.service.ProductService;
@@ -46,6 +48,14 @@ public class ApiUpdateStockSerivce {
 
     private static final Logger logger = Logger.getLogger(ApiUpdateStockSerivce.class);
 
+    private StockOption stockOption;
+
+    private Map<String,Object> skuStoreMap;
+
+    private Product uProduct;
+
+    private List<Map<String,Object>> warningList;
+
     public Map<String,Object> updateStock(StockOption stockOption) {
         Map<String,Object> resultMap = new HashMap<>();
 
@@ -66,7 +76,12 @@ public class ApiUpdateStockSerivce {
             /** 更新价格 */
             this.updatePrice(conn);
 
-            resultMap = ApiCommonUtils.successMap();
+            if(warningList == null || warningList.size() == 0) {
+                resultMap = ApiCommonUtils.successMap();
+            } else {
+                resultMap.put("status",StatusType.WARNING);
+                resultMap.put("warningMaps",warningList);
+            }
         } catch (UpdateException e) {
             resultMap = ApiCommonUtils.errorMap(e.getErrorType(),e.getKey(),e.getValue());
         } catch (Exception e) {
@@ -96,7 +111,12 @@ public class ApiUpdateStockSerivce {
             /** 更新价格 */
             this.updatePrice(conn);
 
-            resultMap = ApiCommonUtils.successMap();
+            if(warningList == null || warningList.size() == 0) {
+                resultMap = ApiCommonUtils.successMap();
+            } else {
+                resultMap.put("status",StatusType.WARNING);
+                resultMap.put("warningMaps",warningList);
+            }
         } catch (UpdateException e) {
             resultMap = ApiCommonUtils.errorMap(e.getErrorType(),e.getKey(),e.getValue());
         } catch (Exception e) {
@@ -117,11 +137,9 @@ public class ApiUpdateStockSerivce {
                 BigDecimal bPrice = new BigDecimal(price);
                 if(bPrice.intValue() < 10 || bPrice.intValue() > 10000 || bPrice.intValue() == 0) {
                     this.toShopProcessing(conn);
-                    throw new UpdateException("price",price,ApiErrorTypeEnum.errorType.warning_price_out_off);
+                    this.setWarning(ApiErrorTypeEnum.errorType.warning_price_out_off,"price",price);
+                    return;
                 }
-            } catch (UpdateException e) {
-                e.printStackTrace();
-                throw new UpdateException(e.getKey(),e.getValue(),e.getErrorType());
             } catch (Exception e) {
                 e.printStackTrace();
                 logger.info("ApiUpdateStockSerivce,checkParams,price not parse int,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",stockOption:"+JSONObject.toJSONString(stockOption));
@@ -137,10 +155,11 @@ public class ApiUpdateStockSerivce {
 
         if(rs == 1) {
             IPriceService iPriceService = new PriceServiceImpl();
+            logger.info("ApiUpdateStockSerivce,synProductPriceRule,product:"+JSONObject.toJSONString(product) +",newPrice:"+newPrice);
             iPriceService.synProductPriceRule(product,newPrice,conn);
         } else if(rs == 2){
             this.toShopProcessing(conn);
-            throw new UpdateException("price",stockOption.getPrice(),ApiErrorTypeEnum.errorType.warning_price_out_off);
+            this.setWarning(ApiErrorTypeEnum.errorType.warning_price_out_off,"price",price);
         }
     }
 
@@ -154,7 +173,7 @@ public class ApiUpdateStockSerivce {
         if(shopProducts != null && shopProducts.size() > 0 && product.getStatus().intValue() == 3) {
             ShopProduct shopProduct = shopProducts.get(0);
 
-            if(shopProduct.getStatus().intValue() == 0){
+            if(shopProduct.getStatus().intValue() == 0) {
                 product.setStatus(4);
                 shopProduct.setStatus(2);
 
@@ -353,6 +372,11 @@ public class ApiUpdateStockSerivce {
             return;
         }
 
+        // -2,1,1的情况
+        if(Contants.STOCK_QTY == type && store < 0) {
+            store = 0;
+        }
+
         if(Contants.STOCK_QTY == type) {
             if(qty < 0 || qty > 100) {
                 qty = 0;
@@ -397,9 +421,9 @@ public class ApiUpdateStockSerivce {
 
         // 当库存小于0，或低于100时，库存在这被清零，然后报警告
         if((qty < 0 || qty > 100) && Contants.STOCK_QTY == type) {
-            throw new UpdateException("store",stockOption.getQuantity(),ApiErrorTypeEnum.errorType.warning_stock_out_off);
+            this.setWarning(ApiErrorTypeEnum.errorType.warning_stock_out_off,"store",stockOption.getQuantity());
         } else if((qty < -100 || qty > 100) && Contants.STOCK_QTY_DIFF == type) {
-            throw new UpdateException("store",stockOption.getQuantity(),ApiErrorTypeEnum.errorType.warning_stock_out_off);
+            this.setWarning(ApiErrorTypeEnum.errorType.warning_stock_out_off,"store",stockOption.getQuantity());
         }
     }
 
@@ -431,7 +455,7 @@ public class ApiUpdateStockSerivce {
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("ApiUpdateStockSerivce,checkParams,stock not parse int,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",stockOption:"+ JSONObject.toJSONString(stockOption));
-            throw new UpdateException("store",quantity,ApiErrorTypeEnum.errorType.error_data_is_not_number);
+            throw new UpdateException("store",quantity, ApiErrorTypeEnum.errorType.error_data_is_not_number);
         }
 
         // 检查vendorId是否为NULL
@@ -465,7 +489,7 @@ public class ApiUpdateStockSerivce {
 
                 // 当修改类型为update_by_sku时,报错:因为没有SIZE
                 if(stockOption.getUpdated_by().equals(ApiUpdateStockSerivce.update_by_sku)) {
-                    throw new UpdateException("size",sizeValue,ApiErrorTypeEnum.errorType.error_size_not_exists);
+                    throw new UpdateException("size",sizeValue,ApiErrorTypeEnum.errorType.error_sku_not_exists);
                 }
             }else{
                 this.skuStoreMap = skuStoreMapList.get(0);
@@ -493,13 +517,7 @@ public class ApiUpdateStockSerivce {
         }
     }
 
-    private StockOption stockOption;
 
-    private Map<String,Object> skuStoreMap;
-
-    private Product uProduct;
-
-    private List<Map<String,Object>> warningList;
 
     public StockOption getStockOption() {
         return stockOption;
@@ -519,6 +537,21 @@ public class ApiUpdateStockSerivce {
 
     public Product getuProduct() {
         return uProduct;
+    }
+
+    private void setWarning(ApiErrorTypeEnum.errorType errorType,String key,String value){
+        Map<String,Object> warningMap = new HashMap<>();
+        warningMap.put("status", StatusType.WARNING);
+        warningMap.put("error_enum",errorType.getCode());
+        warningMap.put("key",key);
+        warningMap.put("value",value);
+        warningMap.put("info",errorType.getDesc());
+
+        if(warningList == null || warningList.size() == 0) {
+            warningList = new ArrayList<>();
+        }
+
+        warningList.add(warningMap);
     }
 
 }

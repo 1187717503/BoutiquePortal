@@ -2,15 +2,24 @@ package com.intramirror.web.controller.api.service;
 
 import com.alibaba.fastjson.JSONObject;
 import static com.intramirror.web.controller.api.service.ApiCommonUtils.escape;
+import com.intramirror.web.mapping.vo.StockOption;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.sql2o.Connection;
 import pk.shoplus.DBConnector;
+import pk.shoplus.common.Contants;
 import pk.shoplus.enums.ApiErrorTypeEnum;
 import pk.shoplus.model.Product;
 import pk.shoplus.model.ProductEDSManagement;
+import pk.shoplus.model.ProductProperty;
+import pk.shoplus.parameter.EnabledType;
+import pk.shoplus.parameter.StatusType;
+import pk.shoplus.service.ProductPropertyService;
 import pk.shoplus.service.ProductService;
 import pk.shoplus.util.ExceptionUtils;
 
@@ -25,7 +34,15 @@ public class ApiUpdateProductService {
 
     private ProductEDSManagement.VendorOptions vendorOptions ;
 
+    private List<StockOption> stockOptions ;
+
     private Product uProduct;
+
+    private Boolean no_img ;
+
+    private boolean modify = false;
+
+    private List<Map<String,Object>> warningList ;
 
     public Map<String,Object> updateProduct(ProductEDSManagement.ProductOptions productOptions,ProductEDSManagement.VendorOptions vendorOptions){
         Map<String,Object> resultMap = null;
@@ -40,6 +57,9 @@ public class ApiUpdateProductService {
             this.checkProductParams(conn);
             this.checkMappingParams(conn);
 
+            // 更新product
+            this.setProduct(conn);
+
             resultMap = ApiCommonUtils.successMap();
         } catch (UpdateException e) {
             resultMap = ApiCommonUtils.errorMap(e.getErrorType(),e.getKey(),e.getValue());
@@ -51,6 +71,73 @@ public class ApiUpdateProductService {
             if(conn != null) {conn.commit();conn.close();}
         }
         return resultMap;
+    }
+
+    private void setProduct(Connection conn) throws Exception{
+        Product product = this.getProduct(conn);
+        product.last_check = new Date();
+
+        // Brand：和原来不一致直接更新。如为空或者不能Mapping报Warning，但其他字段继续更新。
+        String brand_id = productOptions.getBrandId();
+        if(StringUtils.isNotBlank(brand_id)) {
+            product.setBrand_id(Long.parseLong(brand_id));
+        }
+
+        // Image：不予更新。
+        String cover_img = product.getCover_img();
+        boolean noImg = this.getNoImg(conn);
+        if(StringUtils.isBlank(cover_img) || cover_img.length() < 5) {
+            cover_img = productOptions.getCoverImg();
+            if(StringUtils.isNotBlank(cover_img) && !noImg) {
+                String downImgs = ApiCommonUtils.downloadImgs(cover_img);
+                product.cover_img = downImgs;
+                product.description_img = downImgs;
+            }
+        }
+
+        // 和原来不一致直接更新。如为空或者不能Mapping报Warning，但其他字段继续更新。
+        String seasonCode = productOptions.getSeasonCode();
+        if(StringUtils.isNotBlank(seasonCode)) {
+            product.setSeason_code(seasonCode);
+        }
+
+
+        // 获取新的BrandID和ColorCode
+        String newBrandCode = productOptions.getBrandCode();
+        String newColorCode = productOptions.getColorCode();
+
+        String oldBrandCode = product.getDesigner_id();
+        String oldColorCode = product.getColor_code();
+
+        if(StringUtils.isBlank(oldBrandCode)) {
+            product.designer_id = newBrandCode;
+        }
+
+        if(StringUtils.isBlank(oldColorCode)) {
+            product.color_code = newColorCode;
+        }
+
+        // 如果消息重置时,BrandID和ColorCode不为空,直接更新
+        if(modify) {
+            if(StringUtils.isNotBlank(newBrandCode)) {
+                product.designer_id = newBrandCode;
+            }
+
+            if(StringUtils.isNotBlank(newColorCode)) {
+                product.color_code = newColorCode;
+            }
+        } else { // 非消息重置时,BrandID和ColorCode和原来不一致或者为空报警告
+            if(StringUtils.isBlank(newBrandCode) || !newBrandCode.equalsIgnoreCase(oldBrandCode)) {
+                this.setWarning(ApiErrorTypeEnum.errorType.warning_ColorCode_change,"BrandID",newBrandCode);
+            }
+
+            if(StringUtils.isBlank(newColorCode) || !newColorCode.equalsIgnoreCase(oldColorCode)) {
+                this.setWarning(ApiErrorTypeEnum.errorType.warning_BrandID_change,"BrandID",newColorCode);
+            }
+        }
+
+        ProductService productService = new ProductService(conn);
+        productService.updateProduct(product);
     }
 
     private void checkMappingParams(Connection conn) throws Exception {
@@ -130,15 +217,15 @@ public class ApiUpdateProductService {
         mappingCategory.put("category3",category3);
 
         if(StringUtils.isBlank(productOptions.getCategoryId())) {
-            throw new UpdateException("category",JSONObject.toJSONString(mappingCategory), ApiErrorTypeEnum.errorType.data_can_not_find_mapping);
+            this.setWarning(ApiErrorTypeEnum.errorType.data_can_not_find_mapping,"category", JSONObject.toJSONString(mappingCategory));
         }
 
         if(StringUtils.isBlank(productOptions.getBrandId())) {
-            throw new UpdateException("brand",brandName, ApiErrorTypeEnum.errorType.data_can_not_find_mapping);
+            this.setWarning(ApiErrorTypeEnum.errorType.data_can_not_find_mapping,"brand", brandName);
         }
 
         if(StringUtils.isBlank(mappingSeason)) {
-            throw new UpdateException("season",seasonCode, ApiErrorTypeEnum.errorType.data_can_not_find_mapping);
+            this.setWarning(ApiErrorTypeEnum.errorType.data_can_not_find_mapping,"season", seasonCode);
         }
     }
 
@@ -199,6 +286,10 @@ public class ApiUpdateProductService {
             productOptions.setHeigit(height);
         }
 
+        if(StringUtils.isNotBlank(productOptions.getModifyPrice()) && productOptions.getModifyPrice().equalsIgnoreCase("1")) {
+            modify = true;
+        }
+
         if(StringUtils.isBlank(product_code)) {
             throw new UpdateException("product_code",product_code, ApiErrorTypeEnum.errorType.error_data_is_null);
         }
@@ -210,6 +301,27 @@ public class ApiUpdateProductService {
         Product product = this.getProduct(conn);
         if(product == null) {
             throw new UpdateException("product_code",product_code, ApiErrorTypeEnum.errorType.error_boutique_id_not_exists);
+        }
+
+        List<ProductEDSManagement.SkuOptions> skuOptionList = productOptions.getSkus();
+        stockOptions = new ArrayList<>();
+        if(skuOptionList != null && skuOptionList.size() > 0) {
+            for(ProductEDSManagement.SkuOptions skuOption : skuOptionList) {
+                String size = skuOption.getSize();
+                String sku_code = skuOption.getBarcodes();
+                String quantity = skuOption.getStock();
+
+                StockOption stockOption = new StockOption();
+                stockOption.setSizeValue(size);
+                stockOption.setSku_code(sku_code);
+                stockOption.setQuantity(quantity);
+                stockOption.setType(Contants.STOCK_QTY+"");
+                stockOption.setVendor_id(vendor_id.toString());
+                stockOption.setProductCode(product_code);
+                stockOption.setPrice(price);
+                stockOption.setLast_check(new Date());
+                stockOptions.add(stockOption);
+            }
         }
     }
 
@@ -224,6 +336,47 @@ public class ApiUpdateProductService {
             this.uProduct = product;
         }
         return this.uProduct;
+    }
+
+    private boolean getNoImg(Connection conn) throws Exception {
+        if(no_img != null) {
+            return no_img;
+        }
+
+        ProductService productService = new ProductService(conn);
+        no_img = productService.getNoImg(productOptions.getBrandName(),vendorOptions.getVendorId());
+        return no_img;
+    }
+
+    public void updateProductProperty(Connection conn,Long productId,String keyName,String value) throws  Exception{
+        ProductPropertyService productPropertyService = new ProductPropertyService(conn);
+
+        if(org.apache.commons.lang3.StringUtils.isNotBlank(value)){
+            ProductProperty productProperty = new ProductProperty();
+            productProperty.value = value;
+
+            Map<String,Object> productPropertyConditions = new HashMap<>();
+            productPropertyConditions.put("product_id",productId);
+            productPropertyConditions.put("key_name",keyName);
+            productPropertyConditions.put("enabled", EnabledType.USED);
+
+            productPropertyService.updateProductPropertyByCondition(productProperty,productPropertyConditions);
+        }
+    }
+
+    private void setWarning(ApiErrorTypeEnum.errorType errorType,String key,String value){
+        Map<String,Object> warningMap = new HashMap<>();
+        warningMap.put("status", StatusType.WARNING);
+        warningMap.put("error_enum",errorType.getCode());
+        warningMap.put("key",key);
+        warningMap.put("value",value);
+        warningMap.put("info",errorType.getDesc());
+
+        if(warningList == null || warningList.size() == 0) {
+            warningList = new ArrayList<>();
+        }
+
+        warningList.add(warningMap);
     }
 
 }

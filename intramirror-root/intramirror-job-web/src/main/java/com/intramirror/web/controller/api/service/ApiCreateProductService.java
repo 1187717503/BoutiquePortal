@@ -1,12 +1,9 @@
 package com.intramirror.web.controller.api.service;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson15.JSONArray;
 import static com.intramirror.web.controller.api.service.ApiCommonUtils.escape;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -17,7 +14,6 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.sql2o.Connection;
 import pk.shoplus.DBConnector;
-import pk.shoplus.common.FileUploadHelper;
 import pk.shoplus.enums.ApiErrorTypeEnum;
 import pk.shoplus.model.BrandCategory;
 import pk.shoplus.model.CategoryProductInfo;
@@ -61,6 +57,8 @@ public class ApiCreateProductService {
     private ProductEDSManagement.VendorOptions vendorOptions ;
 
     private ProductSkuPropertyKey uProductSkuPropertyKey ;
+
+    private Boolean no_img ;
 
     private Product uProduct;
 
@@ -334,10 +332,15 @@ public class ApiCreateProductService {
         product.updated_at = new Date();
         product.enabled = EnabledType.USED;
 
-        String coverImg = this.downloadImgs(productOptions.getCoverImg());
-        product.cover_img = coverImg;
-        product.description_img = coverImg;
-
+        boolean noImg = this.getNoImg(conn);
+        if(noImg) {
+            product.cover_img = "[]";
+            product.description_img = "[]";
+        } else {
+            String coverImg = ApiCommonUtils.downloadImgs(productOptions.getCoverImg());
+            product.cover_img = coverImg;
+            product.description_img = coverImg;
+        }
         product.season_code = productOptions.getSeasonCode();
         product.max_retail_price = new BigDecimal(productOptions.getSalePrice());
         product.min_retail_price = new BigDecimal(productOptions.getSalePrice());
@@ -349,25 +352,6 @@ public class ApiCreateProductService {
         product = productService.createProduct(product);
         this.uProduct = product;
         logger.info("ApiCreateProductService,setProduct,product:"+JSONObject.toJSONString(product));
-    }
-
-    private String downloadImgs (String originImg) {
-        List<String> newList = new ArrayList<>();
-        if(StringUtils.isNotBlank(originImg)) {
-            try {
-                List<String> originList = JSONArray.parseArray(originImg, String.class);
-                for (String origin : originList) {
-                    List<String> downList = FileUploadHelper.uploadFileByImgUrl2(origin);
-                    if(downList != null && downList.size() > 0) {
-                        newList.add(downList.get(0));
-                    }
-                }
-            } catch (Exception e) {
-                logger.info("ApiCreateProductService,downloadImgs,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+",originImg:"+originImg);
-                newList = new ArrayList<>();
-            }
-        }
-        return JSON.toJSONString(newList);
     }
 
     private void checkMappingParams(Connection conn) throws Exception {
@@ -574,7 +558,7 @@ public class ApiCreateProductService {
 
             String size = escape(StringUtils.trim(skuOption.getSize()));
             if(StringUtils.isBlank(size)) {
-                throw new UpdateException("size",JSONObject.toJSONString(skuOption),ApiErrorTypeEnum.errorType.error_size_not_exists);
+                throw new UpdateException("size",JSONObject.toJSONString(skuOption),ApiErrorTypeEnum.errorType.error_sku_not_exists);
             }
 
             String stock = skuOption.getStock();
@@ -611,4 +595,15 @@ public class ApiCreateProductService {
         }
         return this.uProduct;
     }
+
+    private boolean getNoImg(Connection conn) throws Exception {
+        if(no_img != null) {
+            return no_img;
+        }
+
+        ProductService productService = new ProductService(conn);
+        no_img = productService.getNoImg(productOptions.getBrandName(),vendorOptions.getVendorId());
+        return no_img;
+    }
+
 }

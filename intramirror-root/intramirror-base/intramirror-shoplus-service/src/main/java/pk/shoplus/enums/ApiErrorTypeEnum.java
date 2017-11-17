@@ -53,8 +53,7 @@ public class ApiErrorTypeEnum {
         Data_stock_out_off("Data_stock_out_off","库存数据超过100。"),
         warning_data_is_negative("warning_data_is_negative","警告，数据为负数。"),
         Data_is_not_number("Data_is_not_number","数据不是数字。"),
-        warning_ColorCode_change("warning_ColorCode_change","警告，ColorCode不允许改变。"),
-        warning_BrandID_change("warning_BrandID_change","警告，BrandID不允许改变。"),
+
 
         Data_not_exist("Data_not_exist","数据不能找到。"),
             boutique_id_not_exist("boutique_id_not_exist","查询不到这个boutique_id。"),
@@ -82,7 +81,7 @@ public class ApiErrorTypeEnum {
 
         error_data_is_null("error_data_is_null","数据为NULL"),
         error_data_is_not_number("error_data_is_not_number","数据不是数字"),
-        error_size_not_exists("error_size_not_exists","size不存在"),
+        error_sku_not_exists("error_sku_not_exists","size不存在"),
         error_runtime_exception("error_runtime_exception","运行时异常"),
         error_boutique_id_not_exists("error_boutique_id_not_exists","找不到这个boutique_id"),
         error_boutique_id_already_exists("error_boutique_id_already_exists","找到这个boutque_id"),
@@ -91,7 +90,9 @@ public class ApiErrorTypeEnum {
         warning_stock_out_off("warning_stock_out_off","库存小于0或者高于100"),
         warning_price_out_off("warning_price_out_off","价格超过+-20%"),
         warning_data_can_not_find_mapping("warning_data_can_not_find_mapping","警告，数据不能映射。"),
-        data_can_not_find_mapping("data_can_not_find_mapping","报错，数据不能映射。");
+        data_can_not_find_mapping("data_can_not_find_mapping","报错，数据不能映射。"),
+        warning_ColorCode_change("warning_ColorCode_change","警告，ColorCode不允许改变。"),
+        warning_BrandID_change("warning_BrandID_change","警告，BrandID不允许改变。");
 
         private String code;
         private String desc;
