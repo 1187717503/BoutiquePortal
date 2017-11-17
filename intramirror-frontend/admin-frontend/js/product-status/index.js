@@ -253,6 +253,8 @@ function getProdcutList(status, pageno) {
 
     filter = filter.slice(0, filter.length - 1);
 
+    loading();
+
     $('#order-list').empty();
     $('#order-head-list').empty();
     $('.pagination').empty();
@@ -262,7 +264,6 @@ function getProdcutList(status, pageno) {
     let btnStatus = getBtnStatus(status);
     $("#tmpl-control-pannel").tmpl({list: btnStatus}).appendTo(".control-pannel");
    
-    loading();
     $.ajax({
         type: requestURL.search.method,
         contentType: "application/json",
@@ -327,7 +328,6 @@ function getProdcutList(status, pageno) {
             $("#tmpl-order-list").tmpl({list: result.data, tab_status: status, action: btnStatus}).appendTo("#order-list");
             $("#tmpl-order-head-list").tmpl({tab_status: status}).appendTo("#order-head-list");
 
-            // set orderby icon status
             $('.orderby').each(function() {
                 if ($(this).find('.use-icon').data('order-col') == searchObj.orderByColmun) {
                     if (searchObj.orderByDesc == 1) {
@@ -457,19 +457,19 @@ function showDetail() {
 }
 
 function initSelectItems(elemId, tmplId, listData) {
-
     var $selectDropdown = $('#' + elemId).empty().html('');
-
     $('#' + tmplId).tmpl({list: listData}).appendTo('#' + elemId);
     $('#' + elemId).material_select();
 }
 
 function loading() {
     $('.load-data-holder').toggleClass("active");
+    $('body').addClass('hidden-scroll');
 }
 
 function finishLoading() {
     $('.load-data-holder').toggleClass("active");
+    $('body').removeClass('hidden-scroll');
 }
 
 function updatePagination(status, pagesize, pageno, totalsize) {

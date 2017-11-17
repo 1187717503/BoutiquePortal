@@ -1,3 +1,7 @@
+.hidden-scroll {
+    overflow-y: hidden;
+}
+
 #main {
     padding-left: 0;
     margin: 12px;
