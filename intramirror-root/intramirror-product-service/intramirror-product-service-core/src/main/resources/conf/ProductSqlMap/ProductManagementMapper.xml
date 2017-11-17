@@ -133,10 +133,10 @@
 
             </when>
             <when test="exception == 1">
-                AND product_exception.status = 1
+                AND exception.status = 1
             </when>
             <otherwise>
-                AND (product_exception.status IS NULL or product_exception.status != 1)
+                AND (exception.status IS NULL or exception.status != 1)
             </otherwise>
         </choose>
         <if test="exception != null and exception != 0">
