@@ -3,9 +3,6 @@ if (!token) {
     token = localStorage.getItem('token');
 }
 
-token="eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNjEiLCJpYXQiOjE1MTA4OTEwNjJ9.zKNXfAHqPq-AzbCIicmKJGxTUbJr0vvs9k42gDjqCdXCGqJ78DW3w0gNSQC046WDRwO340xtdXjIXK7Zxu0D9Q";
-
-
 function initBrand() {
 
     $.ajax({
