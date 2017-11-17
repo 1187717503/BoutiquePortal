@@ -82,14 +82,14 @@ public class ApiUpdateStockSerivce {
                 resultMap.put("status",StatusType.WARNING);
                 resultMap.put("warningMaps",warningList);
             }
+            if(conn != null) {conn.commit();conn.close(); }
         } catch (UpdateException e) {
             resultMap = ApiCommonUtils.errorMap(e.getErrorType(),e.getKey(),e.getValue());
+            if(conn != null) {conn.commit();conn.close(); }
         } catch (Exception e) {
             e.printStackTrace();
             resultMap = ApiCommonUtils.errorMap(ApiErrorTypeEnum.errorType.error_runtime_exception,"errorMessage",ExceptionUtils.getExceptionDetail(e));
             if(conn != null) {conn.rollback();conn.close(); }
-        } finally {
-            if(conn != null) {conn.commit();conn.close(); }
         }
         return resultMap;
     }

@@ -29,6 +29,14 @@
             <properties>
                 <profiles.active>test</profiles.active>
             </properties>
+
+        </profile>
+
+        <profile>
+            <id>test_local</id>
+            <properties>
+                <profiles.active>test_local</profiles.active>
+            </properties>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
@@ -181,6 +189,7 @@
                     <exclude>prd/*</exclude>
                     <exclude>staging/*</exclude>
                     <exclude>test/*</exclude>
+                    <exclude>test_local/*</exclude>
                 </excludes>
             </resource>
             <resource>

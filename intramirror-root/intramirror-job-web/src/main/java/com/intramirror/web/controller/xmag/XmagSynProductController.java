@@ -244,7 +244,7 @@ public class XmagSynProductController implements InitializingBean {
 				}
 
 				for(String key : colorMap.keySet()) {
-					Map<String,Object> newProduct = product;
+					Map<String,Object> newProduct = new HashMap<>(product);
 					Map<String, Object> newItems = com.alibaba.fastjson15.JSONObject.parseObject(newProduct.get("items").toString());
 					newItems.put("item",colorMap.get(key));
 					newProduct.put("items",newItems);
@@ -258,6 +258,21 @@ public class XmagSynProductController implements InitializingBean {
 		return mapList;
 	}
 
+	public static void main(String[] args) {
+		Map<String,Object> m = new HashMap<>();
+		m.put("a","1");
+		System.out.println(new Gson().toJson(m));
+
+		Map<String,Object> a = new HashMap<>(m) ;
+		a.put("b","n");
+		System.out.println(new Gson().toJson(a));
+		System.out.println(new Gson().toJson(m));
+
+		List<Map<String,Object>> l = new ArrayList<>();
+		l.add(m);
+
+		System.out.println(new Gson().toJson(l));
+	}
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		ThreadPoolExecutor xmag_all_updateProduct_executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();

@@ -46,7 +46,7 @@
           <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service" /> 
     </context:component-scan>
 
-    <beans profile="sit">
+    <!--<beans profile="sit">
         <context:property-placeholder location="classpath:/test/rocketmq.properties"/>
     </beans>
     <beans profile="shenv">
@@ -57,5 +57,5 @@
     </beans>
     <beans profile="shprd">
         <context:property-placeholder location="classpath:/prd/rocketmq.properties"/>
-    </beans>
+    </beans>-->
 </beans>
