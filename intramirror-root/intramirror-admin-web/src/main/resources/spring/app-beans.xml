@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:util="http://www.springframework.org/schema/util"
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:tx="http://www.springframework.org/schema/tx"
-	xsi:schemaLocation="
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
         http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/mvc
@@ -19,21 +19,21 @@
         http://www.springframework.org/schema/aop 
         http://www.springframework.org/schema/aop/spring-aop.xsd">
 
-	<!-- start 加载其它Jar的配置文件 -->
-	<import resource="classpath*:/conf/app-datasource.xml" />
-	<!-- end 加载其它Jar的配置文件 -->
-	
-	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">  
-		<property name="dataSource" ref="dataSource" />  
-	</bean>  
-	 <!-- 开启事务控制的注解支持 -->  
-    <tx:annotation-driven transaction-manager="transactionManager"/> 
-    
-     <!--Spring中bean获取的工具类-->
-	<bean id="springContextUtils" class="com.intramirror.web.common.SpringContextUtils" />
+    <!-- start 加载其它Jar的配置文件 -->
+    <import resource="classpath*:/conf/app-datasource.xml"/>
+    <!-- end 加载其它Jar的配置文件 -->
 
-	<!-- start spring 自动注解,及解决ReponseBody中文乱码问题 -->
-	<mvc:annotation-driven>
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!-- 开启事务控制的注解支持 -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!--Spring中bean获取的工具类-->
+    <bean id="springContextUtils" class="com.intramirror.web.common.SpringContextUtils"/>
+
+    <!-- start spring 自动注解,及解决ReponseBody中文乱码问题 -->
+    <mvc:annotation-driven>
         <mvc:message-converters>
             <bean id="mappingJacksonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
                 <property name="supportedMediaTypes">
@@ -56,27 +56,35 @@
             </bean>
         </mvc:message-converters>
     </mvc:annotation-driven>
-	<!-- end spring 自动注解,及解决ReponseBody中文乱码问题 -->
+    <!-- end spring 自动注解,及解决ReponseBody中文乱码问题 -->
 
-	
-	<!-- 自动扫描 -->
-	<context:component-scan base-package="com.intramirror">
-	<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
-	</context:component-scan>
+
+    <!-- 自动扫描 -->
+    <context:component-scan base-package="com.intramirror">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
 
     <bean name="orderProperties" class="com.intramirror.web.common.CommonProperties">
         <property name="appOrderUrl" value="${app.order.url}"></property>
         <property name="appCheckUrl" value="${app.check.url}"></property>
     </bean>
     <beans profile="test">
-        <context:property-placeholder location="classpath:test/common.properties" ignore-unresolvable="true" />
+        <context:property-placeholder location="classpath:test/common.properties" ignore-unresolvable="true"/>
     </beans>
 
     <beans profile="staging">
-        <context:property-placeholder location="classpath:staging/common.properties" ignore-unresolvable="true" />
+        <context:property-placeholder location="classpath:staging/common.properties" ignore-unresolvable="true"/>
+    </beans>
+
+    <beans profile="test_local">
+        <context:property-placeholder location="classpath:test_local/common.properties" ignore-unresolvable="true"/>
+    </beans>
+
+    <beans profile="staging_local">
+        <context:property-placeholder location="classpath:staging_local/common.properties" ignore-unresolvable="true"/>
     </beans>
 
     <beans profile="prd">
-        <context:property-placeholder location="classpath:prd/common.properties" ignore-unresolvable="true" />
+        <context:property-placeholder location="classpath:prd/common.properties" ignore-unresolvable="true"/>
     </beans>
 </beans>

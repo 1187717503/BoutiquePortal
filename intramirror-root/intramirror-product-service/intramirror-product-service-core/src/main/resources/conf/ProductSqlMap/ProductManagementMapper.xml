@@ -225,7 +225,7 @@
             LEFT JOIN (SELECT
             product_id,
             sku_id,
-            status
+            max(status) AS status
             FROM product_exception
             GROUP BY product_id) exception
             ON product.product_id = exception.product_id
