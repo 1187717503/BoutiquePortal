@@ -29,8 +29,14 @@
         <if test="stock != null and stock != 0">
             LEFT JOIN view_prod_store_sum ON view_prod_store_sum.product_id = product.product_id
         </if>
-        <if test="exception != null and exception != 0">
-            LEFT JOIN product_exception ON product_exception.product_id = product.product_id
+        <if test="exception !=  null and exception != 0">
+            LEFT JOIN (SELECT
+            product_id,
+            sku_id,
+            max(status) AS status
+            FROM product_exception
+            GROUP BY product_id) exception
+            ON product.product_id = exception.product_id
         </if>
         WHERE 1=1
         <if test="status != -1">
