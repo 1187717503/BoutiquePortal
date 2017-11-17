@@ -1,7 +1,3 @@
-let token = sessionStorage.getItem('token');
-if (!token) {
-    token = localStorage.getItem('token');
-}
 
 function initBrand() {
 

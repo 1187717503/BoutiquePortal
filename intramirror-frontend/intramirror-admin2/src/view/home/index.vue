@@ -50,6 +50,14 @@
             <a href="/admin-frontend/product-status/index.html" active-class="hover">Product Management</a>
           </div>
         </div>
+        <div class="item">
+          <i class="mdi mdi-tag"></i>
+          <span>Content Management</span>
+          <div class="tow-nav">
+            <a href="/admin-frontend/content-management/index.html" active-class="hover">Assign Product Tag</a>
+            <a href="/admin-frontend/content-management/detail.html" active-class="hover">Detail</a>
+          </div>
+        </div>
       </div>
     </div>
     <router-view class="main"></router-view>
