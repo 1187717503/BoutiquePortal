@@ -1,13 +1,19 @@
 package com.intramirror.web.controller.api.service;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson15.JSONArray;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import pk.shoplus.common.FileUploadHelper;
 import pk.shoplus.enums.ApiErrorTypeEnum;
 import pk.shoplus.parameter.StatusType;
+import pk.shoplus.util.ExceptionUtils;
 
 /**
  * Created by dingyifan on 2017/11/11.
@@ -57,7 +63,7 @@ public class ApiCommonUtils {
         resultMap.put("info",errorType.getDesc());
         resultMap.put("key",key);
         resultMap.put("value",value);
-        resultMap.put("error_enum",errorType);
+        resultMap.put("error_enum",errorType.getCode());
         logger.info("ApiCommonUtils,errorMap,outputParams,resultMap:" + JSONObject.toJSONString(resultMap));
         return resultMap;
     }
@@ -75,4 +81,25 @@ public class ApiCommonUtils {
         }
         return str;
     }
+
+    public static String downloadImgs (String originImg) {
+        List<String> newList = new ArrayList<>();
+        if(StringUtils.isNotBlank(originImg)) {
+            try {
+                List<String> originList = JSONArray.parseArray(originImg, String.class);
+                for (String origin : originList) {
+                    List<String> downList = FileUploadHelper.uploadFileByImgUrl2(origin);
+                    if(downList != null && downList.size() > 0) {
+                        newList.add(downList.get(0));
+                    }
+                }
+            } catch (Exception e) {
+                logger.info("ApiCreateProductService,downloadImgs,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",originImg:"+originImg);
+                newList = new ArrayList<>();
+            }
+        }
+        return JSON.toJSONString(newList);
+    }
+
+
 }

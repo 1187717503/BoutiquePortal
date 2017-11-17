@@ -1110,7 +1110,7 @@ public class ProductService {
                     "inner join api_configuration ac on(ac.enabled = 1 and ac.api_configuration_id = acm.api_configuration_id)\n" +
                     "inner join category c on(c.enabled = 1 and c.category_id = acm.category_id)\n" +
                     "where acm.enabled = 1 and ac.vendor_id = '"+vendor_id+"'\n"+
-                    "and LOWER(acm.boutique_category_id) = LOWER('"+boutique_category_id+"')\n"+
+                    "and trim(acm.boutique_category_id) = trim('"+boutique_category_id+"')\n"+
                     " and c.category_id is not null ";
             logger.info("ProductService,getBoutiqueCategory,sql:"+sql);
             List<Map<String,Object>> categoryMap = productDao.executeBySql(sql, null);
@@ -1129,7 +1129,7 @@ public class ProductService {
                     "inner join `category`  c2 on(c1.`category_id` = c2.`parent_id` ) \n" +
                     "inner join `category`  c3 on(c2.`category_id` = c3.`parent_id` )\n" +
                     "where c1.`enabled`  = 1 and c2.`enabled`  = 1 and c3.`enabled`  = 1 \n" +
-                    "and c1.`name`  = '"+one+"' and c2.`name` = '"+two+"' and c3.`name` = '"+three+"'";
+                    "and c1.`name`  = trim('"+one+"') and c2.`name` = trim('"+two+"') and c3.`name` = trim('"+three+"')";
             logger.info("ProductService,getCategory,sql:"+sql);
             List<Map<String,Object>> categoryMap = productDao.executeBySql(sql, null);
             if(categoryMap != null && categoryMap.size() > 0) {
@@ -1141,15 +1141,31 @@ public class ProductService {
         return null;
     }
 
+    public boolean getNoImg(String brandName ,Long vendor_id){
+        try {
+            String sql = "select abm.`api_configuration_id` from `api_brand_map` abm \n"
+                    + "inner join `api_configuration`  ac (abm.`api_configuration_id` = ac.`api_configuration_id`  and ac.`enabled`  = 1 and abm.`enabled`  = 1) \n"
+                    + "where (abm.`brand_name`  = '"+brandName+"'  or abm.`boutique_brand_name` = '"+brandName+"' ) and abm.`no_img`  = 1 and ac.`vendor_id`  ="+vendor_id;
+            logger.info("ProductService,getNoImg,sql:"+sql);
+            List<Map<String,Object>> imgMap = productDao.executeBySql(sql,null);
+            if(imgMap == null || imgMap.size() == 0) {
+                return false;
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return true;
+    }
+
     public Map<String, Object> getThreeCategory(String vendor_id,String one,String two,String three) throws Exception {
         try {
             String sql = "select distinct c.category_id from api_category_map acm\n" +
                     "inner join api_configuration ac on(ac.enabled = 1 and ac.api_configuration_id = acm.api_configuration_id)\n" +
                     "inner join category c on(c.enabled = 1 and c.category_id = acm.category_id)\n" +
                     "where acm.enabled = 1 and ac.vendor_id = '"+vendor_id+"'\n"+
-                    "and LOWER(acm.boutique_first_category) = LOWER('"+one+"')\n"+
-                    "and LOWER(acm.boutique_second_category) = LOWER('"+two+"')\n"+
-                    "and LOWER(acm.boutique_third_category) = LOWER('"+three+"')\n"+
+                    "and trim(acm.boutique_first_category) = trim('"+one+"')\n"+
+                    "and trim(acm.boutique_second_category) = trim('"+two+"')\n"+
+                    "and trim(acm.boutique_third_category) = trim('"+three+"')\n"+
                     " and c.category_id is not null ";
             logger.info("ProductService,getThreeCategory,sql:"+sql);
             List<Map<String,Object>> categoryMap = productDao.executeBySql(sql, null);
@@ -1164,7 +1180,7 @@ public class ProductService {
 
     public Map<String,Object> getBrand(String brandName) throws Exception {
         try {
-            String sql  = "select b.brand_id,b.english_name from brand b where lower(b.english_name) = lower(\"" + brandName+ "\") and b.enabled = 1";
+            String sql  = "select b.brand_id,b.english_name from brand b where trim(b.english_name) = trim(\"" + brandName+ "\") and b.enabled = 1";
             logger.info("ProductService,getThreeCategory,sql:" + sql);
 
             List<Map<String,Object>> brandMap = productDao.executeBySql(sql, null);
@@ -1182,7 +1198,7 @@ public class ProductService {
             String sql  = "select abm.brand_id,b.english_name from `api_brand_map`  abm\n"
                     + "inner join `api_configuration`  ac on(abm.`api_configuration_id` = ac.`api_configuration_id`  and ac.`enabled`  = 1 and abm.`enabled`  = 1)\n"
                     +"inner join brand b on(b.brand_id = abm.brand_id and b.enabled = 1)"
-                    + "where ac.`vendor_id`  = "+vendor_id+" and lower(abm.`boutique_brand_name`)  =lower(\"" + brandName + "\")";
+                    + "where ac.`vendor_id`  = "+vendor_id+" and trim(abm.`boutique_brand_name`)  =trim(\"" + brandName + "\")";
             logger.info("ProductService,getThreeCategory,sql:" + sql);
 
             List<Map<String,Object>> brandMap = productDao.executeBySql(sql, null);
