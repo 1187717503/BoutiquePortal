@@ -86,6 +86,7 @@ public class ProductMgntController {
             productStateCountMap.put(stateEnum, Long.parseLong(item.get("count").toString()));
         }
         mergeOldState(productStateCountMap);
+        countALLState(productStateCountMap);
         return Response.status(StatusType.SUCCESS).data(productStateCountMap);
     }
 
@@ -110,6 +111,14 @@ public class ProductMgntController {
         productStateCountMap.put(StateEnum.SHOP_PROCESSING, countOldShopProcessing + countShopProcessing);
         productStateCountMap.remove(StateEnum.OLD_PROCESSING);
         productStateCountMap.remove(StateEnum.OLD_SHOP_PROCESSING);
+    }
+
+    private void countALLState(Map<StateEnum, Long> productStateCountMap) {
+        Long sum = 0L;
+        for (Map.Entry<StateEnum, Long> entry : productStateCountMap.entrySet()) {
+            sum += entry.getValue();
+        }
+        productStateCountMap.put(StateEnum.ALL, sum);
     }
 
     @GetMapping(value = "/list/{status}")
