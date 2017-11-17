@@ -57,6 +57,7 @@ public class ApiUpdateProductService {
         this.vendorOptions = vendorOptions ;
 
         Connection conn = null;
+
         try {
             conn = DBConnector.sql2o.beginTransaction();
 
@@ -282,15 +283,15 @@ public class ApiUpdateProductService {
         mappingCategory.put("category3",category3);
 
         if(StringUtils.isBlank(productOptions.getCategoryId())) {
-            this.setWarning(ApiErrorTypeEnum.errorType.data_can_not_find_mapping,"category", JSONObject.toJSONString(mappingCategory));
+            this.setWarning(ApiErrorTypeEnum.errorType.warning_data_can_not_find_mapping,"category", JSONObject.toJSONString(mappingCategory));
         }
 
         if(StringUtils.isBlank(productOptions.getBrandId())) {
-            this.setWarning(ApiErrorTypeEnum.errorType.data_can_not_find_mapping,"brand", brandName);
+            this.setWarning(ApiErrorTypeEnum.errorType.warning_data_can_not_find_mapping,"brand", brandName);
         }
 
         if(StringUtils.isBlank(mappingSeason)) {
-            this.setWarning(ApiErrorTypeEnum.errorType.data_can_not_find_mapping,"season", seasonCode);
+            this.setWarning(ApiErrorTypeEnum.errorType.warning_data_can_not_find_mapping,"season", seasonCode);
         }
     }
 
