@@ -40,7 +40,6 @@ function resetAll() {
             $(this).trigger('click');
         }
     })
-    $('#select-boutique').siblings('input').attr('placeholder', "All Boutique");
 }
 
 function initActionforBoutique() {
@@ -53,14 +52,17 @@ function initActionforBoutique() {
                 resetAll();
             }
         }
+
         $('#select-boutique').siblings('input').attr('title', getSelectedText());
     });
 }
 
 function getSelectedText() {
     let selected = '';
+    let anyChecked = false;
     $('#select-boutique').siblings('ul.select-dropdown').find('li').each(function() {
         if ($(this).find('input').prop('checked')) {
+            anyChecked = true;
             if (selected !== '') {
                 selected += ',';
             }
@@ -70,7 +72,12 @@ function getSelectedText() {
                 selected += t;
             }
         }
-    })
+    });
+
+    if (!anyChecked) {
+        $('#select-boutique').siblings('input').attr('placeholder', "All Boutique");
+    }
+
     return selected;
 }
 
