@@ -29,7 +29,7 @@ public class SearchCondition {
 
     private String exception;
 
-    private ContentAdditionalCondition contentAdditionalCondition;
+    private ContentAdditionalCondition addition;
 
     @Override
     public String toString() {
@@ -37,7 +37,7 @@ public class SearchCondition {
                 + boutiqueId + '\'' + ", brandId='" + brandId + '\'' + ", categoryId=" + categoryId + ", season='" + season + '\'' + ", designerId='"
                 + designerId + '\'' + ", colorCode='" + colorCode + '\'' + ", image='" + image + '\'' + ", modelImage='" + modelImage + '\'' + ", streetImage='"
                 + streetImage + '\'' + ", stock='" + stock + '\'' + ", start=" + start + ", count=" + count + ", orderBy='" + orderBy + '\'' + ", desc='" + desc
-                + '\'' + ", exception='" + exception + '\'' + ", contentAdditionalCondition=" + contentAdditionalCondition + '}';
+                + '\'' + ", exception='" + exception + '\'' + ", addition=" + addition + '}';
     }
 
     public int getStatus() {
@@ -184,12 +184,12 @@ public class SearchCondition {
         this.exception = exception;
     }
 
-    public ContentAdditionalCondition getContentAdditionalCondition() {
-        return contentAdditionalCondition;
+    public ContentAdditionalCondition getAddition() {
+        return addition;
     }
 
-    public void setContentAdditionalCondition(ContentAdditionalCondition contentAdditionalCondition) {
-        this.contentAdditionalCondition = contentAdditionalCondition;
+    public void setAddition(ContentAdditionalCondition addition) {
+        this.addition = addition;
     }
 
 }

@@ -132,17 +132,19 @@ public class ProductMgntController {
             @RequestParam(value = "desc",required = false) String desc,
             @RequestParam(value = "exception",required = false) String exception,
             //Additional
-            @RequestParam(value = "minBoutiqueDiscount",required = false) Integer minBoutiqueDiscount,
-            @RequestParam(value = "maxBoutiqueDiscount",required = false) Integer maxBoutiqueDiscount,
-            @RequestParam(value = "minIMDiscount",required = false) Integer minIMDiscount,
-            @RequestParam(value = "maxIMDiscount",required = false) Integer maxIMDiscount,
+            @RequestParam(value = "minBoutiqueDiscount",required = false) Float minBoutiqueDiscount,
+            @RequestParam(value = "maxBoutiqueDiscount",required = false) Float maxBoutiqueDiscount,
+            @RequestParam(value = "minIMDiscount",required = false) Float minIMDiscount,
+            @RequestParam(value = "maxIMDiscount",required = false) Float maxIMDiscount,
             @RequestParam(value = "minStock",required = false) Long minStock,
             @RequestParam(value = "maxStock",required = false) Long maxStock,
+            @RequestParam(value = "saleAtFrom",required = false) Long saleAtFrom,
+            @RequestParam(value = "saleAtTo",required = false) Long saleAtTo,
             @RequestParam(value = "tag",required = false) String tag) {
     // @formatter:on
         SearchCondition searchCondition = initCondition(status, vendorId, boutiqueId, brandId, categoryId, season, designerId, colorCode, image, modelImage,
                 streetImage, stock, pageSize, pageNo, orderBy, desc, exception, minBoutiqueDiscount, maxBoutiqueDiscount, minIMDiscount, maxIMDiscount,
-                minStock, maxStock, tag);
+                minStock, maxStock, saleAtFrom, saleAtTo, tag);
         LOGGER.info("{}", searchCondition);
         LOGGER.info("status: {}, shop status: {}", getStatusEnum(status).getProductStatus(), getStatusEnum(status).getShopProductStatus());
         List<Map<String, Object>> productList;
@@ -173,12 +175,14 @@ public class ProductMgntController {
              String desc,
              String exception,
             //Additional
-             Integer minBoutiqueDiscount,
-             Integer maxBoutiqueDiscount,
-             Integer minIMDiscount,
-             Integer maxIMDiscount,
+             Float minBoutiqueDiscount,
+             Float maxBoutiqueDiscount,
+             Float minIMDiscount,
+             Float maxIMDiscount,
              Long minStock,
              Long maxStock,
+             Long saleAtFrom,
+             Long saleAtTo,
              String tag
     // @formatter:on
     ) {
@@ -201,26 +205,29 @@ public class ProductMgntController {
         searchCondition.setCount((pageSize == null || pageSize < 0) ? 25 : pageSize);
         searchCondition.setOrderBy(orderBy);
         searchCondition.setException(exception);
-        if ((minBoutiqueDiscount != null && maxBoutiqueDiscount != null) || (minIMDiscount != null && maxIMDiscount != null) || (minStock != null
-                && maxStock != null) || tag != null) {
-            ContentAdditionalCondition contentAdditionalCondition = new ContentAdditionalCondition();
-            searchCondition.setContentAdditionalCondition(contentAdditionalCondition);
-            if (minBoutiqueDiscount != null && maxBoutiqueDiscount != null) {
-                contentAdditionalCondition.setMinBoutiqueDiscount(minBoutiqueDiscount);
-                contentAdditionalCondition.setMaxBoutiqueDiscount(maxBoutiqueDiscount);
-            }
-            if (minIMDiscount != null && maxIMDiscount != null) {
-                contentAdditionalCondition.setMinIMDiscount(minIMDiscount);
-                contentAdditionalCondition.setMaxIMDiscount(maxIMDiscount);
-            }
-            if (minStock != null && maxStock != null) {
-                contentAdditionalCondition.setMinStock(minStock);
-                contentAdditionalCondition.setMaxStock(maxStock);
-            }
-            if (tag != null) {
-                contentAdditionalCondition.setTag(tag);
-            }
+        ContentAdditionalCondition contentAdditionalCondition = new ContentAdditionalCondition();
+        searchCondition.setAddition(contentAdditionalCondition);
+
+        if (minBoutiqueDiscount != null && maxBoutiqueDiscount != null) {
+            contentAdditionalCondition.setMinBoutiqueDiscount(minBoutiqueDiscount);
+            contentAdditionalCondition.setMaxBoutiqueDiscount(maxBoutiqueDiscount);
         }
+        if (minIMDiscount != null && maxIMDiscount != null) {
+            contentAdditionalCondition.setMinIMDiscount(minIMDiscount);
+            contentAdditionalCondition.setMaxIMDiscount(maxIMDiscount);
+        }
+        if (minStock != null && maxStock != null) {
+            contentAdditionalCondition.setMinStock(minStock);
+            contentAdditionalCondition.setMaxStock(maxStock);
+        }
+        if (saleAtFrom != null && saleAtTo != null) {
+            contentAdditionalCondition.setSaleAtFrom(saleAtFrom);
+            contentAdditionalCondition.setSaleAtTo(saleAtTo);
+        }
+        if (tag != null) {
+            contentAdditionalCondition.setTag(tag);
+        }
+
         return searchCondition;
     }
 
@@ -251,21 +258,21 @@ public class ProductMgntController {
         }
         if (price.get("boutique_price") != null) {
             Double boutique_price = Double.parseDouble(price.get("boutique_price").toString());
-            BigDecimal b = new BigDecimal(boutique_price / retailPrice * 1.22);
+            BigDecimal b = new BigDecimal(1 - boutique_price / retailPrice * 1.22);
             Double discount = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-            price.put("boutique_discount", 1 - discount);
+            price.put("boutique_discount", discount);
         }
         if (price.get("im_price") != null) {
             Double boutique_price = Double.parseDouble(price.get("im_price").toString());
-            BigDecimal b = new BigDecimal(boutique_price / retailPrice);
+            BigDecimal b = new BigDecimal(1 - boutique_price / retailPrice);
             Double discount = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-            price.put("im_discount", 1 - discount);
+            price.put("im_discount", discount);
         }
         if (price.get("sale_price") != null) {
             Double boutique_price = Double.parseDouble(price.get("sale_price").toString());
-            BigDecimal b = new BigDecimal(boutique_price / retailPrice);
+            BigDecimal b = new BigDecimal(1 - boutique_price / retailPrice);
             Double discount = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-            price.put("sale_discount", 1 - discount);
+            price.put("sale_discount", discount);
         }
     }
 
