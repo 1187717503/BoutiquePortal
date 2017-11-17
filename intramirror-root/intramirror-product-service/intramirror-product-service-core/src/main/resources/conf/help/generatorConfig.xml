@@ -5,17 +5,17 @@
 
     <!-- mybatis-generator:generate -->
     <classPathEntry
-            location="C:\Users\Admin\.m2\repository\mysql\mysql-connector-java\5.1.39\mysql-connector-java-5.1.39.jar"/>  <!-- 配置JAR驱动 -->
+            location="C:\Users\YouFeng.Zhu\.m2\repository\mysql\mysql-connector-java\5.1.39\mysql-connector-java-5.1.39.jar"/>  <!-- 配置JAR驱动 -->
 
-    <context id="context1" targetRuntime="MyBatis3">
+    <context id="context1" defaultModelType="flat" targetRuntime="MyBatis3">
         <commentGenerator>
             <property name="suppressAllComments" value="false"/> <!-- 是否取消注释 -->
             <property name="suppressDate" value="true"/> <!-- 是否生成注释时间戳 -->
         </commentGenerator>
 
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://rm-j6ca0o19fn5755pu8o.mysql.rds.aliyuncs.com:3306/intra-mirror-prd?useUnicode=true&amp;characterEncoding=UTF-8"
-                        userId="intramirror_db" password="Com105980%"/> <!-- JDBC连接 -->
+                        connectionURL="jdbc:mysql://rm-uf66f4a55b173k4cwo.mysql.rds.aliyuncs.com:3306/sha-testing-db?useUnicode=true&amp;characterEncoding=UTF-8"
+                        userId="sha_testing_db" password="Intr@mi55o5"/> <!-- JDBC连接 -->
 
         <javaTypeResolver>
             <property name="forceBigDecimals" value="false"/> <!-- 是否使用bigDecimal， false可自动转化以下类型(Long, Integer, Short, etc.) -->
@@ -34,7 +34,7 @@
                              targetProject="C:\work\repos\BoutiquePortal\intramirror-root\intramirror-product-service\intramirror-product-service-core\src\main\java"
                              type="XMLMAPPER"/> <!-- 生成MAP对应Client -->
 
-        <table schema="intra-mirror-prd" tableName="product" domainObjectName="Product"
+        <table schema="sha_testing_db" tableName="block" domainObjectName="Block"
                enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
                enableSelectByExample="false" selectByExampleQueryId="false">
             <property name="useActualColumnNames" value="false"/>
