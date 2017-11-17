@@ -133,7 +133,7 @@
                 AND (product_exception.status IS NULL or product_exception.status != 1)
             </otherwise>
         </choose>
-        <if test="exception == 1">
+        <if test="exception == null or exception == 0">
             GROUP BY product.product_id
         </if>
         ORDER BY
