@@ -355,6 +355,7 @@ public class ApiUpdateStockSerivce {
 
         logger.info("ApiUpdateStockSerivce,updateStock,inputParams,skuStoreMap:"+JSONObject.toJSONString(skuStoreMap));
         SkuStoreService skuStoreService = new SkuStoreService(conn);
+        int originQty = Integer.parseInt(stockOption.getQuantity());
         int qty = Integer.parseInt(stockOption.getQuantity());
         int type = Integer.parseInt(stockOption.getType());
         int rs = 0;
@@ -420,9 +421,9 @@ public class ApiUpdateStockSerivce {
         logger.info("ApiUpdateStockSerivce,updateStock,outputParams,skuStore:"+JSONObject.toJSONString(skuStore));
 
         // 当库存小于0，或低于100时，库存在这被清零，然后报警告
-        if((qty < 0 || qty > 100) && Contants.STOCK_QTY == type) {
+        if((originQty < 0 || originQty > 100) && Contants.STOCK_QTY == type) {
             this.setWarning(ApiErrorTypeEnum.errorType.warning_stock_out_off,"store",stockOption.getQuantity());
-        } else if((qty < -100 || qty > 100) && Contants.STOCK_QTY_DIFF == type) {
+        } else if((originQty < -100 || originQty > 100) && Contants.STOCK_QTY_DIFF == type) {
             this.setWarning(ApiErrorTypeEnum.errorType.warning_stock_out_off,"store",stockOption.getQuantity());
         }
     }

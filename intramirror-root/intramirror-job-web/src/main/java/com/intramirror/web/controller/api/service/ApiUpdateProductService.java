@@ -3,6 +3,7 @@ package com.intramirror.web.controller.api.service;
 import com.alibaba.fastjson.JSONObject;
 import static com.intramirror.web.controller.api.service.ApiCommonUtils.escape;
 import com.intramirror.web.mapping.vo.StockOption;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -14,11 +15,16 @@ import org.sql2o.Connection;
 import pk.shoplus.DBConnector;
 import pk.shoplus.common.Contants;
 import pk.shoplus.enums.ApiErrorTypeEnum;
+import pk.shoplus.enums.ProductPropertyEnumKeyName;
+import pk.shoplus.model.CategoryProductInfo;
 import pk.shoplus.model.Product;
 import pk.shoplus.model.ProductEDSManagement;
+import pk.shoplus.model.ProductInfo;
 import pk.shoplus.model.ProductProperty;
 import pk.shoplus.parameter.EnabledType;
 import pk.shoplus.parameter.StatusType;
+import pk.shoplus.service.CategoryProductInfoService;
+import pk.shoplus.service.ProductInfoService;
 import pk.shoplus.service.ProductPropertyService;
 import pk.shoplus.service.ProductService;
 import pk.shoplus.util.ExceptionUtils;
@@ -57,10 +63,21 @@ public class ApiUpdateProductService {
             this.checkProductParams(conn);
             this.checkMappingParams(conn);
 
-            // 更新product
+            // update product,product_property
             this.setProduct(conn);
 
-            resultMap = ApiCommonUtils.successMap();
+            // update product_info
+            this.setProductInfo(conn);
+
+            // update sku
+            this.setSku(conn);
+
+            if(warningList == null || warningList.size() == 0) {
+                resultMap = ApiCommonUtils.successMap();
+            } else {
+                resultMap.put("status",StatusType.WARNING);
+                resultMap.put("warningMaps",warningList);
+            }
         } catch (UpdateException e) {
             resultMap = ApiCommonUtils.errorMap(e.getErrorType(),e.getKey(),e.getValue());
         } catch (Exception e) {
@@ -71,6 +88,51 @@ public class ApiUpdateProductService {
             if(conn != null) {conn.commit();conn.close();}
         }
         return resultMap;
+    }
+
+    public void setSku(Connection conn) throws Exception {
+        if(this.stockOptions != null && this.stockOptions.size() > 0) {
+            ApiUpdateStockSerivce apiUpdateStockSerivce = new ApiUpdateStockSerivce();
+            for(StockOption stockOption : stockOptions) {
+
+                logger.info("ApiUpdateProductService,setSku,updateStock,stockOption:"+JSONObject.toJSONString(stockOption));
+                Map<String,Object> resultMap = apiUpdateStockSerivce.updateStock(stockOption);
+                logger.info("ApiUpdateProductService,setSku,updateStock,resultMap:"+JSONObject.toJSONString(resultMap));
+
+                if(resultMap != null && !resultMap.get("status").toString().equals("1")) {
+                    List<Map<String,Object>> warningList = (List<Map<String, Object>>) resultMap.get("warningMaps");
+                    this.warningList.addAll(warningList);
+                }
+            }
+        }
+    }
+
+    public void setProductInfo(Connection conn) throws Exception{
+        CategoryProductInfoService categoryProductInfoService = new CategoryProductInfoService(conn);
+        Map<String,Object> categoryProductInfoMap = new HashMap<>();
+        categoryProductInfoMap.put("enabled",EnabledType.USED);
+        categoryProductInfoMap.put("category_id",this.uProduct.getCategory_id());
+        List<CategoryProductInfo> categoryProductInfoList = categoryProductInfoService.getCategoryProductInfoListByCondition(categoryProductInfoMap);
+        if(categoryProductInfoList != null && categoryProductInfoList.size() >0) {
+            CategoryProductInfo categoryProductInfo = categoryProductInfoList.get(0);
+            ProductInfoService productInfoService = new ProductInfoService(conn);
+
+            Map<String,Object> productInfoConditions = new HashMap<>();
+            productInfoConditions.put("category_prodcut_info_id",categoryProductInfo.category_product_info_id);
+            productInfoConditions.put("product_id",this.uProduct.getProduct_id());
+            productInfoConditions.put("enabled",EnabledType.USED);
+            List<ProductInfo> productInfos = productInfoService.getProductInfoByCondition(productInfoConditions);
+
+            if(productInfos != null && productInfos.size() > 0) {
+                ProductInfo productInfo = productInfos.get(0);
+                productInfo.weight_amount = new BigDecimal(productOptions.getWeight());
+                productInfo.length_amount = new BigDecimal(productOptions.getLength());
+                productInfo.width_amount = new BigDecimal(productOptions.getWeight());
+                productInfo.height_amount = new BigDecimal(productOptions.getHeigit());
+                productInfoService.updateProductInfoById(productInfo);
+                logger.info("ApiUpdateProductService,setProductInfo,productInfo:"+JSONObject.toJSONString(productInfo));
+            }
+        }
     }
 
     private void setProduct(Connection conn) throws Exception{
@@ -101,7 +163,6 @@ public class ApiUpdateProductService {
             product.setSeason_code(seasonCode);
         }
 
-
         // 获取新的BrandID和ColorCode
         String newBrandCode = productOptions.getBrandCode();
         String newColorCode = productOptions.getColorCode();
@@ -120,10 +181,12 @@ public class ApiUpdateProductService {
         // 如果消息重置时,BrandID和ColorCode不为空,直接更新
         if(modify) {
             if(StringUtils.isNotBlank(newBrandCode)) {
+                this.updateProductProperty(conn,product.getProduct_id(), ProductPropertyEnumKeyName.BrandID.getCode(),newBrandCode);
                 product.designer_id = newBrandCode;
             }
 
             if(StringUtils.isNotBlank(newColorCode)) {
+                this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.ColorCode.getCode(),newBrandCode);
                 product.color_code = newColorCode;
             }
         } else { // 非消息重置时,BrandID和ColorCode和原来不一致或者为空报警告
@@ -138,6 +201,9 @@ public class ApiUpdateProductService {
 
         ProductService productService = new ProductService(conn);
         productService.updateProduct(product);
+
+        this.updateProductProperty(conn,product.getProduct_id(), ProductPropertyEnumKeyName.CarryOver.getCode(),productOptions.getCarryOver());
+
     }
 
     private void checkMappingParams(Connection conn) throws Exception {
@@ -319,7 +385,7 @@ public class ApiUpdateProductService {
                 stockOption.setVendor_id(vendor_id.toString());
                 stockOption.setProductCode(product_code);
                 stockOption.setPrice(price);
-                stockOption.setLast_check(new Date());
+                stockOption.setLast_check(productOptions.getLast_check());
                 stockOptions.add(stockOption);
             }
         }
