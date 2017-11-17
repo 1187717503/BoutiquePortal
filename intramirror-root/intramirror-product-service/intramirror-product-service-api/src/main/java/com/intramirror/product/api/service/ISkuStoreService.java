@@ -7,7 +7,6 @@ public interface ISkuStoreService {
 
     /**
      * 根据SkuId修改库存相关信息
-     *
      * @param statusType-订单的状态
      *         skuid
      * @return
@@ -18,7 +17,6 @@ public interface ISkuStoreService {
 
     /**
      * 根据skuId修改确认库存
-     *
      * @param shopProductSkuId
      * @return
      */
@@ -26,7 +24,6 @@ public interface ISkuStoreService {
 
     /**
      * 根据shopProductSkuId 查询SKUid
-     *
      * @param shopProductSkuId
      * @return
      */
@@ -43,5 +40,7 @@ public interface ISkuStoreService {
     Long getTotalStockByProductId(Long productId);
 
     List<Map<String, Object>> listTotalStockByProductIds(List<Long> productIds);
+
+    List<Map<String, Object>> getSkuStoreBySkuId(String[] skuIdString);
 
 }

@@ -47,6 +47,11 @@
         <if test="statusType == 3 ">
             set ss.confirm = ss.confirm - 1,ss.ship = ss.ship + 1
         </if>
+
+        <!-- 异常商品，强制清零库存 -->
+        <if test="statusType == 6 ">
+            set ss.`confirmed` = 0,ss.`store` = (0 - abs(cast(ss.`reserved` as signed)))
+        </if>
         where ss.sku_id = #{skuId,jdbcType=BIGINT}
 
     </update>
@@ -102,10 +107,14 @@
         sku_store.store,
         sku_store.reserved,
         sku_store.confirmed,
+        sku_store.last_check,
         sku.`size`,
-        sku.sku_code as bar_code
+        sku.sku_code as bar_code,
+        product_exception.status as exceptionStatus,
+        product_exception.created_at AS exceptionDate
         FROM sku_store
         INNER JOIN sku ON sku.sku_id = sku_store.sku_id
+        LEFT JOIN product_exception ON sku.sku_id = product_exception.sku_id AND product_exception.status != 0
         WHERE sku_store.product_id IN
         <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
             #{item.product_id}

@@ -1,3 +1,7 @@
+.hidden-scroll {
+    overflow-y: hidden;
+}
+
 #main {
     padding-left: 0;
     margin: 12px;
@@ -245,7 +249,18 @@
     width: 10%;
     text-align: center;
 }
-
+.head-detail-row .list-detail-item:nth-child(7) {
+    width: 10%;
+    text-align: center;
+}
+.head-detail-row .list-detail-item:nth-child(8) {
+    width: 10%;
+    text-align: center;
+}
+.head-detail-row .list-detail-item:nth-child(9) {
+    width: 10%;
+    text-align: center;
+}
 .list-detail-row .list-detail-item:nth-child(n) {
     background-color: #eee;
 }
@@ -270,6 +285,40 @@
 .list-detail-row .list-detail-item:nth-child(6) {
     width: 10%;
     text-align: center;
+}
+.list-detail-row .list-detail-item:nth-child(7) {
+    width: 10%;
+    text-align: center;
+}
+.list-detail-row .list-detail-item:nth-child(8) {
+    width: 10%;
+    text-align: center;
+}
+
+
+.exception-warning {
+    background-color: rgb(236, 126, 126) !important;
+}
+.exception-btn{
+    background-color: rgb(250, 250, 250) !important ;
+}
+
+.list-detail-row .list-detail-item .mini-btn{
+    height: 25px;
+    width: 50px;
+    padding: 0px;
+    font-size: xx-small;
+    line-height: 25px;
+    margin-left: 30px;
+}
+
+.list-detail-row .list-detail-item .mini-long-btn{
+    height: 25px;
+    width: 80px;
+    padding: 0px;
+    font-size: xx-small;
+    line-height: 25px;
+    margin-left: 10px;
 }
 
 

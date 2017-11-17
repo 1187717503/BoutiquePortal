@@ -19,7 +19,7 @@ function initBrand() {
         },
         error: function(code, xx) {
             if (code.status == 401) {
-                window.location.href = '../../login'
+                window.location.href = '../../../login'
             }
         }
     });
@@ -40,7 +40,6 @@ function resetAll() {
             $(this).trigger('click');
         }
     })
-    $('#select-boutique').siblings('input').attr('placeholder', "All Boutique");
 }
 
 function initActionforBoutique() {
@@ -53,14 +52,17 @@ function initActionforBoutique() {
                 resetAll();
             }
         }
+
         $('#select-boutique').siblings('input').attr('title', getSelectedText());
     });
 }
 
 function getSelectedText() {
     let selected = '';
+    let anyChecked = false;
     $('#select-boutique').siblings('ul.select-dropdown').find('li').each(function() {
         if ($(this).find('input').prop('checked')) {
+            anyChecked = true;
             if (selected !== '') {
                 selected += ',';
             }
@@ -70,7 +72,12 @@ function getSelectedText() {
                 selected += t;
             }
         }
-    })
+    });
+
+    if (!anyChecked) {
+        $('#select-boutique').siblings('input').attr('placeholder', "All Boutique");
+    }
+
     return selected;
 }
 
@@ -91,7 +98,7 @@ function initVendor() {
             initActionforBoutique();
         }, error : function (code, exception) {
             if (code.status == 401) {
-                window.location.href = '../../login'
+                window.location.href = '../../../login'
             }
         }
     });
@@ -122,7 +129,7 @@ function initCategory() {
 
         }, error : function (code, exception) {
             if (code.status == 401) {
-                window.location.href = '../../login'
+                window.location.href = '../../../login'
             }
         }
     });
@@ -145,7 +152,7 @@ function initSeason() {
         }, error: function(code, exception) {
 
             if (code.status == 401) {
-                window.location.href = '../../login'
+                window.location.href = '../../../login'
             }
         }
     });
@@ -178,6 +185,7 @@ function getFilterFromDom() {
     searchObj.image = $('#select-image').val();
     searchObj.modelImage = $('#select-model-image').val();
     searchObj.streetImage = $('#select-street-image').val();
+    searchObj.exception = $('#select-exception').val();
     searchObj.designerId = $('#text-designerId').val();
     searchObj.colorCode = $('#text-color-code').val();
     searchObj.boutiqueId = $('#text-boutique').val();
@@ -248,8 +256,11 @@ function getProdcutList(status, pageno) {
     filter += 'image='+ searchObj.image + '&';
     filter += 'modelImage='+ searchObj.modelImage + '&';
     filter += 'streetImage='+ searchObj.streetImage + '&';
+    filter += 'exception='+ searchObj.exception + '&';
 
     filter = filter.slice(0, filter.length - 1);
+
+    loading();
 
     $('#order-list').empty();
     $('#order-head-list').empty();
@@ -260,7 +271,6 @@ function getProdcutList(status, pageno) {
     let btnStatus = getBtnStatus(status);
     $("#tmpl-control-pannel").tmpl({list: btnStatus}).appendTo(".control-pannel");
    
-    loading();
     $.ajax({
         type: requestURL.search.method,
         contentType: "application/json",
@@ -325,7 +335,6 @@ function getProdcutList(status, pageno) {
             $("#tmpl-order-list").tmpl({list: result.data, tab_status: status, action: btnStatus}).appendTo("#order-list");
             $("#tmpl-order-head-list").tmpl({tab_status: status}).appendTo("#order-head-list");
 
-            // set orderby icon status
             $('.orderby').each(function() {
                 if ($(this).find('.use-icon').data('order-col') == searchObj.orderByColmun) {
                     if (searchObj.orderByDesc == 1) {
@@ -349,7 +358,7 @@ function getProdcutList(status, pageno) {
             finishLoading();
 
             if (result.status == 401) {
-                window.location.href = '../../login'
+                window.location.href = '../../../login'
             }
         }
     });
@@ -408,7 +417,7 @@ function getCountWithFilter(filter, tarStatus, pagesize, pageno){
             toashWithCloseBtn(result.responseJSON.message);
 
             if (result.status == 401) {
-                window.location.href = '../../login'
+                window.location.href = '../../../login'
             }
         }
     });
@@ -455,19 +464,19 @@ function showDetail() {
 }
 
 function initSelectItems(elemId, tmplId, listData) {
-
     var $selectDropdown = $('#' + elemId).empty().html('');
-
     $('#' + tmplId).tmpl({list: listData}).appendTo('#' + elemId);
     $('#' + elemId).material_select();
 }
 
 function loading() {
     $('.load-data-holder').toggleClass("active");
+    $('body').addClass('hidden-scroll');
 }
 
 function finishLoading() {
     $('.load-data-holder').toggleClass("active");
+    $('body').removeClass('hidden-scroll');
 }
 
 function updatePagination(status, pagesize, pageno, totalsize) {
@@ -669,7 +678,69 @@ function initActionEvent() {
 
                 finishLoading()
                 if (result.status == 401) {
-                    window.location.href = '../../login';
+                    window.location.href = '../../../login';
+                }
+            }
+        });
+
+    });
+
+
+    $('.exception-batch-action').click(function() {
+        let data = [];
+        let count = 0;
+        data.originalState = $('.tabs .tab a.active').data('status');
+        $('.product-list').each(function(idx, item) {
+            if ($(item).find('.item input[type=checkbox]').prop('checked')) {
+                $(item).find('.goods .exception').each(function(deatilIdx, detailItem){
+                    data.push($(detailItem).data('sku-id'));
+                })
+                count++;
+            }
+        })
+        
+        if (count == 0) {
+            Materialize.toast('Please select at least one', 3000);
+            return;
+        }
+        if (data.length == 0) {
+            Materialize.toast('No exception in selected product.', 3000);
+            return;
+        }
+        console.log(JSON.stringify(data));
+        loading();
+        $.ajax({
+            type: requestURL.updateProductException.method,
+            contentType: "application/json",
+            url: requestURL.updateProductException.url ,
+            data: JSON.stringify(data),
+            dataType: 'json',
+            beforeSend: function(request) {
+                request.setRequestHeader("token", token);
+            },
+            success: function(result) {
+                if (result.data.failed.length > 0) {
+                    let msg = '';
+                    for (var i = 0; i < result.data.failed.length; i++) {
+                        msg += result.data.failed[i].message + "<br/>";
+                    }
+                    toashWithCloseBtn(msg);
+                } else {
+                    Materialize.toast('Resolve Success', 3000);
+                }
+
+                // 获取当前页数
+                let current = $('.pagination .active.pagination-index').data('pageno') + 1;
+
+                getProdcutList(data.originalState, current);
+                finishLoading()
+                
+            }, error: function(result, resp, par) {
+                toashWithCloseBtn(result.responseJSON.message);
+
+                finishLoading()
+                if (result.status == 401) {
+                    window.location.href = '../../../login';
                 }
             }
         });
@@ -730,10 +801,71 @@ function initActionEvent() {
                 toashWithCloseBtn(result.responseJSON.message);
 
                 if (result.status == 401) {
-                    window.location.href = '../../login';
+                    window.location.href = '../../../login';
                 }
             }
         });
+    });
+
+    $('.product-list .exception-ops ').click(function() {
+        let skuId = $(this).parent().parent().data('sku-id');
+        let productId = $(this).parent().parent().data('product-id');
+        let action = $(this).data('action');
+
+
+
+        if(action === 'set0'){
+            let param = {};
+            param.productId = productId;
+            param.skuId = skuId;
+            $.ajax({
+                type: requestURL.saveProductException.method,
+                contentType: "application/json",
+                url: requestURL.saveProductException.url ,
+                data: JSON.stringify(param),
+                dataType: 'json',
+                beforeSend: function(request) {
+                    request.setRequestHeader("token", token);
+                },            
+                success: function(result) {
+                    let status = $('.tabs .tab a.active').data('status');
+                    Materialize.toast('Save success', 3000);
+                    let current = $('.pagination .active.pagination-index').data('pageno') + 1;
+                    getProdcutList(status, current);
+                }, error: function(result, resp, par) {
+                    toashWithCloseBtn(result.responseJSON.message);
+                    if (result.status == 401) {
+                        window.location.href = '../../../login';
+                    }
+                }
+            });
+        } else if(action === 'resolve'){
+            let param = [];
+            param.push(skuId);
+            $.ajax({
+                type: requestURL.updateProductException.method,
+                contentType: "application/json",
+                url: requestURL.updateProductException.url ,
+                data: JSON.stringify(param),
+                dataType: 'json',
+                beforeSend: function(request) {
+                    request.setRequestHeader("token", token);
+                },            
+                success: function(result) {
+                    let status = $('.tabs .tab a.active').data('status');
+                    Materialize.toast('Resolve success', 3000);
+                    let current = $('.pagination .active.pagination-index').data('pageno') + 1;
+                    getProdcutList(status, current);
+                }, error: function(result, resp, par) {
+                    toashWithCloseBtn(result.responseJSON.message);
+                    if (result.status == 401) {
+                        window.location.href = '../../../login';
+                    }
+                }
+            });
+        }
+        
+        
     });
 }
 

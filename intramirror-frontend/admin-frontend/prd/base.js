@@ -8,5 +8,7 @@ var requestURL = {
     "search" : {"url":baseUrl + "product/fetch/list", "method": "GET"},
     "productAction" : {"url": baseUrl + "product/operate/single" , "method": "PUT"},
     "getAllCount": {"url" : baseUrl + "product/fetch/state/count", "method" : "GET"},
-    "productBatchAction": {"url": baseUrl + "product/operate/batch" , "method": "PUT"}
+    "productBatchAction": {"url": baseUrl + "product/operate/batch" , "method": "PUT"},
+        "saveProductException": {"url": baseUrl + "product/exception/saveProductException" , "method": "POST"},
+    "updateProductException": {"url": baseUrl + "/product/exception/updateProductException" , "method": "PUT"}
 }

@@ -30,7 +30,6 @@ public class SkuStoreServiceImpl extends BaseDao implements ISkuStoreService {
 
     /**
      * 根据SkuId修改库存相关信息
-     *
      * @param statusType-订单的状态
      *         skuid
      * @return
@@ -48,7 +47,6 @@ public class SkuStoreServiceImpl extends BaseDao implements ISkuStoreService {
 
     /**
      * 根据skuId修改确认库存
-     *
      * @param shopProductSkuId
      * @return
      */
@@ -79,7 +77,6 @@ public class SkuStoreServiceImpl extends BaseDao implements ISkuStoreService {
 
     /**
      * 根据shopProductSkuId 查询SKUid
-     *
      * @param shopProductSkuId
      * @return
      */
@@ -126,6 +123,11 @@ public class SkuStoreServiceImpl extends BaseDao implements ISkuStoreService {
     @Override
     public List<Map<String, Object>> listTotalStockByProductIds(List<Long> productIds) {
         return skuStoreMapper.listTotalStockByProductIds(productIds);
+    }
+
+    @Override
+    public List<Map<String, Object>> getSkuStoreBySkuId(String[] skuIdString) {
+        return skuStoreMapper.getSkuStoreBySkuId(skuIdString);
     }
 
 }

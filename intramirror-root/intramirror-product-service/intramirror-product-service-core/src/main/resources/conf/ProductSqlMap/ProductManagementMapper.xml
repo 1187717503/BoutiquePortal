@@ -29,6 +29,15 @@
         <if test="stock != null and stock != 0">
             LEFT JOIN view_prod_store_sum ON view_prod_store_sum.product_id = product.product_id
         </if>
+        <if test="exception !=  null and exception != 0">
+            LEFT JOIN (SELECT
+            product_id,
+            sku_id,
+            max(status) AS status
+            FROM product_exception
+            GROUP BY product_id) exception
+            ON product.product_id = exception.product_id
+        </if>
         WHERE 1=1
         <if test="status != -1">
             <choose>
@@ -119,7 +128,20 @@
         <if test="colorCode != null">
             AND product.color_code = #{colorCode}
         </if>
+        <choose>
+            <when test="exception == null or exception == 0">
 
+            </when>
+            <when test="exception == 1">
+                AND exception.status = 1
+            </when>
+            <otherwise>
+                AND (exception.status IS NULL or exception.status != 1)
+            </otherwise>
+        </choose>
+        <if test="exception != null and exception != 0">
+            GROUP BY product.product_id
+        </if>
         ORDER BY
         <choose>
             <when test="orderBy == 'boutique'">
@@ -205,6 +227,15 @@
         <if test="stock != null and stock != 0">
             LEFT JOIN view_prod_store_sum ON view_prod_store_sum.product_id = product.product_id
         </if>
+        <if test="exception !=  null and exception != 0">
+            LEFT JOIN (SELECT
+            product_id,
+            sku_id,
+            max(status) AS status
+            FROM product_exception
+            GROUP BY product_id) exception
+            ON product.product_id = exception.product_id
+        </if>
         WHERE product.enabled = TRUE
         <choose>
             <when test="stock == null or stock == 0">
@@ -277,6 +308,17 @@
         <if test="colorCode != null">
             AND product.color_code = #{colorCode}
         </if>
+        <choose>
+            <when test="exception == null or exception == 0">
+
+            </when>
+            <when test="exception == 1">
+                AND exception.status = 1
+            </when>
+            <otherwise>
+                AND (exception.status IS NULL or exception.status != 1)
+            </otherwise>
+        </choose>
 
         GROUP BY product.status, shop_product.status;
     </select>

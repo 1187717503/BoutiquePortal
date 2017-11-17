@@ -16,14 +16,14 @@
     <!-- For Windows Phone -->
 
     <!-- CORE CSS-->
-    <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection">
-    <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection">
-    <link href="js/plugins/magnific-popup/magnific-popup.css" type="text/css" rel="stylesheet" media="screen,projection">
+    <link href="../css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection">
+    <link href="../css/style.css" type="text/css" rel="stylesheet" media="screen,projection">
+    <link href="../js/plugins/magnific-popup/magnific-popup.css" type="text/css" rel="stylesheet" media="screen,projection">
 
-    <link href="css/css-multi-level-menu/multi-menu.css" rel="stylesheet">
+    <link href="../css/css-multi-level-menu/multi-menu.css" rel="stylesheet">
     <!-- Customer CSS-->
-    <link href="css/custom/custom.css" type="text/css" rel="stylesheet" media="screen,projection">
-    <link href="css/index.css" type="text/css" rel="stylesheet" media="screen,projection">
+    <link href="../css/custom/custom.css" type="text/css" rel="stylesheet" media="screen,projection">
+    <link href="../css/index.css" type="text/css" rel="stylesheet" media="screen,projection">
 
 </head>
 
@@ -86,7 +86,7 @@
                 <ul class="left">
                     <li>
                         <h1 class="logo-wrapper">
-                            <a href="../admin/default" class="brand-logo darken-1 mdi-navigation-menu"><span class="brand-text">Merchandise Management - Product Management</span></a>
+                            <a href="../../admin/default" class="brand-logo darken-1 mdi-navigation-menu"><span class="brand-text">Merchandise Management - Product Management</span></a>
                         </h1>
                     </li>
                 </ul>
@@ -160,9 +160,16 @@
                                         <option value="2">NO</option>
                                     </select>
                                 </div>
-                                <div class="input-field col s2">
+                                <div class="input-field col s1">
                                     <select id="select-stock">
                                         <option value="0" selected>Stock All</option>
+                                        <option value="1">YES</option>
+                                        <option value="2">NO</option>
+                                    </select>
+                                </div>
+                                <div class="input-field col s1">
+                                    <select id="select-exception">
+                                        <option value="0" selected>Exception</option>
                                         <option value="1">YES</option>
                                         <option value="2">NO</option>
                                     </select>
@@ -198,6 +205,7 @@
                     <div>
                         <a id="processing-btn" class="waves-effect waves-light btn">PROCESS</a>
                         <a id="approve-btn" class="waves-effect waves-light btn">APPROVE</a>
+                        <a id="resolve-btn" class="waves-effect waves-light btn">RESOLVE</a>
                     </div>
                     <div class="remove">
                         <a id="remove-btn" class="waves-effect waves-light btn btn-gray">REMOVE</a>
@@ -233,30 +241,30 @@
 <!-- ================================================
 Scripts
 ================================================ -->
-<script type="text/javascript" src="js/base.js?v=1.0"></script>
+<script type="text/javascript" src="../js/base.js?v=1.0"></script>
 
-<script type="text/javascript" src="js/index.js?v=1.0"></script>
+<script type="text/javascript" src="../js/product-status/index.js?v=2.0"></script>
 
 <!-- jQuery Library -->
-<script type="text/javascript" src="js/plugins/jquery-1.11.2.min.js"></script>
+<script type="text/javascript" src="../js/plugins/jquery-1.11.2.min.js"></script>
 
-<script type="text/javascript" src="js/plugins/jquery-tmpl/jquery.tmpl.js"></script>
+<script type="text/javascript" src="../js/plugins/jquery-tmpl/jquery.tmpl.js"></script>
 <!--materialize js-->
- <script type="text/javascript" src="js/materialize.js"></script> 
+ <script type="text/javascript" src="../js/materialize.js"></script> 
 
 <!--scrollbar-->
-<script type="text/javascript" src="js/plugins/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+<script type="text/javascript" src="../js/plugins/perfect-scrollbar/perfect-scrollbar.min.js"></script>
 
 <!-- magnific-popup -->
-<script type="text/javascript" src="js/plugins/magnific-popup/jquery.magnific-popup.min.js"></script> 
+<script type="text/javascript" src="../js/plugins/magnific-popup/jquery.magnific-popup.min.js"></script> 
 
 <!--plugins.js - Some Specific JS codes for Plugin Settings-->
-<script type="text/javascript" src="js/plugins.js"></script>
+<script type="text/javascript" src="../js/plugins.js"></script>
 
 <!--custom-script.js - Add your own theme custom JS-->
-<script type="text/javascript" src="js/custom-script.js"></script>
+<script type="text/javascript" src="../js/custom-script.js"></script>
 
-<script type="text/javascript" src="js/plugins/iconfont/iconfont.js"></script>
+<script type="text/javascript" src="../js/plugins/iconfont/iconfont.js"></script>
 
 <script id="tmpl-brand-select" type="text/x-jquery-tmpl">
     <option value="-1" selected>Brand</option>
@@ -343,6 +351,7 @@ Scripts
         {%if list.on_sale == 1 %}
         <a data-action="onsale" class="waves-effect waves-light btn batch-action">On Sale</a>
         {%/if%}
+        <a id="resolve-btn" class="waves-effect waves-light btn exception-batch-action">RESOLVE</a>
     </div>
     <div class="remove">
         {%if list.remove == 1 || list.trash == 1 %}
@@ -406,7 +415,7 @@ Scripts
             {%if order.display_img %}
             <div class="product-cover-img" style="background-image:url(${order.display_img});" data-images="${order.cover_img}"></div>
             {%else%}
-            <div class="product-no-img" style="background-image:url(images/noimage.gif);"></div>
+            <div class="product-no-img" style="background-image:url(../images/noimage.gif);"></div>
             {%/if%}
         </div>
         <div class="item style-scope page-order">${order.designer_id}-${order.color_code}</div>
@@ -483,15 +492,41 @@ Scripts
             <div class="list-detail-item">Available Stock</div>
             <div class="list-detail-item">Reserverd Stock</div>
             <div class="list-detail-item">Confirmed Stock</div>
+            <div class="list-detail-item">Last Check</div>
+            <div class="list-detail-item">Exception Date</div>
         </div>
         {%each(j, detail) order.skuDetail%}
-            <div class="row list-detail-row">
+            {%if detail.exceptionStatus == null %}
+                <div data-sku-id="${detail.sku_id}" data-product-id="${detail.product_id}" class="row list-detail-row">
                 <div class="list-detail-item">${detail.sku_id}</div>
                 <div class="list-detail-item">${detail.size}</div>
                 <div class="list-detail-item">${detail.bar_code}</div>
                 <div class="list-detail-item">${detail.store}</div>
                 <div class="list-detail-item">${detail.reserved}</div>
                 <div class="list-detail-item">${detail.confirmed}</div>
+                <div class="list-detail-item">${detail.last_check}</div>
+                <div class="list-detail-item">${detail.exceptionDate}</div>
+                <div class="list-detail-item exception-btn">
+                    <span data-action="set0" class="waves-effect waves-light btn mini-long-btn exception-ops">Set 0</span>
+                </div>
+            {%else%}
+                <div data-sku-id="${detail.sku_id}" data-product-id="${detail.product_id}" class="row list-detail-row exception">
+                <div class="list-detail-item exception-warning">${detail.sku_id}</div>
+                <div class="list-detail-item exception-warning">${detail.size}</div>
+                <div class="list-detail-item exception-warning">${detail.bar_code}</div>
+                <div class="list-detail-item exception-warning">${detail.store}</div>
+                <div class="list-detail-item exception-warning">${detail.reserved}</div>
+                <div class="list-detail-item exception-warning">${detail.confirmed}</div>
+                <div class="list-detail-item exception-warning">${detail.last_check}</div>
+                <div class="list-detail-item exception-warning">${detail.exceptionDate}</div>
+                <div class="list-detail-item exception-btn">
+                     <span data-action="resolve" class="waves-effect waves-light btn mini-long-btn exception-ops">Resolve</span>
+                </div>
+            {%/if%}
+
+                
+
+                
             </div>
         {%/each%}
     </div>
@@ -578,6 +613,7 @@ Scripts
             $('#select-image').val('0');
             $('#select-model-image').val('0');
             $('#select-street-image').val('0');
+            $('#select-exception').val('0');
             $('#text-designerId').val('');
             $('#text-color-code').val('');
             $('#text-boutique').val('');

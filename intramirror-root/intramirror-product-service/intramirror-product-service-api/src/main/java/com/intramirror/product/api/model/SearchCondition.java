@@ -1,5 +1,6 @@
 package com.intramirror.product.api.model;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -26,14 +27,17 @@ public class SearchCondition {
     private String orderBy;
     private String desc;
 
+    private String exception;
+
     private ContentAdditionalCondition contentAdditionalCondition;
 
     @Override
     public String toString() {
-        return "SearchCondition{" + "status=" + status + ", shopStatus=" + shopStatus + ", vendorId='" + vendorId + '\'' + ", boutiqueId='" + boutiqueId + '\''
-                + ", brandId='" + brandId + '\'' + ", categoryId='" + categoryId + '\'' + ", season='" + season + '\'' + ", designerId='" + designerId + '\''
-                + ", colorCode='" + colorCode + '\'' + ", image='" + image + '\'' + ", modelImage='" + modelImage + '\'' + ", streetImage='" + streetImage
-                + '\'' + ", stock='" + stock + '\'' + ", start=" + start + ", count=" + count + '}';
+        return "SearchCondition{" + "status=" + status + ", shopStatus=" + shopStatus + ", vendorId=" + Arrays.toString(vendorId) + ", boutiqueId='"
+                + boutiqueId + '\'' + ", brandId='" + brandId + '\'' + ", categoryId=" + categoryId + ", season='" + season + '\'' + ", designerId='"
+                + designerId + '\'' + ", colorCode='" + colorCode + '\'' + ", image='" + image + '\'' + ", modelImage='" + modelImage + '\'' + ", streetImage='"
+                + streetImage + '\'' + ", stock='" + stock + '\'' + ", start=" + start + ", count=" + count + ", orderBy='" + orderBy + '\'' + ", desc='" + desc
+                + '\'' + ", exception='" + exception + '\'' + ", contentAdditionalCondition=" + contentAdditionalCondition + '}';
     }
 
     public int getStatus() {
@@ -170,6 +174,14 @@ public class SearchCondition {
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+
+    public String getException() {
+        return exception;
+    }
+
+    public void setException(String exception) {
+        this.exception = exception;
     }
 
     public ContentAdditionalCondition getContentAdditionalCondition() {

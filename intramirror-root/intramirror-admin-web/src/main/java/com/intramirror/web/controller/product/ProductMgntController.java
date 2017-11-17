@@ -55,11 +55,10 @@ public class ProductMgntController {
             @RequestParam(value = "designerId", required = false) String designerId,
             @RequestParam(value = "colorCode", required = false) String colorCode,
             @RequestParam(value = "image", required = false) String image,
-            //TODO: modelImage filter doesn't work now
             @RequestParam(value = "modelImage", required = false) String modelImage,
             @RequestParam(value = "streetImage", required = false) String streetImage,
-            //TODO: stock filter doesn't work now
-            @RequestParam(value = "stock", required = false) String stock
+            @RequestParam(value = "stock", required = false) String stock,
+            @RequestParam(value = "exception",required = false) String exception
             // @formatter:on
     ) {
 
@@ -75,6 +74,7 @@ public class ProductMgntController {
         searchCondition.setSeason(season);
         searchCondition.setStock(stock);
         searchCondition.setStreetImage(streetImage);
+        searchCondition.setException(exception);
         List<Map<String, Object>> countList = productManagementService.listAllProductCountGounpByState(searchCondition);
         Map<StateEnum, Long> productStateCountMap = initiateCountMap();
         for (Map<String, Object> item : countList) {
@@ -130,19 +130,19 @@ public class ProductMgntController {
             @RequestParam(value = "pageNo",required = false) Integer pageNo,
             @RequestParam(value = "orderBy",required = false) String orderBy,
             @RequestParam(value = "desc",required = false) String desc,
-
+            @RequestParam(value = "exception",required = false) String exception,
             //Additional
-            @RequestParam(value = "orderBy",required = false) Integer minBoutiqueDiscount,
-            @RequestParam(value = "orderBy",required = false) Integer maxBoutiqueDiscount,
-            @RequestParam(value = "orderBy",required = false) Integer minIMDiscount,
-            @RequestParam(value = "orderBy",required = false) Integer maxIMDiscount,
-            @RequestParam(value = "orderBy",required = false) Long minStock,
-            @RequestParam(value = "orderBy",required = false) Long maxStock,
-            @RequestParam(value = "desc",required = false) String tag) {
+            @RequestParam(value = "minBoutiqueDiscount",required = false) Integer minBoutiqueDiscount,
+            @RequestParam(value = "maxBoutiqueDiscount",required = false) Integer maxBoutiqueDiscount,
+            @RequestParam(value = "minIMDiscount",required = false) Integer minIMDiscount,
+            @RequestParam(value = "maxIMDiscount",required = false) Integer maxIMDiscount,
+            @RequestParam(value = "minStock",required = false) Long minStock,
+            @RequestParam(value = "maxStock",required = false) Long maxStock,
+            @RequestParam(value = "tag",required = false) String tag) {
     // @formatter:on
         SearchCondition searchCondition = initCondition(status, vendorId, boutiqueId, brandId, categoryId, season, designerId, colorCode, image, modelImage,
-                streetImage, stock, pageSize, pageNo, orderBy, desc, minBoutiqueDiscount, maxBoutiqueDiscount, minIMDiscount, maxIMDiscount, minStock, maxStock,
-                tag);
+                streetImage, stock, pageSize, pageNo, orderBy, desc, exception, minBoutiqueDiscount, maxBoutiqueDiscount, minIMDiscount, maxIMDiscount,
+                minStock, maxStock, tag);
         LOGGER.info("{}", searchCondition);
         LOGGER.info("status: {}, shop status: {}", getStatusEnum(status).getProductStatus(), getStatusEnum(status).getShopProductStatus());
         List<Map<String, Object>> productList;
@@ -171,6 +171,7 @@ public class ProductMgntController {
              Integer pageNo,
              String orderBy,
              String desc,
+             String exception,
             //Additional
              Integer minBoutiqueDiscount,
              Integer maxBoutiqueDiscount,
@@ -199,6 +200,7 @@ public class ProductMgntController {
         searchCondition.setStart((pageNo == null || pageNo < 0) ? 0 : (pageNo - 1) * pageSize);
         searchCondition.setCount((pageSize == null || pageSize < 0) ? 25 : pageSize);
         searchCondition.setOrderBy(orderBy);
+        searchCondition.setException(exception);
         if ((minBoutiqueDiscount != null && maxBoutiqueDiscount != null) || (minIMDiscount != null && maxIMDiscount != null) || (minStock != null
                 && maxStock != null) || tag != null) {
             ContentAdditionalCondition contentAdditionalCondition = new ContentAdditionalCondition();

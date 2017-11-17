@@ -5,7 +5,7 @@
 
     <!-- mybatis-generator:generate -->
     <classPathEntry
-            location="C:\Users\YouFeng.Zhu\.m2\repository\mysql\mysql-connector-java\5.1.39\mysql-connector-java-5.1.39.jar"/>  <!-- 配置JAR驱动 -->
+            location="C:\Users\Admin\.m2\repository\mysql\mysql-connector-java\5.1.39\mysql-connector-java-5.1.39.jar"/>  <!-- 配置JAR驱动 -->
 
     <context id="context1" targetRuntime="MyBatis3">
         <commentGenerator>
