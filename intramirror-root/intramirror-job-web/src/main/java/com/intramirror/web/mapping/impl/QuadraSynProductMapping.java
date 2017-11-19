@@ -90,10 +90,6 @@ public class QuadraSynProductMapping implements IProductMapping{
         		productOptions.setSalePrice(product.get("LISTINO").toString());
     		}
 
-//    		productOptions.setMadeIn(product.get("KEY").toString());
-//    		productOptions.setComposition(product.get("KEY").toString());	
-//    		productOptions.setDescImg(product.get("KEY").toString());
-    		
     		List<String> imageList = new ArrayList<String>();
     		if(checkValue(product.get("FOTO1"))){
         		imageList.add(BASEIMGURL + product.get("FOTO1").toString());
@@ -169,12 +165,6 @@ public class QuadraSynProductMapping implements IProductMapping{
 
             productOptions.setCategory_name(JSONObject.toJSONString(categoryMap));
             productOptions.setLast_check(new Date());
-    		logger.info("job quadra product mapping getMappingCategoryInfoByCondition param:"+ new Gson().toJson(categoryMap));
-            List<Map<String, Object>> apiCategoryMap = categoryService.getMappingCategoryInfoByCondition(categoryMap);
-            if(apiCategoryMap != null && apiCategoryMap.size() > 0) {
-                productOptions.setCategoryId(apiCategoryMap.get(0).get("category_id").toString());
-            }
-//            productOptions.setCategoryId("1532");
             logger.info("job quadra product mapping productOptions: " + new Gson().toJson(productOptions));
     	}
 		return productOptions;

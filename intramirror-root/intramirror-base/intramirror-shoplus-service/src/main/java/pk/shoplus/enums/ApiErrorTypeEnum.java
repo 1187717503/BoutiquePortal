@@ -47,7 +47,6 @@ public class ApiErrorTypeEnum {
             brand_not_exist("brand_not_exist","通过映射找不到对应品牌。"),
             season_not_exist("season_not_exist","通过映射找不到对应season_code。"),
 
-        warning_duplicated_skusize("warning_duplicated_skusize","重复的sku size"),
 
         Data_is_negative("Data_is_negative","数据为负数。"),
         Data_stock_out_off("Data_stock_out_off","库存数据超过100。"),
@@ -92,6 +91,7 @@ public class ApiErrorTypeEnum {
         warning_data_can_not_find_mapping("warning_data_can_not_find_mapping","警告，数据不能映射。"),
         data_can_not_find_mapping("data_can_not_find_mapping","报错，数据不能映射。"),
         warning_ColorCode_change("warning_ColorCode_change","警告，ColorCode不允许改变。"),
+        warning_duplicated_skusize("warning_duplicated_skusize","重复的sku size"),
         warning_BrandID_change("warning_BrandID_change","警告，BrandID不允许改变。");
 
         private String code;

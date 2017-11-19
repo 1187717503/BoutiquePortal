@@ -1,6 +1,8 @@
 package com.intramirror.web.thread;
 
 import com.alibaba.fastjson.JSONObject;
+import com.intramirror.web.controller.api.service.ApiCreateProductService;
+import com.intramirror.web.controller.api.service.ApiUpdateProductService;
 import com.intramirror.web.util.ApiDataFileUtils;
 import java.util.HashMap;
 import java.util.List;
@@ -10,19 +12,12 @@ import org.sql2o.Connection;
 import pk.shoplus.DBConnector;
 import pk.shoplus.enums.ApiErrorTypeEnum;
 import pk.shoplus.model.ProductEDSManagement;
-import pk.shoplus.parameter.StatusType;
 import pk.shoplus.service.CategoryService;
-import pk.shoplus.service.product.api.IProductService;
-import pk.shoplus.service.product.impl.ProductServiceImpl;
 import pk.shoplus.util.ExceptionUtils;
 
 public class UpdateProductThread implements Runnable{
 
     private static final Logger logger = Logger.getLogger(UpdateProductThread.class);
-
-    private static final IProductService productServie = new ProductServiceImpl();
-
-    private static final ProductEDSManagement productEDSManagement = new ProductEDSManagement();
 
     private ProductEDSManagement.ProductOptions productOptions;
 
@@ -38,16 +33,16 @@ public class UpdateProductThread implements Runnable{
             System.out.println(JSONObject.toJSON(apiDataFileUtils));
             logger.info("UpdateProductThreadRun,createProduct,start,productOptions:"+JSONObject.toJSONString(productOptions)
                     +",vendorOptions:"+JSONObject.toJSONString(vendorOptions));
-            Map<String,Object> resultMap = productEDSManagement.createProduct(productOptions,vendorOptions);
+            ApiCreateProductService apiCreateProductService = new ApiCreateProductService();
+            Map<String,Object> resultMap  = apiCreateProductService.createProduct(productOptions,vendorOptions);
             logger.info("UpdateProductThreadRun,createProduct,end,resultMap:"+ JSONObject.toJSONString(resultMap)+",productOptions:"+JSONObject.toJSONString(productOptions)
                     +",vendorOptions:"+JSONObject.toJSONString(vendorOptions));
 
-            if(resultMap != null && resultMap.get("status").equals(StatusType.PRODUCT_ALREADY_EXISTS)) {
+            if(resultMap != null && resultMap.get("info").equals(ApiErrorTypeEnum.errorType.error_boutique_id_already_exists.getDesc())) {
                 logger.info("UpdateProductThreadRun,updateProduct,start,productOptions:" + JSONObject.toJSONString(productOptions)
                         + ",vendorOptions:" + JSONObject.toJSONString(vendorOptions));
-                resultMap = productServie.updateProduct(productOptions, vendorOptions);
-//                ApiUpdateProductService apiUpdateProductService = new ApiUpdateProductService();
-//                resultMap = apiUpdateProductService.updateProduct(productOptions,vendorOptions);
+                ApiUpdateProductService apiUpdateProductService = new ApiUpdateProductService();
+                resultMap = apiUpdateProductService.updateProduct(productOptions,vendorOptions);
                 logger.info("UpdateProductThreadRun,updateProduct,end,resultMap:" + JSONObject.toJSONString(resultMap) + ",productOptions:" + JSONObject.toJSONString(productOptions)
                         + ",vendorOptions:" + JSONObject.toJSONString(vendorOptions));
             }

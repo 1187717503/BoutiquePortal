@@ -249,6 +249,10 @@ public class ApiUpdateStockSerivce {
             skuStore.updated_at = new Date();
             skuStore.enabled = EnabledType.USED;
             skuStore.setLast_check(new Date());
+            if(skuStore.store.intValue() < 0 || skuStore.store.intValue() > 100) {
+                this.setWarning(ApiErrorTypeEnum.errorType.warning_stock_out_off,"store",stockOption.getQuantity());
+                skuStore.store = 0L;
+            }
             skuStoreService.createSkuStore(skuStore);
             logger.info("ApiUpdateStockSerivce,createSku,sku_store:"+JSONObject.toJSONString(skuStore));
 
@@ -543,7 +547,7 @@ public class ApiUpdateStockSerivce {
     private void setWarning(ApiErrorTypeEnum.errorType errorType,String key,String value){
         Map<String,Object> warningMap = new HashMap<>();
         warningMap.put("status", StatusType.WARNING);
-        warningMap.put("error_enum",errorType.getCode());
+        warningMap.put("error_enum",errorType);
         warningMap.put("key",key);
         warningMap.put("value",value);
         warningMap.put("info",errorType.getDesc());

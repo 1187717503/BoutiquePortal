@@ -1211,9 +1211,35 @@ public class ProductService {
         return null;
     }
 
+    public boolean ifBrand(String brand_id) throws Exception{
+        if(org.apache.commons.lang.StringUtils.isNotBlank(brand_id)) {
+            String sql = "select brand_id from brand where brand_id='"+brand_id+"' and enabled = 1";
+            logger.info("ProductService,ifBrand,sql:" + sql);
+            List<Map<String,Object>> brandMap = productDao.executeBySql(sql, null);
+            if(brandMap == null || brandMap.size() == 0) {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public boolean ifCategory(String category_id) throws Exception{
+        if(org.apache.commons.lang.StringUtils.isNotBlank(category_id)) {
+            String sql = "select category_id from category where category_id='"+category_id+"' and enabled = 1";
+            logger.info("ProductService,ifCategory,sql:" + sql);
+            List<Map<String,Object>> categoryMap = productDao.executeBySql(sql, null);
+            if(categoryMap == null || categoryMap.size() == 0) {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
     public Map<String,Object> getSeason(String seasonCode) throws Exception {
         try {
-            String sql  = "select season_code from `season_mapping` where `season_code`  = '"+seasonCode+"' or trim(`boutique_season_code`)  = trim('"+seasonCode+"')";
+            String sql  = "select season_code from `season_mapping` where trim(`season_code`)  = trim('"+seasonCode+"') or trim(`boutique_season_code`)  = trim('"+seasonCode+"')";
             logger.info("ProductService,getSeason,sql:" + sql);
 
             List<Map<String,Object>> seasonMap = productDao.executeBySql(sql, null);

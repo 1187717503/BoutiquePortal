@@ -94,16 +94,15 @@ public class ApiCreateProductService {
             this.setBrandCategory(conn);
 
             resultMap = ApiCommonUtils.successMap();
+            if(conn != null) {conn.commit();conn.close();}
         } catch (UpdateException e) {
             resultMap = ApiCommonUtils.errorMap(e.getErrorType(),e.getKey(),e.getValue());
+            if(conn != null) {conn.rollback();conn.close();}
         } catch (Exception e) {
             e.printStackTrace();
             resultMap = ApiCommonUtils.errorMap(ApiErrorTypeEnum.errorType.error_runtime_exception,"errorMessage",ExceptionUtils.getExceptionDetail(e));
             if(conn != null) {conn.rollback();conn.close();}
-        } finally {
-            if(conn != null) {conn.commit();conn.close();}
         }
-
         return resultMap;
     }
 
@@ -440,6 +439,14 @@ public class ApiCreateProductService {
 
         if(StringUtils.isBlank(mappingSeason)) {
             throw new UpdateException("season",seasonCode, ApiErrorTypeEnum.errorType.data_can_not_find_mapping);
+        }
+
+        if(!productService.ifBrand(productOptions.getBrandId())) {
+            throw new UpdateException("brand",brandName, ApiErrorTypeEnum.errorType.data_can_not_find_mapping);
+        }
+
+        if(!productService.ifCategory(productOptions.getCategoryId())) {
+            throw new UpdateException("category",JSONObject.toJSONString(mappingCategory), ApiErrorTypeEnum.errorType.data_can_not_find_mapping);
         }
     }
 

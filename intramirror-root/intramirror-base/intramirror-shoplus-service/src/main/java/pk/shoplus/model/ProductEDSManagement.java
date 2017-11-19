@@ -1431,8 +1431,9 @@ public class ProductEDSManagement {
             return category_boutique_id;
         }
 
-        public void setCategory_boutique_id(String category_boutique_id) {
+        public ProductOptions setCategory_boutique_id(String category_boutique_id) {
             this.category_boutique_id = category_boutique_id;
+            return this;
         }
 
         public String getBrandId() {
@@ -1606,24 +1607,27 @@ public class ProductEDSManagement {
             return StringUtils.trim(category1);
         }
 
-        public void setCategory1(String category1) {
+        public ProductOptions setCategory1(String category1) {
             this.category1 = StringUtils.trim(category1);
+            return this;
         }
 
         public String getCategory2() {
             return StringUtils.trim(category2);
         }
 
-        public void setCategory2(String category2) {
+        public ProductOptions setCategory2(String category2) {
             this.category2 = StringUtils.trim(category2);
+            return this;
         }
 
         public String getCategory3() {
             return StringUtils.trim(category3);
         }
 
-        public void setCategory3(String category3) {
+        public ProductOptions setCategory3(String category3) {
             this.category3 = StringUtils.trim(category3);
+            return this;
         }
 
         public String getWeight() {

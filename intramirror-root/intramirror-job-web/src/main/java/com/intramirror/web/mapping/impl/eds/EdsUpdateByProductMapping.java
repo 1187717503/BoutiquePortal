@@ -4,20 +4,16 @@ import com.alibaba.fastjson15.JSONArray;
 import com.alibaba.fastjson15.JSONObject;
 import com.google.gson.Gson;
 import com.intramirror.web.mapping.api.IProductMapping;
-import org.apache.log4j.Logger;
-import org.springframework.stereotype.Service;
-import org.sql2o.Connection;
-import pk.shoplus.DBConnector;
-import pk.shoplus.model.ProductEDSManagement;
-import pk.shoplus.model.SuiTable;
-import pk.shoplus.model.TechnicalInfo;
-import pk.shoplus.service.MappingCategoryService;
-import pk.shoplus.util.ExceptionUtils;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Service;
+import pk.shoplus.model.ProductEDSManagement;
+import pk.shoplus.model.SuiTable;
+import pk.shoplus.model.TechnicalInfo;
+import pk.shoplus.util.ExceptionUtils;
 
 @Service(value = "edsUpdateByProductMapping")
 public class EdsUpdateByProductMapping implements IProductMapping {
@@ -29,34 +25,16 @@ public class EdsUpdateByProductMapping implements IProductMapping {
     @Override
     public ProductEDSManagement.ProductOptions mapping(Map<String, Object> bodyDataMap) {
         logger.info("EdsUpdateByProductMapping,inputParams,bodyDataMap:"+new Gson().toJson(bodyDataMap));
-        Connection conn = null;
         ProductEDSManagement.ProductOptions productOptions = productEDSManagement.getProductOptions();
         try {
             JSONObject productMap = com.alibaba.fastjson15.JSON.parseObject(bodyDataMap.get("product").toString());
             String full_update_product = bodyDataMap.get("full_update_product") == null ? "0" : bodyDataMap.get("full_update_product").toString();
-            String vendor_id = bodyDataMap.get("vendor_id").toString();
             String oneCategory = productMap.getString("gender");
             String twoCategory = productMap.getString("first_category");
             String threeCategory = productMap.getString("second_category");
-
-            // get category
-            String category_id = "";
-            try {
-                conn = DBConnector.sql2o.open();
-                MappingCategoryService mappingCategoryService = new MappingCategoryService(conn);
-                List<Map<String, Object>> apiCategoryMap = mappingCategoryService.getMappingCategoryInfoByCondition(vendor_id,oneCategory,twoCategory,threeCategory);
-                if (null != apiCategoryMap && apiCategoryMap.size() > 0) {
-                    category_id = apiCategoryMap.get(0).get("category_id").toString();
-                }
-                productOptions.setCategory1(oneCategory);
-                productOptions.setCategory2(twoCategory);
-                productOptions.setCategory3(threeCategory);
-                if(conn != null) {conn.close();}
-            } catch (Exception e) {
-                logger.info("EdsUpdateByProductMapping,convertCategory,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+
-                        ",productMap:"+new Gson().toJson(productMap));
-                e.printStackTrace();
-            }
+            productOptions.setCategory1(oneCategory);
+            productOptions.setCategory2(twoCategory);
+            productOptions.setCategory3(threeCategory);
 
             // get composition
             String technicalInfoString = "";
@@ -107,7 +85,6 @@ public class EdsUpdateByProductMapping implements IProductMapping {
                     .setColorCode(productMap.getString("color_reference"))
                     .setColorDesc(productMap.getString("color"))
                     .setDesc(productMap.getString("item_description"))
-                    .setCategoryId(category_id)
                     .setMadeIn(productMap.getString("made_in"))
                     .setComposition(technicalInfoString)
                     .setCategory_name(oneCategory+"-"+twoCategory+"-"+threeCategory)
@@ -143,15 +120,11 @@ public class EdsUpdateByProductMapping implements IProductMapping {
                 productOptions.getSkus().add(skuOptions);
             }
 
-            if(conn != null){conn.close();}
             logger.info("EdsUpdateByProductMapping,outParams,productOptions:"+new Gson().toJson(productOptions));
         } catch (Exception e) {
             logger.info("EdsUpdateByProductMapping,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)
             +",bodyDataMap:"+new Gson().toJson(bodyDataMap));
-            if(conn != null){conn.close();}
             e.printStackTrace();
-        } finally {
-            if(conn != null){conn.close();}
         }
         return productOptions;
     }

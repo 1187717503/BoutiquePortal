@@ -53,7 +53,6 @@ public class FilippoSynProductMapping implements IProductMapping {
         }
 
         ProductEDSManagement.ProductOptions productOptions = productEDSManagement.getProductOptions();
-        Connection conn = null;
         try {
             String[] propertyNames = propertyName.split("\\u007C");
             String[] propertyValues = propertyValue.split("\\u007C");
@@ -105,30 +104,13 @@ public class FilippoSynProductMapping implements IProductMapping {
             skuOptionsList.add(skuOptions);
             productOptions.setSkus(skuOptionsList);
 
-            conn = DBConnector.sql2o.open();
-            MappingCategoryService mappingCategoryService = new MappingCategoryService(conn);
-
-            /*// -- test
-            String sql = "insert into `intra-mirror-prd`.`api_category_map` ( `boutique_third_category`, `boutique_second_category`, `category_id`, `second_category`, `boutique_first_category`, `third_category`, `enabled`, `api_configuration_id`, `first_category`, `created_at`, `updated_at`) \n" +
-                    "values ( '"+threeCategory+"', '"+secondCategory+"', '1518', 'Clothing', '"+firstCategory+"', 'Beachwear', b'1', '55', 'Men','2017-07-06','2017-07-06');\n";
-            logger.info("filippo test : " + sql);
-            FileUtil.writeFileAppendContent("/opt/data/test/api_category_map.sql",sql);
-            // -- test*/
-
             productOptions.setCategory1(firstCategory);
             productOptions.setCategory2(secondCategory);
             productOptions.setCategory3(threeCategory);
-            List<Map<String, Object>> apiCategoryMap = mappingCategoryService.getMappingCategoryInfoByCondition(vendorOptions.getVendorId().toString(),firstCategory,secondCategory,threeCategory);
-            if(apiCategoryMap != null && apiCategoryMap.size() > 0) {
-                productOptions.setCategoryId(apiCategoryMap.get(0).get("category_id").toString());
-            }
             logger.info(" productOptions filippo : " + new Gson().toJson(productOptions));
         } catch (Exception e) {
-            if(conn != null) {conn.close();}
             e.printStackTrace();
             throw e;
-        } finally {
-            if(conn != null) {conn.close();}
         }
         return productOptions;
     }

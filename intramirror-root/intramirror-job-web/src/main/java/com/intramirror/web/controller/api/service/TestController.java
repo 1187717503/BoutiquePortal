@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import pk.shoplus.model.ProductEDSManagement;
+import pk.shoplus.service.product.api.IProductService;
+import pk.shoplus.service.product.impl.ProductServiceImpl;
 
 /**
  * Created by dingyifan on 2017/11/9.
@@ -45,14 +47,15 @@ public class TestController {
         System.out.println("start:"+new Date().toString() +","+start);
         ProductEDSManagement.VendorOptions vendorOptions  = new ProductEDSManagement.VendorOptions();
         vendorOptions.setVendorId(productOptions.getVendor_id());
-        Map<String,Object> map = apiCreateProductService.createProduct(productOptions,vendorOptions);
-//        ProductEDSManagement productEDSManagement = new ProductEDSManagement();
-//        Map<String,Object> map = productEDSManagement.createProduct(productOptions,vendorOptions);
+//        Map<String,Object> map = apiCreateProductService.createProduct(productOptions,vendorOptions);
+        ProductEDSManagement productEDSManagement = new ProductEDSManagement();
+        Map<String,Object> map = productEDSManagement.createProduct(productOptions,vendorOptions);
         long  end = System.currentTimeMillis();
         System.out.println("end:"+new Date().toString()+","+end);
         System.out.println(start-end+",map:"+new Gson().toJson(map));
         return map;
     }
+    private static final IProductService productServie = new ProductServiceImpl();
 
     @RequestMapping("/updateProduct")
     @ResponseBody
@@ -65,8 +68,9 @@ public class TestController {
         ProductEDSManagement.VendorOptions vendorOptions  = new ProductEDSManagement.VendorOptions();
         vendorOptions.setVendorId(productOptions.getVendor_id());
         Map<String,Object> map = apiUpdateProductService.updateProduct(productOptions,vendorOptions);
-        //        ProductEDSManagement productEDSManagement = new ProductEDSManagement();
-        //        Map<String,Object> map = productEDSManagement.createProduct(productOptions,vendorOptions);
+                ProductEDSManagement productEDSManagement = new ProductEDSManagement();
+//                Map<String,Object> map = productEDSManagement.createProduct(productOptions,vendorOptions);
+//        Map<String,Object> map = productServie.updateProduct(productOptions,vendorOptions);
         long  end = System.currentTimeMillis();
         System.out.println("end:"+new Date().toString()+","+end);
         System.out.println(start-end+",map:"+new Gson().toJson(map));

@@ -63,7 +63,7 @@ public class ApiCommonUtils {
         resultMap.put("info",errorType.getDesc());
         resultMap.put("key",key);
         resultMap.put("value",value);
-        resultMap.put("error_enum",errorType.getCode());
+        resultMap.put("error_enum",errorType);
         logger.info("ApiCommonUtils,errorMap,outputParams,resultMap:" + JSONObject.toJSONString(resultMap));
         return resultMap;
     }
