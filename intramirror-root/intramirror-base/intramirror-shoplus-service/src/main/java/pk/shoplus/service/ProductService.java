@@ -1144,8 +1144,8 @@ public class ProductService {
     public boolean getNoImg(String brandName ,Long vendor_id){
         try {
             String sql = "select abm.`api_configuration_id` from `api_brand_map` abm \n"
-                    + "inner join `api_configuration`  ac (abm.`api_configuration_id` = ac.`api_configuration_id`  and ac.`enabled`  = 1 and abm.`enabled`  = 1) \n"
-                    + "where (abm.`brand_name`  = '"+brandName+"'  or abm.`boutique_brand_name` = '"+brandName+"' ) and abm.`no_img`  = 1 and ac.`vendor_id`  ="+vendor_id;
+                    + "inner join `api_configuration`  ac on (abm.`api_configuration_id` = ac.`api_configuration_id`  and ac.`enabled`  = 1 and abm.`enabled`  = 1) \n"
+                    + "where (abm.`brand_name`  = trim('"+brandName+"')  or trim(abm.`boutique_brand_name`) = trim('"+brandName+"') ) and abm.`no_img`  = 1 and ac.`vendor_id`  ="+vendor_id;
             logger.info("ProductService,getNoImg,sql:"+sql);
             List<Map<String,Object>> imgMap = productDao.executeBySql(sql,null);
             if(imgMap == null || imgMap.size() == 0) {
@@ -1180,7 +1180,7 @@ public class ProductService {
 
     public Map<String,Object> getBrand(String brandName) throws Exception {
         try {
-            String sql  = "select b.brand_id,b.english_name from brand b where trim(b.english_name) = trim(\"" + brandName+ "\") and b.enabled = 1";
+            String sql  = "select b.brand_id,b.english_name from brand b where trim(b.english_name) = trim('" + brandName+ "') and b.enabled = 1";
             logger.info("ProductService,getThreeCategory,sql:" + sql);
 
             List<Map<String,Object>> brandMap = productDao.executeBySql(sql, null);
@@ -1213,7 +1213,7 @@ public class ProductService {
 
     public Map<String,Object> getSeason(String seasonCode) throws Exception {
         try {
-            String sql  = "select season_code from `season_mapping` where `season_code`  = '"+seasonCode+"' or `boutique_season_code`  = '"+seasonCode+"'";
+            String sql  = "select season_code from `season_mapping` where `season_code`  = '"+seasonCode+"' or trim(`boutique_season_code`)  = trim('"+seasonCode+"')";
             logger.info("ProductService,getSeason,sql:" + sql);
 
             List<Map<String,Object>> seasonMap = productDao.executeBySql(sql, null);
@@ -1244,8 +1244,8 @@ public class ProductService {
                         "left join api_configuration ac on(ac.enabled = 1 and ac.api_configuration_id = acm.api_configuration_id)\n" +
                         "left join category c on(c.enabled = 1 and c.category_id = acm.category_id)\n" +
                         "where acm.enabled = 1 and ac.vendor_id = '"+vendor_id+"'\n"+
-                        "and LOWER(acm.boutique_first_category) = LOWER('"+one+"')\n"+
-                        "and LOWER(acm.boutique_second_category) = LOWER('"+two+"')\n"+
+                        "and trim(acm.boutique_first_category) = trim('"+one+"')\n"+
+                        "and trim(acm.boutique_second_category) = trim('"+two+"')\n"+
                         " and c.category_id is not null ";
                 logger.info("ProductService,getDeafultCategory,selApiCategorySQL:"+selApiCategorySQL+",vendor_id:"+vendor_id+",one:"+one+",two:"+two);
                 listMap = productDao.executeBySql(selApiCategorySQL, null);

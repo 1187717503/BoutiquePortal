@@ -47,7 +47,7 @@ public class XmagSynProductAllMapper implements IProductMapping {
             ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
             vendorOptions.setVendorId(Long.parseLong(bodyDataMap.get("vendor_id").toString()));
             //封装ProductOptions 对象消息 .substring(1, (mqDataMap.get("product").toString().length()-1)
-            Map<String,Object> productMap = JSONObject.parseObject(bodyDataMap.get("product").toString());
+            Map<String,Object> productMap = (Map<String, Object>) bodyDataMap.get("product");
             productOptions = this.handleMappingData(productMap,vendorOptions);
             productOptions.setLast_check(new Date());
             if(conn != null){conn.close();}

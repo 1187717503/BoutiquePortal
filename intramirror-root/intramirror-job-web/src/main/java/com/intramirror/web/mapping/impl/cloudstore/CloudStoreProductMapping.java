@@ -49,8 +49,9 @@ public class CloudStoreProductMapping implements IProductMapping {
 	        while (it.hasNext()) {
 	            JSONObject jsonObject = (JSONObject) it.next();
 	            boutique_category_id = jsonObject.getString("$id");
-	
-	            MappingCategoryService mappingCategoryService = new MappingCategoryService(conn);
+				productOptions.setCategory_boutique_id(boutique_category_id);
+
+				MappingCategoryService mappingCategoryService = new MappingCategoryService(conn);
 	            List<Map<String,Object>> categoryMaps = mappingCategoryService.getMappingCategoryInfoByCondition(vendor_id,boutique_category_id);
 	            if(categoryMaps != null && categoryMaps.size() >0){
 	                category_id = categoryMaps.get(0).get("category_id").toString();
@@ -75,7 +76,7 @@ public class CloudStoreProductMapping implements IProductMapping {
 	                .setSalePrice(jsonObjectData.getString("stock_price"))
 	                .setFullUpdateProductFlag(full_update_product)
 					.setLast_check(new Date());
-	
+
 	        // handle sku
 	        ProductEDSManagement.SkuOptions sku = productEDSManagement.getSkuOptions();
 	        sku.setBarcodes(jsonObjectData.getString("barcode"));

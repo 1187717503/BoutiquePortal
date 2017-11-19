@@ -51,12 +51,13 @@ public class ApiUpdateProductService {
     private List<Map<String,Object>> warningList ;
 
     public Map<String,Object> updateProduct(ProductEDSManagement.ProductOptions productOptions,ProductEDSManagement.VendorOptions vendorOptions){
-        Map<String,Object> resultMap = null;
+        Map<String,Object> resultMap = new HashMap<>();
 
         this.productOptions = productOptions ;
         this.vendorOptions = vendorOptions ;
 
         Connection conn = null;
+
         try {
             conn = DBConnector.sql2o.beginTransaction();
 
@@ -78,25 +79,25 @@ public class ApiUpdateProductService {
                 resultMap.put("status",StatusType.WARNING);
                 resultMap.put("warningMaps",warningList);
             }
+            if(conn != null) {conn.commit();conn.close();}
         } catch (UpdateException e) {
             resultMap = ApiCommonUtils.errorMap(e.getErrorType(),e.getKey(),e.getValue());
+            if(conn != null) {conn.commit();conn.close();}
         } catch (Exception e) {
             e.printStackTrace();
             resultMap = ApiCommonUtils.errorMap(ApiErrorTypeEnum.errorType.error_runtime_exception,"errorMessage", ExceptionUtils.getExceptionDetail(e));
             if(conn != null) {conn.rollback();conn.close();}
-        } finally {
-            if(conn != null) {conn.commit();conn.close();}
         }
         return resultMap;
     }
 
     public void setSku(Connection conn) throws Exception {
         if(this.stockOptions != null && this.stockOptions.size() > 0) {
-            ApiUpdateStockSerivce apiUpdateStockSerivce = new ApiUpdateStockSerivce();
             for(StockOption stockOption : stockOptions) {
 
                 logger.info("ApiUpdateProductService,setSku,updateStock,stockOption:"+JSONObject.toJSONString(stockOption));
-                Map<String,Object> resultMap = apiUpdateStockSerivce.updateStock(stockOption);
+                ApiUpdateStockSerivce apiUpdateStockSerivce = new ApiUpdateStockSerivce();
+                Map<String,Object> resultMap = apiUpdateStockSerivce.updateStock(stockOption,conn);
                 logger.info("ApiUpdateProductService,setSku,updateStock,resultMap:"+JSONObject.toJSONString(resultMap));
 
                 if(resultMap != null && !resultMap.get("status").toString().equals("1")) {
@@ -203,7 +204,6 @@ public class ApiUpdateProductService {
         productService.updateProduct(product);
 
         this.updateProductProperty(conn,product.getProduct_id(), ProductPropertyEnumKeyName.CarryOver.getCode(),productOptions.getCarryOver());
-
     }
 
     private void checkMappingParams(Connection conn) throws Exception {
@@ -283,15 +283,15 @@ public class ApiUpdateProductService {
         mappingCategory.put("category3",category3);
 
         if(StringUtils.isBlank(productOptions.getCategoryId())) {
-            this.setWarning(ApiErrorTypeEnum.errorType.data_can_not_find_mapping,"category", JSONObject.toJSONString(mappingCategory));
+            this.setWarning(ApiErrorTypeEnum.errorType.warning_data_can_not_find_mapping,"category", JSONObject.toJSONString(mappingCategory));
         }
 
         if(StringUtils.isBlank(productOptions.getBrandId())) {
-            this.setWarning(ApiErrorTypeEnum.errorType.data_can_not_find_mapping,"brand", brandName);
+            this.setWarning(ApiErrorTypeEnum.errorType.warning_data_can_not_find_mapping,"brand", brandName);
         }
 
         if(StringUtils.isBlank(mappingSeason)) {
-            this.setWarning(ApiErrorTypeEnum.errorType.data_can_not_find_mapping,"season", seasonCode);
+            this.setWarning(ApiErrorTypeEnum.errorType.warning_data_can_not_find_mapping,"season", seasonCode);
         }
     }
 

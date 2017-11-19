@@ -1,7 +1,6 @@
 package com.intramirror.web.thread;
 
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.intramirror.web.util.ApiDataFileUtils;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +46,8 @@ public class UpdateProductThread implements Runnable{
                 logger.info("UpdateProductThreadRun,updateProduct,start,productOptions:" + JSONObject.toJSONString(productOptions)
                         + ",vendorOptions:" + JSONObject.toJSONString(vendorOptions));
                 resultMap = productServie.updateProduct(productOptions, vendorOptions);
+//                ApiUpdateProductService apiUpdateProductService = new ApiUpdateProductService();
+//                resultMap = apiUpdateProductService.updateProduct(productOptions,vendorOptions);
                 logger.info("UpdateProductThreadRun,updateProduct,end,resultMap:" + JSONObject.toJSONString(resultMap) + ",productOptions:" + JSONObject.toJSONString(productOptions)
                         + ",vendorOptions:" + JSONObject.toJSONString(vendorOptions));
             }
