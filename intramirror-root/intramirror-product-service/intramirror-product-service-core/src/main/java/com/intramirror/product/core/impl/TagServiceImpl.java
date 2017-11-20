@@ -2,7 +2,6 @@ package com.intramirror.product.core.impl;
 
 import com.intramirror.product.api.model.Tag;
 import com.intramirror.product.api.service.ITagService;
-import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.TagMapper;
 import com.intramirror.product.core.mapper.TagProductRelMapper;
 import java.util.ArrayList;
@@ -12,26 +11,24 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TagServiceImpl extends BaseDao implements ITagService {
+public class TagServiceImpl implements ITagService {
 
     private static Logger logger = LoggerFactory.getLogger(TagServiceImpl.class);
 
+    @Autowired
     private TagProductRelMapper tagProductRelMapper;
 
+    @Autowired
     private TagMapper tagMapper;
 
-    public void init() {
-        tagProductRelMapper = this.getSqlSession().getMapper(TagProductRelMapper.class);
-        tagMapper = this.getSqlSession().getMapper(TagMapper.class);
-    }
-
     @Override
-    public int saveTagProductRel(Map<String, Object> map) throws Exception {
+    public int saveTagProductRel(Map<String, Object> map) {
 
-        List<String> listPrdIdDuplicated = new ArrayList<String>();
+        List<String> listPrdIdDuplicated = new ArrayList<>();
 
         // 已经有的关系，不用添加，并且作为失败列表返回给前端
         // 1. 根据tag_id和product_id拿到重复的选项
@@ -54,7 +51,7 @@ public class TagServiceImpl extends BaseDao implements ITagService {
 
         map.remove(productIdList);
         logger.info("saveTagProductRel： repeat count [{}]; pass count [{}]", listPrdIdDuplicated.size(), productIdList.size());
-        Map<String, Object> mapToSave = new HashMap<String, Object>();
+        Map<String, Object> mapToSave = new HashMap<>();
         mapToSave.put("tagId", map.get("tagId"));
         mapToSave.put("productIdList", map.get("productIdList"));
         mapToSave.put("sort_num", map.get("sort_num"));
@@ -63,13 +60,13 @@ public class TagServiceImpl extends BaseDao implements ITagService {
     }
 
     @Override
-    public List<Tag> getTags() throws Exception {
+    public List<Tag> getTags() {
         logger.info("[service] getTags");
         return tagMapper.getTags();
     }
 
     @Override
-    public Tag selectByPrimaryKey(Long tagId) throws Exception {
+    public Tag selectByPrimaryKey(Long tagId) {
         logger.info("[service] getTags and tagId is [{}]", tagId);
         return tagMapper.selectByPrimaryKey(tagId);
     }
