@@ -1,6 +1,7 @@
 package com.intramirror.product.core.mapper;
 
 import com.intramirror.product.api.model.Tag;
+import java.util.List;
 
 public interface TagMapper {
     /**
@@ -50,4 +51,6 @@ public interface TagMapper {
      * @mbggenerated
      */
     int updateByPrimaryKey(Tag record);
+
+    List<Tag> getTags();
 }
