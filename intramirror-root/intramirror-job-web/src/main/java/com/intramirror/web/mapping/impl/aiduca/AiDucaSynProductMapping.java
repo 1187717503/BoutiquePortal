@@ -3,33 +3,19 @@ package com.intramirror.web.mapping.impl.aiduca;
 import com.alibaba.fastjson15.JSONObject;
 import com.google.gson.Gson;
 import com.intramirror.product.api.service.category.ICategoryService;
-import com.intramirror.product.core.impl.category.CategoryServiceImpl;
 import com.intramirror.web.mapping.api.IProductMapping;
 import com.intramirror.web.util.SpringContextUtils;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.context.support.FileSystemXmlApplicationContext;
-import org.springframework.stereotype.Service;
-
-import pk.shoplus.model.ProductEDSManagement;
-import pk.shoplus.model.ProductEDSManagement.ProductOptions;
-import pk.shoplus.parameter.StatusType;
-import pk.shoplus.service.mapping.api.IMapping;
-import pk.shoplus.service.product.api.IProductService;
-import pk.shoplus.service.product.impl.ProductServiceImpl;
-import pk.shoplus.util.ExceptionUtils;
-import pk.shoplus.util.MapUtils;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.Resource;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import pk.shoplus.model.ProductEDSManagement;
+import pk.shoplus.model.ProductEDSManagement.ProductOptions;
+import pk.shoplus.util.ExceptionUtils;
 
 /**
  * Created by wzh on 2017/9/05.
@@ -130,7 +116,7 @@ public class AiDucaSynProductMapping implements IProductMapping{
 				productOptions.setSkus(skuOptionsList);
 				logger.info("job mapping AiDuca product handleMappingData skuOptionsList:"+ new Gson().toJson(skuOptionsList));
 
-				//根据传过来的类目   获取映射的类目信息
+				//根据传过来的类目获取映射的类目信息
 				Map<String, Object> categoryMap = new HashMap<String, Object>();
 				categoryMap.put("vendor_id", Long.parseLong(dataMap.get("vendor_id").toString()));
 				if(product.get("suitable") != null ){
@@ -152,20 +138,12 @@ public class AiDucaSynProductMapping implements IProductMapping{
 					categoryMap.put("boutique_third_category", "");
 				}
 				productOptions.setCategory_name(JSONObject.toJSONString(categoryMap));
-				logger.info("job mapping AiDuca product handleMappingData getMappingCategoryInfoByCondition param:"+ new Gson().toJson(categoryMap));
-				List<Map<String, Object>> apiCategoryMap = categoryService.getMappingCategoryInfoByCondition(categoryMap);
-				if(apiCategoryMap != null && apiCategoryMap.size() > 0) {
-					productOptions.setCategoryId(apiCategoryMap.get(0).get("category_id").toString());
-				}
 			}
 		} catch (Exception e) {
         	e.printStackTrace();
 			logger.info("AiDucaSynProductMapping,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
 		}
 		logger.info("AiDucaSynProductMapping,outputParams,productOptions:"+JSONObject.toJSONString(productOptions));
-//		productOptions.setCategoryId("1646");
-//		productOptions.setBrandName("Gucci");
-//		productOptions.setSeasonCode("078");
 		return productOptions;
 	}
 

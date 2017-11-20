@@ -48,7 +48,7 @@ public class ApiUpdateProductService {
 
     private boolean modify = false;
 
-    private List<Map<String,Object>> warningList ;
+    private List<Map<String,Object>> warningList = new ArrayList<>() ;
 
     public Map<String,Object> updateProduct(ProductEDSManagement.ProductOptions productOptions,ProductEDSManagement.VendorOptions vendorOptions){
         Map<String,Object> resultMap = new HashMap<>();
@@ -101,8 +101,12 @@ public class ApiUpdateProductService {
                 logger.info("ApiUpdateProductService,setSku,updateStock,resultMap:"+JSONObject.toJSONString(resultMap));
 
                 if(resultMap != null && !resultMap.get("status").toString().equals("1")) {
-                    List<Map<String,Object>> warningList = (List<Map<String, Object>>) resultMap.get("warningMaps");
-                    this.warningList.addAll(warningList);
+                    if(resultMap.get("warningMaps") != null) {
+                        List<Map<String,Object>> warningList = (List<Map<String, Object>>) resultMap.get("warningMaps");
+                        this.warningList.addAll(warningList);
+                    } else {
+                        this.warningList.add(resultMap);
+                    }
                 }
             }
         }
@@ -138,6 +142,7 @@ public class ApiUpdateProductService {
 
     private void setProduct(Connection conn) throws Exception{
         Product product = this.getProduct(conn);
+        logger.info("ApiUpdateProductService,setProduct,start,updateProduct,product:"+JSONObject.toJSONString(product));
         product.last_check = new Date();
 
         // Brand：和原来不一致直接更新。如为空或者不能Mapping报Warning，但其他字段继续更新。
@@ -187,23 +192,23 @@ public class ApiUpdateProductService {
             }
 
             if(StringUtils.isNotBlank(newColorCode)) {
-                this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.ColorCode.getCode(),newBrandCode);
+                this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.ColorCode.getCode(),newColorCode);
                 product.color_code = newColorCode;
             }
         } else { // 非消息重置时,BrandID和ColorCode和原来不一致或者为空报警告
             if(StringUtils.isBlank(newBrandCode) || !newBrandCode.equalsIgnoreCase(oldBrandCode)) {
-                this.setWarning(ApiErrorTypeEnum.errorType.warning_ColorCode_change,"BrandID",newBrandCode);
+                this.setWarning(ApiErrorTypeEnum.errorType.warning_BrandID_change,"BrandID",newBrandCode);
             }
 
             if(StringUtils.isBlank(newColorCode) || !newColorCode.equalsIgnoreCase(oldColorCode)) {
-                this.setWarning(ApiErrorTypeEnum.errorType.warning_BrandID_change,"BrandID",newColorCode);
+                this.setWarning(ApiErrorTypeEnum.errorType.warning_ColorCode_change,"ColorCode",newColorCode);
             }
         }
+        this.updateProductProperty(conn,product.getProduct_id(), ProductPropertyEnumKeyName.CarryOver.getCode(),productOptions.getCarryOver());
 
         ProductService productService = new ProductService(conn);
         productService.updateProduct(product);
-
-        this.updateProductProperty(conn,product.getProduct_id(), ProductPropertyEnumKeyName.CarryOver.getCode(),productOptions.getCarryOver());
+        logger.info("ApiUpdateProductService,setProduct,end,updateProduct,product:"+JSONObject.toJSONString(product));
     }
 
     private void checkMappingParams(Connection conn) throws Exception {
@@ -284,15 +289,20 @@ public class ApiUpdateProductService {
 
         if(StringUtils.isBlank(productOptions.getCategoryId())) {
             this.setWarning(ApiErrorTypeEnum.errorType.warning_data_can_not_find_mapping,"category", JSONObject.toJSONString(mappingCategory));
+        } else if(!productService.ifCategory(productOptions.getCategoryId())) {
+            this.setWarning(ApiErrorTypeEnum.errorType.warning_data_can_not_find_mapping,"category", JSONObject.toJSONString(mappingCategory));
         }
 
         if(StringUtils.isBlank(productOptions.getBrandId())) {
+            this.setWarning(ApiErrorTypeEnum.errorType.warning_data_can_not_find_mapping,"brand", brandName);
+        } else if(!productService.ifBrand(productOptions.getBrandId())) {
             this.setWarning(ApiErrorTypeEnum.errorType.warning_data_can_not_find_mapping,"brand", brandName);
         }
 
         if(StringUtils.isBlank(mappingSeason)) {
             this.setWarning(ApiErrorTypeEnum.errorType.warning_data_can_not_find_mapping,"season", seasonCode);
         }
+
     }
 
     private void checkProductParams(Connection conn) throws Exception{
@@ -372,7 +382,9 @@ public class ApiUpdateProductService {
         List<ProductEDSManagement.SkuOptions> skuOptionList = productOptions.getSkus();
         stockOptions = new ArrayList<>();
         if(skuOptionList != null && skuOptionList.size() > 0) {
-            for(ProductEDSManagement.SkuOptions skuOption : skuOptionList) {
+
+            for(int i = 0,len=skuOptionList.size();i<len;i++) {
+                ProductEDSManagement.SkuOptions skuOption = skuOptionList.get(i);
                 String size = skuOption.getSize();
                 String sku_code = skuOption.getBarcodes();
                 String quantity = skuOption.getStock();
@@ -384,9 +396,15 @@ public class ApiUpdateProductService {
                 stockOption.setType(Contants.STOCK_QTY+"");
                 stockOption.setVendor_id(vendor_id.toString());
                 stockOption.setProductCode(product_code);
-                stockOption.setPrice(price);
                 stockOption.setLast_check(productOptions.getLast_check());
+                if(i == 0) {
+                    stockOption.setPrice(price);
+                }
                 stockOptions.add(stockOption);
+            }
+
+            if(productOptions.getDuplicateSkus() != null && productOptions.getDuplicateSkus().size() > 0) {
+                this.setWarning(ApiErrorTypeEnum.errorType.warning_duplicated_skusize,"skus",JSONObject.toJSONString(productOptions.getDuplicateSkus()));
             }
         }
     }
@@ -427,13 +445,14 @@ public class ApiUpdateProductService {
             productPropertyConditions.put("enabled", EnabledType.USED);
 
             productPropertyService.updateProductPropertyByCondition(productProperty,productPropertyConditions);
+            logger.info("ApiUpdateProductSerice,updateProductPropertyByCondition,productProperty:"+JSONObject.toJSONString(productProperty)+",productPropertyConditions:"+JSONObject.toJSONString(productPropertyConditions));
         }
     }
 
     private void setWarning(ApiErrorTypeEnum.errorType errorType,String key,String value){
         Map<String,Object> warningMap = new HashMap<>();
         warningMap.put("status", StatusType.WARNING);
-        warningMap.put("error_enum",errorType.getCode());
+        warningMap.put("error_enum",errorType);
         warningMap.put("key",key);
         warningMap.put("value",value);
         warningMap.put("info",errorType.getDesc());
