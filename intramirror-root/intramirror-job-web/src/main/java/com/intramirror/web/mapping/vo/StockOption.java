@@ -15,6 +15,7 @@ public class StockOption {
     public String price; // 价格
     public String type; // 库存类型
     public Date last_check; // 消息时间
+    public boolean modify = false;
     public String updated_by; // 根据product_code,size修改,根据sku_code修改
 
     public Date getLast_check() {
@@ -87,5 +88,13 @@ public class StockOption {
 
     public void setUpdated_by(String updated_by) {
         this.updated_by = updated_by;
+    }
+
+    public boolean isModify() {
+        return modify;
+    }
+
+    public void setModify(boolean modify) {
+        this.modify = modify;
     }
 }

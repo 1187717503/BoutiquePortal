@@ -153,7 +153,7 @@ public class ApiUpdateStockSerivce {
         BigDecimal oldPrice = product.getMax_retail_price();
         int rs = ApiCommonUtils.ifUpdatePrice(oldPrice,newPrice);
 
-        if(rs == 1) {
+        if(rs == 1 || stockOption.isModify()) {
             IPriceService iPriceService = new PriceServiceImpl();
             logger.info("ApiUpdateStockSerivce,synProductPriceRule,product:"+JSONObject.toJSONString(product) +",newPrice:"+newPrice);
             iPriceService.synProductPriceRule(product,newPrice,conn);
