@@ -77,7 +77,7 @@ public class ApiCommonUtils {
 
     public static String escape(String str){
         if(StringUtils.isNotBlank(str)) {
-            str = str.replaceAll("'","\\\\'");
+            str = str.replaceAll("\"","\\\"");
         }
         return str;
     }
