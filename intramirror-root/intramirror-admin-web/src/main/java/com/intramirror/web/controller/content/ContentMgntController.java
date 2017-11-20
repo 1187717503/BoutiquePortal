@@ -1,12 +1,12 @@
 package com.intramirror.web.controller.content;
 
+import com.intramirror.common.parameter.StatusType;
+import com.intramirror.product.api.model.Tag;
 import com.intramirror.product.api.service.BlockService;
 import com.intramirror.product.api.service.ITagService;
 import com.intramirror.web.Exception.ErrorResponse;
 import com.intramirror.web.Exception.ValidateException;
 import com.intramirror.web.common.response.Response;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.SessionAttribute;
  * @author YouFeng.Zhu
  */
 @RestController
-@RequestMapping("/ContentMgnt")
+@RequestMapping("/contentmgnt")
 public class ContentMgntController {
     private final static Logger LOGGER = LoggerFactory.getLogger(ContentMgntController.class);
 
@@ -34,9 +34,10 @@ public class ContentMgntController {
     @Autowired
     private ITagService iTagService;
 
-    @PostMapping(value = "/saveTagProductRel", consumes = "application/json")
+    @PostMapping(value = "/savetagproductrel", consumes = "application/json")
     public Response saveTagProductRel(@SessionAttribute(value = "sessionStorage", required = false) Long userId, @RequestBody Map<String, Object> body) {
         Long tagId = body.get("tagId") == null ? null : Long.parseLong(body.get("tagId").toString());
+        Long sortNum = body.get("sortNum") == null ? 999 : Long.parseLong(body.get("sortNum").toString());
         List<String> productIdList = (List<String>) body.get("productIdList");
 
         if (productIdList.size() <= 0 || null == tagId) {
@@ -46,8 +47,7 @@ public class ContentMgntController {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("productIdList", productIdList);
         map.put("tagId", tagId);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        map.put("created_at", sdf.format(new Date()));
+        map.put("sort_num", sortNum);
 
         try {
             iTagService.saveTagProductRel(map);
@@ -56,6 +56,30 @@ public class ContentMgntController {
         }
 
         return Response.success();
+    }
+
+    @PostMapping(value = "/gettags", consumes = "application/json")
+    public Response getTags(@SessionAttribute(value = "sessionStorage", required = false) Long userId) {
+        List<Tag> listTags = null;
+        try {
+            listTags = iTagService.getTags();
+        } catch (Exception e) {
+            throw new ValidateException(new ErrorResponse("Failed to get all tags! ErrorMsg: " + e.getMessage()));
+        }
+        return Response.status(StatusType.SUCCESS).data(listTags);
+    }
+
+    // For test, not used by web page
+    @PostMapping(value = "/gettagbyid", consumes = "application/json")
+    public Response getTagById(@SessionAttribute(value = "sessionStorage", required = false) Long userId, @RequestBody Map<String, Object> body) {
+        Long tagId = body.get("tagId") == null ? 1 : Long.parseLong(body.get("tagId").toString());
+        Tag tag = null;
+        try {
+            tag = iTagService.selectByPrimaryKey(tagId);
+        } catch (Exception e) {
+            throw new ValidateException(new ErrorResponse("Failed to get all tags! ErrorMsg: " + e.getMessage()));
+        }
+        return Response.status(StatusType.SUCCESS).data(tag);
     }
 
 }

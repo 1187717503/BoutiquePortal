@@ -3,14 +3,28 @@
 <mapper namespace="com.intramirror.product.core.mapper.TagProductRelMapper">
 
     <insert id="saveTagProductRel" parameterType="java.util.Map">
-
         INSERT INTO tag_product_rel(
         tag_id,
         product_id,
-        created_at)
+        sort_num)
         VALUES
         <foreach collection="productIdList" item="item" index="index" separator=",">
-            (#{tagId,jdbcType=BIGINT},#{item,jdbcType=BIGINT},#{created_at,jdbcType=TIMESTAMP})
+            (#{tagId,jdbcType=BIGINT},#{item,jdbcType=BIGINT},#{sort_num,jdbcType=BIGINT})
         </foreach>
     </insert>
+
+    <select id="getByProductAndTagId" resultType="java.util.HashMap" parameterType="java.util.Map">
+        SELECT
+        tag_product_id,tag_id,product_id,
+        created_at,sort_num
+        FROM tag_product_rel
+        WHERE
+        <if test="tag_id != null">
+            tag_id = #{tagId} AND
+        </if>
+        product_id IN
+        <foreach collection="productIdList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
 </mapper>

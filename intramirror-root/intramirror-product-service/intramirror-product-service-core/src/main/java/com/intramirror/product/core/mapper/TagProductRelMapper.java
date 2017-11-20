@@ -3,6 +3,7 @@
  */
 package com.intramirror.product.core.mapper;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -11,4 +12,6 @@ import java.util.Map;
 public interface TagProductRelMapper {
 
     int saveTagProductRel(Map<String, Object> map);
+
+    List<Map<String, Object>> getByProductAndTagId(Map<String, Object> map);
 }
