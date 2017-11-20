@@ -105,11 +105,26 @@ public class XmagSynProductAllMapper implements IProductMapping {
 			}
         	
         	String type = product.get("type")==null?" ":product.get("type").toString(); //查询一级
-        	String category = product.get("category")==null?" ":product.get("category").toString(); //查询三级
+        	String category = product.get("category")==null?" ":product.get("category").toString(); //查询二级
         	String SubCategory = product.get("SubCategory")==null?" ":product.get("SubCategory").toString(); //查询三级
         	//根据传过来的类目   获取映射的类目信息
             Map<String, Object> categoryMap = new HashMap<String, Object>();
             categoryMap.put("vendor_id", vendorOptions.getVendorId());
+
+			if(StringUtils.isBlank(SubCategory)) {
+				SubCategory = category;
+
+				if(type.contains("DONNA")) {
+					category = StringUtils.trim(type.replace("DONNA",""));
+					type = "donna";
+
+				}
+				if(type.contains("UOMO")) {
+					category = StringUtils.trim(type.replace("UOMO",""));
+					type = "uomo";
+				}
+			}
+
             //字符转小写
             categoryMap.put("boutique_second_category", category.toLowerCase());
             categoryMap.put("boutique_third_category", SubCategory);
