@@ -58,7 +58,7 @@ public class ContentMgntController {
         return Response.success();
     }
 
-    @PostMapping(value = "/gettags", consumes = "application/json")
+    @PostMapping(value = "/list/tag", consumes = "application/json")
     public Response getTags(@SessionAttribute(value = "sessionStorage", required = false) Long userId) {
         List<Tag> listTags = null;
         try {

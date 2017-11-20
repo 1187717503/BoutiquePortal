@@ -5,7 +5,7 @@
 
     <!-- mybatis-generator:generate -->
     <classPathEntry
-            location="C:\Users\Admin\.m2\repository\mysql\mysql-connector-java\5.1.39\mysql-connector-java-5.1.39.jar"/>  <!-- 配置JAR驱动 -->
+            location="C:\Users\YouFeng.Zhu\.m2\repository\mysql\mysql-connector-java\5.1.39\mysql-connector-java-5.1.39.jar"/>  <!-- 配置JAR驱动 -->
 
     <context id="context1" defaultModelType="flat" targetRuntime="MyBatis3">
         <commentGenerator>
@@ -22,19 +22,19 @@
         </javaTypeResolver>
 
         <javaModelGenerator targetPackage="com.intramirror.product.api.model"
-                            targetProject="D:\Workspace\IntraMirror\BoutiquePortal\intramirror-root\intramirror-product-service\intramirror-product-service-api\src\main\java"> <!-- 生成实体地址 -->
+                            targetProject="C:\work\repos\BoutiquePortal\intramirror-root\intramirror-product-service\intramirror-product-service-api\src\main\java"> <!-- 生成实体地址 -->
             <property name="trimStrings" value="true"/> <!-- 设置string时是否使用trim调用 -->
         </javaModelGenerator>
 
         <sqlMapGenerator targetPackage="conf.ProductSqlMap"
-                         targetProject="D:\Workspace\IntraMirror\BoutiquePortal\intramirror-root\intramirror-product-service\intramirror-product-service-core\src\main\resources"/> <!-- 生成MapXML文件 -->
+                         targetProject="C:\work\repos\BoutiquePortal\intramirror-root\intramirror-product-service\intramirror-product-service-core\src\main\resources"/> <!-- 生成MapXML文件 -->
 
         <!-- XMLMAPPER,ANNOTATEDMAPPER -->
         <javaClientGenerator targetPackage="com.intramirror.product.core.mapper"
-                             targetProject="D:\Workspace\IntraMirror\BoutiquePortal\intramirror-root\intramirror-product-service\intramirror-product-service-core\src\main\java"
+                             targetProject="C:\work\repos\BoutiquePortal\intramirror-root\intramirror-product-service\intramirror-product-service-core\src\main\java"
                              type="XMLMAPPER"/> <!-- 生成MAP对应Client -->
 
-        <table schema="sha_testing_db" tableName="tag" domainObjectName="Tag"
+        <table schema="sha_testing_db" tableName="tag_product_rel" domainObjectName="TagProductRel"
                enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
                enableSelectByExample="false" selectByExampleQueryId="false">
             <property name="useActualColumnNames" value="false"/>
