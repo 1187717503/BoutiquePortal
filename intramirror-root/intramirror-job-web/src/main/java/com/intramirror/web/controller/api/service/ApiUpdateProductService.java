@@ -192,7 +192,7 @@ public class ApiUpdateProductService {
             }
 
             if(StringUtils.isNotBlank(newColorCode)) {
-                this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.ColorCode.getCode(),newBrandCode);
+                this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.ColorCode.getCode(),newColorCode);
                 product.color_code = newColorCode;
             }
         } else { // 非消息重置时,BrandID和ColorCode和原来不一致或者为空报警告
