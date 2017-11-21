@@ -6,6 +6,7 @@ import com.intramirror.product.api.service.category.ICategoryService;
 import com.intramirror.web.mapping.api.IProductMapping;
 import com.intramirror.web.util.SpringContextUtils;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -143,6 +144,7 @@ public class AiDucaSynProductMapping implements IProductMapping{
         	e.printStackTrace();
 			logger.info("AiDucaSynProductMapping,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
 		}
+		productOptions.setLast_check(new Date());
 		logger.info("AiDucaSynProductMapping,outputParams,productOptions:"+JSONObject.toJSONString(productOptions));
 		return productOptions;
 	}
