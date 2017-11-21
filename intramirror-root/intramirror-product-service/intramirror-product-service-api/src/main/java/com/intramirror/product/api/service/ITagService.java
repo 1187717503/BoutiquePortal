@@ -6,9 +6,9 @@ import java.util.Map;
 
 public interface ITagService {
 
-    int saveTagProductRel(Map<String, Object> map) throws Exception;
+    int saveTagProductRel(Map<String, Object> map);
 
-    List<Tag> getTags() throws Exception;
+    List<Tag> getTags();
 
-    Tag selectByPrimaryKey(Long tagId) throws Exception;
+    Tag selectByPrimaryKey(Long tagId);
 }

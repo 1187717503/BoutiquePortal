@@ -38,6 +38,12 @@
             </properties>
         </profile>
         <profile>
+            <id>test_ci</id>
+            <properties>
+                <profiles.active>test_ci</profiles.active>
+            </properties>
+        </profile>
+        <profile>
             <id>staging_local</id>
             <properties>
                 <profiles.active>staging_local</profiles.active>
