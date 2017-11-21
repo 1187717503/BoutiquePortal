@@ -76,6 +76,10 @@
         <context:property-placeholder location="classpath:staging/common.properties" ignore-unresolvable="true"/>
     </beans>
 
+    <beans profile="test_ci">
+        <context:property-placeholder location="classpath:test_ci/common.properties" ignore-unresolvable="true"/>
+    </beans>
+
     <beans profile="test_local">
         <context:property-placeholder location="classpath:test_local/common.properties" ignore-unresolvable="true"/>
     </beans>

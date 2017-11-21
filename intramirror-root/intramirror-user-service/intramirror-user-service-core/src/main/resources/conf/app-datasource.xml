@@ -36,13 +36,22 @@
    		<constructor-arg ref="userSqlSessionFactory" />
   	</bean>
 
-	<beans profile="test">
-		<context:property-placeholder location="classpath:/test/databases.properties" ignore-unresolvable="true" />
-	</beans>
-	<beans profile="staging">
-		<context:property-placeholder location="classpath:/staging/databases.properties" ignore-unresolvable="true" />
-	</beans>
-	<beans profile="prd">
-		<context:property-placeholder location="classpath:/prd/databases.properties" ignore-unresolvable="true" />
-	</beans>
+    <beans profile="test">
+        <context:property-placeholder location="classpath:/test/databases.properties" ignore-unresolvable="true"/>
+    </beans>
+    <beans profile="staging">
+        <context:property-placeholder location="classpath:/staging/databases.properties" ignore-unresolvable="true"/>
+    </beans>
+    <beans profile="test_local">
+        <context:property-placeholder location="classpath:/test_local/databases.properties" ignore-unresolvable="true"/>
+    </beans>
+    <beans profile="test_ci">
+        <context:property-placeholder location="classpath:/test_ci/databases.properties" ignore-unresolvable="true"/>
+    </beans>
+    <beans profile="staging_local">
+        <context:property-placeholder location="classpath:/staging_local/databases.properties" ignore-unresolvable="true"/>
+    </beans>
+    <beans profile="prd">
+        <context:property-placeholder location="classpath:/prd/databases.properties" ignore-unresolvable="true"/>
+    </beans>
 </beans>
