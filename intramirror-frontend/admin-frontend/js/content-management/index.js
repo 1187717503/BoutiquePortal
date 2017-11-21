@@ -173,30 +173,39 @@ function getFilterFromDom() {
     })
 
     searchObj.boutique = selected;
-
     searchObj.category = $('#category-input').data('category-id');
     searchObj.season = $('#select-season').val();
     searchObj.brand = $('#select-brand').val();
-    searchObj.stock = $('#select-stock').val();
     searchObj.image = $('#select-image').val();
     searchObj.modelImage = $('#select-model-image').val();
     searchObj.streetImage = $('#select-street-image').val();
-    searchObj.exception = $('#select-exception').val();
     searchObj.designerId = $('#text-designerId').val();
     searchObj.colorCode = $('#text-color-code').val();
     searchObj.boutiqueId = $('#text-boutique').val();
+
+    searchObj.minBoutiqueDiscount = $('#boutique-discount-left').val();
+    searchObj.maxBoutiqueDiscount = $('#boutique-discount-right').val();
+
+    searchObj.minBoutiqueDiscount = $('#im-discount-left').val();
+    searchObj.maxBoutiqueDiscount = $('#im-discount-right').val();
+
+    searchObj.minStock = $('#stock-left').val();
+    searchObj.maxStock = $('#stock-right').val();
+
+    searchObj.saleAtFrom = $('#sale-at-start').val();
+    searchObj.saleAtTo = $('#sale-at-end').val();
+
+    searchObj.tag = $('#select-product-tag').val();
 
     if ($('.orderby.active use').length > 0) {
         searchObj.orderByColmun = $('.orderby.active use').attr('data-order-col');
         searchObj.orderByDesc = $('.orderby.active use').attr('data-order-desc');
     }
 
-    console.log(searchObj);
-
     return searchObj;
 }
 
-function getProdcutList(status, pageno) {
+function getProdcutList(pageno) {
     let pagesize = localStorage.getItem('product-page-size');
 
     if (pagesize == null) {
@@ -205,7 +214,6 @@ function getProdcutList(status, pageno) {
     }
 
     let searchObj = getFilterFromDom();
-    //return console.log(searchObj);
 
     var filter = '?';
     if (searchObj.boutique !== '-1' && typeof(searchObj.boutique) !== 'undefined' && searchObj.boutique !== '') {
@@ -241,6 +249,10 @@ function getProdcutList(status, pageno) {
         filter += 'desc='+ searchObj.orderByDesc + '&';
     }
 
+    if (searchObj.minBoutiqueDiscount && searchObj.minBoutiqueDiscount) {
+
+    }
+
     if (pagesize) {
         filter += 'pageSize='+ pagesize + '&';
     }
@@ -248,11 +260,12 @@ function getProdcutList(status, pageno) {
     if (pageno) {
         filter += 'pageNo='+ pageno + '&';
     }
-    filter += 'stock=' + searchObj.stock + '&'
+
+
+
     filter += 'image='+ searchObj.image + '&';
     filter += 'modelImage='+ searchObj.modelImage + '&';
     filter += 'streetImage='+ searchObj.streetImage + '&';
-    filter += 'exception='+ searchObj.exception + '&';
 
     filter = filter.slice(0, filter.length - 1);
 
@@ -261,16 +274,12 @@ function getProdcutList(status, pageno) {
     $('#order-list').empty();
     $('#order-head-list').empty();
     $('.pagination').empty();
-    $('.control-pannel').empty();
     $("#order-head-cbx").prop('checked', false);
     
-    let btnStatus = getBtnStatus(status);
-    $("#tmpl-control-pannel").tmpl({list: btnStatus}).appendTo(".control-pannel");
-   
     $.ajax({
         type: requestURL.search.method,
         contentType: "application/json",
-        url: requestURL.search.url + "/" + status + filter,
+        url: requestURL.search.url + "/all" + filter,
         data: {},
         dataType: 'json',
         beforeSend: function(request) {
@@ -328,7 +337,7 @@ function getProdcutList(status, pageno) {
                 }
             }
 
-            $("#tmpl-order-list").tmpl({list: result.data, tab_status: status, action: btnStatus}).appendTo("#order-list");
+            $("#tmpl-order-list").tmpl({list: result.data}).appendTo("#order-list");
             $("#tmpl-order-head-list").tmpl({tab_status: status}).appendTo("#order-head-list");
 
             $('.orderby').each(function() {
@@ -348,7 +357,7 @@ function getProdcutList(status, pageno) {
 
             initActionEvent();
             finishLoading();
-            getCountWithFilter(filter, status, pagesize, pageno);
+            getCountWithFilter(filter, pagesize, pageno);
         }, error: function(result, resp, par) {
             toashWithCloseBtn(result.responseJSON.message);
             finishLoading();
@@ -360,8 +369,8 @@ function getProdcutList(status, pageno) {
     });
 }
 
-function getCountWithFilter(filter, tarStatus, pagesize, pageno){
-    var nStatusCount = 0;
+function getCountWithFilter(filter, pagesize, pageno){
+
     $.ajax({
         type: requestURL.getAllCount.method,
         contentType: "application/json",
@@ -372,46 +381,10 @@ function getCountWithFilter(filter, tarStatus, pagesize, pageno){
             request.setRequestHeader("token", token);
         },
         success: function(result) {
-            //console.log(result);
-            $(".tabs .tab.col a").each(function(e) {
-                var curStatus = $(this).data('status');
-                switch(curStatus){
-                case 'new':
-                    nStatusCount += dealCountWithFilter($(this), result.data.NEW, curStatus, tarStatus);
-                    break;
-                case 'processing':
-                    nStatusCount += dealCountWithFilter($(this), result.data.PROCESSING, curStatus, tarStatus);
-                    break;
-                case 'readytosell':
-                    nStatusCount += dealCountWithFilter($(this), result.data.READY_TO_SELL, curStatus, tarStatus);
-                    break;
-                case 'shopprocessing':
-                    nStatusCount += dealCountWithFilter($(this), result.data.SHOP_PROCESSING, curStatus, tarStatus);
-                    break;
-                case 'shopreadytosell':
-                    nStatusCount += dealCountWithFilter($(this), result.data.SHOP_READY_TO_SELL, curStatus, tarStatus);
-                    break;
-                case 'shopremoved':
-                    nStatusCount += dealCountWithFilter($(this), result.data.SHOP_REMOVED, curStatus, tarStatus);
-                    break;
-                case 'shoponsale':
-                    nStatusCount += dealCountWithFilter($(this), result.data.SHOP_ON_SALE, curStatus, tarStatus);
-                    break;
-                case 'shopsoldout':
-                    nStatusCount += dealCountWithFilter($(this), result.data.SHOP_SOLD_OUT, curStatus, tarStatus);
-                    break;
-                case 'trash':
-                    nStatusCount += dealCountWithFilter($(this), result.data.TRASH, curStatus, tarStatus);
-                    break;
-                }
-            })
-            //update the page index
-
-            updatePagination(tarStatus, pagesize, pageno, Math.ceil(nStatusCount/pagesize));
+            updatePagination(pagesize, pageno, Math.ceil(result.data.NEW/pagesize), pageAction);
         }, error: function(result, resp, par) {
 
             toashWithCloseBtn(result.responseJSON.message);
-
             if (result.status == 401) {
                 window.location.href = '../../../login'
             }
@@ -419,19 +392,6 @@ function getCountWithFilter(filter, tarStatus, pagesize, pageno){
     });
 }
 
-function dealCountWithFilter(handler, data, curStatus, tarStatus){
-    var nCount = 0;
-    if (undefined != data) {
-        nCount = data;
-    }
-
-    handler.find('span').text('('+nCount+')');
-    if (curStatus == tarStatus) {
-        return nCount;
-    } else {
-        return 0;
-    }
-}
 
 function showDetail() {
     if ($(this).hasClass("head-hide-icon")) {
@@ -465,68 +425,8 @@ function initSelectItems(elemId, tmplId, listData) {
     $('#' + elemId).material_select();
 }
 
-function updatePagination(status, pagesize, pageno, totalsize) {
-    $('.pagination').empty();
-
-    let pageinfo = {}
-    pageinfo.totalPage = totalsize;
-    pageinfo.currPage = pageno;
-    pageinfo.list = [];
-    let listData = pageinfo.list;
-
-    if (totalsize == 0) {
-        return;
-    }
-
-    if (pageno > totalsize + 1) {
-        pageno = totalsize + 1;
-    }
-
-    if (pageno < 0) {
-        pageno = 0;
-    }
-
-    if (pageno <= 3 ) {
-        for (let i = 1; i <= totalsize && i <= 5; i++) {
-            listData.push({"no": i});
-        }
-        listData[pageno - 1].active = 1;
-
-    } else if (pageno + 2 > totalsize) {
-        listData.push({"no": totalsize - 4});
-        listData.push({"no": totalsize - 3});
-        listData.push({"no": totalsize - 2});
-        listData.push({"no": totalsize - 1});
-        listData.push({"no": totalsize});
-        if (4 - totalsize + pageno > 4) {
-            listData.push({"no": totalsize + 1});
-            listData[4 - totalsize + pageno].active = 1;
-        } else {
-            listData[4 - totalsize + pageno].active = 1;
-        }
-        
-    } else {
-        listData.push({"no": pageno - 2});
-        listData.push({"no": pageno - 1});
-        listData.push({"no": pageno, "active": 1});
-        listData.push({"no": pageno + 1});
-        listData.push({"no": pageno + 2});
-    }
-    
-    $('#tmpl-pagination').tmpl({page: pageinfo}).appendTo('.pagination');
-
-    $('#page-size').val(localStorage.getItem('product-page-size'));
-    $('#page-size').material_select();
-
-    $('#page-size').change(function() {
-        localStorage.setItem('product-page-size', $(this).val());
-        getProdcutList(status, 1);
-    }) 
-
-    $('.pagination-index').click(function() {
-        getProdcutList(status, $(this).data('pageno') + 1);
-
-    })
+function pageAction(pageno) {
+    getProdcutList(pageno);
 }
 
 function getActionMessage(action) {
@@ -542,44 +442,8 @@ function getActionMessage(action) {
     return actionDesc[action];
 }
 
-function getBtnStatus(status) {
-    let btnStatus = {};
-    if (status === 'new') {
-        btnStatus.approve = 1;
-        btnStatus.trash = 1;
-        btnStatus.process = 1;
-    } else if (status === 'processing') {
-        btnStatus.approve = 1;
-        btnStatus.trash = 1;
-    } else if (status === 'trash') {
-        btnStatus.approve = 1;
-        // btnStatus.process = 1;
-    } else if (status === 'readytosell') {
-        btnStatus.process = 1;
-        btnStatus.trash = 1;
-        btnStatus.add_to_shop = 1;
-    } else if (status === 'shopreadytosell') {
-        // btnStatus.process = 1;
-        btnStatus.remove = 1;
-        btnStatus.remove_from_shop = 1;
-        btnStatus.on_sale = 1
-    } else if (status === 'shopprocessing') {
-        btnStatus.approve = 1;
-        btnStatus.remove = 1;
-    } else if (status === 'shopremoved') {
-        btnStatus.approve = 1;
-    } else if (status === 'shopsoldout') {
-        btnStatus.process = 1;
-        btnStatus.remove = 1;
-    } else if (status === 'shoponsale') {
-        btnStatus.process = 1;
-        btnStatus.remove = 1;
-        btnStatus.off_sale = 1;
-    }
-    return btnStatus;
-}
-
 function initActionEvent() {
+
     $("#order-head-cbx").change(function() {
         if ($(this).prop('checked') === true) {
             $(".product-list .page-order [type='checkbox']").prop('checked', true);
@@ -606,8 +470,7 @@ function initActionEvent() {
 
         $(this).addClass('active');
 
-        let status = $('.tabs .tab a.active').data('status');
-        getProdcutList(status, 1);
+        getProdcutList(1);
         
     })
 
@@ -656,69 +519,7 @@ function initActionEvent() {
                 // 获取当前页数
                 let current = $('.pagination .active.pagination-index').data('pageno') + 1;
 
-                getProdcutList(param.originalState, current);
-                finishLoading()
-                
-            }, error: function(result, resp, par) {
-                toashWithCloseBtn(result.responseJSON.message);
-
-                finishLoading()
-                if (result.status == 401) {
-                    window.location.href = '../../../login';
-                }
-            }
-        });
-
-    });
-
-
-    $('.exception-batch-action').click(function() {
-        let data = [];
-        let count = 0;
-        data.originalState = $('.tabs .tab a.active').data('status');
-        $('.product-list').each(function(idx, item) {
-            if ($(item).find('.item input[type=checkbox]').prop('checked')) {
-                $(item).find('.goods .exception').each(function(deatilIdx, detailItem){
-                    data.push($(detailItem).data('sku-id'));
-                })
-                count++;
-            }
-        })
-        
-        if (count == 0) {
-            Materialize.toast('Please select at least one', 3000);
-            return;
-        }
-        if (data.length == 0) {
-            Materialize.toast('No exception in selected product.', 3000);
-            return;
-        }
-        console.log(JSON.stringify(data));
-        loading();
-        $.ajax({
-            type: requestURL.updateProductException.method,
-            contentType: "application/json",
-            url: requestURL.updateProductException.url ,
-            data: JSON.stringify(data),
-            dataType: 'json',
-            beforeSend: function(request) {
-                request.setRequestHeader("token", token);
-            },
-            success: function(result) {
-                if (result.data.failed.length > 0) {
-                    let msg = '';
-                    for (var i = 0; i < result.data.failed.length; i++) {
-                        msg += result.data.failed[i].message + "<br/>";
-                    }
-                    toashWithCloseBtn(msg);
-                } else {
-                    Materialize.toast('Resolve Success', 3000);
-                }
-
-                // 获取当前页数
-                let current = $('.pagination .active.pagination-index').data('pageno') + 1;
-
-                getProdcutList(data.originalState, current);
+                getProdcutList(current);
                 finishLoading()
                 
             }, error: function(result, resp, par) {
@@ -752,7 +553,7 @@ function initActionEvent() {
                 preload: [0, 1]
             },
         }, 0);
-    })
+    });
 
 
     $('.product-list .action .action-icon').click(function() {
@@ -777,12 +578,11 @@ function initActionEvent() {
                 request.setRequestHeader("token", token);
             },
             success: function(result) {
-                let status = $('.tabs .tab a.active').data('status');
-                
+
                 Materialize.toast(getActionMessage(action) + ' Success', 3000);
                 let current = $('.pagination .active.pagination-index').data('pageno') + 1;
 
-                getProdcutList(status, current);
+                getProdcutList(current);
             }, error: function(result, resp, par) {
                 toashWithCloseBtn(result.responseJSON.message);
 
@@ -792,66 +592,4 @@ function initActionEvent() {
             }
         });
     });
-
-    $('.product-list .exception-ops ').click(function() {
-        let skuId = $(this).parent().parent().data('sku-id');
-        let productId = $(this).parent().parent().data('product-id');
-        let action = $(this).data('action');
-
-
-
-        if(action === 'set0'){
-            let param = {};
-            param.productId = productId;
-            param.skuId = skuId;
-            $.ajax({
-                type: requestURL.saveProductException.method,
-                contentType: "application/json",
-                url: requestURL.saveProductException.url ,
-                data: JSON.stringify(param),
-                dataType: 'json',
-                beforeSend: function(request) {
-                    request.setRequestHeader("token", token);
-                },            
-                success: function(result) {
-                    let status = $('.tabs .tab a.active').data('status');
-                    Materialize.toast('Save success', 3000);
-                    let current = $('.pagination .active.pagination-index').data('pageno') + 1;
-                    getProdcutList(status, current);
-                }, error: function(result, resp, par) {
-                    toashWithCloseBtn(result.responseJSON.message);
-                    if (result.status == 401) {
-                        window.location.href = '../../../login';
-                    }
-                }
-            });
-        } else if(action === 'resolve'){
-            let param = [];
-            param.push(skuId);
-            $.ajax({
-                type: requestURL.updateProductException.method,
-                contentType: "application/json",
-                url: requestURL.updateProductException.url ,
-                data: JSON.stringify(param),
-                dataType: 'json',
-                beforeSend: function(request) {
-                    request.setRequestHeader("token", token);
-                },            
-                success: function(result) {
-                    let status = $('.tabs .tab a.active').data('status');
-                    Materialize.toast('Resolve success', 3000);
-                    let current = $('.pagination .active.pagination-index').data('pageno') + 1;
-                    getProdcutList(status, current);
-                }, error: function(result, resp, par) {
-                    toashWithCloseBtn(result.responseJSON.message);
-                    if (result.status == 401) {
-                        window.location.href = '../../../login';
-                    }
-                }
-            });
-        }
-        
-        
-    });
 }
-

@@ -8,7 +8,7 @@
     <title>Contect Management - Assign Product Tag</title>
 
     <!-- Favicons-->
-    <link rel="icon" href="favicon.ico">
+    <link rel="icon" href="../favicon.ico">
 
     <!-- For iPhone -->
     <meta name="msapplication-TileColor" content="#00bcd4">
@@ -24,7 +24,7 @@
     <!-- Customer CSS-->
     <link href="../css/custom/custom.css" type="text/css" rel="stylesheet" media="screen,projection">
     <link href="../css/index.css" type="text/css" rel="stylesheet" media="screen,projection">
-
+    <link href="../css/content-management.css" type="text/css" rel="stylesheet" media="screen,projection">
 </head>
 
 <body>
@@ -86,7 +86,7 @@
                 <ul class="left">
                     <li>
                         <h1 class="logo-wrapper">
-                            <a href="../../admin/default" class="brand-logo darken-1 mdi-navigation-menu"><span class="brand-text">Merchandise Management - Product Management</span></a>
+                            <a href="../../admin/default" class="brand-logo darken-1 mdi-navigation-menu"><span class="brand-text">Contect Management - Assign Product Tag</span></a>
                         </h1>
                     </li>
                 </ul>
@@ -107,108 +107,129 @@
             <div class="container">
                 <div class="filter">
                     <div class="row">
-                        <div class="col s9">
-                            <div class="row">
-                                <div class="input-field col s3">
-                                    <select id="select-boutique" multiple placeholder="All Boutique"></select>
-                                </div>
-                                <div class="input-field col s2">
-                                    <input id="text-designerId" type="text" class="validate">
-                                    <label for="text-designerId">Designer ID</label>
-                                </div>
-                                <div class="input-field col s2">
-                                    <input id="text-color-code" type="text" class="validate">
-                                    <label for="text-color-code">Color Code</label>
-                                </div>
-                                <div class="input-field col s2">
-                                    <input id="text-boutique" type="text" class="validate">
-                                    <label for="text-boutique">Boutique ID</label>
-                                </div>
-                                <div class="input-field col s3">
-                                    <select id="select-brand"></select>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="input-field col s3" id="category-menu-input" style="position: relative;cursor: pointer;">
-                                    <input id="category-input" type="text" value="Category" data-category-id="-1" placeholder="Category" readonly style="cursor: pointer;">
-                                    <span class="triangle">▼</span>
-                                    <div id="category-menu" style="display: none;"></div>
-                                </div>
-
-                                <div class="input-field col s1" style="padding-right: 0;">
-                                    <select id="select-season"></select>
-                                </div>
-                                <div class="input-field col s2">
-                                    <select id="select-image">
-                                        <option value="0" selected>Image All</option>
-                                        <option value="1">YES</option>
-                                        <option value="2">NO</option>
-                                    </select>
-                                </div>
-                                <div class="input-field col s2">
-                                    <select id="select-model-image">
-                                        <option value="0" selected>Model Image All</option>
-                                        <option value="1">YES</option>
-                                        <option value="2">NO</option>
-                                    </select>
-                                </div>
-                                <div class="input-field col s2">
-                                    <select id="select-street-image">
-                                        <option value="0" selected>Street Image All</option>
-                                        <option value="1">YES</option>
-                                        <option value="2">NO</option>
-                                    </select>
-                                </div>
-                                <div class="input-field col s1">
-                                    <select id="select-stock">
-                                        <option value="0" selected>Stock All</option>
-                                        <option value="1">YES</option>
-                                        <option value="2">NO</option>
-                                    </select>
-                                </div>
-                                <div class="input-field col s1">
-                                    <select id="select-exception">
-                                        <option value="0" selected>Exception</option>
-                                        <option value="1">YES</option>
-                                        <option value="2">NO</option>
-                                    </select>
-                                </div>
-                            </div>
+                        <div class="input-field col s2">
+                            <select id="select-boutique" multiple placeholder="All Boutique"></select>
+                            <label for="select-boutique">Boutique</label>
                         </div>
-
-                        <div class="col s3 search-btns">
-                            <a id="search-btn" class="waves-effect waves-light btn ">Search</a>
-                            <a id="cancel-btn" class="waves-effect waves-light btn btn-gray">Reset</a>
+                        <div class="input-field col s2">
+                            <input id="text-designerId" type="text" class="validate">
+                            <label for="text-designerId">Designer ID</label>
+                        </div>
+                        <div class="input-field col s1">
+                            <input id="text-color-code" type="text" class="validate">
+                            <label for="text-color-code">Color Code</label>
+                        </div>
+                        <div class="input-field col s2">
+                            <input id="text-boutique" type="text" class="validate">
+                            <label for="text-boutique">Boutique ID</label>
+                        </div>
+                        <div class="input-field col s2">
+                            <select id="select-brand"></select>
+                            <label for="select-brand">Brand</label>
                         </div>
                     </div>
+
+                    <div class="row">
+                        <div class="input-field col s2" id="category-menu-input" style="position: relative;cursor: pointer;">
+                            <input id="category-input" type="text" value="Category" data-category-id="-1" placeholder="Category" readonly style="cursor: pointer;">
+                            <span class="triangle">▼</span>
+                            <div id="category-menu" style="display: none;"></div>
+                            <label for="category-menu">Category</label>
+                        </div>
+
+                        <div class="input-field col s1" style="padding-right: 0;">
+                            <select id="select-season"></select>
+                            <label for="select-season">Season</label>
+                        </div>
+                        <div class="input-field col s2">
+                            <select id="select-image">
+                                <option value="0" selected>Image</option>
+                                <option value="1">YES</option>
+                                <option value="2">NO</option>
+                            </select>
+                            <label for="select-image">Image All</label>
+                        </div>
+                        <div class="input-field col s2">
+                            <select id="select-model-image">
+                                <option value="0" selected>Model Image All</option>
+                                <option value="1">YES</option>
+                                <option value="2">NO</option>
+                            </select>
+                            <label for="select-model-image">Model Image All</label>
+                        </div>
+                        <div class="input-field col s2">
+                            <select id="select-street-image">
+                                <option value="0" selected>Street Image All</option>
+                                <option value="1">YES</option>
+                                <option value="2">NO</option>
+                            </select>
+                            <label for="select-model-image">Street Image All</label>
+                        </div>
+                        <div class="col s3 content-seach-btn">
+                            <a id="search-btn" class="waves-effect waves-light btn">Search</a>
+                            <a id="cancel-btn" class="waves-effect waves-light btn btn-gray">Reset</a>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col s2 has-labe-input">
+                            <div class="div-label-text">
+                                <label class="left-label-text">Boutique Discount</label>
+                            </div>
+                            <input id="boutique-discount-left" class="discount-input" placeholder="0-100" type="text">
+                            <label class="center-label-text">~</label>
+                            <input id="boutique-discount-right" class="discount-input" placeholder="0-100" type="text">
+                        </div>
+
+                        <div class="col s2 has-labe-input">
+                            <div class="div-label-text">
+                                <label class="left-label-text">IM Discount</label>
+                            </div>
+                            <input id="im-discount-left" class="discount-input" placeholder="0-100" type="text">
+                            <label class="center-label-text">~</label>
+                            <input id="im-discount-right" class="discount-input" placeholder="0-100" type="text">
+                        </div>
+
+                        <div class="col s2 has-labe-input">
+                            <div class="div-label-text" style="margin-top: 23px;">
+                                <label class="left-label-text">Stock</label>
+                            </div>
+                            <input id="stock-left" class="stock-input"  type="text">
+                            <label class="center-label-text">~</label>
+                            <input id="stock-right" class="stock-input" type="text">
+                        </div>
+
+                        <div class="input-field col s2">
+                            <select id="select-product-tag">
+                                <option value="0" selected>All Tags</option>
+                                <option value="1">YES</option>
+                                <option value="2">NO</option>
+                            </select>
+                            <label for="select-product-tag">Product Tags</label>
+                        </div>
+
+                        <div class="col s4 has-labe-input" style="position: relative;">
+                            <label style="position: absolute;top: -14px;">Sale At</label>
+                            <input id="sale-at-start" class="discount-input sale-datepicker" type="text">
+                            <label class="center-label-text">~</label>
+                            <input id="sale-at-end" class="discount-input sale-datepicker" type="text">
+                        </div>
+                        
+                    </div>
+ 
                 </div>
                 <!--end filter-->
 
-                <!-- tabs -->
-                <div class="row status-tabs">
-                    <div class="col s12">
-                        <ul class="tabs">
-                            <li class="tab col"><a data-status="new" class="active" href="#"><div>NEW<span>(0)</span></div></a></li>
-                            <li class="tab col"><a data-status="trash" href="#"><div>TRASH<span>(0)</span></div></a></li>
-                            <li class="tab col"><a data-status="processing" href="#"><div>PROCESSING<span>(0)</span></div></a></li>
-                            <li class="tab col"><a data-status="readytosell" href="#"><div>READY_TO_SELL<span>(0)</span></div></a></li>
-                            <li class="tab col"><a data-status="shopreadytosell" href="#"><div>SHOP_READY<span>(0)</span></div></a></li>
-                            <li class="tab col"><a data-status="shopprocessing" href="#"><div>SHOP_PROCESSING<span>(0)</span></div></a></li>
-                            <li class="tab col"><a data-status="shoponsale" href="#"><div>SHOP_ONSELL<span>(0)</span></div></a></li>
-                            <li class="tab col"><a data-status="shopsoldout" href="#"><div>SHOP_SOLDOUT<span>(0)</span></div></a></li>
-                            <li class="tab col"><a data-status="shopremoved" href="#"><div>SHOP_REMOVED<span>(0)</span></div></a></li>
-                        </ul>
+                <div style="margin-top: 40px">
+                    <div style="display: inline-block;width: 200px;">
+                        <select id="select-apply-product-tag">
+                            <option value="0" selected>All Tags</option>
+                            <option value="1">YES</option>
+                            <option value="2">NO</option>
+                        </select>
                     </div>
-                </div>
-                <div class="control-pannel">
-                    <div>
-                        <a id="processing-btn" class="waves-effect waves-light btn">PROCESS</a>
-                        <a id="approve-btn" class="waves-effect waves-light btn">APPROVE</a>
-                        <a id="resolve-btn" class="waves-effect waves-light btn">RESOLVE</a>
-                    </div>
-                    <div class="remove">
-                        <a id="remove-btn" class="waves-effect waves-light btn btn-gray">REMOVE</a>
+                    <div style="display: inline-block;margin-left: 12px">
+                        <a id="apply-tag-btn" class="waves-effect waves-light btn">APPLY TAG</a>
                     </div>
                 </div>
 
@@ -238,13 +259,13 @@
 </div>
 <!-- END MAIN -->
 
-<!-- ================================================
-Scripts
-================================================ -->
+<!-- Public js, should be include first -->
 <script type="text/javascript" src="../js/base.js?v=1.0"></script>
 <script type="text/javascript" src="../js/restful.js?v=1.0"></script>
+<script type="text/javascript" src="../js/common.js?v=1.0"></script>
 
-<script type="text/javascript" src="../js/product-status/index.js?v=2.0"></script>
+
+<script type="text/javascript" src="../js/content-management/index.js?v=2.0"></script>
 
 <!-- jQuery Library -->
 <script type="text/javascript" src="../js/plugins/jquery-1.11.2.min.js"></script>
@@ -330,38 +351,6 @@ Scripts
     {%/each%}
 </script>
 
-
-
-<script id="tmpl-control-pannel" type="text/x-jquery-tmpl">
-    <div>
-        {%if list.process == 1 %}
-        <a data-action="process" class="waves-effect waves-light btn batch-action">PROCESS</a>
-        {%/if%}
-        {%if list.approve == 1 %}
-        <a data-action="approve" class="waves-effect waves-light btn batch-action">APPROVE</a>
-        {%/if%}
-        {%if list.add_to_shop == 1 %}
-        <a data-action="addtoshop" class="waves-effect waves-light btn batch-action">Add to Shop</a>
-        {%/if%}
-        {%if list.remove_from_shop == 1 %}
-        <a data-action="removefromshop" class="waves-effect waves-light btn batch-action">Remove from Shop</a>
-        {%/if%}
-        {%if list.off_sale == 1 %}
-        <a data-action="offsale" class="waves-effect waves-light btn batch-action">Off Sale</a>
-        {%/if%}
-        {%if list.on_sale == 1 %}
-        <a data-action="onsale" class="waves-effect waves-light btn batch-action">On Sale</a>
-        {%/if%}
-        <a id="resolve-btn" class="waves-effect waves-light btn exception-batch-action">RESOLVE</a>
-    </div>
-    <div class="remove">
-        {%if list.remove == 1 || list.trash == 1 %}
-        <a data-action="remove" class="waves-effect waves-light btn btn-gray batch-action">REMOVE</a>
-        {%/if%}
-    </div>
-
-</script>
-
 <script id="tmpl-order-head-list" type="text/x-jquery-tmpl">
     <div class="row style-scope page-order">
         <div class="item style-scope page-order">
@@ -394,12 +383,8 @@ Scripts
         <div class="item style-scope page-order">Stock</div>
         <div class="item style-scope page-order">Retail Price</div>
         <div class="item style-scope page-order">Boutique Price</div>
-        {%if tab_status =='new' || tab_status =='processing' || tab_status=='readytosell' || tab_status=='trash' %}
-            <div class="item style-scope page-order">IM Price</div>
-        {%else%}
-            <div class="item style-scope page-order">Sale Price</div>
-        {%/if%}
-        <div class="item style-scope page-order">Action</div>
+        <div class="item style-scope page-order">IM Price/Sale Price</div>
+        <div class="item style-scope page-order">Status</div>
     </div>
 
 </script>
@@ -428,61 +413,13 @@ Scripts
         <div class="item style-scope page-order">${order.totalStore}</div>
         <div class="item style-scope page-order">€${order.retail_price}</div>
         <div class="item style-scope page-order">€${order.boutique_price}<span style="display: block;">${order.boutique_discount}</span></div>
-        {%if tab_status =='new' || tab_status =='processing' || tab_status=='readytosell' || tab_status=='trash' %}
+        {%if order.im_discount && order.im_price %}
         <div class="item style-scope page-order">€${order.im_price}<span style="display: block;">${order.im_discount}</span></div>
         {%else%}
         <div class="item style-scope page-order">€${order.sale_price}<span style="display: block;">${order.sale_discount}</span></div>
         {%/if%}
         <div class="item style-scope page-order action" data-product-id="${order.product_id}" data-shop-product-id="${order.shop_product_id}">
-            {%if action.process == 1 %}
-            <span title="Process" data-action="process" class="waves-effect icon-btn-processing action-icon">
-                <svg class="icon" aria-hidden="true">
-                    <use class="use-icon" xlink:href="#icon-process"></use>
-                </svg>
-            </span>
-            {%/if%}
-            {%if action.approve == 1 %}
-            <span title="Approve" data-action="approve" class="waves-effect icon-btn-approve action-icon">
-                <svg class="icon" aria-hidden="true">
-                    <use class="use-icon" xlink:href="#icon-approve"></use>
-                </svg>
-            </span>
-            {%/if%}
-            {%if action.add_to_shop == 1 %}
-            <span title="Add To Shop" data-action="addtoshop" class="waves-effect mdi-content-add action-icon"></span>
-            {%/if%}
-            {%if action.remove_from_shop == 1 %}
-            <span title="Remove from shop" data-action="removefromshop" class="waves-effect mdi-content-remove action-icon"></span>
-            {%/if%}
-            {%if action.off_sale == 1 %}
-            <span title="Off Sale" data-action="offsale" class="waves-effect action-icon">
-                <svg class="icon" aria-hidden="true">
-                    <use class="use-icon" xlink:href="#icon-off-sell"></use>
-                </svg>
-            </span>
-            {%/if%}
-            {%if action.on_sale == 1 %}
-            <span title="On Sale" data-action="onsale" class="waves-effect action-icon">
-                <svg class="icon" aria-hidden="true">
-                    <use class="use-icon" xlink:href="#icon-on-sell"></use>
-                </svg>
-            </svg>
-            </span>
-            {%/if%}
-            {%if action.remove == 1 %}
-            <span title="Remove" data-action="remove" class="waves-effect icon-btn-delete action-icon">
-                <svg class="icon" aria-hidden="true">
-                    <use class="use-icon" xlink:href="#icon-shop-remove"></use>
-                </svg>
-            </span>
-            {%/if%}
-            {%if action.trash == 1 %}
-            <span title="Trash" data-action="remove" class="waves-effect icon-btn-delete action-icon">
-                <svg class="icon" aria-hidden="true">
-                    <use class="use-icon" xlink:href="#icon-trash"></use>
-                </svg>
-            </span>
-            {%/if%}
+            
         </div>
     </div>
     <div class="goods show-detail">
@@ -493,41 +430,17 @@ Scripts
             <div class="list-detail-item">Available Stock</div>
             <div class="list-detail-item">Reserverd Stock</div>
             <div class="list-detail-item">Confirmed Stock</div>
-            <div class="list-detail-item">Last Check</div>
-            <div class="list-detail-item">Exception Date</div>
+            <div class="list-detail-item">Tags</div>
         </div>
         {%each(j, detail) order.skuDetail%}
-            {%if detail.exceptionStatus == null %}
-                <div data-sku-id="${detail.sku_id}" data-product-id="${detail.product_id}" class="row list-detail-row">
+            <div data-sku-id="${detail.sku_id}" data-product-id="${detail.product_id}" class="row list-detail-row">
                 <div class="list-detail-item">${detail.sku_id}</div>
                 <div class="list-detail-item">${detail.size}</div>
                 <div class="list-detail-item">${detail.bar_code}</div>
                 <div class="list-detail-item">${detail.store}</div>
                 <div class="list-detail-item">${detail.reserved}</div>
                 <div class="list-detail-item">${detail.confirmed}</div>
-                <div class="list-detail-item">${detail.last_check}</div>
                 <div class="list-detail-item">${detail.exceptionDate}</div>
-                <div class="list-detail-item exception-btn">
-                    <span data-action="set0" class="waves-effect waves-light btn mini-long-btn exception-ops">Set 0</span>
-                </div>
-            {%else%}
-                <div data-sku-id="${detail.sku_id}" data-product-id="${detail.product_id}" class="row list-detail-row exception">
-                <div class="list-detail-item exception-warning">${detail.sku_id}</div>
-                <div class="list-detail-item exception-warning">${detail.size}</div>
-                <div class="list-detail-item exception-warning">${detail.bar_code}</div>
-                <div class="list-detail-item exception-warning">${detail.store}</div>
-                <div class="list-detail-item exception-warning">${detail.reserved}</div>
-                <div class="list-detail-item exception-warning">${detail.confirmed}</div>
-                <div class="list-detail-item exception-warning">${detail.last_check}</div>
-                <div class="list-detail-item exception-warning">${detail.exceptionDate}</div>
-                <div class="list-detail-item exception-btn">
-                     <span data-action="resolve" class="waves-effect waves-light btn mini-long-btn exception-ops">Resolve</span>
-                </div>
-            {%/if%}
-
-                
-
-                
             </div>
         {%/each%}
     </div>
@@ -551,38 +464,46 @@ Scripts
     
     {%if page.currPage <= 1 %}
     <li class="disabled">
-        <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-first-page"></use> </svg> </a> </li>
+        <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-first-page"></use></svg></a>
+    </li>
     <li class="disabled">
-        <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-left"></use> </svg> </a> </li>
+        <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-left"></use> </svg></a>
+    </li>
     {%else%}
     <li class="waves-effect pagination-index" data-pageno="0">
-        <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-first-page"></use> </svg> </a> </li>
+        <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-first-page"></use></svg></a>
+    </li>
     <li class="waves-effect pagination-index" data-pageno="${page.currPage-2}">
-        <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-left"></use> </svg> </a> </li>
+        <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-left"></use></svg></a>
+    </li>
     {%/if%}
     {%each(i, pageInfo) page.list%}
         {%if pageInfo.active %}
-            <li class="waves-effect active pagination-index" data-pageno="${pageInfo.no - 1}"><a href="#!">${pageInfo.no}</a></li>
+            <li class="waves-effect active pagination-index" data-pageno="${pageInfo.no - 1}"><a href="#!">${pageInfo.no}</a>
+            </li>
         {%else%}
-            <li class="waves-effect pagination-index" data-pageno="${pageInfo.no - 1}"><a href="#!">${pageInfo.no}</a></li>
+            <li class="waves-effect pagination-index" data-pageno="${pageInfo.no - 1}"><a href="#!">${pageInfo.no}</a>
+            </li>
         {%/if%}
     {%/each%}
 
     {%if page.currPage <= page.totalPage - 1 %}
     <li class="waves-effect pagination-index" data-pageno="${page.currPage}">
-        <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-right"></use> </svg> </a>
+        <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-right"></use></svg></a>
     </li>
     <li class="waves-effect pagination-index" data-pageno="${page.totalPage - 1}">
-        <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-last-page"></use> </svg> </a> </li>
+        <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-last-page"></use></svg></a>
+    </li>
     {%else%}
     <li class="disabled">
-        <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-right"></use> </svg> </a>
+        <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-right"></use></svg></a>
     </li>
     <li class="disabled">
-        <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-last-page"></use> </svg> </a></li> {%/if%}
+        <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-last-page"></use></svg></a>
+    </li> 
+    {%/if%}
 
 </script>
-
 
 <script type="text/javascript">
 
@@ -593,16 +514,23 @@ Scripts
         initSeason();
         initCategory();
 
-        $('#search-btn').click(function() {
-            let status = $('.tabs .tab a.active').data('status');
-            getProdcutList(status, 1);
+        $('#apply-tag-btn').click(function() {
+            console.log($('#sale-at-start').val());
         })
 
-        $('.tabs .tab a').click(function() {
-            let status = $(this).data('status');
-            getProdcutList(status, 1);
+        $('.sale-datepicker').pickadate({
+            selectMonths: true,
+            selectYears: 15,
+            today: 'Today',
+            clear: 'Clear',
+            close: 'Ok',
+            format: 'yyyy-mm-dd',
+            closeOnSelect: true // Close upon selecting a date,
+        });
+
+        $('#search-btn').click(function() {
+            getProdcutList(1);
         })
-        
 
         $('#cancel-btn').click(function() {
             $('#select-boutique').val('-1');
@@ -618,21 +546,25 @@ Scripts
             $('#text-designerId').val('');
             $('#text-color-code').val('');
             $('#text-boutique').val('');
+            $('#boutique-discount-left').val('');
+            $('#boutique-discount-right').val('');
+            $('#im-discount-left').val('');
+            $('#im-discount-right').val('');
 
             $('#text-designerId').trigger('blur');
             $('#text-color-code').trigger('blur');
             $('#text-boutique').trigger('blur');
+            $('#sale-at-start').val('');
+            $('#sale-at-end').val('');
 
             $('select').material_select();
             initActionforBoutique();
 
             $('.orderby .icon use').attr('xlink:href', '#icon-paixu-copy');
             $('.orderby').removeClass('active');
-            let status = $('.tabs .tab a.active').data('status');
-            getProdcutList(status, 1);
+            getProdcutList(1);
         })
 
-        $('ul.tabs').tabs();
 
         $('#category-menu-input input, #category-menu-input span.triangle').click(function(e) {
             $('#category-menu .multi-menu').css('min-width', $('#category-input').width() + 'px');
