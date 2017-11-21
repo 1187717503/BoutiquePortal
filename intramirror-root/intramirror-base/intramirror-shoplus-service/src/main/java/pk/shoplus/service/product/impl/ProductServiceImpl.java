@@ -114,7 +114,7 @@ public class ProductServiceImpl implements IProductService{
                 mapUtils = new MapUtils(new HashMap<>());
                 mapUtils.putData("status",StatusType.WARNING)
                         .putData("info","update product - " + ApiErrorTypeEnum.errorType.category_is_null.getDesc()+" category_id:null")
-                        .putData("error_enum",warning_data_can_not_find_mapping)
+                        .putData("error_enum", error_data_can_not_find_mapping)
                         .putData("key","category_id")
                         .putData("value",productOptions.getCategory_name());
                 warningMaps.add(mapUtils.getMap());
@@ -124,7 +124,7 @@ public class ProductServiceImpl implements IProductService{
                     mapUtils = new MapUtils(new HashMap<>());
                     mapUtils.putData("status",StatusType.WARNING)
                             .putData("info","update product - "+ ApiErrorTypeEnum.errorType.category_not_exist.getDesc()+" category_id:"+productOptions.getCategoryId())
-                            .putData("error_enum",warning_data_can_not_find_mapping)
+                            .putData("error_enum", error_data_can_not_find_mapping)
                             .putData("key","category_id")
                             .putData("value",productOptions.getCategory_name());
                     warningMaps.add(mapUtils.getMap());
@@ -146,7 +146,7 @@ public class ProductServiceImpl implements IProductService{
                 mapUtils = new MapUtils(new HashMap<>());
                 mapUtils.putData("status",StatusType.WARNING)
                         .putData("info","update product - "+ ApiErrorTypeEnum.errorType.category_is_not_three.getDesc()+" category_id:"+productOptions.getCategoryId())
-                        .putData("error_enum",warning_data_can_not_find_mapping)
+                        .putData("error_enum", error_data_can_not_find_mapping)
                         .putData("key","category_id")
                         .putData("value",productOptions.getCategory_name());
                 warningMaps.add(mapUtils.getMap());
@@ -175,7 +175,7 @@ public class ProductServiceImpl implements IProductService{
                     mapUtils = new MapUtils(new HashMap<>());
                     mapUtils.putData("status",StatusType.WARNING)
                             .putData("info","update product - "+ ApiErrorTypeEnum.errorType.brand_not_exist.getCode()+" brand_name:"+productOptions.getBrandName())
-                            .putData("error_enum",warning_data_can_not_find_mapping)
+                            .putData("error_enum", error_data_can_not_find_mapping)
                             .putData("key","brand_name")
                             .putData("value",productOptions.getBrandName());
                     warningMaps.add(mapUtils.getMap());
@@ -284,7 +284,7 @@ public class ProductServiceImpl implements IProductService{
                 mapUtils = new MapUtils(new HashMap<>());
                 mapUtils.putData("status",StatusType.WARNING)
                         .putData("info","update product - "+ ApiErrorTypeEnum.errorType.season_not_exist.getDesc()+" season_code:"+productOptions.getSeasonCode() )
-                        .putData("error_enum",warning_data_can_not_find_mapping)
+                        .putData("error_enum", error_data_can_not_find_mapping)
                         .putData("key","season_code")
                         .putData("value","null");
                 warningMaps.add(mapUtils.getMap());
@@ -947,8 +947,8 @@ public class ProductServiceImpl implements IProductService{
                 if(keyName.equals(ProductPropertyEnumKeyName.ColorCode.getCode())) {
                     mapUtils = new MapUtils(new HashMap<>());
                     mapUtils.putData("status",StatusType.WARNING)
-                            .putData("info","update product - "+ ApiErrorTypeEnum.errorType.warning_ColorCode_change.getDesc()+" ColorCode:"+value)
-                            .putData("error_enum",ApiErrorTypeEnum.errorType.warning_ColorCode_change)
+                            .putData("info","update product - "+ ApiErrorTypeEnum.errorType.error_ColorCode_change.getDesc()+" ColorCode:"+value)
+                            .putData("error_enum",ApiErrorTypeEnum.errorType.error_ColorCode_change)
                             .putData("key","ColorCode")
                             .putData("value",value);
                     maps.add(mapUtils.getMap());
@@ -957,8 +957,8 @@ public class ProductServiceImpl implements IProductService{
                 } else if(keyName.equals(ProductPropertyEnumKeyName.BrandID.getCode())) {
                     mapUtils = new MapUtils(new HashMap<>());
                     mapUtils.putData("status",StatusType.WARNING)
-                            .putData("info","update product - "+ ApiErrorTypeEnum.errorType.warning_BrandID_change.getDesc()+" BrandID:"+value)
-                            .putData("error_enum",ApiErrorTypeEnum.errorType.warning_BrandID_change)
+                            .putData("info","update product - "+ ApiErrorTypeEnum.errorType.error_BrandID_change.getDesc()+" BrandID:"+value)
+                            .putData("error_enum",ApiErrorTypeEnum.errorType.error_BrandID_change)
                             .putData("key","BrandID")
                             .putData("value",value);
                     maps.add(mapUtils.getMap());

@@ -88,11 +88,11 @@ public class ApiErrorTypeEnum {
         error_stock_out_off("error_stock_out_off","库存小于0或者高于100"),
         warning_stock_out_off("warning_stock_out_off","库存小于0或者高于100"),
         warning_price_out_off("warning_price_out_off","价格超过+-20%"),
-        warning_data_can_not_find_mapping("warning_data_can_not_find_mapping","警告，数据不能映射。"),
+        error_data_can_not_find_mapping("error_data_can_not_find_mapping","警告，数据不能映射。"),
         data_can_not_find_mapping("data_can_not_find_mapping","报错，数据不能映射。"),
-        warning_ColorCode_change("warning_ColorCode_change","警告，ColorCode不允许改变。"),
+        error_ColorCode_change("error_ColorCode_change","警告，ColorCode不允许改变。"),
         warning_duplicated_skusize("warning_duplicated_skusize","重复的sku size"),
-        warning_BrandID_change("warning_BrandID_change","警告，BrandID不允许改变。");
+        error_BrandID_change("error_BrandID_change","警告，BrandID不允许改变。");
 
         private String code;
         private String desc;

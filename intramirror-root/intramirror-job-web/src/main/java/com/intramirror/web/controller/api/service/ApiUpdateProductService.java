@@ -1,6 +1,7 @@
 package com.intramirror.web.controller.api.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.gson.Gson;
 import static com.intramirror.web.controller.api.service.ApiCommonUtils.escape;
 import com.intramirror.web.mapping.vo.StockOption;
 import java.math.BigDecimal;
@@ -197,11 +198,11 @@ public class ApiUpdateProductService {
             }
         } else { // 非消息重置时,BrandID和ColorCode和原来不一致或者为空报警告
             if(StringUtils.isBlank(newBrandCode) || !newBrandCode.equalsIgnoreCase(oldBrandCode)) {
-                this.setWarning(ApiErrorTypeEnum.errorType.warning_BrandID_change,"BrandID",newBrandCode);
+                this.setWarning(ApiErrorTypeEnum.errorType.error_BrandID_change,"BrandID",newBrandCode);
             }
 
             if(StringUtils.isBlank(newColorCode) || !newColorCode.equalsIgnoreCase(oldColorCode)) {
-                this.setWarning(ApiErrorTypeEnum.errorType.warning_ColorCode_change,"ColorCode",newColorCode);
+                this.setWarning(ApiErrorTypeEnum.errorType.error_ColorCode_change,"ColorCode",newColorCode);
             }
         }
         this.updateProductProperty(conn,product.getProduct_id(), ProductPropertyEnumKeyName.CarryOver.getCode(),productOptions.getCarryOver());
@@ -213,6 +214,7 @@ public class ApiUpdateProductService {
 
     private void checkMappingParams(Connection conn) throws Exception {
         ProductService productService = new ProductService(conn);
+        Product product = this.getProduct(conn);
         String boutique_category_id = escape(StringUtils.trim(productOptions.getCategory_boutique_id()));
         String category1 = escape(StringUtils.trim(productOptions.getCategory1()));
         String category2 = escape(StringUtils.trim(productOptions.getCategory2()));
@@ -287,22 +289,36 @@ public class ApiUpdateProductService {
         mappingCategory.put("categroy2",category2);
         mappingCategory.put("category3",category3);
 
+        int cId = -1;
+        int bId = -1;
+        try {cId = Integer.parseInt(productOptions.getCategoryId());} catch (Exception e) {cId = -1;}
+        try {bId = Integer.parseInt(productOptions.getBrandId());} catch (Exception e) {bId = -1;}
+
         if(StringUtils.isBlank(productOptions.getCategoryId())) {
-            this.setWarning(ApiErrorTypeEnum.errorType.warning_data_can_not_find_mapping,"category", JSONObject.toJSONString(mappingCategory));
+            this.setWarning(ApiErrorTypeEnum.errorType.error_data_can_not_find_mapping,"category", JSONObject.toJSONString(mappingCategory));
+            logger.info("ApiUpdateProductService,checkMappingParams,category,categoryIsNull,productOptions:"+new Gson().toJson(productOptions));
         } else if(!productService.ifCategory(productOptions.getCategoryId())) {
-            this.setWarning(ApiErrorTypeEnum.errorType.warning_data_can_not_find_mapping,"category", JSONObject.toJSONString(mappingCategory));
+            this.setWarning(ApiErrorTypeEnum.errorType.error_data_can_not_find_mapping,"category", JSONObject.toJSONString(mappingCategory));
+            logger.info("ApiUpdateProductService,checkMappingParams,category,categoryIsError,productOptions:"+new Gson().toJson(productOptions));
+        } else if(cId != product.getCategory_id().intValue()) {
+            this.setWarning(ApiErrorTypeEnum.errorType.error_data_can_not_find_mapping,"category", JSONObject.toJSONString(mappingCategory));
+            logger.info("ApiUpdateProductService,checkMappingParams,category,categoryIsChange,productOptions:"+new Gson().toJson(productOptions));
         }
 
         if(StringUtils.isBlank(productOptions.getBrandId())) {
-            this.setWarning(ApiErrorTypeEnum.errorType.warning_data_can_not_find_mapping,"brand", brandName);
+            this.setWarning(ApiErrorTypeEnum.errorType.error_data_can_not_find_mapping,"brand", brandName);
+            logger.info("ApiUpdateProductService,checkMappingParams,brand,brandIsNull,productOptions:"+new Gson().toJson(productOptions));
         } else if(!productService.ifBrand(productOptions.getBrandId())) {
-            this.setWarning(ApiErrorTypeEnum.errorType.warning_data_can_not_find_mapping,"brand", brandName);
+            this.setWarning(ApiErrorTypeEnum.errorType.error_data_can_not_find_mapping,"brand", brandName);
+            logger.info("ApiUpdateProductService,checkMappingParams,brand,brandIsError,productOptions:"+new Gson().toJson(productOptions));
+        } else if(bId != product.getBrand_id()) {
+            this.setWarning(ApiErrorTypeEnum.errorType.error_data_can_not_find_mapping,"brand", brandName);
+            logger.info("ApiUpdateProductService,checkMappingParams,brand,brandIsChange,productOptions:"+new Gson().toJson(productOptions));
         }
 
         if(StringUtils.isBlank(mappingSeason)) {
-            this.setWarning(ApiErrorTypeEnum.errorType.warning_data_can_not_find_mapping,"season", seasonCode);
+            this.setWarning(ApiErrorTypeEnum.errorType.error_data_can_not_find_mapping,"season", seasonCode);
         }
-
     }
 
     private void checkProductParams(Connection conn) throws Exception{
