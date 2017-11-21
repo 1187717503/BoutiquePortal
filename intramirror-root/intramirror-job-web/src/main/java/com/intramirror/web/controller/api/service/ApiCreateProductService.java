@@ -256,8 +256,10 @@ public class ApiCreateProductService {
             productProperty.value = this.getProductValue(cpp.getKey_name());
             productProperty.remark = "";
             productProperty.enabled = EnabledType.USED;
-            productPropertyService.createProductProperty(productProperty);
-            logger.info("ApiCreateProductService,setProductProperty,productProperty:"+JSONObject.toJSONString(productProperty));
+            if(StringUtils.isNotBlank(productProperty.getValue())) {
+                productPropertyService.createProductProperty(productProperty);
+                logger.info("ApiCreateProductService,setProductProperty,productProperty:"+JSONObject.toJSONString(productProperty));
+            }
         }
     }
 
