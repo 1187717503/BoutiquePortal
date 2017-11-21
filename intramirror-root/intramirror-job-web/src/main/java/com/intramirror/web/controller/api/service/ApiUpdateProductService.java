@@ -25,9 +25,11 @@ import pk.shoplus.model.ProductProperty;
 import pk.shoplus.parameter.EnabledType;
 import pk.shoplus.parameter.StatusType;
 import pk.shoplus.service.CategoryProductInfoService;
+import pk.shoplus.service.CategoryService;
 import pk.shoplus.service.ProductInfoService;
 import pk.shoplus.service.ProductPropertyService;
 import pk.shoplus.service.ProductService;
+import pk.shoplus.util.DateUtils;
 import pk.shoplus.util.ExceptionUtils;
 
 /**
@@ -80,6 +82,7 @@ public class ApiUpdateProductService {
                 resultMap.put("status",StatusType.WARNING);
                 resultMap.put("warningMaps",warningList);
             }
+            this.printChangeLog(conn);
             if(conn != null) {conn.commit();conn.close();}
         } catch (UpdateException e) {
             resultMap = ApiCommonUtils.errorMap(e.getErrorType(),e.getKey(),e.getValue());
@@ -481,4 +484,32 @@ public class ApiUpdateProductService {
         warningList.add(warningMap);
     }
 
+    private void printChangeLog(Connection conn) throws Exception {
+        // 查询Product
+        Product product = this.getProduct(conn);
+        if(product == null) {
+            return;
+        }
+
+        // skuLog
+        CategoryService categoryService = new CategoryService(conn);
+        List<Map<String,Object>> skuList = categoryService.executeSQL("select s.`sku_id` ,s.`sku_code` ,s.`size` ,s.`in_price` ,s.`im_price` ,s.`price` ,ss.`store` ,ss.`reserved` ,ss.`confirmed`  from `sku`  s\n"
+                                + "left join `sku_store`  ss  on(s.`sku_id` = ss.`sku_id`  and ss.`enabled`  = 1 and s.`enabled`  = 1)\n"
+                                + "where s.`product_id`  ="+product.getProduct_id());
+
+        // productLog
+        Map<String,Object> productMap = new HashMap<>();
+        productMap.put("vendor_id",product.getVendor_id());
+        productMap.put("boutique_id",product.getProduct_code());
+        productMap.put("designer_id",product.getDesigner_id());
+        productMap.put("color_code",product.getColor_code());
+        productMap.put("season_code",product.getSeason_code());
+        productMap.put("category_id",product.getCategory_id());
+        productMap.put("brand_id",product.getBrand_id());
+        productMap.put("img:",product.getCover_img());
+        productMap.put("retail_price",product.getMax_retail_price());
+
+        String productLog = "Prodcut Change Record,product:"+JSONObject.toJSONString(productMap)+",skus:"+ JSONObject.toJSONString(skuList)+",update_at:"+DateUtils.getformatDate(new Date());
+        logger.info(productLog);
+    }
 }
