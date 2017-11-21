@@ -570,7 +570,9 @@ public class ApiCreateProductService {
 
             String stock = skuOption.getStock();
             try {
-                int bStock = Integer.parseInt(stock);
+                Double dStock = Double.parseDouble(stock);
+                int bStock = dStock.intValue();
+                stock = dStock.intValue()+"";
                 if(bStock < 0 || bStock > 100 ) {
                     throw new UpdateException("store",stock,ApiErrorTypeEnum.errorType.error_stock_out_off);
                 }

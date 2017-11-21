@@ -456,7 +456,9 @@ public class ApiUpdateStockSerivce {
 
         // 检查quantity是否为数字,如果库存数量 store<0 or store>100,库存置0，报警告 updateStock()执行后
         try {
-            int stock = Integer.parseInt(quantity);
+            Double dStock = Double.parseDouble(quantity);
+            quantity = dStock.intValue()+"";
+            stockOption.setQuantity(quantity);
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("ApiUpdateStockSerivce,checkParams,stock not parse int,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",stockOption:"+ JSONObject.toJSONString(stockOption));

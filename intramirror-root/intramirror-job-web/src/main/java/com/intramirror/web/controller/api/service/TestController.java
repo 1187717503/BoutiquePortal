@@ -47,9 +47,9 @@ public class TestController {
         System.out.println("start:"+new Date().toString() +","+start);
         ProductEDSManagement.VendorOptions vendorOptions  = new ProductEDSManagement.VendorOptions();
         vendorOptions.setVendorId(productOptions.getVendor_id());
-//        Map<String,Object> map = apiCreateProductService.createProduct(productOptions,vendorOptions);
-        ProductEDSManagement productEDSManagement = new ProductEDSManagement();
-        Map<String,Object> map = productEDSManagement.createProduct(productOptions,vendorOptions);
+        Map<String,Object> map = apiCreateProductService.createProduct(productOptions,vendorOptions);
+//        ProductEDSManagement productEDSManagement = new ProductEDSManagement();
+//        Map<String,Object> map = productEDSManagement.createProduct(productOptions,vendorOptions);
         long  end = System.currentTimeMillis();
         System.out.println("end:"+new Date().toString()+","+end);
         System.out.println(start-end+",map:"+new Gson().toJson(map));
