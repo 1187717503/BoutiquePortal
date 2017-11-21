@@ -1,0 +1,61 @@
+.control-pannel {
+    height: 60px;
+    display: flex;
+    line-height: 60px;
+    justify-content: space-between;
+}
+
+input.discount-input {
+    width: 35%;
+    border-bottom: 2px solid #871b55;
+    margin: 0;
+    box-shadow: none;
+}
+
+input.stock-input {
+    width: 40%;
+    border-bottom: 2px solid #871b55;
+    margin: 0;
+    box-shadow: none;
+}
+
+.has-labe-input {
+    display: flex;
+    margin-top: 1rem;
+}
+
+.div-label-text {
+    width: 50%;
+    padding: 5px;
+}
+
+.left-label-text {
+    color: #000;
+    font-size: 1em;
+    text-align: right;
+}
+
+.center-label-text {
+    color: #000;
+    margin: 5px;
+    line-height: 47px
+}
+.center-label-text.active {
+    color: #000 !important;
+} 
+
+.content-seach-btn{
+    height: 47px;
+    line-height: 47px;
+    text-align: right;
+}
+
+.head-detail-row .list-detail-item:nth-child(7) {
+    width: 30%;
+    text-align: center;
+}
+
+.list-detail-row .list-detail-item:nth-child(7) {
+    width: 30%;
+    text-align: center;
+}
