@@ -23,5 +23,10 @@ switch (process.env.WEB_ENV){
     baseConfig.ERROR_URL = '"http://vendor.intramirror.com/"';
     baseConfig.ERROR_URL2 = '"http://api.intramirror.com/"';
     break;
+  case "test_ci":
+    baseConfig.BASE_URL = '"http://test.admin.intramirror.com:8099/"';
+    baseConfig.ERROR_URL = '"http://test.admin.intramirror.com:8099/"';
+    baseConfig.ERROR_URL2 = '"http://test.api.intramirror.com:8095/"';
+    break;
 }
 module.exports = baseConfig;

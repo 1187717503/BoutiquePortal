@@ -60,6 +60,16 @@ public class ContentManagementServiceImpl implements ContentManagementService {
         return contentManagementMapper.listUnbindTag();
     }
 
+    @Override
+    public List<Long> listTagProductIds(Long tagId) {
+        return tagProductRelMapper.listTagProductIds(tagId);
+    }
+
+    @Override
+    public List<Map<String, Object>> listTagsByProductIds(List<Map<String, Object>> productIds) {
+        return contentManagementMapper.listTagsByProductIds(productIds);
+    }
+
     private int updateBlock(Block block) {
         blockService.updateByBlockId(block);
         List<Block> blockList = blockService.listBlockBySortExcludeSelf(block.getSortOrder(), block.getBlockId());

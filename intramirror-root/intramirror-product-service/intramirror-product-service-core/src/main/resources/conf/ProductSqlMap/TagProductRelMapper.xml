@@ -164,4 +164,10 @@
             )
         </foreach>
     </insert>
+
+    <select id="listTagProductIds" resultType="long">
+        SELECT product_id
+        FROM tag_product_rel
+        WHERE tag_id = #{tagId}
+    </select>
 </mapper>

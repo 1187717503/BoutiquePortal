@@ -19,4 +19,6 @@ public interface TagProductRelMapper {
     List<Map<String, Object>> getByProductAndTagId(Map<String, Object> map);
 
     int batchInsert(List<TagProductRel> listTagProductRel);
+
+    List<Long> listTagProductIds(Long tagId);
 }

@@ -1,5 +1,7 @@
 package com.intramirror.product.api.model;
 
+import java.util.List;
+
 /**
  * Created on 2017/11/15.
  *
@@ -15,7 +17,8 @@ public class ContentAdditionalCondition {
     private Long maxStock;
     private Long saleAtFrom;
     private Long saleAtTo;
-    private String tag;
+    private Long tagId;
+    private List<Long> productIds;
 
     public Float getMinBoutiqueDiscount() {
         return minBoutiqueDiscount;
@@ -65,12 +68,12 @@ public class ContentAdditionalCondition {
         this.maxStock = maxStock;
     }
 
-    public String getTag() {
-        return tag;
+    public Long getTagId() {
+        return tagId;
     }
 
-    public void setTag(String tag) {
-        this.tag = tag;
+    public void setTagId(Long tagId) {
+        this.tagId = tagId;
     }
 
     public Long getSaleAtFrom() {
@@ -89,10 +92,12 @@ public class ContentAdditionalCondition {
         this.saleAtTo = saleAtTo;
     }
 
-    @Override
-    public String toString() {
-        return "ContentAdditionalCondition{" + "minBoutiqueDiscount=" + minBoutiqueDiscount + ", maxBoutiqueDiscount=" + maxBoutiqueDiscount
-                + ", minIMDiscount=" + minIMDiscount + ", maxIMDiscount=" + maxIMDiscount + ", minStock=" + minStock + ", maxStock=" + maxStock
-                + ", saleAtFrom=" + saleAtFrom + ", saleAtTo=" + saleAtTo + ", tag='" + tag + '\'' + '}';
+    public List<Long> getProductIds() {
+        return productIds;
     }
+
+    public void setProductIds(List<Long> productIds) {
+        this.productIds = productIds;
+    }
+
 }

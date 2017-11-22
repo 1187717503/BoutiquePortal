@@ -20,4 +20,8 @@ public interface ContentManagementService {
 
     List<Map<String, Object>> listUnbindTag();
 
+    List<Long> listTagProductIds(Long tagId);
+
+    List<Map<String, Object>> listTagsByProductIds(List<Map<String, Object>> products);
+
 }
