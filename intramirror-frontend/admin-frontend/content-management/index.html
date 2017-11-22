@@ -136,19 +136,16 @@
                             <div id="category-menu" style="display: none;"></div>
                             <label for="category-menu">Category</label>
                         </div>
-
+                        
                         <div class="input-field col s1" style="padding-right: 0;">
-                            <select id="select-season"></select>
-                            <label for="select-season">Season</label>
-                        </div>
-                        <div class="input-field col s2">
-                            <select id="select-image">
+                            <select id="select-image"> e
                                 <option value="0" selected>Image</option>
                                 <option value="1">YES</option>
                                 <option value="2">NO</option>
                             </select>
                             <label for="select-image">Image All</label>
                         </div>
+                        
                         <div class="input-field col s2">
                             <select id="select-model-image">
                                 <option value="0" selected>Model Image All</option>
@@ -157,6 +154,7 @@
                             </select>
                             <label for="select-model-image">Model Image All</label>
                         </div>
+
                         <div class="input-field col s2">
                             <select id="select-street-image">
                                 <option value="0" selected>Street Image All</option>
@@ -165,6 +163,23 @@
                             </select>
                             <label for="select-model-image">Street Image All</label>
                         </div>
+
+                        <div class="input-field col s2">
+                            <select id="select-status">
+                                <option value="all" data-status="all" selected>All Status</option>
+                                <option value="new" data-status="new">NEW</option>
+                                <option value="trash" data-status="trash">TRASH</option>
+                                <option value="processing">PROCESSING</option>
+                                <option value="readytosell">READY_TO_SELL</option>
+                                <option value="shopreadytosell">SHOP_READY</option>
+                                <option value="shopprocessing">SHOP_PROCESSING</option>
+                                <option value="shoponsale">SHOP_ONSELL</option>
+                                <option value="shopsoldout">SHOP_SOLDOUT</option>
+                                <option value="shopremoved">SHOP_REMOVED</option>
+                            </select>
+                            <label for="select-status">Status</label>
+                        </div>
+
                         <div class="col s3 content-seach-btn">
                             <a id="search-btn" class="waves-effect waves-light btn">Search</a>
                             <a id="cancel-btn" class="waves-effect waves-light btn btn-gray">Reset</a>
@@ -200,21 +215,25 @@
                         </div>
 
                         <div class="input-field col s2">
-                            <select id="select-product-tag">
-                                <option value="0" selected>All Tags</option>
-                                <option value="1">YES</option>
-                                <option value="2">NO</option>
+                            <select id="select-tag">
                             </select>
-                            <label for="select-product-tag">Product Tags</label>
+                            <label for="select-tag">Product Tags</label>
                         </div>
 
+                        <div class="input-field col s1" style="padding-right: 0;">
+                            <select id="select-season"></select>
+                            <label for="select-season">Season</label>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
                         <div class="col s4 has-labe-input" style="position: relative;">
                             <label style="position: absolute;top: -14px;">Sale At</label>
                             <input id="sale-at-start" class="discount-input sale-datepicker" type="text">
                             <label class="center-label-text">~</label>
                             <input id="sale-at-end" class="discount-input sale-datepicker" type="text">
                         </div>
-                        
                     </div>
  
                 </div>
@@ -222,10 +241,7 @@
 
                 <div style="margin-top: 40px">
                     <div style="display: inline-block;width: 200px;">
-                        <select id="select-apply-product-tag">
-                            <option value="0" selected>All Tags</option>
-                            <option value="1">YES</option>
-                            <option value="2">NO</option>
+                        <select id="select-apply-tag">
                         </select>
                     </div>
                     <div style="display: inline-block;margin-left: 12px">
@@ -299,6 +315,13 @@
     <option value="-1" selected>All Boutique</option>
     {%each(i, boutique) list%}
     <option value="${boutique.vendor_id}">${boutique.vendor_name}</option>
+    {%/each%}
+</script>
+
+<script id="tmpl-tag-select" type="text/x-jquery-tmpl">
+    <option value="-1" selected>All Tags</option>
+    {%each(i, tag) list%}
+    <option value="${tag.tagId}">${tag.tagName}</option>
     {%/each%}
 </script>
 
@@ -392,58 +415,58 @@
 <script id="tmpl-order-list" type="text/x-jquery-tmpl">
     {%each(i, order) list%}
     <div class="product-list">
-    <div class="row style-scope page-order">
-        <div class="item style-scope page-order">
-            <input type="checkbox" class="filled-in" id="order-id-${order.product_id}" data-product-id="${order.product_id}" data-shop-product-id="${order.shop_product_id}"/>
-            <label for="order-id-${order.product_id}"></label>
-        </div>
-        <div class="item style-scope page-order"><span class="mdi-hardware-keyboard-arrow-right hide-icon"></span>
-            {%if order.display_img %}
-            <div class="product-cover-img" style="background-image:url(${order.display_img});" data-images="${order.cover_img}"></div>
-            {%else%}
-            <div class="product-no-img" style="background-image:url(../images/noimage.gif);"></div>
-            {%/if%}
-        </div>
-        <div class="item style-scope page-order">${order.designer_id}-${order.color_code}</div>
-        <div class="item style-scope page-order">${order.brand_name}</div>
-        <div class="item style-scope page-order">${order.boutique}</div>
-        <div class="item style-scope page-order">${order.boutique_id}</div>
-        <div class="item style-scope page-order">${order.season_code}</div>
-        <div class="item style-scope page-order">${order.category}</div>
-        <div class="item style-scope page-order">${order.totalStore}</div>
-        <div class="item style-scope page-order">€${order.retail_price}</div>
-        <div class="item style-scope page-order">€${order.boutique_price}<span style="display: block;">${order.boutique_discount}</span></div>
-        {%if order.im_discount && order.im_price %}
-        <div class="item style-scope page-order">€${order.im_price}<span style="display: block;">${order.im_discount}</span></div>
-        {%else%}
-        <div class="item style-scope page-order">€${order.sale_price}<span style="display: block;">${order.sale_discount}</span></div>
-        {%/if%}
-        <div class="item style-scope page-order action" data-product-id="${order.product_id}" data-shop-product-id="${order.shop_product_id}">
-            
-        </div>
-    </div>
-    <div class="goods show-detail">
-        <div class="row head-detail-row">
-            <div class="list-detail-item">SKU ID</div>
-            <div class="list-detail-item">Size</div>
-            <div class="list-detail-item">Barcode</div>
-            <div class="list-detail-item">Available Stock</div>
-            <div class="list-detail-item">Reserverd Stock</div>
-            <div class="list-detail-item">Confirmed Stock</div>
-            <div class="list-detail-item">Tags</div>
-        </div>
-        {%each(j, detail) order.skuDetail%}
-            <div data-sku-id="${detail.sku_id}" data-product-id="${detail.product_id}" class="row list-detail-row">
-                <div class="list-detail-item">${detail.sku_id}</div>
-                <div class="list-detail-item">${detail.size}</div>
-                <div class="list-detail-item">${detail.bar_code}</div>
-                <div class="list-detail-item">${detail.store}</div>
-                <div class="list-detail-item">${detail.reserved}</div>
-                <div class="list-detail-item">${detail.confirmed}</div>
-                <div class="list-detail-item">${detail.exceptionDate}</div>
+        <div class="row style-scope page-order">
+            <div class="item style-scope page-order">
+                <input type="checkbox" class="filled-in" id="order-id-${order.product_id}" data-product-id="${order.product_id}" data-shop-product-id="${order.shop_product_id}"/>
+                <label for="order-id-${order.product_id}"></label>
             </div>
-        {%/each%}
-    </div>
+            <div class="item style-scope page-order"><span class="mdi-hardware-keyboard-arrow-right hide-icon"></span>
+                {%if order.display_img %}
+                <div class="product-cover-img" style="background-image:url(${order.display_img});" data-images="${order.cover_img}"></div>
+                {%else%}
+                <div class="product-no-img" style="background-image:url(../images/noimage.gif);"></div>
+                {%/if%}
+            </div>
+            <div class="item style-scope page-order">${order.designer_id}-${order.color_code}</div>
+            <div class="item style-scope page-order">${order.brand_name}</div>
+            <div class="item style-scope page-order">${order.boutique}</div>
+            <div class="item style-scope page-order">${order.boutique_id}</div>
+            <div class="item style-scope page-order">${order.season_code}</div>
+            <div class="item style-scope page-order">${order.category}</div>
+            <div class="item style-scope page-order">${order.totalStore}</div>
+            <div class="item style-scope page-order">€${order.retail_price}</div>
+            <div class="item style-scope page-order">€${order.boutique_price}<span style="display: block;">${order.boutique_discount}</span></div>
+            {%if order.im_discount && order.im_price %}
+            <div class="item style-scope page-order">€${order.im_price}<span style="display: block;">${order.im_discount}</span></div>
+            {%else%}
+            <div class="item style-scope page-order">€${order.sale_price}<span style="display: block;">${order.sale_discount}</span></div>
+            {%/if%}
+            <div class="item style-scope page-order action" data-product-id="${order.product_id}" data-shop-product-id="${order.shop_product_id}">
+                
+            </div>
+        </div>
+        <div class="goods show-detail">
+            <div class="row head-detail-row">
+                <div class="list-detail-item">SKU ID</div>
+                <div class="list-detail-item">Size</div>
+                <div class="list-detail-item">Barcode</div>
+                <div class="list-detail-item">Available Stock</div>
+                <div class="list-detail-item">Reserverd Stock</div>
+                <div class="list-detail-item">Confirmed Stock</div>
+                <div class="list-detail-item">Tags</div>
+            </div>
+            {%each(j, detail) order.skuDetail%}
+                <div data-sku-id="${detail.sku_id}" data-product-id="${detail.product_id}" class="row list-detail-row">
+                    <div class="list-detail-item">${detail.sku_id}</div>
+                    <div class="list-detail-item">${detail.size}</div>
+                    <div class="list-detail-item">${detail.bar_code}</div>
+                    <div class="list-detail-item">${detail.store}</div>
+                    <div class="list-detail-item">${detail.reserved}</div>
+                    <div class="list-detail-item">${detail.confirmed}</div>
+                    <div class="list-detail-item">${detail.exceptionDate}</div>
+                </div>
+            {%/each%}
+        </div>
     </div>
     {%/each%}
 </script>
@@ -513,6 +536,7 @@
         initVendor();
         initSeason();
         initCategory();
+        initTag();
 
         $('#apply-tag-btn').click(function() {
             console.log($('#sale-at-start').val());
@@ -575,6 +599,57 @@
         $('html').click(function() {
             $('#category-menu').hide();
         })
+
+        $('#apply-tag-btn').click(function() {
+        
+            let param = {};
+            param.productIdList = [];
+            param.tagId = $('#select-apply-tag').val();
+            param.sortNum = 999;
+
+            let count = 0;
+            $('.product-list .item input[type=checkbox]').each(function(idx, item) {
+                if ($(item).prop('checked')) {
+                    param.productIdList.push($(item).data('product-id'));
+                    count++;
+                }
+            })
+
+            if (param.tagId == -1) {
+                Materialize.toast('Please select tag', 3000);
+                return;
+            }
+            if (count == 0) {
+                Materialize.toast('Please select at least one product', 3000);
+                return;
+            }
+
+            loading();
+            $.ajax({
+                type: requestURL.applyTag.method,
+                contentType: "application/json",
+                url: requestURL.applyTag.url,
+                data: JSON.stringify(param),
+                dataType: 'json',
+                beforeSend: function(request) {
+                    request.setRequestHeader("token", token);
+                },
+                success: function(result) {
+                    Materialize.toast('Apply Tag Success', 3000);
+                    // 获取当前页数
+                    let current = $('.pagination .active.pagination-index').data('pageno') + 1;
+                    getProdcutList(current);
+                    finishLoading()
+                }, error: function(result, resp, par) {
+                    toashWithCloseBtn(result.responseJSON.message);
+                    finishLoading()
+                    if (result.status == 401) {
+                        window.location.href = '../../../login';
+                    }
+                }
+            });
+
+        });
     });
 
 </script>

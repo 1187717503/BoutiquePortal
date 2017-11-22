@@ -1,4 +1,6 @@
 var requestURL = {
+    "getTag" : {"url":baseUrl + "content/tag/list", "method": "GET"},
+    "applyTag" : {"url":baseUrl + "content/savetagproductrel", "method": "POST"},
     "getBrand" : {"url":baseUrl + "product/filter/brand/list", "method": "GET"},
     "getVendor" : {"url":baseUrl + "vendor/select/queryAllVendor.htm", "method": "GET"},
     "getCategory": {"url":baseUrl + "category/selectActiveCategorys.htm", "method": "GET"},

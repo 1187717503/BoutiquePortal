@@ -1,8 +1,8 @@
-DROP TRIGGER IF EXISTS `trg_sku_store_onoffsale`; 
+﻿DROP TRIGGER IF EXISTS `ger-prd-db`.`trg_sku_store_onoffsale`; 
 
 delimiter //
 CREATE  TRIGGER `trg_sku_store_onoffsale` 
-AFTER UPDATE  ON `sku_store`
+AFTER UPDATE  ON sku_store
  FOR EACH ROW  
 begin
 DECLARE l_product_id bigint;
@@ -19,9 +19,9 @@ SET l_product_id = NEW.product_id;
 SET l_sku_id = NEW.sku_id;
 
 IF OLD.store > 0 AND NEW.store <= 0 THEN 
-	-- 加锁防止并发
+	
 	SELECT product_id INTO l_product_id FROM shop_product WHERE product_id = l_product_id AND enabled = 1 FOR UPDATE;
-	-- 查询最大一个库存是否大于零
+	
     SELECT MAX(store) INTO l_product_store FROM sku_store WHERE product_id = l_product_id AND enabled = 1;
 
 	IF l_product_store <= 0 THEN
@@ -29,7 +29,7 @@ IF OLD.store > 0 AND NEW.store <= 0 THEN
         	ON (p.product_id = l_product_id and p.product_id = sp.product_id AND p.enabled = 1 AND sp.enabled = 1 
                 AND p.`status` = const_product_status_approved AND sp.`status` = const_shop_product_status_onsale);
         IF l_product_count > 0 THEN
-        	UPDATE shop_product SET `status` = const_shop_product_status_soldout 
+        	UPDATE shop_product SET `status` = const_shop_product_status_soldout,`updated_at` = NOW()
 				WHERE product_id = l_product_id AND enabled = 1 AND `status` = const_shop_product_status_onsale;
 			UPDATE product SET updated_at = NOW() 
 				WHERE product_id = l_product_id AND enabled = 1 AND `status` = const_product_status_approved;
@@ -41,12 +41,12 @@ ELSEIF OLD.store <= 0  AND NEW.store > 0 THEN
         	ON (p.product_id = l_product_id and p.product_id = sp.product_id AND p.enabled = 1 AND sp.enabled = 1 
                 AND p.`status` = const_product_status_approved AND sp.`status` = const_shop_product_status_soldout);
 	IF l_product_count > 0 THEN
-		UPDATE shop_product SET `status` = const_shop_product_status_onsale 
+		UPDATE shop_product SET `status` = const_shop_product_status_onsale,`updated_at` = NOW()
 			WHERE product_id = l_product_id AND enabled = 1 AND `status` = const_shop_product_status_soldout;
 		UPDATE product SET updated_at = NOW() 
 				WHERE product_id = l_product_id AND enabled = 1 AND `status` = const_product_status_approved;
 		INSERT INTO log_trigger VALUES(102,l_product_id,l_sku_id,'onsale logic of trg_sku_store_onoffsale','3,1 -> 3,0', NOW());
 	END IF;
 END IF;
-end; //
+end;  //
 delimiter ;

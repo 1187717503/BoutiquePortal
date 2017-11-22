@@ -154,6 +154,29 @@ function initSeason() {
     });
 }
 
+function initTag() {
+    
+    $.ajax({
+        type: requestURL.getTag.method,
+        contentType: "application/json",
+        url: requestURL.getTag.url,
+        data: {},
+        dataType: 'json',
+        beforeSend: function(request) {
+            request.setRequestHeader("token", token);
+        },
+        success: function(result) {
+            initSelectItems('select-tag', 'tmpl-tag-select', result.data);
+            initSelectItems('select-apply-tag', 'tmpl-tag-select', result.data);            
+        }, error: function(code, exception) {
+
+            if (code.status == 401) {
+                window.location.href = '../../../login'
+            }
+        }
+    });
+}
+
 
 function getFilterFromDom() {
     let searchObj = {}
@@ -183,11 +206,12 @@ function getFilterFromDom() {
     searchObj.colorCode = $('#text-color-code').val();
     searchObj.boutiqueId = $('#text-boutique').val();
 
+    //App3.0 new added
     searchObj.minBoutiqueDiscount = $('#boutique-discount-left').val();
     searchObj.maxBoutiqueDiscount = $('#boutique-discount-right').val();
 
-    searchObj.minBoutiqueDiscount = $('#im-discount-left').val();
-    searchObj.maxBoutiqueDiscount = $('#im-discount-right').val();
+    searchObj.minImDiscount = $('#im-discount-left').val();
+    searchObj.maxImDiscount = $('#im-discount-right').val();
 
     searchObj.minStock = $('#stock-left').val();
     searchObj.maxStock = $('#stock-right').val();
@@ -195,7 +219,22 @@ function getFilterFromDom() {
     searchObj.saleAtFrom = $('#sale-at-start').val();
     searchObj.saleAtTo = $('#sale-at-end').val();
 
-    searchObj.tag = $('#select-product-tag').val();
+    searchObj.minBoutiqueDiscount = $('#boutique-discount-left').val();
+    searchObj.maxBoutiqueDiscount = $('#boutique-discount-right').val();
+    
+    searchObj.minIMDiscount = $('#im-discount-left').val();
+    searchObj.maxIMDiscount = $('#im-discount-right').val();
+
+    searchObj.minStock = $('#stock-left').val();
+    searchObj.maxStock = $('#stock-right').val();
+
+    searchObj.saleAtFrom = $('#sale-at-start').val();
+    searchObj.saleAtTo = $('#sale-at-end').val();
+
+    searchObj.tag = $('#select-tag').val();
+    searchObj.status = $('#select-status').val();
+
+    console.log(searchObj);
 
     if ($('.orderby.active use').length > 0) {
         searchObj.orderByColmun = $('.orderby.active use').attr('data-order-col');
@@ -249,9 +288,36 @@ function getProdcutList(pageno) {
         filter += 'desc='+ searchObj.orderByDesc + '&';
     }
 
-    if (searchObj.minBoutiqueDiscount && searchObj.minBoutiqueDiscount) {
-
+    if(!checkNumRange(searchObj.minBoutiqueDiscount,searchObj.maxBoutiqueDiscount,"Boutique")){
+        return false;
     }
+
+    // searchObj.minBoutiqueDiscount = $('#boutique-discount-left').val();
+    // searchObj.maxBoutiqueDiscount = $('#boutique-discount-right').val();
+
+    // searchObj.minImDiscount = $('#im-discount-left').val();
+    // searchObj.maxImDiscount = $('#im-discount-right').val();
+
+    // searchObj.minStock = $('#stock-left').val();
+    // searchObj.maxStock = $('#stock-right').val();
+
+    // searchObj.saleAtFrom = $('#sale-at-start').val();
+    // searchObj.saleAtTo = $('#sale-at-end').val();
+
+    // searchObj.minBoutiqueDiscount = $('#boutique-discount-left').val();
+    // searchObj.maxBoutiqueDiscount = $('#boutique-discount-right').val();
+    
+    // searchObj.minIMDiscount = $('#im-discount-left').val();
+    // searchObj.maxIMDiscount = $('#im-discount-right').val();
+
+    // searchObj.minStock = $('#stock-left').val();
+    // searchObj.maxStock = $('#stock-right').val();
+
+    // searchObj.saleAtFrom = $('#sale-at-start').val();
+    // searchObj.saleAtTo = $('#sale-at-end').val();
+
+    // searchObj.tag = $('#select-tag').val();
+    // searchObj.status = $('#select-status').val();
 
     if (pagesize) {
         filter += 'pageSize='+ pagesize + '&';
@@ -279,7 +345,7 @@ function getProdcutList(pageno) {
     $.ajax({
         type: requestURL.search.method,
         contentType: "application/json",
-        url: requestURL.search.url + "/all" + filter,
+        url: requestURL.search.url + "/" + searchObj.status + filter,
         data: {},
         dataType: 'json',
         beforeSend: function(request) {
@@ -473,66 +539,6 @@ function initActionEvent() {
         getProdcutList(1);
         
     })
-
-    $('.batch-action').click(function() {
-        
-        let param = {};
-        let action = $(this).data('action');
-        param.originalState = $('.tabs .tab a.active').data('status');
-        param.ids = [];
-
-        let count = 0;
-        $('.product-list .item input[type=checkbox]').each(function(idx, item) {
-            if ($(item).prop('checked')) {
-                param.ids.push({"productId": $(item).data('product-id'), "shopProductId": $(item).data('shop-product-id')});
-                count++;
-            }
-        })
-
-        if (count == 0) {
-            Materialize.toast('Please select at least one', 3000);
-            return;
-        }
-
-        loading();
-        $.ajax({
-            type: requestURL.productBatchAction.method,
-            contentType: "application/json",
-            url: requestURL.productBatchAction.url + "/" + action,
-            data: JSON.stringify(param),
-            dataType: 'json',
-            beforeSend: function(request) {
-                request.setRequestHeader("token", token);
-            },
-            success: function(result) {
-
-                if (result.data.failed.length > 0) {
-                    let msg = '';
-                    for (var i = 0; i < result.data.failed.length; i++) {
-                        msg += result.data.failed[i].message + "<br/>";
-                    }
-                    toashWithCloseBtn(msg);
-                } else {
-                    Materialize.toast(getActionMessage(action) + ' Success', 3000);
-                }
-
-                // 获取当前页数
-                let current = $('.pagination .active.pagination-index').data('pageno') + 1;
-
-                getProdcutList(current);
-                finishLoading()
-                
-            }, error: function(result, resp, par) {
-                toashWithCloseBtn(result.responseJSON.message);
-
-                finishLoading()
-                if (result.status == 401) {
-                    window.location.href = '../../../login';
-                }
-            }
-        });
-
-    });
 
     // 展示图片
     $('.product-cover-img').click(function() {

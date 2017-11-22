@@ -1,3 +1,34 @@
+function checkNumRange(nMin, nMax, sFiledName){
+    //全空 or 全不空
+    if ((nMin && nMax) || (nMin == "" && nMax == "")) {
+        //数字类型
+        if ($.isNumeric(nMin) && $.isNumeric(nMax)) {
+            //右值 > 左值
+            if (nMax >= nMin) {
+                // discount是0~100
+                if (sFiledName == "Boutique" || sFiledName == "IM") {
+                    if((nMax >= 0 && nMax <= 100) && (nMin >= 0 && nMin <= 100)) {
+                        return true;
+                    }else {
+                        toashWithCloseBtn("The value of "+ sFiledName +" should be between 0 ~ 100.");
+                        return false;
+                    }
+                }else {
+                    return true;
+                }
+            }else {
+                toashWithCloseBtn("The max value should be bigger than min value.");
+                return false;
+            }            
+        }else {
+            toashWithCloseBtn("The value of "+ sFiledName +" should be number.");
+            return false;
+        }
+    }else {
+        toashWithCloseBtn("All the field of "+ sFiledName +" should be fulfilled.");
+        return false;
+    }
+}
 
 function loading() {
     $('.load-data-holder').toggleClass("active");
