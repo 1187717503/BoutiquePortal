@@ -20,4 +20,8 @@ public interface BlockService {
 
     List<Map<String, Object>> listSimpleBlock();
 
+    List<Block> listBlockBySortExcludeSelf(int sortOrder, Long blockId);
+
+    int batchUpdateSort(List<Block> blockList);
+
 }

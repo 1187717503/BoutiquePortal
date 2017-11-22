@@ -3,6 +3,7 @@ package com.intramirror.product.core.mapper;
 import com.intramirror.product.api.model.Block;
 import java.util.List;
 import java.util.Map;
+import org.apache.ibatis.annotations.Param;
 
 public interface BlockMapper {
 
@@ -14,11 +15,15 @@ public interface BlockMapper {
 
     Block selectByPrimaryKey(Long blockId);
 
-    int updateByPrimaryKeySelective(Block record);
+    int updateByBlockId(Block record);
 
     int updateByPrimaryKeyWithBLOBs(Block record);
 
     int updateByPrimaryKey(Block record);
 
     List<Map<String, Object>> listSimpleBlock();
+
+    List<Block> listBlockBySortExcludeSelf(@Param(value = "sortOrder") int sortOrder, @Param(value = "blockId") Long blockId);
+
+    int batchUpdateSort(List<Block> blockList);
 }

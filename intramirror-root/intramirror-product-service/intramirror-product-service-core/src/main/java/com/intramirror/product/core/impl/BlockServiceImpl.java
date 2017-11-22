@@ -30,7 +30,7 @@ public class BlockServiceImpl implements BlockService {
 
     @Override
     public int updateByBlockId(Block record) {
-        return blockMapper.updateByPrimaryKeySelective(record);
+        return blockMapper.updateByBlockId(record);
     }
 
     @Override
@@ -46,5 +46,15 @@ public class BlockServiceImpl implements BlockService {
     @Override
     public List<Map<String, Object>> listSimpleBlock() {
         return blockMapper.listSimpleBlock();
+    }
+
+    @Override
+    public List<Block> listBlockBySortExcludeSelf(int sortOrder, Long blockId) {
+        return blockMapper.listBlockBySortExcludeSelf(sortOrder, blockId);
+    }
+
+    @Override
+    public int batchUpdateSort(List<Block> blockList) {
+        return blockMapper.batchUpdateSort(blockList);
     }
 }

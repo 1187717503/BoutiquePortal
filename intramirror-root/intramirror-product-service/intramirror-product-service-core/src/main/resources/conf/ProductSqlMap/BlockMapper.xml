@@ -9,7 +9,7 @@
         <result column="title" jdbcType="VARCHAR" property="title"/>
         <result column="create_at" jdbcType="TIMESTAMP" property="createAt"/>
         <result column="modified_at" jdbcType="TIMESTAMP" property="modifiedAt"/>
-        <result column="bk_color" jdbcType="CHAR" property="bkColor"/>
+        <result column="bg_color" jdbcType="CHAR" property="bgColor"/>
         <result column="sort_order" jdbcType="INTEGER" property="sortOrder"/>
         <result column="subtitle" jdbcType="VARCHAR" property="subtitle"/>
         <result column="title_english" jdbcType="VARCHAR" property="titleEnglish"/>
@@ -21,7 +21,7 @@
     </resultMap>
     <sql id="Base_Column_List">
 
-        block_id, block_name, status, title, create_at, modified_at, bk_color, sort_order,
+        block_id, block_name, status, title, create_at, modified_at, bg_color, sort_order,
         subtitle, title_english, enabled
     </sql>
     <sql id="Blob_Column_List">
@@ -46,12 +46,12 @@
 
         INSERT INTO block (block_id, block_name, status,
                            title, create_at, modified_at,
-                           bk_color, sort_order, subtitle,
+                           bg_color, sort_order, subtitle,
                            title_english, enabled, content
         )
         VALUES (#{blockId,jdbcType=BIGINT}, #{blockName,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT},
                                             #{title,jdbcType=VARCHAR}, #{createAt,jdbcType=TIMESTAMP}, #{modifiedAt,jdbcType=TIMESTAMP},
-                                            #{bkColor,jdbcType=CHAR}, #{sortOrder,jdbcType=INTEGER}, #{subtitle,jdbcType=VARCHAR},
+                                            #{bgColor,jdbcType=CHAR}, #{sortOrder,jdbcType=INTEGER}, #{subtitle,jdbcType=VARCHAR},
                                             #{titleEnglish,jdbcType=VARCHAR}, #{enabled,jdbcType=BIT}, #{content,jdbcType=LONGVARBINARY}
         )
     </insert>
@@ -77,8 +77,8 @@
             <if test="modifiedAt != null">
                 modified_at,
             </if>
-            <if test="bkColor != null">
-                bk_color,
+            <if test="bgColor != null">
+                bg_color,
             </if>
             <if test="sortOrder != null">
                 sort_order,
@@ -115,8 +115,8 @@
             <if test="modifiedAt != null">
                 #{modifiedAt,jdbcType=TIMESTAMP},
             </if>
-            <if test="bkColor != null">
-                #{bkColor,jdbcType=CHAR},
+            <if test="bgColor != null">
+                #{bgColor,jdbcType=CHAR},
             </if>
             <if test="sortOrder != null">
                 #{sortOrder,jdbcType=INTEGER},
@@ -135,7 +135,7 @@
             </if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.intramirror.product.api.model.Block">
+    <update id="updateByBlockId" parameterType="com.intramirror.product.api.model.Block">
 
         update block
         <set>
@@ -151,11 +151,9 @@
             <if test="createAt != null">
                 create_at = #{createAt,jdbcType=TIMESTAMP},
             </if>
-            <if test="modifiedAt != null">
-                modified_at = #{modifiedAt,jdbcType=TIMESTAMP},
-            </if>
-            <if test="bkColor != null">
-                bk_color = #{bkColor,jdbcType=CHAR},
+            modified_at = now(),
+            <if test="bgColor != null">
+                bg_color = #{bgColor,jdbcType=CHAR},
             </if>
             <if test="sortOrder != null">
                 sort_order = #{sortOrder,jdbcType=INTEGER},
@@ -182,7 +180,7 @@
             title         = #{title,jdbcType=VARCHAR},
             create_at     = #{createAt,jdbcType=TIMESTAMP},
             modified_at   = #{modifiedAt,jdbcType=TIMESTAMP},
-            bk_color      = #{bkColor,jdbcType=CHAR},
+            bg_color      = #{bgColor,jdbcType=CHAR},
             sort_order    = #{sortOrder,jdbcType=INTEGER},
             subtitle      = #{subtitle,jdbcType=VARCHAR},
             title_english = #{titleEnglish,jdbcType=VARCHAR},
@@ -197,7 +195,7 @@
             title         = #{title,jdbcType=VARCHAR},
             create_at     = #{createAt,jdbcType=TIMESTAMP},
             modified_at   = #{modifiedAt,jdbcType=TIMESTAMP},
-            bk_color      = #{bkColor,jdbcType=CHAR},
+            bg_color      = #{bgColor,jdbcType=CHAR},
             sort_order    = #{sortOrder,jdbcType=INTEGER},
             subtitle      = #{subtitle,jdbcType=VARCHAR},
             title_english = #{titleEnglish,jdbcType=VARCHAR},
@@ -212,4 +210,23 @@
         FROM block
         WHERE block.enabled = TRUE;
     </select>
+
+    <select id="listBlockBySortExcludeSelf" resultMap="BaseResultMap">
+        SELECT
+            block_id,
+            sort_order
+        FROM `block`
+        WHERE `block`.enabled = TRUE AND `block`.sort_order >= #{sortOrder} AND `block`.block_id != #{blockId};
+    </select>
+
+    <update id="batchUpdateSort" parameterType="java.util.List">
+        update `block`
+        SET sort_order = sort_order +1,
+        modified_at = now()
+        where `block`.block_id IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.blockId}
+        </foreach>
+        AND `block`.enabled = TRUE;
+    </update>
 </mapper>

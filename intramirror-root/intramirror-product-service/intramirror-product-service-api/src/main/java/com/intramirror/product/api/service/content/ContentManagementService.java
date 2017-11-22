@@ -1,5 +1,8 @@
 package com.intramirror.product.api.service.content;
 
+import com.intramirror.product.api.model.Block;
+import com.intramirror.product.api.model.Tag;
+import com.intramirror.product.api.model.TagProductRel;
 import java.util.List;
 import java.util.Map;
 
@@ -10,4 +13,9 @@ import java.util.Map;
  */
 public interface ContentManagementService {
     List<Map<String, Object>> listTagProductInfo(Long tagId);
+
+    void updateContent(Block block, Tag tag, List<TagProductRel> sort);
+
+    Map<String, Object> getTagAndBlockRelByTagId(Long tagId);
+
 }

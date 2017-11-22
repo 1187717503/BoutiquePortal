@@ -14,4 +14,13 @@
             INNER JOIN brand ON brand.brand_id = product.brand_id AND brand.enabled = TRUE
         WHERE tag_product_rel.tag_id = #{tagId};
     </select>
+    <select id="getTagAndBlockRelByTagId" resultType="java.util.Map">
+        SELECT
+            tag.tag_id,
+            block_tag_rel.block_tag_id,
+            block_tag_rel.block_id
+        FROM tag
+            LEFT JOIN block_tag_rel ON tag.tag_id = block_tag_rel.tag_id
+        WHERE tag.tag_id = #{tagId} AND tag.enabled = TRUE;
+    </select>
 </mapper>
