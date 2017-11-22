@@ -31,4 +31,18 @@
             LEFT JOIN block_tag_rel ON tag.tag_id = block_tag_rel.tag_id
         WHERE tag.enabled = TRUE AND block_tag_rel.block_tag_id IS NULL;
     </select>
+
+    <select id="listTagsByProductIds" resultType="map">
+        SELECT
+        tag.tag_id,
+        tag_product_rel.product_id,
+        tag.tag_name
+        FROM tag
+        INNER JOIN tag_product_rel ON tag.tag_id = tag_product_rel.tag_id
+        WHERE tag_product_rel.product_id IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.product_id}
+        </foreach>
+        AND tag.enabled = TRUE;
+    </select>
 </mapper>

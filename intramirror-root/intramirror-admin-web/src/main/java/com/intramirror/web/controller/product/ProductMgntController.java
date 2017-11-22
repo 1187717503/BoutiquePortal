@@ -4,10 +4,13 @@ import com.intramirror.common.parameter.StatusType;
 import com.intramirror.product.api.model.ContentAdditionalCondition;
 import com.intramirror.product.api.model.SearchCondition;
 import com.intramirror.product.api.service.ISkuStoreService;
+import com.intramirror.product.api.service.ITagService;
 import com.intramirror.product.api.service.ProductPropertyService;
+import com.intramirror.product.api.service.content.ContentManagementService;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
 import com.intramirror.web.common.response.Response;
 import com.intramirror.web.controller.cache.CategoryCache;
+import com.intramirror.web.util.JsonTransformUtil;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -36,6 +39,9 @@ public class ProductMgntController {
     private ProductManagementService productManagementService;
 
     @Autowired
+    private ContentManagementService contentManagementService;
+
+    @Autowired
     private CategoryCache categoryCache;
 
     @Autowired
@@ -43,6 +49,9 @@ public class ProductMgntController {
 
     @Autowired
     private ISkuStoreService iSkuStoreService;
+
+    @Autowired
+    private ITagService tagService;
 
     @GetMapping(value = "/state/count")
     public Response listAllProductStateCount(
@@ -149,13 +158,20 @@ public class ProductMgntController {
             @RequestParam(value = "maxStock",required = false) Long maxStock,
             @RequestParam(value = "saleAtFrom",required = false) Long saleAtFrom,
             @RequestParam(value = "saleAtTo",required = false) Long saleAtTo,
-            @RequestParam(value = "tag",required = false) String tag) {
+            @RequestParam(value = "tagId",required = false) Long tagId) {
     // @formatter:on
         SearchCondition searchCondition = initCondition(status, vendorId, boutiqueId, brandId, categoryId, season, designerId, colorCode, image, modelImage,
                 streetImage, stock, pageSize, pageNo, orderBy, desc, exception, minBoutiqueDiscount, maxBoutiqueDiscount, minIMDiscount, maxIMDiscount,
-                minStock, maxStock, saleAtFrom, saleAtTo, tag);
-        LOGGER.info("{}", searchCondition);
-        LOGGER.info("status: {}, shop status: {}", getStatusEnum(status).getProductStatus(), getStatusEnum(status).getShopProductStatus());
+                minStock, maxStock, saleAtFrom, saleAtTo, tagId);
+        LOGGER.info("Search condition : {}", JsonTransformUtil.toJson(searchCondition));
+
+        if (searchCondition.getAddition().getTagId() != null) {
+            List<Long> productList = contentManagementService.listTagProductIds(searchCondition.getAddition().getTagId());
+            if (productList.size() > 0) {
+                searchCondition.getAddition().setProductIds(productList);
+            }
+        }
+
         List<Map<String, Object>> productList;
         productList = productManagementService.listProductService(searchCondition);
         if (productList.size() > 0) {
@@ -192,7 +208,7 @@ public class ProductMgntController {
              Long maxStock,
              Long saleAtFrom,
              Long saleAtTo,
-             String tag
+             Long tag
     // @formatter:on
     ) {
         SearchCondition searchCondition = new SearchCondition();
@@ -234,7 +250,7 @@ public class ProductMgntController {
             contentAdditionalCondition.setSaleAtTo(saleAtTo);
         }
         if (tag != null) {
-            contentAdditionalCondition.setTag(tag);
+            contentAdditionalCondition.setTagId(tag);
         }
 
         return searchCondition;
@@ -244,12 +260,14 @@ public class ProductMgntController {
         setCategoryPath(productList);
         List<Map<String, Object>> skuStoreList = iSkuStoreService.listSkuStoreByProductList(productList);
         List<Map<String, Object>> priceList = productManagementService.listPriceByProductList(productList);
+        List<Map<String, Object>> tagsList = contentManagementService.listTagsByProductIds(productList);
         for (Map<String, Object> price : priceList) {
             calculateDiscount(price);
         }
         for (Map<String, Object> product : productList) {
             setSkuInfo(product, skuStoreList);
             setPrice(product, priceList);
+            setTags(product, tagsList);
             if (stateEnum == StateEnum.ALL) {
                 setStatus(product);
             }
@@ -287,6 +305,17 @@ public class ProductMgntController {
 
     private StateEnum getStatusEnum(String status) {
         return ProductStateOperationMap.getStatus(status);
+    }
+
+    private void setTags(Map<String, Object> product, List<Map<String, Object>> tagList) {
+        List<Map<String, Object>> productTagList = new LinkedList<>();
+        for (Map<String, Object> tag : tagList) {
+            if (product.get("product_id").equals(tag.get("product_id"))) {
+                tag.remove("product_id");
+                productTagList.add(tag);
+            }
+        }
+        product.put("tagList", productTagList);
     }
 
     private void setCategoryPath(List<Map<String, Object>> productList) {

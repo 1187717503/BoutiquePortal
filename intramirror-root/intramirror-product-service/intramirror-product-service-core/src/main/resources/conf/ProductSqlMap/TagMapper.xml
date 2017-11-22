@@ -122,4 +122,5 @@
         from tag
         where enabled = 1
     </select>
+
 </mapper>
