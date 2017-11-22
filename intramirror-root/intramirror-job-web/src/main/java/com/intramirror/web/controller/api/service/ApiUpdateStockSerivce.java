@@ -139,7 +139,7 @@ public class ApiUpdateStockSerivce {
                 BigDecimal bPrice = new BigDecimal(price);
                 if(bPrice.intValue() < 10 || bPrice.intValue() > 10000 || bPrice.intValue() == 0) {
                     this.toShopProcessing(conn);
-                    this.setWarning(ApiErrorTypeEnum.errorType.warning_price_out_off,"price",price);
+                    this.setWarning(ApiErrorTypeEnum.errorType.error_price_out_off,"price",price);
                     return;
                 }
             } catch (Exception e) {
@@ -155,13 +155,17 @@ public class ApiUpdateStockSerivce {
         BigDecimal oldPrice = product.getMax_retail_price();
         int rs = ApiCommonUtils.ifUpdatePrice(oldPrice,newPrice);
 
+        if(rs == 0) {
+            this.setWarning(ApiErrorTypeEnum.errorType.warning_price_out_off,"price",price);
+        }
+
         if(rs == 1 || stockOption.isModify()) {
             IPriceService iPriceService = new PriceServiceImpl();
             logger.info("ApiUpdateStockSerivce,synProductPriceRule,product:"+JSONObject.toJSONString(product) +",newPrice:"+newPrice);
             iPriceService.synProductPriceRule(product,newPrice,conn);
         } else if(rs == 2){
             this.toShopProcessing(conn);
-            this.setWarning(ApiErrorTypeEnum.errorType.warning_price_out_off,"price",price);
+            this.setWarning(ApiErrorTypeEnum.errorType.error_price_out_off,"price",price);
         }
     }
 
