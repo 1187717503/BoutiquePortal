@@ -18,4 +18,6 @@ public interface ContentManagementService {
 
     Map<String, Object> getTagAndBlockRelByTagId(Long tagId);
 
+    List<Map<String, Object>> listUnbindTag();
+
 }

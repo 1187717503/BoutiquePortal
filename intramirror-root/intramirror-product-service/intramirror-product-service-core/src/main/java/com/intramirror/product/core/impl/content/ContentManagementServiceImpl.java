@@ -5,7 +5,6 @@ import com.intramirror.product.api.model.BlockTagRel;
 import com.intramirror.product.api.model.Tag;
 import com.intramirror.product.api.model.TagProductRel;
 import com.intramirror.product.api.service.BlockService;
-import com.intramirror.product.api.service.ITagService;
 import com.intramirror.product.api.service.content.ContentManagementService;
 import com.intramirror.product.core.mapper.BlockTagRelMapper;
 import com.intramirror.product.core.mapper.ContentManagementMapper;
@@ -33,9 +32,6 @@ public class ContentManagementServiceImpl implements ContentManagementService {
     private BlockService blockService;
 
     @Autowired
-    private ITagService tagService;
-
-    @Autowired
     private BlockTagRelMapper blockTagRelMapper;
 
     @Autowired
@@ -57,6 +53,11 @@ public class ContentManagementServiceImpl implements ContentManagementService {
     @Override
     public Map<String, Object> getTagAndBlockRelByTagId(Long tagId) {
         return contentManagementMapper.getTagAndBlockRelByTagId(tagId);
+    }
+
+    @Override
+    public List<Map<String, Object>> listUnbindTag() {
+        return contentManagementMapper.listUnbindTag();
     }
 
     private int updateBlock(Block block) {

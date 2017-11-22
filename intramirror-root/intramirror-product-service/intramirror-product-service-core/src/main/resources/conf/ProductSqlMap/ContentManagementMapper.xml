@@ -23,4 +23,12 @@
             LEFT JOIN block_tag_rel ON tag.tag_id = block_tag_rel.tag_id
         WHERE tag.tag_id = #{tagId} AND tag.enabled = TRUE;
     </select>
+    <select id="listUnbindTag" resultType="map">
+        SELECT
+            tag.tag_id,
+            tag.tag_name
+        FROM tag
+            LEFT JOIN block_tag_rel ON tag.tag_id = block_tag_rel.tag_id
+        WHERE tag.enabled = TRUE AND block_tag_rel.block_tag_id IS NULL;
+    </select>
 </mapper>

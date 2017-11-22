@@ -13,4 +13,6 @@ public interface ContentManagementMapper {
     List<Map<String, Object>> listTagProductInfo(Long tagId);
 
     Map<String, Object> getTagAndBlockRelByTagId(Long tagId);
+
+    List<Map<String, Object>> listUnbindTag();
 }

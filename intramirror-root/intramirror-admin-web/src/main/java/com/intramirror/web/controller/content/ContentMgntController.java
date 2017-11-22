@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created on 2017/11/17.
+ *
  * @author YouFeng.Zhu
  */
 @RestController
@@ -88,6 +89,11 @@ public class ContentMgntController {
     @GetMapping(value = "/tag/list", produces = "application/json")
     public Response listTags() {
         return Response.status(StatusType.SUCCESS).data(iTagService.getTags());
+    }
+
+    @GetMapping(value = "/tag/list/unbind", produces = "application/json")
+    public Response listUnbindTags() {
+        return Response.status(StatusType.SUCCESS).data(contentManagementService.listUnbindTag());
     }
 
     private void appendInfo(List<Map<String, Object>> productList) {
