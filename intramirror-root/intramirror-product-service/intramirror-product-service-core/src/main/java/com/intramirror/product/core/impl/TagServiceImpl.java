@@ -49,8 +49,12 @@ public class TagServiceImpl implements ITagService {
             }
         }
 
-        map.remove(productIdList);
         logger.info("saveTagProductRel： repeat count [{}]; pass count [{}]", listPrdIdDuplicated.size(), productIdList.size());
+
+        if (productIdList.size() <= 0) {
+            return 0;
+        }
+
         Map<String, Object> mapToSave = new HashMap<>();
         mapToSave.put("tagId", map.get("tagId"));
         mapToSave.put("productIdList", map.get("productIdList"));

@@ -1,7 +1,6 @@
 package com.intramirror.web.controller.content;
 
 import com.intramirror.common.parameter.StatusType;
-import com.intramirror.product.api.model.Tag;
 import com.intramirror.product.api.service.BlockService;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ITagService;
@@ -27,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created on 2017/11/17.
- *
  * @author YouFeng.Zhu
  */
 @RestController
@@ -69,8 +67,6 @@ public class ContentMgntController {
         return Response.status(StatusType.SUCCESS).data(productList);
     }
 
-
-
     @PostMapping(value = "/savetagproductrel", consumes = "application/json")
     public Response saveTagProductRel(@RequestBody Map<String, Object> body) {
         Long tagId = body.get("tagId") == null ? null : Long.parseLong(body.get("tagId").toString());
@@ -89,10 +85,9 @@ public class ContentMgntController {
         return Response.success();
     }
 
-    @PostMapping(value = "/tag/list", consumes = "application/json")
+    @GetMapping(value = "/tag/list", produces = "application/json")
     public Response listTags() {
-        List<Tag> listTags = iTagService.getTags();
-        return Response.status(StatusType.SUCCESS).data(listTags);
+        return Response.status(StatusType.SUCCESS).data(iTagService.getTags());
     }
 
     private void appendInfo(List<Map<String, Object>> productList) {
