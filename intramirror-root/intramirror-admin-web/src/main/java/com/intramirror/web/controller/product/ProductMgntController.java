@@ -175,7 +175,7 @@ public class ProductMgntController {
         List<Map<String, Object>> productList;
         productList = productManagementService.listProductService(searchCondition);
         if (productList.size() > 0) {
-            appendInfo(productList, getStatusEnum(status));
+            appendInfo(productList, getStatusEnum(status), searchCondition);
         }
         return Response.status(StatusType.SUCCESS).data(productList);
     }
@@ -256,7 +256,7 @@ public class ProductMgntController {
         return searchCondition;
     }
 
-    private void appendInfo(List<Map<String, Object>> productList, StateEnum stateEnum) {
+    private void appendInfo(List<Map<String, Object>> productList, StateEnum stateEnum, SearchCondition searchCondition) {
         setCategoryPath(productList);
         List<Map<String, Object>> skuStoreList = iSkuStoreService.listSkuStoreByProductList(productList);
         List<Map<String, Object>> priceList = productManagementService.listPriceByProductList(productList);
@@ -267,7 +267,9 @@ public class ProductMgntController {
         for (Map<String, Object> product : productList) {
             setSkuInfo(product, skuStoreList);
             setPrice(product, priceList);
-            setTags(product, tagsList);
+            if (searchCondition.getAddition().getTagId() != null) {
+                setTags(product, tagsList);
+            }
             if (stateEnum == StateEnum.ALL) {
                 setStatus(product);
             }

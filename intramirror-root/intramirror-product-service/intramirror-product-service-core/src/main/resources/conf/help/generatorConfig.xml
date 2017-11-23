@@ -34,7 +34,7 @@
                              targetProject="C:\work\repos\BoutiquePortal\intramirror-root\intramirror-product-service\intramirror-product-service-core\src\main\java"
                              type="XMLMAPPER"/> <!-- 生成MAP对应Client -->
 
-        <table schema="sha_testing_db" tableName="tag_product_rel" domainObjectName="TagProductRel"
+        <table schema="sha_testing_db" tableName="block" domainObjectName="Block"
                enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
                enableSelectByExample="false" selectByExampleQueryId="false">
             <property name="useActualColumnNames" value="false"/>
