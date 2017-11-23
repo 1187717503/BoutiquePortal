@@ -3,35 +3,62 @@
 <mapper namespace="com.intramirror.order.core.mapper.OrderMapper">
 
     <select id="getOrderList" resultType="java.util.HashMap" parameterType="java.util.Map">
-    select 
-    DISTINCT o.order_num,o.order_id,o.created_at,o.`status`,o.current_rate,o.total_sale_price_rmb,o.total_shipping_fee_rmb,o.total_tax_rmb,o.total_rmb,
-    l.rec_name,l.rec_mobile,l.user_rec_name,l.user_rec_mobile,l.user_rec_province,l.user_rec_city,l.user_rec_area,l.user_rec_addr,v.vendor_id,
-    u.contact_person_name,o.contact_phone as telephone,o.wechat as contact_info,g.`name` as geography_name 
-    from logistics_product lp 
-    INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id 
-    INNER JOIN `order` o ON o.order_id = ol.order_id   
-    LEFT JOIN `user` u ON o.user_id = u.user_id 
-    LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id 
-    INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id 
-    INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id 
-    INNER JOIN product p ON sp.product_id = p.product_id  
-        
-	LEFT JOIN category c ON p.category_id = c.category_id 
-	LEFT JOIN brand b ON p.brand_id = b.brand_id 
-	LEFT JOIN vendor v ON lp.vendor_id = v.vendor_id 
-	LEFT JOIN geography g ON l.geography_id = g.geography_id 
-    where lp.`status` = #{status,jdbcType=BIGINT} 
-    group By o.order_num 
-    ORDER BY o.created_at desc 
-    
-  </select>
+        SELECT
+            DISTINCT
+            o.order_num,
+            o.order_id,
+            o.created_at,
+            o.`status`,
+            o.current_rate,
+            o.total_sale_price_rmb,
+            o.total_shipping_fee_rmb,
+            o.total_tax_rmb,
+            o.total_rmb,
+            l.rec_name,
+            l.rec_mobile,
+            l.user_rec_name,
+            l.user_rec_mobile,
+            l.user_rec_province,
+            l.user_rec_city,
+            l.user_rec_area,
+            l.user_rec_addr,
+            v.vendor_id,
+            u.contact_person_name,
+            o.contact_phone AS telephone,
+            o.wechat        AS contact_info,
+            g.`name`        AS geography_name
+        FROM logistics_product lp
+            INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+            INNER JOIN `order` o ON o.order_id = ol.order_id
+            LEFT JOIN `user` u ON o.user_id = u.user_id
+            LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
+            INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
+            INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
+            INNER JOIN product p ON sp.product_id = p.product_id
+
+            LEFT JOIN category c ON p.category_id = c.category_id
+            LEFT JOIN brand b ON p.brand_id = b.brand_id
+            LEFT JOIN vendor v ON lp.vendor_id = v.vendor_id
+            LEFT JOIN geography g ON l.geography_id = g.geography_id
+        WHERE lp.`status` = #{status,jdbcType=BIGINT}
+        GROUP BY o.order_num
+        ORDER BY o.created_at DESC
+
+    </select>
 
     <select id="selectOrderInfo" resultType="java.util.HashMap" parameterType="java.util.HashMap">
 
-        select o.`order_id` ,o.`status` as order_status ,lp.`order_line_num` ,lp.`status` as logis_status,lp.`logistics_product_id` ,lp.`vendor_id`   from `order`  o
-        inner join `order_logistics`  ol on (o.`order_id` = ol.`order_id`  and ol.`enabled`  = 1)
-        inner join `logistics_product`  lp on (ol.`order_logistics_id` = lp.`order_logistics_id` and lp.`enabled`  = 1)
-        where  lp.`order_line_num`  = #{order_line_num} and o.`enabled`  = 1
+        SELECT
+            o.`order_id`,
+            o.`status`  AS order_status,
+            lp.`order_line_num`,
+            lp.`status` AS logis_status,
+            lp.`logistics_product_id`,
+            lp.`vendor_id`
+        FROM `order` o
+            INNER JOIN `order_logistics` ol ON (o.`order_id` = ol.`order_id` AND ol.`enabled` = 1)
+            INNER JOIN `logistics_product` lp ON (ol.`order_logistics_id` = lp.`order_logistics_id` AND lp.`enabled` = 1)
+        WHERE lp.`order_line_num` = #{order_line_num} AND o.`enabled` = 1
     </select>
 
     <select id="getOrderListByOrderNumber" resultType="java.util.HashMap" parameterType="java.util.Map">
@@ -148,131 +175,238 @@
     </select>
 
     <select id="getOrderListByStatusAndContainerId" resultType="java.util.HashMap" parameterType="java.util.Map">
-			SELECT  o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id,pp.colorCode,pp.brandID,pspv.`value` as size,p.category_id,
-			s.price,s.in_price,sps.sale_price,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,b.english_name as brandName,
-			v.vendor_name,p.cover_img,lp.logistics_product_id  
-			FROM logistics_product lp  
-			INNER JOIN container c on lp.container_id = c.container_id 
-			INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id  
-			INNER JOIN `order` o ON ol.order_id = o.order_id   
-			LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id   
-			INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id  
-			INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id   
-			INNER JOIN product p ON (sp.product_id = p.product_id )  
-			INNER JOIN brand b ON (p.brand_id = b.brand_id and b.enabled = 1 )  
-			INNER JOIN sku s ON (s.sku_id = sps.sku_id and s.enabled = 1)  
-			INNER JOIN sku_property skup on (skup.sku_id = s.sku_id and skup.enabled = 1)  
-			INNER JOIN product_sku_property_key pspk ON (
-				pspk.product_id = p.product_id 
-				and pspk.product_sku_property_key_id = skup.product_sku_property_key_id 
-				and pspk.enabled = 1
-			) INNER JOIN product_sku_property_value pspv ON (
-				pspv.product_sku_property_key_id = skup.product_sku_property_key_id 
-				and pspv.product_sku_property_value_id = skup.product_sku_property_value_id 
-				and pspv.enabled = 1
-			) INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
-        	LEFT JOIN (
-			SELECT t_pp.product_id,
-			max(case t_pp.key_name when 'ColorCode' then t_pp.`value` else '' end) as colorCode,
-			max(case t_pp.key_name when 'BrandID' then t_pp.`value` else '' end) as brandID 
-			from product_property t_pp 
-			where t_pp.enabled = 1 and (t_pp.key_name='BrandID' or t_pp.key_name = 'ColorCode') 
-			group by t_pp.product_id 
-			) pp ON p.product_id = pp.product_id   
-			where pspk.`name` = 'Size' 
-			and c.container_id =#{containerId,jdbcType=BIGINT} 
-			and lp.`status` = #{status,jdbcType=BIGINT}
-			and v.vendor_id = #{vendorId,jdbcType=BIGINT}
-			GROUP BY lp.order_line_num
-  </select>
+        SELECT
+            o.order_num,
+            o.order_id,
+            o.created_at,
+            o.current_rate,
+            p.name,
+            p.product_id,
+            pp.colorCode,
+            pp.brandID,
+            pspv.`value`   AS size,
+            p.category_id,
+            s.price,
+            s.in_price,
+            sps.sale_price,
+            lp.amount,
+            lp.shipping_fee,
+            lp.tax_fee,
+            lp.order_line_num,
+            lp.`status`,
+            b.english_name AS brandName,
+            v.vendor_name,
+            p.cover_img,
+            lp.logistics_product_id
+        FROM logistics_product lp
+            INNER JOIN container c ON lp.container_id = c.container_id
+            INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+            INNER JOIN `order` o ON ol.order_id = o.order_id
+            LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
+            INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
+            INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
+            INNER JOIN product p ON (sp.product_id = p.product_id)
+            INNER JOIN brand b ON (p.brand_id = b.brand_id AND b.enabled = 1)
+            INNER JOIN sku s ON (s.sku_id = sps.sku_id AND s.enabled = 1)
+            INNER JOIN sku_property skup ON (skup.sku_id = s.sku_id AND skup.enabled = 1)
+            INNER JOIN product_sku_property_key pspk ON (
+                pspk.product_id = p.product_id
+                AND pspk.product_sku_property_key_id = skup.product_sku_property_key_id
+                AND pspk.enabled = 1
+                )
+            INNER JOIN product_sku_property_value pspv ON (
+                pspv.product_sku_property_key_id = skup.product_sku_property_key_id
+                AND pspv.product_sku_property_value_id = skup.product_sku_property_value_id
+                AND pspv.enabled = 1
+                )
+            INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
+            LEFT JOIN (
+                          SELECT
+                              t_pp.product_id,
+                              max(CASE t_pp.key_name
+                                  WHEN 'ColorCode'
+                                      THEN t_pp.`value`
+                                  ELSE '' END) AS colorCode,
+                              max(CASE t_pp.key_name
+                                  WHEN 'BrandID'
+                                      THEN t_pp.`value`
+                                  ELSE '' END) AS brandID
+                          FROM product_property t_pp
+                          WHERE t_pp.enabled = 1 AND (t_pp.key_name = 'BrandID' OR t_pp.key_name = 'ColorCode')
+                          GROUP BY t_pp.product_id
+                      ) pp ON p.product_id = pp.product_id
+        WHERE pspk.`name` = 'Size'
+              AND c.container_id = #{containerId,jdbcType=BIGINT}
+              AND lp.`status` = #{status,jdbcType=BIGINT}
+              AND v.vendor_id = #{vendorId,jdbcType=BIGINT}
+        GROUP BY lp.order_line_num
+    </select>
 
 
     <select id="getOrderLogisticsInfoByIdWithSql" resultType="java.util.HashMap" parameterType="java.lang.Long">
-			SELECT  o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id,pp.colorCode,pp.brandID,pspv.`value` as size,p.category_id,
-			s.price,s.in_price,sps.sale_price,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,s.sku_code,b.english_name as brandName, 
-			v.vendor_name,v.vendor_id,v.contact,p.cover_img,g.english_name as geography_name ,lp.logistics_product_id ,p.product_code
-			FROM logistics_product lp  
-			INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id  
-			INNER JOIN `order` o ON ol.order_id = o.order_id   
-			INNER JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id   
-			INNER JOIN geography g on l.geography_id = g.geography_id 
-			INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id  
-			INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id   
-			INNER JOIN product p ON (sp.product_id = p.product_id )  
-			INNER JOIN brand b ON (p.brand_id = b.brand_id and b.enabled = 1 )   
-			INNER JOIN sku s ON (s.sku_id = sps.sku_id and s.enabled = 1)  
-			INNER JOIN sku_property skup on (skup.sku_id = s.sku_id and skup.enabled = 1)  
-			INNER JOIN product_sku_property_key pspk ON (
-			pspk.product_id = p.product_id 
-			and pspk.product_sku_property_key_id = skup.product_sku_property_key_id 
-			and pspk.enabled = 1 
-			) INNER JOIN product_sku_property_value pspv ON (
-			pspv.product_sku_property_key_id = skup.product_sku_property_key_id 
-			and pspv.product_sku_property_value_id = skup.product_sku_property_value_id 
-			and pspv.enabled = 1
-			) INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1) 
-			LEFT JOIN (
-			SELECT t_pp.product_id,
-			max(case t_pp.key_name when 'ColorCode' then t_pp.`value` else '' end) as colorCode,
-			max(case t_pp.key_name when 'BrandID' then t_pp.`value` else '' end) as brandID 
-			from product_property t_pp 
-			where t_pp.enabled = 1 and (t_pp.key_name='BrandID' or t_pp.key_name = 'ColorCode') 
-			group by t_pp.product_id 
-			) pp ON p.product_id = pp.product_id   
-			where pspk.`name` = 'Size' 
-			and lp.logistics_product_id = #{logisticsProductId,jdbcType=BIGINT}
-  </select>
+        SELECT
+            o.order_num,
+            o.order_id,
+            o.created_at,
+            o.current_rate,
+            p.name,
+            p.product_id,
+            pp.colorCode,
+            pp.brandID,
+            pspv.`value`   AS size,
+            p.category_id,
+            s.price,
+            s.in_price,
+            sps.sale_price,
+            lp.amount,
+            lp.shipping_fee,
+            lp.tax_fee,
+            lp.order_line_num,
+            lp.`status`,
+            s.sku_code,
+            b.english_name AS brandName,
+            v.vendor_name,
+            v.vendor_id,
+            v.contact,
+            p.cover_img,
+            g.english_name AS geography_name,
+            lp.logistics_product_id,
+            p.product_code
+        FROM logistics_product lp
+            INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+            INNER JOIN `order` o ON ol.order_id = o.order_id
+            INNER JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
+            INNER JOIN geography g ON l.geography_id = g.geography_id
+            INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
+            INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
+            INNER JOIN product p ON (sp.product_id = p.product_id)
+            INNER JOIN brand b ON (p.brand_id = b.brand_id AND b.enabled = 1)
+            INNER JOIN sku s ON (s.sku_id = sps.sku_id AND s.enabled = 1)
+            INNER JOIN sku_property skup ON (skup.sku_id = s.sku_id AND skup.enabled = 1)
+            INNER JOIN product_sku_property_key pspk ON (
+                pspk.product_id = p.product_id
+                AND pspk.product_sku_property_key_id = skup.product_sku_property_key_id
+                AND pspk.enabled = 1
+                )
+            INNER JOIN product_sku_property_value pspv ON (
+                pspv.product_sku_property_key_id = skup.product_sku_property_key_id
+                AND pspv.product_sku_property_value_id = skup.product_sku_property_value_id
+                AND pspv.enabled = 1
+                )
+            INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
+            LEFT JOIN (
+                          SELECT
+                              t_pp.product_id,
+                              max(CASE t_pp.key_name
+                                  WHEN 'ColorCode'
+                                      THEN t_pp.`value`
+                                  ELSE '' END) AS colorCode,
+                              max(CASE t_pp.key_name
+                                  WHEN 'BrandID'
+                                      THEN t_pp.`value`
+                                  ELSE '' END) AS brandID
+                          FROM product_property t_pp
+                          WHERE t_pp.enabled = 1 AND (t_pp.key_name = 'BrandID' OR t_pp.key_name = 'ColorCode')
+                          GROUP BY t_pp.product_id
+                      ) pp ON p.product_id = pp.product_id
+        WHERE pspk.`name` = 'Size'
+              AND lp.logistics_product_id = #{logisticsProductId,jdbcType=BIGINT}
+    </select>
 
 
     <select id="getOrderListByShipmentId" resultType="java.util.HashMap" parameterType="java.util.Map">
-			SELECT  o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id,pp.colorCode,pp.brandID,pp.MadeIn,pp.Composition,
-			pspv.`value` as size,p.category_id,	s.price,s.in_price,sps.sale_price,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,
-			lp.`status`,b.english_name as brandName,v.vendor_name,p.cover_img,lp.logistics_product_id,c.*  ,c3.name AS categoryName,
-			l.logistics_id,l.user_rec_country,l.geography_id
-			FROM logistics_product lp  
-			INNER JOIN container c on lp.container_id = c.container_id 
-			INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id  
-			INNER JOIN `order` o ON ol.order_id = o.order_id   
-			LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id   
-			INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id  
-			INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id   
-			INNER JOIN product p ON (sp.product_id = p.product_id )
-			LEFT JOIN (select * from category where `level` = 3 and enabled = 1) c3 on(c3.category_id=p.category_id)
-			INNER JOIN brand b ON (p.brand_id = b.brand_id and b.enabled = 1 )  
-			INNER JOIN sku s ON (s.sku_id = sps.sku_id and s.enabled = 1)  
-			INNER JOIN sku_property skup on (skup.sku_id = s.sku_id and skup.enabled = 1)  
-			INNER JOIN product_sku_property_key pspk ON (
-				pspk.product_id = p.product_id 
-				and pspk.product_sku_property_key_id = skup.product_sku_property_key_id 
-				and pspk.enabled = 1
-			) INNER JOIN product_sku_property_value pspv ON (
-				pspv.product_sku_property_key_id = skup.product_sku_property_key_id 
-				and pspv.product_sku_property_value_id = skup.product_sku_property_value_id 
-				and pspv.enabled = 1
-			) INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
-        	LEFT JOIN (
-			SELECT t_pp.product_id,
-			max(case t_pp.key_name when 'ColorCode' then t_pp.`value` else '' end) as colorCode,
-			max(case t_pp.key_name when 'BrandID' then t_pp.`value` else '' end) as brandID ,
-			max(case t_pp.key_name when 'MadeIn' then t_pp.`value` else '' end) as MadeIn,
-			max(case t_pp.key_name when 'Composition' then t_pp.`value` else '' end) as Composition
-			from product_property t_pp 
-			where t_pp.enabled = 1 and (t_pp.key_name='BrandID' or t_pp.key_name = 'ColorCode'or t_pp.key_name = 'MadeIn'or t_pp.key_name = 'Composition')
-			group by t_pp.product_id 
-			) pp ON p.product_id = pp.product_id   
-			where pspk.`name` = 'Size' 
-			and c.shipment_id =#{shipment_id,jdbcType=BIGINT} 
-			and lp.`status` = #{status,jdbcType=BIGINT}
-			and v.vendor_id = #{vendorId,jdbcType=BIGINT}
-			GROUP BY lp.order_line_num
-  </select>
+        SELECT
+            o.order_num,
+            o.order_id,
+            o.created_at,
+            o.current_rate,
+            p.name,
+            p.product_id,
+            pp.colorCode,
+            pp.brandID,
+            pp.MadeIn,
+            pp.Composition,
+            pspv.`value`   AS size,
+            p.category_id,
+            s.price,
+            s.in_price,
+            sps.sale_price,
+            lp.amount,
+            lp.shipping_fee,
+            lp.tax_fee,
+            lp.order_line_num,
+            lp.`status`,
+            b.english_name AS brandName,
+            v.vendor_name,
+            p.cover_img,
+            lp.logistics_product_id,
+            c.*,
+            c3.name        AS categoryName,
+            l.logistics_id,
+            l.user_rec_country,
+            l.geography_id
+        FROM logistics_product lp
+            INNER JOIN container c ON lp.container_id = c.container_id
+            INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+            INNER JOIN `order` o ON ol.order_id = o.order_id
+            LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
+            INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
+            INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
+            INNER JOIN product p ON (sp.product_id = p.product_id)
+            LEFT JOIN (SELECT *
+                       FROM category
+                       WHERE `level` = 3 AND enabled = 1) c3 ON (c3.category_id = p.category_id)
+            INNER JOIN brand b ON (p.brand_id = b.brand_id AND b.enabled = 1)
+            INNER JOIN sku s ON (s.sku_id = sps.sku_id AND s.enabled = 1)
+            INNER JOIN sku_property skup ON (skup.sku_id = s.sku_id AND skup.enabled = 1)
+            INNER JOIN product_sku_property_key pspk ON (
+                pspk.product_id = p.product_id
+                AND pspk.product_sku_property_key_id = skup.product_sku_property_key_id
+                AND pspk.enabled = 1
+                )
+            INNER JOIN product_sku_property_value pspv ON (
+                pspv.product_sku_property_key_id = skup.product_sku_property_key_id
+                AND pspv.product_sku_property_value_id = skup.product_sku_property_value_id
+                AND pspv.enabled = 1
+                )
+            INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
+            LEFT JOIN (
+                          SELECT
+                              t_pp.product_id,
+                              max(CASE t_pp.key_name
+                                  WHEN 'ColorCode'
+                                      THEN t_pp.`value`
+                                  ELSE '' END) AS colorCode,
+                              max(CASE t_pp.key_name
+                                  WHEN 'BrandID'
+                                      THEN t_pp.`value`
+                                  ELSE '' END) AS brandID,
+                              max(CASE t_pp.key_name
+                                  WHEN 'MadeIn'
+                                      THEN t_pp.`value`
+                                  ELSE '' END) AS MadeIn,
+                              max(CASE t_pp.key_name
+                                  WHEN 'Composition'
+                                      THEN t_pp.`value`
+                                  ELSE '' END) AS Composition
+                          FROM product_property t_pp
+                          WHERE t_pp.enabled = 1 AND
+                                (t_pp.key_name = 'BrandID' OR t_pp.key_name = 'ColorCode' OR t_pp.key_name = 'MadeIn' OR t_pp.key_name = 'Composition')
+                          GROUP BY t_pp.product_id
+                      ) pp ON p.product_id = pp.product_id
+        WHERE pspk.`name` = 'Size'
+              AND c.shipment_id = #{shipment_id,jdbcType=BIGINT}
+              AND lp.`status` = #{status,jdbcType=BIGINT}
+              AND v.vendor_id = #{vendorId,jdbcType=BIGINT}
+        GROUP BY lp.order_line_num
+    </select>
 
 
     <select id="getOrderInfoByCondition" resultType="java.util.HashMap" parameterType="java.util.Map">
         SELECT
         o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id,pp.colorCode,pp.brandID,pspv.`value` as
         size,p.category_id,
-        s.price,s.in_price,sps.sale_price,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,s.sku_code,b.english_name
+        s.price,lp.in_price,sps.sale_price,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,s.sku_code,b.english_name
         as brandName,
         v.vendor_name,p.cover_img,g.english_name as geography_name ,lp.logistics_product_id,v.vendor_id
         FROM logistics_product lp
@@ -316,86 +450,151 @@
 
 
     <select id="getOrderPaymentByLogisProductId" resultType="java.util.HashMap" parameterType="java.lang.Long">
-            select pt.order_num,lp.amount*lp.sale_price*100 as price,pr.request_id,pr.serial_number,o.pay_way,lp.logistics_product_id 
-            from `order` o 
-            left join order_logistics ol on o.order_id = ol.order_id 
-            left join logistics_product lp on lp.order_logistics_id = ol.order_logistics_id 
-            left join payment pt on pt.order_num = ol.order_id 
-            left join payment_result pr on pr.payment_id = pt.payment_id 
-            where lp.logistics_product_id = #{logisticsProductId,jdbcType=BIGINT} 
-    
-  </select>
+        SELECT
+            pt.order_num,
+            lp.amount * lp.sale_price * 100 AS price,
+            pr.request_id,
+            pr.serial_number,
+            o.pay_way,
+            lp.logistics_product_id
+        FROM `order` o
+            LEFT JOIN order_logistics ol ON o.order_id = ol.order_id
+            LEFT JOIN logistics_product lp ON lp.order_logistics_id = ol.order_logistics_id
+            LEFT JOIN payment pt ON pt.order_num = ol.order_id
+            LEFT JOIN payment_result pr ON pr.payment_id = pt.payment_id
+        WHERE lp.logistics_product_id = #{logisticsProductId,jdbcType=BIGINT}
+
+    </select>
     <!--   根据status统计各个状态的订单数量 -->
     <select id="getOrderByIsvalidCount" resultType="java.lang.Integer" parameterType="java.util.Map">
-		 SELECT COUNT(1) FROM(
-		 SELECT
-		        o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id,pp.colorCode,pp.brandID,pspv.`value` as
-		        size,p.category_id,
-		        s.price,s.in_price,sps.sale_price,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
-		        lp.confirmed_at,lp.est_ship_date,lp.packed_at,lp.shipped_at,s.sku_code,usa.address_country_id,b.english_name as
-		        brandName,
-		        l.user_rec_name,l.user_rec_province,l.user_rec_city,l.user_rec_area,l.user_rec_addr,l.user_rec_country,l.geography_id,
-		        v.vendor_name,v.vendor_id,g.english_name as geography_name,v.address_country_id as
-		        vendor_address_country_id,p.cover_img,lp.logistics_product_id
-		        FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
-		        INNER JOIN `order` o ON ol.order_id = o.order_id
-		        LEFT JOIN user_ship_address usa ON o.user_id = usa.user_id
-		        LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
-		        INNER JOIN geography g on l.geography_id = g.geography_id
-		        INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
-		        INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
-		        INNER JOIN product p ON (sp.product_id = p.product_id )
-		        INNER JOIN brand b ON (p.brand_id = b.brand_id and b.enabled = 1 )
-		        INNER JOIN sku s ON (s.sku_id = sps.sku_id and s.enabled = 1)
-		        INNER JOIN sku_property skup on (skup.sku_id = s.sku_id and skup.enabled = 1)
-		        INNER JOIN product_sku_property_key pspk ON (
-		        pspk.product_id = p.product_id
-		        and pspk.product_sku_property_key_id = skup.product_sku_property_key_id
-		        and pspk.enabled = 1
-		        ) INNER JOIN product_sku_property_value pspv ON (
-		        pspv.product_sku_property_key_id = skup.product_sku_property_key_id
-		        and pspv.product_sku_property_value_id = skup.product_sku_property_value_id
-		        and pspv.enabled = 1
-		        ) INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
-		        LEFT JOIN (
-		        SELECT t_pp.product_id,
-		        max(case t_pp.key_name when 'ColorCode' then t_pp.`value` else '' end) as colorCode,
-		        max(case t_pp.key_name when 'BrandID' then t_pp.`value` else '' end) as brandID
-		        from product_property t_pp
-		        where t_pp.enabled = 1 and (t_pp.key_name='BrandID' or t_pp.key_name = 'ColorCode')
-		        group by t_pp.product_id
-		        ) pp ON p.product_id = pp.product_id
-		        where pspk.`name` = 'Size' and lp.`status` = #{status,jdbcType=BIGINT} 
-		        and v.vendor_id = #{vendorId,jdbcType=BIGINT}
-		        GROUP BY lp.order_line_num
-		) AS DD
-  </select>
+        SELECT COUNT(1)
+        FROM (
+                 SELECT
+                     o.order_num,
+                     o.order_id,
+                     o.created_at,
+                     o.current_rate,
+                     p.name,
+                     p.product_id,
+                     pp.colorCode,
+                     pp.brandID,
+                     pspv.`value`         AS
+                                             size,
+                     p.category_id,
+                     s.price,
+                     s.in_price,
+                     sps.sale_price,
+                     lp.amount,
+                     lp.shipping_fee,
+                     lp.tax_fee,
+                     lp.order_line_num,
+                     lp.`status`,
+                     lp.confirmed_at,
+                     lp.est_ship_date,
+                     lp.packed_at,
+                     lp.shipped_at,
+                     s.sku_code,
+                     usa.address_country_id,
+                     b.english_name       AS
+                                             brandName,
+                     l.user_rec_name,
+                     l.user_rec_province,
+                     l.user_rec_city,
+                     l.user_rec_area,
+                     l.user_rec_addr,
+                     l.user_rec_country,
+                     l.geography_id,
+                     v.vendor_name,
+                     v.vendor_id,
+                     g.english_name       AS geography_name,
+                     v.address_country_id AS
+                                             vendor_address_country_id,
+                     p.cover_img,
+                     lp.logistics_product_id
+                 FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+                     INNER JOIN `order` o ON ol.order_id = o.order_id
+                     LEFT JOIN user_ship_address usa ON o.user_id = usa.user_id
+                     LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
+                     INNER JOIN geography g ON l.geography_id = g.geography_id
+                     INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
+                     INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
+                     INNER JOIN product p ON (sp.product_id = p.product_id)
+                     INNER JOIN brand b ON (p.brand_id = b.brand_id AND b.enabled = 1)
+                     INNER JOIN sku s ON (s.sku_id = sps.sku_id AND s.enabled = 1)
+                     INNER JOIN sku_property skup ON (skup.sku_id = s.sku_id AND skup.enabled = 1)
+                     INNER JOIN product_sku_property_key pspk ON (
+                         pspk.product_id = p.product_id
+                         AND pspk.product_sku_property_key_id = skup.product_sku_property_key_id
+                         AND pspk.enabled = 1
+                         )
+                     INNER JOIN product_sku_property_value pspv ON (
+                         pspv.product_sku_property_key_id = skup.product_sku_property_key_id
+                         AND pspv.product_sku_property_value_id = skup.product_sku_property_value_id
+                         AND pspv.enabled = 1
+                         )
+                     INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
+                     LEFT JOIN (
+                                   SELECT
+                                       t_pp.product_id,
+                                       max(CASE t_pp.key_name
+                                           WHEN 'ColorCode'
+                                               THEN t_pp.`value`
+                                           ELSE '' END) AS colorCode,
+                                       max(CASE t_pp.key_name
+                                           WHEN 'BrandID'
+                                               THEN t_pp.`value`
+                                           ELSE '' END) AS brandID
+                                   FROM product_property t_pp
+                                   WHERE t_pp.enabled = 1 AND (t_pp.key_name = 'BrandID' OR t_pp.key_name = 'ColorCode')
+                                   GROUP BY t_pp.product_id
+                               ) pp ON p.product_id = pp.product_id
+                 WHERE pspk.`name` = 'Size' AND lp.`status` = #{status,jdbcType=BIGINT}
+                       AND v.vendor_id = #{vendorId,jdbcType=BIGINT}
+                 GROUP BY lp.order_line_num
+             ) AS DD
+    </select>
     <!--   根据订单号查询物流ID -->
     <select id="getOrderPaymentInfoByOrderId" resultType="java.util.HashMap" parameterType="java.lang.Integer">
-	SELECT order_logistics_id FROM order_logistics ol
-	LEFT JOIN `order` o  ON o.order_id =ol.order_id
-	WHERE o.order_id= #{orderId,jdbcType=BIGINT} 
-</select>
+        SELECT order_logistics_id
+        FROM order_logistics ol
+            LEFT JOIN `order` o ON o.order_id = ol.order_id
+        WHERE o.order_id = #{orderId,jdbcType=BIGINT}
+    </select>
 
     <!-- 根据订单号查询支付信息 -->
     <select id="getPaymentInfoByOrderId" resultType="java.util.HashMap" parameterType="java.lang.Integer">
-		select t5.pay_way,t1.order_num,sum(t4.amount*t4.sale_price) as price,t2.request_id,t2.serial_number  ,t4.logistics_product_id from payment t1,payment_result t2,order_logistics t3,logistics_product t4 ,`order` t5 
-where t1.payment_id = t2.payment_id and t3.order_id = t1.order_num
-and t3.order_logistics_id = t4.order_logistics_id and t5.order_id = t3.order_id group by t2.request_id,t2.serial_number
-and t1.order_num =  #{orderId,jdbcType=BIGINT} 
-</select>
+        SELECT
+            t5.pay_way,
+            t1.order_num,
+            sum(t4.amount * t4.sale_price) AS price,
+            t2.request_id,
+            t2.serial_number,
+            t4.logistics_product_id
+        FROM payment t1, payment_result t2, order_logistics t3, logistics_product t4, `order` t5
+        WHERE t1.payment_id = t2.payment_id AND t3.order_id = t1.order_num
+              AND t3.order_logistics_id = t4.order_logistics_id AND t5.order_id = t3.order_id
+        GROUP BY t2.request_id, t2.serial_number
+                                AND t1.order_num = #{orderId,jdbcType=BIGINT}
+    </select>
 
     <select id="getOrderByShipment" resultType="com.intramirror.order.api.model.Shipment">
-	 select g.`name` as ship_to_geography,u.username as consignee,l.user_rec_addr as ship_to_addr,l.user_rec_area as ship_to_district,
-		l.user_rec_city as ship_to_city,l.user_rec_province as ship_to_province,o.`status`,l.user_rec_country as ship_to_country
-		from logistics_product lp
-		INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id 
-		INNER JOIN `order` o ON o.order_id = ol.order_id   
-		LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id 
-		LEFT JOIN geography g ON l.geography_id = g.geography_id 
-		LEFT JOIN `user` u ON o.user_id = u.user_id
-		where lp.logistics_product_id =  #{logisticsProductId,jdbcType=BIGINT} 
- </select>
+        SELECT
+            g.`name`            AS ship_to_geography,
+            u.username          AS consignee,
+            l.user_rec_addr     AS ship_to_addr,
+            l.user_rec_area     AS ship_to_district,
+            l.user_rec_city     AS ship_to_city,
+            l.user_rec_province AS ship_to_province,
+            o.`status`,
+            l.user_rec_country  AS ship_to_country
+        FROM logistics_product lp
+            INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+            INNER JOIN `order` o ON o.order_id = ol.order_id
+            LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
+            LEFT JOIN geography g ON l.geography_id = g.geography_id
+            LEFT JOIN `user` u ON o.user_id = u.user_id
+        WHERE lp.logistics_product_id = #{logisticsProductId,jdbcType=BIGINT}
+    </select>
 
     <select id="getShippedOrderListByStatus" resultType="java.util.HashMap" parameterType="java.util.Map">
         SELECT
@@ -470,105 +669,148 @@ and t1.order_num =  #{orderId,jdbcType=BIGINT}
     </select>
 
     <select id="getShipmentDetails" resultType="java.util.HashMap" parameterType="java.util.Map">
-		SELECT  o.order_num,lp.vendor_id,l.user_rec_name AS consignee,l.user_rec_addr AS shipToAddr,l.user_rec_area AS shipToDistrict
-	,l.user_rec_city AS shipToCity,l.user_rec_province AS shipToProvince,l.user_rec_country AS shipToCountry,
-	v.address_country_id AS consigner_country_id,(SELECT addc.address_country_id FROM address_country addc where addc.`name`=l.user_rec_country) AS consignee_country_id,g.english_name AS shipToGeography,lp.logistics_product_id
-				FROM logistics_product lp  
-				INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id  
-				INNER JOIN `order` o ON ol.order_id = o.order_id   
-				INNER JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id   
-				INNER JOIN geography g on l.geography_id = g.geography_id
-				INNER JOIN `user` u on o.user_id= u.user_id
-				LEFT JOIN user_ship_address us on (us.user_id = u.user_id)
-				INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id  
-				INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id   
-				INNER JOIN product p ON (sp.product_id = p.product_id ) 
-				INNER JOIN brand b ON (p.brand_id = b.brand_id and b.enabled = 1 )  
-				INNER JOIN sku s ON (s.sku_id = sps.sku_id and s.enabled = 1) 
-				INNER JOIN sku_property skup on (skup.sku_id = s.sku_id and skup.enabled = 1)  
-				INNER JOIN product_sku_property_key pspk ON (
-					pspk.product_id = p.product_id 
-					and pspk.product_sku_property_key_id = skup.product_sku_property_key_id 
-					and pspk.enabled = 1
-				) INNER JOIN product_sku_property_value pspv ON (
-					pspv.product_sku_property_key_id = skup.product_sku_property_key_id 
-					and pspv.product_sku_property_value_id = skup.product_sku_property_value_id   
-					and pspv.enabled = 1
-				) INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
-	        	LEFT JOIN (
-				SELECT t_pp.product_id,
-				max(case t_pp.key_name when 'ColorCode' then t_pp.`value` else '' end) as colorCode,
-				max(case t_pp.key_name when 'BrandID' then t_pp.`value` else '' end) as brandID 
-				from product_property t_pp 
-				where t_pp.enabled = 1 and (t_pp.key_name='BrandID' or t_pp.key_name = 'ColorCode') 
-				group by t_pp.product_id 
-				) pp ON p.product_id = pp.product_id   
-				where pspk.`name` = 'Size' and lp.enabled = 1 
-				and lp.order_line_num =  #{orderNumber,jdbcType=VARCHAR} GROUP BY o.order_num;
-	</select>
+        SELECT
+            o.order_num,
+            lp.vendor_id,
+            l.user_rec_name                          AS consignee,
+            l.user_rec_addr                          AS shipToAddr,
+            l.user_rec_area                          AS shipToDistrict,
+            l.user_rec_city                          AS shipToCity,
+            l.user_rec_province                      AS shipToProvince,
+            l.user_rec_country                       AS shipToCountry,
+            v.address_country_id                     AS consigner_country_id,
+            (SELECT addc.address_country_id
+             FROM address_country addc
+             WHERE addc.`name` = l.user_rec_country) AS consignee_country_id,
+            g.english_name                           AS shipToGeography,
+            lp.logistics_product_id
+        FROM logistics_product lp
+            INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+            INNER JOIN `order` o ON ol.order_id = o.order_id
+            INNER JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
+            INNER JOIN geography g ON l.geography_id = g.geography_id
+            INNER JOIN `user` u ON o.user_id = u.user_id
+            LEFT JOIN user_ship_address us ON (us.user_id = u.user_id)
+            INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
+            INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
+            INNER JOIN product p ON (sp.product_id = p.product_id)
+            INNER JOIN brand b ON (p.brand_id = b.brand_id AND b.enabled = 1)
+            INNER JOIN sku s ON (s.sku_id = sps.sku_id AND s.enabled = 1)
+            INNER JOIN sku_property skup ON (skup.sku_id = s.sku_id AND skup.enabled = 1)
+            INNER JOIN product_sku_property_key pspk ON (
+                pspk.product_id = p.product_id
+                AND pspk.product_sku_property_key_id = skup.product_sku_property_key_id
+                AND pspk.enabled = 1
+                )
+            INNER JOIN product_sku_property_value pspv ON (
+                pspv.product_sku_property_key_id = skup.product_sku_property_key_id
+                AND pspv.product_sku_property_value_id = skup.product_sku_property_value_id
+                AND pspv.enabled = 1
+                )
+            INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
+            LEFT JOIN (
+                          SELECT
+                              t_pp.product_id,
+                              max(CASE t_pp.key_name
+                                  WHEN 'ColorCode'
+                                      THEN t_pp.`value`
+                                  ELSE '' END) AS colorCode,
+                              max(CASE t_pp.key_name
+                                  WHEN 'BrandID'
+                                      THEN t_pp.`value`
+                                  ELSE '' END) AS brandID
+                          FROM product_property t_pp
+                          WHERE t_pp.enabled = 1 AND (t_pp.key_name = 'BrandID' OR t_pp.key_name = 'ColorCode')
+                          GROUP BY t_pp.product_id
+                      ) pp ON p.product_id = pp.product_id
+        WHERE pspk.`name` = 'Size' AND lp.enabled = 1
+              AND lp.order_line_num = #{orderNumber,jdbcType=VARCHAR}
+        GROUP BY o.order_num;
+    </select>
 
     <select id="getShippedCount" resultType="java.lang.Integer" parameterType="java.util.Map">
-		SELECT COUNT(1) FROM(
-	SELECT  lp.order_line_num
-	FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
-	INNER JOIN `order` o ON ol.order_id = o.order_id
-	LEFT JOIN user_ship_address usa ON o.user_id = usa.user_id
-	LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
-	INNER JOIN geography g on l.geography_id = g.geography_id
-	INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
-	INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
-	INNER JOIN product p ON (sp.product_id = p.product_id )
-	INNER JOIN brand b ON (p.brand_id = b.brand_id and b.enabled = 1 )
-	INNER JOIN sku s ON (s.sku_id = sps.sku_id and s.enabled = 1)
-	INNER JOIN sku_property skup on (skup.sku_id = s.sku_id and skup.enabled = 1)
-	INNER JOIN product_sku_property_key pspk ON (
-	pspk.product_id = p.product_id
-	and pspk.product_sku_property_key_id = skup.product_sku_property_key_id
-	and pspk.enabled = 1
-	) INNER JOIN product_sku_property_value pspv ON (
-	pspv.product_sku_property_key_id = skup.product_sku_property_key_id
-	and pspv.product_sku_property_value_id = skup.product_sku_property_value_id
-	and pspv.enabled = 1
-	) INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
-	LEFT JOIN (
-	SELECT t_pp.product_id,
-	max(case t_pp.key_name when 'ColorCode' then t_pp.`value` else '' end) as colorCode,
-	max(case t_pp.key_name when 'BrandID' then t_pp.`value` else '' end) as brandID
-	from product_property t_pp
-	where t_pp.enabled = 1 and (t_pp.key_name='BrandID' or t_pp.key_name = 'ColorCode')
-	group by t_pp.product_id
-	) pp ON p.product_id = pp.product_id
-	LEFT JOIN shipment sm on sm.vendor_id = v.vendor_id
-	where pspk.`name` = 'Size' and (lp.`status` = 3 OR lp.`status` = 4) and v.vendor_id = #{vendorId,jdbcType=BIGINT}
-	GROUP BY lp.order_line_num
-	)AS DD
-	</select>
+        SELECT COUNT(1)
+        FROM (
+                 SELECT lp.order_line_num
+                 FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+                     INNER JOIN `order` o ON ol.order_id = o.order_id
+                     LEFT JOIN user_ship_address usa ON o.user_id = usa.user_id
+                     LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
+                     INNER JOIN geography g ON l.geography_id = g.geography_id
+                     INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
+                     INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
+                     INNER JOIN product p ON (sp.product_id = p.product_id)
+                     INNER JOIN brand b ON (p.brand_id = b.brand_id AND b.enabled = 1)
+                     INNER JOIN sku s ON (s.sku_id = sps.sku_id AND s.enabled = 1)
+                     INNER JOIN sku_property skup ON (skup.sku_id = s.sku_id AND skup.enabled = 1)
+                     INNER JOIN product_sku_property_key pspk ON (
+                         pspk.product_id = p.product_id
+                         AND pspk.product_sku_property_key_id = skup.product_sku_property_key_id
+                         AND pspk.enabled = 1
+                         )
+                     INNER JOIN product_sku_property_value pspv ON (
+                         pspv.product_sku_property_key_id = skup.product_sku_property_key_id
+                         AND pspv.product_sku_property_value_id = skup.product_sku_property_value_id
+                         AND pspv.enabled = 1
+                         )
+                     INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
+                     LEFT JOIN (
+                                   SELECT
+                                       t_pp.product_id,
+                                       max(CASE t_pp.key_name
+                                           WHEN 'ColorCode'
+                                               THEN t_pp.`value`
+                                           ELSE '' END) AS colorCode,
+                                       max(CASE t_pp.key_name
+                                           WHEN 'BrandID'
+                                               THEN t_pp.`value`
+                                           ELSE '' END) AS brandID
+                                   FROM product_property t_pp
+                                   WHERE t_pp.enabled = 1 AND (t_pp.key_name = 'BrandID' OR t_pp.key_name = 'ColorCode')
+                                   GROUP BY t_pp.product_id
+                               ) pp ON p.product_id = pp.product_id
+                     LEFT JOIN shipment sm ON sm.vendor_id = v.vendor_id
+                 WHERE pspk.`name` = 'Size' AND (lp.`status` = 3 OR lp.`status` = 4) AND v.vendor_id = #{vendorId,jdbcType=BIGINT}
+                 GROUP BY lp.order_line_num
+             ) AS DD
+    </select>
 
     <insert id="createOrder" parameterType="com.intramirror.order.api.model.Order" keyProperty="orderId">
-        insert into `order` (order_id, order_num, user_id, fee, coupon, coupon_fee, discount, discount_fee, ship_fee, pay_fee, pay_way, online_payment_id, confirmed_at, status, cancel_type, created_at, updated_at, enabled,
-        tax_fee, current_rate, total_sale_price_rmb, total_shipping_fee_rmb, total_tax_rmb, total_rmb,remaining_rmb, wechat, contact_phone,buyer_name, area_code )
-        values (#{orderId,jdbcType=BIGINT}, #{orderNum,jdbcType=VARCHAR}, #{userId,jdbcType=BIGINT},
-        #{fee,jdbcType=DECIMAL}, #{coupon,jdbcType=VARCHAR}, #{couponFee,jdbcType=DECIMAL},
-        #{discount,jdbcType=INTEGER}, #{discountFee,jdbcType=DECIMAL}, #{shipFee,jdbcType=DECIMAL},
-        #{payFee,jdbcType=DECIMAL}, #{payWay,jdbcType=TINYINT}, #{onlinePaymentId,jdbcType=BIGINT},
-        #{confirmedAt,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER}, #{cancelType,jdbcType=TINYINT},
-        #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}, #{enabled,jdbcType=BIT},
-        #{taxFee,jdbcType=DECIMAL}, #{currentRate,jdbcType=DECIMAL}, #{totalSalePriceRmb,jdbcType=DECIMAL},
-        #{totalShippingFeeRmb,jdbcType=DECIMAL}, #{totalTaxRmb,jdbcType=DECIMAL}, #{totalRmb,jdbcType=VARCHAR}, #{remainingRmb,jdbcType=VARCHAR},
-        #{wechat,jdbcType=VARCHAR}, #{contactPhone,jdbcType=VARCHAR}, #{buyerName,jdbcType=VARCHAR}, #{areaCode,jdbcType=VARCHAR}
+        INSERT INTO `order` (order_id, order_num, user_id, fee, coupon, coupon_fee, discount, discount_fee, ship_fee, pay_fee, pay_way, online_payment_id, confirmed_at, status, cancel_type, created_at, updated_at, enabled,
+                             tax_fee, current_rate, total_sale_price_rmb, total_shipping_fee_rmb, total_tax_rmb, total_rmb, remaining_rmb, wechat, contact_phone, buyer_name, area_code)
+        VALUES (#{orderId,jdbcType=BIGINT}, #{orderNum,jdbcType=VARCHAR}, #{userId,jdbcType=BIGINT},
+                                            #{fee,jdbcType=DECIMAL}, #{coupon,jdbcType=VARCHAR}, #{couponFee,jdbcType=DECIMAL},
+                                            #{discount,jdbcType=INTEGER}, #{discountFee,jdbcType=DECIMAL}, #{shipFee,jdbcType=DECIMAL},
+                                            #{payFee,jdbcType=DECIMAL}, #{payWay,jdbcType=TINYINT}, #{onlinePaymentId,jdbcType=BIGINT},
+                                                                                                    #{confirmedAt,jdbcType=TIMESTAMP},
+                                                                                                    #{status,jdbcType=INTEGER}, #{cancelType,jdbcType=TINYINT},
+                                                                                                    #{createdAt,jdbcType=TIMESTAMP},
+                                                                                                    #{updatedAt,jdbcType=TIMESTAMP}, #{enabled,jdbcType=BIT},
+                                                                                                    #{taxFee,jdbcType=DECIMAL}, #{currentRate,jdbcType=DECIMAL},
+                                                                                                    #{totalSalePriceRmb,jdbcType=DECIMAL},
+                #{totalShippingFeeRmb,jdbcType=DECIMAL}, #{totalTaxRmb,jdbcType=DECIMAL}, #{totalRmb,jdbcType=VARCHAR}, #{remainingRmb,jdbcType=VARCHAR},
+                #{wechat,jdbcType=VARCHAR}, #{contactPhone,jdbcType=VARCHAR}, #{buyerName,jdbcType=VARCHAR}, #{areaCode,jdbcType=VARCHAR}
         )
     </insert>
-    
+
     <select id="atelierSelectOrder" parameterType="java.util.Map" resultType="java.util.Map">
 
-        select distinct lp.`order_line_num`,DATE_FORMAT(lp.`created_at`,'%Y-%m-%d') as created_at,p.`product_code` ,pspv.`value` ,ss.`store` ,ROUND(sku.`in_price`,2) as in_price from `logistics_product` lp
-        inner join `shop_product_sku` sps on(lp.`shop_product_sku_id` = sps.`shop_product_sku_id`  and sps.`enabled`  = 1)
-        inner join `sku`  on(sps.`sku_id` = sku.`sku_id`  and sku.`enabled`  = 1)
-        inner join `sku_property` sk on(sku.`sku_id` = sk.`sku_id`  and sk.`enabled`  = 1)
-        inner join `product_sku_property_value`  pspv on(sk.`product_sku_property_value_id` = pspv.`product_sku_property_value_id` )
-        inner join `sku_store`  ss on(sku.`sku_id` = ss.`sku_id` and ss.`enabled`  = 1)
-        inner join `product` p on(sku.`product_id` = p.`product_id`  and p.`enabled`  = 1)
-        where DATE_FORMAT(lp.`created_at`,'%Y-%m-%d')  = #{create_at,jdbcType=VARCHAR} and p.`vendor_id`  = #{vendor_id,jdbcType=VARCHAR} and lp.`enabled`  = 1 limit #{offset,jdbcType=INTEGER},#{limit,jdbcType=INTEGER}
+        SELECT DISTINCT
+            lp.`order_line_num`,
+            DATE_FORMAT(lp.`created_at`, '%Y-%m-%d') AS created_at,
+            p.`product_code`,
+            pspv.`value`,
+            ss.`store`,
+            ROUND(sku.`in_price`, 2)                 AS in_price
+        FROM `logistics_product` lp
+            INNER JOIN `shop_product_sku` sps ON (lp.`shop_product_sku_id` = sps.`shop_product_sku_id` AND sps.`enabled` = 1)
+            INNER JOIN `sku` ON (sps.`sku_id` = sku.`sku_id` AND sku.`enabled` = 1)
+            INNER JOIN `sku_property` sk ON (sku.`sku_id` = sk.`sku_id` AND sk.`enabled` = 1)
+            INNER JOIN `product_sku_property_value` pspv ON (sk.`product_sku_property_value_id` = pspv.`product_sku_property_value_id`)
+            INNER JOIN `sku_store` ss ON (sku.`sku_id` = ss.`sku_id` AND ss.`enabled` = 1)
+            INNER JOIN `product` p ON (sku.`product_id` = p.`product_id` AND p.`enabled` = 1)
+        WHERE DATE_FORMAT(lp.`created_at`, '%Y-%m-%d') = #{create_at,jdbcType=VARCHAR} AND p.`vendor_id` = #{vendor_id,jdbcType=VARCHAR} AND lp.`enabled` = 1
+        LIMIT #{offset,jdbcType=INTEGER}, #{limit,jdbcType=INTEGER}
     </select>
 
     <update id="updateById" parameterType="com.intramirror.order.api.model.Order">
