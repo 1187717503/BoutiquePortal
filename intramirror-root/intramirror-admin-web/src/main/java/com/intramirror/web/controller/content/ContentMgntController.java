@@ -51,7 +51,7 @@ public class ContentMgntController {
 
     @GetMapping(value = "/block/detail", produces = "application/json")
     public Response getContentDetail(@RequestParam(value = "blockId") Long blockId) {
-        return Response.status(StatusType.SUCCESS).data(blockService.getBlockById(blockId));
+        return Response.status(StatusType.SUCCESS).data(contentManagementService.getBlockWithTagByBlockId(blockId));
     }
 
     @GetMapping(value = "/block/list", produces = "application/json")
@@ -92,8 +92,8 @@ public class ContentMgntController {
     }
 
     @GetMapping(value = "/tag/list/unbind", produces = "application/json")
-    public Response listUnbindTags() {
-        return Response.status(StatusType.SUCCESS).data(contentManagementService.listUnbindTag());
+    public Response listUnbindTags(@RequestParam(value = "blockId", required = false) Long blockId) {
+        return Response.status(StatusType.SUCCESS).data(contentManagementService.listUnbindTag(blockId));
     }
 
     private void appendInfo(List<Map<String, Object>> productList) {

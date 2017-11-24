@@ -56,8 +56,8 @@ public class ContentManagementServiceImpl implements ContentManagementService {
     }
 
     @Override
-    public List<Map<String, Object>> listUnbindTag() {
-        return contentManagementMapper.listUnbindTag();
+    public List<Map<String, Object>> listUnbindTag(Long blockId) {
+        return contentManagementMapper.listUnbindTag(blockId);
     }
 
     @Override
@@ -68,6 +68,16 @@ public class ContentManagementServiceImpl implements ContentManagementService {
     @Override
     public List<Map<String, Object>> listTagsByProductIds(List<Map<String, Object>> productIds) {
         return contentManagementMapper.listTagsByProductIds(productIds);
+    }
+
+    @Override
+    public List<Map<String, Object>> listBlockWithTag() {
+        return contentManagementMapper.listBlockWithTag();
+    }
+
+    @Override
+    public Map<String, Object> getBlockWithTagByBlockId(Long blockId) {
+        return contentManagementMapper.getBlockWithTagByBlockId(blockId);
     }
 
     private int updateBlock(Block block) {
