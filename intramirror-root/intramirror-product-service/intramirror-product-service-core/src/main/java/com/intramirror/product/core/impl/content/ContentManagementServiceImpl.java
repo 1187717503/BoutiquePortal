@@ -4,8 +4,8 @@ import com.intramirror.product.api.model.Block;
 import com.intramirror.product.api.model.BlockTagRel;
 import com.intramirror.product.api.model.Tag;
 import com.intramirror.product.api.model.TagProductRel;
-import com.intramirror.product.api.service.BlockService;
 import com.intramirror.product.api.service.content.ContentManagementService;
+import com.intramirror.product.core.mapper.BlockMapper;
 import com.intramirror.product.core.mapper.BlockTagRelMapper;
 import com.intramirror.product.core.mapper.ContentManagementMapper;
 import com.intramirror.product.core.mapper.TagProductRelMapper;
@@ -29,7 +29,7 @@ public class ContentManagementServiceImpl implements ContentManagementService {
     private ContentManagementMapper contentManagementMapper;
 
     @Autowired
-    private BlockService blockService;
+    private BlockMapper blockMapper;
 
     @Autowired
     private BlockTagRelMapper blockTagRelMapper;
@@ -81,12 +81,12 @@ public class ContentManagementServiceImpl implements ContentManagementService {
     }
 
     private int updateBlock(Block block) {
-        blockService.updateByBlockId(block);
-        List<Block> blockList = blockService.listBlockBySortExcludeSelf(block.getSortOrder(), block.getBlockId());
+        blockMapper.updateByBlockId(block);
+        List<Block> blockList = blockMapper.listBlockBySortExcludeSelf(block.getSortOrder(), block.getBlockId());
         if (blockList.size() == 0) {
             return 0;
         }
-        return blockService.batchUpdateSort(blockList);
+        return blockMapper.batchUpdateSort(blockList);
     }
 
     private int rebindBlockTag(Block block, Long tagId) {
