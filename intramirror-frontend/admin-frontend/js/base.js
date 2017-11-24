@@ -1,4 +1,4 @@
-var baseUrl = "http://test.admin.intramirror.com:8096/";
+var baseUrl = "http://localhost:8080/";
 
 
 let token = sessionStorage.getItem('token');
@@ -6,4 +6,4 @@ if (!token) {
     token = localStorage.getItem('token');
 }
 
-token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNjEiLCJpYXQiOjE1MTE0MjQ4MzB9.-xQ8H_03BWP9pNmbV5wWNNrDd2dYb-noN4vEj9xf5fdAFa1uO4PZRiQflFP8bt7z81m4eG-6EF2JKk3LCIZcBw";
+token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNjEiLCJpYXQiOjE1MTE2NjY5MzB9.RKA5HdiFcrTHUzzJB2zkZlgKZq5eedQSlgqUY9uq-3QVJeb9oQvccOfhlmIsx9Bgye3Lgyy2YIdKu-UBkINDrQ";
