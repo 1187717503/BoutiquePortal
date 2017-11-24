@@ -127,7 +127,7 @@ public class ApiUpdateProductService {
             ProductInfoService productInfoService = new ProductInfoService(conn);
 
             Map<String,Object> productInfoConditions = new HashMap<>();
-            productInfoConditions.put("category_prodcut_info_id",categoryProductInfo.category_product_info_id);
+            productInfoConditions.put("category_product_info_id",categoryProductInfo.category_product_info_id);
             productInfoConditions.put("product_id",this.uProduct.getProduct_id());
             productInfoConditions.put("enabled",EnabledType.USED);
             List<ProductInfo> productInfos = productInfoService.getProductInfoByCondition(productInfoConditions);
