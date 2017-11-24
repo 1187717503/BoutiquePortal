@@ -13,6 +13,11 @@ public class ErrorResponse {
     private String message;
     private String detail;
 
+    public ErrorResponse(String message, String detail) {
+        this.message = message;
+        this.detail = detail;
+    }
+
     public ErrorResponse(int status, String message) {
         this.status = status;
         this.message = message;

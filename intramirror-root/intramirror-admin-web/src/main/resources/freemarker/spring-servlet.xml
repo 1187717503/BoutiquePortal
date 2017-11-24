@@ -46,14 +46,6 @@
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service"/>
     </context:component-scan>
 
-    <!--设置登录拦截器
-    <mvc:interceptors>  
-        <mvc:interceptor>  
-            <mvc:mapping path="/*.htm" />  
-            <mvc:mapping path="/*/*.htm" />   
-            <bean class="com.intramirror.web.interceptor.LoginInterceptor"/>  
-        </mvc:interceptor>  
-    </mvc:interceptors> -->
 
     <context:property-placeholder location="classpath:/commons.properties"/>
 
@@ -67,6 +59,13 @@
             <ref bean="authenticationInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>
+
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+
+        <!-- one of the properties available; the maximum file size in bytes -->
+        <property name="maxUploadSize" value="100000"/>
+
+    </bean>
 
 
     <!--<mvc:cors>-->
