@@ -30,8 +30,8 @@
         FROM tag
         LEFT JOIN block_tag_rel ON tag.tag_id = block_tag_rel.tag_id
         WHERE tag.enabled = TRUE AND (block_tag_rel.block_tag_id IS NULL
-        <if test="blockId == null">
-            OR block_tag_rel.block_tag_id = #{blockId};
+        <if test="blockId != null">
+            OR block_tag_rel.block_id = #{blockId}
         </if>
         );
     </select>
@@ -90,6 +90,6 @@
         FROM `block`
             LEFT JOIN block_tag_rel ON block_tag_rel.block_id = block.block_id
             LEFT JOIN tag ON block_tag_rel.tag_id = tag.tag_id AND tag.enabled = TRUE
-        WHERE `block`.block_id = #{block_id} AND `block`.enabled = TRUE
+        WHERE `block`.block_id = #{block_id,jdbcType=BIGINT} AND `block`.enabled = TRUE
     </select>
 </mapper>
