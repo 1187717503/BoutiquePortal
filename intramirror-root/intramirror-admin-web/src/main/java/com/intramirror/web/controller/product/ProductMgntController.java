@@ -260,7 +260,11 @@ public class ProductMgntController {
         setCategoryPath(productList);
         List<Map<String, Object>> skuStoreList = iSkuStoreService.listSkuStoreByProductList(productList);
         List<Map<String, Object>> priceList = productManagementService.listPriceByProductList(productList);
-        List<Map<String, Object>> tagsList = contentManagementService.listTagsByProductIds(productList);
+        List<Map<String, Object>> tagsList = null;
+        if (searchCondition.getAddition().getTagId() != null) {
+            tagsList = contentManagementService.listTagsByProductIds(productList);
+        }
+
         for (Map<String, Object> price : priceList) {
             calculateDiscount(price);
         }

@@ -26,7 +26,7 @@ import pk.shoplus.common.FileUploadHelper;
 public class FileController {
     private final static Logger LOGGER = LoggerFactory.getLogger(FileController.class);
 
-    @PostMapping(value = "/upload")
+    @PostMapping(value = "")
     public Response uploadFile(@RequestParam("file") MultipartFile file) {
 
         if (file.isEmpty()) {

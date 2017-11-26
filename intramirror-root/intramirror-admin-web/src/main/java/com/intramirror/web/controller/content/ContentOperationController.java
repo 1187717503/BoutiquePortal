@@ -9,6 +9,7 @@ import com.intramirror.web.Exception.ValidateException;
 import com.intramirror.web.common.request.Content;
 import com.intramirror.web.common.response.Response;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,7 @@ public class ContentOperationController {
     }
 
     private void validate(Content content) {
+        checkParameter(content);
         Block block = content.getBlock();
         Tag tag = content.getTag();
         if (block == null || block.getBlockId() == null || tag == null || tag.getTagId() == null) {
@@ -58,5 +60,27 @@ public class ContentOperationController {
         if (tagRelInfo.get("block_tag_id") != null && Long.parseLong(tagRelInfo.get("block_id").toString()) != block.getBlockId()) {
             throw new ValidateException(new ErrorResponse("The tag has bind to other block [" + tagRelInfo.get("block_id") + "]."));
         }
+    }
+
+    private void checkParameter(Content content) {
+        if (StringUtils.isEmpty(content.getBlock().getTitle())) {
+            throw new ValidateException(new ErrorResponse("Block title is missing"));
+        }
+        if (StringUtils.isEmpty(content.getBlock().getSubtitle())) {
+            throw new ValidateException(new ErrorResponse("Block subtitle is missing"));
+        }
+        if (StringUtils.isEmpty(content.getBlock().getTitleEnglish())) {
+            throw new ValidateException(new ErrorResponse("Block title english is missing"));
+        }
+        if (StringUtils.isEmpty(content.getBlock().getCoverImg())) {
+            throw new ValidateException(new ErrorResponse("Block cover image is missing"));
+        }
+        if (StringUtils.isEmpty(content.getBlock().getBgColor())) {
+            throw new ValidateException(new ErrorResponse("Block background color is missing"));
+        }
+        if (content.getBlock().getSortOrder() == null) {
+            throw new ValidateException(new ErrorResponse("Block sort order is missing"));
+        }
+
     }
 }
