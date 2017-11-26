@@ -1,10 +1,9 @@
 function initDragger() {
-    var updateOutput = function(e)
-    {
-        var list   = e.length ? e : $(e.target),
+    var updateOutput = function (e) {
+        var list = e.length ? e : $(e.target),
             output = list.data('output');
         if (window.JSON) {
-            output.val(window.JSON.stringify(list.nestable('serialize')));//, null, 2));
+            output.val(window.JSON.stringify(list.nestable('serialize'))); //, null, 2));
         } else {
             output.val('JSON browser support required for this demo.');
         }
@@ -12,19 +11,19 @@ function initDragger() {
 
     // activate Nestable for list 1
     $('#left-nestable').nestable({
-        group: 0,
-        maxDepth: 1,
-        handleClass: 'dragger-able-ele'
-    })
-    .on('change', updateOutput);
+            group: 0,
+            maxDepth: 1,
+            handleClass: 'dragger-able-ele'
+        })
+        .on('change', updateOutput);
 
     // activate Nestable for list 2
     $('#right-nestable').nestable({
-        group: 0,
-        maxDepth: 1,
-        handleClass: 'dragger-able-ele'
-    })
-    .on('change', updateOutput);
+            group: 0,
+            maxDepth: 1,
+            handleClass: 'dragger-able-ele'
+        })
+        .on('change', updateOutput);
 
     // output initial serialised data
     updateOutput($('#left-nestable').data('output', $('#left-nestable-output')));
@@ -38,15 +37,18 @@ function initBlock() {
         url: requestURL.getBlock.url,
         data: {},
         dataType: 'json',
-        beforeSend: function(request) {
+        beforeSend: function (request) {
             request.setRequestHeader("token", token);
         },
-        success: function(result) {
+        success: function (result) {
             console.log(result.data);
             $('#select-block-name').empty();
-            $('#tmpl-block-select').tmpl({list: result.data}).appendTo('#select-block-name');
+            $('#tmpl-block-select').tmpl({
+                list: result.data
+            }).appendTo('#select-block-name');
             $('#select-block-name').material_select();
-        }, error: function(code, exception) {
+        },
+        error: function (code, exception) {
 
             if (code.status == 401) {
                 window.location.href = '../../../login'
@@ -62,15 +64,18 @@ function initProductTags() {
         url: requestURL.getBlock.url,
         data: {},
         dataType: 'json',
-        beforeSend: function(request) {
+        beforeSend: function (request) {
             request.setRequestHeader("token", token);
         },
-        success: function(result) {
+        success: function (result) {
             console.log(result.data);
             $('#select-block-name').empty();
-            $('#tmpl-block-select').tmpl({list: result.data}).appendTo('#select-block-name');
+            $('#tmpl-block-select').tmpl({
+                list: result.data
+            }).appendTo('#select-block-name');
             $('#select-block-name').material_select();
-        }, error: function(code, exception) {
+        },
+        error: function (code, exception) {
 
             if (code.status == 401) {
                 window.location.href = '../../../login'
@@ -79,21 +84,45 @@ function initProductTags() {
     });
 }
 
+function initUpload() {
+    Dropzone.options.upload = {
+        url: requestURL.uploadImage.url,
+        method: requestURL.uploadImage.method,
+        paramName: "file", // The name that will be used to transfer the file
+        maxFilesize: 5, // MB
+        maxFiles: 1,
+        headers: {
+            "token": token
+        },
+        init: function () {
+            this.on("success", function success(file, response) {
+                console.log(response);
+            });
+            this.on("maxfilesexceeded", function (file) {
+                this.removeAllFiles(true);
+                this.addFile(file);
+            });
+        }
+    };
+
+}
+
 function getProductsByTag(tagId) {
-    
+
     $.ajax({
         type: requestURL.getProductsByTag.method,
         contentType: "application/json",
         url: requestURL.getProductsByTag.url + '?tagId=' + tagId,
         data: {},
         dataType: 'json',
-        beforeSend: function(request) {
+        beforeSend: function (request) {
             request.setRequestHeader("token", token);
         },
-        success: function(result) {
+        success: function (result) {
             console.log(result.data);
 
-        }, error: function(code, exception) {
+        },
+        error: function (code, exception) {
 
             if (code.status == 401) {
                 window.location.href = '../../../login'
