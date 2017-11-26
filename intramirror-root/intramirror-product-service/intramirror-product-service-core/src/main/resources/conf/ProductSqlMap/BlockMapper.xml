@@ -243,6 +243,9 @@
             <if test="content != null">
                 content = #{content,jdbcType=LONGVARBINARY},
             </if>
+            <if test="coverImg != null">
+                cover_img = #{coverImg,jdbcType=VARCHAR},
+            </if>
         </set>
         where block_id = #{blockId,jdbcType=BIGINT}
     </update>
