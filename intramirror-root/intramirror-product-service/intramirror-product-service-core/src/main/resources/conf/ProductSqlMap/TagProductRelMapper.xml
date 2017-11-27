@@ -130,7 +130,7 @@
         sort_num)
         VALUES
         <foreach collection="productIdList" index="index" item="item" separator=",">
-            (#{tagId,jdbcType=BIGINT},#{item,jdbcType=BIGINT},#{sort_num,jdbcType=BIGINT})
+            (#{tag_id,jdbcType=BIGINT},#{item,jdbcType=BIGINT},#{sort_num,jdbcType=BIGINT})
         </foreach>
     </insert>
 
@@ -141,7 +141,7 @@
         FROM tag_product_rel
         WHERE
         <if test="tag_id != null">
-            tag_id = #{tagId} AND
+            tag_id = #{tag_id} AND
         </if>
         product_id IN
         <foreach close=")" collection="productIdList" index="index" item="item" open="(" separator=",">

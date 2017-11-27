@@ -79,7 +79,7 @@ public class ContentMgntController {
 
         Map<String, Object> map = new HashMap<>();
         map.put("productIdList", productIdList);
-        map.put("tagId", tagId);
+        map.put("tag_id", tagId);
         map.put("sort_num", sortNum);
         iTagService.saveTagProductRel(map);
         return Response.success();

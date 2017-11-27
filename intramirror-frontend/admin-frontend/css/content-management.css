@@ -68,29 +68,60 @@ input.stock-input {
     margin-left: 0px;
 }
 
-.row .col.s10 {
-    margin-left: 12px;
-}
-
-.row .col {
+.row.head-detail-row .col {
     padding: 0px;
 }
 
+.row.head-detail-row .list-detail-item.col {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
 .head-detail-row .list-detail-item:nth-child(1) {
-    width: 20%;
+    width: 17%;
 }
 .head-detail-row .list-detail-item:nth-child(2) {
-    width: 20%;
+    width: 17%;
 }
 .head-detail-row .list-detail-item:nth-child(3) {
-    width: 15%;
+    width: 17%;
 }
 .head-detail-row .list-detail-item:nth-child(4) {
-    width: 15%;
+    width: 17%;
 }
 .head-detail-row .list-detail-item:nth-child(5) {
-    width: 15%;
+    width: 16%;
 }
 .head-detail-row .list-detail-item:nth-child(6) {
-    width: 15%;
+    width: 16%;
+}
+
+.goods .row {
+    margin-left: 0rem;
+    margin-right: 0rem;
+}
+
+.head-detail-row .list-detail-item.tags {
+    display: inline-block;
+    border-radius: 16px;
+    border: 1px solid #ccc;
+    line-height: 2em;
+    padding: 0 5px 0 5px;
+    width: auto;
+    background: #861b54;
+    color: #fff;
+}
+
+.has-labe-input .discount-input.sale-datepicker {
+    text-align: center;
+    width: 150px;
+}
+.has-labe-input .mdi-editor-insert-invitation {
+    font-size: 30px;
+    margin-top: 12px;
+    padding-right: 12px;
+}
+
+.head-detail-row.detail-head .list-detail-item {
+    border-bottom: 1px solid #ccc;
 }
