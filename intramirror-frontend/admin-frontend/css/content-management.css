@@ -125,3 +125,7 @@ input.stock-input {
 .head-detail-row.detail-head .list-detail-item {
     border-bottom: 1px solid #ccc;
 }
+
+.z-depth-2 {
+    padding: 0px 12px 0 12px;
+}
