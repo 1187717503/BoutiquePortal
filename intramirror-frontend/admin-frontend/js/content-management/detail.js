@@ -1,3 +1,5 @@
+var uploadDropzone;
+
 function initDragger() {
     var updateOutput = function (e) {
         var list = e.length ? e : $(e.target),
@@ -85,7 +87,8 @@ function initProductTags() {
 }
 
 function initUpload() {
-    Dropzone.options.upload = {
+    Dropzone.options.upload = false;
+    uploadDropzone = new Dropzone("div#upload", {
         url: requestURL.uploadImage.url,
         method: requestURL.uploadImage.method,
         paramName: "file", // The name that will be used to transfer the file
@@ -102,8 +105,14 @@ function initUpload() {
                 this.removeAllFiles(true);
                 this.addFile(file);
             });
+
+
+            this.on("addedfile", function () {
+                $('.dz-preview.dz-complete.dz-image-preview').remove();
+            });
+ 
         }
-    };
+    });
 
 }
 
@@ -131,6 +140,33 @@ function getProductsByTag(tagId) {
     });
 }
 
+function loadExistingImage(url) {
+
+    uploadDropzone.removeAllFiles(true);
+    $('.dz-preview.dz-complete.dz-image-preview').remove();
+
+    var mockFile = {
+        name: "cover_image.png",
+        size: 0,
+        dataURL: url
+    };
+
+
+    uploadDropzone.emit("addedfile", mockFile);
+    uploadDropzone.createThumbnailFromUrl(mockFile, 120, 120, "crop", false, function (thumbnail) {
+        uploadDropzone.emit("thumbnail", mockFile, thumbnail);
+    }, "Anonymous");
+    // uploadDropzone.addFile(mockFile);
+    uploadDropzone.emit("complete", mockFile);
+
+    // var existingFileCount = 1; // The number of files already uploaded
+    // uploadDropzone.options.maxFiles = uploadDropzone.options.maxFiles - existingFileCount;
+
+}
+
 function saveAction() {
-    console.log($('#backgroup-color').val());
+    loadExistingImage('http://sha-oss-static.oss-cn-shanghai.aliyuncs.com/upload/2e262add-b4ca-464d-86ba-2ad2dfa3402d');
+    // loadExistingImage('http://sha-oss-static.oss-cn-shanghai.aliyuncs.com/upload/8c2e9b52-233a-49dc-8788-ee8131246332');
+    // console.log(uploadDropzone);
+    // console.log($('#backgroup-color').val());
 }
