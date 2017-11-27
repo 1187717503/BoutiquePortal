@@ -100,4 +100,7 @@ public interface PriceChangeRuleMapper {
 
     /** 修改product.retail_price*/
     int updateProductRetailPrice();
+
+    /** 修改product.boutique_price*/
+    int updateProductBoutiquePrice();
 }
