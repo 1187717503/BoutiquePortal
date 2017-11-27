@@ -11,12 +11,12 @@ ENGINE=InnoDB
 ;
 
 -- 测试数据
-insert into tag(tag_name,enabled) values ("16FW",1);
-insert into tag(tag_name,enabled) values ("16SS",1);
-insert into tag(tag_name,enabled) values ("17FW",1);
-insert into tag(tag_name,enabled) values ("17SS",1);
-insert into tag(tag_name,enabled) values ("18SS",1);
-insert into tag(tag_name,enabled) values ("18FW",1);
+insert into tag(tag_name,enabled) values ("TAG_16FW",1);
+insert into tag(tag_name,enabled) values ("TAG_16SS",1);
+insert into tag(tag_name,enabled) values ("TAG_17FW",1);
+insert into tag(tag_name,enabled) values ("TAG_17SS",1);
+insert into tag(tag_name,enabled) values ("TAG_18SS",1);
+insert into tag(tag_name,enabled) values ("TAG_18FW",1);
 
 DROP TABLE IF EXISTS `tag_product_rel`;
 CREATE TABLE `tag_product_rel` (
@@ -37,19 +37,22 @@ CREATE TABLE `block` (
 	`block_name` VARCHAR(256) NOT NULL,
 	`status` TINYINT(4) NOT NULL COMMENT '0:inactive;1:active',
 	`title` VARCHAR(256) NULL DEFAULT NULL,
-	`create_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	`modified_at`timestamp NOT NULL DEFAULT NULL,
-	`content` BLOB NULL,
-	`bk_color` CHAR(32) NULL DEFAULT NULL COMMENT 'background color',
-	`sort_order` INT(11) NULL DEFAULT NULL,
-	`subtitle` VARCHAR(256) NULL DEFAULT NULL,
 	`title_english` VARCHAR(256) NULL DEFAULT NULL,
+	`subtitle` VARCHAR(256) NULL DEFAULT NULL,
+	`content` BLOB NULL,
+	`bg_color` CHAR(32) NULL DEFAULT NULL COMMENT 'background color',
+	`sort_order` INT(11) NULL DEFAULT NULL,
+	`create_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`modified_at` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00',
 	`enabled` BIT(1) NOT NULL,
+	`cover_img` VARCHAR(1024) NULL DEFAULT NULL,
 	PRIMARY KEY (`block_id`)
 )
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB
+AUTO_INCREMENT=8
 ;
+
 
 DROP TABLE IF EXISTS `block_tag_rel`;
 CREATE TABLE `block_tag_rel` (

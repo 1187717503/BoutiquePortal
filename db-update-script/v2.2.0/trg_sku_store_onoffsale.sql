@@ -1,4 +1,4 @@
-﻿DROP TRIGGER IF EXISTS `ger-prd-db`.`trg_sku_store_onoffsale`; 
+DROP TRIGGER IF EXISTS `trg_sku_store_onoffsale`; 
 
 delimiter //
 CREATE  TRIGGER `trg_sku_store_onoffsale` 
