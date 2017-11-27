@@ -177,9 +177,19 @@ function initTag() {
     });
 }
 
+function initDate() {
+    let curDate = format(new Date(), 'yyyy-MM-dd');
+    let endDate = new Date(curDate);
+    endDate.setMonth(endDate.getMonth() - 1);
+    let startDate = format(endDate, 'yyyy-MM-dd');
+
+    $('#sale-at-start').val(startDate);
+    $('#sale-at-end').val(curDate);
+}
+
 
 function getFilterFromDom() {
-    let searchObj = {}
+    let searchObj = {};
     let selected = '';
 
     $('#select-boutique').siblings('ul.select-dropdown').find('li').each(function() {
@@ -209,18 +219,6 @@ function getFilterFromDom() {
     //App3.0 new added
     searchObj.minBoutiqueDiscount = $('#boutique-discount-left').val();
     searchObj.maxBoutiqueDiscount = $('#boutique-discount-right').val();
-
-    searchObj.minImDiscount = $('#im-discount-left').val();
-    searchObj.maxImDiscount = $('#im-discount-right').val();
-
-    searchObj.minStock = $('#stock-left').val();
-    searchObj.maxStock = $('#stock-right').val();
-
-    searchObj.saleAtFrom = $('#sale-at-start').val();
-    searchObj.saleAtTo = $('#sale-at-end').val();
-
-    searchObj.minBoutiqueDiscount = $('#boutique-discount-left').val();
-    searchObj.maxBoutiqueDiscount = $('#boutique-discount-right').val();
     
     searchObj.minIMDiscount = $('#im-discount-left').val();
     searchObj.maxIMDiscount = $('#im-discount-right').val();
@@ -231,7 +229,7 @@ function getFilterFromDom() {
     searchObj.saleAtFrom = $('#sale-at-start').val();
     searchObj.saleAtTo = $('#sale-at-end').val();
 
-    searchObj.tag = $('#select-tag').val();
+    searchObj.tagId = $('#select-tag').val();
     searchObj.status = $('#select-status').val();
 
     console.log(searchObj);
@@ -288,36 +286,42 @@ function getProdcutList(pageno) {
         filter += 'desc='+ searchObj.orderByDesc + '&';
     }
 
-    if(!checkNumRange(searchObj.minBoutiqueDiscount,searchObj.maxBoutiqueDiscount,"Boutique")){
+    //App3.0 add
+    var nResult = checkNumRange(searchObj.minBoutiqueDiscount,searchObj.maxBoutiqueDiscount,"Boutique");
+    if(-1 == nResult){
+        return false;
+    } else if (1 == nResult) {
+        filter += 'minBoutiqueDiscount='+ searchObj.minBoutiqueDiscount + '&';
+        filter += 'maxBoutiqueDiscount='+ searchObj.maxBoutiqueDiscount + '&';
+    }
+
+    nResult = checkNumRange(searchObj.minIMDiscount,searchObj.maxIMDiscount,"IM");
+    if(-1 == nResult){
+        return false;
+    } else if(1 == nResult) {
+        filter += 'minIMDiscount='+ searchObj.minIMDiscount + '&';
+        filter += 'maxIMDiscount='+ searchObj.maxIMDiscount + '&';
+    }
+    nResult = checkNumRange(searchObj.minStock,searchObj.maxStock,"Stock");
+    if(-1 == nResult){
+        return false;
+    } else if (1 == nResult) {
+        filter += 'minStock='+ searchObj.minStock + '&';
+        filter += 'maxStock='+ searchObj.maxStock + '&';
+    }
+
+    let obj = transDateRange(searchObj.saleAtFrom, searchObj.saleAtTo, "Sale At");
+    if(obj.dStart != undefined && obj.dEnd != undefined) {
+        
+        filter += 'saleAtFrom='+ obj.dStart + '&';
+        filter += 'saleAtTo='+ obj.dEnd + '&';
+    }else {
         return false;
     }
 
-    // searchObj.minBoutiqueDiscount = $('#boutique-discount-left').val();
-    // searchObj.maxBoutiqueDiscount = $('#boutique-discount-right').val();
-
-    // searchObj.minImDiscount = $('#im-discount-left').val();
-    // searchObj.maxImDiscount = $('#im-discount-right').val();
-
-    // searchObj.minStock = $('#stock-left').val();
-    // searchObj.maxStock = $('#stock-right').val();
-
-    // searchObj.saleAtFrom = $('#sale-at-start').val();
-    // searchObj.saleAtTo = $('#sale-at-end').val();
-
-    // searchObj.minBoutiqueDiscount = $('#boutique-discount-left').val();
-    // searchObj.maxBoutiqueDiscount = $('#boutique-discount-right').val();
-    
-    // searchObj.minIMDiscount = $('#im-discount-left').val();
-    // searchObj.maxIMDiscount = $('#im-discount-right').val();
-
-    // searchObj.minStock = $('#stock-left').val();
-    // searchObj.maxStock = $('#stock-right').val();
-
-    // searchObj.saleAtFrom = $('#sale-at-start').val();
-    // searchObj.saleAtTo = $('#sale-at-end').val();
-
-    // searchObj.tag = $('#select-tag').val();
-    // searchObj.status = $('#select-status').val();
+    if(searchObj.tagId  !== -1){
+        filter += 'tagId='+ searchObj.tagId + '&';
+    }
 
     if (pagesize) {
         filter += 'pageSize='+ pagesize + '&';
@@ -326,8 +330,6 @@ function getProdcutList(pageno) {
     if (pageno) {
         filter += 'pageNo='+ pageno + '&';
     }
-
-
 
     filter += 'image='+ searchObj.image + '&';
     filter += 'modelImage='+ searchObj.modelImage + '&';

@@ -191,27 +191,27 @@
                             <div class="div-label-text">
                                 <label class="left-label-text">Boutique Discount</label>
                             </div>
-                            <input id="boutique-discount-left" class="discount-input" placeholder="0-100" type="text">
+                            <input id="boutique-discount-left" class="discount-input" placeholder="0-100" type="number" min="0" max="100">
                             <label class="center-label-text">~</label>
-                            <input id="boutique-discount-right" class="discount-input" placeholder="0-100" type="text">
+                            <input id="boutique-discount-right" class="discount-input" placeholder="0-100" type="number" min="0" max="100">
                         </div>
 
                         <div class="col s2 has-labe-input">
                             <div class="div-label-text">
                                 <label class="left-label-text">IM Discount</label>
                             </div>
-                            <input id="im-discount-left" class="discount-input" placeholder="0-100" type="text">
+                            <input id="im-discount-left" class="discount-input" placeholder="0-100" type="number" min="0" max="100">
                             <label class="center-label-text">~</label>
-                            <input id="im-discount-right" class="discount-input" placeholder="0-100" type="text">
+                            <input id="im-discount-right" class="discount-input" placeholder="0-100" type="number" min="0" max="100">
                         </div>
 
                         <div class="col s2 has-labe-input">
                             <div class="div-label-text" style="margin-top: 23px;">
                                 <label class="left-label-text">Stock</label>
                             </div>
-                            <input id="stock-left" class="stock-input"  type="text">
+                            <input id="stock-left" class="stock-input"  type="number">
                             <label class="center-label-text">~</label>
-                            <input id="stock-right" class="stock-input" type="text">
+                            <input id="stock-right" class="stock-input" type="number">
                         </div>
 
                         <div class="input-field col s2">
@@ -230,9 +230,9 @@
                     <div class="row">
                         <div class="col s4 has-labe-input" style="position: relative;">
                             <label style="position: absolute;top: -14px;">Sale At</label>
-                            <input id="sale-at-start" class="discount-input sale-datepicker" type="text">
+                            <input id="sale-at-start" class="discount-input sale-datepicker" type="text" readonly="true">
                             <label class="center-label-text">~</label>
-                            <input id="sale-at-end" class="discount-input sale-datepicker" type="text">
+                            <input id="sale-at-end" class="discount-input sale-datepicker" type="text" readonly="true">
                         </div>
                     </div>
  
@@ -441,31 +441,43 @@
             {%else%}
             <div class="item style-scope page-order">€${order.sale_price}<span style="display: block;">${order.sale_discount}</span></div>
             {%/if%}
+            <div class="item style-scope page-order">${order.status}</div>
             <div class="item style-scope page-order action" data-product-id="${order.product_id}" data-shop-product-id="${order.shop_product_id}">
                 
             </div>
         </div>
         <div class="goods show-detail">
             <div class="row head-detail-row">
-                <div class="list-detail-item">SKU ID</div>
-                <div class="list-detail-item">Size</div>
-                <div class="list-detail-item">Barcode</div>
-                <div class="list-detail-item">Available Stock</div>
-                <div class="list-detail-item">Reserverd Stock</div>
-                <div class="list-detail-item">Confirmed Stock</div>
-                <div class="list-detail-item">Tags</div>
+                    <div class="col s10" style="margin-left: 0px;">
+                        <div class="list-detail-item col s2">SKU ID</div>
+                        <div class="list-detail-item col s1">Size</div>
+                        <div class="list-detail-item col s2">Barcode</div>
+                        <div class="list-detail-item col s1">Available Stock</div>
+                        <div class="list-detail-item col s1">Reserverd Stock</div>
+                        <div class="list-detail-item col s1">Confirmed Stock</div>
+                    </div>
+                    <div class="list-detail-item col s2">Tags</div>
+                
             </div>
-            {%each(j, detail) order.skuDetail%}
-                <div data-sku-id="${detail.sku_id}" data-product-id="${detail.product_id}" class="row list-detail-row">
-                    <div class="list-detail-item">${detail.sku_id}</div>
-                    <div class="list-detail-item">${detail.size}</div>
-                    <div class="list-detail-item">${detail.bar_code}</div>
-                    <div class="list-detail-item">${detail.store}</div>
-                    <div class="list-detail-item">${detail.reserved}</div>
-                    <div class="list-detail-item">${detail.confirmed}</div>
-                    <div class="list-detail-item">${detail.exceptionDate}</div>
+            <div class="row">
+                <div class="col s10">
+                {%each(j, detail) order.skuDetail%}
+                    <div data-sku-id="${detail.sku_id}" data-product-id="${detail.product_id}" class="row list-detail-row">
+                        <div class="list-detail-item  col s2">${detail.sku_id}</div>
+                        <div class="list-detail-item  col s1">${detail.size}</div>
+                        <div class="list-detail-item  col s2">${detail.bar_code}</div>
+                        <div class="list-detail-item  col s1">${detail.store}</div>
+                        <div class="list-detail-item  col s1">${detail.reserved}</div>
+                        <div class="list-detail-item  col s1">${detail.confirmed}</div>
+                    </div>
+                {%/each%}
                 </div>
-            {%/each%}
+                <div class="col s2" style="display: flex;">
+                {%each(j, tag) order.tagList%}
+                    <div class="list-detail-item" data-tag-id="${tag.tag_id}">${tag.name}</div>
+                {%/each%}
+                </div>
+            </div>
         </div>
     </div>
     {%/each%}
@@ -537,6 +549,7 @@
         initSeason();
         initCategory();
         initTag();
+        initDate();
 
         $('#apply-tag-btn').click(function() {
             console.log($('#sale-at-start').val());
@@ -547,9 +560,9 @@
             selectYears: 15,
             today: 'Today',
             clear: 'Clear',
-            close: 'Ok',
+            close: 'Close',
             format: 'yyyy-mm-dd',
-            closeOnSelect: true // Close upon selecting a date,
+            closeOnSelect: false // Close upon selecting a date,
         });
 
         $('#search-btn').click(function() {
@@ -578,8 +591,8 @@
             $('#text-designerId').trigger('blur');
             $('#text-color-code').trigger('blur');
             $('#text-boutique').trigger('blur');
-            $('#sale-at-start').val('');
-            $('#sale-at-end').val('');
+
+            initDate();
 
             $('select').material_select();
             initActionforBoutique();
@@ -605,7 +618,7 @@
             let param = {};
             param.productIdList = [];
             param.tagId = $('#select-apply-tag').val();
-            param.sortNum = 999;
+            param.sortNum = -1;
 
             let count = 0;
             $('.product-list .item input[type=checkbox]').each(function(idx, item) {

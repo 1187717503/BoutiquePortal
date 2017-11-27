@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created on 2017/11/17.
- *
  * @author YouFeng.Zhu
  */
 @RestController
@@ -71,7 +70,7 @@ public class ContentMgntController {
     @PostMapping(value = "/savetagproductrel", consumes = "application/json")
     public Response saveTagProductRel(@RequestBody Map<String, Object> body) {
         Long tagId = body.get("tagId") == null ? null : Long.parseLong(body.get("tagId").toString());
-        Long sortNum = body.get("sortNum") == null ? 999 : Long.parseLong(body.get("sortNum").toString());
+        Long sortNum = body.get("sortNum") == null ? -1 : Long.parseLong(body.get("sortNum").toString());
         List<String> productIdList = (List<String>) body.get("productIdList");
 
         if (productIdList.size() <= 0 || null == tagId) {

@@ -1,33 +1,104 @@
+/*return value: 
+ *  1:全不空且合法
+ *  2:全空
+ *  -1:不合法
+ */
 function checkNumRange(nMin, nMax, sFiledName){
+
+    var rInt100 = /^(100|\d{1,2})$/;
+    var rInt = /^-?[1-9]\d*$/;
+
+    let nResult = -1;
     //全空 or 全不空
-    if ((nMin && nMax) || (nMin == "" && nMax == "")) {
+    if (nMin && nMax) {
         //数字类型
         if ($.isNumeric(nMin) && $.isNumeric(nMax)) {
             //右值 > 左值
             if (nMax >= nMin) {
                 // discount是0~100
                 if (sFiledName == "Boutique" || sFiledName == "IM") {
-                    if((nMax >= 0 && nMax <= 100) && (nMin >= 0 && nMin <= 100)) {
-                        return true;
+                    if(rInt100.test(nMax) && rInt100.test(nMin)) {
+                        nResult = 1;
                     }else {
-                        toashWithCloseBtn("The value of "+ sFiledName +" should be between 0 ~ 100.");
-                        return false;
+                        toashWithCloseBtn("The value of "+ sFiledName +" should be a positive integer and between 0 ~ 100.");
+                        nResult = -1;
                     }
-                }else {
-                    return true;
-                }
+                } else if (sFiledName == "Stock") {
+                    if(rInt.test(nMax) && rInt.test(nMin)) {
+                        nResult = 1;
+                    }else {
+                        toashWithCloseBtn("The value of "+ sFiledName +" should be positive integer.");
+                        nResult = -1;
+                    }
+                } else {
+                    nResult = 1;
+                }       
             }else {
                 toashWithCloseBtn("The max value should be bigger than min value.");
-                return false;
-            }            
+                nResult = -1;
+            } 
+
         }else {
             toashWithCloseBtn("The value of "+ sFiledName +" should be number.");
-            return false;
+            nResult = -1;
         }
-    }else {
+    } else if (nMin == "" && nMax == "") {
+        nResult = 2;
+    } else {
         toashWithCloseBtn("All the field of "+ sFiledName +" should be fulfilled.");
-        return false;
+        nResult = -1;
     }
+    return nResult;
+}
+
+/*
+ * 日期格式转换 
+ */
+format = function date2str(x, y) {
+    var z = {
+        M: x.getMonth() + 1,
+        d: x.getDate(),
+        h: x.getHours(),
+        m: x.getMinutes(),
+        s: x.getSeconds()
+    };
+    y = y.replace(/(M+|d+|h+|m+|s+)/g, function(v) {
+        return ((v.length > 1 ? "0" : "") + eval('z.' + v.slice(-1))).slice(-2)
+    });
+
+    return y.replace(/(y+)/g, function(v) {
+        return x.getFullYear().toString().slice(-v.length)
+    });
+}
+
+function transDateRange(dStart, dEnd, sFiledName) {
+    let obj = {};
+    if (dStart && dEnd) {
+        if(dStart > dEnd) {
+            toashWithCloseBtn("For the "+ sFiledName +", the start date should be smaller than end date.");
+        } else {
+            obj.dStart = Date.parse(dStart + ' 00:00:00') / 1000;
+            obj.dEnd = Date.parse(dEnd + ' 23:59:59')  / 1000;
+            console.log(dStart + ' 00:00:00');
+            console.log(dEnd + ' 23:59:59');
+        }
+    } else if (dStart == "" && dEnd == "") {
+        //时间要取到月
+        let curDate = format(new Date(), 'yyyy-MM-dd') + ' 23:59:59';
+        console.log("curDate: " + curDate);
+
+        let endDate = new Date(curDate);
+        obj.dEnd = Date.parse(endDate) / 1000;
+
+        endDate.setMonth(endDate.getMonth() - 1);
+        let startDate = format(endDate, 'yyyy-MM-dd') + ' 00:00:00';
+        console.log("startDate: " + startDate);
+
+        obj.dStart = Date.parse(startDate) / 1000;
+    } else {
+        toashWithCloseBtn("All the field of "+ sFiledName +" should be fulfilled.");
+    }
+    return obj;
 }
 
 function loading() {

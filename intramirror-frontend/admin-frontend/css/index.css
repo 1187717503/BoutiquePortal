@@ -188,7 +188,13 @@
     width: 7%;
 
 }
+
 .order-list.page-order .item.page-order:nth-child(13) {
+    width: 8%;
+    word-wrap: break-word;
+}
+
+.order-list.page-order .item.page-order:nth-child(14) {
     font-size: 20px;
     color: #333;
 }
