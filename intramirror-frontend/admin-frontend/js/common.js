@@ -84,17 +84,17 @@ function transDateRange(dStart, dEnd, sFiledName) {
         }
     } else if (dStart == "" && dEnd == "") {
         //时间要取到月
-        let curDate = format(new Date(), 'yyyy-MM-dd') + ' 23:59:59';
-        console.log("curDate: " + curDate);
+        // let curDate = format(new Date(), 'yyyy-MM-dd') + ' 23:59:59';
+        // console.log("curDate: " + curDate);
 
-        let endDate = new Date(curDate);
-        obj.dEnd = Date.parse(endDate) / 1000;
+        // let endDate = new Date(curDate);
+        // obj.dEnd = Date.parse(endDate) / 1000;
 
-        endDate.setMonth(endDate.getMonth() - 1);
-        let startDate = format(endDate, 'yyyy-MM-dd') + ' 00:00:00';
-        console.log("startDate: " + startDate);
+        // endDate.setMonth(endDate.getMonth() - 1);
+        // let startDate = format(endDate, 'yyyy-MM-dd') + ' 00:00:00';
+        // console.log("startDate: " + startDate);
 
-        obj.dStart = Date.parse(startDate) / 1000;
+        // obj.dStart = Date.parse(startDate) / 1000;
     } else {
         toashWithCloseBtn("All the field of "+ sFiledName +" should be fulfilled.");
     }

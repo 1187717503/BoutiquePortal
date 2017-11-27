@@ -315,11 +315,13 @@ function getProdcutList(pageno) {
         
         filter += 'saleAtFrom='+ obj.dStart + '&';
         filter += 'saleAtTo='+ obj.dEnd + '&';
+    }else if (obj.dStart == undefined && obj.dEnd == undefined) {
+        ;
     }else {
         return false;
     }
 
-    if(searchObj.tagId  !== -1){
+    if (searchObj.tagId !== '-1') {
         filter += 'tagId='+ searchObj.tagId + '&';
     }
 
