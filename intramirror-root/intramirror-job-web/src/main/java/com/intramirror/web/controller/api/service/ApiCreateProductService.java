@@ -133,6 +133,13 @@ public class ApiCreateProductService {
             return;
         }
 
+        ProductService productService = new ProductService(conn);
+        IPriceService iPriceService = new PriceServiceImpl();
+        Sku sku1 = iPriceService.getPriceByRule(this.uProduct,this.uProduct.getVendor_id(),this.uProduct.getMax_retail_price(),conn);
+        this.uProduct.setMax_boutique_price(sku1.getIn_price());
+        this.uProduct.setMin_boutique_price(sku1.getIn_price());
+        productService.updateProduct(uProduct);
+
         for(ProductEDSManagement.SkuOptions skuOption : skuOptions) {
             Sku sku = new Sku();
             sku.product_id = this.uProduct.getProduct_id();
@@ -141,8 +148,6 @@ public class ApiCreateProductService {
             sku.name = this.uProduct.getName();
             sku.coverpic = this.uProduct.getCover_img();
             sku.introduction = this.uProduct.getDescription();
-            IPriceService iPriceService = new PriceServiceImpl();
-            Sku sku1 = iPriceService.getPriceByRule(this.uProduct,this.uProduct.getVendor_id(),this.uProduct.getMax_retail_price(),conn);
             sku.im_price = sku1.getIm_price();
             sku.in_price = sku1.getIn_price();
             sku.price = this.uProduct.getMax_retail_price();

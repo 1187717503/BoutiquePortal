@@ -129,6 +129,9 @@ public class Product{
 
 	   @Column public String designer_id;
 
+	   @Column public BigDecimal max_boutique_price;
+	   @Column public BigDecimal min_boutique_price;
+
 	   public Long getProduct_id(){
 		return product_id;
 	}
@@ -352,6 +355,22 @@ public class Product{
 
 	   public void setDesigner_id(String designer_id) {
 		   this.designer_id = designer_id;
+	   }
+
+	   public BigDecimal getMax_boutique_price() {
+		   return max_boutique_price;
+	   }
+
+	   public void setMax_boutique_price(BigDecimal max_boutique_price) {
+		   this.max_boutique_price = max_boutique_price;
+	   }
+
+	   public BigDecimal getMin_boutique_price() {
+		   return min_boutique_price;
+	   }
+
+	   public void setMin_boutique_price(BigDecimal min_boutique_price) {
+		   this.min_boutique_price = min_boutique_price;
 	   }
    }
 

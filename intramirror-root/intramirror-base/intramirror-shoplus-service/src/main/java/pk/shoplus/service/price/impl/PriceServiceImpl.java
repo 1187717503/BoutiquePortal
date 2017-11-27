@@ -70,6 +70,7 @@ public class PriceServiceImpl implements IPriceService{
         List<Sku> skus = skuService.getSkuListByCondition(conditions);
         if(skus != null && skus.size() >0) {
             BigDecimal im_price = new BigDecimal(0);
+            BigDecimal in_price = new BigDecimal(0);
             for(Sku sku : skus) {
                 logger.info("IPriceService,synProductPriceRule,updateSkuPrice,start,sku:"+ JSONObject.toJSONString(sku));
                 sku.price = newPrice;
@@ -78,6 +79,7 @@ public class PriceServiceImpl implements IPriceService{
                 sku.updated_at = new Date();
                 skuService.updateSku(sku);
                 im_price = sku.im_price;
+                in_price = sku.in_price;
                 logger.info("IPriceService,synProductPriceRule,updateSkuPrice,end,sku:"+ JSONObject.toJSONString(sku));
             }
 
@@ -87,13 +89,17 @@ public class PriceServiceImpl implements IPriceService{
                         + "set sps.`sale_price`  ="+im_price+",sps.updated_at=now()\n"
                         + "where sp.`product_id`  ="+product.getProduct_id();
             String updateProductRetailPrice = "update `product` set `max_retail_price` ="+newPrice+",`min_retail_price` = "+newPrice+",updated_at=now(),last_check=now()  where enabled = 1 and product_id="+product.getProduct_id();
+            String updateProductBoutiquePrice = "update `product` set `min_boutique_price` ="+in_price+",`max_boutique_price` = "+in_price+",updated_at=now(),last_check=now()  where enabled = 1 and product_id="+product.getProduct_id();
+
             skuService.updateBySQL(updateShopProductSalePrice);
             skuService.updateBySQL(updateShopProductSkuImPrice);
             skuService.updateBySQL(updateProductRetailPrice);
+            skuService.updateBySQL(updateProductBoutiquePrice);
 
             logger.info("IPriceService,synProductPriceRule,updateShopProductSalePrice:"+updateShopProductSalePrice);
             logger.info("IPriceService,synProductPriceRule,updateShopProductSkuImPrice:"+updateShopProductSkuImPrice);
             logger.info("IPriceService,synProductPriceRule,updateProductRetailPrice:"+updateProductRetailPrice);
+            logger.info("IPriceService,synProductPriceRule,updateProductBoutiquePrice:"+updateProductBoutiquePrice);
         }
         return true;
     }

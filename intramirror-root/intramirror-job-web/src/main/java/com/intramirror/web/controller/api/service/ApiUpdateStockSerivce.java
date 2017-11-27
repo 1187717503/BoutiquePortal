@@ -155,9 +155,9 @@ public class ApiUpdateStockSerivce {
         BigDecimal oldPrice = product.getMax_retail_price();
         int rs = ApiCommonUtils.ifUpdatePrice(oldPrice,newPrice);
 
-        if(rs == 0) {
+        /*if(rs == 0) {
             this.setWarning(ApiErrorTypeEnum.errorType.warning_price_out_off,"price",price);
-        }
+        }*/
 
         if(rs == 1 || stockOption.isModify()) {
             IPriceService iPriceService = new PriceServiceImpl();

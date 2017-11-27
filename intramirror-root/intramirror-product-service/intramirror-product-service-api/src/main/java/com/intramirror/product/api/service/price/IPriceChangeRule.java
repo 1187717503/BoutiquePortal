@@ -46,6 +46,8 @@ public interface IPriceChangeRule {
      */
     boolean updateProductRetailPrice() throws Exception;
 
+    boolean updateProductBoutiquePrice() throws Exception;
+
     int deleteByPrimaryKey(Long priceChangeRuleId);
 
     int insert(PriceChangeRule record);
