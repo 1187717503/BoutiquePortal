@@ -259,18 +259,18 @@ public class ProductMgntController {
     private void appendInfo(List<Map<String, Object>> productList, StateEnum stateEnum, SearchCondition searchCondition) {
         setCategoryPath(productList);
         List<Map<String, Object>> skuStoreList = iSkuStoreService.listSkuStoreByProductList(productList);
-        List<Map<String, Object>> priceList = productManagementService.listPriceByProductList(productList);
+        //        List<Map<String, Object>> priceList = productManagementService.listPriceByProductList(productList);
         List<Map<String, Object>> tagsList = null;
         if (searchCondition.getAddition().getTagId() != null) {
             tagsList = contentManagementService.listTagsByProductIds(productList);
         }
 
-        for (Map<String, Object> price : priceList) {
-            calculateDiscount(price);
-        }
+        //        for (Map<String, Object> price : priceList) {
+        //            calculateDiscount(price);
+        //        }
         for (Map<String, Object> product : productList) {
             setSkuInfo(product, skuStoreList);
-            setPrice(product, priceList);
+            //            setPrice(product, priceList);
             if (searchCondition.getAddition().getTagId() != null) {
                 setTags(product, tagsList);
             }
