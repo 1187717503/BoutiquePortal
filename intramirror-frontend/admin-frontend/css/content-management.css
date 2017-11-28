@@ -114,10 +114,11 @@ input.stock-input {
 
 .head-detail-row .col {
     padding: 0px;
-    margin-left: 0px;
 }
 .list-detail-row .col {
     padding: 0px;
+}
+.row .col.s8 {
     margin-left: 0px;
 }
 
