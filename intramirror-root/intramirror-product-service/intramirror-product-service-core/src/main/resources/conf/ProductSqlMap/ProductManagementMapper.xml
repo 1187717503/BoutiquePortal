@@ -62,7 +62,15 @@
                 </if>-->
         WHERE 1=1
         <if test="productIds != null">
-            AND product.product_id IN
+            AND product.product_id
+            <choose>
+                <when test="tagId == 0">
+                    NOT IN
+                </when>
+                <otherwise>
+                    IN
+                </otherwise>
+            </choose>
             <foreach item="item" index="index" collection="productIds" open="(" separator="," close=")">
                 #{item}
             </foreach>
@@ -277,7 +285,16 @@
         </if>
         WHERE product.enabled = TRUE
         <if test="productIds != null">
-            AND product.product_id IN
+            AND product.product_id
+            <choose>
+                <when test="tagId == 0">
+                    NOT IN
+                </when>
+                <otherwise>
+                    IN
+                </otherwise>
+            </choose>
+
             <foreach item="item" index="index" collection="productIds" open="(" separator="," close=")">
                 #{item}
             </foreach>

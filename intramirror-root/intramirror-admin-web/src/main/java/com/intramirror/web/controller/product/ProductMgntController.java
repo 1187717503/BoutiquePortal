@@ -123,6 +123,10 @@ public class ProductMgntController {
         SearchCondition searchCondition = initCondition(searchParams, state, categoryId, pageSize, pageNo);
         LOGGER.info("Search condition : {}", JsonTransformUtil.toJson(searchCondition));
 
+        if (!(searchCondition.getTagId() < 0) && (searchCondition.getProductIds() == null)) {
+            return Response.success();
+        }
+
         List<Map<String, Object>> productList;
         productList = productManagementService.listProductService(searchCondition);
         if (productList.size() > 0) {
@@ -143,10 +147,16 @@ public class ProductMgntController {
         searchCondition.setStart((pageNo == null || pageNo < 0) ? 0 : (pageNo - 1) * pageSize);
         searchCondition.setCount((pageSize == null || pageSize < 0) ? 25 : pageSize);
         if (searchCondition.getTagId() != null) {
-            List<Long> productList = contentManagementService.listTagProductIds(searchCondition.getTagId());
-            if (productList.size() > 0) {
+            List<Long> productList = null;
+            if (searchCondition.getTagId() == 0) {
+                productList = contentManagementService.listAllTagProductIds();
+            } else if (searchCondition.getTagId() > 0) {
+                productList = contentManagementService.listTagProductIds(searchCondition.getTagId());
+            }
+            if (productList != null && productList.size() > 0) {
                 searchCondition.setProductIds(productList);
             }
+
         }
         return searchCondition;
     }

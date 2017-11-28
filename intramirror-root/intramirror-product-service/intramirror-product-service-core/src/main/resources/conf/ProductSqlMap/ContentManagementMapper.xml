@@ -92,4 +92,18 @@
             LEFT JOIN tag ON block_tag_rel.tag_id = tag.tag_id AND tag.enabled = TRUE
         WHERE `block`.block_id = #{block_id,jdbcType=BIGINT} AND `block`.enabled = TRUE
     </select>
+
+
+    <select id="listTagProductIds" resultType="long">
+        SELECT product.product_id
+        FROM tag_product_rel
+            INNER JOIN product ON product.product_id = tag_product_rel.product_id AND product.enabled = TRUE
+        WHERE tag_id = #{tagId}
+    </select>
+
+    <select id="listAllTagProductIds" resultType="long">
+        SELECT product.product_id
+        FROM tag_product_rel
+            INNER JOIN product ON product.product_id = tag_product_rel.product_id AND product.enabled = TRUE
+    </select>
 </mapper>

@@ -62,12 +62,17 @@ public class ContentManagementServiceImpl implements ContentManagementService {
 
     @Override
     public List<Long> listTagProductIds(Long tagId) {
-        return tagProductRelMapper.listTagProductIds(tagId);
+        return contentManagementMapper.listTagProductIds(tagId);
     }
 
     @Override
     public List<Map<String, Object>> listTagsByProductIds(List<Map<String, Object>> productIds) {
         return contentManagementMapper.listTagsByProductIds(productIds);
+    }
+
+    @Override
+    public List<Long> listAllTagProductIds() {
+        return contentManagementMapper.listAllTagProductIds();
     }
 
     @Override
