@@ -18,7 +18,7 @@
         product.cover_img,
         product.description_img,
         product.category_id,
-        <if test="addition.minStock !=null and addition.maxStock !=null">
+        <if test="(stock != null and stock != 0) or (addition.minStock !=null and addition.maxStock !=null)">
             view_prod_store_sum.store AS totalStore,
         </if>
         product.designer_id AS designer_id,
@@ -34,7 +34,7 @@
         LEFT JOIN shop_product ON shop_product.shop_id = 65 AND shop_product.enabled = TRUE AND shop_product.product_id = product.product_id
         INNER JOIN vendor ON product.vendor_id = vendor.vendor_id AND product.enabled = TRUE
         INNER JOIN brand ON brand.brand_id = product.brand_id AND brand.enabled = TRUE
-        <if test="addition.minStock !=null and addition.maxStock !=null">
+        <if test="(stock != null and stock != 0) or (addition.minStock !=null and addition.maxStock !=null)">
             LEFT JOIN view_prod_store_sum ON view_prod_store_sum.product_id = product.product_id
         </if>
         <if test="exception !=  null and exception != 0">
@@ -85,9 +85,20 @@
                 </otherwise>
             </choose>
         </if>
-        <if test="addition.minStock !=null and addition.maxStock !=null">
-            AND view_prod_store_sum.store BETWEEN #{addition.minStock} AND #{addition.maxStock}
-        </if>
+        <choose>
+            <when test="(stock == null or stock == 0) and (addition.minStock ==null or addition.maxStock ==null)">
+
+            </when>
+            <when test="addition.minStock !=null and addition.maxStock !=null">
+                AND view_prod_store_sum.store BETWEEN #{addition.minStock} AND #{addition.maxStock}
+            </when>
+            <when test="stock == 1">
+                AND view_prod_store_sum.store > 0
+            </when>
+            <otherwise>
+                AND view_prod_store_sum.store &lt;= 0
+            </otherwise>
+        </choose>
         <if test="brandId != null">
             AND brand.brand_id = #{brandId}
         </if>
