@@ -22,4 +22,8 @@ public interface ContentManagementMapper {
     List<Map<String, Object>> listBlockWithTag();
 
     Map<String, Object> getBlockWithTagByBlockId(Long blockId);
+
+    List<Long> listTagProductIds(Long tagId);
+
+    List<Long> listAllTagProductIds();
 }

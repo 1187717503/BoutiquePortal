@@ -20,5 +20,4 @@ public interface TagProductRelMapper {
 
     int batchInsert(List<TagProductRel> listTagProductRel);
 
-    List<Long> listTagProductIds(Long tagId);
 }
