@@ -329,6 +329,13 @@
     {%/each%}
 </script>
 
+<script id="tmpl-apply-tag-select" type="text/x-jquery-tmpl">
+    <option value="-1" selected>All Tags</option>
+    {%each(i, tag) list%}
+    <option value="${tag.tagId}">${tag.tagName}</option>
+    {%/each%}
+</script>
+
 <script id="tmpl-category-menu" type="text/x-jquery-tmpl">
     <div class="multi-menu">
         <ul>
@@ -579,6 +586,8 @@
             $('#category-input').val('Category');
             $('#select-season').val('-1');
             $('#select-brand').val('-1');
+            $('#select-tag').val('-1');
+            $('#select-apply-tag').val('-1');
             $('#select-stock').val('0');
             $('#select-image').val('0');
             $('#select-model-image').val('0');

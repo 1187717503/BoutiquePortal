@@ -167,7 +167,7 @@ function initTag() {
         },
         success: function(result) {
             initSelectItems('select-tag', 'tmpl-tag-select', result.data);
-            initSelectItems('select-apply-tag', 'tmpl-tag-select', result.data);            
+            initSelectItems('select-apply-tag', 'tmpl-apply-tag-select', result.data);          
         }, error: function(code, exception) {
 
             if (code.status == 401) {
