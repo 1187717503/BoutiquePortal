@@ -73,10 +73,6 @@ input.stock-input {
     width: 30%;
     text-align: center;
 }
-.head-detail-row .list-detail-item:nth-child(n) {
-    background-color: #eee;
-}
-
 
 .list-detail-row .list-detail-item:nth-child(1) {
     width: 17%;
@@ -114,9 +110,11 @@ input.stock-input {
 
 .head-detail-row .col {
     padding: 0px;
+    background-color: #eee;
 }
 .list-detail-row .col {
     padding: 0px;
+    background-color: #eee;
 }
 .row .col.s8 {
     margin-left: 0px;
