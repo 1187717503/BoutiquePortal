@@ -321,10 +321,6 @@ function getProdcutList(pageno) {
         return false;
     }
 
-    if (searchObj.tagId !== '-1') {
-        filter += 'tagId='+ searchObj.tagId + '&';
-    }
-
     if (pagesize) {
         filter += 'pageSize='+ pagesize + '&';
     }
@@ -333,6 +329,7 @@ function getProdcutList(pageno) {
         filter += 'pageNo='+ pageno + '&';
     }
 
+    filter += 'tagId='+ searchObj.tagId + '&';
     filter += 'image='+ searchObj.image + '&';
     filter += 'modelImage='+ searchObj.modelImage + '&';
     filter += 'streetImage='+ searchObj.streetImage + '&';
@@ -451,7 +448,7 @@ function getCountWithFilter(filter, pagesize, pageno){
             request.setRequestHeader("token", token);
         },
         success: function(result) {
-            updatePagination(pagesize, pageno, Math.ceil(result.data.NEW/pagesize), pageAction);
+            updatePagination(pagesize, pageno, Math.ceil(result.data.ALL/pagesize), pageAction);
         }, error: function(result, resp, par) {
 
             toashWithCloseBtn(result.responseJSON.message);
