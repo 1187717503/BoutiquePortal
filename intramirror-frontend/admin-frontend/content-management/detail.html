@@ -124,7 +124,9 @@
                                     </div>
 
                                     <div class="input-field col s3">
-                                        <select id="select-product-tag"></select>
+                                        <select id="select-product-tag">
+                                            <option value="-1">Product Tags</option>
+                                        </select>
                                         <label for="select-product-tag">Product Tags</label>
                                     </div>
 
@@ -164,13 +166,13 @@
                                             <div class="input-field col s7">
                                                 <input id="text-sub-title" type="text">
                                                 <label for="text-sub-title">Subtitle</label>
-                                            </div>
+                                            </div>    
                                             <div class="input-field col s3">
-                                                <input type="color" style="margin-top:22px;width: 100%" id="backgroup-color" />
+                                                <input type="color" style="margin-top:16px;width: 100%;height: 30px;" id="backgroup-color" />
                                                 <label for="backgroup-color" style="top:-14px;font-size: 0.8rem">Backgroup Color</label>
                                             </div>
                                             <div class="input-field col s2">
-                                                <input id="text-sort-order" type="text">
+                                                <input id="text-sort-order" type="number">
                                                 <label for="text-sort-order">Sort Order</label>
                                             </div>
                                         </div>
@@ -189,125 +191,10 @@
                                 <div class="hompage-pannel-title">Block Product List</div>
                                 <div style="display: flex;">
                                     <div id="left-nestable" class="left-product-list dd">
-                                        <ol class="dd-list">
-                                            <li class="prod-item dd-item" data-nestable-id="4">
-                                                <div class="dd-handle">
-                                                    <div class="dragger-able-ele" style="float:left;margin:5px; width: 63px;height: 85px;background-image: url(../images/noimage.gif);background-size: 63px 85px;"></div>
-                                                    <div style="float:left;width: 234px;">
-                                                        <div>
-                                                            <div class="prod-info-line">
-                                                                <div class="prod-brand">Victoria Becham</div>
-                                                                <div class="prod-stock-title">Stock</div>
-                                                            </div>
-                                                            <div class="prod-info-line">
-                                                                <div class="prod-price-discount">6.5折 €2,923</div>
-                                                                <div class="prod-stock">1</div>
-                                                            </div>
-                                                        </div>
-                                                        <div>
-                                                            <div class="img-tag-list">
-                                                                <div class="image-tag">
-                                                                    模特
-                                                                </div>
-                                                                <div class="image-tag">
-                                                                    街拍
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-                                            </li>
-
-                                            <li class="prod-item dd-item" data-nestable-id="3">
-                                                <div class="dd-handle">
-                                                    <div class="dragger-able-ele" style="float:left;margin:5px; width: 63px;height: 85px;background-image: url(../images/noimage.gif);background-size: 63px 85px;"></div>
-                                                    <div style="float:left;width: 234px;">
-                                                        <div>
-                                                            <div class="prod-info-line">
-                                                                <div class="prod-brand">Victoria Becham</div>
-                                                                <div class="prod-stock-title">Stock</div>
-                                                            </div>
-                                                            <div class="prod-info-line">
-                                                                <div class="prod-price-discount">6.5折 €2,923</div>
-                                                                <div class="prod-stock">2</div>
-                                                            </div>
-                                                        </div>
-                                                        <div>
-                                                            <div class="img-tag-list">
-                                                                <div class="image-tag">
-                                                                    模特
-                                                                </div>
-                                                                <div class="image-tag">
-                                                                    街拍
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        </ol>
+                                        <!-- to be added by templete-->
                                     </div>
                                     <div id="right-nestable" class="right-product-list dd">
-                                        <ol class="dd-list">
-                                            <li class="prod-item dd-item" data-nestable-id="1">
-                                                <div class="dd-handle">
-                                                    <div class="dragger-able-ele" style="float:left;margin:5px; width: 63px;height: 85px;background-image: url(../images/noimage.gif);background-size: 63px 85px;"></div>
-                                                    <div style="float:left;width: 234px;">
-                                                        <div>
-                                                            <div class="prod-info-line">
-                                                                <div class="prod-brand">Victoria Becham</div>
-                                                                <div class="prod-stock-title">Stock</div>
-                                                            </div>
-                                                            <div class="prod-info-line">
-                                                                <div class="prod-price-discount">6.5折 €2,923</div>
-                                                                <div class="prod-stock">3</div>
-                                                            </div>
-                                                        </div>
-                                                        <div>
-                                                            <div class="img-tag-list">
-                                                                <div class="image-tag">
-                                                                    模特
-                                                                </div>
-                                                                <div class="image-tag">
-                                                                    街拍
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-                                            </li>
-
-                                            <li class="prod-item dd-item" data-nestable-id="2">
-                                                <div class="dd-handle">
-                                                    <div class="dragger-able-ele" style="float:left;margin:5px; width: 63px;height: 85px;background-image: url(../images/noimage.gif);background-size: 63px 85px;"></div>
-                                                    <div style="float:left;width: 234px;">
-                                                        <div>
-                                                            <div class="prod-info-line">
-                                                                <div class="prod-brand">Victoria Becham</div>
-                                                                <div class="prod-stock-title">Stock</div>
-                                                            </div>
-                                                            <div class="prod-info-line">
-                                                                <div class="prod-price-discount">6.5折 €2,923</div>
-                                                                <div class="prod-stock">4</div>
-                                                            </div>
-                                                        </div>
-                                                        <div>
-                                                            <div class="img-tag-list">
-                                                                <div class="image-tag">
-                                                                    模特
-                                                                </div>
-                                                                <div class="image-tag">
-                                                                    街拍
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        </ol>
+                                        <!-- to be added by templete-->
                                     </div>
                                 </div>
                             </div>
@@ -365,10 +252,52 @@
             </script>
 
             <script id="tmpl-product-tags-select" type="text/x-jquery-tmpl">
-                <option value="-1" selected disabled>Product Tags</option>
-                {%each(i, data) list%}
-                <option value="${data.brand_id}">${data.english_name}</option>
+                <option value="-1">Product Tags</option>
+                {%each(i, data) list%} 
+                    {%if data.tag_id==curTagId%}
+                        <option value="${data.tag_id}" selected>${data.tag_name}</option>
+                    {%else%}
+                        <option value="${data.tag_id}">${data.tag_name}</option>
+                    {%/if%}
                 {%/each%}
+            </script>
+
+            <script id="tmpl-product-list" type="text/x-jquery-tmpl">
+                <ol class="dd-list">
+                    {%each(i, product) list%}
+                    <li class="prod-item dd-item" data-nestable-id="${i}">
+                        <div class="dd-handle">
+                            <div class="dragger-able-ele" style="float:left;margin:5px; width: 63px;height: 85px;background-image: url(${product.image});background-size: 63px 85px;"></div>
+                            <div class="product-info-display" data-product-id="${product.product_id}" >
+                                <div>
+                                    <div class="prod-info-line">
+                                        <div class="prod-brand">${product.english_name}</div>
+                                        <div class="prod-stock-title">Stock</div>
+                                    </div>
+                                    <div class="prod-info-line">
+                                        <div class="prod-price-discount">${product.im_discount}折 €${product.im_price}</div>
+                                        <div class="prod-stock">${product.totalStock}</div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="sort">
+                                        Sort : 1
+                                    </div>
+                                    <div class="img-tag-list">
+                                        {%if product.model == 1%}
+                                        <div class="image-tag">模特</div>
+                                        {%/if%}
+                                        {%if product.steet == 1%}
+                                        <div class="image-tag">街拍</div>
+                                        {%/if%}
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </li>
+                    {%/each%}
+                </ol>
             </script>
 
             <script type="text/javascript">
@@ -377,9 +306,16 @@
                     initBlock();
                     initUpload();
 
-
                     $('#save-btn').click(function () {
                         saveAction();
+                    })
+
+                    $('#select-block-name').change(function(e) {
+                        getBlockDetail($(this).val())
+                    });
+
+                    $('#select-product-tag').change(function(e) {
+                        initProductList($(this).val());
                     })
 
                 });

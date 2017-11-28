@@ -187,3 +187,8 @@ p { line-height: 1.5em; }
 }
 
 ol.dd-dragel .dragger-able-ele {cursor: move;}
+
+/********************************************/
+.dd-list .prod-item .sort {float: left; margin-left:16px;font-size:12px;color: #000;}
+.product-info-display {float:left;width: 234px;}
+
