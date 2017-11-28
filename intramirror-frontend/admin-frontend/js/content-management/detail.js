@@ -379,9 +379,12 @@ function loadExistingImage(url) {
 
 
     uploadDropzone.emit("addedfile", mockFile);
-    uploadDropzone.createThumbnailFromUrl(mockFile, 120, 120, "crop", false, function (thumbnail) {
-        uploadDropzone.emit("thumbnail", mockFile, thumbnail);
-    }, "Anonymous");
+
+    uploadDropzone.emit("thumbnail", mockFile, url + '?x-oss-process=image/resize,m_fill,w_140,h_160/quality,Q_100/auto-orient,0/format,jpg');
+
+    // uploadDropzone.createThumbnailFromUrl(mockFile, 120, 120, "crop", false, function (thumbnail) {
+    //     uploadDropzone.emit("thumbnail", mockFile, thumbnail);
+    // }, "Anonymous");
     // uploadDropzone.addFile(mockFile);
     uploadDropzone.emit("complete", mockFile);
 }

@@ -107,6 +107,36 @@ label.text-label {
 	padding: 4px;
 }
 
+#upload {
+	margin-top: -48px;
+    margin-bottom: 12px;
+    width: 200px;
+	padding-left: 11px;
+	border: 2px solid rgba(0, 0, 0, 0.3);
+	border-style: dashed;
+	padding: inherit;
+}
+
+.col .dropzone .dz-preview .dz-image {
+    width: 140px;
+	height: 160px;
+	border-radius: 0px;
+}
+
+.col .dropzone .dz-preview:hover .dz-details {
+	margin-left: 8px;
+    margin-top: 20px;
+}
+
+.col .dropzone .dz-preview .dz-details .dz-filename span, .dropzone .dz-preview .dz-details .dz-size span {
+    border-radius: 0px;
+}
+
+.col .dropzone.dz-clickable .dz-message, .dropzone.dz-clickable .dz-message * {
+    width: 140px;
+    height: 132px;
+}
+
 .left-product-list,.right-product-list {
 	margin-left: 8px;
 	padding: 8px;
