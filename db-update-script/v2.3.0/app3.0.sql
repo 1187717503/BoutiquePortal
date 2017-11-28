@@ -67,3 +67,6 @@ CREATE TABLE `block_tag_rel` (
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB
 ;
+
+
+alter table `product`  add `preview_im_price` decimal(16,4) DEFAULT  NULL COMMENT '预热售价' ;
