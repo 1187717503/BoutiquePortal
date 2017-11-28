@@ -62,9 +62,11 @@ public class ProductMgntController {
 
         SearchCondition searchCondition = initCondition(searchParams, null, categoryId, null, null);
         LOGGER.info("Search condition : {}", JsonTransformUtil.toJson(searchCondition));
-
-        List<Map<String, Object>> countList = productManagementService.listAllProductCountGounpByState(searchCondition);
         Map<StateEnum, Long> productStateCountMap = initiateCountMap();
+        if (isEmptyTag(searchCondition)) {
+            return Response.status(StatusType.SUCCESS).data(productStateCountMap);
+        }
+        List<Map<String, Object>> countList = productManagementService.listAllProductCountGounpByState(searchCondition);
         for (Map<String, Object> item : countList) {
             StateEnum stateEnum = StateMachineCoreRule.map2StateEnum(item);
             if (stateEnum == null) {
@@ -123,7 +125,7 @@ public class ProductMgntController {
         SearchCondition searchCondition = initCondition(searchParams, state, categoryId, pageSize, pageNo);
         LOGGER.info("Search condition : {}", JsonTransformUtil.toJson(searchCondition));
 
-        if (!(searchCondition.getTagId() < 0) && (searchCondition.getProductIds() == null)) {
+        if (isEmptyTag(searchCondition)) {
             return Response.success();
         }
 
@@ -159,6 +161,16 @@ public class ProductMgntController {
 
         }
         return searchCondition;
+    }
+
+    private boolean isEmptyTag(SearchCondition searchCondition) {
+        if (searchCondition.getTagId() == null || searchCondition.getTagId() < 0) {
+            return false;
+        }
+        if (searchCondition.getProductIds() == null || searchCondition.getProductIds().size() == 0) {
+            return true;
+        }
+        return false;
     }
 
     private void appendInfo(List<Map<String, Object>> productList, StateEnum stateEnum, SearchCondition searchCondition) {
