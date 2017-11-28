@@ -88,8 +88,8 @@ public class PriceServiceImpl implements IPriceService{
                         + "inner join `shop_product`  sp on(sps.`shop_product_id` = sp.`shop_product_id`)\n"
                         + "set sps.`sale_price`  ="+im_price+",sps.updated_at=now()\n"
                         + "where sp.`product_id`  ="+product.getProduct_id();
-            String updateProductRetailPrice = "update `product` set `max_retail_price` ="+newPrice+",`min_retail_price` = "+newPrice+",updated_at=now(),last_check=now()  where enabled = 1 and product_id="+product.getProduct_id();
-            String updateProductBoutiquePrice = "update `product` set `min_boutique_price` ="+in_price+",`max_boutique_price` = "+in_price+",updated_at=now(),last_check=now()  where enabled = 1 and product_id="+product.getProduct_id();
+            String updateProductRetailPrice = "update `product` set `max_retail_price` ="+newPrice+",`min_retail_price` = "+newPrice+",last_check=now()  where enabled = 1 and product_id="+product.getProduct_id();
+            String updateProductBoutiquePrice = "update `product` set `min_boutique_price` ="+in_price+",`max_boutique_price` = "+in_price+",last_check=now()  where enabled = 1 and product_id="+product.getProduct_id();
 
             skuService.updateBySQL(updateShopProductSalePrice);
             skuService.updateBySQL(updateShopProductSkuImPrice);
