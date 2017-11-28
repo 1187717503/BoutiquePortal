@@ -1,6 +1,5 @@
 package com.intramirror.product.api.model;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -9,11 +8,11 @@ import java.util.List;
  * @author YouFeng.Zhu
  */
 public class SearchCondition {
-    private int status;
-    private int shopStatus;
-    private String[] vendorId;
+    private Integer productStatus;
+    private Integer shopProductStatus;
+    private Long[] vendorId;
     private String boutiqueId;
-    private String brandId;
+    private Long brandId;
     private List<Long> categoryId;
     private String season;
     private String designerId;
@@ -22,45 +21,47 @@ public class SearchCondition {
     private String modelImage;
     private String streetImage;
     private String stock;
-    private int start;
-    private int count;
+    private Integer start;
+    private Integer count;
     private String orderBy;
     private String desc;
 
     private String exception;
 
-    private ContentAdditionalCondition addition;
+    //content page
 
-    @Override
-    public String toString() {
-        return "SearchCondition{" + "status=" + status + ", shopStatus=" + shopStatus + ", vendorId=" + Arrays.toString(vendorId) + ", boutiqueId='"
-                + boutiqueId + '\'' + ", brandId='" + brandId + '\'' + ", categoryId=" + categoryId + ", season='" + season + '\'' + ", designerId='"
-                + designerId + '\'' + ", colorCode='" + colorCode + '\'' + ", image='" + image + '\'' + ", modelImage='" + modelImage + '\'' + ", streetImage='"
-                + streetImage + '\'' + ", stock='" + stock + '\'' + ", start=" + start + ", count=" + count + ", orderBy='" + orderBy + '\'' + ", desc='" + desc
-                + '\'' + ", exception='" + exception + '\'' + ", addition=" + addition + '}';
+    private Float minBoutiqueDiscount;
+    private Float maxBoutiqueDiscount;
+    private Float minIMDiscount;
+    private Float maxIMDiscount;
+    private Long minStock;
+    private Long maxStock;
+    private Long saleAtFrom;
+    private Long saleAtTo;
+    private Long tagId;
+    private List<Long> productIds;
+
+    public int getProductStatus() {
+        return productStatus;
     }
 
-    public int getStatus() {
-        return status;
+    public void setProductStatus(int productStatus) {
+        this.productStatus = productStatus;
     }
 
-    public void setStatus(int status) {
-        this.status = status;
+    public void setShopProductStatus(int shopProductStatus) {
+        this.shopProductStatus = shopProductStatus;
     }
 
-    public void setShopStatus(int shopStatus) {
-        this.shopStatus = shopStatus;
+    public int getShopProductStatus() {
+        return shopProductStatus;
     }
 
-    public int getShopStatus() {
-        return shopStatus;
-    }
-
-    public String[] getVendorId() {
+    public Long[] getVendorId() {
         return vendorId;
     }
 
-    public void setVendorId(String[] vendorId) {
+    public void setVendorId(Long[] vendorId) {
         this.vendorId = vendorId;
     }
 
@@ -72,11 +73,11 @@ public class SearchCondition {
         this.boutiqueId = boutiqueId;
     }
 
-    public String getBrandId() {
+    public Long getBrandId() {
         return brandId;
     }
 
-    public void setBrandId(String brandId) {
+    public void setBrandId(Long brandId) {
         this.brandId = brandId;
     }
 
@@ -184,12 +185,84 @@ public class SearchCondition {
         this.exception = exception;
     }
 
-    public ContentAdditionalCondition getAddition() {
-        return addition;
+    public Float getMinBoutiqueDiscount() {
+        return minBoutiqueDiscount;
     }
 
-    public void setAddition(ContentAdditionalCondition addition) {
-        this.addition = addition;
+    public void setMinBoutiqueDiscount(Float minBoutiqueDiscount) {
+        this.minBoutiqueDiscount = minBoutiqueDiscount;
+    }
+
+    public Float getMaxBoutiqueDiscount() {
+        return maxBoutiqueDiscount;
+    }
+
+    public void setMaxBoutiqueDiscount(Float maxBoutiqueDiscount) {
+        this.maxBoutiqueDiscount = maxBoutiqueDiscount;
+    }
+
+    public Float getMinIMDiscount() {
+        return minIMDiscount;
+    }
+
+    public void setMinIMDiscount(Float minIMDiscount) {
+        this.minIMDiscount = minIMDiscount;
+    }
+
+    public Float getMaxIMDiscount() {
+        return maxIMDiscount;
+    }
+
+    public void setMaxIMDiscount(Float maxIMDiscount) {
+        this.maxIMDiscount = maxIMDiscount;
+    }
+
+    public Long getMinStock() {
+        return minStock;
+    }
+
+    public void setMinStock(Long minStock) {
+        this.minStock = minStock;
+    }
+
+    public Long getMaxStock() {
+        return maxStock;
+    }
+
+    public void setMaxStock(Long maxStock) {
+        this.maxStock = maxStock;
+    }
+
+    public Long getSaleAtFrom() {
+        return saleAtFrom;
+    }
+
+    public void setSaleAtFrom(Long saleAtFrom) {
+        this.saleAtFrom = saleAtFrom;
+    }
+
+    public Long getSaleAtTo() {
+        return saleAtTo;
+    }
+
+    public void setSaleAtTo(Long saleAtTo) {
+        this.saleAtTo = saleAtTo;
+    }
+
+    public Long getTagId() {
+        return tagId;
+    }
+
+    public void setTagId(Long tagId) {
+        this.tagId = tagId;
+    }
+
+    public List<Long> getProductIds() {
+        return productIds;
+    }
+
+    public void setProductIds(List<Long> productIds) {
+        this.productIds = productIds;
     }
 
 }

@@ -18,7 +18,7 @@
         product.cover_img,
         product.description_img,
         product.category_id,
-        <if test="(stock != null and stock != 0) or (addition.minStock !=null and addition.maxStock !=null)">
+        <if test="(stock != null and stock != 0) or (minStock !=null and maxStock !=null)">
             view_prod_store_sum.store AS totalStore,
         </if>
         product.designer_id AS designer_id,
@@ -34,7 +34,7 @@
         LEFT JOIN shop_product ON shop_product.shop_id = 65 AND shop_product.enabled = TRUE AND shop_product.product_id = product.product_id
         INNER JOIN vendor ON product.vendor_id = vendor.vendor_id AND product.enabled = TRUE
         INNER JOIN brand ON brand.brand_id = product.brand_id AND brand.enabled = TRUE
-        <if test="(stock != null and stock != 0) or (addition.minStock !=null and addition.maxStock !=null)">
+        <if test="(stock != null and stock != 0) or (minStock !=null and maxStock !=null)">
             LEFT JOIN view_prod_store_sum ON view_prod_store_sum.product_id = product.product_id
         </if>
         <if test="exception !=  null and exception != 0">
@@ -46,7 +46,7 @@
             GROUP BY product_id) exception
             ON product.product_id = exception.product_id
         </if>
-        <!--        <if test="addition.minIMDiscount != null or addition.minBoutiqueDiscount != null">
+        <!--        <if test="minIMDiscount != null or minBoutiqueDiscount != null">
                     INNER JOIN (
                     SELECT
                     sku.price AS retail_price,
@@ -61,36 +61,36 @@
                     ) price ON price.product_id = product.product_id
                 </if>-->
         WHERE 1=1
-        <if test="addition.productIds != null">
+        <if test="productIds != null">
             AND product.product_id IN
-            <foreach item="item" index="index" collection="addition.productIds" open="(" separator="," close=")">
+            <foreach item="item" index="index" collection="productIds" open="(" separator="," close=")">
                 #{item}
             </foreach>
         </if>
-        <if test="status != -1">
+        <if test="productStatus != -1">
             <choose>
-                <when test="status == 2 or status == 4">
+                <when test="productStatus == 2 or productStatus == 4">
                     AND product.status IN (4,2)
                 </when>
                 <otherwise>
-                    AND product.status = #{status}
+                    AND product.status = #{productStatus}
                 </otherwise>
             </choose>
             <choose>
-                <when test="shopStatus == -1">
+                <when test="shopProductStatus == -1">
                     AND shop_product.status IS NULL
                 </when>
                 <otherwise>
-                    AND shop_product.status = #{shopStatus}
+                    AND shop_product.status = #{shopProductStatus}
                 </otherwise>
             </choose>
         </if>
         <choose>
-            <when test="(stock == null or stock == 0) and (addition.minStock ==null or addition.maxStock ==null)">
+            <when test="(stock == null or stock == 0) and (minStock ==null or maxStock ==null)">
 
             </when>
-            <when test="addition.minStock !=null and addition.maxStock !=null">
-                AND view_prod_store_sum.store BETWEEN #{addition.minStock} AND #{addition.maxStock}
+            <when test="minStock !=null and maxStock !=null">
+                AND view_prod_store_sum.store BETWEEN #{minStock} AND #{maxStock}
             </when>
             <when test="stock == 1">
                 AND view_prod_store_sum.store > 0
@@ -170,16 +170,16 @@
                 AND (exception.status IS NULL or exception.status != 1)
             </otherwise>
         </choose>
-        <if test="addition.minIMDiscount != null and addition.maxIMDiscount != null">
-            AND CONVERT(1 - shop_product.min_sale_price / product.min_retail_price, DECIMAL(10, 2)) * 100 BETWEEN #{addition.minIMDiscount} AND
-            #{addition.maxIMDiscount}
+        <if test="minIMDiscount != null and maxIMDiscount != null">
+            AND CONVERT(1 - shop_product.min_sale_price / product.min_retail_price, DECIMAL(10, 2)) * 100 BETWEEN #{minIMDiscount} AND
+            #{maxIMDiscount}
         </if>
-        <if test="addition.minBoutiqueDiscount != null and addition.maxBoutiqueDiscount != null">
-            AND CONVERT(1 - product.min_boutique_price / product.min_retail_price * 1.22, DECIMAL(10, 2)) * 100 BETWEEN #{addition.minBoutiqueDiscount} AND
-            #{addition.maxBoutiqueDiscount}
+        <if test="minBoutiqueDiscount != null and maxBoutiqueDiscount != null">
+            AND CONVERT(1 - product.min_boutique_price / product.min_retail_price * 1.22, DECIMAL(10, 2)) * 100 BETWEEN #{minBoutiqueDiscount} AND
+            #{maxBoutiqueDiscount}
         </if>
-        <if test="addition.saleAtFrom != null and addition.saleAtTo != null">
-            AND unix_timestamp(shop_product.sale_at) BETWEEN #{addition.saleAtFrom} AND #{addition.saleAtTo}
+        <if test="saleAtFrom != null and saleAtTo != null">
+            AND unix_timestamp(shop_product.sale_at) BETWEEN #{saleAtFrom} AND #{saleAtTo}
         </if>
         ORDER BY
         <choose>
@@ -263,7 +263,7 @@
         <if test="vendorId != null">
             INNER JOIN vendor ON product.vendor_id = vendor.vendor_id AND vendor.enabled = TRUE
         </if>
-        <if test="stock != null and stock != 0">
+        <if test="(stock != null and stock != 0) or (minStock !=null and maxStock !=null)">
             LEFT JOIN view_prod_store_sum ON view_prod_store_sum.product_id = product.product_id
         </if>
         <if test="exception !=  null and exception != 0">
@@ -276,9 +276,18 @@
             ON product.product_id = exception.product_id
         </if>
         WHERE product.enabled = TRUE
+        <if test="productIds != null">
+            AND product.product_id IN
+            <foreach item="item" index="index" collection="productIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
         <choose>
-            <when test="stock == null or stock == 0">
+            <when test="(stock == null or stock == 0) and (minStock ==null or maxStock ==null)">
 
+            </when>
+            <when test="minStock !=null and maxStock !=null">
+                AND view_prod_store_sum.store BETWEEN #{minStock} AND #{maxStock}
             </when>
             <when test="stock == 1">
                 AND view_prod_store_sum.store > 0
@@ -358,6 +367,17 @@
                 AND (exception.status IS NULL or exception.status != 1)
             </otherwise>
         </choose>
+        <if test="minIMDiscount != null and maxIMDiscount != null">
+            AND CONVERT(1 - shop_product.min_sale_price / product.min_retail_price, DECIMAL(10, 2)) * 100 BETWEEN #{minIMDiscount} AND
+            #{maxIMDiscount}
+        </if>
+        <if test="minBoutiqueDiscount != null and maxBoutiqueDiscount != null">
+            AND CONVERT(1 - product.min_boutique_price / product.min_retail_price * 1.22, DECIMAL(10, 2)) * 100 BETWEEN #{minBoutiqueDiscount} AND
+            #{maxBoutiqueDiscount}
+        </if>
+        <if test="saleAtFrom != null and saleAtTo != null">
+            AND unix_timestamp(shop_product.sale_at) BETWEEN #{saleAtFrom} AND #{saleAtTo}
+        </if>
 
         GROUP BY product.status, shop_product.status;
     </select>
