@@ -85,6 +85,7 @@
             `block`.sort_order,
             `block`.subtitle,
             `block`.title_english,
+            `block`.cover_img,
             tag.tag_id,
             tag_name
         FROM `block`
