@@ -33,6 +33,7 @@ public class LogisticsProduct{
 	private Date est_ship_date;
 	private Date packed_at;
 	private Date shipped_at;
+	private BigDecimal retail_price;
 	
 	
 	public Integer getAmount() {
@@ -213,6 +214,14 @@ public class LogisticsProduct{
 
 	public void setTax_input_amt(BigDecimal tax_input_amt) {
 		this.tax_input_amt = tax_input_amt;
+	}
+
+	public BigDecimal getRetail_price() {
+		return retail_price;
+	}
+
+	public void setRetail_price(BigDecimal retail_price) {
+		this.retail_price = retail_price;
 	}
 }
 

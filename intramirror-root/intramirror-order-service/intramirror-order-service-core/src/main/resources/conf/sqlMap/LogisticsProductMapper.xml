@@ -216,7 +216,7 @@
     tax_fee, tax_id, tax_input_amt,
     tracking_num, vat_num, container_id,
     invoice_id, confirmed_at, est_ship_date,
-    packed_at, shipped_at)
+    packed_at, shipped_at,retail_price)
     values (#{logistics_product_id,jdbcType=BIGINT}, #{order_logistics_id,jdbcType=BIGINT}, #{shop_product_sku_id,jdbcType=BIGINT},
    #{in_price,jdbcType=DECIMAL}, #{sale_price,jdbcType=DECIMAL},  #{amount,jdbcType=BIGINT},
     #{fee,jdbcType=DECIMAL}, #{deduct_amount,jdbcType=BIGINT}, #{deduct_fee,jdbcType=DECIMAL},
@@ -226,7 +226,7 @@
     #{tax_fee,jdbcType=DECIMAL}, #{tax_id,jdbcType=DECIMAL}, #{tax_input_amt,jdbcType=DECIMAL},
     #{tracking_num,jdbcType=LONGVARCHAR}, #{vat_num,jdbcType=LONGVARCHAR}, #{container_id,jdbcType=BIGINT},
     #{invoice_id,jdbcType=TIMESTAMP}, #{confirmed_at,jdbcType=TIMESTAMP}, #{est_ship_date,jdbcType=TIMESTAMP},
-    #{packed_at,jdbcType=TIMESTAMP}, #{shipped_at,jdbcType=TIMESTAMP})
+    #{packed_at,jdbcType=TIMESTAMP}, #{shipped_at,jdbcType=TIMESTAMP},#{retail_price,jdbcType=DECIMAL})
   </insert>
   
   

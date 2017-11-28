@@ -1,6 +1,7 @@
 package com.intramirror.web.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.intramirror.common.Helper;
 import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.common.parameter.StatusType;
@@ -21,9 +22,12 @@ import com.intramirror.order.api.service.OrderLogisticsService;
 import com.intramirror.order.api.service.PaymentOfflineService;
 import com.intramirror.order.api.vo.CheckoutEntity;
 import com.intramirror.order.api.vo.InputCreateOrder;
+import com.intramirror.product.api.model.ShopProductSku;
+import com.intramirror.product.api.model.Sku;
 import com.intramirror.product.api.service.IProductService;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ShopProductSkuService;
+import com.intramirror.product.api.service.SkuService;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.service.VendorService;
 import java.math.BigDecimal;
@@ -75,6 +79,9 @@ public class OrderInputCreateOrderService {
 
 	@Autowired
 	private PaymentOfflineService paymentOfflineService;
+
+	@Autowired
+	private SkuService skuService;
 
 
 	/**
@@ -168,11 +175,17 @@ public class OrderInputCreateOrderService {
 				CheckoutEntity obj = inputCreateOrder.checkoutListStr.get(j);
 				logger.info("checkout:" + obj);
 
+				Long shop_product_sku_id = obj.getShop_product_sku_id();
+				ShopProductSku shopProductSku = shopProductSkuService.getShopProductSkuById(shop_product_sku_id);
+				Sku sku = skuService.getSkuById(shopProductSku.getSkuId());
+				logger.info("OrderInputCreateOrderService,orderInputCreateOrder,getSkuById,shop_product_sku_id:"+shop_product_sku_id+",sku:"+ JSONObject.toJSONString(sku));
+
 				LogisticsProduct logisticsProduct = new LogisticsProduct();
 				logisticsProduct.setOrder_logistics_id(orderLogistics.getOrderLogisticsId());
-				logisticsProduct.setShop_product_sku_id(obj.getShop_product_sku_id());
-				logisticsProduct.setIn_price(obj.getIn_price());
-				logisticsProduct.setSale_price(obj.getSale_price());
+				logisticsProduct.setShop_product_sku_id(shop_product_sku_id);
+				logisticsProduct.setIn_price(sku.getInPrice());
+				logisticsProduct.setSale_price(sku.getImPrice());
+				logisticsProduct.setRetail_price(sku.getPrice());
 				logisticsProduct.setAmount(obj.getQuantity());
 				logisticsProduct.setFee(obj.getTax_fee()
 						.multiply(BigDecimal.valueOf(obj.getQuantity()).setScale(2, RoundingMode.HALF_UP)));
