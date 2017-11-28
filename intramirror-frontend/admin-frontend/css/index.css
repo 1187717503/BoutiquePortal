@@ -225,9 +225,11 @@
 
 .head-detail-row .list-detail-item:nth-child(n) {
     font-weight: 600;
-    border-bottom: 1px solid #EBEBEC;
     line-height: 3.5em;
-    background-color: #eee;
+}
+
+.head-detail-row.detail-head .list-detail-item {
+    border-bottom: 1px solid #ccc;
 }
 
 .head-detail-row .list-detail-item:nth-child(1) {
@@ -267,6 +269,10 @@
     width: 10%;
     text-align: center;
 }
+.head-detail-row .list-detail-item:nth-child(n) {
+    background-color: #eee;
+}
+
 .list-detail-row .list-detail-item:nth-child(n) {
     background-color: #eee;
 }

@@ -51,33 +51,6 @@ input.stock-input {
     text-align: right;
 }
 
-.head-detail-row .list-detail-item:nth-child(7) {
-    width: 30%;
-    text-align: center;
-}
-
-.list-detail-row .list-detail-item:nth-child(7) {
-    width: 30%;
-    text-align: center;
-}
-
-.aaaa {
-    display: block;
-}
-
-.list-detail-row .list-detail-item.col {
-    margin-left: 0px;
-}
-
-.row.head-detail-row .col {
-    padding: 0px;
-}
-
-.row.head-detail-row .list-detail-item.col {
-    padding-left: 12px;
-    padding-right: 12px;
-}
-
 .head-detail-row .list-detail-item:nth-child(1) {
     width: 17%;
 }
@@ -96,21 +69,72 @@ input.stock-input {
 .head-detail-row .list-detail-item:nth-child(6) {
     width: 16%;
 }
-
-.goods .row {
-    margin-left: 0rem;
-    margin-right: 0rem;
+.head-detail-row .list-detail-item:nth-child(7) {
+    width: 30%;
+    text-align: center;
+}
+.head-detail-row .list-detail-item:nth-child(n) {
+    background-color: #eee;
 }
 
-.head-detail-row .list-detail-item.tags {
+
+.list-detail-row .list-detail-item:nth-child(1) {
+    width: 17%;
+}
+.list-detail-row .list-detail-item:nth-child(2) {
+    width: 17%;
+}
+.list-detail-row .list-detail-item:nth-child(3) {
+    width: 17%;
+}
+.list-detail-row .list-detail-item:nth-child(4) {
+    width: 17%;
+}
+.list-detail-row .list-detail-item:nth-child(5) {
+    width: 16%;
+}
+.list-detail-row .list-detail-item:nth-child(6) {
+    width: 16%;
+}
+.list-detail-row .list-detail-item:nth-child(7) {
+    width: 30%;
+    text-align: center;
+}
+
+.list-detail-row .list-detail-item.tags {
     display: inline-block;
     border-radius: 16px;
     border: 1px solid #ccc;
-    line-height: 2em;
+    line-height: 1.5em;
     padding: 0 5px 0 5px;
     width: auto;
     background: #861b54;
     color: #fff;
+}
+
+.head-detail-row .col {
+    padding: 0px;
+    margin-left: 0px;
+}
+.list-detail-row .col {
+    padding: 0px;
+    margin-left: 0px;
+}
+
+.head-detail-row .list-detail-item.col {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+.list-detail-row .list-detail-item.col {
+    margin-left: 0px;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+
+.goods .row {
+    margin-left: 0rem;
+    margin-right: 0rem;
 }
 
 .has-labe-input .discount-input.sale-datepicker {
@@ -128,12 +152,10 @@ input.stock-input {
     text-align: center;
 }
 
-
-
-.head-detail-row.detail-head .list-detail-item {
-    border-bottom: 1px solid #ccc;
-}
-
 .z-depth-2 {
     padding: 0px 12px 0 12px;
+}
+
+.nav-wrapper {
+    background: #FAFAFA;
 }
