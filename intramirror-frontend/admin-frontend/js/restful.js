@@ -13,5 +13,8 @@ var requestURL = {
     "updateProductException": {"url": baseUrl + "product/exception/updateProductException" , "method": "PUT"},
     "getBlock" : {"url" : baseUrl + "content/block/list", "method": "GET"},
     "getProductsByTag" : {"url" : baseUrl + "content/tag/products", "method": "GET"},
-    "uploadImage": {"url" : baseUrl + "file", "method":"POST"}
+    "uploadImage": {"url" : baseUrl + "file", "method":"POST"},
+    "getBlockDetail": {"url": baseUrl + "content/block/detail", "method" : "GET"},
+    "getUnBindTags": {"url" : baseUrl + "content/tag/list/unbind", "method": "GET"},
+    "saveBlock" : {"url" : baseUrl + "content/operation/save", "method" : "PUT"}
 }

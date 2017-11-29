@@ -46,6 +46,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         Map<String,Object> paramsMap = new HashMap<>();
         List<Map<String,Object>> paramsList = new ArrayList<>();
         paramsMap.put("price_type", PriceChangeRuleEnum.PriceType.SUPPLY_PRICE.getCode());
+        paramsMap.put("preview_status","0");
         
         List<Map<String,Object>> selSeasonGroupRuleMaps = priceChangeRuleMapper.selectSeasonGroupRule(paramsMap);
         logger.info("vendor selSeasonGroupRuleMaps : "+selSeasonGroupRuleMaps.size());
@@ -164,6 +165,8 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         // update by dingyifan 2017-10-11*/
     }
 
+
+
     @Override
     public boolean updateShopPrice() {
         priceChangeRuleMapper.updateSkuPriceByImPrice();
@@ -202,6 +205,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         Map<String,Object> paramsMap = new HashMap<>();
         List<Map<String,Object>> paramsList = new ArrayList<>();
         paramsMap.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
+        paramsMap.put("preview_status","0");
 
         List<Map<String,Object>> selSeasonGroupRuleMaps = priceChangeRuleMapper.selectSeasonGroupRule(paramsMap);
         logger.info("admin selSeasonGroupRuleMaps : "+selSeasonGroupRuleMaps.size());
@@ -237,6 +241,62 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
 
         this.updateDefaultPrice(PriceChangeRuleEnum.PriceType.IM_PRICE,paramsMap);
         return true;
+    }
+
+
+
+    @Override
+    public boolean updatePreviewPrice(Long vendor_id,Long preview_status) throws Exception {
+
+        if(preview_status.intValue() == 0) {
+            priceChangeRuleMapper.clearProductPreviewPrice(vendor_id);
+            priceChangeRuleMapper.updatePriceChangeRulePreviewStatus(vendor_id,preview_status);
+        }
+
+        if(preview_status.intValue() == 1) {
+            Map<String,Object> paramsMap = new HashMap<>();
+            List<Map<String,Object>> paramsList = new ArrayList<>();
+            paramsMap.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
+            paramsMap.put("preview_status","1");
+            paramsMap.put("vendor_id",vendor_id);
+
+            List<Map<String,Object>> selSeasonGroupRuleMaps = priceChangeRuleMapper.selectSeasonGroupRule(paramsMap);
+
+            List<Map<String,Object>> selSecondCategoryRuleMaps = priceChangeRuleMapper.selectSecondCategoryRule(paramsMap);
+
+            List<Map<String,Object>> selAllCategoryRuleMaps = priceChangeRuleMapper.selectAllCategoryRule(paramsMap);
+            selAllCategoryRuleMaps = this.sortListByLevel(selAllCategoryRuleMaps);
+
+            List<Map<String,Object>> selProductGroupRuleMaps = priceChangeRuleMapper.selectProductGroupRule(paramsMap);
+
+            List<Map<String,Object>> selProductRuleMaps = priceChangeRuleMapper.selectProductRule(paramsMap);
+
+            paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selSecondCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
+            this.updateProductPreviewImPrice(paramsList,paramsMap);
+            paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selAllCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
+            this.updateProductPreviewImPrice(paramsList,paramsMap);
+            paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selProductGroupRuleMaps,Contants.num_three,selSeasonGroupRuleMaps);
+            this.updateProductPreviewImPrice(paramsList,paramsMap);
+            paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selProductRuleMaps,Contants.num_four,selSeasonGroupRuleMaps);
+            this.updateProductPreviewImPrice(paramsList,paramsMap);
+
+            priceChangeRuleMapper.updateProductPreviewPrice(vendor_id);
+            priceChangeRuleMapper.updatePriceChangeRulePreviewStatus(vendor_id,preview_status);
+        }
+        return true;
+    }
+
+    private int updateProductPreviewImPrice(List<Map<String,Object>> paramsList,Map<String,Object> paramsMap){
+        if(paramsList != null && paramsList.size() > 0) {
+            for(int i = 0,len = paramsList.size();i<len;i++) {
+
+                Map<String,Object> executeMap = paramsList.get(i);
+                logger.info("updatePriceByAdmin,updateSkuPriceByAdmin,start,executeMap:"+JSONObject.toJSONString(executeMap)+",i:"+i+","+len);
+                priceChangeRuleMapper.updateProductPreviewImPrice(executeMap);
+                logger.info("updatePriceByAdmin,updateSkuPriceByAdmin,end,executeMap:"+JSONObject.toJSONString(executeMap)+",i:"+i+","+len);
+            }
+        }
+        return 0;
     }
 
     @Override
