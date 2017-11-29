@@ -345,6 +345,8 @@ function initUpload() {
         headers: {
             "token": token
         },
+        thumbnailWidth: 140,
+        thumbnailHeight: 160,
         init: function () {
             this.on("success", function success(file, response) {
 
@@ -359,6 +361,7 @@ function initUpload() {
             this.on("addedfile", function () {
                 $('.dz-preview.dz-complete.dz-image-preview').remove();
             });
+
  
         }
     });
@@ -367,7 +370,6 @@ function initUpload() {
 
 
 function loadExistingImage(url) {
-
     uploadDropzone.removeAllFiles(true);
     $('.dz-preview.dz-complete.dz-image-preview').remove();
 
@@ -377,11 +379,8 @@ function loadExistingImage(url) {
         dataURL: url
     };
 
-
     uploadDropzone.emit("addedfile", mockFile);
-
     uploadDropzone.emit("thumbnail", mockFile, url + '?x-oss-process=image/resize,m_fill,w_140,h_160/quality,Q_100/auto-orient,0/format,jpg');
-
     // uploadDropzone.createThumbnailFromUrl(mockFile, 120, 120, "crop", false, function (thumbnail) {
     //     uploadDropzone.emit("thumbnail", mockFile, thumbnail);
     // }, "Anonymous");
@@ -391,10 +390,10 @@ function loadExistingImage(url) {
 
 function saveAction() {
 
-    // loadExistingImage('http://sha-oss-static.oss-cn-shanghai.aliyuncs.com/upload/8c2e9b52-233a-49dc-8788-ee8131246332');
+     //loadExistingImage('http://sha-oss-static.oss-cn-shanghai.aliyuncs.com/upload/4d759f85-8627-457f-8c15-6f0889c454e4');
     // loadExistingImage('http://static-intramirror.oss-cn-hongkong.aliyuncs.com/upload/343449a7-fe96-4cf0-bf4d-0e59e9675b58');
-    // loadExistingImage('http://sha-oss-static.oss-cn-shanghai.aliyuncs.com/upload/617d1ff1-b067-48c1-82b2-2552f2322eae');
-    saveBlock();
+    //loadExistingImage('http://sha-oss-static.oss-cn-shanghai.aliyuncs.com/upload/617d1ff1-b067-48c1-82b2-2552f2322eae');
+     saveBlock();
     // console.log(uploadDropzone);
     // console.log($('#backgroup-color').val());
 }

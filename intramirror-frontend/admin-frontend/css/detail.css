@@ -132,9 +132,11 @@ label.text-label {
     border-radius: 0px;
 }
 
-.col .dropzone.dz-clickable .dz-message, .dropzone.dz-clickable .dz-message * {
+.col .dropzone.dz-clickable .dz-message, .dropzone.dz-clickable .dz-message  {
     width: 140px;
-    height: 132px;
+	height: 132px;
+	padding-top:32px; 
+	padding-left:32px; 
 }
 
 .left-product-list,.right-product-list {
