@@ -25,11 +25,11 @@
         product.color_code AS color_code,
         product.min_retail_price AS retail_price,
         product.min_boutique_price AS boutique_price,
-        shop_product.min_sale_price AS im_price,
+        # shop_product.min_sale_price AS im_price,
         shop_product.min_sale_price AS sale_price,
         product.img_modified AS modelImage,
         CONVERT(1 - product.min_boutique_price / product.min_retail_price * 1.22, DECIMAL(10, 2)) AS boutique_discount,
-        CONVERT(1 - shop_product.min_sale_price / product.min_retail_price, DECIMAL(10, 2)) AS im_discount
+        CONVERT(1 - shop_product.min_sale_price / product.min_retail_price, DECIMAL(10, 2)) AS sale_discount
         FROM product
         LEFT JOIN shop_product ON shop_product.shop_id = 65 AND shop_product.enabled = TRUE AND shop_product.product_id = product.product_id
         INNER JOIN vendor ON product.vendor_id = vendor.vendor_id AND product.enabled = TRUE
