@@ -132,6 +132,7 @@ public class Product{
 	   @Column public BigDecimal max_boutique_price;
 	   @Column public BigDecimal min_boutique_price;
 
+	   @Column public BigDecimal preview_im_price;
 	   public Long getProduct_id(){
 		return product_id;
 	}
@@ -371,6 +372,14 @@ public class Product{
 
 	   public void setMin_boutique_price(BigDecimal min_boutique_price) {
 		   this.min_boutique_price = min_boutique_price;
+	   }
+
+	   public BigDecimal getPreview_im_price() {
+		   return preview_im_price;
+	   }
+
+	   public void setPreview_im_price(BigDecimal preview_im_price) {
+		   this.preview_im_price = preview_im_price;
 	   }
    }
 

@@ -1,33 +1,11 @@
 package com.intramirror.web.controller.price;
 
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
-import com.intramirror.common.enums.SystemPropertyEnum;
-import com.intramirror.common.help.ResultMessage;
-import com.intramirror.product.api.service.*;
-import com.sun.org.apache.regexp.internal.RE;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.annotations.Param;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-
+import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.intramirror.common.enums.SystemPropertyEnum;
+import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.product.api.model.PriceChangeRule;
@@ -35,10 +13,30 @@ import com.intramirror.product.api.model.PriceChangeRuleCategoryBrand;
 import com.intramirror.product.api.model.PriceChangeRuleGroup;
 import com.intramirror.product.api.model.PriceChangeRuleProduct;
 import com.intramirror.product.api.model.ProductWithBLOBs;
+import com.intramirror.product.api.service.IPriceChangeRuleCategoryBrandService;
+import com.intramirror.product.api.service.IPriceChangeRuleGroupService;
+import com.intramirror.product.api.service.IPriceChangeRuleProductService;
+import com.intramirror.product.api.service.IProductService;
+import com.intramirror.product.api.service.ISystemPropertyService;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
 import com.intramirror.user.api.model.User;
 import com.intramirror.web.controller.BaseController;
 import com.intramirror.web.service.PriceChangeRuleService;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Param;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * 
@@ -95,6 +93,26 @@ public class PriceChangeRuleController extends BaseController{
 			logger.error("error message : " + e.getMessage());
 			resultMessage.errorStatus().putMsg("info","error message : " + e.getMessage());
 		}
+		return resultMessage;
+	}
+
+	@RequestMapping("/changepreview")
+	@ResponseBody
+	public ResultMessage changePreview(@Param("price_change_rule_id") Long price_change_rule_id,@Param("preview_status")Long preview_status){
+		logger.info("PriceChangeRuleController,changePreview,inputParams,price_change_rule_id:"+price_change_rule_id +",preview_status : "+preview_status);
+		ResultMessage resultMessage = ResultMessage.getInstance();
+		try {
+			PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(price_change_rule_id);
+
+			priceChangeRule.updatePreviewPrice(pcrModel.getVendorId(),preview_status);
+
+			resultMessage.successStatus().putMsg("info","success !!!");
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("error message : " + e.getMessage());
+			resultMessage.errorStatus().putMsg("info","error message : " + e.getMessage());
+		}
+		logger.info("PriceChangeRuleController,changePreview,outParams,price_change_rule_id:"+price_change_rule_id +",preview_status : "+preview_status+",resultMessage:"+ JSONObject.toJSONString(resultMessage));
 		return resultMessage;
 	}
 
