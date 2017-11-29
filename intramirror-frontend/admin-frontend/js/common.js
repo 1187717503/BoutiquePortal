@@ -14,6 +14,8 @@ function checkNumRange(nMin, nMax, sFiledName){
         //数字类型
         if ($.isNumeric(nMin) && $.isNumeric(nMax)) {
             //右值 > 左值
+            nMax = parseInt(nMax);
+            nMin = parseInt(nMin);
             if (nMax >= nMin) {
                 // discount是0~100
                 if (sFiledName == "Boutique" || sFiledName == "IM") {
@@ -32,12 +34,11 @@ function checkNumRange(nMin, nMax, sFiledName){
                     }
                 } else {
                     nResult = 1;
-                }       
+                }
             }else {
                 toashWithCloseBtn("The max value should be bigger than min value.");
                 nResult = -1;
-            } 
-
+            }
         }else {
             toashWithCloseBtn("The value of "+ sFiledName +" should be number.");
             nResult = -1;
