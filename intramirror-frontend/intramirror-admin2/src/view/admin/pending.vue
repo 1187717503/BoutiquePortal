@@ -236,7 +236,7 @@
             <v-switch v-bind:label="`Preveiw`" v-model="previewToggle" class="preview-toggle" :class="{notActive:!previewToggle}" @click="changePreviewStatusAction()"></v-switch>
             <v-icon class="preview-replay" v-show="previewToggle" @click="refreshPreView()">replay</v-icon>
         </div>
-        <button class="waves-effect waves-light btn active-button" v-on:click.once="activeNow()" :class="{hadClicked:activeNowButtonClicked}">ACTIVE NOW</button>
+        <!-- <button class="waves-effect waves-light btn active-button" v-on:click.once="activeNow()" :class="{hadClicked:activeNowButtonClicked}">ACTIVE NOW</button> -->
       </div>
     </div>
 

@@ -17,7 +17,7 @@ switch (process.env.WEB_ENV){
     break;
   case "stag":
     baseConfig.BASE_URL = '"http://sha.staging.admin2.intramirror.com:8096/"';
-    baseConfig.API_URL = '"http://101.132.132.34:8095/"';
+    baseConfig.API_URL = '"http://sha.staging.api.intramirror.com/"';
     baseConfig.ERROR_URL = '"http://sha.staging.vendor.intramirror.com:8092"';
     baseConfig.ERROR_URL2 = '"http://101.132.132.34:8095"';
     break;
