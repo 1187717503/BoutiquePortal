@@ -176,13 +176,17 @@ public class ProductMgntController {
     private void appendInfo(List<Map<String, Object>> productList, StateEnum stateEnum, SearchCondition searchCondition) {
         setCategoryPath(productList);
         List<Map<String, Object>> skuStoreList = iSkuStoreService.listSkuStoreByProductList(productList);
+        List<Map<String, Object>> priceList = productManagementService.listPriceByProductList(productList);
         List<Map<String, Object>> tagsList = null;
         if (searchCondition.getTagId() != null) {
             tagsList = contentManagementService.listTagsByProductIds(productList);
         }
-
+        for (Map<String, Object> price : priceList) {
+            calculateDiscount(price);
+        }
         for (Map<String, Object> product : productList) {
             setSkuInfo(product, skuStoreList);
+            setPrice(product, priceList);
             if (searchCondition.getTagId() != null) {
                 setTags(product, tagsList);
             }
@@ -201,24 +205,24 @@ public class ProductMgntController {
         if (retailPrice <= 0) {
             return;
         }
-        if (price.get("boutique_price") != null) {
-            Double boutique_price = Double.parseDouble(price.get("boutique_price").toString());
-            BigDecimal b = new BigDecimal(1 - boutique_price / retailPrice * 1.22);
-            Double discount = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-            price.put("boutique_discount", discount);
-        }
+        //        if (price.get("boutique_price") != null) {
+        //            Double boutique_price = Double.parseDouble(price.get("boutique_price").toString());
+        //            BigDecimal b = new BigDecimal(1 - boutique_price / retailPrice * 1.22);
+        //            Double discount = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+        //            price.put("boutique_discount", discount);
+        //        }
         if (price.get("im_price") != null) {
             Double boutique_price = Double.parseDouble(price.get("im_price").toString());
             BigDecimal b = new BigDecimal(1 - boutique_price / retailPrice);
             Double discount = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
             price.put("im_discount", discount);
         }
-        if (price.get("sale_price") != null) {
-            Double boutique_price = Double.parseDouble(price.get("sale_price").toString());
-            BigDecimal b = new BigDecimal(1 - boutique_price / retailPrice);
-            Double discount = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-            price.put("sale_discount", discount);
-        }
+        //        if (price.get("sale_price") != null) {
+        //            Double boutique_price = Double.parseDouble(price.get("sale_price").toString());
+        //            BigDecimal b = new BigDecimal(1 - boutique_price / retailPrice);
+        //            Double discount = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+        //            price.put("sale_discount", discount);
+        //        }
     }
 
     private StateEnum getStatusEnum(String status) {
