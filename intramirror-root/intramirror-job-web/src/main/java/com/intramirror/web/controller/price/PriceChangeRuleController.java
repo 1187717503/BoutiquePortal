@@ -6,6 +6,7 @@ import com.intramirror.product.api.service.price.IPriceChangeRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -25,6 +26,7 @@ public class PriceChangeRuleController {
     @Resource(name = "productPriceChangeRule")
     private IPriceChangeRule iPriceChangeRule;
 
+    @CrossOrigin
     @RequestMapping(value = "/updatePriceByVendor",method = RequestMethod.GET)
     @ResponseBody
     public ResultMessage updatePriceByVendor(){
@@ -57,6 +59,7 @@ public class PriceChangeRuleController {
         return resultMessage;
     }*/
 
+    @CrossOrigin
     @RequestMapping(value = "/updatePriceByAdmin",method = RequestMethod.GET)
     @ResponseBody
     public ResultMessage updatePriceByAdmin(){
