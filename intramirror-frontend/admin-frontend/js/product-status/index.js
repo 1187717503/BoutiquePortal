@@ -559,7 +559,7 @@ function getBtnStatus(status) {
         btnStatus.trash = 1;
         btnStatus.add_to_shop = 1;
     } else if (status === 'shopreadytosell') {
-        // btnStatus.process = 1;
+        btnStatus.process = 1;
         btnStatus.remove = 1;
         btnStatus.remove_from_shop = 1;
         btnStatus.on_sale = 1
