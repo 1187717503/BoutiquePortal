@@ -27,7 +27,7 @@ public class PriceChangeRuleController {
     private IPriceChangeRule iPriceChangeRule;
 
     @CrossOrigin
-    @RequestMapping(value = "/updatePriceByVendor",method = RequestMethod.GET)
+    @RequestMapping("/updatePriceByVendor")
     @ResponseBody
     public ResultMessage updatePriceByVendor(){
 
@@ -60,7 +60,7 @@ public class PriceChangeRuleController {
     }*/
 
     @CrossOrigin
-    @RequestMapping(value = "/updatePriceByAdmin",method = RequestMethod.GET)
+    @RequestMapping("/updatePriceByAdmin")
     @ResponseBody
     public ResultMessage updatePriceByAdmin(){
 
