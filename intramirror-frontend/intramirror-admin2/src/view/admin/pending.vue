@@ -223,7 +223,7 @@
           </div>
         </div>
       </div>
-      <div class="foot-btn">
+      <div class="foot-btn position-relative">
         <div class="input-field">
           <i class="mdi mdi-calendar prefix"></i>
           <input id="seleDate" type="text" class="validate" placeholder="Date" @focus="setEffectiveDate"
@@ -232,6 +232,11 @@
         </div>
         <button class="waves-effect waves-light btn" @click="saveDate">SAVE</button>
         <button class="waves-effect waves-light btn">CANCEL</button>
+        <div class="preview-button-group">
+            <v-switch v-bind:label="`Preveiw`" v-model="previewToggle" class="preview-toggle" :class="{notActive:!previewToggle}" @click="changePreviewStatusAction()"></v-switch>
+            <v-icon class="preview-replay" v-show="previewToggle" @click="refreshPreView()">replay</v-icon>
+        </div>
+        <button class="waves-effect waves-light btn active-button" v-on:click.once="activeNow()" :class="{hadClicked:activeNowButtonClicked}">ACTIVE NOW</button>
       </div>
     </div>
 
@@ -380,12 +385,16 @@
     deletePriceChangeRule,
     updatePriceChangeRule,
     getRuleDate,
-    copyRule
+    copyRule,
+    changePreviewStatus,
+    activeNowAcation1,
+    activeNowAcation2
   } from '../../api/pricingrule'
 
   export default {
     data() {
       return {
+        previewToggle: false,
         showShade: false, //是否显示遮罩
         showSeason: false,
         showAddbrand: false,
@@ -445,8 +454,8 @@
         addProductGroupid: null,
         addProductGroupVal: null,
         coptyNewType: 'COPY',
-        RuleDate: ''
-
+        RuleDate: '',
+        activeNowButtonClicked: false,
       }
     },
     watch: {
@@ -510,7 +519,7 @@
           monthsShort: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
           selectMonths: true,
           selectYears: 15,
-          min: new Date(this.year, this.month, this.date + 1),
+          min: new Date(this.year, this.month, this.date),
           format: 'dd/mmm/yyyy'
         });
       },
@@ -671,9 +680,11 @@
         this.getTable(id)
         this.priceId = id
         getRuleDate(id).then(res => {
+          debugger;
           if (res.data.status === 1) {
             this.RuleDate = res.data.data.validFromStr
             this.pagination.page = 1;
+            this.previewToggle = res.data.data.preview_status ? true:false;
           }
         })
       },
@@ -1124,6 +1135,35 @@
             }
           })
         }
+      },
+      changePreviewStatusAction(){
+        this.isLoading = true;
+        this.previewToggle = !this.previewToggle;
+        changePreviewStatus(this.priceId,this.previewToggle?1:0).then(res => {
+          if (res.data.status === 1) {
+            Materialize.toast('Pricing Rule 更新成功', 4000);
+          } else {
+            Materialize.toast(res.data.info, 4000);
+          }
+          this.isLoading = false;
+        });
+      },
+      refreshPreView(){
+        this.isLoading = true;
+        changePreviewStatus(this.priceId,1).then(res => {
+          if (res.data.status === 1) {
+            Materialize.toast('Pricing Rule 刷新成功', 4000);
+          } else {
+            Materialize.toast(res.data.info, 4000);
+          }
+          this.isLoading = false;
+        });
+      },
+      activeNow(){
+        console.log(process);
+        this.activeNowButtonClicked = true;
+        activeNowAcation1();
+        activeNowAcation2();
       }
     },
     filters: {
@@ -1145,7 +1185,7 @@
 </script>
 <style lang="less" scoped>
   @import "../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css";
-
+  
   .head-search {
     position: relative;
     z-index: 6;
@@ -1875,5 +1915,47 @@
 
   .input-group {
     margin-bottom: 0;
+  }
+
+  .preview-toggle .input-group--selection-controls__toggle{
+    background-color: #9E2976 !important;
+  }
+  .preview-toggle .input-group--selection-controls__ripple::after{
+    background: #871B55;
+  }
+  .notActive .input-group--selection-controls__toggle{
+    background-color: rgba(34,31,31,0.26) !important;
+  }
+  .notActive .input-group--selection-controls__ripple::after{
+    background: #F1F1F1;
+  }
+  .preview-toggle label{
+    font-size: 16px;
+    color: #424242;
+  }
+  .preview-button-group{
+    flex: 0 1 auto;
+    display: inline-flex;
+    width: 139px;
+    margin-left: 10px;
+  }
+  .preview-toggle{
+    margin-top: 10px;
+  }
+  .preview-replay{
+    color:#4a4a4a;
+    height: 48px;
+    cursor: pointer;
+  }
+  .active-button{
+    position: absolute;
+    right: 0;
+    margin-right: 0;
+  }
+  .position-relative{
+    position: relative;
+  }
+  .hadClicked{
+    background: #9B9B9B !important
   }
 </style>

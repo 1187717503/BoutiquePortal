@@ -2,7 +2,7 @@
  * Created by 1 on 2017/7/19.
  */
 import HTTP from '../http'
-
+let apiUrl = process.env.API_URL;
 export function queryRuleByHasSeason(id, vendor, type) {
   return HTTP({
     url: 'rule/select/queryRuleByHasSeason.htm?ruleStatus=' + id + '&vendor_id=' + vendor + '&price_type=' + type
@@ -216,6 +216,26 @@ export function selectDefaultDiscount() {
 }
 export function copyRule( vendouid, type, discount = 0) {
   return HTTP({
-    url: '/rule/copy/copyRule.htm?vendor_id=' + vendouid + '&price_type=' + type + '&discount=' + discount
+    url: 'rule/copy/copyRule.htm?vendor_id=' + vendouid + '&price_type=' + type + '&discount=' + discount
+  })
+}
+
+export function changePreviewStatus(price_id,priview_status) {
+  return HTTP({
+    url: 'priceChangeRule/changepreview.htm?price_change_rule_id='+price_id+'&preview_status='+priview_status
+  })
+}
+
+export function activeNowAcation1() {
+  return HTTP({
+    baseURL: apiUrl,
+    url: 'job/price/updatePriceByVendor'
+  })
+}
+
+export function activeNowAcation2() {
+  return HTTP({
+    baseURL: apiUrl,
+    url: 'job/price/updatePriceByAdmin'
   })
 }
