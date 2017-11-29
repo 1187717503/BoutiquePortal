@@ -64,14 +64,14 @@ function saveBlock() {
 
     param.block = {};
     param.block.blockId = $('#select-block-name').val();
-    if (param.block.blockId == null) {
+    if (param.block.blockId == null || param.block.blockId == -1) {
         Materialize.toast('Please select block', 3000);
         return;
     }
 
     param.tag = {}
     param.tag.tagId = $('#select-product-tag').val();
-    if (param.tag.tagId == null || param.tag.tagId == '-1') {
+    if (param.tag.tagId == null || param.tag.tagId == -1) {
         Materialize.toast('Please select product tag', 3000);
         return;
     }
@@ -219,7 +219,12 @@ function initProductList(curTagId) {
 
                 // 街拍图拿不到
                 result.data[i].steet = 0;
-                result.data[i].model = 1;
+                if (result.data[i].img_modified) {
+                    result.data[i].model = 1;
+                } else {
+                    result.data[i].model = 0;
+                }
+                
 
                 if (result.data[i].sort_num == -1) {
 
@@ -275,6 +280,7 @@ function initTagSelect(blockId, curTagId) {
             
             $('#tmpl-product-tags-select').tmpl({list: result.data, curTagId: curTagId}).appendTo('#select-product-tag');
             $('#select-product-tag').material_select();
+            $('#select-product-tag').attr('data-origin-product-id', curTagId);
             
         }, error: function(code, exception) {
 
@@ -339,8 +345,8 @@ function initUpload() {
     uploadDropzone = new Dropzone("div#upload", {
         url: requestURL.uploadImage.url,
         method: requestURL.uploadImage.method,
-        paramName: "file", // The name that will be used to transfer the file
-        maxFilesize: 5, // MB
+        paramName: "file",
+        maxFilesize: 5,
         maxFiles: 1,
         headers: {
             "token": token
@@ -352,20 +358,17 @@ function initUpload() {
 
                 $('#upload').attr('data-block-image', response.data);
             });
+
             this.on("maxfilesexceeded", function (file) {
                 this.removeAllFiles(true);
                 this.addFile(file);
             });
 
-
             this.on("addedfile", function () {
                 $('.dz-preview.dz-complete.dz-image-preview').remove();
             });
-
- 
         }
     });
-
 }
 
 
@@ -381,19 +384,68 @@ function loadExistingImage(url) {
 
     uploadDropzone.emit("addedfile", mockFile);
     uploadDropzone.emit("thumbnail", mockFile, url + '?x-oss-process=image/resize,m_fill,w_140,h_160/quality,Q_100/auto-orient,0/format,jpg');
-    // uploadDropzone.createThumbnailFromUrl(mockFile, 120, 120, "crop", false, function (thumbnail) {
-    //     uploadDropzone.emit("thumbnail", mockFile, thumbnail);
-    // }, "Anonymous");
-    // uploadDropzone.addFile(mockFile);
     uploadDropzone.emit("complete", mockFile);
 }
 
-function saveAction() {
 
-     //loadExistingImage('http://sha-oss-static.oss-cn-shanghai.aliyuncs.com/upload/4d759f85-8627-457f-8c15-6f0889c454e4');
-    // loadExistingImage('http://static-intramirror.oss-cn-hongkong.aliyuncs.com/upload/343449a7-fe96-4cf0-bf4d-0e59e9675b58');
-    //loadExistingImage('http://sha-oss-static.oss-cn-shanghai.aliyuncs.com/upload/617d1ff1-b067-48c1-82b2-2552f2322eae');
-     saveBlock();
-    // console.log(uploadDropzone);
-    // console.log($('#backgroup-color').val());
+function initEvent() {
+    $('#save-btn').click(function () {
+        saveBlock();
+    })
+
+    $('#select-block-name').change(function(e) {
+        $('#modal2').openModal({
+            dismissible: false,
+            opacity: .5,
+            inDuration: 300,
+            outDuration: 200,
+            startingTop: '4%',
+            endingTop: '10%'
+        });
+    });
+
+    $('#modal1 .model-yes').click(function() {
+        $('#modal1').closeModal();
+        let productTag = $('#select-product-tag').val();
+        $('#select-product-tag').attr('data-origin-product-id', productTag);
+        initProductList(productTag);
+    })
+
+    $('#modal2 .model-yes').click(function() {
+        $('#modal2').closeModal();
+        console.log('blockId');
+        let blockId = $('#select-block-name').val();
+        $('#select-block-name').attr('data-origin-block-id', blockId);
+        getBlockDetail(blockId)
+    })
+
+    $('#modal1 .model-no').click(function() {
+        let oriProductTag = $('#select-product-tag').data('origin-product-id');
+        $('#select-product-tag').val(oriProductTag);
+        $('#select-product-tag').material_select();
+        
+        $('#modal1').closeModal();
+    })
+
+    $('#modal2 .model-no').click(function() {
+        let oriBlockId = $('#select-block-name').data('origin-block-id');
+        if (typeof(oriBlockId) =='undefined') {
+            oriBlockId = -1;
+        }
+
+        $('#select-block-name').val(oriBlockId);
+        $('#select-block-name').material_select();
+        $('#modal2').closeModal();
+    })
+
+    $('#select-product-tag').change(function(e) {
+        $('#modal1').openModal({
+            dismissible: false,
+            opacity: .5,
+            inDuration: 300,
+            outDuration: 200,
+            startingTop: '4%',
+            endingTop: '10%'
+        });
+    })
 }
