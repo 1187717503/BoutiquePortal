@@ -190,9 +190,8 @@ public class ProductMgntController {
             if (searchCondition.getTagId() != null) {
                 setTags(product, tagsList);
             }
-            if (stateEnum == StateEnum.ALL) {
-                setStatus(product);
-            }
+            setStatus(product);
+
         }
     }
 
