@@ -70,7 +70,7 @@ ENGINE=InnoDB
 
 
 alter table `product`  add `preview_im_price` decimal(16,4) DEFAULT  NULL COMMENT '预热售价' ;
-
+alter table `price_change_rule`  add `preview_status` int(2) default 0 COMMENT  '0 非活动折扣 1 活动折扣';
 alter table `logistics_product`  add `retail_price` decimal(16,4) DEFAULT  NULL COMMENT '商城售价' ;
 update `logistics_product`  lp inner join `shop_product_sku`  sps on(lp.`shop_product_sku_id` = sps.`shop_product_sku_id`  and sps.`enabled`  = 1 and lp.`enabled`  = 1 )
 inner join `sku`  s on(s.`sku_id` = sps.`sku_id`  and s.`enabled`  = 1 )
