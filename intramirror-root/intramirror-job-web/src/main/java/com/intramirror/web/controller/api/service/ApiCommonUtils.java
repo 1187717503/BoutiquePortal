@@ -88,6 +88,10 @@ public class ApiCommonUtils {
             try {
                 List<String> originList = JSONArray.parseArray(originImg, String.class);
                 for (String origin : originList) {
+                    if(origin.contains(" ")) {
+                        origin = origin.replaceAll(" ","%20");
+                    }
+
                     List<String> downList = FileUploadHelper.uploadFileByImgUrl2(origin);
                     if(downList != null && downList.size() > 0) {
                         newList.add(downList.get(0));
