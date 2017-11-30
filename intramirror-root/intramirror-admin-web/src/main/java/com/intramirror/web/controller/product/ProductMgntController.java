@@ -186,7 +186,7 @@ public class ProductMgntController {
             if (searchCondition.getTagId() != null) {
                 setTags(product, tagsList);
             }
-            setStatus(product);
+            setState(product);
 
         }
     }
@@ -241,8 +241,14 @@ public class ProductMgntController {
         }
     }
 
-    private void setStatus(Map<String, Object> product) {
-        product.put("status", StateMachineCoreRule.map2StateEnum(product));
+    private void setState(Map<String, Object> product) {
+        StateEnum stateEnum = StateMachineCoreRule.map2StateEnum(product);
+        if (stateEnum == StateEnum.OLD_PROCESSING) {
+            stateEnum = StateEnum.PROCESSING;
+        } else if (stateEnum == StateEnum.OLD_SHOP_PROCESSING) {
+            stateEnum = StateEnum.SHOP_PROCESSING;
+        }
+        product.put("status", stateEnum);
     }
 
     private void setPrice(Map<String, Object> product, List<Map<String, Object>> priceList) {
