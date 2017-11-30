@@ -29,7 +29,8 @@ switch (process.env.WEB_ENV){
     break;
   case "test_ci":
     baseConfig.BASE_URL = '"http://test.admin.intramirror.com:8099/"';
-    baseConfig.ERROR_URL = '"http://test.admin.intramirror.com:8099/"';
+    baseConfig.API_URL = '"http://test.vendor.intramirror.com:8095/"';
+    baseConfig.ERROR_URL = '"http://test.admin.intramirror.com:8096/"';
     baseConfig.ERROR_URL2 = '"http://test.api.intramirror.com:8095/"';
     break;
 }
