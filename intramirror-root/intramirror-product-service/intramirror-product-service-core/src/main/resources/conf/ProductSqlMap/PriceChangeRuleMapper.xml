@@ -700,6 +700,12 @@
         where p.`vendor_id`  = #{vendor_id,jdbcType=BIGINT} <![CDATA[ and p.`preview_im_price`  >=  s.`im_price` ]]>
     </update>
 
+    <update id="updateProductImPrice">
+
+        update `product`  p,sku set p.`min_im_price` = sku.`im_price`,p.`max_im_price` = sku.`im_price`
+        where p.`enabled`  = 1 and sku.`enabled`  = 1 and p.`product_id`  = sku.`product_id` ;
+    </update>
+
     <update id="clearProductPreviewPrice" >
 
         update `product`  p

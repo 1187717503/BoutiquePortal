@@ -138,6 +138,8 @@ public class ApiCreateProductService {
         Sku sku1 = iPriceService.getPriceByRule(this.uProduct,this.uProduct.getVendor_id(),this.uProduct.getMax_retail_price(),conn);
         this.uProduct.setMax_boutique_price(sku1.getIn_price());
         this.uProduct.setMin_boutique_price(sku1.getIn_price());
+        this.uProduct.setMax_im_price(sku1.getIm_price());
+        this.uProduct.setMin_im_price(sku1.getIm_price());
         productService.updateProduct(uProduct);
 
         for(ProductEDSManagement.SkuOptions skuOption : skuOptions) {

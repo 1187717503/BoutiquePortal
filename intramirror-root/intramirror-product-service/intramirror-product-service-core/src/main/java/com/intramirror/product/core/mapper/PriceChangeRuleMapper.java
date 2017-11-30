@@ -106,6 +106,9 @@ public interface PriceChangeRuleMapper {
     /** 修改product.boutique_price*/
     int updateProductBoutiquePrice();
 
+    /** 修改product.im_price */
+    int updateProductImPrice();
+
     /** 修改product.preview_im_price */
     int updateProductPreviewPrice(Long vendor_id);
     int clearProductPreviewPrice(Long vendor_id);

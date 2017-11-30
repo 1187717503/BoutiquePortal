@@ -46,6 +46,7 @@ public interface IPriceChangeRule {
      */
     boolean updateShopProductSalePrice() throws Exception;
 
+    boolean updateProductImPrice() throws Exception;
     /**
      * 定时job修改product.retail_price
      * @return

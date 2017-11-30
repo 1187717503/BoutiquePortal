@@ -90,16 +90,21 @@ public class PriceServiceImpl implements IPriceService{
                         + "where sp.`product_id`  ="+product.getProduct_id();
             String updateProductRetailPrice = "update `product` set `max_retail_price` ="+newPrice+",`min_retail_price` = "+newPrice+",last_check=now()  where enabled = 1 and product_id="+product.getProduct_id();
             String updateProductBoutiquePrice = "update `product` set `min_boutique_price` ="+in_price+",`max_boutique_price` = "+in_price+",last_check=now()  where enabled = 1 and product_id="+product.getProduct_id();
+            String updateProductImPrice = "update `product` set `min_im_price` ="+im_price+",`max_im_price` = "+im_price+",last_check=now()  where enabled = 1 and product_id="+product.getProduct_id();
 
             skuService.updateBySQL(updateShopProductSalePrice);
             skuService.updateBySQL(updateShopProductSkuImPrice);
             skuService.updateBySQL(updateProductRetailPrice);
             skuService.updateBySQL(updateProductBoutiquePrice);
+            skuService.updateBySQL(updateProductImPrice);
 
-            logger.info("IPriceService,synProductPriceRule,updateShopProductSalePrice:"+updateShopProductSalePrice);
-            logger.info("IPriceService,synProductPriceRule,updateShopProductSkuImPrice:"+updateShopProductSkuImPrice);
-            logger.info("IPriceService,synProductPriceRule,updateProductRetailPrice:"+updateProductRetailPrice);
-            logger.info("IPriceService,synProductPriceRule,updateProductBoutiquePrice:"+updateProductBoutiquePrice);
+
+            logger.info("IPriceService,synProductPriceRule,SQL:"+
+                            "updateShopProductSalePrice:"+updateShopProductSalePrice+
+                            ",updateShopProductSkuImPrice:"+updateShopProductSkuImPrice+
+                            ",updateProductRetailPrice:"+updateProductRetailPrice+
+                            ",updateProductBoutiquePrice:"+updateProductBoutiquePrice+
+                            ",updateProductImPrice:"+updateProductImPrice);
         }
         return true;
     }

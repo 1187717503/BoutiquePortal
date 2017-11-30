@@ -69,6 +69,7 @@ public class PriceChangeRuleController {
             iPriceChangeRule.updateShopProductSalePrice();
             iPriceChangeRule.updateProductRetailPrice();
             iPriceChangeRule.updateProductBoutiquePrice();
+            iPriceChangeRule.updateProductImPrice();
             resultMessage.successStatus().addMsg("SUCCESS");
         } catch (Exception e) {
             e.printStackTrace();

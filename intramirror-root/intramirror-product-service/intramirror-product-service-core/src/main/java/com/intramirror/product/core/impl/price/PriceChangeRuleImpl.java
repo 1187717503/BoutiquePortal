@@ -306,6 +306,12 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     }
 
     @Override
+    public boolean updateProductImPrice() throws Exception {
+        priceChangeRuleMapper.updateProductImPrice();
+        return true;
+    }
+
+    @Override
     public boolean updateProductRetailPrice() throws Exception {
         priceChangeRuleMapper.updateProductRetailPrice();
         return true;
