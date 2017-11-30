@@ -174,14 +174,6 @@ function updatePagination(pagesize, pageno, totalsize, pageAction, param) {
     
     $('#tmpl-pagination').tmpl({page: pageinfo}).appendTo('.pagination');
 
-    $('#page-size').val(localStorage.getItem('product-page-size'));
-    $('#page-size').material_select();
-
-    $('#page-size').change(function() {
-        localStorage.setItem('product-page-size', $(this).val());
-        pageAction(1, param);
-    }) 
-
     $('.pagination-index').click(function() {
         pageAction($(this).data('pageno') + 1, param);
     })

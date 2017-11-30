@@ -407,7 +407,16 @@ function getCountWithFilter(filter, tarStatus, pagesize, pageno){
             })
             //update the page index
 
-            updatePagination(tarStatus, pagesize, pageno, Math.ceil(nStatusCount/pagesize));
+            updatePagination(pagesize, pageno, Math.ceil(nStatusCount/pagesize), pageAction, tarStatus);
+            // localStorage.setItem('product-page-size', $(this).val());
+
+            $('#page-size').val(localStorage.getItem('product-page-size'));
+            $('#page-size').material_select();
+            $('#page-size').change(function() {
+                localStorage.setItem('product-page-size', $(this).val());
+                pageAction(1, tarStatus);
+            });
+
         }, error: function(result, resp, par) {
 
             toashWithCloseBtn(result.responseJSON.message);
@@ -465,68 +474,73 @@ function initSelectItems(elemId, tmplId, listData) {
     $('#' + elemId).material_select();
 }
 
-function updatePagination(status, pagesize, pageno, totalsize) {
-    $('.pagination').empty();
+// function updatePagination(status, pagesize, pageno, totalsize) {
+//     $('.pagination').empty();
 
-    let pageinfo = {}
-    pageinfo.totalPage = totalsize;
-    pageinfo.currPage = pageno;
-    pageinfo.list = [];
-    let listData = pageinfo.list;
+//     let pageinfo = {}
+//     pageinfo.totalPage = totalsize;
+//     pageinfo.currPage = pageno;
+//     pageinfo.list = [];
+//     let listData = pageinfo.list;
 
-    if (totalsize == 0) {
-        return;
-    }
+//     if (totalsize == 0) {
+//         return;
+//     }
 
-    if (pageno > totalsize + 1) {
-        pageno = totalsize + 1;
-    }
+//     if (pageno > totalsize + 1) {
+//         pageno = totalsize + 1;
+//     }
 
-    if (pageno < 0) {
-        pageno = 0;
-    }
+//     if (pageno < 0) {
+//         pageno = 0;
+//     }
 
-    if (pageno <= 3 ) {
-        for (let i = 1; i <= totalsize && i <= 5; i++) {
-            listData.push({"no": i});
-        }
-        listData[pageno - 1].active = 1;
+//     if (pageno <= 3 ) {
+//         for (let i = 1; i <= totalsize && i <= 5; i++) {
+//             listData.push({"no": i});
+//         }
+//         listData[pageno - 1].active = 1;
 
-    } else if (pageno + 2 > totalsize) {
-        listData.push({"no": totalsize - 4});
-        listData.push({"no": totalsize - 3});
-        listData.push({"no": totalsize - 2});
-        listData.push({"no": totalsize - 1});
-        listData.push({"no": totalsize});
-        if (4 - totalsize + pageno > 4) {
-            listData.push({"no": totalsize + 1});
-            listData[4 - totalsize + pageno].active = 1;
-        } else {
-            listData[4 - totalsize + pageno].active = 1;
-        }
+//     } else if (pageno + 2 > totalsize) {
+//         listData.push({"no": totalsize - 4});
+//         listData.push({"no": totalsize - 3});
+//         listData.push({"no": totalsize - 2});
+//         listData.push({"no": totalsize - 1});
+//         listData.push({"no": totalsize});
+//         if (4 - totalsize + pageno > 4) {
+//             listData.push({"no": totalsize + 1});
+//             listData[4 - totalsize + pageno].active = 1;
+//         } else {
+//             listData[4 - totalsize + pageno].active = 1;
+//         }
         
-    } else {
-        listData.push({"no": pageno - 2});
-        listData.push({"no": pageno - 1});
-        listData.push({"no": pageno, "active": 1});
-        listData.push({"no": pageno + 1});
-        listData.push({"no": pageno + 2});
-    }
+//     } else {
+//         listData.push({"no": pageno - 2});
+//         listData.push({"no": pageno - 1});
+//         listData.push({"no": pageno, "active": 1});
+//         listData.push({"no": pageno + 1});
+//         listData.push({"no": pageno + 2});
+//     }
     
-    $('#tmpl-pagination').tmpl({page: pageinfo}).appendTo('.pagination');
+//     $('#tmpl-pagination').tmpl({page: pageinfo}).appendTo('.pagination');
 
-    $('#page-size').val(localStorage.getItem('product-page-size'));
-    $('#page-size').material_select();
+//     $('#page-size').val(localStorage.getItem('product-page-size'));
+//     $('#page-size').material_select();
 
-    $('#page-size').change(function() {
-        localStorage.setItem('product-page-size', $(this).val());
-        getProdcutList(status, 1);
-    }) 
+//     $('#page-size').change(function() {
+//         localStorage.setItem('product-page-size', $(this).val());
+//         getProdcutList(status, 1);
+//     }) 
 
-    $('.pagination-index').click(function() {
-        getProdcutList(status, $(this).data('pageno') + 1);
+//     $('.pagination-index').click(function() {
+//         pageAction(param, $(this).data('pageno') + 1);
+//         //getProdcutList(status, $(this).data('pageno') + 1);
 
-    })
+//     })
+// }
+
+function pageAction(pageno, param) {
+    getProdcutList(param, pageno);
 }
 
 function getActionMessage(action) {

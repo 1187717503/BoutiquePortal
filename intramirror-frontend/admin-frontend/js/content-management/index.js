@@ -248,11 +248,11 @@ function getFilterFromDom() {
 }
 
 function getProdcutList(pageno) {
-    let pagesize = localStorage.getItem('product-page-size');
+    let pagesize = localStorage.getItem('content-page-size');
 
     if (pagesize == null) {
         pagesize = 25;
-        localStorage.setItem('product-page-size', 25);
+        localStorage.setItem('content-page-size', 25);
     }
 
     let searchObj = getFilterFromDom();
@@ -458,6 +458,12 @@ function getCountWithFilter(filter, pagesize, pageno, statusText){
         },
         success: function(result) {
             updatePagination(pagesize, pageno, Math.ceil(result.data[statusText]/pagesize), pageAction);
+            $('#page-size').val(localStorage.getItem('content-page-size'));
+            $('#page-size').material_select();
+            $('#page-size').change(function() {
+                localStorage.setItem('content-page-size', $(this).val());
+                pageAction(1);
+            });
         }, error: function(result, resp, par) {
 
             toashWithCloseBtn(result.responseJSON.message);
