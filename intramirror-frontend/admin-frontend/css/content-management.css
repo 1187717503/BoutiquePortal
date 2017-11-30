@@ -169,4 +169,5 @@ input.stock-input {
     color: #fff;
     overflow:hidden; 
     text-overflow:ellipsis;
+    white-space: nowrap;
 }

@@ -485,7 +485,7 @@
                 </div>
                 <div class="list-detail-item col s2" style="margin-left: 0px;" >
                 {%each(k, tag) order.tagList%}
-                    <div class="list-detail-item tags" data-tag-id="${tag.tag_id}">${tag.tag_name}</div>
+                    <div class="list-detail-item tags" title="${tag.tag_name}" data-tag-id="${tag.tag_id}">${tag.tag_name}</div>
                 {%/each%}
                 </div>
             </div>
