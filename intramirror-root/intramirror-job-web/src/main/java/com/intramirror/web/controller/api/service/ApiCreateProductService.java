@@ -546,7 +546,7 @@ public class ApiCreateProductService {
             ProductService productService = new ProductService(conn);
             boolean flag = productService.duplicateColorBrandByAD(designer_id,color_code);
             if(flag) {
-                throw new UpdateException("color_code,BrandID",color_code+","+designer_id, ApiErrorTypeEnum.errorType.error_data_is_null);
+                throw new UpdateException("color_code,BrandID",color_code+","+designer_id, ApiErrorTypeEnum.errorType.error_duplicate_product);
             }
         }
 
