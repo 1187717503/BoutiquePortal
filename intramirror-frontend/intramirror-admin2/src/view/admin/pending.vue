@@ -233,7 +233,7 @@
         <button class="waves-effect waves-light btn" @click="saveDate">SAVE</button>
         <button class="waves-effect waves-light btn">CANCEL</button>
         <div class="preview-button-group">
-            <v-switch v-bind:label="`Preveiw`" v-model="previewToggle" class="preview-toggle" :class="{notActive:!previewToggle}" @click="changePreviewStatusAction()"></v-switch>
+            <v-switch v-bind:label="`Preview`" v-model="previewToggle" class="preview-toggle" :class="{notActive:!previewToggle}" @click="changePreviewStatusAction()"></v-switch>
             <v-icon class="preview-replay" v-show="previewToggle" @click="refreshPreView()">replay</v-icon>
         </div>
         <!-- <button class="waves-effect waves-light btn active-button" v-on:click.once="activeNow()" :class="{hadClicked:activeNowButtonClicked}">ACTIVE NOW</button> -->
