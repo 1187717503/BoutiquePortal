@@ -166,15 +166,15 @@
 
                         <div class="input-field col s2">
                             <select id="select-status">
-                                <option value="all" data-status="all" selected>All Status</option>
+                                <option value="all" data-status="all" selected>ALL</option>
                                 <option value="new" data-status="new">NEW</option>
                                 <option value="trash" data-status="trash">TRASH</option>
                                 <option value="processing">PROCESSING</option>
                                 <option value="readytosell">READY_TO_SELL</option>
-                                <option value="shopreadytosell">SHOP_READY</option>
+                                <option value="shopreadytosell">SHOP_READY_TO_SELL</option>
                                 <option value="shopprocessing">SHOP_PROCESSING</option>
-                                <option value="shoponsale">SHOP_ONSELL</option>
-                                <option value="shopsoldout">SHOP_SOLDOUT</option>
+                                <option value="shoponsale">SHOP_ON_SALE</option>
+                                <option value="shopsoldout">SHOP_SOLD_OUT</option>
                                 <option value="shopremoved">SHOP_REMOVED</option>
                             </select>
                             <label for="select-status">Status</label>
@@ -588,7 +588,8 @@
             $('#select-brand').val('-1');
             $('#select-tag').val('-1');
             $('#select-apply-tag').val('-1');
-            $('#select-stock').val('0');
+            $('#stock-left').val('');
+            $('#stock-right').val('');
             $('#select-image').val('0');
             $('#select-model-image').val('0');
             $('#select-street-image').val('0');

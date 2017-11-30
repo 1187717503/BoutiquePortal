@@ -231,6 +231,11 @@ function getFilterFromDom() {
 
     searchObj.tagId = $('#select-tag').val();
     searchObj.status = $('#select-status').val();
+    searchObj.statusText = $('#select-status').siblings('ul').find('li.active span').text();
+    if (searchObj.statusText == '') {
+        searchObj.statusText = 'ALL';
+    }
+
 
     console.log(searchObj);
 
@@ -428,7 +433,7 @@ function getProdcutList(pageno) {
 
             initActionEvent();
             finishLoading();
-            getCountWithFilter(filter, pagesize, pageno);
+            getCountWithFilter(filter, pagesize, pageno, searchObj.statusText);
         }, error: function(result, resp, par) {
             toashWithCloseBtn(result.responseJSON.message);
             finishLoading();
@@ -440,8 +445,8 @@ function getProdcutList(pageno) {
     });
 }
 
-function getCountWithFilter(filter, pagesize, pageno){
-
+function getCountWithFilter(filter, pagesize, pageno, statusText){
+    console.log(statusText);
     $.ajax({
         type: requestURL.getAllCount.method,
         contentType: "application/json",
@@ -452,7 +457,7 @@ function getCountWithFilter(filter, pagesize, pageno){
             request.setRequestHeader("token", token);
         },
         success: function(result) {
-            updatePagination(pagesize, pageno, Math.ceil(result.data.ALL/pagesize), pageAction);
+            updatePagination(pagesize, pageno, Math.ceil(result.data[statusText]/pagesize), pageAction);
         }, error: function(result, resp, par) {
 
             toashWithCloseBtn(result.responseJSON.message);
