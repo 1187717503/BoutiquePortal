@@ -6,7 +6,7 @@
 function checkNumRange(nMin, nMax, sFiledName){
 
     var rInt100 = /^(100|\d{1,2})$/;
-    var rInt = /^-?[1-9]\d*$/;
+    var rInt = /^-?[0-9]\d*$/;
 
     let nResult = -1;
     //全空 or 全不空
