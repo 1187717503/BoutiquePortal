@@ -60,7 +60,7 @@ CREATE TABLE `block_tag_rel` (
 	`tag_id` BIGINT(20) NOT NULL,
 	`block_id` BIGINT(20) NULL DEFAULT NULL,
 	`create_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	PRIMARY KEY (`id`),
+	PRIMARY KEY (`block_tag_id`),
 	INDEX `block_tag_rel_tag_id_index` (`tag_id`),
 	INDEX `block_tag_rel_block_id_index` (`block_id`)
 )
