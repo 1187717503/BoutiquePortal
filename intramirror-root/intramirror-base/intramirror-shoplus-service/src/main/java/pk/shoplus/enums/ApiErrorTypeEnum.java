@@ -78,6 +78,7 @@ public class ApiErrorTypeEnum {
         error_boutique_id_is_null("error_boutique_id_is_null","product_code为空"),
         error_boutique_id_already_exist("boutique_id_already_exist","boutique_id已经存在"),
 
+        error_duplicate_product("error_duplicate_product","Al Duca商品BrandID,ColorCode重复"),
         error_data_is_null("error_data_is_null","数据为NULL"),
         error_data_is_not_number("error_data_is_not_number","数据不是数字"),
         error_sku_not_exists("error_sku_not_exists","size不存在"),

@@ -541,6 +541,15 @@ public class ApiCreateProductService {
             throw new UpdateException("color_code",color_code, ApiErrorTypeEnum.errorType.error_data_is_null);
         }
 
+        // AD 特殊判断
+        if(vendor_id.intValue() == 22) {
+            ProductService productService = new ProductService(conn);
+            boolean flag = productService.duplicateColorBrandByAD(designer_id,color_code);
+            if(flag) {
+                throw new UpdateException("color_code,BrandID",color_code+","+designer_id, ApiErrorTypeEnum.errorType.error_data_is_null);
+            }
+        }
+
         if(StringUtils.isBlank(price)) {
             throw new UpdateException("price",price, ApiErrorTypeEnum.errorType.error_data_is_null);
         }
