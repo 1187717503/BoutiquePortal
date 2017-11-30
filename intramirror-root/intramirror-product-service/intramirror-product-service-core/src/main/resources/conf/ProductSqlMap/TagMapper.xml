@@ -121,6 +121,7 @@
         <include refid="Base_Column_List"/>
         from tag
         where enabled = 1
+        ORDER BY tag_name
     </select>
 
 </mapper>
