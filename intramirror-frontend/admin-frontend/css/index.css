@@ -122,6 +122,10 @@
     width: 7%;
 }
 
+.order-head.page-order .item.page-order:nth-child(13) {
+    width: 7%;
+}
+
 .order-list.page-order .row.page-order {
     display: flex;
     border-bottom: 1px solid #E0E0E0;

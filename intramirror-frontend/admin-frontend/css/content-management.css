@@ -17,6 +17,7 @@ input.stock-input {
     border-bottom: 2px solid #871b55;
     margin: 0;
     box-shadow: none;
+    text-align: center;
 }
 
 .has-labe-input {
@@ -97,17 +98,6 @@ input.stock-input {
     text-align: center;
 }
 
-.list-detail-row .list-detail-item.tags {
-    display: inline-block;
-    border-radius: 16px;
-    border: 1px solid #ccc;
-    line-height: 1.5em;
-    padding: 0 5px 0 5px;
-    width: auto;
-    background: #861b54;
-    color: #fff;
-}
-
 .head-detail-row .col {
     padding: 0px;
     background-color: #eee;
@@ -124,10 +114,16 @@ input.stock-input {
     padding-left: 12px;
     padding-right: 12px;
 }
+.head-detail-row.detail-head {
+    min-width: 1075px;
+}
 .list-detail-row .list-detail-item.col {
     margin-left: 0px;
     padding-left: 12px;
     padding-right: 12px;
+}
+.list-detail-row.detail-item { 
+    min-width: 1075px;
 }
 
 
@@ -157,4 +153,20 @@ input.stock-input {
 
 .nav-wrapper {
     background: #FAFAFA;
+}
+
+
+
+.list-detail-row .list-detail-item.tags {
+    display: inline-block;
+    border-radius: 16px;
+    border: 1px solid #ccc;
+    line-height: 1.5em;
+    padding: 0 5px 0 5px;
+    width: auto;
+    max-width: 110px;
+    background: #861b54;
+    color: #fff;
+    overflow:hidden; 
+    text-overflow:ellipsis;
 }

@@ -353,6 +353,10 @@ function getProdcutList(pageno) {
             request.setRequestHeader("token", token);
         },
         success: function(result) {
+            if (result.data == null) {
+                result.data = [];
+            }
+
             for (var i = 0; i < result.data.length; i++) {
                 if (result.data[i].cover_img.length > 0) {
                     let obj = JSON.parse(result.data[i].cover_img);
@@ -405,7 +409,7 @@ function getProdcutList(pageno) {
             }
 
             $("#tmpl-order-list").tmpl({list: result.data}).appendTo("#order-list");
-            $("#tmpl-order-head-list").tmpl({tab_status: status}).appendTo("#order-head-list");
+            $("#tmpl-order-head-list").tmpl().appendTo("#order-head-list");
 
             $('.orderby').each(function() {
                 if ($(this).find('.use-icon').data('order-col') == searchObj.orderByColmun) {
