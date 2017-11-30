@@ -77,11 +77,11 @@ function transDateRange(dStart, dEnd, sFiledName) {
     if (dStart && dEnd) {
         if(dStart > dEnd) {
             toashWithCloseBtn("For the "+ sFiledName +", the start date should be smaller than end date.");
+            // only add one value to let it know it's an error.
+            obj.dStart = Date.parse('0000-00-00 00:00:00') / 1000;
         } else {
             obj.dStart = Date.parse(dStart + ' 00:00:00') / 1000;
             obj.dEnd = Date.parse(dEnd + ' 23:59:59')  / 1000;
-            console.log(dStart + ' 00:00:00');
-            console.log(dEnd + ' 23:59:59');
         }
     } else if (dStart == "" && dEnd == "") {
         //时间要取到月
@@ -98,6 +98,8 @@ function transDateRange(dStart, dEnd, sFiledName) {
         // obj.dStart = Date.parse(startDate) / 1000;
     } else {
         toashWithCloseBtn("All the field of "+ sFiledName +" should be fulfilled.");
+        // only add one value to let it know it's an error.
+        obj.dStart = Date.parse('0000-00-00 00:00:00') / 1000;
     }
     return obj;
 }
