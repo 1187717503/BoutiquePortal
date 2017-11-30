@@ -44,7 +44,12 @@
 	    	<artifactId>mail</artifactId>
 	    	<version>1.4.7</version>
 		</dependency>
-		
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>3.9</version>
+        </dependency>
+
     </dependencies>
 
 

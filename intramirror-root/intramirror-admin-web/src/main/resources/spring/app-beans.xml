@@ -67,6 +67,7 @@
     <bean name="orderProperties" class="com.intramirror.web.common.CommonProperties">
         <property name="appOrderUrl" value="${app.order.url}"></property>
         <property name="appCheckUrl" value="${app.check.url}"></property>
+        <property name="ruleExcelPath" value="${price.rule.path}"></property>
     </bean>
     <beans profile="test">
         <context:property-placeholder location="classpath:test/common.properties" ignore-unresolvable="true"/>

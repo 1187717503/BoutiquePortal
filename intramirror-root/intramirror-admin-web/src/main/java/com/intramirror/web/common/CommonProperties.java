@@ -11,6 +11,8 @@ public class CommonProperties {
 
     private String appCheckUrl;
 
+    private String ruleExcelPath;
+
     public String getAppOrderUrl() {
         return appOrderUrl;
     }
@@ -25,5 +27,13 @@ public class CommonProperties {
 
     public void setAppCheckUrl(String appCheckUrl) {
         this.appCheckUrl = appCheckUrl;
+    }
+
+    public String getRuleExcelPath() {
+        return ruleExcelPath;
+    }
+
+    public void setRuleExcelPath(String ruleExcelPath) {
+        this.ruleExcelPath = ruleExcelPath;
     }
 }

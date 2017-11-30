@@ -49,7 +49,7 @@
 
     <context:property-placeholder location="classpath:/commons.properties"/>
 
-
+<!--
     <bean id="authenticationInterceptor" class="com.intramirror.web.interceptor.AuthenticationInterceptor"/>
 
     <mvc:interceptors>
@@ -58,7 +58,7 @@
             <mvc:exclude-mapping path="/login"/>
             <ref bean="authenticationInterceptor"/>
         </mvc:interceptor>
-    </mvc:interceptors>
+    </mvc:interceptors>-->
 
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
 
