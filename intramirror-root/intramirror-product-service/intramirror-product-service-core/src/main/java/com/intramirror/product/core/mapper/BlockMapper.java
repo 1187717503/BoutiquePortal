@@ -25,5 +25,7 @@ public interface BlockMapper {
 
     List<Block> listBlockBySortExcludeSelf(@Param(value = "sortOrder") int sortOrder, @Param(value = "blockId") Long blockId);
 
+    List<Block> listBlockBySort(@Param(value = "sortOrder") int sortOrder);
+
     int batchUpdateSort(List<Block> blockList);
 }

@@ -33,7 +33,7 @@ public final class JsonTransformUtil {
         try {
             return objectMapper.writeValueAsString(object);
         } catch (Exception e) {
-            LOGGER.warn("Failed to transform Object [{}] -> String.", object.getClass());
+            LOGGER.warn("Failed to transform Object [{}] -> String.", object.getClass(),e);
         }
 
         return null;
