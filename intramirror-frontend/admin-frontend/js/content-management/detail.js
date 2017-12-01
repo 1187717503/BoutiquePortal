@@ -1,5 +1,17 @@
 var uploadDropzone;
 
+String.prototype.gblen = function() {  
+  var len = 0;  
+  for (var i=0; i<this.length; i++) {  
+    if (this.charCodeAt(i)>127 || this.charCodeAt(i)==94) {  
+       len += 2;  
+     } else {  
+       len ++;  
+     }  
+   }  
+  return len;  
+}
+
 function initDragger() {
     var leftUpdateOutput = function (e) {
         var list = e.length ? e : $(e.target),
@@ -82,7 +94,7 @@ function saveBlock() {
         return;
     }
 
-    if (param.block.title.length > 22) {
+    if (param.block.title.gblen() > 22) {
         Materialize.toast('Title must be less 22 character', 3000);
         return;
     }
@@ -98,7 +110,7 @@ function saveBlock() {
         Materialize.toast('Please type sub title', 3000);
         return;
     }
-    if (param.block.subtitle.length > 108) {
+    if (param.block.subtitle.gblen() > 108) {
         Materialize.toast('Sub title must be less 108 character', 3000);
         return;
     }
