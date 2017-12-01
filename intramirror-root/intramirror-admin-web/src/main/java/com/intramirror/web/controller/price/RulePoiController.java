@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -107,9 +108,9 @@ public class RulePoiController {
         }
     }
 
-    @RequestMapping("/upload")
+    @RequestMapping(value = "/upload", method = RequestMethod.POST , consumes = "multipart/form-data")
     @ResponseBody
-    public Response upload(@RequestParam("file")MultipartFile file,@Param("price_change_rule_id")String price_change_rule_id,HttpServletRequest request)
+    public Response upload(@RequestParam("file")MultipartFile file,@RequestParam("price_change_rule_id")String price_change_rule_id,HttpServletRequest request)
             throws Exception {
 
         // 查询所有品牌
