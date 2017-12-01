@@ -394,6 +394,14 @@ function initEvent() {
     })
 
     $('#select-block-name').change(function(e) {
+        let oriBlockId = $('#select-block-name').data('origin-block-id');
+        if (typeof(oriBlockId) =='undefined' || oriBlockId == -1) {
+            let blockId = $('#select-block-name').val();
+            $('#select-block-name').attr('data-origin-block-id', blockId);
+            getBlockDetail(blockId)
+            return;
+        }
+
         $('#modal2').openModal({
             dismissible: false,
             opacity: .5,
@@ -413,7 +421,7 @@ function initEvent() {
 
     $('#modal2 .model-yes').click(function() {
         $('#modal2').closeModal();
-        console.log('blockId');
+        
         let blockId = $('#select-block-name').val();
         $('#select-block-name').attr('data-origin-block-id', blockId);
         getBlockDetail(blockId)
