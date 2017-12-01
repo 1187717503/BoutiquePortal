@@ -115,6 +115,9 @@ public class ContentManagementServiceImpl implements ContentManagementService {
 
     private int updateTagProductSort(Long tagId, List<TagProductRel> sort) {
         tagProductRelMapper.deleteByTagId(tagId);
+        if (sort.size() == 0) {
+            return 0;
+        }
         for (TagProductRel tagProductRel : sort) {
             tagProductRel.setTagId(tagId);
         }
