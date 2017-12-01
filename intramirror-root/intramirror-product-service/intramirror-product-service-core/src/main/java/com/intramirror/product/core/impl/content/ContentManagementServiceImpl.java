@@ -87,6 +87,7 @@ public class ContentManagementServiceImpl implements ContentManagementService {
 
     private int updateBlock(Block block) {
         List<Block> blockList = blockMapper.listBlockBySort(block.getSortOrder());
+        blockMapper.updateByBlockId(block);
         Block self = null;
         for (Block b : blockList) {
             if (b.getBlockId() == block.getBlockId()) {
@@ -98,7 +99,6 @@ public class ContentManagementServiceImpl implements ContentManagementService {
             }
         }
         blockList.remove(self);
-        blockMapper.updateByBlockId(block);
         if (blockList.size() == 0) {
             return 0;
         }
