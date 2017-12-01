@@ -87,7 +87,12 @@ public class ContentManagementServiceImpl implements ContentManagementService {
 
     private int updateBlock(Block block) {
         blockMapper.updateByBlockId(block);
-        List<Block> blockList = blockMapper.listBlockBySortExcludeSelf(block.getSortOrder(), block.getBlockId());
+        List<Block> blockList = blockMapper.listBlockBySort(block.getSortOrder());
+        for (Block b : blockList) {
+            if (b.getBlockId() == block.getBlockId() && b.getSortOrder() == block.getSortOrder()) {
+                return 0;
+            }
+        }
         if (blockList.size() == 0) {
             return 0;
         }

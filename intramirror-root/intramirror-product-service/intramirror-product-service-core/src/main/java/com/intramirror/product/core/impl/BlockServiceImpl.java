@@ -54,6 +54,11 @@ public class BlockServiceImpl implements BlockService {
     }
 
     @Override
+    public List<Block> listBlockBySort(int sortOrder) {
+        return blockMapper.listBlockBySort(sortOrder);
+    }
+
+    @Override
     public int batchUpdateSort(List<Block> blockList) {
         return blockMapper.batchUpdateSort(blockList);
     }

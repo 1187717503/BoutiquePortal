@@ -267,6 +267,14 @@
         WHERE `block`.enabled = TRUE AND `block`.sort_order &gt;= #{sortOrder} AND `block`.block_id != #{blockId};
     </select>
 
+    <select id="listBlockBySort" resultMap="BaseResultMap">
+        SELECT
+            block_id,
+            sort_order
+        FROM `block`
+        WHERE `block`.enabled = TRUE AND `block`.sort_order &gt;= #{sortOrder};
+    </select>
+
     <update id="batchUpdateSort" parameterType="java.util.List">
         update `block`
         SET sort_order = sort_order +1,
