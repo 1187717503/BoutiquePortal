@@ -103,7 +103,7 @@ function saveBlock() {
         return;
     }
 
-    param.block.coverImg = $('#upload').data('block-image');
+    param.block.coverImg = $('#upload').attr('data-block-image');
     if (param.block.coverImg == '') {
         Materialize.toast('Please upload block image', 3000);
         return;
@@ -115,6 +115,7 @@ function saveBlock() {
         Materialize.toast('Please type sort order', 3000);
         return;
     }
+
 
     param.sort = []
 
