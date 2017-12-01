@@ -366,7 +366,7 @@ public class EntityDao<T> {
 	public List<T> getBySql(Class<T> klass, String fieldNames, String extensiveSql, Object[] params) throws Exception {
 		String tableName = DaoHelper.getTableName(klass);
 		StringBuilder sql = new StringBuilder();
-		if (fieldNames == null) {
+		if (fieldNames == null || fieldNames.equals("*")) {
 
 			// 返回全部列
 			StringBuilder fieldNamesSB = new StringBuilder();

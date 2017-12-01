@@ -29,6 +29,8 @@ import pk.shoplus.service.CategoryService;
 import pk.shoplus.service.ProductInfoService;
 import pk.shoplus.service.ProductPropertyService;
 import pk.shoplus.service.ProductService;
+import pk.shoplus.service.price.api.IPriceService;
+import pk.shoplus.service.price.impl.PriceServiceImpl;
 import pk.shoplus.util.DateUtils;
 import pk.shoplus.util.ExceptionUtils;
 
@@ -169,8 +171,10 @@ public class ApiUpdateProductService {
 
         // 和原来不一致直接更新。如为空或者不能Mapping报Warning，但其他字段继续更新。
         String seasonCode = productOptions.getSeasonCode();
-        if(StringUtils.isNotBlank(seasonCode)) {
+        if(StringUtils.isNotBlank(seasonCode) && !seasonCode.equals(product.getSeason_code())) {
+            IPriceService iPriceService = new PriceServiceImpl();
             product.setSeason_code(seasonCode);
+            iPriceService.synProductPriceRule(product,null,conn);
         }
 
         // 获取新的BrandID和ColorCode
