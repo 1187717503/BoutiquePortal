@@ -111,8 +111,13 @@ function saveBlock() {
 
     param.block.bgColor = $('#backgroup-color').val();
     param.block.sortOrder = $('#text-sort-order').val();
-    if (param.block.sortOrder === '') {
+    if (param.block.sortOrder == '') {
         Materialize.toast('Please type sort order', 3000);
+        return;
+    }
+
+    if (param.block.sortOrder <= 0) {
+        Materialize.toast('Sort order must be large then 0', 3000);
         return;
     }
 
@@ -151,12 +156,12 @@ function saveBlock() {
             } else {
                 toashWithCloseBtn('Save failed, ' + result.data);
             }
-            
         },
         error: function (code, exception) {
-
             if (code.status == 401) {
                 window.location.href = '../../../login'
+            } else {
+                toashWithCloseBtn('Save failed, ' + exception);
             }
         }
     });
