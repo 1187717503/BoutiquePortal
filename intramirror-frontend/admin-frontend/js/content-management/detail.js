@@ -308,9 +308,16 @@ function initBlockDetailInfo(data) {
         $('label[for=status]').text('inactive');
     }
     Materialize.updateTextFields();
+    uploadDropzone.removeAllFiles(true);
+    $('.dz-preview.dz-complete.dz-image-preview').remove();
+    $('.needsclick.dz-message').css('display', "none");
 
-    loadExistingImage(data.cover_img);
-    $('#upload').attr('data-block-image', data.cover_img);
+    if (data.cover_img) {
+        loadExistingImage(data.cover_img);
+        $('#upload').attr('data-block-image', data.cover_img);
+    } else {
+        $('.needsclick.dz-message').css('display', "block");
+    }
 }
 
 function getBlockDetail(blockId) {
