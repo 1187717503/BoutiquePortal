@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by dingyifan on 2017/7/20.
@@ -139,6 +140,11 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
     }
 
     @Override
+    public List<Map<String, Object>> queryAllBrand() throws Exception {
+        return seasonMapper.queryAllBrand();
+    }
+
+    @Override
     public List<Map<String, Object>> queryRuleByGroup(Map<String, Object> params) throws Exception {
         return seasonMapper.queryRuleByGroup(params);
     }
@@ -146,5 +152,15 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
     @Override
     public List<Map<String, Object>> queryRuleByProduct(Map<String, Object> params) throws Exception {
         return seasonMapper.queryRuleByProduct(params);
+    }
+
+    @Transactional
+    @Override
+    public boolean changeRule(String price_change_rule_id,List<Map<String,Object>> list) throws Exception {
+        seasonMapper.deleteCategoryBrandRule(price_change_rule_id);
+        for(Map<String,Object> params:list) {
+            seasonMapper.insertCategoryBrandRule(params);
+        }
+        return true;
     }
 }
