@@ -100,7 +100,11 @@ public class ApiCreateProductService {
             if(conn != null) {conn.rollback();conn.close();}
         } catch (Exception e) {
             e.printStackTrace();
-            resultMap = ApiCommonUtils.errorMap(ApiErrorTypeEnum.errorType.error_runtime_exception,"errorMessage",ExceptionUtils.getExceptionDetail(e));
+            if(e.getMessage().contains("Duplicate entry") && e.getMessage().contains("vendor_id")) {
+                resultMap = ApiCommonUtils.errorMap(ApiErrorTypeEnum.errorType.error_boutique_id_already_exists,"errorMessage",ExceptionUtils.getExceptionDetail(e));
+            } else {
+                resultMap = ApiCommonUtils.errorMap(ApiErrorTypeEnum.errorType.error_runtime_exception,"errorMessage",ExceptionUtils.getExceptionDetail(e));
+            }
             if(conn != null) {conn.rollback();conn.close();}
         }
         return resultMap;
