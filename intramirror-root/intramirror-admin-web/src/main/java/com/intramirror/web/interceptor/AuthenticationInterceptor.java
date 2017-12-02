@@ -36,6 +36,9 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         LOGGER.info("RequestURI {}", request.getRequestURI());
+        if(request.getRequestURI().contains("rule")) {
+            return true;
+        }
 
         if (HttpMethod.OPTIONS.matches(request.getMethod())) {
             return true;
