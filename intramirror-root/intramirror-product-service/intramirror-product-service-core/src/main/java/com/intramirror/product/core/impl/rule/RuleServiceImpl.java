@@ -158,6 +158,7 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
     @Override
     public boolean changeRule(String price_change_rule_id,List<Map<String,Object>> list) throws Exception {
         seasonMapper.deleteCategoryBrandRule(price_change_rule_id);
+        Collections.reverse(list);
         for(Map<String,Object> params:list) {
             seasonMapper.insertCategoryBrandRule(params);
         }
