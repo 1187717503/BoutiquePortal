@@ -70,7 +70,7 @@ public class RulePoiController {
             File file = new File(filePath);
             response.setContentType("application/force-download");
             response.addHeader("Content-Disposition",
-                    "attachment;fileName="+fileName+".xls");
+                    "attachment;fileName="+fileName);
 
             byte[] buffer = new byte[1024];
             FileInputStream fis = null;
