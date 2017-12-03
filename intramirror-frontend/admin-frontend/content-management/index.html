@@ -418,7 +418,8 @@
         <div class="item style-scope page-order">Retail Price</div>
         <div class="item style-scope page-order">Boutique Price</div>
         <div class="item style-scope page-order">IM Price/Sale Price</div>
-        <div class="item style-scope page-order">Status</div>
+        <div class="item style-scope page-order" style="text-align: center;">Status</div>
+        <div class="item style-scope page-order" style="text-align: center;">Sale At</div>
     </div>
 
 </script>
@@ -452,7 +453,8 @@
             {%else%}
             <div class="item style-scope page-order">€${order.sale_price}<span style="display: block;">${order.sale_discount}</span></div>
             {%/if%}
-            <div class="item style-scope page-order">${order.status}</div>
+            <div class="item style-scope page-order" style="text-align: center;">${order.status}</div>
+            <div class="item style-scope page-order" style="text-align: center;">${order.sale_at}</div>
             <div class="item style-scope page-order action" data-product-id="${order.product_id}" data-shop-product-id="${order.shop_product_id}">
                 
             </div>

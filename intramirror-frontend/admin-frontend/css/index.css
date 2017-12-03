@@ -123,7 +123,11 @@
 }
 
 .order-head.page-order .item.page-order:nth-child(13) {
-    width: 7%;
+    width: 10%;
+}
+
+.order-head.page-order .item.page-order:nth-child(14) {
+    width: 10%;
 }
 
 .order-list.page-order .row.page-order {
@@ -194,11 +198,16 @@
 }
 
 .order-list.page-order .item.page-order:nth-child(13) {
-    width: 8%;
+    width: 10%;
     word-wrap: break-word;
 }
 
 .order-list.page-order .item.page-order:nth-child(14) {
+    width: 10%;
+    word-wrap: break-word;
+}
+
+.order-list.page-order .item.page-order:nth-child(15) {
     font-size: 20px;
     color: #333;
 }
