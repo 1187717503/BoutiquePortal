@@ -1215,6 +1215,7 @@ export default {
         formData.append("file", this.update_files);
         uploadFileApi(this.priceId, formData).then(() => {
           Materialize.toast("文件上传成功！", 4000);
+          this.getTable(this.boutiqueVendorid);
         }).catch(()=>{
           Materialize.toast("文件上传失败！", 4000);
         });
