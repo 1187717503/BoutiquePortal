@@ -1117,6 +1117,7 @@ export default {
         uploadFileApi(this.priceId, formData)
           .then(() => {
             Materialize.toast("文件上传成功！", 4000);
+            this.getTablenav(this.boutiqueVendorid);
             this.getTable(this.boutiqueVendorid);
           })
           .catch(() => {

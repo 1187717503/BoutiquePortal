@@ -708,6 +708,7 @@ export default {
       });
     },
     getTable(id) {
+      debugger;
       this.isLoading = true;
       queryRuleByBrandZero(id).then(res => {
         //获取table列表
@@ -1213,14 +1214,17 @@ export default {
       if (this.update_files) {
         let formData = new FormData();
         formData.append("file", this.update_files);
-        uploadFileApi(this.priceId, formData).then(() => {
-          Materialize.toast("文件上传成功！", 4000);
-          this.getTable(this.boutiqueVendorid);
-        }).catch(()=>{
-          Materialize.toast("文件上传失败！", 4000);
-        });
-      }else{
-         Materialize.toast("请选择文件上传！", 4000);
+        uploadFileApi(this.priceId, formData)
+          .then(() => {
+            Materialize.toast("文件上传成功！", 4000);
+            this.getTablenav(this.boutiqueVendorid);
+            this.getTable(this.boutiqueVendorid);
+          })
+          .catch(() => {
+            Materialize.toast("文件上传失败！", 4000);
+          });
+      } else {
+        Materialize.toast("请选择文件上传！", 4000);
       }
     },
     downloadFile() {
