@@ -170,6 +170,7 @@ input.stock-input {
     overflow:hidden; 
     text-overflow:ellipsis;
     white-space: nowrap;
+    margin-top: 5px;
 }
 
 .disp-brand {display:block;white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}

@@ -82,6 +82,9 @@ set lp.`retail_price` = s.`price`  ;
  alter table `product`  add `min_im_price` decimal(16,4) DEFAULT NULL COMMENT 'sku.im_price冗余字段';
  update `product`  p,sku set p.`min_im_price` = sku.`im_price`,p.`max_im_price` = sku.`im_price`
  where p.`enabled`  = 1 and sku.`enabled`  = 1 and p.`product_id`  = sku.`product_id` ;
+ 
+ ALTER TABLE `block`
+	ADD UNIQUE INDEX `UNI_BLOCK_NAME` (`block_name`);
 
 
 
