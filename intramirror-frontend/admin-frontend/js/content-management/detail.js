@@ -122,9 +122,15 @@ function saveBlock() {
     }
 
     param.block.bgColor = $('#backgroup-color').val();
-    param.block.sortOrder = $('#text-sort-order').val();
-    if (param.block.sortOrder == '') {
+    param.block.sortOrder = parseInt($('#text-sort-order').val());
+
+    if (isNaN(param.block.sortOrder)) {
         Materialize.toast('Please type sort order', 3000);
+        return;
+    }
+
+    if (param.block.sortOrder >= 65535) {
+        Materialize.toast('Sort order must be less then 65535', 3000);
         return;
     }
 
@@ -380,7 +386,6 @@ function initUpload() {
         thumbnailHeight: 160,
         init: function () {
             this.on("success", function success(file, response) {
-
                 $('#upload').attr('data-block-image', response.data);
             });
 
@@ -388,9 +393,9 @@ function initUpload() {
                 this.removeAllFiles(true);
                 this.addFile(file);
             });
-
             this.on("addedfile", function () {
                 $('.dz-preview.dz-complete.dz-image-preview').remove();
+                $('.needsclick.dz-message').css('display', "none");
             });
         }
     });
@@ -400,6 +405,7 @@ function initUpload() {
 function loadExistingImage(url) {
     uploadDropzone.removeAllFiles(true);
     $('.dz-preview.dz-complete.dz-image-preview').remove();
+    $('.needsclick.dz-message').css('display', "none");
 
     var mockFile = {
         name: "cover_image.png",
