@@ -232,13 +232,15 @@ function initProductList(curTagId) {
             let rightProductList = [];
 
             for (var i = 0; i < result.data.length; i++) {
-                let obj = JSON.parse(result.data[i].cover_img);
-                if (obj.length > 0) {
-                    result.data[i].image = obj[0];
-                } else {
-                    result.data[i].image = '../images/noimage.gif';
-                }
 
+                 result.data[i].image = '../images/noimage.gif';
+                if (result.data[i].cover_img) {
+                    let obj = JSON.parse(result.data[i].cover_img);
+                    if (obj.length > 0) {
+                        result.data[i].image = obj[0];
+                    }
+                } 
+                
                 result.data[i].im_discount = (result.data[i].im_discount*10).toFixed(1);
 
                 // 街拍图拿不到
