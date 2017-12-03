@@ -42,10 +42,7 @@
     <!-- end spring 自动注解,及解决ReponseBody中文乱码问题 -->
 
     <!-- 设置使用注解的类所在的jar包，这里必须排除扫描service层的组件 -->
-    <context:component-scan base-package="com.intramirror">
-        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service"/>
-    </context:component-scan>
-
+    <context:component-scan base-package="com.intramirror"/>
 
     <context:property-placeholder location="classpath:/commons.properties"/>
 
