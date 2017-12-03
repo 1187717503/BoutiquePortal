@@ -65,10 +65,20 @@ public class PriceChangeRuleController {
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
             iPriceChangeRule.updateAdminPrice();
+
+            // sku.im_price -> shop_product_sku.sale_price
             iPriceChangeRule.updateShopPrice();
+
+            // shop_product_sku.sale_price -> shop_product.min_sale_price,shop_product.max_sale_price
             iPriceChangeRule.updateShopProductSalePrice();
+
+            // sku.price -> product.min_retail_price,product.max_retail_price
             iPriceChangeRule.updateProductRetailPrice();
+
+            // sku.in_price -> product.min_boutique_price,product.max_boutique_price
             iPriceChangeRule.updateProductBoutiquePrice();
+
+            // sku.im_price -> product.min_im_price,product.max_im_price
             iPriceChangeRule.updateProductImPrice();
             resultMessage.successStatus().addMsg("SUCCESS");
         } catch (Exception e) {

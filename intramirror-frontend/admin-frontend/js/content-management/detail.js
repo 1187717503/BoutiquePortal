@@ -1,5 +1,17 @@
 var uploadDropzone;
 
+String.prototype.gblen = function() {  
+  var len = 0;  
+  for (var i=0; i<this.length; i++) {  
+    if (this.charCodeAt(i)>127 || this.charCodeAt(i)==94) {  
+       len += 2;  
+     } else {  
+       len ++;  
+     }  
+   }  
+  return len;  
+}
+
 function initDragger() {
     var leftUpdateOutput = function (e) {
         var list = e.length ? e : $(e.target),
@@ -82,7 +94,7 @@ function saveBlock() {
         return;
     }
 
-    if (param.block.title.length > 22) {
+    if (param.block.title.gblen() > 22) {
         Materialize.toast('Title must be less 22 character', 3000);
         return;
     }
@@ -98,12 +110,12 @@ function saveBlock() {
         Materialize.toast('Please type sub title', 3000);
         return;
     }
-    if (param.block.subtitle.length > 108) {
+    if (param.block.subtitle.gblen() > 108) {
         Materialize.toast('Sub title must be less 108 character', 3000);
         return;
     }
 
-    param.block.coverImg = $('#upload').data('block-image');
+    param.block.coverImg = $('#upload').attr('data-block-image');
     if (param.block.coverImg == '') {
         Materialize.toast('Please upload block image', 3000);
         return;
@@ -111,10 +123,16 @@ function saveBlock() {
 
     param.block.bgColor = $('#backgroup-color').val();
     param.block.sortOrder = $('#text-sort-order').val();
-    if (param.block.sortOrder === '') {
+    if (param.block.sortOrder == '') {
         Materialize.toast('Please type sort order', 3000);
         return;
     }
+
+    if (param.block.sortOrder <= 0) {
+        Materialize.toast('Sort order must be large then 0', 3000);
+        return;
+    }
+
 
     param.sort = []
 
@@ -150,12 +168,12 @@ function saveBlock() {
             } else {
                 toashWithCloseBtn('Save failed, ' + result.data);
             }
-            
         },
         error: function (code, exception) {
-
             if (code.status == 401) {
                 window.location.href = '../../../login'
+            } else {
+                toashWithCloseBtn('Save failed, ' + exception);
             }
         }
     });
@@ -307,9 +325,16 @@ function initBlockDetailInfo(data) {
         $('label[for=status]').text('inactive');
     }
     Materialize.updateTextFields();
+    uploadDropzone.removeAllFiles(true);
+    $('.dz-preview.dz-complete.dz-image-preview').remove();
+    $('.needsclick.dz-message').css('display', "none");
 
-    loadExistingImage(data.cover_img);
-    $('#upload').attr('data-block-image', data.cover_img);
+    if (data.cover_img) {
+        loadExistingImage(data.cover_img);
+        $('#upload').attr('data-block-image', data.cover_img);
+    } else {
+        $('.needsclick.dz-message').css('display', "block");
+    }
 }
 
 function getBlockDetail(blockId) {
@@ -394,6 +419,14 @@ function initEvent() {
     })
 
     $('#select-block-name').change(function(e) {
+        let oriBlockId = $('#select-block-name').data('origin-block-id');
+        if (typeof(oriBlockId) =='undefined' || oriBlockId == -1) {
+            let blockId = $('#select-block-name').val();
+            $('#select-block-name').attr('data-origin-block-id', blockId);
+            getBlockDetail(blockId)
+            return;
+        }
+
         $('#modal2').openModal({
             dismissible: false,
             opacity: .5,
@@ -413,7 +446,7 @@ function initEvent() {
 
     $('#modal2 .model-yes').click(function() {
         $('#modal2').closeModal();
-        console.log('blockId');
+        
         let blockId = $('#select-block-name').val();
         $('#select-block-name').attr('data-origin-block-id', blockId);
         getBlockDetail(blockId)

@@ -73,6 +73,9 @@ public class PriceServiceImpl implements IPriceService{
             BigDecimal in_price = new BigDecimal(0);
             for(Sku sku : skus) {
                 logger.info("IPriceService,synProductPriceRule,updateSkuPrice,start,sku:"+ JSONObject.toJSONString(sku));
+                if(newPrice == null) {
+                    newPrice=sku.price;
+                }
                 sku.price = newPrice;
                 sku.in_price = new BigDecimal(newPrice.doubleValue() * vendorDiscount / ((1 + 0.22) * 100));
                 sku.im_price = new BigDecimal(newPrice.doubleValue() * adminDiscount / ((1) * 100));

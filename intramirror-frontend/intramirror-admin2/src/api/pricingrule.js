@@ -239,3 +239,19 @@ export function activeNowAcation2() {
     url: 'job/price/updatePriceByAdmin'
   })
 }
+
+export function uploadFileApi(price_id,data){
+  return HTTP({
+    url: 'rule/upload.htm?price_change_rule_id='+price_id,
+    data:data,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    },
+    method:'post'
+  })
+}
+
+export function downFileApi(price_id){
+  const downloadUrl = process.env.BASE_URL + 'rule/download.htm?price_change_rule_id='+price_id;
+  window.open(downloadUrl);
+}

@@ -188,6 +188,10 @@
         </if>
     </select>
 
+    <select id="queryAllBrand" resultType="java.util.Map" >
+        select distinct brand_id,english_name from brand where enabled = 1
+    </select>
+
     <select id="queryRuleByGroup" resultType="java.util.Map" parameterType="java.util.Map">
 
     select pcrg.price_change_rule_group_id,pg.`name`,pcrg.discount_percentage from price_change_rule_group pcrg
@@ -296,4 +300,21 @@
     select `name`,#{insert_price_change_rule_id,jdbcType=INTEGER},season_code,enabled,now(),now() from price_change_rule_season_group pcrsg
     where pcrsg.price_change_rule_id = #{price_change_rule_id,jdbcType=INTEGER}
   </insert>
+
+    <update id="deleteCategoryBrandRule" parameterType="java.lang.String">
+        delete from `price_change_rule_category_brand`  where `price_change_rule_id`  = #{item.price_change_rule_id,jdbcType=BIGINT} and `exception_flag` = 0 and `level`  = 2
+    </update>
+
+    <!--<update id="updateCategoryBrandRule" parameterType="java.util.List">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update `price_change_rule_category_brand`
+            set `discount_percentage`  = #{item.discount_percentage,jdbcType=BIGINT}
+            where `price_change_rule_id`  = #{item.price_change_rule_id,jdbcType=BIGINT} and `level`  = 2 and `exception_flag`  = 0 and `category_id`  = #{item.category_id,jdbcType=BIGINT} and `brand_id`  = #{item.brand_id,jdbcType=BIGINT};
+        </foreach>
+    </update>-->
+
+    <update id="insertCategoryBrandRule" parameterType="java.util.List">
+            insert into `price_change_rule_category_brand`(`price_change_rule_id` ,`category_id` ,`level` ,`brand_id` ,`discount_percentage` ,`exception_flag` )
+            values(#{price_change_rule_id,jdbcType=BIGINT},#{category_id,jdbcType=BIGINT},2,#{brand_id,jdbcType=BIGINT},#{discount_percentage,jdbcType=BIGINT},0);
+    </update>
 </mapper>

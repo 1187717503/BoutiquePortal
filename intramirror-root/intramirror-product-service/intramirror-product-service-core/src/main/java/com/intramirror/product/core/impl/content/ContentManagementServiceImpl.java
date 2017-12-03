@@ -86,8 +86,19 @@ public class ContentManagementServiceImpl implements ContentManagementService {
     }
 
     private int updateBlock(Block block) {
+        List<Block> blockList = blockMapper.listBlockBySort(block.getSortOrder());
         blockMapper.updateByBlockId(block);
-        List<Block> blockList = blockMapper.listBlockBySortExcludeSelf(block.getSortOrder(), block.getBlockId());
+        Block self = null;
+        for (Block b : blockList) {
+            if (b.getBlockId() == block.getBlockId()) {
+                if (b.getSortOrder() == block.getSortOrder()) {
+                    return 0;
+                } else {
+                    self = b;
+                }
+            }
+        }
+        blockList.remove(self);
         if (blockList.size() == 0) {
             return 0;
         }
@@ -104,6 +115,9 @@ public class ContentManagementServiceImpl implements ContentManagementService {
 
     private int updateTagProductSort(Long tagId, List<TagProductRel> sort) {
         tagProductRelMapper.deleteByTagId(tagId);
+        if (sort.size() == 0) {
+            return 0;
+        }
         for (TagProductRel tagProductRel : sort) {
             tagProductRel.setTagId(tagId);
         }

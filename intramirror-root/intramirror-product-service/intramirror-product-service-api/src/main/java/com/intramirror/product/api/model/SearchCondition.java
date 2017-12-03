@@ -41,19 +41,19 @@ public class SearchCondition {
     private Long tagId;
     private List<Long> productIds;
 
-    public int getProductStatus() {
+    public Integer getProductStatus() {
         return productStatus;
     }
 
-    public void setProductStatus(int productStatus) {
+    public void setProductStatus(Integer productStatus) {
         this.productStatus = productStatus;
     }
 
-    public void setShopProductStatus(int shopProductStatus) {
+    public void setShopProductStatus(Integer shopProductStatus) {
         this.shopProductStatus = shopProductStatus;
     }
 
-    public int getShopProductStatus() {
+    public Integer getShopProductStatus() {
         return shopProductStatus;
     }
 

@@ -22,6 +22,8 @@ public interface BlockService {
 
     List<Block> listBlockBySortExcludeSelf(int sortOrder, Long blockId);
 
+    List<Block> listBlockBySort(int sortOrder);
+
     int batchUpdateSort(List<Block> blockList);
 
 }

@@ -100,7 +100,11 @@ public class ApiCreateProductService {
             if(conn != null) {conn.rollback();conn.close();}
         } catch (Exception e) {
             e.printStackTrace();
-            resultMap = ApiCommonUtils.errorMap(ApiErrorTypeEnum.errorType.error_runtime_exception,"errorMessage",ExceptionUtils.getExceptionDetail(e));
+            if(e.getMessage().contains("Duplicate entry") && e.getMessage().contains("vendor_id")) {
+                resultMap = ApiCommonUtils.errorMap(ApiErrorTypeEnum.errorType.error_boutique_id_already_exists,"errorMessage",ExceptionUtils.getExceptionDetail(e));
+            } else {
+                resultMap = ApiCommonUtils.errorMap(ApiErrorTypeEnum.errorType.error_runtime_exception,"errorMessage",ExceptionUtils.getExceptionDetail(e));
+            }
             if(conn != null) {conn.rollback();conn.close();}
         }
         return resultMap;
@@ -539,6 +543,15 @@ public class ApiCreateProductService {
 
         if(StringUtils.isBlank(color_code)) {
             throw new UpdateException("color_code",color_code, ApiErrorTypeEnum.errorType.error_data_is_null);
+        }
+
+        // AD 特殊判断
+        if(vendor_id.intValue() == 22) {
+            ProductService productService = new ProductService(conn);
+            boolean flag = productService.duplicateColorBrandByAD(designer_id,color_code);
+            if(flag) {
+                throw new UpdateException("color_code,BrandID",color_code+","+designer_id, ApiErrorTypeEnum.errorType.error_duplicate_product);
+            }
         }
 
         if(StringUtils.isBlank(price)) {
