@@ -277,8 +277,7 @@
 
     <update id="batchUpdateSort" parameterType="java.util.List">
         update `block`
-        SET sort_order = sort_order +1,
-        modified_at = now()
+        SET sort_order = sort_order +1
         where `block`.block_id IN
         <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
             #{item.blockId}
