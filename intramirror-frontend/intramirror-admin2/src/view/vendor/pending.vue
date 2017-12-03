@@ -653,7 +653,11 @@ export default {
         //获取head tab
         this.tableBar = res.data.data;
         if (this.tableBar.length !== 0) {
-          this.setTablebar(this.tableBar[0].price_change_rule_id);
+          if(this.priceId){
+            this.setTablebar(this.priceId);
+          }else{
+            this.setTablebar(this.tableBar[0].price_change_rule_id);
+          } 
         }
       });
     },

@@ -674,7 +674,11 @@ export default {
         //获取head tab
         this.tableBar = res.data.data;
         if (this.tableBar.length !== 0) {
-          this.setTablebar(this.tableBar[0].price_change_rule_id);
+          if(this.priceId){
+             this.setTablebar(this.priceId);
+          }else{
+             this.setTablebar(this.tableBar[0].price_change_rule_id);
+          }
         }
       });
     },
@@ -1219,6 +1223,7 @@ export default {
             Materialize.toast("文件上传成功！", 4000);
             this.getTablenav(this.boutiqueVendorid);
             this.getTable(this.boutiqueVendorid);
+            
           })
           .catch(() => {
             Materialize.toast("文件上传失败！", 4000);
