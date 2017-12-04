@@ -2,23 +2,26 @@ package com.intramirror.web.controller.product;
 
 import com.intramirror.product.api.model.SearchCondition;
 import com.intramirror.web.common.response.Response;
-import com.intramirror.web.controller.BaseTest;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Created on 2017/12/3.
  *
  * @author YouFeng.Zhu
  */
-
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "/mockApplicationContext.xml" })
 // @formatter:off
 @SqlGroup({
           @Sql(scripts = "classpath:database/sha_ci_db_brand.sql"),
@@ -31,7 +34,7 @@ import org.springframework.test.context.jdbc.SqlGroup;
           @Sql(scripts = "classpath:database/sha_ci_db_tag.sql"),
           @Sql(scripts = "classpath:database/sha_ci_db_vendor.sql") })
 // @formatter:on
-public class ProductManagementTest extends BaseTest {
+public class ProductManagementTest {
     private Logger LOGGER = LoggerFactory.getLogger(ProductManagementTest.class);
 
     @Autowired
