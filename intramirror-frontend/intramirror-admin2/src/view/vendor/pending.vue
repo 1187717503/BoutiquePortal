@@ -653,11 +653,18 @@ export default {
         //获取head tab
         this.tableBar = res.data.data;
         if (this.tableBar.length !== 0) {
-          if(this.priceId){
+          let contain = false;
+          this.tableBar.forEach(tabBarItem => {
+            if (tabBarItem.price_change_rule_id == this.priceId) {
+              contain = true;
+            }
+          });
+
+          if (contain === true) {
             this.setTablebar(this.priceId);
-          }else{
+          } else {
             this.setTablebar(this.tableBar[0].price_change_rule_id);
-          } 
+          }
         }
       });
     },
@@ -1124,7 +1131,7 @@ export default {
             this.getTablenav(this.boutiqueVendorid);
             this.getTable(this.boutiqueVendorid);
           })
-          .catch((error) => {
+          .catch(error => {
             Materialize.toast(error.detail, 4000);
           });
       } else {
@@ -1909,7 +1916,7 @@ export default {
   top: 12px;
 }
 
-.button-no-padding{
-  padding:0;
+.button-no-padding {
+  padding: 0;
 }
 </style>
