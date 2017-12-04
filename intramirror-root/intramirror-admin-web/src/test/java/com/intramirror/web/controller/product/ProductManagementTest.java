@@ -10,12 +10,27 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
 
 /**
  * Created on 2017/12/3.
  *
  * @author YouFeng.Zhu
  */
+
+// @formatter:off
+@SqlGroup({
+          @Sql(scripts = "classpath:database/sha_ci_db_brand.sql"),
+          @Sql(scripts = "classpath:database/sha_ci_db_category.sql"),
+          @Sql(scripts = "classpath:database/sha_ci_db_product.sql"),
+          @Sql(scripts = "classpath:database/sha_ci_db_product_exception.sql"),
+          @Sql(scripts = "classpath:database/sha_ci_db_shop_product.sql"),
+          @Sql(scripts = "classpath:database/sha_ci_db_sku.sql"),
+          @Sql(scripts = "classpath:database/sha_ci_db_sku_store.sql"),
+          @Sql(scripts = "classpath:database/sha_ci_db_tag.sql"),
+          @Sql(scripts = "classpath:database/sha_ci_db_vendor.sql") })
+// @formatter:on
 public class ProductManagementTest extends BaseTest {
     private Logger LOGGER = LoggerFactory.getLogger(ProductManagementTest.class);
 

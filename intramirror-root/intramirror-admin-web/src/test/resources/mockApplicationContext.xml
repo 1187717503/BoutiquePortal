@@ -56,7 +56,6 @@
     <!-- initialize database -->
     <jdbc:initialize-database data-source="dataSource">
         <jdbc:script location="classpath:database/schemas.sql"/>
-        <jdbc:script location="classpath:database/sha_ci_db*.sql"/>
     </jdbc:initialize-database>
 
 </beans>
