@@ -1,24 +1,26 @@
 /**
  * 
  */
-package com.intramirror.web.junit.container;
+package com.intramirror.web.controller.order.container;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.web.controller.order.ShipmentController;
-import com.intramirror.web.junit.BaseJunit4Test;
+import com.intramirror.web.controller.order.BaseJunit4Test;
 
 /**
  * @author yml
  *
  */
+@Ignore
 public class ShipmentJunitTest extends BaseJunit4Test{
 
 	@Autowired

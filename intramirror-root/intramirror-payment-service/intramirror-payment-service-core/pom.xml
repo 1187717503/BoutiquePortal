@@ -112,10 +112,6 @@
 	    <artifactId>mybatis</artifactId>
 	</dependency>
 
-	  <dependency>
-		  <groupId>org.springframework</groupId>
-		  <artifactId>spring-context</artifactId>
-	  </dependency>
   </dependencies>
   <build>
     <finalName>intramirror-product-service-core</finalName>
