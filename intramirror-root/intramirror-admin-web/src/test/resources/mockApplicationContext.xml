@@ -1,0 +1,62 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
+
+
+    <!--<context:property-placeholder location="classpath:/databases.properties" ignore-unresolvable="true"/>-->
+    <import resource="classpath:/*-datasource.xml"/>
+    <context:component-scan base-package="com.intramirror"/>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!-- 开启事务控制的注解支持 -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!--Spring中bean获取的工具类-->
+    <bean id="springContextUtils" class="com.intramirror.web.common.SpringContextUtils"/>
+
+    <!-- start spring 自动注解,及解决ReponseBody中文乱码问题 -->
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+            <bean id="mappingJacksonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>text/plain;charset=utf-8</value>
+                        <value>text/html;charset=UTF-8</value>
+                        <value>text/json;charset=UTF-8</value>
+                        <value>application/json;charset=utf-8</value>
+                    </list>
+                </property>
+                <property name="objectMapper">
+                    <bean class="com.fasterxml.jackson.databind.ObjectMapper">
+                        <property name="dateFormat">
+                            <bean class="java.text.SimpleDateFormat">
+                                <constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss"/>
+                            </bean>
+                        </property>
+                    </bean>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+    <!-- end spring 自动注解,及解决ReponseBody中文乱码问题 -->
+
+    <bean name="orderProperties" class="com.intramirror.web.common.CommonProperties">
+        <property name="appOrderUrl" value="${app.order.url}"></property>
+        <property name="appCheckUrl" value="${app.check.url}"></property>
+        <property name="ruleExcelPath" value="${price.rule.path}"></property>
+    </bean>
+
+    <!-- initialize database -->
+    <jdbc:initialize-database data-source="dataSource">
+        <jdbc:script location="classpath:database/schemas.sql"/>
+        <jdbc:script location="classpath:database/sha_ci_db*.sql"/>
+    </jdbc:initialize-database>
+
+</beans>
