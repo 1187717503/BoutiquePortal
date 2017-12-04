@@ -237,8 +237,8 @@
             <v-icon class="preview-replay" v-show="previewToggle" @click="refreshPreView()">replay</v-icon>
         </div>
         <input type="file" @change="getFile($event)" class="file-input"/>
-        <button class="waves-effect waves-light btn" @click="uploadFile">上传文件</button>
-        <button class="waves-effect waves-light btn" @click="downloadFile">DOWNLOAD</button>
+        <button class="waves-effect waves-light btn button-no-padding" @click="uploadFile">UPLOAD EXCL</button>
+        <button class="waves-effect waves-light btn button-no-padding" @click="downloadFile">DOWNLOAD EXCL</button>
         <!-- <button class="waves-effect waves-light btn active-button" v-on:click.once="activeNow()" :class="{hadClicked:activeNowButtonClicked}">ACTIVE NOW</button> -->
       </div>
     </div>
@@ -1225,8 +1225,8 @@ export default {
             this.getTable(this.boutiqueVendorid);
             
           })
-          .catch(() => {
-            Materialize.toast("文件上传失败！", 4000);
+          .catch((error) => {
+            Materialize.toast(error.detail, 4000);
           });
       } else {
         Materialize.toast("请选择文件上传！", 4000);
@@ -2049,5 +2049,8 @@ export default {
   width: 200px;
   position: relative;
   top: 12px;
+}
+.button-no-padding{
+  padding:0;
 }
 </style>
