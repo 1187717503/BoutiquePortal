@@ -819,6 +819,19 @@
         LIMIT #{offset,jdbcType=INTEGER}, #{limit,jdbcType=INTEGER}
     </select>
 
+    <select id="selectCreateThreeOrderInfo" parameterType="java.util.Map" resultType="java.util.Map">
+        select lp.`logistics_product_id` ,lp.`order_line_num`,lp.`created_at`   from `logistics_product`  lp
+        where lp.`vendor_id` in
+        <foreach item="item" index="index" collection="vendors" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and lp.`status` in
+        <foreach item="item" index="index" collection="order_status" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and lp.`plase_order_at`  is null ;
+    </select>
+
     <update id="updateById" parameterType="com.intramirror.order.api.model.Order">
         update `order`
         <set>

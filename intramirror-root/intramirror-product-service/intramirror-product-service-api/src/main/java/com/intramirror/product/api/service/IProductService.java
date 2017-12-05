@@ -74,4 +74,7 @@ public interface IProductService {
     int batchUpdateProductStatus(int status, List<Long> productIds);
 
     List<ProductWithBLOBs> listProductByProductIds(List<Long> productIds);
+
+    List<Map<String, Object>> selectDayNoUpdateSum(Map<String,Object> params);
+    List<Map<String, Object>> selectDayUpdateSum(Map<String,Object> params);
 }

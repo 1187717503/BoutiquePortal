@@ -50,6 +50,8 @@ public interface IOrderService {
      */
     Map<String, Object> getOrderPaymentInfoByOrderId(int orderId);
 
+    List<Map<String,Object>> selectCreateThreeOrderInfo(Map<String,Object> params);
+
     /**
      * 根据订单号查询支付信息
      *

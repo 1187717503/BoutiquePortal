@@ -569,4 +569,27 @@
         AND product.enabled = TRUE;
     </select>
 
+    <select id="selectDayUpdateSum" parameterType="java.util.Map" resultType="java.util.Map">
+        <!-- 查询每个vendor每天更新了多少条数据 -->
+        select v.`vendor_name` , count(*)  as num from `sku_store`  ss
+
+        inner join `product`  p on(ss.`product_id` = p.`product_id`  and p.`enabled`  = 1 and ss.`enabled`  = 1)
+
+        inner join `vendor`  v on(v.`vendor_id` = p.`vendor_id`  and v.`enabled`  = 1)
+
+        where <![CDATA[  ss.`last_check` >= #{sLastCheck,jdbcType=VARCHAR}  and ss.`last_check` <= #{eLastCheck,jdbcType=VARCHAR} ]]>  group by v.`vendor_id`
+    </select>
+
+    <select id="selectDayNoUpdateSum" parameterType="java.util.Map" resultType="java.util.Map">
+
+        <!-- 查询每个vendor还有多少条>0的数据没更新 -->
+        select v.`vendor_name` , count(*) as num from `sku_store`  ss
+
+        inner join `product`  p on(ss.`product_id` = p.`product_id`  and p.`enabled`  = 1 and ss.`enabled`  = 1)
+
+        inner join `vendor`  v on(v.`vendor_id` = p.`vendor_id`  and v.`enabled`  = 1)
+
+        where <![CDATA[ ss.`last_check` < #{lastCheck,jdbcType=VARCHAR} ]]> and ss.`store`  > 0 group by v.`vendor_id`
+    </select>
+
 </mapper>

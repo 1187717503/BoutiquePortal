@@ -84,7 +84,7 @@ public interface OrderMapper {
      */
     List<Map<String, Object>> getOrderListByStatusAndContainerId(Map<String, Object> conditionMap);
     
-    
+    List<Map<String,Object>> selectCreateThreeOrderInfo(Map<String,Object> params);
     
     /**
      * 根据 logisticsProductId 获取订单详情
