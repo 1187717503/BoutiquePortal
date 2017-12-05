@@ -8,6 +8,7 @@ import com.intramirror.product.api.service.content.ContentManagementService;
 import com.intramirror.product.core.mapper.BlockMapper;
 import com.intramirror.product.core.mapper.BlockTagRelMapper;
 import com.intramirror.product.core.mapper.ContentManagementMapper;
+import com.intramirror.product.core.mapper.TagMapper;
 import com.intramirror.product.core.mapper.TagProductRelMapper;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,9 @@ public class ContentManagementServiceImpl implements ContentManagementService {
 
     @Autowired
     private TagProductRelMapper tagProductRelMapper;
+
+    @Autowired
+    private TagMapper tagMapper;
 
     @Override
     public List<Map<String, Object>> listTagProductInfo(Long tagId) {
@@ -76,13 +80,44 @@ public class ContentManagementServiceImpl implements ContentManagementService {
     }
 
     @Override
-    public List<Map<String, Object>> listBlockWithTag() {
-        return contentManagementMapper.listBlockWithTag();
+    public List<Map<String, Object>> listBlockWithTag(String blockName, Integer status, Long tagId, Long modifiedAtFrom, Long modifiedAtTo) {
+        return contentManagementMapper.listBlockWithTag(blockName, status, tagId, modifiedAtFrom, modifiedAtTo);
     }
 
     @Override
     public Map<String, Object> getBlockWithTagByBlockId(Long blockId) {
         return contentManagementMapper.getBlockWithTagByBlockId(blockId);
+    }
+
+    @Override
+    @Transactional
+    public int updateBlockByBlockId(Block record) {
+        if (record.getSortOrder() == null) {
+            return blockMapper.updateByBlockId(record);
+        } else {
+            return updateBlock(record);
+        }
+    }
+
+    @Override
+    @Transactional
+    public int batchUpdateBlock(List<Block> record) {
+        return blockMapper.batchUpdateBlock(record);
+    }
+
+    @Override
+    @Transactional
+    public int createTag(Tag record) {
+        record.setEnabled(true);
+        return tagMapper.insertSelective(record);
+    }
+
+    @Override
+    @Transactional
+    public int deleteTag(Long tagId) {
+        tagProductRelMapper.deleteByTagId(tagId);
+        blockTagRelMapper.deleteByTagId(tagId);
+        return tagMapper.deleteByPrimaryKey(tagId);
     }
 
     private int updateBlock(Block block) {

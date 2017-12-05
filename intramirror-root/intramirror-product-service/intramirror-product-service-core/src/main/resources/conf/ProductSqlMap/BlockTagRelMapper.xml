@@ -28,10 +28,6 @@
         from block_tag_rel
         where block_tag_id = #{blockTagId,jdbcType=BIGINT}
     </select>
-    <delete id="deleteByBlockId" parameterType="java.lang.Long">
-        DELETE FROM block_tag_rel
-        WHERE block_id = #{blockId,jdbcType=BIGINT}
-    </delete>
     <insert id="insert" parameterType="com.intramirror.product.api.model.BlockTagRel">
         <!--
           WARNING - @mbggenerated
@@ -107,4 +103,14 @@
         create_at = #{createAt,jdbcType=TIMESTAMP}
         WHERE block_tag_id = #{blockTagId,jdbcType=BIGINT}
     </update>
+
+    <delete id="deleteByBlockId" parameterType="java.lang.Long">
+        DELETE FROM block_tag_rel
+        WHERE block_id = #{blockId,jdbcType=BIGINT}
+    </delete>
+
+    <delete id="deleteByTagId" parameterType="java.lang.Long">
+        DELETE FROM block_tag_rel
+        WHERE tag_id = #{tagId,jdbcType=BIGINT}
+    </delete>
 </mapper>

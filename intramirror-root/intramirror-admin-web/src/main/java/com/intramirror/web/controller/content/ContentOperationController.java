@@ -1,13 +1,13 @@
 package com.intramirror.web.controller.content;
 
+import com.intramirror.core.common.exception.ValidateException;
+import com.intramirror.core.common.response.ErrorResponse;
+import com.intramirror.core.common.response.Response;
 import com.intramirror.product.api.model.Block;
 import com.intramirror.product.api.model.Tag;
 import com.intramirror.product.api.service.BlockService;
 import com.intramirror.product.api.service.content.ContentManagementService;
-import com.intramirror.web.Exception.ErrorResponse;
-import com.intramirror.web.Exception.ValidateException;
 import com.intramirror.web.common.request.Content;
-import com.intramirror.web.common.response.Response;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

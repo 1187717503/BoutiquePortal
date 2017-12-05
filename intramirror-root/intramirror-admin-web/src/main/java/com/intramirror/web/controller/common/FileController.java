@@ -1,9 +1,9 @@
 package com.intramirror.web.controller.common;
 
 import com.intramirror.common.parameter.StatusType;
-import com.intramirror.web.Exception.ErrorResponse;
-import com.intramirror.web.Exception.ValidateException;
-import com.intramirror.web.common.response.Response;
+import com.intramirror.core.common.response.ErrorResponse;
+import com.intramirror.core.common.exception.ValidateException;
+import com.intramirror.core.common.response.Response;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;

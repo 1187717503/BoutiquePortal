@@ -1,4 +1,6 @@
-package com.intramirror.web.Exception;
+package com.intramirror.core.common.exception;
+
+import com.intramirror.core.common.response.ErrorResponse;
 
 /**
  * Created on 3/24/2017.

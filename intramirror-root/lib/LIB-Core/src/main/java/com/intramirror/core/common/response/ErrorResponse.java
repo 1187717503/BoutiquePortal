@@ -1,6 +1,4 @@
-package com.intramirror.web.Exception;
-
-import com.intramirror.common.parameter.StatusType;
+package com.intramirror.core.common.response;
 
 /**
  * Created on 3/24/2017.
@@ -24,7 +22,7 @@ public class ErrorResponse {
     }
 
     public ErrorResponse(String message) {
-        this.status = StatusType.FAILURE;
+        this.status = StatusCode.FAILURE;
         this.message = message;
     }
 

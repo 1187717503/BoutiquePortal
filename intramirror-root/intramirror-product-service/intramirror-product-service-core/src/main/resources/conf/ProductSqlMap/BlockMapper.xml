@@ -254,7 +254,8 @@
     <select id="listSimpleBlock" resultType="map">
         SELECT
             block_id,
-            block_name
+            block_name,
+            sort_order
         FROM block
         WHERE block.enabled = TRUE;
     </select>
@@ -284,4 +285,45 @@
         </foreach>
         AND `block`.enabled = TRUE;
     </update>
+
+    <update id="batchUpdateBlock" >
+        update block
+        <set>
+            <if test="blockName != null">
+                block_name = #{blockName,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=TINYINT},
+            </if>
+            <if test="title != null">
+                title = #{title,jdbcType=VARCHAR},
+            </if>
+            modified_at = now(),
+            <if test="bgColor != null">
+                bg_color = #{bgColor,jdbcType=CHAR},
+            </if>
+            <if test="subtitle != null">
+                subtitle = #{subtitle,jdbcType=VARCHAR},
+            </if>
+            <if test="titleEnglish != null">
+                title_english = #{titleEnglish,jdbcType=VARCHAR},
+            </if>
+            <if test="enabled != null">
+                enabled = #{enabled,jdbcType=BIT},
+            </if>
+            <if test="content != null">
+                content = #{content,jdbcType=LONGVARBINARY},
+            </if>
+            <if test="coverImg != null">
+                cover_img = #{coverImg,jdbcType=VARCHAR},
+            </if>
+        </set>
+        WHERE block_id IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.blockId}
+        </foreach>
+        AND enabled = TRUE;
+    </update>
+
+
 </mapper>

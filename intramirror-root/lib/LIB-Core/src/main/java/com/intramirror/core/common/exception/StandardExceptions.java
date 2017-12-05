@@ -1,7 +1,6 @@
-package com.intramirror.web.Exception;
+package com.intramirror.core.common.exception;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * Created on 2017/11/1.
@@ -16,7 +15,7 @@ public class StandardExceptions {
 
     public static final AlreadyExistException ALREADYEXIST = new AlreadyExistException();
 
-    static class HttpCommonException extends RuntimeException {
+    public static class HttpCommonException extends RuntimeException {
         private HttpStatus httpStatus;
 
         public HttpStatus getHttpStatus() {
@@ -33,7 +32,6 @@ public class StandardExceptions {
 
     }
 
-    @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY, reason = "Resource already exist")
     static class AlreadyExistException extends HttpCommonException {// 422
 
         AlreadyExistException() {
@@ -43,7 +41,6 @@ public class StandardExceptions {
 
     }
 
-    @ResponseStatus(value = HttpStatus.UNAUTHORIZED, reason = "Not login or session expired")
     static class UnauthorizedException extends HttpCommonException {// 422
 
         UnauthorizedException() {
@@ -53,7 +50,6 @@ public class StandardExceptions {
         }
     }
 
-    @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")
     static class NotFoundException extends HttpCommonException {// 404
 
         NotFoundException() {

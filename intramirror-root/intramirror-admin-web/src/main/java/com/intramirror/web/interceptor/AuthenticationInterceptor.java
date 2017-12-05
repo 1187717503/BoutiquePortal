@@ -1,6 +1,6 @@
 package com.intramirror.web.interceptor;
 
-import com.intramirror.web.Exception.StandardExceptions;
+import com.intramirror.core.common.exception.StandardExceptions;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;

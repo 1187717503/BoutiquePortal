@@ -52,26 +52,6 @@
     </select>
 
 
-    <select id="listBlockWithTag" resultType="map">
-        SELECT
-            block_id,
-            block_name,
-            status,
-            title,
-            create_at,
-            modified_at,
-            content,
-            bg_color,
-            sort_order,
-            subtitle,
-            title_english,
-            tag.tag_id,
-            tag_name
-        FROM `block`
-            LEFT JOIN block_tag_rel ON block_tag_rel.block_id = block.block_id
-            LEFT JOIN tag ON block_tag_rel.tag_id = tag.tag_id AND tag.enabled = TRUE
-        WHERE `block`.enabled = TRUE
-    </select>
 
     <select id="getBlockWithTagByBlockId" resultType="map">
         SELECT
@@ -107,5 +87,35 @@
         SELECT product.product_id
         FROM tag_product_rel
             INNER JOIN product ON product.product_id = tag_product_rel.product_id AND product.enabled = TRUE
+    </select>
+
+    <select id="listBlockWithTag" resultType="map">
+        SELECT
+        block.block_id,
+        block.block_name,
+        block.modified_at,
+        block.status,
+        block.sort_order,
+        block.title,
+        block.subtitle,
+        tag.tag_id,
+        tag.tag_name
+        FROM block
+        LEFT JOIN block_tag_rel ON block.block_id = block_tag_rel.block_id
+        LEFT JOIN tag ON tag.tag_id = block_tag_rel.tag_id AND tag.enabled = TRUE
+        WHERE block.enabled = TRUE
+        <if test="blockName != null">
+            AND block.block_name = #{blockName}
+        </if>
+        <if test="status != null">
+            AND block.status = #{status}
+        </if>
+        <if test="tagId != null">
+            AND tag.tag_id = #{tagId}
+        </if>
+        <if test="modifiedAtFrom != null and modifiedAtTo != null">
+            AND unix_timestamp(block.modified_at) BETWEEN #{modifiedAtFrom} AND #{modifiedAtTo}
+        </if>
+        ORDER BY block.modified_at
     </select>
 </mapper>

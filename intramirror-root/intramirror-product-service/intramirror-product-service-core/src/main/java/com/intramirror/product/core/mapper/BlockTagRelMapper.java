@@ -50,4 +50,6 @@ public interface BlockTagRelMapper {
      * @mbggenerated
      */
     int updateByPrimaryKey(BlockTagRel record);
+
+    int deleteByTagId(Long tagId);
 }

@@ -26,8 +26,16 @@ public interface ContentManagementService {
 
     List<Long> listAllTagProductIds();
 
-    List<Map<String, Object>> listBlockWithTag();
+    List<Map<String, Object>> listBlockWithTag(String blockName, Integer status, Long tagId, Long modifiedAtFrom, Long modifiedAtTo);
 
     Map<String, Object> getBlockWithTagByBlockId(Long blockId);
+
+    int updateBlockByBlockId(Block record);
+
+    int batchUpdateBlock(List<Block> record);
+
+    int createTag(Tag record);
+
+    int deleteTag(Long tagId);
 
 }

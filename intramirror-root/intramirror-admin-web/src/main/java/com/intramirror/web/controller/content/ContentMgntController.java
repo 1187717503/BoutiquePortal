@@ -1,14 +1,16 @@
 package com.intramirror.web.controller.content;
 
 import com.intramirror.common.parameter.StatusType;
+import com.intramirror.product.api.model.Block;
+import com.intramirror.product.api.model.Tag;
 import com.intramirror.product.api.service.BlockService;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ITagService;
 import com.intramirror.product.api.service.content.ContentManagementService;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
-import com.intramirror.web.Exception.ErrorResponse;
-import com.intramirror.web.Exception.ValidateException;
-import com.intramirror.web.common.response.Response;
+import com.intramirror.core.common.response.ErrorResponse;
+import com.intramirror.core.common.exception.ValidateException;
+import com.intramirror.core.common.response.Response;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,15 +19,21 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created on 2017/11/17.
+ *
  * @author YouFeng.Zhu
  */
 @RestController
@@ -48,13 +56,51 @@ public class ContentMgntController {
     @Autowired
     private ISkuStoreService skuStoreService;
 
+    @GetMapping(value = "/blocks", produces = "application/json")
+    public Response listBlockTag(@RequestParam(value = "blockName", required = false) String blockName,
+            @RequestParam(value = "status", required = false) Integer status, @RequestParam(value = "tagId", required = false) Long tagId,
+            @RequestParam(value = "modifiedAtFrom", required = false) Long modifiedAtFrom,
+            @RequestParam(value = "modifiedAtTo", required = false) Long modifiedAtTo) {
+        return Response.status(StatusType.SUCCESS).data(contentManagementService.listBlockWithTag(blockName, status, tagId, modifiedAtFrom, modifiedAtTo));
+    }
+
+    @PostMapping(value = "/blocks", consumes = "application/json")
+    @ResponseStatus(value = HttpStatus.CREATED)
+    public Response createBlock() {
+        return Response.status(StatusType.SUCCESS).data("");
+    }
+
+    @PutMapping(value = "/blocks/{blockId}", consumes = "application/json")
+    public Response updateBlock(@PathVariable Long blockId, @RequestBody Block block) {
+        block.setBlockId(blockId);
+        return Response.status(StatusType.SUCCESS).data(contentManagementService.updateBlockByBlockId(block));
+    }
+
+    @PutMapping(value = "/blocks", consumes = "application/json")
+    public Response updateBlock( @RequestBody List<Block> blocks) {
+        return Response.status(StatusType.SUCCESS).data(contentManagementService.batchUpdateBlock(blocks));
+    }
+
+    @PostMapping(value = "/tags", consumes = "application/json")
+    @ResponseStatus(value = HttpStatus.CREATED)
+    public Response createTag(@RequestBody Tag tag) {
+        contentManagementService.createTag(tag);
+        return Response.success();
+    }
+
+    @DeleteMapping(value = "/tags/{tagId}")
+    public Response deleteTag(@PathVariable Long tagId) {
+        contentManagementService.deleteTag(tagId);
+        return Response.success();
+    }
+
     @GetMapping(value = "/block/detail", produces = "application/json")
     public Response getContentDetail(@RequestParam(value = "blockId") Long blockId) {
         return Response.status(StatusType.SUCCESS).data(contentManagementService.getBlockWithTagByBlockId(blockId));
     }
 
     @GetMapping(value = "/block/list", produces = "application/json")
-    public Response getContentDetail() {
+    public Response listBlockSimple() {
         return Response.status(StatusType.SUCCESS).data(blockService.listSimpleBlock());
     }
 

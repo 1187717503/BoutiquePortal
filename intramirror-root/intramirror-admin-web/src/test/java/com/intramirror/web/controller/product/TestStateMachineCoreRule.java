@@ -4,7 +4,7 @@ import com.intramirror.product.api.model.Block;
 import com.intramirror.product.api.model.Tag;
 import com.intramirror.product.api.model.TagProductRel;
 import com.intramirror.web.common.request.Content;
-import com.intramirror.web.util.JsonTransformUtil;
+import com.intramirror.utils.transform.JsonTransformUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

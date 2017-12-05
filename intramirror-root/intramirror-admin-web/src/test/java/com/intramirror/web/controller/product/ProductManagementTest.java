@@ -1,7 +1,7 @@
 package com.intramirror.web.controller.product;
 
+import com.intramirror.core.common.response.Response;
 import com.intramirror.product.api.model.SearchCondition;
-import com.intramirror.web.common.response.Response;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Assert;

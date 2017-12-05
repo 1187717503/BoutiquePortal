@@ -89,6 +89,12 @@
             <groupId>com.intramirror</groupId>
             <artifactId>intramirror-order-service-core</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.intramirror</groupId>
+            <artifactId>lib-core</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>com.intramirror</groupId>
             <artifactId>intramirror-shoplus-service</artifactId>

@@ -1,7 +1,7 @@
 package com.intramirror.web.controller.product;
 
-import com.intramirror.web.Exception.ErrorResponse;
-import com.intramirror.web.Exception.ValidateException;
+import com.intramirror.core.common.exception.ValidateException;
+import com.intramirror.core.common.response.ErrorResponse;
 import java.util.EnumMap;
 import java.util.Map;
 

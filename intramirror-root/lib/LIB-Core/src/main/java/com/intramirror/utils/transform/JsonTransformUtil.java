@@ -1,4 +1,4 @@
-package com.intramirror.web.util;
+package com.intramirror.utils.transform;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;

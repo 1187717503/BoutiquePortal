@@ -1,6 +1,4 @@
-package com.intramirror.web.common.response;
-
-import com.intramirror.common.parameter.StatusType;
+package com.intramirror.core.common.response;
 
 /**
  * Created on 2017/10/26.
@@ -42,7 +40,7 @@ public class Response {
     }
 
     public static Response success() {
-        return new Response.ResponseBuilder(StatusType.SUCCESS).build();
+        return new Response.ResponseBuilder(StatusCode.SUCCESS).build();
     }
 
     public static class ResponseBuilder {
