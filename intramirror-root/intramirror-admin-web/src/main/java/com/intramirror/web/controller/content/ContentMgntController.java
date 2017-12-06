@@ -136,9 +136,8 @@ public class ContentMgntController {
         return Response.success();
     }
 
-    @PostMapping(value = "/savetagproductrel", consumes = "application/json")
-    public Response saveTagProductRel(@RequestBody Map<String, Object> body) {
-        Long tagId = body.get("tagId") == null ? null : Long.parseLong(body.get("tagId").toString());
+    @PostMapping(value = "/tags/{tagId}/products", consumes = "application/json")
+    public Response saveTagProductRel(@PathVariable(value = "tagId") Long tagId, @RequestBody Map<String, Object> body) {
         Long sortNum = body.get("sortNum") == null ? -1 : Long.parseLong(body.get("sortNum").toString());
         List<String> productIdList = (List<String>) body.get("productIdList");
 
