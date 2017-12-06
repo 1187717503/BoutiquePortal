@@ -165,4 +165,17 @@
         </foreach>
     </insert>
 
+    <delete id="deleteByTagIdAndProductId" >
+        DELETE FROM tag_product_rel
+        WHERE tag_id = #{tagId,jdbcType=BIGINT} AND product_id = #{productId,jdbcType=BIGINT};
+    </delete>
+
+    <delete id="batchDeleteByTagIdAndProductId" parameterType="java.util.List">
+        DELETE FROM tag_product_rel
+        WHERE
+        <foreach collection="list" item="item" index="index" separator=" OR ">
+            (tag_id = #{item.tagId,jdbcType=BIGINT} AND product_id = #{item.productId,jdbcType=BIGINT})
+        </foreach>
+    </delete>
+
 </mapper>

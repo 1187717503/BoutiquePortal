@@ -12,7 +12,9 @@ import java.util.Map;
 public interface BlockService {
     int insert(Block record);
 
-    int updateByBlockId(Block record);
+    int createBlock(Block record);
+
+    int updateByBlockId(Block block);
 
     Block getBlockById(Long blockId);
 

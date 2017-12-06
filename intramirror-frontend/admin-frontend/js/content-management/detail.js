@@ -220,7 +220,7 @@ function initProductList(curTagId) {
     $.ajax({
         type: requestURL.getProductsByTag.method,
         contentType: "application/json",
-        url: requestURL.getProductsByTag.url + "?tagId=" + curTagId,
+        url: requestURL.getProductsByTag.url.replace("{tagId}",curTagId),
         data: {},
         dataType: 'json',
         beforeSend: function(request) {
@@ -348,11 +348,13 @@ function initBlockDetailInfo(data) {
 function getBlockDetail(blockId) {
     $('.left-product-list').empty();
     $('.right-product-list').empty();
+    console.log("blockId : " + blockId);
+    console.log("url : " + requestURL.getBlockDetail.url.replace("\{blockId\}",blockId));
 
     $.ajax({
         type: requestURL.getBlockDetail.method,
         contentType: "application/json",
-        url: requestURL.getBlockDetail.url + "?blockId=" + blockId,
+        url: requestURL.getBlockDetail.url.replace("{blockId}",blockId),
         data: {},
         dataType: 'json',
         beforeSend: function(request) {
