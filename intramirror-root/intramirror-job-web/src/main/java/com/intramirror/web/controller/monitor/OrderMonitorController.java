@@ -65,7 +65,7 @@ public class OrderMonitorController implements InitializingBean {
 
         consignees = new ArrayList<>();
         consignees.add("yifan.ding@intramirror.com");
-//        consignees.add("arthur.chen@intramirror.com");
-//        consignees.add("jian.shang@intramirror.com");
+        consignees.add("arthur.chen@intramirror.com");
+        consignees.add("jian.shang@intramirror.com");
     }
 }
