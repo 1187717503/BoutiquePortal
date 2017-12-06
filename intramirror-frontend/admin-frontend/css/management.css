@@ -69,33 +69,23 @@ input.date-input {
     padding-top: 32px;
 }
 
+.has-labe-input .mdi-editor-insert-invitation {
+    font-size: 30px;
+    margin-top: 12px;
+    padding-right: 12px;
+}
 
+.z-depth-2 {
+    padding: 0px 12px 0 12px;
+}
 
-
-
-
-.control-pannel {
-    height: 60px;
-    display: flex;
-    line-height: 60px;
-    justify-content: space-between;
+.nav-wrapper {
+    background: #FAFAFA;
 }
 
 .has-labe-input {
     display: flex;
     margin-top: 1rem;
-}
-
-.div-label-text {
-    width: 25%;
-    padding: 5px 5px 0px 0px;
-}
-
-.left-label-text {
-    color: #898989;
-    font-size: 1em;
-    text-align: left;
-    margin-top: 30px;
 }
 
 .center-label-text {
@@ -111,70 +101,4 @@ input.date-input {
     height: 47px;
     line-height: 47px;
     text-align: right;
-}
-
-.head-detail-row .col {
-    padding: 0px;
-    background-color: #eee;
-}
-.list-detail-row .col {
-    padding: 0px;
-    background-color: #eee;
-}
-.row .col.s8 {
-    margin-left: 0px;
-}
-
-.head-detail-row .list-detail-item.col {
-    padding-left: 12px;
-    padding-right: 12px;
-}
-.head-detail-row.detail-head {
-    min-width: 1075px;
-}
-.list-detail-row .list-detail-item.col {
-    margin-left: 0px;
-    padding-left: 12px;
-    padding-right: 12px;
-}
-.list-detail-row.detail-item { 
-    min-width: 1075px;
-}
-
-
-.goods .row {
-    margin-left: 0rem;
-    margin-right: 0rem;
-}
-
-.has-labe-input .mdi-editor-insert-invitation {
-    font-size: 30px;
-    margin-top: 12px;
-    padding-right: 12px;
-}
-
-.z-depth-2 {
-    padding: 0px 12px 0 12px;
-}
-
-.nav-wrapper {
-    background: #FAFAFA;
-}
-
-
-
-.list-detail-row .list-detail-item.tags {
-    display: inline-block;
-    border-radius: 16px;
-    border: 1px solid #ccc;
-    line-height: 1.5em;
-    padding: 0 5px 0 5px;
-    width: auto;
-    max-width: 110px;
-    background: #861b54;
-    color: #fff;
-    overflow:hidden; 
-    text-overflow:ellipsis;
-    white-space: nowrap;
-    margin-top: 5px;
 }
