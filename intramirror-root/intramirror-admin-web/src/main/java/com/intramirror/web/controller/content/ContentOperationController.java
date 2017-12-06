@@ -83,4 +83,20 @@ public class ContentOperationController {
         }
 
     }
+
+    //    @GetMapping(value = "/temp")
+    //    public Response temp() throws IOException {
+    //        List<Block> list = blockService.listAllBlock();
+    //        for (Block block : list) {
+    //            if (block.getStatus() == 0 || block.getContent() == null) {
+    //                continue;
+    //            }
+    //
+    //            FileOutputStream out = new FileOutputStream("C:\\Users\\YouFeng.Zhu\\Desktop\\html\\" + block.getTitle() + ".html");
+    //            out.write(block.getContent());
+    //            out.close();
+    //        }
+    //
+    //        return Response.success();
+    //    }
 }

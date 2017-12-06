@@ -27,6 +27,8 @@ public interface BlockMapper {
 
     List<Block> listBlockBySort(@Param(value = "sortOrder") int sortOrder);
 
+    List<Block> listAllBlock();
+
     int batchUpdateSort(List<Block> blockList);
 
     int batchUpdateBlock(List<Block> blockList);

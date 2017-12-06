@@ -40,7 +40,7 @@ public class BlockServiceImpl implements BlockService {
 
     @Override
     public List<Block> listAllBlock() {
-        return null;
+        return blockMapper.listAllBlock();
     }
 
     @Override

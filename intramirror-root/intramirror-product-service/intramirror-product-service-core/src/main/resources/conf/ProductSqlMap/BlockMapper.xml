@@ -286,7 +286,7 @@
         AND `block`.enabled = TRUE;
     </update>
 
-    <update id="batchUpdateBlock" >
+    <update id="batchUpdateBlock">
         update block
         <set>
             <if test="blockName != null">
@@ -324,6 +324,25 @@
         </foreach>
         AND enabled = TRUE;
     </update>
+
+    <select id="listAllBlock" resultMap="BaseResultMap">
+        SELECT
+            block_id,
+            block_name,
+            status,
+            title,
+            title_english,
+            subtitle,
+            content,
+            bg_color,
+            sort_order,
+            create_at,
+            modified_at,
+            enabled,
+            cover_img
+        FROM `block`
+        WHERE `block`.enabled = TRUE;
+    </select>
 
 
 </mapper>
