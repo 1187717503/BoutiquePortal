@@ -59,13 +59,13 @@ public class OrderMonitorController implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         params = new HashMap<>();
         String[] vendors = new String[]{"9","16","21","22","20"};
-        String[] order_status = new String[]{"1"};
+        String[] order_status = new String[]{"1","2","7","3","4","5","6"};
         params.put("vendors",vendors);
         params.put("order_status",order_status);
 
         consignees = new ArrayList<>();
         consignees.add("yifan.ding@intramirror.com");
-        consignees.add("arthur.chen@intramirror.com");
-        consignees.add("jian.shang@intramirror.com");
+//        consignees.add("arthur.chen@intramirror.com");
+//        consignees.add("jian.shang@intramirror.com");
     }
 }
