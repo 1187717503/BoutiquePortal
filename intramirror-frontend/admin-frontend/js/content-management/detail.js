@@ -1,15 +1,15 @@
 var uploadDropzone;
 
-String.prototype.gblen = function() {  
-  var len = 0;  
-  for (var i=0; i<this.length; i++) {  
-    if (this.charCodeAt(i)>127 || this.charCodeAt(i)==94) {  
-       len += 2;  
-     } else {  
-       len ++;  
-     }  
-   }  
-  return len;  
+String.prototype.gblen = function() {
+    var len = 0;
+    for (var i=0; i<this.length; i++) {
+        if (this.charCodeAt(i) > 127 || this.charCodeAt(i) == 94) {
+           len += 2;
+        } else {
+           len ++;
+        }
+    }
+  return len;
 }
 
 function initDragger() {
@@ -241,7 +241,7 @@ function initProductList(curTagId) {
                     }
                 } 
                 
-                result.data[i].im_discount = (result.data[i].im_discount*10).toFixed(1);
+                result.data[i].im_discount = (result.data[i].im_discount*100).toFixed(0);
 
                 // 街拍图拿不到
                 result.data[i].steet = 0;
