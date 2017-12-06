@@ -258,9 +258,10 @@
             pp.brandID,
             pspv.`value`   AS size,
             p.category_id,
-            s.price,
+            /*s.price,
             s.in_price,
-            sps.sale_price,
+            sps.sale_price,*/
+            lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
             lp.amount,
             lp.shipping_fee,
             lp.tax_fee,
@@ -331,9 +332,10 @@
             pp.Composition,
             pspv.`value`   AS size,
             p.category_id,
-            s.price,
+            /*s.price,
             s.in_price,
-            sps.sale_price,
+            sps.sale_price,*/
+            lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
             lp.amount,
             lp.shipping_fee,
             lp.tax_fee,
@@ -486,9 +488,10 @@
                      pspv.`value`         AS
                                              size,
                      p.category_id,
-                     s.price,
+                     /*s.price,
                      s.in_price,
-                     sps.sale_price,
+                     sps.sale_price,*/
+                     lp.`retail_price` as price,lp.`in_price`,
                      lp.amount,
                      lp.shipping_fee,
                      lp.tax_fee,
