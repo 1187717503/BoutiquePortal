@@ -236,9 +236,6 @@ function getFilterFromDom() {
         searchObj.statusText = 'ALL';
     }
 
-
-    console.log(searchObj);
-
     if ($('.orderby.active use').length > 0) {
         searchObj.orderByColmun = $('.orderby.active use').attr('data-order-col');
         searchObj.orderByDesc = $('.orderby.active use').attr('data-order-desc');
@@ -614,4 +611,15 @@ function initActionEvent() {
             }
         });
     });
+
+    $('.remove-tag-icon').click(function() {
+        var tag = $(this).closest('.list-detail-item.tags');
+        tag.remove();
+        removeOneTag(tag.data('tag-id'));
+    })
+
+}
+
+function removeOneTag(tagId) {
+
 }

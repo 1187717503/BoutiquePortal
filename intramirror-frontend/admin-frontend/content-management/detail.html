@@ -142,7 +142,7 @@
                                     <div class="input-field col s7">
                                         <input id="text-sub-title" type="text">
                                         <label for="text-sub-title">Subtitle</label>
-                                    </div>    
+                                    </div>
                                     <div class="input-field col s3">
                                         <input type="color" style="margin-top:16px;width: 100%;height: 30px;" id="backgroup-color" />
                                         <label for="backgroup-color" style="top:-14px;font-size: 0.8rem">Backgroup Color</label>
@@ -152,7 +152,7 @@
                                         <input id="text-sort-order" type="number">
                                         <label for="text-sort-order">Sort Order</label>
                                     </div>
-                                    
+
                                 </div>
                             </div>
                             <div class="col s6">
@@ -167,6 +167,9 @@
                         </div>
                     </div>
 
+                    <div style="margin-top: 16px;">
+                        <textarea name="editor1" id="blockContent"></textarea>
+                    </div>
                     <div class="z-depth-2 hompage-pannel">
                         <div class="hompage-pannel-title">Block Product List</div>
                         <div style="display: flex;">
@@ -239,6 +242,8 @@
     <script type="text/javascript" src="../js/plugins/upload/dropzone.js"></script>
     <script type="text/javascript" src="../js/plugins/nestable/jquery.nestable.js?v=2"></script>
 
+    <script type="text/javascript" src="../js/plugins/ckeditor/ckeditor.js"></script>
+
     <script id="tmpl-block-select" type="text/x-jquery-tmpl">
         <option value=-1 selected disabled>Block</option>
         {%each(i, data) list%}
@@ -248,7 +253,7 @@
 
     <script id="tmpl-product-tags-select" type="text/x-jquery-tmpl">
         <option value=-1>Product Tags</option>
-        {%each(i, data) list%} 
+        {%each(i, data) list%}
             {%if data.tag_id==curTagId%}
                 <option value="${data.tag_id}" selected>${data.tag_name}</option>
             {%else%}
@@ -297,6 +302,15 @@
 
     <script type="text/javascript">
         $(function () {
+
+            CKEDITOR.replace('editor1', {
+                height: 250,
+                extraPlugins: 'colorbutton',
+                colorButton_colors: 'CF5D4E,454545,FFF,CCC,DDD,CCEAEE,66AB16',
+                colorButton_enableAutomatic: false
+                // filebrowserImageUploadUrl: requestURL.uploadImage.url
+            });
+
             initDragger();
             initBlock();
             initUpload();
