@@ -179,12 +179,12 @@ public class AtelierUpdateByStockController  implements InitializingBean {
         paramsMap.put("WISE",WISE);
 
         Map<String,Object> JUL = new HashMap<>();
-        JUL.put("store_code","JUL");
+        JUL.put("store_code","Julian");
         JUL.put("vendor_id","26");
         JUL.put("vendor_name","Julian");
         JUL.put("eventName","julian更新库存");
         JUL.put("fileUtils",new ApiDataFileUtils("julian","stock_delta_stock"));
-        paramsMap.put("JUL",JUL);
+        paramsMap.put("Julian",JUL);
 
         Map<String,Object> ANDD = new HashMap<>();
         ANDD.put("store_code","ANDD");
