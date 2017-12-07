@@ -39,8 +39,8 @@ function initSelectItems(elemId, tmplId, listData) {
 function getFilterFromDom() {
     let searchObj = {};
 
-    searchObj.modifiedStart = $('#modified-start').val();
-    searchObj.modifiedEnd = $('#modified-end').val();
+    searchObj.modifiedAtFrom = $('#modified-start').val();
+    searchObj.modifiedAtTo = $('#modified-end').val();
     searchObj.blockName = $('#text-blockName').val();
     searchObj.status = $('#select-status').val();
     searchObj.tagId = $('#select-tag').val();
@@ -56,35 +56,40 @@ function getFilterFromDom() {
 }
 
 function getBlockList(pageno) {
-    let pagesize = localStorage.getItem('content-page-size');
+    let pagesize = localStorage.getItem('block-page-size');
 
     if (pagesize == null) {
         pagesize = 25;
-        localStorage.setItem('content-page-size', 25);
+        localStorage.setItem('block-page-size', 25);
     }
 
     let searchObj = getFilterFromDom();
 
     var filter = '?';
-    // if (searchObj.boutique !== '-1' && typeof(searchObj.boutique) !== 'undefined' && searchObj.boutique !== '') {
-    //     filter += 'vendorId='+ searchObj.boutique + '&';
-    // }
+    filter += 'tagId='+ searchObj.tagId + '&';
 
-    if (searchObj.orderByColmun) {
-        filter += 'orderBy='+ searchObj.orderByColmun + '&';
-        filter += 'desc='+ searchObj.orderByDesc + '&';
+    if (searchObj.blockName) {
+        filter += 'blockName='+ searchObj.designerId + '&';
     }
 
-    //App3.0 add
-    let obj = transDateRange(searchObj.modifiedStart, searchObj.modifiedEnd, "Last Modified");
+    if (searchObj.status !== '-1') {
+        filter += 'status='+ searchObj.status + '&';
+    }
+
+    let obj = transDateRange(searchObj.modifiedAtFrom, searchObj.modifiedAtTo, "Last Modified");
     if(obj.dStart != undefined && obj.dEnd != undefined) {
         
-        filter += 'saleAtFrom='+ obj.dStart + '&';
-        filter += 'saleAtTo='+ obj.dEnd + '&';
+        filter += 'modifiedAtFrom='+ obj.dStart + '&';
+        filter += 'modifiedAtTo='+ obj.dEnd + '&';
     }else if (obj.dStart == undefined && obj.dEnd == undefined) {
         ;
     }else {
         return false;
+    }
+
+    if (searchObj.orderByColmun) {
+        filter += 'orderBy='+ searchObj.orderByColmun + '&';
+        filter += 'desc='+ searchObj.orderByDesc + '&';
     }
 
     if (pagesize) {
@@ -95,8 +100,6 @@ function getBlockList(pageno) {
         filter += 'pageNo='+ pageno + '&';
     }
 
-    filter += 'tagId='+ searchObj.tagId + '&';
-
     filter = filter.slice(0, filter.length - 1);
 
     loading();
@@ -105,59 +108,55 @@ function getBlockList(pageno) {
     $('#block-head-list').empty();
     $('.pagination').empty();
     $("#block-head-cbx").prop('checked', false);
-    
-    $("#tmpl-block-head-list").tmpl().appendTo("#block-head-list");
 
-    finishLoading();
+    $.ajax({
+        type: requestURL.getBlockTagRel.method,
+        contentType: "application/json",
+        url: requestURL.getBlockTagRel.url + filter,
+        data: {},
+        dataType: 'json',
+        beforeSend: function(request) {
+            request.setRequestHeader("token", token);
+        },
+        success: function(result) {
+            if (result.data == null) {
+                result.data = [];
+            }
 
-    // $.ajax({
-    //     type: requestURL.search.method,
-    //     contentType: "application/json",
-    //     url: requestURL.search.url + "/" + searchObj.status + filter,
-    //     data: {},
-    //     dataType: 'json',
-    //     beforeSend: function(request) {
-    //         request.setRequestHeader("token", token);
-    //     },
-    //     success: function(result) {
-    //         if (result.data == null) {
-    //             result.data = [];
-    //         }
-
-    //         for (var i = 0; i < result.data.length; i++) {
+            for (var i = 0; i < result.data.length; i++) {
                 
-    //         }
+            }
 
-    //         $("#tmpl-block-list").tmpl({list: result.data}).appendTo("#block-list");
-    //         $("#tmpl-block-head-list").tmpl().appendTo("#block-head-list");
+            $("#tmpl-block-list").tmpl({list: result.data}).appendTo("#block-list");
+            $("#tmpl-block-head-list").tmpl().appendTo("#block-head-list");
 
-    //         $('.orderby').each(function() {
-    //             if ($(this).find('.use-icon').data('order-col') == searchObj.orderByColmun) {
-    //                 if (searchObj.orderByDesc == 1) {
-    //                     $(this).find('.use-icon').attr('xlink:href', '#icon-desc');
-    //                     $(this).find('.use-icon').attr('data-order-desc', '1');
-    //                 } else {
-    //                     $(this).find('.use-icon').attr('xlink:href', '#icon-asc');
-    //                     $(this).find('.use-icon').attr('data-order-desc', '0');
-    //                 }
-    //                 $(this).addClass('active');
-    //             } else {
-    //                 $(this).find('.use-icon').attr('xlink:href', '#icon-default-order');
-    //             }
-    //         })
+            // $('.orderby').each(function() {
+            //     if ($(this).find('.use-icon').data('order-col') == searchObj.orderByColmun) {
+            //         if (searchObj.orderByDesc == 1) {
+            //             $(this).find('.use-icon').attr('xlink:href', '#icon-desc');
+            //             $(this).find('.use-icon').attr('data-order-desc', '1');
+            //         } else {
+            //             $(this).find('.use-icon').attr('xlink:href', '#icon-asc');
+            //             $(this).find('.use-icon').attr('data-order-desc', '0');
+            //         }
+            //         $(this).addClass('active');
+            //     } else {
+            //         $(this).find('.use-icon').attr('xlink:href', '#icon-default-order');
+            //     }
+            // })
 
-    //         initActionEvent();
-    //         finishLoading();
-    //         getCountWithFilter(filter, pagesize, pageno, searchObj.statusText);
-    //     }, error: function(result, resp, par) {
-    //         toashWithCloseBtn(result.responseJSON.message);
-    //         finishLoading();
+            // initActionEvent();
+            // finishLoading();
+            // getCountWithFilter(filter, pagesize, pageno, searchObj.statusText);
+        }, error: function(result, resp, par) {
+            toashWithCloseBtn(result.responseJSON.message);
+            finishLoading();
 
-    //         if (result.status == 401) {
-    //             window.location.href = '../../../login'
-    //         }
-    //     }
-    // });
+            if (result.status == 401) {
+                window.location.href = '../../../login'
+            }
+        }
+    });
 }
 
 function getCountWithFilter(filter, pagesize, pageno, statusText){

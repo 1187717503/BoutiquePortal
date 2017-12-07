@@ -52,6 +52,48 @@ input.date-input {
     text-align: center;
 }
 
+.block-list.page-block .item.page-block:nth-child(1) {
+    width: 24px;
+    margin-right: 30px;
+    margin-left: 16px;
+    margin-top: 11.5px
+}
+
+.block-list.page-block .item.page-block:nth-child(2) {
+    width: 10%;
+}
+
+.block-list.page-block .item.page-block:nth-child(3) {
+    width: 10%;
+}
+
+.block-list.page-block .item.page-block:nth-child(4) {
+    width: 8%;
+    text-align: center;
+}
+
+.block-list.page-block .item.page-block:nth-child(5) {
+    width: 8%;
+}
+
+.block-list.page-block .item.page-block:nth-child(6) {
+    width: 10%;
+}
+
+.block-list.page-block .item.page-block:nth-child(7) {
+    width: 6%;
+    text-align: center;
+}
+
+.block-list.page-block .item.page-block:nth-child(8) {
+    width: 10%;
+}
+
+.block-list.page-block .item.page-block:nth-child(9) {
+    width: 5%;
+    text-align: center;
+}
+
 .block-head.page-block .row.page-block {
     display: flex;
 }
