@@ -167,12 +167,14 @@
                         </div>
                     </div>
 
-                    <div style="margin-top: 16px;">
-                        <textarea name="editor1" id="blockContent"></textarea>
-                    </div>
+
                     <div class="z-depth-2 hompage-pannel">
                         <div class="hompage-pannel-title">Block Product List</div>
                         <div style="display: flex;">
+                            <div class="content-editor">
+                                <textarea name="editor1" id="blockContent"></textarea>
+                            </div>
+
                             <div id="left-nestable" class="left-product-list dd">
                                 <!-- to be added by templete-->
                             </div>
@@ -275,7 +277,7 @@
                                 <div class="prod-stock-title">Stock</div>
                             </div>
                             <div class="prod-info-line">
-                                <div class="prod-price-discount">${product.im_discount}%off €${product.im_price}</div>
+                                <div class="prod-price-discount">${product.im_discount}% off €${product.im_price}</div>
                                 <div class="prod-stock">${product.totalStock}</div>
                             </div>
                         </div>
@@ -289,6 +291,9 @@
                                 {%/if%}
                                 {%if product.steet == 1%}
                                 <div class="image-tag">街拍</div>
+                                {%/if%}
+                                {%if product.previewDiscount %}
+                                <div class="off-tag">${product.previewDiscount}% off</div>
                                 {%/if%}
                             </div>
                         </div>

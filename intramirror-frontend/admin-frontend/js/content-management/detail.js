@@ -25,7 +25,7 @@ function initDragger() {
     };
 
     var rightUpdateOutput = function (e) {
-        
+
         var list = e.length ? e : $(e.target),
             output = list.data('output');
 
@@ -243,9 +243,12 @@ function initProductList(curTagId) {
                     if (obj.length > 0) {
                         result.data[i].image = obj[0];
                     }
-                } 
-                
+                }
+
                 result.data[i].im_discount = (result.data[i].im_discount*100).toFixed(0);
+                if (result.data[i].preview_discount) {
+                    result.data[i].previewDiscount = (result.data[i].preview_discount*100).toFixed(0);
+                }
 
                 // 街拍图拿不到
                 result.data[i].steet = 0;
@@ -254,7 +257,7 @@ function initProductList(curTagId) {
                 } else {
                     result.data[i].model = 0;
                 }
-                
+
 
                 if (result.data[i].sort_num == -1) {
 
@@ -296,7 +299,7 @@ function initTagSelect(blockId, curTagId) {
     }
 
 
-    $('#select-product-tag').empty(); 
+    $('#select-product-tag').empty();
     $.ajax({
         type: requestURL.getUnBindTags.method,
         contentType: "application/json",
@@ -307,11 +310,11 @@ function initTagSelect(blockId, curTagId) {
             request.setRequestHeader("token", token);
         },
         success: function(result) {
-            
+
             $('#tmpl-product-tags-select').tmpl({list: result.data, curTagId: curTagId}).appendTo('#select-product-tag');
             $('#select-product-tag').material_select();
             $('#select-product-tag').attr('data-origin-product-id', curTagId);
-            
+
         }, error: function(code, exception) {
 
             if (code.status == 401) {
@@ -325,13 +328,13 @@ function initTagSelect(blockId, curTagId) {
 
 function initBlockDetailInfo(data) {
     var editor = CKEDITOR.instances.blockContent;
-    if (typeof(data.content) != 'undefined' && data.content != '') {    
+    if (typeof(data.content) != 'undefined' && data.content != '') {
         var b = new Base64();
         editor.setData(b.decode(data.content));
     } else {
         editor.setData('');
     }
-    
+
 
     $('#text-title').val(data.title);
     $('#text-english-name').val(data.title_english);
@@ -375,7 +378,7 @@ function getBlockDetail(blockId) {
         success: function(result) {
             initBlockDetailInfo(result.data);
             initTagSelect(blockId, result.data.tag_id);
-            
+
         }, error: function(code, exception) {
             if (code.status == 401) {
                 window.location.href = '../../../login'
@@ -468,7 +471,7 @@ function initEvent() {
 
     $('#modal2 .model-yes').click(function() {
         $('#modal2').closeModal();
-        
+
         let blockId = $('#select-block-name').val();
         $('#select-block-name').attr('data-origin-block-id', blockId);
         getBlockDetail(blockId)
@@ -478,7 +481,7 @@ function initEvent() {
         let oriProductTag = $('#select-product-tag').data('origin-product-id');
         $('#select-product-tag').val(oriProductTag);
         $('#select-product-tag').material_select();
-        
+
         $('#modal1').closeModal();
     })
 
