@@ -46,7 +46,7 @@
 
     <context:property-placeholder location="classpath:/commons.properties"/>
 
-    <bean id="authenticationInterceptor" class="com.intramirror.web.interceptor.AuthenticationInterceptor"/>
+    <bean id="authenticationInterceptor" class="com.intramirror.core.servlet.interceptor.AuthenticationInterceptor"/>
 
     <mvc:interceptors>
         <mvc:interceptor>

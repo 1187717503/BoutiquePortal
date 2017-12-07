@@ -1,4 +1,4 @@
-package com.intramirror.web.interceptor;
+package com.intramirror.core.servlet.interceptor;
 
 import com.intramirror.core.common.exception.StandardExceptions;
 import io.jsonwebtoken.Claims;

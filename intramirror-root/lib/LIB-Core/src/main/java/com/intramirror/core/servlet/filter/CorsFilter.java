@@ -1,4 +1,4 @@
-package com.intramirror.web.filter;
+package com.intramirror.core.servlet.filter;
 
 import java.io.IOException;
 import javax.servlet.Filter;
@@ -27,7 +27,7 @@ public class CorsFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) res;
         HttpServletRequest request = (HttpServletRequest) req;
 
-        LOGGER.info("RequestURI: {} , RequestMethod: {}", request.getRequestURI(), request.getMethod());
+        LOGGER.debug("RequestURI: {} , RequestMethod: {}", request.getRequestURI(), request.getMethod());
 
         if (request.getHeader(HttpHeaders.ORIGIN) != null) {
             response.addHeader("Access-Control-Allow-Origin", "*");
