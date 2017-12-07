@@ -43,10 +43,8 @@ AND v.vendor_name = ('Base Blu') AND b.english_name IN ('Saint Laurent');
 
 /*2017-12-7 排除 Base Blu ***品牌的所有商品*/
 INSERT INTO t_promotion_exclude(vendor_id,brand_id,category_level,category_id)
-SELECT v.vendor_id,b.brand_id,2,-1
-FROM category c,vendor v,brand b
-WHERE c.parent_id IN(
-	SELECT c1.category_id
-	FROM category c1
-	WHERE c1.name = 'Bags' AND c1.enabled = 1) 
-AND v.vendor_name = ('Base Blu') AND b.english_name IN ('Bottega Veneta','Antipast','Oamc','Marc Jacobs');
+SELECT distinct v.vendor_id,b.brand_id,1,-1
+FROM vendor v,brand b
+WHERE v.vendor_name = ('Base Blu') AND b.english_name 
+IN ('Bottega Veneta','Antipast','Oamc','Marc Jacobs','Philipp Plein','Philipp Plein Sport','Puma','Calvin Klein','Sacai')
+and b.enabled = 1;

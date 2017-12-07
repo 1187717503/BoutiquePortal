@@ -133,7 +133,7 @@ function initCategory() {
 
 
 function initSeason() {
-    
+
     $.ajax({
         type: requestURL.getSeason.method,
         contentType: "application/json",
@@ -155,7 +155,7 @@ function initSeason() {
 }
 
 function initTag() {
-    
+
     $.ajax({
         type: requestURL.getTag.method,
         contentType: "application/json",
@@ -167,7 +167,7 @@ function initTag() {
         },
         success: function(result) {
             initSelectItems('select-tag', 'tmpl-tag-select', result.data);
-            initSelectItems('select-apply-tag', 'tmpl-apply-tag-select', result.data);          
+            initSelectItems('select-apply-tag', 'tmpl-apply-tag-select', result.data);
         }, error: function(code, exception) {
 
             if (code.status == 401) {
@@ -219,7 +219,7 @@ function getFilterFromDom() {
     //App3.0 new added
     searchObj.minBoutiqueDiscount = $('#boutique-discount-left').val();
     searchObj.maxBoutiqueDiscount = $('#boutique-discount-right').val();
-    
+
     searchObj.minIMDiscount = $('#im-discount-left').val();
     searchObj.maxIMDiscount = $('#im-discount-right').val();
 
@@ -314,7 +314,7 @@ function getProdcutList(pageno) {
 
     let obj = transDateRange(searchObj.saleAtFrom, searchObj.saleAtTo, "Sale At");
     if(obj.dStart != undefined && obj.dEnd != undefined) {
-        
+
         filter += 'saleAtFrom='+ obj.dStart + '&';
         filter += 'saleAtTo='+ obj.dEnd + '&';
     }else if (obj.dStart == undefined && obj.dEnd == undefined) {
@@ -344,7 +344,7 @@ function getProdcutList(pageno) {
     $('#order-head-list').empty();
     $('.pagination').empty();
     $("#order-head-cbx").prop('checked', false);
-    
+
     $.ajax({
         type: requestURL.search.method,
         contentType: "application/json",
@@ -402,7 +402,7 @@ function getProdcutList(pageno) {
                 } else {
                     result.data[i].im_discount = Math.round(result.data[i].im_discount * 100) + '%';
                 }
-                
+
                 if (!result.data[i].sale_discount) {
                     result.data[i].sale_discount = '';
                 } else {
@@ -474,7 +474,7 @@ function getCountWithFilter(filter, pagesize, pageno, statusText){
 
 function showDetail() {
     if ($(this).hasClass("head-hide-icon")) {
-        
+
         $(this).toggleClass("mdi-hardware-keyboard-arrow-down");
         $(this).toggleClass("mdi-hardware-keyboard-arrow-right");
 
@@ -489,9 +489,9 @@ function showDetail() {
             $(".product-list .hide-icon").addClass("mdi-hardware-keyboard-arrow-down");
             $(".product-list .goods").removeClass("show-detail");
         }
-        
+
     } else {
-        
+
         $(this).toggleClass("mdi-hardware-keyboard-arrow-down");
         $(this).toggleClass("mdi-hardware-keyboard-arrow-right");
         $(this).parent().parent().next().toggleClass("show-detail");
@@ -550,7 +550,7 @@ function initActionEvent() {
         $(this).addClass('active');
 
         getProdcutList(1);
-        
+
     })
 
     // 展示图片
@@ -561,7 +561,7 @@ function initActionEvent() {
         for (var i = 0; i < images.length; i++) {
             itemsValue.push({"src": images[i]});
         }
-     
+
         $.magnificPopup.open({
             items: itemsValue,
             type: 'image',
@@ -586,7 +586,7 @@ function initActionEvent() {
         if (shopProductId.length !== 0) {
             param.shopProductId = shopProductId;
         }
-        
+
         $.ajax({
             type: requestURL.productAction.method,
             contentType: "application/json",
@@ -614,12 +614,143 @@ function initActionEvent() {
 
     $('.remove-tag-icon').click(function() {
         var tag = $(this).closest('.list-detail-item.tags');
-        tag.remove();
-        removeOneTag(tag.data('tag-id'));
-    })
+        let tagId = tag.data('tag-id');
+        let productId = tag.data('product-id');
+        let reqUrl = requestURL.delTagFromProduct.url;
+        reqUrl = reqUrl.replace("{tagId}", tagId);
+        reqUrl = reqUrl.replace("{productId}", productId);
+        // tags/{tagId}/products/{productId}
+        $.ajax({
+            type: requestURL.delTagFromProduct.method,
+            contentType: "application/json",
+            url: reqUrl,
+            data: {},
+            dataType: 'json',
+            beforeSend: function(request) {
+                request.setRequestHeader("token", token);
+            },
+            success: function(result) {
+                tag.remove();
+            }, error: function(result, resp, par) {
+                if (result.status == 401) {
+                    window.location.href = '../../../login';
+                } else {
+                    toashWithCloseBtn(result.responseJSON.message);
+                }
+            }
+        });
 
+    })
 }
 
-function removeOneTag(tagId) {
 
+function getCheckedParam() {
+    let param = {};
+    param.productIdList = [];
+    param.tagId = $('#select-apply-tag').val();
+    param.sortNum = -1;
+
+    let count = 0;
+    $('.product-list .item input[type=checkbox]').each(function(idx, item) {
+        if ($(item).prop('checked')) {
+            param.productIdList.push($(item).data('product-id'));
+            count++;
+        }
+    })
+
+    if (param.tagId == -1) {
+        Materialize.toast('Please select tag', 3000);
+        return false;
+    }
+    if (count == 0) {
+        Materialize.toast('Please select at least one product', 3000);
+        return false;
+    }
+    return param;
+}
+
+function initBatchAction() {
+    $('#apply-tag-btn').click(function() {
+        let param = getCheckedParam();
+        if (!param) {
+            return;
+        }
+
+        loading();
+        $.ajax({
+            type: requestURL.applyTag.method,
+            contentType: "application/json",
+            url: requestURL.applyTag.url.replace("{tagId}",param.tagId),
+            data: JSON.stringify(param),
+            dataType: 'json',
+            beforeSend: function(request) {
+                request.setRequestHeader("token", token);
+            },
+            success: function(result) {
+                Materialize.toast('Apply Tag Success', 3000);
+                // 获取当前页数
+                let current = $('.pagination .active.pagination-index').data('pageno') + 1;
+                getProdcutList(current);
+                finishLoading()
+            }, error: function(result, resp, par) {
+                toashWithCloseBtn(result.responseJSON.message);
+                finishLoading()
+                if (result.status == 401) {
+                    window.location.href = '../../../login';
+                }
+            }
+        });
+
+    });
+
+
+    $('#remove-tag-btn').click(function() {
+        let param = [];
+
+        let tagId = $('#select-apply-tag').val();
+
+        let count = 0;
+        $('.product-list .item input[type=checkbox]').each(function(idx, item) {
+            if ($(item).prop('checked')) {
+                param.push({"productId": $(item).data('product-id'), "tagId" : tagId});
+                count++;
+            }
+        })
+
+        if (param.tagId == -1) {
+            Materialize.toast('Please select tag', 3000);
+            return false;
+        }
+        if (count == 0) {
+            Materialize.toast('Please select at least one product', 3000);
+            return false;
+        }
+
+        loading();
+        $.ajax({
+            type: requestURL.delTagForProducts.method,
+            contentType: "application/json",
+            url: requestURL.delTagForProducts.url.replace("{tagId}", tagId),
+            data: JSON.stringify(param),
+            dataType: 'json',
+            beforeSend: function(request) {
+                request.setRequestHeader("token", token);
+            },
+            success: function(result) {
+                Materialize.toast('Remove Tag Success', 3000);
+                // 获取当前页数
+                let current = $('.pagination .active.pagination-index').data('pageno') + 1;
+                getProdcutList(current);
+                finishLoading()
+            }, error: function(result, resp, par) {
+                finishLoading()
+                if (result.status == 401) {
+                    window.location.href = '../../../login';
+                }  else {
+                   toashWithCloseBtn(result.responseJSON.message);
+                }
+            }
+        });
+
+    });
 }

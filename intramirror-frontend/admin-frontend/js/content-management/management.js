@@ -1,6 +1,6 @@
 
 function initTag() {
-    
+
     $.ajax({
         type: requestURL.getTag.method,
         contentType: "application/json",
@@ -82,7 +82,7 @@ function getBlockList(pageno) {
 
     let obj = transDateRange(searchObj.modifiedAtFrom, searchObj.modifiedAtTo, "Last Modified");
     if(obj.dStart != undefined && obj.dEnd != undefined) {
-        
+
         filter += 'modifiedAtFrom='+ obj.dStart + '&';
         filter += 'modifiedAtTo='+ obj.dEnd + '&';
     }else if (obj.dStart == undefined && obj.dEnd == undefined) {
@@ -227,6 +227,63 @@ function initActionEvent() {
         $(this).addClass('active');
 
         getProdcutList(1);
-        
+
     })
+}
+
+function updateBlock(action) {
+  let msg = '';
+  let status = 0;
+  if(activate == 'activate') {
+    msg = 'Activate Block Success';
+    status = 1;
+  } else {
+    msg = 'De-Activate Block Success';
+    status = 0;
+  }
+
+  let blockList = [];
+  let count = 0;
+  $('.block-list .item input[type=checkbox]').each(function(idx, item) {
+      if ($(item).prop('checked')) {
+          let param = {};
+          param.blockId = $(item).data('block-id');
+          param.status = status;
+          blockList.push(param);
+          count++;
+      }
+  })
+
+  if (count == 0) {
+      Materialize.toast('Please select at least one block', 3000);
+      return;
+  }
+
+  console.log(blockList);
+
+  loading();
+  $.ajax({
+      type: requestURL.activateBlock.method,
+      contentType: "application/json",
+      url: requestURL.activateBlock.url,
+      data: JSON.stringify(blockList),
+      dataType: 'json',
+      beforeSend: function(request) {
+          request.setRequestHeader("token", token);
+      },
+      success: function(result) {
+          Materialize.toast(msg, 3000);
+          // 获取当前页数
+          // let current = $('.pagination .active.pagination-index').data('pageno') + 1;
+          // getProdcutList(current);
+          getProdcutList(1);
+          finishLoading();
+      }, error: function(result, resp, par) {
+          toashWithCloseBtn(result.responseJSON.message);
+          finishLoading();
+          if (result.status == 401) {
+              window.location.href = '../../../login';
+          }
+      }
+  });
 }
