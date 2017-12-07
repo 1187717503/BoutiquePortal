@@ -16,6 +16,6 @@ var requestURL = {
     "uploadImage": {"url" : baseUrl + "file", "method":"POST"},
     "getBlockDetail": {"url": baseUrl + "content/blocks/{blockId}", "method" : "GET"},
     "getUnBindTags": {"url" : baseUrl + "content/tags/unbind", "method": "GET"},
-    "saveBlock" : {"url" : baseUrl + "content/operation/save", "method" : "PUT"}
+    "saveBlock" : {"url" : baseUrl + "content/operation/save", "method" : "PUT"},
     "getBlockTagRel" : {"url" : baseUrl + "content/blocks", "method" : "GET"}
 }

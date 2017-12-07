@@ -107,39 +107,44 @@
             <div class="container">
                 <div class="filter">
                     <div class="row">
-                    	<div class="col s3 has-labe-input" style="position: relative;width:21%;min-width: 380px;">
-                            <i class="mdi-editor-insert-invitation"></i>
-                            <label style="position: absolute;top: -14px;">Last Modified</label>
-                            <input id="modified-start" class="date-input sale-datepicker" type="text" readonly="true">
-                            <label class="center-label-text">~</label>
-                            <input id="modified-end" class="date-input sale-datepicker" type="text" readonly="true">
-                        </div>
+                    	<div style="display: flex;">
+                    		<div class="col s3" style="width: 380px;margin-left: 0px;">
+		                    	<div class="has-labe-input" style="position: relative;width:21%;">
+		                            <i class="mdi-editor-insert-invitation"></i>
+		                            <label style="position: absolute;top: -14px;">Last Modified</label>
+		                            <input id="modified-start" class="date-input sale-datepicker" type="text" readonly="true">
+		                            <label class="center-label-text">~</label>
+		                            <input id="modified-end" class="date-input sale-datepicker" type="text" readonly="true">
+		                        </div>
+							</div>
+							<div class="col s6" style="margin-left: 0px;padding-left: 11px;">
+		                        <div class="input-field col s4">
+		                            <input id="text-blockName" type="text" class="validate">
+		                            <label for="text-blockName">Block Name</label>
+		                        </div>
 
-                        <div class="input-field col s2">
-                            <input id="text-blockName" type="text" class="validate">
-                            <label for="text-blockName">Block Name</label>
-                        </div>
+		                        <div class="input-field col s4">
+		                            <select id="select-status">
+		                            	<option value="-1" selected>All</option>
+		                                <option value="1">Active</option>
+		                                <option value="0">Inactive</option>
+		                            </select>
+		                            <label for="select-status">Status</label>
+		                        </div>
 
-                        <div class="input-field col s2">
-                            <select id="select-status">
-                            	<option value="-1" selected>All</option>
-                                <option value="1">Active</option>
-                                <option value="0">Inactive</option>
-                            </select>
-                            <label for="select-status">Status</label>
-                        </div>
-
-                        <div class="input-field col s2">
-                            <select id="select-tag">
-                            </select>
-                            <label for="select-tag">Product Tags</label>
-                        </div>
-
-                        <div class="col s2 content-seach-btn">
-                            <a id="search-btn" class="waves-effect waves-light btn">Search</a>
-                            <a id="cancel-btn" class="waves-effect waves-light btn btn-gray">Reset</a>
-                        </div>
-
+		                        <div class="input-field col s4">
+		                            <select id="select-tag">
+		                            </select>
+		                            <label for="select-tag">Product Tags</label>
+		                        </div>
+		                    </div>
+							<div class="col s3" style="margin-left: 0px;padding-left: 11px;min-width: 266px;">
+		                        <div class="content-seach-btn">
+		                            <a id="search-btn" class="waves-effect waves-light btn">Search</a>
+		                            <a id="cancel-btn" class="waves-effect waves-light btn btn-gray">Reset</a>
+		                        </div>
+	                        </div>
+						</div>
                     </div>
                 </div>
                 <!--end filter-->
@@ -185,11 +190,11 @@
 
 <!-- Public js, should be include first -->
 <script type="text/javascript" src="../js/base.js?v=1.0"></script>
-<script type="text/javascript" src="../js/restful.js?v=1.0"></script>
+<script type="text/javascript" src="../js/restful.js?v=2.0"></script>
 <script type="text/javascript" src="../js/common.js?v=1.0"></script>
 
 
-<script type="text/javascript" src="../js/content-management/management.js?v=2.0"></script>
+<script type="text/javascript" src="../js/content-management/management.js?v=3.0"></script>
 
 <!-- jQuery Library -->
 <script type="text/javascript" src="../js/plugins/jquery-1.11.2.min.js"></script>
@@ -244,22 +249,20 @@
 
 <script id="tmpl-block-list" type="text/x-jquery-tmpl">
     {%each(i, block) list%}
-    <div class="block-list">
-        <div class="row style-scope page-block">
-            <div class="item style-scope page-block">
-                <input type="checkbox" class="filled-in" id="block-id-${block.block_id}"/>
-                <label for="block-id-${block.block_id}"></label>
-            </div>
-            <div class="item style-scope page-block">${block.block_id}</div>
-            <div class="item style-scope page-block">${block.block_name}</div>
-            <div class="item style-scope page-block">${block.status}</div>
-            <div class="item style-scope page-block">${block.modified_at}</div>
-            <div class="item style-scope page-block">${block.title}</div>
-            <div class="item style-scope page-block">${block.tag_name}</div>
-            <div class="item style-scope page-block">${block.sort_order}</div>
-            <div class="item style-scope page-block action" data-block-id="${block.block_id}">
-                
-            </div>
+    <div class="row style-scope page-block">
+        <div class="item style-scope page-block">
+            <input type="checkbox" class="filled-in" id="block-id-${block.block_id}"/>
+            <label for="block-id-${block.block_id}"></label>
+        </div>
+        <div class="item style-scope page-block">${block.block_id}</div>
+        <div class="item style-scope page-block">${block.block_name}</div>
+        <div class="item style-scope page-block">${block.status}</div>
+        <div class="item style-scope page-block">${block.modified_at}</div>
+        <div class="item style-scope page-block">${block.title}</div>
+        <div class="item style-scope page-block">${block.tag_name}</div>
+        <div class="item style-scope page-block">${block.sort_order}</div>
+        <div class="item style-scope page-block action" data-block-id="${block.block_id}">
+            
         </div>
     </div>
     {%/each%}

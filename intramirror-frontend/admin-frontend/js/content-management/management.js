@@ -1,3 +1,4 @@
+
 function initTag() {
     
     $.ajax({
@@ -66,7 +67,10 @@ function getBlockList(pageno) {
     let searchObj = getFilterFromDom();
 
     var filter = '?';
-    filter += 'tagId='+ searchObj.tagId + '&';
+
+    if (searchObj.tagId !== '-1') {
+        filter += 'tagId='+ searchObj.tagId + '&';
+    }
 
     if (searchObj.blockName) {
         filter += 'blockName='+ searchObj.designerId + '&';
@@ -124,7 +128,11 @@ function getBlockList(pageno) {
             }
 
             for (var i = 0; i < result.data.length; i++) {
-                
+                if (!result.data[i].status) {
+                    result.data[i].status = 'Inactive';
+                } else {
+                   result.data[i].status = 'Active';
+                }
             }
 
             $("#tmpl-block-list").tmpl({list: result.data}).appendTo("#block-list");
@@ -146,7 +154,7 @@ function getBlockList(pageno) {
             // })
 
             // initActionEvent();
-            // finishLoading();
+            finishLoading();
             // getCountWithFilter(filter, pagesize, pageno, searchObj.statusText);
         }, error: function(result, resp, par) {
             toashWithCloseBtn(result.responseJSON.message);
