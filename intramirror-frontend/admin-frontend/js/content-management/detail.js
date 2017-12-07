@@ -71,7 +71,7 @@ function adjustRightSeqNo() {
 }
 
 function saveBlock() {
-    
+
     let param = {};
 
     param.block = {};
@@ -138,6 +138,10 @@ function saveBlock() {
         Materialize.toast('Sort order must be large then 0', 3000);
         return;
     }
+
+    var editor = CKEDITOR.instances.blockContent;
+    var b = new Base64();
+    param.block.content = b.encode(editor.getData());
 
 
     param.sort = []
@@ -320,6 +324,14 @@ function initTagSelect(blockId, curTagId) {
 }
 
 function initBlockDetailInfo(data) {
+    var editor = CKEDITOR.instances.blockContent;
+    if (typeof(data.content) != 'undefined' && data.content != '') {    
+        var b = new Base64();
+        editor.setData(b.decode(data.content));
+    } else {
+        editor.setData('');
+    }
+    
 
     $('#text-title').val(data.title);
     $('#text-english-name').val(data.title_english);
