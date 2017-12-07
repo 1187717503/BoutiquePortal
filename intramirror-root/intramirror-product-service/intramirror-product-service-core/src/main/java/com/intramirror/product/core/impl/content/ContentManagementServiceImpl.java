@@ -103,7 +103,7 @@ public class ContentManagementServiceImpl implements ContentManagementService {
     @Override
     @Transactional
     public int batchUpdateBlock(List<Block> record) {
-        return blockMapper.batchUpdateBlock(record);
+        return blockMapper.batchUpdateBlock(record.get(0).getStatus(),record);
     }
 
     @Override

@@ -289,41 +289,82 @@
     <update id="batchUpdateBlock">
         update block
         <set>
-            <if test="blockName != null">
-                block_name = #{blockName,jdbcType=VARCHAR},
-            </if>
-            <if test="status != null">
-                status = #{status,jdbcType=TINYINT},
-            </if>
-            <if test="title != null">
-                title = #{title,jdbcType=VARCHAR},
-            </if>
-            modified_at = now(),
-            <if test="bgColor != null">
-                bg_color = #{bgColor,jdbcType=CHAR},
-            </if>
-            <if test="subtitle != null">
-                subtitle = #{subtitle,jdbcType=VARCHAR},
-            </if>
-            <if test="titleEnglish != null">
-                title_english = #{titleEnglish,jdbcType=VARCHAR},
-            </if>
-            <if test="enabled != null">
-                enabled = #{enabled,jdbcType=BIT},
-            </if>
-            <if test="content != null">
-                content = #{content,jdbcType=LONGVARBINARY},
-            </if>
-            <if test="coverImg != null">
-                cover_img = #{coverImg,jdbcType=VARCHAR},
-            </if>
+            <!--<if test="colum.blockName != null">-->
+            <!--block_name = #{blockName,jdbcType=VARCHAR},-->
+            <!--</if>-->
+            <!--<if test="colum.status != null">-->
+            <!--status = #{status,jdbcType=TINYINT},-->
+            <!--</if>-->
+            <!--<if test="colum.title != null">-->
+            <!--title = #{title,jdbcType=VARCHAR},-->
+            <!--</if>-->
+            status = #{status,jdbcType=TINYINT},
+            modified_at = now()
+            <!--<if test="colum.bgColor != null">-->
+                <!--bg_color = #{bgColor,jdbcType=CHAR},-->
+            <!--</if>-->
+            <!--<if test="colum.subtitle != null">-->
+                <!--subtitle = #{subtitle,jdbcType=VARCHAR},-->
+            <!--</if>-->
+            <!--<if test="colum.titleEnglish != null">-->
+                <!--title_english = #{titleEnglish,jdbcType=VARCHAR},-->
+            <!--</if>-->
+            <!--<if test="colum.enabled != null">-->
+                <!--enabled = #{enabled,jdbcType=BIT},-->
+            <!--</if>-->
+            <!--<if test="colum.content != null">-->
+                <!--content = #{content,jdbcType=LONGVARBINARY},-->
+            <!--</if>-->
+            <!--<if test="colum.coverImg != null">-->
+                <!--cover_img = #{coverImg,jdbcType=VARCHAR},-->
+            <!--</if>-->
         </set>
         WHERE block_id IN
-        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+        <foreach item="item" index="index" collection="blockList" open="(" separator="," close=")">
             #{item.blockId}
         </foreach>
         AND enabled = TRUE;
     </update>
+
+
+    <!--<update id="updateBatch" parameterType="list">-->
+    <!--update block-->
+    <!--<trim prefix="set" suffixOverrides=",">-->
+    <!--<trim prefix="peopleId =case" suffix="end,">-->
+    <!--<foreach collection="list" item="i" index="index">-->
+    <!--<if test="i.peopleId!=null">-->
+    <!--when id=#{i.id} then #{i.peopleId}-->
+    <!--</if>-->
+    <!--</foreach>-->
+    <!--</trim>-->
+    <!--<trim prefix=" roadgridid =case" suffix="end,">-->
+    <!--<foreach collection="list" item="i" index="index">-->
+    <!--<if test="i.roadgridid!=null">-->
+    <!--when id=#{i.id} then #{i.roadgridid}-->
+    <!--</if>-->
+    <!--</foreach>-->
+    <!--</trim>-->
+
+    <!--<trim prefix="type =case" suffix="end,">-->
+    <!--<foreach collection="list" item="i" index="index">-->
+    <!--<if test="i.type!=null">-->
+    <!--when id=#{i.id} then #{i.type}-->
+    <!--</if>-->
+    <!--</foreach>-->
+    <!--</trim>-->
+    <!--<trim prefix="unitsid =case" suffix="end,">-->
+    <!--<foreach collection="list" item="i" index="index">-->
+    <!--<if test="i.unitsid!=null">-->
+    <!--when id=#{i.id} then #{i.unitsid}-->
+    <!--</if>-->
+    <!--</foreach>-->
+    <!--</trim>-->
+    <!--</trim>-->
+    <!--where-->
+    <!--<foreach collection="list" separator="or" item="i" index="index">-->
+    <!--id=#{i.id}-->
+    <!--</foreach>-->
+    <!--</update>-->
 
     <select id="listAllBlock" resultMap="BaseResultMap">
         SELECT
