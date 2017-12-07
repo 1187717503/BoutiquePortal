@@ -396,7 +396,7 @@
             $.ajax({
                 type: requestURL.applyTag.method,
                 contentType: "application/json",
-                url: requestURL.applyTag.url,
+                url: requestURL.applyTag.url.replace("{tagId}",param.tagId),
                 data: JSON.stringify(param),
                 dataType: 'json',
                 beforeSend: function(request) {

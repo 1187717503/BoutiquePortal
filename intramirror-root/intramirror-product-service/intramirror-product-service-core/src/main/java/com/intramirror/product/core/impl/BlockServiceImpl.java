@@ -29,6 +29,13 @@ public class BlockServiceImpl implements BlockService {
     }
 
     @Override
+    public int createBlock(Block block) {
+        block.setStatus((byte) 0);
+        block.setEnabled(true);
+        return blockMapper.insert(block);
+    }
+
+    @Override
     public int updateByBlockId(Block record) {
         return blockMapper.updateByBlockId(record);
     }

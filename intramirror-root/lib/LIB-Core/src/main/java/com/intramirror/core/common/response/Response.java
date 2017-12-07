@@ -1,5 +1,7 @@
 package com.intramirror.core.common.response;
 
+import java.util.ArrayList;
+
 /**
  * Created on 2017/10/26.
  *
@@ -52,7 +54,7 @@ public class Response {
         }
 
         public Response build() {
-            return data(null);
+            return data(new ArrayList<>());
         }
 
         public Response data(Object data) {

@@ -3,6 +3,7 @@ package com.intramirror.web.controller.content;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.product.api.model.Block;
 import com.intramirror.product.api.model.Tag;
+import com.intramirror.product.api.model.TagProductRel;
 import com.intramirror.product.api.service.BlockService;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ITagService;
@@ -66,18 +67,20 @@ public class ContentMgntController {
 
     @PostMapping(value = "/blocks", consumes = "application/json")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public Response createBlock() {
-        return Response.status(StatusType.SUCCESS).data("");
+    public Response createBlock(@RequestBody Block block) {
+        blockService.createBlock(block);
+        return Response.success();
     }
 
     @PutMapping(value = "/blocks/{blockId}", consumes = "application/json")
     public Response updateBlock(@PathVariable Long blockId, @RequestBody Block block) {
         block.setBlockId(blockId);
-        return Response.status(StatusType.SUCCESS).data(contentManagementService.updateBlockByBlockId(block));
+        contentManagementService.updateBlockByBlockId(block);
+        return Response.success();
     }
 
     @PutMapping(value = "/blocks", consumes = "application/json")
-    public Response updateBlock( @RequestBody List<Block> blocks) {
+    public Response updateBlock(@RequestBody List<Block> blocks) {
         return Response.status(StatusType.SUCCESS).data(contentManagementService.batchUpdateBlock(blocks));
     }
 
@@ -88,24 +91,30 @@ public class ContentMgntController {
         return Response.success();
     }
 
+    @GetMapping(value = "/tags", produces = "application/json")
+    public Response listTags() {
+        return Response.status(StatusType.SUCCESS).data(iTagService.getTags());
+    }
+
     @DeleteMapping(value = "/tags/{tagId}")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public Response deleteTag(@PathVariable Long tagId) {
         contentManagementService.deleteTag(tagId);
         return Response.success();
     }
 
-    @GetMapping(value = "/block/detail", produces = "application/json")
-    public Response getContentDetail(@RequestParam(value = "blockId") Long blockId) {
+    @GetMapping(value = "/blocks/{blockId}", produces = "application/json")
+    public Response getBlocksDetail(@PathVariable Long blockId) {
         return Response.status(StatusType.SUCCESS).data(contentManagementService.getBlockWithTagByBlockId(blockId));
     }
 
-    @GetMapping(value = "/block/list", produces = "application/json")
+    @GetMapping(value = "/blocks/simple", produces = "application/json")
     public Response listBlockSimple() {
         return Response.status(StatusType.SUCCESS).data(blockService.listSimpleBlock());
     }
 
-    @GetMapping(value = "/tag/products", produces = "application/json")
-    public Response listProductByTag(@RequestParam(value = "tagId") Long tagId) {
+    @GetMapping(value = "/tags/{tagId}/products", produces = "application/json")
+    public Response listProductByTag(@PathVariable(value = "tagId") Long tagId) {
         List<Map<String, Object>> productList = contentManagementService.listTagProductInfo(tagId);
         if (productList.size() > 0) {
             appendInfo(productList);
@@ -113,9 +122,22 @@ public class ContentMgntController {
         return Response.status(StatusType.SUCCESS).data(productList);
     }
 
-    @PostMapping(value = "/savetagproductrel", consumes = "application/json")
-    public Response saveTagProductRel(@RequestBody Map<String, Object> body) {
-        Long tagId = body.get("tagId") == null ? null : Long.parseLong(body.get("tagId").toString());
+    @DeleteMapping(value = "/tags/{tagId}/products/{productId}")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public Response removeTagProduct(@PathVariable(value = "tagId") Long tagId, @PathVariable(value = "productId") Long productId) {
+        contentManagementService.deleteByTagIdAndProductId(tagId, productId);
+        return Response.success();
+    }
+
+    @DeleteMapping(value = "/tags/{tagId}/products")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public Response removeTagProduct(@RequestBody List<TagProductRel> tagProductRelList) {
+        contentManagementService.batchDeleteByTagIdAndProductId(tagProductRelList);
+        return Response.success();
+    }
+
+    @PostMapping(value = "/tags/{tagId}/products", consumes = "application/json")
+    public Response saveTagProductRel(@PathVariable(value = "tagId") Long tagId, @RequestBody Map<String, Object> body) {
         Long sortNum = body.get("sortNum") == null ? -1 : Long.parseLong(body.get("sortNum").toString());
         List<String> productIdList = (List<String>) body.get("productIdList");
 
@@ -131,12 +153,7 @@ public class ContentMgntController {
         return Response.success();
     }
 
-    @GetMapping(value = "/tag/list", produces = "application/json")
-    public Response listTags() {
-        return Response.status(StatusType.SUCCESS).data(iTagService.getTags());
-    }
-
-    @GetMapping(value = "/tag/list/unbind", produces = "application/json")
+    @GetMapping(value = "/tags/unbind", produces = "application/json")
     public Response listUnbindTags(@RequestParam(value = "blockId", required = false) Long blockId) {
         return Response.status(StatusType.SUCCESS).data(contentManagementService.listUnbindTag(blockId));
     }

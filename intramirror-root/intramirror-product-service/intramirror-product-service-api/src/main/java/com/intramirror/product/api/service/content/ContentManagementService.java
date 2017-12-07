@@ -38,4 +38,8 @@ public interface ContentManagementService {
 
     int deleteTag(Long tagId);
 
+    int deleteByTagIdAndProductId(Long tagId, Long productId);
+
+    int batchDeleteByTagIdAndProductId(List<TagProductRel> listTagProductRel);
+
 }

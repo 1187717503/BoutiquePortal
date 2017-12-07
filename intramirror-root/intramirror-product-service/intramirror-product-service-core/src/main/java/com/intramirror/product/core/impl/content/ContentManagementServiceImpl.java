@@ -120,6 +120,18 @@ public class ContentManagementServiceImpl implements ContentManagementService {
         return tagMapper.deleteByPrimaryKey(tagId);
     }
 
+    @Override
+    @Transactional
+    public int deleteByTagIdAndProductId(Long tagId, Long productId) {
+        return tagProductRelMapper.deleteByTagIdAndProductId(tagId, productId);
+    }
+
+    @Override
+    @Transactional
+    public int batchDeleteByTagIdAndProductId(List<TagProductRel> listTagProductRel) {
+        return tagProductRelMapper.batchDeleteByTagIdAndProductId(listTagProductRel);
+    }
+
     private int updateBlock(Block block) {
         List<Block> blockList = blockMapper.listBlockBySort(block.getSortOrder());
         blockMapper.updateByBlockId(block);
