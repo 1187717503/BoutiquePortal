@@ -73,6 +73,7 @@ public class PriceChangeRuleController extends BaseController{
 	private ISystemPropertyService iSystemPropertyService;
 
 	@RequestMapping("/run/im")
+	@ResponseBody
 	public Response runIm(@Param("price_change_rule_id") String price_change_rule_id) throws Exception{
 		PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
 		priceChangeRule.updateAdminPrice(pcrModel.getVendorId());
@@ -95,6 +96,7 @@ public class PriceChangeRuleController extends BaseController{
 	}
 
 	@RequestMapping("/run/boutique")
+	@ResponseBody
 	public Response runBoutique(@Param("price_change_rule_id") String price_change_rule_id) throws Exception{
 		PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
 		priceChangeRule.updateVendorPrice(pcrModel.getVendorId());
