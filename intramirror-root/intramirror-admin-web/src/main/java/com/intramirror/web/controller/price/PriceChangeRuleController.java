@@ -8,6 +8,7 @@ import com.intramirror.common.enums.SystemPropertyEnum;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.common.parameter.StatusType;
+import com.intramirror.core.common.response.Response;
 import com.intramirror.product.api.model.PriceChangeRule;
 import com.intramirror.product.api.model.PriceChangeRuleCategoryBrand;
 import com.intramirror.product.api.model.PriceChangeRuleGroup;
@@ -70,7 +71,51 @@ public class PriceChangeRuleController extends BaseController{
 
 	@Autowired
 	private ISystemPropertyService iSystemPropertyService;
-	
+
+	@RequestMapping("/run/im")
+	public Response runIm(@Param("price_change_rule_id") String price_change_rule_id) throws Exception{
+		PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
+		priceChangeRule.updateAdminPrice(pcrModel.getVendorId());
+
+		// sku.im_price -> shop_product_sku.sale_price
+		priceChangeRule.updateShopPrice();
+
+		// shop_product_sku.sale_price -> shop_product.min_sale_price,shop_product.max_sale_price
+		priceChangeRule.updateShopProductSalePrice();
+
+		// sku.price -> product.min_retail_price,product.max_retail_price
+		priceChangeRule.updateProductRetailPrice();
+
+		// sku.in_price -> product.min_boutique_price,product.max_boutique_price
+		priceChangeRule.updateProductBoutiquePrice();
+
+		// sku.im_price -> product.min_im_price,product.max_im_price
+		priceChangeRule.updateProductImPrice();
+		return Response.success();
+	}
+
+	@RequestMapping("/run/boutique")
+	public Response runBoutique(@Param("price_change_rule_id") String price_change_rule_id) throws Exception{
+		PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
+		priceChangeRule.updateVendorPrice(pcrModel.getVendorId());
+
+		// sku.im_price -> shop_product_sku.sale_price
+		priceChangeRule.updateShopPrice();
+
+		// shop_product_sku.sale_price -> shop_product.min_sale_price,shop_product.max_sale_price
+		priceChangeRule.updateShopProductSalePrice();
+
+		// sku.price -> product.min_retail_price,product.max_retail_price
+		priceChangeRule.updateProductRetailPrice();
+
+		// sku.in_price -> product.min_boutique_price,product.max_boutique_price
+		priceChangeRule.updateProductBoutiquePrice();
+
+		// sku.im_price -> product.min_im_price,product.max_im_price
+		priceChangeRule.updateProductImPrice();
+
+		return Response.success();
+	}
 
 	@RequestMapping("select")
 	@ResponseBody
