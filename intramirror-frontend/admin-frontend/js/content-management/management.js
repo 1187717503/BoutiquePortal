@@ -73,7 +73,7 @@ function getBlockList(pageno) {
     }
 
     if (searchObj.blockName) {
-        filter += 'blockName='+ searchObj.designerId + '&';
+        filter += 'blockName='+ searchObj.blockName + '&';
     }
 
     if (searchObj.status !== '-1') {
@@ -153,7 +153,7 @@ function getBlockList(pageno) {
             //     }
             // })
 
-            // initActionEvent();
+            initActionEvent();
             finishLoading();
             // getCountWithFilter(filter, pagesize, pageno, searchObj.statusText);
         }, error: function(result, resp, par) {
@@ -202,15 +202,13 @@ function pageAction(pageno) {
 
 function initActionEvent() {
 
-    $("#order-head-cbx").change(function() {
+    $("#block-head-cbx").change(function() {
         if ($(this).prop('checked') === true) {
-            $(".product-list .page-order [type='checkbox']").prop('checked', true);
+            $(".block-list .page-block [type='checkbox']").prop('checked', true);
         } else {
-            $(".product-list .page-order [type='checkbox']").prop('checked', false);
+            $(".block-list .page-block [type='checkbox']").prop('checked', false);
         }
     })
-
-    $(".head-hide-icon, .hide-icon").click(showDetail);
 
     $('.orderby').click(function() {
 

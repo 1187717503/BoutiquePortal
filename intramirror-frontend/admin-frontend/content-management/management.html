@@ -152,19 +152,19 @@
                 <div class="z-depth-2" style="min-width: 1180px">
                     <div style="margin-top: 40px">
                         <div style="display: inline-block;margin-left: 12px;margin-top: 12px">
-                            <a id="apply-tag-btn" class="waves-effect waves-light btn">NEW</a>
+                            <a id="new-block-btn" class="waves-effect waves-light btn">NEW</a>
                         </div>
                         <div style="display: inline-block;margin-left: 12px;margin-top: 12px">
-                            <a id="apply-tag-btn" class="waves-effect waves-light btn">ACTIVATE</a>
+                            <a id="activate-btn" class="waves-effect waves-light btn">ACTIVATE</a>
                         </div>
                         <div style="display: inline-block;margin-left: 12px;margin-top: 12px">
-                            <a id="apply-tag-btn" class="waves-effect waves-light btn">DE-ACTIVATE</a>
+                            <a id="de-activate-btn" class="waves-effect waves-light btn">DE-ACTIVATE</a>
                         </div>
                     </div>
 
                     <div id="test1" class="col s12">
                         <div id="block-head-list" class="block-head style-scope page-block">
-                            
+
                         </div>
                         <div class="block-list style-scope page-block">
                             <div id="block-list" class="style-scope page-block">
@@ -173,7 +173,7 @@
                         </div>
                     </div>
                     <ul class="pagination">
-                        
+
                     </ul>
                 </div>
                 <!-- end tabs -->
@@ -201,13 +201,13 @@
 
 <script type="text/javascript" src="../js/plugins/jquery-tmpl/jquery.tmpl.js"></script>
 <!--materialize js-->
- <script type="text/javascript" src="../js/materialize.js"></script> 
+ <script type="text/javascript" src="../js/materialize.js"></script>
 
 <!--scrollbar-->
 <script type="text/javascript" src="../js/plugins/perfect-scrollbar/perfect-scrollbar.min.js"></script>
 
 <!-- magnific-popup -->
-<script type="text/javascript" src="../js/plugins/magnific-popup/jquery.magnific-popup.min.js"></script> 
+<script type="text/javascript" src="../js/plugins/magnific-popup/jquery.magnific-popup.min.js"></script>
 
 <!--plugins.js - Some Specific JS codes for Plugin Settings-->
 <script type="text/javascript" src="../js/plugins.js"></script>
@@ -251,7 +251,7 @@
     {%each(i, block) list%}
     <div class="row style-scope page-block">
         <div class="item style-scope page-block">
-            <input type="checkbox" class="filled-in" id="block-id-${block.block_id}"/>
+            <input type="checkbox" class="filled-in" id="block-id-${block.block_id}" data-block-id="${block.block_id}"/>
             <label for="block-id-${block.block_id}"></label>
         </div>
         <div class="item style-scope page-block">${block.block_id}</div>
@@ -262,7 +262,7 @@
         <div class="item style-scope page-block">${block.tag_name}</div>
         <div class="item style-scope page-block">${block.sort_order}</div>
         <div class="item style-scope page-block action" data-block-id="${block.block_id}">
-            
+
         </div>
     </div>
     {%/each%}
@@ -281,7 +281,7 @@
             </select>
         </div>
     </li>
-    
+
     {%if page.currPage <= 1 %}
     <li class="disabled">
         <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-first-page"></use></svg></a>
@@ -320,7 +320,7 @@
     </li>
     <li class="disabled">
         <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-last-page"></use></svg></a>
-    </li> 
+    </li>
     {%/if%}
 
 </script>
@@ -348,7 +348,7 @@
 
         $('#cancel-btn').click(function() {
             $('#select-tag').val('-1');
-            $('#select-status').val('all');
+            $('#select-status').val('-1');
             $('#text-blockName').val('');
             $('#text-blockName').trigger('blur');
 
@@ -371,49 +371,47 @@
             $('#category-menu').hide();
         })
 
-        $('#apply-tag-btn').click(function() {
-        
-            let param = {};
-            param.productIdList = [];
-            param.tagId = $('#select-apply-tag').val();
-            param.sortNum = -1;
+        $('#activate-btn').click(function() {
 
+            let blockList = [];
             let count = 0;
-            $('.product-list .item input[type=checkbox]').each(function(idx, item) {
+            $('.block-list .item input[type=checkbox]').each(function(idx, item) {
                 if ($(item).prop('checked')) {
-                    param.productIdList.push($(item).data('product-id'));
+                    let param = {};
+                    param.blockId = $(item).data('block-id');
+                    param.status = 1;
+                    blockList.push(param);
                     count++;
                 }
             })
 
-            if (param.tagId == -1) {
-                Materialize.toast('Please select tag', 3000);
-                return;
-            }
             if (count == 0) {
-                Materialize.toast('Please select at least one product', 3000);
+                Materialize.toast('Please select at least one block', 3000);
                 return;
             }
 
+            console.log(blockList);
+
             loading();
             $.ajax({
-                type: requestURL.applyTag.method,
+                type: requestURL.activateBlock.method,
                 contentType: "application/json",
-                url: requestURL.applyTag.url.replace("{tagId}",param.tagId),
-                data: JSON.stringify(param),
+                url: requestURL.activateBlock.url,
+                data: JSON.stringify(blockList),
                 dataType: 'json',
                 beforeSend: function(request) {
                     request.setRequestHeader("token", token);
                 },
                 success: function(result) {
-                    Materialize.toast('Apply Tag Success', 3000);
+                    Materialize.toast('Activate Block Success', 3000);
                     // 获取当前页数
-                    let current = $('.pagination .active.pagination-index').data('pageno') + 1;
-                    getProdcutList(current);
-                    finishLoading()
+                    // let current = $('.pagination .active.pagination-index').data('pageno') + 1;
+                    // getProdcutList(current);
+                    getProdcutList(1);
+                    finishLoading();
                 }, error: function(result, resp, par) {
                     toashWithCloseBtn(result.responseJSON.message);
-                    finishLoading()
+                    finishLoading();
                     if (result.status == 401) {
                         window.location.href = '../../../login';
                     }
