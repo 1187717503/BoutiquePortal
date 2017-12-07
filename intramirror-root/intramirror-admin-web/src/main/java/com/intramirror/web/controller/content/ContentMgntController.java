@@ -115,7 +115,6 @@ public class ContentMgntController {
     }
 
     /**
-     *
      * @param blocks
      * @return
      */
@@ -125,7 +124,6 @@ public class ContentMgntController {
     }
 
     /**
-     *
      * @param tag
      * @return
      */
@@ -136,12 +134,10 @@ public class ContentMgntController {
         return Response.success();
     }
 
-
     @GetMapping(value = "/tags", produces = "application/json")
     public Response listTags() {
         return Response.status(StatusType.SUCCESS).data(iTagService.getTags());
     }
-
 
     @DeleteMapping(value = "/tags/{tagId}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
@@ -209,10 +205,10 @@ public class ContentMgntController {
         List<Long> idList = extractProductIdList(productList);
         List<Map<String, Object>> storeList = skuStoreService.listTotalStockByProductIds(idList);
         Map<Long, Long> productStock = mapProductStock(storeList);
-        List<Map<String, Object>> priceList = productManagementService.listPriceByProductList(productList);
+        //        List<Map<String, Object>> priceList = productManagementService.listPriceByProductList(productList);
         for (Map<String, Object> product : productList) {
             product.put("totalStock", productStock.get(Long.parseLong(product.get("product_id").toString())));
-            setPriceDiscount(product, priceList);
+            //            setPriceDiscount(product, priceList);
         }
 
     }

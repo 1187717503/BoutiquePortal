@@ -9,10 +9,15 @@
             product.cover_img,
             brand.english_name,
             product.img_modified,
-            tag_product_rel.sort_num
+            tag_product_rel.sort_num,
+            product.min_im_price                                                             AS im_price,
+            product.preview_im_price                                                         AS preview_im_price,
+            CONVERT(1 - product.min_im_price / product.min_retail_price, DECIMAL(10, 2))     AS im_discount,
+            CONVERT(1 - product.preview_im_price / product.min_retail_price, DECIMAL(10, 2)) AS preview_discount
         FROM tag_product_rel
             INNER JOIN product ON tag_product_rel.product_id = product.product_id AND product.enabled = TRUE
             INNER JOIN brand ON brand.brand_id = product.brand_id AND brand.enabled = TRUE
+
         WHERE tag_product_rel.tag_id = #{tagId};
     </select>
     <select id="getTagAndBlockRelByTagId" resultType="java.util.Map">
@@ -109,9 +114,17 @@
         <if test="status != null">
             AND block.status = #{status}
         </if>
-        <if test="tagId != null">
-            AND tag.tag_id = #{tagId}
-        </if>
+        <choose>
+            <when test="tagId == null">
+
+            </when>
+            <when test="tagId == 0">
+                AND tag.tag_id IS NULL
+            </when>
+            <otherwise>
+                AND tag.tag_id = #{tagId}
+            </otherwise>
+        </choose>
         <if test="modifiedAtFrom != null and modifiedAtTo != null">
             AND unix_timestamp(block.modified_at) BETWEEN #{modifiedAtFrom} AND #{modifiedAtTo}
         </if>

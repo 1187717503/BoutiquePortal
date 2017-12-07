@@ -88,6 +88,67 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         return true;
     }
 
+    @Override
+    public boolean updateVendorPrice(Long vendor_id) throws Exception {
+        Map<String,Object> paramsMap = new HashMap<>();
+        List<Map<String,Object>> paramsList = new ArrayList<>();
+        paramsMap.put("price_type", PriceChangeRuleEnum.PriceType.SUPPLY_PRICE.getCode());
+        paramsMap.put("preview_status","1");
+        paramsMap.put("vendor_id",vendor_id);
+
+        List<Map<String,Object>> selSeasonGroupRuleMaps = priceChangeRuleMapper.selectSeasonGroupRule(paramsMap);
+        if(selSeasonGroupRuleMaps != null && selSeasonGroupRuleMaps.size() > 0) {
+            List<Map<String,Object>> selSecondCategoryRuleMaps = priceChangeRuleMapper.selectSecondCategoryRule(paramsMap);
+            List<Map<String,Object>> selAllCategoryRuleMaps = priceChangeRuleMapper.selectAllCategoryRule(paramsMap);
+            selAllCategoryRuleMaps = this.sortListByLevel(selAllCategoryRuleMaps);
+            List<Map<String,Object>> selProductGroupRuleMaps = priceChangeRuleMapper.selectProductGroupRule(paramsMap);
+            List<Map<String,Object>> selProductRuleMaps = priceChangeRuleMapper.selectProductRule(paramsMap);
+
+            paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selSecondCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
+            this.updatePriceByVendor(paramsList,paramsMap);
+            paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selAllCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
+            this.updatePriceByVendor(paramsList,paramsMap);
+            paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selProductGroupRuleMaps,Contants.num_three,selSeasonGroupRuleMaps);
+            this.updatePriceByVendor(paramsList,paramsMap);
+            paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selProductRuleMaps,Contants.num_four,selSeasonGroupRuleMaps);
+            this.updatePriceByVendor(paramsList,paramsMap);
+            this.updateRuleStatus(paramsMap);
+            this.updateDefaultPrice(PriceChangeRuleEnum.PriceType.SUPPLY_PRICE,paramsMap);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean updateAdminPrice(Long vendor_id) throws Exception {
+        Map<String,Object> paramsMap = new HashMap<>();
+        List<Map<String,Object>> paramsList = new ArrayList<>();
+        paramsMap.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
+        paramsMap.put("preview_status","1");
+        paramsMap.put("vendor_id",vendor_id);
+
+        List<Map<String,Object>> selSeasonGroupRuleMaps = priceChangeRuleMapper.selectSeasonGroupRule(paramsMap);
+        if(selSeasonGroupRuleMaps != null && selSeasonGroupRuleMaps.size() > 0) {
+            List<Map<String,Object>> selSecondCategoryRuleMaps = priceChangeRuleMapper.selectSecondCategoryRule(paramsMap);
+            List<Map<String,Object>> selAllCategoryRuleMaps = priceChangeRuleMapper.selectAllCategoryRule(paramsMap);
+            selAllCategoryRuleMaps = this.sortListByLevel(selAllCategoryRuleMaps);
+            List<Map<String,Object>> selProductGroupRuleMaps = priceChangeRuleMapper.selectProductGroupRule(paramsMap);
+            List<Map<String,Object>> selProductRuleMaps = priceChangeRuleMapper.selectProductRule(paramsMap);
+
+            paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selSecondCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
+            this.updatePriceByAdmin(paramsList,paramsMap);
+            paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selAllCategoryRuleMaps,Contants.num_second,selSeasonGroupRuleMaps);
+            this.updatePriceByAdmin(paramsList,paramsMap);
+            paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selProductGroupRuleMaps,Contants.num_three,selSeasonGroupRuleMaps);
+            this.updatePriceByAdmin(paramsList,paramsMap);
+            paramsList = this.handleMap(new ArrayList<Map<String, Object>>(),selProductRuleMaps,Contants.num_four,selSeasonGroupRuleMaps);
+            this.updatePriceByAdmin(paramsList,paramsMap);
+
+            this.updateRuleStatus(paramsMap);
+            this.updateDefaultPrice(PriceChangeRuleEnum.PriceType.IM_PRICE,paramsMap);
+        }
+        return true;
+    }
+
     private void updateDefaultPrice(PriceChangeRuleEnum.PriceType priceType,Map<String,Object> paramsMap){
         // update default discount
         int default_discount = this.getDeafultDisscount(priceType);
