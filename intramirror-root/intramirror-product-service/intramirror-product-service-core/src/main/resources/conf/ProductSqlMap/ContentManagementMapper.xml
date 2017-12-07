@@ -52,7 +52,6 @@
     </select>
 
 
-
     <select id="getBlockWithTagByBlockId" resultType="map">
         SELECT
             `block`.block_id,
@@ -116,6 +115,7 @@
         <if test="modifiedAtFrom != null and modifiedAtTo != null">
             AND unix_timestamp(block.modified_at) BETWEEN #{modifiedAtFrom} AND #{modifiedAtTo}
         </if>
-        ORDER BY block.modified_at
+        ORDER BY block.sort_order
+        LIMIT #{start}, #{limit};
     </select>
 </mapper>

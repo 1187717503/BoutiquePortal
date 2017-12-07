@@ -20,13 +20,13 @@ public interface ContentManagementMapper {
     List<Map<String, Object>> listTagsByProductIds(List<Map<String, Object>> productIds);
 
     List<Map<String, Object>> listBlockWithTag(@Param(value = "blockName") String blockName, @Param(value = "status") Integer status,
-            @Param(value = "tagId") Long tagId, @Param(value = "modifiedAtFrom") Long modifiedAtFrom, @Param(value = "modifiedAtTo") Long modifiedAtTo);
+            @Param(value = "tagId") Long tagId, @Param(value = "modifiedAtFrom") Long modifiedAtFrom, @Param(value = "modifiedAtTo") Long modifiedAtTo,
+            @Param(value = "start") int start, @Param(value = "limit") int limit);
 
     Map<String, Object> getBlockWithTagByBlockId(Long blockId);
 
     List<Long> listTagProductIds(Long tagId);
 
     List<Long> listAllTagProductIds();
-
 
 }

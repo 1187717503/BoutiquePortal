@@ -63,6 +63,8 @@
 
     </bean>
 
+    <bean class="com.intramirror.web.controller.cache.CategoryCache" init-method="init"/>
+
 
     <!--<mvc:cors>-->
     <!--<mvc:mapping path="/**"/>-->

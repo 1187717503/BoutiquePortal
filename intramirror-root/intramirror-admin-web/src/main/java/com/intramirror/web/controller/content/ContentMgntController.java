@@ -57,14 +57,42 @@ public class ContentMgntController {
     @Autowired
     private ISkuStoreService skuStoreService;
 
+    /**
+     * Return block info with bind tag.
+     *
+     * @param blockName
+     * @param status
+     * @param tagId
+     * @param modifiedAtFrom
+     * @param modifiedAtTo
+     * @param pageSize
+     * @param pageNo
+     * @return
+     */
     @GetMapping(value = "/blocks", produces = "application/json")
-    public Response listBlockTag(@RequestParam(value = "blockName", required = false) String blockName,
-            @RequestParam(value = "status", required = false) Integer status, @RequestParam(value = "tagId", required = false) Long tagId,
+    // @formatter:off
+    public Response listBlockTag(
+            @RequestParam(value = "blockName", required = false) String blockName,
+            @RequestParam(value = "status", required = false) Integer status,
+            @RequestParam(value = "tagId", required = false) Long tagId,
             @RequestParam(value = "modifiedAtFrom", required = false) Long modifiedAtFrom,
-            @RequestParam(value = "modifiedAtTo", required = false) Long modifiedAtTo) {
-        return Response.status(StatusType.SUCCESS).data(contentManagementService.listBlockWithTag(blockName, status, tagId, modifiedAtFrom, modifiedAtTo));
+            @RequestParam(value = "modifiedAtTo", required = false) Long modifiedAtTo,
+            @RequestParam(value = "pageSize",required = false) Integer pageSize,
+            @RequestParam(value = "pageNo",required = false) Integer pageNo)
+    // @formatter:on
+    {
+        int start = ((pageNo == null || pageNo < 0) ? 0 : (pageNo - 1) * pageSize);
+        int limit = ((pageSize == null || pageSize < 0) ? 25 : pageSize);
+        return Response.status(StatusType.SUCCESS).data(
+                contentManagementService.listBlockWithTag(blockName, status, tagId, modifiedAtFrom, modifiedAtTo, start, limit));
     }
 
+    /**
+     * Create an new block only.
+     *
+     * @param block
+     * @return
+     */
     @PostMapping(value = "/blocks", consumes = "application/json")
     @ResponseStatus(value = HttpStatus.CREATED)
     public Response createBlock(@RequestBody Block block) {
@@ -72,6 +100,13 @@ public class ContentMgntController {
         return Response.success();
     }
 
+    /**
+     * Update block info by block id.
+     *
+     * @param blockId
+     * @param block
+     * @return
+     */
     @PutMapping(value = "/blocks/{blockId}", consumes = "application/json")
     public Response updateBlock(@PathVariable Long blockId, @RequestBody Block block) {
         block.setBlockId(blockId);
@@ -79,11 +114,21 @@ public class ContentMgntController {
         return Response.success();
     }
 
+    /**
+     *
+     * @param blocks
+     * @return
+     */
     @PutMapping(value = "/blocks", consumes = "application/json")
     public Response updateBlock(@RequestBody List<Block> blocks) {
         return Response.status(StatusType.SUCCESS).data(contentManagementService.batchUpdateBlock(blocks));
     }
 
+    /**
+     *
+     * @param tag
+     * @return
+     */
     @PostMapping(value = "/tags", consumes = "application/json")
     @ResponseStatus(value = HttpStatus.CREATED)
     public Response createTag(@RequestBody Tag tag) {
@@ -91,10 +136,12 @@ public class ContentMgntController {
         return Response.success();
     }
 
+
     @GetMapping(value = "/tags", produces = "application/json")
     public Response listTags() {
         return Response.status(StatusType.SUCCESS).data(iTagService.getTags());
     }
+
 
     @DeleteMapping(value = "/tags/{tagId}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)

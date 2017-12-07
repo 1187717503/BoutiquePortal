@@ -26,7 +26,7 @@ public interface ContentManagementService {
 
     List<Long> listAllTagProductIds();
 
-    List<Map<String, Object>> listBlockWithTag(String blockName, Integer status, Long tagId, Long modifiedAtFrom, Long modifiedAtTo);
+    List<Map<String, Object>> listBlockWithTag(String blockName, Integer status, Long tagId, Long modifiedAtFrom, Long modifiedAtTo, int start, int limit);
 
     Map<String, Object> getBlockWithTagByBlockId(Long blockId);
 

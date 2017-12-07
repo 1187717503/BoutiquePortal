@@ -9,14 +9,13 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * Created on 2017/10/23.
  *
  * @author YouFeng.Zhu
  */
-@Component
+
 public class CategoryCache {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CategoryCache.class);
@@ -25,7 +24,6 @@ public class CategoryCache {
     private static HashMap<Long, Category> categoryHashMap = new HashMap<>();
     private static final String NO_SUCH_CATEGORY = "No such category";
     private static final int MAX_CATEGORY_LEVEL = 3;
-    private boolean isInit = false;
 
     @Autowired
     private ICategoryService iCategoryService;
@@ -34,8 +32,6 @@ public class CategoryCache {
         try {
             List<Category> categories = iCategoryService.listAllCategoryByConditions();
             mapCategory(categories, categoryHashMap);
-
-            isInit = true;
         } catch (Exception e) {
             LOGGER.error("Unexcepted Exception: {}", e.getMessage(), e);
         }
@@ -71,9 +67,6 @@ public class CategoryCache {
     }
 
     public List<Long> getAllChildCategory(Long categoryId) {
-        if (!isInit) {
-            init();
-        }
 
         List<Long> categoryList = new ArrayList<>();
         Category category = categoryHashMap.get(categoryId);
@@ -95,9 +88,9 @@ public class CategoryCache {
         List<Category> newCategoryList = new ArrayList<>();
         for (Category parent : parentList) {
             LOGGER.info("{}", parent.getChildren());
-            if(parent.getChildren() == null){
+            if (parent.getChildren() == null) {
                 newCategoryList.add(parent);
-            }else {
+            } else {
                 newCategoryList.addAll(parent.getChildren());
             }
 
@@ -113,9 +106,6 @@ public class CategoryCache {
     }
 
     public String getAbsolutelyCategoryPath(Long categoryId) {
-        if (!isInit) {
-            init();
-        }
 
         StringBuilder sb = new StringBuilder();
         LinkedList<Category> pathCategory = new LinkedList<>();
