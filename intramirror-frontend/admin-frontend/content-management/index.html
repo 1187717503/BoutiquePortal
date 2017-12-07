@@ -136,7 +136,7 @@
                             <div id="category-menu" style="display: none;"></div>
                             <label for="category-menu">Category</label>
                         </div>
-                        
+
                         <div class="input-field col s1" style="padding-right: 0;">
                             <select id="select-image"> e
                                 <option value="0" selected>Image</option>
@@ -145,7 +145,7 @@
                             </select>
                             <label for="select-image">Image</label>
                         </div>
-                        
+
                         <div class="input-field col s2">
                             <select id="select-model-image">
                                 <option value="0" selected>Model Image All</option>
@@ -236,7 +236,7 @@
                             <input id="sale-at-end" class="discount-input sale-datepicker" type="text" readonly="true">
                         </div>
                     </div>
- 
+
                 </div>
                 <!--end filter-->
 
@@ -249,12 +249,15 @@
                         <div style="display: inline-block;margin-left: 12px">
                             <a id="apply-tag-btn" class="waves-effect waves-light btn">APPLY TAG</a>
                         </div>
+                        <div style="display: inline-block;margin-left: 12px">
+                            <a id="remove-tag-btn" class="waves-effect waves-light btn">REMOVE TAG</a>
+                        </div>
                     </div>
 
 
                     <div id="test1" class="col s12">
                         <div id="order-head-list" class="order-head style-scope page-order">
-                            
+
                         </div>
                         <div class="order-list style-scope page-order">
                             <div id="order-list" class="style-scope page-order">
@@ -263,7 +266,7 @@
                         </div>
                     </div>
                     <ul class="pagination">
-                        
+
                     </ul>
                 </div>
                 <!-- end tabs -->
@@ -291,13 +294,13 @@
 
 <script type="text/javascript" src="../js/plugins/jquery-tmpl/jquery.tmpl.js"></script>
 <!--materialize js-->
- <script type="text/javascript" src="../js/materialize.js"></script> 
+ <script type="text/javascript" src="../js/materialize.js"></script>
 
 <!--scrollbar-->
 <script type="text/javascript" src="../js/plugins/perfect-scrollbar/perfect-scrollbar.min.js"></script>
 
 <!-- magnific-popup -->
-<script type="text/javascript" src="../js/plugins/magnific-popup/jquery.magnific-popup.min.js"></script> 
+<script type="text/javascript" src="../js/plugins/magnific-popup/jquery.magnific-popup.min.js"></script>
 
 <!--plugins.js - Some Specific JS codes for Plugin Settings-->
 <script type="text/javascript" src="../js/plugins.js"></script>
@@ -456,7 +459,7 @@
             <div class="item style-scope page-order" style="text-align: center;">${order.status}</div>
             <div class="item style-scope page-order" style="text-align: center;">${order.sale_at}</div>
             <div class="item style-scope page-order action" data-product-id="${order.product_id}" data-shop-product-id="${order.shop_product_id}">
-                
+
             </div>
         </div>
         <div class="goods show-detail">
@@ -470,7 +473,7 @@
                         <div class="list-detail-item col s1">Confirmed Stock</div>
                     </div>
                     <div class="list-detail-item col s2" style="margin-left: 0px;text-align: center;">Tags</div>
-                
+
             </div>
             <div class="row list-detail-row detail-item">
                 <div class="col s8">
@@ -509,7 +512,7 @@
             </select>
         </div>
     </li>
-    
+
     {%if page.currPage <= 1 %}
     <li class="disabled">
         <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-first-page"></use></svg></a>
@@ -548,7 +551,7 @@
     </li>
     <li class="disabled">
         <a href="#!"> <svg class="icon" aria-hidden="true"> <use class="use-icon" xlink:href="#icon-last-page"></use></svg></a>
-    </li> 
+    </li>
     {%/if%}
 
 </script>
@@ -556,7 +559,7 @@
 <script type="text/javascript">
 
     $(function () {
-        
+
         initBrand();
         initVendor();
         initSeason();
@@ -626,56 +629,7 @@
             $('#category-menu').hide();
         })
 
-        $('#apply-tag-btn').click(function() {
-        
-            let param = {};
-            param.productIdList = [];
-            param.tagId = $('#select-apply-tag').val();
-            param.sortNum = -1;
-
-            let count = 0;
-            $('.product-list .item input[type=checkbox]').each(function(idx, item) {
-                if ($(item).prop('checked')) {
-                    param.productIdList.push($(item).data('product-id'));
-                    count++;
-                }
-            })
-
-            if (param.tagId == -1) {
-                Materialize.toast('Please select tag', 3000);
-                return;
-            }
-            if (count == 0) {
-                Materialize.toast('Please select at least one product', 3000);
-                return;
-            }
-
-            loading();
-            $.ajax({
-                type: requestURL.applyTag.method,
-                contentType: "application/json",
-                url: requestURL.applyTag.url.replace("{tagId}",param.tagId),
-                data: JSON.stringify(param),
-                dataType: 'json',
-                beforeSend: function(request) {
-                    request.setRequestHeader("token", token);
-                },
-                success: function(result) {
-                    Materialize.toast('Apply Tag Success', 3000);
-                    // 获取当前页数
-                    let current = $('.pagination .active.pagination-index').data('pageno') + 1;
-                    getProdcutList(current);
-                    finishLoading()
-                }, error: function(result, resp, par) {
-                    toashWithCloseBtn(result.responseJSON.message);
-                    finishLoading()
-                    if (result.status == 401) {
-                        window.location.href = '../../../login';
-                    }
-                }
-            });
-
-        });
+        initBatchAction();
     });
 
 </script>

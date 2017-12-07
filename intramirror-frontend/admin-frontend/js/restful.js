@@ -17,5 +17,7 @@ var requestURL = {
     "getBlockDetail": {"url": baseUrl + "content/blocks/{blockId}", "method" : "GET"},
     "getUnBindTags": {"url" : baseUrl + "content/tags/unbind", "method": "GET"},
     "saveBlock" : {"url" : baseUrl + "content/operation/save", "method" : "PUT"},
-    "getBlockTagRel" : {"url" : baseUrl + "content/blocks", "method" : "GET"}
+    "getBlockTagRel" : {"url" : baseUrl + "content/blocks", "method" : "GET"},
+    "delTagFromProduct" : {"url" : baseUrl + "content/tags/{tagId}/products/{productId}", "method" : "DELETE"},
+    "delTagForProducts" : {"url" : baseUrl + "content/tags/{tagId}/products", "method" : "DELETE"}
 }
