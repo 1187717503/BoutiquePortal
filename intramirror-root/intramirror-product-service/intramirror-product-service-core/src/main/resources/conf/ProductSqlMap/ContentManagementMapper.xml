@@ -109,9 +109,17 @@
         <if test="status != null">
             AND block.status = #{status}
         </if>
-        <if test="tagId != null">
-            AND tag.tag_id = #{tagId}
-        </if>
+        <choose>
+            <when test="tagId == null">
+
+            </when>
+            <when test="tagId == 0">
+                AND tag.tag_id IS NULL
+            </when>
+            <otherwise>
+                AND tag.tag_id = #{tagId}
+            </otherwise>
+        </choose>
         <if test="modifiedAtFrom != null and modifiedAtTo != null">
             AND unix_timestamp(block.modified_at) BETWEEN #{modifiedAtFrom} AND #{modifiedAtTo}
         </if>
