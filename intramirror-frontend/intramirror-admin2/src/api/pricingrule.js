@@ -226,17 +226,15 @@ export function changePreviewStatus(price_id,priview_status) {
   })
 }
 
-export function activeNowAcation1() {
+export function imActiveRefresh(priceId) {
   return HTTP({
-    baseURL: apiUrl,
-    url: 'job/price/updatePriceByVendor'
+    url: 'priceChangeRule/run/im.htm?price_change_rule_id=' + priceId
   })
 }
 
-export function activeNowAcation2() {
+export function boutiqueActiveRefresh(priceId) {
   return HTTP({
-    baseURL: apiUrl,
-    url: 'job/price/updatePriceByAdmin'
+    url: 'priceChangeRule/run/boutique.htm?price_change_rule_id='+ priceId
   })
 }
 

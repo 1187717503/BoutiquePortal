@@ -239,7 +239,7 @@
         <input type="file" @change="getFile($event)" class="file-input"/>
         <button class="waves-effect waves-light btn button-no-padding" @click="uploadFile">UPLOAD EXCL</button>
         <button class="waves-effect waves-light btn button-no-padding" @click="downloadFile">DOWNLOAD EXCL</button>
-        <!-- <button class="waves-effect waves-light btn active-button" v-on:click.once="activeNow()" :class="{hadClicked:activeNowButtonClicked}">ACTIVE NOW</button> -->
+        <button class="waves-effect waves-light btn active-button" v-on:click.once="activeNow()" :class="{hadClicked:activeNowButtonClicked}">ACTIVE NOW</button>
       </div>
     </div>
 
@@ -390,8 +390,7 @@ import {
   getRuleDate,
   copyRule,
   changePreviewStatus,
-  activeNowAcation1,
-  activeNowAcation2,
+  imActiveRefresh,
   downFileApi,
   uploadFileApi
 } from "../../api/pricingrule";
@@ -1216,10 +1215,13 @@ export default {
       });
     },
     activeNow() {
-      console.log(process);
       this.activeNowButtonClicked = true;
-      activeNowAcation1();
-      activeNowAcation2();
+      this.isLoading = true;
+      imActiveRefresh(this.priceId).then(result => {
+        this.getTablenav(this.boutiqueVendorid);
+        this.getTable(this.boutiqueVendorid);
+        this.isLoading = false;
+      });
     },
     uploadFile() {
       if (this.update_files) {
