@@ -6,7 +6,8 @@
 function checkNumRange(nMin, nMax, sFiledName){
 
     var rInt100 = /^(100|\d{1,2})$/;
-    var rInt = /^-?[0-9]\d*$/;
+    var rInt = /^-?\d+$/;
+    var ruFloat = /^\d+(\.\d+)?$/;
 
     let nResult = -1;
     //全空 or 全不空
@@ -14,8 +15,14 @@ function checkNumRange(nMin, nMax, sFiledName){
         //数字类型
         if ($.isNumeric(nMin) && $.isNumeric(nMax)) {
             //右值 > 左值
-            nMax = parseInt(nMax);
-            nMin = parseInt(nMin);
+
+            if(sFiledName == "Price"){
+                nMax = parseFloat(nMax);
+                nMin = parseFloat(nMin);
+            }else{
+                nMax = parseInt(nMax);
+                nMin = parseInt(nMin);
+            }
             if (nMax >= nMin) {
                 // discount是0~100
                 if (sFiledName == "Boutique" || sFiledName == "IM") {
@@ -30,6 +37,13 @@ function checkNumRange(nMin, nMax, sFiledName){
                         nResult = 1;
                     }else {
                         toashWithCloseBtn("The value of "+ sFiledName +" should be positive integer.");
+                        nResult = -1;
+                    }
+                } else if (sFiledName == "Price") {
+                    if(ruFloat.test(nMax) && ruFloat.test(nMin)) {
+                        nResult = 1;
+                    }else {
+                        toashWithCloseBtn("The value of "+ sFiledName +" should be positive float.");
                         nResult = -1;
                     }
                 } else {

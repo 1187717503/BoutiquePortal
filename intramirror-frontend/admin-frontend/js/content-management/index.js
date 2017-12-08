@@ -226,6 +226,9 @@ function getFilterFromDom() {
     searchObj.minStock = $('#stock-left').val();
     searchObj.maxStock = $('#stock-right').val();
 
+    searchObj.minPrice = $('#price-left').val();
+    searchObj.maxPrice = $('#price-right').val();
+
     searchObj.saleAtFrom = $('#sale-at-start').val();
     searchObj.saleAtTo = $('#sale-at-end').val();
 
@@ -310,6 +313,14 @@ function getProdcutList(pageno) {
     } else if (1 == nResult) {
         filter += 'minStock='+ searchObj.minStock + '&';
         filter += 'maxStock='+ searchObj.maxStock + '&';
+    }
+
+    nResult = checkNumRange(searchObj.minPrice,searchObj.maxPrice,"Price");
+    if(-1 == nResult){
+        return false;
+    } else if (1 == nResult) {
+        filter += 'minPrice='+ searchObj.minPrice + '&';
+        filter += 'maxPrice='+ searchObj.maxPrice + '&';
     }
 
     let obj = transDateRange(searchObj.saleAtFrom, searchObj.saleAtTo, "Sale At");
@@ -407,6 +418,12 @@ function getProdcutList(pageno) {
                     result.data[i].sale_discount = '';
                 } else {
                     result.data[i].sale_discount = Math.round(result.data[i].sale_discount * 100) + '%';
+                }
+
+                if (!result.data[i].preview_discount) {
+                    result.data[i].preview_discount = '';
+                } else {
+                    result.data[i].preview_discount = Math.round(result.data[i].preview_discount * 100) + '%';
                 }
             }
 

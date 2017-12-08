@@ -36,8 +36,8 @@ public class SearchCondition {
     private Float maxIMDiscount;
     private Long minStock;
     private Long maxStock;
-    private Long minPrice;
-    private Long maxPrice;
+    private Float minPrice;
+    private Float maxPrice;
     private Long saleAtFrom;
     private Long saleAtTo;
     private Long tagId;
@@ -267,19 +267,19 @@ public class SearchCondition {
         this.productIds = productIds;
     }
 
-    public Long getMinPrice() {
+    public Float getMinPrice() {
         return minPrice;
     }
 
-    public void setMinPrice(Long minPrice) {
+    public void setMinPrice(Float minPrice) {
         this.minPrice = minPrice;
     }
 
-    public Long getMaxPrice() {
+    public Float getMaxPrice() {
         return maxPrice;
     }
 
-    public void setMaxPrice(Long maxPrice) {
+    public void setMaxPrice(Float maxPrice) {
         this.maxPrice = maxPrice;
     }
 

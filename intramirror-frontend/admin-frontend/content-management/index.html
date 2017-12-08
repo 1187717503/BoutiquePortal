@@ -228,6 +228,14 @@
                     </div>
 
                     <div class="row">
+                        <div class="col s2 has-labe-input">
+                            <div class="div-label-text" style="margin-top: 23px;width: 18%;">
+                                <label class="left-label-text">Price</label>
+                            </div>
+                            <input id="price-left" class="price-input"  type="number">
+                            <label class="center-label-text">~</label>
+                            <input id="price-right" class="price-input" type="number">
+                        </div>
                         <div class="col s4 has-labe-input" style="position: relative;">
                             <i class="mdi-editor-insert-invitation"></i>
                             <label style="position: absolute;top: -14px;">Sale At</label>
@@ -235,6 +243,7 @@
                             <label class="center-label-text">~</label>
                             <input id="sale-at-end" class="discount-input sale-datepicker" type="text" readonly="true">
                         </div>
+
                     </div>
 
                 </div>
@@ -420,7 +429,8 @@
         <div class="item style-scope page-order">Stock</div>
         <div class="item style-scope page-order">Retail Price</div>
         <div class="item style-scope page-order">Boutique Price</div>
-        <div class="item style-scope page-order">IM Price/Sale Price</div>
+        <div class="item style-scope page-order">IM/Sale Price</div>
+        <div class="item style-scope page-order">Preview Price</div>
         <div class="item style-scope page-order" style="text-align: center;">Status</div>
         <div class="item style-scope page-order" style="text-align: center;">Sale At</div>
     </div>
@@ -456,6 +466,7 @@
             {%else%}
             <div class="item style-scope page-order">€${order.sale_price}<span style="display: block;">${order.sale_discount}</span></div>
             {%/if%}
+            <div class="item style-scope page-order">€${order.preview_price}<span style="display: block;">${order.preview_discount}</span></div>
             <div class="item style-scope page-order" style="text-align: center;">${order.status}</div>
             <div class="item style-scope page-order" style="text-align: center;">${order.sale_at}</div>
             <div class="item style-scope page-order action" data-product-id="${order.product_id}" data-shop-product-id="${order.shop_product_id}">
