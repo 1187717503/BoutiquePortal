@@ -10,5 +10,7 @@ public interface ITagService {
 
     List<Tag> getTags();
 
+    List<Tag> getTagsByDate();
+
     Tag selectByPrimaryKey(Long tagId);
 }

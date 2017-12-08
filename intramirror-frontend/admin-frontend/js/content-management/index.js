@@ -770,4 +770,53 @@ function initBatchAction() {
         });
 
     });
+
+
+    $('#edit-tag-btn').click(function() {
+        $('#edit-tag').openModal({
+            dismissible: false,
+            opacity: .5,
+            inDuration: 300,
+            outDuration: 200,
+            startingTop: '4%',
+            endingTop: '10%'
+        });
+    });
+
+    $('#edit-tag .model-no').click(function() {
+        $('#edit-tag').closeModal();
+    });
+
+    $('#edit-tag .model-yes').click(function() {
+        $('#edit-tag').closeModal();
+    });
+
+    $('#add-tag-btn').click(function() {
+        loading();
+        let param = {};
+        param.tagName = $('#text-new-tag').val();
+        param.enabled = 1;
+        //掉后台接口
+        $.ajax({
+            type: requestURL.createTag.method,
+            contentType: "application/json",
+            url: requestURL.createTag.url,
+            data: JSON.stringify(param),
+            dataType: 'json',
+            beforeSend: function(request) {
+                request.setRequestHeader("token", token);
+            },
+            success: function(result) {
+                Materialize.toast("Create Tag Success!", 3000);
+                $('#text-new-tag').val('');
+                finishLoading();
+            }, error: function(result, resp, par) {
+                toashWithCloseBtn(result.responseJSON.message);
+                finishLoading();
+                if (result.status == 401) {
+                    window.location.href = '../../../login';
+                }
+            }
+        });
+    });
 }

@@ -70,6 +70,12 @@ public class TagServiceImpl implements ITagService {
     }
 
     @Override
+    public List<Tag> getTagsByDate() {
+        logger.info("[service] getTagsByDate");
+        return tagMapper.getTagsByDate();
+    }
+
+    @Override
     public Tag selectByPrimaryKey(Long tagId) {
         logger.info("[service] getTags and tagId is [{}]", tagId);
         return tagMapper.selectByPrimaryKey(tagId);

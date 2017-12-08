@@ -261,6 +261,9 @@
                         <div style="display: inline-block;margin-left: 12px">
                             <a id="remove-tag-btn" class="waves-effect waves-light btn">REMOVE TAG</a>
                         </div>
+                        <div style="display: inline-block;float: right;margin-top: 38px;">
+                            <a id="edit-tag-btn" class="waves-effect waves-light btn" style="background-color: #00a6ce;">EDIT TAG</a>
+                        </div>
                     </div>
 
 
@@ -286,6 +289,27 @@
 
     </div>
     <!-- END WRAPPER -->
+
+    <!-- Start Edit Tag -->
+    <div id="edit-tag" class="modal input-modal">
+        <div class="modal-content row">
+            <span class="brand-text" style="font-size: 20px;">Edit Product Tag</span>
+            <div style="margin-top: 12px;">
+                <div class="input-field col s5" style="padding-left: 0px;">
+                    <input id="text-new-tag" type="text" class="validate">
+                    <label for="text-new-tag">Enter a new tag name</label>
+                </div>
+                <div class="col s4" style="margin-top: 26px;">
+                    <a id="add-tag-btn" class="waves-effect waves-light btn">ADD</a>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="waves-effect waves-red btn-flat modal-action model-no">CANCEL</a>
+            <a href="#" class="waves-effect waves-green btn-flat modal-action model-yes">OK</a>
+        </div>
+    </div>
+    <!-- End Edit Tag -->
 
 </div>
 <!-- END MAIN -->
@@ -389,12 +413,27 @@
     </div>
 </script>
 
-
 <script id="tmpl-season-select" type="text/x-jquery-tmpl">
     <option value="-1" selected>Season</option>
     {%each(i, season) list%}
     <option value="${season}">${season}</option>
     {%/each%}
+</script>
+
+<script id="tmpl-tag-head-list" type="text/x-jquery-tmpl">
+    <div class="row style-scope page-tag">
+        <div class="item style-scope page-tag">Tag Id</div>
+        <div class="item style-scope page-tag">Tag Name</div>
+        <div class="item style-scope page-tag">Created At</div>
+    </div>
+</script>
+
+<script id="tmpl-tag-list" type="text/x-jquery-tmpl">
+    <div class="row style-scope page-tag">
+        <div class="item style-scope page-tag">Tag Id</div>
+        <div class="item style-scope page-tag">Tag Name</div>
+        <div class="item style-scope page-tag">Created At</div>
+    </div>
 </script>
 
 <script id="tmpl-order-head-list" type="text/x-jquery-tmpl">
