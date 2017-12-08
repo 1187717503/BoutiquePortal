@@ -174,7 +174,8 @@ public class ApiUpdateProductService {
         if(StringUtils.isNotBlank(seasonCode) && !seasonCode.equals(product.getSeason_code())) {
             IPriceService iPriceService = new PriceServiceImpl();
             product.setSeason_code(seasonCode);
-            iPriceService.synProductPriceRule(product,null,conn);
+            logger.info("ApiUpdateProductService,setProduct,seasonCodeChange:"+JSONObject.toJSONString(product));
+            iPriceService.synProductPriceRule(product,product.getMin_retail_price(),conn);
         }
 
         // 获取新的BrandID和ColorCode
