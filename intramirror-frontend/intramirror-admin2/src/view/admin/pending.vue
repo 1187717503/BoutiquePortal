@@ -239,7 +239,7 @@
         <input type="file" @change="getFile($event)" class="file-input"/>
         <button class="waves-effect waves-light btn button-no-padding" @click="uploadFile">UPLOAD EXCL</button>
         <button class="waves-effect waves-light btn button-no-padding" @click="downloadFile">DOWNLOAD EXCL</button>
-        <button class="waves-effect waves-light btn active-button" v-on:click.once="activeNow()" :class="{hadClicked:activeNowButtonClicked}">ACTIVE NOW</button>
+        <button class="waves-effect waves-light btn active-button" @click="activeNow">ACTIVE NOW</button>
       </div>
     </div>
 
@@ -464,9 +464,8 @@ export default {
       addProductGroupid: null,
       addProductGroupVal: null,
       coptyNewType: "COPY",
-      RuleDate: "",
-      activeNowButtonClicked: false
-    };
+      RuleDate: ""    
+      };
   },
   watch: {
     priceId(val) {
@@ -1215,7 +1214,6 @@ export default {
       });
     },
     activeNow() {
-      this.activeNowButtonClicked = true;
       this.isLoading = true;
       imActiveRefresh(this.priceId).then(result => {
         this.getTablenav(this.boutiqueVendorid);
