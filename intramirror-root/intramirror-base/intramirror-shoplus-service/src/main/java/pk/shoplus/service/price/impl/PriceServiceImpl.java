@@ -66,7 +66,7 @@ public class PriceServiceImpl implements IPriceService{
         Long product_id = product.getProduct_id();
 
         if(im_price.intValue() != 0 && newPrice.intValue() != 0 && in_price.intValue() != 0) {
-            String updateSkuPrice = "update `sku`  set `in_price`  ="+in_price+" ,`im_price` ="+im_price+" , `price`  = "+newPrice+" where `product_id`  ="+product_id;
+            String updateSkuPrice = "update `sku`  set `in_price`  ="+in_price+" ,`im_price` ="+im_price+" , `price`  = "+newPrice+" ,`last_check`  = now()  where `product_id`  ="+product_id;
             String updateShopProductSalePrice = "update shop_product set max_sale_price="+im_price+",min_sale_price="+im_price+",updated_at=now() where product_id="+product_id;
             String updateShopProductSkuImPrice =  "update `shop_product_sku`  sps \n"
                     + "inner join `shop_product`  sp on(sps.`shop_product_id` = sp.`shop_product_id`)\n"
