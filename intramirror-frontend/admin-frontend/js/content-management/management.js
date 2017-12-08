@@ -57,13 +57,14 @@ function getFilterFromDom() {
 }
 
 function getBlockList(pageno) {
-    let pagesize = localStorage.getItem('block-page-size');
+    // let pagesize = localStorage.getItem('block-page-size');
 
-    if (pagesize == null) {
-        pagesize = 25;
-        localStorage.setItem('block-page-size', 25);
-    }
+    // if (pagesize == null) {
+    //     pagesize = 300;
+    //     localStorage.setItem('block-page-size', 300);
+    // }
 
+    let pagesize = 300;
     let searchObj = getFilterFromDom();
 
     var filter = '?';
@@ -91,18 +92,18 @@ function getBlockList(pageno) {
         return false;
     }
 
-    if (searchObj.orderByColmun) {
-        filter += 'orderBy='+ searchObj.orderByColmun + '&';
-        filter += 'desc='+ searchObj.orderByDesc + '&';
-    }
+    // if (searchObj.orderByColmun) {
+    //     filter += 'orderBy='+ searchObj.orderByColmun + '&';
+    //     filter += 'desc='+ searchObj.orderByDesc + '&';
+    // }
 
     if (pagesize) {
         filter += 'pageSize='+ pagesize + '&';
     }
 
-    if (pageno) {
-        filter += 'pageNo='+ pageno + '&';
-    }
+    // if (pageno) {
+    //     filter += 'pageNo='+ pageno + '&';
+    // }
 
     filter = filter.slice(0, filter.length - 1);
 
@@ -138,6 +139,7 @@ function getBlockList(pageno) {
             $("#tmpl-block-list").tmpl({list: result.data}).appendTo("#block-list");
             $("#tmpl-block-head-list").tmpl().appendTo("#block-head-list");
 
+            // 时间原因没有做分页 2017-12-8
             // $('.orderby').each(function() {
             //     if ($(this).find('.use-icon').data('order-col') == searchObj.orderByColmun) {
             //         if (searchObj.orderByDesc == 1) {
@@ -155,7 +157,7 @@ function getBlockList(pageno) {
 
             initActionEvent();
             finishLoading();
-            // getCountWithFilter(filter, pagesize, pageno, searchObj.statusText);
+            // getCountWithFilter(filter, pagesize, pageno);
         }, error: function(result, resp, par) {
             toashWithCloseBtn(result.responseJSON.message);
             finishLoading();
@@ -167,23 +169,23 @@ function getBlockList(pageno) {
     });
 }
 
-function getCountWithFilter(filter, pagesize, pageno, statusText){
+function getCountWithFilter(filter, pagesize, pageno){
     console.log(statusText);
     $.ajax({
-        type: requestURL.getAllCount.method,
+        type: requestURL.getBlocksCount.method,
         contentType: "application/json",
-        url: requestURL.getAllCount.url + filter,
+        url: requestURL.getBlocksCount.url + filter,
         data: {},
         dataType: 'json',
         beforeSend: function(request) {
             request.setRequestHeader("token", token);
         },
         success: function(result) {
-            updatePagination(pagesize, pageno, Math.ceil(result.data[statusText]/pagesize), pageAction);
-            $('#page-size').val(localStorage.getItem('content-page-size'));
+            updatePagination(pagesize, pageno, Math.ceil(result.data/pagesize), pageAction);
+            $('#page-size').val(localStorage.getItem('block-page-size'));
             $('#page-size').material_select();
             $('#page-size').change(function() {
-                localStorage.setItem('content-page-size', $(this).val());
+                localStorage.setItem('block-page-size', $(this).val());
                 pageAction(1);
             });
         }, error: function(result, resp, par) {
@@ -197,7 +199,7 @@ function getCountWithFilter(filter, pagesize, pageno, statusText){
 }
 
 function pageAction(pageno) {
-    getProdcutList(pageno);
+    getBlockList(pageno);
 }
 
 function initActionEvent() {
@@ -210,31 +212,29 @@ function initActionEvent() {
         }
     })
 
-    $('.orderby').click(function() {
+    // 时间原因，没有做排序 2017-12-8
+    // $('.orderby').click(function() {
 
-        var orderby = $(this).find('use').attr('xlink:href');
-        $('.orderby use').attr('xlink:href', '#icon-default-order');
-        $('.orderby').removeClass('active');
+    //     var orderby = $(this).find('use').attr('xlink:href');
+    //     $('.orderby use').attr('xlink:href', '#icon-default-order');
+    //     $('.orderby').removeClass('active');
 
-        if (orderby == '#icon-asc') {
-            $(this).find('use').attr('xlink:href', '#icon-desc');
-            $(this).find('.use-icon').attr('data-order-desc', '1');
-        } else {
-            $(this).find('use').attr('xlink:href', '#icon-asc');
-            $(this).find('.use-icon').attr('data-order-desc', '0');
-        }
-
-        $(this).addClass('active');
-
-        getProdcutList(1);
-
-    })
+    //     if (orderby == '#icon-asc') {
+    //         $(this).find('use').attr('xlink:href', '#icon-desc');
+    //         $(this).find('.use-icon').attr('data-order-desc', '1');
+    //     } else {
+    //         $(this).find('use').attr('xlink:href', '#icon-asc');
+    //         $(this).find('.use-icon').attr('data-order-desc', '0');
+    //     }
+    //     $(this).addClass('active');
+    //     getBlockList(1);
+    // })
 }
 
 function updateBlock(action) {
   let msg = '';
   let status = 0;
-  if(activate == 'activate') {
+  if(action == 'activate') {
     msg = 'Activate Block Success';
     status = 1;
   } else {
@@ -274,9 +274,8 @@ function updateBlock(action) {
       success: function(result) {
           Materialize.toast(msg, 3000);
           // 获取当前页数
-          // let current = $('.pagination .active.pagination-index').data('pageno') + 1;
-          // getProdcutList(current);
-          getProdcutList(1);
+          let current = $('.pagination .active.pagination-index').data('pageno') + 1;
+          getBlockList(current);
           finishLoading();
       }, error: function(result, resp, par) {
           toashWithCloseBtn(result.responseJSON.message);
@@ -286,4 +285,106 @@ function updateBlock(action) {
           }
       }
   });
+}
+
+function initEvent() {
+    $('.sale-datepicker').pickadate({
+        selectMonths: true,
+        selectYears: 15,
+        today: 'Today',
+        clear: 'Clear',
+        close: 'Close',
+        format: 'yyyy-mm-dd',
+        closeOnSelect: false // Close upon selecting a date,
+    });
+
+    $('#search-btn').click(function() {
+        getBlockList(1);
+    })
+
+    $('#cancel-btn').click(function() {
+        $('#select-tag').val('-1');
+        $('#select-status').val('-1');
+        $('#text-blockName').val('');
+        $('#text-blockName').trigger('blur');
+
+        $('#text-new-blockName').val('');
+        $('#text-new-blockName').trigger('blur');
+
+        initDate();
+        $('select').material_select();
+
+        $('.orderby .icon use').attr('xlink:href', '#icon-paixu-copy');
+        $('.orderby').removeClass('active');
+        getBlockList(1);
+    })
+
+
+    $('#category-menu-input input, #category-menu-input span.triangle').click(function(e) {
+        $('#category-menu .multi-menu').css('min-width', $('#category-input').width() + 'px');
+        $('#category-menu').show();
+        e.stopPropagation();
+    });
+
+    $('html').click(function() {
+        $('#category-menu').hide();
+    })
+
+    $('#activate-btn').click(function() {
+        updateBlock('activate');
+    });
+
+    $('#de-activate-btn').click(function() {
+        updateBlock('de-activate');
+    });
+
+    $('#new-block-btn').click(function() {
+        $('#new-block').openModal({
+            dismissible: false,
+            opacity: .5,
+            inDuration: 300,
+            outDuration: 200,
+            startingTop: '4%',
+            endingTop: '10%'
+        });
+    });
+
+    $('#new-block .model-yes').click(function() {
+        $('#new-block').closeModal();
+        loading();
+        
+        let param = {};
+        param.status = 0;
+        param.blockName = $('#text-new-blockName').val();
+        param.enabled = 1;
+        //掉后台接口
+        $.ajax({
+            type: requestURL.createBlock.method,
+            contentType: "application/json",
+            url: requestURL.createBlock.url,
+            data: JSON.stringify(param),
+            dataType: 'json',
+            beforeSend: function(request) {
+                request.setRequestHeader("token", token);
+            },
+            success: function(result) {
+                Materialize.toast("Create Block Success!", 3000);
+                // 获取当前页数
+                //let current = $('.pagination .active.pagination-index').data('pageno') + 1;
+                getBlockList(1);
+                finishLoading();
+            }, error: function(result, resp, par) {
+                toashWithCloseBtn(result.responseJSON.message);
+                finishLoading();
+                if (result.status == 401) {
+                    window.location.href = '../../../login';
+                }
+            }
+        });
+    });
+
+    $('#new-block .model-no').click(function() {
+        let oriProductTag = $('#select-product-tag').data('origin-product-id');        
+        $('#new-block').closeModal();
+    });
 }

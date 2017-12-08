@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created on 2017/11/17.
- *
  * @author YouFeng.Zhu
  */
 @RestController
@@ -89,7 +88,6 @@ public class ContentMgntController {
 
     /**
      * Create an new block only.
-     *
      * @param block
      * @return
      */
@@ -102,7 +100,6 @@ public class ContentMgntController {
 
     /**
      * Update block info by block id.
-     *
      * @param blockId
      * @param block
      * @return
@@ -154,6 +151,11 @@ public class ContentMgntController {
     @GetMapping(value = "/blocks/simple", produces = "application/json")
     public Response listBlockSimple() {
         return Response.status(StatusType.SUCCESS).data(blockService.listSimpleBlock());
+    }
+
+    @GetMapping(value = "/blocks/count", produces = "application/json")
+    public Response getBlocksCount() {
+        return Response.status(StatusType.SUCCESS).data(blockService.listAllBlock().size());
     }
 
     @GetMapping(value = "/tags/{tagId}/products", produces = "application/json")

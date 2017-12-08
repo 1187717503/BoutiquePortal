@@ -20,5 +20,7 @@ var requestURL = {
     "getBlockTagRel" : {"url" : baseUrl + "content/blocks", "method" : "GET"},
     "delTagFromProduct" : {"url" : baseUrl + "content/tags/{tagId}/products/{productId}", "method" : "DELETE"},
     "delTagForProducts" : {"url" : baseUrl + "content/tags/{tagId}/products", "method" : "DELETE"},
-    "activateBlock" : {"url" : baseUrl + "content/blocks", "method" : "PUT"}
+    "activateBlock" : {"url" : baseUrl + "content/blocks", "method" : "PUT"},
+    "getBlocksCount" : {"url" : baseUrl + "content/blocks/count", "method" : "GET"},
+    "createBlock" : {"url" : baseUrl + "content/blocks", "method" : "POST"},
 }

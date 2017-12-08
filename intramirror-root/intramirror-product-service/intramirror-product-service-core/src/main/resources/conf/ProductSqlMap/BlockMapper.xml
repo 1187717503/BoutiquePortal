@@ -301,22 +301,22 @@
             status = #{status,jdbcType=TINYINT},
             modified_at = now()
             <!--<if test="colum.bgColor != null">-->
-                <!--bg_color = #{bgColor,jdbcType=CHAR},-->
+            <!--bg_color = #{bgColor,jdbcType=CHAR},-->
             <!--</if>-->
             <!--<if test="colum.subtitle != null">-->
-                <!--subtitle = #{subtitle,jdbcType=VARCHAR},-->
+            <!--subtitle = #{subtitle,jdbcType=VARCHAR},-->
             <!--</if>-->
             <!--<if test="colum.titleEnglish != null">-->
-                <!--title_english = #{titleEnglish,jdbcType=VARCHAR},-->
+            <!--title_english = #{titleEnglish,jdbcType=VARCHAR},-->
             <!--</if>-->
             <!--<if test="colum.enabled != null">-->
-                <!--enabled = #{enabled,jdbcType=BIT},-->
+            <!--enabled = #{enabled,jdbcType=BIT},-->
             <!--</if>-->
             <!--<if test="colum.content != null">-->
-                <!--content = #{content,jdbcType=LONGVARBINARY},-->
+            <!--content = #{content,jdbcType=LONGVARBINARY},-->
             <!--</if>-->
             <!--<if test="colum.coverImg != null">-->
-                <!--cover_img = #{coverImg,jdbcType=VARCHAR},-->
+            <!--cover_img = #{coverImg,jdbcType=VARCHAR},-->
             <!--</if>-->
         </set>
         WHERE block_id IN
@@ -384,6 +384,5 @@
         FROM `block`
         WHERE `block`.enabled = TRUE;
     </select>
-
 
 </mapper>

@@ -184,7 +184,20 @@
 
     </div>
     <!-- END WRAPPER -->
-
+	<div id="new-block" class="modal input-modal">
+        <div class="modal-content">
+            <div class="col" style="margin-left: 0px;padding-left: 11px;">
+                <div class="input-field col s4">
+                    <input id="text-new-blockName" type="text" class="validate">
+                    <label for="text-new-blockName">New Block Name</label>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="waves-effect waves-red btn-flat modal-action model-no">NO</a>
+            <a href="#" class="waves-effect waves-green btn-flat modal-action model-yes">YES</a>
+        </div>
+    </div>
 </div>
 <!-- END MAIN -->
 
@@ -328,57 +341,9 @@
 <script type="text/javascript">
 
     $(function () {
-
         initTag();
         initDate();
-
-        $('.sale-datepicker').pickadate({
-            selectMonths: true,
-            selectYears: 15,
-            today: 'Today',
-            clear: 'Clear',
-            close: 'Close',
-            format: 'yyyy-mm-dd',
-            closeOnSelect: false // Close upon selecting a date,
-        });
-
-        $('#search-btn').click(function() {
-            getBlockList(1);
-        })
-
-        $('#cancel-btn').click(function() {
-            $('#select-tag').val('-1');
-            $('#select-status').val('-1');
-            $('#text-blockName').val('');
-            $('#text-blockName').trigger('blur');
-
-            initDate();
-            $('select').material_select();
-
-            $('.orderby .icon use').attr('xlink:href', '#icon-paixu-copy');
-            $('.orderby').removeClass('active');
-            getBlockList(1);
-        })
-
-
-        $('#category-menu-input input, #category-menu-input span.triangle').click(function(e) {
-            $('#category-menu .multi-menu').css('min-width', $('#category-input').width() + 'px');
-            $('#category-menu').show();
-            e.stopPropagation();
-        });
-
-        $('html').click(function() {
-            $('#category-menu').hide();
-        })
-
-        $('#activate-btn').click(function() {
-            updateBlock('activate');
-        });
-
-        $('#de-activate-btn').click(function() {
-            updateBlock('de-activate');
-        });
-
+        initEvent();
     });
 
 </script>
