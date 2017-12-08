@@ -58,7 +58,6 @@ public class ContentMgntController {
 
     /**
      * Return block info with bind tag.
-     *
      * @param blockName
      * @param status
      * @param tagId
@@ -134,6 +133,11 @@ public class ContentMgntController {
     @GetMapping(value = "/tags", produces = "application/json")
     public Response listTags() {
         return Response.status(StatusType.SUCCESS).data(iTagService.getTags());
+    }
+
+    @GetMapping(value = "/tags/bydate", produces = "application/json")
+    public Response listTagsByDate() {
+        return Response.status(StatusType.SUCCESS).data(iTagService.getTagsByDate());
     }
 
     @DeleteMapping(value = "/tags/{tagId}")
