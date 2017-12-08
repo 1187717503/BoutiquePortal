@@ -355,7 +355,7 @@
 
         select pcr.`vendor_id` , GROUP_CONCAT(pcrsg.`season_code`) as season_codes  from price_change_rule pcr
         inner join price_change_rule_season_group pcrsg on (pcrsg.price_change_rule_id = pcr.price_change_rule_id and pcrsg.enabled = 1)
-        where pcr.price_type = #{price_type,jdbcType=BIGINT}
+        where pcr.price_type = #{price_type,jdbcType=BIGINT} and pcrsg.`season_code`  is not null
         and pcr.`status` = 2  group by pcr.`vendor_id`
     </select>
 
@@ -632,7 +632,11 @@
         update sku
         inner join `product`  p on(sku.`product_id` = p.`product_id` )
         set sku.`in_price`  = sku.price * #{default_discount_percentage,jdbcType=BIGINT}/((1+0.22)*100)
-        where p.`enabled`  =1  and sku.`enabled`  =1  and p.`vendor_id`  = #{vendor_id,jdbcType=BIGINT} and p.`season_code`  not in (#{season_codes,jdbcType=VARCHAR})
+        where p.`enabled`  =1  and sku.`enabled`  =1  and p.`vendor_id`  = #{vendor_id,jdbcType=BIGINT}
+        and p.`season_code`  not in
+        <foreach item="item" index="index" collection="season_codes" open="(" separator="," close=")">
+            #{item}
+        </foreach>
     </update>
 
     <update id="updateDefaultPriceByAdmin" parameterType="java.util.Map">
@@ -640,7 +644,11 @@
         update sku
         inner join `product`  p on(sku.`product_id` = p.`product_id` )
         set sku.`im_price`  = sku.price * #{default_discount_percentage,jdbcType=BIGINT}/100
-        where p.`enabled`  =1  and sku.`enabled`  =1  and p.`vendor_id`  = #{vendor_id,jdbcType=BIGINT} and p.`season_code`  not in (#{season_codes,jdbcType=VARCHAR})
+        where p.`enabled`  =1  and sku.`enabled`  =1  and p.`vendor_id`  = #{vendor_id,jdbcType=BIGINT}
+        and p.`season_code`  not in
+        <foreach item="item" index="index" collection="season_codes" open="(" separator="," close=")">
+            #{item}
+        </foreach>
     </update>
 
     <update id="updateSkuPriceByImPrice" >
