@@ -1,17 +1,13 @@
 package pk.shoplus.service.price.impl;
 
-import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
 import org.sql2o.Connection;
 import pk.shoplus.model.Product;
 import pk.shoplus.model.Sku;
-import pk.shoplus.parameter.EnabledType;
 import pk.shoplus.service.PriceChangeRuleService;
 import pk.shoplus.service.SkuService;
 import pk.shoplus.service.price.api.IPriceService;
@@ -64,34 +60,23 @@ public class PriceServiceImpl implements IPriceService{
         }
 
         SkuService skuService = new SkuService(conn);
-        Map<String,Object> conditions = new HashMap<>();
-        conditions.put("enabled", EnabledType.USED);
-        conditions.put("product_id",product.getProduct_id());
-        List<Sku> skus = skuService.getSkuListByCondition(conditions);
-        if(skus != null && skus.size() >0) {
-            BigDecimal im_price = new BigDecimal(0);
-            BigDecimal in_price = new BigDecimal(0);
-            for(Sku sku : skus) {
-                logger.info("IPriceService,synProductPriceRule,updateSkuPrice,start,sku:"+ JSONObject.toJSONString(sku)+",newPrice:"+newPrice);
-                sku.price = newPrice;
-                sku.in_price = new BigDecimal(newPrice.doubleValue() * vendorDiscount / ((1 + 0.22) * 100));
-                sku.im_price = new BigDecimal(newPrice.doubleValue() * adminDiscount / ((1) * 100));
-                sku.updated_at = new Date();
-                skuService.updateSku(sku);
-                im_price = sku.im_price;
-                in_price = sku.in_price;
-                logger.info("IPriceService,synProductPriceRule,updateSkuPrice,end,sku:"+ JSONObject.toJSONString(sku));
-            }
 
-            String updateShopProductSalePrice = "update shop_product set max_sale_price="+im_price+",min_sale_price="+im_price+",updated_at=now() where product_id="+product.getProduct_id();
+        BigDecimal im_price = new BigDecimal(newPrice.doubleValue() * adminDiscount / ((1) * 100));
+        BigDecimal in_price = new BigDecimal(newPrice.doubleValue() * vendorDiscount / ((1 + 0.22) * 100));
+        Long product_id = product.getProduct_id();
+
+        if(im_price.intValue() != 0 && newPrice.intValue() != 0 && in_price.intValue() != 0) {
+            String updateSkuPrice = "update `sku`  set `in_price`  ="+in_price+" ,`im_price` ="+im_price+" , `price`  = "+newPrice+" where `product_id`  ="+product_id;
+            String updateShopProductSalePrice = "update shop_product set max_sale_price="+im_price+",min_sale_price="+im_price+",updated_at=now() where product_id="+product_id;
             String updateShopProductSkuImPrice =  "update `shop_product_sku`  sps \n"
-                        + "inner join `shop_product`  sp on(sps.`shop_product_id` = sp.`shop_product_id`)\n"
-                        + "set sps.`sale_price`  ="+im_price+",sps.updated_at=now()\n"
-                        + "where sp.`product_id`  ="+product.getProduct_id();
-            String updateProductRetailPrice = "update `product` set `max_retail_price` ="+newPrice+",`min_retail_price` = "+newPrice+",last_check=now()  where enabled = 1 and product_id="+product.getProduct_id();
-            String updateProductBoutiquePrice = "update `product` set `min_boutique_price` ="+in_price+",`max_boutique_price` = "+in_price+",last_check=now()  where enabled = 1 and product_id="+product.getProduct_id();
-            String updateProductImPrice = "update `product` set `min_im_price` ="+im_price+",`max_im_price` = "+im_price+",last_check=now()  where enabled = 1 and product_id="+product.getProduct_id();
+                    + "inner join `shop_product`  sp on(sps.`shop_product_id` = sp.`shop_product_id`)\n"
+                    + "set sps.`sale_price`  ="+im_price+",sps.updated_at=now()\n"
+                    + "where sp.`product_id`  ="+product_id;
+            String updateProductRetailPrice = "update `product` set `max_retail_price` ="+newPrice+",`min_retail_price` = "+newPrice+",last_check=now()  where enabled = 1 and product_id="+product_id;
+            String updateProductBoutiquePrice = "update `product` set `min_boutique_price` ="+in_price+",`max_boutique_price` = "+in_price+",last_check=now()  where enabled = 1 and product_id="+product_id;
+            String updateProductImPrice = "update `product` set `min_im_price` ="+im_price+",`max_im_price` = "+im_price+",last_check=now()  where enabled = 1 and product_id="+product_id;
 
+            skuService.updateBySQL(updateSkuPrice);
             skuService.updateBySQL(updateShopProductSalePrice);
             skuService.updateBySQL(updateShopProductSkuImPrice);
             skuService.updateBySQL(updateProductRetailPrice);
@@ -100,11 +85,12 @@ public class PriceServiceImpl implements IPriceService{
 
 
             logger.info("IPriceService,synProductPriceRule,SQL:"+
-                            "updateShopProductSalePrice:"+updateShopProductSalePrice+
-                            ",updateShopProductSkuImPrice:"+updateShopProductSkuImPrice+
-                            ",updateProductRetailPrice:"+updateProductRetailPrice+
-                            ",updateProductBoutiquePrice:"+updateProductBoutiquePrice+
-                            ",updateProductImPrice:"+updateProductImPrice);
+                    "updateSkuPrice:"+updateSkuPrice+
+                    ",updateShopProductSalePrice:"+updateShopProductSalePrice+
+                    ",updateShopProductSkuImPrice:"+updateShopProductSkuImPrice+
+                    ",updateProductRetailPrice:"+updateProductRetailPrice+
+                    ",updateProductBoutiquePrice:"+updateProductBoutiquePrice+
+                    ",updateProductImPrice:"+updateProductImPrice);
         }
         return true;
     }
