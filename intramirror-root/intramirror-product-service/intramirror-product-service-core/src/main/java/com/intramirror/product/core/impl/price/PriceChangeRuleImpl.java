@@ -3,7 +3,6 @@
 package com.intramirror.product.core.impl.price;
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.gson.Gson;
 import com.intramirror.common.Contants;
 import com.intramirror.common.enums.PriceChangeRuleEnum;
 import com.intramirror.common.enums.SystemPropertyEnum;
@@ -17,12 +16,14 @@ import com.intramirror.product.core.mapper.PriceChangeRuleMapper;
 import com.intramirror.product.core.mapper.PriceChangeRuleSeasonGroupMapper;
 import com.intramirror.product.core.mapper.SeasonMapper;
 import com.intramirror.product.core.mapper.SystemPropertyMapper;
-
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
 
 /**
  * Created by dingyifan on 2017/7/17.
@@ -155,10 +156,23 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         if(default_discount > 0) {
             paramsMap.put("default_discount_percentage",default_discount);
 
-            List<String> vendor_ids = new ArrayList<>();
-            List<String> season_codes = new ArrayList<>();
             List<Map<String,Object>> activeSeasonList = priceChangeRuleMapper.selectActiveSeasonGroupRule(paramsMap);
+            logger.info("updateDefaultPrice,selectActiveSeasonGroupRule,activeSeasonList:"+JSONObject.toJSONString(activeSeasonList));
+
             if(activeSeasonList != null && activeSeasonList.size() > 0) {
+
+                for(Map<String,Object> map : activeSeasonList) {
+                    if(priceType.getCode().intValue() == PriceChangeRuleEnum.PriceType.SUPPLY_PRICE.getCode().intValue()) {
+                        int i = priceChangeRuleMapper.updateDefaultPriceByVendor(map);
+                        logger.info("update vendor price by default discount : "+i +",map:"+JSONObject.toJSONString(map));
+                    } else if(priceType.getCode().intValue() == PriceChangeRuleEnum.PriceType.IM_PRICE.getCode().intValue()) {
+                        int i = priceChangeRuleMapper.updateDefaultPriceByAdmin(paramsMap);
+                        logger.info("update admin price by default discount : "+i +",map:"+JSONObject.toJSONString(map));
+                    }
+                }
+            }
+
+            /*if(activeSeasonList != null && activeSeasonList.size() > 0) {
                 for(Map<String,Object> map : activeSeasonList) {
                     vendor_ids.add(map.get("vendor_id").toString());
                     season_codes.add(map.get("season_code").toString());
@@ -179,7 +193,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             } else if(priceType.getCode().intValue() == PriceChangeRuleEnum.PriceType.IM_PRICE.getCode().intValue()) {
                 int i = priceChangeRuleMapper.updateDefaultPriceByAdmin(paramsMap);
                 logger.info("update admin price by default discount : "+i );
-            }
+            }*/
         }
     }
 
