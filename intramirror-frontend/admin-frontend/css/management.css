@@ -160,3 +160,7 @@ input.date-input {
     line-height: 47px;
     text-align: right;
 }
+
+.modal.input-modal{
+    width: 30%;
+}
