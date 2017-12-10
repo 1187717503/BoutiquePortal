@@ -773,6 +773,8 @@ function initBatchAction() {
 
 
     $('#edit-tag-btn').click(function() {
+        $("#tmpl-tag-head-list").tmpl().appendTo("#tag-head-list");
+
         $('#edit-tag').openModal({
             dismissible: false,
             opacity: .5,

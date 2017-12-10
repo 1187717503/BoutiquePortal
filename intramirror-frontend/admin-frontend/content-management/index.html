@@ -291,16 +291,29 @@
     <!-- END WRAPPER -->
 
     <!-- Start Edit Tag -->
-    <div id="edit-tag" class="modal input-modal">
+    <div id="edit-tag" class="modal input-modal" style="max-height: 100%;">
         <div class="modal-content row">
-            <span class="brand-text" style="font-size: 20px;">Edit Product Tag</span>
-            <div style="margin-top: 12px;">
-                <div class="input-field col s5" style="padding-left: 0px;">
-                    <input id="text-new-tag" type="text" class="validate">
-                    <label for="text-new-tag">Enter a new tag name</label>
-                </div>
-                <div class="col s4" style="margin-top: 26px;">
-                    <a id="add-tag-btn" class="waves-effect waves-light btn">ADD</a>
+            <span class="brand-text" style="font-size: 20px;font-weight: 500;">Edit Product Tag</span>
+            <div class="row">
+                <div style="margin-top: 12px;">
+                    <div class="row">
+                        <div class="input-field col s5" style="padding-left: 0px;">
+                            <input id="text-new-tag" type="text" class="validate">
+                            <label for="text-new-tag">Enter a new tag name</label>
+                        </div>
+                        <div class="col s4" style="margin-top: 26px;">
+                            <a id="add-tag-btn" class="waves-effect waves-light btn">ADD</a>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 50px;border-bottom: solid 1px;margin-bottom: 12px;">
+                        <h5 style="font-size: 16px;font-weight: 500;">Product Tags</h5>
+                    </div>
+                    <div class="row">
+                        <div id="tag-head-list" class="tag-head style-scope page-tag"></div>
+                        <div class="tag-list style-scope page-tag">
+                            <div id="tag-list" class="style-scope page-tag"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -421,19 +434,19 @@
 </script>
 
 <script id="tmpl-tag-head-list" type="text/x-jquery-tmpl">
-    <div class="row style-scope page-tag">
-        <div class="item style-scope page-tag">Tag Id</div>
-        <div class="item style-scope page-tag">Tag Name</div>
-        <div class="item style-scope page-tag">Created At</div>
-    </div>
+    <div class="item style-scope page-tag">Tag Id</div>
+    <div class="item style-scope page-tag">Tag Name</div>
+    <div class="item style-scope page-tag">Created At</div>
 </script>
 
 <script id="tmpl-tag-list" type="text/x-jquery-tmpl">
+    {%each(i, tag) list%}
     <div class="row style-scope page-tag">
-        <div class="item style-scope page-tag">Tag Id</div>
-        <div class="item style-scope page-tag">Tag Name</div>
-        <div class="item style-scope page-tag">Created At</div>
+        <div class="item style-scope page-tag">${tag.tag_id}</div>
+        <div class="item style-scope page-tag">${tag.tag_name}</div>
+        <div class="item style-scope page-tag">${tag.created_at}</div>
     </div>
+    {%/each%}
 </script>
 
 <script id="tmpl-order-head-list" type="text/x-jquery-tmpl">
