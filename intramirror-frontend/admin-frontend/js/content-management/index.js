@@ -773,7 +773,7 @@ function initBatchAction() {
 
 
     $('#edit-tag-btn').click(function() {
-        $("#tmpl-tag-head-list").tmpl().appendTo("#tag-head-list");
+        getTags();
 
         $('#edit-tag').openModal({
             dismissible: false,
@@ -783,10 +783,6 @@ function initBatchAction() {
             startingTop: '4%',
             endingTop: '10%'
         });
-    });
-
-    $('#edit-tag .model-no').click(function() {
-        $('#edit-tag').closeModal();
     });
 
     $('#edit-tag .model-yes').click(function() {
@@ -811,10 +807,70 @@ function initBatchAction() {
             success: function(result) {
                 Materialize.toast("Create Tag Success!", 3000);
                 $('#text-new-tag').val('');
+                $('#text-new-tag').trigger('blur');
+                getTags();
                 finishLoading();
             }, error: function(result, resp, par) {
                 toashWithCloseBtn(result.responseJSON.message);
                 finishLoading();
+                if (result.status == 401) {
+                    window.location.href = '../../../login';
+                }
+            }
+        });
+    });
+}
+
+function getTags () {
+    $('#tag-head-list').empty();
+    $('#tag-list').empty();
+    // 查询所有tag
+    $.ajax({
+        type: requestURL.getTagByDate.method,
+        contentType: "application/json",
+        url: requestURL.getTagByDate.url,
+        data: {},
+        dataType: 'json',
+        beforeSend: function(request) {
+            request.setRequestHeader("token", token);
+        },
+        success: function(result) {
+            $("#tmpl-tag-head-list").tmpl().appendTo("#tag-head-list");
+            $("#tmpl-tag-list").tmpl({list: result.data}).appendTo("#tag-list");
+            initAcitonEvent();
+        }, error: function(code, exception) {
+            if (code.status == 401) {
+                window.location.href = '../../../login'
+            }
+        }
+    });
+}
+
+function initAcitonEvent() {
+    $('.tag-list .action .action-icon').click(function() {
+        loading();
+        let tagId = $(this).parent().data('tag-id');
+        
+        $.ajax({
+            type: requestURL.delTag2Rel.method,
+            contentType: "application/json",
+            url: requestURL.delTag2Rel.url + "/" + tagId,
+            data: {},
+            dataType: 'json',
+            beforeSend: function(request) {
+                request.setRequestHeader("token", token);
+            },
+            success: function(result) {
+                let status = $('.tabs .tab a.active').data('status');
+                Materialize.toast('Delete Tag Success', 3000);
+                let current = $('.pagination .active.pagination-index').data('pageno') + 1;
+                initTag();
+                getProdcutList(status, current);
+                getTags();
+                finishLoading();
+            }, error: function(result, resp, par) {
+                toashWithCloseBtn(result.responseJSON.message);
+
                 if (result.status == 401) {
                     window.location.href = '../../../login';
                 }

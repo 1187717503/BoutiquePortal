@@ -24,5 +24,6 @@ var requestURL = {
     "getBlocksCount" : {"url" : baseUrl + "content/blocks/count", "method" : "GET"},
     "createBlock" : {"url" : baseUrl + "content/blocks", "method" : "POST"},
     "createTag" : {"url" : baseUrl + "content/tags", "method" : "POST"},
-    "getTagByDate" : {"url": baseUrl + "content/tags/bydate", "method": "GET"}
+    "getTagByDate" : {"url": baseUrl + "content/tags/bydate", "method": "GET"},
+    "delTag2Rel" : {"url": baseUrl + "content/tags", "method": "DELETE"}
 }

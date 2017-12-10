@@ -311,14 +311,14 @@
                     <div class="row">
                         <div id="tag-head-list" class="tag-head style-scope page-tag"></div>
                         <div class="tag-list style-scope page-tag">
-                            <div id="tag-list" class="style-scope page-tag"></div>
+                            <div id="tag-list" class="style-scope page-tag tag-list-body"></div>
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="row" style="border-bottom: 1px solid"></div>
         </div>
         <div class="modal-footer">
-            <a href="#" class="waves-effect waves-red btn-flat modal-action model-no">CANCEL</a>
             <a href="#" class="waves-effect waves-green btn-flat modal-action model-yes">OK</a>
         </div>
     </div>
@@ -437,14 +437,22 @@
     <div class="item style-scope page-tag">Tag Id</div>
     <div class="item style-scope page-tag">Tag Name</div>
     <div class="item style-scope page-tag">Created At</div>
+    <div class="item style-scope page-tag">Action</div>
 </script>
 
 <script id="tmpl-tag-list" type="text/x-jquery-tmpl">
     {%each(i, tag) list%}
     <div class="row style-scope page-tag">
-        <div class="item style-scope page-tag">${tag.tag_id}</div>
-        <div class="item style-scope page-tag">${tag.tag_name}</div>
-        <div class="item style-scope page-tag">${tag.created_at}</div>
+        <div class="item style-scope page-tag">${tag.tagId}</div>
+        <div class="item style-scope page-tag">${tag.tagName}</div>
+        <div class="item style-scope page-tag">${tag.createdAt}</div>
+        <div class="item style-scope page-tag action" data-tag-id="${tag.tagId}">
+            <span title="Trash" data-action="remove" class="waves-effect icon-btn-delete action-icon">
+                <svg class="icon" aria-hidden="true">
+                    <use class="use-icon" xlink:href="#icon-trash"></use>
+                </svg>
+            </span>
+        </div>
     </div>
     {%/each%}
 </script>
