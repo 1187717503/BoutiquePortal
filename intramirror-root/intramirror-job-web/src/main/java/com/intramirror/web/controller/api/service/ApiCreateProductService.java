@@ -330,8 +330,8 @@ public class ApiCreateProductService {
         product.vendor_id = vendorOptions.getVendorId();
         product.brand_id = Long.parseLong(productOptions.getBrandId());
         product.product_code = productOptions.getCode();
-        product.name = name;
-        product.description = productOptions.getDesc();
+        product.name = ApiCommonUtils.handleName(name);
+        product.description = ApiCommonUtils.handleName(productOptions.getDesc());
         product.remark = "";
         product.status = ProductStatusType.NEW_PENDING;
         product.feature = ProductFeatureType.NORMAL;
