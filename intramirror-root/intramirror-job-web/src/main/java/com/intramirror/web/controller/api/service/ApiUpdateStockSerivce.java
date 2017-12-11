@@ -373,6 +373,7 @@ public class ApiUpdateStockSerivce {
         int reserved = 0;
         int confirmed = 0;
         int sku_store_id = 0;
+        String sku_id = skuStoreMap.get("sku_id").toString();
         store = Integer.parseInt(skuStoreMap.get("store").toString());
         reserved = Integer.parseInt(skuStoreMap.get("reserved").toString());
         confirmed = Integer.parseInt(skuStoreMap.get("confirmed").toString());
@@ -429,6 +430,13 @@ public class ApiUpdateStockSerivce {
         skuStore.setConfirmed((long)confirmed);
         skuStoreService.updateSkuStore(skuStore);
         logger.info("ApiUpdateStockSerivce,updateStock,outputParams,skuStore:"+JSONObject.toJSONString(skuStore));
+
+        if(StringUtils.isNotBlank(stockOption.getSku_code())) {
+            String updateSkuCodeSQL = "update sku set sku_code =\""+stockOption.getSku_code()+"\" where sku_id="+sku_id;
+            SkuService skuService = new SkuService(conn);
+            skuService.updateBySQL(updateSkuCodeSQL);
+            logger.info("ApiUpdateStockSerivce,updateStock,updateSkuCodeSQL:"+updateSkuCodeSQL);
+        }
 
         // 当库存小于0，或低于100时，库存在这被清零，然后报警告
         if((originQty < 0 || originQty > 100) && Contants.STOCK_QTY == type) {
