@@ -8,7 +8,7 @@ import com.intramirror.common.enums.SystemPropertyEnum;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.common.parameter.StatusType;
-import com.intramirror.core.common.response.Response;
+import com.intramirror.web.common.response.Response;
 import com.intramirror.product.api.model.PriceChangeRule;
 import com.intramirror.product.api.model.PriceChangeRuleCategoryBrand;
 import com.intramirror.product.api.model.PriceChangeRuleGroup;
