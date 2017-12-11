@@ -66,7 +66,22 @@ public class PriceServiceImpl implements IPriceService{
         Long product_id = product.getProduct_id();
 
         if(im_price.intValue() != 0 && newPrice.intValue() != 0 && in_price.intValue() != 0) {
-            String updateSkuPrice = "update `sku`  set `in_price`  ="+in_price+" ,`im_price` ="+im_price+" , `price`  = "+newPrice+" ,`last_check`  = now()  where `product_id`  ="+product_id+";";
+
+            String updatePriceSQL = "update `sku`  s\n"
+                    + "inner join `product`  p on( s.`product_id`  = p.`product_id`  and s.`enabled`  = 1 and p.`enabled`  = 1)\n"
+                    + "left join `shop_product`  sp on(sp.`product_id` = p.`product_id`  and sp.`enabled`  = 1)\n"
+                    + "left join `shop_product_sku`  sps on(sps.`shop_product_id` = sp.`shop_product_id`  and sps.`enabled`  = 1)\n" + "set \n"
+                    + "s.`price` ="+newPrice+" ,s.`in_price` ="+in_price+" ,s.`im_price`  ="+im_price+" ,\n"
+                    + "p.`min_boutique_price` ="+in_price+" ,p.`min_im_price`  ="+im_price+" ,p.`min_retail_price` ="+newPrice+" ,\n"
+                    + "p.`max_boutique_price` ="+in_price+" ,p.`max_im_price` ="+im_price+" , p.`max_retail_price`  ="+newPrice+",\n"
+                    + "sps.`sale_price`  = "+im_price+",\n"
+                    + "sp.`min_sale_price` ="+im_price+" ,sp.`max_sale_price`   ="+im_price+" \n" + "where p.`product_id`  ="+product_id+";";
+
+            logger.info("synProductPriceRule,updatePriceSQL,start,SQL:"+updatePriceSQL);
+            skuService.updateBySQL(updatePriceSQL);
+            logger.info("synProductPriceRule,updatePriceSQL,end,SQL:"+updatePriceSQL);
+
+            /*String updateSkuPrice = "update `sku`  set `in_price`  ="+in_price+" ,`im_price` ="+im_price+" , `price`  = "+newPrice+" ,`last_check`  = now()  where `product_id`  ="+product_id+";";
             logger.info("IPriceService,synProductPriceRule,updateSkuPrice,sql:"+updateSkuPrice);
             skuService.updateBySQL(updateSkuPrice);
 
@@ -102,7 +117,7 @@ public class PriceServiceImpl implements IPriceService{
                     ",sql02:"+sql02+
                     ",sql03:"+sql03+
                     ",sql04:"+sql04+
-                    ",sql05:"+sql05);
+                    ",sql05:"+sql05);*/
 
             /*String updateShopProductSalePrice = "update shop_product set max_sale_price="+im_price+",min_sale_price="+im_price+",updated_at=now() where product_id="+product_id;
             String updateShopProductSkuImPrice =  "update `shop_product_sku`  sps \n"
