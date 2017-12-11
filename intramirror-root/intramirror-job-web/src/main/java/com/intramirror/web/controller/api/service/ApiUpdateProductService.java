@@ -147,6 +147,7 @@ public class ApiUpdateProductService {
     }
 
     private void setProduct(Connection conn) throws Exception{
+        ProductService productService = new ProductService(conn);
         Product product = this.getProduct(conn);
         logger.info("ApiUpdateProductService,setProduct,start,updateProduct,product:"+JSONObject.toJSONString(product));
         product.last_check = new Date();
@@ -172,10 +173,20 @@ public class ApiUpdateProductService {
         // 和原来不一致直接更新。如为空或者不能Mapping报Warning，但其他字段继续更新。
         String seasonCode = productOptions.getSeasonCode();
         if(StringUtils.isNotBlank(seasonCode) && !seasonCode.equals(product.getSeason_code())) {
-            IPriceService iPriceService = new PriceServiceImpl();
             product.setSeason_code(seasonCode);
-            logger.info("ApiUpdateProductService,setProduct,seasonCodeChange:"+JSONObject.toJSONString(product));
-            iPriceService.synProductPriceRule(product,product.getMin_retail_price(),conn);
+            String sql = "update product set preview_im_price = null where product_id ="+product.getProduct_id();
+            productService.updateBySQL(sql);
+            logger.info("ApiUpdateProductService,updatePreviewImPrice,sql:"+sql);
+
+            BigDecimal retailPrice = new BigDecimal(productOptions.getSalePrice());
+            int rs = ApiCommonUtils.ifUpdatePrice(product.getMax_retail_price(),retailPrice);
+
+            // 当season_code发生变化，买手店价格和product.retail_price相同（0），或者超出20%，重新同步价格（2），
+            if(rs == 0 || rs == 2) {
+                IPriceService iPriceService = new PriceServiceImpl();
+                logger.info("ApiUpdateProductService,setProduct,seasonCodeChange:"+JSONObject.toJSONString(product));
+                iPriceService.synProductPriceRule(product,product.getMin_retail_price(),conn);
+            }
         }
 
         // 获取新的BrandID和ColorCode
@@ -215,7 +226,6 @@ public class ApiUpdateProductService {
         }
         this.updateProductProperty(conn,product.getProduct_id(), ProductPropertyEnumKeyName.CarryOver.getCode(),productOptions.getCarryOver());
 
-        ProductService productService = new ProductService(conn);
         productService.updateProduct(product);
         logger.info("ApiUpdateProductService,setProduct,end,updateProduct,product:"+JSONObject.toJSONString(product));
     }

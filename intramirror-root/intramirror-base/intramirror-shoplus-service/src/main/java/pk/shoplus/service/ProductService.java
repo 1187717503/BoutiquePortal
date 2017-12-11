@@ -104,6 +104,10 @@ public class ProductService {
         }
     }
 
+    public void updateBySQL(String sql) throws Exception{
+        productDao.updateBySQL(sql,null);
+    }
+
     /**
      * 通过product_id 获取 product
      *
