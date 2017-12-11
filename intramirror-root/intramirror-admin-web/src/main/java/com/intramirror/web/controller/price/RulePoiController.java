@@ -3,7 +3,6 @@ package com.intramirror.web.controller.price;
 import com.intramirror.common.help.ExceptionUtils;
 import com.intramirror.common.help.PriceChangeRuleExcelUtils;
 import com.intramirror.common.utils.DateUtils;
-import com.intramirror.core.common.response.Response;
 import com.intramirror.product.api.service.rule.IRuleService;
 import com.intramirror.web.common.CommonProperties;
 import java.io.BufferedInputStream;
