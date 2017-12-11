@@ -178,6 +178,7 @@ function initTag() {
 }
 
 function initDate() {
+    /* 2017-12-11 需求变更，不要初始化日期
     let curDate = format(new Date(), 'yyyy-MM-dd');
     let endDate = new Date(curDate);
     endDate.setMonth(endDate.getMonth() - 1);
@@ -185,6 +186,7 @@ function initDate() {
 
     $('#sale-at-start').val(startDate);
     $('#sale-at-end').val(curDate);
+    */
 }
 
 
@@ -809,6 +811,7 @@ function initBatchAction() {
                 $('#text-new-tag').val('');
                 $('#text-new-tag').trigger('blur');
                 getTags();
+                initTag();
                 finishLoading();
             }, error: function(result, resp, par) {
                 toashWithCloseBtn(result.responseJSON.message);
@@ -861,11 +864,10 @@ function initAcitonEvent() {
                 request.setRequestHeader("token", token);
             },
             success: function(result) {
-                let status = $('.tabs .tab a.active').data('status');
                 Materialize.toast('Delete Tag Success', 3000);
                 let current = $('.pagination .active.pagination-index').data('pageno') + 1;
                 initTag();
-                getProdcutList(status, current);
+                getProdcutList(current);
                 getTags();
                 finishLoading();
             }, error: function(result, resp, par) {
