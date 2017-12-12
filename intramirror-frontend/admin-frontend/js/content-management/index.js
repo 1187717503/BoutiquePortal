@@ -404,6 +404,13 @@ function getProdcutList(pageno) {
                     result.data[i].sale_price = result.data[i].sale_price.toFixed(2);
                 }
 
+                if (!result.data[i].preview_price) {
+                    result.data[i].preview_price = '-';
+                } else {
+                    result.data[i].preview_price = result.data[i].preview_price.toFixed(2);
+                }
+                
+
                 if (!result.data[i].boutique_discount) {
                     result.data[i].boutique_discount = '';
                 } else {

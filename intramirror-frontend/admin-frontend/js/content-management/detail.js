@@ -250,6 +250,10 @@ function initProductList(curTagId) {
                     result.data[i].previewDiscount = (result.data[i].preview_discount*100).toFixed(0);
                 }
 
+                if (result.data[i].im_price) {
+                    result.data[i].im_price = result.data[i].im_price.toFixed(2);
+                }
+
                 // 街拍图拿不到
                 result.data[i].steet = 0;
                 if (result.data[i].img_modified) {
