@@ -111,7 +111,10 @@
             </otherwise>
         </choose>
         <if test="brandId != null">
-            AND brand.brand_id = #{brandId}
+            AND brand.brand_id IN
+            <foreach item="item" index="index" collection="brandId" open="(" separator="," close=")">
+                #{item}
+            </foreach>
         </if>
         <if test="categoryId != null">
             AND product.category_id IN

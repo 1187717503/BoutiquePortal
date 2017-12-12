@@ -12,7 +12,7 @@ public class SearchCondition {
     private Integer shopProductStatus;
     private Long[] vendorId;
     private String boutiqueId;
-    private Long brandId;
+    private Long[] brandId;
     private List<Long> categoryId;
     private String season;
     private String designerId;
@@ -75,11 +75,11 @@ public class SearchCondition {
         this.boutiqueId = boutiqueId;
     }
 
-    public Long getBrandId() {
+    public Long[] getBrandId() {
         return brandId;
     }
 
-    public void setBrandId(Long brandId) {
+    public void setBrandId(Long[] brandId) {
         this.brandId = brandId;
     }
 
