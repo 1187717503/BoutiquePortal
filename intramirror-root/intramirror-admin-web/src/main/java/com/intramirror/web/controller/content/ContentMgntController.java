@@ -82,7 +82,14 @@ public class ContentMgntController {
         int start = ((pageNo == null || pageNo < 0) ? 0 : (pageNo - 1) * pageSize);
         int limit = ((pageSize == null || pageSize < 0) ? 25 : pageSize);
         return Response.status(StatusType.SUCCESS).data(
-                contentManagementService.listBlockWithTag(blockName, status, tagId, modifiedAtFrom, modifiedAtTo, start, limit));
+                contentManagementService.listBlockWithTag(escapeLikeParams(blockName), status, tagId, modifiedAtFrom, modifiedAtTo, start, limit));
+    }
+
+    private String escapeLikeParams(String input) {
+        if (input == null) {
+            return input;
+        }
+        return input.replace("_", "\\_").replace("%", "\\%");
     }
 
     /**

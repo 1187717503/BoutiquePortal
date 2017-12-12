@@ -109,7 +109,7 @@
         LEFT JOIN tag ON tag.tag_id = block_tag_rel.tag_id AND tag.enabled = TRUE
         WHERE block.enabled = TRUE
         <if test="blockName != null">
-            AND block.block_name = #{blockName}
+            AND block.block_name LIKE "%"#{blockName}"%"
         </if>
         <if test="status != null">
             AND block.status = #{status}
