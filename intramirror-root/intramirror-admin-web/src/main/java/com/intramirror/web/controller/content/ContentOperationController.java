@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created on 2017/11/21.
- *
  * @author YouFeng.Zhu
  */
 @RestController
@@ -53,13 +52,16 @@ public class ContentOperationController {
             throw new ValidateException(new ErrorResponse("The block does not exist."));
         }
 
-        Map<String, Object> tagRelInfo = contentManagementService.getTagAndBlockRelByTagId(tag.getTagId());
-        if (tagRelInfo == null) {
-            throw new ValidateException(new ErrorResponse("The tag does not exist."));
+        if (tag.getTagId() != -1) {
+            Map<String, Object> tagRelInfo = contentManagementService.getTagAndBlockRelByTagId(tag.getTagId());
+            if (tagRelInfo == null) {
+                throw new ValidateException(new ErrorResponse("The tag does not exist."));
+            }
+            if (tagRelInfo.get("block_tag_id") != null && Long.parseLong(tagRelInfo.get("block_id").toString()) != block.getBlockId()) {
+                throw new ValidateException(new ErrorResponse("The tag has bind to other block [" + tagRelInfo.get("block_id") + "]."));
+            }
         }
-        if (tagRelInfo.get("block_tag_id") != null && Long.parseLong(tagRelInfo.get("block_id").toString()) != block.getBlockId()) {
-            throw new ValidateException(new ErrorResponse("The tag has bind to other block [" + tagRelInfo.get("block_id") + "]."));
-        }
+
     }
 
     private void checkParameter(Content content) {

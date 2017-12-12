@@ -83,10 +83,12 @@ function saveBlock() {
 
     param.tag = {}
     param.tag.tagId = $('#select-product-tag').val();
+    /*2017-12-12 tag不选可以解绑block和tag的关系，临时方案
     if (param.tag.tagId == null || param.tag.tagId == -1) {
         Materialize.toast('Please select product tag', 3000);
         return;
     }
+    */
 
     param.block.title = $('#text-title').val();
     if (param.block.title === '') {

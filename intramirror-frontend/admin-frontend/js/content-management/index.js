@@ -802,6 +802,11 @@ function initBatchAction() {
         loading();
         let param = {};
         param.tagName = $('#text-new-tag').val();
+        if(param.tagName == "") {
+            toashWithCloseBtn("Please enter the tag name!");
+            finishLoading();
+            return;
+        }
         param.enabled = 1;
         //掉后台接口
         $.ajax({

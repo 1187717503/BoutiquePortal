@@ -77,7 +77,12 @@ public class TagServiceImpl implements ITagService {
 
     @Override
     public Tag selectByPrimaryKey(Long tagId) {
-        logger.info("[service] getTags and tagId is [{}]", tagId);
+        logger.info("[service] selectByPrimaryKey and tagId is [{}]", tagId);
         return tagMapper.selectByPrimaryKey(tagId);
+    }
+
+    public List<Tag> getTagsByName(Tag record) {
+        logger.info("[service] getTagsByName and tagId is [{}]", record.getTagId());
+        return tagMapper.getTagsByName(record);
     }
 }

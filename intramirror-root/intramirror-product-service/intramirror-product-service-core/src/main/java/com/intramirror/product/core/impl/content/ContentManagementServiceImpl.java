@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created on 2017/11/21.
- *
  * @author YouFeng.Zhu
  */
 @Service
@@ -82,7 +81,7 @@ public class ContentManagementServiceImpl implements ContentManagementService {
     @Override
     public List<Map<String, Object>> listBlockWithTag(String blockName, Integer status, Long tagId, Long modifiedAtFrom, Long modifiedAtTo, int start,
             int limit) {
-        return contentManagementMapper.listBlockWithTag(blockName, status, tagId, modifiedAtFrom, modifiedAtTo,start,limit);
+        return contentManagementMapper.listBlockWithTag(blockName, status, tagId, modifiedAtFrom, modifiedAtTo, start, limit);
     }
 
     @Override
@@ -103,7 +102,7 @@ public class ContentManagementServiceImpl implements ContentManagementService {
     @Override
     @Transactional
     public int batchUpdateBlock(List<Block> record) {
-        return blockMapper.batchUpdateBlock(record.get(0).getStatus(),record);
+        return blockMapper.batchUpdateBlock(record.get(0).getStatus(), record);
     }
 
     @Override
@@ -155,6 +154,9 @@ public class ContentManagementServiceImpl implements ContentManagementService {
 
     private int rebindBlockTag(Block block, Long tagId) {
         blockTagRelMapper.deleteByBlockId(block.getBlockId());
+        if (tagId == -1) {
+            return 0;
+        }
         BlockTagRel btRel = new BlockTagRel();
         btRel.setBlockId(block.getBlockId());
         btRel.setTagId(tagId);
@@ -163,7 +165,7 @@ public class ContentManagementServiceImpl implements ContentManagementService {
 
     private int updateTagProductSort(Long tagId, List<TagProductRel> sort) {
         tagProductRelMapper.deleteByTagId(tagId);
-        if (sort.size() == 0) {
+        if (sort.size() == 0 || tagId == -1) {
             return 0;
         }
         for (TagProductRel tagProductRel : sort) {

@@ -49,4 +49,6 @@ public interface TagMapper {
     List<Tag> getTags();
 
     List<Tag> getTagsByDate();
+
+    List<Tag> getTagsByName(Tag record);
 }

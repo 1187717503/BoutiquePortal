@@ -133,6 +133,10 @@ public class ContentMgntController {
     @PostMapping(value = "/tags", consumes = "application/json")
     @ResponseStatus(value = HttpStatus.CREATED)
     public Response createTag(@RequestBody Tag tag) {
+        List<Tag> list = iTagService.getTagsByName(tag);
+        if (list.size() > 0) {
+            throw new ValidateException(new ErrorResponse("The tag name already exist."));
+        }
         contentManagementService.createTag(tag);
         return Response.success();
     }
