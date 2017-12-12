@@ -11,7 +11,13 @@ function initBrand() {
             request.setRequestHeader("token", token);
         },
         success: function(result) {
-            initSelectItems('select-brand', 'tmpl-brand-select', result.data);
+
+            $('#select-brand').empty();
+            $('#tmpl-brand-select').tmpl({list: result.data}).appendTo('#select-brand');
+            
+            $('#select-brand').selectize({
+                maxItems: 30
+            });
         },
         error: function(code, xx) {
             if (code.status == 401) {
@@ -268,7 +274,7 @@ function getProdcutList(pageno) {
         filter += 'boutiqueId='+ searchObj.boutiqueId + '&';
     }
 
-    if (searchObj.brand !== '-1') {
+    if (searchObj.brand !== '-1' && searchObj.brand) {
         filter += 'brandId='+ searchObj.brand + '&';
     }
 

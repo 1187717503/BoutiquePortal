@@ -21,6 +21,9 @@
     <link href="../js/plugins/magnific-popup/magnific-popup.css" type="text/css" rel="stylesheet" media="screen,projection">
 
     <link href="../css/css-multi-level-menu/multi-menu.css" rel="stylesheet">
+
+    <link href="../js/plugins/selector/css/selectize.css" rel="stylesheet">
+
     <!-- Customer CSS-->
     <link href="../css/custom/custom.css" type="text/css" rel="stylesheet" media="screen,projection">
     <link href="../css/index.css" type="text/css" rel="stylesheet" media="screen,projection">
@@ -124,7 +127,7 @@
                             <label for="text-boutique">Boutique ID</label>
                         </div>
                         <div class="input-field col s2">
-                            <select id="select-brand"></select>
+                            <select id="select-brand" class="browser-default" placeholder="Please select brand..."></select>
                             <label for="select-brand">Brand</label>
                         </div>
                     </div>
@@ -351,13 +354,15 @@
 <!--plugins.js - Some Specific JS codes for Plugin Settings-->
 <script type="text/javascript" src="../js/plugins.js"></script>
 
+<script src="../js/plugins/selector/js/standalone/selectize.js"></script>
+
 <!--custom-script.js - Add your own theme custom JS-->
 <script type="text/javascript" src="../js/custom-script.js"></script>
 
 <script type="text/javascript" src="../js/plugins/iconfont/iconfont.js"></script>
 
 <script id="tmpl-brand-select" type="text/x-jquery-tmpl">
-    <option value="-1" selected>Brand</option>
+    <option value="">Please select brand</option>
     {%each(i, brand) list%}
     <option value="${brand.brand_id}">${brand.english_name}</option>
     {%/each%}
@@ -657,7 +662,11 @@
             $('#category-input').data('category-id', '-1');
             $('#category-input').val('Category');
             $('#select-season').val('-1');
-            $('#select-brand').val('-1');
+
+            var select = $('#select-brand').selectize();
+            var selectSizeControl = select[0].selectize;
+            selectSizeControl.clear();
+
             $('#select-tag').val('-1');
             $('#select-apply-tag').val('-1');
             $('#stock-left').val('');
