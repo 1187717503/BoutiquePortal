@@ -15,7 +15,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <junit.version>4.12</junit.version>
-        <spring.version>4.3.0.RELEASE</spring.version>
+        <spring.version>4.3.13.RELEASE</spring.version>
         <jsonpath.version>2.1.0</jsonpath.version>
         <jackson.version>2.9.2</jackson.version>
     </properties>
@@ -129,7 +129,7 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-webmvc</artifactId>
                 <version>${spring.version}</version>
-            </dependency>
+            </dependency> 
 
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -160,22 +160,22 @@
                 <artifactId>spring-jdbc</artifactId>
                 <version>${spring.version}</version>
             </dependency>
-            <dependency>
+            <!-- <dependency>
                 <groupId>org.springframework.data</groupId>
                 <artifactId>spring-data-redis</artifactId>
-                <version>2.0.1.RELEASE</version>
-            </dependency>
+                <version>1.8.9.RELEASE</version>
+            </dependency> -->
 
             <!-- end spring pom -->
 
             <!-- Override Spring Data release train provided by Spring Boot -->
-            <dependency>
+            <!-- <dependency>
                 <groupId>org.springframework.data</groupId>
                 <artifactId>spring-data-releasetrain</artifactId>
                 <version>Fowler-SR2</version>
                 <scope>import</scope>
                 <type>pom</type>
-            </dependency>
+            </dependency> -->
 
             <dependency>
                 <groupId>org.springframework.boot</groupId>
