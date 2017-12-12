@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 /**
  * Created on 2017/11/17.
- *
  * @author YouFeng.Zhu
  */
 @Service
@@ -68,5 +67,9 @@ public class BlockServiceImpl implements BlockService {
     @Override
     public int batchUpdateSort(List<Block> blockList) {
         return blockMapper.batchUpdateSort(blockList);
+    }
+
+    public List<Block> getBlockByName(Block record) {
+        return blockMapper.getBlockByName(record);
     }
 }

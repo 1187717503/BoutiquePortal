@@ -350,12 +350,16 @@ function initEvent() {
     });
 
     $('#new-block .model-yes').click(function() {
-        $('#new-block').closeModal();
         loading();
         
         let param = {};
         param.status = 0;
         param.blockName = $('#text-new-blockName').val();
+        if(param.blockName == "") {
+            toashWithCloseBtn("Please enter the block name!");
+            finishLoading();
+            return;
+        }
         param.enabled = 1;
         //掉后台接口
         $.ajax({
@@ -371,6 +375,7 @@ function initEvent() {
                 Materialize.toast("Create Block Success!", 3000);
                 // 获取当前页数
                 //let current = $('.pagination .active.pagination-index').data('pageno') + 1;
+                $('#new-block').closeModal();
                 getBlockList(1);
                 finishLoading();
             }, error: function(result, resp, par) {

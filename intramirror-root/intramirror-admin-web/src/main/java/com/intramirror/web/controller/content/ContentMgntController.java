@@ -100,6 +100,11 @@ public class ContentMgntController {
     @PostMapping(value = "/blocks", consumes = "application/json")
     @ResponseStatus(value = HttpStatus.CREATED)
     public Response createBlock(@RequestBody Block block) {
+        //先查block Jain
+        List<Block> list = blockService.getBlockByName(block);
+        if (list.size() > 0) {
+            throw new ValidateException(new ErrorResponse("The block name already exist."));
+        }
         blockService.createBlock(block);
         return Response.success();
     }
