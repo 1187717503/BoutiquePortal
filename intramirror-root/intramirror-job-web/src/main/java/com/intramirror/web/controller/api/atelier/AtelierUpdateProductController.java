@@ -61,9 +61,9 @@ public class AtelierUpdateProductController {
 
             this.setRedisDate(type,storeID,body);
 
-            logger.info("AtelierFullUpdateProductControllerExecute,params,type:"+type+",storeID:"+storeID+",version:"+version+",body:"+body);
+            logger.info("AtelierFullUpdateProductControllerExecute,params,type:"+type+",storeID:"+storeID+",version:"+version+",body:"+body+","+storeID+"_"+type);
             Map<String,Object> resultMap = atelierUpdateByProductService.updateProduct(body,storeID,version,type);
-            logger.info("AtelierFullUpdateProductControllerExecute,updateProduct,type:"+type+",resultMap:"+JSONObject.toJSONString(resultMap)+",storeID:"+storeID+",version:"+version+",body:"+body);
+            logger.info("AtelierFullUpdateProductControllerExecute,updateProduct,type:"+type+",resultMap:"+JSONObject.toJSONString(resultMap)+",storeID:"+storeID+",version:"+version+",body:"+body+","+storeID+"_"+type);
 
             return resultMap;
         } catch (Exception e) {

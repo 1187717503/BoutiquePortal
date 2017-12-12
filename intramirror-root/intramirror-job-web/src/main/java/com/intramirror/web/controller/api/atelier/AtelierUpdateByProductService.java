@@ -198,5 +198,26 @@ public class AtelierUpdateByProductService implements InitializingBean {
         DIVO.put("vendor_name","divo");
         DIVO.put("eventName","divo");
         paramsMap.put("DIVO",DIVO);
+
+        Map<String,Object> BAG = new HashMap<>();
+        BAG.put("store_code","BAG");
+        BAG.put("vendor_id","31");
+        BAG.put("vendor_name","BagheeraBoutique");
+        BAG.put("eventName","bagheera");
+        paramsMap.put("BAG",BAG);
+
+        Map<String,Object> GAD = new HashMap<>();
+        GAD.put("store_code","GAD");
+        GAD.put("vendor_id","25");
+        GAD.put("vendor_name","Gaudenzi");
+        GAD.put("eventName","gaudenzi");
+        paramsMap.put("GAD",GAD);
+
+        Map<String,Object> VLT = new HashMap<>();
+        VLT.put("store_code","VLT");
+        VLT.put("vendor_id","27");
+        VLT.put("vendor_name","Valenti");
+        VLT.put("eventName","valenti");
+        paramsMap.put("VLT",VLT);
     }
 }

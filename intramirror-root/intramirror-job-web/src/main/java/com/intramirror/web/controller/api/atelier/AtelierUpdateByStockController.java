@@ -201,6 +201,31 @@ public class AtelierUpdateByStockController  implements InitializingBean {
         DIVO.put("eventName","divo更新库存");
         DIVO.put("fileUtils",new ApiDataFileUtils("divo","stock_delta_stock"));
         paramsMap.put("DIVO",DIVO);
+
+        Map<String,Object> BAG = new HashMap<>();
+        BAG.put("store_code","BAG");
+        BAG.put("vendor_id","31");
+        BAG.put("vendor_name","BagheeraBoutique");
+        BAG.put("eventName","bagheeraBoutique_stock_delta_stock");
+        BAG.put("fileUtils",new ApiDataFileUtils("bagheeraBoutique","stock_delta_stock"));
+        paramsMap.put("BAG",BAG);
+
+        Map<String,Object> GAD = new HashMap<>();
+        GAD.put("store_code","GAD");
+        GAD.put("vendor_id","25");
+        GAD.put("vendor_name","Gaudenzi");
+        GAD.put("eventName","gaudenzi_stock_delta_stock");
+        GAD.put("fileUtils",new ApiDataFileUtils("gaudenzi","stock_delta_stock"));
+        paramsMap.put("GAD",GAD);
+
+        Map<String,Object> VLT = new HashMap<>();
+        VLT.put("store_code","VLT");
+        VLT.put("vendor_id","27");
+        VLT.put("vendor_name","Valenti");
+        VLT.put("eventName","valenti_stock_delta_stock");
+        VLT.put("fileUtils",new ApiDataFileUtils("valenti","stock_delta_stock"));
+        paramsMap.put("VLT",VLT);
+
     }
 }
 
