@@ -71,9 +71,9 @@ public class ContentOperationController {
         if (StringUtils.isEmpty(content.getBlock().getSubtitle())) {
             throw new ValidateException(new ErrorResponse("Block subtitle is missing"));
         }
-        if (StringUtils.isEmpty(content.getBlock().getTitleEnglish())) {
-            throw new ValidateException(new ErrorResponse("Block title english is missing"));
-        }
+        //        if (StringUtils.isEmpty(content.getBlock().getTitleEnglish())) {
+        //            throw new ValidateException(new ErrorResponse("Block title english is missing"));
+        //        }
         if (StringUtils.isEmpty(content.getBlock().getCoverImg())) {
             throw new ValidateException(new ErrorResponse("Block cover image is missing"));
         }
