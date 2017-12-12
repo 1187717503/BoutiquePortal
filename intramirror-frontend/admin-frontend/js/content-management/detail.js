@@ -96,16 +96,16 @@ function saveBlock() {
         return;
     }
 
-    if (param.block.title.gblen() > 22) {
-        Materialize.toast('Title must be less 22 character', 3000);
+    if (param.block.title.gblen() > 40) {
+        Materialize.toast('Title must be less 40 character', 3000);
         return;
     }
 
     param.block.titleEnglish = $('#text-english-name').val();
-    if (param.block.titleEnglish === '') {
-        Materialize.toast('Please type title in english', 3000);
-        return;
-    }
+    // if (param.block.titleEnglish === '') {
+    //     Materialize.toast('Please type title in english', 3000);
+    //     return;
+    // }
 
     param.block.subtitle = $('#text-sub-title').val();
     if (param.block.subtitle == '') {
