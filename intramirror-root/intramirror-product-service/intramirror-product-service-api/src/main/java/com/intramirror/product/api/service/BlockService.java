@@ -6,7 +6,6 @@ import java.util.Map;
 
 /**
  * Created on 2017/11/17.
- *
  * @author YouFeng.Zhu
  */
 public interface BlockService {
@@ -27,5 +26,7 @@ public interface BlockService {
     List<Block> listBlockBySort(int sortOrder);
 
     int batchUpdateSort(List<Block> blockList);
+
+    List<Block> getBlockByName(Block record);
 
 }
