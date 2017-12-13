@@ -235,6 +235,22 @@ public class ApiUpdateStockSerivce {
             skuService.createSku(sku);
             logger.info("ApiUpdateStockSerivce,createSku,sku:"+JSONObject.toJSONString(sku));
 
+            BigDecimal newPrice = product.getMax_retail_price();
+            BigDecimal im_price = sku.im_price;
+            BigDecimal in_price = sku.in_price;
+            Long product_id = product.getProduct_id();
+            String updatePriceSQL = "update `sku`  s\n"
+                    + "inner join `product`  p on( s.`product_id`  = p.`product_id`  and s.`enabled`  = 1 and p.`enabled`  = 1)\n"
+                    + "left join `shop_product`  sp on(sp.`product_id` = p.`product_id`  and sp.`enabled`  = 1)\n"
+                    + "left join `shop_product_sku`  sps on(sps.`shop_product_id` = sp.`shop_product_id`  and sps.`enabled`  = 1)\n" + "set \n"
+                    + "s.`price` ="+newPrice+" ,s.`in_price` ="+in_price+" ,s.`im_price`  ="+im_price+" ,\n"
+                    + "p.`min_boutique_price` ="+in_price+" ,p.`min_im_price`  ="+im_price+" ,p.`min_retail_price` ="+newPrice+" ,\n"
+                    + "p.`max_boutique_price` ="+in_price+" ,p.`max_im_price` ="+im_price+" , p.`max_retail_price`  ="+newPrice+",\n"
+                    + "sps.`sale_price`  = "+im_price+",\n"
+                    + "sp.`min_sale_price` ="+im_price+" ,sp.`max_sale_price`   ="+im_price+" \n" + "where p.`product_id`  ="+product_id+";";
+            skuService.updateBySQL(updatePriceSQL);
+            logger.info("ApiUpdateStockService,createSku,updateProduct,updatePriceSQL:"+updatePriceSQL);
+
             // 2.create sku_store
             SkuStoreService skuStoreService = new SkuStoreService(conn);
             SkuStore skuStore = new SkuStore();
