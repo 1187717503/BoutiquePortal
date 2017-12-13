@@ -23,4 +23,11 @@ public class ApiErrorProcessingServiceImpl extends BaseDao implements IApiErrorP
     public int insert(ApiErrorProcessing record) {
         return apiErrorProcessingMapper.insert(record);
     }
+
+    @Override
+    public int deleteApiErrorProcessing(String createTime) {
+        apiErrorProcessingMapper.deleteApiErrorProcessing(createTime);
+        return 0;
+    }
+
 }

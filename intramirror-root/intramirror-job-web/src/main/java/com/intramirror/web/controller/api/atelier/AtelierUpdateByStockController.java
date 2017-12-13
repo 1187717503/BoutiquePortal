@@ -126,7 +126,7 @@ public class AtelierUpdateByStockController  implements InitializingBean {
         X4ZMP.put("store_code","X4ZMP");
         X4ZMP.put("vendor_id","8");
         X4ZMP.put("vendor_name","Luciana Bari");
-        X4ZMP.put("eventName","luciana更新库存");
+        X4ZMP.put("eventName","luciana_stock_delta_stock");
         X4ZMP.put("fileUtils",new ApiDataFileUtils("luciana","stock_delta_stock"));
         paramsMap.put("X4ZMP",X4ZMP);
 
@@ -134,7 +134,7 @@ public class AtelierUpdateByStockController  implements InitializingBean {
         XIW2E.put("store_code","XIW2E");
         XIW2E.put("vendor_id","10");
         XIW2E.put("vendor_name","Dante 5");
-        XIW2E.put("eventName","dante更新库存");
+        XIW2E.put("eventName","dante_stock_delta_stock");
         XIW2E.put("fileUtils",new ApiDataFileUtils("dante","stock_delta_stock"));
         paramsMap.put("XIW2E",XIW2E);
 
@@ -142,7 +142,7 @@ public class AtelierUpdateByStockController  implements InitializingBean {
         UIWK2.put("store_code","UIWK2");
         UIWK2.put("vendor_id","11");
         UIWK2.put("vendor_name","I Cinque Fiori");
-        UIWK2.put("eventName","iCinque更新库存");
+        UIWK2.put("eventName","icinque_stock_delta_stock");
         UIWK2.put("fileUtils",new ApiDataFileUtils("iCinque","stock_delta_stock"));
         paramsMap.put("UIWK2",UIWK2);
 
@@ -150,7 +150,7 @@ public class AtelierUpdateByStockController  implements InitializingBean {
         ERS4S.put("store_code","ERS4S");
         ERS4S.put("vendor_id","12");
         ERS4S.put("vendor_name","Mimma Ninni");
-        ERS4S.put("eventName","mimma更新库存");
+        ERS4S.put("eventName","mimma_stock_delta_stock");
         ERS4S.put("fileUtils",new ApiDataFileUtils("mimma","stock_delta_stock"));
         paramsMap.put("ERS4S",ERS4S);
 
@@ -158,7 +158,7 @@ public class AtelierUpdateByStockController  implements InitializingBean {
         UEYHD.put("store_code","UEYHD");
         UEYHD.put("vendor_id","13");
         UEYHD.put("vendor_name","Di Pierro");
-        UEYHD.put("eventName","diPierro更新库存");
+        UEYHD.put("eventName","dippero_stock_delta_stock");
         UEYHD.put("fileUtils",new ApiDataFileUtils("diPierro","stock_delta_stock"));
         paramsMap.put("UEYHD",UEYHD);
 
@@ -166,7 +166,7 @@ public class AtelierUpdateByStockController  implements InitializingBean {
         IEK7W.put("store_code","IEK7W");
         IEK7W.put("vendor_id","14");
         IEK7W.put("vendor_name","Gisa Boutique");
-        IEK7W.put("eventName","gisa更新库存");
+        IEK7W.put("eventName","gisa_stock_delta_stock");
         IEK7W.put("fileUtils",new ApiDataFileUtils("gisa","stock_delta_stock"));
         paramsMap.put("IEK7W",IEK7W);
 
@@ -174,7 +174,7 @@ public class AtelierUpdateByStockController  implements InitializingBean {
         WISE.put("store_code","WISE");
         WISE.put("vendor_id","18");
         WISE.put("vendor_name","Wise Boutique");
-        WISE.put("eventName","wise更新库存");
+        WISE.put("eventName","wise_stock_delta_stock");
         WISE.put("fileUtils",new ApiDataFileUtils("wise","stock_delta_stock"));
         paramsMap.put("WISE",WISE);
 
@@ -182,7 +182,7 @@ public class AtelierUpdateByStockController  implements InitializingBean {
         JUL.put("store_code","JULIAN");
         JUL.put("vendor_id","26");
         JUL.put("vendor_name","Julian");
-        JUL.put("eventName","julian更新库存");
+        JUL.put("eventName","julian_stock_delta_stock");
         JUL.put("fileUtils",new ApiDataFileUtils("julian","stock_delta_stock"));
         paramsMap.put("JULIAN",JUL);
 
@@ -190,7 +190,7 @@ public class AtelierUpdateByStockController  implements InitializingBean {
         ANDD.put("store_code","ANDD");
         ANDD.put("vendor_id","29");
         ANDD.put("vendor_name","and");
-        ANDD.put("eventName","and更新库存");
+        ANDD.put("eventName","and_stock_delta_stock");
         ANDD.put("fileUtils",new ApiDataFileUtils("and","stock_delta_stock"));
         paramsMap.put("ANDD",ANDD);
 
@@ -198,7 +198,7 @@ public class AtelierUpdateByStockController  implements InitializingBean {
         DIVO.put("store_code","DIVO");
         DIVO.put("vendor_id","28");
         DIVO.put("vendor_name","divo");
-        DIVO.put("eventName","divo更新库存");
+        DIVO.put("eventName","divo_stock_delta_stock");
         DIVO.put("fileUtils",new ApiDataFileUtils("divo","stock_delta_stock"));
         paramsMap.put("DIVO",DIVO);
 
@@ -225,6 +225,14 @@ public class AtelierUpdateByStockController  implements InitializingBean {
         VLT.put("eventName","valenti_stock_delta_stock");
         VLT.put("fileUtils",new ApiDataFileUtils("valenti","stock_delta_stock"));
         paramsMap.put("VLT",VLT);
+
+        Map<String,Object> SUG = new HashMap<>();
+        SUG.put("store_code","SUG");
+        SUG.put("vendor_id","23");
+        SUG.put("vendor_name","SugarBoutique");
+        SUG.put("eventName","sugar_stock_delta_stock");
+        SUG.put("fileUtils",new ApiDataFileUtils("sugar","stock_delta_stock"));
+        paramsMap.put("SUG",SUG);
 
     }
 }
