@@ -222,7 +222,7 @@ function getProdcutList(status, pageno) {
         filter += 'boutiqueId='+ searchObj.boutiqueId + '&';
     }
 
-    if (searchObj.brand !== '-1') {
+    if (searchObj.brand !== '-1' && searchObj.brand) {
         filter += 'brandId='+ searchObj.brand + '&';
     }
 
