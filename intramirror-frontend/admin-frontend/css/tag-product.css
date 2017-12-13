@@ -346,19 +346,6 @@ input.price-input {
     padding: 4px 6px;
 }
 
-.selectize-control {
-    border-bottom: 2px solid #871b55;
-}
-.selectize-control input {
-    height: 1rem;
-    -webkit-box-shadow: none;
-}
-.selectize-input {
-    border: none;
-    background-color: inherit;
-    -webkit-box-shadow: none;
-}
-
 
 #select-brand~label{
     top: -14px;
