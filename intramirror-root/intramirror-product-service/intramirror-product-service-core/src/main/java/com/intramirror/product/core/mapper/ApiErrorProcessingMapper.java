@@ -50,4 +50,7 @@ public interface ApiErrorProcessingMapper {
      * @mbggenerated
      */
     int updateByPrimaryKey(ApiErrorProcessing record);
+
+    int deleteApiErrorProcessing(String createTime);
+
 }

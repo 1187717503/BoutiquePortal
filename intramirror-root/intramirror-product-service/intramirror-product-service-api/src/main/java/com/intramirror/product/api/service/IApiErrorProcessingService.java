@@ -7,4 +7,7 @@ import com.intramirror.product.api.model.ApiErrorProcessing;
  */
 public interface IApiErrorProcessingService {
     int insert(ApiErrorProcessing record);
+
+    int deleteApiErrorProcessing(String createTime);
+
 }

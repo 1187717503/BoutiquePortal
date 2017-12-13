@@ -229,4 +229,8 @@
       enabled = #{enabled,jdbcType=BIT}
     where api_error_processing_id = #{apiErrorProcessingId,jdbcType=BIGINT}
   </update>
+
+  <update id="deleteApiErrorProcessing" parameterType="java.lang.String">
+    delete from `api_error_processing`  where  <![CDATA[ `create_time`  < #{createTime,jdbcType=VARCHAR} ]]>
+  </update>
 </mapper>

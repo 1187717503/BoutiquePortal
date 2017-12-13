@@ -219,5 +219,12 @@ public class AtelierUpdateByProductService implements InitializingBean {
         VLT.put("vendor_name","Valenti");
         VLT.put("eventName","valenti");
         paramsMap.put("VLT",VLT);
+
+        Map<String,Object> SUG = new HashMap<>();
+        SUG.put("store_code","SUG");
+        SUG.put("vendor_id","23");
+        SUG.put("vendor_name","SugarBoutique");
+        SUG.put("eventName","sugar");
+        paramsMap.put("SUG",SUG);
     }
 }
