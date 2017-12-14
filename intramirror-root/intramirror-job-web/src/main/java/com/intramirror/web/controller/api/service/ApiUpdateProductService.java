@@ -170,22 +170,51 @@ public class ApiUpdateProductService {
             }
         }
 
-        // 和原来不一致直接更新。如为空或者不能Mapping报Warning，但其他字段继续更新。
+        // 新数据为空或者不能找到season code Mapping则报Error不更新已有season code，但其他字段继续更新。判断只有当新season比现有season新时才更新。
         String seasonCode = productOptions.getSeasonCode();
         if(StringUtils.isNotBlank(seasonCode) && !seasonCode.equals(product.getSeason_code())) {
-            product.setSeason_code(seasonCode);
-            String sql = "update product set preview_im_price = null where product_id ="+product.getProduct_id();
-            productService.updateBySQL(sql);
-            logger.info("ApiUpdateProductService,updatePreviewImPrice,sql:"+sql);
+            /* update by yf 12/14*/
+            boolean updateSeasonFlag = false;
+            String newSeasonCode = seasonCode;
+            String oldSeasonCode = product.getSeason_code();
 
-            BigDecimal retailPrice = new BigDecimal(productOptions.getSalePrice());
-            int rs = ApiCommonUtils.ifUpdatePrice(product.getMax_retail_price(),retailPrice);
+            String selSeasonCodeSQL = "select * from `season`  s  where s.`season_code`  in(\""+newSeasonCode+"\",\""+oldSeasonCode+"\") and s.`enabled`  = 1";
+            List<Map<String,Object>> seasonMapList = productService.executeSQL(selSeasonCodeSQL);
+            logger.info("ApiUpdateProductService,seasonMapList:"+JSONObject.toJSONString(seasonMapList));
 
-            // 当season_code发生变化，买手店价格和product.retail_price相同（0），或者超出20%，重新同步价格（2），
-            if(rs == 0 || rs == 2) {
-                IPriceService iPriceService = new PriceServiceImpl();
-                logger.info("ApiUpdateProductService,setProduct,seasonCodeChange:"+JSONObject.toJSONString(product));
-                iPriceService.synProductPriceRule(product,product.getMin_retail_price(),conn);
+            if(seasonMapList != null && seasonMapList.size() > 0) {
+                int oldSort = 0;
+                int newSort = 0;
+
+                for(Map<String,Object> map : seasonMapList) {
+                    if(map.get("season_code") != null && map.get("season_code").toString().equals(oldSeasonCode)) {
+                        oldSort = Integer.parseInt(map.get("season_sort").toString());
+                    } else if(map.get("season_code") != null && map.get("season_code").toString().equals(newSeasonCode)) {
+                        newSort = Integer.parseInt(map.get("season_sort").toString());
+                    }
+                }
+
+                if(newSort > oldSort) {
+                    updateSeasonFlag = true;
+                }
+            }
+            /* update by yf 12/14*/
+
+            if(updateSeasonFlag) {
+                product.setSeason_code(seasonCode);
+                String sql = "update product set preview_im_price = null where product_id ="+product.getProduct_id();
+                productService.updateBySQL(sql);
+                logger.info("ApiUpdateProductService,updatePreviewImPrice,sql:"+sql);
+
+                BigDecimal retailPrice = new BigDecimal(productOptions.getSalePrice());
+                int rs = ApiCommonUtils.ifUpdatePrice(product.getMax_retail_price(),retailPrice);
+
+                // 当season_code发生变化，买手店价格和product.retail_price相同（0），或者超出20%，重新同步价格（2），
+                if(rs == 0 || rs == 2) {
+                    IPriceService iPriceService = new PriceServiceImpl();
+                    logger.info("ApiUpdateProductService,setProduct,seasonCodeChange:"+JSONObject.toJSONString(product) +",retailPrice:"+retailPrice);
+                    iPriceService.synProductPriceRule(product,product.getMin_retail_price(),conn);
+                }
             }
         }
 

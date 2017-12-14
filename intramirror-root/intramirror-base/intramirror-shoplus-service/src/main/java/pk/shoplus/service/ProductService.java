@@ -108,6 +108,10 @@ public class ProductService {
         productDao.updateBySQL(sql,null);
     }
 
+    public List<Map<String,Object>> executeSQL(String sql) throws Exception {
+        return productDao.executeBySql(sql,null);
+    }
+
     /**
      * 通过product_id 获取 product
      *
