@@ -6,6 +6,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.impl.Base64Codec;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,6 +31,7 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
     private static List<String> passUrlList;
 
     static {
+        passUrlList = new ArrayList<>();
         passUrlList.add("/login");
         passUrlList.add("/rule");
         passUrlList.add("/file");
