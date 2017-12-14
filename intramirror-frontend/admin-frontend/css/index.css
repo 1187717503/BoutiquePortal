@@ -507,7 +507,7 @@ input[type=text].valid, input[type=text]:focus.valid {
     width: 40%;
 }
 .tag-list.page-tag .item.page-tag:nth-child(3) {
-    width: 30%;
+    width: 30%;`
 }
 .tag-list.page-tag .item.page-tag:nth-child(4) {
     width: 15%;
