@@ -94,6 +94,7 @@
 
                 var handle = $(e.target);
                 if (!handle.hasClass(list.options.handleClass)) {
+                    return;
                     if (handle.closest('.' + list.options.noDragClass).length) {
                         return;
                     }

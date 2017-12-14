@@ -289,6 +289,28 @@ function initProductList(curTagId) {
                 $('.right-product-list').append('<div class="dd-empty"></div>');
             }
             adjustRightSeqNo();
+
+            $('.dragger-able-ele .preview-pic').click(function() {
+                let images = $(this).data('images');
+
+                let itemsValue = [];
+                for (var i = 0; i < images.length; i++) {
+                    itemsValue.push({"src": images[i]});
+                }
+             
+                $.magnificPopup.open({
+                    items: itemsValue,
+                    type: 'image',
+                    fixedContentPos: true,
+                    gallery: {
+                        enabled: true,
+                        navigateByImgClick: true,
+                        preload: [0, 1]
+                    },
+                }, 0);
+            });
+
+
         }, error: function(code, exception) {
 
             if (code.status == 401) {

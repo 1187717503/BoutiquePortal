@@ -273,7 +273,10 @@
             {%each(i, product) list%}
             <li class="prod-item dd-item" data-nestable-id="${i}">
                 <div class="dd-handle">
-                    <div class="dragger-able-ele" style="float:left;margin:5px; width: 63px;height: 85px;background-image: url(${product.image});background-size: 63px 85px;"></div>
+                    <div class="dragger-able-ele" style=";float:left;margin:5px; width: 63px;height: 85px;background-image: url(${product.image});background-size: 63px 85px;">
+                        <div class="preview-pic" data-images="${product.cover_img}" style="cursor:pointer;"><i class="mdi-action-search"></i></div>
+                    </div>
+                    
                     <div class="product-info-display" data-product-id="${product.product_id}" >
                         <div>
                             <div class="prod-info-line">
