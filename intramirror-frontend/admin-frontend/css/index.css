@@ -570,3 +570,7 @@ input[type=text].valid, input[type=text]:focus.valid {
     background-color: inherit;
     -webkit-box-shadow: none;
 }
+
+#edit-tag .row {
+    margin-bottom: 0px;
+}
