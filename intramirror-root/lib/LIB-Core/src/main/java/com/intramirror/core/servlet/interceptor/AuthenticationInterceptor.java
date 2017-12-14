@@ -6,6 +6,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.impl.Base64Codec;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +27,14 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
     private final static String jwtSecret = "qazxswedcvfr543216yhnmju70plmjkiu89";
     private static final String LOGIN_URI = "/login";
 
+    private static List<String> passUrlList;
+
+    static {
+        passUrlList.add("/login");
+        passUrlList.add("/rule");
+        passUrlList.add("/file");
+    }
+
     /**
      * This implementation always returns {@code true}.
      *
@@ -36,17 +45,17 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         LOGGER.info("RequestURI {}", request.getRequestURI());
-        if(request.getRequestURI().contains("rule")) {
-            return true;
+
+        for (String passUrl : passUrlList) {
+            if (request.getRequestURI().startsWith(passUrl)) {
+                return true;
+            }
         }
 
         if (HttpMethod.OPTIONS.matches(request.getMethod())) {
             return true;
         }
 
-        if (request.getRequestURI().startsWith(LOGIN_URI)) {
-            return true;
-        }
         Long userId = null;
 
         String jwt = request.getHeader("token");
