@@ -4,7 +4,7 @@ function initTag() {
     $.ajax({
         type: requestURL.getTag.method,
         contentType: "application/json",
-        url: requestURL.getTag.url,
+        url: requestURL.getTag.url + "?orderBy=date",
         data: {},
         dataType: 'json',
         beforeSend: function(request) {
@@ -57,14 +57,13 @@ function getFilterFromDom() {
 }
 
 function getBlockList(pageno) {
-    // let pagesize = localStorage.getItem('block-page-size');
+    let pagesize = localStorage.getItem('block-page-size');
 
-    // if (pagesize == null) {
-    //     pagesize = 300;
-    //     localStorage.setItem('block-page-size', 300);
-    // }
+    if (pagesize == null) {
+        pagesize = 25;
+        localStorage.setItem('block-page-size', 25);
+    }
 
-    let pagesize = 300;
     let searchObj = getFilterFromDom();
 
     var filter = '?';
@@ -92,18 +91,18 @@ function getBlockList(pageno) {
         return false;
     }
 
-    // if (searchObj.orderByColmun) {
-    //     filter += 'orderBy='+ searchObj.orderByColmun + '&';
-    //     filter += 'desc='+ searchObj.orderByDesc + '&';
-    // }
+    if (searchObj.orderByColmun) {
+        filter += 'orderBy='+ searchObj.orderByColmun + '&';
+        filter += 'desc='+ searchObj.orderByDesc + '&';
+    }
 
     if (pagesize) {
         filter += 'pageSize='+ pagesize + '&';
     }
 
-    // if (pageno) {
-    //     filter += 'pageNo='+ pageno + '&';
-    // }
+    if (pageno) {
+        filter += 'pageNo='+ pageno + '&';
+    }
 
     filter = filter.slice(0, filter.length - 1);
 
@@ -157,7 +156,7 @@ function getBlockList(pageno) {
 
             initActionEvent();
             finishLoading();
-            // getCountWithFilter(filter, pagesize, pageno);
+            getCountWithFilter(filter, pagesize, pageno);
         }, error: function(result, resp, par) {
             toashWithCloseBtn(result.responseJSON.message);
             finishLoading();

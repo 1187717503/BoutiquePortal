@@ -68,6 +68,7 @@
             `block`.modified_at,
             `block`.content,
             `block`.bg_color,
+            `block`.text_color,
             `block`.sort_order,
             `block`.subtitle,
             `block`.title_english,
