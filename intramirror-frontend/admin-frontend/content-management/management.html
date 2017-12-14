@@ -275,7 +275,11 @@
         <div class="item style-scope page-block" title="${block.tag_name}">${block.tag_name}</div>
         <div class="item style-scope page-block">${block.sort_order}</div>
         <div class="item style-scope page-block action" data-block-id="${block.block_id}">
-
+            <span title="Process" data-action="process" class="waves-effect icon-btn-processing action-icon">
+                <svg class="icon" aria-hidden="true">
+                    <use class="use-icon" xlink:href="#icon-process"></use>
+                </svg>
+            </span>
         </div>
     </div>
     {%/each%}

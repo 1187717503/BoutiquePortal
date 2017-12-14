@@ -173,3 +173,9 @@ input.date-input {
 .modal.input-modal{
     width: 30%;
 }
+
+.block-list .item.action .action-icon {
+    font-size: 20px;
+    margin-left: 5px;
+    cursor: pointer;
+}

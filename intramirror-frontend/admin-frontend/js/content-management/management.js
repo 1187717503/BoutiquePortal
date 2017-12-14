@@ -169,7 +169,6 @@ function getBlockList(pageno) {
 }
 
 function getCountWithFilter(filter, pagesize, pageno){
-    console.log(statusText);
     $.ajax({
         type: requestURL.getBlocksCount.method,
         contentType: "application/json",
