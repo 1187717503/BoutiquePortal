@@ -8,10 +8,10 @@
         <relativePath>../</relativePath>
     </parent>
     <groupId>com.intramirror</groupId>
-    <artifactId>DB-Service</artifactId>
-	<name>Common Functionality</name>
-	<packaging>pom</packaging>
-	<description>The common db service layer</description>
+    <artifactId>lib</artifactId>
+    <packaging>pom</packaging>
+    <name>lib</name>
+    <version>0.0.1-SNAPSHOT</version>
 
 
     <properties>
@@ -24,7 +24,7 @@
         All modules/components listed here will be part of the Maven build cycles
     ========================================================================= -->
     <modules>
-        <module>DB-Order-Service</module>
+        <module>LIB-Core</module>
     </modules>
 
 </project>
