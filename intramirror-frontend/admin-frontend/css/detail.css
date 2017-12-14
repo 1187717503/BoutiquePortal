@@ -117,9 +117,10 @@ label.text-label {
 }
 
 #upload {
-	margin-top: -48px;
+	margin: 0 auto;
+	margin-top: 12px;
     margin-bottom: 12px;
-    width: 200px;
+    width: 180px;
 	padding-left: 11px;
 	border: 2px solid rgba(0, 0, 0, 0.3);
 	border-style: dashed;
@@ -147,21 +148,25 @@ label.text-label {
 	padding-top:32px;
 	padding-left:32px;
 }
-
-.content-editor {
-	max-height: 800px;
-	height: 800px;
-	margin-right: 16px;
-	width: 450px;
+.input-field label {
+	font-size: 0.8rem;
 }
+.content-editor {
+	width: 450px;
+/*	max-height: 500px;
+    height: 500px;*/
+    margin-left: 16px;
+    margin-top: 12px;
+}
+
 .left-product-list,.right-product-list {
 	margin-left: 8px;
 	padding: 8px;
 	border: 1px solid #8d8d8d;
-	margin-bottom: 20px;
+	margin-bottom: 10px;
 	width: 345px !important;
-	max-height: 800px;
-	height: 800px;
+	max-height: 558px;
+	height: 558px;
 	overflow-y: scroll;
 	overflow-x: hidden;
 }
@@ -239,3 +244,25 @@ ol.dd-dragel .dragger-able-ele {cursor: move;}
 .dd-list .prod-item .sort {float: left; margin-left:16px;font-size:12px;color: #000;}
 .product-info-display {float:left;width: 234px;}
 .disp-brand {display:block;white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+
+.block-input-fields {
+	width: 220px;
+	margin-left: 16px;
+	margin-top: -60px;
+	float:left;
+}
+
+.block-upload-pic {
+	float:left;
+	margin-left: 24px;
+	margin-top: -40px;
+}
+
+input[type=text]:focus:not([readonly]), input[type=number]:focus:not([readonly]), input[type=search]:focus:not([readonly]), textarea.materialize-textarea:focus:not([readonly]) {
+	border-bottom:2px solid #871b55;
+	box-shadow: none;
+}
+
+input[type=text], input[type=password], input[type=email], input[type=url], input[type=time], input[type=date], input[type=datetime-local], input[type=tel], input[type=number], input[type=search], textarea.materialize-textarea {
+	height: 2rem;
+}

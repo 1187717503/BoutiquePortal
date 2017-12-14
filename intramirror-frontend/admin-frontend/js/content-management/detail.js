@@ -124,7 +124,10 @@ function saveBlock() {
     }
 
     param.block.bgColor = $('#backgroup-color').val();
+    param.block.textColor = $('#title-color').val();
     param.block.sortOrder = parseInt($('#text-sort-order').val());
+
+
 
     if (isNaN(param.block.sortOrder)) {
         Materialize.toast('Please type sort order', 3000);
@@ -347,6 +350,7 @@ function initBlockDetailInfo(data) {
     $('#text-sub-title').val(data.subtitle);
     $('#text-sort-order').val(data.sort_order);
     $('#backgroup-color').val(data.bg_color);
+    $('#title-color').val(data.text_color);
     $('label[for=last-modified]').text(data.modified_at);
     if (data.status == 1) {
         $('label[for=status]').text('active');
