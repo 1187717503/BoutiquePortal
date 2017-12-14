@@ -165,7 +165,7 @@ function initTag() {
     $.ajax({
         type: requestURL.getTag.method,
         contentType: "application/json",
-        url: requestURL.getTag.url,
+        url: requestURL.getTag.url + "?orderBy=date",
         data: {},
         dataType: 'json',
         beforeSend: function(request) {
@@ -847,7 +847,7 @@ function getTags () {
     $('#tag-list').empty();
     // 查询所有tag
     $.ajax({
-        type: requestURL.getTagByDate.method,
+        type: requestURL.getTag.method,
         contentType: "application/json",
         url: requestURL.getTag.url + "?orderBy=date",
         data: {},

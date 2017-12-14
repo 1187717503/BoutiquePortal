@@ -4,7 +4,7 @@ function initTag() {
     $.ajax({
         type: requestURL.getTag.method,
         contentType: "application/json",
-        url: requestURL.getTag.url,
+        url: requestURL.getTag.url + "?orderBy=date",
         data: {},
         dataType: 'json',
         beforeSend: function(request) {
