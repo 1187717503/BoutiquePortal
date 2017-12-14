@@ -2,6 +2,7 @@ package com.intramirror.web.controller.content;
 
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.product.api.model.Block;
+import com.intramirror.product.api.model.Category;
 import com.intramirror.product.api.model.Tag;
 import com.intramirror.product.api.model.TagProductRel;
 import com.intramirror.product.api.service.BlockService;
@@ -12,6 +13,7 @@ import com.intramirror.product.api.service.merchandise.ProductManagementService;
 import com.intramirror.core.common.response.ErrorResponse;
 import com.intramirror.core.common.exception.ValidateException;
 import com.intramirror.core.common.response.Response;
+import com.intramirror.web.controller.cache.CategoryCache;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created on 2017/11/17.
+ *
  * @author YouFeng.Zhu
  */
 @RestController
@@ -56,8 +59,12 @@ public class ContentMgntController {
     @Autowired
     private ISkuStoreService skuStoreService;
 
+    @Autowired
+    private CategoryCache categoryCache;
+
     /**
      * Return block info with bind tag.
+     *
      * @param blockName
      * @param status
      * @param tagId
@@ -94,23 +101,20 @@ public class ContentMgntController {
 
     /**
      * Create an new block only.
+     *
      * @param block
      * @return
      */
     @PostMapping(value = "/blocks", consumes = "application/json")
     @ResponseStatus(value = HttpStatus.CREATED)
     public Response createBlock(@RequestBody Block block) {
-        //先查block Jain
-        List<Block> list = blockService.getBlockByName(block);
-        if (list.size() > 0) {
-            throw new ValidateException(new ErrorResponse("The block name already exist."));
-        }
-        blockService.createBlock(block);
+        contentManagementService.createBlockWithDefaultTag(block);
         return Response.success();
     }
 
     /**
      * Update block info by block id.
+     *
      * @param blockId
      * @param block
      * @return
@@ -138,10 +142,6 @@ public class ContentMgntController {
     @PostMapping(value = "/tags", consumes = "application/json")
     @ResponseStatus(value = HttpStatus.CREATED)
     public Response createTag(@RequestBody Tag tag) {
-        List<Tag> list = iTagService.getTagsByName(tag);
-        if (list.size() > 0) {
-            throw new ValidateException(new ErrorResponse("The tag name already exist."));
-        }
         contentManagementService.createTag(tag);
         return Response.success();
     }
@@ -180,6 +180,7 @@ public class ContentMgntController {
 
     @GetMapping(value = "/tags/{tagId}/products", produces = "application/json")
     public Response listProductByTag(@PathVariable(value = "tagId") Long tagId) {
+
         List<Map<String, Object>> productList = contentManagementService.listTagProductInfo(tagId);
         if (productList.size() > 0) {
             appendInfo(productList);
@@ -224,12 +225,18 @@ public class ContentMgntController {
     }
 
     private void appendInfo(List<Map<String, Object>> productList) {
+
         List<Long> idList = extractProductIdList(productList);
         List<Map<String, Object>> storeList = skuStoreService.listTotalStockByProductIds(idList);
         Map<Long, Long> productStock = mapProductStock(storeList);
         //        List<Map<String, Object>> priceList = productManagementService.listPriceByProductList(productList);
         for (Map<String, Object> product : productList) {
             product.put("totalStock", productStock.get(Long.parseLong(product.get("product_id").toString())));
+            Category rootCategory = categoryCache.getRootCategory(Long.parseLong(product.get("category_id").toString()));
+            if (rootCategory != null) {
+                product.put("gender", rootCategory.getName());
+            }
+
             //            setPriceDiscount(product, priceList);
         }
 

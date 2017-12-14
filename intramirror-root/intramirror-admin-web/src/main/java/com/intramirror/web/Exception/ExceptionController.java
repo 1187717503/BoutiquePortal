@@ -1,11 +1,13 @@
 package com.intramirror.web.Exception;
 
 import com.intramirror.common.parameter.StatusType;
+import static com.intramirror.core.common.exception.StandardExceptions.HttpCommonException;
 import com.intramirror.core.common.exception.ValidateException;
 import com.intramirror.core.common.response.ErrorResponse;
-import static com.intramirror.core.common.exception.StandardExceptions.HttpCommonException;
+import com.intramirror.core.common.response.StatusCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -39,6 +41,16 @@ public class ExceptionController {
     public ErrorResponse handleValidateException(ValidateException e) {
         LOGGER.warn("Validate Exception: {}", e.getErrorResponse().getMessage());
         return e.getErrorResponse();
+    }
+
+    @ExceptionHandler(DuplicateKeyException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleDuplicateKeyException(DuplicateKeyException e) {
+        LOGGER.warn("DuplicateKey: {}", e.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(StatusCode.ALREAD_EXIST, "Resource already exist.");
+        errorResponse.setDetail(e.getMessage());
+        return errorResponse;
     }
 
     @ExceptionHandler(HttpCommonException.class)

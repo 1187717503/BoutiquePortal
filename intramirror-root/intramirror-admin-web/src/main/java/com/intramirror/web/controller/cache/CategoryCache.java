@@ -20,7 +20,6 @@ public class CategoryCache {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CategoryCache.class);
 
-    private static CategoryCache instance = null;
     private static HashMap<Long, Category> categoryHashMap = new HashMap<>();
     private static final String NO_SUCH_CATEGORY = "No such category";
     private static final int MAX_CATEGORY_LEVEL = 3;
@@ -124,6 +123,19 @@ public class CategoryCache {
             sb.append(" > ");
         }
         return sb.substring(0, sb.length() - 2);
+    }
+
+    public Category getRootCategory(Long categoryId) {
+        Long key = categoryId;
+        Category category;
+        do {
+            category = categoryHashMap.get(key);
+            if (category == null) {
+                return null;
+            }
+            key = category.getParentId();
+        } while (key != null && key > 0);
+        return category;
     }
 
 }

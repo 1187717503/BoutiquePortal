@@ -7,6 +7,7 @@
         SELECT
             product.product_id,
             product.cover_img,
+            product.category_id,
             brand.english_name,
             product.img_modified,
             tag_product_rel.sort_num,

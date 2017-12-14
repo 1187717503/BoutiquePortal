@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created on 2017/11/21.
+ *
  * @author YouFeng.Zhu
  */
 @Service
@@ -130,6 +131,28 @@ public class ContentManagementServiceImpl implements ContentManagementService {
     @Transactional
     public int batchDeleteByTagIdAndProductId(List<TagProductRel> listTagProductRel) {
         return tagProductRelMapper.batchDeleteByTagIdAndProductId(listTagProductRel);
+    }
+
+    @Override
+    @Transactional
+    public int createBlockWithDefaultTag(Block block) {
+        List<Block> blockList = blockMapper.listBlockBySort(block.getSortOrder());
+        block.setEnabled(true);
+        blockMapper.insertSelective(block);
+        if (blockList.size() != 0) {
+            blockMapper.batchUpdateSort(blockList);
+        }
+
+        Tag tag = new Tag();
+        tag.setEnabled(true);
+        tag.setTagName(block.getBlockName());
+        tagMapper.insertSelective(tag);
+
+        BlockTagRel btRel = new BlockTagRel();
+        btRel.setTagId(tag.getTagId());
+        btRel.setBlockId(block.getBlockId());
+
+        return blockTagRelMapper.insertSelective(btRel);
     }
 
     private int updateBlock(Block block) {

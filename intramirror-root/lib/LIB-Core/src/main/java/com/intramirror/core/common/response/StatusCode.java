@@ -8,4 +8,5 @@ package com.intramirror.core.common.response;
 public class StatusCode {
     public static final int SUCCESS = 1;
     public static final int FAILURE = -1;
+    public static final int ALREAD_EXIST = -1001;
 }
