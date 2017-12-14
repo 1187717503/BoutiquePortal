@@ -64,25 +64,8 @@ public class TagServiceImpl implements ITagService {
     }
 
     @Override
-    public List<Tag> getTags() {
-        logger.info("[service] getTags");
-        return tagMapper.getTags();
+    public List<Tag> getTags(String orderBy) {
+        return tagMapper.getTags(orderBy);
     }
 
-    @Override
-    public List<Tag> getTagsByDate() {
-        logger.info("[service] getTagsByDate");
-        return tagMapper.getTagsByDate();
-    }
-
-    @Override
-    public Tag selectByPrimaryKey(Long tagId) {
-        logger.info("[service] selectByPrimaryKey and tagId is [{}]", tagId);
-        return tagMapper.selectByPrimaryKey(tagId);
-    }
-
-    public List<Tag> getTagsByName(Tag record) {
-        logger.info("[service] getTagsByName and tagId is [{}]", record.getTagId());
-        return tagMapper.getTagsByName(record);
-    }
 }

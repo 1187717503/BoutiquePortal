@@ -8,11 +8,6 @@ public interface ITagService {
 
     int saveTagProductRel(Map<String, Object> map);
 
-    List<Tag> getTags();
+    List<Tag> getTags(String orderBy);
 
-    List<Tag> getTagsByDate();
-
-    Tag selectByPrimaryKey(Long tagId);
-
-    List<Tag> getTagsByName(Tag record);
 }

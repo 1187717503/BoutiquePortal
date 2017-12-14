@@ -269,7 +269,8 @@
             block_name,
             sort_order
         FROM block
-        WHERE block.enabled = TRUE;
+        WHERE block.enabled = TRUE
+        ORDER BY block.modified_at;
     </select>
 
     <select id="listBlockBySortExcludeSelf" resultMap="BaseResultMap">

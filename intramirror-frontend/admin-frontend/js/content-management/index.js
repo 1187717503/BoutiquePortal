@@ -849,7 +849,7 @@ function getTags () {
     $.ajax({
         type: requestURL.getTagByDate.method,
         contentType: "application/json",
-        url: requestURL.getTagByDate.url,
+        url: requestURL.getTag.url + "?orderBy=date",
         data: {},
         dataType: 'json',
         beforeSend: function(request) {

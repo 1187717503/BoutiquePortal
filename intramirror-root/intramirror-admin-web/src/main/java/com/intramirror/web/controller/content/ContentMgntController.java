@@ -147,13 +147,8 @@ public class ContentMgntController {
     }
 
     @GetMapping(value = "/tags", produces = "application/json")
-    public Response listTags() {
-        return Response.status(StatusType.SUCCESS).data(iTagService.getTags());
-    }
-
-    @GetMapping(value = "/tags/bydate", produces = "application/json")
-    public Response listTagsByDate() {
-        return Response.status(StatusType.SUCCESS).data(iTagService.getTagsByDate());
+    public Response listTags(@RequestParam(value = "orderBy", required = false) String orderBy) {
+        return Response.status(StatusType.SUCCESS).data(iTagService.getTags(orderBy));
     }
 
     @DeleteMapping(value = "/tags/{tagId}")
