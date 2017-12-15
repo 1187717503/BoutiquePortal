@@ -75,12 +75,6 @@
 
         <dependency>
             <groupId>com.intramirror</groupId>
-            <artifactId>DB-Product-Service</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.intramirror</groupId>
             <artifactId>intramirror-user-service-core</artifactId>
         </dependency>
         <dependency>
