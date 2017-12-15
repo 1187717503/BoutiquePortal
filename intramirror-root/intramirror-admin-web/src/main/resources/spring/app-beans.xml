@@ -21,6 +21,7 @@
 
     <!-- start 加载其它Jar的配置文件 -->
     <import resource="classpath*:/conf/app-datasource.xml"/>
+    <import resource="classpath*:/spring/database.xml"/>
     <!-- end 加载其它Jar的配置文件 -->
 
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">

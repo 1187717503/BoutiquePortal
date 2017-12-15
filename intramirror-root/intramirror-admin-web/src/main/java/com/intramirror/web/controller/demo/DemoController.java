@@ -1,13 +1,15 @@
 package com.intramirror.web.controller.demo;
 
+import com.intramirror.database.service.product.model.ShopProduct;
+import com.intramirror.database.service.product.service.ProductService;
+import com.intramirror.order.api.model.ApiMq;
 import java.util.Date;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.intramirror.order.api.model.ApiMq;
 
 /**
  * 
@@ -17,7 +19,14 @@ import com.intramirror.order.api.model.ApiMq;
 @Controller
 @RequestMapping("/demo_test")
 public class DemoController {
-	
+	@Autowired
+	private ProductService productService;
+
+	@GetMapping("/new/service")
+	@ResponseBody
+	public ShopProduct getProduct(){
+		return productService.getShopProduct();
+	}
 	/** 测试返回对象转换JSON !!! */
 	@RequestMapping(value = "/get_api_mq",method = RequestMethod.GET)
 	@ResponseBody
