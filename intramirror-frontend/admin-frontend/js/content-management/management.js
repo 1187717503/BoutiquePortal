@@ -24,7 +24,7 @@ function initTag() {
 function initDate() {
     let curDate = format(new Date(), 'yyyy-MM-dd');
     let endDate = new Date(curDate);
-    endDate.setMonth(endDate.getMonth() - 1);
+    endDate.setDate(endDate.getDate() - 2);
     let startDate = format(endDate, 'yyyy-MM-dd');
 
     $('#modified-start').val(startDate);
