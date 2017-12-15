@@ -211,22 +211,24 @@ function initActionEvent() {
     })
 
     // 时间原因，没有做排序 2017-12-8
-    // $('.orderby').click(function() {
+    $('.orderby').click(function() {
 
-    //     var orderby = $(this).find('use').attr('xlink:href');
-    //     $('.orderby use').attr('xlink:href', '#icon-default-order');
-    //     $('.orderby').removeClass('active');
-
-    //     if (orderby == '#icon-asc') {
-    //         $(this).find('use').attr('xlink:href', '#icon-desc');
-    //         $(this).find('.use-icon').attr('data-order-desc', '1');
-    //     } else {
-    //         $(this).find('use').attr('xlink:href', '#icon-asc');
-    //         $(this).find('.use-icon').attr('data-order-desc', '0');
-    //     }
-    //     $(this).addClass('active');
-    //     getBlockList(1);
-    // })
+        var orderby = $(this).find('use').attr('xlink:href');
+        $('.orderby use').attr('xlink:href', '#icon-default-order');
+        $('.orderby').removeClass('active');
+        
+        if (orderby == '#icon-asc') {
+            
+            $(this).find('use').attr('xlink:href', '#icon-desc');
+            $(this).find('.use-icon').attr('data-order-desc', '1');
+        } else {
+            
+            $(this).find('use').attr('xlink:href', '#icon-asc');
+            $(this).find('.use-icon').attr('data-order-desc', '0');
+        }
+        $(this).addClass('active');
+        //getBlockList(1);
+    })
 }
 
 function updateBlock(action) {
