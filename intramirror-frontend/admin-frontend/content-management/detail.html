@@ -95,21 +95,11 @@
                     <div class="filter">
                         <div class="row">
                             <div class="input-field col s3">
-                            <!--                                 
-                                <select id="select-block-name" placeholder="Block Name"></select>
-                                <label for="select-block-name">Block Name</label> 
-                            -->
                                 <input id="text-blockName" type="text" class="validate">
-                                <label for="text-blockName">Block Name</label>
+                                <label id="lab-blockName" for="text-blockName">Block Name</label>
                             </div>
 
                             <div class="input-field col s3">
-                            <!-- 
-                                <select id="select-product-tag">
-                                    <option value="-1">Product Tags</option>
-                                </select>
-                                <label for="select-product-tag">Product Tags</label>
-                            -->
                                 <input id="text-product-tag" type="text"  disabled="disabled">
                                 <label for="text-product-tag" class="placehoder-label">Product Tag</label>
                             </div>
@@ -357,7 +347,7 @@
             });
 
             if(isNew != 1) {
-                initBlock(blockId);
+                getBlockDetail(blockId);
             } else {
                 $('#text-sort-order').val('1');
             }

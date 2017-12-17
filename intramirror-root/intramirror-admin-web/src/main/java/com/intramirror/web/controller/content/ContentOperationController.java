@@ -4,6 +4,7 @@ import com.intramirror.core.common.exception.ValidateException;
 import com.intramirror.core.common.response.ErrorResponse;
 import com.intramirror.core.common.response.Response;
 import com.intramirror.product.api.model.Block;
+import com.intramirror.product.api.model.BlockTagRel;
 import com.intramirror.product.api.model.Tag;
 import com.intramirror.product.api.service.BlockService;
 import com.intramirror.product.api.service.content.ContentManagementService;
@@ -36,10 +37,13 @@ public class ContentOperationController {
     @PutMapping(value = "/save", consumes = "application/json")
     public Response saveContent(@RequestBody Content content) {
         validate(content);
-//        if (content.getIsNew().equals("1")) {
-        //            contentManagementService.createBlockWithDefaultTag(content.getBlock());
-        //        }
-        contentManagementService.updateContent(content.getBlock(), content.getTag(), content.getSort());
+        if (content.getIsNew().equals("1")) {
+            BlockTagRel btRel = contentManagementService.createBlockWithDefaultTag(content.getBlock());
+            content.getBlock().setBlockId(btRel.getBlockId());
+            content.getTag().setTagId(btRel.getTagId());
+        } else {
+            contentManagementService.updateContent(content.getBlock(), content.getTag(), content.getSort());
+        }
         return Response.success();
     }
 

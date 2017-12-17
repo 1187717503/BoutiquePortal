@@ -79,17 +79,18 @@ function saveBlock(isNew) {
 
     if(isNew == '1') {
         param.block.blockName = $('#text-blockName').val();
+        param.block.status = 1;
         param.tag.tagName = $('#text-product-tag').val();
         param.isNew = '1';
     } else {
         param.isNew = '0';
-        param.block.blockId = $('#select-block-name').val();
+        param.block.blockId = $('#text-blockName').data('block-id');
         if (param.block.blockId == null || param.block.blockId == -1) {
-            Materialize.toast('Please select block', 3000);
+            Materialize.toast('Get BlockId failed', 3000);
             return;
         }
 
-        param.tag.tagId = $('#select-product-tag').val();
+        param.tag.tagId = $('#text-product-tag').data('tag-id');
     }
 
     param.block.title = $('#text-title').val();
@@ -104,11 +105,6 @@ function saveBlock(isNew) {
     }
 
     param.block.titleEnglish = $('#text-english-name').val();
-    // if (param.block.titleEnglish === '') {
-    //     Materialize.toast('Please type title in english', 3000);
-    //     return;
-    // }
-
     param.block.subtitle = $('#text-sub-title').val();
     if (param.block.subtitle == '') {
         Materialize.toast('Please type sub title', 3000);
@@ -197,7 +193,7 @@ function saveBlock(isNew) {
 }
 
 
-function initBlock() {
+function initBlock(blockId) {
     $.ajax({
         type: requestURL.getBlock.method,
         contentType: "application/json",
@@ -324,41 +320,6 @@ function initProductList(curTagId) {
     });
 }
 
-function initTagSelect(blockId, curTagId) {
-    if (typeof(curTagId) == 'undefined' || curTagId == '') {
-        curTagId = "-1";
-    } else {
-        initProductList(curTagId);
-    }
-
-
-    $('#select-product-tag').empty();
-    $.ajax({
-        type: requestURL.getUnBindTags.method,
-        contentType: "application/json",
-        url: requestURL.getUnBindTags.url + "?blockId=" + blockId,
-        data: {},
-        dataType: 'json',
-        beforeSend: function(request) {
-            request.setRequestHeader("token", token);
-        },
-        success: function(result) {
-
-            $('#tmpl-product-tags-select').tmpl({list: result.data, curTagId: curTagId}).appendTo('#select-product-tag');
-            $('#select-product-tag').material_select();
-            $('#select-product-tag').attr('data-origin-product-id', curTagId);
-
-        }, error: function(code, exception) {
-
-            if (code.status == 401) {
-                window.location.href = '../../../login'
-            } else {
-                toashWithCloseBtn('Get product tags failed.' + code.responseJSON.message);
-            }
-        }
-    });
-}
-
 function initBlockDetailInfo(data) {
     var editor = CKEDITOR.instances.blockContent;
     if (typeof(data.content) != 'undefined' && data.content != '') {
@@ -411,8 +372,18 @@ function getBlockDetail(blockId) {
         },
         success: function(result) {
             initBlockDetailInfo(result.data);
-            initTagSelect(blockId, result.data.tag_id);
+            //名字能改，但是后台需要修改才能存 2017-12-17
+            $('#text-blockName').val(result.data.block_name);
+            $('#text-blockName').attr("data-block-id",result.data.block_id);
+            //$('#text-blockName').focus();
 
+            //名字不能改的方案 2017-12-17
+            $('#text-blockName').attr("disabled","disabled");
+            $('#lab-blockName').addClass("placehoder-label");
+
+            $('#text-product-tag').val(result.data.tag_name);
+            $('#text-product-tag').attr("data-tag-id",result.data.tag_id);
+            initProductList(result.data.tag_id);
         }, error: function(code, exception) {
             if (code.status == 401) {
                 window.location.href = '../../../login'
