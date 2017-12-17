@@ -19,7 +19,6 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 /**
  * Created on 3/28/2017.
- *
  * @author eyoufzh
  */
 public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
@@ -34,12 +33,11 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
         passUrlList = new ArrayList<>();
         passUrlList.add("/login");
         passUrlList.add("/rule");
-        passUrlList.add("/file");
+        //        passUrlList.add("/file");
     }
 
     /**
      * This implementation always returns {@code true}.
-     *
      * @param request
      * @param response
      * @param handler
@@ -100,7 +98,6 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
 
     /**
      * This implementation is empty.
-     *
      * @param request
      * @param response
      * @param handler
@@ -113,7 +110,6 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter {
 
     /**
      * This implementation is empty.
-     *
      * @param request
      * @param response
      * @param handler

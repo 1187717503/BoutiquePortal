@@ -316,11 +316,22 @@
     <script type="text/javascript">
         $(function () {
             CKEDITOR.replace('editor1', {
-                height: 86,
-                //extraPlugins: 'colorbutton',
-                //colorButton_colors: 'CF5D4E,454545,FFF,CCC,DDD,CCEAEE,66AB16',
-                colorButton_enableAutomatic: false
-                // filebrowserImageUploadUrl: requestURL.uploadImage.url
+                height: 218,
+                extraPlugins: 'serverimg',
+                stylesSet: [
+                    { name: 'Narrow image', type: 'widget', widget: 'image', attributes: { 'class': 'image-narrow' } }
+                ],
+                toolbar: [
+                    { name: 'clipboard', items: ['Undo', 'Redo' ] },
+                    { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'RemoveFormat', 'Subscript', 'Superscript' ] },
+                    { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote' ] },
+                    { name: 'insert', items: [ 'Image', 'Table' ] },
+                    { name: 'editing', items: [ 'Scayt' ] },
+                    { name: 'styles', items: [ 'Format', 'Font', 'FontSize' ] },
+                    { name: 'colors', items: [ 'TextColor', 'BGColor', 'CopyFormatting' ] },
+                    { name: 'align', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },
+                    { name: 'document', items: ['Source', 'Maximize', 'serverimg'] },
+                ],
             });
 
             initDragger();
