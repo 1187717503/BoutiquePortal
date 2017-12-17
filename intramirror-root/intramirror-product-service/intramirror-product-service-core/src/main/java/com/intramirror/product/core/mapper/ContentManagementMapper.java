@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Param;
 
 /**
  * Created on 2017/10/30.
- *
  * @author YouFeng.Zhu
  */
 public interface ContentManagementMapper {
@@ -21,7 +20,7 @@ public interface ContentManagementMapper {
 
     List<Map<String, Object>> listBlockWithTag(@Param(value = "blockName") String blockName, @Param(value = "status") Integer status,
             @Param(value = "tagId") Long tagId, @Param(value = "modifiedAtFrom") Long modifiedAtFrom, @Param(value = "modifiedAtTo") Long modifiedAtTo,
-            @Param(value = "start") int start, @Param(value = "limit") int limit);
+            @Param(value = "start") int start, @Param(value = "limit") int limit, @Param(value = "desc") int desc);
 
     Map<String, Object> getBlockWithTagByBlockId(Long blockId);
 

@@ -36,7 +36,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created on 2017/11/17.
- *
  * @author YouFeng.Zhu
  */
 @RestController
@@ -83,13 +82,15 @@ public class ContentMgntController {
             @RequestParam(value = "modifiedAtFrom", required = false) Long modifiedAtFrom,
             @RequestParam(value = "modifiedAtTo", required = false) Long modifiedAtTo,
             @RequestParam(value = "pageSize",required = false) Integer pageSize,
-            @RequestParam(value = "pageNo",required = false) Integer pageNo)
+            @RequestParam(value = "pageNo",required = false) Integer pageNo,
+            @RequestParam(value = "desc",required = false) Integer desc)
     // @formatter:on
     {
         int start = ((pageNo == null || pageNo < 0) ? 0 : (pageNo - 1) * pageSize);
         int limit = ((pageSize == null || pageSize < 0) ? 25 : pageSize);
+
         return Response.status(StatusType.SUCCESS).data(
-                contentManagementService.listBlockWithTag(escapeLikeParams(blockName), status, tagId, modifiedAtFrom, modifiedAtTo, start, limit));
+                contentManagementService.listBlockWithTag(escapeLikeParams(blockName), status, tagId, modifiedAtFrom, modifiedAtTo, start, limit, desc));
     }
 
     private String escapeLikeParams(String input) {
@@ -101,7 +102,6 @@ public class ContentMgntController {
 
     /**
      * Create an new block only.
-     *
      * @param block
      * @return
      */
@@ -114,7 +114,6 @@ public class ContentMgntController {
 
     /**
      * Update block info by block id.
-     *
      * @param blockId
      * @param block
      * @return

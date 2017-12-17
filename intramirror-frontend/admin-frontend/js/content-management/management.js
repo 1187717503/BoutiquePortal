@@ -46,13 +46,15 @@ function getFilterFromDom() {
     searchObj.status = $('#select-status').val();
     searchObj.tagId = $('#select-tag').val();
 
-    console.log(searchObj);
-
     if ($('.orderby.active use').length > 0) {
         searchObj.orderByColmun = $('.orderby.active use').attr('data-order-col');
         searchObj.orderByDesc = $('.orderby.active use').attr('data-order-desc');
+    }else {
+        searchObj.orderByColmun = 'SortOrder';
+        searchObj.orderByDesc = 0;
     }
 
+    console.log(searchObj);
     return searchObj;
 }
 
@@ -91,11 +93,9 @@ function getBlockList(pageno) {
         return false;
     }
 
-    if (searchObj.orderByColmun) {
-        filter += 'orderBy='+ searchObj.orderByColmun + '&';
-        filter += 'desc='+ searchObj.orderByDesc + '&';
-    }
-
+    filter += 'orderBy='+ searchObj.orderByColmun + '&';
+    filter += 'desc='+ searchObj.orderByDesc + '&';
+    
     if (pagesize) {
         filter += 'pageSize='+ pagesize + '&';
     }
@@ -139,20 +139,20 @@ function getBlockList(pageno) {
             $("#tmpl-block-head-list").tmpl().appendTo("#block-head-list");
 
             // 时间原因没有做分页 2017-12-8
-            // $('.orderby').each(function() {
-            //     if ($(this).find('.use-icon').data('order-col') == searchObj.orderByColmun) {
-            //         if (searchObj.orderByDesc == 1) {
-            //             $(this).find('.use-icon').attr('xlink:href', '#icon-desc');
-            //             $(this).find('.use-icon').attr('data-order-desc', '1');
-            //         } else {
-            //             $(this).find('.use-icon').attr('xlink:href', '#icon-asc');
-            //             $(this).find('.use-icon').attr('data-order-desc', '0');
-            //         }
-            //         $(this).addClass('active');
-            //     } else {
-            //         $(this).find('.use-icon').attr('xlink:href', '#icon-default-order');
-            //     }
-            // })
+            $('.orderby').each(function() {
+                if ($(this).find('.use-icon').data('order-col') == searchObj.orderByColmun) {
+                    if (searchObj.orderByDesc == 1) {
+                        $(this).find('use').attr('xlink:href', '#icon-desc');
+                        $(this).find('.use-icon').attr('data-order-desc', '1');
+                    } else {
+                        $(this).find('.use-icon').attr('xlink:href', '#icon-asc');
+                        $(this).find('.use-icon').attr('data-order-desc', '0');
+                    }
+                    $(this).addClass('active');
+                } else {
+                    $(this).find('.use-icon').attr('xlink:href', '#icon-default-order');
+                }
+            })
 
             initActionEvent();
             finishLoading();
@@ -218,16 +218,15 @@ function initActionEvent() {
         $('.orderby').removeClass('active');
         
         if (orderby == '#icon-asc') {
-            
             $(this).find('use').attr('xlink:href', '#icon-desc');
             $(this).find('.use-icon').attr('data-order-desc', '1');
         } else {
-            
             $(this).find('use').attr('xlink:href', '#icon-asc');
             $(this).find('.use-icon').attr('data-order-desc', '0');
         }
         $(this).addClass('active');
-        //getBlockList(1);
+        let current = $('.pagination .active.pagination-index').data('pageno') + 1;
+        getBlockList(current);
     })
 }
 

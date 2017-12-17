@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created on 2017/11/21.
- *
  * @author YouFeng.Zhu
  */
 @Service
@@ -81,8 +80,8 @@ public class ContentManagementServiceImpl implements ContentManagementService {
 
     @Override
     public List<Map<String, Object>> listBlockWithTag(String blockName, Integer status, Long tagId, Long modifiedAtFrom, Long modifiedAtTo, int start,
-            int limit) {
-        return contentManagementMapper.listBlockWithTag(blockName, status, tagId, modifiedAtFrom, modifiedAtTo, start, limit);
+            int limit, int desc) {
+        return contentManagementMapper.listBlockWithTag(blockName, status, tagId, modifiedAtFrom, modifiedAtTo, start, limit, desc);
     }
 
     @Override

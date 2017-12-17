@@ -131,6 +131,9 @@
             AND unix_timestamp(block.modified_at) BETWEEN #{modifiedAtFrom} AND #{modifiedAtTo}
         </if>
         ORDER BY block.sort_order
+        <if test="desc != null and desc == 1">
+            DESC
+        </if>
         LIMIT #{start}, #{limit};
     </select>
 </mapper>
