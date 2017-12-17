@@ -26,6 +26,10 @@ CKEDITOR.dialog.add(
             onOk: function () {
 
                 let imgUrl = localStorage.getItem('ckeditor-uploadImage');
+                if (!imgUrl) {
+                    alert('Please upload image.')
+                    return false;
+                }
                 editor.insertHtml("<img src='"+imgUrl+"' />");
                 localStorage.removeItem('ckeditor-uploadImage')
                 
