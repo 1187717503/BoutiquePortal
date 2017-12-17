@@ -271,3 +271,7 @@ input[type=text], input[type=password], input[type=email], input[type=url], inpu
 	cursor: pointer;
     display: inline-block;
 }
+
+input[type=text]:disabled {
+	border-bottom: 2px solid #871b55;
+}

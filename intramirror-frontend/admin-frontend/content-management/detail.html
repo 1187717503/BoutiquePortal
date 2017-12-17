@@ -95,15 +95,23 @@
                     <div class="filter">
                         <div class="row">
                             <div class="input-field col s3">
+                            <!--                                 
                                 <select id="select-block-name" placeholder="Block Name"></select>
-                                <label for="select-block-name">Block Name</label>
+                                <label for="select-block-name">Block Name</label> 
+                            -->
+                                <input id="text-blockName" type="text" class="validate">
+                                <label for="text-blockName">Block Name</label>
                             </div>
 
                             <div class="input-field col s3">
+                            <!-- 
                                 <select id="select-product-tag">
                                     <option value="-1">Product Tags</option>
                                 </select>
                                 <label for="select-product-tag">Product Tags</label>
+                            -->
+                                <input id="text-product-tag" type="text"  disabled="disabled">
+                                <label for="text-product-tag" class="placehoder-label">Product Tag</label>
                             </div>
 
                             <div class="input-field col s1">
@@ -314,7 +322,21 @@
     </script>
 
     <script type="text/javascript">
+        
+
         $(function () {
+            //方法二：
+            (function ($) {
+                $.getUrlParam = function (name) {
+                    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+                    var r = window.location.search.substr(1).match(reg);
+                    if (r != null) return unescape(r[2]); return null;
+                }
+            })(jQuery);
+
+            var isNew = $.getUrlParam('new');
+            var blockId = $.getUrlParam('blockId');
+
             CKEDITOR.replace('editor1', {
                 height: 218,
                 extraPlugins: 'serverimg',
@@ -334,10 +356,15 @@
                 ],
             });
 
+            if(isNew != 1) {
+                initBlock(blockId);
+            } else {
+                $('#text-sort-order').val('1');
+            }
+
             initDragger();
-            initBlock();
             initUpload();
-            initEvent();
+            initEvent(isNew);
         });
     </script>
 </body>

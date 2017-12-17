@@ -338,14 +338,15 @@ function initEvent() {
     });
 
     $('#new-block-btn').click(function() {
-        $('#new-block').openModal({
-            dismissible: false,
-            opacity: .5,
-            inDuration: 300,
-            outDuration: 200,
-            startingTop: '4%',
-            endingTop: '10%'
-        });
+        // $('#new-block').openModal({
+        //     dismissible: false,
+        //     opacity: .5,
+        //     inDuration: 300,
+        //     outDuration: 200,
+        //     startingTop: '4%',
+        //     endingTop: '10%'
+        // });
+        window.open('./detail.html?new=1&blockId=abc');
     });
 
     $('#new-block .model-yes').click(function() {

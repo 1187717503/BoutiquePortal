@@ -151,6 +151,8 @@ public class ContentManagementServiceImpl implements ContentManagementService {
         btRel.setTagId(tag.getTagId());
         btRel.setBlockId(block.getBlockId());
 
+        blockTagRelMapper.insertSelective(btRel);
+
         return blockTagRelMapper.insertSelective(btRel);
     }
 

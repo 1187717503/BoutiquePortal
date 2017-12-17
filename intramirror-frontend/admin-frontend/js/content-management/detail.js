@@ -70,25 +70,27 @@ function adjustRightSeqNo() {
     })
 }
 
-function saveBlock() {
+function saveBlock(isNew) {
 
     let param = {};
 
     param.block = {};
-    param.block.blockId = $('#select-block-name').val();
-    if (param.block.blockId == null || param.block.blockId == -1) {
-        Materialize.toast('Please select block', 3000);
-        return;
-    }
-
     param.tag = {}
-    param.tag.tagId = $('#select-product-tag').val();
-    /*2017-12-12 tag不选可以解绑block和tag的关系，临时方案
-    if (param.tag.tagId == null || param.tag.tagId == -1) {
-        Materialize.toast('Please select product tag', 3000);
-        return;
+
+    if(isNew == '1') {
+        param.block.blockName = $('#text-blockName').val();
+        param.tag.tagName = $('#text-product-tag').val();
+        param.isNew = '1';
+    } else {
+        param.isNew = '0';
+        param.block.blockId = $('#select-block-name').val();
+        if (param.block.blockId == null || param.block.blockId == -1) {
+            Materialize.toast('Please select block', 3000);
+            return;
+        }
+
+        param.tag.tagId = $('#select-product-tag').val();
     }
-    */
 
     param.block.title = $('#text-title').val();
     if (param.block.title === '') {
@@ -470,9 +472,9 @@ function loadExistingImage(url) {
 }
 
 
-function initEvent() {
+function initEvent(isNew) {
     $('#save-btn').click(function () {
-        saveBlock();
+        saveBlock(isNew);
     })
 
     $('#select-block-name').change(function(e) {
@@ -538,4 +540,8 @@ function initEvent() {
             endingTop: '10%'
         });
     })
+
+    $("#text-blockName").keyup(function(){
+        $("#text-product-tag").val($("#text-blockName").val());
+    });
 }
