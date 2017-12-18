@@ -183,7 +183,14 @@ public class HttpUtils {
             Map<String,List<String>> headers = conn.getHeaderFields();
             mapUtils.putData("headers",headers);
             // 读取服务器端返回的内容
-            InputStream is = conn.getInputStream();
+            int code = conn.getResponseCode();
+            InputStream is = null;
+            if(code != 200) {
+                 is = conn.getErrorStream();
+            } else {
+                 is = conn.getInputStream();
+            }
+
             InputStreamReader isr = new InputStreamReader(is, "utf-8");
             BufferedReader br = new BufferedReader(isr);
             buffer = new StringBuffer();
