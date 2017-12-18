@@ -30,6 +30,7 @@ public class ColtoriProductMapping implements IProductMapping {
         try {
             String key = bodyDataMap.get("key").toString();
             JSONObject productObj = (JSONObject) bodyDataMap.get("product");
+//            traveseJson(productObj);
             productOptions.setName(productObj.getJSONObject("name").get("en") == null?"":productObj.getJSONObject("name").getString("en"))
                     .setCode(key)
                     .setSeasonCode(productObj.getString("season_id"))
@@ -54,6 +55,8 @@ public class ColtoriProductMapping implements IProductMapping {
             String category_l1 = productObj.getString("family_id");
             String category_l2 = productObj.getString("group_id");
             String category_l3 = productObj.getString("subgroup_id");
+            String category_id = productObj.getString("category_id");
+
             if(StringUtils.isBlank(category_l1) || "null".equals(category_l1)) {
                 productObj.put("family_id","");
             }
@@ -62,6 +65,10 @@ public class ColtoriProductMapping implements IProductMapping {
             }
             if(StringUtils.isBlank(category_l3) || "null".equals(category_l3)) {
                 productObj.put("subgroup_id","");
+            }
+
+            if(StringUtils.isBlank(category_id) || "null".equals(category_id)) {
+                productObj.put("category_id","");
             }
 
             /*Map<String, Object> categoryMap = new HashMap<String, Object>();
@@ -88,4 +95,35 @@ public class ColtoriProductMapping implements IProductMapping {
         logger.info("ColtoriProductMapping,outputParams,bodyDataMap:"+ JSONObject.fromObject(bodyDataMap));
         return productOptions;
     }
+/*
+    public Object traveseJson(Object data){
+        if(data instanceof JSONObject) {
+            JSONObject jsonObject = (JSONObject) data;
+            Iterator it = jsonObject.keys();
+            while (it.hasNext()) {
+                Object object = jsonObject.get(it.next());
+                if(object instanceof JSONObject || object instanceof JSONArray) {
+                    this.traveseJson(object);
+                } else {
+                    if(object == null || object.toString().equalsIgnoreCase("null")) {
+                        jsonObject.put(it.next(),"");
+                    }
+                }
+            }
+
+        } else if(data instanceof JSONArray) {
+            JSONArray jsonArray = (JSONArray) data;
+            Iterator<Object> it = jsonArray.iterator();
+            while (it.hasNext()) {
+                Object object = it.next();
+                if(object instanceof JSONObject || object instanceof JSONArray) {
+                    this.traveseJson(object);
+                } *//*if(object == null || object.toString().equalsIgnoreCase("null")) {
+
+                    System.out.println("a");
+                }*//*
+            }
+        }
+        return data;
+    }*/
 }
