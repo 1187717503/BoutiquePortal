@@ -161,9 +161,9 @@ public class ColtoriUpdateStockController  implements InitializingBean {
         Map<String,Object> stock_all_update = new HashMap<>();
         stock_all_update.put("get_token_url","https://api.orderlink.it/v2/user/token");
         stock_all_update.put("get_stock_url","https://api.orderlink.it/v2/stocks");
-        stock_all_update.put("user","TEST");
-        stock_all_update.put("password","1k0nic");
-        stock_all_update.put("vendor_id", "7");
+        stock_all_update.put("user","INTRAMIRROR");
+        stock_all_update.put("password","mbzZQsEN");
+        stock_all_update.put("vendor_id", "24");
         stock_all_update.put("eventName","stock_all_update");
         stock_all_update.put("fileUtils",new ApiDataFileUtils("coltori","stock_all_update"));
         stock_all_update.put("executor",stock_all_update_executor);
@@ -172,9 +172,9 @@ public class ColtoriUpdateStockController  implements InitializingBean {
         Map<String,Object> stock_delta_update = new HashMap<>();
         stock_delta_update.put("get_token_url","https://api.orderlink.it/v2/user/token");
         stock_delta_update.put("get_stock_url","https://api.orderlink.it/v2/stocks");
-        stock_delta_update.put("user","TEST");
-        stock_delta_update.put("password","1k0nic");
-        stock_delta_update.put("vendor_id", "7");
+        stock_delta_update.put("user","INTRAMIRROR");
+        stock_delta_update.put("password","mbzZQsEN");
+        stock_delta_update.put("vendor_id", "24");
         stock_delta_update.put("eventName","stock_delta_update");
         stock_delta_update.put("fileUtils",new ApiDataFileUtils("coltori","stock_delta_update"));
         stock_delta_update.put("executor",stock_delta_update_executor);
