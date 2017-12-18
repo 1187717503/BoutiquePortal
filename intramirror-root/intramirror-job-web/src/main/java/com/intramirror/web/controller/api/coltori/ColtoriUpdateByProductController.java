@@ -146,7 +146,10 @@ public class ColtoriUpdateByProductController implements InitializingBean {
                     }
 
                     if(StringUtils.isBlank(productOptions.getCategory1())
-                            ||StringUtils.isBlank(productOptions.getCategory2())) {
+                            ||StringUtils.isBlank(productOptions.getCategory2())
+                            || productOptions.getCategory1().equals("null")
+                            || productOptions.getCategory2().equals("null")
+                            ) {
                         logger.info("ColtoriUpdateByProductController,Category IS NULL,mqDataMap:"+JSONObject.fromObject(mqDataMap)+",productOptions:"+JSONObject.fromObject(productOptions));
                         continue;
                     }
