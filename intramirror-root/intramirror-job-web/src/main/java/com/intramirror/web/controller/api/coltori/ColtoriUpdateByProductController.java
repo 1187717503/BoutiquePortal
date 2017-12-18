@@ -154,10 +154,10 @@ public class ColtoriUpdateByProductController implements InitializingBean {
                         continue;
                     }
 
-                    /*if(StringUtils.isBlank(productOptions.getCoverImg()) || productOptions.getCoverImg().length() < 5) {
+                    if(StringUtils.isBlank(productOptions.getCoverImg()) || productOptions.getCoverImg().length() < 5) {
                         logger.info("ColtoriUpdateByProductController,CoverImg IS NULL,mqDataMap:"+JSONObject.fromObject(mqDataMap)+",productOptions:"+JSONObject.fromObject(productOptions));
                         continue;
-                    }*/
+                    }
 
                     logger.info("ColtoriUpdateByProductController,execute,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
                     CommonThreadPool.execute(eventName,executor,5,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,mqDataMap));
