@@ -68,6 +68,9 @@ public class ApiUpdateStockSerivce {
             /** 检查参数 */
             this.checkParams(conn);
 
+            /** 过滤season和brand */
+            this.checkFilter(conn);
+
             /** 更新stock */
             this.updateStock(conn);
 
@@ -87,13 +90,44 @@ public class ApiUpdateStockSerivce {
             if(conn != null) {conn.commit();conn.close(); }
         } catch (UpdateException e) {
             resultMap = ApiCommonUtils.errorMap(e.getErrorType(),e.getKey(),e.getValue());
-            if(conn != null) {conn.commit();conn.close(); }
+            if(conn != null) {conn.rollback();conn.close(); }
+        } catch (FilterException e) {
+            resultMap = ApiCommonUtils.successMap();
+            logger.info("ApiUpdateStockSerivce,FilterException,errorMsg:"+e.getMessage()
+                    +",stockOption:"+JSONObject.toJSONString(stockOption));
+            if(conn != null) {conn.rollback();conn.close();}
         } catch (Exception e) {
             e.printStackTrace();
             resultMap = ApiCommonUtils.errorMap(ApiErrorTypeEnum.errorType.error_runtime_exception,"errorMessage",ExceptionUtils.getExceptionDetail(e));
             if(conn != null) {conn.rollback();conn.close(); }
         }
         return resultMap;
+    }
+
+    public void checkFilter(Connection conn) throws Exception{
+        ProductService productService = new ProductService(conn);
+        Product product = this.getProduct(conn);
+        Long vendor_id = product.getVendor_id();
+        String season_code = product.getSeason_code();
+        Long brand_id = product.getBrand_id();
+
+        // 判断season是否需要
+        String seasonFilterSQL = " select * from `season_filter` sf "
+                + " where sf.`enabled`  =1  and sf.`vendor_id`  = "+vendor_id
+                + " and (sf.`season_code` = '-1' or sf.`season_code`  = \""+season_code+"\")";
+        List<Map<String,Object>> seasonFilterMap = productService.executeSQL(seasonFilterSQL);
+        if(seasonFilterMap != null && seasonFilterMap.size() > 0) {
+            throw new FilterException("season_filter_msg:"+JSONObject.toJSONString(seasonFilterMap));
+        }
+
+        // 判断Brand是否需要
+        String brandFilterSQL = " select * from `brand_filter`  bf "
+                + " where bf.`enabled`  = 1 and bf.`vendor_id`  ="+vendor_id
+                + " and (bf.`brand_id` = '-1' or bf.`brand_id`  = '"+brand_id+"')";
+        List<Map<String,Object>> brandFilterMap = productService.executeSQL(brandFilterSQL);
+        if(brandFilterMap != null && brandFilterMap.size() > 0) {
+            throw new FilterException("brand_filter_msg:"+JSONObject.toJSONString(brandFilterMap));
+        }
     }
 
     public Map<String,Object> updateStock(StockOption stockOption,Connection conn) {
