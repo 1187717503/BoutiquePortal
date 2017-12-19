@@ -269,7 +269,7 @@ public class ApiUpdateStockSerivce {
             skuService.createSku(sku);
             logger.info("ApiUpdateStockSerivce,createSku,sku:"+JSONObject.toJSONString(sku));
 
-            BigDecimal newPrice = product.getMax_retail_price();
+            /*BigDecimal newPrice = product.getMax_retail_price();
             BigDecimal im_price = sku.im_price;
             BigDecimal in_price = sku.in_price;
             Long product_id = product.getProduct_id();
@@ -283,7 +283,7 @@ public class ApiUpdateStockSerivce {
                     + "sps.`sale_price`  = "+im_price+",\n"
                     + "sp.`min_sale_price` ="+im_price+" ,sp.`max_sale_price`   ="+im_price+" \n" + "where p.`product_id`  ="+product_id+";";
             skuService.updateBySQL(updatePriceSQL);
-            logger.info("ApiUpdateStockService,createSku,updateProduct,updatePriceSQL:"+updatePriceSQL);
+            logger.info("ApiUpdateStockService,createSku,updateProduct,updatePriceSQL:"+updatePriceSQL);*/
 
             // 2.create sku_store
             SkuStoreService skuStoreService = new SkuStoreService(conn);
