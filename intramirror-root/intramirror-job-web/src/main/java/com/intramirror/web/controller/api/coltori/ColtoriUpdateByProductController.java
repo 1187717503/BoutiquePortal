@@ -24,6 +24,7 @@ import net.sf.json.JSONObject;
 import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -47,6 +48,9 @@ public class ColtoriUpdateByProductController implements InitializingBean {
 
     @Resource(name = "updateStockService")
     private IUpdateStockService iUpdateStockService;
+
+    @Autowired
+    private ColtoriUpdateStockController coltoriUpdateStockController;
 
     @RequestMapping("/syn_product")
     @ResponseBody
@@ -121,7 +125,7 @@ public class ColtoriUpdateByProductController implements InitializingBean {
                     mqDataMap.put("product",product);
                     mqDataMap.put("vendor_id",vendor_id);
 
-                    logger.info("ColtoriUpdateByProductController,start,mapping,mqDataMap:"+JSONObject.fromObject(mqDataMap));
+                    logger.info("ColtoriUpdateByProductController,start,mapping,mqDataMap:"+JSONObject.fromObject(mqDataMap)+",flag:"+flag);
                     ProductEDSManagement.ProductOptions productOptions = iProductMapping.mapping(mqDataMap);
                     logger.info("ColtoriUpdateByProductController,end,mapping,mqDataMap:"+JSONObject.fromObject(mqDataMap)+",productOptions:"+JSONObject.fromObject(productOptions));
 
@@ -159,7 +163,7 @@ public class ColtoriUpdateByProductController implements InitializingBean {
                         continue;
                     }
 
-                    logger.info("ColtoriUpdateByProductController,execute,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
+                    logger.info("ColtoriUpdateByProductController,execute,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName+",flag:"+flag);
                     CommonThreadPool.execute(eventName,executor,5,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,mqDataMap));
                     logger.info("ColtoriUpdateByProductController,execute,endDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
                     flag ++;
@@ -167,12 +171,16 @@ public class ColtoriUpdateByProductController implements InitializingBean {
                 i++;
             }
 
-            logger.info("ColtoriUpdateByProductController,zeroClearing,flag:"+flag);
+            /*logger.info("ColtoriUpdateByProductController,zeroClearing,flag:"+flag);
             if(eventName.equals("product_all_update") && flag > 100 ) {
                 logger.info("ColtoriUpdateByProductController,zeroClearing,start,vendor_id:"+vendor_id);
                 iUpdateStockService.zeroClearing(vendor_id);
                 logger.info("ColtoriUpdateByProductController,zeroClearing,end,vendor_id:"+vendor_id);
-            }
+            }*/
+
+            logger.info("ColtoriUpdateByProductController,start stock_all_update,sum:"+sum);
+            coltoriUpdateStockController.execute("stock_all_update");
+            logger.info("ColtoriUpdateByProductController,end stock_all_update,sum:"+sum);
 
         } catch (Exception e) {
             e.printStackTrace();
