@@ -414,12 +414,12 @@
         /*s.price,lp.in_price,sps.sale_price,*/
         lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
         lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,s.sku_code,b.english_name
-        as brandName,
+        as brandName,l.user_rec_country as userRecCountry,
         v.vendor_name,p.cover_img,g.english_name as geography_name ,lp.logistics_product_id,v.vendor_id
         FROM logistics_product lp
         INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
         INNER JOIN `order` o ON ol.order_id = o.order_id
-        INNER JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
+        INNER JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id and l.enabled = 1
         INNER JOIN geography g on l.geography_id = g.geography_id
         INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
         INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id

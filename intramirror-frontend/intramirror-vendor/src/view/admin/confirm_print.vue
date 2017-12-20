@@ -15,6 +15,7 @@
       </tr>
       <tr>
         <td style="padding-left:24px;font-size:47px">{{printData.order_line_num}}</td>
+        <td style="padding-left:24px;font-size:47px" v-if="isLocal">*LOCAL*</td>
       </tr>
       <tr>
         <td>
@@ -63,6 +64,7 @@
       return {
         printData: [],
         isLoading: true,
+        isLocal: false,
         apiUrl:process.env.BASE_URL
       }
     },
@@ -79,6 +81,11 @@
         getOrderDetail(data).then(res => {
           if (res.data.status === 1) {
             this.printData = res.data.data;
+            if (this.printData.userRecCountry == '中国香港' || 
+                this.printData.userRecCountry == '中国澳门' ||
+                this.printData.userRecCountry == '中国台湾') {
+              this.isLocal = true;
+            }
             this.isImgLoad(() => {
               this.isLoading = false;
               setTimeout(() => {
