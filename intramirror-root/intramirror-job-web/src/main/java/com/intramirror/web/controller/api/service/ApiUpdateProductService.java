@@ -350,7 +350,7 @@ public class ApiUpdateProductService {
                 productOptions.setBrandId(brandMap.get("brand_id").toString());
                 productOptions.setBrand_name(brandMap.get("english_name").toString());
             } else {
-                brandMap = productService.getBrandMapping(vendorOptions.getVendorId(),brandName);
+                brandMap = productService.getBrandMapping(brandName);
                 if(brandMap != null) {
                     productOptions.setBrandId(brandMap.get("brand_id").toString());
                     productOptions.setBrand_name(brandMap.get("english_name").toString());

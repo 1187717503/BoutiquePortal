@@ -1201,12 +1201,13 @@ public class ProductService {
         return null;
     }
 
-    public Map<String,Object> getBrandMapping(Long vendor_id,String brandName) throws Exception {
+    public Map<String,Object> getBrandMapping(String brandName) throws Exception {
         try {
-            String sql  = "select abm.brand_id,b.english_name from `api_brand_map`  abm\n"
-                    + "inner join `api_configuration`  ac on(abm.`api_configuration_id` = ac.`api_configuration_id`  and ac.`enabled`  = 1 and abm.`enabled`  = 1)\n"
-                    +"inner join brand b on(b.brand_id = abm.brand_id and b.enabled = 1)"
-                    + "where ac.`vendor_id`  = "+vendor_id+" and trim(abm.`boutique_brand_name`)  =trim(\"" + brandName + "\")";
+            String sql  = " select abm.brand_id,b.english_name from `api_brand_map`  abm\n"
+                    + " inner join `api_configuration`  ac on(abm.`api_configuration_id` = ac.`api_configuration_id`  and ac.`enabled`  = 1 and abm.`enabled`  = 1)\n"
+                    +" inner join brand b on(b.brand_id = abm.brand_id and b.enabled = 1)\n"
+//                    + "where ac.`vendor_id`  = "+vendor_id+" and trim(abm.`boutique_brand_name`)  =trim(\"" + brandName + "\")";
+                    + " where trim(abm.`boutique_brand_name`)  = trim(\"" + brandName + "\")";
             logger.info("ProductService,getThreeCategory,sql:" + sql);
 
             List<Map<String,Object>> brandMap = productDao.executeBySql(sql, null);
