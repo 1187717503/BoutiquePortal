@@ -2,6 +2,7 @@ package com.intramirror.web.controller.content;
 
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.product.api.model.Block;
+import com.intramirror.product.api.model.BlockTagRel;
 import com.intramirror.product.api.model.Category;
 import com.intramirror.product.api.model.Tag;
 import com.intramirror.product.api.model.TagProductRel;
@@ -63,7 +64,6 @@ public class ContentMgntController {
 
     /**
      * Return block info with bind tag.
-     *
      * @param blockName
      * @param status
      * @param tagId
@@ -153,6 +153,10 @@ public class ContentMgntController {
     @DeleteMapping(value = "/tags/{tagId}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public Response deleteTag(@PathVariable Long tagId) {
+        List<BlockTagRel> blockTagRelList = blockService.getBlockTagRelByTagId(tagId);
+        if (blockTagRelList.size() >= 1) {
+            throw new ValidateException(new ErrorResponse("The tag has been bound with block and cannot be removed!"));
+        }
         contentManagementService.deleteTag(tagId);
         return Response.success();
     }

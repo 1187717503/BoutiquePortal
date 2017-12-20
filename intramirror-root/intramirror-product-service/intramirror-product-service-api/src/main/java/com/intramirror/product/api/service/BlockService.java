@@ -1,6 +1,7 @@
 package com.intramirror.product.api.service;
 
 import com.intramirror.product.api.model.Block;
+import com.intramirror.product.api.model.BlockTagRel;
 import java.util.List;
 import java.util.Map;
 
@@ -29,4 +30,5 @@ public interface BlockService {
 
     List<Block> getBlockByName(Block record);
 
+    List<BlockTagRel> getBlockTagRelByTagId(Long tagId);
 }

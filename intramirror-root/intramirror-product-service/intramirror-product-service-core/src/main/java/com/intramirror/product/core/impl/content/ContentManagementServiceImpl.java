@@ -116,7 +116,7 @@ public class ContentManagementServiceImpl implements ContentManagementService {
     @Transactional
     public int deleteTag(Long tagId) {
         tagProductRelMapper.deleteByTagId(tagId);
-        blockTagRelMapper.deleteByTagId(tagId);
+        //blockTagRelMapper.deleteByTagId(tagId);
         return tagMapper.deleteByPrimaryKey(tagId);
     }
 

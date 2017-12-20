@@ -890,7 +890,7 @@ function initAcitonEvent() {
                 finishLoading();
             }, error: function(result, resp, par) {
                 toashWithCloseBtn(result.responseJSON.message);
-
+                finishLoading();
                 if (result.status == 401) {
                     window.location.href = '../../../login';
                 }

@@ -113,4 +113,11 @@
         DELETE FROM block_tag_rel
         WHERE tag_id = #{tagId,jdbcType=BIGINT}
     </delete>
+
+    <select id="getBlockTagRelByTagId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from block_tag_rel
+        where tag_id = #{tagId,jdbcType=BIGINT}
+    </select>
 </mapper>

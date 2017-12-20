@@ -1,8 +1,10 @@
 package com.intramirror.product.core.impl;
 
 import com.intramirror.product.api.model.Block;
+import com.intramirror.product.api.model.BlockTagRel;
 import com.intramirror.product.api.service.BlockService;
 import com.intramirror.product.core.mapper.BlockMapper;
+import com.intramirror.product.core.mapper.BlockTagRelMapper;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -21,6 +23,9 @@ public class BlockServiceImpl implements BlockService {
 
     @Autowired
     private BlockMapper blockMapper;
+
+    @Autowired
+    private BlockTagRelMapper blockTagRelMapper;
 
     @Override
     public int insert(Block record) {
@@ -71,5 +76,9 @@ public class BlockServiceImpl implements BlockService {
 
     public List<Block> getBlockByName(Block record) {
         return blockMapper.getBlockByName(record);
+    }
+
+    public List<BlockTagRel> getBlockTagRelByTagId(Long tagId) {
+        return blockTagRelMapper.getBlockTagRelByTagId(tagId);
     }
 }
