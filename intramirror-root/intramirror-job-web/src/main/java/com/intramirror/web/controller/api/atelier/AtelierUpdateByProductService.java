@@ -44,9 +44,10 @@ public class AtelierUpdateByProductService implements InitializingBean {
     public String create_product = "product_delta_create";
 
     // thread num
-    private static final int threadNum = 20;
+    private static final int threadNum = 60;
 
     public Map<String,Object> updateProduct(String body,String storeID,String version,String type){
+        long start = System.currentTimeMillis();
         MapUtils mapUtils = new MapUtils(new HashMap<String, Object>());
         try {
             // 校验入参
@@ -86,7 +87,7 @@ public class AtelierUpdateByProductService implements InitializingBean {
                 return ResultHelper.createErrorResult("206", "E206: StoreID non existent.storeID:"+storeID);
             }
             Map<String,Object> paramMap = (Map<String, Object>) paramsMap.get(storeID);
-            ThreadPoolExecutor executor = (ThreadPoolExecutor) paramsMap.get("executor");
+            ThreadPoolExecutor executor = (ThreadPoolExecutor) paramMap.get("executor");
             logger.info("AtelierUpdateByStockControllerExecute,getBaseData,paramMap:"+JSONObject.toJSONString(paramMap));
             String vendor_id = paramMap.get("vendor_id").toString();
             String eventName = paramMap.get("eventName").toString();
@@ -104,9 +105,13 @@ public class AtelierUpdateByProductService implements InitializingBean {
             ProductEDSManagement.VendorOptions vendorOptions = new ProductEDSManagement().getVendorOptions();
             vendorOptions.setVendorId(Long.parseLong(vendor_id));
 
+            long start_execute = System.currentTimeMillis();
             logger.info("AtelierUpdateByProductServiceUpdateProduct,executeThreadTool,eventName:"+eventName+",productOptions:"+JSONObject.toJSONString(productOptions)+",vendorOptions:"+JSONObject.toJSONString(vendorOptions)+",fileUtils:"+JSONObject.toJSONString(fileUtils)+",storeCode:"+storeID);
             CommonThreadPool.execute(eventName,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,fileUtils,bodyDataMap));
             logger.info("AtelierUpdateByProductServiceUpdateProduct,executeThreadTool,eventName:"+eventName+",productOptions:"+JSONObject.toJSONString(productOptions)+",vendorOptions:"+JSONObject.toJSONString(vendorOptions)+",fileUtils:"+JSONObject.toJSONString(fileUtils)+",storeCode:"+storeID);
+            long end_execute = System.currentTimeMillis();
+            logger.info("Job_Run_Time,AtelierUpdateByProductService_UpdateProductThread,start:"+start_execute+",end:"+end_execute+",time:"+(end_execute-start_execute));
+
             mapUtils.putData("ResponseStatus","1000");
         } catch (Exception e) {
             e.printStackTrace();
@@ -116,6 +121,8 @@ public class AtelierUpdateByProductService implements InitializingBean {
                     .putData("ErrorMsg","500: E500: failed:"+ExceptionUtils.getExceptionDetail(e))
                     .putData("TimeStamp",new Date()).getMap();
         }
+        long end = System.currentTimeMillis();
+        logger.info("Job_Run_Time,AtelierUpdateByProductService_updateProduct,start:"+start+",end:"+end+",time:"+(end-start));
         return mapUtils.getMap();
     }
 
@@ -126,14 +133,26 @@ public class AtelierUpdateByProductService implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         paramsMap = new HashMap<>();
-        ThreadPoolExecutor executor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
-        paramsMap.put("executor",executor);
+        ThreadPoolExecutor executor_8 =(ThreadPoolExecutor) Executors.newCachedThreadPool();
+        ThreadPoolExecutor executor_10 =(ThreadPoolExecutor) Executors.newCachedThreadPool();
+        ThreadPoolExecutor executor_12 =(ThreadPoolExecutor) Executors.newCachedThreadPool();
+        ThreadPoolExecutor executor_13 =(ThreadPoolExecutor) Executors.newCachedThreadPool();
+        ThreadPoolExecutor executor_14 =(ThreadPoolExecutor) Executors.newCachedThreadPool();
+        ThreadPoolExecutor executor_18 =(ThreadPoolExecutor) Executors.newCachedThreadPool();
+        ThreadPoolExecutor executor_26 =(ThreadPoolExecutor) Executors.newCachedThreadPool();
+        ThreadPoolExecutor executor_28 =(ThreadPoolExecutor) Executors.newCachedThreadPool();
+        ThreadPoolExecutor executor_31 =(ThreadPoolExecutor) Executors.newCachedThreadPool();
+        ThreadPoolExecutor executor_25 =(ThreadPoolExecutor) Executors.newCachedThreadPool();
+        ThreadPoolExecutor executor_23 =(ThreadPoolExecutor) Executors.newCachedThreadPool();
+        ThreadPoolExecutor executor_29 =(ThreadPoolExecutor) Executors.newCachedThreadPool();
+        ThreadPoolExecutor executor_27 =(ThreadPoolExecutor) Executors.newCachedThreadPool();
 
         Map<String,Object> X4ZMP = new HashMap<>();
         X4ZMP.put("store_code","X4ZMP");
         X4ZMP.put("vendor_id","8");
         X4ZMP.put("vendor_name","Luciana Bari");
         X4ZMP.put("eventName","luciana");
+        X4ZMP.put("executor",executor_8);
         paramsMap.put("X4ZMP",X4ZMP);
 
         Map<String,Object> XIW2E = new HashMap<>();
@@ -141,6 +160,7 @@ public class AtelierUpdateByProductService implements InitializingBean {
         XIW2E.put("vendor_id","10");
         XIW2E.put("vendor_name","Dante 5");
         XIW2E.put("eventName","dante");
+        XIW2E.put("executor",executor_10);
         paramsMap.put("XIW2E",XIW2E);
 
         /*Map<String,Object> UIWK2 = new HashMap<>();
@@ -155,6 +175,7 @@ public class AtelierUpdateByProductService implements InitializingBean {
         ERS4S.put("vendor_id","12");
         ERS4S.put("vendor_name","Mimma Ninni");
         ERS4S.put("eventName","mimma");
+        ERS4S.put("executor",executor_12);
         paramsMap.put("ERS4S",ERS4S);
 
         Map<String,Object> UEYHD = new HashMap<>();
@@ -162,6 +183,7 @@ public class AtelierUpdateByProductService implements InitializingBean {
         UEYHD.put("vendor_id","13");
         UEYHD.put("vendor_name","Di Pierro");
         UEYHD.put("eventName","diPierro");
+        UEYHD.put("executor",executor_13);
         paramsMap.put("UEYHD",UEYHD);
 
         Map<String,Object> IEK7W = new HashMap<>();
@@ -169,6 +191,7 @@ public class AtelierUpdateByProductService implements InitializingBean {
         IEK7W.put("vendor_id","14");
         IEK7W.put("vendor_name","Gisa Boutique");
         IEK7W.put("eventName","gisa");
+        IEK7W.put("executor",executor_14);
         paramsMap.put("IEK7W",IEK7W);
 
         Map<String,Object> WISE = new HashMap<>();
@@ -176,6 +199,7 @@ public class AtelierUpdateByProductService implements InitializingBean {
         WISE.put("vendor_id","18");
         WISE.put("vendor_name","Wise Boutique");
         WISE.put("eventName","wise");
+        WISE.put("executor",executor_18);
         paramsMap.put("WISE",WISE);
 
         Map<String,Object> JUL = new HashMap<>();
@@ -183,6 +207,7 @@ public class AtelierUpdateByProductService implements InitializingBean {
         JUL.put("vendor_id","26");
         JUL.put("vendor_name","Julian");
         JUL.put("eventName","julian");
+        JUL.put("executor",executor_26);
         paramsMap.put("JULIAN",JUL);
 
         Map<String,Object> ANDD = new HashMap<>();
@@ -190,6 +215,7 @@ public class AtelierUpdateByProductService implements InitializingBean {
         ANDD.put("vendor_id","29");
         ANDD.put("vendor_name","and");
         ANDD.put("eventName","and");
+        ANDD.put("executor",executor_29);
         paramsMap.put("ANDD",ANDD);
 
         Map<String,Object> DIVO = new HashMap<>();
@@ -197,6 +223,7 @@ public class AtelierUpdateByProductService implements InitializingBean {
         DIVO.put("vendor_id","28");
         DIVO.put("vendor_name","divo");
         DIVO.put("eventName","divo");
+        DIVO.put("executor",executor_28);
         paramsMap.put("DIVO",DIVO);
 
         Map<String,Object> BAG = new HashMap<>();
@@ -204,6 +231,7 @@ public class AtelierUpdateByProductService implements InitializingBean {
         BAG.put("vendor_id","31");
         BAG.put("vendor_name","BagheeraBoutique");
         BAG.put("eventName","bagheera");
+        BAG.put("executor",executor_31);
         paramsMap.put("BAG",BAG);
 
         Map<String,Object> GAD = new HashMap<>();
@@ -211,6 +239,7 @@ public class AtelierUpdateByProductService implements InitializingBean {
         GAD.put("vendor_id","25");
         GAD.put("vendor_name","Gaudenzi");
         GAD.put("eventName","gaudenzi");
+        GAD.put("executor",executor_25);
         paramsMap.put("GAD",GAD);
 
         Map<String,Object> VLT = new HashMap<>();
@@ -218,6 +247,7 @@ public class AtelierUpdateByProductService implements InitializingBean {
         VLT.put("vendor_id","27");
         VLT.put("vendor_name","Valenti");
         VLT.put("eventName","valenti");
+        VLT.put("executor",executor_27);
         paramsMap.put("VLT",VLT);
 
         Map<String,Object> SUG = new HashMap<>();
@@ -225,6 +255,7 @@ public class AtelierUpdateByProductService implements InitializingBean {
         SUG.put("vendor_id","23");
         SUG.put("vendor_name","SugarBoutique");
         SUG.put("eventName","sugar");
+        SUG.put("executor",executor_23);
         paramsMap.put("SUG",SUG);
     }
 }

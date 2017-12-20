@@ -58,6 +58,7 @@ public class ApiUpdateStockSerivce {
     private List<Map<String,Object>> warningList;
 
     public Map<String,Object> updateStock(StockOption stockOption) {
+        long start = System.currentTimeMillis();
         Map<String,Object> resultMap = new HashMap<>();
 
         this.stockOption = stockOption;
@@ -101,6 +102,8 @@ public class ApiUpdateStockSerivce {
             resultMap = ApiCommonUtils.errorMap(ApiErrorTypeEnum.errorType.error_runtime_exception,"errorMessage",ExceptionUtils.getExceptionDetail(e));
             if(conn != null) {conn.rollback();conn.close(); }
         }
+        long end = System.currentTimeMillis();
+        logger.info("Job_Run_Time,ApiUpdateStockSerivce_updateStock,start:"+start+",end:"+end+",time:"+(end-start));
         return resultMap;
     }
 
@@ -131,6 +134,7 @@ public class ApiUpdateStockSerivce {
     }
 
     public Map<String,Object> updateStock(StockOption stockOption,Connection conn) {
+        long start = System.currentTimeMillis();
         Map<String,Object> resultMap = new HashMap<>();
         this.stockOption = stockOption;
         try{
@@ -159,6 +163,8 @@ public class ApiUpdateStockSerivce {
             e.printStackTrace();
             resultMap = ApiCommonUtils.errorMap(ApiErrorTypeEnum.errorType.error_runtime_exception,"errorMessage",ExceptionUtils.getExceptionDetail(e));
         }
+        long end = System.currentTimeMillis();
+        logger.info("Job_Run_Time,ApiUpdateStockSerivce_updateStock_call_byUpdateProduct,start:"+start+",end:"+end+",time:"+(end-start));
         return resultMap;
     }
 

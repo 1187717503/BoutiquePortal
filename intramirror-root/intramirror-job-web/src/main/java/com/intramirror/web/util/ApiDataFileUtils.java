@@ -16,9 +16,9 @@ public class ApiDataFileUtils {
 
     private static final Logger logger = Logger.getLogger(ApiDataFileUtils.class);
 
-    public static final String baseUrl = "/mnt2";
+//    public static final String baseUrl = "/mnt2";
 
-//    public static final String baseUrl = "/Users/dingyifan/Documents/fileTest";
+    public static final String baseUrl = "/Users/dingyifan/Documents/fileTest";
 
     public static final String bak_file = "backup";
 
@@ -36,17 +36,25 @@ public class ApiDataFileUtils {
     }
 
     public String bakPendingFile(String fileName, String content){
+        long start = System.currentTimeMillis();
         // 获取文件夹路径
         String strDate = DateUtils.getStrDate(new Date(),"yyyyMMdd");
         String bakUrl = baseUrl+"/"+vendorName+"/"+bak_file+"/"+eventName+"/"+strDate;
-        return this.writeFile(bakUrl,fileName,content);
+        String url = this.writeFile(bakUrl,fileName,content);
+        long end = System.currentTimeMillis();
+        logger.info("Job_Run_Time,ApiDataFileUtils_bakPendingFile,start:"+start+",end:"+end+",time:"+(end-start));
+        return url;
     }
 
     public String bakErrorFile(String fileName, String content){
+        long start = System.currentTimeMillis();
         // 获取文件夹路径
         String strDate = DateUtils.getStrDate(new Date(),"yyyyMMdd");
         String bakUrl = baseUrl+"/"+vendorName+"/"+error_file+"/"+eventName+"/"+strDate;
-        return this.writeFile(bakUrl,fileName,content);
+        String url = this.writeFile(bakUrl,fileName,content);
+        long end = System.currentTimeMillis();
+        logger.info("Job_Run_Time,ApiDataFileUtils_bakErrorFile,start:"+start+",end:"+end+",time:"+(end-start));
+        return url;
     }
 
     private String writeFile(String bakUrl,String fileName, String content) {

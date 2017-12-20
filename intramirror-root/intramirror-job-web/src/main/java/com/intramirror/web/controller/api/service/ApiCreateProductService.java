@@ -63,6 +63,7 @@ public class ApiCreateProductService {
     private Product uProduct;
 
     public Map<String,Object> createProduct(ProductEDSManagement.ProductOptions productOptions,ProductEDSManagement.VendorOptions vendorOptions) {
+        long start = System.currentTimeMillis();
         Map<String,Object> resultMap = null;
 
         this.productOptions = productOptions ;
@@ -114,6 +115,8 @@ public class ApiCreateProductService {
             }
             if(conn != null) {conn.rollback();conn.close();}
         }
+        long end = System.currentTimeMillis();
+        logger.info("Job_Run_Time,ApiCreateProductService_createProduct,start:"+start+",end:"+end+",time:"+(end-start));
         return resultMap;
     }
 

@@ -56,6 +56,8 @@ public class ApiUpdateProductService {
     private List<Map<String,Object>> warningList = new ArrayList<>() ;
 
     public Map<String,Object> updateProduct(ProductEDSManagement.ProductOptions productOptions,ProductEDSManagement.VendorOptions vendorOptions){
+        long start = System.currentTimeMillis();
+
         Map<String,Object> resultMap = new HashMap<>();
 
         this.productOptions = productOptions ;
@@ -102,6 +104,8 @@ public class ApiUpdateProductService {
             resultMap = ApiCommonUtils.errorMap(ApiErrorTypeEnum.errorType.error_runtime_exception,"errorMessage", ExceptionUtils.getExceptionDetail(e));
             if(conn != null) {conn.rollback();conn.close();}
         }
+        long end = System.currentTimeMillis();
+        logger.info("Job_Run_Time,ApiUpdateProductService_updateProduct,start:"+start+",end:"+end+",time:"+(end-start));
         return resultMap;
     }
 
