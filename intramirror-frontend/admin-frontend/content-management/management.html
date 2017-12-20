@@ -184,20 +184,6 @@
 
     </div>
     <!-- END WRAPPER -->
-	<div id="new-block" class="modal input-modal">
-        <div class="modal-content">
-            <div class="col" style="margin-left: 0px;padding-left: 11px;">
-                <div class="input-field col s4">
-                    <input id="text-new-blockName" type="text" class="validate">
-                    <label for="text-new-blockName">New Block Name</label>
-                </div>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <a href="#" class="waves-effect waves-red btn-flat modal-action model-no">CLOSE</a>
-            <a href="#" class="waves-effect waves-green btn-flat modal-action model-yes">SAVE</a>
-        </div>
-    </div>
 </div>
 <!-- END MAIN -->
 
@@ -275,7 +261,7 @@
         <div class="item style-scope page-block" title="${block.tag_name}">${block.tag_name}</div>
         <div class="item style-scope page-block">${block.sort_order}</div>
         <div class="item style-scope page-block action" data-block-id="${block.block_id}">
-            <span title="Process" data-action="process" class="waves-effect icon-btn-processing action-icon">
+            <span title="Process" data-action="modify" class="waves-effect icon-btn-processing action-icon">
                 <i class="mdi-editor-mode-edit"></i>
             </span>
         </div>

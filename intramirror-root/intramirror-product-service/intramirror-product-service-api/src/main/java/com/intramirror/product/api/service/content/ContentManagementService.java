@@ -1,6 +1,7 @@
 package com.intramirror.product.api.service.content;
 
 import com.intramirror.product.api.model.Block;
+import com.intramirror.product.api.model.BlockTagRel;
 import com.intramirror.product.api.model.Tag;
 import com.intramirror.product.api.model.TagProductRel;
 import java.util.List;
@@ -42,6 +43,6 @@ public interface ContentManagementService {
 
     int batchDeleteByTagIdAndProductId(List<TagProductRel> listTagProductRel);
 
-    int createBlockWithDefaultTag(Block block);
+    BlockTagRel createBlockWithDefaultTag(Block block);
 
 }

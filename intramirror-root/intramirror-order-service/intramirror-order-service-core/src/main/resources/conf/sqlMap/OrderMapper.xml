@@ -123,8 +123,8 @@
         LEFT JOIN user_ship_address usa ON o.user_id = usa.user_id
         LEFT JOIN logistics l ON (lp.order_logistics_id = l.order_logistics_id and l.enabled = 1)
         LEFT JOIN geography g on l.geography_id = g.geography_id
-        INNER JOIN shop_product_sku sps ON (lp.shop_product_sku_id = sps.shop_product_sku_id and sps.enabled = 1)
-        INNER JOIN shop_product sp ON (sps.shop_product_id = sp.shop_product_id and sp.enabled = 1)
+        INNER JOIN shop_product_sku sps ON (lp.shop_product_sku_id = sps.shop_product_sku_id)
+        INNER JOIN shop_product sp ON (sps.shop_product_id = sp.shop_product_id)
         INNER JOIN product p ON (sp.product_id = p.product_id and p.enabled = 1)
         INNER JOIN brand b ON (p.brand_id = b.brand_id and b.enabled = 1 )
         INNER JOIN sku s ON (s.sku_id = sps.sku_id and s.enabled = 1)
@@ -718,21 +718,6 @@
                 AND pspv.enabled = 1
                 )
             INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
-            LEFT JOIN (
-                          SELECT
-                              t_pp.product_id,
-                              max(CASE t_pp.key_name
-                                  WHEN 'ColorCode'
-                                      THEN t_pp.`value`
-                                  ELSE '' END) AS colorCode,
-                              max(CASE t_pp.key_name
-                                  WHEN 'BrandID'
-                                      THEN t_pp.`value`
-                                  ELSE '' END) AS brandID
-                          FROM product_property t_pp
-                          WHERE t_pp.enabled = 1 AND (t_pp.key_name = 'BrandID' OR t_pp.key_name = 'ColorCode')
-                          GROUP BY t_pp.product_id
-                      ) pp ON p.product_id = pp.product_id
         WHERE pspk.`name` = 'Size' AND lp.enabled = 1
               AND lp.order_line_num = #{orderNumber,jdbcType=VARCHAR}
         GROUP BY o.order_num;
@@ -824,7 +809,7 @@
     </select>
 
     <select id="selectCreateThreeOrderInfo" parameterType="java.util.Map" resultType="java.util.Map">
-        select lp.`logistics_product_id` ,lp.`order_line_num`,lp.`created_at`   from `logistics_product`  lp
+        select lp.`logistics_product_id` ,lp.`order_line_num`,lp.`created_at` from `logistics_product` lp
         where lp.`vendor_id` in
         <foreach item="item" index="index" collection="vendors" open="(" separator="," close=")">
             #{item}
@@ -833,7 +818,7 @@
         <foreach item="item" index="index" collection="order_status" open="(" separator="," close=")">
             #{item}
         </foreach>
-        and lp.`plase_order_at`  is null ;
+        and lp.`plase_order_at` is null ;
     </select>
 
     <update id="updateById" parameterType="com.intramirror.order.api.model.Order">

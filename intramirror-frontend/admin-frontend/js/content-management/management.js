@@ -210,7 +210,6 @@ function initActionEvent() {
         }
     })
 
-    // 时间原因，没有做排序 2017-12-8
     $('.orderby').click(function() {
 
         var orderby = $(this).find('use').attr('xlink:href');
@@ -228,6 +227,11 @@ function initActionEvent() {
         let current = $('.pagination .active.pagination-index').data('pageno') + 1;
         getBlockList(current);
     })
+
+    $('.block-list .action .action-icon').click(function() {
+        let blockId = $(this).parent().data('block-id');
+        window.open('./detail.html?new=0&blockId='+blockId);
+    });
 }
 
 function updateBlock(action) {
@@ -338,57 +342,6 @@ function initEvent() {
     });
 
     $('#new-block-btn').click(function() {
-        $('#new-block').openModal({
-            dismissible: false,
-            opacity: .5,
-            inDuration: 300,
-            outDuration: 200,
-            startingTop: '4%',
-            endingTop: '10%'
-        });
-    });
-
-    $('#new-block .model-yes').click(function() {
-        loading();
-        
-        let param = {};
-        param.status = 0;
-        param.blockName = $('#text-new-blockName').val();
-        if(param.blockName == "") {
-            toashWithCloseBtn("Please enter the block name!");
-            finishLoading();
-            return;
-        }
-        param.enabled = 1;
-        //掉后台接口
-        $.ajax({
-            type: requestURL.createBlock.method,
-            contentType: "application/json",
-            url: requestURL.createBlock.url,
-            data: JSON.stringify(param),
-            dataType: 'json',
-            beforeSend: function(request) {
-                request.setRequestHeader("token", token);
-            },
-            success: function(result) {
-                Materialize.toast("Create Block Success!", 3000);
-                // 获取当前页数
-                //let current = $('.pagination .active.pagination-index').data('pageno') + 1;
-                $('#new-block').closeModal();
-                getBlockList(1);
-                finishLoading();
-            }, error: function(result, resp, par) {
-                toashWithCloseBtn(result.responseJSON.message);
-                finishLoading();
-                if (result.status == 401) {
-                    window.location.href = '../../../login';
-                }
-            }
-        });
-    });
-
-    $('#new-block .model-no').click(function() {
-        let oriProductTag = $('#select-product-tag').data('origin-product-id');        
-        $('#new-block').closeModal();
+        window.open('./detail.html?new=1');
     });
 }

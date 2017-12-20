@@ -134,8 +134,9 @@ public class ContentManagementServiceImpl implements ContentManagementService {
 
     @Override
     @Transactional
-    public int createBlockWithDefaultTag(Block block) {
+    public BlockTagRel createBlockWithDefaultTag(Block block) {
         List<Block> blockList = blockMapper.listBlockBySort(block.getSortOrder());
+        block.setStatus((byte) 1);
         block.setEnabled(true);
         blockMapper.insertSelective(block);
         if (blockList.size() != 0) {
@@ -151,7 +152,9 @@ public class ContentManagementServiceImpl implements ContentManagementService {
         btRel.setTagId(tag.getTagId());
         btRel.setBlockId(block.getBlockId());
 
-        return blockTagRelMapper.insertSelective(btRel);
+        blockTagRelMapper.insertSelective(btRel);
+
+        return btRel;
     }
 
     private int updateBlock(Block block) {

@@ -24,6 +24,7 @@ import net.sf.json.JSONObject;
 import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -47,6 +48,9 @@ public class ColtoriUpdateByProductController implements InitializingBean {
 
     @Resource(name = "updateStockService")
     private IUpdateStockService iUpdateStockService;
+
+    @Autowired
+    private ColtoriUpdateStockController coltoriUpdateStockController;
 
     @RequestMapping("/syn_product")
     @ResponseBody
@@ -121,12 +125,22 @@ public class ColtoriUpdateByProductController implements InitializingBean {
                     mqDataMap.put("product",product);
                     mqDataMap.put("vendor_id",vendor_id);
 
-                    logger.info("ColtoriUpdateByProductController,start,mapping,mqDataMap:"+JSONObject.fromObject(mqDataMap));
+                    logger.info("ColtoriUpdateByProductController,start,mapping,mqDataMap:"+JSONObject.fromObject(mqDataMap)+",flag:"+flag);
                     ProductEDSManagement.ProductOptions productOptions = iProductMapping.mapping(mqDataMap);
                     logger.info("ColtoriUpdateByProductController,end,mapping,mqDataMap:"+JSONObject.fromObject(mqDataMap)+",productOptions:"+JSONObject.fromObject(productOptions));
 
                     if(StringUtils.isBlank(productOptions.getBrandCode())) {
                         logger.info("ColtoriUpdateByProductController,BrandID IS NULL,mqDataMap:"+JSONObject.fromObject(mqDataMap)+",productOptions:"+JSONObject.fromObject(productOptions));
+                        continue;
+                    }
+
+                    if(StringUtils.isBlank(productOptions.getBrandName())) {
+                        logger.info("ColtoriUpdateByProductController,BrandName IS NULL,mqDataMap:"+JSONObject.fromObject(mqDataMap)+",productOptions:"+JSONObject.fromObject(productOptions));
+                        continue;
+                    }
+
+                    if(StringUtils.isBlank(productOptions.getColorCode())) {
+                        logger.info("ColtoriUpdateByProductController,ColorCode IS NULL,mqDataMap:"+JSONObject.fromObject(mqDataMap)+",productOptions:"+JSONObject.fromObject(productOptions));
                         continue;
                     }
 
@@ -136,17 +150,20 @@ public class ColtoriUpdateByProductController implements InitializingBean {
                     }
 
                     if(StringUtils.isBlank(productOptions.getCategory1())
-                            ||StringUtils.isBlank(productOptions.getCategory2())) {
+                            ||StringUtils.isBlank(productOptions.getCategory2())
+                            || productOptions.getCategory1().equals("null")
+                            || productOptions.getCategory2().equals("null")
+                            ) {
                         logger.info("ColtoriUpdateByProductController,Category IS NULL,mqDataMap:"+JSONObject.fromObject(mqDataMap)+",productOptions:"+JSONObject.fromObject(productOptions));
                         continue;
                     }
 
-                    if(StringUtils.isBlank(productOptions.getCoverImg())) {
+                    if(StringUtils.isBlank(productOptions.getCoverImg()) || productOptions.getCoverImg().length() < 5) {
                         logger.info("ColtoriUpdateByProductController,CoverImg IS NULL,mqDataMap:"+JSONObject.fromObject(mqDataMap)+",productOptions:"+JSONObject.fromObject(productOptions));
                         continue;
                     }
 
-                    logger.info("ColtoriUpdateByProductController,execute,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
+                    logger.info("ColtoriUpdateByProductController,execute,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName+",flag:"+flag);
                     CommonThreadPool.execute(eventName,executor,5,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,mqDataMap));
                     logger.info("ColtoriUpdateByProductController,execute,endDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
                     flag ++;
@@ -154,12 +171,16 @@ public class ColtoriUpdateByProductController implements InitializingBean {
                 i++;
             }
 
-            logger.info("ColtoriUpdateByProductController,zeroClearing,flag:"+flag);
+            /*logger.info("ColtoriUpdateByProductController,zeroClearing,flag:"+flag);
             if(eventName.equals("product_all_update") && flag > 100 ) {
                 logger.info("ColtoriUpdateByProductController,zeroClearing,start,vendor_id:"+vendor_id);
                 iUpdateStockService.zeroClearing(vendor_id);
                 logger.info("ColtoriUpdateByProductController,zeroClearing,end,vendor_id:"+vendor_id);
-            }
+            }*/
+
+            logger.info("ColtoriUpdateByProductController,start stock_all_update,sum:"+sum);
+            coltoriUpdateStockController.execute("stock_all_update");
+            logger.info("ColtoriUpdateByProductController,end stock_all_update,sum:"+sum);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -174,9 +195,9 @@ public class ColtoriUpdateByProductController implements InitializingBean {
         Map<String,Object> product_all_update = new HashMap<>();
         product_all_update.put("get_token_url","https://api.orderlink.it/v2/user/token");
         product_all_update.put("get_product_url","https://api.orderlink.it/v2/products");
-        product_all_update.put("user","TEST");
-        product_all_update.put("password","1k0nic");
-        product_all_update.put("vendor_id", "7");
+        product_all_update.put("user","INTRAMIRROR");
+        product_all_update.put("password","mbzZQsEN");
+        product_all_update.put("vendor_id", "24");
         product_all_update.put("eventName","product_all_update");
         product_all_update.put("fileUtils",new ApiDataFileUtils("coltori","product_all_update"));
         product_all_update.put("executor",product_all_update_executor);
@@ -185,9 +206,9 @@ public class ColtoriUpdateByProductController implements InitializingBean {
         Map<String,Object> product_delta_update = new HashMap<>();
         product_delta_update.put("get_token_url","https://api.orderlink.it/v2/user/token");
         product_delta_update.put("get_product_url","https://api.orderlink.it/v2/products");
-        product_delta_update.put("user","TEST");
-        product_delta_update.put("password","1k0nic");
-        product_delta_update.put("vendor_id", "7");
+        product_delta_update.put("user","INTRAMIRROR");
+        product_delta_update.put("password","mbzZQsEN");
+        product_delta_update.put("vendor_id", "24");
         product_delta_update.put("eventName","product_delta_update");
         product_delta_update.put("fileUtils",new ApiDataFileUtils("coltori","product_delta_update"));
         product_delta_update.put("executor",product_delta_update_executor);

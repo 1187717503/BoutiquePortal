@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.intramirror.common.help.ExceptionUtils;
 import com.intramirror.common.help.StringUtils;
 import com.intramirror.common.utils.DateUtils;
+import com.intramirror.product.api.service.stock.IUpdateStockService;
 import com.intramirror.web.contants.RedisKeyContants;
 import com.intramirror.web.mapping.api.IStockMapping;
 import com.intramirror.web.mapping.vo.StockOption;
@@ -46,6 +47,9 @@ public class ColtoriUpdateStockController  implements InitializingBean {
 
     @Resource(name = "coltoriStockMapping")
     private IStockMapping iStockMapping;
+
+    @Resource(name = "updateStockService")
+    private IUpdateStockService iUpdateStockService;
 
     @RequestMapping("/syn_stock")
     @ResponseBody
@@ -93,6 +97,7 @@ public class ColtoriUpdateStockController  implements InitializingBean {
             String total = "";
             int sum = 0;
             int i = 1;
+            int flag = 1;
             while (true) {
                 String new_url = get_stock_url;
                 if(i <= sum || i == 1) {
@@ -138,13 +143,21 @@ public class ColtoriUpdateStockController  implements InitializingBean {
                             StockOption stockOption = iStockMapping.mapping(stockMap);
                             logger.info("ColtoriUpdateStockController,end,mapping,stockMap:"+JSONObject.fromObject(stockMap)+",stockOption:"+JSONObject.fromObject(stockOption));
                             // 线程池
-                            logger.info("ColtoriUpdateStockController,execute,startDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(stockMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
-                            CommonThreadPool.execute(eventName,executor,5,new UpdateStockThread(stockOption,apiDataFileUtils,stockMap));
+                            logger.info("ColtoriUpdateStockController,execute,startDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(stockMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName+",flag:"+flag);
+                            CommonThreadPool.execute(eventName,executor,10,new UpdateStockThread(stockOption,apiDataFileUtils,stockMap));
                             logger.info("ColtoriUpdateStockController,execute,endDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(stockMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
+                            flag++;
                         }
                     }
                 }
                 i++;
+            }
+
+            logger.info("ColtoriUpdateStockController,zeroClearing,flag:"+flag);
+            if(eventName.equals("stock_all_update") && flag > 100 ) {
+                logger.info("ColtoriUpdateStockController,zeroClearing,start,vendor_id:"+vendor_id+",flag:"+flag);
+                iUpdateStockService.zeroClearing(vendor_id);
+                logger.info("ColtoriUpdateStockController,zeroClearing,end,vendor_id:"+vendor_id+",flag:"+flag);
             }
 
             System.out.println("end");
@@ -161,9 +174,9 @@ public class ColtoriUpdateStockController  implements InitializingBean {
         Map<String,Object> stock_all_update = new HashMap<>();
         stock_all_update.put("get_token_url","https://api.orderlink.it/v2/user/token");
         stock_all_update.put("get_stock_url","https://api.orderlink.it/v2/stocks");
-        stock_all_update.put("user","TEST");
-        stock_all_update.put("password","1k0nic");
-        stock_all_update.put("vendor_id", "7");
+        stock_all_update.put("user","INTRAMIRROR");
+        stock_all_update.put("password","mbzZQsEN");
+        stock_all_update.put("vendor_id", "24");
         stock_all_update.put("eventName","stock_all_update");
         stock_all_update.put("fileUtils",new ApiDataFileUtils("coltori","stock_all_update"));
         stock_all_update.put("executor",stock_all_update_executor);
@@ -172,9 +185,9 @@ public class ColtoriUpdateStockController  implements InitializingBean {
         Map<String,Object> stock_delta_update = new HashMap<>();
         stock_delta_update.put("get_token_url","https://api.orderlink.it/v2/user/token");
         stock_delta_update.put("get_stock_url","https://api.orderlink.it/v2/stocks");
-        stock_delta_update.put("user","TEST");
-        stock_delta_update.put("password","1k0nic");
-        stock_delta_update.put("vendor_id", "7");
+        stock_delta_update.put("user","INTRAMIRROR");
+        stock_delta_update.put("password","mbzZQsEN");
+        stock_delta_update.put("vendor_id", "24");
         stock_delta_update.put("eventName","stock_delta_update");
         stock_delta_update.put("fileUtils",new ApiDataFileUtils("coltori","stock_delta_update"));
         stock_delta_update.put("executor",stock_delta_update_executor);

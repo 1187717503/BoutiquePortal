@@ -14,7 +14,7 @@
 
     <!-- 启用spring mvc 注解 
     <context:annotation-config />-->
-    
+
 	<!-- start spring 自动注解,及解决ReponseBody中文乱码问题 -->
 	<mvc:annotation-driven>
         <mvc:message-converters>
@@ -40,12 +40,45 @@
         </mvc:message-converters>
     </mvc:annotation-driven>
 	<!-- end spring 自动注解,及解决ReponseBody中文乱码问题 -->
-	
+
     <!-- 设置使用注解的类所在的jar包，这里必须排除扫描service层的组件 -->
     <context:component-scan base-package="com.intramirror">
           <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service" /> 
     </context:component-scan>
 
+    <!-- 配置转义符 -->
+    <bean id="fmXmlEscape" class="freemarker.template.utility.XmlEscape" />
+
+    <bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+        <description>freemarker config</description>
+        <property name="templateLoaderPath" value="/WEB-INF/views/" />
+        <!-- 配置全局变量 -->
+        <property name="freemarkerVariables">
+            <map>
+                <entry key="xml_escape" value-ref="fmXmlEscape" />
+                <entry key="jscssdate_format" value="yymmdd"></entry>
+            </map>
+        </property>
+    </bean>
+
+    <!-- frremarker 视图解析 -->
+    <bean id="freemakerViewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.freemarker.FreeMarkerView" />
+        <property name="viewNames">
+            <array>
+                <value>*.ftl</value>
+            </array>
+        </property>
+        <property name="contentType" value="text/html; charset=utf-8" />
+        <property name="exposeRequestAttributes" value="true" />
+        <property name="exposeSessionAttributes" value="true" />
+        <property name="exposeSpringMacroHelpers" value="true" />
+        <property name="requestContextAttribute" value="request" />
+        <property name="cache" value="true" />
+        <property name="order" value="1" />
+    </bean>
+
+    <mvc:resources location="/WEB-INF/resources/js/" mapping="/js/**" />
     <!--<beans profile="sit">
         <context:property-placeholder location="classpath:/test/rocketmq.properties"/>
     </beans>

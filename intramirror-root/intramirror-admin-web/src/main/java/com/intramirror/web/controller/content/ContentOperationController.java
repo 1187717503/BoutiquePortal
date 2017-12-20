@@ -4,6 +4,7 @@ import com.intramirror.core.common.exception.ValidateException;
 import com.intramirror.core.common.response.ErrorResponse;
 import com.intramirror.core.common.response.Response;
 import com.intramirror.product.api.model.Block;
+import com.intramirror.product.api.model.BlockTagRel;
 import com.intramirror.product.api.model.Tag;
 import com.intramirror.product.api.service.BlockService;
 import com.intramirror.product.api.service.content.ContentManagementService;
@@ -36,12 +37,22 @@ public class ContentOperationController {
     @PutMapping(value = "/save", consumes = "application/json")
     public Response saveContent(@RequestBody Content content) {
         validate(content);
-        contentManagementService.updateContent(content.getBlock(), content.getTag(), content.getSort());
+        if (content.getIsNew().equals("1")) {
+            BlockTagRel btRel = contentManagementService.createBlockWithDefaultTag(content.getBlock());
+            content.getBlock().setBlockId(btRel.getBlockId());
+            content.getTag().setTagId(btRel.getTagId());
+        } else {
+            contentManagementService.updateContent(content.getBlock(), content.getTag(), content.getSort());
+        }
         return Response.success();
     }
 
     private void validate(Content content) {
         checkParameter(content);
+        if (content.getIsNew().equals("1")) {
+            return;
+        }
+
         Block block = content.getBlock();
         Tag tag = content.getTag();
         if (block == null || block.getBlockId() == null || tag == null || tag.getTagId() == null) {
@@ -65,6 +76,9 @@ public class ContentOperationController {
     }
 
     private void checkParameter(Content content) {
+        if (StringUtils.isEmpty(content.getIsNew())) {
+            throw new ValidateException(new ErrorResponse("The action type is missing"));
+        }
         if (StringUtils.isEmpty(content.getBlock().getTitle())) {
             throw new ValidateException(new ErrorResponse("Block title is missing"));
         }
