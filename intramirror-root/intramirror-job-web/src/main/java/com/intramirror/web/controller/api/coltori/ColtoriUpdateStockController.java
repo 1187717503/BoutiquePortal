@@ -101,7 +101,7 @@ public class ColtoriUpdateStockController  implements InitializingBean {
             while (true) {
                 String new_url = get_stock_url;
                 if(i <= sum || i == 1) {
-                    new_url = new_url + "&page="+i+"&limit=200";
+                    new_url = new_url + "&page="+i+"&limit=500";
                 }
                 logger.info("ColtoriUpdateStockController,requestMethod,start,get_stock_url:"+new_url);
                 System.out.println(new_url);
@@ -144,7 +144,7 @@ public class ColtoriUpdateStockController  implements InitializingBean {
                             logger.info("ColtoriUpdateStockController,end,mapping,stockMap:"+JSONObject.fromObject(stockMap)+",stockOption:"+JSONObject.fromObject(stockOption));
                             // 线程池
                             logger.info("ColtoriUpdateStockController,execute,startDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(stockMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName+",flag:"+flag);
-                            CommonThreadPool.execute(eventName,executor,10,new UpdateStockThread(stockOption,apiDataFileUtils,stockMap));
+                            CommonThreadPool.execute(eventName,executor,30,new UpdateStockThread(stockOption,apiDataFileUtils,stockMap));
                             logger.info("ColtoriUpdateStockController,execute,endDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(stockMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
                             flag++;
                         }
