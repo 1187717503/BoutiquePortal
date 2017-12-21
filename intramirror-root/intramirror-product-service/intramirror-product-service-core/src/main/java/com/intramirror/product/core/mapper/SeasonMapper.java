@@ -64,6 +64,8 @@ public interface SeasonMapper {
 
     List<Map<String, Object>> queryNotRuleByBrand(Map<String, Object> params);
 
+    List<Map<String, Object>> queryAllBrand();
+
     List<Map<String, Object>> queryRuleByGroup(Map<String, Object> params);
 
     List<Map<String, Object>> queryRuleByProduct(Map<String, Object> params);
@@ -79,6 +81,10 @@ public interface SeasonMapper {
     int copyPriceChangeRuleProduct(Map<String, Object> params);
 
     int copyPriceChangeRuleSeasonGroup(Map<String, Object> params);
+
+    int deleteCategoryBrandRule(String price_change_rule_id);
+
+    int insertCategoryBrandRule(Map<String,Object> params);
 
     List<Map<String, Object>> querySeasonByVendor(Map<String, Object> params);
 

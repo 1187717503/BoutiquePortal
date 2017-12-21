@@ -8,7 +8,6 @@ public interface ITagService {
 
     int saveTagProductRel(Map<String, Object> map);
 
-    List<Tag> getTags();
+    List<Tag> getTags(String orderBy);
 
-    Tag selectByPrimaryKey(Long tagId);
 }

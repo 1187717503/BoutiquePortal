@@ -2977,7 +2977,7 @@ video.responsive-video {
 
 @media only screen and (max-width: 992px) {
   .pagination {
-    width: 100%;
+    width: 100%
   }
   .pagination li.prev,
   .pagination li.next {
@@ -7939,14 +7939,12 @@ nav .input-field label.active {
 
 @media only screen and (max-width: 600px) {
   #toast-container {
-    min-width: 100%;
-    bottom: 0%;
+
   }
 }
 
 @media only screen and (min-width: 601px) and (max-width: 992px) {
   #toast-container {
-    left: 5%;
     bottom: 7%;
     max-width: 90%;
   }

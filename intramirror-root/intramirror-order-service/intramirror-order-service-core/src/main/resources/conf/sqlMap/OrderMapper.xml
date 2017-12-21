@@ -65,7 +65,7 @@
 
         <!-- SELECT  o.order_num,o.order_id,p.name,pp.colorCode,pp.brandID,pspv.`value` as size,p.category_id, -->
         SELECT o.order_num,o.order_id,p.name,pp.colorCode,pp.brandID,pspv.`value` as size,p.category_id,
-        s.price,s.in_price,sps.sale_price,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
+        lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
         v.vendor_name,p.cover_img,lp.logistics_product_id
         FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
         INNER JOIN `order` o ON ol.order_id = o.order_id
@@ -107,7 +107,9 @@
         SELECT
         o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id,pp.colorCode,pp.brandID,pspv.`value` as
         size,p.category_id,
-        s.price,lp.in_price,sps.sale_price,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
+        /*s.price,lp.in_price,sps.sale_price,*/
+        lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
+        lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
         lp.confirmed_at,lp.est_ship_date,lp.packed_at,lp.shipped_at,s.sku_code,usa.address_country_id,b.english_name as
         brandName,
         l.user_rec_name,l.user_rec_province,l.user_rec_city,l.user_rec_area,l.user_rec_addr,l.user_rec_country,l.geography_id,
@@ -119,11 +121,11 @@
         FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
         INNER JOIN `order` o ON ol.order_id = o.order_id
         LEFT JOIN user_ship_address usa ON o.user_id = usa.user_id
-        LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
-        INNER JOIN geography g on l.geography_id = g.geography_id
-        INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
-        INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
-        INNER JOIN product p ON (sp.product_id = p.product_id )
+        LEFT JOIN logistics l ON (lp.order_logistics_id = l.order_logistics_id and l.enabled = 1)
+        LEFT JOIN geography g on l.geography_id = g.geography_id
+        INNER JOIN shop_product_sku sps ON (lp.shop_product_sku_id = sps.shop_product_sku_id)
+        INNER JOIN shop_product sp ON (sps.shop_product_id = sp.shop_product_id)
+        INNER JOIN product p ON (sp.product_id = p.product_id and p.enabled = 1)
         INNER JOIN brand b ON (p.brand_id = b.brand_id and b.enabled = 1 )
         INNER JOIN sku s ON (s.sku_id = sps.sku_id and s.enabled = 1)
         INNER JOIN sku_property skup on (skup.sku_id = s.sku_id and skup.enabled = 1)
@@ -144,12 +146,12 @@
         where t_pp.enabled = 1 and (t_pp.key_name='BrandID' or t_pp.key_name = 'ColorCode')
         group by t_pp.product_id
         ) pp ON p.product_id = pp.product_id
-        LEFT JOIN order_exception oe ON(oe.logistics_product_id=lp.logistics_product_id AND oe.created_at =
-        (SELECT MAX(oe1.created_at) FROM order_exception oe1 WHERE oe1.logistics_product_id = oe.logistics_product_id))
+        LEFT JOIN order_exception oe ON(oe.logistics_product_id=lp.logistics_product_id AND oe.order_exception_id =
+        (SELECT MAX(oe1.order_exception_id) FROM order_exception oe1 WHERE oe1.logistics_product_id = oe.logistics_product_id))
         LEFT JOIN order_exception_type oet ON(oet.order_exception_type_id=oe.order_exception_type_id)
         LEFT JOIN `user` u ON(u.user_id=oe.created_by_user_id)
         LEFT JOIN `user` uu on(uu.user_id=oe.modified_by_user_id)
-        where pspk.`name` = 'Size' and lp.`status` = #{status,jdbcType=BIGINT}
+        where pspk.`name` = 'Size' and lp.`status` = #{status,jdbcType=BIGINT} and lp.enabled = 1
         and v.vendor_id = #{vendorId,jdbcType=BIGINT}
         GROUP BY lp.order_line_num
 
@@ -186,9 +188,10 @@
             pp.brandID,
             pspv.`value`   AS size,
             p.category_id,
-            s.price,
+            /*s.price,
             s.in_price,
-            sps.sale_price,
+            sps.sale_price,*/
+            lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
             lp.amount,
             lp.shipping_fee,
             lp.tax_fee,
@@ -255,9 +258,10 @@
             pp.brandID,
             pspv.`value`   AS size,
             p.category_id,
-            s.price,
+            /*s.price,
             s.in_price,
-            sps.sale_price,
+            sps.sale_price,*/
+            lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
             lp.amount,
             lp.shipping_fee,
             lp.tax_fee,
@@ -328,9 +332,10 @@
             pp.Composition,
             pspv.`value`   AS size,
             p.category_id,
-            s.price,
+            /*s.price,
             s.in_price,
-            sps.sale_price,
+            sps.sale_price,*/
+            lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
             lp.amount,
             lp.shipping_fee,
             lp.tax_fee,
@@ -406,13 +411,15 @@
         SELECT
         o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id,pp.colorCode,pp.brandID,pspv.`value` as
         size,p.category_id,
-        s.price,lp.in_price,sps.sale_price,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,s.sku_code,b.english_name
-        as brandName,
+        /*s.price,lp.in_price,sps.sale_price,*/
+        lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
+        lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,s.sku_code,b.english_name
+        as brandName,l.user_rec_country as userRecCountry,
         v.vendor_name,p.cover_img,g.english_name as geography_name ,lp.logistics_product_id,v.vendor_id
         FROM logistics_product lp
         INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
         INNER JOIN `order` o ON ol.order_id = o.order_id
-        INNER JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
+        INNER JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id and l.enabled = 1
         INNER JOIN geography g on l.geography_id = g.geography_id
         INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
         INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
@@ -481,9 +488,10 @@
                      pspv.`value`         AS
                                              size,
                      p.category_id,
-                     s.price,
+                     /*s.price,
                      s.in_price,
-                     sps.sale_price,
+                     sps.sale_price,*/
+                     lp.`retail_price` as price,lp.`in_price`,
                      lp.amount,
                      lp.shipping_fee,
                      lp.tax_fee,
@@ -605,7 +613,9 @@
             </when>
             <otherwise>
                 o.created_at AS order_date,o.current_rate,pp.colorCode,pp.brandID,pspv.`value` as size,
-                s.price,s.in_price,sps.sale_price,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
+                /*s.price,s.in_price,sps.sale_price,*/
+                lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
+                lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
                 lp.shipped_at AS shipped_date,sm.shipment_no,s.sku_code,b.english_name as brandName,
                 v.vendor_name,g.english_name as geography_name,p.cover_img
             </otherwise>
@@ -708,21 +718,6 @@
                 AND pspv.enabled = 1
                 )
             INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
-            LEFT JOIN (
-                          SELECT
-                              t_pp.product_id,
-                              max(CASE t_pp.key_name
-                                  WHEN 'ColorCode'
-                                      THEN t_pp.`value`
-                                  ELSE '' END) AS colorCode,
-                              max(CASE t_pp.key_name
-                                  WHEN 'BrandID'
-                                      THEN t_pp.`value`
-                                  ELSE '' END) AS brandID
-                          FROM product_property t_pp
-                          WHERE t_pp.enabled = 1 AND (t_pp.key_name = 'BrandID' OR t_pp.key_name = 'ColorCode')
-                          GROUP BY t_pp.product_id
-                      ) pp ON p.product_id = pp.product_id
         WHERE pspk.`name` = 'Size' AND lp.enabled = 1
               AND lp.order_line_num = #{orderNumber,jdbcType=VARCHAR}
         GROUP BY o.order_num;
@@ -811,6 +806,19 @@
             INNER JOIN `product` p ON (sku.`product_id` = p.`product_id` AND p.`enabled` = 1)
         WHERE DATE_FORMAT(lp.`created_at`, '%Y-%m-%d') = #{create_at,jdbcType=VARCHAR} AND p.`vendor_id` = #{vendor_id,jdbcType=VARCHAR} AND lp.`enabled` = 1
         LIMIT #{offset,jdbcType=INTEGER}, #{limit,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectCreateThreeOrderInfo" parameterType="java.util.Map" resultType="java.util.Map">
+        select lp.`logistics_product_id` ,lp.`order_line_num`,lp.`created_at` from `logistics_product` lp
+        where lp.`vendor_id` in
+        <foreach item="item" index="index" collection="vendors" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and lp.`status` in
+        <foreach item="item" index="index" collection="order_status" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and lp.`plase_order_at` is null ;
     </select>
 
     <update id="updateById" parameterType="com.intramirror.order.api.model.Order">

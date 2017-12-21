@@ -63,6 +63,7 @@ public class ApiCreateProductService {
     private Product uProduct;
 
     public Map<String,Object> createProduct(ProductEDSManagement.ProductOptions productOptions,ProductEDSManagement.VendorOptions vendorOptions) {
+        long start = System.currentTimeMillis();
         Map<String,Object> resultMap = null;
 
         this.productOptions = productOptions ;
@@ -74,6 +75,7 @@ public class ApiCreateProductService {
 
             this.checkProductParams(conn);
             this.checkMappingParams(conn);
+            this.checkFilter(conn);
 
             /** 1.create product */
             this.setProduct(conn);
@@ -98,12 +100,48 @@ public class ApiCreateProductService {
         } catch (UpdateException e) {
             resultMap = ApiCommonUtils.errorMap(e.getErrorType(),e.getKey(),e.getValue());
             if(conn != null) {conn.rollback();conn.close();}
+        } catch (FilterException e) {
+            resultMap = ApiCommonUtils.successMap();
+            logger.info("ApiUpdateProductService,FilterException,errorMsg:"+e.getMessage()
+                    +",productOptions:"+JSONObject.toJSONString(productOptions)
+                    +",vendorOptions:"+JSONObject.toJSONString(vendorOptions));
+            if(conn != null) {conn.rollback();conn.close();}
         } catch (Exception e) {
             e.printStackTrace();
-            resultMap = ApiCommonUtils.errorMap(ApiErrorTypeEnum.errorType.error_runtime_exception,"errorMessage",ExceptionUtils.getExceptionDetail(e));
+            if(e.getMessage().contains("Duplicate entry") && e.getMessage().contains("vendor_id")) {
+                resultMap = ApiCommonUtils.errorMap(ApiErrorTypeEnum.errorType.error_boutique_id_already_exists,"errorMessage",ExceptionUtils.getExceptionDetail(e));
+            } else {
+                resultMap = ApiCommonUtils.errorMap(ApiErrorTypeEnum.errorType.error_runtime_exception,"errorMessage",ExceptionUtils.getExceptionDetail(e));
+            }
             if(conn != null) {conn.rollback();conn.close();}
         }
+        long end = System.currentTimeMillis();
+        logger.info("Job_Run_Time,ApiCreateProductService_createProduct,start:"+start+",end:"+end+",time:"+(end-start));
         return resultMap;
+    }
+
+    public void checkFilter(Connection conn) throws Exception{
+        ProductService productService = new ProductService(conn);
+        String season_code = productOptions.getSeasonCode()==null?"":productOptions.getSeasonCode();
+        String brand_id = productOptions.getBrandId()==null?"":productOptions.getBrandId();
+
+        // 判断season是否需要
+        String seasonFilterSQL = " select * from `season_filter` sf "
+                + " where sf.`enabled`  =1  and sf.`vendor_id`  = "+vendorOptions.getVendorId()
+                + " and (sf.`season_code` = '-1' or sf.`season_code`  = \""+season_code+"\")";
+        List<Map<String,Object>> seasonFilterMap = productService.executeSQL(seasonFilterSQL);
+        if(seasonFilterMap != null && seasonFilterMap.size() > 0) {
+            throw new FilterException("season_filter_msg:"+JSONObject.toJSONString(seasonFilterMap));
+        }
+
+        // 判断Brand是否需要
+        String brandFilterSQL = " select * from `brand_filter`  bf "
+                + " where bf.`enabled`  = 1 and bf.`vendor_id`  ="+vendorOptions.getVendorId()
+                + " and (bf.`brand_id` = '-1' or bf.`brand_id`  = '"+brand_id+"')";
+        List<Map<String,Object>> brandFilterMap = productService.executeSQL(brandFilterSQL);
+        if(brandFilterMap != null && brandFilterMap.size() > 0) {
+            throw new FilterException("brand_filter_msg:"+JSONObject.toJSONString(brandFilterMap));
+        }
     }
 
     private void setBrandCategory(Connection conn) throws Exception{
@@ -133,6 +171,15 @@ public class ApiCreateProductService {
             return;
         }
 
+        ProductService productService = new ProductService(conn);
+        IPriceService iPriceService = new PriceServiceImpl();
+        Sku sku1 = iPriceService.getPriceByRule(this.uProduct,this.uProduct.getVendor_id(),this.uProduct.getMax_retail_price(),conn);
+        this.uProduct.setMax_boutique_price(sku1.getIn_price());
+        this.uProduct.setMin_boutique_price(sku1.getIn_price());
+        this.uProduct.setMax_im_price(sku1.getIm_price());
+        this.uProduct.setMin_im_price(sku1.getIm_price());
+        productService.updateProduct(uProduct);
+
         for(ProductEDSManagement.SkuOptions skuOption : skuOptions) {
             Sku sku = new Sku();
             sku.product_id = this.uProduct.getProduct_id();
@@ -141,8 +188,6 @@ public class ApiCreateProductService {
             sku.name = this.uProduct.getName();
             sku.coverpic = this.uProduct.getCover_img();
             sku.introduction = this.uProduct.getDescription();
-            IPriceService iPriceService = new PriceServiceImpl();
-            Sku sku1 = iPriceService.getPriceByRule(this.uProduct,this.uProduct.getVendor_id(),this.uProduct.getMax_retail_price(),conn);
             sku.im_price = sku1.getIm_price();
             sku.in_price = sku1.getIn_price();
             sku.price = this.uProduct.getMax_retail_price();
@@ -319,8 +364,8 @@ public class ApiCreateProductService {
         product.vendor_id = vendorOptions.getVendorId();
         product.brand_id = Long.parseLong(productOptions.getBrandId());
         product.product_code = productOptions.getCode();
-        product.name = name;
-        product.description = productOptions.getDesc();
+        product.name = ApiCommonUtils.handleName(name);
+        product.description = ApiCommonUtils.handleName(productOptions.getDesc());
         product.remark = "";
         product.status = ProductStatusType.NEW_PENDING;
         product.feature = ProductFeatureType.NORMAL;
@@ -408,7 +453,7 @@ public class ApiCreateProductService {
                 productOptions.setBrandId(brandMap.get("brand_id").toString());
                 productOptions.setBrand_name(brandMap.get("english_name").toString());
             } else {
-                brandMap = productService.getBrandMapping(vendorOptions.getVendorId(),brandName);
+                brandMap = productService.getBrandMapping(brandName);
                 if(brandMap != null) {
                     productOptions.setBrandId(brandMap.get("brand_id").toString());
                     productOptions.setBrand_name(brandMap.get("english_name").toString());
@@ -532,6 +577,15 @@ public class ApiCreateProductService {
 
         if(StringUtils.isBlank(color_code)) {
             throw new UpdateException("color_code",color_code, ApiErrorTypeEnum.errorType.error_data_is_null);
+        }
+
+        // AD 特殊判断
+        if(vendor_id.intValue() == 22) {
+            ProductService productService = new ProductService(conn);
+            boolean flag = productService.duplicateColorBrandByAD(designer_id,color_code);
+            if(flag) {
+                throw new UpdateException("color_code,BrandID",color_code+","+designer_id, ApiErrorTypeEnum.errorType.error_duplicate_product);
+            }
         }
 
         if(StringUtils.isBlank(price)) {

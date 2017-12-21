@@ -1,0 +1,48 @@
+<html>
+<head>
+    <title>Upload</title>
+</head>
+<body>
+
+<div id="uploadForm">
+    <input id="file" type="file"/>
+    <button id="upload" type="button">upload</button>
+</div>
+<div id="result">
+    <label id='result-content'></label>    
+</div>
+
+
+<script type="text/javascript" src="../js/base.js?v=1.0"></script>
+<script type="text/javascript" src="../js/restful.js?v=1.0"></script>
+<script type="text/javascript" src="../js/plugins/jquery-1.11.2.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $("#upload").click(function() {
+            var formData = new FormData();
+            formData.append("file", $("#file")[0].files[0]);
+            
+            $.ajax({
+                url: requestURL.uploadImage.url,
+                type: 'POST',
+                cache: false,
+                data: formData,
+                processData: false,
+                contentType : false,
+                headers : {
+                    "token": token
+                },success : function(res) {
+                    
+                    let data = JSON.parse(res);
+                   // $('#result-content').text(data.data);
+                    localStorage.setItem('ckeditor-uploadImage', data.data);
+                    alert('上传成功')
+                }
+            });
+       })
+    });
+
+</script>
+</body>
+
+</html>

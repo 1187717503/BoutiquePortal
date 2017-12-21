@@ -88,6 +88,10 @@ public class ApiCommonUtils {
             try {
                 List<String> originList = JSONArray.parseArray(originImg, String.class);
                 for (String origin : originList) {
+                    if(origin.contains(" ")) {
+                        origin = origin.replaceAll(" ","%20");
+                    }
+
                     List<String> downList = FileUploadHelper.uploadFileByImgUrl2(origin);
                     if(downList != null && downList.size() > 0) {
                         newList.add(downList.get(0));
@@ -99,6 +103,46 @@ public class ApiCommonUtils {
             }
         }
         return JSON.toJSONString(newList);
+    }
+
+    // 字母,数字,_,-
+    public static String handleName(String name) throws Exception{
+        if(StringUtils.isBlank(name)) {
+            return name;
+        }
+
+        String[] names = name.split("");
+        StringBuilder stringBuilder = new StringBuilder();
+        for(String charName : names) {
+
+            if(isNumeric(charName)
+                    || isLetter(charName) || charName.equals("_") || charName.equals("-")) {
+                stringBuilder.append(charName);
+            } else {
+                stringBuilder.append(" ");
+            }
+        }
+        return stringBuilder.toString();
+    }
+
+    // 判断是否为数字
+    public static boolean isNumeric(String str)throws Exception{
+        for (int i = str.length();--i>=0;){
+            if (!Character.isDigit(str.charAt(i))){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // 判断是否为字母
+    public static boolean isLetter(String   s) throws Exception{
+        char c = s.charAt(0);
+        int i =(int)c;
+        if((i>=65&&i<=90)||(i>=97&&i<=122)) {
+            return true;
+        }
+        return false;
     }
 
 

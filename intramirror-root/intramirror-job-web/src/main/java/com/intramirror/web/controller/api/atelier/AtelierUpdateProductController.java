@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import pk.shoplus.service.RedisService;
 import pk.shoplus.util.DateUtils;
 import pk.shoplus.util.ExceptionUtils;
-import pk.shoplus.util.MapUtils;
 
 /**
  * Created by dingyifan on 2017/9/3.
@@ -52,7 +51,8 @@ public class AtelierUpdateProductController {
     }
 
     private Map<String,Object> execute(HttpServletRequest request,String type) {
-        MapUtils mapUtils = new MapUtils(new HashMap<String, Object>());
+        long start = System.currentTimeMillis();
+        Map<String,Object> resultMap = new HashMap<>();
         try {
             InputStream is = request.getInputStream();
             String body = IOUtils.toString(is, "utf-8");
@@ -61,21 +61,22 @@ public class AtelierUpdateProductController {
 
             this.setRedisDate(type,storeID,body);
 
-            logger.info("AtelierFullUpdateProductControllerExecute,params,type:"+type+",storeID:"+storeID+",version:"+version+",body:"+body);
-            Map<String,Object> resultMap = atelierUpdateByProductService.updateProduct(body,storeID,version,type);
-            logger.info("AtelierFullUpdateProductControllerExecute,updateProduct,type:"+type+",resultMap:"+JSONObject.toJSONString(resultMap)+",storeID:"+storeID+",version:"+version+",body:"+body);
+            logger.info("AtelierFullUpdateProductControllerExecute,params,type:"+type+",storeID:"+storeID+",version:"+version+",body:"+body+","+storeID+"_"+type);
+            resultMap = atelierUpdateByProductService.updateProduct(body,storeID,version,type);
+            logger.info("AtelierFullUpdateProductControllerExecute,updateProduct,type:"+type+",resultMap:"+JSONObject.toJSONString(resultMap)+",storeID:"+storeID+",version:"+version+",body:"+body+","+storeID+"_"+type);
 
-            return resultMap;
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("AtelierFullUpdateProductControllerExecute,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
-            mapUtils.putData("ResponseStatus","2000")
-                    .putData("ErrorCode","1")
-                    .putData("ErrorMsg","500: E500: Update product failed:"+ExceptionUtils.getExceptionDetail(e))
-                    .putData("TimeStamp",new Date());
-            logger.info("AtelierFullUpdateProductControllerExecute,outputParams,mapUtils:"+JSONObject.toJSONString(mapUtils));
-            return mapUtils.getMap();
+            resultMap.put("ResponseStatus","2000");
+            resultMap.put("ErrorCode","1");
+            resultMap.put("ErrorMsg","500: E500: Update product failed:"+ExceptionUtils.getExceptionDetail(e));
+            resultMap.put("TimeStamp",new Date());
+            logger.info("AtelierFullUpdateProductControllerExecute,outputParams,mapUtils:"+JSONObject.toJSONString(resultMap));
         }
+        long end = System.currentTimeMillis();
+        logger.info("Job_Run_Time,AtelierUpdateProductController_execute,start:"+start+",end:"+end+",time:"+(end-start));
+        return resultMap;
     }
 
     private void setRedisDate(String type,String storeID,String body){

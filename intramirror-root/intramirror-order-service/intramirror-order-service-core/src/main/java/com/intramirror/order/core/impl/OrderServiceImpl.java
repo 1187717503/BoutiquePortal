@@ -77,6 +77,11 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
         return orderMapper.getOrderPaymentInfoByOrderId(orderId);
     }
 
+    @Override
+    public List<Map<String, Object>> selectCreateThreeOrderInfo(Map<String, Object> params) {
+        return orderMapper.selectCreateThreeOrderInfo(params);
+    }
+
     /**
      * 根据订单号查询支付信息
      *

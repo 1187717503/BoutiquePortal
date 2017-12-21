@@ -75,4 +75,8 @@ public interface ProductMapper {
     int batchUpdateProductStatus(@Param("status") int status, @Param("productIds") List<Long> productIds);
 
     List<ProductWithBLOBs> listProductByProductIds(List<Long> productIds);
+
+    List<Map<String, Object>> selectDayNoUpdateSum(Map<String,Object> params);
+    List<Map<String, Object>> selectDayUpdateSum(Map<String,Object> params);
+
 }

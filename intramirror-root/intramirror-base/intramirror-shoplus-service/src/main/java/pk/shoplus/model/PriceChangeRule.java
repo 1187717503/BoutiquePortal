@@ -52,6 +52,9 @@ public class PriceChangeRule {
 
     public String season_code;
 
+    @Column
+    public Integer preview_status;
+
 
     public Long getPrice_change_rule_id() {
         return price_change_rule_id;
@@ -87,6 +90,50 @@ public class PriceChangeRule {
 
     public String getSeason_code() {
         return season_code;
+    }
+
+    public void setPrice_change_rule_id(Long price_change_rule_id) {
+        this.price_change_rule_id = price_change_rule_id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPrice_type(Integer price_type) {
+        this.price_type = price_type;
+    }
+
+    public void setValid_from(Date valid_from) {
+        this.valid_from = valid_from;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public void setVendor_id(Long vendor_id) {
+        this.vendor_id = vendor_id;
+    }
+
+    public void setShop_id(Long shop_id) {
+        this.shop_id = shop_id;
+    }
+
+    public void setUser_id(Long user_id) {
+        this.user_id = user_id;
+    }
+
+    public void setSeason_code(String season_code) {
+        this.season_code = season_code;
+    }
+
+    public Integer getPreview_status() {
+        return preview_status;
+    }
+
+    public void setPreview_status(Integer preview_status) {
+        this.preview_status = preview_status;
     }
 }
 

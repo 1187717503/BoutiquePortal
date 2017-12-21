@@ -2,7 +2,7 @@
  * Created by 1 on 2017/7/19.
  */
 import HTTP from '../http'
-
+let apiUrl = process.env.API_URL;
 export function queryRuleByHasSeason(id, vendor, type) {
   return HTTP({
     url: 'rule/select/queryRuleByHasSeason.htm?ruleStatus=' + id + '&vendor_id=' + vendor + '&price_type=' + type
@@ -216,6 +216,40 @@ export function selectDefaultDiscount() {
 }
 export function copyRule( vendouid, type, discount = 0) {
   return HTTP({
-    url: '/rule/copy/copyRule.htm?vendor_id=' + vendouid + '&price_type=' + type + '&discount=' + discount
+    url: 'rule/copy/copyRule.htm?vendor_id=' + vendouid + '&price_type=' + type + '&discount=' + discount
   })
+}
+
+export function changePreviewStatus(price_id,priview_status) {
+  return HTTP({
+    url: 'priceChangeRule/changepreview.htm?price_change_rule_id='+price_id+'&preview_status='+priview_status
+  })
+}
+
+export function imActiveRefresh(priceId) {
+  return HTTP({
+    url: 'priceChangeRule/run/im.htm?price_change_rule_id=' + priceId
+  })
+}
+
+export function boutiqueActiveRefresh(priceId) {
+  return HTTP({
+    url: 'priceChangeRule/run/boutique.htm?price_change_rule_id='+ priceId
+  })
+}
+
+export function uploadFileApi(price_id,data){
+  return HTTP({
+    url: 'rule/upload.htm?price_change_rule_id='+price_id,
+    data:data,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    },
+    method:'post'
+  })
+}
+
+export function downFileApi(price_id){
+  const downloadUrl = process.env.BASE_URL + 'rule/download.htm?price_change_rule_id='+price_id;
+  window.open(downloadUrl);
 }

@@ -29,6 +29,8 @@ import pk.shoplus.service.CategoryService;
 import pk.shoplus.service.ProductInfoService;
 import pk.shoplus.service.ProductPropertyService;
 import pk.shoplus.service.ProductService;
+import pk.shoplus.service.price.api.IPriceService;
+import pk.shoplus.service.price.impl.PriceServiceImpl;
 import pk.shoplus.util.DateUtils;
 import pk.shoplus.util.ExceptionUtils;
 
@@ -54,6 +56,8 @@ public class ApiUpdateProductService {
     private List<Map<String,Object>> warningList = new ArrayList<>() ;
 
     public Map<String,Object> updateProduct(ProductEDSManagement.ProductOptions productOptions,ProductEDSManagement.VendorOptions vendorOptions){
+        long start = System.currentTimeMillis();
+
         Map<String,Object> resultMap = new HashMap<>();
 
         this.productOptions = productOptions ;
@@ -69,6 +73,8 @@ public class ApiUpdateProductService {
 
             // update product,product_property
             this.setProduct(conn);
+
+            this.checkFilter(conn);
 
             // update product_info
             this.setProductInfo(conn);
@@ -86,13 +92,46 @@ public class ApiUpdateProductService {
             if(conn != null) {conn.commit();conn.close();}
         } catch (UpdateException e) {
             resultMap = ApiCommonUtils.errorMap(e.getErrorType(),e.getKey(),e.getValue());
-            if(conn != null) {conn.commit();conn.close();}
+            if(conn != null) {conn.rollback();conn.close();}
+        } catch (FilterException e) {
+            resultMap = ApiCommonUtils.successMap();
+            logger.info("ApiUpdateProductService,FilterException,errorMsg:"+e.getMessage()
+                    +",productOptions:"+JSONObject.toJSONString(productOptions)
+                    +",vendorOptions:"+JSONObject.toJSONString(vendorOptions));
+            if(conn != null) {conn.rollback();conn.close();}
         } catch (Exception e) {
             e.printStackTrace();
             resultMap = ApiCommonUtils.errorMap(ApiErrorTypeEnum.errorType.error_runtime_exception,"errorMessage", ExceptionUtils.getExceptionDetail(e));
             if(conn != null) {conn.rollback();conn.close();}
         }
+        long end = System.currentTimeMillis();
+        logger.info("Job_Run_Time,ApiUpdateProductService_updateProduct,start:"+start+",end:"+end+",time:"+(end-start));
         return resultMap;
+    }
+
+    public void checkFilter(Connection conn) throws Exception{
+        ProductService productService = new ProductService(conn);
+        Product product = this.getProduct(conn);
+        String season_code = product.getSeason_code();
+        String brand_id = product.getBrand_id().toString();
+
+        // 判断season是否需要
+        String seasonFilterSQL = " select * from `season_filter` sf "
+                + " where sf.`enabled`  =1  and sf.`vendor_id`  = "+vendorOptions.getVendorId()
+                + " and (sf.`season_code` = '-1' or sf.`season_code`  = \""+season_code+"\")";
+        List<Map<String,Object>> seasonFilterMap = productService.executeSQL(seasonFilterSQL);
+        if(seasonFilterMap != null && seasonFilterMap.size() > 0) {
+            throw new FilterException("season_filter_msg:"+JSONObject.toJSONString(seasonFilterMap));
+        }
+
+        // 判断Brand是否需要
+        String brandFilterSQL = " select * from `brand_filter`  bf "
+                + " where bf.`enabled`  = 1 and bf.`vendor_id`  ="+vendorOptions.getVendorId()
+                + " and (bf.`brand_id` = '-1' or bf.`brand_id`  = '"+brand_id+"')";
+        List<Map<String,Object>> brandFilterMap = productService.executeSQL(brandFilterSQL);
+        if(brandFilterMap != null && brandFilterMap.size() > 0) {
+            throw new FilterException("brand_filter_msg:"+JSONObject.toJSONString(brandFilterMap));
+        }
     }
 
     public void setSku(Connection conn) throws Exception {
@@ -145,6 +184,7 @@ public class ApiUpdateProductService {
     }
 
     private void setProduct(Connection conn) throws Exception{
+        ProductService productService = new ProductService(conn);
         Product product = this.getProduct(conn);
         logger.info("ApiUpdateProductService,setProduct,start,updateProduct,product:"+JSONObject.toJSONString(product));
         product.last_check = new Date();
@@ -167,10 +207,52 @@ public class ApiUpdateProductService {
             }
         }
 
-        // 和原来不一致直接更新。如为空或者不能Mapping报Warning，但其他字段继续更新。
+        // 新数据为空或者不能找到season code Mapping则报Error不更新已有season code，但其他字段继续更新。判断只有当新season比现有season新时才更新。
         String seasonCode = productOptions.getSeasonCode();
-        if(StringUtils.isNotBlank(seasonCode)) {
-            product.setSeason_code(seasonCode);
+        if(StringUtils.isNotBlank(seasonCode) && !seasonCode.equals(product.getSeason_code())) {
+            /* update by yf 12/14*/
+            boolean updateSeasonFlag = false;
+            String newSeasonCode = seasonCode;
+            String oldSeasonCode = product.getSeason_code();
+
+            String selSeasonCodeSQL = "select * from `season`  s  where s.`season_code`  in(\""+newSeasonCode+"\",\""+oldSeasonCode+"\") and s.`enabled`  = 1";
+            List<Map<String,Object>> seasonMapList = productService.executeSQL(selSeasonCodeSQL);
+            logger.info("ApiUpdateProductService,seasonMapList:"+JSONObject.toJSONString(seasonMapList));
+
+            if(seasonMapList != null && seasonMapList.size() > 0) {
+                int oldSort = 0;
+                int newSort = 0;
+
+                for(Map<String,Object> map : seasonMapList) {
+                    if(map.get("season_code") != null && map.get("season_code").toString().equals(oldSeasonCode)) {
+                        oldSort = Integer.parseInt(map.get("season_sort").toString());
+                    } else if(map.get("season_code") != null && map.get("season_code").toString().equals(newSeasonCode)) {
+                        newSort = Integer.parseInt(map.get("season_sort").toString());
+                    }
+                }
+
+                if(newSort > oldSort) {
+                    updateSeasonFlag = true;
+                }
+            }
+            /* update by yf 12/14*/
+
+            if(updateSeasonFlag) {
+                product.setSeason_code(seasonCode);
+                String sql = "update product set preview_im_price = null where product_id ="+product.getProduct_id();
+                productService.updateBySQL(sql);
+                logger.info("ApiUpdateProductService,updatePreviewImPrice,sql:"+sql);
+
+                BigDecimal retailPrice = new BigDecimal(productOptions.getSalePrice());
+                int rs = ApiCommonUtils.ifUpdatePrice(product.getMax_retail_price(),retailPrice);
+
+                // 当season_code发生变化，买手店价格和product.retail_price相同（0），或者超出20%，重新同步价格（2），
+                if(rs == 0 || rs == 2) {
+                    IPriceService iPriceService = new PriceServiceImpl();
+                    logger.info("ApiUpdateProductService,setProduct,seasonCodeChange:"+JSONObject.toJSONString(product) +",retailPrice:"+retailPrice);
+                    iPriceService.synProductPriceRule(product,product.getMin_retail_price(),conn);
+                }
+            }
         }
 
         // 获取新的BrandID和ColorCode
@@ -210,7 +292,6 @@ public class ApiUpdateProductService {
         }
         this.updateProductProperty(conn,product.getProduct_id(), ProductPropertyEnumKeyName.CarryOver.getCode(),productOptions.getCarryOver());
 
-        ProductService productService = new ProductService(conn);
         productService.updateProduct(product);
         logger.info("ApiUpdateProductService,setProduct,end,updateProduct,product:"+JSONObject.toJSONString(product));
     }
@@ -269,7 +350,7 @@ public class ApiUpdateProductService {
                 productOptions.setBrandId(brandMap.get("brand_id").toString());
                 productOptions.setBrand_name(brandMap.get("english_name").toString());
             } else {
-                brandMap = productService.getBrandMapping(vendorOptions.getVendorId(),brandName);
+                brandMap = productService.getBrandMapping(brandName);
                 if(brandMap != null) {
                     productOptions.setBrandId(brandMap.get("brand_id").toString());
                     productOptions.setBrand_name(brandMap.get("english_name").toString());

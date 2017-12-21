@@ -144,11 +144,6 @@
             <groupId>com.intramirror</groupId>
             <artifactId>intramirror-order-service-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>compile</scope>
-        </dependency>
 
     </dependencies>
     <build>

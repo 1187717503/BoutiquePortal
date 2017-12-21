@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="msapplication-tap-highlight" content="no">
+    <title>Contect Management - Detail</title>
+
+    <!-- Favicons-->
+    <link rel="icon" href="../favicon.ico">
+
+    <!-- For iPhone -->
+    <meta name="msapplication-TileColor" content="#00bcd4">
+    <meta name="msapplication-TileImage" content="favicon.ico">
+    <!-- For Windows Phone -->
+
+    <!-- CORE CSS-->
+    <link href="../css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection">
+    <link href="../css/style.css" type="text/css" rel="stylesheet" media="screen,projection">
+    <link href="../js/plugins/magnific-popup/magnific-popup.css" type="text/css" rel="stylesheet" media="screen,projection">
+
+    <link href="../css/css-multi-level-menu/multi-menu.css" rel="stylesheet">
+    <!-- Customer CSS-->
+    <link href="../css/custom/custom.css" type="text/css" rel="stylesheet" media="screen,projection">
+    <link href="../css/index.css" type="text/css" rel="stylesheet" media="screen,projection">
+    <link href="../css/detail.css" type="text/css" rel="stylesheet" media="screen,projection">
+
+    <link href="../css/upload/basic.css" type="text/css" rel="stylesheet" media="screen,projection">
+    <link href="../css/upload/dropzone.css" type="text/css" rel="stylesheet" media="screen,projection">
+</head>
+<body>
+    <div id="loader-wrapper">
+        <div id="loader"></div>
+        <div class="loader-section section-left"></div>
+        <div class="loader-section section-right"></div>
+    </div>
+
+    <div class="load-data-holder">
+        <div class="preloader-wrapper big active">
+            <div class="spinner-layer spinner-blue">
+                <div class="circle-clipper left"><div class="circle"></div></div>
+                <div class="gap-patch"><div class="circle"></div></div>
+                <div class="circle-clipper right"><div class="circle"></div></div>
+            </div>
+            <div class="spinner-layer spinner-red">
+                <div class="circle-clipper left"><div class="circle"></div></div>
+                <div class="gap-patch"><div class="circle"></div></div>
+                <div class="circle-clipper right"><div class="circle"></div></div>
+            </div>
+
+            <div class="spinner-layer spinner-yellow">
+                <div class="circle-clipper left"><div class="circle"></div></div>
+                <div class="gap-patch"><div class="circle"></div></div>
+                <div class="circle-clipper right"><div class="circle"></div></div>
+            </div>
+
+            <div class="spinner-layer spinner-green">
+                <div class="circle-clipper left"><div class="circle"></div></div>
+                <div class="gap-patch"><div class="circle"></div></div>
+                <div class="circle-clipper right"><div class="circle"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <header id="header" class="page-topbar">
+        <div class="navbar-fixed">
+            <nav class="navbar-color">
+                <div class="nav-wrapper">
+                    <ul class="left">
+                        <li>
+                            <h1 class="logo-wrapper">
+                                <a href="../../admin/default" class="brand-logo darken-1 mdi-navigation-menu">
+                                    <span class="brand-text">Contect Management - Detail</span>
+                                </a>
+                            </h1>
+                        </li>
+                    </ul>
+
+                </div>
+            </nav>
+        </div>
+    </header>
+
+
+    <!-- START MAIN -->
+    <div id="main">
+        <!-- START WRAPPER -->
+        <div class="wrapper">
+            <!-- START CONTENT -->
+            <section id="content">
+                <!--start container-->
+                <div class="container">
+                    <div class="filter">
+                        <div class="row">
+                            <div class="input-field col s3">
+                                <input id="text-blockName" type="text" class="validate">
+                                <label id="lab-blockName" for="text-blockName">Block Name</label>
+                            </div>
+
+                            <div class="input-field col s3">
+                                <input id="text-product-tag" type="text"  disabled="disabled">
+                                <label for="text-product-tag" class="placehoder-label">Product Tag</label>
+                            </div>
+
+                            <div class="input-field col s1">
+                                <label id="status" class="placehoder-label">Status</label>
+                                <label for="status" class="text-label">Status</label>
+                            </div>
+
+                            <div class="input-field col s2">
+                                <label id="last-modified" class="placehoder-label">Last Modified</label>
+                                <label for="last-modified" class="text-label">Last Modified</label>
+                            </div>
+
+                            <div class="col s3 save-btns">
+                                <a id="save-btn" class="waves-effect waves-light btn">Save</a>
+                                <!-- <a id="cancel-btn" class="waves-effect waves-light btn btn-gray">Reset</a> -->
+                            </div>
+                        </div>
+                    </div>
+                    <!--end filter-->
+
+                    <div class="z-depth-2 hompage-pannel">
+                        <div class="hompage-pannel-title">Block Product List</div>
+                        <div>
+                            <div style="float:left;">
+                                <div style="display:flex;">
+                                    <div id="left-nestable" class="left-product-list dd">
+                                        <!-- to be added by templete-->
+                                    </div>
+                                    <div id="right-nestable" class="right-product-list dd">
+                                        <!-- to be added by templete-->
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="float: left;">
+                                <div class="block-input-fields">
+                                    <div class="input-field">
+                                        <input id="text-title" type="text">
+                                        <label for="text-title">Title</label>
+                                    </div>
+                                    
+                                    <div class="input-field">
+                                        <input id="text-english-name" type="text">
+                                        <label for="text-english-name">Title in English</label>
+                                    </div>
+                                    <div class="input-field">
+                                        <input id="text-sub-title" type="text">
+                                        <label for="text-sub-title">Subtitle</label>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col s6 input-field">
+                                            <input type="color" style="margin-top:16px;width: 100%;height: 30px;" id="title-color" />
+                                            <label for="title-color" style="top:-14px;font-size: 0.8rem">Title Color</label>
+                                        </div>
+                                        <div class="col s6 input-field">
+                                            <input type="color" style="margin-top:16px;width: 100%;height: 30px;" id="backgroup-color" />
+                                            <label for="backgroup-color" style="top:-14px;font-size: 0.8rem">Background Color</label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="input-field" style="width: 50%">
+                                        <input id="text-sort-order" type="number">
+                                        <label for="text-sort-order">Sort Order</label>
+                                    </div>
+                                </div>
+                                <div class="block-upload-pic">
+                                    <div action="/file" class="dropzone needsclick dz-clickable" id="upload">
+                                        <div class="dz-message needsclick">
+                                               Upload Image<br>
+                                               <div><strong>372 X 426</strong></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="clear: both;"></div>
+
+                                <div class="content-editor">
+                                    <textarea name="editor1" id="blockContent"></textarea>
+                                </div>
+
+                            </div>
+                            <div style="clear:both;"></div>
+                        </div>   
+                    </div>
+
+                </div>
+
+                <!--end container-->
+            </section>
+            <!-- END CONTENT -->
+
+        </div>
+        <!-- END WRAPPER -->
+        <div id="modal1" class="modal">
+            <div class="modal-content">
+                <p>Product list may be not save, Do you want continue?</p>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="waves-effect waves-red btn-flat modal-action model-no">NO</a>
+                <a href="#" class="waves-effect waves-green btn-flat modal-action model-yes">YES</a>
+            </div>
+        </div>
+
+        <div id="modal2" class="modal">
+            <div class="modal-content">
+                <p>Product list may be not save, Do you want continue?</p>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="waves-effect waves-red btn-flat modal-action model-no">NO</a>
+                <a href="#" class="waves-effect waves-green btn-flat modal-action model-yes">YES</a>
+            </div>
+        </div>
+    </div>
+    <!-- END MAIN -->
+
+    <!-- Public js, should be include first -->
+    <script type="text/javascript" src="../js/base.js?v=1.0"></script>
+    <script type="text/javascript" src="../js/restful.js?v=1.0"></script>
+    <script type="text/javascript" src="../js/common.js?v=1.0"></script>
+
+    <script type="text/javascript" src="../js/content-management/detail.js?v=1.0"></script>
+
+    <!-- jQuery Library -->
+    <script type="text/javascript" src="../js/plugins/jquery-1.11.2.min.js"></script>
+
+    <script type="text/javascript" src="../js/plugins/jquery-tmpl/jquery.tmpl.js"></script>
+    <!--materialize js-->
+    <script type="text/javascript" src="../js/materialize.js"></script>
+
+    <!--scrollbar-->
+    <script type="text/javascript" src="../js/plugins/perfect-scrollbar/perfect-scrollbar.min.js"></script>
+
+    <!-- magnific-popup -->
+    <script type="text/javascript" src="../js/plugins/magnific-popup/jquery.magnific-popup.min.js"></script>
+
+    <!--plugins.js - Some Specific JS codes for Plugin Settings-->
+    <script type="text/javascript" src="../js/plugins.js"></script>
+
+    <!--custom-script.js - Add your own theme custom JS-->
+    <script type="text/javascript" src="../js/custom-script.js"></script>
+
+    <script type="text/javascript" src="../js/plugins/iconfont/iconfont.js"></script>
+    <script type="text/javascript" src="../js/plugins/upload/dropzone.js"></script>
+    <script type="text/javascript" src="../js/plugins/nestable/jquery.nestable.js?v=2"></script>
+
+    <script type="text/javascript" src="../js/plugins/ckeditor/ckeditor.js"></script>
+
+    <script id="tmpl-block-select" type="text/x-jquery-tmpl">
+        <option value=-1 selected disabled>Block</option>
+        {%each(i, data) list%}
+        <option value="${data.block_id}">${data.block_name}</option>
+        {%/each%}
+    </script>
+
+    <script id="tmpl-product-tags-select" type="text/x-jquery-tmpl">
+        <option value=-1>Product Tags</option>
+        {%each(i, data) list%}
+            {%if data.tag_id==curTagId%}
+                <option value="${data.tag_id}" selected>${data.tag_name}</option>
+            {%else%}
+                <option value="${data.tag_id}">${data.tag_name}</option>
+            {%/if%}
+        {%/each%}
+    </script>
+
+    <script id="tmpl-product-list" type="text/x-jquery-tmpl">
+        <ol class="dd-list">
+            {%each(i, product) list%}
+            <li class="prod-item dd-item" data-nestable-id="${i}">
+                <div class="dd-handle">
+                    <div class="dragger-able-ele" style=";float:left;margin:5px; width: 63px;height: 85px;background-image: url(${product.image});background-size: 63px 85px;">
+                        <div class="preview-pic" data-images="${product.cover_img}" style="cursor:pointer;"><i class="mdi-action-search"></i></div>
+                    </div>
+                    
+                    <div class="product-info-display" data-product-id="${product.product_id}" >
+                        <div>
+                            <div class="prod-info-line">
+                                <div class="prod-brand disp-brand" title="${product.english_name}">${product.english_name}</div>
+                                <div class="prod-stock-title">Stock</div>
+                            </div>
+                            <div class="prod-info-line">
+                                <div class="prod-price-discount">${product.im_discount}% off €${product.im_price}</div>
+                                <div class="prod-stock">${product.totalStock}</div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="sort">
+                                Sort: 1
+                            </div>
+                            <div class="img-tag-list">
+                                {%if product.model == 1%}
+                                <div class="image-tag">模特</div>
+                                {%/if%}
+                                {%if product.steet == 1%}
+                                <div class="image-tag">街拍</div>
+                                {%/if%}
+                                {%if product.previewDiscount %}
+                                <div class="off-tag">${product.previewDiscount}% off</div>
+                                {%/if%}
+                                <div class="off-tag">${product.gender}</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </li>
+            {%/each%}
+        </ol>
+    </script>
+
+    <script type="text/javascript">
+        
+
+        $(function () {
+            //方法二：
+            (function ($) {
+                $.getUrlParam = function (name) {
+                    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+                    var r = window.location.search.substr(1).match(reg);
+                    if (r != null) return unescape(r[2]); return null;
+                }
+            })(jQuery);
+
+            var isNew = $.getUrlParam('new');
+            var blockId = $.getUrlParam('blockId');
+
+            CKEDITOR.replace('editor1', {
+                height: 218,
+                extraPlugins: 'serverimg',
+                stylesSet: [
+                    { name: 'Narrow image', type: 'widget', widget: 'image', attributes: { 'class': 'image-narrow' } }
+                ],
+                toolbar: [
+                    { name: 'clipboard', items: ['Undo', 'Redo' ] },
+                    { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'RemoveFormat', 'Subscript', 'Superscript' ] },
+                    { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote' ] },
+                    { name: 'insert', items: [ 'Image', 'Table' ] },
+                    { name: 'editing', items: [ 'Scayt' ] },
+                    { name: 'styles', items: [ 'Format', 'Font', 'FontSize' ] },
+                    { name: 'colors', items: [ 'TextColor', 'BGColor', 'CopyFormatting' ] },
+                    { name: 'align', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },
+                    { name: 'document', items: ['Source', 'Maximize', 'serverimg'] },
+                ],
+            });
+
+            if(isNew != 1) {
+                getBlockDetail(blockId);
+            } else {
+                $('#text-sort-order').val('1');
+            }
+
+            initDragger();
+            initUpload();
+            initEvent(isNew);
+        });
+    </script>
+</body>
+
+</html>

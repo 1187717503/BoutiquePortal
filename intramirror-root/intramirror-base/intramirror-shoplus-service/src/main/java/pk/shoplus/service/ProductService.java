@@ -104,6 +104,14 @@ public class ProductService {
         }
     }
 
+    public void updateBySQL(String sql) throws Exception{
+        productDao.updateBySQL(sql,null);
+    }
+
+    public List<Map<String,Object>> executeSQL(String sql) throws Exception {
+        return productDao.executeBySql(sql,null);
+    }
+
     /**
      * 通过product_id 获取 product
      *
@@ -1193,12 +1201,13 @@ public class ProductService {
         return null;
     }
 
-    public Map<String,Object> getBrandMapping(Long vendor_id,String brandName) throws Exception {
+    public Map<String,Object> getBrandMapping(String brandName) throws Exception {
         try {
-            String sql  = "select abm.brand_id,b.english_name from `api_brand_map`  abm\n"
-                    + "inner join `api_configuration`  ac on(abm.`api_configuration_id` = ac.`api_configuration_id`  and ac.`enabled`  = 1 and abm.`enabled`  = 1)\n"
-                    +"inner join brand b on(b.brand_id = abm.brand_id and b.enabled = 1)"
-                    + "where ac.`vendor_id`  = "+vendor_id+" and trim(abm.`boutique_brand_name`)  =trim(\"" + brandName + "\")";
+            String sql  = " select abm.brand_id,b.english_name from `api_brand_map`  abm\n"
+                    + " inner join `api_configuration`  ac on(abm.`api_configuration_id` = ac.`api_configuration_id`  and ac.`enabled`  = 1 and abm.`enabled`  = 1)\n"
+                    +" inner join brand b on(b.brand_id = abm.brand_id and b.enabled = 1)\n"
+//                    + "where ac.`vendor_id`  = "+vendor_id+" and trim(abm.`boutique_brand_name`)  =trim(\"" + brandName + "\")";
+                    + " where trim(abm.`boutique_brand_name`)  = trim(\"" + brandName + "\")";
             logger.info("ProductService,getThreeCategory,sql:" + sql);
 
             List<Map<String,Object>> brandMap = productDao.executeBySql(sql, null);
@@ -1327,6 +1336,24 @@ public class ProductService {
             }
             logger.info("ProductService,outputParams,getDeafultCategory,vendor_id:"+vendor_id+",one:"+one+",two:"+two+",rsCategoryId:"+rsCategoryId);
             return rsCategoryId;
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public boolean duplicateColorBrandByAD(String brandID,String colorCode){
+        try {
+            String sql = "select p.`product_id`, p.`product_code` , p1.`key_name` , p1.`value` , p2.`key_name` , p2.`value`, count(*) from `product` p\n"
+                    + "inner join `product_property`  p1 on(p.`product_id` = p1.`product_id`  and p.`enabled`  = 1 and p1.`enabled`  = 1 and p1.`key_name`  = 'ColorCode')\n"
+                    + "inner join `product_property`  p2 on(p.`product_id` = p2.`product_id`  and p.`enabled`  = 1 and p2.`enabled`  = 1 and p2.`key_name`  = 'BrandID')\n"
+                    + "where p.`vendor_id`  = 22 and p1.`value`  = \""+colorCode+"\" and p2.`value`  = \""+brandID+"\" group by p1.`value` ,p2.`value` HAVING  count(*)>0 \n";
+
+            logger.info("ProductService,outputParams,duplicateColorBrandByAD,sql:"+sql);
+            List<Map<String,Object>> productMap = productDao.executeBySql(sql, null);
+            if(productMap != null && productMap.size() > 0) {
+                return true;
+            }
+            return false;
         } catch (Exception e) {
             throw e;
         }

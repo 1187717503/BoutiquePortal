@@ -55,7 +55,7 @@
           <span>Content Management</span>
           <div class="tow-nav">
             <a href="/admin-frontend/content-management/index.html" active-class="hover">Assign Product Tag</a>
-            <a href="/admin-frontend/content-management/detail.html" active-class="hover">Detail</a>
+            <a href="/admin-frontend/content-management/management.html" active-class="hover">Block Management</a>
           </div>
         </div>
       </div>

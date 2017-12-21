@@ -1,21 +1,16 @@
 package com.intramirror.web.mapping.impl.filippo;
 
+import com.google.gson.Gson;
+import com.intramirror.web.mapping.api.IProductMapping;
+import difflib.DiffRow;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
-import org.sql2o.Connection;
-
-import com.google.gson.Gson;
-import com.intramirror.web.mapping.api.IProductMapping;
-
-import difflib.DiffRow;
-import pk.shoplus.DBConnector;
 import pk.shoplus.model.ProductEDSManagement;
-import pk.shoplus.service.MappingCategoryService;
 
 @Service(value = "filippoSynProductMapping")
 public class FilippoSynProductMapping implements IProductMapping {
@@ -107,6 +102,7 @@ public class FilippoSynProductMapping implements IProductMapping {
             productOptions.setCategory1(firstCategory);
             productOptions.setCategory2(secondCategory);
             productOptions.setCategory3(threeCategory);
+            productOptions.setLast_check(new Date());
             logger.info(" productOptions filippo : " + new Gson().toJson(productOptions));
         } catch (Exception e) {
             e.printStackTrace();

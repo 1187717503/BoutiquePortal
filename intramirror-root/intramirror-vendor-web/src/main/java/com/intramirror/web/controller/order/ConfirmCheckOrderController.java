@@ -49,6 +49,7 @@ public class ConfirmCheckOrderController {
 
     @Autowired
     IOrderService orderService;
+
     /**
      * Wang
      *
@@ -90,6 +91,7 @@ public class ConfirmCheckOrderController {
         String colorCode = null;
         String estShipDate = null;
         String logisticsProductId = null;
+        String stockLocation = null;
 
         if (map.get("barCode") != null && StringUtils.isNotBlank(map.get("barCode").toString()) && !map.get("barCode").toString().equals("#")) {
             barCode = map.get("barCode").toString();
@@ -111,15 +113,18 @@ public class ConfirmCheckOrderController {
             logisticsProductId = map.get("logisticsProductId").toString();
         }
 
+        if (map.get("stockLocation") != null && StringUtils.isNotBlank(map.get("stockLocation").toString())) {
+            stockLocation = map.get("stockLocation").toString();
+        }
 
         Sku sku = null;
         List<Map<String, Object>> mapList = new ArrayList<Map<String, Object>>();
         if (barCode != null) {
             sku = skuService.getSkuBySkuCode(barCode);
-//            result.put("sku", sku);
+            //            result.put("sku", sku);
         } else {
             mapList = productPropertyService.getProductPropertyByBrandIDAndColorCode(brandId, colorCode);
-//            result.put("mapList", mapList);
+            //            result.put("mapList", mapList);
         }
 
         if (sku != null || (mapList != null && mapList.size() > 0)) {
@@ -131,25 +136,28 @@ public class ConfirmCheckOrderController {
 
                     LogisticsProduct logis = logisticsProductServiceImpl.selectById(Long.parseLong(logisticsProductId));
                     Map<String, Object> maps = orderService.getOrderLogisticsInfoByIdWithSql(Long.parseLong(logisticsProductId));
-                    String mapBrandId = maps.get("brandID")==null?"":maps.get("brandID").toString();
-                    String mapColorCode = maps.get("colorCode")==null?"":maps.get("colorCode").toString();
-                    
+                    String mapBrandId = maps.get("brandID") == null ? "" : maps.get("brandID").toString();
+                    String mapColorCode = maps.get("colorCode") == null ? "" : maps.get("colorCode").toString();
+
                     //如果是当前自己的brandId喝colorCode保存
-                    if (mapBrandId.equals(brandId) && mapColorCode.equals(mapColorCode)){
-	                    if (logis != null) {
-	                        LogisticsProduct upLogis = new LogisticsProduct();
-	                        upLogis.setLogistics_product_id(logis.getLogistics_product_id());
-	                        if (estShipDate != null) {
-	                            upLogis.setEst_ship_date(sdf.parse(estShipDate));
-	                        }
-	                        upLogis.setConfirmed_at(Helper.getCurrentUTCTime());
-	                        logisticsProductServiceImpl.updateByLogisticsProduct(upLogis);
-	                    } else {
-	                        result.setMsg("Order does not exist,logisticsProductId:" + logisticsProductId);
-	                    }
-                    }else{
-                    	result.errorStatus().putMsg("error", "noMatching parm").setData("noMatching parm");
-                    	return result;
+                    if (mapBrandId.equals(brandId) && mapColorCode.equals(mapColorCode)) {
+                        if (logis != null) {
+                            LogisticsProduct upLogis = new LogisticsProduct();
+                            upLogis.setLogistics_product_id(logis.getLogistics_product_id());
+                            if (stockLocation != null) {
+                                upLogis.setStock_location(stockLocation);
+                            }
+                            if (estShipDate != null) {
+                                upLogis.setEst_ship_date(sdf.parse(estShipDate));
+                            }
+                            upLogis.setConfirmed_at(Helper.getCurrentUTCTime());
+                            logisticsProductServiceImpl.updateByLogisticsProduct(upLogis);
+                        } else {
+                            result.setMsg("Order does not exist,logisticsProductId:" + logisticsProductId);
+                        }
+                    } else {
+                        result.errorStatus().putMsg("error", "noMatching parm").setData("noMatching parm");
+                        return result;
                     }
 
                 }
@@ -162,7 +170,6 @@ public class ConfirmCheckOrderController {
 
         return result;
     }
-
 
     public String getJwtBase64Key() {
         return Base64Codec.BASE64.encode(jwtSecret);

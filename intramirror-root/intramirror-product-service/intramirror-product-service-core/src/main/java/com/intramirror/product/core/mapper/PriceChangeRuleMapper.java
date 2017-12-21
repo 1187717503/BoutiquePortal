@@ -4,6 +4,7 @@ import com.intramirror.product.api.model.PriceChangeRule;
 
 import java.util.List;
 import java.util.Map;
+import org.apache.ibatis.annotations.Param;
 
 public interface PriceChangeRuleMapper {
     /**
@@ -82,6 +83,7 @@ public interface PriceChangeRuleMapper {
 
     int updateSkuPriceByVendor(Map<String,Object> map);
     int updateSkuPriceByAdmin(Map<String,Object> map);
+    int updateProductPreviewImPrice(Map<String,Object> map);
     int updateSkuPriceByShop(List<Map<String,Object>> paramsList);
 
 
@@ -100,4 +102,17 @@ public interface PriceChangeRuleMapper {
 
     /** 修改product.retail_price*/
     int updateProductRetailPrice();
+
+    /** 修改product.boutique_price*/
+    int updateProductBoutiquePrice();
+
+    /** 修改product.im_price */
+    int updateProductImPrice();
+
+    /** 修改product.preview_im_price */
+    int updateProductPreviewPrice(Long vendor_id);
+    int clearProductPreviewPrice(Long vendor_id);
+
+    int updatePriceChangeRulePreviewStatus(@Param(value = "vendor_id") Long vendor_id,@Param(value = "preview_status") Long preview_status);
+
 }

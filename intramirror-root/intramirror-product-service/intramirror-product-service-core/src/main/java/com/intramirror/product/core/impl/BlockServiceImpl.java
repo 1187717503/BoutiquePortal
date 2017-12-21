@@ -1,8 +1,10 @@
 package com.intramirror.product.core.impl;
 
 import com.intramirror.product.api.model.Block;
+import com.intramirror.product.api.model.BlockTagRel;
 import com.intramirror.product.api.service.BlockService;
 import com.intramirror.product.core.mapper.BlockMapper;
+import com.intramirror.product.core.mapper.BlockTagRelMapper;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -12,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 /**
  * Created on 2017/11/17.
- *
  * @author YouFeng.Zhu
  */
 @Service
@@ -23,9 +24,19 @@ public class BlockServiceImpl implements BlockService {
     @Autowired
     private BlockMapper blockMapper;
 
+    @Autowired
+    private BlockTagRelMapper blockTagRelMapper;
+
     @Override
     public int insert(Block record) {
         return blockMapper.insert(record);
+    }
+
+    @Override
+    public int createBlock(Block block) {
+        block.setStatus((byte) 0);
+        block.setEnabled(true);
+        return blockMapper.insertSelective(block);
     }
 
     @Override
@@ -40,7 +51,7 @@ public class BlockServiceImpl implements BlockService {
 
     @Override
     public List<Block> listAllBlock() {
-        return null;
+        return blockMapper.listAllBlock();
     }
 
     @Override
@@ -54,7 +65,20 @@ public class BlockServiceImpl implements BlockService {
     }
 
     @Override
+    public List<Block> listBlockBySort(int sortOrder) {
+        return blockMapper.listBlockBySort(sortOrder);
+    }
+
+    @Override
     public int batchUpdateSort(List<Block> blockList) {
         return blockMapper.batchUpdateSort(blockList);
+    }
+
+    public List<Block> getBlockByName(Block record) {
+        return blockMapper.getBlockByName(record);
+    }
+
+    public List<BlockTagRel> getBlockTagRelByTagId(Long tagId) {
+        return blockTagRelMapper.getBlockTagRelByTagId(tagId);
     }
 }

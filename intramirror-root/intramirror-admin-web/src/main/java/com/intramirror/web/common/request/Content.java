@@ -7,7 +7,6 @@ import java.util.List;
 
 /**
  * Created on 2017/11/21.
- *
  * @author YouFeng.Zhu
  */
 public class Content {
@@ -35,9 +34,18 @@ public class Content {
         this.sort = sort;
     }
 
+    public String getIsNew() {
+        return isNew;
+    }
+
+    public void setIsNew(String isNew) {
+        this.isNew = isNew;
+    }
+
     private Block block;
     private Tag tag;
     private List<TagProductRel> sort;
+    private String isNew;
 }
 
 

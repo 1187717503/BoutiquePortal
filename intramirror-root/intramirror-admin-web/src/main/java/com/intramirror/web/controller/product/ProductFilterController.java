@@ -3,7 +3,7 @@ package com.intramirror.web.controller.product;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.product.api.service.brand.IBrandService;
 import com.intramirror.product.api.service.season.SeasonService;
-import com.intramirror.web.common.response.Response;
+import com.intramirror.core.common.response.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

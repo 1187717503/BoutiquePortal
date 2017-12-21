@@ -56,7 +56,7 @@ public class TagServiceImpl implements ITagService {
         }
 
         Map<String, Object> mapToSave = new HashMap<>();
-        mapToSave.put("tagId", map.get("tagId"));
+        mapToSave.put("tag_id", map.get("tag_id"));
         mapToSave.put("productIdList", map.get("productIdList"));
         mapToSave.put("sort_num", map.get("sort_num"));
 
@@ -64,14 +64,8 @@ public class TagServiceImpl implements ITagService {
     }
 
     @Override
-    public List<Tag> getTags() {
-        logger.info("[service] getTags");
-        return tagMapper.getTags();
+    public List<Tag> getTags(String orderBy) {
+        return tagMapper.getTags(orderBy);
     }
 
-    @Override
-    public Tag selectByPrimaryKey(Long tagId) {
-        logger.info("[service] getTags and tagId is [{}]", tagId);
-        return tagMapper.selectByPrimaryKey(tagId);
-    }
 }

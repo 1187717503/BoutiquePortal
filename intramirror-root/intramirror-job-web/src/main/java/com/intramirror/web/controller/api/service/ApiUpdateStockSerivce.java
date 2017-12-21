@@ -58,6 +58,7 @@ public class ApiUpdateStockSerivce {
     private List<Map<String,Object>> warningList;
 
     public Map<String,Object> updateStock(StockOption stockOption) {
+        long start = System.currentTimeMillis();
         Map<String,Object> resultMap = new HashMap<>();
 
         this.stockOption = stockOption;
@@ -67,6 +68,9 @@ public class ApiUpdateStockSerivce {
 
             /** 检查参数 */
             this.checkParams(conn);
+
+            /** 过滤season和brand */
+            this.checkFilter(conn);
 
             /** 更新stock */
             this.updateStock(conn);
@@ -87,16 +91,50 @@ public class ApiUpdateStockSerivce {
             if(conn != null) {conn.commit();conn.close(); }
         } catch (UpdateException e) {
             resultMap = ApiCommonUtils.errorMap(e.getErrorType(),e.getKey(),e.getValue());
-            if(conn != null) {conn.commit();conn.close(); }
+            if(conn != null) {conn.rollback();conn.close(); }
+        } catch (FilterException e) {
+            resultMap = ApiCommonUtils.successMap();
+            logger.info("ApiUpdateStockSerivce,FilterException,errorMsg:"+e.getMessage()
+                    +",stockOption:"+JSONObject.toJSONString(stockOption));
+            if(conn != null) {conn.rollback();conn.close();}
         } catch (Exception e) {
             e.printStackTrace();
             resultMap = ApiCommonUtils.errorMap(ApiErrorTypeEnum.errorType.error_runtime_exception,"errorMessage",ExceptionUtils.getExceptionDetail(e));
             if(conn != null) {conn.rollback();conn.close(); }
         }
+        long end = System.currentTimeMillis();
+        logger.info("Job_Run_Time,ApiUpdateStockSerivce_updateStock,start:"+start+",end:"+end+",time:"+(end-start));
         return resultMap;
     }
 
+    public void checkFilter(Connection conn) throws Exception{
+        ProductService productService = new ProductService(conn);
+        Product product = this.getProduct(conn);
+        Long vendor_id = product.getVendor_id();
+        String season_code = product.getSeason_code();
+        Long brand_id = product.getBrand_id();
+
+        // 判断season是否需要
+        String seasonFilterSQL = " select * from `season_filter` sf "
+                + " where sf.`enabled`  =1  and sf.`vendor_id`  = "+vendor_id
+                + " and (sf.`season_code` = '-1' or sf.`season_code`  = \""+season_code+"\")";
+        List<Map<String,Object>> seasonFilterMap = productService.executeSQL(seasonFilterSQL);
+        if(seasonFilterMap != null && seasonFilterMap.size() > 0) {
+            throw new FilterException("season_filter_msg:"+JSONObject.toJSONString(seasonFilterMap));
+        }
+
+        // 判断Brand是否需要
+        String brandFilterSQL = " select * from `brand_filter`  bf "
+                + " where bf.`enabled`  = 1 and bf.`vendor_id`  ="+vendor_id
+                + " and (bf.`brand_id` = '-1' or bf.`brand_id`  = '"+brand_id+"')";
+        List<Map<String,Object>> brandFilterMap = productService.executeSQL(brandFilterSQL);
+        if(brandFilterMap != null && brandFilterMap.size() > 0) {
+            throw new FilterException("brand_filter_msg:"+JSONObject.toJSONString(brandFilterMap));
+        }
+    }
+
     public Map<String,Object> updateStock(StockOption stockOption,Connection conn) {
+        long start = System.currentTimeMillis();
         Map<String,Object> resultMap = new HashMap<>();
         this.stockOption = stockOption;
         try{
@@ -125,6 +163,8 @@ public class ApiUpdateStockSerivce {
             e.printStackTrace();
             resultMap = ApiCommonUtils.errorMap(ApiErrorTypeEnum.errorType.error_runtime_exception,"errorMessage",ExceptionUtils.getExceptionDetail(e));
         }
+        long end = System.currentTimeMillis();
+        logger.info("Job_Run_Time,ApiUpdateStockSerivce_updateStock_call_byUpdateProduct,start:"+start+",end:"+end+",time:"+(end-start));
         return resultMap;
     }
 
@@ -155,9 +195,9 @@ public class ApiUpdateStockSerivce {
         BigDecimal oldPrice = product.getMax_retail_price();
         int rs = ApiCommonUtils.ifUpdatePrice(oldPrice,newPrice);
 
-        if(rs == 0) {
+        /*if(rs == 0) {
             this.setWarning(ApiErrorTypeEnum.errorType.warning_price_out_off,"price",price);
-        }
+        }*/
 
         if(rs == 1 || stockOption.isModify()) {
             IPriceService iPriceService = new PriceServiceImpl();
@@ -234,6 +274,22 @@ public class ApiUpdateStockSerivce {
             sku.last_check = new Date();
             skuService.createSku(sku);
             logger.info("ApiUpdateStockSerivce,createSku,sku:"+JSONObject.toJSONString(sku));
+
+            /*BigDecimal newPrice = product.getMax_retail_price();
+            BigDecimal im_price = sku.im_price;
+            BigDecimal in_price = sku.in_price;
+            Long product_id = product.getProduct_id();
+            String updatePriceSQL = "update `sku`  s\n"
+                    + "inner join `product`  p on( s.`product_id`  = p.`product_id`  and s.`enabled`  = 1 and p.`enabled`  = 1)\n"
+                    + "left join `shop_product`  sp on(sp.`product_id` = p.`product_id`  and sp.`enabled`  = 1)\n"
+                    + "left join `shop_product_sku`  sps on(sps.`shop_product_id` = sp.`shop_product_id`  and sps.`enabled`  = 1)\n" + "set \n"
+                    + "s.`price` ="+newPrice+" ,s.`in_price` ="+in_price+" ,s.`im_price`  ="+im_price+" ,\n"
+                    + "p.`min_boutique_price` ="+in_price+" ,p.`min_im_price`  ="+im_price+" ,p.`min_retail_price` ="+newPrice+" ,\n"
+                    + "p.`max_boutique_price` ="+in_price+" ,p.`max_im_price` ="+im_price+" , p.`max_retail_price`  ="+newPrice+",\n"
+                    + "sps.`sale_price`  = "+im_price+",\n"
+                    + "sp.`min_sale_price` ="+im_price+" ,sp.`max_sale_price`   ="+im_price+" \n" + "where p.`product_id`  ="+product_id+";";
+            skuService.updateBySQL(updatePriceSQL);
+            logger.info("ApiUpdateStockService,createSku,updateProduct,updatePriceSQL:"+updatePriceSQL);*/
 
             // 2.create sku_store
             SkuStoreService skuStoreService = new SkuStoreService(conn);
@@ -373,6 +429,7 @@ public class ApiUpdateStockSerivce {
         int reserved = 0;
         int confirmed = 0;
         int sku_store_id = 0;
+        String sku_id = skuStoreMap.get("sku_id").toString();
         store = Integer.parseInt(skuStoreMap.get("store").toString());
         reserved = Integer.parseInt(skuStoreMap.get("reserved").toString());
         confirmed = Integer.parseInt(skuStoreMap.get("confirmed").toString());
@@ -429,6 +486,13 @@ public class ApiUpdateStockSerivce {
         skuStore.setConfirmed((long)confirmed);
         skuStoreService.updateSkuStore(skuStore);
         logger.info("ApiUpdateStockSerivce,updateStock,outputParams,skuStore:"+JSONObject.toJSONString(skuStore));
+
+        if(StringUtils.isNotBlank(stockOption.getSku_code())) {
+            String updateSkuCodeSQL = "update sku set sku_code =\""+stockOption.getSku_code()+"\" where sku_id="+sku_id;
+            SkuService skuService = new SkuService(conn);
+            skuService.updateBySQL(updateSkuCodeSQL);
+            logger.info("ApiUpdateStockSerivce,updateStock,updateSkuCodeSQL:"+updateSkuCodeSQL);
+        }
 
         // 当库存小于0，或低于100时，库存在这被清零，然后报警告
         if((originQty < 0 || originQty > 100) && Contants.STOCK_QTY == type) {

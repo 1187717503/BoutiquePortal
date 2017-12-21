@@ -28,6 +28,7 @@ public class UpdateStockThread implements Runnable{
 
     @Override
     public void run() {
+        long start = System.currentTimeMillis();
         try {
             System.out.println(JSONObject.toJSON(apiDataFileUtils));
             logger.info("UpdateStockThreadRun,updateStock,start,stockOption:"+JSONObject.toJSONString(stockOption));
@@ -63,6 +64,8 @@ public class UpdateStockThread implements Runnable{
             e.printStackTrace();
             logger.info("UpdateStockThreadRun,updateStock,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",stockOption:"+new Gson().toJson(stockOption));
         }
+        long end = System.currentTimeMillis();
+        logger.info("Job_Run_Time,UpdateStockThread_run,start:"+start+",end:"+end+",time:"+(end-start));
     }
 
     public UpdateStockThread(StockOption stockOption,ApiDataFileUtils apiDataFileUtils,Object originData) {

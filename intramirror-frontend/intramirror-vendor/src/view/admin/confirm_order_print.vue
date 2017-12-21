@@ -76,7 +76,11 @@
           </td>
           <td>
             <span style="transform:scale(0.833333);display:inline-block;margin-left:-6px">Purchase Price</span>
-            <p style="font-size:14px;margin:4px 0 0 0">€ {{printData.in_price | PriceForm}}</p>
+            <p style="font-size:14px;margin:4px 0 0 0">
+              € {{(printData.in_price + printData.tax_fee) | PriceForm}}
+              <span style="font-size:14px;margin:4px 0 0 0;padding-left:14px;" v-if="printData.tax_fee > 0">VAT included.</span>
+              <span style="font-size:14px;margin:4px 0 0 0;padding-left:14px;" v-if="printData.tax_fee <= 0">VAT exempt.</span>
+            </p>
           </td>
           <td>
             <span style="transform:scale(0.833333);display:inline-block;margin-left:-6px">Discount</span>

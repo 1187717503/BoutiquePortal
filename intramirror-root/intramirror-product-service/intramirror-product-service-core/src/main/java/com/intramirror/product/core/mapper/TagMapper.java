@@ -2,6 +2,7 @@ package com.intramirror.product.core.mapper;
 
 import com.intramirror.product.api.model.Tag;
 import java.util.List;
+import org.apache.ibatis.annotations.Param;
 
 public interface TagMapper {
     /**
@@ -52,5 +53,8 @@ public interface TagMapper {
      */
     int updateByPrimaryKey(Tag record);
 
-    List<Tag> getTags();
+    List<Tag> getTags(@Param(value = "orderBy") String orderBy);
+
+    List<Tag> getTagsByDate();
+
 }

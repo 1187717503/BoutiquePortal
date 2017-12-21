@@ -77,6 +77,16 @@ public class ProductServiceImpl extends BaseDao implements IProductService {
     }
 
     @Override
+    public List<Map<String, Object>> selectDayNoUpdateSum(Map<String, Object> params) {
+        return productMapper.selectDayNoUpdateSum(params);
+    }
+
+    @Override
+    public List<Map<String, Object>> selectDayUpdateSum(Map<String, Object> params) {
+        return productMapper.selectDayUpdateSum(params);
+    }
+
+    @Override
     public void init() {
         productMapper = this.getSqlSession().getMapper(ProductMapper.class);
     }

@@ -1,0 +1,1 @@
+ALTER TABLE logistics_product ADD stock_location VARCHAR(256) NULL;

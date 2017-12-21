@@ -260,7 +260,7 @@
 
     <sql id="selectColumn">
         sku_id, product_id, sku_code, name, coverpic, introduction, in_price, price, created_at, updated_at, enabled,
-        retail_price
+        retail_price,im_price
     </sql>
     <sql id="selectTable">
         sku s

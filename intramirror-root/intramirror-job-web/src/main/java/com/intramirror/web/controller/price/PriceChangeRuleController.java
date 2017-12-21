@@ -3,14 +3,13 @@ package com.intramirror.web.controller.price;
 import com.intramirror.common.help.ExceptionUtils;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
+import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.annotation.Resource;
 
 /**
  * Created by dingyifan on 2017/7/17.
@@ -25,7 +24,8 @@ public class PriceChangeRuleController {
     @Resource(name = "productPriceChangeRule")
     private IPriceChangeRule iPriceChangeRule;
 
-    @RequestMapping(value = "/updatePriceByVendor",method = RequestMethod.GET)
+    @CrossOrigin
+    @RequestMapping("/updatePriceByVendor")
     @ResponseBody
     public ResultMessage updatePriceByVendor(){
 
@@ -57,16 +57,29 @@ public class PriceChangeRuleController {
         return resultMessage;
     }*/
 
-    @RequestMapping(value = "/updatePriceByAdmin",method = RequestMethod.GET)
+    @CrossOrigin
+    @RequestMapping("/updatePriceByAdmin")
     @ResponseBody
     public ResultMessage updatePriceByAdmin(){
 
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
             iPriceChangeRule.updateAdminPrice();
+
+            // sku.im_price -> shop_product_sku.sale_price
             iPriceChangeRule.updateShopPrice();
+
+            // shop_product_sku.sale_price -> shop_product.min_sale_price,shop_product.max_sale_price
             iPriceChangeRule.updateShopProductSalePrice();
+
+            // sku.price -> product.min_retail_price,product.max_retail_price
             iPriceChangeRule.updateProductRetailPrice();
+
+            // sku.in_price -> product.min_boutique_price,product.max_boutique_price
+            iPriceChangeRule.updateProductBoutiquePrice();
+
+            // sku.im_price -> product.min_im_price,product.max_im_price
+            iPriceChangeRule.updateProductImPrice();
             resultMessage.successStatus().addMsg("SUCCESS");
         } catch (Exception e) {
             e.printStackTrace();

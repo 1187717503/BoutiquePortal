@@ -42,23 +42,11 @@
     <!-- end spring 自动注解,及解决ReponseBody中文乱码问题 -->
 
     <!-- 设置使用注解的类所在的jar包，这里必须排除扫描service层的组件 -->
-    <context:component-scan base-package="com.intramirror">
-        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service"/>
-    </context:component-scan>
-
-    <!--设置登录拦截器
-    <mvc:interceptors>  
-        <mvc:interceptor>  
-            <mvc:mapping path="/*.htm" />  
-            <mvc:mapping path="/*/*.htm" />   
-            <bean class="com.intramirror.web.interceptor.LoginInterceptor"/>  
-        </mvc:interceptor>  
-    </mvc:interceptors> -->
+    <context:component-scan base-package="com.intramirror"/>
 
     <context:property-placeholder location="classpath:/commons.properties"/>
 
-
-    <bean id="authenticationInterceptor" class="com.intramirror.web.interceptor.AuthenticationInterceptor"/>
+    <bean id="authenticationInterceptor" class="com.intramirror.core.servlet.interceptor.AuthenticationInterceptor"/>
 
     <mvc:interceptors>
         <mvc:interceptor>
@@ -67,6 +55,15 @@
             <ref bean="authenticationInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>
+
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+
+        <!-- one of the properties available; the maximum file size in bytes -->
+        <property name="maxUploadSize" value="5242800"/>
+
+    </bean>
+
+    <bean class="com.intramirror.web.controller.cache.CategoryCache" init-method="init"/>
 
 
     <!--<mvc:cors>-->

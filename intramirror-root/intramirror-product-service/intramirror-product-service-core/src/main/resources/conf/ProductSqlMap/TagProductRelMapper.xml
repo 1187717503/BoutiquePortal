@@ -130,7 +130,7 @@
         sort_num)
         VALUES
         <foreach collection="productIdList" index="index" item="item" separator=",">
-            (#{tagId,jdbcType=BIGINT},#{item,jdbcType=BIGINT},#{sort_num,jdbcType=BIGINT})
+            (#{tag_id,jdbcType=BIGINT},#{item,jdbcType=BIGINT},#{sort_num,jdbcType=BIGINT})
         </foreach>
     </insert>
 
@@ -141,7 +141,7 @@
         FROM tag_product_rel
         WHERE
         <if test="tag_id != null">
-            tag_id = #{tagId} AND
+            tag_id = #{tag_id} AND
         </if>
         product_id IN
         <foreach close=")" collection="productIdList" index="index" item="item" open="(" separator=",">
@@ -165,9 +165,17 @@
         </foreach>
     </insert>
 
-    <select id="listTagProductIds" resultType="long">
-        SELECT product_id
-        FROM tag_product_rel
-        WHERE tag_id = #{tagId}
-    </select>
+    <delete id="deleteByTagIdAndProductId" >
+        DELETE FROM tag_product_rel
+        WHERE tag_id = #{tagId,jdbcType=BIGINT} AND product_id = #{productId,jdbcType=BIGINT};
+    </delete>
+
+    <delete id="batchDeleteByTagIdAndProductId" parameterType="java.util.List">
+        DELETE FROM tag_product_rel
+        WHERE
+        <foreach collection="list" item="item" index="index" separator=" OR ">
+            (tag_id = #{item.tagId,jdbcType=BIGINT} AND product_id = #{item.productId,jdbcType=BIGINT})
+        </foreach>
+    </delete>
+
 </mapper>

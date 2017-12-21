@@ -17,6 +17,8 @@ public interface IPriceChangeRule {
      * @throws Exception
      */
     boolean updateVendorPrice() throws Exception;
+    boolean updateVendorPrice(Long vendor_id) throws Exception;
+
 
     /**
      * 定时job修改shop价格 update im_price -> shop_product_sku.sale_price
@@ -31,6 +33,14 @@ public interface IPriceChangeRule {
      * @throws Exception
      */
     boolean updateAdminPrice() throws Exception;
+    boolean updateAdminPrice(Long vendor_id) throws Exception;
+
+    /**
+     * 手动触发修改 product.preview_im_price
+     * @return true,false
+     * @throws Exception
+     */
+    boolean updatePreviewPrice(Long vendor_id,Long preview_status) throws Exception;
 
     /**
      * 定时job修改shop_product.max_sale_price,shop_product.min_sale_price
@@ -39,12 +49,15 @@ public interface IPriceChangeRule {
      */
     boolean updateShopProductSalePrice() throws Exception;
 
+    boolean updateProductImPrice() throws Exception;
     /**
      * 定时job修改product.retail_price
      * @return
      * @throws Exception
      */
     boolean updateProductRetailPrice() throws Exception;
+
+    boolean updateProductBoutiquePrice() throws Exception;
 
     int deleteByPrimaryKey(Long priceChangeRuleId);
 

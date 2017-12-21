@@ -29,6 +29,7 @@ public class UpdateProductThread implements Runnable{
 
     @Override
     public void run() {
+        long start = System.currentTimeMillis();
         try {
             System.out.println(JSONObject.toJSON(apiDataFileUtils));
             logger.info("UpdateProductThreadRun,createProduct,start,productOptions:"+JSONObject.toJSONString(productOptions)
@@ -76,6 +77,8 @@ public class UpdateProductThread implements Runnable{
             logger.info("UpdateProductThreadRun,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+",productOptions:"+JSONObject.toJSONString(productOptions)
                     +",vendorOptions:"+JSONObject.toJSONString(vendorOptions));
         }
+        long end = System.currentTimeMillis();
+        logger.info("Job_Run_Time,UpdateProductThread_run,start:"+start+",end:"+end+",time:"+(end-start));
     }
 
     public UpdateProductThread(ProductEDSManagement.ProductOptions productOptions, ProductEDSManagement.VendorOptions vendorOptions,ApiDataFileUtils apiDataFileUtils,Object originData) {
@@ -87,6 +90,8 @@ public class UpdateProductThread implements Runnable{
 
     // 错误消息存库
     public static boolean saveErrorMsg(String fileDataContent,String vendor_id,ApiDataFileUtils apiDataFileUtils,Map<String,Object> resultMap,String fileName){
+        long start = System.currentTimeMillis();
+
         logger.info("UpdateProductThreadSaveErrorMsg,inputParams,fileDataContent:"+fileDataContent+",vendor_id:"+vendor_id+",apiDataFileUtils:"+JSONObject.toJSONString(apiDataFileUtils)+",resultMap:"+JSONObject.toJSONString(resultMap)+",fileName:"+fileName);
         Connection conn = null;
         try {
@@ -125,6 +130,8 @@ public class UpdateProductThread implements Runnable{
         } finally {
             if(conn!=null){conn.close();}
         }
+        long end = System.currentTimeMillis();
+        logger.info("Job_Run_Time,UpdateProductThread_saveErrorMsg,start:"+start+",end:"+end+",time:"+(end-start));
         return true;
     }
 

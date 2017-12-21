@@ -4,10 +4,11 @@ import com.intramirror.product.api.model.Block;
 import com.intramirror.product.api.model.BlockTagRel;
 import com.intramirror.product.api.model.Tag;
 import com.intramirror.product.api.model.TagProductRel;
-import com.intramirror.product.api.service.BlockService;
 import com.intramirror.product.api.service.content.ContentManagementService;
+import com.intramirror.product.core.mapper.BlockMapper;
 import com.intramirror.product.core.mapper.BlockTagRelMapper;
 import com.intramirror.product.core.mapper.ContentManagementMapper;
+import com.intramirror.product.core.mapper.TagMapper;
 import com.intramirror.product.core.mapper.TagProductRelMapper;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created on 2017/11/21.
- *
  * @author YouFeng.Zhu
  */
 @Service
@@ -29,13 +29,16 @@ public class ContentManagementServiceImpl implements ContentManagementService {
     private ContentManagementMapper contentManagementMapper;
 
     @Autowired
-    private BlockService blockService;
+    private BlockMapper blockMapper;
 
     @Autowired
     private BlockTagRelMapper blockTagRelMapper;
 
     @Autowired
     private TagProductRelMapper tagProductRelMapper;
+
+    @Autowired
+    private TagMapper tagMapper;
 
     @Override
     public List<Map<String, Object>> listTagProductInfo(Long tagId) {
@@ -56,13 +59,13 @@ public class ContentManagementServiceImpl implements ContentManagementService {
     }
 
     @Override
-    public List<Map<String, Object>> listUnbindTag() {
-        return contentManagementMapper.listUnbindTag();
+    public List<Map<String, Object>> listUnbindTag(Long blockId) {
+        return contentManagementMapper.listUnbindTag(blockId);
     }
 
     @Override
     public List<Long> listTagProductIds(Long tagId) {
-        return tagProductRelMapper.listTagProductIds(tagId);
+        return contentManagementMapper.listTagProductIds(tagId);
     }
 
     @Override
@@ -70,17 +73,115 @@ public class ContentManagementServiceImpl implements ContentManagementService {
         return contentManagementMapper.listTagsByProductIds(productIds);
     }
 
+    @Override
+    public List<Long> listAllTagProductIds() {
+        return contentManagementMapper.listAllTagProductIds();
+    }
+
+    @Override
+    public List<Map<String, Object>> listBlockWithTag(String blockName, Integer status, Long tagId, Long modifiedAtFrom, Long modifiedAtTo, int start,
+            int limit, int desc) {
+        return contentManagementMapper.listBlockWithTag(blockName, status, tagId, modifiedAtFrom, modifiedAtTo, start, limit, desc);
+    }
+
+    @Override
+    public Map<String, Object> getBlockWithTagByBlockId(Long blockId) {
+        return contentManagementMapper.getBlockWithTagByBlockId(blockId);
+    }
+
+    @Override
+    @Transactional
+    public int updateBlockByBlockId(Block record) {
+        if (record.getSortOrder() == null) {
+            return blockMapper.updateByBlockId(record);
+        } else {
+            return updateBlock(record);
+        }
+    }
+
+    @Override
+    @Transactional
+    public int batchUpdateBlock(List<Block> record) {
+        return blockMapper.batchUpdateBlock(record.get(0).getStatus(), record);
+    }
+
+    @Override
+    @Transactional
+    public int createTag(Tag record) {
+        record.setEnabled(true);
+        return tagMapper.insertSelective(record);
+    }
+
+    @Override
+    @Transactional
+    public int deleteTag(Long tagId) {
+        tagProductRelMapper.deleteByTagId(tagId);
+        //blockTagRelMapper.deleteByTagId(tagId);
+        return tagMapper.deleteByPrimaryKey(tagId);
+    }
+
+    @Override
+    @Transactional
+    public int deleteByTagIdAndProductId(Long tagId, Long productId) {
+        return tagProductRelMapper.deleteByTagIdAndProductId(tagId, productId);
+    }
+
+    @Override
+    @Transactional
+    public int batchDeleteByTagIdAndProductId(List<TagProductRel> listTagProductRel) {
+        return tagProductRelMapper.batchDeleteByTagIdAndProductId(listTagProductRel);
+    }
+
+    @Override
+    @Transactional
+    public BlockTagRel createBlockWithDefaultTag(Block block) {
+        List<Block> blockList = blockMapper.listBlockBySort(block.getSortOrder());
+        block.setStatus((byte) 1);
+        block.setEnabled(true);
+        blockMapper.insertSelective(block);
+        if (blockList.size() != 0) {
+            blockMapper.batchUpdateSort(blockList);
+        }
+
+        Tag tag = new Tag();
+        tag.setEnabled(true);
+        tag.setTagName(block.getBlockName());
+        tagMapper.insertSelective(tag);
+
+        BlockTagRel btRel = new BlockTagRel();
+        btRel.setTagId(tag.getTagId());
+        btRel.setBlockId(block.getBlockId());
+
+        blockTagRelMapper.insertSelective(btRel);
+
+        return btRel;
+    }
+
     private int updateBlock(Block block) {
-        blockService.updateByBlockId(block);
-        List<Block> blockList = blockService.listBlockBySortExcludeSelf(block.getSortOrder(), block.getBlockId());
+        List<Block> blockList = blockMapper.listBlockBySort(block.getSortOrder());
+        blockMapper.updateByBlockId(block);
+        Block self = null;
+        for (Block b : blockList) {
+            if (b.getBlockId() == block.getBlockId()) {
+                if (b.getSortOrder() == block.getSortOrder()) {
+                    return 0;
+                } else {
+                    self = b;
+                }
+            }
+        }
+        blockList.remove(self);
         if (blockList.size() == 0) {
             return 0;
         }
-        return blockService.batchUpdateSort(blockList);
+        return blockMapper.batchUpdateSort(blockList);
     }
 
     private int rebindBlockTag(Block block, Long tagId) {
         blockTagRelMapper.deleteByBlockId(block.getBlockId());
+        if (tagId == -1) {
+            return 0;
+        }
         BlockTagRel btRel = new BlockTagRel();
         btRel.setBlockId(block.getBlockId());
         btRel.setTagId(tagId);
@@ -89,6 +190,9 @@ public class ContentManagementServiceImpl implements ContentManagementService {
 
     private int updateTagProductSort(Long tagId, List<TagProductRel> sort) {
         tagProductRelMapper.deleteByTagId(tagId);
+        if (sort.size() == 0 || tagId == -1) {
+            return 0;
+        }
         for (TagProductRel tagProductRel : sort) {
             tagProductRel.setTagId(tagId);
         }
