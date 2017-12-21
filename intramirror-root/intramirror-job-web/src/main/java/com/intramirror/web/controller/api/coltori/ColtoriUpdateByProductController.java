@@ -97,7 +97,7 @@ public class ColtoriUpdateByProductController implements InitializingBean {
             while (true) {
                 String new_url = get_product_url;
                 if(i <= sum || i == 1) {
-                    new_url = new_url + "&page="+i+"&limit=500";
+                    new_url = new_url + "&page="+i+"&limit=300";
                 }
                 logger.info("ColtoriUpdateByProductController,requestMethod,start,get_product_url:"+new_url);
                 Map<String, Object> resultMap = HttpUtils.responseAndHeadersGet(new_url);
@@ -164,7 +164,7 @@ public class ColtoriUpdateByProductController implements InitializingBean {
                     }
 
                     logger.info("ColtoriUpdateByProductController,execute,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName+",flag:"+flag);
-                    CommonThreadPool.execute(eventName,executor,30,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,mqDataMap));
+                    CommonThreadPool.execute(eventName,executor,10,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,mqDataMap));
                     logger.info("ColtoriUpdateByProductController,execute,endDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
                     flag ++;
                 }
