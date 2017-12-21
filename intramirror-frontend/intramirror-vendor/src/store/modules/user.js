@@ -31,10 +31,12 @@ const user = {
       return new Promise((resolve, reject) => {
         ajaxLogin(data.username, data.password).then(res => {
           if (res.data.status === 1) {
+            console.log(data)
             if (data.remember) {
               localStorage.token = res.data.token;
             } else {
               sessionStorage.token = res.data.token;
+              localStorage.removeItem('token');
             }
           }
           resolve(res)
