@@ -67,31 +67,43 @@
     <div class="ConfirmOrder" v-if="showPopup.configm">
       <h3>Confirm Order</h3>
       <div class="barcode">
-        <div class="input-field">
-          <i class="mdi mdi-barcode-scan prefix"></i>
-          <input id="code" type="text" class="validate" v-model="confirmBarCode">
-          <label for="code">Please scan or type PRODUCT barcode</label>
+        <div class="input-row">
+          <div class="input-field full">
+            <i class="mdi mdi-barcode-scan prefix"></i>
+            <input id="code" type="text" class="validate" v-model="confirmBarCode">
+            <label for="code">Please scan or type PRODUCT barcode</label>
+          </div>
         </div>
-        <p class="or">OR</p>
-        <div class="product-input">
-          <div class="input-field">
+        <div class="input-row">
+          <p class="or half">OR</p>
+        </div>
+        <div class="input-row">
+          <div class="input-field half">
             <input id="productID" type="text" class="validate" v-model="confirmBrandId">
             <label for="productID">Please enter Product ID</label>
           </div>
-          <div class="input-field">
+          <div class="input-field half">
             <input id="ColorCode" type="text" class="validate" v-model="confirmColorCode">
             <label for="ColorCode">Please enter Color Code</label>
           </div>
-
-          <div class="input-field">
+        </div>
+        <div class="input-row ">
+          <div class="input-field half">
             <i class="mdi mdi-calendar prefix"></i>
             <input id="seleDate" type="text" class="validate" @focus="setEffectiveDate">
             <label for="seleDate">Estimated Ship Date</label>
           </div>
+          <div class="input-field half">
+            <input id="stockLocation" type="text" class="validate" v-model="stockLocation">
+            <label for="stockLocation">Stock Location</label>
+          </div>
         </div>
-        <div class="btns">
-          <span @click="cancelLayer('configm')">CANCEL</span>
-          <span @click="updateOrder">SAVE</span>
+
+        <div class="input-row">
+          <div class="btns">
+            <span @click="cancelLayer('configm')">CANCEL</span>
+            <span @click="updateOrder">SAVE</span>
+          </div>
         </div>
       </div>
     </div>
@@ -237,6 +249,7 @@
         confirmBrandId: null,
         confirmColorCode: null,
         confirmDate: null,
+        stockLocation:null,
         exceptionInfo: {
           show: false,
           info: {}
@@ -338,7 +351,8 @@
           "barCode": this.confirmBarCode,
           "brandId": this.confirmBrandId,
           "colorCode": this.confirmColorCode,
-          "estShipDate": this.confirmDate
+          "estShipDate": this.confirmDate,
+          "stockLocation":this.stockLocation
         };
         confirmCheckOrder(data).then(res => {
           if (res.data.status === 1) {
@@ -348,6 +362,7 @@
             this.confirmBarCode = null;
             this.confirmBrandId = null;
             this.confirmColorCode = null;
+            this.stockLocation = null;
             this.confirmDate = null;
           } else {
             this.showPopup.configm = false;
@@ -355,6 +370,7 @@
             this.confirmBrandId = null;
             this.confirmColorCode = null;
             this.confirmDate = null;
+            this.stockLocation = null;
             this.showPopup.cancel = true;
             this.showShade = true;
           }
@@ -661,48 +677,91 @@
       margin-bottom: 30px;
     }
     .barcode {
-      .input-field {
-        input {
-          border-bottom: 2px solid #00A6CE;
+      display: flex;
+      flex-wrap: wrap;
+      .input-row {
+        flex-basis: 100%;
+        display:flex;
+        .input-field {
+          width: 100%;
+          input {
+            border-bottom: 2px solid #00A6CE;
+          }
+          label {
+            left: 0;
+          }
         }
-        label {
-          left: 0;
+        .input-field.half{
+          margin-left: 10px;
         }
-      }
-      .or {
-        font-size: 16px;
-        margin: 10px 0 0 0;
-      }
-      .product-input {
-        .input-field:nth-child(1), .input-field:nth-child(2) {
-          width: 187.55px;
-          float: left;
+        .input-field.half:nth-child(1){
+          margin-left: 0px;
         }
-        .input-field:nth-child(2) {
-          margin-left: 20px;
+
+        .or {
+          font-size: 16px;
+          margin: 10px 0 0 0;
         }
-        .input-field:nth-child(3) {
-          clear: both;
-          width: 220px;
-          top: 20px;
-          .prefix {
-            top: 10px;
-            color: #4A4A4A;
+
+        .btns {
+          position: absolute;
+          right: 24px;
+          bottom: 24px;
+          color: #871B55;
+          font-size: 14px;
+          span {
+            margin-left: 40px;
+            cursor: pointer;
           }
         }
       }
+
+
+      // .input-row:nth-child(3){
+      //   .input-field:nth-child(1), .input-field:nth-child(2){
+      //     width: 187.55px;
+      //     float: left;
+      //   }
+      //   .input-field:nth-child(2) {
+      //     margin-left: 20px;
+      //   }
+      // }
+      // .input-field {
+      //   input {
+      //     border-bottom: 2px solid #00A6CE;
+      //   }
+      //   label {
+      //     left: 0;
+      //   }
+      // }
+      // .or {
+      //   font-size: 16px;
+      //   margin: 10px 0 0 0;
+      // }
+      // .product-input {
+      //   .input-field:nth-child(1), .input-field:nth-child(2) {
+      //     width: 187.55px;
+      //     float: left;
+      //   }
+      //   .input-field:nth-child(2) {
+      //     margin-left: 20px;
+      //   }
+      //   .input-field:nth-child(3) {
+      //     clear: both;
+      //     width: 220px;
+      //     top: 20px;
+      //     .prefix {
+      //       top: 10px;
+      //       color: #4A4A4A;
+      //     }
+      //   }
+      //   .input-field:nth-child(4) {
+      //     margin-left: 20px;
+      //     float: left;
+      //   }
+      // }
     }
-    .btns {
-      position: absolute;
-      right: 24px;
-      bottom: 24px;
-      color: #871B55;
-      font-size: 14px;
-      span {
-        margin-left: 40px;
-        cursor: pointer;
-      }
-    }
+
   }
 
   .sucess-order {
