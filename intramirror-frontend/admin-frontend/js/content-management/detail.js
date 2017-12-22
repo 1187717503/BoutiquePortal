@@ -82,6 +82,12 @@ function saveBlock(isNew) {
         param.block.status = 1;
         param.tag.tagName = $('#text-product-tag').val();
         param.isNew = '1';
+
+        if (param.block.blockName == '') {
+            Materialize.toast('Please type block name', 3000);
+            return;
+        }
+
     } else {
         param.isNew = '0';
         param.block.blockId = $('#text-blockName').data('block-id');
@@ -116,7 +122,7 @@ function saveBlock(isNew) {
     }
 
     param.block.coverImg = $('#upload').attr('data-block-image');
-    if (param.block.coverImg == '') {
+    if (param.block.coverImg == '' || typeof(param.block.coverImg) == 'undefined') {
         Materialize.toast('Please upload block image', 3000);
         return;
     }
@@ -124,8 +130,6 @@ function saveBlock(isNew) {
     param.block.bgColor = $('#backgroup-color').val();
     param.block.textColor = $('#title-color').val();
     param.block.sortOrder = parseInt($('#text-sort-order').val());
-
-
 
     if (isNaN(param.block.sortOrder)) {
         Materialize.toast('Please type sort order', 3000);
