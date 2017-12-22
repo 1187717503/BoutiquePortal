@@ -174,7 +174,6 @@ public class ColtoriUpdateByProductController implements InitializingBean {
                     flag ++;
                 }
                 i++;
-                break;
             }
 
             /*logger.info("ColtoriUpdateByProductController,zeroClearing,flag:"+flag);
