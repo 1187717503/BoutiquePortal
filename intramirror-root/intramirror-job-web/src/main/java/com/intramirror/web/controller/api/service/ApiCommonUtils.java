@@ -3,11 +3,15 @@ package com.intramirror.web.controller.api.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson15.JSONArray;
+import java.awt.image.BufferedImage;
 import java.math.BigDecimal;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.imageio.ImageIO;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import pk.shoplus.common.FileUploadHelper;
@@ -92,9 +96,11 @@ public class ApiCommonUtils {
                         origin = origin.replaceAll(" ","%20");
                     }
 
-                    List<String> downList = FileUploadHelper.uploadFileByImgUrl2(origin);
-                    if(downList != null && downList.size() > 0) {
-                        newList.add(downList.get(0));
+                    if(checkImgSize(origin)) {
+                        List<String> downList = FileUploadHelper.uploadFileByImgUrl2(origin);
+                        if(downList != null && downList.size() > 0) {
+                            newList.add(downList.get(0));
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -103,6 +109,26 @@ public class ApiCommonUtils {
             }
         }
         return JSON.toJSONString(newList);
+    }
+
+    public static boolean checkImgSize(String imgUrl){
+        try {
+            URL url = new URL(imgUrl);
+            URLConnection connection = url.openConnection();
+            connection.setDoOutput(true);
+            BufferedImage image = ImageIO.read(connection.getInputStream());
+            int srcWidth = image .getWidth();
+            int srcHeight = image .getHeight();
+
+            if(srcWidth < 400 || srcHeight < 400){
+                logger.info("ApiCreateProductService,checkImgSize,errorImage:"+imgUrl);
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("ApiCreateProductService,checkImgSize,errorMessage:"+e);
+        }
+        return true;
     }
 
     // 字母,数字,_,-

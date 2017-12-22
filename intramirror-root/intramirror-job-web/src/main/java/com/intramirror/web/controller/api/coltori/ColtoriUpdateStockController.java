@@ -2,7 +2,6 @@ package com.intramirror.web.controller.api.coltori;
 
 import com.google.gson.Gson;
 import com.intramirror.common.help.ExceptionUtils;
-import com.intramirror.common.help.StringUtils;
 import com.intramirror.common.utils.DateUtils;
 import com.intramirror.product.api.service.stock.IUpdateStockService;
 import com.intramirror.web.contants.RedisKeyContants;
@@ -22,6 +21,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import javax.annotation.Resource;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
@@ -50,6 +50,9 @@ public class ColtoriUpdateStockController  implements InitializingBean {
 
     @Resource(name = "updateStockService")
     private IUpdateStockService iUpdateStockService;
+
+    private static final String coltori_product_code_all="coltori_product_code_all";
+
 
     @RequestMapping("/syn_stock")
     @ResponseBody
@@ -101,7 +104,7 @@ public class ColtoriUpdateStockController  implements InitializingBean {
             while (true) {
                 String new_url = get_stock_url;
                 if(i <= sum || i == 1) {
-                    new_url = new_url + "&page="+i+"&limit=300";
+                    new_url = new_url + "&page="+i+"&limit=400";
                 }
                 logger.info("ColtoriUpdateStockController,requestMethod,start,get_stock_url:"+new_url);
                 System.out.println(new_url);
@@ -142,11 +145,19 @@ public class ColtoriUpdateStockController  implements InitializingBean {
                             logger.info("ColtoriUpdateStockController,start,mapping,stockMap:"+JSONObject.fromObject(stockMap));
                             StockOption stockOption = iStockMapping.mapping(stockMap);
                             logger.info("ColtoriUpdateStockController,end,mapping,stockMap:"+JSONObject.fromObject(stockMap)+",stockOption:"+JSONObject.fromObject(stockOption));
-                            // 线程池
-                            logger.info("ColtoriUpdateStockController,execute,startDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(stockMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName+",flag:"+flag);
-                            CommonThreadPool.execute(eventName,executor,10,new UpdateStockThread(stockOption,apiDataFileUtils,stockMap));
-                            logger.info("ColtoriUpdateStockController,execute,endDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(stockMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
-                            flag++;
+
+                            if(stockOption != null && org.apache.commons.lang.StringUtils.isNotBlank(stockOption.getProductCode())) {
+
+                                String productCodes = redisService.getKey(coltori_product_code_all).toString();
+
+                                if(productCodes.contains(","+ StringUtils.trim(stockOption.getProductCode())+",")) {
+                                    // 线程池
+                                    logger.info("ColtoriUpdateStockController,execute,startDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(stockMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName+",flag:"+flag);
+                                    CommonThreadPool.execute(eventName,executor,15,new UpdateStockThread(stockOption,apiDataFileUtils,stockMap));
+                                    logger.info("ColtoriUpdateStockController,execute,endDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(stockMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
+                                    flag++;
+                                }
+                            }
                         }
                     }
                 }

@@ -16,6 +16,7 @@ import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -28,7 +29,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.sql2o.Connection;
+import pk.shoplus.DBConnector;
 import pk.shoplus.model.ProductEDSManagement;
+import pk.shoplus.service.ProductService;
 import pk.shoplus.service.RedisService;
 
 @Controller
@@ -41,8 +45,6 @@ public class ColtoriUpdateByProductController implements InitializingBean {
 
     private Map<String,Object> paramsMap;
 
-    private static RedisService redisService = RedisService.getInstance();
-
     @Resource(name = "coltoriProductMapping")
     private IProductMapping iProductMapping;
 
@@ -52,12 +54,15 @@ public class ColtoriUpdateByProductController implements InitializingBean {
     @Autowired
     private ColtoriUpdateStockController coltoriUpdateStockController;
 
+    private static RedisService redisService = RedisService.getInstance();
+
+    private static final String coltori_product_code_all="coltori_product_code_all";
+
     @RequestMapping("/syn_product")
     @ResponseBody
     public Map<String, Object> execute(@Param(value = "name") String name) {
         try {
             Map<String,Object> paramMap = (Map<String, Object>) paramsMap.get(name);
-            logger.info("ColtoriUpdateByProductController,Execute,inputParams,name:"+name+",paramsMap:"+ JSONObject.fromObject(paramMap));
             ThreadPoolExecutor executor = (ThreadPoolExecutor) paramMap.get("executor");
             ApiDataFileUtils apiDataFileUtils = (ApiDataFileUtils) paramMap.get("fileUtils");
             String get_token_url = paramMap.get("get_token_url").toString();
@@ -97,7 +102,7 @@ public class ColtoriUpdateByProductController implements InitializingBean {
             while (true) {
                 String new_url = get_product_url;
                 if(i <= sum || i == 1) {
-                    new_url = new_url + "&page="+i+"&limit=300";
+                    new_url = new_url + "&page="+i+"&limit=400";
                 }
                 logger.info("ColtoriUpdateByProductController,requestMethod,start,get_product_url:"+new_url);
                 Map<String, Object> resultMap = HttpUtils.responseAndHeadersGet(new_url);
@@ -164,11 +169,12 @@ public class ColtoriUpdateByProductController implements InitializingBean {
                     }
 
                     logger.info("ColtoriUpdateByProductController,execute,startDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName+",flag:"+flag);
-                    CommonThreadPool.execute(eventName,executor,10,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,mqDataMap));
+                    CommonThreadPool.execute(eventName,executor,15,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,mqDataMap));
                     logger.info("ColtoriUpdateByProductController,execute,endDate:"+DateUtils.getStrDate(new Date())+",productOptions:"+new Gson().toJson(productOptions)+",vendorOptions:"+new Gson().toJson(vendorOptions)+",eventName:"+eventName);
                     flag ++;
                 }
                 i++;
+                break;
             }
 
             /*logger.info("ColtoriUpdateByProductController,zeroClearing,flag:"+flag);
@@ -178,15 +184,38 @@ public class ColtoriUpdateByProductController implements InitializingBean {
                 logger.info("ColtoriUpdateByProductController,zeroClearing,end,vendor_id:"+vendor_id);
             }*/
 
-            logger.info("ColtoriUpdateByProductController,start stock_all_update,sum:"+sum);
-            coltoriUpdateStockController.execute("stock_all_update");
-            logger.info("ColtoriUpdateByProductController,end stock_all_update,sum:"+sum);
+            if(eventName.equals("product_all_update") && flag>100){
+                StringBuilder sb = this.getProductCode(vendor_id);
+                redisService.put(coltori_product_code_all,sb.toString());
+                logger.info("ColtoriUpdateByProductController,start stock_all_update,sum:"+flag);
+                coltoriUpdateStockController.execute("stock_all_update");
+                logger.info("ColtoriUpdateByProductController,end stock_all_update,sum:"+flag);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("ColtoriUpdateByProductController,Execute,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
         }
         return null;
+    }
+
+    public StringBuilder getProductCode(Long vendor_id){
+        StringBuilder sb = new StringBuilder();
+        Connection conn = null;
+        try {
+            conn = DBConnector.sql2o.open();
+            ProductService productService = new ProductService(conn);
+            List<Map<String,Object>> productList = productService.executeSQL("select distinct product_code from product where enabled = 1 and vendor_id="+vendor_id);
+            for(Map<String,Object> map : productList) {
+                sb.append(","+map.get("product_code").toString()+",");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("ColtoriUpdateByProductController,getProductCode,ErrorMessage:"+e);
+        } finally {
+            if(conn != null){conn.close();}
+        }
+        return sb;
     }
 
     @Override

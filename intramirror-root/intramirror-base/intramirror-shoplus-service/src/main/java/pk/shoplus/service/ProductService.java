@@ -1189,7 +1189,7 @@ public class ProductService {
     public Map<String,Object> getBrand(String brandName) throws Exception {
         try {
             String sql  = "select b.brand_id,b.english_name from brand b where trim(b.english_name) = trim(\"" + brandName+ "\") and b.enabled = 1";
-            logger.info("ProductService,getThreeCategory,sql:" + sql);
+            logger.info("ProductService,getBrand,sql:" + sql);
 
             List<Map<String,Object>> brandMap = productDao.executeBySql(sql, null);
             if(brandMap != null && brandMap.size() > 0) {
