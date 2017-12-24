@@ -136,4 +136,33 @@
         </if>
         LIMIT #{start}, #{limit};
     </select>
+
+    <select id="getBlockSize" resultType="int">
+        SELECT
+        count(block.block_id) as blockSize
+        FROM block
+        LEFT JOIN block_tag_rel ON block.block_id = block_tag_rel.block_id
+        LEFT JOIN tag ON tag.tag_id = block_tag_rel.tag_id AND tag.enabled = TRUE
+        WHERE block.enabled = TRUE
+        <if test="blockName != null">
+            AND block.block_name LIKE "%"#{blockName}"%"
+        </if>
+        <if test="status != null">
+            AND block.status = #{status}
+        </if>
+        <choose>
+            <when test="tagId == null">
+
+            </when>
+            <when test="tagId == 0">
+                AND tag.tag_id IS NULL
+            </when>
+            <otherwise>
+                AND tag.tag_id = #{tagId}
+            </otherwise>
+        </choose>
+        <if test="modifiedAtFrom != null and modifiedAtTo != null">
+            AND unix_timestamp(block.modified_at) BETWEEN #{modifiedAtFrom} AND #{modifiedAtTo}
+        </if>
+    </select>
 </mapper>

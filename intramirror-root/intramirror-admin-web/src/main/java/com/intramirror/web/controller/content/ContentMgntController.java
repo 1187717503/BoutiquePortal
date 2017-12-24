@@ -1,6 +1,9 @@
 package com.intramirror.web.controller.content;
 
 import com.intramirror.common.parameter.StatusType;
+import com.intramirror.core.common.exception.ValidateException;
+import com.intramirror.core.common.response.ErrorResponse;
+import com.intramirror.core.common.response.Response;
 import com.intramirror.product.api.model.Block;
 import com.intramirror.product.api.model.BlockTagRel;
 import com.intramirror.product.api.model.Category;
@@ -10,10 +13,6 @@ import com.intramirror.product.api.service.BlockService;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ITagService;
 import com.intramirror.product.api.service.content.ContentManagementService;
-import com.intramirror.product.api.service.merchandise.ProductManagementService;
-import com.intramirror.core.common.response.ErrorResponse;
-import com.intramirror.core.common.exception.ValidateException;
-import com.intramirror.core.common.response.Response;
 import com.intramirror.web.controller.cache.CategoryCache;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -54,9 +53,6 @@ public class ContentMgntController {
     private ContentManagementService contentManagementService;
 
     @Autowired
-    private ProductManagementService productManagementService;
-
-    @Autowired
     private ISkuStoreService skuStoreService;
 
     @Autowired
@@ -91,6 +87,19 @@ public class ContentMgntController {
 
         return Response.status(StatusType.SUCCESS).data(
                 contentManagementService.listBlockWithTag(escapeLikeParams(blockName), status, tagId, modifiedAtFrom, modifiedAtTo, start, limit, desc));
+    }
+
+    // @formatter:off
+    @GetMapping(value = "/blocks/count", produces = "application/json")
+    public Response getBlocksCount(
+            @RequestParam(value = "blockName", required = false) String blockName,
+            @RequestParam(value = "status", required = false) Integer status,
+            @RequestParam(value = "tagId", required = false) Long tagId,
+            @RequestParam(value = "modifiedAtFrom", required = false) Long modifiedAtFrom,
+            @RequestParam(value = "modifiedAtTo", required = false) Long modifiedAtTo) {
+        // @formatter:on
+        return Response.status(StatusType.SUCCESS).data(
+                contentManagementService.getBlockSize(escapeLikeParams(blockName), status, tagId, modifiedAtFrom, modifiedAtTo));
     }
 
     private String escapeLikeParams(String input) {
@@ -169,11 +178,6 @@ public class ContentMgntController {
     @GetMapping(value = "/blocks/simple", produces = "application/json")
     public Response listBlockSimple() {
         return Response.status(StatusType.SUCCESS).data(blockService.listSimpleBlock());
-    }
-
-    @GetMapping(value = "/blocks/count", produces = "application/json")
-    public Response getBlocksCount() {
-        return Response.status(StatusType.SUCCESS).data(blockService.listAllBlock().size());
     }
 
     @GetMapping(value = "/tags/{tagId}/products", produces = "application/json")

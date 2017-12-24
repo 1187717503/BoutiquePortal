@@ -22,6 +22,9 @@ public interface ContentManagementMapper {
             @Param(value = "tagId") Long tagId, @Param(value = "modifiedAtFrom") Long modifiedAtFrom, @Param(value = "modifiedAtTo") Long modifiedAtTo,
             @Param(value = "start") int start, @Param(value = "limit") int limit, @Param(value = "desc") int desc);
 
+    int getBlockSize(@Param(value = "blockName") String blockName, @Param(value = "status") Integer status, @Param(value = "tagId") Long tagId,
+            @Param(value = "modifiedAtFrom") Long modifiedAtFrom, @Param(value = "modifiedAtTo") Long modifiedAtTo);
+
     Map<String, Object> getBlockWithTagByBlockId(Long blockId);
 
     List<Long> listTagProductIds(Long tagId);

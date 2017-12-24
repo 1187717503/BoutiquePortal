@@ -85,6 +85,11 @@ public class ContentManagementServiceImpl implements ContentManagementService {
     }
 
     @Override
+    public int getBlockSize(String blockName, Integer status, Long tagId, Long modifiedAtFrom, Long modifiedAtTo) {
+        return contentManagementMapper.getBlockSize(blockName, status, tagId, modifiedAtFrom, modifiedAtTo);
+    }
+
+    @Override
     public Map<String, Object> getBlockWithTagByBlockId(Long blockId) {
         return contentManagementMapper.getBlockWithTagByBlockId(blockId);
     }

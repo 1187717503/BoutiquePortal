@@ -29,6 +29,8 @@ public interface ContentManagementService {
     List<Map<String, Object>> listBlockWithTag(String blockName, Integer status, Long tagId, Long modifiedAtFrom, Long modifiedAtTo, int start, int limit,
             int desc);
 
+    int getBlockSize(String blockName, Integer status, Long tagId, Long modifiedAtFrom, Long modifiedAtTo);
+
     Map<String, Object> getBlockWithTagByBlockId(Long blockId);
 
     int updateBlockByBlockId(Block record);
