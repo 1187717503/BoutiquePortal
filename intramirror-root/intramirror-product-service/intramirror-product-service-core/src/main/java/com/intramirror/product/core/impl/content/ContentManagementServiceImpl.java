@@ -158,23 +158,17 @@ public class ContentManagementServiceImpl implements ContentManagementService {
     }
 
     private int updateBlock(Block block) {
-        List<Block> blockList = blockMapper.listBlockBySort(block.getSortOrder());
-        blockMapper.updateByBlockId(block);
-        Block self = null;
-        for (Block b : blockList) {
-            if (b.getBlockId() == block.getBlockId()) {
-                if (b.getSortOrder() == block.getSortOrder()) {
-                    return 0;
-                } else {
-                    self = b;
-                }
-            }
+        Block originBlock = blockMapper.selectByPrimaryKey(block.getBlockId());
+        int origSort = originBlock.getSortOrder();
+        int newSort = block.getSortOrder();
+
+        if (newSort < origSort) {
+            blockMapper.updateLeftSort(newSort, origSort);
+        } else if (newSort > origSort) {
+            blockMapper.updateRightSort(origSort, newSort);
         }
-        blockList.remove(self);
-        if (blockList.size() == 0) {
-            return 0;
-        }
-        return blockMapper.batchUpdateSort(blockList);
+
+        return blockMapper.updateByBlockId(block);
     }
 
     private int rebindBlockTag(Block block, Long tagId) {

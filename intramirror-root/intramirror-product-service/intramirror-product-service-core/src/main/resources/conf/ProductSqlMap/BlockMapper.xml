@@ -298,6 +298,19 @@
         </foreach>
         AND `block`.enabled = TRUE;
     </update>
+    <update id="updateLeftSort">
+        update `block`
+        SET sort_order = sort_order +1
+        where sort_order &gt;= #{left} AND sort_order &lt; #{right}
+        AND `block`.enabled = TRUE;
+    </update>
+    <update id="updateRightSort">
+        update `block`
+        SET sort_order = sort_order -1
+        where sort_order &gt; #{left} AND sort_order &lt;= #{right}
+        AND
+        `block`.enabled = TRUE;
+    </update>
 
     <update id="batchUpdateBlock">
         update block

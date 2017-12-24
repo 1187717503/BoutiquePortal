@@ -31,7 +31,12 @@ public interface BlockMapper {
 
     int batchUpdateSort(List<Block> blockList);
 
+    int updateLeftSort(@Param(value = "left") int left, @Param(value = "right") int right);
+
+    int updateRightSort(@Param(value = "left") int left, @Param(value = "right") int right);
+
     int batchUpdateBlock(@Param(value = "status") Byte status, @Param(value = "blockList") List<Block> blockList);
 
     List<Block> getBlockByName(Block record);
+
 }
