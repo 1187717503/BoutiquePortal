@@ -230,7 +230,7 @@ function initActionEvent() {
 
     $('.block-list .action .action-icon').click(function() {
         let blockId = $(this).parent().data('block-id');
-        window.open('./detail.html?new=0&blockId='+blockId);
+        window.location.href = './detail.html?new=0&blockId='+blockId;
     });
 }
 
@@ -342,6 +342,6 @@ function initEvent() {
     });
 
     $('#new-block-btn').click(function() {
-        window.open('./detail.html?new=1');
+        window.location.href = './detail.html?new=1';
     });
 }
