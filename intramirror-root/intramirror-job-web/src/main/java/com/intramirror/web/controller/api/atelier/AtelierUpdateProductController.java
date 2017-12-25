@@ -1,5 +1,6 @@
 package com.intramirror.web.controller.api.atelier;
 
+import com.alibaba.fastjson15.JSONArray;
 import com.alibaba.fastjson15.JSONObject;
 import com.intramirror.web.contants.RedisKeyContants;
 import java.io.InputStream;
@@ -58,13 +59,24 @@ public class AtelierUpdateProductController {
             String body = IOUtils.toString(is, "utf-8");
             String storeID = request.getParameter("StoreID");
             String version = request.getParameter("Version");
+            logger.info("AtelierFullUpdateProductControllerExecute,inputParams,type:"+type+",storeID:"+storeID+",version:"+version+",body:"+body+","+storeID+"_"+type);
 
             this.setRedisDate(type,storeID,body);
 
-            logger.info("AtelierFullUpdateProductControllerExecute,params,type:"+type+",storeID:"+storeID+",version:"+version+",body:"+body+","+storeID+"_"+type);
-            resultMap = atelierUpdateByProductService.updateProduct(body,storeID,version,type);
-            logger.info("AtelierFullUpdateProductControllerExecute,updateProduct,type:"+type+",resultMap:"+JSONObject.toJSONString(resultMap)+",storeID:"+storeID+",version:"+version+",body:"+body+","+storeID+"_"+type);
+            JSONArray datas = this.parasJSONArray(body);
 
+            if(datas == null) {
+                logger.info("AtelierFullUpdateProductControllerExecute,params,type:"+type+",storeID:"+storeID+",version:"+version+",body:"+body+","+storeID+"_"+type);
+                resultMap = atelierUpdateByProductService.updateProduct(body,storeID,version,type);
+                logger.info("AtelierFullUpdateProductControllerExecute,updateProduct,type:"+type+",resultMap:"+JSONObject.toJSONString(resultMap)+",storeID:"+storeID+",version:"+version+",body:"+body+","+storeID+"_"+type);
+            } else {
+                for(int i=0,len=datas.size();i<len;i++){
+                    JSONObject bodyJSON = datas.getJSONObject(i);
+                    logger.info("AtelierFullUpdateProductControllerExecutes,params,type:"+type+",storeID:"+storeID+",version:"+version+",body:"+bodyJSON.toJSONString()+","+storeID+"_"+type);
+                    resultMap = atelierUpdateByProductService.updateProduct(bodyJSON.toJSONString(),storeID,version,type);
+                    logger.info("AtelierFullUpdateProductControllerExecutes,updateProduct,type:"+type+",resultMap:"+JSONObject.toJSONString(resultMap)+",storeID:"+storeID+",version:"+version+",body:"+bodyJSON.toJSONString()+","+storeID+"_"+type);
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("AtelierFullUpdateProductControllerExecute,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
@@ -77,6 +89,16 @@ public class AtelierUpdateProductController {
         long end = System.currentTimeMillis();
         logger.info("Job_Run_Time,AtelierUpdateProductController_execute,start:"+start+",end:"+end+",time:"+(end-start));
         return resultMap;
+    }
+
+    public JSONArray parasJSONArray(String body){
+        JSONArray datas = null;
+        try {
+            datas = JSONArray.parseArray(body);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return datas;
     }
 
     private void setRedisDate(String type,String storeID,String body){
