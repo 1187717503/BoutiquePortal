@@ -1057,9 +1057,9 @@ public class PriceChangeRuleController extends BaseController{
     	if(StringUtils.isNotBlank(vue)){
     		try{
     			Long number = Long.parseLong(vue);
-    			if(number == null || number < 0 || number > 100){
-    				return true;
-    			}
+				if(number == null || number < 0){
+					return true;
+				}
     		}catch(Exception e){
     			return true;
     		}
