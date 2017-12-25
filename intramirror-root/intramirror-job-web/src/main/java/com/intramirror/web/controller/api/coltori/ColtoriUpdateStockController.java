@@ -142,6 +142,7 @@ public class ColtoriUpdateStockController  implements InitializingBean {
                             stockMap.put("product_code",product_code);
                             stockMap.put("size",size);
                             stockMap.put("stock",stock);
+                            stockMap.put("barcode",key);
                             logger.info("ColtoriUpdateStockController,start,mapping,stockMap:"+JSONObject.fromObject(stockMap));
                             StockOption stockOption = iStockMapping.mapping(stockMap);
                             logger.info("ColtoriUpdateStockController,end,mapping,stockMap:"+JSONObject.fromObject(stockMap)+",stockOption:"+JSONObject.fromObject(stockOption));
