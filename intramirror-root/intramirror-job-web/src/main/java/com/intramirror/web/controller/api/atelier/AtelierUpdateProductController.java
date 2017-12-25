@@ -10,6 +10,8 @@ import java.util.Map;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +31,8 @@ public class AtelierUpdateProductController {
     private static Logger logger = Logger.getLogger(AtelierUpdateProductController.class);
 
     private static RedisService redisService = RedisService.getInstance();
+
+    private static final String atelier_full_count = "atelier_full_count";
 
     @Resource(name = "atelierUpdateByProductService")
     private AtelierUpdateByProductService atelierUpdateByProductService;
@@ -51,6 +55,31 @@ public class AtelierUpdateProductController {
         return this.execute(request,atelierUpdateByProductService.update_product);
     }
 
+    @RequestMapping(value = "/fullUpdateProduct/setCount",method = RequestMethod.GET)
+    @ResponseBody
+    public Map<String,Object> setCount(HttpServletRequest request,@Param("count")String count) throws Exception {
+        if(StringUtils.isNotBlank(count)) {
+            this.setCount(count);
+        }
+        Map<String,Object> map = new HashMap<>();
+        map.put("count",this.getCount());
+        return map;
+    }
+
+    private void setCount(String count) throws Exception {
+        redisService.put(atelier_full_count,count);
+    }
+
+    private int getCount(){
+        try {
+            int count = Integer.parseInt(redisService.getKey(atelier_full_count));
+            return count;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 200;
+    }
+
     private Map<String,Object> execute(HttpServletRequest request,String type) {
         long start = System.currentTimeMillis();
         Map<String,Object> resultMap = new HashMap<>();
@@ -70,7 +99,19 @@ public class AtelierUpdateProductController {
                 resultMap = atelierUpdateByProductService.updateProduct(body,storeID,version,type);
                 logger.info("AtelierFullUpdateProductControllerExecute,updateProduct,type:"+type+",resultMap:"+JSONObject.toJSONString(resultMap)+",storeID:"+storeID+",version:"+version+",body:"+body+","+storeID+"_"+type);
             } else {
-                for(int i=0,len=datas.size();i<len;i++){
+                int count = this.getCount();
+                int len = datas.size();
+                logger.info("AtelierFullUpdateProductControllerExecutes,len:"+len+",count:"+count);
+                if(len > count) {
+                    resultMap.put("ResponseStatus","2000");
+                    resultMap.put("ErrorCode","1");
+                    resultMap.put("ErrorMsg","Data exceeds the specified number");
+                    resultMap.put("count",count);
+                    resultMap.put("TimeStamp",new Date());
+                    return resultMap;
+                }
+
+                for(int i=0;i<len;i++){
                     JSONObject bodyJSON = datas.getJSONObject(i);
                     logger.info("AtelierFullUpdateProductControllerExecutes,params,type:"+type+",storeID:"+storeID+",version:"+version+",body:"+bodyJSON.toJSONString()+","+storeID+"_"+type);
                     resultMap = atelierUpdateByProductService.updateProduct(bodyJSON.toJSONString(),storeID,version,type);
