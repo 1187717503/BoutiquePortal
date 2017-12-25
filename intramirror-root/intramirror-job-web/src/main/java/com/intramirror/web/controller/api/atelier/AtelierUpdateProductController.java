@@ -137,7 +137,8 @@ public class AtelierUpdateProductController {
         try {
             datas = JSONArray.parseArray(body);
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            System.out.println(" not jsonArray!");
         }
         return datas;
     }
