@@ -182,6 +182,7 @@ function saveBlock(isNew) {
         success: function (result) {
             if (result.status === 1) {
                 Materialize.toast('Save success', 3000);
+                window.location.href = './management.html'
             } else {
                 toashWithCloseBtn('Save failed, ' + result.data);
             }
@@ -450,6 +451,10 @@ function loadExistingImage(url) {
 function initEvent(isNew) {
     $('#save-btn').click(function () {
         saveBlock(isNew);
+    })
+
+    $('#cancel-btn').click(function () {
+        window.location.href = './management.html';
     })
 
     $('#select-block-name').change(function(e) {
