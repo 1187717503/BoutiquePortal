@@ -32,6 +32,12 @@ public class DateUtils {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(calendar.getTime());
     }
 
+    public static String getTimeByMinuteGMT(int minute) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.MINUTE, calendar.get(Calendar.MINUTE) - minute);
+        return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss+08:00").format(calendar.getTime());
+    }
+
     public static void main(String[] args) {
         System.out.println(getTimeByMinute(0));;
 
