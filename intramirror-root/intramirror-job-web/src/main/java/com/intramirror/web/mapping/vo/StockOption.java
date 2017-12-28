@@ -17,6 +17,7 @@ public class StockOption {
     public Date last_check; // 消息时间
     public boolean modify = false;
     public String updated_by; // 根据product_code,size修改,根据sku_code修改
+    public String boutique_sku_id;
 
     public Date getLast_check() {
         return last_check;
@@ -96,5 +97,13 @@ public class StockOption {
 
     public void setModify(boolean modify) {
         this.modify = modify;
+    }
+
+    public String getBoutique_sku_id() {
+        return boutique_sku_id;
+    }
+
+    public void setBoutique_sku_id(String boutique_sku_id) {
+        this.boutique_sku_id = boutique_sku_id;
     }
 }

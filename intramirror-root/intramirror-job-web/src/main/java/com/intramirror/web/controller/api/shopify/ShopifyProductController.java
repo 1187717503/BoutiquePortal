@@ -45,7 +45,7 @@ public class ShopifyProductController  implements InitializingBean {
     private static final int limit = 250;
     private static final String url = "https://37a1a604bfe49d29fad33217c84b7df5:36065b388b4109c56ca3c9b9d4a8a9ad@amr-fashion.myshopify.com/admin/products.json";
     private static final int threadNum = 20;
-    private static final Long vendor_id = 10L;
+    private static final Long vendor_id = 32L;
 
     @RequestMapping("/syn")
     @ResponseBody

@@ -66,6 +66,8 @@ public class Sku{
  @Column public Date last_check;
 
  @Column public String size;
+
+ @Column public String boutique_sku_id;
  
 	public Long getSku_id(){
 		return sku_id;
@@ -182,6 +184,14 @@ public class Sku{
 
 	   public void setSize(String size) {
 		   this.size = size;
+	   }
+
+	   public String getBoutique_sku_id() {
+		   return boutique_sku_id;
+	   }
+
+	   public void setBoutique_sku_id(String boutique_sku_id) {
+		   this.boutique_sku_id = boutique_sku_id;
 	   }
    }
 

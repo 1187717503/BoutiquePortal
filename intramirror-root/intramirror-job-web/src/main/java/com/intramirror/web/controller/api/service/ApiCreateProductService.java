@@ -195,6 +195,7 @@ public class ApiCreateProductService {
             sku.updated_at = new Date();
             sku.enabled = EnabledType.USED;
             sku.last_check = new Date();
+            sku.boutique_sku_id = skuOption.getBoutique_sku_id();
             skuService.createSku(sku);
             logger.info("ApiCreateProductService,setSku,sku:"+JSONObject.toJSONString(sku));
 

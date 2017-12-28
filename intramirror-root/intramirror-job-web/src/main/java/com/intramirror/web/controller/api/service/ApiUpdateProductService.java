@@ -498,6 +498,7 @@ public class ApiUpdateProductService {
                 stockOption.setProductCode(product_code);
                 stockOption.setLast_check(productOptions.getLast_check());
                 stockOption.setModify(modify);
+                stockOption.setBoutique_sku_id(skuOption.getBoutique_sku_id());
                 if(i == 0) {
                     stockOption.setPrice(price);
                 }

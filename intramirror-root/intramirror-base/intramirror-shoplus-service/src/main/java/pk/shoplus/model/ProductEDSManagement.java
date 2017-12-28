@@ -1767,6 +1767,8 @@ public class ProductEDSManagement {
 
 		public String sizeid; // filippo
 
+        public String boutique_sku_id;
+
 		public String getSize() {
 			return StringUtils.trim(size);
 		}
@@ -1797,6 +1799,14 @@ public class ProductEDSManagement {
 
         public void setSizeid(String sizeid) {
             this.sizeid = StringUtils.trim(sizeid);
+        }
+
+        public String getBoutique_sku_id() {
+            return boutique_sku_id;
+        }
+
+        public void setBoutique_sku_id(String boutique_sku_id) {
+            this.boutique_sku_id = boutique_sku_id;
         }
 
         public SkuOptions() {

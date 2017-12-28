@@ -272,6 +272,7 @@ public class ApiUpdateStockSerivce {
             sku.updated_at = new Date();
             sku.enabled = EnabledType.USED;
             sku.last_check = new Date();
+            sku.boutique_sku_id = stockOption.getBoutique_sku_id();
             skuService.createSku(sku);
             logger.info("ApiUpdateStockSerivce,createSku,sku:"+JSONObject.toJSONString(sku));
 
@@ -492,6 +493,13 @@ public class ApiUpdateStockSerivce {
             SkuService skuService = new SkuService(conn);
             skuService.updateBySQL(updateSkuCodeSQL);
             logger.info("ApiUpdateStockSerivce,updateStock,updateSkuCodeSQL:"+updateSkuCodeSQL);
+        }
+
+        if(StringUtils.isNotBlank(stockOption.getBoutique_sku_id())) {
+            String updateSkuCodeSQL = "update sku set boutique_sku_id =\""+stockOption.getBoutique_sku_id()+"\" where sku_id="+sku_id;
+            SkuService skuService = new SkuService(conn);
+            skuService.updateBySQL(updateSkuCodeSQL);
+            logger.info("ApiUpdateStockSerivce,updateStock,updateBoutiqueSkuIdSQL:"+updateSkuCodeSQL);
         }
 
         // 当库存小于0，或低于100时，库存在这被清零，然后报警告

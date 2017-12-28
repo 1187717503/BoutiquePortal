@@ -25,6 +25,7 @@ public class ShopifyProductMapping implements IProductMapping {
 
     public static List<String> secondLevels = new ArrayList<>();
     public static List<String> threeLevels = new ArrayList<>();
+    public static List<String> seasons = new ArrayList<>();
 
     static {
         secondLevels.add("LADIES CLOTHING");
@@ -107,6 +108,10 @@ public class ShopifyProductMapping implements IProductMapping {
         threeLevels.add("Sunglasses");
         threeLevels.add("Ties");
         threeLevels.add("Wallets");
+
+        seasons.add("E40");
+        seasons.add("I50");
+        seasons.add("E60");
     }
 
     @Override
@@ -117,7 +122,6 @@ public class ShopifyProductMapping implements IProductMapping {
             JSONObject product = (JSONObject) bodyDataMap.get("product");
             productOptions.setName("")
                     .setCode(product.getString("id"))
-                    .setSeasonCode("")
                     .setBrandName(product.getString("vendor"))
                     .setDesc(product.getString("title"))
                     .setMadeIn("")
@@ -136,9 +140,10 @@ public class ShopifyProductMapping implements IProductMapping {
                 String size = sku.getString("option1");
                 String sku_code = sku.getString("barcode");
                 String stock = sku.getString("inventory_quantity");
+                String boutique_sku_id = sku.getString("id");
 
                 String weight = sku.getString("grams");
-                String color_description = sku.getString("color_description");
+                String color_description = sku.getString("option2");
                 String BrandID = sku.getString("sku");
                 String price = sku.getString("price");
                 if(StringUtils.isNotBlank(weight)) {
@@ -146,6 +151,7 @@ public class ShopifyProductMapping implements IProductMapping {
                 }
                 if(StringUtils.isNotBlank(color_description)) {
                     productOptions.setColorDesc(color_description);
+                    productOptions.setColorCode(color_description);
                 }
                 if(StringUtils.isNotBlank(BrandID)) {
                     productOptions.setBrandCode(BrandID);
@@ -156,6 +162,7 @@ public class ShopifyProductMapping implements IProductMapping {
 
                 ProductEDSManagement.SkuOptions skuOptions = productEDSManagement.getSkuOptions();
                 skuOptions.setSize(size);
+                skuOptions.setBoutique_sku_id(boutique_sku_id);
                 skuOptions.setBarcodes(sku_code);
                 skuOptions.setStock(stock);
                 productOptions.getSkus().add(skuOptions);
@@ -168,6 +175,7 @@ public class ShopifyProductMapping implements IProductMapping {
                 String category1 = "";
                 String category2 = "";
                 String category3 = "";
+                String seasonCode = "";
 
                 for(String tag : tagArr) {
                     tag = StringUtils.trim(tag);
@@ -197,11 +205,20 @@ public class ShopifyProductMapping implements IProductMapping {
                             }
                         }
                     }
+
+                    if(StringUtils.isBlank(seasonCode)) {
+                        for(String season_code : seasons) {
+                            if(season_code.equalsIgnoreCase(tag)) {
+                                seasonCode = tag;
+                            }
+                        }
+                    }
                 }
 
                 productOptions.setCategory1(category1)
                         .setCategory2(category2)
-                        .setCategory3(category3);
+                        .setCategory3(category3)
+                        .setSeasonCode(seasonCode);
 
             }
 
