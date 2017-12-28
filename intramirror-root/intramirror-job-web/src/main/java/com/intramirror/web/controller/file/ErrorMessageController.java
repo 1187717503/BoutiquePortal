@@ -8,6 +8,7 @@ import com.intramirror.web.mapping.impl.QuadraSynProductMapping;
 import com.intramirror.web.mapping.impl.aiduca.AiDucaSynAllStockMapping;
 import com.intramirror.web.mapping.impl.aiduca.AiDucaSynProductMapping;
 import com.intramirror.web.mapping.impl.atelier.AtelierUpdateByProductMapping;
+import com.intramirror.web.mapping.impl.shopify.ShopifyProductMapping;
 import com.intramirror.web.mapping.vo.StockOption;
 import com.intramirror.web.thread.CommonThreadPool;
 import com.intramirror.web.thread.UpdateProductThread;
@@ -103,6 +104,9 @@ public class ErrorMessageController {
 
     @Autowired
     private AiDucaSynProductMapping aiDucaSynProductMapping;
+
+    @Resource(name = "shopifyProductMapping")
+    private ShopifyProductMapping shopifyProductMapping;
 
     private static final int threadNum = 5;
 
@@ -274,9 +278,21 @@ public class ErrorMessageController {
                         ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
                         vendorOptions.setVendorId(Long.parseLong(vendor_id));
                         productOptions.setModifyPrice("1");
+                        CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
+
                     } else if(name.equals("stock_all_update") || name.equals("stock_delta_update")) {
                         StockOption stockOption = coltoriStockMapping.mapping(originDataMap);
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateStockThread(stockOption,apiDataFileUtils,originDataMap));
+                    }
+                }
+
+                if(vendor_id.equals("32")) {
+                    if(name.equals("product_all_update") || name.equals("product_delta_update") ) {
+                        ProductEDSManagement.ProductOptions productOptions = shopifyProductMapping.mapping(originDataMap);
+                        ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
+                        vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                        CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
+
                     }
                 }
 
