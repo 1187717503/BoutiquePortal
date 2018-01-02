@@ -3,6 +3,7 @@ package com.intramirror.web.controller.api.shopify;
 import com.alibaba.fastjson15.JSONArray;
 import com.alibaba.fastjson15.JSONObject;
 import com.intramirror.common.utils.DateUtils;
+import com.intramirror.product.api.service.stock.IUpdateStockService;
 import com.intramirror.web.mapping.impl.shopify.ShopifyProductMapping;
 import com.intramirror.web.thread.CommonThreadPool;
 import com.intramirror.web.thread.UpdateProductThread;
@@ -38,6 +39,9 @@ public class ShopifyProductController  implements InitializingBean {
 
     @Resource(name = "shopifyProductMapping")
     private ShopifyProductMapping shopifyProductMapping;
+
+    @Resource(name = "updateStockService")
+    private IUpdateStockService iUpdateStockService;
 
     public static ProductEDSManagement productEDSManagement = new ProductEDSManagement();
 
@@ -96,6 +100,12 @@ public class ShopifyProductController  implements InitializingBean {
                     index++;
                 }
                 page ++;
+            }
+
+            if(name.equals(product_all_update) && index > 100 ) {
+                logger.info("ShopifyProductController,zeroClearing,start,vendor_id:"+vendor_id);
+                iUpdateStockService.zeroClearing(vendor_id);
+                logger.info("ShopifyProductController,zeroClearing,end,vendor_id:"+vendor_id);
             }
         } catch (Exception e) {
             e.printStackTrace();
