@@ -4,6 +4,8 @@ import com.alibaba.fastjson15.JSONArray;
 import com.alibaba.fastjson15.JSONObject;
 import com.intramirror.common.utils.DateUtils;
 import com.intramirror.web.mapping.impl.shopify.ShopifyProductMapping;
+import com.intramirror.web.thread.CommonThreadPool;
+import com.intramirror.web.thread.UpdateProductThread;
 import com.intramirror.web.util.ApiDataFileUtils;
 import java.util.HashMap;
 import java.util.Map;
@@ -90,7 +92,7 @@ public class ShopifyProductController  implements InitializingBean {
                     ProductEDSManagement.ProductOptions productOptions = shopifyProductMapping.mapping(bodyMap);
                     logger.info("shopify_product_update,mapping,bodyMap:"+JSONObject.toJSONString(bodyMap)+",productOptions:"+JSONObject.toJSONString(productOptions)+",page:"+page+",index:"+index);
 
-//                    CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,fileUtils,bodyMap));
+                    CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,fileUtils,bodyMap));
                     index++;
                 }
                 page ++;

@@ -233,6 +233,11 @@ public class ShopifyProductMapping implements IProductMapping {
             productOptions.setDescImg(img)
             .setCoverImg(img);
 
+            /*productOptions.setSeasonCode("17FW");
+            productOptions.setCategory1("MEN");
+            productOptions.setCategory2("Clothing");
+            productOptions.setCategory3("Beachwear");
+            productOptions.setBrandName("Gucci");*/
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("ShopifyProductMapping,mapping,errorMessage:"+e);
