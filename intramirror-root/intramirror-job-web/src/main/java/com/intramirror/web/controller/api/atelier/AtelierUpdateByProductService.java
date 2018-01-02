@@ -146,6 +146,7 @@ public class AtelierUpdateByProductService implements InitializingBean {
         ThreadPoolExecutor executor_23 =(ThreadPoolExecutor) Executors.newCachedThreadPool();
         ThreadPoolExecutor executor_29 =(ThreadPoolExecutor) Executors.newCachedThreadPool();
         ThreadPoolExecutor executor_27 =(ThreadPoolExecutor) Executors.newCachedThreadPool();
+        ThreadPoolExecutor executor_33 =(ThreadPoolExecutor) Executors.newCachedThreadPool();
 
         Map<String,Object> X4ZMP = new HashMap<>();
         X4ZMP.put("store_code","X4ZMP");
@@ -257,5 +258,13 @@ public class AtelierUpdateByProductService implements InitializingBean {
         SUG.put("eventName","sugar");
         SUG.put("executor",executor_23);
         paramsMap.put("SUG",SUG);
+
+        Map<String,Object> LUG = new HashMap<>();
+        LUG.put("store_code","LUG");
+        LUG.put("vendor_id","33");
+        LUG.put("vendor_name","Lungoliviglio");
+        LUG.put("eventName","lungoliviglio");
+        LUG.put("executor",executor_33);
+        paramsMap.put("LUG",LUG);
     }
 }
