@@ -134,17 +134,31 @@ public class ShopifyProductMapping implements IProductMapping {
                     .setFullUpdateProductFlag("")
                     .setLast_check(new Date());
 
+            String sizeKey = "";
+            String colorKey = "";
+            JSONArray options = product.getJSONArray("options");
+            for(int o =0,oLen=options.size();o<oLen;o++) {
+                JSONObject option = options.getJSONObject(o);
+                String name = option.getString("name");
+
+                if(name.equalsIgnoreCase("size")) {
+                    sizeKey = "option"+option.getString("position");
+                }else if(name.equalsIgnoreCase("Color")) {
+                    colorKey = "option"+option.getString("position");
+                }
+            }
+
             // mapping sku
             JSONArray skus = product.getJSONArray("variants");
             for(int i = 0,len=skus.size();i<len;i++){
                 JSONObject sku = skus.getJSONObject(i);
-                String size = sku.getString("option1");
+                String size = sku.getString(sizeKey);
                 String sku_code = sku.getString("barcode");
                 String stock = sku.getString("inventory_quantity");
                 String boutique_sku_id = sku.getString("id");
 
                 String weight = sku.getString("grams");
-                String color_description = sku.getString("option2");
+                String color_description = sku.getString(colorKey);
                 String BrandID = sku.getString("sku");
                 String price = sku.getString("price");
                 String compare_at_price = sku.getString("compare_at_price");
