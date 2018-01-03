@@ -156,6 +156,8 @@ public class Vendor {
     public String edd_title;
     //@Column public String vendor_code;
 
+    @Column public Boolean cover_image_flag;
+
     public String getVendor_code() {
         return vendor_code;
     }
@@ -444,6 +446,14 @@ public class Vendor {
 
     public void setAddress_country_id(Long address_country_id) {
         this.address_country_id = address_country_id;
+    }
+
+    public Boolean getCover_image_flag() {
+        return cover_image_flag;
+    }
+
+    public void setCover_image_flag(Boolean cover_image_flag) {
+        this.cover_image_flag = cover_image_flag;
     }
 }
 

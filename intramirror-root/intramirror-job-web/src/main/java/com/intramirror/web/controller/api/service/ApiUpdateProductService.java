@@ -1,6 +1,7 @@
 package com.intramirror.web.controller.api.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson15.JSONArray;
 import com.google.gson.Gson;
 import static com.intramirror.web.controller.api.service.ApiCommonUtils.escape;
 import com.intramirror.web.mapping.vo.StockOption;
@@ -22,6 +23,7 @@ import pk.shoplus.model.Product;
 import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.model.ProductInfo;
 import pk.shoplus.model.ProductProperty;
+import pk.shoplus.model.Vendor;
 import pk.shoplus.parameter.EnabledType;
 import pk.shoplus.parameter.StatusType;
 import pk.shoplus.service.CategoryProductInfoService;
@@ -29,6 +31,7 @@ import pk.shoplus.service.CategoryService;
 import pk.shoplus.service.ProductInfoService;
 import pk.shoplus.service.ProductPropertyService;
 import pk.shoplus.service.ProductService;
+import pk.shoplus.service.VendorService;
 import pk.shoplus.service.price.api.IPriceService;
 import pk.shoplus.service.price.impl.PriceServiceImpl;
 import pk.shoplus.util.DateUtils;
@@ -204,6 +207,30 @@ public class ApiUpdateProductService {
                 String downImgs = ApiCommonUtils.downloadImgs(cover_img);
                 product.cover_img = downImgs;
                 product.description_img = downImgs;
+            }
+        } else {
+            VendorService vendorService = new VendorService(conn);
+            Vendor vendor = vendorService.getVendorByVendorId(product.getVendor_id());
+
+            if(vendor.getCover_image_flag() && !noImg) {
+                try {
+                    String apiImg = productOptions.getCoverImg();
+                    String coverImg = product.getCover_img();
+                    List<String> apiImgList = JSONArray.parseArray(apiImg, String.class);
+                    List<String> coverImgList = JSONArray.parseArray(coverImg, String.class);
+
+                    if(coverImgList.size() <= 3 && apiImgList.size() > coverImgList.size()) {
+                        String downImgs = ApiCommonUtils.downloadImgs(apiImg);
+                        if(downImgs.length() > 5) {
+                            product.cover_img = downImgs;
+                            product.description_img = downImgs;
+                            logger.info("ApiUpdateProductService,setProduct,updateImg,coverImg:"+coverImg+",downImgs:"+downImgs+",product:"+JSONObject.toJSONString(product));
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    logger.info("ApiUpdateProductService,setProduct,Error:"+e);
+                }
             }
         }
 
