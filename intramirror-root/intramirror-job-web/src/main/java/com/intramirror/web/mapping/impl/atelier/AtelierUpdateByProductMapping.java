@@ -2,8 +2,10 @@ package com.intramirror.web.mapping.impl.atelier;
 
 import com.alibaba.fastjson15.JSONArray;
 import com.alibaba.fastjson15.JSONObject;
+import com.google.gson.Gson;
 import com.intramirror.web.mapping.api.IProductMapping;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -63,6 +65,24 @@ public class AtelierUpdateByProductMapping implements IProductMapping{
                 sku.setStock(item.getString("stock"));
                 productOptions.getSkus().add(sku);
             }
+
+            try {
+                String vendor_id = bodyDataMap.get("vendor_id").toString();
+
+                if(vendor_id.equals("26")) {
+                    List<String> originList = JSONArray.parseArray(productOptions.getCoverImg(), String.class);
+                    String one = originList.get(0);
+                    originList.remove(0);
+                    originList.add(one);
+                    productOptions.setCoverImg(new Gson().toJson(originList));
+                    productOptions.setDescImg(new Gson().toJson(originList));
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.info("AtelierUpdateByProductService,imagesReplace,errorMessage:"+e);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("AtelierUpdateByProductMapping,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
@@ -70,4 +90,6 @@ public class AtelierUpdateByProductMapping implements IProductMapping{
         logger.info("AtelierUpdateByProductMapping,outputParams,productOptions:"+JSONObject.toJSONString(productOptions));
         return productOptions;
     }
+
+
 }

@@ -292,6 +292,12 @@ public class ApiUpdateProductService {
         }
         this.updateProductProperty(conn,product.getProduct_id(), ProductPropertyEnumKeyName.CarryOver.getCode(),productOptions.getCarryOver());
 
+        /** 只发一次后面注释 */
+        if(product.getVendor_id().intValue() == 24 && StringUtils.isNotBlank(productOptions.getCategoryId())) {
+            product.category_id = Long.parseLong(productOptions.getCategoryId());
+        }
+        /** 只发一次后面注释 */
+
         productService.updateProduct(product);
         logger.info("ApiUpdateProductService,setProduct,end,updateProduct,product:"+JSONObject.toJSONString(product));
     }

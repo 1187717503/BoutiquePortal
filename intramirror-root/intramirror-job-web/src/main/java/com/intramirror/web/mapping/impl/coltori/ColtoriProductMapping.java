@@ -61,6 +61,9 @@ public class ColtoriProductMapping implements IProductMapping {
             String category_l2 = productObj.getString("group_id");
             String category_l3 = productObj.getString("subgroup_id");
             String category_id = productObj.getString("category_id");
+            productOptions.setCategory1(category_l1);
+            productOptions.setCategory2(category_l2);
+            productOptions.setCategory3(category_l3);
 
             if(StringUtils.isBlank(category_l1) || "null".equals(category_l1)) {
                 productObj.put("family_id","");
@@ -74,6 +77,8 @@ public class ColtoriProductMapping implements IProductMapping {
 
             if(StringUtils.isBlank(category_id) || "null".equals(category_id)) {
                 productObj.put("category_id","");
+            } else {
+                productOptions.setCategory3(category_id);
             }
 
             /*Map<String, Object> categoryMap = new HashMap<String, Object>();
@@ -82,9 +87,7 @@ public class ColtoriProductMapping implements IProductMapping {
             categoryMap.put("boutique_second_category", category_l2);
             categoryMap.put("boutique_third_category", category_l3);
             productOptions.setCategory_name(com.alibaba.fastjson15.JSONObject.toJSONString(categoryMap));*/
-            productOptions.setCategory1(category_l1);
-            productOptions.setCategory2(category_l2);
-            productOptions.setCategory3(category_l3);
+
             /*logger.info("ColtoriProductMapping,getCategoryByCondition,categoryMap:"+ com.alibaba.fastjson15.JSONObject.toJSONString(categoryMap));
             List<Map<String, Object>> apiCategoryMap = categoryService.getCategoryByCondition(categoryMap);
             logger.info("ColtoriProductMapping,getCategoryByCondition,apiCategoryMap:"+ com.alibaba.fastjson15.JSONObject.toJSONString(apiCategoryMap)+",categoryMap:"+ com.alibaba.fastjson15.JSONObject
