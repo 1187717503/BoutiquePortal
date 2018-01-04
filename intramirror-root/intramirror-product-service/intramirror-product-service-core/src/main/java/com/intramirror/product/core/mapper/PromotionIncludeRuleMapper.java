@@ -1,5 +1,6 @@
 package com.intramirror.product.core.mapper;
 
+import com.intramirror.product.api.model.PromotionIncludeRule;
 import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.annotations.Param;
@@ -15,6 +16,8 @@ public interface PromotionIncludeRuleMapper {
     List<Map<String, Object>> listExcludeRulePromotion(@Param(value = "bannerId") String bannerId);
 
     List<Map<String, Object>> listIncluedRulePromotion(@Param(value = "bannerId") String bannerId);
+
+    Long insertIncludeRule(PromotionIncludeRule rule);
 
 }
 

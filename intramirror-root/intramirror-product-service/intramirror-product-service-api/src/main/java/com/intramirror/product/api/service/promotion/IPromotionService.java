@@ -1,5 +1,6 @@
 package com.intramirror.product.api.service.promotion;
 
+import com.intramirror.product.api.model.PromotionIncludeRule;
 import java.util.List;
 import java.util.Map;
 
@@ -10,8 +11,10 @@ import java.util.Map;
 public interface IPromotionService {
     List<Map<String, Object>> listActivePromotion();
 
-    List<Map<String,Object>> listExcludeRulePromotion(String bannerId);
+    List<Map<String, Object>> listExcludeRulePromotion(String bannerId);
 
-    List<Map<String,Object>> listIncluedRulePromotion(String bannerId);
+    List<Map<String, Object>> listIncluedRulePromotion(String bannerId);
+
+    Long savePromotionIncludeRule(PromotionIncludeRule rule);
 
 }

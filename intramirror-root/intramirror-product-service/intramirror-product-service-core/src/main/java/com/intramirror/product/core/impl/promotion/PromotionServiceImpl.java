@@ -1,5 +1,6 @@
 package com.intramirror.product.core.impl.promotion;
 
+import com.intramirror.product.api.model.PromotionIncludeRule;
 import com.intramirror.product.api.service.promotion.IPromotionService;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.impl.brand.BrandServiceImpl;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,9 +17,11 @@ import org.springframework.stereotype.Service;
  * @author 123
  */
 @Service(value = "promotionService")
-public class PromotionServiceImpl  extends BaseDao implements IPromotionService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BrandServiceImpl.class);
 
+public class PromotionServiceImpl extends BaseDao implements IPromotionService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PromotionServiceImpl.class);
+
+    @Autowired
     private PromotionIncludeRuleMapper promotionIncludeRuleMapper;
 
     @Override
@@ -26,6 +30,7 @@ public class PromotionServiceImpl  extends BaseDao implements IPromotionService 
     }
 
     @Override
+
     public List<Map<String, Object>> listExcludeRulePromotion(String bannerId) {
         return promotionIncludeRuleMapper.listExcludeRulePromotion(bannerId);
     }
@@ -38,6 +43,12 @@ public class PromotionServiceImpl  extends BaseDao implements IPromotionService 
     @Override
     public void init() {
         promotionIncludeRuleMapper = this.getSqlSession().getMapper(PromotionIncludeRuleMapper.class);
+    }
+
+    public Long savePromotionIncludeRule(PromotionIncludeRule rule) {
+        LOGGER.info("Start to save promotion include rule.");
+        promotionIncludeRuleMapper.insertIncludeRule(rule);
+        return rule.getPromotionIncludeRuleId();
 
     }
 }

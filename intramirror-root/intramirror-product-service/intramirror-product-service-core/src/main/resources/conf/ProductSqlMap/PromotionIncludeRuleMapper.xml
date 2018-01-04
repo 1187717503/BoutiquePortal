@@ -15,7 +15,8 @@
         select * from t_promotion WHERE enabled=TRUE
     </select>
 
-    <select id="listExcludeRulePromotion" resultType="java.util.Map" >
+
+    <select id="listExcludeRulePromotion" resultType="java.util.Map">
         select tpir.`promotion_include_rule_id`, tpir.`promotion_id` , case tpir.`vendor_id`  when -1 then 'All boutiques' else v.`vendor_name`  end as vendor_name,tpir.`season_code` ,tpir.`brands` ,tpir.`categorys`
         from `t_promotion`  tp
         inner join `t_promotion_exclude_rule`  tpir on(tp.`promotion_id` = tpir.`promotion_id` and tp.`enabled`  = 1)
@@ -23,12 +24,50 @@
         where tp.`banner_id`  = #{bannerId,jdbcType=VARCHAR}
     </select>
 
-    <select id="listIncluedRulePromotion" resultType="java.util.Map" >
+    <select id="listIncluedRulePromotion" resultType="java.util.Map">
         select tpir.`promotion_include_rule_id`, tpir.`promotion_id` , case tpir.`vendor_id`  when -1 then 'All boutiques' else v.`vendor_name`  end as vendor_name,tpir.`season_code` ,tpir.`brands` ,tpir.`categorys`
         from `t_promotion`  tp
         inner join `t_promotion_include_rule`  tpir on(tp.`promotion_id` = tpir.`promotion_id` and tp.`enabled`  = 1)
         left join `vendor` v on(v.`vendor_id` = tpir.`vendor_id`  and v.`enabled`  = 1)
         where tp.`banner_id`  = #{bannerId,jdbcType=VARCHAR}
     </select>
+
+
+    <insert id="insertIncludeRule" keyProperty="promotionIncludeRuleId" useGeneratedKeys="true"
+            parameterType="com.intramirror.product.api.model.PromotionIncludeRule">
+        INSERT INTO t_promotion_include_rule
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            `promotion_id`,
+            <if test="seasonCode != null">
+                `season_code`,
+            </if>
+            <if test="vendorId != null">
+                `vendor_id`,
+            </if>
+            <if test="categorys != null">
+                `categorys`,
+            </if>
+            <if test="brands != null">
+                `brands`,
+            </if>
+            `created_at`
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            #{promotionId, jdbcType=BIGINT},
+            <if test="seasonCode != null">
+                #{seasonCode,jdbcType=BIGINT},
+            </if>
+            <if test="vendorId != null">
+                #{vendorId,jdbcType=BIGINT},
+            </if>
+            <if test="categorys != null">
+                #{categorys,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="brands != null">
+                #{brands,jdbcType=LONGVARCHAR},
+            </if>
+            NOW()
+        </trim>
+    </insert>
 
 </mapper>
