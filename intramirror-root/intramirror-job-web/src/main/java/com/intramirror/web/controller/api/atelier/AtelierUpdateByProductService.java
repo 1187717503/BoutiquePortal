@@ -164,12 +164,12 @@ public class AtelierUpdateByProductService implements InitializingBean {
         XIW2E.put("executor",executor_10);
         paramsMap.put("XIW2E",XIW2E);
 
-        /*Map<String,Object> UIWK2 = new HashMap<>();
+        Map<String,Object> UIWK2 = new HashMap<>();
         UIWK2.put("store_code","UIWK2");
         UIWK2.put("vendor_id","11");
         UIWK2.put("vendor_name","I Cinque Fiori");
         UIWK2.put("eventName","iCinque");
-        paramsMap.put("UIWK2",UIWK2);*/
+        paramsMap.put("UIWK2",UIWK2);
 
         Map<String,Object> ERS4S = new HashMap<>();
         ERS4S.put("store_code","ERS4S");
