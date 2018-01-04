@@ -48,12 +48,13 @@ public class CategoryServiceImpl extends BaseDao implements ICategoryService {
             Long parentId = Long.parseLong(map.get("parent_id").toString());
             String name = map.get("name").toString();
             Long categoryId = Long.parseLong(map.get("category_id").toString());
-            int level = Integer.parseInt(map.get("level").toString());
 
             if (bl_parentId.equals(parentId)) {
                 Category category = new Category();
                 category.setName(name);
                 category.setCategoryId(categoryId);
+                category.setLevel(Byte.parseByte(map.get("level").toString()));
+                category.setParentId(parentId);
 
                 //				mapList.remove(i);
                 category.setChildren(this.convertMapToCategory(mapList, new ArrayList<Category>(), categoryId));
