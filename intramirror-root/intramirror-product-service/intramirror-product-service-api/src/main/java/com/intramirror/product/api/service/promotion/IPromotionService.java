@@ -9,4 +9,9 @@ import java.util.Map;
  */
 public interface IPromotionService {
     List<Map<String, Object>> listActivePromotion();
+
+    List<Map<String,Object>> listExcludeRulePromotion(String bannerId);
+
+    List<Map<String,Object>> listIncluedRulePromotion(String bannerId);
+
 }

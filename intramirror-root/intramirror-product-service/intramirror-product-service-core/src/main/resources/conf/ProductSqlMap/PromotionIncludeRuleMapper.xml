@@ -6,12 +6,29 @@
         <result column="promotion_id" jdbcType="BIGINT" property="promotionId"/>
         <result column="season_code" jdbcType="VARCHAR" property="seasonCode"/>
         <result column="vendor_id" jdbcType="BIGINT" property="vendorId"/>
-        <result column="brands" jdbcType="TEXT" property="brands"/>
-        <result column="categorys" jdbcType="TEXT" property="categorys"/>
+        <result column="brands" jdbcType="LONGVARCHAR" property="brands"/>
+        <result column="categorys" jdbcType="LONGVARCHAR" property="categorys"/>
         <result column="created_at" jdbcType="TIMESTAMP" property="createdAt"/>
     </resultMap>
 
     <select id="listActivePromotion" resultType="java.util.Map">
         select * from t_promotion WHERE enabled=TRUE
     </select>
+
+    <select id="listExcludeRulePromotion" resultType="java.util.Map" >
+        select tpir.`promotion_include_rule_id`, tpir.`promotion_id` , case tpir.`vendor_id`  when -1 then 'All boutiques' else v.`vendor_name`  end as vendor_name,tpir.`season_code` ,tpir.`brands` ,tpir.`categorys`
+        from `t_promotion`  tp
+        inner join `t_promotion_exclude_rule`  tpir on(tp.`promotion_id` = tpir.`promotion_id` and tp.`enabled`  = 1)
+        left join `vendor` v on(v.`vendor_id` = tpir.`vendor_id`  and v.`enabled`  = 1)
+        where tp.`banner_id`  = #{bannerId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="listIncluedRulePromotion" resultType="java.util.Map" >
+        select tpir.`promotion_include_rule_id`, tpir.`promotion_id` , case tpir.`vendor_id`  when -1 then 'All boutiques' else v.`vendor_name`  end as vendor_name,tpir.`season_code` ,tpir.`brands` ,tpir.`categorys`
+        from `t_promotion`  tp
+        inner join `t_promotion_include_rule`  tpir on(tp.`promotion_id` = tpir.`promotion_id` and tp.`enabled`  = 1)
+        left join `vendor` v on(v.`vendor_id` = tpir.`vendor_id`  and v.`enabled`  = 1)
+        where tp.`banner_id`  = #{bannerId,jdbcType=VARCHAR}
+    </select>
+
 </mapper>
