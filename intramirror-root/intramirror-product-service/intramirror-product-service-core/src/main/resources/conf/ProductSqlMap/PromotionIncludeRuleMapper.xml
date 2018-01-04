@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.intramirror.product.core.mapper.PromotionIncludeRuleMapper">
+    <resultMap id="BaseResultMap" type="com.intramirror.product.api.model.PromotionIncludeRule">
+        <id column="promotion_include_rule_id" jdbcType="BIGINT" property="promotionIncludeRuleId"/>
+        <result column="promotion_id" jdbcType="BIGINT" property="promotionId"/>
+        <result column="season_code" jdbcType="VARCHAR" property="seasonCode"/>
+        <result column="vendor_id" jdbcType="BIGINT" property="vendorId"/>
+        <result column="brands" jdbcType="TEXT" property="brands"/>
+        <result column="categorys" jdbcType="TEXT" property="categorys"/>
+        <result column="created_at" jdbcType="TIMESTAMP" property="createdAt"/>
+    </resultMap>
+
+    <select id="listActivePromotion" resultType="java.util.Map">
+        select * from t_promotion WHERE enabled=TRUE
+    </select>
+</mapper>
