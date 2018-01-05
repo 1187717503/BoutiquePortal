@@ -1,4 +1,4 @@
-package com.intramirror.web.common.request;
+package com.intramirror.product.api.entity.promotion;
 
 /**
  * Created on 2018/1/4.

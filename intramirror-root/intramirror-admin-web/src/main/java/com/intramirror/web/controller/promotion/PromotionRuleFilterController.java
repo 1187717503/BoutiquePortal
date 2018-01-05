@@ -5,7 +5,8 @@ import com.alibaba.fastjson15.JSONObject;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.core.common.response.Response;
 import com.intramirror.product.api.service.promotion.IPromotionService;
-import java.util.ArrayList;
+import static com.intramirror.web.common.request.ConstantsEntity.EXCLUDE;
+import static com.intramirror.web.common.request.ConstantsEntity.INCLUDE;
 import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.annotations.Param;
@@ -22,42 +23,45 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/promotion")
 public class PromotionRuleFilterController {
 
-    private static final String include ="include";
-    private static final String exclude ="exclude";
-
     @Autowired
     IPromotionService promotionService;
 
     /**
-     * @param promotionType include,exclude
+     * @param ruleType
+     *         must be include or exclude
+     * @param promotionId
+     *         promotion id
+     * @return promotion rules
      */
-    @RequestMapping(value = "/{promotionType}/list",method = RequestMethod.GET)
-    public Response listPromotionRule(@PathVariable("promotionType") String promotionType,@Param("bannerId") String bannerId){
-        List<Map<String,Object>> data = new ArrayList<>();
-        if(promotionType.equals(include)) {
-            data = promotionService.listIncluedRulePromotion(bannerId);
-        } else if(promotionType.equals(exclude)) {
-            data = promotionService.listExcludeRulePromotion(bannerId);
+    @RequestMapping(value = "/{ruleType}/list", method = RequestMethod.GET)
+    public Response listPromotionRule(@PathVariable("ruleType") String ruleType, @Param("promotionId") String promotionId) {
+        List<Map<String, Object>> data;
+        if (INCLUDE.equals(ruleType)) {
+            data = promotionService.listIncludeRulePromotion(promotionId);
+        } else if (EXCLUDE.equals(ruleType)) {
+            data = promotionService.listExcludeRulePromotion(promotionId);
+        } else {
+            return Response.status(StatusType.FAILURE).data(null);
         }
         return Response.status(StatusType.SUCCESS).data(transFormation(data));
     }
 
-    public List<Map<String,Object>> transFormation(List<Map<String,Object>> data){
-        for (Map<String,Object> rule : data) {
+    private List<Map<String, Object>> transFormation(List<Map<String, Object>> data) {
+        for (Map<String, Object> rule : data) {
             String categorys = rule.get("categorys") == null ? "[]" : rule.get("categorys").toString();
             String brands = rule.get("brands") == null ? "[]" : rule.get("brands").toString();
 
             JSONArray arrCategorys = JSONArray.parseArray(categorys);
             JSONArray arrBrands = JSONArray.parseArray(brands);
 
-            rule.put("categorys",arrCategorys);
-            rule.put("brands",arrBrands);
+            rule.put("categorys", arrCategorys);
+            rule.put("brands", arrBrands);
 
-            for(int i=0,len=arrBrands.size();i<len;i++) {
+            for (int i = 0, len = arrBrands.size(); i < len; i++) {
                 JSONObject brand = arrBrands.getJSONObject(i);
                 String name = brand.getString("english_name");
                 brand.remove("english_name");
-                brand.put("name",name);
+                brand.put("name", name);
             }
         }
         return data;

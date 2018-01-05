@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.intramirror.product.core.mapper.PromotionRuleMapper">
+
+    <resultMap id="BaseResultMap" type="com.intramirror.product.api.model.PromotionIncludeRule">
+        <id column="promotion_include_rule_id" jdbcType="BIGINT" property="promotionIncludeRuleId"/>
+        <result column="promotion_id" jdbcType="BIGINT" property="promotionId"/>
+        <result column="season_code" jdbcType="VARCHAR" property="seasonCode"/>
+        <result column="vendor_id" jdbcType="BIGINT" property="vendorId"/>
+        <result column="brands" jdbcType="LONGVARCHAR" property="brands"/>
+        <result column="categorys" jdbcType="LONGVARCHAR" property="categorys"/>
+        <result column="created_at" jdbcType="TIMESTAMP" property="createdAt"/>
+    </resultMap>
+
+    <select id="listActivePromotion" resultType="java.util.Map">
+        SELECT * FROM t_promotion WHERE enabled=TRUE
+    </select>
+
+
+    <select id="listExcludeRulePromotion" parameterType="java.lang.String" resultType="java.util.Map">
+        SELECT tpir.`promotion_exclude_rule_id`,
+          tpir.`promotion_id` ,tpir.`vendor_id`,
+          CASE tpir.`vendor_id` WHEN -1 THEN 'ALL Boutiques' ELSE v.`vendor_name` END AS vendor_name,
+          tpir.`season_code`,
+          tpir.`brands`,
+          tpir.`categorys`
+        FROM `t_promotion_exclude_rule` tpir
+        LEFT JOIN `vendor` v ON (v.`vendor_id` = tpir.`vendor_id` AND v.`enabled` = 1)
+        WHERE tpir.`promotion_id` = ${promotionId}
+    </select>
+
+    <select id="listIncluedRulePromotion" parameterType="java.lang.String" resultType="java.util.Map">
+        SELECT tpir.`promotion_include_rule_id`,
+          tpir.`promotion_id`,
+          tpir.`vendor_id`,
+          CASE tpir.`vendor_id` WHEN -1 THEN 'ALL Boutiques' ELSE v.`vendor_name` END AS vendor_name,
+          tpir.`season_code`,
+          tpir.`brands`,
+          tpir.`categorys`
+        FROM `t_promotion_include_rule` tpir
+        LEFT JOIN `vendor` v ON (v.`vendor_id` = tpir.`vendor_id` AND v.`enabled` = 1)
+        WHERE tpir.`promotion_id` = ${promotionId}
+    </select>
+
+    <insert id="insertIncludeRule" keyProperty="promotionIncludeRuleId" useGeneratedKeys="true"
+            parameterType="com.intramirror.product.api.model.PromotionRule">
+        INSERT INTO t_promotion_include_rule
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            `promotion_id`,
+            <if test="seasonCode != null">
+                `season_code`,
+            </if>
+            <if test="vendorId != null">
+                `vendor_id`,
+            </if>
+            <if test="categorys != null">
+                `categorys`,
+            </if>
+            <if test="brands != null">
+                `brands`,
+            </if>
+            `created_at`
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            #{promotionId, jdbcType=BIGINT},
+            <if test="seasonCode != null">
+                #{seasonCode,jdbcType=BIGINT},
+            </if>
+            <if test="vendorId != null">
+                #{vendorId,jdbcType=BIGINT},
+            </if>
+            <if test="categorys != null">
+                #{categorys,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="brands != null">
+                #{brands,jdbcType=LONGVARCHAR},
+            </if>
+            NOW()
+        </trim>
+    </insert>
+
+    <insert id="insertExcludeRule" keyProperty="promotionExcludeRuleId" useGeneratedKeys="true"
+            parameterType="com.intramirror.product.api.model.PromotionRule">
+        INSERT INTO t_promotion_exclude_rule
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            `promotion_id`,
+            <if test="seasonCode != null">
+                `season_code`,
+            </if>
+            <if test="vendorId != null">
+                `vendor_id`,
+            </if>
+            <if test="categorys != null">
+                `categorys`,
+            </if>
+            <if test="brands != null">
+                `brands`,
+            </if>
+            `created_at`
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            #{promotionId, jdbcType=BIGINT},
+            <if test="seasonCode != null">
+                #{seasonCode,jdbcType=BIGINT},
+            </if>
+            <if test="vendorId != null">
+                #{vendorId,jdbcType=BIGINT},
+            </if>
+            <if test="categorys != null">
+                #{categorys,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="brands != null">
+                #{brands,jdbcType=LONGVARCHAR},
+            </if>
+            NOW()
+        </trim>
+    </insert>
+
+    <insert id="insertIncludeRuleDetail" keyProperty="promotionIncludeId" useGeneratedKeys="true"
+            parameterType="com.intramirror.product.api.model.PromotionInclude">
+        INSERT INTO t_promotion_include
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            `promotion_include_rule_id`,
+            `promotion_id`,
+            <if test="seasonCode != null">
+                `season_code`,
+            </if>
+            <if test="vendorId != null">
+                `vendor_id`,
+            </if>
+            <if test="categoryId != null">
+                `category_id`,
+            </if>
+            <if test="brandId != null">
+                `brand_id`,
+            </if>
+            `created_at`,`updated_at`
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            #{promotionIncludeRuleId, jdbcType=BIGINT},
+            #{promotionId, jdbcType=BIGINT},
+            <if test="seasonCode != null">
+                #{seasonCode,jdbcType=BIGINT},
+            </if>
+            <if test="vendorId != null">
+                #{vendorId,jdbcType=BIGINT},
+            </if>
+            <if test="categoryId != null">
+                #{categoryId,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="brandId != null">
+                #{brandId,jdbcType=LONGVARCHAR},
+            </if>
+            NOW(), NOW()
+        </trim>
+    </insert>
+
+    <insert id="insertExcludeRuleDetail" keyProperty="promotionExcludeId" useGeneratedKeys="true"
+            parameterType="com.intramirror.product.api.model.PromotionExclude">
+        INSERT INTO t_promotion_exclude
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            `promotion_exclude_rule_id`,
+            `promotion_id`,
+            <if test="seasonCode != null">
+                `season_code`,
+            </if>
+            <if test="vendorId != null">
+                `vendor_id`,
+            </if>
+            <if test="categoryId != null">
+                `category_id`,
+            </if>
+            <if test="brandId != null">
+                `brand_id`,
+            </if>
+            `created_at`,`updated_at`
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            #{promotionExcludeRuleId, jdbcType=BIGINT},
+            #{promotionId, jdbcType=BIGINT},
+            <if test="seasonCode != null">
+                #{seasonCode,jdbcType=BIGINT},
+            </if>
+            <if test="vendorId != null">
+                #{vendorId,jdbcType=BIGINT},
+            </if>
+            <if test="categoryId != null">
+                #{categoryId,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="brandId != null">
+                #{brandId,jdbcType=LONGVARCHAR},
+            </if>
+            NOW(), NOW()
+        </trim>
+    </insert>
+
+</mapper>

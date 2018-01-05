@@ -1,14 +1,13 @@
 package com.intramirror.web.controller.promotion;
 
-import com.alibaba.fastjson15.JSONObject;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.core.common.response.Response;
-import com.intramirror.product.api.model.PromotionInclude;
+import com.intramirror.product.api.enums.PromotionRuleType;
+import com.intramirror.product.api.model.PromotionExcludeRule;
 import com.intramirror.product.api.model.PromotionIncludeRule;
+import com.intramirror.product.api.model.PromotionRule;
+import com.intramirror.product.api.model.PromotionRuleDetail;
 import com.intramirror.product.api.service.promotion.IPromotionService;
-import com.intramirror.web.common.request.BrandEntity;
-import com.intramirror.web.common.request.CategoryEntity;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -36,34 +35,27 @@ public class PromotionManagementController {
     public Response savePromotionProductRule(@PathVariable(value = "ruleType") String ruleType, @RequestBody Map<String, Object> body) {
         LOGGER.info("Save rule with type {}.", ruleType);
 
-        PromotionIncludeRule promotionIncludeRule = new PromotionIncludeRule();
-        promotionIncludeRule.setBrands((String) body.get("brands"));
-        promotionIncludeRule.setCategorys((String) body.get("categorys"));
-        promotionIncludeRule.setPromotionId(Long.parseLong(body.get("promotion_id").toString()));
-        promotionIncludeRule.setVendorId(Long.parseLong(body.get("vendor_id").toString()));
-        promotionIncludeRule.setSeasonCode((String) body.get("season_code"));
+        PromotionRule promotionRule = null;
+        PromotionRuleType type;
+        if ("include".equals(ruleType)) {
+            promotionRule = new PromotionIncludeRule();
+            type = PromotionRuleType.INCLUDE_RULE;
 
-        List<BrandEntity> listBrand = JSONObject.parseArray(promotionIncludeRule.getBrands(), BrandEntity.class);
-        List<CategoryEntity> listCategory = JSONObject.parseArray(promotionIncludeRule.getCategorys(), CategoryEntity.class);
-
-        Long promotionIncludeRuleId = promotionService.savePromotionIncludeRule(promotionIncludeRule);
-
-        List<PromotionInclude> listPromotionInclude = new ArrayList<>();
-        for (BrandEntity brand : listBrand) {
-            for (CategoryEntity category : listCategory) {
-                PromotionInclude promotionInclude = new PromotionInclude();
-                promotionInclude.setBrandId(Long.parseLong(brand.getBrand_id()));
-                promotionInclude.setCategoryId(Long.parseLong(category.getCategory_id()));
-                promotionInclude.setPromotionId(promotionIncludeRule.getPromotionId());
-                promotionInclude.setPromotionIncludeRuleId(promotionIncludeRuleId);
-                promotionInclude.setSeasonCode(promotionIncludeRule.getSeasonCode());
-                promotionInclude.setVendorId(promotionIncludeRule.getVendorId());
-                promotionService.savePromotionInclude(promotionInclude);
-
-                listPromotionInclude.add(promotionInclude);
-            }
+        } else if ("exclude".equals(ruleType)) {
+            promotionRule = new PromotionExcludeRule();
+            type = PromotionRuleType.EXCLUDE_RULE;
+        } else {
+            return Response.status(StatusType.PARAM_NOT_POSITIVE).build();
         }
-        return Response.status(StatusType.SUCCESS).data(listPromotionInclude);
+
+        promotionRule.setBrands((String) body.get("brands"));
+        promotionRule.setCategorys((String) body.get("categorys"));
+        promotionRule.setPromotionId(Long.parseLong(body.get("promotion_id").toString()));
+        promotionRule.setVendorId(Long.parseLong(body.get("vendor_id").toString()));
+        promotionRule.setSeasonCode((String) body.get("season_code"));
+
+        List<PromotionRuleDetail> listRuleDetail = promotionService.processPromotionRule(promotionRule, type);
+        return Response.status(StatusType.SUCCESS).data(listRuleDetail);
 
     }
 }
