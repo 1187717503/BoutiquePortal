@@ -1,5 +1,6 @@
 package com.intramirror.product.core.mapper;
 
+import com.intramirror.product.api.model.PromotionInclude;
 import com.intramirror.product.api.model.PromotionIncludeRule;
 import java.util.List;
 import java.util.Map;
@@ -19,5 +20,6 @@ public interface PromotionIncludeRuleMapper {
 
     Long insertIncludeRule(PromotionIncludeRule rule);
 
+    Long insertIncludeProduct(PromotionInclude promotionInclude);
 }
 

@@ -70,4 +70,43 @@
         </trim>
     </insert>
 
+    <insert id="insertIncludeProduct" keyProperty="promotionIncludeId" useGeneratedKeys="true"
+            parameterType="com.intramirror.product.api.model.PromotionInclude">
+        INSERT INTO t_promotion_include
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            `promotion_include_rule_id`,
+            `promotion_id`,
+            <if test="seasonCode != null">
+                `season_code`,
+            </if>
+            <if test="vendorId != null">
+                `vendor_id`,
+            </if>
+            <if test="categoryId != null">
+                `category_id`,
+            </if>
+            <if test="brandId != null">
+                `brand_id`,
+            </if>
+            `created_at`,`updated_at`
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            #{promotionIncludeRuleId, jdbcType=BIGINT},
+            #{promotionId, jdbcType=BIGINT},
+            <if test="seasonCode != null">
+                #{seasonCode,jdbcType=BIGINT},
+            </if>
+            <if test="vendorId != null">
+                #{vendorId,jdbcType=BIGINT},
+            </if>
+            <if test="categoryId != null">
+                #{categoryId,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="brandId != null">
+                #{brandId,jdbcType=LONGVARCHAR},
+            </if>
+            NOW(), NOW()
+        </trim>
+    </insert>
+
 </mapper>

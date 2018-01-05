@@ -10,7 +10,8 @@ public class PromotionInclude {
     private Long promotionIncludeId;
     private Long promotionIncludeRuleId;
     private Long promotionId;
-    private String season_code;
+    private String seasonCode;
+
     private Long vendorId;
     private Long categoryId;
     private Long brandId;
@@ -37,16 +38,16 @@ public class PromotionInclude {
         return promotionId;
     }
 
+    public String getSeasonCode() {
+        return seasonCode;
+    }
+
+    public void setSeasonCode(String seasonCode) {
+        this.seasonCode = seasonCode;
+    }
+
     public void setPromotionId(Long promotionId) {
         this.promotionId = promotionId;
-    }
-
-    public String getSeason_code() {
-        return season_code;
-    }
-
-    public void setSeason_code(String season_code) {
-        this.season_code = season_code;
     }
 
     public Long getVendorId() {

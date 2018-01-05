@@ -1,5 +1,6 @@
 package com.intramirror.product.core.impl.promotion;
 
+import com.intramirror.product.api.model.PromotionInclude;
 import com.intramirror.product.api.model.PromotionIncludeRule;
 import com.intramirror.product.api.service.promotion.IPromotionService;
 import com.intramirror.product.core.dao.BaseDao;
@@ -47,5 +48,12 @@ public class PromotionServiceImpl extends BaseDao implements IPromotionService {
         promotionIncludeRuleMapper.insertIncludeRule(rule);
         return rule.getPromotionIncludeRuleId();
 
+    }
+
+    @Override
+    public Long savePromotionInclude(PromotionInclude promotionIncludeProduct) {
+        LOGGER.info("Start to save promotion include rule.");
+        promotionIncludeRuleMapper.insertIncludeProduct(promotionIncludeProduct);
+        return promotionIncludeProduct.getPromotionIncludeId();
     }
 }
