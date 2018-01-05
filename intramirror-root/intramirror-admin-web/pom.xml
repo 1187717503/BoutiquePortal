@@ -21,9 +21,7 @@
             <properties>
                 <profiles.active>test</profiles.active>
             </properties>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
+
         </profile>
         <profile>
             <id>staging</id>
@@ -48,6 +46,9 @@
             <properties>
                 <profiles.active>staging_local</profiles.active>
             </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
         </profile>
         <profile>
             <id>prd</id>
