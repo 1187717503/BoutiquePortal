@@ -1,6 +1,7 @@
 package com.intramirror.web.controller.promotion;
 
 import com.alibaba.fastjson15.JSONArray;
+import com.alibaba.fastjson15.JSONObject;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.core.common.response.Response;
 import com.intramirror.product.api.service.promotion.IPromotionService;
@@ -46,8 +47,18 @@ public class PromotionRuleFilterController {
             String categorys = rule.get("categorys") == null ? "[]" : rule.get("categorys").toString();
             String brands = rule.get("brands") == null ? "[]" : rule.get("brands").toString();
 
-            rule.put("categorys",JSONArray.parseArray(categorys));
-            rule.put("brands",JSONArray.parseArray(brands));
+            JSONArray arrCategorys = JSONArray.parseArray(categorys);
+            JSONArray arrBrands = JSONArray.parseArray(brands);
+
+            rule.put("categorys",arrCategorys);
+            rule.put("brands",arrBrands);
+
+            for(int i=0,len=arrBrands.size();i<len;i++) {
+                JSONObject brand = arrBrands.getJSONObject(i);
+                String name = brand.getString("english_name");
+                brand.remove("english_name");
+                brand.put("name",name);
+            }
         }
         return data;
     }
