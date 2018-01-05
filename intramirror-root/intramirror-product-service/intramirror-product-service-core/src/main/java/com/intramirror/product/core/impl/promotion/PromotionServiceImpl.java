@@ -33,8 +33,8 @@ public class PromotionServiceImpl implements IPromotionService {
     private PromotionRuleMapper promotionRuleMapper;
 
     @Override
-    public List<Map<String, Object>> listActivePromotion() {
-        return promotionRuleMapper.listActivePromotion();
+    public List<Map<String, Object>> listPromotionByBanner(Long bannerId) {
+        return promotionRuleMapper.listPromotionByBanner(bannerId);
     }
 
     @Override

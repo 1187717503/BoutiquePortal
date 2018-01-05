@@ -11,7 +11,7 @@ import java.util.Map;
  * @author 123
  */
 public interface IPromotionService {
-    List<Map<String, Object>> listActivePromotion();
+    List<Map<String, Object>> listPromotionByBanner(Long banner);
 
     List<Map<String, Object>> listExcludeRulePromotion(Long promotionId);
 

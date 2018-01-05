@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public interface PromotionRuleMapper {
 
-    List<Map<String, Object>> listActivePromotion();
+    List<Map<String, Object>> listPromotionByBanner(Long banner);
 
     List<Map<String, Object>> listExcludeRulePromotion(Long promotionId);
 

@@ -12,8 +12,8 @@
         <result column="created_at" jdbcType="TIMESTAMP" property="createdAt"/>
     </resultMap>
 
-    <select id="listActivePromotion" resultType="java.util.Map">
-        SELECT * FROM t_promotion WHERE enabled=TRUE
+    <select id="listPromotionByBanner" parameterType="Long" resultType="java.util.Map">
+        SELECT * FROM t_promotion WHERE enabled=TRUE AND banner_id = #{bannerId}
     </select>
 
 

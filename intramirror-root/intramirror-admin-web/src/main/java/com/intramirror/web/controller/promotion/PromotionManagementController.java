@@ -15,14 +15,16 @@ import static com.intramirror.web.common.request.ConstantsEntity.INCLUDE;
 import com.intramirror.web.common.request.PromotionRuleEntity;
 import com.intramirror.web.controller.cache.CategoryCache;
 import java.util.List;
+import java.util.Map;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -30,7 +32,6 @@ import org.springframework.web.bind.annotation.RestController;
  * @author 123
  */
 @RestController
-@RequestMapping("/promotion")
 public class PromotionManagementController {
     private static final Logger LOGGER = LoggerFactory.getLogger(PromotionManagementController.class);
 
@@ -40,7 +41,13 @@ public class PromotionManagementController {
     @Autowired
     CategoryCache categoryCache;
 
-    @PutMapping(value = "/{ruleType}", consumes = "application/json")
+    @GetMapping(value = "/banner/promotion")
+    public Response getAllPromotion(@Param(value = "bannerId") Long bannerId) {
+        List<Map<String, Object>> result = promotionService.listPromotionByBanner(bannerId);
+        return Response.status(StatusType.SUCCESS).data(result);
+    }
+
+    @PutMapping(value = "/promotion/{ruleType}", consumes = "application/json")
     public Response savePromotionProductRule(@PathVariable(value = "ruleType") String ruleType, @RequestBody PromotionRuleEntity body) {
         LOGGER.info("Save rule with type {}, {}.", ruleType, body);
 
@@ -76,7 +83,7 @@ public class PromotionManagementController {
 
     }
 
-    @DeleteMapping(value = "/{ruleType}/{ruleId}", consumes = "application/json")
+    @DeleteMapping(value = "/promotion/{ruleType}/{ruleId}", consumes = "application/json")
     public Response removePromotionRule(@PathVariable(value = "ruleType") String ruleType, @PathVariable("ruleId") Long ruleId) {
         LOGGER.info("Start to remove rule with type {} and ruleId {}.", ruleType, ruleId);
 
