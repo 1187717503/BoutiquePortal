@@ -6,7 +6,7 @@ package com.intramirror.product.api.entity.promotion;
  */
 public class BrandEntity {
     private String brand_id;
-    private String english_name;
+    private String name;
 
     public String getBrand_id() {
         return brand_id;
@@ -16,11 +16,11 @@ public class BrandEntity {
         this.brand_id = brand_id;
     }
 
-    public String getEnglish_name() {
-        return english_name;
+    public String getName() {
+        return name;
     }
 
-    public void setEnglish_name(String english_name) {
-        this.english_name = english_name;
+    public void setName(String name) {
+        this.name = name;
     }
 }

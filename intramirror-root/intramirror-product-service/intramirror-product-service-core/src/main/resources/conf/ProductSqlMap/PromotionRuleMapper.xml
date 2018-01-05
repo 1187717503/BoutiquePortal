@@ -17,7 +17,7 @@
     </select>
 
 
-    <select id="listExcludeRulePromotion" parameterType="java.lang.String" resultType="java.util.Map">
+    <select id="listExcludeRulePromotion" parameterType="String" resultType="java.util.Map">
         SELECT tpir.`promotion_exclude_rule_id`,
           tpir.`promotion_id` ,tpir.`vendor_id`,
           CASE tpir.`vendor_id` WHEN -1 THEN 'ALL Boutiques' ELSE v.`vendor_name` END AS vendor_name,
@@ -26,10 +26,10 @@
           tpir.`categorys`
         FROM `t_promotion_exclude_rule` tpir
         LEFT JOIN `vendor` v ON (v.`vendor_id` = tpir.`vendor_id` AND v.`enabled` = 1)
-        WHERE tpir.`promotion_id` = ${promotionId}
+        WHERE tpir.`promotion_id` = #{promotionId}
     </select>
 
-    <select id="listIncluedRulePromotion" parameterType="java.lang.String" resultType="java.util.Map">
+    <select id="listIncluedRulePromotion" parameterType="String" resultType="java.util.Map">
         SELECT tpir.`promotion_include_rule_id`,
           tpir.`promotion_id`,
           tpir.`vendor_id`,
@@ -39,7 +39,7 @@
           tpir.`categorys`
         FROM `t_promotion_include_rule` tpir
         LEFT JOIN `vendor` v ON (v.`vendor_id` = tpir.`vendor_id` AND v.`enabled` = 1)
-        WHERE tpir.`promotion_id` = ${promotionId}
+        WHERE tpir.`promotion_id` = #{promotionId}
     </select>
 
     <insert id="insertIncludeRule" keyProperty="promotionIncludeRuleId" useGeneratedKeys="true"
@@ -193,5 +193,21 @@
             NOW(), NOW()
         </trim>
     </insert>
+
+    <delete id="removeIncludeRule" parameterType="Long">
+        DELETE FROM t_promotion_include_rule WHERE promotion_include_rule_id = #{ruleId}
+    </delete>
+
+    <delete id="removeExcludeRule" parameterType="Long">
+        DELETE FROM t_promotion_exclude_rule WHERE promotion_exclude_rule_id = #{ruleId}
+    </delete>
+
+    <delete id="removeIncludeRuleDetail" parameterType="Long">
+        DELETE FROM t_promotion_include WHERE promotion_include_rule_id = #{ruleId}
+    </delete>
+
+    <delete id="removeExcludeRuleDetail" parameterType="Long">
+        DELETE FROM t_promotion_exclude WHERE promotion_exclude_rule_id = #{ruleId}
+    </delete>
 
 </mapper>

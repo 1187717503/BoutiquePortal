@@ -58,6 +58,19 @@ public class PromotionServiceImpl implements IPromotionService {
         return insertRuleDetailByRule(rule, ruleType);
     }
 
+    @Override
+    public Boolean removePromotionRule(Long ruleId, PromotionRuleType ruleType) {
+        if (ruleType == PromotionRuleType.INCLUDE_RULE) {
+            promotionRuleMapper.removeIncludeRule(ruleId);
+            promotionRuleMapper.removeIncludeRuleDetail(ruleId);
+        } else {
+            promotionRuleMapper.removeExcludeRule(ruleId);
+            promotionRuleMapper.removeExcludeRuleDetail(ruleId);
+        }
+
+        return true;
+    }
+
     private List<PromotionRuleDetail> insertRuleDetailByRule(PromotionRule rule, PromotionRuleType ruleType) {
         List<BrandEntity> listBrand = JSONObject.parseArray(rule.getBrands(), BrandEntity.class);
         List<CategoryEntity> listCategory = JSONObject.parseArray(rule.getCategorys(), CategoryEntity.class);

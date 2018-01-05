@@ -18,4 +18,6 @@ public interface IPromotionService {
     List<Map<String, Object>> listIncludeRulePromotion(String promotionId);
 
     List<PromotionRuleDetail> processPromotionRule(PromotionRule rule, PromotionRuleType ruleType);
+
+    Boolean removePromotionRule(Long ruleId, PromotionRuleType ruleType);
 }
