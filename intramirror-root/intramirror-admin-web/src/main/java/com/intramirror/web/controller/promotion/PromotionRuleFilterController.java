@@ -1,5 +1,6 @@
 package com.intramirror.web.controller.promotion;
 
+import com.alibaba.fastjson15.JSONArray;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.core.common.response.Response;
 import com.intramirror.product.api.service.promotion.IPromotionService;
@@ -37,7 +38,18 @@ public class PromotionRuleFilterController {
         } else if(promotionType.equals(exclude)) {
             data = promotionService.listExcludeRulePromotion(bannerId);
         }
-        return Response.status(StatusType.SUCCESS).data(data);
+        return Response.status(StatusType.SUCCESS).data(transFormation(data));
+    }
+
+    public List<Map<String,Object>> transFormation(List<Map<String,Object>> data){
+        for (Map<String,Object> rule : data) {
+            String categorys = rule.get("categorys") == null ? "[]" : rule.get("categorys").toString();
+            String brands = rule.get("brands") == null ? "[]" : rule.get("brands").toString();
+
+            rule.put("categorys",JSONArray.parseArray(categorys));
+            rule.put("brands",JSONArray.parseArray(brands));
+        }
+        return data;
     }
 
 }
