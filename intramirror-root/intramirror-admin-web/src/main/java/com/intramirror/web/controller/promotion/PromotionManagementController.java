@@ -1,7 +1,9 @@
 package com.intramirror.web.controller.promotion;
 
+import com.alibaba.fastjson.JSONArray;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.core.common.response.Response;
+import com.intramirror.product.api.entity.promotion.CategoryEntity;
 import com.intramirror.product.api.enums.PromotionRuleType;
 import com.intramirror.product.api.model.ProductWithBLOBs;
 import com.intramirror.product.api.model.PromotionExcludeProduct;
@@ -12,11 +14,14 @@ import com.intramirror.product.api.model.PromotionRuleDetail;
 import com.intramirror.product.api.service.IProductService;
 import com.intramirror.product.api.service.promotion.IPromotionExcludeProductService;
 import com.intramirror.product.api.service.promotion.IPromotionService;
-import com.intramirror.utils.transform.JsonTransformUtil;
+import static com.intramirror.utils.transform.JsonTransformUtil.toJson;
 import static com.intramirror.web.common.request.ConstantsEntity.EXCLUDE;
 import static com.intramirror.web.common.request.ConstantsEntity.INCLUDE;
+import com.intramirror.web.common.request.PromotionRuleEntity;
+import com.intramirror.web.controller.cache.CategoryCache;
 import java.util.List;
 import java.util.Map;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +30,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,7 +38,6 @@ import org.springframework.web.bind.annotation.RestController;
  * @author 123
  */
 @RestController
-@RequestMapping("/promotion")
 public class PromotionManagementController {
     private static final Logger LOGGER = LoggerFactory.getLogger(PromotionManagementController.class);
 
@@ -42,14 +45,23 @@ public class PromotionManagementController {
     IPromotionService promotionService;
 
     @Autowired
+    CategoryCache categoryCache;
+
+    @Autowired
     IPromotionExcludeProductService promotionExcludeProductService;
 
     @Autowired
     IProductService productService;
 
-    @PutMapping(value = "/{ruleType}", consumes = "application/json")
-    public Response savePromotionProductRule(@PathVariable(value = "ruleType") String ruleType, @RequestBody Map<String, Object> body) {
-        LOGGER.info("Save rule with type {}.", ruleType);
+    @GetMapping(value = "/banner/promotion")
+    public Response getAllPromotion(@Param(value = "bannerId") Long bannerId) {
+        List<Map<String, Object>> result = promotionService.listPromotionByBanner(bannerId);
+        return Response.status(StatusType.SUCCESS).data(result);
+    }
+
+    @PutMapping(value = "/promotion/{ruleType}", consumes = "application/json")
+    public Response savePromotionProductRule(@PathVariable(value = "ruleType") String ruleType, @RequestBody PromotionRuleEntity body) {
+        LOGGER.info("Save rule with type {}, {}.", ruleType, body);
 
         PromotionRule promotionRule;
         PromotionRuleType type;
@@ -64,19 +76,27 @@ public class PromotionManagementController {
             return Response.status(StatusType.PARAM_NOT_POSITIVE).build();
         }
 
-        promotionRule.setBrands((String) body.get("brands"));
-        promotionRule.setCategorys((String) body.get("categorys"));
-        promotionRule.setPromotionId(Long.parseLong(body.get("promotionId").toString()));
-        promotionRule.setVendorId(Long.parseLong(body.get("vendorId").toString()));
-        promotionRule.setSeasonCode((String) body.get("seasonCode"));
+        promotionRule.setBrands(JSONArray.toJSONString(body.getBrands()));
+        promotionRule.setPromotionId(body.getPromotionId());
+        promotionRule.setVendorId(body.getVendorId());
+        promotionRule.setSeasonCode(body.getSeasonCode());
+
+        for (CategoryEntity category : body.getCategorys()) {
+            if (category.getCategoryId() == -1L) {
+                category.setName("All Category");
+            } else {
+                category.setName(categoryCache.getAbsolutelyCategoryPath(category.getCategoryId()));
+            }
+        }
+        promotionRule.setCategorys(JSONArray.toJSONString(body.getCategorys()));
 
         List<PromotionRuleDetail> listRuleDetail = promotionService.processPromotionRule(promotionRule, type);
         return Response.status(StatusType.SUCCESS).data(listRuleDetail);
 
     }
 
-    @DeleteMapping(value = "/{ruleType}/{ruleId}", consumes = "application/json")
-    public Response removePromotionRule(@PathVariable(value = "ruleType") String ruleType, @PathVariable("ruleId") String ruleId) {
+    @DeleteMapping(value = "/promotion/{ruleType}/{ruleId}", consumes = "application/json")
+    public Response removePromotionRule(@PathVariable(value = "ruleType") String ruleType, @PathVariable("ruleId") Long ruleId) {
         LOGGER.info("Start to remove rule with type {} and ruleId {}.", ruleType, ruleId);
 
         PromotionRuleType type;
@@ -88,13 +108,13 @@ public class PromotionManagementController {
             return Response.status(StatusType.PARAM_NOT_POSITIVE).build();
         }
 
-        Boolean result = promotionService.removePromotionRule(Long.parseLong(ruleId), type);
+        Boolean result = promotionService.removePromotionRule(ruleId, type);
         return Response.status(StatusType.SUCCESS).data(result);
     }
 
     @PutMapping(value = "/exclude/product/save", consumes = "application/json")
     public Response savePromotionExcludeProduct(@RequestBody PromotionExcludeProduct promotionExcludeProduct){
-        LOGGER.info("savePromotionExcludeProduct by promotionExcludeProduct : {}", JsonTransformUtil.toJson(promotionExcludeProduct));
+        LOGGER.info("savePromotionExcludeProduct by promotionExcludeProduct : {}", toJson(promotionExcludeProduct));
 
         ProductWithBLOBs productWithBLOBs = productService.selectByPrimaryKey(promotionExcludeProduct.getProductId());
         if(productWithBLOBs == null || !productWithBLOBs.getEnabled()) {
@@ -128,5 +148,4 @@ public class PromotionManagementController {
 
         return Response.status(StatusType.SUCCESS).data(promotionExcludeProducts);
     }
-
 }
