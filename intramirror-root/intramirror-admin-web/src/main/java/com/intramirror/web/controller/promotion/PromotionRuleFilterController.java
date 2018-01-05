@@ -33,7 +33,7 @@ public class PromotionRuleFilterController {
      *         promotion id
      * @return promotion rules
      */
-    @RequestMapping(value = "/{ruleType}/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/{ruleType}", method = RequestMethod.GET)
     public Response listPromotionRule(@PathVariable("ruleType") String ruleType, @Param("promotionId") String promotionId) {
         List<Map<String, Object>> data;
         if (INCLUDE.equals(ruleType)) {

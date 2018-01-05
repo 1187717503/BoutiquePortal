@@ -5,15 +5,15 @@ package com.intramirror.product.api.entity.promotion;
  * @author 123
  */
 public class BrandEntity {
-    private String brand_id;
+    private String brandId;
     private String name;
 
-    public String getBrand_id() {
-        return brand_id;
+    public String getBrandId() {
+        return brandId;
     }
 
-    public void setBrand_id(String brand_id) {
-        this.brand_id = brand_id;
+    public void setBrandId(String brandId) {
+        this.brandId = brandId;
     }
 
     public String getName() {

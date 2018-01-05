@@ -1,7 +1,9 @@
 package com.intramirror.web.controller.promotion;
 
+import com.alibaba.fastjson.JSONArray;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.core.common.response.Response;
+import com.intramirror.product.api.entity.promotion.CategoryEntity;
 import com.intramirror.product.api.enums.PromotionRuleType;
 import com.intramirror.product.api.model.PromotionExcludeRule;
 import com.intramirror.product.api.model.PromotionIncludeRule;
@@ -10,8 +12,9 @@ import com.intramirror.product.api.model.PromotionRuleDetail;
 import com.intramirror.product.api.service.promotion.IPromotionService;
 import static com.intramirror.web.common.request.ConstantsEntity.EXCLUDE;
 import static com.intramirror.web.common.request.ConstantsEntity.INCLUDE;
+import com.intramirror.web.common.request.PromotionRuleEntity;
+import com.intramirror.web.controller.cache.CategoryCache;
 import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +37,11 @@ public class PromotionManagementController {
     @Autowired
     IPromotionService promotionService;
 
+    @Autowired
+    CategoryCache categoryCache;
+
     @PutMapping(value = "/{ruleType}", consumes = "application/json")
-    public Response savePromotionProductRule(@PathVariable(value = "ruleType") String ruleType, @RequestBody Map<String, Object> body) {
+    public Response savePromotionProductRule(@PathVariable(value = "ruleType") String ruleType, @RequestBody PromotionRuleEntity body) {
         LOGGER.info("Save rule with type {}.", ruleType);
 
         PromotionRule promotionRule;
@@ -51,11 +57,15 @@ public class PromotionManagementController {
             return Response.status(StatusType.PARAM_NOT_POSITIVE).build();
         }
 
-        promotionRule.setBrands((String) body.get("brands"));
-        promotionRule.setCategorys((String) body.get("categorys"));
-        promotionRule.setPromotionId(Long.parseLong(body.get("promotionId").toString()));
-        promotionRule.setVendorId(Long.parseLong(body.get("vendorId").toString()));
-        promotionRule.setSeasonCode((String) body.get("seasonCode"));
+        promotionRule.setBrands(JSONArray.toJSONString(body.getBrands()));
+        promotionRule.setPromotionId(body.getPromotionId());
+        promotionRule.setVendorId(body.getVendorId());
+        promotionRule.setSeasonCode(body.getSeasonCode());
+
+        for (CategoryEntity category : body.getCategorys()) {
+            category.setName(categoryCache.getAbsolutelyCategoryPath(Long.parseLong(category.getCategoryId())));
+        }
+        promotionRule.setCategorys(JSONArray.toJSONString(body.getCategorys()));
 
         List<PromotionRuleDetail> listRuleDetail = promotionService.processPromotionRule(promotionRule, type);
         return Response.status(StatusType.SUCCESS).data(listRuleDetail);
