@@ -3,13 +3,11 @@ package com.intramirror.product.core.impl.promotion;
 import com.intramirror.product.api.model.PromotionIncludeRule;
 import com.intramirror.product.api.service.promotion.IPromotionService;
 import com.intramirror.product.core.dao.BaseDao;
-import com.intramirror.product.core.impl.brand.BrandServiceImpl;
 import com.intramirror.product.core.mapper.PromotionIncludeRuleMapper;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -21,7 +19,6 @@ import org.springframework.stereotype.Service;
 public class PromotionServiceImpl extends BaseDao implements IPromotionService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PromotionServiceImpl.class);
 
-    @Autowired
     private PromotionIncludeRuleMapper promotionIncludeRuleMapper;
 
     @Override
