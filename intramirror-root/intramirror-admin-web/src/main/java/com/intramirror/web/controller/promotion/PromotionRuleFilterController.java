@@ -1,7 +1,6 @@
 package com.intramirror.web.controller.promotion;
 
 import com.alibaba.fastjson15.JSONArray;
-import com.alibaba.fastjson15.JSONObject;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.core.common.response.Response;
 import com.intramirror.product.api.service.promotion.IPromotionService;
@@ -33,8 +32,8 @@ public class PromotionRuleFilterController {
      *         promotion id
      * @return promotion rules
      */
-    @RequestMapping(value = "/{ruleType}/list", method = RequestMethod.GET)
-    public Response listPromotionRule(@PathVariable("ruleType") String ruleType, @Param("promotionId") String promotionId) {
+    @RequestMapping(value = "/{ruleType}", method = RequestMethod.GET)
+    public Response listPromotionRule(@PathVariable("ruleType") String ruleType, @Param("promotionId") Long promotionId) {
         List<Map<String, Object>> data;
         if (INCLUDE.equals(ruleType)) {
             data = promotionService.listIncludeRulePromotion(promotionId);
@@ -56,13 +55,6 @@ public class PromotionRuleFilterController {
 
             rule.put("categorys", arrCategorys);
             rule.put("brands", arrBrands);
-
-            for (int i = 0, len = arrBrands.size(); i < len; i++) {
-                JSONObject brand = arrBrands.getJSONObject(i);
-                String name = brand.getString("english_name");
-                brand.remove("english_name");
-                brand.put("name", name);
-            }
         }
         return data;
     }

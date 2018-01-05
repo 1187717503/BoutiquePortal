@@ -12,16 +12,17 @@
         <result column="created_at" jdbcType="TIMESTAMP" property="createdAt"/>
     </resultMap>
 
-    <select id="listActivePromotion" resultType="java.util.Map">
-        SELECT * FROM t_promotion WHERE enabled=TRUE
+    <select id="listPromotionByBanner" parameterType="Long" resultType="java.util.Map">
+        SELECT * FROM t_promotion WHERE enabled=TRUE AND banner_id = #{bannerId}
     </select>
 
 
-    <select id="listExcludeRulePromotion" parameterType="String" resultType="java.util.Map">
-        SELECT tpir.`promotion_exclude_rule_id`,
-          tpir.`promotion_id` ,tpir.`vendor_id`,
-          CASE tpir.`vendor_id` WHEN -1 THEN 'ALL Boutiques' ELSE v.`vendor_name` END AS vendor_name,
-          tpir.`season_code`,
+    <select id="listExcludeRulePromotion" parameterType="Long" resultType="java.util.Map">
+        SELECT tpir.`promotion_exclude_rule_id` AS promotionExcludeRuleId,
+          tpir.`promotion_id` AS promotionId,
+          tpir.`vendor_id` AS vendorId,
+          CASE tpir.`vendor_id` WHEN -1 THEN 'ALL Boutiques' ELSE v.`vendor_name` END AS vendorName,
+          tpir.`season_code` AS seasonCode,
           tpir.`brands`,
           tpir.`categorys`
         FROM `t_promotion_exclude_rule` tpir
@@ -29,12 +30,12 @@
         WHERE tpir.`promotion_id` = #{promotionId}
     </select>
 
-    <select id="listIncluedRulePromotion" parameterType="String" resultType="java.util.Map">
-        SELECT tpir.`promotion_include_rule_id`,
-          tpir.`promotion_id`,
-          tpir.`vendor_id`,
-          CASE tpir.`vendor_id` WHEN -1 THEN 'ALL Boutiques' ELSE v.`vendor_name` END AS vendor_name,
-          tpir.`season_code`,
+    <select id="listIncluedRulePromotion" parameterType="Long" resultType="java.util.Map">
+        SELECT tpir.`promotion_include_rule_id` AS promotionIncludeRuleId,
+          tpir.`promotion_id` AS promotionId,
+          tpir.`vendor_id` AS vendorId,
+          CASE tpir.`vendor_id` WHEN -1 THEN 'ALL Boutiques' ELSE v.`vendor_name` END AS vendorName,
+          tpir.`season_code` AS seasonCode,
           tpir.`brands`,
           tpir.`categorys`
         FROM `t_promotion_include_rule` tpir
