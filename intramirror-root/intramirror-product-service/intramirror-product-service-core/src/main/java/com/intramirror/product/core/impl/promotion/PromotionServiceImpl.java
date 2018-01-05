@@ -38,12 +38,12 @@ public class PromotionServiceImpl implements IPromotionService {
     }
 
     @Override
-    public List<Map<String, Object>> listExcludeRulePromotion(String promotionId) {
+    public List<Map<String, Object>> listExcludeRulePromotion(Long promotionId) {
         return promotionRuleMapper.listExcludeRulePromotion(promotionId);
     }
 
     @Override
-    public List<Map<String, Object>> listIncludeRulePromotion(String promotionId) {
+    public List<Map<String, Object>> listIncludeRulePromotion(Long promotionId) {
         return promotionRuleMapper.listIncluedRulePromotion(promotionId);
     }
 
@@ -81,8 +81,8 @@ public class PromotionServiceImpl implements IPromotionService {
 
                 if (ruleType == PromotionRuleType.INCLUDE_RULE) {
                     PromotionInclude ruleDetail = new PromotionInclude();
-                    ruleDetail.setBrandId(Long.parseLong(brand.getBrandId()));
-                    ruleDetail.setCategoryId(Long.parseLong(category.getCategoryId()));
+                    ruleDetail.setBrandId(brand.getBrandId());
+                    ruleDetail.setCategoryId(category.getCategoryId());
                     ruleDetail.setPromotionId(rule.getPromotionId());
                     ruleDetail.setPromotionIncludeRuleId(((PromotionIncludeRule) rule).getPromotionIncludeRuleId());
                     ruleDetail.setSeasonCode(rule.getSeasonCode());
@@ -91,8 +91,8 @@ public class PromotionServiceImpl implements IPromotionService {
                     listPromotionRuleDetail.add(ruleDetail);
                 } else {
                     PromotionExclude ruleDetail = new PromotionExclude();
-                    ruleDetail.setBrandId(Long.parseLong(brand.getBrandId()));
-                    ruleDetail.setCategoryId(Long.parseLong(category.getCategoryId()));
+                    ruleDetail.setBrandId(brand.getBrandId());
+                    ruleDetail.setCategoryId(category.getCategoryId());
                     ruleDetail.setPromotionId(rule.getPromotionId());
                     ruleDetail.setPromotionExcludeRuleId(((PromotionExcludeRule) rule).getPromotionExcludeRuleId());
                     ruleDetail.setSeasonCode(rule.getSeasonCode());

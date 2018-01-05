@@ -13,9 +13,9 @@ import java.util.Map;
 public interface IPromotionService {
     List<Map<String, Object>> listActivePromotion();
 
-    List<Map<String, Object>> listExcludeRulePromotion(String promotionId);
+    List<Map<String, Object>> listExcludeRulePromotion(Long promotionId);
 
-    List<Map<String, Object>> listIncludeRulePromotion(String promotionId);
+    List<Map<String, Object>> listIncludeRulePromotion(Long promotionId);
 
     List<PromotionRuleDetail> processPromotionRule(PromotionRule rule, PromotionRuleType ruleType);
 

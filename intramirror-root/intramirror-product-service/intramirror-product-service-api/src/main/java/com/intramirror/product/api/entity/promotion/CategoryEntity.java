@@ -5,14 +5,14 @@ package com.intramirror.product.api.entity.promotion;
  * @author 123
  */
 public class CategoryEntity {
-    private String categoryId;
+    private Long categoryId;
     private String name;
 
-    public String getCategoryId() {
+    public Long getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(String categoryId) {
+    public void setCategoryId(Long categoryId) {
         this.categoryId = categoryId;
     }
 

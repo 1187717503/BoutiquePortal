@@ -54,4 +54,10 @@ public class PromotionRuleEntity {
     public void setSeasonCode(String seasonCode) {
         this.seasonCode = seasonCode;
     }
+
+    @Override
+    public String toString() {
+        return "PromotionRuleEntity{" + "brands=" + brands + ", categorys=" + categorys + ", promotionId=" + promotionId + ", vendorId=" + vendorId
+                + ", seasonCode='" + seasonCode + '\'' + '}';
+    }
 }

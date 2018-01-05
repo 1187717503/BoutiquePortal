@@ -42,7 +42,7 @@ public class PromotionManagementController {
 
     @PutMapping(value = "/{ruleType}", consumes = "application/json")
     public Response savePromotionProductRule(@PathVariable(value = "ruleType") String ruleType, @RequestBody PromotionRuleEntity body) {
-        LOGGER.info("Save rule with type {}.", ruleType);
+        LOGGER.info("Save rule with type {}, {}.", ruleType, body);
 
         PromotionRule promotionRule;
         PromotionRuleType type;
@@ -63,7 +63,11 @@ public class PromotionManagementController {
         promotionRule.setSeasonCode(body.getSeasonCode());
 
         for (CategoryEntity category : body.getCategorys()) {
-            category.setName(categoryCache.getAbsolutelyCategoryPath(Long.parseLong(category.getCategoryId())));
+            if (category.getCategoryId() == -1L) {
+                category.setName("All Category");
+            } else {
+                category.setName(categoryCache.getAbsolutelyCategoryPath(category.getCategoryId()));
+            }
         }
         promotionRule.setCategorys(JSONArray.toJSONString(body.getCategorys()));
 
@@ -73,7 +77,7 @@ public class PromotionManagementController {
     }
 
     @DeleteMapping(value = "/{ruleType}/{ruleId}", consumes = "application/json")
-    public Response removePromotionRule(@PathVariable(value = "ruleType") String ruleType, @PathVariable("ruleId") String ruleId) {
+    public Response removePromotionRule(@PathVariable(value = "ruleType") String ruleType, @PathVariable("ruleId") Long ruleId) {
         LOGGER.info("Start to remove rule with type {} and ruleId {}.", ruleType, ruleId);
 
         PromotionRuleType type;
@@ -85,7 +89,7 @@ public class PromotionManagementController {
             return Response.status(StatusType.PARAM_NOT_POSITIVE).build();
         }
 
-        Boolean result = promotionService.removePromotionRule(Long.parseLong(ruleId), type);
+        Boolean result = promotionService.removePromotionRule(ruleId, type);
         return Response.status(StatusType.SUCCESS).data(result);
     }
 }
