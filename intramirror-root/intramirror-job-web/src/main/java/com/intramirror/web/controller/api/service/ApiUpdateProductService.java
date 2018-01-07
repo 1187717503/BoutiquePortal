@@ -289,23 +289,21 @@ public class ApiUpdateProductService {
         String oldBrandCode = product.getDesigner_id();
         String oldColorCode = product.getColor_code();
 
-        if(StringUtils.isBlank(oldBrandCode)) {
+        /*if(StringUtils.isBlank(oldBrandCode)) {
             product.designer_id = newBrandCode;
         }
 
         if(StringUtils.isBlank(oldColorCode)) {
             product.color_code = newColorCode;
-        }
+        }*/
 
         // 如果消息重置时,BrandID和ColorCode不为空,直接更新
         if(modify) {
             if(StringUtils.isNotBlank(newBrandCode)) {
-                this.updateProductProperty(conn,product.getProduct_id(), ProductPropertyEnumKeyName.BrandID.getCode(),newBrandCode);
                 product.designer_id = newBrandCode;
             }
 
             if(StringUtils.isNotBlank(newColorCode)) {
-                this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.ColorCode.getCode(),newColorCode);
                 product.color_code = newColorCode;
             }
         } else { // 非消息重置时,BrandID和ColorCode和原来不一致或者为空报警告
@@ -313,10 +311,15 @@ public class ApiUpdateProductService {
                 this.setWarning(ApiErrorTypeEnum.errorType.error_BrandID_change,"BrandID",newBrandCode);
             }
 
-            if(StringUtils.isBlank(newColorCode) || !newColorCode.equalsIgnoreCase(oldColorCode)) {
+            if(oldColorCode.equals("#") && StringUtils.isNotBlank(newColorCode)) {
+                product.color_code = newColorCode;
+            } else if(StringUtils.isBlank(newColorCode) || !newColorCode.equalsIgnoreCase(oldColorCode)) {
                 this.setWarning(ApiErrorTypeEnum.errorType.error_ColorCode_change,"ColorCode",newColorCode);
             }
         }
+
+        this.updateProductProperty(conn,product.getProduct_id(), ProductPropertyEnumKeyName.BrandID.getCode(),product.getDesigner_id());
+        this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.ColorCode.getCode(),product.getColor_code());
         this.updateProductProperty(conn,product.getProduct_id(), ProductPropertyEnumKeyName.CarryOver.getCode(),productOptions.getCarryOver());
 
         /** 只发一次后面注释 */
