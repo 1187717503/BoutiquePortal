@@ -26,13 +26,16 @@ public interface PromotionRuleMapper {
 
     Long insertExcludeRuleDetail(PromotionExclude promotionExclude);
 
-    Boolean removeIncludeRule(Long ruleId);
+    int removeIncludeRule(Long ruleId);
 
-    Boolean removeExcludeRule(Long ruleId);
+    int removeExcludeRule(Long ruleId);
 
-    Boolean removeIncludeRuleDetail(Long ruleId);
+    int removeIncludeRuleDetail(Long ruleId);
 
-    Boolean removeExcludeRuleDetail(Long ruleId);
+    int removeExcludeRuleDetail(Long ruleId);
 
+    int updateIncludeRule(PromotionRule rule);
+
+    int updateExcludeRule(PromotionRule rule);
 }
 

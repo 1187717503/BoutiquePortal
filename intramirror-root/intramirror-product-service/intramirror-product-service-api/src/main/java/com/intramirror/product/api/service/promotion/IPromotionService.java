@@ -2,7 +2,6 @@ package com.intramirror.product.api.service.promotion;
 
 import com.intramirror.product.api.enums.PromotionRuleType;
 import com.intramirror.product.api.model.PromotionRule;
-import com.intramirror.product.api.model.PromotionRuleDetail;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +16,9 @@ public interface IPromotionService {
 
     List<Map<String, Object>> listIncludeRulePromotion(Long promotionId);
 
-    List<PromotionRuleDetail> processPromotionRule(PromotionRule rule, PromotionRuleType ruleType);
+    PromotionRule processPromotionRule(PromotionRule rule, PromotionRuleType ruleType);
 
     Boolean removePromotionRule(Long ruleId, PromotionRuleType ruleType);
+
+    Boolean updatePromotionRule(PromotionRuleType ruleType, PromotionRule rule);
 }

@@ -14,6 +14,15 @@ public class PromotionRuleEntity {
     Long promotionId;
     Long vendorId;
     String seasonCode;
+    Long ruleId;
+
+    public Long getRuleId() {
+        return ruleId;
+    }
+
+    public void setRuleId(Long ruleId) {
+        this.ruleId = ruleId;
+    }
 
     public List<BrandEntity> getBrands() {
         return brands;
@@ -58,6 +67,6 @@ public class PromotionRuleEntity {
     @Override
     public String toString() {
         return "PromotionRuleEntity{" + "brands=" + brands + ", categorys=" + categorys + ", promotionId=" + promotionId + ", vendorId=" + vendorId
-                + ", seasonCode='" + seasonCode + '\'' + '}';
+                + ", seasonCode='" + seasonCode + '\'' + ", ruleId=" + ruleId + '}';
     }
 }

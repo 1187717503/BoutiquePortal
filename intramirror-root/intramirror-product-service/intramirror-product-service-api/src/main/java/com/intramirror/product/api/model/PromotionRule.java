@@ -7,12 +7,21 @@ import java.util.Date;
  * @author 123
  */
 public class PromotionRule {
+    private Long ruleId;
     private Long promotionId;
     private Long vendorId;
     private String seasonCode;
     private String brands;
     private String categorys;
     private Date createdAt;
+
+    public Long getRuleId() {
+        return ruleId;
+    }
+
+    public void setRuleId(Long ruleId) {
+        this.ruleId = ruleId;
+    }
 
     public Long getPromotionId() {
         return promotionId;

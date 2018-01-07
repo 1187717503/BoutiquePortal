@@ -2,15 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.intramirror.product.core.mapper.PromotionRuleMapper">
 
-    <resultMap id="BaseResultMap" type="com.intramirror.product.api.model.PromotionIncludeRule">
-        <id column="promotion_include_rule_id" jdbcType="BIGINT" property="promotionIncludeRuleId"/>
-        <result column="promotion_id" jdbcType="BIGINT" property="promotionId"/>
-        <result column="season_code" jdbcType="VARCHAR" property="seasonCode"/>
-        <result column="vendor_id" jdbcType="BIGINT" property="vendorId"/>
-        <result column="brands" jdbcType="LONGVARCHAR" property="brands"/>
-        <result column="categorys" jdbcType="LONGVARCHAR" property="categorys"/>
-        <result column="created_at" jdbcType="TIMESTAMP" property="createdAt"/>
-    </resultMap>
 
     <select id="listPromotionByBanner" parameterType="Long" resultType="java.util.Map">
         SELECT * FROM t_promotion WHERE enabled=TRUE AND banner_id = #{bannerId}
@@ -43,7 +34,7 @@
         WHERE tpir.`promotion_id` = #{promotionId}
     </select>
 
-    <insert id="insertIncludeRule" keyProperty="promotionIncludeRuleId" useGeneratedKeys="true"
+    <insert id="insertIncludeRule" keyProperty="ruleId" useGeneratedKeys="true"
             parameterType="com.intramirror.product.api.model.PromotionRule">
         INSERT INTO t_promotion_include_rule
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -80,7 +71,7 @@
         </trim>
     </insert>
 
-    <insert id="insertExcludeRule" keyProperty="promotionExcludeRuleId" useGeneratedKeys="true"
+    <insert id="insertExcludeRule" keyProperty="ruleId" useGeneratedKeys="true"
             parameterType="com.intramirror.product.api.model.PromotionRule">
         INSERT INTO t_promotion_exclude_rule
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -210,5 +201,69 @@
     <delete id="removeExcludeRuleDetail" parameterType="Long">
         DELETE FROM t_promotion_exclude WHERE promotion_exclude_rule_id = #{ruleId}
     </delete>
+
+    <update id="updateIncludeRule" parameterType="com.intramirror.product.api.model.PromotionInclude">
+        UPDATE t_promotion_include_rule SET
+        <trim prefix=" " suffixOverrides=",">
+            <choose>
+                <when test="seasonCode != null">
+                    `season_code` = #{seasonCode, jdbcType=VARCHAR},
+                </when>
+                <otherwise>
+                    `season_code` = '-1',
+                </otherwise>
+            </choose>
+
+            <choose>
+                <when test="vendorId != null">
+                    `vendor_id` = #{vendorId, jdbcType=BIGINT},
+                </when>
+                <otherwise>
+                    `vendor_id` = -1,
+                </otherwise>
+            </choose>
+
+            <if test="categorys != null">
+                `categorys` = #{categorys, jdbcType=LONGVARCHAR},
+            </if>
+            <if test="brands != null">
+                `brands` = #{brands, jdbcType=LONGVARCHAR},
+            </if>
+            `created_at` = NOW(),
+        </trim>
+        WHERE promotion_include_rule_id = #{ruleId, jdbcType=BIGINT}
+    </update>
+
+    <update id="updateExcludeRule" parameterType="com.intramirror.product.api.model.PromotionExclude">
+        UPDATE t_promotion_exclude_rule SET
+        <trim prefix=" " suffixOverrides=",">
+            <choose>
+                <when test="seasonCode != null">
+                    `season_code` = #{seasonCode, jdbcType=VARCHAR},
+                </when>
+                <otherwise>
+                    `season_code` = '-1',
+                </otherwise>
+            </choose>
+
+            <choose>
+                <when test="vendorId != null">
+                    `vendor_id` = #{vendorId, jdbcType=BIGINT},
+                </when>
+                <otherwise>
+                    `vendor_id` = -1,
+                </otherwise>
+            </choose>
+
+            <if test="categorys != null">
+                `categorys` = #{categorys, jdbcType=LONGVARCHAR},
+            </if>
+            <if test="brands != null">
+                `brands` = #{brands, jdbcType=LONGVARCHAR},
+            </if>
+            `created_at` = NOW(),
+        </trim>
+        WHERE promotion_exclude_rule_id = #{ruleId, jdbcType=BIGINT}
+    </update>
 
 </mapper>

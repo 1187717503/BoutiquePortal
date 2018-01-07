@@ -5,9 +5,7 @@ import com.intramirror.product.api.entity.promotion.BrandEntity;
 import com.intramirror.product.api.entity.promotion.CategoryEntity;
 import com.intramirror.product.api.enums.PromotionRuleType;
 import com.intramirror.product.api.model.PromotionExclude;
-import com.intramirror.product.api.model.PromotionExcludeRule;
 import com.intramirror.product.api.model.PromotionInclude;
-import com.intramirror.product.api.model.PromotionIncludeRule;
 import com.intramirror.product.api.model.PromotionRule;
 import com.intramirror.product.api.model.PromotionRuleDetail;
 import com.intramirror.product.api.service.promotion.IPromotionService;
@@ -19,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created on 2018/1/4.
@@ -47,28 +46,52 @@ public class PromotionServiceImpl implements IPromotionService {
         return promotionRuleMapper.listIncluedRulePromotion(promotionId);
     }
 
+    @Transactional
     @Override
-    public List<PromotionRuleDetail> processPromotionRule(PromotionRule rule, PromotionRuleType ruleType) {
+    public PromotionRule processPromotionRule(PromotionRule rule, PromotionRuleType ruleType) {
         LOGGER.info("Start to save promotion include rule.");
         if (ruleType == PromotionRuleType.INCLUDE_RULE) {
             promotionRuleMapper.insertIncludeRule(rule);
         } else {
             promotionRuleMapper.insertExcludeRule(rule);
         }
-        return insertRuleDetailByRule(rule, ruleType);
+        insertRuleDetailByRule(rule, ruleType);
+
+        return rule;
     }
 
+    @Transactional
     @Override
     public Boolean removePromotionRule(Long ruleId, PromotionRuleType ruleType) {
+        Boolean flag = false;
         if (ruleType == PromotionRuleType.INCLUDE_RULE) {
-            promotionRuleMapper.removeIncludeRule(ruleId);
-            promotionRuleMapper.removeIncludeRuleDetail(ruleId);
+            if (promotionRuleMapper.removeIncludeRule(ruleId) > 0) {
+                flag = promotionRuleMapper.removeIncludeRuleDetail(ruleId) > 0;
+            }
+
         } else {
-            promotionRuleMapper.removeExcludeRule(ruleId);
-            promotionRuleMapper.removeExcludeRuleDetail(ruleId);
+            if (promotionRuleMapper.removeExcludeRule(ruleId) > 0) {
+                flag = promotionRuleMapper.removeExcludeRuleDetail(ruleId) > 0;
+            }
         }
 
-        return true;
+        return flag;
+    }
+
+    @Transactional
+    @Override
+    public Boolean updatePromotionRule(PromotionRuleType ruleType, PromotionRule rule) {
+        Boolean flag;
+        if (ruleType == PromotionRuleType.INCLUDE_RULE) {
+            flag = promotionRuleMapper.removeIncludeRuleDetail(rule.getRuleId()) > 0;
+            flag = (flag & promotionRuleMapper.updateIncludeRule(rule) > 0);
+
+        } else {
+            flag = promotionRuleMapper.removeExcludeRuleDetail(rule.getRuleId()) > 0;
+            flag = (flag & promotionRuleMapper.updateExcludeRule(rule) > 0);
+        }
+        return flag & (insertRuleDetailByRule(rule, ruleType).size() > 0);
+
     }
 
     private List<PromotionRuleDetail> insertRuleDetailByRule(PromotionRule rule, PromotionRuleType ruleType) {
@@ -84,7 +107,7 @@ public class PromotionServiceImpl implements IPromotionService {
                     ruleDetail.setBrandId(brand.getBrandId());
                     ruleDetail.setCategoryId(category.getCategoryId());
                     ruleDetail.setPromotionId(rule.getPromotionId());
-                    ruleDetail.setPromotionIncludeRuleId(((PromotionIncludeRule) rule).getPromotionIncludeRuleId());
+                    ruleDetail.setPromotionIncludeRuleId(rule.getRuleId());
                     ruleDetail.setSeasonCode(rule.getSeasonCode());
                     ruleDetail.setVendorId(rule.getVendorId());
                     promotionRuleMapper.insertIncludeRuleDetail(ruleDetail);
@@ -94,7 +117,7 @@ public class PromotionServiceImpl implements IPromotionService {
                     ruleDetail.setBrandId(brand.getBrandId());
                     ruleDetail.setCategoryId(category.getCategoryId());
                     ruleDetail.setPromotionId(rule.getPromotionId());
-                    ruleDetail.setPromotionExcludeRuleId(((PromotionExcludeRule) rule).getPromotionExcludeRuleId());
+                    ruleDetail.setPromotionExcludeRuleId(rule.getRuleId());
                     ruleDetail.setSeasonCode(rule.getSeasonCode());
                     ruleDetail.setVendorId(rule.getVendorId());
                     promotionRuleMapper.insertExcludeRuleDetail(ruleDetail);
@@ -104,5 +127,4 @@ public class PromotionServiceImpl implements IPromotionService {
         }
         return listPromotionRuleDetail;
     }
-
 }
