@@ -80,7 +80,7 @@ public class PromotionManagementController {
 
     }
 
-    @DeleteMapping(value = "/promotion/{ruleType}/{ruleId}", consumes = "application/json")
+    @DeleteMapping(value = "/promotion/{ruleType}/{ruleId}")
     public Response removePromotionRule(@PathVariable(value = "ruleType") String ruleType, @PathVariable("ruleId") Long ruleId) {
         LOGGER.info("Start to remove rule with type {} and ruleId {}.", ruleType, ruleId);
 
