@@ -19,7 +19,7 @@
 
 
     <select id="listExcludeRulePromotion" parameterType="Long" resultType="java.util.Map">
-        SELECT tpir.`promotion_exclude_rule_id` AS promotionExcludeRuleId,
+        SELECT tpir.`promotion_exclude_rule_id` AS ruleId,
           tpir.`promotion_id` AS promotionId,
           tpir.`vendor_id` AS vendorId,
           CASE tpir.`vendor_id` WHEN -1 THEN 'ALL Boutiques' ELSE v.`vendor_name` END AS vendorName,
@@ -32,7 +32,7 @@
     </select>
 
     <select id="listIncluedRulePromotion" parameterType="Long" resultType="java.util.Map">
-        SELECT tpir.`promotion_include_rule_id` AS promotionIncludeRuleId,
+        SELECT tpir.`promotion_include_rule_id` AS ruleId,
           tpir.`promotion_id` AS promotionId,
           tpir.`vendor_id` AS vendorId,
           CASE tpir.`vendor_id` WHEN -1 THEN 'ALL Boutiques' ELSE v.`vendor_name` END AS vendorName,
