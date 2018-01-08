@@ -4,12 +4,22 @@
 
 
     <select id="listPromotionByBanner" parameterType="Long" resultType="java.util.Map">
-        SELECT * FROM t_promotion WHERE enabled=TRUE AND banner_id = #{bannerId}
+        SELECT
+          start_time AS startTime,
+          promotion_name AS promotionName,
+          updated_at AS updatedAt,
+          banner_id AS bannerId,
+          poster_img AS posterImg,
+          banner_img AS bannerImg,
+          created_at as createdAt,
+          promotion_id AS  promotionId,
+          enabled AS enabled
+        FROM t_promotion WHERE enabled=TRUE AND banner_id = #{bannerId}
     </select>
 
 
     <select id="listExcludeRulePromotion" parameterType="Long" resultType="java.util.Map">
-        SELECT tpir.`promotion_exclude_rule_id` AS promotionExcludeRuleId,
+        SELECT tpir.`promotion_exclude_rule_id` AS ruleId,
           tpir.`promotion_id` AS promotionId,
           tpir.`vendor_id` AS vendorId,
           CASE tpir.`vendor_id` WHEN -1 THEN 'ALL Boutiques' ELSE v.`vendor_name` END AS vendorName,
@@ -22,7 +32,7 @@
     </select>
 
     <select id="listIncluedRulePromotion" parameterType="Long" resultType="java.util.Map">
-        SELECT tpir.`promotion_include_rule_id` AS promotionIncludeRuleId,
+        SELECT tpir.`promotion_include_rule_id` AS ruleId,
           tpir.`promotion_id` AS promotionId,
           tpir.`vendor_id` AS vendorId,
           CASE tpir.`vendor_id` WHEN -1 THEN 'ALL Boutiques' ELSE v.`vendor_name` END AS vendorName,
