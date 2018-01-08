@@ -66,6 +66,8 @@ public class PriceChangeRuleController {
         try {
             iPriceChangeRule.updateAdminPrice();
 
+            iPriceChangeRule.updateVendorPrice();
+
             // sku.im_price -> shop_product_sku.sale_price
             iPriceChangeRule.updateShopPrice();
 
