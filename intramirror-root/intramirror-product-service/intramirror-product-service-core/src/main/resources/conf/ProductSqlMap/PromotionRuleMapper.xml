@@ -4,7 +4,17 @@
 
 
     <select id="listPromotionByBanner" parameterType="Long" resultType="java.util.Map">
-        SELECT * FROM t_promotion WHERE enabled=TRUE AND banner_id = #{bannerId}
+        SELECT
+          start_time AS startTime,
+          promotion_name AS promotionName,
+          updated_at AS updatedAt,
+          banner_id AS bannerId,
+          poster_img AS posterImg,
+          banner_img AS bannerImg,
+          created_at as createdAt,
+          promotion_id AS  promotionId,
+          enabled AS enabled
+        FROM t_promotion WHERE enabled=TRUE AND banner_id = #{bannerId}
     </select>
 
 
