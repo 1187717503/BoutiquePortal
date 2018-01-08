@@ -200,6 +200,7 @@ public class HttpUtils {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            logger.info("HttpUtils,https,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
         }
         mapUtils.putData("resultMessage",buffer.toString());
         return mapUtils.getMap();
