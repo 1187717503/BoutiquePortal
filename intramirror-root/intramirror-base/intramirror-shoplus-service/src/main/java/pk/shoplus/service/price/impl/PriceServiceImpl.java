@@ -81,6 +81,15 @@ public class PriceServiceImpl implements IPriceService{
             skuService.updateBySQL(updatePriceSQL);
             logger.info("synProductPriceRule,updatePriceSQL,end,SQL:"+updatePriceSQL);
 
+            product.max_retail_price = newPrice;
+            product.min_retail_price = newPrice;
+
+            product.max_im_price = im_price;
+            product.min_im_price = im_price;
+
+            product.max_boutique_price = in_price;
+            product.min_boutique_price = in_price;
+
             /*String updateSkuPrice = "update `sku`  set `in_price`  ="+in_price+" ,`im_price` ="+im_price+" , `price`  = "+newPrice+" ,`last_check`  = now()  where `product_id`  ="+product_id+";";
             logger.info("IPriceService,synProductPriceRule,updateSkuPrice,sql:"+updateSkuPrice);
             skuService.updateBySQL(updateSkuPrice);
