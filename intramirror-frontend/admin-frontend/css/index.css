@@ -66,7 +66,7 @@
     color: #000;
 }
 
-.order-list.page-order .item.page-order:nth-child(1) {
+.order-head.page-order .item.page-order:nth-child(1) {
     width: 24px;
     margin-left: 16px;
     margin-top: 11.5px
@@ -83,25 +83,26 @@
 }
 
 .order-head.page-order .item.page-order:nth-child(4) {
-    width: 8%;
+    width: 6%;
     text-align: center;
 }
 
 .order-head.page-order .item.page-order:nth-child(5) {
-    width: 8%;
+    width: 6%;
 }
 
 .order-head.page-order .item.page-order:nth-child(6) {
-    width: 10%;
+    width: 8%;
 }
 
 .order-head.page-order .item.page-order:nth-child(7) {
-    width: 6%;
+    width: 4%;
     text-align: center;
 }
 
 .order-head.page-order .item.page-order:nth-child(8) {
     width: 10%;
+    text-align: center;
 }
 
 .order-head.page-order .item.page-order:nth-child(9) {
@@ -114,19 +115,24 @@
 }
 
 .order-head.page-order .item.page-order:nth-child(11) {
-    width: 7%;
+    width: 6%;
 }
 
 .order-head.page-order .item.page-order:nth-child(12) {
-    width: 7%;
+    width: 6%;
 }
 
 .order-head.page-order .item.page-order:nth-child(13) {
-    width: 10%;
+    width: 8%;
 }
 
 .order-head.page-order .item.page-order:nth-child(14) {
-    width: 10%;
+    width: 8%;
+}
+
+.order-head.page-order .item.page-order:nth-child(15) {
+    width: 8%;
+    text-align: center;
 }
 
 .order-list.page-order .row.page-order {
@@ -154,27 +160,28 @@
 }
 
 .order-list.page-order .item.page-order:nth-child(4) {
-    width: 8%;
+    width: 6%;
     text-align: center;
 }
 
 .order-list.page-order .item.page-order:nth-child(5) {
-    width: 8%;
+    width: 6%;
     word-wrap: break-word;
 }
 
 .order-list.page-order .item.page-order:nth-child(6) {
-    width: 10%;
+    width: 8%;
     word-wrap: break-word;
 }
 
 .order-list.page-order .item.page-order:nth-child(7) {
-    width: 6%;
+    width: 4%;
     text-align: center;
 }
 
 .order-list.page-order .item.page-order:nth-child(8) {
     width: 10%;
+    text-align: center;
 }
 
 .order-list.page-order .item.page-order:nth-child(9) {
@@ -187,25 +194,30 @@
 }
 
 .order-list.page-order .item.page-order:nth-child(11) {
-    width: 7%;
+    width: 6%;
 }
 
 .order-list.page-order .item.page-order:nth-child(12) {
-    width: 7%;
-
+    width: 6%;
 }
 
 .order-list.page-order .item.page-order:nth-child(13) {
-    width: 10%;
+    width: 8%;
     word-wrap: break-word;
 }
 
 .order-list.page-order .item.page-order:nth-child(14) {
-    width: 10%;
+    width: 8%;
     word-wrap: break-word;
 }
 
 .order-list.page-order .item.page-order:nth-child(15) {
+    width: 8%;
+    word-wrap: break-word;
+    text-align: center;
+}
+
+.order-list.page-order .item.page-order:nth-child(16) {
     font-size: 20px;
     color: #333;
 }

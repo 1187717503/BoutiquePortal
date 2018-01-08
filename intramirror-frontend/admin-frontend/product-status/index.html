@@ -405,6 +405,8 @@ Scripts
         {%else%}
             <div class="item style-scope page-order">Sale Price</div>
         {%/if%}
+        <div class="item style-scope page-order">Update At</div>
+        <div class="item style-scope page-order">Last Check</div>
         <div class="item style-scope page-order">Action</div>
     </div>
 
@@ -439,6 +441,8 @@ Scripts
         {%else%}
         <div class="item style-scope page-order">€${order.sale_price}<span style="display: block;">${order.sale_discount}</span></div>
         {%/if%}
+        <div class="item style-scope page-order">${order.updated_at}</div>
+        <div class="item style-scope page-order">${order.last_check}</div>
         <div class="item style-scope page-order action" data-product-id="${order.product_id}" data-shop-product-id="${order.shop_product_id}">
             {%if action.process == 1 %}
             <span title="Process" data-action="process" class="waves-effect icon-btn-processing action-icon">
