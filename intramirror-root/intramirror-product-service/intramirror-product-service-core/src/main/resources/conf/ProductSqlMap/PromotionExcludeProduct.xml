@@ -9,10 +9,10 @@
         ep.product_id AS productId,
         p.name AS `name`
         FROM `t_promotion_exclude_product` ep
-        INNER JOIN p on p.product_id = ep.product_id
-        <trim prefix="WHERE" suffixOverrides="AND">
+        INNER JOIN product p on p.product_id = ep.product_id
+        <trim prefix="WHERE" prefixOverrides="AND">
             <if test="promotionExcludeProductId != null">
-                AND ep.`promotion_exclude_product_id` = #{promotionExcludeProductId,jdbcType=BIGINT}
+                ep.`promotion_exclude_product_id` = #{promotionExcludeProductId,jdbcType=BIGINT}
             </if>
 
             <if test="promotionId != null">
