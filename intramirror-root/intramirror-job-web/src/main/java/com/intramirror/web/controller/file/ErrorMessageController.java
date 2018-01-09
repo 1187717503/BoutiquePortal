@@ -291,6 +291,7 @@ public class ErrorMessageController {
                         ProductEDSManagement.ProductOptions productOptions = shopifyProductMapping.mapping(originDataMap);
                         ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
                         vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                        productOptions.setModifyPrice("1");
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
 
                     }
