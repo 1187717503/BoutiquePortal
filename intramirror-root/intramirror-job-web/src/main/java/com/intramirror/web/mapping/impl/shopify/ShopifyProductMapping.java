@@ -176,7 +176,7 @@ public class ShopifyProductMapping implements IProductMapping {
                 String changePrice = "";
                 if(StringUtils.isBlank(compare_at_price)) {
                     productOptions.setSalePrice(price);
-                    changePrice = price;
+                    changePrice = productOptions.getSalePrice();
                 } else {
                     BigDecimal cPrice = new BigDecimal(compare_at_price);
                     BigDecimal pPrice = new BigDecimal(price);
@@ -184,7 +184,7 @@ public class ShopifyProductMapping implements IProductMapping {
                     int flag = cPrice.compareTo(pPrice);
                     if(flag == 1 || flag == 0) {
                         productOptions.setSalePrice(compare_at_price);
-                        changePrice = price;
+                        changePrice = productOptions.getSalePrice();
                     } else {
                         logger.info("ShopifyProductMapping,mapping,compare_at_price小于price,bodyDataMap:"+JSONObject.toJSONString(bodyDataMap));
                     }
