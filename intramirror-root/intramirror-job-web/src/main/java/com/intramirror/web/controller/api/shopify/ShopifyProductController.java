@@ -1,7 +1,7 @@
 package com.intramirror.web.controller.api.shopify;
 
-import com.alibaba.fastjson15.JSONArray;
-import com.alibaba.fastjson15.JSONObject;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.intramirror.common.utils.DateUtils;
 import com.intramirror.product.api.service.stock.IUpdateStockService;
 import com.intramirror.web.mapping.impl.shopify.ShopifyProductMapping;

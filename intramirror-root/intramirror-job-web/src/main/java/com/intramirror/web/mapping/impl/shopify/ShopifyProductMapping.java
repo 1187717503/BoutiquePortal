@@ -1,7 +1,7 @@
 package com.intramirror.web.mapping.impl.shopify;
 
-import com.alibaba.fastjson15.JSONArray;
-import com.alibaba.fastjson15.JSONObject;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.intramirror.common.help.StringUtils;
 import com.intramirror.web.mapping.api.IProductMapping;
 import com.intramirror.web.mapping.impl.eds.EdsUpdateByProductMapping;
