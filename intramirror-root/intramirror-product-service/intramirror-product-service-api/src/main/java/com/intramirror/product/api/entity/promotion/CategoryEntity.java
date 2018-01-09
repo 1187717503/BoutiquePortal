@@ -9,6 +9,15 @@ public class CategoryEntity {
     private String name;
     private int level;
     private Long parentId;
+    private Boolean isDel;
+
+    public Boolean getDel() {
+        return isDel;
+    }
+
+    public void setDel(Boolean del) {
+        isDel = del;
+    }
 
     public int getLevel() {
         return level;
