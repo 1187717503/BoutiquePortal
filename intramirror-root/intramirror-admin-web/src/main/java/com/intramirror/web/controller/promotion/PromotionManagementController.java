@@ -97,7 +97,7 @@ public class PromotionManagementController {
         return Response.status(StatusType.SUCCESS).data(result);
     }
 
-    @PutMapping(value = "/promotion/exclude/product", consumes = "application/json")
+    @PutMapping(value = "/promotion/product/exclude", consumes = "application/json")
     public Response savePromotionExcludeProduct(@RequestBody PromotionExcludeProduct promotionExcludeProduct) {
         LOGGER.info("Add promotion exclude product by promotionExcludeProduct: {}", toJson(promotionExcludeProduct));
 
@@ -115,7 +115,7 @@ public class PromotionManagementController {
         return Response.status(StatusType.SUCCESS).data(promotionExcludeProduct);
     }
 
-    @DeleteMapping(value = "/promotion/exclude/product/{promotionExcludeProductId}")
+    @DeleteMapping(value = "/promotion/product/exclude/{promotionExcludeProductId}")
     public Response removePromotionExcludeProduct(@PathVariable("promotionExcludeProductId") Long promotionExcludeProductId) {
         LOGGER.info("remove promotion exclude product by promotionExcludeProductId: {}", promotionExcludeProductId);
 
@@ -124,7 +124,7 @@ public class PromotionManagementController {
         return Response.status(StatusType.SUCCESS).data(row);
     }
 
-    @GetMapping(value = "/promotion/exclude/product")
+    @GetMapping(value = "/promotion/product/exclude")
     public Response queryPromotionExcludeProduct(@RequestParam(value = "promotionId", required = true) Long promotionId) {
         LOGGER.info("Search promotion exclude product by promotionId: {}", promotionId);
 
