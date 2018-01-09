@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.intramirror.product.core.mapper.PromotionExcludeProductMapper">
 
-    <select id="selectByParameter" parameterType="com.intramirror.product.api.model.PromotionExcludeProduct" resultMap="java.util.Map">
+    <select id="selectByParameter" parameterType="com.intramirror.product.api.model.PromotionExcludeProduct" resultType="java.util.Map">
         SELECT
         ep.promotion_id AS promotionId,
         ep.promotion_exclude_product_id AS ruleId,
