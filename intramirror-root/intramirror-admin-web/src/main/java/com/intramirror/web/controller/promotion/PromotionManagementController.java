@@ -97,40 +97,39 @@ public class PromotionManagementController {
         return Response.status(StatusType.SUCCESS).data(result);
     }
 
-    @PutMapping(value = "/exclude/product/save", consumes = "application/json")
+    @PutMapping(value = "/promotion/exclude/product", consumes = "application/json")
     public Response savePromotionExcludeProduct(@RequestBody PromotionExcludeProduct promotionExcludeProduct) {
-        LOGGER.info("savePromotionExcludeProduct by promotionExcludeProduct : {}", toJson(promotionExcludeProduct));
+        LOGGER.info("Add promotion exclude product by promotionExcludeProduct: {}", toJson(promotionExcludeProduct));
 
         ProductWithBLOBs productWithBLOBs = productService.selectByPrimaryKey(promotionExcludeProduct.getProductId());
         if (productWithBLOBs == null || !productWithBLOBs.getEnabled()) {
-            return Response.status(StatusType.FAILURE).data("product_id not found.");
+            return Response.status(StatusType.FAILURE).data("product id not found.");
         }
 
-        List<PromotionExcludeProduct> promotionExcludeProducts = promotionExcludeProductService.selectByParameter(promotionExcludeProduct);
+        List<Map<String, Object>> promotionExcludeProducts = promotionExcludeProductService.selectByParameter(promotionExcludeProduct);
         if (promotionExcludeProducts.size() > 0) {
-            return Response.status(StatusType.FAILURE).data("product_id already existed.");
+            return Response.status(StatusType.FAILURE).data("product id already existed.");
         }
 
         promotionExcludeProductService.insertPromotionExcludeProduct(promotionExcludeProduct);
         return Response.status(StatusType.SUCCESS).data(promotionExcludeProduct);
     }
 
-    @DeleteMapping(value = "/exclude/product/{promotionExcludeProductId}")
+    @DeleteMapping(value = "/promotion/exclude/product/{promotionExcludeProductId}")
     public Response removePromotionExcludeProduct(@PathVariable("promotionExcludeProductId") Long promotionExcludeProductId) {
-        LOGGER.info("removePromotionExcludeProduct by promotionExcludeProductId : {}", promotionExcludeProductId);
+        LOGGER.info("remove promotion exclude product by promotionExcludeProductId: {}", promotionExcludeProductId);
 
         Long row = promotionExcludeProductService.deletePromotionExcludeProduct(promotionExcludeProductId);
 
         return Response.status(StatusType.SUCCESS).data(row);
     }
 
-    @GetMapping(value = "/exclude/product/list")
+    @GetMapping(value = "/promotion/exclude/product")
     public Response queryPromotionExcludeProduct(@RequestParam(value = "promotionId", required = true) Long promotionId) {
-        LOGGER.info("queryPromotionExcludeProduct by promotionId : {}", promotionId);
+        LOGGER.info("Search promotion exclude product by promotionId: {}", promotionId);
 
         PromotionExcludeProduct promotionExcludeProduct = new PromotionExcludeProduct(promotionId);
-        List<PromotionExcludeProduct> promotionExcludeProducts = promotionExcludeProductService.selectByParameter(promotionExcludeProduct);
-
+        List<Map<String, Object>> promotionExcludeProducts = promotionExcludeProductService.selectByParameter(promotionExcludeProduct);
         return Response.status(StatusType.SUCCESS).data(promotionExcludeProducts);
     }
 

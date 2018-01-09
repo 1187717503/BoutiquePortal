@@ -2,36 +2,31 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.intramirror.product.core.mapper.PromotionExcludeProductMapper">
 
-    <resultMap id="BaseResultMap" type="com.intramirror.product.api.model.PromotionExcludeProduct">
-        <id column="promotion_exclude_product_id" jdbcType="BIGINT" property="promotionExcludeProductId"/>
-        <result column="promotion_id" jdbcType="BIGINT" property="promotionId"/>
-        <result column="product_id" jdbcType="VARCHAR" property="productId"/>
-    </resultMap>
+    <select id="selectByParameter" parameterType="com.intramirror.product.api.model.PromotionExcludeProduct" resultMap="java.util.Map">
+        SELECT
+        ep.promotion_id AS promotionId,
+        ep.promotion_exclude_product_id AS ruleId,
+        ep.product_id AS productId,
+        p.name AS `name`
+        FROM `t_promotion_exclude_product` ep
+        INNER JOIN p on p.product_id = ep.product_id
+        <trim prefix="WHERE" suffixOverrides="AND">
+            <if test="promotionExcludeProductId != null">
+                AND ep.`promotion_exclude_product_id` = #{promotionExcludeProductId,jdbcType=BIGINT}
+            </if>
 
-    <sql id="Base_Column_List">
-        promotion_exclude_product_id,promotion_id,product_id
-    </sql>
+            <if test="promotionId != null">
+                AND ep.`promotion_id` = #{promotionId,jdbcType=BIGINT}
+            </if>
 
-    <select id="selectByParameter" parameterType="com.intramirror.product.api.model.PromotionExcludeProduct" resultMap="BaseResultMap">
-        select
-        <include refid="Base_Column_List"/>
-        from `t_promotion_exclude_product` where 1=1
-
-        <if test="promotionExcludeProductId != null">
-            and `promotion_exclude_product_id`  =#{promotionExcludeProductId,jdbcType=BIGINT}
-        </if>
-
-        <if test="promotionId != null">
-            and `promotion_id`  =#{promotionId,jdbcType=BIGINT}
-        </if>
-
-        <if test="productId != null">
-            and `product_id`  =#{productId,jdbcType=BIGINT}
-        </if>
-
+            <if test="productId != null">
+                AND ep.`product_id` = #{productId,jdbcType=BIGINT}
+            </if>
+        </trim>
     </select>
 
-    <insert id="insertPromotionExcludeProduct" keyProperty="promotionExcludeProductId" parameterType="com.intramirror.product.api.model.PromotionExcludeProduct">
+    <insert id="insertPromotionExcludeProduct" keyProperty="promotionExcludeProductId"
+            parameterType="com.intramirror.product.api.model.PromotionExcludeProduct">
         insert into `t_promotion_exclude_product`(`promotion_id` ,`product_id` )values(#{promotionId,jdbcType=BIGINT},#{productId,jdbcType=BIGINT});
     </insert>
 
