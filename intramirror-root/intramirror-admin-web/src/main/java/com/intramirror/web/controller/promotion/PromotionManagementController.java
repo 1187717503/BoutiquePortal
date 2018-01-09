@@ -112,6 +112,7 @@ public class PromotionManagementController {
         }
 
         promotionExcludeProductService.insertPromotionExcludeProduct(promotionExcludeProduct);
+        promotionExcludeProduct.setName(productWithBLOBs.getName());
         return Response.status(StatusType.SUCCESS).data(promotionExcludeProduct);
     }
 
