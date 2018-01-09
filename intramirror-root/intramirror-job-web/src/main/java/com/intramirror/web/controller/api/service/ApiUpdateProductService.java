@@ -192,11 +192,11 @@ public class ApiUpdateProductService {
         logger.info("ApiUpdateProductService,setProduct,start,updateProduct,product:"+JSONObject.toJSONString(product));
         product.last_check = new Date();
 
-        // Brand：和原来不一致直接更新。如为空或者不能Mapping报Warning，但其他字段继续更新。
-        String brand_id = productOptions.getBrandId();
+        // updateProduct, brand不一致则报error，error_data_can_not_find_mapping，不修改数据。而且reprocess也不处理
+        /*String brand_id = productOptions.getBrandId();
         if(StringUtils.isNotBlank(brand_id)) {
             product.setBrand_id(Long.parseLong(brand_id));
-        }
+        }*/
 
         // Image：不予更新。
         String cover_img = product.getCover_img();
@@ -322,11 +322,11 @@ public class ApiUpdateProductService {
         this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.ColorCode.getCode(),product.getColor_code());
         this.updateProductProperty(conn,product.getProduct_id(), ProductPropertyEnumKeyName.CarryOver.getCode(),productOptions.getCarryOver());
 
-        /** 只发一次后面注释 */
+        /** 只发一次后面注释
         if(product.getVendor_id().intValue() == 24 && StringUtils.isNotBlank(productOptions.getCategoryId())) {
             product.category_id = Long.parseLong(productOptions.getCategoryId());
         }
-        /** 只发一次后面注释 */
+        * 只发一次后面注释 */
 
         productService.updateProduct(product);
         logger.info("ApiUpdateProductService,setProduct,end,updateProduct,product:"+JSONObject.toJSONString(product));
