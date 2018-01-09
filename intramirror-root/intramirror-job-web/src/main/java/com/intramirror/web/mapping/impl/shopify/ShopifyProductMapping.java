@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.intramirror.common.help.StringUtils;
 import com.intramirror.web.mapping.api.IProductMapping;
 import com.intramirror.web.mapping.impl.eds.EdsUpdateByProductMapping;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -146,6 +147,8 @@ public class ShopifyProductMapping implements IProductMapping {
                 String color_description = sku.getString("option2");
                 String BrandID = sku.getString("sku");
                 String price = sku.getString("price");
+                String compare_at_price = sku.getString("compare_at_price");
+
                 if(StringUtils.isNotBlank(weight)) {
                     productOptions.setWeight(weight);
                 }
@@ -156,9 +159,9 @@ public class ShopifyProductMapping implements IProductMapping {
                 if(StringUtils.isNotBlank(BrandID)) {
                     productOptions.setBrandCode(BrandID);
                 }
-                if(StringUtils.isNotBlank(price)) {
+                /*if(StringUtils.isNotBlank(price)) {
                     productOptions.setSalePrice(price);
-                }
+                }*/
 
                 ProductEDSManagement.SkuOptions skuOptions = productEDSManagement.getSkuOptions();
                 skuOptions.setSize(size);
@@ -166,6 +169,34 @@ public class ShopifyProductMapping implements IProductMapping {
                 skuOptions.setBarcodes(sku_code);
                 skuOptions.setStock(stock);
                 productOptions.getSkus().add(skuOptions);
+
+                /* update by 2018/01/09*/
+
+                String salePrice = productOptions.getSalePrice();
+                String changePrice = "";
+                if(StringUtils.isBlank(compare_at_price)) {
+                    productOptions.setSalePrice(price);
+                    changePrice = price;
+                } else {
+                    BigDecimal cPrice = new BigDecimal(compare_at_price);
+                    BigDecimal pPrice = new BigDecimal(price);
+
+                    int flag = cPrice.compareTo(pPrice);
+                    if(flag == 1 || flag == 0) {
+                        productOptions.setSalePrice(compare_at_price);
+                        changePrice = price;
+                    } else {
+                        logger.info("ShopifyProductMapping,mapping,compare_at_price小于price,bodyDataMap:"+JSONObject.toJSONString(bodyDataMap));
+                    }
+                }
+
+                if(StringUtils.isNotBlank(salePrice) && StringUtils.isNotBlank(changePrice)) {
+                    if(!salePrice.equals(changePrice)) {
+                        logger.info("ShopifyProductMapping,mapping,sku价格不一致,bodyDataMap:"+JSONObject.toJSONString(bodyDataMap)+",salePrice:"+salePrice+",changePrice:"+changePrice);
+                    }
+                }
+
+                /* update by 2018/01/09*/
             }
 
             // mapping category
@@ -232,6 +263,7 @@ public class ShopifyProductMapping implements IProductMapping {
             String img = JSONObject.toJSONString(coverImg);
             productOptions.setDescImg(img)
             .setCoverImg(img);
+            productOptions.setModifyPrice("1");
 
             /*productOptions.setSeasonCode("17FW");
             productOptions.setCategory1("MEN");
@@ -244,4 +276,11 @@ public class ShopifyProductMapping implements IProductMapping {
         }
         return productOptions;
     }
+
+    /*public static void main(String[] args) {
+        BigDecimal b1 = new BigDecimal(2);
+        BigDecimal b2 = new BigDecimal(2);
+
+        System.out.println(b1.compareTo(b2));
+    }*/
 }
