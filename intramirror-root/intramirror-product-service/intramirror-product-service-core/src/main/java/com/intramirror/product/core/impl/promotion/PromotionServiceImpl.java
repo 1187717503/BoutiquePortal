@@ -131,7 +131,7 @@ public class PromotionServiceImpl implements IPromotionService {
             }
 
             for (Category dbCategory : listDBCategory) {
-                if (dbCategory.getCategoryId() == category.getCategoryId()) {
+                if (dbCategory.getCategoryId().longValue() == category.getCategoryId().longValue()) {
                     category.setLevel(dbCategory.getLevel());
                     category.setParentId(dbCategory.getParentId());
                 }
