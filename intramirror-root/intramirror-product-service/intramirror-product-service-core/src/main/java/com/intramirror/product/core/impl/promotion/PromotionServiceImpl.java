@@ -102,14 +102,14 @@ public class PromotionServiceImpl implements IPromotionService {
 
     private void removeSubCategoryInList(List<CategoryEntity> list, Long parentId, int level) {
         for (CategoryEntity category : list) {
-            if (!category.getDel()) {
+            if (category.getDel()) {
                 continue;
             }
             if (category.getParentId().longValue() == parentId.longValue()) {
                 if (level < 3) {
                     removeSubCategoryInList(list, category.getCategoryId(), level + 1);
                 }
-                category.setDel(false);
+                category.setDel(true);
             }
         }
     }
@@ -136,6 +136,7 @@ public class PromotionServiceImpl implements IPromotionService {
                 if (dbCategory.getCategoryId().longValue() == category.getCategoryId().longValue()) {
                     category.setLevel(dbCategory.getLevel());
                     category.setParentId(dbCategory.getParentId());
+                    category.setDel(false);
                 }
             }
         }
@@ -144,19 +145,13 @@ public class PromotionServiceImpl implements IPromotionService {
             listRuleCategory.add(allCategoryEntity);
         } else {
             for (CategoryEntity category : listCategory) {
-                if (!category.getDel()) {
-                    continue;
-                }
-
                 if (category.getLevel() == 1) {
                     removeSubCategoryInList(listCategory, category.getCategoryId(), 1);
                 }
             }
 
-            LOGGER.info("After level 1, category size is:{}.", listCategory.size());
-
             for (CategoryEntity category : listCategory) {
-                if (!category.getDel()) {
+                if (category.getDel()) {
                     continue;
                 }
 
@@ -164,10 +159,9 @@ public class PromotionServiceImpl implements IPromotionService {
                     removeSubCategoryInList(listCategory, category.getCategoryId(), 2);
                 }
             }
-            LOGGER.info("After level 2, category size is:{}.", listCategory.size());
 
             for (CategoryEntity category : listCategory) {
-                if (!category.getDel()) {
+                if (category.getDel()) {
                     continue;
                 }
 
@@ -175,7 +169,6 @@ public class PromotionServiceImpl implements IPromotionService {
                     removeSubCategoryInList(listCategory, category.getCategoryId(), 3);
                 }
             }
-            LOGGER.info("After level 3, category size is:{}.", listCategory.size());
 
             listRuleCategory = listCategory;
         }
@@ -183,7 +176,7 @@ public class PromotionServiceImpl implements IPromotionService {
         List<PromotionRuleDetail> listPromotionRuleDetail = new ArrayList<>();
         for (BrandEntity brand : listBrand) {
             for (CategoryEntity category : listRuleCategory) {
-                if (!category.getDel()) {
+                if (category.getDel()) {
                     continue;
                 }
 
