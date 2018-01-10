@@ -16,7 +16,7 @@ export function getApiErrorPage(data) {
 
   return HTTP({
     baseURL: adminUrl,
-    url: 'errormessage/getApiErrorPage?startDate=' + data.Date[0] + '&endDate=' + data.Date[1] + '&boutiqueIds=' + data.boutique + '&apis=' + data.api + '&errorTypes=' + data.errorType + '&brandIds=' + data.brandId + '&colors=' + data.color + '&pageNumber=' + data.pageNum + '&pageSize=' + data.pageSize + '&param=' + data.sortType + '&num=' + data.sortNum,
+    url: 'errormessage/getApiErrorPage?startDate=' + data.Date[0] + '&endDate=' + data.Date[1] + '&boutiqueIds=' + data.boutique + '&apis=' + data.api + '&errorTypes=' + data.errorType + '&apiField=' + data.apiField + '&boutiqueDataId=' + data.boutiqueDataId + '&brandIds=' + data.brandId + '&colors=' + data.color + '&pageNumber=' + data.pageNum + '&pageSize=' + data.pageSize + '&param=' + data.sortType + '&num=' + data.sortNum,
     method: 'post'
   })
 }
@@ -24,7 +24,7 @@ export function getApiErrorPage(data) {
 export function searchApiError(data) {
   return HTTP({
     baseURL: adminUrl,
-    url: 'errormessage/searchApiError?vendorId=' + data.vid + '&apiEndPointId=' + data.pid,
+    url: 'errormessage/searchApiError?vendorId=' + (data.vid?data.vid:'') + '&apiEndPointId=' + (data.pid?data.pid:'') + '&apiErrorTypeId=' + (data.etp?data.etp:'')+ '&apiField=' + (data.field?data.field:''),
     method: 'post'
   })
 }
