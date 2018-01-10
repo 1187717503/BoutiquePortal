@@ -183,7 +183,7 @@ public class PromotionServiceImpl implements IPromotionService {
         List<PromotionRuleDetail> listPromotionRuleDetail = new ArrayList<>();
         for (BrandEntity brand : listBrand) {
             for (CategoryEntity category : listRuleCategory) {
-                if (category.getDel()) {
+                if (category.getDel() != null && category.getDel()) {
                     continue;
                 }
 
