@@ -144,31 +144,38 @@ public class PromotionServiceImpl implements IPromotionService {
         if (allCategory) {
             listRuleCategory.add(allCategoryEntity);
         } else {
+
             for (CategoryEntity category : listCategory) {
-                if (category.getLevel() == 1) {
-                    removeSubCategoryInList(listCategory, category.getCategoryId(), 1);
+                if (category.getLevel() == 1 || category.getLevel() == 2) {
+                    category.setDel(true);
                 }
             }
 
-            for (CategoryEntity category : listCategory) {
-                if (category.getDel()) {
-                    continue;
-                }
-
-                if (category.getLevel() == 2) {
-                    removeSubCategoryInList(listCategory, category.getCategoryId(), 2);
-                }
-            }
-
-            for (CategoryEntity category : listCategory) {
-                if (category.getDel()) {
-                    continue;
-                }
-
-                if (category.getLevel() == 3) {
-                    removeSubCategoryInList(listCategory, category.getCategoryId(), 3);
-                }
-            }
+            //            for (CategoryEntity category : listCategory) {
+            //                if (category.getLevel() == 1) {
+            //                    removeSubCategoryInList(listCategory, category.getCategoryId(), 1);
+            //                }
+            //            }
+            //
+            //            for (CategoryEntity category : listCategory) {
+            //                if (category.getDel()) {
+            //                    continue;
+            //                }
+            //
+            //                if (category.getLevel() == 2) {
+            //                    removeSubCategoryInList(listCategory, category.getCategoryId(), 2);
+            //                }
+            //            }
+            //
+            //            for (CategoryEntity category : listCategory) {
+            //                if (category.getDel()) {
+            //                    continue;
+            //                }
+            //
+            //                if (category.getLevel() == 3) {
+            //                    removeSubCategoryInList(listCategory, category.getCategoryId(), 3);
+            //                }
+            //            }
 
             listRuleCategory = listCategory;
         }
