@@ -464,8 +464,8 @@ export default {
         this.searchData.boutiqueDataId = undefined;
       } else {
         this.searchData.boutiqueDataId = {
-          id: e.target.value.substring(0,data-1),
-          name: String(e.target.value.substring(data+1))
+          id: e.target.value.substring(0, data - 1),
+          name: String(e.target.value.substring(data + 1))
         };
       }
       console.log(this.searchData.boutiqueDataId);
@@ -852,7 +852,7 @@ export default {
           : "",
         brandId: this.searchData.brandId,
         color: this.searchData.color,
-        apiField: this.searchData.apiField,
+        apiField: this.searchData.apiField?this.searchData.apiField:"",
         boutiqueDataId: this.searchData.boutiqueDataId
           ? this.searchData.boutiqueDataId.id
           : "",
@@ -1004,7 +1004,9 @@ export default {
       debugger;
       let data = {
         vid: "",
-        pid: ""
+        pid: "",
+        etp: "",
+        field: ""
       };
       if (vid && vid !== undefined) {
         data.vid = vid;
