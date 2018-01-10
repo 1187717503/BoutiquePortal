@@ -7,6 +7,33 @@ package com.intramirror.product.api.entity.promotion;
 public class CategoryEntity {
     private Long categoryId;
     private String name;
+    private int level;
+    private Long parentId;
+    private Boolean isDel;
+
+    public Boolean getDel() {
+        return isDel;
+    }
+
+    public void setDel(Boolean del) {
+        isDel = del;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
+    }
 
     public Long getCategoryId() {
         return categoryId;
