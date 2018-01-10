@@ -1359,4 +1359,14 @@ public class ProductService {
         }
     }
 
+    public boolean isClothing(Long categorId) throws Exception{
+        String sql = "select c.`category_id`  from `category`  c where c.`enabled`  = 1 and c.`parent_id` in(1504,1569)  and c.`category_id`  = '"+categorId+"'";
+        logger.info("roductService,outputParams,isClothing,sql:"+sql);
+        List<Map<String,Object>> categoryMap = productDao.executeBySql(sql, null);
+        if(categoryMap != null && categoryMap.size() > 0) {
+            return true;
+        }
+        return false;
+    }
+
 }

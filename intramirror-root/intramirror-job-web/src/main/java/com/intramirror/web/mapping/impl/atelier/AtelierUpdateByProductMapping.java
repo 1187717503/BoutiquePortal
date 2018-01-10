@@ -2,10 +2,8 @@ package com.intramirror.web.mapping.impl.atelier;
 
 import com.alibaba.fastjson15.JSONArray;
 import com.alibaba.fastjson15.JSONObject;
-import com.google.gson.Gson;
 import com.intramirror.web.mapping.api.IProductMapping;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -66,7 +64,7 @@ public class AtelierUpdateByProductMapping implements IProductMapping{
                 productOptions.getSkus().add(sku);
             }
 
-            try {
+            /*try {
                 String vendor_id = bodyDataMap.get("vendor_id").toString();
 
                 if(vendor_id.equals("26")) {
@@ -81,7 +79,7 @@ public class AtelierUpdateByProductMapping implements IProductMapping{
             } catch (Exception e) {
                 e.printStackTrace();
                 logger.info("AtelierUpdateByProductService,imagesReplace,errorMessage:"+e);
-            }
+            }*/
 
         } catch (Exception e) {
             e.printStackTrace();
