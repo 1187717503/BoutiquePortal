@@ -185,7 +185,10 @@ public class ShopifyProductMapping implements IProductMapping {
                     if(flag == 1 || flag == 0) {
                         productOptions.setSalePrice(compare_at_price);
                         changePrice = productOptions.getSalePrice();
+                        logger.info("ShopifyProductMapping,mapping,compare_at_price大于或等于price,bodyDataMap:"+JSONObject.toJSONString(bodyDataMap));
                     } else {
+                        productOptions.setSalePrice(price);
+                        changePrice = productOptions.getSalePrice();
                         logger.info("ShopifyProductMapping,mapping,compare_at_price小于price,bodyDataMap:"+JSONObject.toJSONString(bodyDataMap));
                     }
                 }
