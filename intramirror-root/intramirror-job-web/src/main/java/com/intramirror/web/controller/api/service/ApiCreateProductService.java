@@ -1,6 +1,8 @@
 package com.intramirror.web.controller.api.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson15.JSONArray;
+import com.google.gson.Gson;
 import static com.intramirror.web.controller.api.service.ApiCommonUtils.escape;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -354,6 +356,7 @@ public class ApiCreateProductService {
     }
 
     private void setProduct(Connection conn) throws Exception{
+        ProductService productService = new ProductService(conn);
         String name = productOptions.getName();
         if(StringUtils.isBlank(name)) {
             name = productOptions.getBrand_name();
@@ -379,6 +382,23 @@ public class ApiCreateProductService {
         product.updated_at = new Date();
         product.enabled = EnabledType.USED;
 
+        /* 由于Julian的服装的第一张图不是正面照，需要将其放到所有图片的最后一张,只处理成人的男士、女士的服装，不更改包、鞋和配饰*/
+        if(product.vendor_id == 26L) {
+            if(productService.isClothing(product.category_id)) {
+                try {
+                    List<String> originList = JSONArray.parseArray(productOptions.getCoverImg(), String.class);
+                    String one = originList.get(0);
+                    originList.remove(0);
+                    originList.add(one);
+                    productOptions.setCoverImg(new Gson().toJson(originList));
+                    productOptions.setDescImg(new Gson().toJson(originList));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        /* end*/
+
         boolean noImg = this.getNoImg(conn);
         if(noImg) {
             product.cover_img = "[]";
@@ -395,7 +415,6 @@ public class ApiCreateProductService {
         product.designer_id = productOptions.getBrandCode();
         product.color_code = productOptions.getColorCode();
 
-        ProductService productService = new ProductService(conn);
         product = productService.createProduct(product);
         this.uProduct = product;
         logger.info("ApiCreateProductService,setProduct,product:"+JSONObject.toJSONString(product));
