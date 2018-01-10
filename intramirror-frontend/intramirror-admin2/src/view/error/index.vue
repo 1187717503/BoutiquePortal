@@ -464,9 +464,9 @@ export default {
         this.searchData.boutiqueDataId = undefined;
       } else {
         this.searchData.boutiqueDataId = {
-          id: e.target.value.substring(0, data - 1),
+          id: e.target.value.substring(0, data),
           name: String(e.target.value.substring(data + 1))
-        };
+        };  
       }
       console.log(this.searchData.boutiqueDataId);
     });
