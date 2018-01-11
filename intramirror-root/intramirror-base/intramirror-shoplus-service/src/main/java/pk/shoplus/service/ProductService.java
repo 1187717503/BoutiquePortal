@@ -1,5 +1,6 @@
 package pk.shoplus.service;
 
+import com.alibaba.fastjson15.JSONArray;
 import com.alibaba.fastjson15.JSONObject;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
@@ -1367,6 +1368,42 @@ public class ProductService {
             return true;
         }
         return false;
+    }
+
+    public boolean isProductImage(Long product_id,String image) {
+        String selSql = "select product_id,image from product_image where product_id ="+product_id;
+        List<Map<String,Object>> selMap = productDao.executeBySql(selSql,null);
+        if(selMap != null && selMap.size() >0){
+            String productImage = selMap.get(0).get("image").toString();
+            if(productImage.contains(image)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void insertProductImage(Long product_id,String image) {
+        try {
+            List<String> productImage = new ArrayList<>();
+            String selSql = "select product_id,image from product_image where product_id ="+product_id;
+            List<Map<String,Object>> selMap = productDao.executeBySql(selSql,null);
+            String dataImage = "[]";
+            if(selMap != null || selMap.size() > 0) {
+                dataImage = selMap.get(0).get("image").toString();
+            }
+
+            if(!dataImage.contains(image)) {
+                productImage = JSONArray.parseArray(dataImage, String.class);
+                productImage.add(image);
+
+                String insertSql = "insert into product_image (product_id,image)values("+product_id+","+JSONObject.toJSONString(productImage)+")";
+                productDao.updateBySQL(insertSql,null);
+                logger.info("ProductService,outputParams,insertProductImage,sql");
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+            logger.info("ProductService,outputParams,insertProductImage,errorMessage:"+e);
+        }
     }
 
 }
