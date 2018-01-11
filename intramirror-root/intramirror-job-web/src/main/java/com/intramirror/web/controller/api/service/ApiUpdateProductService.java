@@ -192,13 +192,13 @@ public class ApiUpdateProductService {
         logger.info("ApiUpdateProductService,setProduct,start,updateProduct,product:"+JSONObject.toJSONString(product));
         product.last_check = new Date();
 
-        // updateProduct, brand不一致则报error，error_data_can_not_find_mapping，不修改数据。而且reprocess也不处理
+        /*// updateProduct, brand不一致则报error，error_data_can_not_find_mapping，不修改数据。而且reprocess也不处理
         String brand_id = productOptions.getBrandId();
         if(StringUtils.isNotBlank(brand_id) && product.vendor_id == 32 && product.brand_id != Long.parseLong(brand_id)) {
             product.setBrand_id(Long.parseLong(brand_id));
             IPriceService iPriceService = new PriceServiceImpl();
             iPriceService.synProductPriceRule(product,product.getMin_retail_price(),conn);
-        }
+        }*/
 
         // Image：不予更新。
         String cover_img = product.getCover_img();
