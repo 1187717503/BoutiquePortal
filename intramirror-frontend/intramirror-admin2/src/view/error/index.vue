@@ -56,8 +56,8 @@
         <input id="Color" type="text" class="validate" v-model="searchData.color">
         <label for="Color">Color</label>
       </div>
-      <button class="waves-effect waves-light btn" @click="searchList">SEARCH</button>
-      <button class="waves-effect waves-light btn" @click="resetLoad">RESET</button>
+     <button class="waves-effect waves-light btn" style="background-color:#871b55 !important" @click="searchList">SEARCH</button>
+      <button class="waves-effect waves-light btn" style="background-color:#9b9b9b !important"  @click="resetLoad">RESET</button>
     </div>
     <div class="search-tag">
       <div v-for="(item,index) in searchArr" v-if="item.name">
@@ -464,7 +464,7 @@ export default {
         this.searchData.boutiqueDataId = undefined;
       } else {
         this.searchData.boutiqueDataId = {
-          id: e.target.value.substring(0, data - 1),
+          id: e.target.value.substring(0, data),
           name: String(e.target.value.substring(data + 1))
         };
       }
@@ -852,7 +852,7 @@ export default {
           : "",
         brandId: this.searchData.brandId,
         color: this.searchData.color,
-        apiField: this.searchData.apiField?this.searchData.apiField:"",
+        apiField: this.searchData.apiField ? this.searchData.apiField : "",
         boutiqueDataId: this.searchData.boutiqueDataId
           ? this.searchData.boutiqueDataId.id
           : "",
