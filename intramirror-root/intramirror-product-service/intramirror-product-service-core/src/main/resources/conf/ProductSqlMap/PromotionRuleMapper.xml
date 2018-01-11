@@ -28,7 +28,7 @@
           tpir.`categorys`
         FROM `t_promotion_exclude_rule` tpir
         LEFT JOIN `vendor` v ON (v.`vendor_id` = tpir.`vendor_id` AND v.`enabled` = 1)
-        WHERE tpir.`promotion_id` = #{promotionId}
+        WHERE tpir.`promotion_id` = #{promotionId} ORDER BY  tpir.`created_at` DESC
     </select>
 
     <select id="listIncluedRulePromotion" parameterType="Long" resultType="java.util.Map">
@@ -41,7 +41,7 @@
           tpir.`categorys`
         FROM `t_promotion_include_rule` tpir
         LEFT JOIN `vendor` v ON (v.`vendor_id` = tpir.`vendor_id` AND v.`enabled` = 1)
-        WHERE tpir.`promotion_id` = #{promotionId}
+        WHERE tpir.`promotion_id` = #{promotionId} ORDER BY  tpir.`created_at` DESC
     </select>
 
     <insert id="insertIncludeRule" keyProperty="ruleId" useGeneratedKeys="true"
