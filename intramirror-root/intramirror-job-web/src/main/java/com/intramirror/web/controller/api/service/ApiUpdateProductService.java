@@ -234,6 +234,22 @@ public class ApiUpdateProductService {
                     logger.info("ApiUpdateProductService,setProduct,Error:"+e);
                 }
             }
+
+
+            /** FM 接口特殊判断*/
+            if(product.vendor_id == 17) {
+                try {
+                    List<String> apiImgList = JSONArray.parseArray(productOptions.getCoverImg(), String.class);
+                    List<String> coverImgList = JSONArray.parseArray(product.getCover_img(), String.class);
+
+                    if(coverImgList.size() <= 1) {
+
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                    logger.info("ApiUpdateProductService,FM,setProduct,Error:"+e);
+                }
+            }
         }
 
         // 新数据为空或者不能找到season code Mapping则报Error不更新已有season code，但其他字段继续更新。判断只有当新season比现有season新时才更新。
