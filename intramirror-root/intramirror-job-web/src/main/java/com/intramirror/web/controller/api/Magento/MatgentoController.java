@@ -36,7 +36,7 @@ public class MatgentoController implements InitializingBean {
 
     public static ProductEDSManagement productEDSManagement = new ProductEDSManagement();
 
-    private Map<String,Object> paramsMap;
+    private Map<String,Object> paramsMap = new HashMap<>();
 
     private static final int limit = 100;
 

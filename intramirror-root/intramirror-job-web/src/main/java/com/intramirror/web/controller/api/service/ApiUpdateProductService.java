@@ -241,8 +241,27 @@ public class ApiUpdateProductService {
                 try {
                     List<String> apiImgList = JSONArray.parseArray(productOptions.getCoverImg(), String.class);
                     List<String> coverImgList = JSONArray.parseArray(product.getCover_img(), String.class);
+                    String productImage = productService.selProductImage(product.product_id);
+                    String apiImg = apiImgList.get(0);
 
-                    if(coverImgList.size() <= 1) {
+                    if(!productImage.contains(apiImg) && apiImgList.size() == 1) {
+
+                        if (productImage.length() > 5) { // 当图片有多张，并且图片不包含时，准备累加图片
+                            String downImgs = ApiCommonUtils.downloadImgs(productOptions.getCoverImg());
+                            if(StringUtils.isNotBlank(downImgs) && downImgs.length() > 5) {
+                                coverImgList.addAll(JSONArray.parseArray(downImgs,String.class));
+                                product.cover_img = JSONArray.toJSONString(coverImgList);
+                                product.description_img = JSONArray.toJSONString(coverImgList);
+                                productService.insertProductImage(product.product_id,apiImg);
+                            }
+                        } else if(coverImgList.size() <= 1) { // 当图片只有一张时，准备累加图片
+                            String downImgs = ApiCommonUtils.downloadImgs(productOptions.getCoverImg());
+                            if (StringUtils.isNotBlank(downImgs) && downImgs.length() > 5) {
+                                product.cover_img = downImgs;
+                                product.description_img = downImgs;
+                                productService.insertProductImage(product.product_id, apiImg);
+                            }
+                        }
 
                     }
                 }catch (Exception e){
