@@ -1370,7 +1370,17 @@ public class ProductService {
         return false;
     }
 
-    public boolean isProductImage(Long product_id,String image) {
+    public String selProductImage(Long product_id) throws Exception{
+        String selSql = "select product_id,image from product_image where product_id ="+product_id;
+        List<Map<String,Object>> selMap = productDao.executeBySql(selSql,null);
+        if(selMap!=null && selMap.size() >0) {
+            String image = selMap.get(0).get("image").toString();
+            return image;
+        }
+        return "";
+    }
+
+    /*public boolean isProductImage(Long product_id,String image) {
         String selSql = "select product_id,image from product_image where product_id ="+product_id;
         List<Map<String,Object>> selMap = productDao.executeBySql(selSql,null);
         if(selMap != null && selMap.size() >0){
@@ -1380,7 +1390,7 @@ public class ProductService {
             }
         }
         return false;
-    }
+    }*/
 
     public void insertProductImage(Long product_id,String image) {
         try {
@@ -1388,15 +1398,21 @@ public class ProductService {
             String selSql = "select product_id,image from product_image where product_id ="+product_id;
             List<Map<String,Object>> selMap = productDao.executeBySql(selSql,null);
             String dataImage = "[]";
-            if(selMap != null || selMap.size() > 0) {
+            if(selMap != null && selMap.size() > 0) {
                 dataImage = selMap.get(0).get("image").toString();
             }
 
             if(!dataImage.contains(image)) {
                 productImage = JSONArray.parseArray(dataImage, String.class);
                 productImage.add(image);
+            }
 
-                String insertSql = "insert into product_image (product_id,image)values("+product_id+","+JSONObject.toJSONString(productImage)+")";
+            if(selMap != null && selMap.size() > 0) {
+                String insertSql = "update product_image set image ='"+JSONObject.toJSONString(productImage)+"' where product_id ="+product_id;
+                productDao.updateBySQL(insertSql,null);
+                logger.info("ProductService,outputParams,updateProductImage,sql");
+            } else {
+                String insertSql = "insert into product_image (product_id,image)values("+product_id+",'"+JSONObject.toJSONString(productImage)+"')";
                 productDao.updateBySQL(insertSql,null);
                 logger.info("ProductService,outputParams,insertProductImage,sql");
             }
