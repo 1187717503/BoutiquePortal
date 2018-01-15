@@ -465,7 +465,7 @@ public class ApiUpdateProductService {
             this.setWarning(ApiErrorTypeEnum.errorType.error_data_can_not_find_mapping,"category", JSONObject.toJSONString(mappingCategory));
             logger.info("ApiUpdateProductService,checkMappingParams,category,categoryIsError,productOptions:"+new Gson().toJson(productOptions));
         } else if(cId != product.getCategory_id().intValue()) {
-            this.setWarning(ApiErrorTypeEnum.errorType.error_data_can_not_find_mapping,"category", JSONObject.toJSONString(mappingCategory));
+            this.setWarning(ApiErrorTypeEnum.errorType.error_Category_change,"category", JSONObject.toJSONString(mappingCategory));
             logger.info("ApiUpdateProductService,checkMappingParams,category,categoryIsChange,productOptions:"+new Gson().toJson(productOptions));
         }
 
@@ -476,7 +476,7 @@ public class ApiUpdateProductService {
             this.setWarning(ApiErrorTypeEnum.errorType.error_data_can_not_find_mapping,"brand", brandName);
             logger.info("ApiUpdateProductService,checkMappingParams,brand,brandIsError,productOptions:"+new Gson().toJson(productOptions));
         } else if(bId != product.getBrand_id()) {
-            this.setWarning(ApiErrorTypeEnum.errorType.error_data_can_not_find_mapping,"brand", brandName);
+            this.setWarning(ApiErrorTypeEnum.errorType.error_Brand_change,"brand", brandName);
             logger.info("ApiUpdateProductService,checkMappingParams,brand,brandIsChange,productOptions:"+new Gson().toJson(productOptions));
         }
 
