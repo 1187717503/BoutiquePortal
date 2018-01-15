@@ -3,7 +3,10 @@ package com.intramirror.product.core.impl.promotion;
 import com.alibaba.fastjson.JSONObject;
 import com.intramirror.product.api.entity.promotion.BrandEntity;
 import com.intramirror.product.api.entity.promotion.CategoryEntity;
+import com.intramirror.product.api.entity.promotion.SortPromotion;
 import com.intramirror.product.api.enums.PromotionRuleType;
+import com.intramirror.product.api.enums.SortColumn;
+import com.intramirror.product.api.exception.BusinessException;
 import com.intramirror.product.api.model.Category;
 import com.intramirror.product.api.model.PromotionExclude;
 import com.intramirror.product.api.model.PromotionInclude;
@@ -13,7 +16,6 @@ import com.intramirror.product.api.service.promotion.IPromotionService;
 import com.intramirror.product.core.mapper.CategoryMapper;
 import com.intramirror.product.core.mapper.PromotionRuleMapper;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -49,7 +51,7 @@ public class PromotionServiceImpl implements IPromotionService {
 
     @Override
     public List<Map<String, Object>> listIncludeRulePromotion(Long promotionId) {
-        return promotionRuleMapper.listIncluedRulePromotion(promotionId);
+        return promotionRuleMapper.listIncludeRulePromotion(promotionId);
     }
 
     @Transactional
@@ -98,6 +100,46 @@ public class PromotionServiceImpl implements IPromotionService {
         }
         return flag & (insertRuleDetailByRule(rule, ruleType).size() > 0);
 
+    }
+
+    @Override
+    public List<Map<String, Object>> listSortColumn(Long promotionId) {
+        return promotionRuleMapper.listSortColumn(promotionId);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Boolean updateSortPromotion(List<SortPromotion> listSort) throws BusinessException {
+        for (SortPromotion sortPromotion : listSort) {
+            if (promotionRuleMapper.updateSortColumn(sortPromotion) <= 0) {
+                throw new BusinessException("update sort failed.");
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public List<Map<String, Object>> listSortItemByColumn(Long promotionId, SortColumn sortColumn) {
+        List<Map<String, Object>> result = null;
+        switch (sortColumn) {
+        case BRAND:
+            result = promotionRuleMapper.getBrandSortItem(promotionId);
+            break;
+        case VENDOR:
+            result = promotionRuleMapper.getVendorSortItem(promotionId);
+            break;
+        case CATEGORY:
+            result = promotionRuleMapper.getCategorySortItem(promotionId);
+            break;
+        case DISCOUNT:
+        case SEASON:
+            SortPromotion sortPromotion = new SortPromotion();
+            sortPromotion.setColumnName(sortColumn.getValue());
+            sortPromotion.setPromotionId(promotionId);
+            result = promotionRuleMapper.getSimpleSort(sortPromotion);
+            break;
+        }
+        return result;
     }
 
     private void removeSubCategoryInList(List<CategoryEntity> list, Long parentId, int level) {

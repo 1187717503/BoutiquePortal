@@ -1,6 +1,9 @@
 package com.intramirror.product.api.service.promotion;
 
+import com.intramirror.product.api.entity.promotion.SortPromotion;
 import com.intramirror.product.api.enums.PromotionRuleType;
+import com.intramirror.product.api.enums.SortColumn;
+import com.intramirror.product.api.exception.BusinessException;
 import com.intramirror.product.api.model.PromotionRule;
 import java.util.List;
 import java.util.Map;
@@ -21,4 +24,10 @@ public interface IPromotionService {
     Boolean removePromotionRule(Long ruleId, PromotionRuleType ruleType);
 
     Boolean updatePromotionRule(PromotionRuleType ruleType, PromotionRule rule);
+
+    List<Map<String, Object>> listSortColumn(Long promotionId);
+
+    Boolean updateSortPromotion(List<SortPromotion> listSort) throws BusinessException;
+
+    List<Map<String, Object>> listSortItemByColumn(Long promotionId, SortColumn sortColumn);
 }

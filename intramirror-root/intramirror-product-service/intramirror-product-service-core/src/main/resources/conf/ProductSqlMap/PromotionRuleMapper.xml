@@ -31,7 +31,7 @@
         WHERE tpir.`promotion_id` = #{promotionId} ORDER BY  tpir.`created_at` DESC
     </select>
 
-    <select id="listIncluedRulePromotion" parameterType="Long" resultType="java.util.Map">
+    <select id="listIncludeRulePromotion" parameterType="Long" resultType="java.util.Map">
         SELECT tpir.`promotion_include_rule_id` AS ruleId,
           tpir.`promotion_id` AS promotionId,
           tpir.`vendor_id` AS vendorId,
@@ -275,5 +275,77 @@
         </trim>
         WHERE promotion_exclude_rule_id = #{ruleId, jdbcType=BIGINT}
     </update>
+
+    <select id="listSortColumn" parameterType="Long" resultType="java.util.Map">
+      SELECT promotion_seq_id AS promotionSeqId,
+      promotion_id AS promotionId,
+      `column_name` AS columnName,
+      seq_type AS seqType,
+      `sort`,
+      enabled,
+      description
+      FROM t_promotion_seq
+      WHERE promotion_id = #{promotionId}
+      ORDER BY `sort` ASC
+    </select>
+
+    <update id="updateSortColumn" parameterType="com.intramirror.product.api.entity.promotion.SortPromotion">
+        UPDATE t_promotion_seq SET
+        <trim prefix=" " suffixOverrides=",">
+            <if test="seqType != null">
+                `seq_type` = #{seqType, jdbcType=TINYINT},
+            </if>
+            <if test="sort != null">
+                `sort` = #{sort, jdbcType=INTEGER},
+            </if>
+            <if test="enabled != null">
+                `enabled` = #{enabled, jdbcType=BIT},
+            </if>
+        </trim>
+        WHERE promotion_seq_id = #{promotionSeqId, jdbcType=BIGINT}
+    </update>
+
+    <select id="getVendorSortItem" parameterType="Long" resultType="java.util.Map">
+        SELECT
+          promotion_vendor_id AS promotionVendorId,
+          promotion_id AS promotionId,
+          vendor_id AS vendorId,
+          vendor_name AS name,
+          sort
+        FROM t_promotion_seq_vendor
+        WHERE promotion_id = #{promotionId}
+    </select>
+    <select id="getBrandSortItem" parameterType="Long" resultType="java.util.Map">
+        SELECT
+        promotion_brand_id AS promotionBrandId,
+        promotion_id AS promotionId,
+        brand_id AS brandId,
+        english_name AS name,
+        sort
+        FROM t_promotion_seq_brand
+        WHERE promotion_id = #{promotionId}
+    </select>
+    <select id="getCategorySortItem" parameterType="Long" resultType="java.util.Map">
+        SELECT
+        promotion_category_id AS promotionCategoryId,
+        promotion_id AS promotionId,
+        category_id AS categoryId,
+        name AS name,
+        sort
+        FROM t_promotion_seq_category
+        WHERE promotion_id = #{promotionId} AND level = 2
+    </select>
+
+    <select id="getSimpleSort" parameterType="com.intramirror.product.api.entity.promotion.SortPromotion" resultType="java.util.Map">
+         SELECT promotion_seq_id AS promotionSeqId,
+          promotion_id AS promotionId,
+          `column_name` AS columnName,
+          seq_type AS seqType,
+          `sort`,
+          enabled,
+          description
+      FROM t_promotion_seq
+      WHERE promotion_id = #{promotionId} AND column_name = #{columnName}
+    </select>
 
 </mapper>
