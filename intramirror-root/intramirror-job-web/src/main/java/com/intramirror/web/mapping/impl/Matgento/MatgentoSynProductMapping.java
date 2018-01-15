@@ -55,6 +55,11 @@ public class MatgentoSynProductMapping implements IProductMapping{
             sku.setSize(jsonObjectData.getString("size"));
             sku.setStock(jsonObjectData.getString("qty"));
             sku.setBarcodes(jsonObjectData.getString("stock_id"));
+
+            String stock = bodyDataMap.get("stock") == null?"":bodyDataMap.get("stock").toString();
+            if(stock.equals("0")) {
+                sku.setStock("0");
+            }
             productOptions.getSkus().add(sku);
 
             // image
@@ -67,6 +72,13 @@ public class MatgentoSynProductMapping implements IProductMapping{
             }
             productOptions.setCoverImg(JSONObject.toJSONString(images));
             productOptions.setDescImg(JSONObject.toJSONString(images));
+
+            productOptions.setSeasonCode("17FW");
+            productOptions.setCategory1("MEN");
+            productOptions.setCategory2("Clothing");
+            productOptions.setCategory3("Beachwear");
+            productOptions.setBrandName("Gucci");
+            productOptions.setColorCode("123");
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("MatgentoSynProductMapping,ErrorMessage:"+e);
