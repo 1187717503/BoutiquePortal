@@ -81,4 +81,6 @@ public interface CategoryMapper {
      */
     List<Map<String, Object>> getCategoryByCondition(Map<String, Object> map);
 
+    List<Category> listSubCategoryByCategoryId(Long categoryId);
+
 }

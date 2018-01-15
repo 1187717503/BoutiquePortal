@@ -1,6 +1,9 @@
 package com.intramirror.product.core.mapper;
 
+import com.intramirror.product.api.entity.promotion.BrandSort;
+import com.intramirror.product.api.entity.promotion.CategorySort;
 import com.intramirror.product.api.entity.promotion.SortPromotion;
+import com.intramirror.product.api.entity.promotion.VendorSort;
 import com.intramirror.product.api.model.PromotionExclude;
 import com.intramirror.product.api.model.PromotionInclude;
 import com.intramirror.product.api.model.PromotionRule;
@@ -39,6 +42,8 @@ public interface PromotionRuleMapper {
 
     int updateExcludeRule(PromotionRule rule);
 
+    // sort
+
     List<Map<String, Object>> listSortColumn(Long promotionId);
 
     int updateSortColumn(SortPromotion sortPromotion);
@@ -50,5 +55,20 @@ public interface PromotionRuleMapper {
     List<Map<String, Object>> getCategorySortItem(Long promotionId);
 
     List<Map<String, Object>> getSimpleSort(SortPromotion sortPromotion);
+
+    int removeBrandSortItems(Long promotionId);
+
+    int removeVendorSortItems(Long promotionId);
+
+    int removeCategorySortItems(Long promotionId);
+
+    int updateSimpleSort(SortPromotion sortPromotion);
+
+    int insertBrandSort(BrandSort brandSort);
+
+    int insertVendSort(VendorSort vendorSort);
+
+    int insertCategorySort(CategorySort categorySort);
+
 }
 
