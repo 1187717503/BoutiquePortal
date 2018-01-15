@@ -90,6 +90,8 @@ public class ApiErrorTypeEnum {
         error_price_out_off("error_price_out_off","价格超过+-20%"),
         warning_price_out_off("warning_price_out_off","价格超过+-20%"),
         error_data_can_not_find_mapping("error_data_can_not_find_mapping","警告，数据不能映射。"),
+        error_Category_change("error_Category_change","警告，Category不允许改变。"),
+        error_Brand_change("error_Brand_change","警告，BrandId不允许改变。"),
         data_can_not_find_mapping("data_can_not_find_mapping","报错，数据不能映射。"),
         error_ColorCode_change("error_ColorCode_change","警告，ColorCode不允许改变。"),
         warning_duplicated_skusize("warning_duplicated_skusize","重复的sku size"),
