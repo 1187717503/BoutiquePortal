@@ -2,8 +2,11 @@ package com.intramirror.product.core.impl.promotion;
 
 import com.alibaba.fastjson.JSONObject;
 import com.intramirror.product.api.entity.promotion.BrandEntity;
+import com.intramirror.product.api.entity.promotion.BrandSort;
 import com.intramirror.product.api.entity.promotion.CategoryEntity;
+import com.intramirror.product.api.entity.promotion.CategorySort;
 import com.intramirror.product.api.entity.promotion.SortPromotion;
+import com.intramirror.product.api.entity.promotion.VendorSort;
 import com.intramirror.product.api.enums.PromotionRuleType;
 import com.intramirror.product.api.enums.SortColumn;
 import com.intramirror.product.api.exception.BusinessException;
@@ -29,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
  * @author 123
  */
 @Service(value = "promotionService")
-
 public class PromotionServiceImpl implements IPromotionService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PromotionServiceImpl.class);
 
@@ -107,7 +109,7 @@ public class PromotionServiceImpl implements IPromotionService {
         return promotionRuleMapper.listSortColumn(promotionId);
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     @Override
     public Boolean updateSortPromotion(List<SortPromotion> listSort) throws BusinessException {
         for (SortPromotion sortPromotion : listSort) {
@@ -140,6 +142,99 @@ public class PromotionServiceImpl implements IPromotionService {
             break;
         }
         return result;
+    }
+
+    @Transactional
+    @Override
+    public Boolean updateItemsSort(Long promotionId, SortColumn sortColumn, List<Map<String, Object>> items) throws BusinessException {
+        Boolean result = false;
+        switch (sortColumn) {
+        case BRAND:
+            result = updateBrandSortItems(promotionId, items);
+            break;
+        case VENDOR:
+            result = updateVendSortItems(promotionId, items);
+            break;
+        case CATEGORY:
+            result = updateCategorySortItems(promotionId, items);
+            break;
+        case DISCOUNT:
+        case SEASON:
+            result = updateSimpleSort(promotionId, sortColumn, items);
+            break;
+        }
+        return result;
+    }
+
+    private Boolean updateCategorySortItems(Long promotionId, List<Map<String, Object>> items) throws BusinessException {
+        try {
+            promotionRuleMapper.removeCategorySortItems(promotionId);
+            for (Map<String, Object> item : items) {
+
+                List<Category> subCategoryList = categoryMapper.listSubCategoryByCategoryId(Long.parseLong(item.get("categoryId").toString()));
+                for (Category category : subCategoryList) {
+                    CategorySort categorySort = new CategorySort();
+                    categorySort.setPromotionId(promotionId);
+                    categorySort.setCategoryId(category.getCategoryId());
+                    categorySort.setSort(Integer.parseInt(item.get("sort").toString()));
+                    categorySort.setChineseName(category.getChineseName());
+                    categorySort.setParentId(category.getParentId());
+                    categorySort.setShowCodeInt(category.getShowCodeInt());
+                    categorySort.setName(category.getName());
+                    categorySort.setLevel(category.getLevel().intValue());
+                    LOGGER.info("Category id {}, sort {}.", category.getCategoryId(), item.get("sort").toString());
+                    promotionRuleMapper.insertCategorySort(categorySort);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BusinessException("update category sort failed.");
+        }
+        return true;
+    }
+
+    private Boolean updateVendSortItems(Long promotionId, List<Map<String, Object>> items) throws BusinessException {
+        try {
+            promotionRuleMapper.removeVendorSortItems(promotionId);
+            for (Map<String, Object> item : items) {
+                VendorSort vendorSort = new VendorSort();
+                vendorSort.setVendorId(Long.parseLong(item.get("vendorId").toString()));
+                vendorSort.setSort(Integer.parseInt(item.get("sort").toString()));
+                vendorSort.setPromotionId(promotionId);
+                vendorSort.setName(item.get("name").toString());
+                promotionRuleMapper.insertVendSort(vendorSort);
+            }
+        } catch (Exception e) {
+            throw new BusinessException("update vendor sort failed.");
+        }
+        return true;
+    }
+
+    private Boolean updateBrandSortItems(Long promotionId, List<Map<String, Object>> items) throws BusinessException {
+        try {
+            promotionRuleMapper.removeBrandSortItems(promotionId);
+            for (Map<String, Object> item : items) {
+                BrandSort brandSort = new BrandSort();
+                brandSort.setBrandId(Long.parseLong(item.get("brandId").toString()));
+                brandSort.setSort(Integer.parseInt(item.get("sort").toString()));
+                brandSort.setPromotionId(promotionId);
+                brandSort.setName(item.get("name").toString());
+                promotionRuleMapper.insertBrandSort(brandSort);
+            }
+
+        } catch (Exception e) {
+
+            throw new BusinessException("update brand sort failed.");
+        }
+        return true;
+    }
+
+    private Boolean updateSimpleSort(Long promotionId, SortColumn sortColumn, List<Map<String, Object>> items) {
+        SortPromotion sortPromotion = new SortPromotion();
+        sortPromotion.setPromotionId(promotionId);
+        sortPromotion.setColumnName(sortColumn.getValue());
+        sortPromotion.setSeqType(Integer.parseInt(items.get(0).get("seqType").toString()));
+        return promotionRuleMapper.updateSimpleSort(sortPromotion) > 0;
     }
 
     private void removeSubCategoryInList(List<CategoryEntity> list, Long parentId, int level) {

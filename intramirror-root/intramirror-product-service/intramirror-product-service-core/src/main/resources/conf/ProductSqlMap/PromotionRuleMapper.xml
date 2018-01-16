@@ -348,4 +348,141 @@
       WHERE promotion_id = #{promotionId} AND column_name = #{columnName}
     </select>
 
+    <update id="updateSimpleSort" parameterType="com.intramirror.product.api.entity.promotion.SortPromotion">
+        UPDATE t_promotion_seq SET seq_type=#{seqType}
+        WHERE promotion_id = #{promotionId} AND column_name ={columnName}
+    </update>
+
+    <delete id="removeBrandSortItems" parameterType="Long">
+        DELETE FROM t_promotion_seq_brand
+        WHERE promotion_id = #{promotionId}
+    </delete>
+
+    <delete id="removeVendorSortItems" parameterType="Long">
+        DELETE FROM t_promotion_seq_vendor
+        WHERE promotion_id = #{promotionId}
+    </delete>
+
+    <delete id="removeCategorySortItems" parameterType="Long">
+        DELETE FROM t_promotion_seq_category
+        WHERE promotion_id = #{promotionId}
+    </delete>
+
+    <insert id="insertBrandSort" keyProperty="promotionBrandId" useGeneratedKeys="true"
+            parameterType="com.intramirror.product.api.entity.promotion.BrandSort">
+        INSERT INTO t_promotion_seq_brand
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            `promotion_id`,
+            <if test="brandId != null">
+                `brand_id`,
+            </if>
+            <if test="name != null">
+                `english_name`,
+            </if>
+            <if test="sort != null">
+                `sort`
+            </if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            #{promotionId, jdbcType=BIGINT},
+            <if test="brandId != null">
+                #{brandId, jdbcType=BIGINT},
+            </if>
+            <if test="name != null">
+                #{name, jdbcType=VARCHAR},
+            </if>
+            <if test="sort != null">
+                #{sort, jdbcType=INTEGER}
+            </if>
+        </trim>
+    </insert>
+
+    <insert id="insertVendorSort" keyProperty="promotionVendorId" useGeneratedKeys="true"
+            parameterType="com.intramirror.product.api.entity.promotion.VendorSort">
+        INSERT INTO t_promotion_seq_vendor
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            `promotion_id`,
+            <if test="vendorId != null">
+                `vendor_id`,
+            </if>
+            <if test="name != null">
+                `vendor_name`,
+            </if>
+            <if test="sort != null">
+                `sort`
+            </if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            #{promotionId, jdbcType=BIGINT},
+            <if test="vendorId != null">
+                #{vendorId, jdbcType=BIGINT},
+            </if>
+            <if test="name != null">
+                #{name, jdbcType=VARCHAR},
+            </if>
+            <if test="sort != null">
+                #{sort, jdbcType=INTEGER}
+            </if>
+        </trim>
+    </insert>
+
+    <insert id="insertCategorySort" keyProperty="promotionCategoryId" useGeneratedKeys="true"
+            parameterType="com.intramirror.product.api.entity.promotion.CategorySort">
+        INSERT INTO t_promotion_seq_category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            `promotion_id`,
+            <if test="categoryId != null">
+                `category_id`,
+            </if>
+            <if test="name != null">
+                `name`,
+            </if>
+            <if test="chineseName != null">
+                `chinese_name`,
+            </if>
+            <if test="parentId != null">
+                `parent_id`,
+            </if>
+            <if test="sort != null">
+                `sort`,
+            </if>
+            <if test="level != null">
+                `level`,
+            </if>
+            <if test="showCodeInt != null">
+                `show_code_int`,
+            </if>
+            <if test="coverImg != null">
+                `cover_img`
+            </if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            #{promotionId, jdbcType=BIGINT},
+            <if test="categoryId != null">
+                #{categoryId, jdbcType=BIGINT},
+            </if>
+            <if test="name != null">
+                #{name, jdbcType=VARCHAR},
+            </if>
+            <if test="chineseName != null">
+                #{chineseName, jdbcType=VARCHAR},
+            </if>
+            <if test="parentId != null">
+                #{parentId, jdbcType=BIGINT},
+            </if>
+            <if test="sort != null">
+                #{sort, jdbcType=INTEGER},
+            </if>
+            <if test="level != null">
+                #{level, jdbcType=INTEGER},
+            </if>
+            <if test="showCodeInt != null">
+                #{showCodeInt, jdbcType=BIGINT},
+            </if>
+            <if test="coverImg != null">
+                #{coverImg, jdbcType=LONGVARCHAR}
+            </if>
+        </trim>
+    </insert>
+
 </mapper>

@@ -47,7 +47,7 @@ public class PromotionSortManageController {
     @PutMapping(value = "/{promotionId}", consumes = "application/json")
     public Response setSortColumn(@PathVariable(value = "promotionId") Long promotionId, @RequestBody List<SortPromotion> body) throws BusinessException {
         if (promotionId == null) {
-            LOGGER.error("Promotion id is empty, {}.", promotionId);
+            LOGGER.error("Promotion id is empty.");
             throw new ValidateException(new ErrorResponse("Promotion id is empty."));
         }
 
@@ -81,5 +81,16 @@ public class PromotionSortManageController {
         }
 
         return Response.status(StatusType.SUCCESS).data(data);
+    }
+
+    @PutMapping(value = "/{promotionId}/{columnName}", consumes = "application/json")
+    public Response setSortItems(@PathVariable(value = "promotionId") Long promotionId, @PathVariable(value = "columnName") String columnName,
+            @RequestBody List<Map<String, Object>> body) throws BusinessException {
+        SortColumn sortColumn = SortColumn.fromString(columnName);
+        if (sortColumn == null) {
+            throw new ValidateException(new ErrorResponse("Column name is not correct."));
+        }
+
+        return Response.status(StatusType.SUCCESS).data(promotionService.updateItemsSort(promotionId, sortColumn, body));
     }
 }
