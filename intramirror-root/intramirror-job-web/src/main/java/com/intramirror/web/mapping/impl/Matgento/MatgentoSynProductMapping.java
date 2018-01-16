@@ -28,9 +28,9 @@ public class MatgentoSynProductMapping implements IProductMapping{
             productOptions.setName(jsonObjectData.getString("name"))
                     .setCode(jsonObjectData.getString("product_id").trim())
                     .setSeasonCode(jsonObjectData.getString("season"))
-                    .setBrandCode(jsonObjectData.getString("supplier_sku").trim())
+//                    .setBrandCode(jsonObjectData.getString("supplier_sku").trim())
 //                    .setCarryOver("")
-                    .setBrandName(jsonObjectData.getString("brand").trim())
+                    .setBrandName(jsonObjectData.getString("brand"))
                     .setColorCode("") // TODO
                     .setColorDesc(jsonObjectData.getString("color"))
 //                    .setCategory_boutique_id("")
@@ -73,6 +73,14 @@ public class MatgentoSynProductMapping implements IProductMapping{
             productOptions.setCoverImg(JSONObject.toJSONString(images));
             productOptions.setDescImg(JSONObject.toJSONString(images));
 
+            // brandID , colorCode
+            String supplier_sku = jsonObjectData.getString("supplier_sku").trim();
+            String[] suppliers = supplier_sku.split("-");
+            String BrandID = suppliers[0]+suppliers[1];
+            String colorCode = suppliers[2];
+            productOptions.setBrandCode(BrandID);
+            productOptions.setColorCode(colorCode);
+
             productOptions.setSeasonCode("17FW");
             productOptions.setCategory1("MEN");
             productOptions.setCategory2("Clothing");
@@ -85,4 +93,5 @@ public class MatgentoSynProductMapping implements IProductMapping{
         }
         return productOptions;
     }
+
 }
