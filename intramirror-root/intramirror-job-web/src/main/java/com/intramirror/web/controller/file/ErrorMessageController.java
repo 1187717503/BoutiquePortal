@@ -207,13 +207,23 @@ public class ErrorMessageController {
                 }
 
                 // atelier
-                if(vendor_id.equals("8")
+                if(
+                        vendor_id.equals("8")
                         ||vendor_id.equals("10")
                         ||vendor_id.equals("11")
                         ||vendor_id.equals("12")
                         ||vendor_id.equals("13")
                         ||vendor_id.equals("14")
-                        ||vendor_id.equals("18")) {
+                        ||vendor_id.equals("18")
+                        ||vendor_id.equals("26")
+                        ||vendor_id.equals("28")
+                        ||vendor_id.equals("31")
+                        ||vendor_id.equals("25")
+                        ||vendor_id.equals("23")
+                        ||vendor_id.equals("29")
+                        ||vendor_id.equals("27")
+                        ||vendor_id.equals("33")
+                        ) {
                     if(name.equals("stock_delta_stock")) {
                         StockOption stockOption = atelierUpdateByStockMapping.mapping(originDataMap);
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateStockThread(stockOption,apiDataFileUtils,originDataMap));

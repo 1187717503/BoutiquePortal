@@ -298,6 +298,11 @@ public class ApiUpdateProductService {
                 if(newSort > oldSort) {
                     updateSeasonFlag = true;
                 }
+
+                if((newSeasonCode.equalsIgnoreCase("CarryOver") || oldSeasonCode.equalsIgnoreCase("CarryOver"))
+                        && !newSeasonCode.equalsIgnoreCase(oldSeasonCode) && newSort != 0) {
+                    updateSeasonFlag = true;
+                }
             }
             /* update by yf 12/14*/
 
