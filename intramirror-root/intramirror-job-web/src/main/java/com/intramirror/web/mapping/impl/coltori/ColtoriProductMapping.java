@@ -2,7 +2,6 @@ package com.intramirror.web.mapping.impl.coltori;
 
 import com.alibaba.fastjson15.JSONArray;
 import com.google.gson.Gson;
-import com.intramirror.common.help.ExceptionUtils;
 import com.intramirror.common.help.StringUtils;
 import com.intramirror.product.api.service.category.ICategoryService;
 import com.intramirror.web.mapping.api.IProductMapping;
@@ -17,9 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pk.shoplus.model.ProductEDSManagement;
 
-/**
- * Created by dingyifan on 2017/11/1.
- */
 @Service(value = "coltoriProductMapping")
 public class ColtoriProductMapping implements IProductMapping {
 
@@ -30,12 +26,10 @@ public class ColtoriProductMapping implements IProductMapping {
 
     @Override
     public ProductEDSManagement.ProductOptions mapping(Map<String, Object> bodyDataMap) {
-        logger.info("ColtoriProductMapping,inputParams,bodyDataMap:"+ JSONObject.fromObject(bodyDataMap));
         ProductEDSManagement.ProductOptions productOptions = new ProductEDSManagement.ProductOptions();
         try {
             String key = bodyDataMap.get("key").toString();
             JSONObject productObj = (JSONObject) bodyDataMap.get("product");
-//            traveseJson(productObj);
             productOptions.setName(productObj.getJSONObject("name").get("en") == null?"":productObj.getJSONObject("name").getString("en"))
                     .setCode(key)
                     .setSeasonCode(productObj.getString("season_id"))
@@ -48,8 +42,6 @@ public class ColtoriProductMapping implements IProductMapping {
                     .setComposition(productObj.get("notes") == null?"":productObj.getString("notes"))
                     .setMadeIn("")
                     .setSizeFit("")
-//                    .setCoverImg(productObj.getString("images"))
-//                    .setDescImg(productObj.getString("images"))
                     .setWeight("")
                     .setLength("")
                     .setWidth("")
@@ -57,6 +49,7 @@ public class ColtoriProductMapping implements IProductMapping {
                     .setSalePrice(productObj.getString("retail_price"))
                     .setLast_check(new Date());
 
+            // category
             String category_l1 = productObj.getString("family_id");
             String category_l2 = productObj.getString("group_id");
             String category_l3 = productObj.getString("subgroup_id");
@@ -81,21 +74,7 @@ public class ColtoriProductMapping implements IProductMapping {
                 productOptions.setCategory3(category_id);
             }
 
-            /*Map<String, Object> categoryMap = new HashMap<String, Object>();
-            categoryMap.put("vendor_id", bodyDataMap.get("vendor_id"));
-            categoryMap.put("boutique_first_category", category_l1);
-            categoryMap.put("boutique_second_category", category_l2);
-            categoryMap.put("boutique_third_category", category_l3);
-            productOptions.setCategory_name(com.alibaba.fastjson15.JSONObject.toJSONString(categoryMap));*/
-
-            /*logger.info("ColtoriProductMapping,getCategoryByCondition,categoryMap:"+ com.alibaba.fastjson15.JSONObject.toJSONString(categoryMap));
-            List<Map<String, Object>> apiCategoryMap = categoryService.getCategoryByCondition(categoryMap);
-            logger.info("ColtoriProductMapping,getCategoryByCondition,apiCategoryMap:"+ com.alibaba.fastjson15.JSONObject.toJSONString(apiCategoryMap)+",categoryMap:"+ com.alibaba.fastjson15.JSONObject
-                    .toJSONString(categoryMap));
-            if(null != apiCategoryMap && 0 < apiCategoryMap.size()) {
-                productOptions.setCategoryId(apiCategoryMap.get(0).get("category_id").toString());
-            }*/
-
+            // images
             String images = productObj.getString("images");
             if(StringUtils.isNotBlank(images)) {
                 List<String> imageList = JSONArray.parseArray(images, String.class);
@@ -120,41 +99,20 @@ public class ColtoriProductMapping implements IProductMapping {
                 productOptions.setDescImg(new Gson().toJson(imageList));
             }
 
+            // season_code
+            String product_code = productOptions.getCode();
+            String season_code = productOptions.getSeasonCode();
+            if(StringUtils.isNotBlank(product_code)
+                    && StringUtils.isNotBlank(season_code)) {
+                if(!product_code.substring(0,3).equals(season_code.substring(0,3))) {
+                    productOptions.setSeasonCode("CarryOver");
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            logger.info("ColtoriProductMapping,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",bodyDataMap:"+ JSONObject.fromObject(bodyDataMap));
+            logger.info("coltori product mapping error message : " + e);
         }
-        logger.info("ColtoriProductMapping,outputParams,bodyDataMap:"+ JSONObject.fromObject(bodyDataMap));
         return productOptions;
     }
 
-    public static void main(String[] args) {
-        String str = "[\"http://sha-oss-static.oss-cn-shanghai.aliyuncs.com/upload/c99a5cd5-3415-4e98-b8ae-9c1933c2210a-100.jpg\",\"http://sha-oss-static.oss-cn-shanghai.aliyuncs.com/upload/c99a5cd5-3415-4e98-b8ae-9c1933c2210a-1.jpg\",\"http://cdn.orderlink.it/foto/181728BNBFLAS0SPU/BNBFLAS0SPUvxf-17.jpg\",\"http://cdn.orderlink.it/foto/181728BNBFLAS0SPU/BNBFLAS0SPUpth-15.jpg\",\"http://cdn.orderlink.it/foto/181728BNBFLAS0SPU/BNBFLAS0SPUsfn-19.jpg\"]";
-
-        List<String> originList = JSONArray.parseArray(str, String.class);
-
-        String o1 = "http://sha-oss-static.oss-cn-shanghai.aliyuncs.com/upload/c99a5cd5-3415-4e98-b8ae-9c1933c2210a-100.jpg";
-        System.out.println(o1.substring(o1.lastIndexOf("-")+1,o1.lastIndexOf(".jpg")));
-
-        Collections.sort(originList, new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) {
-                try {
-                    int i1 = Integer.parseInt(o1.substring(o1.lastIndexOf("-")+1,o1.lastIndexOf(".jpg")));
-                    int i2 = Integer.parseInt(o2.substring(o2.lastIndexOf("-")+1,o2.lastIndexOf(".jpg")));
-
-                    if(i1>i2){
-                        return 1;
-                    }
-                } catch (Exception e) {
-
-                }
-                return -1;
-            }
-        });
-
-        for (int i = 0;i<originList.size();i++){
-            System.out.println(originList.get(i));
-        }
-    }
 }
