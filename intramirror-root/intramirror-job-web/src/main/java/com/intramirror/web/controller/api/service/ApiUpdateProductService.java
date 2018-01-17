@@ -364,18 +364,23 @@ public class ApiUpdateProductService {
         this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.ColorCode.getCode(),product.getColor_code());
         this.updateProductProperty(conn,product.getProduct_id(), ProductPropertyEnumKeyName.CarryOver.getCode(),productOptions.getCarryOver());
 
-        /** 只发一次后面注释*/
+        /** 只发一次后面注释*//*
         if(product.vendor_id == 32L) {
             if(StringUtils.isNotBlank(newColorCode)) {
                 product.color_code = newColorCode;
                 this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.ColorCode.getCode(),newColorCode);
             }
-        }
+        }*/
         /** 只发一次后面注释
         if(product.getVendor_id().intValue() == 24 && StringUtils.isNotBlank(productOptions.getCategoryId())) {
             product.category_id = Long.parseLong(productOptions.getCategoryId());
         }
         * 只发一次后面注释 */
+
+        // Lungolivigno
+        if(product.getVendor_id().intValue() == 33 && StringUtils.isNotBlank(productOptions.getCategoryId())) {
+            product.category_id = Long.parseLong(productOptions.getCategoryId());
+        }
 
         productService.updateProduct(product);
         logger.info("ApiUpdateProductService,setProduct,end,updateProduct,product:"+JSONObject.toJSONString(product));
