@@ -5,6 +5,7 @@ import com.alibaba.fastjson15.JSONObject;
 import com.intramirror.web.mapping.api.IProductMapping;
 import java.util.Date;
 import java.util.Map;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 import pk.shoplus.model.ProductEDSManagement;
@@ -62,6 +63,11 @@ public class AtelierUpdateByProductMapping implements IProductMapping{
                 sku.setSize(item.getString("size"));
                 sku.setStock(item.getString("stock"));
                 productOptions.getSkus().add(sku);
+            }
+
+            String carryOver = jsonObjectData.getString("carry_over");
+            if(StringUtils.isNotBlank(carryOver) && StringUtils.trim(carryOver).equalsIgnoreCase("CO")) {
+                productOptions.setSeasonCode("CO");
             }
 
             /*try {
