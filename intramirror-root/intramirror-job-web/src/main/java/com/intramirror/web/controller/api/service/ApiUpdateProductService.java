@@ -340,7 +340,7 @@ public class ApiUpdateProductService {
         }*/
 
         // 如果消息重置时,BrandID和ColorCode不为空,直接更新
-        if(modify) {
+        /*if(modify) {
             if(StringUtils.isNotBlank(newBrandCode)) {
                 product.designer_id = newBrandCode;
             }
@@ -358,6 +358,22 @@ public class ApiUpdateProductService {
             } else if(StringUtils.isBlank(newColorCode) || !newColorCode.equalsIgnoreCase(oldColorCode)) {
                 this.setWarning(ApiErrorTypeEnum.errorType.error_ColorCode_change,"ColorCode",newColorCode);
             }
+        }*/
+
+        // designer_id和Color_code接口里有改变直接覆盖修改，并报Warning。
+        if(StringUtils.isBlank(newBrandCode) || !newBrandCode.equalsIgnoreCase(oldBrandCode)) {
+            this.setWarning(ApiErrorTypeEnum.errorType.error_BrandID_change,"BrandID",newBrandCode);
+        }
+
+        if(StringUtils.isBlank(newColorCode) || !newColorCode.equalsIgnoreCase(oldColorCode)) {
+            this.setWarning(ApiErrorTypeEnum.errorType.error_ColorCode_change,"ColorCode",newColorCode);
+        }
+
+        if(StringUtils.isNotBlank(newBrandCode)) {
+            product.designer_id = newBrandCode;
+        }
+        if(StringUtils.isNotBlank(newColorCode)) {
+            product.color_code = newColorCode;
         }
 
         this.updateProductProperty(conn,product.getProduct_id(), ProductPropertyEnumKeyName.BrandID.getCode(),product.getDesigner_id());
@@ -377,10 +393,10 @@ public class ApiUpdateProductService {
         }
         * 只发一次后面注释 */
 
-        // Lungolivigno
+        /*// Lungolivigno
         if(product.getVendor_id().intValue() == 33 && StringUtils.isNotBlank(productOptions.getCategoryId())) {
             product.category_id = Long.parseLong(productOptions.getCategoryId());
-        }
+        }*/
 
         productService.updateProduct(product);
         logger.info("ApiUpdateProductService,setProduct,end,updateProduct,product:"+JSONObject.toJSONString(product));
