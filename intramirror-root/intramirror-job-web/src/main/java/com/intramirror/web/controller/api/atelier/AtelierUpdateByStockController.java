@@ -242,6 +242,14 @@ public class AtelierUpdateByStockController  implements InitializingBean {
         LUG.put("fileUtils",new ApiDataFileUtils("lungoliviglio","stock_delta_stock"));
         paramsMap.put("LUG",LUG);
 
+        Map<String,Object> OBQ = new HashMap<>();
+        OBQ.put("store_code","OBQ");
+        OBQ.put("vendor_id","35");
+        OBQ.put("vendor_name","OBoutique");
+        OBQ.put("eventName","OBoutique_stock_delta_stock");
+        OBQ.put("fileUtils",new ApiDataFileUtils("OBoutique","stock_delta_stock"));
+        paramsMap.put("OBQ",OBQ);
+
     }
 }
 
