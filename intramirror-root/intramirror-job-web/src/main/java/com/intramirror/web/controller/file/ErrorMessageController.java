@@ -223,6 +223,7 @@ public class ErrorMessageController {
                         ||vendor_id.equals("29")
                         ||vendor_id.equals("27")
                         ||vendor_id.equals("33")
+                                ||vendor_id.equals("35")
                         ) {
                     if(name.equals("stock_delta_stock")) {
                         StockOption stockOption = atelierUpdateByStockMapping.mapping(originDataMap);
@@ -262,6 +263,32 @@ public class ErrorMessageController {
                         productOptions.setModifyPrice("1");
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
                     } else if(name.equals("apartment_stock_all_update")){
+                        StockOption stockOption = xmagSynAllStockMapping.mapping(originDataMap);
+                        CommonThreadPool.execute(name,executor,threadNum,new UpdateStockThread(stockOption,apiDataFileUtils,originDataMap));
+                    }
+                }
+
+                if(vendor_id.equals("37")) {
+                    if(name.equals("dolci_product_all_update") || name.equals("dolci_product_delta_update")) {
+                        ProductEDSManagement.ProductOptions productOptions = xmagSynProductAllMapper.mapping(originDataMap);
+                        ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
+                        vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                        productOptions.setModifyPrice("1");
+                        CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
+                    } else if(name.equals("dolci_stock_all_update")){
+                        StockOption stockOption = xmagSynAllStockMapping.mapping(originDataMap);
+                        CommonThreadPool.execute(name,executor,threadNum,new UpdateStockThread(stockOption,apiDataFileUtils,originDataMap));
+                    }
+                }
+
+                if(vendor_id.equals("12")) {
+                    if(name.equals("mimma_product_all_update") || name.equals("mimma_product_delta_update")) {
+                        ProductEDSManagement.ProductOptions productOptions = xmagSynProductAllMapper.mapping(originDataMap);
+                        ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
+                        vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                        productOptions.setModifyPrice("1");
+                        CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
+                    } else if(name.equals("mimma_stock_all_update")){
                         StockOption stockOption = xmagSynAllStockMapping.mapping(originDataMap);
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateStockThread(stockOption,apiDataFileUtils,originDataMap));
                     }

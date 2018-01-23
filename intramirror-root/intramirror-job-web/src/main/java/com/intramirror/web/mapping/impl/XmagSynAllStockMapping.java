@@ -55,6 +55,7 @@ public class XmagSynAllStockMapping implements IStockMapping{
 				stockOption.setSizeValue(sizeValue.get("value").toString());
 				stockOption.setProductCode(sizeValue.get("product_code").toString());
 			}
+			stockOption.setSku_code(productMap.get("Barcode").toString());
 			stockOption.setQuantity(qty);
 			stockOption.setVendor_id(vendor_id);
 			stockOption.setType(StockContants.absolute_qty); // 库存绝对值

@@ -5,7 +5,6 @@ import com.google.gson.Gson;
 import com.intramirror.common.utils.DateUtils;
 import com.intramirror.main.api.service.SeasonMappingService;
 import com.intramirror.product.api.service.stock.IUpdateStockService;
-import com.intramirror.web.contants.RedisKeyContants;
 import com.intramirror.web.mapping.api.IProductMapping;
 import com.intramirror.web.thread.CommonThreadPool;
 import com.intramirror.web.thread.UpdateProductThread;
@@ -181,9 +180,9 @@ public class XmagSynProductController implements InitializingBean {
 				// end 增量更新
 //			}
 
-			logger.info("XmagSynProductAllControllerSynProduct,zeroClearing,flag:"+flag);
+			logger.info("XmagSynProductAllControllerSynProduct,zeroClearing,flag:"+flag+",eventName:"+eventName);
 			if(eventName.equals("apartment_product_all_update") && flag > 100 ) {
-				logger.info("XmagSynProductAllControllerSynProduct,zeroClearing,start,vendor_id:"+vendor_id);
+				logger.info("XmagSynProductAllControllerSynProduct,zeroClearing,start,vendor_id:"+vendor_id+",eventName:"+eventName+",flag:"+flag);
 				iUpdateStockService.zeroClearing(Long.parseLong(vendor_id));
 				logger.info("XmagSynProductAllControllerSynProduct,zeroClearing,end,vendor_id:"+vendor_id);
 			}
@@ -258,62 +257,98 @@ public class XmagSynProductController implements InitializingBean {
 		return mapList;
 	}
 
-	public static void main(String[] args) {
-		Map<String,Object> m = new HashMap<>();
-		m.put("a","1");
-		System.out.println(new Gson().toJson(m));
-
-		Map<String,Object> a = new HashMap<>(m) ;
-		a.put("b","n");
-		System.out.println(new Gson().toJson(a));
-		System.out.println(new Gson().toJson(m));
-
-		List<Map<String,Object>> l = new ArrayList<>();
-		l.add(m);
-
-		System.out.println(new Gson().toJson(l));
-	}
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		ThreadPoolExecutor xmag_all_updateProduct_executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
-		Map<String, Object> xmag_all_updateProduct = new HashMap<>();
-		xmag_all_updateProduct.put("url", "http://net13server2.net/TheApartmentAPI/MyApi/Productslist/GetProducts");
-		xmag_all_updateProduct.put("DBContext", "Default");
-		xmag_all_updateProduct.put("BrandId", "");
-		xmag_all_updateProduct.put("StartIndex", "1");
-		xmag_all_updateProduct.put("EndIndex", "50");
-		xmag_all_updateProduct.put("Key", "RTs7g634sH");
-		xmag_all_updateProduct.put("CategoryId", "");
-		xmag_all_updateProduct.put("executor", xmag_all_updateProduct_executor);
-		xmag_all_updateProduct.put("vendor_id", "20");
-		xmag_all_updateProduct.put("threadNum", "5");
-		xmag_all_updateProduct.put("eventName", "apartment_product_all_update");
-		xmag_all_updateProduct.put("fileUtils", new ApiDataFileUtils("xmag", "apartment_product_all_update"));
-
-		ThreadPoolExecutor apartment_product_delta_update_executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
-		Map<String, Object> apartment_product_delta_update = new HashMap<>();
-		apartment_product_delta_update.put("url", "http://net13server2.net/TheApartmentAPI/MyApi/Productslist/GetProducts");
-		apartment_product_delta_update.put("DBContext", "Default");
-		apartment_product_delta_update.put("BrandId", "");
-		apartment_product_delta_update.put("StartIndex", "1");
-		apartment_product_delta_update.put("EndIndex", "50");
-		apartment_product_delta_update.put("Key", "RTs7g634sH");
-		apartment_product_delta_update.put("CategoryId", "");
-		apartment_product_delta_update.put("executor", apartment_product_delta_update_executor);
-		apartment_product_delta_update.put("vendor_id", "20");
-		apartment_product_delta_update.put("threadNum", "5");
-		apartment_product_delta_update.put("redisStartIndex", RedisKeyContants.apartment_start_index_bydate);
-		apartment_product_delta_update.put("redisEndIndex",RedisKeyContants.apartment_end_index_bydate);
-		apartment_product_delta_update.put("eventName", "apartment_product_delta_update");
-		apartment_product_delta_update.put("fileUtils", new ApiDataFileUtils("xmag", "apartment_product_delta_update"));
-
-		// put data
 		paramsMap = new HashMap<>();
-		paramsMap.put("apartment_product_all_update", xmag_all_updateProduct);
-		paramsMap.put("apartment_product_delta_update", apartment_product_delta_update);
+		paramsMap.put("apartment_product_all_update",new MapUtils(new HashMap<String, Object>())
+				.putData("url","http://net13server2.net/TheApartmentAPI/MyApi/Productslist/GetProducts")
+				.putData("DBContext","Default")
+				.putData("BrandId","")
+				.putData("StartIndex","1")
+				.putData("EndIndex","50")
+				.putData("Key","RTs7g634sH")
+				.putData("CategoryId","")
+				.putData("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool())
+				.putData("vendor_id","20")
+				.putData("threadNum","5")
+				.putData("eventName","apartment_product_all_update")
+				.putData("fileUtils",new ApiDataFileUtils("apartment", "product_all_update")).getMap());
 
+		paramsMap.put("apartment_product_delta_update", new MapUtils(new HashMap<String, Object>())
+				.putData("url","http://net13server2.net/TheApartmentAPI/MyApi/Productslist/GetProducts")
+				.putData("DBContext","Default")
+				.putData("BrandId","")
+				.putData("StartIndex","1")
+				.putData("EndIndex","50")
+				.putData("Key","RTs7g634sH")
+				.putData("CategoryId","")
+				.putData("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool())
+				.putData("vendor_id","20")
+				.putData("threadNum","5")
+				.putData("redisStartIndex","apartment_start_index_bydate")
+				.putData("redisEndIndex","apartment_end_index_bydate")
+				.putData("eventName","apartment_product_delta_update")
+				.putData("fileUtils",new ApiDataFileUtils("apartment", "product_delta_update")).getMap());
 
+		paramsMap.put("dolci_product_all_update",new MapUtils(new HashMap<String, Object>())
+				.putData("url","http://net13server2.net/dolcitrameapi/MyApi/Productslist/GetProducts")
+				.putData("DBContext","Default")
+				.putData("BrandId","")
+				.putData("StartIndex","1")
+				.putData("EndIndex","50")
+				.putData("Key","FwkQO9jAYJ")
+				.putData("CategoryId","")
+				.putData("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool())
+				.putData("vendor_id","37")
+				.putData("threadNum","5")
+				.putData("eventName","dolci_product_all_update")
+				.putData("fileUtils",new ApiDataFileUtils("dolci", "product_all_update")).getMap());
 
+		paramsMap.put("dolci_product_delta_update",new MapUtils(new HashMap<String, Object>())
+				.putData("url","http://net13server2.net/dolcitrameapi/MyApi/Productslist/GetProducts")
+				.putData("DBContext","Default")
+				.putData("BrandId","")
+				.putData("StartIndex","1")
+				.putData("EndIndex","50")
+				.putData("Key","FwkQO9jAYJ")
+				.putData("CategoryId","")
+				.putData("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool())
+				.putData("vendor_id","37")
+				.putData("threadNum","5")
+				.putData("redisStartIndex","dolci_start_index_bydate")
+				.putData("redisEndIndex","dolci_end_index_bydate")
+				.putData("eventName","dolci_product_delta_update")
+				.putData("fileUtils",new ApiDataFileUtils("dolci", "product_delta_update")).getMap());
+
+		paramsMap.put("mimma_product_all_update",new MapUtils(new HashMap<String, Object>())
+				.putData("url","http://net13server3.it/mimmaninniapi/MyApi/Productslist/GetProducts")
+				.putData("DBContext","Default")
+				.putData("BrandId","")
+				.putData("StartIndex","1")
+				.putData("EndIndex","50")
+				.putData("Key","G4jKb0sFid")
+				.putData("CategoryId","")
+				.putData("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool())
+				.putData("vendor_id","12")
+				.putData("threadNum","5")
+				.putData("eventName","mimma_product_all_update")
+				.putData("fileUtils",new ApiDataFileUtils("mimma", "product_all_update")));
+
+		paramsMap.put("mimma_product_delta_update",new MapUtils(new HashMap<String, Object>())
+				.putData("url","http://net13server3.it/mimmaninniapi/MyApi/Productslist/GetProducts")
+				.putData("DBContext","Default")
+				.putData("BrandId","")
+				.putData("StartIndex","1")
+				.putData("EndIndex","50")
+				.putData("Key","G4jKb0sFid")
+				.putData("CategoryId","")
+				.putData("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool())
+				.putData("vendor_id","12")
+				.putData("threadNum","5")
+				.putData("redisStartIndex","mimma_start_index_bydate")
+				.putData("redisEndIndex","mimma_end_index_bydate")
+				.putData("eventName","mimma_product_delta_update")
+				.putData("fileUtils",new ApiDataFileUtils("mimma", "product_delta_update")).getMap());
 	}
 
 }

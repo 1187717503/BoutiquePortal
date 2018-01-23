@@ -268,5 +268,13 @@ public class AtelierUpdateByProductService implements InitializingBean {
         LUG.put("eventName","lungoliviglio");
         LUG.put("executor",executor_33);
         paramsMap.put("LUG",LUG);
+
+        Map<String,Object> OBQ = new HashMap<>();
+        OBQ.put("store_code","OBQ");
+        OBQ.put("vendor_id","35");
+        OBQ.put("vendor_name","OBoutique");
+        OBQ.put("eventName","OBoutique");
+        OBQ.put("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool());
+        paramsMap.put("OBQ",OBQ);
     }
 }

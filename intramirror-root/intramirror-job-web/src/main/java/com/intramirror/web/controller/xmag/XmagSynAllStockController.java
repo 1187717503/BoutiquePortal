@@ -1,14 +1,19 @@
 package com.intramirror.web.controller.xmag;
 
-import java.util.Date;
+import com.alibaba.fastjson.JSONObject;
+import com.google.gson.Gson;
+import com.intramirror.main.api.service.SeasonMappingService;
+import com.intramirror.web.mapping.api.IStockMapping;
+import com.intramirror.web.mapping.vo.StockOption;
+import com.intramirror.web.thread.CommonThreadPool;
+import com.intramirror.web.thread.UpdateStockThread;
+import com.intramirror.web.util.ApiDataFileUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
-
 import javax.annotation.Resource;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
@@ -17,17 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.alibaba.fastjson.JSONObject;
-import com.google.gson.Gson;
-import com.intramirror.common.utils.DateUtils;
-import com.intramirror.main.api.service.SeasonMappingService;
-import com.intramirror.web.mapping.api.IStockMapping;
-import com.intramirror.web.mapping.vo.StockOption;
-import com.intramirror.web.thread.CommonThreadPool;
-import com.intramirror.web.thread.UpdateStockThread;
-import com.intramirror.web.util.ApiDataFileUtils;
-
 import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.parameter.StatusType;
 import pk.shoplus.service.request.api.IGetPostRequest;
@@ -79,11 +73,11 @@ public class XmagSynAllStockController implements InitializingBean {
 	        String vendor_id = param.get("vendor_id").toString();
 	        String eventName = param.get("eventName").toString();
 	        int threadNum = Integer.parseInt(param.get("threadNum").toString());
-	        ThreadPoolExecutor nugnesExecutor = (ThreadPoolExecutor) param.get("nugnesExecutor");
+	        ThreadPoolExecutor nugnesExecutor = (ThreadPoolExecutor) param.get("executor");
 	        ApiDataFileUtils fileUtils = (ApiDataFileUtils) param.get("fileUtils");
 
 			logger.info("XmagSynAllStockControllerSyn_stock,getBoutiqueSeasonCode,vendor_id:" +vendor_id);
-			List<Map<String, Object>> code = seasonMappingService.getBoutiqueSeasonCode(vendor_id);
+			List<Map<String, Object>> code = seasonMappingService.getBoutiqueSeasonCode("20");
 			logger.info("XmagSynAllStockControllerSyn_stock,getBoutiqueSeasonCode,code:"+JSONObject.toJSONString(code)+",vendor_id:" +vendor_id);
 
 			if (null != code && 0 < code.size()){
@@ -113,9 +107,9 @@ public class XmagSynAllStockController implements InitializingBean {
 		                        StockOption stockOption = iStockMapping.mapping(mqDataMap);
 		                        logger.info("XmagSynAllStockControllerSyn_stock,mapping,end,stockMap:"+new Gson().toJson(mqDataMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
 
-		                        logger.info("EdsAllUpdateByStockControllerExecute,execute,stockMap:"+new Gson().toJson(mqDataMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
+		                        logger.info("XmagSynAllStockControllerSyn_stock,execute,stockMap:"+new Gson().toJson(mqDataMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
 		                        CommonThreadPool.execute(eventName,nugnesExecutor,threadNum,new UpdateStockThread(stockOption,fileUtils,mqDataMap));
-		                        logger.info("EdsAllUpdateByStockControllerExecute,execute,stockMap:"+new Gson().toJson(mqDataMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
+		                        logger.info("XmagSynAllStockControllerSyn_stock,execute,stockMap:"+new Gson().toJson(mqDataMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
 		            		}
 			    		}
 			    	}
@@ -138,8 +132,8 @@ public class XmagSynAllStockController implements InitializingBean {
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		// xmag
-        ThreadPoolExecutor nugnesExecutor =(ThreadPoolExecutor) Executors.newCachedThreadPool();
+		/*// xmag
+        ThreadPoolExecutor nugnesExecutor =;
         Map<String,Object> xmag_all_stock = new HashMap<>();
         xmag_all_stock.put("url","http://net13server2.net/TheApartmentAPI/MyApi/Productslist/GetAllStockForSync");
         xmag_all_stock.put("DBContext","Default");
@@ -151,12 +145,44 @@ public class XmagSynAllStockController implements InitializingBean {
         xmag_all_stock.put("threadNum","5");
         xmag_all_stock.put("vendorName","The Apartment Cosenza");
         xmag_all_stock.put("eventName","apartment_stock_all_update");
-        xmag_all_stock.put("fileUtils",new ApiDataFileUtils("xmag","apartment_stock_all_update"));
+        xmag_all_stock.put("fileUtils",new ApiDataFileUtils("xmag","apartment_stock_all_update"));*/
         
-        // put data
         paramsMap = new HashMap<>();
-        paramsMap.put("apartment_stock_all_update",xmag_all_stock);
+        paramsMap.put("apartment_stock_all_update",new MapUtils(new HashMap<String, Object>())
+				.putData("url","http://net13server2.net/TheApartmentAPI/MyApi/Productslist/GetAllStockForSync")
+				.putData("DBContext","Default")
+				.putData("SeasonCode","080")
+				.putData("typeSync","api")
+				.putData("Key","RTs7g634sH")
+				.putData("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool())
+				.putData("vendor_id","20")
+				.putData("threadNum","5")
+				.putData("eventName","apartment_stock_all_update")
+				.putData("fileUtils",new ApiDataFileUtils("apartment","stock_all_update")).getMap());
 
+		paramsMap.put("dolci_stock_all_update",new MapUtils(new HashMap<String, Object>())
+				.putData("url","http://net13server2.net/dolcitrameAPI/MyApi/Productslist/GetAllStockForSync")
+				.putData("DBContext","Default")
+				.putData("SeasonCode","080")
+				.putData("typeSync","api")
+				.putData("Key","FwkQO9jAYJ")
+				.putData("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool())
+				.putData("vendor_id","37")
+				.putData("threadNum","5")
+				.putData("eventName","dolci_stock_all_update")
+				.putData("fileUtils",new ApiDataFileUtils("dolci","stock_all_update")).getMap());
+
+		paramsMap.put("mimma_stock_all_update",new MapUtils(new HashMap<String, Object>())
+				.putData("url","http://net13server3.it/mimmaninniapi/MyApi/Productslist/GetAllStockForSync")
+				.putData("DBContext","Default")
+				.putData("SeasonCode","080")
+				.putData("typeSync","api")
+				.putData("Key","G4jKb0sFid")
+				.putData("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool())
+				.putData("vendor_id","12")
+				.putData("threadNum","5")
+				.putData("eventName","mimma_stock_all_update")
+				.putData("fileUtils",new ApiDataFileUtils("mimma","stock_all_update")).getMap());
 	}
 
 }
