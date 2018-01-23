@@ -1422,4 +1422,12 @@ public class ProductService {
         }
     }
 
+    public List<Map<String, Object>> selectProductByDesignerColor(String designerId , String colorCode,Long vendor_id) throws Exception {
+        String sql = "select p.`product_id` ,p.`designer_id` ,p.`color_code` ,s.`season_sort`,p.`season_code`  from `product`  p \n"
+                    +"inner join `season`  s  on(p.`enabled` = 1 and p.`season_code`  = s.`season_code` )\n"
+                    +"where p.`vendor_id` = "+vendor_id+"  and p.`designer_id` = \""+designerId+"\" and p.`color_code`  = \""+colorCode +"\" \n"
+                    +"order by s.`season_sort`  desc ";
+        return productDao.executeBySql(sql,null);
+    }
+
 }
