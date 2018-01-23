@@ -146,13 +146,13 @@ public class AtelierUpdateByStockController  implements InitializingBean {
         UIWK2.put("fileUtils",new ApiDataFileUtils("iCinque","stock_delta_stock"));
         paramsMap.put("UIWK2",UIWK2);
 
-        Map<String,Object> ERS4S = new HashMap<>();
+        /*Map<String,Object> ERS4S = new HashMap<>();
         ERS4S.put("store_code","ERS4S");
         ERS4S.put("vendor_id","12");
         ERS4S.put("vendor_name","Mimma Ninni");
         ERS4S.put("eventName","mimma_stock_delta_stock");
         ERS4S.put("fileUtils",new ApiDataFileUtils("mimma","stock_delta_stock"));
-        paramsMap.put("ERS4S",ERS4S);
+        paramsMap.put("ERS4S",ERS4S);*/
 
         Map<String,Object> UEYHD = new HashMap<>();
         UEYHD.put("store_code","UEYHD");
