@@ -124,7 +124,7 @@ public class ApiUpdateProductService {
 
             if (products != null && products.size() > 1) {
                 String productIds = "";
-                if(product.getSeason_code().equals("CarryOver")) { // 如果是CarryOver过来，清除其他的season的库存
+                /*if(product.getSeason_code().equals("CarryOver")) { // 如果是CarryOver过来，清除其他的season的库存
 
                     for(int i = 0;i<products.size();i++) {
                         String product_id = products.get(i).get("product_id").toString();
@@ -135,15 +135,15 @@ public class ApiUpdateProductService {
                         }
                     }
 
-                } else {
-                    for(int i = 0;i<products.size();i++) { // 如果不是CarryOver过来，取最新的season的库存
+                } else {*/
+                    for(int i = 0;i<products.size();i++) {
                         String product_id = products.get(i).get("product_id").toString();
 
                         if(i!=0) {
                             productIds += product_id+",";
                         }
                     }
-                }
+                /*}*/
 
                 if(StringUtils.isNotBlank(productIds)) {
                     productIds = productIds.substring(0,productIds.length()-1);
@@ -346,8 +346,11 @@ public class ApiUpdateProductService {
 
                 if((newSeasonCode.equalsIgnoreCase("CarryOver") || oldSeasonCode.equalsIgnoreCase("CarryOver"))
                         && !newSeasonCode.equalsIgnoreCase(oldSeasonCode) && newSort != 0) {
-                    updateSeasonFlag = true;
+                    if(!oldSeasonCode.equals("18SS") && !oldSeasonCode.equals("18FW")) {
+                        updateSeasonFlag = true;
+                    }
                 }
+
             }
             /* update by yf 12/14*/
 
