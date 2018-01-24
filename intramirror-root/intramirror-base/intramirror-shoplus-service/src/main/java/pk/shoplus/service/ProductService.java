@@ -1249,7 +1249,7 @@ public class ProductService {
 
     public Map<String,Object> getSeason(String seasonCode) throws Exception {
         try {
-            String sql  = "select season_code from `season_mapping` where enabled = 1 and trim(`season_code`)  = trim(\""+seasonCode+"\") or trim(`boutique_season_code`)  = trim(\""+seasonCode+"\")";
+            String sql  = "select season_code from `season_mapping` where enabled = 1 and (trim(`season_code`)  = trim(\""+seasonCode+"\") or trim(`boutique_season_code`)  = trim(\""+seasonCode+"\"))";
             logger.info("ProductService,getSeason,sql:" + sql);
 
             List<Map<String,Object>> seasonMap = productDao.executeBySql(sql, null);
