@@ -181,7 +181,7 @@ public class XmagSynProductController implements InitializingBean {
 //			}
 
 			logger.info("XmagSynProductAllControllerSynProduct,zeroClearing,flag:"+flag+",eventName:"+eventName);
-			if(eventName.equals("apartment_product_all_update") && flag > 100 ) {
+			if(eventName.contains("all") && flag > 100 ) {
 				logger.info("XmagSynProductAllControllerSynProduct,zeroClearing,start,vendor_id:"+vendor_id+",eventName:"+eventName+",flag:"+flag);
 				iUpdateStockService.zeroClearing(Long.parseLong(vendor_id));
 				logger.info("XmagSynProductAllControllerSynProduct,zeroClearing,end,vendor_id:"+vendor_id);
