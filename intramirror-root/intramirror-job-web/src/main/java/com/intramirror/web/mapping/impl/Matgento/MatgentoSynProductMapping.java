@@ -81,12 +81,12 @@ public class MatgentoSynProductMapping implements IProductMapping{
             productOptions.setBrandCode(BrandID);
             productOptions.setColorCode(colorCode);
 
-            productOptions.setSeasonCode("17FW");
+            /*productOptions.setSeasonCode("17FW");
             productOptions.setCategory1("MEN");
             productOptions.setCategory2("Clothing");
             productOptions.setCategory3("Beachwear");
             productOptions.setBrandName("Gucci");
-            productOptions.setColorCode("123");
+            productOptions.setColorCode("123");*/
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("MatgentoSynProductMapping,ErrorMessage:"+e);

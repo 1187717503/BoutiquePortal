@@ -20,6 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import pk.shoplus.service.RedisService;
 import pk.shoplus.util.FileUtil;
 
 @Controller
@@ -36,6 +37,8 @@ public class MatgentoController implements InitializingBean {
     @Resource(name = "updateStockService")
     private IUpdateStockService iUpdateStockService;
 
+    private static RedisService redisService = RedisService.getInstance();
+
     @GetMapping("/{vendorName}/{updateType}")
     public String execute(@PathVariable("vendorName") String name,@PathVariable("updateType") String type){
         long start = System.currentTimeMillis();
@@ -50,6 +53,7 @@ public class MatgentoController implements InitializingBean {
                 while (true) {
                     String url = this.generatorURL(config.getUrl(),config.getLimit());
                     String response = ApiHttpTools.httpGet(url);
+                    logger.info("MatgentoController,httpGet,url:"+url);
                     config.getFileUtils().bakPendingFile(config.getEventName(),response);
                     if (StringUtils.isBlank(response) || response.equals("[\"NO DATA\"]")) {
                         break;
@@ -59,7 +63,7 @@ public class MatgentoController implements InitializingBean {
                     for (int i = 0, len = products.size(); i < len; i++) {
                         Map<String, Object> mqDataMap = new HashMap<>();
                         mqDataMap.put("Data", products.get(i));
-//                        ApiExectorUtils.putThreadPool(config.setIndex(index),mqDataMap,matgentoSynProductMapping);
+                        ApiExectorUtils.putThreadPool(config.setIndex(index),mqDataMap,matgentoSynProductMapping);
                         index++;
                     }
                 }
@@ -124,7 +128,6 @@ public class MatgentoController implements InitializingBean {
     private int page = 1;
     private String generatorURL(String url,int limit){
         int limit1 = (page*limit) - limit;
-//        int limit2 = page*limit;
         page++;
         return url+"&limit="+limit1+","+limit;
     }
@@ -145,23 +148,23 @@ public class MatgentoController implements InitializingBean {
         apiConfigPool = new ApiConfigPool();
 
         apiConfigPool.put(
-                new ApiConfig().setUrl("http://srv1.best-fashion.net/export/apiv2/?t=507167b1d174406d152a4bd24344389c&type=allstock&limit=0,10")
-                .setVendor_id(10L)
-                .setVendorName("matgento")
+                new ApiConfig().setUrl("http://srv1.best-fashion.net/export/apiv2/?t=507167b1d174406d152a4bd24344389c&type=allstock&supplier_sku_split=1&limit=0,10000")
+                .setVendor_id(34L)
+                .setVendorName("leam")
                 .setThreadNum(15).setLimit(10)
                 .setEventName(ApiConfigPool.product_delta_update)
                 .setExecutor(ApiConfigPool.getExecutor())
                 .setOriginName("origin.txt")
-                .setOriginPath("/Users/dingyifan/Documents/fileTest/")
+                .setOriginPath("/mnt2/leam/compare")
                 .setRevisedName("revised.txt")
-                .setRevisedPath("/Users/dingyifan/Documents/fileTest/")
+                .setRevisedPath("/mnt2/leam/compare")
                 );
 
         apiConfigPool.put(
-                new ApiConfig().setUrl("http://srv1.best-fashion.net/export/apiv2/?t=507167b1d174406d152a4bd24344389c&type=allstock")
-                .setVendor_id(10L)
-                .setVendorName("matgento")
-                .setThreadNum(15).setLimit(10)
+                new ApiConfig().setUrl("http://srv1.best-fashion.net/export/apiv2/?t=507167b1d174406d152a4bd24344389c&type=allstock&supplier_sku_split=1")
+                .setVendor_id(34L)
+                .setVendorName("leam")
+                .setThreadNum(15).setLimit(500)
                 .setEventName(ApiConfigPool.product_all_update)
                 .setExecutor(ApiConfigPool.getExecutor())
         );
