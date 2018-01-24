@@ -123,6 +123,16 @@ public class XmagSynProductAllMapper implements IProductMapping {
 					category = StringUtils.trim(type.replace("UOMO",""));
 					type = "uomo";
 				}
+
+				if(type.contains("men")) {
+					category = StringUtils.trim(type.replace("men",""));
+					type = "men";
+				}
+
+				if(type.contains("women")) {
+					category = StringUtils.trim(type.replace("women",""));
+					type = "women";
+				}
 			}
 
             //字符转小写
