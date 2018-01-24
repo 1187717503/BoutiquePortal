@@ -88,6 +88,7 @@ public class ApiUpdateStockSerivce {
                 resultMap.put("warningMaps",warningList);
             }
             this.printChangeLog(conn);
+            this.exceptional(conn);
             if(conn != null) {conn.commit();conn.close(); }
         } catch (UpdateException e) {
             resultMap = ApiCommonUtils.errorMap(e.getErrorType(),e.getKey(),e.getValue());
@@ -105,6 +106,49 @@ public class ApiUpdateStockSerivce {
         long end = System.currentTimeMillis();
         logger.info("Job_Run_Time,ApiUpdateStockSerivce_updateStock,start:"+start+",end:"+end+",time:"+(end-start));
         return resultMap;
+    }
+
+    public void exceptional( Connection conn) throws Exception {
+        Product product = this.getProduct(conn);
+
+        // AD 买手店如果有相同designer_id和color_code，但是不同season和boutique_id的商品，需要将老season的商品库存set 0
+        if(product.getVendor_id() == 22L) {
+            ProductService productService = new ProductService(conn);
+            List<Map<String,Object>> products = productService.selectProductByDesignerColor(product.designer_id,product.color_code,product.vendor_id);
+
+            if (products != null && products.size() > 1) {
+                String productIds = "";
+                /*if(product.getSeason_code().equals("CarryOver")) { // 如果是CarryOver过来，清除其他的season的库存
+
+                    for(int i = 0;i<products.size();i++) {
+                        String product_id = products.get(i).get("product_id").toString();
+                        String season_code = products.get(i).get("season_code").toString();
+
+                        if(!season_code.equals("CarryOver")) {
+                            productIds += product_id+",";
+                        }
+                    }
+
+                } else {*/
+                for(int i = 0;i<products.size();i++) {
+                    String product_id = products.get(i).get("product_id").toString();
+
+                    if(i!=0) {
+                        productIds += product_id+",";
+                    }
+                }
+                /*}*/
+
+                if(StringUtils.isNotBlank(productIds)) {
+                    productIds = productIds.substring(0,productIds.length()-1);
+                    String sql = "update `sku_store` ss set ss.`confirmed` = 0,ss.`store` = (0 - abs(cast(ss.`reserved` as signed))) \n"
+                            + " where ss.`enabled` = 1 \n"
+                            + " and ss.`product_id` in("+productIds+")";
+                    productService.updateBySQL(sql);
+                    logger.info("AlDuca,exceptional:"+sql+",products:"+JSONObject.toJSONString(products));
+                }
+            }
+        }
     }
 
     public void checkFilter(Connection conn) throws Exception{

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.web.mapping.api.IProductMapping;
 import com.intramirror.web.mapping.api.IStockMapping;
+import com.intramirror.web.mapping.impl.Matgento.MatgentoSynProductMapping;
 import com.intramirror.web.mapping.impl.QuadraSynProductMapping;
 import com.intramirror.web.mapping.impl.aiduca.AiDucaSynAllStockMapping;
 import com.intramirror.web.mapping.impl.aiduca.AiDucaSynProductMapping;
@@ -107,6 +108,9 @@ public class ErrorMessageController {
 
     @Resource(name = "shopifyProductMapping")
     private ShopifyProductMapping shopifyProductMapping;
+
+    @Resource(name = "matgentoSynProductMapping")
+    private MatgentoSynProductMapping matgentoSynProductMapping;
 
     private static final int threadNum = 5;
 
@@ -331,6 +335,16 @@ public class ErrorMessageController {
                         productOptions.setModifyPrice("1");
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
 
+                    }
+                }
+
+                if(vendor_id.equals("34")) {
+                    if(name.equals("product_all_update") || name.equals("product_delta_update") ) {
+                        ProductEDSManagement.ProductOptions productOptions = matgentoSynProductMapping.mapping(originDataMap);
+                        ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
+                        vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                        productOptions.setModifyPrice("1");
+                        CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
                     }
                 }
 
