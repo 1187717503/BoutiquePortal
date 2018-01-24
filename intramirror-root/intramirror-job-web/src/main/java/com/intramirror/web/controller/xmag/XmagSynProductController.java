@@ -332,7 +332,7 @@ public class XmagSynProductController implements InitializingBean {
 				.putData("vendor_id","12")
 				.putData("threadNum","5")
 				.putData("eventName","mimma_product_all_update")
-				.putData("fileUtils",new ApiDataFileUtils("mimma", "product_all_update")));
+				.putData("fileUtils",new ApiDataFileUtils("mimma", "product_all_update")).getMap());
 
 		paramsMap.put("mimma_product_delta_update",new MapUtils(new HashMap<String, Object>())
 				.putData("url","http://net13server3.it/mimmaninniapi/MyApi/Productslist/GetProducts")
