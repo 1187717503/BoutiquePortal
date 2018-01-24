@@ -155,9 +155,9 @@ public class MatgentoController implements InitializingBean {
                 .setEventName(ApiConfigPool.product_delta_update)
                 .setExecutor(ApiConfigPool.getExecutor())
                 .setOriginName("origin.txt")
-                .setOriginPath("/mnt2/leam/compare")
+                .setOriginPath("/mnt2/leam/compare/")
                 .setRevisedName("revised.txt")
-                .setRevisedPath("/mnt2/leam/compare")
+                .setRevisedPath("/mnt2/leam/compare/")
                 );
 
         apiConfigPool.put(
