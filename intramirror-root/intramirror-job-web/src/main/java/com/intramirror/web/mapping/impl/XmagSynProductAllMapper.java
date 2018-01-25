@@ -114,7 +114,7 @@ public class XmagSynProductAllMapper implements IProductMapping {
 			if(StringUtils.isBlank(SubCategory)) {
 				SubCategory = category;
 
-				if(type.contains("DONNA")) {
+				/*if(type.contains("DONNA")) {
 					category = StringUtils.trim(type.replace("DONNA",""));
 					type = "donna";
 
@@ -132,6 +132,12 @@ public class XmagSynProductAllMapper implements IProductMapping {
 				if(type.contains("women")) {
 					category = StringUtils.trim(type.replace("women",""));
 					type = "women";
+				}*/
+
+				if(type.contains("Accessories")) {
+					category = "Clothing";
+				} else {
+					category ="Accessories";
 				}
 			}
 
