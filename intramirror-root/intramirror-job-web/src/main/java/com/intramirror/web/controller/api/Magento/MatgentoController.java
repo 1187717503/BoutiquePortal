@@ -55,7 +55,7 @@ public class MatgentoController implements InitializingBean {
                     String response = ApiHttpTools.httpGet(url);
                     logger.info("MatgentoController,httpGet,url:"+url);
                     config.getFileUtils().bakPendingFile(config.getEventName(),response);
-                    if (StringUtils.isBlank(response) || response.equals("[\"NO DATA\"]")) {
+                    if (StringUtils.isBlank(response) || response.equals("[\"NO DATA\"]") || response.equals("[\"NO DATA\"]\n")) {
                         break;
                     }
 
