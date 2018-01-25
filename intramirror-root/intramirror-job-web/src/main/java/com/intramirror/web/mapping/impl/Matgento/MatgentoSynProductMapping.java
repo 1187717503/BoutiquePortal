@@ -4,6 +4,7 @@ import com.alibaba.fastjson15.JSONObject;
 import com.intramirror.common.help.StringUtils;
 import com.intramirror.web.mapping.api.IProductMapping;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
@@ -80,6 +81,7 @@ public class MatgentoSynProductMapping implements IProductMapping{
             String colorCode = suppliers[2];
             productOptions.setBrandCode(BrandID);
             productOptions.setColorCode(colorCode);
+            productOptions.setLast_check(new Date());
 
             /*productOptions.setSeasonCode("17FW");
             productOptions.setCategory1("MEN");
