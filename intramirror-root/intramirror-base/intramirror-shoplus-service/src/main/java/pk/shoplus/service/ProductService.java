@@ -1342,16 +1342,28 @@ public class ProductService {
         }
     }
 
-    public boolean duplicateColorBrandByAD(String brandID,String colorCode){
+    public boolean duplicateColorBrandByADCreate(String brandID,String colorCode,String seasonCode){
         try {
-            String sql = "select p.`product_id`, p.`product_code` , p1.`key_name` , p1.`value` , p2.`key_name` , p2.`value`, count(*) from `product` p\n"
-                    + "inner join `product_property`  p1 on(p.`product_id` = p1.`product_id`  and p.`enabled`  = 1 and p1.`enabled`  = 1 and p1.`key_name`  = 'ColorCode')\n"
-                    + "inner join `product_property`  p2 on(p.`product_id` = p2.`product_id`  and p.`enabled`  = 1 and p2.`enabled`  = 1 and p2.`key_name`  = 'BrandID')\n"
-                    + "where p.`vendor_id`  = 22 and p1.`value`  = \""+colorCode+"\" and p2.`value`  = \""+brandID+"\" group by p1.`value` ,p2.`value` HAVING  count(*)>0 \n";
+            String sql = "select p.product_id from `product`  p where p.`designer_id`  = \""+brandID+"\" and p.`color_code`  = \""+colorCode+"\" and p.`season_code`  = \""+seasonCode+"\" and p.`vendor_id`  = 22 and p.`enabled`  = 1";
 
-            logger.info("ProductService,outputParams,duplicateColorBrandByAD,sql:"+sql);
+            logger.info("ProductService,outputParams,duplicateColorBrandByADCreate,sql:"+sql);
             List<Map<String,Object>> productMap = productDao.executeBySql(sql, null);
             if(productMap != null && productMap.size() > 0) {
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public boolean duplicateColorBrandByADUpdate(String brandID,String colorCode,String seasonCode){
+        try {
+            String sql = "select p.product_id from `product`  p where p.`designer_id`  = \""+brandID+"\" and p.`color_code`  = \""+colorCode+"\" and p.`season_code`  = \""+seasonCode+"\" and p.`vendor_id`  = 22 and p.`enabled`  = 1";
+
+            logger.info("ProductService,outputParams,duplicateColorBrandByADUpdate,sql:"+sql);
+            List<Map<String,Object>> productMap = productDao.executeBySql(sql, null);
+            if(productMap != null && productMap.size() > 1) {
                 return true;
             }
             return false;

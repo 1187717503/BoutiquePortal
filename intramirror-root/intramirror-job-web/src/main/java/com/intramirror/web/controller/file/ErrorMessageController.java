@@ -143,6 +143,7 @@ public class ErrorMessageController {
                 logger.info("ErrorMessageControllerProcessing,readFile,jsonObject:"+jsonObject.toJSONString()+",api_error_processing_id:"+api_error_processing_id);
 
                 Map<String,Object> originDataMap = jsonObject.getObject("originData",Map.class);
+                String error_type = jsonObject.getString("error_type");
                 ApiDataFileUtils apiDataFileUtils = jsonObject.getObject("apiDataFileUtils",ApiDataFileUtils.class);
 //                ProductEDSManagement.ProductOptions productOptions = jsonObject.getObject("productOptions", ProductEDSManagement.ProductOptions.class);
 //                ProductEDSManagement.VendorOptions vendorOptions = jsonObject.getObject("vendorOptions", ProductEDSManagement.VendorOptions.class);
@@ -155,6 +156,7 @@ public class ErrorMessageController {
                         ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
                         vendorOptions.setVendorId(Long.parseLong(vendor_id));
                         productOptions.setModifyPrice("1");
+                        productOptions.setError_type(error_type);
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
                     }
                 }
@@ -169,6 +171,7 @@ public class ErrorMessageController {
                         ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
                         vendorOptions.setVendorId(Long.parseLong(vendor_id));
                         productOptions.setModifyPrice("1");
+                        productOptions.setError_type(error_type);
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
                     }
                 }
@@ -183,6 +186,7 @@ public class ErrorMessageController {
                         ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
                         vendorOptions.setVendorId(Long.parseLong(vendor_id));
                         productOptions.setModifyPrice("1");
+                        productOptions.setError_type(error_type);
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
                     }
                 }
@@ -195,6 +199,7 @@ public class ErrorMessageController {
                         ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
                         vendorOptions.setVendorId(Long.parseLong(vendor_id));
                         productOptions.setModifyPrice("1");
+                        productOptions.setError_type(error_type);
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
                     }else if(name.equals("product_delta_update")) {
                         if(jsonObject.get("stockOption") == null) {
@@ -202,6 +207,7 @@ public class ErrorMessageController {
                             ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
                             vendorOptions.setVendorId(Long.parseLong(vendor_id));
                             productOptions.setModifyPrice("1");
+                            productOptions.setError_type(error_type);
                             CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
                         } else {
                             StockOption stockOption = cloudStoreUpdateByStockMapping.mapping(originDataMap);
@@ -240,6 +246,7 @@ public class ErrorMessageController {
                         ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
                         vendorOptions.setVendorId(Long.parseLong(vendor_id));
                         productOptions.setModifyPrice("1");
+                        productOptions.setError_type(error_type);
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
                     }
                 }
@@ -254,6 +261,7 @@ public class ErrorMessageController {
                         ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
                         vendorOptions.setVendorId(Long.parseLong(vendor_id));
                         productOptions.setModifyPrice("1");
+                        productOptions.setError_type(error_type);
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
                     }
                 }
@@ -265,6 +273,7 @@ public class ErrorMessageController {
                         ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
                         vendorOptions.setVendorId(Long.parseLong(vendor_id));
                         productOptions.setModifyPrice("1");
+                        productOptions.setError_type(error_type);
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
                     } else if(name.equals("apartment_stock_all_update")){
                         StockOption stockOption = xmagSynAllStockMapping.mapping(originDataMap);
@@ -278,6 +287,7 @@ public class ErrorMessageController {
                         ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
                         vendorOptions.setVendorId(Long.parseLong(vendor_id));
                         productOptions.setModifyPrice("1");
+                        productOptions.setError_type(error_type);
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
                     } else if(name.equals("dolci_stock_all_update")){
                         StockOption stockOption = xmagSynAllStockMapping.mapping(originDataMap);
@@ -291,6 +301,7 @@ public class ErrorMessageController {
                         ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
                         vendorOptions.setVendorId(Long.parseLong(vendor_id));
                         productOptions.setModifyPrice("1");
+                        productOptions.setError_type(error_type);
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
                     } else if(name.equals("mimma_stock_all_update")){
                         StockOption stockOption = xmagSynAllStockMapping.mapping(originDataMap);
@@ -305,6 +316,7 @@ public class ErrorMessageController {
                         ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
                         vendorOptions.setVendorId(Long.parseLong(vendor_id));
                         productOptions.setModifyPrice("1");
+                        productOptions.setError_type(error_type);
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
                     } else if(name.equals("alduca_stock_all_update")){
                         StockOption stockOption = aiDucaSynAllStockMapping.mapping(originDataMap);
@@ -319,6 +331,7 @@ public class ErrorMessageController {
                         ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
                         vendorOptions.setVendorId(Long.parseLong(vendor_id));
                         productOptions.setModifyPrice("1");
+                        productOptions.setError_type(error_type);
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
 
                     } else if(name.equals("stock_all_update") || name.equals("stock_delta_update")) {
@@ -333,6 +346,7 @@ public class ErrorMessageController {
                         ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
                         vendorOptions.setVendorId(Long.parseLong(vendor_id));
                         productOptions.setModifyPrice("1");
+                        productOptions.setError_type(error_type);
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
 
                     }
@@ -344,6 +358,7 @@ public class ErrorMessageController {
                         ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
                         vendorOptions.setVendorId(Long.parseLong(vendor_id));
                         productOptions.setModifyPrice("1");
+                        productOptions.setError_type(error_type);
                         CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
                     }
                 }
