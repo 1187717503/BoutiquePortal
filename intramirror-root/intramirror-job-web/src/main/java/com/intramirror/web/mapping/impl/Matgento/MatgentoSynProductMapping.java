@@ -46,7 +46,7 @@ public class MatgentoSynProductMapping implements IProductMapping{
 //                    .setLength(jsonObjectData.getString("length"))
 //                    .setWidth(jsonObjectData.getString("width"))
 //                    .setHeigit(jsonObjectData.getString("height"))
-                    .setSalePrice(jsonObjectData.getString("price"))
+                    .setSalePrice(jsonObjectData.getString("default_price"))
                     .setCategory1(jsonObjectData.getString("department"))
                     .setCategory2(jsonObjectData.getString("category"))
                     .setCategory3(jsonObjectData.getString("subcategory"));
@@ -82,6 +82,7 @@ public class MatgentoSynProductMapping implements IProductMapping{
             productOptions.setBrandCode(BrandID);
             productOptions.setColorCode(colorCode);
             productOptions.setLast_check(new Date());
+            productOptions.setModifyPrice("1");
 
             /*productOptions.setSeasonCode("17FW");
             productOptions.setCategory1("MEN");
