@@ -1427,6 +1427,8 @@ public class ProductEDSManagement {
 
         public String brand_name;
 
+        public String error_type = "";
+
         public String getCategory_boutique_id() {
             return category_boutique_id;
         }
@@ -1580,7 +1582,15 @@ public class ProductEDSManagement {
 			return StringUtils.trim(sizeFit);
 		}
 
-		public ProductOptions setSizeFit(String sizeFit) {
+        public String getError_type() {
+            return error_type;
+        }
+
+        public void setError_type(String error_type) {
+            this.error_type = error_type;
+        }
+
+        public ProductOptions setSizeFit(String sizeFit) {
 			this.sizeFit = StringUtils.trim(sizeFit);
 			return this;
 		}

@@ -58,6 +58,7 @@ public class UpdateProductThread implements Runnable{
                 fileData.put("vendorOptions",vendorOptions);
                 fileData.put("apiDataFileUtils",apiDataFileUtils);
                 fileData.put("result",resultMap);
+                fileData.put("error_type",productOptions.getError_type());
 
                 resultMap.put("product_code",productOptions.getCode());
                 resultMap.put("color_code",productOptions.getColorCode());

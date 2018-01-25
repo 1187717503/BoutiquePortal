@@ -116,10 +116,10 @@ public class ApiUpdateProductService {
 
     public void exceptional( Connection conn) throws Exception {
         Product product = this.getProduct(conn);
+        ProductService productService = new ProductService(conn);
 
         // AD 买手店如果有相同designer_id和color_code，但是不同season和boutique_id的商品，需要将老season的商品库存set 0
         if(product.getVendor_id() == 22L) {
-            ProductService productService = new ProductService(conn);
             List<Map<String,Object>> products = productService.selectProductByDesignerColor(product.designer_id,product.color_code,product.vendor_id);
 
             if (products != null && products.size() > 1) {
@@ -153,6 +153,14 @@ public class ApiUpdateProductService {
                     productService.updateBySQL(sql);
                     logger.info("AlDuca,exceptional:"+sql+",products:"+JSONObject.toJSONString(products));
                 }
+            }
+        }
+
+        // 不允许存在重复的BrandID,
+        if(vendorOptions.getVendorId().intValue() == 22) {
+            boolean flag = productService.duplicateColorBrandByADUpdate(product.getDesigner_id(),product.getColor_code(),product.getSeason_code());
+            if(flag) {
+                throw new UpdateException("color_code,BrandID",product.getDesigner_id()+","+product.getColor_code()+","+product.getSeason_code(), ApiErrorTypeEnum.errorType.error_duplicate_product);
             }
         }
     }
@@ -446,6 +454,22 @@ public class ApiUpdateProductService {
             product.category_id = Long.parseLong(productOptions.getCategoryId());
         }*/
 
+        if(StringUtils.isNotBlank(productOptions.getBrandId())
+                && productOptions.getError_type().equals(ApiErrorTypeEnum.errorType.error_Brand_change.getCode())
+                && product.getBrand_id() != Long.parseLong(productOptions.getBrandId())) {
+            product.brand_id = Long.parseLong(productOptions.getBrandId());
+            IPriceService iPriceService = new PriceServiceImpl();
+            iPriceService.synProductPriceRule(product,product.getMin_retail_price(),conn);
+        }
+
+        if(StringUtils.isNotBlank(productOptions.getCategoryId())
+                && productOptions.getError_type().equals(ApiErrorTypeEnum.errorType.error_Category_change.getCode())
+                && product.getCategory_id() != Long.parseLong(productOptions.getCategoryId())) {
+            product.category_id = Long.parseLong(productOptions.getCategoryId());
+            IPriceService iPriceService = new PriceServiceImpl();
+            iPriceService.synProductPriceRule(product,product.getMin_retail_price(),conn);
+        }
+
         productService.updateProduct(product);
         logger.info("ApiUpdateProductService,setProduct,end,updateProduct,product:"+JSONObject.toJSONString(product));
     }
@@ -541,6 +565,7 @@ public class ApiUpdateProductService {
         } else if(cId != product.getCategory_id().intValue()) {
             this.setWarning(ApiErrorTypeEnum.errorType.error_Category_change,"category", JSONObject.toJSONString(mappingCategory));
             logger.info("ApiUpdateProductService,checkMappingParams,category,categoryIsChange,productOptions:"+new Gson().toJson(productOptions));
+            productOptions.setError_type(ApiErrorTypeEnum.errorType.error_Category_change.getCode());
         }
 
         if(StringUtils.isBlank(productOptions.getBrandId())) {
@@ -552,6 +577,7 @@ public class ApiUpdateProductService {
         } else if(bId != product.getBrand_id()) {
             this.setWarning(ApiErrorTypeEnum.errorType.error_Brand_change,"brand", brandName);
             logger.info("ApiUpdateProductService,checkMappingParams,brand,brandIsChange,productOptions:"+new Gson().toJson(productOptions));
+            productOptions.setError_type(ApiErrorTypeEnum.errorType.error_Brand_change.getCode());
         }
 
         if(StringUtils.isBlank(mappingSeason)) {
