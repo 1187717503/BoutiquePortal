@@ -454,20 +454,22 @@ public class ApiUpdateProductService {
             product.category_id = Long.parseLong(productOptions.getCategoryId());
         }*/
 
-        if(StringUtils.isNotBlank(productOptions.getBrandId())
-                && productOptions.getError_type().equals(ApiErrorTypeEnum.errorType.error_Brand_change.getCode())
-                && product.getBrand_id() != Long.parseLong(productOptions.getBrandId())) {
-            product.brand_id = Long.parseLong(productOptions.getBrandId());
-            IPriceService iPriceService = new PriceServiceImpl();
-            iPriceService.synProductPriceRule(product,product.getMin_retail_price(),conn);
-        }
+        if(StringUtils.isNotBlank(productOptions.getError_type())) {
+            if(StringUtils.isNotBlank(productOptions.getBrandId())
+                    && productOptions.getError_type().equals(ApiErrorTypeEnum.errorType.error_Brand_change.getCode())
+                    && product.getBrand_id() != Long.parseLong(productOptions.getBrandId())) {
+                product.brand_id = Long.parseLong(productOptions.getBrandId());
+                IPriceService iPriceService = new PriceServiceImpl();
+                iPriceService.synProductPriceRule(product,product.getMin_retail_price(),conn);
+            }
 
-        if(StringUtils.isNotBlank(productOptions.getCategoryId())
-                && productOptions.getError_type().equals(ApiErrorTypeEnum.errorType.error_Category_change.getCode())
-                && product.getCategory_id() != Long.parseLong(productOptions.getCategoryId())) {
-            product.category_id = Long.parseLong(productOptions.getCategoryId());
-            IPriceService iPriceService = new PriceServiceImpl();
-            iPriceService.synProductPriceRule(product,product.getMin_retail_price(),conn);
+            if(StringUtils.isNotBlank(productOptions.getCategoryId())
+                    && productOptions.getError_type().equals(ApiErrorTypeEnum.errorType.error_Category_change.getCode())
+                    && product.getCategory_id() != Long.parseLong(productOptions.getCategoryId())) {
+                product.category_id = Long.parseLong(productOptions.getCategoryId());
+                IPriceService iPriceService = new PriceServiceImpl();
+                iPriceService.synProductPriceRule(product,product.getMin_retail_price(),conn);
+            }
         }
 
         product.status = null;
