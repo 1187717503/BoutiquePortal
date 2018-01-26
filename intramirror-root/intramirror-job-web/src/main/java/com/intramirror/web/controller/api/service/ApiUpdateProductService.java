@@ -470,6 +470,7 @@ public class ApiUpdateProductService {
             iPriceService.synProductPriceRule(product,product.getMin_retail_price(),conn);
         }
 
+        product.status = null;
         productService.updateProduct(product);
         logger.info("ApiUpdateProductService,setProduct,end,updateProduct,product:"+JSONObject.toJSONString(product));
     }
