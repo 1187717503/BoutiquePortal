@@ -217,11 +217,11 @@ public class XmagSynProductAllMapper implements IProductMapping {
 		productOptions.setCode(productOptions.getCode()+"_"+productOptions.getColorCode());
         logger.info(" productOptions filippo : " + new Gson().toJson(productOptions));
 
-        if(StringUtils.isNotBlank(productOptions.getCategory1())
+        /*if(StringUtils.isNotBlank(productOptions.getCategory1())
 				&& StringUtils.isNotBlank(productOptions.getCategory3())
 				&& StringUtils.isBlank(productOptions.getCategory2())) {
         	productOptions.setCategory2("xmag");
-		}
+		}*/
 //		productOptions.setCategoryId("1646");
 //		productOptions.setBrandName("Gucci");
 //		productOptions.setSeasonCode("078");
