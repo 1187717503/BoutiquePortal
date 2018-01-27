@@ -56,6 +56,8 @@ public class ApiUpdateProductService {
 
     private boolean modify = false;
 
+    private String error_type;
+
     private List<Map<String,Object>> warningList = new ArrayList<>() ;
 
     public Map<String,Object> updateProduct(ProductEDSManagement.ProductOptions productOptions,ProductEDSManagement.VendorOptions vendorOptions){
@@ -95,6 +97,7 @@ public class ApiUpdateProductService {
             }
             this.printChangeLog(conn);
             if(conn != null) {conn.commit();conn.close();}
+            productOptions.setError_type(error_type);
         } catch (UpdateException e) {
             resultMap = ApiCommonUtils.errorMap(e.getErrorType(),e.getKey(),e.getValue());
             if(conn != null) {conn.rollback();conn.close();}
@@ -568,7 +571,8 @@ public class ApiUpdateProductService {
         } else if(cId != product.getCategory_id().intValue()) {
             this.setWarning(ApiErrorTypeEnum.errorType.error_Category_change,"category", JSONObject.toJSONString(mappingCategory));
             logger.info("ApiUpdateProductService,checkMappingParams,category,categoryIsChange,productOptions:"+new Gson().toJson(productOptions));
-            productOptions.setError_type(ApiErrorTypeEnum.errorType.error_Category_change.getCode());
+//            productOptions.setError_type(ApiErrorTypeEnum.errorType.error_Category_change.getCode());
+            error_type = ApiErrorTypeEnum.errorType.error_Category_change.getCode();
         }
 
         if(StringUtils.isBlank(productOptions.getBrandId())) {
@@ -580,7 +584,8 @@ public class ApiUpdateProductService {
         } else if(bId != product.getBrand_id()) {
             this.setWarning(ApiErrorTypeEnum.errorType.error_Brand_change,"brand", brandName);
             logger.info("ApiUpdateProductService,checkMappingParams,brand,brandIsChange,productOptions:"+new Gson().toJson(productOptions));
-            productOptions.setError_type(ApiErrorTypeEnum.errorType.error_Brand_change.getCode());
+//            productOptions.setError_type(ApiErrorTypeEnum.errorType.error_Brand_change.getCode());
+            error_type = ApiErrorTypeEnum.errorType.error_Brand_change.getCode();
         }
 
         if(StringUtils.isBlank(mappingSeason)) {
