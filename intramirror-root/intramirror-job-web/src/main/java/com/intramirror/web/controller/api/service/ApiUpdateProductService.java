@@ -461,6 +461,7 @@ public class ApiUpdateProductService {
             if(StringUtils.isNotBlank(productOptions.getBrandId())
                     && productOptions.getError_type().equals(ApiErrorTypeEnum.errorType.error_Brand_change.getCode())
                     && product.getBrand_id() != Long.parseLong(productOptions.getBrandId())) {
+                logger.info("ApiUpdateProductService,setProduct,categoryChange,sBrand:"+product.brand_id+",eBrand_id:"+productOptions.getBrandId()+",product:"+product.getProduct_id());
                 product.brand_id = Long.parseLong(productOptions.getBrandId());
                 IPriceService iPriceService = new PriceServiceImpl();
                 iPriceService.synProductPriceRule(product,product.getMin_retail_price(),conn);
@@ -469,6 +470,7 @@ public class ApiUpdateProductService {
             if(StringUtils.isNotBlank(productOptions.getCategoryId())
                     && productOptions.getError_type().equals(ApiErrorTypeEnum.errorType.error_Category_change.getCode())
                     && product.getCategory_id() != Long.parseLong(productOptions.getCategoryId())) {
+                logger.info("ApiUpdateProductService,setProduct,categoryChange,sCategory:"+product.category_id+",eCategory:"+productOptions.getCategoryId()+",product:"+product.getProduct_id());
                 product.category_id = Long.parseLong(productOptions.getCategoryId());
                 IPriceService iPriceService = new PriceServiceImpl();
                 iPriceService.synProductPriceRule(product,product.getMin_retail_price(),conn);
