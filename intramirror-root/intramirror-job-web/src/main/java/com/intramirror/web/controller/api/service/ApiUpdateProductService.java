@@ -457,7 +457,7 @@ public class ApiUpdateProductService {
             product.category_id = Long.parseLong(productOptions.getCategoryId());
         }*/
 
-        if(StringUtils.isNotBlank(productOptions.getError_type())) {
+        if(StringUtils.isNotBlank(productOptions.getError_type()) && modify) {
             if(StringUtils.isNotBlank(productOptions.getBrandId())
                     && productOptions.getError_type().equals(ApiErrorTypeEnum.errorType.error_Brand_change.getCode())
                     && product.getBrand_id() != Long.parseLong(productOptions.getBrandId())) {
