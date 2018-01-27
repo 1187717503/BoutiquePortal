@@ -49,7 +49,7 @@ public class DataRollbackController {
                 product.category_id = pbCategory_id;
                 iPriceService.synProductPriceRule(product,product.getMin_retail_price(),conn);
                 productService.updateProduct(product);
-                logger.info("DataRollbackController,end,category:"+ JSONObject.toJSONString(category));
+                logger.info("DataRollbackController,end,category:"+ JSONObject.toJSONString(product));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -86,7 +86,7 @@ public class DataRollbackController {
                 product.brand_id = pbBrand_id;
                 iPriceService.synProductPriceRule(product,product.getMin_retail_price(),conn);
                 productService.updateProduct(product);
-                logger.info("DataRollbackController,end,brand:"+ JSONObject.toJSONString(brand));
+                logger.info("DataRollbackController,end,brand:"+ JSONObject.toJSONString(product));
             }
         } catch (Exception e) {
             e.printStackTrace();
