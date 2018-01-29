@@ -183,6 +183,30 @@ public class XmagSynAllStockController implements InitializingBean {
 				.putData("threadNum","5")
 				.putData("eventName","mimma_stock_all_update")
 				.putData("fileUtils",new ApiDataFileUtils("mimma","stock_all_update")).getMap());
+
+		paramsMap.put("mimma2_stock_all_update",new MapUtils(new HashMap<String, Object>())
+				.putData("url","http://net13server3.it/mimmaninniapi/MyApi/Productslist/GetAllStockForSync")
+				.putData("DBContext","Domini2")
+				.putData("SeasonCode","080")
+				.putData("typeSync","api")
+				.putData("Key","G4jKb0sFid")
+				.putData("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool())
+				.putData("vendor_id","39")
+				.putData("threadNum","5")
+				.putData("eventName","mimma2_stock_all_update")
+				.putData("fileUtils",new ApiDataFileUtils("mimma2","stock_all_update")).getMap());
+
+		paramsMap.put("spinnaker_stock_all_update",new MapUtils(new HashMap<String, Object>())
+				.putData("url","http://net13server.net/spinnakerapi/MyApi/Productslist/GetAllStockForSync")
+				.putData("DBContext","Default")
+				.putData("SeasonCode","080")
+				.putData("typeSync","api")
+				.putData("Key","0mFLb4VtKS")
+				.putData("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool())
+				.putData("vendor_id","38")
+				.putData("threadNum","5")
+				.putData("eventName","spinnaker_stock_all_update")
+				.putData("fileUtils",new ApiDataFileUtils("spinnaker","stock_all_update")).getMap());
 	}
 
 }
