@@ -309,6 +309,34 @@ public class ErrorMessageController {
                     }
                 }
 
+                if(vendor_id.equals("39")) {
+                    if(name.equals("mimma2_product_all_update") || name.equals("mimma2_product_delta_update")) {
+                        ProductEDSManagement.ProductOptions productOptions = xmagSynProductAllMapper.mapping(originDataMap);
+                        ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
+                        vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                        productOptions.setModifyPrice("1");
+                        productOptions.setError_type(error_type);
+                        CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
+                    } else if(name.equals("mimma2_stock_all_update")){
+                        StockOption stockOption = xmagSynAllStockMapping.mapping(originDataMap);
+                        CommonThreadPool.execute(name,executor,threadNum,new UpdateStockThread(stockOption,apiDataFileUtils,originDataMap));
+                    }
+                }
+
+                if(vendor_id.equals("38")) {
+                    if(name.equals("spinnaker_product_all_update") || name.equals("spinnaker_product_delta_update")) {
+                        ProductEDSManagement.ProductOptions productOptions = xmagSynProductAllMapper.mapping(originDataMap);
+                        ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
+                        vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                        productOptions.setModifyPrice("1");
+                        productOptions.setError_type(error_type);
+                        CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
+                    } else if(name.equals("spinnaker_stock_all_update")){
+                        StockOption stockOption = xmagSynAllStockMapping.mapping(originDataMap);
+                        CommonThreadPool.execute(name,executor,threadNum,new UpdateStockThread(stockOption,apiDataFileUtils,originDataMap));
+                    }
+                }
+
                 // alduca
                 if(vendor_id.equals("22")) {
                     if(name.equals("alduca_product_delta_update") || name.equals("alduca_product_all_update")) {
