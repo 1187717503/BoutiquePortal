@@ -148,6 +148,7 @@ public class XmagSynAllStockController implements InitializingBean {
         xmag_all_stock.put("fileUtils",new ApiDataFileUtils("xmag","apartment_stock_all_update"));*/
         
         paramsMap = new HashMap<>();
+        // apartment
         paramsMap.put("apartment_stock_all_update",new MapUtils(new HashMap<String, Object>())
 				.putData("url","http://net13server2.net/TheApartmentAPI/MyApi/Productslist/GetAllStockForSync")
 				.putData("DBContext","Default")
@@ -160,6 +161,7 @@ public class XmagSynAllStockController implements InitializingBean {
 				.putData("eventName","apartment_stock_all_update")
 				.putData("fileUtils",new ApiDataFileUtils("apartment","stock_all_update")).getMap());
 
+        // dolci
 		paramsMap.put("dolci_stock_all_update",new MapUtils(new HashMap<String, Object>())
 				.putData("url","http://net13server2.net/dolcitrameAPI/MyApi/Productslist/GetAllStockForSync")
 				.putData("DBContext","Default")
@@ -172,6 +174,7 @@ public class XmagSynAllStockController implements InitializingBean {
 				.putData("eventName","dolci_stock_all_update")
 				.putData("fileUtils",new ApiDataFileUtils("dolci","stock_all_update")).getMap());
 
+		// mimma
 		paramsMap.put("mimma_stock_all_update",new MapUtils(new HashMap<String, Object>())
 				.putData("url","http://net13server3.it/mimmaninniapi/MyApi/Productslist/GetAllStockForSync")
 				.putData("DBContext","Default")
@@ -184,6 +187,7 @@ public class XmagSynAllStockController implements InitializingBean {
 				.putData("eventName","mimma_stock_all_update")
 				.putData("fileUtils",new ApiDataFileUtils("mimma","stock_all_update")).getMap());
 
+		// mimma2
 		paramsMap.put("mimma2_stock_all_update",new MapUtils(new HashMap<String, Object>())
 				.putData("url","http://net13server3.it/mimmaninniapi/MyApi/Productslist/GetAllStockForSync")
 				.putData("DBContext","Domini2")
@@ -196,6 +200,7 @@ public class XmagSynAllStockController implements InitializingBean {
 				.putData("eventName","mimma2_stock_all_update")
 				.putData("fileUtils",new ApiDataFileUtils("mimma2","stock_all_update")).getMap());
 
+		// spinnaker
 		paramsMap.put("spinnaker_stock_all_update",new MapUtils(new HashMap<String, Object>())
 				.putData("url","http://net13server.net/spinnakerapi/MyApi/Productslist/GetAllStockForSync")
 				.putData("DBContext","Default")
@@ -207,6 +212,34 @@ public class XmagSynAllStockController implements InitializingBean {
 				.putData("threadNum","5")
 				.putData("eventName","spinnaker_stock_all_update")
 				.putData("fileUtils",new ApiDataFileUtils("spinnaker","stock_all_update")).getMap());
+
+		// spinnaker Sanremo
+		paramsMap.put("spinnakerSanremo_stock_all_update",new MapUtils(new HashMap<String, Object>())
+				.putData("url","http://net13server.net/spinnakerapi/MyApi/Productslist/GetAllStockForSync")
+				.putData("DBContext","Sanremo")
+				.putData("SeasonCode","080")
+				.putData("typeSync","api")
+				.putData("Key","0mFLb4VtKS")
+				.putData("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool())
+				.putData("vendor_id","40")
+				.putData("threadNum","5")
+				.putData("eventName","spinnakerSanremo_stock_all_update")
+				.putData("fileUtils",new ApiDataFileUtils("spinnakerSanremo","stock_all_update")).getMap());
+
+		// spinnaker Portofino
+		paramsMap.put("spinnakerPortofino_stock_all_update",new MapUtils(new HashMap<String, Object>())
+				.putData("url","http://net13server.net/spinnakerapi/MyApi/Productslist/GetAllStockForSync")
+				.putData("DBContext","Portofino")
+				.putData("SeasonCode","080")
+				.putData("typeSync","api")
+				.putData("Key","0mFLb4VtKS")
+				.putData("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool())
+				.putData("vendor_id","41")
+				.putData("threadNum","5")
+				.putData("eventName","spinnakerPortofino_stock_all_update")
+				.putData("fileUtils",new ApiDataFileUtils("spinnakerPortofino","stock_all_update")).getMap());
+
+
 	}
 
 }

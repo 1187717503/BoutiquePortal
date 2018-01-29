@@ -260,6 +260,7 @@ public class XmagSynProductController implements InitializingBean {
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		paramsMap = new HashMap<>();
+		// apartment
 		paramsMap.put("apartment_product_all_update",new MapUtils(new HashMap<String, Object>())
 				.putData("url","http://net13server2.net/TheApartmentAPI/MyApi/Productslist/GetProducts")
 				.putData("DBContext","Default")
@@ -290,6 +291,7 @@ public class XmagSynProductController implements InitializingBean {
 				.putData("eventName","apartment_product_delta_update")
 				.putData("fileUtils",new ApiDataFileUtils("apartment", "product_delta_update")).getMap());
 
+		// dolci
 		paramsMap.put("dolci_product_all_update",new MapUtils(new HashMap<String, Object>())
 				.putData("url","http://net13server2.net/dolcitrameapi/MyApi/Productslist/GetProducts")
 				.putData("DBContext","Default")
@@ -320,6 +322,7 @@ public class XmagSynProductController implements InitializingBean {
 				.putData("eventName","dolci_product_delta_update")
 				.putData("fileUtils",new ApiDataFileUtils("dolci", "product_delta_update")).getMap());
 
+		// mimma
 		paramsMap.put("mimma_product_all_update",new MapUtils(new HashMap<String, Object>())
 				.putData("url","http://net13server3.it/mimmaninniapi/MyApi/Productslist/GetProducts")
 				.putData("DBContext","Default")
@@ -350,6 +353,7 @@ public class XmagSynProductController implements InitializingBean {
 				.putData("eventName","mimma_product_delta_update")
 				.putData("fileUtils",new ApiDataFileUtils("mimma", "product_delta_update")).getMap());
 
+		// mimma2
 		paramsMap.put("mimma2_product_all_update",new MapUtils(new HashMap<String, Object>())
 				.putData("url","http://net13server3.it/mimmaninniapi/MyApi/Productslist/GetProducts")
 				.putData("DBContext","Domini2")
@@ -380,6 +384,7 @@ public class XmagSynProductController implements InitializingBean {
 				.putData("eventName","mimma2_product_delta_update")
 				.putData("fileUtils",new ApiDataFileUtils("mimma2", "product_delta_update")).getMap());
 
+		// Spinnaker
 		paramsMap.put("spinnaker_product_all_update",new MapUtils(new HashMap<String, Object>())
 				.putData("url","http://net13server.net/spinnakerapi/MyApi/Productslist/GetProducts")
 				.putData("DBContext","Default")
@@ -409,6 +414,70 @@ public class XmagSynProductController implements InitializingBean {
 				.putData("redisEndIndex","spinnaker_end_index_bydate")
 				.putData("eventName","spinnaker_product_delta_update")
 				.putData("fileUtils",new ApiDataFileUtils("spinnaker", "product_delta_update")).getMap());
+
+		// Spinnaker Sanremo
+		paramsMap.put("spinnakerSanremo_product_all_update",new MapUtils(new HashMap<String, Object>())
+				.putData("url","http://net13server.net/spinnakerapi/MyApi/Productslist/GetProducts")
+				.putData("DBContext","Sanremo")
+				.putData("BrandId","")
+				.putData("StartIndex","1")
+				.putData("EndIndex","50")
+				.putData("Key","0mFLb4VtKS")
+				.putData("CategoryId","")
+				.putData("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool())
+				.putData("vendor_id","40")
+				.putData("threadNum","5")
+				.putData("eventName","spinnakerSanremo_product_all_update")
+				.putData("fileUtils",new ApiDataFileUtils("spinnakerSanremo", "product_all_update")).getMap());
+
+		paramsMap.put("spinnakerSanremo_product_delta_update",new MapUtils(new HashMap<String, Object>())
+				.putData("url","http://net13server.net/spinnakerapi/MyApi/Productslist/GetProducts")
+				.putData("DBContext","Sanremo")
+				.putData("BrandId","")
+				.putData("StartIndex","1")
+				.putData("EndIndex","50")
+				.putData("Key","0mFLb4VtKS")
+				.putData("CategoryId","")
+				.putData("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool())
+				.putData("vendor_id","40")
+				.putData("threadNum","5")
+				.putData("redisStartIndex","spinnakerSanremo_start_index_bydate")
+				.putData("redisEndIndex","spinnakerSanremo_end_index_bydate")
+				.putData("eventName","spinnakerSanremo_product_delta_update")
+				.putData("fileUtils",new ApiDataFileUtils("spinnakerSanremo", "product_delta_update")).getMap());
+
+		// Spinnaker Portofino
+		paramsMap.put("spinnakerPortofino_product_all_update",new MapUtils(new HashMap<String, Object>())
+				.putData("url","http://net13server.net/spinnakerapi/MyApi/Productslist/GetProducts")
+				.putData("DBContext","Portofino")
+				.putData("BrandId","")
+				.putData("StartIndex","1")
+				.putData("EndIndex","50")
+				.putData("Key","0mFLb4VtKS")
+				.putData("CategoryId","")
+				.putData("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool())
+				.putData("vendor_id","41")
+				.putData("threadNum","5")
+				.putData("eventName","spinnakerPortofino_product_all_update")
+				.putData("fileUtils",new ApiDataFileUtils("spinnakerPortofino", "product_all_update")).getMap());
+
+		paramsMap.put("spinnakerPortofino_product_delta_update",new MapUtils(new HashMap<String, Object>())
+				.putData("url","http://net13server.net/spinnakerapi/MyApi/Productslist/GetProducts")
+				.putData("DBContext","Portofino")
+				.putData("BrandId","")
+				.putData("StartIndex","1")
+				.putData("EndIndex","50")
+				.putData("Key","0mFLb4VtKS")
+				.putData("CategoryId","")
+				.putData("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool())
+				.putData("vendor_id","41")
+				.putData("threadNum","5")
+				.putData("redisStartIndex","spinnakerPortofino_start_index_bydate")
+				.putData("redisEndIndex","spinnakerPortofino_end_index_bydate")
+				.putData("eventName","spinnakerPortofino_product_delta_update")
+				.putData("fileUtils",new ApiDataFileUtils("spinnakerPortofino", "product_delta_update")).getMap());
+
+
 	}
 
 }
