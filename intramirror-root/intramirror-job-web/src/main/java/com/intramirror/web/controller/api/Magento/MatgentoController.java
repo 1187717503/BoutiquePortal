@@ -148,7 +148,7 @@ public class MatgentoController implements InitializingBean {
         apiConfigPool = new ApiConfigPool();
 
         apiConfigPool.put(
-                new ApiConfig().setUrl("http://srv1.best-fashion.net/export/apiv2/?t=507167b1d174406d152a4bd24344389c&type=allstock&supplier_sku_split=1&limit=0,10000")
+                new ApiConfig().setUrl("http://srv1.best-fashion.net/export/apiv2/?t=2caac260ced5700794d4d6efb17d4bcb&type=allstock&supplier_sku_split=1&limit=0,10000")
                 .setVendor_id(34L)
                 .setVendorName("leam")
                 .setThreadNum(15).setLimit(10)
@@ -161,7 +161,7 @@ public class MatgentoController implements InitializingBean {
                 );
 
         apiConfigPool.put(
-                new ApiConfig().setUrl("http://srv1.best-fashion.net/export/apiv2/?t=507167b1d174406d152a4bd24344389c&type=allstock&supplier_sku_split=1")
+                new ApiConfig().setUrl("http://srv1.best-fashion.net/export/apiv2/?t=2caac260ced5700794d4d6efb17d4bcb&type=allstock&supplier_sku_split=1")
                 .setVendor_id(34L)
                 .setVendorName("leam")
                 .setThreadNum(15).setLimit(500)
