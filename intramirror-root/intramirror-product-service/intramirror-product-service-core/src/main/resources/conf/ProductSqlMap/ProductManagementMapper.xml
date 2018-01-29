@@ -7,6 +7,7 @@
     <select id="listProductDetailInfo" parameterType="com.intramirror.product.api.model.SearchCondition" resultType="java.util.HashMap">
         SELECT
         product.product_id,
+        product.spu_id,
         shop_product.shop_product_id,
         shop_product.sale_at,
         product.status AS product_status,
