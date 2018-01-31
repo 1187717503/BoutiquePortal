@@ -817,7 +817,10 @@ function initActionEvent() {
         const spuId = $(this).data('spu-id');
         if(spuId !== ''){
             clearAllCookie();
-            const token = sessionStorage.getItem('token');
+            let token = sessionStorage.getItem('token');
+            if (!token) {
+                token = localStorage.getItem('token');
+            }
             if(baseUrl.match(/staging/)){
                 document.cookie = "staging-admin3-token=" + token + ";domain=intramirror.com;path=/";
                 location.href = 'sha.staging.admin3.intramirror.com/admin#/spuinfo/' + spuId;
