@@ -2,6 +2,7 @@ package com.intramirror.web.controller.api.shopify;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.intramirror.common.help.ExceptionUtils;
 import com.intramirror.common.help.StringUtils;
 import com.intramirror.common.utils.DateUtils;
 import com.intramirror.product.api.service.stock.IUpdateStockService;
@@ -113,7 +114,7 @@ public class ShopifyProductController  implements InitializingBean {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            logger.info("shopify_product_update,errorMessage:"+e);
+            logger.info("shopify_product_update,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
         }
         logger.info("shopify_product_update,end,name:"+name+",page:"+page+",index:"+index+",call_url:"+call_url);
         return "SUCCESS";
@@ -139,6 +140,7 @@ public class ShopifyProductController  implements InitializingBean {
             response = httpclient.execute(httpget);
         } catch (IOException e1) {
             e1.printStackTrace();
+            throw e1;
         }
         String result = null;
         try {
@@ -149,11 +151,13 @@ public class ShopifyProductController  implements InitializingBean {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw e;
         } finally {
             try {
                 response.close();
             } catch (IOException e) {
                 e.printStackTrace();
+                throw e;
             }
         }
         return result;
