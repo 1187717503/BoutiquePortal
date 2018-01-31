@@ -10,13 +10,13 @@ import com.intramirror.web.mapping.impl.shopify.ShopifyProductMapping;
 import com.intramirror.web.thread.CommonThreadPool;
 import com.intramirror.web.thread.UpdateProductThread;
 import com.intramirror.web.util.ApiDataFileUtils;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import javax.annotation.Resource;
 import org.apache.http.HttpEntity;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -81,8 +81,11 @@ public class ShopifyProductController  implements InitializingBean {
         try {
             while (true) {
                 String newURL = call_url +"&page="+page;
+
                 String responseBody = this.sendGet(newURL);
-//                String responseBody = HttpUtils.httpGet(newURL);
+//                Map<String,Object> map = HttpUtils.requestHttps(newURL,"GET");
+//                String responseBody = map.get("resultMessage").toString();
+//                String responseBody = HttpUtils.httpGetAmr(newURL);
                 fileUtils.bakPendingFile("page"+page,responseBody);
 
                 if(StringUtils.isBlank(responseBody) || responseBody.contains("{\"products\":[]}")) {
@@ -130,35 +133,30 @@ public class ShopifyProductController  implements InitializingBean {
     }
 
     public  String sendGet(String url) throws Exception{
-        //1.获得一个httpclient对象
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-        //2.生成一个get请求
-        HttpGet httpget = new HttpGet(url);
-        CloseableHttpResponse response = null;
+        String result = "";
         try {
-            //3.执行get请求并返回结果
-            response = httpclient.execute(httpget);
-        } catch (IOException e1) {
-            e1.printStackTrace();
-            throw e1;
-        }
-        String result = null;
-        try {
-            //4.处理结果，这里将结果返回为字符串
-            HttpEntity entity = response.getEntity();
-            if (entity != null) {
-                result = EntityUtils.toString(entity);
-            }
+            CloseableHttpClient httpclient = HttpClients.createDefault();
+
+            HttpGet httpGet = new HttpGet(url);
+
+            RequestConfig requestConfig = RequestConfig.custom()
+
+                    .setConnectTimeout(600000).setConnectionRequestTimeout(600000)
+
+                    .setSocketTimeout(600000).build();
+
+            httpGet.setConfig(requestConfig);
+
+            CloseableHttpResponse response = httpclient.execute(httpGet);
+
+            System.out.println("得到的结果:" + response.getStatusLine());//得到请求结果
+
+            HttpEntity entity = response.getEntity();//得到请求回来的数据
+            result = EntityUtils.toString(entity);
+            response.close();
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
-        } finally {
-            try {
-                response.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw e;
-            }
         }
         return result;
     }
