@@ -95,7 +95,21 @@ function initVendor() {
             request.setRequestHeader("token", token);
         },
         success: function(result) {
-            initSelectItems('select-boutique', 'tmpl-boutique-select', result.data);
+            let list = result.data;
+            let nameList = [];
+            list.forEach(function(item){
+                nameList.push(item.vendor_name);
+            });
+            nameList.sort();
+            let sortList = [];
+            nameList.forEach(function(name){
+                const temp = _.find(list,function(o){
+                    return o.vendor_name === name;
+                });
+                sortList.push(temp);
+            });
+
+            initSelectItems('select-boutique', 'tmpl-boutique-select', sortList);
             $('#select-boutique').siblings('input').attr('title', 'All Boutique');
             initActionforBoutique();
         }, error : function (code, exception) {
@@ -812,6 +826,32 @@ function initActionEvent() {
             }
         });
     });
+
+    $('.product-list .spu-id').click(function(){
+        const spuId = $(this).data('spu-id');
+        if(spuId !== ''){
+            clearAllCookie();
+            let token = sessionStorage.getItem('token');
+            if (!token) {
+                token = localStorage.getItem('token');
+            }
+            if(baseUrl.match(/staging/)){
+                document.cookie = "staging-admin3-token=" + token + ";domain=intramirror.com;path=/";
+                location.href = 'sha.staging.admin3.intramirror.com/admin#/spuinfo/' + spuId;
+            }else{
+                document.cookie = "prod-admin3-token=" + token + ";domain=intramirror.com;path=/";
+                location.href = 'admin3.intramirror.com/admin#/spuinfo/' + spuId;
+            }
+        }
+    });
+
+    function clearAllCookie() {  
+        var keys = document.cookie.match(/[^ =;]+(?=\=)/g);  
+        if(keys) {  
+            for(var i = keys.length; i--;)  
+                document.cookie = keys[i] + '=0;expires=' + new Date(0).toUTCString()  
+        }  
+    }
 
     $('.product-list .exception-ops ').click(function() {
         let skuId = $(this).parent().parent().data('sku-id');
