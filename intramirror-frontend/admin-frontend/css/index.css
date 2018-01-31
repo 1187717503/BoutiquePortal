@@ -92,7 +92,7 @@
 }
 
 .order-head.page-order .item.page-order:nth-child(6) {
-    width: 8%;
+    width: 6%;
 }
 
 .order-head.page-order .item.page-order:nth-child(7) {
@@ -101,21 +101,22 @@
 }
 
 .order-head.page-order .item.page-order:nth-child(8) {
-    width: 10%;
+    width: 4%;
     text-align: center;
 }
 
 .order-head.page-order .item.page-order:nth-child(9) {
-    width: 5%;
+    width: 8%;
     text-align: center;
 }
 
 .order-head.page-order .item.page-order:nth-child(10) {
-    width: 7%;
+    width: 5%;
+    text-align: center;
 }
 
 .order-head.page-order .item.page-order:nth-child(11) {
-    width: 6%;
+    width: 7%;
 }
 
 .order-head.page-order .item.page-order:nth-child(12) {
@@ -123,7 +124,7 @@
 }
 
 .order-head.page-order .item.page-order:nth-child(13) {
-    width: 8%;
+    width: 6%;
 }
 
 .order-head.page-order .item.page-order:nth-child(14) {
@@ -131,6 +132,10 @@
 }
 
 .order-head.page-order .item.page-order:nth-child(15) {
+    width: 8%;
+}
+
+.order-head.page-order .item.page-order:nth-child(16) {
     width: 8%;
     text-align: center;
 }
@@ -170,7 +175,7 @@
 }
 
 .order-list.page-order .item.page-order:nth-child(6) {
-    width: 8%;
+    width: 6%;
     word-wrap: break-word;
 }
 
@@ -180,21 +185,28 @@
 }
 
 .order-list.page-order .item.page-order:nth-child(8) {
-    width: 10%;
+    width: 4%;
     text-align: center;
 }
 
+.spu-id{
+    text-decoration: underline;
+    color: blue;
+    cursor: pointer;
+}
+
 .order-list.page-order .item.page-order:nth-child(9) {
-    width: 5%;
+    width: 8%;
     text-align: center;
 }
 
 .order-list.page-order .item.page-order:nth-child(10) {
-    width: 7%;
+    width: 5%;
+    text-align: center;
 }
 
 .order-list.page-order .item.page-order:nth-child(11) {
-    width: 6%;
+    width: 7%;
 }
 
 .order-list.page-order .item.page-order:nth-child(12) {
@@ -202,8 +214,7 @@
 }
 
 .order-list.page-order .item.page-order:nth-child(13) {
-    width: 8%;
-    word-wrap: break-word;
+    width: 6%;
 }
 
 .order-list.page-order .item.page-order:nth-child(14) {
@@ -214,10 +225,15 @@
 .order-list.page-order .item.page-order:nth-child(15) {
     width: 8%;
     word-wrap: break-word;
-    text-align: center;
 }
 
 .order-list.page-order .item.page-order:nth-child(16) {
+    width: 8%;
+    word-wrap: break-word;
+    text-align: center;
+}
+
+.order-list.page-order .item.page-order:nth-child(17) {
     font-size: 20px;
     color: #333;
 }

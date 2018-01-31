@@ -813,6 +813,29 @@ function initActionEvent() {
         });
     });
 
+    $('.product-list .spu-id').click(function(){
+        const spuId = $(this).data('spu-id');
+        if(spuId !== ''){
+            clearAllCookie();
+            const token = sessionStorage.getItem('token');
+            if(baseUrl.match(/staging/)){
+                document.cookie = "staging-admin3-token=" + token + ";domain=intramirror.com;path=/";
+                location.href = 'sha.staging.admin3.intramirror.com/admin#/spuinfo/' + spuId;
+            }else{
+                document.cookie = "prod-admin3-token=" + token + ";domain=intramirror.com;path=/";
+                location.href = 'admin3.intramirror.com/admin#/spuinfo/' + spuId;
+            }
+        }
+    });
+
+    function clearAllCookie() {  
+        var keys = document.cookie.match(/[^ =;]+(?=\=)/g);  
+        if(keys) {  
+            for(var i = keys.length; i--;)  
+                document.cookie = keys[i] + '=0;expires=' + new Date(0).toUTCString()  
+        }  
+    }
+
     $('.product-list .exception-ops ').click(function() {
         let skuId = $(this).parent().parent().data('sku-id');
         let productId = $(this).parent().parent().data('product-id');
