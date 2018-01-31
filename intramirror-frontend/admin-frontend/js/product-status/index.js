@@ -95,7 +95,21 @@ function initVendor() {
             request.setRequestHeader("token", token);
         },
         success: function(result) {
-            initSelectItems('select-boutique', 'tmpl-boutique-select', result.data);
+            let list = result.data;
+            let nameList = [];
+            list.forEach(function(item){
+                nameList.push(item.vendor_name);
+            });
+            nameList.sort();
+            let sortList = [];
+            nameList.forEach(function(name){
+                const temp = _.find(list,function(o){
+                    return o.vendor_name === name;
+                });
+                sortList.push(temp);
+            });
+
+            initSelectItems('select-boutique', 'tmpl-boutique-select', sortList);
             $('#select-boutique').siblings('input').attr('title', 'All Boutique');
             initActionforBoutique();
         }, error : function (code, exception) {
