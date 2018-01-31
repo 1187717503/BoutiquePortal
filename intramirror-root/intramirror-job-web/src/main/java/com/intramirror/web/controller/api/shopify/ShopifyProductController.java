@@ -2,21 +2,24 @@ package com.intramirror.web.controller.api.shopify;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.intramirror.common.help.StringUtils;
 import com.intramirror.common.utils.DateUtils;
 import com.intramirror.product.api.service.stock.IUpdateStockService;
 import com.intramirror.web.mapping.impl.shopify.ShopifyProductMapping;
 import com.intramirror.web.thread.CommonThreadPool;
 import com.intramirror.web.thread.UpdateProductThread;
 import com.intramirror.web.util.ApiDataFileUtils;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import javax.annotation.Resource;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
@@ -77,10 +80,11 @@ public class ShopifyProductController  implements InitializingBean {
         try {
             while (true) {
                 String newURL = call_url +"&page="+page;
-                String responseBody = this.doGet(newURL);
+                String responseBody = this.sendGet(newURL);
+//                String responseBody = HttpUtils.httpGet(newURL);
                 fileUtils.bakPendingFile("page"+page,responseBody);
 
-                if(responseBody.contains("{\"products\":[]}")) {
+                if(StringUtils.isBlank(responseBody) || responseBody.contains("{\"products\":[]}")) {
                     break;
                 }
 
@@ -124,18 +128,32 @@ public class ShopifyProductController  implements InitializingBean {
         executors.put(product_delta_update,delta_executor);
     }
 
-    public  String doGet(String url) throws Exception {
-        HttpClient httpClient = null;
-        HttpGet httpGet = null;
+    public  String sendGet(String url) throws Exception{
+        //1.获得一个httpclient对象
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        //2.生成一个get请求
+        HttpGet httpget = new HttpGet(url);
+        CloseableHttpResponse response = null;
+        try {
+            //3.执行get请求并返回结果
+            response = httpclient.execute(httpget);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
         String result = null;
-        httpClient = new SSLClient();
-        httpGet = new HttpGet(url);
-        httpGet.addHeader("Content-Type", "application/json");
-        HttpResponse response = httpClient.execute(httpGet);
-        if(response != null){
-            HttpEntity resEntity = response.getEntity();
-            if(resEntity != null){
-                result = EntityUtils.toString(resEntity,"utf-8");
+        try {
+            //4.处理结果，这里将结果返回为字符串
+            HttpEntity entity = response.getEntity();
+            if (entity != null) {
+                result = EntityUtils.toString(entity);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                response.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
         return result;
