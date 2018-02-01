@@ -70,27 +70,50 @@
         <property name="appCheckUrl" value="${app.check.url}"></property>
         <property name="ruleExcelPath" value="${price.rule.path}"></property>
     </bean>
+
+
+    <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+    </bean>
+
+    <bean id="jedisConnectionFactory"
+          class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+        <property name="hostName" value="${spring.redis.host}"/>
+        <property name="port" value="${spring.redis.port}"/>
+        <property name="poolConfig" ref="jedisPoolConfig"/>
+        <property name="usePool" value="true"/>
+    </bean>
+
+
+    <bean id="redisHttpSessionConfiguration" class="org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration">
+        <property name="redisNamespace" value="mirco-service"/>
+        <property name="httpSessionStrategy" ref="headerHttpSessionStrategy"/>
+    </bean>
+
+    <bean id="headerHttpSessionStrategy" class="org.springframework.session.web.http.HeaderHttpSessionStrategy">
+        <property name="headerName" value="token"/>
+    </bean>
+
     <beans profile="test">
-        <context:property-placeholder location="classpath:test/common.properties" ignore-unresolvable="true"/>
+        <context:property-placeholder location="classpath:test/*.properties" ignore-unresolvable="true"/>
     </beans>
 
     <beans profile="staging">
-        <context:property-placeholder location="classpath:staging/common.properties" ignore-unresolvable="true"/>
+        <context:property-placeholder location="classpath:staging/*.properties" ignore-unresolvable="true"/>
     </beans>
 
     <beans profile="test_ci">
-        <context:property-placeholder location="classpath:test_ci/common.properties" ignore-unresolvable="true"/>
+        <context:property-placeholder location="classpath:test_ci/*.properties" ignore-unresolvable="true"/>
     </beans>
 
     <beans profile="test_local">
-        <context:property-placeholder location="classpath:test_local/common.properties" ignore-unresolvable="true"/>
+        <context:property-placeholder location="classpath:test_local/*.properties" ignore-unresolvable="true"/>
     </beans>
 
     <beans profile="staging_local">
-        <context:property-placeholder location="classpath:staging_local/common.properties" ignore-unresolvable="true"/>
+        <context:property-placeholder location="classpath:staging_local/*.properties" ignore-unresolvable="true"/>
     </beans>
 
     <beans profile="prd">
-        <context:property-placeholder location="classpath:prd/common.properties" ignore-unresolvable="true"/>
+        <context:property-placeholder location="classpath:prd/*.properties" ignore-unresolvable="true"/>
     </beans>
 </beans>

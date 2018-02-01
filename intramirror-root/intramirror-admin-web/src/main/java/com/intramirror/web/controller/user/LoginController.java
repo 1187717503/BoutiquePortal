@@ -9,12 +9,9 @@ import com.intramirror.user.api.model.UserRole;
 import com.intramirror.user.api.service.RoleService;
 import com.intramirror.user.api.service.UserRoleService;
 import com.intramirror.user.api.service.UserService;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.Base64Codec;
 import java.util.HashMap;
 import java.util.Map;
-import org.joda.time.DateTime;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,10 +22,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 @RequestMapping("/login")
 public class LoginController {
-
-    private String jwtSecret = "qazxswedcvfr543216yhnmju70plmjkiu89";
-
-    private int jwtExpireIn = 172800;
 
     //@Resource(name = "userServiceImpl")
     @Autowired
@@ -47,7 +40,7 @@ public class LoginController {
      */
     @RequestMapping(value = "/do_login", method = RequestMethod.POST)
     @ResponseBody
-    public Map do_login(@RequestBody Map<String, Object> map) throws Exception {
+    public Map do_login(HttpServletRequest request, @RequestBody Map<String, Object> map) throws Exception {
         // 返回数据初始化
         int status = StatusType.FAILURE;
         Map<String, Object> stringObjectMap = new HashMap<String, Object>();
@@ -82,10 +75,13 @@ public class LoginController {
             Role role = roleService.getRoleById(userRole.getRoleId());
             if (role != null) {
                 //计算过期时间生成token
-                DateTime dateTime = DateTime.now().plusSeconds(jwtExpireIn);
-                String token = Jwts.builder().setSubject(String.valueOf(user.getUserId())).setIssuedAt(dateTime.toDate()).signWith(SignatureAlgorithm.HS512,
-                        getJwtBase64Key()).compact();
-                stringObjectMap.put("token", token);
+                Map<String, Object> sessionUser = new HashMap<>();
+                sessionUser.put("userId", user.getUserId());
+                sessionUser.put("email", user.getEmail());
+                sessionUser.put("roleId", role.getRoleId());
+                request.getSession().setAttribute("user", sessionUser);
+
+                stringObjectMap.put("token", request.getSession().getId());
                 status = StatusType.SUCCESS;
             } else {
                 status = StatusType.ADMIN_ROLE_NOT_EXIST;
@@ -99,7 +95,4 @@ public class LoginController {
         return stringObjectMap;
     }
 
-    public String getJwtBase64Key() {
-        return Base64Codec.BASE64.encode(jwtSecret);
-    }
 }

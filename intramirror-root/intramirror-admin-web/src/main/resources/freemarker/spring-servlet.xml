@@ -46,13 +46,13 @@
 
     <context:property-placeholder location="classpath:/commons.properties"/>
 
-    <bean id="authenticationInterceptor" class="com.intramirror.core.servlet.interceptor.AuthenticationInterceptor"/>
+    <bean id="authorizationInterceptor" class="com.intramirror.web.interceptor.AuthorizationInterceptor"/>
 
     <mvc:interceptors>
         <mvc:interceptor>
             <mvc:mapping path="/**"/>
             <mvc:exclude-mapping path="/login"/>
-            <ref bean="authenticationInterceptor"/>
+            <ref bean="authorizationInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>
 
