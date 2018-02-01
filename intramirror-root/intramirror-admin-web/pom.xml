@@ -8,6 +8,7 @@
         <groupId>com.intramirror</groupId>
         <artifactId>intramirror-root</artifactId>
         <version>1.0.0</version>
+        <relativePath>../</relativePath>
     </parent>
 
     <artifactId>intramirror-admin-web</artifactId>
