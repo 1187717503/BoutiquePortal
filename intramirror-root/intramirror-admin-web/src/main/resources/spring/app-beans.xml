@@ -85,7 +85,7 @@
 
 
     <bean id="redisHttpSessionConfiguration" class="org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration">
-        <property name="redisNamespace" value="mirco-service"/>
+        <property name="redisNamespace" value="micro-service"/>
         <property name="httpSessionStrategy" ref="headerHttpSessionStrategy"/>
     </bean>
 
