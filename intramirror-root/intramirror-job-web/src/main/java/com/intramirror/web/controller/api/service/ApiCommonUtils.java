@@ -93,6 +93,7 @@ public class ApiCommonUtils {
     }
 
     public static void sortProductOptionsImage(ProductEDSManagement.ProductOptions productOptions) {
+        logger.info("sortProductOptionsImage -> productOptions : " + productOptions);
         if (productOptions.vendor_id == 12L || productOptions.vendor_id == 37L || productOptions.vendor_id == 38L || productOptions.vendor_id == 39L
                 || productOptions.vendor_id == 40L || productOptions.vendor_id == 41L) {
             String img = productOptions.getCoverImg();
@@ -103,6 +104,7 @@ public class ApiCommonUtils {
     public static String sortImageString(String imageJson) {
         List<String> imageList = JsonTransformUtil.readValue(imageJson, ArrayList.class);
         if (imageList == null) {
+            logger.info("Skip sort due to fail to covert to json : " + imageJson);
             return imageJson;
         }
         Map<String, String> sortedImages = new TreeMap<>();
@@ -110,6 +112,7 @@ public class ApiCommonUtils {
         for (String image : imageList) {
             String[] ret = image.split("_");
             if (ret.length <= 1) {
+                logger.info("Skip sort due to no delimiter '_' : " + image);
                 return imageJson;
             }
             sortedImages.put(ret[ret.length - 1], image);
@@ -120,7 +123,9 @@ public class ApiCommonUtils {
         while (it.hasNext()) {
             sortedImagesList.add(sortedImages.get(it.next()));
         }
-        return JsonTransformUtil.toJson(sortedImagesList);
+        String sortedImagesListString = JsonTransformUtil.toJson(sortedImagesList);
+        logger.info("Sort image from [ " + imageJson + " ]" + " to " + sortedImagesListString);
+        return sortedImagesListString;
     }
 
     public static String downloadImgs(String originImg) {
