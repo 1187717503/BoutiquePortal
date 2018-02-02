@@ -393,6 +393,7 @@ public class ApiCreateProductService {
         product.updated_at = new Date();
         product.enabled = EnabledType.USED;
 
+        productOptions.setVendor_id(product.getVendor_id());
         ApiCommonUtils.sortProductOptionsImage(productOptions);
 
         /* 由于Julian的服装的第一张图不是正面照，需要将其放到所有图片的最后一张,只处理成人的男士、女士的服装，不更改包、鞋和配饰*/

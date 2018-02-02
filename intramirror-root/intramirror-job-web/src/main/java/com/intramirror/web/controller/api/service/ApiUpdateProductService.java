@@ -265,7 +265,7 @@ public class ApiUpdateProductService {
             IPriceService iPriceService = new PriceServiceImpl();
             iPriceService.synProductPriceRule(product,product.getMin_retail_price(),conn);
         }*/
-
+        productOptions.setVendor_id(product.getVendor_id());
         ApiCommonUtils.sortProductOptionsImage(productOptions);
 
         // Image：不予更新。
