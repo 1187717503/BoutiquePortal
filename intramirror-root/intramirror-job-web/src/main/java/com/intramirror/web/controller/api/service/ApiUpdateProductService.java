@@ -5,6 +5,7 @@ import com.alibaba.fastjson15.JSONArray;
 import com.google.gson.Gson;
 import static com.intramirror.web.controller.api.service.ApiCommonUtils.escape;
 import com.intramirror.web.mapping.vo.StockOption;
+import com.zhy.http.okhttp.OkHttpUtils;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -265,6 +266,8 @@ public class ApiUpdateProductService {
             iPriceService.synProductPriceRule(product,product.getMin_retail_price(),conn);
         }*/
 
+        ApiCommonUtils.sortProductOptionsImage(productOptions);
+
         // Image：不予更新。
         String cover_img = product.getCover_img();
         boolean noImg = this.getNoImg(conn);
@@ -432,10 +435,18 @@ public class ApiUpdateProductService {
         // designer_id和Color_code接口里有改变直接覆盖修改，并报Warning。
         if (StringUtils.isBlank(newBrandCode) || !newBrandCode.equalsIgnoreCase(oldBrandCode)) {
             this.setWarning(ApiErrorTypeEnum.errorType.error_BrandID_change, "BrandID", newBrandCode);
+
         }
 
         if (StringUtils.isBlank(newColorCode) || !newColorCode.equalsIgnoreCase(oldColorCode)) {
             this.setWarning(ApiErrorTypeEnum.errorType.error_ColorCode_change, "ColorCode", newColorCode);
+
+        }
+
+        if ((StringUtils.isNotBlank(newBrandCode) && !newBrandCode.equalsIgnoreCase(oldBrandCode)) || (StringUtils.isNotBlank(newColorCode) && !newColorCode
+                .equalsIgnoreCase(oldColorCode))) {
+            OkHttpUtils.get().build();
+
         }
 
         if (StringUtils.isNotBlank(newBrandCode)) {
@@ -448,6 +459,16 @@ public class ApiUpdateProductService {
         this.updateProductProperty(conn, product.getProduct_id(), ProductPropertyEnumKeyName.BrandID.getCode(), product.getDesigner_id());
         this.updateProductProperty(conn, product.getProduct_id(), ProductPropertyEnumKeyName.ColorCode.getCode(), product.getColor_code());
         this.updateProductProperty(conn, product.getProduct_id(), ProductPropertyEnumKeyName.CarryOver.getCode(), productOptions.getCarryOver());
+
+        if ((productOptions.vendor_id == 12L || productOptions.vendor_id == 37L || productOptions.vendor_id == 38L || productOptions.vendor_id == 39L
+                || productOptions.vendor_id == 40L || productOptions.vendor_id == 41L) && product.status == 1) {
+            String img = productOptions.getCoverImg();
+            if (StringUtils.isNotBlank(cover_img)) {
+                String downImgs = ApiCommonUtils.downloadImgs(img);
+                product.cover_img = downImgs;
+                product.description_img = downImgs;
+            }
+        }
 
         /** 只发一次后面注释*//*
         if(product.vendor_id == 32L) {
@@ -472,6 +493,16 @@ public class ApiUpdateProductService {
             IPriceService iPriceService = new PriceServiceImpl();
             iPriceService.synProductPriceRule(product, product.getMin_retail_price(), conn);
             logger.info("apartment 修改product :" + new Gson().toJson(product));
+        }
+
+        if (product.vendor_id == 37L && product.status == 38L) {
+            String srcImages = productOptions.getCoverImg();
+            if (StringUtils.isNotBlank(srcImages)) {
+                String downImgs = ApiCommonUtils.downloadImgs(srcImages);
+                product.cover_img = downImgs;
+                product.description_img = downImgs;
+            }
+
         }
 
         if (StringUtils.isNotBlank(productOptions.getError_type()) && modify) {
