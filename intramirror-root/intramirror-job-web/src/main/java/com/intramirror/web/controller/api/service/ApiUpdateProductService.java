@@ -3,9 +3,11 @@ package com.intramirror.web.controller.api.service;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson15.JSONArray;
 import com.google.gson.Gson;
+import com.intramirror.utils.transform.JsonTransformUtil;
 import static com.intramirror.web.controller.api.service.ApiCommonUtils.escape;
 import com.intramirror.web.mapping.vo.StockOption;
-import com.zhy.http.okhttp.OkHttpUtils;
+import com.intramirror.web.util.Facility;
+import com.intramirror.web.util.HttpUtils;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,6 +19,7 @@ import org.apache.log4j.Logger;
 import org.sql2o.Connection;
 import pk.shoplus.DBConnector;
 import pk.shoplus.common.Contants;
+import pk.shoplus.common.utils.StringUtil;
 import pk.shoplus.enums.ApiErrorTypeEnum;
 import pk.shoplus.enums.ProductPropertyEnumKeyName;
 import pk.shoplus.model.CategoryProductInfo;
@@ -445,7 +448,11 @@ public class ApiUpdateProductService {
 
         if ((StringUtils.isNotBlank(newBrandCode) && !newBrandCode.equalsIgnoreCase(oldBrandCode)) || (StringUtils.isNotBlank(newColorCode) && !newColorCode
                 .equalsIgnoreCase(oldColorCode))) {
-            OkHttpUtils.get().build();
+            if (product.spu_id != null) {
+                logger.info("Try to unbind product [" + product.product_id + "] -- [" + product.spu_id + "]");
+                unbindProductSpu(product.product_id, product.spu_id);
+                product.spu_id = null;
+            }
 
         }
 
@@ -460,7 +467,7 @@ public class ApiUpdateProductService {
         this.updateProductProperty(conn, product.getProduct_id(), ProductPropertyEnumKeyName.ColorCode.getCode(), product.getColor_code());
         this.updateProductProperty(conn, product.getProduct_id(), ProductPropertyEnumKeyName.CarryOver.getCode(), productOptions.getCarryOver());
 
-        if ((productOptions.vendor_id == 12L || productOptions.vendor_id == 37L || productOptions.vendor_id == 38L || productOptions.vendor_id == 39L
+/*        if ((productOptions.vendor_id == 12L || productOptions.vendor_id == 37L || productOptions.vendor_id == 38L || productOptions.vendor_id == 39L
                 || productOptions.vendor_id == 40L || productOptions.vendor_id == 41L) && product.status == 1) {
             String img = productOptions.getCoverImg();
             if (StringUtils.isNotBlank(cover_img)) {
@@ -468,7 +475,7 @@ public class ApiUpdateProductService {
                 product.cover_img = downImgs;
                 product.description_img = downImgs;
             }
-        }
+        }*/
 
         /** 只发一次后面注释*//*
         if(product.vendor_id == 32L) {
@@ -529,6 +536,48 @@ public class ApiUpdateProductService {
         product.status = null;
         productService.updateProduct(product);
         logger.info("ApiUpdateProductService,setProduct,end,updateProduct,product:" + JSONObject.toJSONString(product));
+    }
+
+    private boolean unbindProductSpu(Long productId, Long spuId) {
+        String baseUrl = Facility.getInstance().getMicroProperties().getBaseUrl();
+        if (StringUtil.isEmpty(HttpUtils.getToken())) {
+            login(baseUrl);
+        }
+        Map<String, Object> response = sendUnbindRequest(baseUrl, productId, spuId);
+        if (Integer.parseInt(response.get("status").toString()) == 401) {
+            login(baseUrl);
+            response = sendUnbindRequest(baseUrl, productId, spuId);
+        }
+
+        if (Integer.parseInt(response.get("status").toString()) != 200) {
+            logger.error("Fail to unbind product [" + productId + "] -- [" + spuId + "] : " + response);
+
+            return false;
+        }
+        logger.info("Success to unbind product [" + productId + "] -- [" + spuId + "]");
+        return true;
+    }
+
+    private Map<String, Object> sendUnbindRequest(String baseUrl, Long productId, Long spuId) {
+        String url = baseUrl + "/product/spus/" + spuId + "/products/" + productId;
+        Map<String, Object> response = HttpUtils.httpPut(url, HttpUtils.getToken(), "");
+        return response;
+    }
+
+    private void login(String baseUrl) {
+        String loginUrl = baseUrl + "/auth/login";
+        Map<String, String> loginBody = new HashMap<>();
+        loginBody.put("email", Facility.getInstance().getMicroProperties().getUsername());
+        loginBody.put("password", Facility.getInstance().getMicroProperties().getPassword());
+        Map<String, Object> loginResp = HttpUtils.httpPost2(loginUrl, JsonTransformUtil.toJson(loginBody));
+        if (loginResp.get("resultMessage") != null) {
+            Map<String, Object> resultMessage = JsonTransformUtil.readValue(loginResp.get("resultMessage").toString(), HashMap.class);
+            String token = (String) resultMessage.get("token");
+
+            if (token != null) {
+                HttpUtils.setToken(token);
+            }
+        }
     }
 
     private void checkMappingParams(Connection conn) throws Exception {

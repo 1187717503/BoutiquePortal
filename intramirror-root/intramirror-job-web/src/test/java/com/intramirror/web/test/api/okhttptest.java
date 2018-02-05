@@ -1,12 +1,12 @@
 package com.intramirror.web.test.api;
 
 import com.intramirror.utils.transform.JsonTransformUtil;
+import com.intramirror.web.util.HttpUtils;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,6 +15,7 @@ import static junit.framework.TestCase.assertTrue;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pk.shoplus.common.utils.StringUtil;
 
 /**
  * Created on 2018/2/1.
@@ -26,34 +27,50 @@ public class okhttptest {
     private final Logger LOGGER = LoggerFactory.getLogger(okhttptest.class);
 
     @Test
-    public void testSortimage() {
+    public void testhttp() {
 
-        String img = "[\"http://185.58.119.172/dolcitrame/ObjImg//08012018/080120180_0027.jpg\",\"http://185.58.119.172/dolcitrame/ObjImg//08012018/08012018_00026.jpg\",\"http://185.58.119.172/dolcitrame/ObjImg//08012018/08012018_00025.jpg\"]";
+        unbindProductSpu(706L, 1L);
 
-        LOGGER.info("{}", sortImageString(img));
     }
 
-    private String sortImageString(String imageJson) {
-        List<String> imageList = JsonTransformUtil.readValue(imageJson, ArrayList.class);
-        if (imageList == null) {
-            return imageJson;
+    private boolean unbindProductSpu(Long productId, Long spuId) {
+        String baseUrl = "http://localhost:8103";
+        if (StringUtil.isEmpty(HttpUtils.getToken())) {
+            login(baseUrl);
         }
-        Map<String, String> sortedImages = new TreeMap<>();
+        Map<String, Object> response = sendUnbindRequest(baseUrl, productId, spuId);
+        if (Integer.parseInt(response.get("status").toString()) == 401) {
+            login(baseUrl);
+            response = sendUnbindRequest(baseUrl, productId, spuId);
+        }
 
-        for (String image : imageList) {
-            String[] ret = image.split("_");
-            if (ret.length <= 1) {
-                return imageJson;
+        if (Integer.parseInt(response.get("status").toString()) != 200) {
+            LOGGER.error("Fail to unbind product [{}] -- [{}]", productId, spuId);
+            return false;
+        }
+        return true;
+    }
+
+    private Map<String, Object> sendUnbindRequest(String baseUrl, Long productId, Long spuId) {
+        String url = baseUrl + "/product/spus/" + spuId + "/products/" + productId;
+        Map<String, Object> response = HttpUtils.httpPut(url, HttpUtils.getToken(), "");
+        return response;
+    }
+
+    private void login(String baseUrl) {
+        String loginUrl = baseUrl + "/auth/login";
+        Map<String, String> loginBody = new HashMap<>();
+        loginBody.put("email", "job@intramirror.com");
+        loginBody.put("password", "e10adc3949ba59abbe56e057f20f883e");
+        Map<String, Object> loginResp = HttpUtils.httpPost2(loginUrl, JsonTransformUtil.toJson(loginBody));
+        if (loginResp.get("resultMessage") != null) {
+            Map<String, Object> resultMessage = JsonTransformUtil.readValue(loginResp.get("resultMessage").toString(), HashMap.class);
+           String token = (String) resultMessage.get("token");
+
+            if (token != null ) {
+                HttpUtils.setToken(token);
             }
-            sortedImages.put(ret[ret.length - 11], image);
         }
-
-        List<String> sortedImagesList = new ArrayList<>();
-        Iterator it = sortedImages.keySet().iterator();
-        while (it.hasNext()) {
-            sortedImagesList.add(sortedImages.get(it.next()));
-        }
-        return JsonTransformUtil.toJson(sortedImagesList);
     }
 
     @Test

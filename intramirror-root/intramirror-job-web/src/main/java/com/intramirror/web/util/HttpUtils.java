@@ -16,6 +16,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import org.apache.log4j.Logger;
+import pk.shoplus.common.utils.StringUtil;
 import pk.shoplus.util.ExceptionUtils;
 import pk.shoplus.util.MapUtils;
 
@@ -30,6 +31,8 @@ public class HttpUtils {
 
     private static final String HTTP_GET = "GET";
 
+    private static final String HTTP_PUT = "PUT";
+
     private static final String CONTENT_FROM_TYPE = "application/x-www-form-urlencoded";
 
     private static final int SEND_REQUEST_TIME_OUT = 1800000;
@@ -38,19 +41,37 @@ public class HttpUtils {
 
     private static final String CHARSET_UTF_8 = "UTF-8";
 
-    public static String httpGet(String url){
-        Map<String,Object> result = requestHttp(HTTP_GET,url,CONTENT_FROM_TYPE,null);
+    public static String getToken() {
+        return token;
+    }
+
+    public static synchronized void setToken(String token) {
+        HttpUtils.token = token;
+    }
+
+    private static String token = "";
+
+    public static String httpGet(String url) {
+        Map<String, Object> result = requestHttp(HTTP_GET, url, CONTENT_FROM_TYPE, null, null);
         return result.get("resultMessage").toString();
     }
 
-    public static String httpPost(String url,String body){
-        Map<String,Object> result = requestHttp(HTTP_POST,url,CONTENT_FROM_TYPE,body);
+    public static String httpPost(String url, String body) {
+        Map<String, Object> result = requestHttp(HTTP_POST, url, CONTENT_FROM_TYPE, body, null);
         return result.get("resultMessage").toString();
     }
 
-    public static Map<String,Object> responseAndHeadersGet(String url){
-        Map<String,Object> result = requestHttps(url,HTTP_GET);
-        Map<String,List<String>> headers = (Map<String, List<String>>) result.get("headers");
+    public static Map<String, Object> httpPost2(String url, String body) {
+        return requestHttp(HTTP_POST, url, "application/json", body, null);
+    }
+
+    public static Map<String, Object> httpPut(String url, String token, String body) {
+        return requestHttp(HTTP_PUT, url, "application/json", body, token);
+    }
+
+    public static Map<String, Object> responseAndHeadersGet(String url) {
+        Map<String, Object> result = requestHttps(url, HTTP_GET);
+        Map<String, List<String>> headers = (Map<String, List<String>>) result.get("headers");
         List<String> currentList = headers.get("X-Count-Current");
         List<String> pagesList = headers.get("X-Count-Pages");
         List<String> totalList = headers.get("X-Count-Total");
@@ -59,13 +80,13 @@ public class HttpUtils {
         int pages = Integer.parseInt(pagesList.get(0));
         int total = Integer.parseInt(totalList.get(0));
 
-        result.put("current",current);
-        result.put("pages",pages);
-        result.put("total",total);
+        result.put("current", current);
+        result.put("pages", pages);
+        result.put("total", total);
         return result;
     }
 
-    private static Map<String,Object> requestHttp(String requestType,String url,String contentType,String body){
+    private static Map<String, Object> requestHttp(String requestType, String url, String contentType, String body, String token) {
         MapUtils mapUtils = new MapUtils(new HashMap<String, Object>());
         OutputStream outputStream = null;
         OutputStreamWriter outputStreamWriter = null;
@@ -79,7 +100,7 @@ public class HttpUtils {
             URL urlObj = new URL(url);
             URLConnection urlConnection = urlObj.openConnection();
             HttpURLConnection httpURLConnection = (HttpURLConnection) urlConnection;
-            if(requestType.equals(HTTP_POST)) {
+            if (requestType.equals(HTTP_POST)) {
                 httpURLConnection.setDoOutput(true);
                 httpURLConnection.setRequestProperty("Content-Length", String.valueOf(body.length()));
             }
@@ -90,16 +111,20 @@ public class HttpUtils {
             httpURLConnection.setRequestProperty("Accept-Charset", CHARSET_UTF_8);
             httpURLConnection.setRequestProperty("Content-Type", contentType);
             httpURLConnection.setRequestMethod(requestType);
-            httpURLConnection.connect();
 
-            Map<String,List<String>> headers = httpURLConnection.getHeaderFields();
-            mapUtils.putData("headers",headers);
-            if(requestType.equals(HTTP_POST)) {
+            if (StringUtil.isNotEmpty(token)) {
+                httpURLConnection.setRequestProperty("token", token);
+            }
+            httpURLConnection.connect();
+            if (requestType.equals(HTTP_POST)) {
                 outputStream = httpURLConnection.getOutputStream();
                 outputStreamWriter = new OutputStreamWriter(outputStream);
                 outputStreamWriter.write(body);
                 outputStreamWriter.flush();
             }
+            Map<String, List<String>> headers = httpURLConnection.getHeaderFields();
+            mapUtils.putData("status", httpURLConnection.getResponseCode());
+            mapUtils.putData("headers", headers);
 
             inputStream = httpURLConnection.getInputStream();
             inputStreamReader = new InputStreamReader(inputStream);
@@ -111,8 +136,8 @@ public class HttpUtils {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            logger.info("HttpUtils,requestHttp,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
-        }finally {
+            logger.info("HttpUtils,requestHttp,errorMessage:" + ExceptionUtils.getExceptionDetail(e));
+        } finally {
             try {
                 if (outputStreamWriter != null) {
                     outputStreamWriter.close();
@@ -149,11 +174,11 @@ public class HttpUtils {
                 e.printStackTrace();
             }
         }
-        mapUtils.putData("resultMessage",resultBuffer.toString());
+        mapUtils.putData("resultMessage", resultBuffer.toString());
         return mapUtils.getMap();
     }
 
-    public static Map<String,Object> requestHttps(String requestUrl,String requestType) {
+    public static Map<String, Object> requestHttps(String requestUrl, String requestType) {
         MapUtils mapUtils = new MapUtils(new HashMap<String, Object>());
         StringBuffer buffer = null;
         try {
@@ -180,15 +205,15 @@ public class HttpUtils {
                 os.write(outputStr.getBytes("utf-8"));
                 os.close();
             }*/
-            Map<String,List<String>> headers = conn.getHeaderFields();
-            mapUtils.putData("headers",headers);
+            Map<String, List<String>> headers = conn.getHeaderFields();
+            mapUtils.putData("headers", headers);
             // 读取服务器端返回的内容
             int code = conn.getResponseCode();
             InputStream is = null;
-            if(code != 200) {
-                 is = conn.getErrorStream();
+            if (code != 200) {
+                is = conn.getErrorStream();
             } else {
-                 is = conn.getInputStream();
+                is = conn.getInputStream();
             }
 
             InputStreamReader isr = new InputStreamReader(is, "utf-8");
@@ -200,9 +225,9 @@ public class HttpUtils {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            logger.info("HttpUtils,https,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
+            logger.info("HttpUtils,https,errorMessage:" + ExceptionUtils.getExceptionDetail(e));
         }
-        mapUtils.putData("resultMessage",buffer.toString());
+        mapUtils.putData("resultMessage", buffer.toString());
         return mapUtils.getMap();
     }
 
