@@ -494,6 +494,13 @@ public class ApiUpdateProductService {
             }
         }
 
+        if (product.getVendor_id().intValue() == 20 && StringUtils.isNotBlank(productOptions.getCategoryId())) {
+            product.category_id = Long.parseLong(productOptions.getCategoryId());
+            IPriceService iPriceService = new PriceServiceImpl();
+            iPriceService.synProductPriceRule(product, product.getMin_retail_price(), conn);
+            logger.info("apartment 修改product :" + new Gson().toJson(product));
+        }
+
         if (StringUtils.isNotBlank(productOptions.getError_type()) && modify) {
             if (StringUtils.isNotBlank(productOptions.getBrandId()) && productOptions.getError_type().equals(
                     ApiErrorTypeEnum.errorType.error_Brand_change.getCode()) && product.getBrand_id() != Long.parseLong(productOptions.getBrandId())) {
