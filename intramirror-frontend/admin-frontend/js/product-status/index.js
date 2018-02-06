@@ -837,10 +837,12 @@ function initActionEvent() {
             }
             if(baseUrl.match(/staging/)){
                 document.cookie = "staging-admin3-token=" + token + ";domain=intramirror.com;path=/";
-                location.href = 'sha.staging.admin3.intramirror.com/admin#/spuinfo/' + spuId;
+                let href = 'http://sha.staging.admin3.intramirror.com/admin#/spuinfo/' + spuId;
+                window.open(href);
             }else{
                 document.cookie = "prod-admin3-token=" + token + ";domain=intramirror.com;path=/";
-                location.href = 'admin3.intramirror.com/admin#/spuinfo/' + spuId;
+                let href = 'http://admin3.intramirror.com/admin#/spuinfo/' + spuId;
+                window.open(href);
             }
         }
     });
