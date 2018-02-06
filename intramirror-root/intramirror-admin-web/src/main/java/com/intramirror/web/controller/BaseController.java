@@ -1,20 +1,16 @@
 package com.intramirror.web.controller;
 
-import com.intramirror.common.Helper;
 import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.common.parameter.StatusType;
+import com.intramirror.core.common.exception.StandardExceptions;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.service.UserService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.impl.Base64Codec;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
+import javax.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,9 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/base")
 public class BaseController {
 
-    private String jwtSecret = "qazxswedcvfr543216yhnmju70plmjkiu89";
+    private final Logger LOGGER = LoggerFactory.getLogger(BaseController.class);
 
-    //@Resource(name = "userServiceImpl")
     @Autowired
     private UserService userService;
 
@@ -39,35 +34,22 @@ public class BaseController {
     public Map baseController(HttpServletRequest httpRequest) throws Exception {
         // 返回数据初始化
         int status = StatusType.FAILURE;
-        Map<String, Object> result = new HashMap<String, Object>();
-        Long userId = null;
+        Map<String, Object> result = new HashMap<>();
 
-        try {
-            String jwt = httpRequest.getHeader("token");
-            if (StringUtils.isEmpty(jwt)) {
-                throw new JwtException("header not found,token is null");
-            }
-            //解析Jwt内容
-            Claims claims = this.parseBody(jwt);
-
-            Date expireation = claims.getIssuedAt();
-            //如果信息过期则提示重新登录。
-            if (System.currentTimeMillis() > expireation.getTime()) {
-                result.put("userStatus", "1000002");
-                return result;
-            }
-            //获取用户详情
-            userId = Long.valueOf(claims.getSubject());
-
-            //如果匿名访问则跳过
-            if (!Helper.checkNotNull(userId)) {
-                result.put("userStatus", "1000003");
-                return result;
-            }
-        } catch (Exception e) {
-            result.put("status", status);
-            return result;
+        HttpSession httpSession = httpRequest.getSession(false);
+        Map<String, Object> sessionUser = (Map<String, Object>) httpSession.getAttribute("user");
+        if (sessionUser == null) {
+            LOGGER.warn("Fail to get session due to no session or session expired.");
+            throw StandardExceptions.UNAUTHORIZED;
         }
+
+        if (sessionUser.get("userId") == null) {
+            LOGGER.warn("Fail to get session due to no session or session expired.");
+            throw StandardExceptions.UNAUTHORIZED;
+        }
+
+        Long userId = Long.valueOf(sessionUser.get("userId").toString());
+
         User user = userService.getUserById(userId, EnabledType.USED);
         if (user != null) {
             result.put("user", user);
@@ -77,58 +59,25 @@ public class BaseController {
         return result;
     }
 
-
     public User getUserInfo(HttpServletRequest httpRequest) throws Exception {
-        // 返回数据初始化
-        int status = StatusType.FAILURE;
-        Map<String, Object> result = new HashMap<String, Object>();
-        Long userId = null;
 
-        try {
-            String jwt = httpRequest.getHeader("token");
-            if (StringUtils.isEmpty(jwt)) {
-                throw new JwtException("header not found,token is null");
-            }
-            //解析Jwt内容
-            Claims claims = this.parseBody(jwt);
-
-            Date expireation = claims.getIssuedAt();
-            //如果信息过期则提示重新登录。
-            if (System.currentTimeMillis() > expireation.getTime()) {
-                result.put("userStatus", "1000002");
-                return null;
-            }
-            //获取用户详情
-            userId = Long.valueOf(claims.getSubject());
-
-            //如果匿名访问则跳过
-            if (!Helper.checkNotNull(userId)) {
-                result.put("userStatus", "1000003");
-                return null;
-            }
-        } catch (Exception e) {
-            result.put("status", status);
-            return null;
+        HttpSession httpSession = httpRequest.getSession(false);
+        Map<String, Object> sessionUser = (Map<String, Object>) httpSession.getAttribute("user");
+        if (sessionUser == null) {
+            LOGGER.warn("Fail to get session due to no session or session expired.");
+            throw StandardExceptions.UNAUTHORIZED;
         }
+
+        if (sessionUser.get("userId") == null) {
+            LOGGER.warn("Fail to get session due to no session or session expired.");
+            throw StandardExceptions.UNAUTHORIZED;
+        }
+
+        Long userId = Long.valueOf(sessionUser.get("userId").toString());
+
         User user = userService.getUserById(userId, EnabledType.USED);
-        if (user != null) {
-            result.put("user", user);
-            status = StatusType.SUCCESS;
-        }
-        result.put("status", status);
+
         return user;
     }
 
-
-    public String getJwtBase64Key() {
-        return Base64Codec.BASE64.encode(jwtSecret);
-    }
-
-    public JwtParser parseToken() {
-        return Jwts.parser().setSigningKey(getJwtBase64Key());
-    }
-
-    public Claims parseBody(String jwt) throws JwtException {
-        return parseToken().setSigningKey(getJwtBase64Key()).parseClaimsJws(jwt).getBody();
-    }
 }
