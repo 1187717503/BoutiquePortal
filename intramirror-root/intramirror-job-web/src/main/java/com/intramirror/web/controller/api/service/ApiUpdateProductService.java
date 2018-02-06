@@ -5,7 +5,6 @@ import com.alibaba.fastjson15.JSONArray;
 import com.google.gson.Gson;
 import static com.intramirror.web.controller.api.service.ApiCommonUtils.escape;
 import com.intramirror.web.mapping.vo.StockOption;
-import com.zhy.http.okhttp.OkHttpUtils;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -441,10 +440,6 @@ public class ApiUpdateProductService {
             this.setWarning(ApiErrorTypeEnum.errorType.error_ColorCode_change, "ColorCode", newColorCode);
         }
 
-        if ((StringUtils.isNotBlank(newBrandCode) && !newBrandCode.equalsIgnoreCase(oldBrandCode)) || (StringUtils.isNotBlank(newColorCode) && !newColorCode
-                .equalsIgnoreCase(oldColorCode))) {
-            OkHttpUtils.get().build();
-        }
 
         if (StringUtils.isNotBlank(newBrandCode)) {
             product.designer_id = newBrandCode;
@@ -457,7 +452,7 @@ public class ApiUpdateProductService {
         this.updateProductProperty(conn, product.getProduct_id(), ProductPropertyEnumKeyName.ColorCode.getCode(), product.getColor_code());
         this.updateProductProperty(conn, product.getProduct_id(), ProductPropertyEnumKeyName.CarryOver.getCode(), productOptions.getCarryOver());
 
-        if ((productOptions.vendor_id == 12L || productOptions.vendor_id == 37L || productOptions.vendor_id == 38L || productOptions.vendor_id == 39L
+        /*if ((productOptions.vendor_id == 12L || productOptions.vendor_id == 37L || productOptions.vendor_id == 38L || productOptions.vendor_id == 39L
                 || productOptions.vendor_id == 40L || productOptions.vendor_id == 41L) && product.status == 1) {
             String img = productOptions.getCoverImg();
             if (StringUtils.isNotBlank(cover_img)) {
@@ -465,7 +460,7 @@ public class ApiUpdateProductService {
                 product.cover_img = downImgs;
                 product.description_img = downImgs;
             }
-        }
+        }*/
 
         /** 只发一次后面注释*//*
         if(product.vendor_id == 32L) {
@@ -485,14 +480,14 @@ public class ApiUpdateProductService {
             product.category_id = Long.parseLong(productOptions.getCategoryId());
         }*/
 
-        if (product.vendor_id == 37L && product.status == 38L) {
+        /*if (product.vendor_id == 37L && product.status == 38L) {
             String srcImages = productOptions.getCoverImg();
             if (StringUtils.isNotBlank(srcImages)) {
                 String downImgs = ApiCommonUtils.downloadImgs(srcImages);
                 product.cover_img = downImgs;
                 product.description_img = downImgs;
             }
-        }
+        }*/
 
         if (product.getVendor_id().intValue() == 20 && StringUtils.isNotBlank(productOptions.getCategoryId())) {
             product.category_id = Long.parseLong(productOptions.getCategoryId());
