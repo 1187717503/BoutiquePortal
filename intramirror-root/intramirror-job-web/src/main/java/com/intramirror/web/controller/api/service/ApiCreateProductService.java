@@ -54,22 +54,22 @@ public class ApiCreateProductService {
 
     private static final Logger logger = Logger.getLogger(ApiCreateProductService.class);
 
-    private ProductEDSManagement.ProductOptions productOptions ;
+    private ProductEDSManagement.ProductOptions productOptions;
 
-    private ProductEDSManagement.VendorOptions vendorOptions ;
+    private ProductEDSManagement.VendorOptions vendorOptions;
 
-    private ProductSkuPropertyKey uProductSkuPropertyKey ;
+    private ProductSkuPropertyKey uProductSkuPropertyKey;
 
-    private Boolean no_img ;
+    private Boolean no_img;
 
     private Product uProduct;
 
-    public Map<String,Object> createProduct(ProductEDSManagement.ProductOptions productOptions,ProductEDSManagement.VendorOptions vendorOptions) {
+    public Map<String, Object> createProduct(ProductEDSManagement.ProductOptions productOptions, ProductEDSManagement.VendorOptions vendorOptions) {
         long start = System.currentTimeMillis();
-        Map<String,Object> resultMap = null;
+        Map<String, Object> resultMap = null;
 
-        this.productOptions = productOptions ;
-        this.vendorOptions = vendorOptions ;
+        this.productOptions = productOptions;
+        this.vendorOptions = vendorOptions;
 
         Connection conn = null;
         try {
@@ -98,61 +98,71 @@ public class ApiCreateProductService {
             this.setBrandCategory(conn);
 
             resultMap = ApiCommonUtils.successMap();
-            if(conn != null) {conn.commit();conn.close();}
+            if (conn != null) {
+                conn.commit();
+                conn.close();
+            }
         } catch (UpdateException e) {
-            resultMap = ApiCommonUtils.errorMap(e.getErrorType(),e.getKey(),e.getValue());
-            if(conn != null) {conn.rollback();conn.close();}
+            resultMap = ApiCommonUtils.errorMap(e.getErrorType(), e.getKey(), e.getValue());
+            if (conn != null) {
+                conn.rollback();
+                conn.close();
+            }
         } catch (FilterException e) {
             resultMap = ApiCommonUtils.successMap();
-            logger.info("ApiUpdateProductService,FilterException,errorMsg:"+e.getMessage()
-                    +",productOptions:"+JSONObject.toJSONString(productOptions)
-                    +",vendorOptions:"+JSONObject.toJSONString(vendorOptions));
-            if(conn != null) {conn.rollback();conn.close();}
+            logger.info("ApiUpdateProductService,FilterException,errorMsg:" + e.getMessage() + ",productOptions:" + JSONObject.toJSONString(productOptions)
+                    + ",vendorOptions:" + JSONObject.toJSONString(vendorOptions));
+            if (conn != null) {
+                conn.rollback();
+                conn.close();
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            if(e.getMessage().contains("Duplicate entry") && e.getMessage().contains("vendor_id")) {
-                resultMap = ApiCommonUtils.errorMap(ApiErrorTypeEnum.errorType.error_boutique_id_already_exists,"errorMessage",ExceptionUtils.getExceptionDetail(e));
+            if (e.getMessage().contains("Duplicate entry") && e.getMessage().contains("vendor_id")) {
+                resultMap = ApiCommonUtils.errorMap(ApiErrorTypeEnum.errorType.error_boutique_id_already_exists, "errorMessage",
+                        ExceptionUtils.getExceptionDetail(e));
             } else {
-                resultMap = ApiCommonUtils.errorMap(ApiErrorTypeEnum.errorType.error_runtime_exception,"errorMessage",ExceptionUtils.getExceptionDetail(e));
+                resultMap = ApiCommonUtils.errorMap(ApiErrorTypeEnum.errorType.error_runtime_exception, "errorMessage", ExceptionUtils.getExceptionDetail(e));
             }
-            if(conn != null) {conn.rollback();conn.close();}
+            if (conn != null) {
+                conn.rollback();
+                conn.close();
+            }
         }
         long end = System.currentTimeMillis();
-        logger.info("Job_Run_Time,ApiCreateProductService_createProduct,start:"+start+",end:"+end+",time:"+(end-start));
+        logger.info("Job_Run_Time,ApiCreateProductService_createProduct,start:" + start + ",end:" + end + ",time:" + (end - start));
         return resultMap;
     }
 
-    public void checkFilter(Connection conn) throws Exception{
+    public void checkFilter(Connection conn) throws Exception {
         ProductService productService = new ProductService(conn);
-        String season_code = productOptions.getSeasonCode()==null?"":productOptions.getSeasonCode();
-        String brand_id = productOptions.getBrandId()==null?"":productOptions.getBrandId();
+        String season_code = productOptions.getSeasonCode() == null ? "" : productOptions.getSeasonCode();
+        String brand_id = productOptions.getBrandId() == null ? "" : productOptions.getBrandId();
 
         // 判断season是否需要
-        String seasonFilterSQL = " select * from `season_filter` sf "
-                + " where sf.`enabled`  =1  and sf.`vendor_id`  = "+vendorOptions.getVendorId()
-                + " and (sf.`season_code` = '-1' or sf.`season_code`  = \""+season_code+"\")";
-        List<Map<String,Object>> seasonFilterMap = productService.executeSQL(seasonFilterSQL);
-        if(seasonFilterMap != null && seasonFilterMap.size() > 0) {
-            throw new FilterException("season_filter_msg:"+JSONObject.toJSONString(seasonFilterMap));
+        String seasonFilterSQL = " select * from `season_filter` sf " + " where sf.`enabled`  =1  and sf.`vendor_id`  = " + vendorOptions.getVendorId()
+                + " and (sf.`season_code` = '-1' or sf.`season_code`  = \"" + season_code + "\")";
+        List<Map<String, Object>> seasonFilterMap = productService.executeSQL(seasonFilterSQL);
+        if (seasonFilterMap != null && seasonFilterMap.size() > 0) {
+            throw new FilterException("season_filter_msg:" + JSONObject.toJSONString(seasonFilterMap));
         }
 
         // 判断Brand是否需要
-        String brandFilterSQL = " select * from `brand_filter`  bf "
-                + " where bf.`enabled`  = 1 and bf.`vendor_id`  ="+vendorOptions.getVendorId()
-                + " and (bf.`brand_id` = '-1' or bf.`brand_id`  = '"+brand_id+"')";
-        List<Map<String,Object>> brandFilterMap = productService.executeSQL(brandFilterSQL);
-        if(brandFilterMap != null && brandFilterMap.size() > 0) {
-            throw new FilterException("brand_filter_msg:"+JSONObject.toJSONString(brandFilterMap));
+        String brandFilterSQL = " select * from `brand_filter`  bf " + " where bf.`enabled`  = 1 and bf.`vendor_id`  =" + vendorOptions.getVendorId()
+                + " and (bf.`brand_id` = '-1' or bf.`brand_id`  = '" + brand_id + "')";
+        List<Map<String, Object>> brandFilterMap = productService.executeSQL(brandFilterSQL);
+        if (brandFilterMap != null && brandFilterMap.size() > 0) {
+            throw new FilterException("brand_filter_msg:" + JSONObject.toJSONString(brandFilterMap));
         }
     }
 
-    private void setBrandCategory(Connection conn) throws Exception{
+    private void setBrandCategory(Connection conn) throws Exception {
         Map<String, Object> brandCategoryMap = new HashMap<String, Object>();
         brandCategoryMap.put("brand_id", this.uProduct.getBrand_id());
         brandCategoryMap.put("category_id", this.uProduct.getCategory_id());
         brandCategoryMap.put("enabled", EnabledType.USED);
         BrandCategoryService brandCategoryService = new BrandCategoryService(conn);
-        List<BrandCategory> brandCategoryList = brandCategoryService.getBrandCategoryListByCondition(null,brandCategoryMap);
+        List<BrandCategory> brandCategoryList = brandCategoryService.getBrandCategoryListByCondition(null, brandCategoryMap);
 
         if (brandCategoryList == null || brandCategoryList.size() == 0) {
             BrandCategory brandCategory = new BrandCategory();
@@ -162,27 +172,27 @@ public class ApiCreateProductService {
             brandCategory.updated_at = new Date();
             brandCategory.enabled = EnabledType.USED;
             brandCategoryService.createBrandCategory(brandCategory);
-            logger.info("ApiCreateProductService,setBrandCategory,brandCategory:"+JSONObject.toJSONString(brandCategory));
+            logger.info("ApiCreateProductService,setBrandCategory,brandCategory:" + JSONObject.toJSONString(brandCategory));
         }
     }
 
     private void setSku(Connection conn) throws Exception {
         SkuService skuService = new SkuService(conn);
         List<ProductEDSManagement.SkuOptions> skuOptions = productOptions.getSkus();
-        if(skuOptions == null || skuOptions.size() == 0) {
+        if (skuOptions == null || skuOptions.size() == 0) {
             return;
         }
 
         ProductService productService = new ProductService(conn);
         IPriceService iPriceService = new PriceServiceImpl();
-        Sku sku1 = iPriceService.getPriceByRule(this.uProduct,this.uProduct.getVendor_id(),this.uProduct.getMax_retail_price(),conn);
+        Sku sku1 = iPriceService.getPriceByRule(this.uProduct, this.uProduct.getVendor_id(), this.uProduct.getMax_retail_price(), conn);
         this.uProduct.setMax_boutique_price(sku1.getIn_price());
         this.uProduct.setMin_boutique_price(sku1.getIn_price());
         this.uProduct.setMax_im_price(sku1.getIm_price());
         this.uProduct.setMin_im_price(sku1.getIm_price());
         productService.updateProduct(uProduct);
 
-        for(ProductEDSManagement.SkuOptions skuOption : skuOptions) {
+        for (ProductEDSManagement.SkuOptions skuOption : skuOptions) {
             Sku sku = new Sku();
             sku.product_id = this.uProduct.getProduct_id();
             sku.size = skuOption.getSize();
@@ -199,13 +209,13 @@ public class ApiCreateProductService {
             sku.last_check = new Date();
             sku.boutique_sku_id = skuOption.getBoutique_sku_id();
             skuService.createSku(sku);
-            logger.info("ApiCreateProductService,setSku,sku:"+JSONObject.toJSONString(sku));
+            logger.info("ApiCreateProductService,setSku,sku:" + JSONObject.toJSONString(sku));
 
             SkuStoreService skuStoreService = new SkuStoreService(conn);
             SkuStore skuStore = new SkuStore();
             skuStore.product_id = this.uProduct.getProduct_id();
             skuStore.sku_id = sku.sku_id;
-            skuStore.store  = Long.valueOf(skuOption.getStock());
+            skuStore.store = Long.valueOf(skuOption.getStock());
             skuStore.reserved = 0L;
             skuStore.confirmed = 0L;
             skuStore.remind = 0;
@@ -221,18 +231,18 @@ public class ApiCreateProductService {
             skuStore.enabled = EnabledType.USED;
             skuStore.setLast_check(new Date());
             skuStoreService.createSkuStore(skuStore);
-            logger.info("ApiCreateProductService,setSku,skuStore:"+JSONObject.toJSONString(skuStore));
+            logger.info("ApiCreateProductService,setSku,skuStore:" + JSONObject.toJSONString(skuStore));
 
             ProductPropertyValueService productPropertyValueService = new ProductPropertyValueService(conn);
             ProductSkuPropertyValue productSkuPropertyValue = new ProductSkuPropertyValue();
             productSkuPropertyValue.product_sku_property_key_id = this.uProductSkuPropertyKey.getProduct_sku_property_key_id();
             productSkuPropertyValue.value = skuOption.getSize();
-            productSkuPropertyValue.remark = skuOption.getSizeid() == null?"":skuOption.getSizeid();
+            productSkuPropertyValue.remark = skuOption.getSizeid() == null ? "" : skuOption.getSizeid();
             productSkuPropertyValue.created_at = new Date();
             productSkuPropertyValue.updated_at = new Date();
             productSkuPropertyValue.enabled = EnabledType.USED;
             ProductSkuPropertyValue pspv = productPropertyValueService.createProductPropertyValue(productSkuPropertyValue);
-            logger.info("ApiCreateProductService,setSku,pspv:"+JSONObject.toJSONString(pspv));
+            logger.info("ApiCreateProductService,setSku,pspv:" + JSONObject.toJSONString(pspv));
 
             SkuPropertyService skuPropertyService = new SkuPropertyService(conn);
             SkuProperty skuProperty = new SkuProperty();
@@ -245,17 +255,17 @@ public class ApiCreateProductService {
             skuProperty.updated_at = new Date();
             skuProperty.enabled = EnabledType.USED;
             skuPropertyService.createSkuProperty(skuProperty);
-            logger.info("ApiCreateProductService,setSku,skuProperty:"+JSONObject.toJSONString(skuProperty));
+            logger.info("ApiCreateProductService,setSku,skuProperty:" + JSONObject.toJSONString(skuProperty));
         }
     }
 
-    public void setProductInfo(Connection conn) throws Exception{
+    public void setProductInfo(Connection conn) throws Exception {
         CategoryProductInfoService categoryProductInfoService = new CategoryProductInfoService(conn);
-        Map<String,Object> categoryProductInfoMap = new HashMap<>();
-        categoryProductInfoMap.put("enabled",EnabledType.USED);
-        categoryProductInfoMap.put("category_id",this.uProduct.getCategory_id());
+        Map<String, Object> categoryProductInfoMap = new HashMap<>();
+        categoryProductInfoMap.put("enabled", EnabledType.USED);
+        categoryProductInfoMap.put("category_id", this.uProduct.getCategory_id());
         List<CategoryProductInfo> categoryProductInfoList = categoryProductInfoService.getCategoryProductInfoListByCondition(categoryProductInfoMap);
-        if(categoryProductInfoList != null && categoryProductInfoList.size() >0) {
+        if (categoryProductInfoList != null && categoryProductInfoList.size() > 0) {
             CategoryProductInfo categoryProductInfo = categoryProductInfoList.get(0);
             ProductInfoService productInfoService = new ProductInfoService(conn);
             ProductInfo productInfo = new ProductInfo();
@@ -282,18 +292,19 @@ public class ApiCreateProductService {
             productInfo.size_amount = new BigDecimal(0);
             productInfo.other_property = "";
             productInfoService.createProductInfo(productInfo);
-            logger.info("ApiCreateProductService,setProductInfo,productInfo:"+JSONObject.toJSONString(productInfo));
+            logger.info("ApiCreateProductService,setProductInfo,productInfo:" + JSONObject.toJSONString(productInfo));
         }
     }
 
-    public void setProductProperty(Connection conn) throws Exception{
+    public void setProductProperty(Connection conn) throws Exception {
         ProductPropertyService productPropertyService = new ProductPropertyService(conn);
         CategoryProductPropertyService categoryProductPropertyService = new CategoryProductPropertyService(conn);
-        Map<String,Object> categoryProductPropertMap = new HashMap<>();
-        categoryProductPropertMap.put("category_id",productOptions.getCategoryId());
-        categoryProductPropertMap.put("enabled",EnabledType.USED);
-        List<CategoryProductProperty> categoryProductProperties = categoryProductPropertyService.getCategoryProductPropertyListByCondition(categoryProductPropertMap);
-        for(CategoryProductProperty cpp : categoryProductProperties) {
+        Map<String, Object> categoryProductPropertMap = new HashMap<>();
+        categoryProductPropertMap.put("category_id", productOptions.getCategoryId());
+        categoryProductPropertMap.put("enabled", EnabledType.USED);
+        List<CategoryProductProperty> categoryProductProperties = categoryProductPropertyService.getCategoryProductPropertyListByCondition(
+                categoryProductPropertMap);
+        for (CategoryProductProperty cpp : categoryProductProperties) {
             ProductProperty productProperty = new ProductProperty();
             productProperty.category_product_property_id = cpp.getCategory_product_property_id();
             productProperty.product_id = this.uProduct.getProduct_id();
@@ -304,9 +315,9 @@ public class ApiCreateProductService {
             productProperty.value = this.getProductValue(cpp.getKey_name());
             productProperty.remark = "";
             productProperty.enabled = EnabledType.USED;
-            if(StringUtils.isNotBlank(productProperty.getValue())) {
+            if (StringUtils.isNotBlank(productProperty.getValue())) {
                 productPropertyService.createProductProperty(productProperty);
-                logger.info("ApiCreateProductService,setProductProperty,productProperty:"+JSONObject.toJSONString(productProperty));
+                logger.info("ApiCreateProductService,setProductProperty,productProperty:" + JSONObject.toJSONString(productProperty));
             }
         }
     }
@@ -342,7 +353,7 @@ public class ApiCreateProductService {
         return value;
     }
 
-    public void setProductSkuPropertyKey(Connection conn) throws Exception{
+    public void setProductSkuPropertyKey(Connection conn) throws Exception {
         ProductPropertyKeyService productPropertyKeyService = new ProductPropertyKeyService(conn);
         ProductSkuPropertyKey productSkuPropertyKey = new ProductSkuPropertyKey();
         productSkuPropertyKey.product_id = this.uProduct.getProduct_id();
@@ -352,13 +363,13 @@ public class ApiCreateProductService {
         productSkuPropertyKey.updated_at = new Date();
         productSkuPropertyKey.enabled = EnabledType.USED;
         uProductSkuPropertyKey = productPropertyKeyService.createProductPropertyKey(productSkuPropertyKey);
-        logger.info("ApiCreateProductService,setProductSkuPropertyKey,productSkuPropertyKey:"+JSONObject.toJSONString(productSkuPropertyKey));
+        logger.info("ApiCreateProductService,setProductSkuPropertyKey,productSkuPropertyKey:" + JSONObject.toJSONString(productSkuPropertyKey));
     }
 
-    private void setProduct(Connection conn) throws Exception{
+    private void setProduct(Connection conn) throws Exception {
         ProductService productService = new ProductService(conn);
         String name = productOptions.getName();
-        if(StringUtils.isBlank(name)) {
+        if (StringUtils.isBlank(name)) {
             name = productOptions.getBrand_name();
         }
 
@@ -382,9 +393,12 @@ public class ApiCreateProductService {
         product.updated_at = new Date();
         product.enabled = EnabledType.USED;
 
+        productOptions.setVendor_id(product.getVendor_id());
+        ApiCommonUtils.sortProductOptionsImage(productOptions);
+
         /* 由于Julian的服装的第一张图不是正面照，需要将其放到所有图片的最后一张,只处理成人的男士、女士的服装，不更改包、鞋和配饰*/
-        if(product.vendor_id == 26L) {
-            if(productService.isClothing(product.category_id)) {
+        if (product.vendor_id == 26L) {
+            if (productService.isClothing(product.category_id)) {
                 try {
                     List<String> originList = JSONArray.parseArray(productOptions.getCoverImg(), String.class);
                     String one = originList.get(0);
@@ -400,7 +414,7 @@ public class ApiCreateProductService {
         /* end*/
 
         boolean noImg = this.getNoImg(conn);
-        if(noImg) {
+        if (noImg) {
             product.cover_img = "[]";
             product.description_img = "[]";
         } else {
@@ -417,7 +431,7 @@ public class ApiCreateProductService {
 
         product = productService.createProduct(product);
         this.uProduct = product;
-        logger.info("ApiCreateProductService,setProduct,product:"+JSONObject.toJSONString(product));
+        logger.info("ApiCreateProductService,setProduct,product:" + JSONObject.toJSONString(product));
     }
 
     private void checkMappingParams(Connection conn) throws Exception {
@@ -438,43 +452,39 @@ public class ApiCreateProductService {
         productOptions.setSeasonCode(seasonCode);
 
         // get category
-        if(StringUtils.isNotBlank(boutique_category_id)) {
-            Map<String,Object> categoryMap = productService.getBoutiqueCategory(vendorOptions.getVendorId().toString(),boutique_category_id);
-            if(categoryMap != null) {
+        if (StringUtils.isNotBlank(boutique_category_id)) {
+            Map<String, Object> categoryMap = productService.getBoutiqueCategory(vendorOptions.getVendorId().toString(), boutique_category_id);
+            if (categoryMap != null) {
                 productOptions.setCategoryId(categoryMap.get("category_id").toString());
             }
         }
-        if(StringUtils.isNotBlank(productOptions.getCategory1())
-                &&StringUtils.isNotBlank(productOptions.getCategory2())
-                &&StringUtils.isNotBlank(productOptions.getCategory3())) {
-            Map<String,Object> categoryMap =productService.getCategory(category1,category2,category3);
-            if(categoryMap != null) {
+        if (StringUtils.isNotBlank(productOptions.getCategory1()) && StringUtils.isNotBlank(productOptions.getCategory2()) && StringUtils.isNotBlank(
+                productOptions.getCategory3())) {
+            Map<String, Object> categoryMap = productService.getCategory(category1, category2, category3);
+            if (categoryMap != null) {
                 productOptions.setCategoryId(categoryMap.get("category_id").toString());
             } else {
-                categoryMap = productService.getThreeCategory(vendorOptions.getVendorId().toString(),category1,category2,category3);
-                if(categoryMap != null) {
+                categoryMap = productService.getThreeCategory(vendorOptions.getVendorId().toString(), category1, category2, category3);
+                if (categoryMap != null) {
                     productOptions.setCategoryId(categoryMap.get("category_id").toString());
                 }
             }
         }
-        if(StringUtils.isBlank(productOptions.getCategoryId())
-                && StringUtils.isBlank(category3)
-                && StringUtils.isNotBlank(productOptions.getCategory1())
-                && StringUtils.isNotBlank(productOptions.getCategory2())
-                ) {
-            String categoryId = productService.getDeafultCategory(vendorOptions.getVendorId(),category1,category2);
+        if (StringUtils.isBlank(productOptions.getCategoryId()) && StringUtils.isBlank(category3) && StringUtils.isNotBlank(productOptions.getCategory1())
+                && StringUtils.isNotBlank(productOptions.getCategory2())) {
+            String categoryId = productService.getDeafultCategory(vendorOptions.getVendorId(), category1, category2);
             productOptions.setCategoryId(categoryId);
         }
 
         // get brand
-        if(StringUtils.isNotBlank(brandName)) {
-            Map<String,Object> brandMap = productService.getBrand(brandName);
-            if(brandMap != null) {
+        if (StringUtils.isNotBlank(brandName)) {
+            Map<String, Object> brandMap = productService.getBrand(brandName);
+            if (brandMap != null) {
                 productOptions.setBrandId(brandMap.get("brand_id").toString());
                 productOptions.setBrand_name(brandMap.get("english_name").toString());
             } else {
                 brandMap = productService.getBrandMapping(brandName);
-                if(brandMap != null) {
+                if (brandMap != null) {
                     productOptions.setBrandId(brandMap.get("brand_id").toString());
                     productOptions.setBrand_name(brandMap.get("english_name").toString());
                 }
@@ -482,50 +492,53 @@ public class ApiCreateProductService {
         }
 
         // get season
-        if(StringUtils.isNotBlank(seasonCode)) {
-            Map<String,Object> seasonMap = productService.getSeason(seasonCode);
-            if(seasonMap != null) {
+        if (StringUtils.isNotBlank(seasonCode)) {
+            Map<String, Object> seasonMap = productService.getSeason(seasonCode);
+            if (seasonMap != null) {
                 mappingSeason = seasonMap.get("season_code").toString();
                 productOptions.setSeasonCode(mappingSeason);
             }
         }
 
-        Map<String,Object> mappingCategory = new HashMap<>();
-        mappingCategory.put("boutique_category_id",boutique_category_id);
-        mappingCategory.put("category1",category1);
-        mappingCategory.put("categroy2",category2);
-        mappingCategory.put("category3",category3);
+        Map<String, Object> mappingCategory = new HashMap<>();
+        mappingCategory.put("boutique_category_id", boutique_category_id);
+        mappingCategory.put("category1", category1);
+        mappingCategory.put("categroy2", category2);
+        mappingCategory.put("category3", category3);
 
-        if(StringUtils.isBlank(productOptions.getCategoryId())) {
-            throw new UpdateException("category",JSONObject.toJSONString(mappingCategory), ApiErrorTypeEnum.errorType.data_can_not_find_mapping);
+        if (StringUtils.isBlank(productOptions.getCategoryId())) {
+            throw new UpdateException("category", JSONObject.toJSONString(mappingCategory), ApiErrorTypeEnum.errorType.data_can_not_find_mapping);
         }
 
-        if(StringUtils.isBlank(productOptions.getBrandId())) {
-            throw new UpdateException("brand",brandName, ApiErrorTypeEnum.errorType.data_can_not_find_mapping);
+        if (StringUtils.isBlank(productOptions.getBrandId())) {
+            throw new UpdateException("brand", brandName, ApiErrorTypeEnum.errorType.data_can_not_find_mapping);
         }
 
-        if(StringUtils.isBlank(mappingSeason)) {
-            throw new UpdateException("season",seasonCode, ApiErrorTypeEnum.errorType.data_can_not_find_mapping);
+        if (StringUtils.isBlank(mappingSeason)) {
+            throw new UpdateException("season", seasonCode, ApiErrorTypeEnum.errorType.data_can_not_find_mapping);
         }
 
-        if(!productService.ifBrand(productOptions.getBrandId())) {
-            throw new UpdateException("brand",brandName, ApiErrorTypeEnum.errorType.data_can_not_find_mapping);
+        if (!productService.ifBrand(productOptions.getBrandId())) {
+            throw new UpdateException("brand", brandName, ApiErrorTypeEnum.errorType.data_can_not_find_mapping);
         }
 
-        if(!productService.ifCategory(productOptions.getCategoryId())) {
-            throw new UpdateException("category",JSONObject.toJSONString(mappingCategory), ApiErrorTypeEnum.errorType.data_can_not_find_mapping);
+        if (!productService.ifCategory(productOptions.getCategoryId())) {
+            throw new UpdateException("category", JSONObject.toJSONString(mappingCategory), ApiErrorTypeEnum.errorType.data_can_not_find_mapping);
         }
 
         // AD 特殊判断
-        if(vendorOptions.getVendorId().intValue() == 22) {
-            boolean flag = productService.duplicateColorBrandByADCreate(productOptions.getBrandCode(),productOptions.getColorCode(),productOptions.getSeasonCode());
-            if(flag) {
-                throw new UpdateException("color_code,BrandID",productOptions.getBrandCode()+","+productOptions.getColorCode()+","+productOptions.getSeasonCode(), ApiErrorTypeEnum.errorType.error_duplicate_product);
+        if (vendorOptions.getVendorId().intValue() == 22) {
+            boolean flag = productService.duplicateColorBrandByADCreate(productOptions.getBrandCode(), productOptions.getColorCode(),
+                    productOptions.getSeasonCode());
+            if (flag) {
+                throw new UpdateException("color_code,BrandID",
+                        productOptions.getBrandCode() + "," + productOptions.getColorCode() + "," + productOptions.getSeasonCode(),
+                        ApiErrorTypeEnum.errorType.error_duplicate_product);
             }
         }
     }
 
-    private void checkProductParams(Connection conn) throws Exception{
+    private void checkProductParams(Connection conn) throws Exception {
         String product_code = escape(StringUtils.trim(productOptions.getCode()));
         String designer_id = escape(StringUtils.trim(productOptions.getBrandCode()));
         String brand_name = escape(StringUtils.trim(productOptions.getBrandName()));
@@ -561,103 +574,105 @@ public class ApiCreateProductService {
         productOptions.setMadeIn(madeIn);
         productOptions.setSizeFit(sizeFit);
 
-        if(StringUtils.isBlank(weight)) {
+        if (StringUtils.isBlank(weight)) {
             productOptions.setWeight("1");
         } else {
             productOptions.setWeight(weight);
         }
-        if(StringUtils.isBlank(length)) {
+        if (StringUtils.isBlank(length)) {
             productOptions.setLength("0");
         } else {
             productOptions.setLength(length);
         }
-        if(StringUtils.isBlank(width)) {
+        if (StringUtils.isBlank(width)) {
             productOptions.setWidth("0");
         } else {
             productOptions.setWidth(width);
         }
-        if(StringUtils.isBlank(height)) {
+        if (StringUtils.isBlank(height)) {
             productOptions.setHeigit("0");
         } else {
             productOptions.setHeigit(height);
         }
 
-        if(StringUtils.isBlank(product_code)) {
-            throw new UpdateException("product_code",product_code, ApiErrorTypeEnum.errorType.error_data_is_null);
+        if (StringUtils.isBlank(product_code)) {
+            throw new UpdateException("product_code", product_code, ApiErrorTypeEnum.errorType.error_data_is_null);
         }
 
-        if(vendor_id == null) {
-            throw new UpdateException("vendor_id","", ApiErrorTypeEnum.errorType.error_data_is_null);
+        if (vendor_id == null) {
+            throw new UpdateException("vendor_id", "", ApiErrorTypeEnum.errorType.error_data_is_null);
         }
 
         Product product = this.getProduct(conn);
-        if(product != null) {
-            throw new UpdateException("product_code",product_code, ApiErrorTypeEnum.errorType.error_boutique_id_already_exists);
+        if (product != null) {
+            throw new UpdateException("product_code", product_code, ApiErrorTypeEnum.errorType.error_boutique_id_already_exists);
         }
 
-        if(StringUtils.isBlank(designer_id)) {
-            throw new UpdateException("BrandID",designer_id, ApiErrorTypeEnum.errorType.error_data_is_null);
+        if (StringUtils.isBlank(designer_id)) {
+            throw new UpdateException("BrandID", designer_id, ApiErrorTypeEnum.errorType.error_data_is_null);
         }
 
-        if(StringUtils.isBlank(brand_name)) {
-            throw new UpdateException("brand_name",brand_name, ApiErrorTypeEnum.errorType.error_data_is_null);
+        if (StringUtils.isBlank(brand_name)) {
+            throw new UpdateException("brand_name", brand_name, ApiErrorTypeEnum.errorType.error_data_is_null);
         }
 
-        if(StringUtils.isBlank(color_code)) {
-            throw new UpdateException("color_code",color_code, ApiErrorTypeEnum.errorType.error_data_is_null);
+        if (StringUtils.isBlank(color_code)) {
+            throw new UpdateException("color_code", color_code, ApiErrorTypeEnum.errorType.error_data_is_null);
         }
 
-        if(StringUtils.isBlank(price)) {
-            throw new UpdateException("price",price, ApiErrorTypeEnum.errorType.error_data_is_null);
+        if (StringUtils.isBlank(price)) {
+            throw new UpdateException("price", price, ApiErrorTypeEnum.errorType.error_data_is_null);
         }
 
-        if(StringUtils.isNotBlank(price)) {
+        if (StringUtils.isNotBlank(price)) {
             try {
                 BigDecimal bPrice = new BigDecimal(price);
-                if(bPrice.intValue() < 10 || bPrice.intValue() > 10000 || bPrice.intValue() == 0) {
-                    throw new UpdateException("price",price,ApiErrorTypeEnum.errorType.error_price_out_off);
+                if (bPrice.intValue() < 10 || bPrice.intValue() > 10000 || bPrice.intValue() == 0) {
+                    throw new UpdateException("price", price, ApiErrorTypeEnum.errorType.error_price_out_off);
                 }
             } catch (UpdateException e) {
                 e.printStackTrace();
-                throw new UpdateException(e.getKey(),e.getValue(),e.getErrorType());
+                throw new UpdateException(e.getKey(), e.getValue(), e.getErrorType());
             } catch (Exception e) {
                 e.printStackTrace();
-                logger.info("ApiUpdateStockSerivce,checkParams,price not parse int,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",productOptions:"+JSONObject.toJSONString(productOptions));
-                throw new UpdateException("price",price,ApiErrorTypeEnum.errorType.error_data_is_not_number);
+                logger.info("ApiUpdateStockSerivce,checkParams,price not parse int,errorMessage:" + ExceptionUtils.getExceptionDetail(e) + ",productOptions:"
+                        + JSONObject.toJSONString(productOptions));
+                throw new UpdateException("price", price, ApiErrorTypeEnum.errorType.error_data_is_not_number);
             }
         }
 
         List<ProductEDSManagement.SkuOptions> skuOptions = productOptions.getSkus();
-        if(skuOptions == null || skuOptions.size() == 0) {
+        if (skuOptions == null || skuOptions.size() == 0) {
             return;
         }
 
-        for(ProductEDSManagement.SkuOptions skuOption : skuOptions) {
+        for (ProductEDSManagement.SkuOptions skuOption : skuOptions) {
             String sku_code = escape(StringUtils.trim(skuOption.getBarcodes()));
-            if(StringUtils.isBlank(sku_code)) {
+            if (StringUtils.isBlank(sku_code)) {
                 sku_code = "#";
             }
 
             String size = escape(StringUtils.trim(skuOption.getSize()));
-            if(StringUtils.isBlank(size)) {
-                throw new UpdateException("size",JSONObject.toJSONString(skuOption),ApiErrorTypeEnum.errorType.error_sku_not_exists);
+            if (StringUtils.isBlank(size)) {
+                throw new UpdateException("size", JSONObject.toJSONString(skuOption), ApiErrorTypeEnum.errorType.error_sku_not_exists);
             }
 
             String stock = skuOption.getStock();
             try {
                 Double dStock = Double.parseDouble(stock);
                 int bStock = dStock.intValue();
-                stock = dStock.intValue()+"";
-                if(bStock < 0 || bStock > 100 ) {
-                    throw new UpdateException("store",stock,ApiErrorTypeEnum.errorType.error_stock_out_off);
+                stock = dStock.intValue() + "";
+                if (bStock < 0 || bStock > 100) {
+                    throw new UpdateException("store", stock, ApiErrorTypeEnum.errorType.error_stock_out_off);
                 }
             } catch (UpdateException e) {
                 e.printStackTrace();
-                throw new UpdateException(e.getKey(),e.getValue(),e.getErrorType());
+                throw new UpdateException(e.getKey(), e.getValue(), e.getErrorType());
             } catch (Exception e) {
                 e.printStackTrace();
-                logger.info("ApiUpdateStockSerivce,checkParams,stock not parse int,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",productOptions:"+JSONObject.toJSONString(productOptions));
-                throw new UpdateException("store",stock,ApiErrorTypeEnum.errorType.error_data_is_not_number);
+                logger.info("ApiUpdateStockSerivce,checkParams,stock not parse int,errorMessage:" + ExceptionUtils.getExceptionDetail(e) + ",productOptions:"
+                        + JSONObject.toJSONString(productOptions));
+                throw new UpdateException("store", stock, ApiErrorTypeEnum.errorType.error_data_is_not_number);
             }
 
             skuOption.setBarcodes(sku_code);
@@ -667,13 +682,13 @@ public class ApiCreateProductService {
 
     }
 
-    private Product getProduct(Connection conn) throws Exception{
-        if(this.uProduct == null) {
+    private Product getProduct(Connection conn) throws Exception {
+        if (this.uProduct == null) {
             ProductService productService = new ProductService(conn);
             Map<String, Object> condition = new HashMap<>();
             condition.put("product_code", productOptions.getCode());
             condition.put("enabled", 1);
-            condition.put("vendor_id",vendorOptions.getVendorId());
+            condition.put("vendor_id", vendorOptions.getVendorId());
             Product product = productService.getProductByCondition(condition, null);
             this.uProduct = product;
         }
@@ -681,12 +696,12 @@ public class ApiCreateProductService {
     }
 
     private boolean getNoImg(Connection conn) throws Exception {
-        if(no_img != null) {
+        if (no_img != null) {
             return no_img;
         }
 
         ProductService productService = new ProductService(conn);
-        no_img = productService.getNoImg(productOptions.getBrandName(),vendorOptions.getVendorId());
+        no_img = productService.getNoImg(productOptions.getBrandName(), vendorOptions.getVendorId());
         return no_img;
     }
 

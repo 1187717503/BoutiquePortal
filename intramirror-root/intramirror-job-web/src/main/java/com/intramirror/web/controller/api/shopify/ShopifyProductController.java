@@ -2,6 +2,8 @@ package com.intramirror.web.controller.api.shopify;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.intramirror.common.help.ExceptionUtils;
+import com.intramirror.common.help.StringUtils;
 import com.intramirror.common.utils.DateUtils;
 import com.intramirror.product.api.service.stock.IUpdateStockService;
 import com.intramirror.web.mapping.impl.shopify.ShopifyProductMapping;
@@ -14,9 +16,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import javax.annotation.Resource;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
@@ -77,10 +81,14 @@ public class ShopifyProductController  implements InitializingBean {
         try {
             while (true) {
                 String newURL = call_url +"&page="+page;
-                String responseBody = this.doGet(newURL);
+
+                String responseBody = this.sendGet(newURL);
+//                Map<String,Object> map = HttpUtils.requestHttps(newURL,"GET");
+//                String responseBody = map.get("resultMessage").toString();
+//                String responseBody = HttpUtils.httpGetAmr(newURL);
                 fileUtils.bakPendingFile("page"+page,responseBody);
 
-                if(responseBody.contains("{\"products\":[]}")) {
+                if(StringUtils.isBlank(responseBody) || responseBody.contains("{\"products\":[]}")) {
                     break;
                 }
 
@@ -109,7 +117,7 @@ public class ShopifyProductController  implements InitializingBean {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            logger.info("shopify_product_update,errorMessage:"+e);
+            logger.info("shopify_product_update,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
         }
         logger.info("shopify_product_update,end,name:"+name+",page:"+page+",index:"+index+",call_url:"+call_url);
         return "SUCCESS";
@@ -124,19 +132,31 @@ public class ShopifyProductController  implements InitializingBean {
         executors.put(product_delta_update,delta_executor);
     }
 
-    public  String doGet(String url) throws Exception {
-        HttpClient httpClient = null;
-        HttpGet httpGet = null;
-        String result = null;
-        httpClient = new SSLClient();
-        httpGet = new HttpGet(url);
-        httpGet.addHeader("Content-Type", "application/json");
-        HttpResponse response = httpClient.execute(httpGet);
-        if(response != null){
-            HttpEntity resEntity = response.getEntity();
-            if(resEntity != null){
-                result = EntityUtils.toString(resEntity,"utf-8");
-            }
+    public  String sendGet(String url) throws Exception{
+        String result = "";
+        try {
+            CloseableHttpClient httpclient = HttpClients.createDefault();
+
+            HttpGet httpGet = new HttpGet(url);
+
+            RequestConfig requestConfig = RequestConfig.custom()
+
+                    .setConnectTimeout(600000).setConnectionRequestTimeout(600000)
+
+                    .setSocketTimeout(600000).build();
+
+            httpGet.setConfig(requestConfig);
+
+            CloseableHttpResponse response = httpclient.execute(httpGet);
+
+            System.out.println("得到的结果:" + response.getStatusLine());//得到请求结果
+
+            HttpEntity entity = response.getEntity();//得到请求回来的数据
+            result = EntityUtils.toString(entity);
+            response.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
         }
         return result;
     }

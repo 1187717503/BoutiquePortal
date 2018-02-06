@@ -223,6 +223,7 @@ public class FileUploadHelper {
         } catch (IOException e) {
             fileUrls = new ArrayList<>();
             e.printStackTrace();
+            logger.info("uploadFileByImgUrl2,e:"+ e+",imageUrl:"+imgUrl);
         } finally {
             httpUrl.disconnect();
             inputStream.close();

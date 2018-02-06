@@ -41,6 +41,12 @@
 
         </profile>
         <profile>
+            <id>staging_local</id>
+            <properties>
+                <profiles.active>staging_local</profiles.active>
+            </properties>
+        </profile>
+        <profile>
             <id>prd</id>
             <properties>
                 <profiles.active>prd</profiles.active>
@@ -61,10 +67,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-			<scope>provided</scope>
-		</dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
@@ -87,15 +93,21 @@
             <groupId>com.intramirror</groupId>
             <artifactId>intramirror-payment-service-core</artifactId>
         </dependency>
-       	<dependency>
-			<groupId>com.intramirror</groupId>
-			<artifactId>intramirror-main-service-core</artifactId>
-		</dependency>
         <dependency>
-			<groupId>com.intramirror</groupId>
-			<artifactId>intramirror-shoplus-message</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
+            <groupId>com.intramirror</groupId>
+            <artifactId>intramirror-main-service-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.intramirror</groupId>
+            <artifactId>intramirror-shoplus-message</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.intramirror</groupId>
+            <artifactId>lib-web-common</artifactId>
+            <version>1.0.6</version>
+        </dependency>
 
         <dependency>
             <groupId>com.intramirror</groupId>
@@ -144,6 +156,7 @@
             <groupId>com.intramirror</groupId>
             <artifactId>intramirror-order-service-core</artifactId>
         </dependency>
+
 
     </dependencies>
     <build>
