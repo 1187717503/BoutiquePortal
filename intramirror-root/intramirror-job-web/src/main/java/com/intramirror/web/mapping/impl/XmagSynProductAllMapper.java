@@ -134,7 +134,7 @@ public class XmagSynProductAllMapper implements IProductMapping {
 					type = "women";
 				}*/
 
-				if(type.contains("Accessories")) {
+				if(type.toLowerCase().contains("Accessories".toLowerCase())) {
 					category = "Clothing";
 				} else {
 					category ="Accessories";

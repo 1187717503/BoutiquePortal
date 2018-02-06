@@ -467,49 +467,11 @@ public class ApiUpdateProductService {
         this.updateProductProperty(conn, product.getProduct_id(), ProductPropertyEnumKeyName.ColorCode.getCode(), product.getColor_code());
         this.updateProductProperty(conn, product.getProduct_id(), ProductPropertyEnumKeyName.CarryOver.getCode(), productOptions.getCarryOver());
 
-/*        if ((productOptions.vendor_id == 12L || productOptions.vendor_id == 37L || productOptions.vendor_id == 38L || productOptions.vendor_id == 39L
-                || productOptions.vendor_id == 40L || productOptions.vendor_id == 41L) && product.status == 1) {
-            String img = productOptions.getCoverImg();
-            if (StringUtils.isNotBlank(cover_img)) {
-                String downImgs = ApiCommonUtils.downloadImgs(img);
-                product.cover_img = downImgs;
-                product.description_img = downImgs;
-            }
-        }*/
-
-        /** 只发一次后面注释*//*
-        if(product.vendor_id == 32L) {
-            if(StringUtils.isNotBlank(newColorCode)) {
-                product.color_code = newColorCode;
-                this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.ColorCode.getCode(),newColorCode);
-            }
-        }*/
-        /** 只发一次后面注释
-         if(product.getVendor_id().intValue() == 24 && StringUtils.isNotBlank(productOptions.getCategoryId())) {
-         product.category_id = Long.parseLong(productOptions.getCategoryId());
-         }
-         * 只发一次后面注释 */
-
-        /*// Lungolivigno
-        if(product.getVendor_id().intValue() == 33 && StringUtils.isNotBlank(productOptions.getCategoryId())) {
-            product.category_id = Long.parseLong(productOptions.getCategoryId());
-        }*/
-
         if (product.getVendor_id().intValue() == 20 && StringUtils.isNotBlank(productOptions.getCategoryId())) {
             product.category_id = Long.parseLong(productOptions.getCategoryId());
             IPriceService iPriceService = new PriceServiceImpl();
             iPriceService.synProductPriceRule(product, product.getMin_retail_price(), conn);
             logger.info("apartment 修改product :" + new Gson().toJson(product));
-        }
-
-        if (product.vendor_id == 37L && product.status == 38L) {
-            String srcImages = productOptions.getCoverImg();
-            if (StringUtils.isNotBlank(srcImages)) {
-                String downImgs = ApiCommonUtils.downloadImgs(srcImages);
-                product.cover_img = downImgs;
-                product.description_img = downImgs;
-            }
-
         }
 
         if (StringUtils.isNotBlank(productOptions.getError_type()) && modify) {
