@@ -836,11 +836,11 @@ function initActionEvent() {
                 token = localStorage.getItem('token');
             }
             if(baseUrl.match(/staging/)){
-                document.cookie = "staging-admin3-token=" + token + ";domain=intramirror.com;path=/";
+                document.cookie = "staging-admin3-token=" + token + ";domain=intramirror.com;path=/;max-age=10";
                 let href = 'http://sha.staging.admin3.intramirror.com/admin#/spuinfo/' + spuId;
                 window.open(href);
             }else{
-                document.cookie = "prod-admin3-token=" + token + ";domain=intramirror.com;path=/";
+                document.cookie = "prod-admin3-token=" + token + ";domain=intramirror.com;path=/;max-age=10";
                 let href = 'http://admin3.intramirror.com/admin#/spuinfo/' + spuId;
                 window.open(href);
             }
