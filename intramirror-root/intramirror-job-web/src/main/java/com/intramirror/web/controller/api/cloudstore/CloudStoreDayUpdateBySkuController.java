@@ -299,7 +299,7 @@ public class CloudStoreDayUpdateBySkuController implements InitializingBean {
         tony2_day_updateProduct.put("token", "7a8f88efd4d0e244cb1c196f1d916cb4");
         tony2_day_updateProduct.put("store_code", "daiqueren");
         tony2_day_updateProduct.put("executor", executor);
-        tony2_day_updateProduct.put("vendor_id", "16"); // TODO
+        tony2_day_updateProduct.put("vendor_id", "43");
         tony2_day_updateProduct.put("threadNum", "5");
         tony2_day_updateProduct.put("eventName", "product_delta_update");
         tony2_day_updateProduct.put("datetime", DateUtils.getStrDate(new Date()));
