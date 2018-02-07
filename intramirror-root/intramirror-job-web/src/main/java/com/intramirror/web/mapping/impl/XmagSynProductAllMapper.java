@@ -120,10 +120,17 @@ public class XmagSynProductAllMapper implements IProductMapping {
             categoryMap.put("vendor_id", vendorOptions.getVendorId());
 
             if (StringUtils.isBlank(SubCategory)) {
-                if (type.toLowerCase().contains("Accessories".toLowerCase())) {
-                    if (!StringUtils.trim(category).equals("Bag") && !StringUtils.trim(category).equals("Shoes")) {
+                if (type.toLowerCase().contains("accessories".toLowerCase())) {
+                    if (!StringUtils.trim(category).toLowerCase().equals("Bag".toLowerCase()) && !StringUtils.trim(category.toLowerCase()).equals(
+                            "Shoes".toLowerCase())) {
                         SubCategory = category;
-                        category = "Accessories";
+                        category = "accessories";
+                    }
+                } else if (type.toLowerCase().contains("accessori".toLowerCase())) {
+                    if (!StringUtils.trim(category).toLowerCase().equals("Bag".toLowerCase()) && !StringUtils.trim(category.toLowerCase()).equals(
+                            "Shoes".toLowerCase())) {
+                        SubCategory = category;
+                        category = "accessori";
                     }
                 } else {
                     SubCategory = category;
