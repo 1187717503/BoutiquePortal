@@ -352,6 +352,11 @@ public class ApiUpdateProductService {
                             if (retB.length > 1) {
                                 srcImageBName = retB[retB.length - 1];
                             }
+
+                            if (srcImageAName.length() != srcImageBName.length()) {
+                                return srcImageAName.length() > srcImageBName.length() ? 1 : -1;
+                            }
+
                             logger.info("ret : " + srcImageAName.compareTo(srcImageBName));
 
                             return srcImageAName.compareTo(srcImageBName);

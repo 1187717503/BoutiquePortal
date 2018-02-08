@@ -194,6 +194,7 @@
                 <excludes>
                     <exclude>prd/*</exclude>
                     <exclude>staging/*</exclude>
+                    <exclude>staging_local/*</exclude>
                     <exclude>test/*</exclude>
                     <exclude>test_local/*</exclude>
                 </excludes>
