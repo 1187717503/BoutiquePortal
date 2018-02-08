@@ -25,6 +25,12 @@
             </properties>
         </profile>
         <profile>
+            <id>staging_local</id>
+            <properties>
+                <profiles.active>staging_local</profiles.active>
+            </properties>
+        </profile>
+        <profile>
             <id>test</id>
             <properties>
                 <profiles.active>test</profiles.active>

@@ -41,6 +41,13 @@
 
         </profile>
         <profile>
+            <id>staging_local</id>
+            <properties>
+                <profiles.active>staging_local</profiles.active>
+            </properties>
+
+        </profile>
+        <profile>
             <id>prd</id>
             <properties>
                 <profiles.active>prd</profiles.active>
