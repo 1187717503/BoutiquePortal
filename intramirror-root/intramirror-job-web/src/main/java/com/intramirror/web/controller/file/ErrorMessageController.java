@@ -192,7 +192,7 @@ public class ErrorMessageController {
                 }
 
                 // cloud_store
-                if(vendor_id.equals("16")) {
+                if(vendor_id.equals("16") || vendor_id.equals("43")) {
                     if(name.equals("product_all_update")) {
                         originDataMap.put("vendor_id",vendor_id);
                         ProductEDSManagement.ProductOptions productOptions = cloudStoreProductMapping.mapping(originDataMap);
