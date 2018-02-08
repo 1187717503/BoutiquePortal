@@ -310,34 +310,71 @@ public class ApiUpdateProductService {
             /** FM 接口特殊判断*/
             if (product.vendor_id == 17) {
                 try {
-                    List<String> apiImgList = JSONArray.parseArray(productOptions.getCoverImg(), String.class);
-                    List<String> coverImgList = JSONArray.parseArray(product.getCover_img(), String.class);
-                    String productImage = productService.selProductImage(product.product_id);
-                    String apiImg = apiImgList.get(0);
+                    //only one
+                    List<String> apiImgList = JsonTransformUtil.readValue(productOptions.getCoverImg(), ArrayList.class);
+                    String apiImage = apiImgList.get(0);
+                    Map<String, Object> productImages = productService.selProductImage(product.product_id);
+                    String image = "[]";
+                    String oss_image = "[]";
+                    if (productImages != null) {
+                        image = productImages.get("image") == null ? "[]" : productImages.get("image").toString();
 
-                    if (!productImage.contains(apiImg) && apiImgList.size() == 1) {
+                    }
+                    List<Map<String, String>> imgList = JsonTransformUtil.readValue(image, ArrayList.class);
+                    if (imgList == null) {
+                        imgList = new ArrayList<>();
+                    }
+                    boolean existed = false;
+                    for (Map<String, String> imageEntry : imgList) {
+                        if (imageEntry.get("src_image").equals(apiImage)) {
+                            existed = true;
+                        }
+                    }
 
-                        if (productImage.length() > 5) { // 当图片有多张，并且图片不包含时，准备累加图片
-                            String downImgs = ApiCommonUtils.downloadImgs(productOptions.getCoverImg());
-                            if (StringUtils.isNotBlank(downImgs) && downImgs.length() > 5) {
-                                coverImgList.addAll(JSONArray.parseArray(downImgs, String.class));
-                                product.cover_img = JSONArray.toJSONString(coverImgList);
-                                product.description_img = JSONArray.toJSONString(coverImgList);
-                                productService.insertProductImage(product.product_id, apiImg);
+                    if (!existed) {
+
+                        String ossImage = ApiCommonUtils.downloadSingleImg(apiImage);
+                        Map<String, String> newImage = new HashMap<>();
+                        newImage.put("src_image", apiImage);
+                        newImage.put("oss_image", ossImage);
+                        imgList.add(newImage);
+
+                        imgList.sort((a, b) -> {
+                            String srcImageA = a.get("src_image");
+                            String srcImageB = b.get("src_image");
+
+                            String[] retA = srcImageA.split("/");
+                            String[] retB = srcImageB.split("/");
+                            String srcImageAName = "", srcImageBName = "";
+                            if (retA.length > 1) {
+                                srcImageAName = retA[retA.length - 1];
                             }
-                        } else if (coverImgList.size() <= 1) { // 当图片只有一张时，准备累加图片
-                            String downImgs = ApiCommonUtils.downloadImgs(productOptions.getCoverImg());
-                            if (StringUtils.isNotBlank(downImgs) && downImgs.length() > 5) {
-                                product.cover_img = downImgs;
-                                product.description_img = downImgs;
-                                productService.insertProductImage(product.product_id, apiImg);
+                            if (retB.length > 1) {
+                                srcImageBName = retB[retB.length - 1];
                             }
+                            logger.info("ret : " + srcImageAName.compareTo(srcImageBName));
+
+                            return srcImageAName.compareTo(srcImageBName);
+                        });
+
+                        productService.insertProductImage(product.product_id, JsonTransformUtil.toJson(imgList));
+
+                        List<String> ossImageList = new ArrayList<>();
+                        for (Map<String, String> imageEntry : imgList) {
+                            ossImageList.add(imageEntry.get("oss_image"));
+                        }
+                        oss_image = JsonTransformUtil.toJson(ossImageList);
+
+                        if (StringUtils.isNotBlank(oss_image) && oss_image.length() > 5) {
+                            product.cover_img = oss_image;
+                            product.description_img = oss_image;
                         }
 
                     }
+
                 } catch (Exception e) {
                     e.printStackTrace();
-                    logger.info("ApiUpdateProductService,FM,setProduct,Error:" + e);
+                    logger.error("ApiUpdateProductService,FM,setProduct,Error:" + e);
                 }
             }
         }
