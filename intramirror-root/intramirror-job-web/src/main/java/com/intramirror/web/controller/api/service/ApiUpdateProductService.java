@@ -572,7 +572,6 @@ public class ApiUpdateProductService {
         product.status = null;
         productService.updateProduct(product);
         logger.info("ApiUpdateProductService,setProduct,end,updateProduct,product:" + JSONObject.toJSONString(product));
-<<<<<<< HEAD
     }
 
     private boolean unbindProductSpu(Long productId, Long spuId) {
@@ -615,8 +614,6 @@ public class ApiUpdateProductService {
                 HttpUtils.setToken(token);
             }
         }
-=======
->>>>>>> v2.6.0
     }
 
     private void checkMappingParams(Connection conn) throws Exception {
