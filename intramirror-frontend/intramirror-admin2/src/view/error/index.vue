@@ -56,7 +56,7 @@
         <input id="Color" type="text" class="validate" v-model="searchData.color">
         <label for="Color">Color</label>
       </div>
-     <button class="waves-effect waves-light btn" style="background-color:#871b55 !important" @click="searchList">SEARCH</button>
+      <button class="waves-effect waves-light btn" style="background-color:#871b55 !important" @click="searchList">SEARCH</button>
       <button class="waves-effect waves-light btn" style="background-color:#9b9b9b !important"  @click="resetLoad">RESET</button>
     </div>
     <div class="search-tag">
