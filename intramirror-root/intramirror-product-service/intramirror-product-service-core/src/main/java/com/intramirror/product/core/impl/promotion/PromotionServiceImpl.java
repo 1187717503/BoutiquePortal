@@ -349,4 +349,14 @@ public class PromotionServiceImpl implements IPromotionService {
         }
         return listPromotionRuleDetail;
     }
+
+    @Override
+    public List<Map<String, Object>> listBannerPos() {
+        return promotionRuleMapper.listBannerPos();
+    }
+
+    @Override
+    public List<Map<String, Object>> listPromotionByBannerIds(List<Long> bannerIds) {
+        return promotionRuleMapper.listPromotionByBannerIds(bannerIds);
+    }
 }

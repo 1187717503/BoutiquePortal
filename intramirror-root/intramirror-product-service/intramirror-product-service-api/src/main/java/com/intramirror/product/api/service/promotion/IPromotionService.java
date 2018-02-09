@@ -33,4 +33,8 @@ public interface IPromotionService {
 
     Boolean updateItemsSort(Long promotionId, SortColumn sortColumn, List<Map<String, Object>> items) throws BusinessException;
 
+    List<Map<String, Object>> listBannerPos();
+
+    List<Map<String, Object>> listPromotionByBannerIds(List<Long> bannerIds);
+
 }
