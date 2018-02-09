@@ -313,6 +313,7 @@ public class ApiUpdateProductService {
                     //only one
                     List<String> apiImgList = JsonTransformUtil.readValue(productOptions.getCoverImg(), ArrayList.class);
                     String apiImage = apiImgList.get(0);
+//                    logger.info("Product [" + product.product_code + "] ");
                     Map<String, Object> productImages = productService.selProductImage(product.product_id);
                     String image = "[]";
                     String oss_image = "[]";

@@ -1,6 +1,7 @@
 package com.intramirror.web.test.api;
 
 import com.intramirror.utils.transform.JsonTransformUtil;
+import com.intramirror.web.util.GetPostRequestUtil;
 import com.intramirror.web.util.HttpUtils;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,7 +30,9 @@ public class okhttptest {
     @Test
     public void testhttp() {
 
-        unbindProductSpu(706L, 1L);
+        String appendUrl = "https://www.gibot.it/mcapi/products/" + "?page_n=" + 1 + "&page_size=" + 100;
+        String resp = GetPostRequestUtil.httpsGetRequest(appendUrl, "Wz9Fye7BfBc6BAhL");
+        LOGGER.info(resp);
 
     }
 
@@ -65,9 +68,9 @@ public class okhttptest {
         Map<String, Object> loginResp = HttpUtils.httpPost2(loginUrl, JsonTransformUtil.toJson(loginBody));
         if (loginResp.get("resultMessage") != null) {
             Map<String, Object> resultMessage = JsonTransformUtil.readValue(loginResp.get("resultMessage").toString(), HashMap.class);
-           String token = (String) resultMessage.get("token");
+            String token = (String) resultMessage.get("token");
 
-            if (token != null ) {
+            if (token != null) {
                 HttpUtils.setToken(token);
             }
         }

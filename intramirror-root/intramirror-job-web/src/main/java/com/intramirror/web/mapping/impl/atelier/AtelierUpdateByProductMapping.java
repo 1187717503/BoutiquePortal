@@ -60,7 +60,8 @@ public class AtelierUpdateByProductMapping implements IProductMapping{
                 JSONObject item = (JSONObject) it;
                 ProductEDSManagement.SkuOptions sku = productEDSManagement.getSkuOptions();
                 sku.setBarcodes(item.getString("barcode"));
-                sku.setSize(item.getString("size"));
+                sku.setSize(item.getString(""
+                        + ""));
                 sku.setStock(item.getString("stock"));
                 productOptions.getSkus().add(sku);
             }
