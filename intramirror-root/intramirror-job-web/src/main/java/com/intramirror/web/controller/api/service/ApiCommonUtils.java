@@ -192,6 +192,8 @@ public class ApiCommonUtils {
         try {
             URL url = new URL(imgUrl);
             URLConnection connection = url.openConnection();
+            connection.setReadTimeout(3 * 1000);
+            connection.setConnectTimeout(3 * 1000);
             connection.setDoOutput(true);
             BufferedImage image = ImageIO.read(connection.getInputStream());
             int srcWidth = image.getWidth();
