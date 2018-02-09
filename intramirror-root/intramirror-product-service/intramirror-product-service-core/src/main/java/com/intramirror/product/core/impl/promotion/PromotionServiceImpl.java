@@ -47,11 +47,6 @@ public class PromotionServiceImpl implements IPromotionService {
     }
 
     @Override
-    public List<Map<String, Object>> listBannerPos(Long bannerPosId) {
-        return null;
-    }
-
-    @Override
     public List<Map<String, Object>> listExcludeRulePromotion(Long promotionId) {
         return promotionRuleMapper.listExcludeRulePromotion(promotionId);
     }
@@ -353,5 +348,15 @@ public class PromotionServiceImpl implements IPromotionService {
             }
         }
         return listPromotionRuleDetail;
+    }
+
+    @Override
+    public List<Map<String, Object>> listBannerPos() {
+        return promotionRuleMapper.listBannerPos();
+    }
+
+    @Override
+    public List<Map<String, Object>> listPromotionByBannerIds(List<Long> bannerIds) {
+        return promotionRuleMapper.listPromotionByBannerIds(bannerIds);
     }
 }

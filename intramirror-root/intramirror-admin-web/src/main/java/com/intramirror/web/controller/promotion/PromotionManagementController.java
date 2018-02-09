@@ -17,6 +17,8 @@ import static com.intramirror.web.common.request.ConstantsEntity.EXCLUDE;
 import static com.intramirror.web.common.request.ConstantsEntity.INCLUDE;
 import com.intramirror.web.common.request.PromotionRuleEntity;
 import com.intramirror.web.controller.cache.CategoryCache;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.annotations.Param;
@@ -59,9 +61,36 @@ public class PromotionManagementController {
     }
 
     @GetMapping(value = "/banner/bannerPosList")
-    public Response getAllBannerPos(@RequestParam(value = "bannerPosId", required = true) Long bannerPosId) {
-        //        List<Map<String, Object>> result = promotionService.listPromotionByBanner(bannerId);
-        return Response.status(StatusType.SUCCESS).data("");
+    public Response getAllBannerPos() {
+        List<Map<String, Object>> listBannerPos = promotionService.listBannerPos();
+        List<Long> bannerIds = new ArrayList<>();
+        for (int i = 0; i < listBannerPos.size(); i++) {
+            Map<String, Object> banner = listBannerPos.get(i);
+            bannerIds.add((Long) banner.get("bannerId"));
+        }
+
+        List<Map<String, Object>> listPromotions = new ArrayList<>();
+        if (bannerIds.size() > 0) {
+            listPromotions = promotionService.listPromotionByBannerIds(bannerIds);
+        }
+
+        List<Map<String, Object>> listResult = new ArrayList<>();
+        for (Map<String, Object> bannerPos : listBannerPos) {
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("bannerId", bannerPos.get("bannerId"));
+            resultMap.put("bannerPosId", bannerPos.get("bannerPosId"));
+            resultMap.put("bannerName", bannerPos.get("bannerName"));
+            List<Map<String, Object>> listPro = new ArrayList<>();
+            for (Map<String, Object> promotion : listPromotions) {
+                if (promotion.get("bannerId") == bannerPos.get("bannerId")) {
+                    listPro.add(promotion);
+                }
+            }
+            resultMap.put("promotion", listPro);
+            listResult.add(resultMap);
+        }
+
+        return Response.status(StatusType.SUCCESS).data(listResult);
     }
 
     @PostMapping(value = "/promotion/{ruleType}", consumes = "application/json")

@@ -17,21 +17,6 @@
         FROM t_promotion WHERE enabled=TRUE AND banner_id = #{bannerId}
     </select>
 
-    <select id="listBannerPos" parameterType="Long" resultType="java.util.Map">
-        SELECT
-        start_time AS startTime,
-        promotion_name AS promotionName,
-        updated_at AS updatedAt,
-        banner_id AS bannerId,
-        poster_img AS posterImg,
-        banner_img AS bannerImg,
-        created_at as createdAt,
-        promotion_id AS  promotionId,
-        enabled AS enabled
-        FROM t_promotion WHERE enabled=TRUE AND banner_id = #{bannerId}
-    </select>
-
-
     <select id="listExcludeRulePromotion" parameterType="Long" resultType="java.util.Map">
         SELECT tpir.`promotion_exclude_rule_id` AS ruleId,
           tpir.`promotion_id` AS promotionId,
@@ -498,5 +483,27 @@
             </if>
         </trim>
     </insert>
+
+
+    <select id="listBannerPos" resultType="java.util.Map">
+        select t.banner_id as bannerId,
+        t.banner_pos_id as bannerPosId,
+        t.banner_name as bannerName
+        from t_promotion_banner t where t.enabled = true
+        order by t.banner_pos_id;
+    </select>
+
+    <select id="listPromotionByBannerIds" resultType="java.util.Map">
+        SELECT
+        start_time AS startTime,
+        promotion_name AS promotionName,
+        banner_id AS bannerId,
+        promotion_id AS promotionId
+        FROM t_promotion WHERE enabled=TRUE AND banner_id in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        order by banner_id,start_time
+    </select>
 
 </mapper>

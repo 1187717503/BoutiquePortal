@@ -15,8 +15,6 @@ import java.util.Map;
 public interface IPromotionService {
     List<Map<String, Object>> listPromotionByBanner(Long banner);
 
-    List<Map<String, Object>> listBannerPos(Long bannerPosId);
-
     List<Map<String, Object>> listExcludeRulePromotion(Long promotionId);
 
     List<Map<String, Object>> listIncludeRulePromotion(Long promotionId);
@@ -34,5 +32,9 @@ public interface IPromotionService {
     List<Map<String, Object>> listSortItemByColumn(Long promotionId, SortColumn sortColumn);
 
     Boolean updateItemsSort(Long promotionId, SortColumn sortColumn, List<Map<String, Object>> items) throws BusinessException;
+
+    List<Map<String, Object>> listBannerPos();
+
+    List<Map<String, Object>> listPromotionByBannerIds(List<Long> bannerIds);
 
 }
