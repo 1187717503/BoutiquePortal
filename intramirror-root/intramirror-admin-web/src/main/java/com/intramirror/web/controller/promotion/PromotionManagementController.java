@@ -58,6 +58,12 @@ public class PromotionManagementController {
         return Response.status(StatusType.SUCCESS).data(result);
     }
 
+    @GetMapping(value = "/banner/bannerPosList")
+    public Response getAllBannerPos(@RequestParam(value = "bannerPosId", required = true) Long bannerPosId) {
+        //        List<Map<String, Object>> result = promotionService.listPromotionByBanner(bannerId);
+        return Response.status(StatusType.SUCCESS).data("");
+    }
+
     @PostMapping(value = "/promotion/{ruleType}", consumes = "application/json")
     public Response savePromotionProductRule(@PathVariable(value = "ruleType") String ruleType, @RequestBody PromotionRuleEntity body) {
         LOGGER.info("Save rule with type {}, {}.", ruleType, body);

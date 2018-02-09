@@ -47,6 +47,11 @@ public class PromotionServiceImpl implements IPromotionService {
     }
 
     @Override
+    public List<Map<String, Object>> listBannerPos(Long bannerPosId) {
+        return null;
+    }
+
+    @Override
     public List<Map<String, Object>> listExcludeRulePromotion(Long promotionId) {
         return promotionRuleMapper.listExcludeRulePromotion(promotionId);
     }
