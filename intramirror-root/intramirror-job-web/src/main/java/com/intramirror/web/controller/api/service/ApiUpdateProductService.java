@@ -308,7 +308,7 @@ public class ApiUpdateProductService {
             }
 
             /** FM 接口特殊判断*/
-            if (product.vendor_id == 17) {
+            if (product.vendor_id == 17 && product.status == 1) {
                 try {
                     //only one
                     List<String> apiImgList = JsonTransformUtil.readValue(productOptions.getCoverImg(), ArrayList.class);
