@@ -200,6 +200,7 @@ public class FileUploadHelper {
     }
 
     public static List<String> uploadFileByImgUrl2(String imgUrl) throws Exception {
+        long start = System.currentTimeMillis();
         HttpURLConnection httpUrl = null;
         InputStream inputStream = null;
         URL url = null;
@@ -210,6 +211,7 @@ public class FileUploadHelper {
             imgUrl = imgUrl.replace("https:", "http:");
             url = new URL(imgUrl);
             httpUrl = (HttpURLConnection) url.openConnection();
+            httpUrl.setConnectTimeout(20000);
             //            httpUrl.connect();
             httpUrl.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:37.0) Gecko/20100101 Firefox/37.0");
             inputStream = httpUrl.getInputStream();
@@ -223,12 +225,13 @@ public class FileUploadHelper {
         } catch (IOException e) {
             fileUrls = new ArrayList<>();
             e.printStackTrace();
-            logger.info("uploadFileByImgUrl2,e:"+ e+",imageUrl:"+imgUrl);
+            logger.info("uploadFileByImgUrl2,e:" + e + ",imageUrl:" + imgUrl);
         } finally {
             httpUrl.disconnect();
             inputStream.close();
         }
-
+        long end = System.currentTimeMillis();
+        logger.info("Job_Run_Time,uploadFileByImgUrl2,start:" + start + ",end:" + end + ",time:" + (end - start));
         return fileUrls;
     }
 
