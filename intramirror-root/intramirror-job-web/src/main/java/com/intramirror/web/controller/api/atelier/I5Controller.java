@@ -87,7 +87,7 @@ public class I5Controller {
                     logger.info(
                             "I5Controller,option:" + JSONObject.toJSONString(option) + ",bodyDataMap:" + JSONObject.toJSONString(bodyDataMap) + ",date:" + date
                                     + ",i:" + i);
-                    CommonThreadPool.execute("julian_product_all_update", executor, 10, new UpdateStockThread(option, fileUtils, bodyDataMap));
+                    CommonThreadPool.execute("julian_product_all_update", executor, 50, new UpdateStockThread(option, fileUtils, bodyDataMap));
                 }
 
             } catch (Exception e) {
