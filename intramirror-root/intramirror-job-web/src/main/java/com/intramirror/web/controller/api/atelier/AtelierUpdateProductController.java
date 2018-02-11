@@ -37,40 +37,40 @@ public class AtelierUpdateProductController {
     @Resource(name = "atelierUpdateByProductService")
     private AtelierUpdateByProductService atelierUpdateByProductService;
 
-    @RequestMapping(value = "/fullUpdateProduct",method = RequestMethod.POST)
+    @RequestMapping(value = "/fullUpdateProduct", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String,Object> fullUpdateProduct(HttpServletRequest request){
-        return this.execute(request,atelierUpdateByProductService.all_update_product);
+    public Map<String, Object> fullUpdateProduct(HttpServletRequest request) {
+        return this.execute(request, atelierUpdateByProductService.all_update_product);
     }
 
-    @RequestMapping(value = "/createProduct",method = RequestMethod.POST)
+    @RequestMapping(value = "/createProduct", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String,Object> createProduct(HttpServletRequest request){
-        return this.execute(request,atelierUpdateByProductService.create_product);
+    public Map<String, Object> createProduct(HttpServletRequest request) {
+        return this.execute(request, atelierUpdateByProductService.create_product);
     }
 
-    @RequestMapping(value = "/updateProduct",method = RequestMethod.POST)
+    @RequestMapping(value = "/updateProduct", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String,Object> updateProduct(HttpServletRequest request){
-        return this.execute(request,atelierUpdateByProductService.update_product);
+    public Map<String, Object> updateProduct(HttpServletRequest request) {
+        return this.execute(request, atelierUpdateByProductService.update_product);
     }
 
-    @RequestMapping(value = "/fullUpdateProduct/setCount",method = RequestMethod.GET)
+    @RequestMapping(value = "/fullUpdateProduct/setCount", method = RequestMethod.GET)
     @ResponseBody
-    public Map<String,Object> setCount(HttpServletRequest request,@Param("count")String count) throws Exception {
-        if(StringUtils.isNotBlank(count)) {
+    public Map<String, Object> setCount(HttpServletRequest request, @Param("count") String count) throws Exception {
+        if (StringUtils.isNotBlank(count)) {
             this.setCount(count);
         }
-        Map<String,Object> map = new HashMap<>();
-        map.put("count",this.getCount());
+        Map<String, Object> map = new HashMap<>();
+        map.put("count", this.getCount());
         return map;
     }
 
     private void setCount(String count) throws Exception {
-        redisService.put(atelier_full_count,count);
+        redisService.put(atelier_full_count, count);
     }
 
-    private int getCount(){
+    private int getCount() {
         try {
             int count = Integer.parseInt(redisService.getKey(atelier_full_count));
             return count;
@@ -80,87 +80,91 @@ public class AtelierUpdateProductController {
         return 200;
     }
 
-    private Map<String,Object> execute(HttpServletRequest request,String type) {
+    private Map<String, Object> execute(HttpServletRequest request, String type) {
         long start = System.currentTimeMillis();
-        Map<String,Object> resultMap = new HashMap<>();
+        Map<String, Object> resultMap = new HashMap<>();
         try {
             InputStream is = request.getInputStream();
             String body = IOUtils.toString(is, "utf-8");
             String storeID = request.getParameter("StoreID");
             String version = request.getParameter("Version");
-            logger.info("AtelierFullUpdateProductControllerExecute,inputParams,type:"+type+",storeID:"+storeID+",version:"+version+",body:"+body+","+storeID+"_"+type);
-
-            this.setRedisDate(type,storeID,body);
-
+            this.setRedisDate(type, storeID, body);
             JSONArray datas = this.parasJSONArray(body);
 
-            if(datas == null) {
-                logger.info("AtelierFullUpdateProductControllerExecute,params,type:"+type+",storeID:"+storeID+",version:"+version+",body:"+body+","+storeID+"_"+type);
-                resultMap = atelierUpdateByProductService.updateProduct(body,storeID,version,type);
-                logger.info("AtelierFullUpdateProductControllerExecute,updateProduct,type:"+type+",resultMap:"+JSONObject.toJSONString(resultMap)+",storeID:"+storeID+",version:"+version+",body:"+body+","+storeID+"_"+type);
+            if (datas == null) {
+                logger.info(
+                        "AtelierFullUpdateProductControllerExecute,params,type:" + type + ",storeID:" + storeID + ",version:" + version + ",body:" + body + ","
+                                + storeID + "_" + type);
+                resultMap = atelierUpdateByProductService.updateProduct(body, storeID, version, type);
+                logger.info("AtelierFullUpdateProductControllerExecute,updateProduct,type:" + type + ",resultMap:" + JSONObject.toJSONString(resultMap)
+                        + ",storeID:" + storeID + ",version:" + version + ",body:" + body + "," + storeID + "_" + type);
             } else {
                 int count = this.getCount();
                 int len = datas.size();
-                logger.info("AtelierFullUpdateProductControllerExecutes,len:"+len+",count:"+count);
-                if(len > count) {
-                    resultMap.put("ResponseStatus","2000");
-                    resultMap.put("ErrorCode","1");
-                    resultMap.put("ErrorMsg","Data exceeds the specified number");
-                    resultMap.put("count",count);
-                    resultMap.put("TimeStamp",new Date());
+                logger.info("AtelierFullUpdateProductControllerExecutes,len:" + len + ",count:" + count);
+                if (len > count) {
+                    resultMap.put("ResponseStatus", "2000");
+                    resultMap.put("ErrorCode", "1");
+                    resultMap.put("ErrorMsg", "Data exceeds the specified number");
+                    resultMap.put("count", count);
+                    resultMap.put("TimeStamp", new Date());
                     return resultMap;
                 }
 
-                for(int i=0;i<len;i++){
+                for (int i = 0; i < len; i++) {
                     JSONObject bodyJSON = datas.getJSONObject(i);
-                    logger.info("AtelierFullUpdateProductControllerExecutes,params,type:"+type+",storeID:"+storeID+",version:"+version+",body:"+bodyJSON.toJSONString()+","+storeID+"_"+type);
-                    resultMap = atelierUpdateByProductService.updateProduct(bodyJSON.toJSONString(),storeID,version,type);
-                    logger.info("AtelierFullUpdateProductControllerExecutes,updateProduct,type:"+type+",resultMap:"+JSONObject.toJSONString(resultMap)+",storeID:"+storeID+",version:"+version+",body:"+bodyJSON.toJSONString()+","+storeID+"_"+type);
+                    logger.info("AtelierFullUpdateProductControllerExecutes,params,type:" + type + ",storeID:" + storeID + ",version:" + version + ",body:"
+                            + bodyJSON.toJSONString() + "," + storeID + "_" + type);
+                    resultMap = atelierUpdateByProductService.updateProduct(bodyJSON.toJSONString(), storeID, version, type);
+                    logger.info("AtelierFullUpdateProductControllerExecutes,updateProduct,type:" + type + ",resultMap:" + JSONObject.toJSONString(resultMap)
+                            + ",storeID:" + storeID + ",version:" + version + ",body:" + bodyJSON.toJSONString() + "," + storeID + "_" + type);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            logger.info("AtelierFullUpdateProductControllerExecute,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
-            resultMap.put("ResponseStatus","2000");
-            resultMap.put("ErrorCode","1");
-            resultMap.put("ErrorMsg","500: E500: Update product failed:"+ExceptionUtils.getExceptionDetail(e));
-            resultMap.put("TimeStamp",new Date());
-            logger.info("AtelierFullUpdateProductControllerExecute,outputParams,mapUtils:"+JSONObject.toJSONString(resultMap));
+            logger.info("AtelierFullUpdateProductControllerExecute,errorMessage:" + ExceptionUtils.getExceptionDetail(e));
+            resultMap.put("ResponseStatus", "2000");
+            resultMap.put("ErrorCode", "1");
+            resultMap.put("ErrorMsg", "500: E500: Update product failed:" + ExceptionUtils.getExceptionDetail(e));
+            resultMap.put("TimeStamp", new Date());
+            logger.info("AtelierFullUpdateProductControllerExecute,outputParams,mapUtils:" + JSONObject.toJSONString(resultMap));
         }
         long end = System.currentTimeMillis();
-        logger.info("Job_Run_Time,AtelierUpdateProductController_execute,start:"+start+",end:"+end+",time:"+(end-start));
+        logger.info("Job_Run_Time,AtelierUpdateProductController_execute,start:" + start + ",end:" + end + ",time:" + (end - start));
         return resultMap;
     }
 
-    public JSONArray parasJSONArray(String body){
+    public JSONArray parasJSONArray(String body) {
         JSONArray datas = null;
         try {
             datas = JSONArray.parseArray(body);
         } catch (Exception e) {
-//            e.printStackTrace();
+            //            e.printStackTrace();
             System.out.println(" not jsonArray!");
         }
         return datas;
     }
 
-    private void setRedisDate(String type,String storeID,String body){
-        logger.info("AtelierUpdateProductController,setRedisDate,type:"+type+",storeID:"+storeID+",body:"+body);
-        Map<String,Object> paramsMap = atelierUpdateByProductService.getParamsMap();
+    private void setRedisDate(String type, String storeID, String body) {
+        logger.info("AtelierUpdateProductController,setRedisDate,type:" + type + ",storeID:" + storeID + ",body:" + body);
+        Map<String, Object> paramsMap = atelierUpdateByProductService.getParamsMap();
 
-        if(!atelierUpdateByProductService.all_update_product.equals(type) || paramsMap == null || paramsMap.get(storeID) == null) {
+        if (!atelierUpdateByProductService.all_update_product.equals(type) || paramsMap == null || paramsMap.get(storeID) == null) {
             return;
         }
-        Map<String,Object> paramMap = (Map<String, Object>) paramsMap.get(storeID);
+        Map<String, Object> paramMap = (Map<String, Object>) paramsMap.get(storeID);
         String vendor_id = paramMap.get("vendor_id").toString();
-        String key = RedisKeyContants.atelier_all_product_zero+vendor_id;
-        String value = DateUtils.getStrDate(new Date(),"yyyy-MM-dd HH:mm:ss");
+        String key = RedisKeyContants.atelier_all_product_zero + vendor_id;
+        String value = DateUtils.getStrDate(new Date(), "yyyy-MM-dd HH:mm:ss");
         try {
-            logger.info("AtelierUpdateProductController,start,setRedisDate,putRedis,key:"+key+",value:"+value+",body:"+body);
-            redisService.put(key,value);
-            logger.info("AtelierUpdateProductController,end,setRedisDate,putRedis,key:"+key+",value:"+value+",body:"+body);
+            logger.info("AtelierUpdateProductController,start,setRedisDate,putRedis,key:" + key + ",value:" + value + ",body:" + body);
+            redisService.put(key, value);
+            logger.info("AtelierUpdateProductController,end,setRedisDate,putRedis,key:" + key + ",value:" + value + ",body:" + body);
         } catch (Exception e) {
             e.printStackTrace();
-            logger.info("AtelierUpdateProductController,setRedisDate,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+",type:"+type+",storeID:"+storeID+",body:"+body);
+            logger.info(
+                    "AtelierUpdateProductController,setRedisDate,errorMessage:" + ExceptionUtils.getExceptionDetail(e) + ",type:" + type + ",storeID:" + storeID
+                            + ",body:" + body);
         }
     }
 }
