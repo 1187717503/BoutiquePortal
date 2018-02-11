@@ -506,4 +506,36 @@
         order by banner_id,start_time
     </select>
 
+    <update id="updateBannerImg" parameterType="com.intramirror.product.api.model.PromotionExclude">
+        UPDATE t_promotion_exclude_rule SET
+        <trim prefix=" " suffixOverrides=",">
+            <choose>
+                <when test="seasonCode != null">
+                    `season_code` = #{seasonCode, jdbcType=VARCHAR},
+                </when>
+                <otherwise>
+                    `season_code` = '-1',
+                </otherwise>
+            </choose>
+
+            <choose>
+                <when test="vendorId != null">
+                    `vendor_id` = #{vendorId, jdbcType=BIGINT},
+                </when>
+                <otherwise>
+                    `vendor_id` = -1,
+                </otherwise>
+            </choose>
+
+            <if test="categorys != null">
+                `categorys` = #{categorys, jdbcType=LONGVARCHAR},
+            </if>
+            <if test="brands != null">
+                `brands` = #{brands, jdbcType=LONGVARCHAR},
+            </if>
+            `created_at` = NOW(),
+        </trim>
+        WHERE promotion_exclude_rule_id = #{ruleId, jdbcType=BIGINT}
+    </update>
+
 </mapper>

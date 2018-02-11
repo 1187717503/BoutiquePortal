@@ -60,39 +60,6 @@ public class PromotionManagementController {
         return Response.status(StatusType.SUCCESS).data(result);
     }
 
-    @GetMapping(value = "/banner/bannerPosList")
-    public Response getAllBannerPos() {
-        List<Map<String, Object>> listBannerPos = promotionService.listBannerPos();
-        List<Long> bannerIds = new ArrayList<>();
-        for (int i = 0; i < listBannerPos.size(); i++) {
-            Map<String, Object> banner = listBannerPos.get(i);
-            bannerIds.add((Long) banner.get("bannerId"));
-        }
-
-        List<Map<String, Object>> listPromotions = new ArrayList<>();
-        if (bannerIds.size() > 0) {
-            listPromotions = promotionService.listPromotionByBannerIds(bannerIds);
-        }
-
-        List<Map<String, Object>> listResult = new ArrayList<>();
-        for (Map<String, Object> bannerPos : listBannerPos) {
-            Map<String, Object> resultMap = new HashMap<>();
-            resultMap.put("bannerId", bannerPos.get("bannerId"));
-            resultMap.put("bannerPosId", bannerPos.get("bannerPosId"));
-            resultMap.put("bannerName", bannerPos.get("bannerName"));
-            List<Map<String, Object>> listPro = new ArrayList<>();
-            for (Map<String, Object> promotion : listPromotions) {
-                if (promotion.get("bannerId") == bannerPos.get("bannerId")) {
-                    listPro.add(promotion);
-                }
-            }
-            resultMap.put("promotion", listPro);
-            listResult.add(resultMap);
-        }
-
-        return Response.status(StatusType.SUCCESS).data(listResult);
-    }
-
     @PostMapping(value = "/promotion/{ruleType}", consumes = "application/json")
     public Response savePromotionProductRule(@PathVariable(value = "ruleType") String ruleType, @RequestBody PromotionRuleEntity body) {
         LOGGER.info("Save rule with type {}, {}.", ruleType, body);
@@ -210,5 +177,43 @@ public class PromotionManagementController {
         }
         promotionRule.setCategorys(JSONArray.toJSONString(body.getCategorys()));
         return promotionRule;
+    }
+
+    @GetMapping(value = "/banner/bannerPosList")
+    public Response getAllBannerPos() {
+        List<Map<String, Object>> listBannerPos = promotionService.listBannerPos();
+        List<Long> bannerIds = new ArrayList<>();
+        for (int i = 0; i < listBannerPos.size(); i++) {
+            Map<String, Object> banner = listBannerPos.get(i);
+            bannerIds.add((Long) banner.get("bannerId"));
+        }
+
+        List<Map<String, Object>> listPromotions = new ArrayList<>();
+        if (bannerIds.size() > 0) {
+            listPromotions = promotionService.listPromotionByBannerIds(bannerIds);
+        }
+
+        List<Map<String, Object>> listResult = new ArrayList<>();
+        for (Map<String, Object> bannerPos : listBannerPos) {
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("bannerId", bannerPos.get("bannerId"));
+            resultMap.put("bannerPosId", bannerPos.get("bannerPosId"));
+            resultMap.put("bannerName", bannerPos.get("bannerName"));
+            List<Map<String, Object>> listPro = new ArrayList<>();
+            for (Map<String, Object> promotion : listPromotions) {
+                if (promotion.get("bannerId") == bannerPos.get("bannerId")) {
+                    listPro.add(promotion);
+                }
+            }
+            resultMap.put("promotion", listPro);
+            listResult.add(resultMap);
+        }
+
+        return Response.status(StatusType.SUCCESS).data(listResult);
+    }
+
+    @PutMapping(value = "/banner/dealImg")
+    public Response saveImgForBanner() {
+        return Response.status(StatusType.SUCCESS).data("");
     }
 }
