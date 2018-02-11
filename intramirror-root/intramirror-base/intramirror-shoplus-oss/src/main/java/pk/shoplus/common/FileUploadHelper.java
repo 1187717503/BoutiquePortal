@@ -213,7 +213,6 @@ public class FileUploadHelper {
             httpUrl = (HttpURLConnection) url.openConnection();
             httpUrl.setConnectTimeout(5 * 1000);
             httpUrl.setReadTimeout(5 * 1000);
-            //            httpUrl.connect();
             httpUrl.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:37.0) Gecko/20100101 Firefox/37.0");
             inputStream = httpUrl.getInputStream();
             if (null != inputStream) {
