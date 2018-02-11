@@ -48,7 +48,7 @@ public class I5Controller {
     @RequestMapping(value = "/update", method = RequestMethod.GET)
     @ResponseBody
     public String update() {
-        this.handle(path1, "product_all_update", "20180210");
+        //        this.handle(path1, "product_all_update", "20180210");
         this.handle(path2, "product_all_update", "20180209");
         this.handle(path3, "product_all_update", "20180208");
         return null;
@@ -87,7 +87,7 @@ public class I5Controller {
                     logger.info(
                             "I5Controller,option:" + JSONObject.toJSONString(option) + ",bodyDataMap:" + JSONObject.toJSONString(bodyDataMap) + ",date:" + date
                                     + ",i:" + i);
-                    CommonThreadPool.execute("julian_product_all_update", executor, 50, new UpdateStockThread(option, fileUtils, bodyDataMap));
+                    CommonThreadPool.execute("julian_product_all_update", executor, 100, new UpdateStockThread(option, fileUtils, bodyDataMap));
                 }
 
             } catch (Exception e) {
