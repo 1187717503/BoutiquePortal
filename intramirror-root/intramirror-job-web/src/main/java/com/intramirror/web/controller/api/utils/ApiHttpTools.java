@@ -10,6 +10,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 public class ApiHttpTools {
 
     public static String httpGet(String url) throws Exception {
+        url = url.replace(" ", "%20");
         DefaultHttpClient httpClient = new DefaultHttpClient();
         HttpGet httpGet = new HttpGet(url);
         HttpResponse httpResponse = httpClient.execute(httpGet);

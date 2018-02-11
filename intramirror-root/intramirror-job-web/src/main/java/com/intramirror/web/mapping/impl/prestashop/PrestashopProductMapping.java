@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.intramirror.web.mapping.api.IProductMapping;
 import java.util.Date;
 import java.util.Map;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 import pk.shoplus.model.ProductEDSManagement;
 
@@ -12,6 +13,8 @@ import pk.shoplus.model.ProductEDSManagement;
 public class PrestashopProductMapping implements IProductMapping {
 
     private static ProductEDSManagement productEDSManagement = new ProductEDSManagement();
+
+    private static final Logger logger = Logger.getLogger(PrestashopProductMapping.class);
 
     @Override
     public ProductEDSManagement.ProductOptions mapping(Map<String, Object> bodyDataMap) {
@@ -55,6 +58,7 @@ public class PrestashopProductMapping implements IProductMapping {
             // @formatter:off
         } catch (Exception e) {
             e.printStackTrace();
+            logger.info("PrestashopProductMapping,ErrorMessage:e->" + e + ",bodyDataMap:" + JSONObject.toJSONString(bodyDataMap));
         }
         return productOptions;
     }
