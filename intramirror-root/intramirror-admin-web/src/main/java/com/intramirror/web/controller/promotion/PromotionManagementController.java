@@ -2,15 +2,17 @@ package com.intramirror.web.controller.promotion;
 
 import com.alibaba.fastjson.JSONArray;
 import com.intramirror.common.parameter.StatusType;
+import com.intramirror.core.common.exception.ValidateException;
+import com.intramirror.core.common.response.ErrorResponse;
 import com.intramirror.core.common.response.Response;
 import com.intramirror.product.api.entity.promotion.CategoryEntity;
 import com.intramirror.product.api.enums.PromotionRuleType;
 import com.intramirror.product.api.model.ProductWithBLOBs;
+import com.intramirror.product.api.model.Promotion;
 import com.intramirror.product.api.model.PromotionExcludeProduct;
 import com.intramirror.product.api.model.PromotionRule;
 import com.intramirror.product.api.service.IProductService;
 import com.intramirror.product.api.service.promotion.IPromotionExcludeProductService;
-
 import com.intramirror.product.api.service.promotion.IPromotionService;
 import static com.intramirror.utils.transform.JsonTransformUtil.toJson;
 import static com.intramirror.web.common.request.ConstantsEntity.EXCLUDE;
@@ -212,8 +214,16 @@ public class PromotionManagementController {
         return Response.status(StatusType.SUCCESS).data(listResult);
     }
 
-    @PutMapping(value = "/banner/dealImg")
-    public Response saveImgForBanner() {
-        return Response.status(StatusType.SUCCESS).data("");
+    @PutMapping(value = "/banner/updateImg", consumes = "application/json")
+    public Response saveImgForBanner(@RequestBody Promotion promotion) {
+        if (promotion == null || promotion.getPromotionId() == null) {
+            throw new ValidateException(new ErrorResponse("Input promotion info could not be null!"));
+        }
+        return Response.status(StatusType.SUCCESS).data(promotionService.saveImgForBanner(promotion));
+    }
+
+    @GetMapping(value = "/banner/promotion/pid")
+    public Response getPromotion(@RequestParam(value = "promotionId", required = true) Long promotionId) {
+        return Response.status(StatusType.SUCCESS).data(promotionService.getPromotion(promotionId));
     }
 }

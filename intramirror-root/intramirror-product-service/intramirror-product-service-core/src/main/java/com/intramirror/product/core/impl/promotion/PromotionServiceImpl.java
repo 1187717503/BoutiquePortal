@@ -11,12 +11,14 @@ import com.intramirror.product.api.enums.PromotionRuleType;
 import com.intramirror.product.api.enums.SortColumn;
 import com.intramirror.product.api.exception.BusinessException;
 import com.intramirror.product.api.model.Category;
+import com.intramirror.product.api.model.Promotion;
 import com.intramirror.product.api.model.PromotionExclude;
 import com.intramirror.product.api.model.PromotionInclude;
 import com.intramirror.product.api.model.PromotionRule;
 import com.intramirror.product.api.model.PromotionRuleDetail;
 import com.intramirror.product.api.service.promotion.IPromotionService;
 import com.intramirror.product.core.mapper.CategoryMapper;
+import com.intramirror.product.core.mapper.PromotionMapper;
 import com.intramirror.product.core.mapper.PromotionRuleMapper;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +42,9 @@ public class PromotionServiceImpl implements IPromotionService {
 
     @Autowired
     CategoryMapper categoryMapper;
+
+    @Autowired
+    PromotionMapper promotionMapper;
 
     @Override
     public List<Map<String, Object>> listPromotionByBanner(Long bannerId) {
@@ -358,5 +363,15 @@ public class PromotionServiceImpl implements IPromotionService {
     @Override
     public List<Map<String, Object>> listPromotionByBannerIds(List<Long> bannerIds) {
         return promotionRuleMapper.listPromotionByBannerIds(bannerIds);
+    }
+
+    @Override
+    public Integer saveImgForBanner(Promotion promotion) {
+        return promotionMapper.updateByPrimaryKeySelective(promotion);
+    }
+
+    @Override
+    public Promotion getPromotion(Long promotionId) {
+        return promotionMapper.selectByPrimaryKey(promotionId);
     }
 }
