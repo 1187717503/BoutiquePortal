@@ -9,6 +9,7 @@ import com.intramirror.product.api.entity.promotion.CategoryEntity;
 import com.intramirror.product.api.enums.PromotionRuleType;
 import com.intramirror.product.api.model.ProductWithBLOBs;
 import com.intramirror.product.api.model.Promotion;
+import com.intramirror.product.api.model.PromotionBrandHot;
 import com.intramirror.product.api.model.PromotionExcludeProduct;
 import com.intramirror.product.api.model.PromotionRule;
 import com.intramirror.product.api.service.IProductService;
@@ -225,5 +226,15 @@ public class PromotionManagementController {
     @GetMapping(value = "/banner/promotion/pid")
     public Response getPromotion(@RequestParam(value = "promotionId", required = true) Long promotionId) {
         return Response.status(StatusType.SUCCESS).data(promotionService.getPromotion(promotionId));
+    }
+
+    @GetMapping(value = "/banner/promotion/brandhot")
+    public Response getPromotionBrandHot(@RequestParam(value = "promotionId", required = true) Long promotionId) {
+        return Response.status(StatusType.SUCCESS).data(promotionService.getPromotionBrandHot(promotionId));
+    }
+
+    @PutMapping(value = "/banner/promotion/brandhot")
+    public Response updatePromotionBrandHot(@RequestBody List<PromotionBrandHot> listPromotionBrandHot) {
+        return Response.status(StatusType.SUCCESS).data(promotionService.updatePromotionBrandHot(listPromotionBrandHot));
     }
 }

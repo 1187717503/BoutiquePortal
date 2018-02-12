@@ -285,6 +285,7 @@
       description
       FROM t_promotion_seq
       WHERE promotion_id = #{promotionId}
+      AND `enabled` = TRUE
       ORDER BY `sort` ASC
     </select>
 

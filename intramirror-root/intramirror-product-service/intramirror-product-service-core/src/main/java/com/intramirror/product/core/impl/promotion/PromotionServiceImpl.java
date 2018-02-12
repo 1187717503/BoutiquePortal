@@ -12,12 +12,14 @@ import com.intramirror.product.api.enums.SortColumn;
 import com.intramirror.product.api.exception.BusinessException;
 import com.intramirror.product.api.model.Category;
 import com.intramirror.product.api.model.Promotion;
+import com.intramirror.product.api.model.PromotionBrandHot;
 import com.intramirror.product.api.model.PromotionExclude;
 import com.intramirror.product.api.model.PromotionInclude;
 import com.intramirror.product.api.model.PromotionRule;
 import com.intramirror.product.api.model.PromotionRuleDetail;
 import com.intramirror.product.api.service.promotion.IPromotionService;
 import com.intramirror.product.core.mapper.CategoryMapper;
+import com.intramirror.product.core.mapper.PromotionBrandHotMapper;
 import com.intramirror.product.core.mapper.PromotionMapper;
 import com.intramirror.product.core.mapper.PromotionRuleMapper;
 import java.util.ArrayList;
@@ -45,6 +47,9 @@ public class PromotionServiceImpl implements IPromotionService {
 
     @Autowired
     PromotionMapper promotionMapper;
+
+    @Autowired
+    PromotionBrandHotMapper promotionBrandHotMapper;
 
     @Override
     public List<Map<String, Object>> listPromotionByBanner(Long bannerId) {
@@ -177,6 +182,9 @@ public class PromotionServiceImpl implements IPromotionService {
             for (Map<String, Object> item : items) {
 
                 List<Category> subCategoryList = categoryMapper.listSubCategoryByCategoryId(Long.parseLong(item.get("categoryId").toString()));
+                //把第二级目录本身也加进去
+                subCategoryList.add(categoryMapper.selectByPrimaryKey(Long.parseLong(item.get("categoryId").toString())));
+
                 for (Category category : subCategoryList) {
                     CategorySort categorySort = new CategorySort();
                     categorySort.setPromotionId(promotionId);
@@ -190,6 +198,7 @@ public class PromotionServiceImpl implements IPromotionService {
                     LOGGER.info("Category id {}, sort {}.", category.getCategoryId(), item.get("sort").toString());
                     promotionRuleMapper.insertCategorySort(categorySort);
                 }
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -207,7 +216,7 @@ public class PromotionServiceImpl implements IPromotionService {
                 vendorSort.setSort(Integer.parseInt(item.get("sort").toString()));
                 vendorSort.setPromotionId(promotionId);
                 vendorSort.setName(item.get("name").toString());
-                promotionRuleMapper.insertVendSort(vendorSort);
+                promotionRuleMapper.insertVendorSort(vendorSort);
             }
         } catch (Exception e) {
             throw new BusinessException("update vendor sort failed.");
@@ -373,5 +382,25 @@ public class PromotionServiceImpl implements IPromotionService {
     @Override
     public Promotion getPromotion(Long promotionId) {
         return promotionMapper.selectByPrimaryKey(promotionId);
+    }
+
+    @Override
+    public List<PromotionBrandHot> getPromotionBrandHot(Long promotionId) {
+        return promotionBrandHotMapper.getPromotionBrandHot(promotionId);
+    }
+
+    @Override
+    public Integer updatePromotionBrandHot(List<PromotionBrandHot> listPromotionBrandHot) {
+        Long promotionId = 0L;
+        if (listPromotionBrandHot.size() > 0) {
+            promotionId = listPromotionBrandHot.get(0).getPromotionId();
+        }
+
+        if (promotionId != 0) {
+            promotionBrandHotMapper.deleteAll(promotionId);
+            return promotionBrandHotMapper.insertList(listPromotionBrandHot);
+        } else {
+            return -1;
+        }
     }
 }

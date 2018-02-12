@@ -66,7 +66,7 @@ public interface PromotionRuleMapper {
 
     int insertBrandSort(BrandSort brandSort);
 
-    int insertVendSort(VendorSort vendorSort);
+    int insertVendorSort(VendorSort vendorSort);
 
     int insertCategorySort(CategorySort categorySort);
 

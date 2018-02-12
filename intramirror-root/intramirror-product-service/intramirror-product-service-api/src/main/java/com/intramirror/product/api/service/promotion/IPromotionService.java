@@ -5,6 +5,7 @@ import com.intramirror.product.api.enums.PromotionRuleType;
 import com.intramirror.product.api.enums.SortColumn;
 import com.intramirror.product.api.exception.BusinessException;
 import com.intramirror.product.api.model.Promotion;
+import com.intramirror.product.api.model.PromotionBrandHot;
 import com.intramirror.product.api.model.PromotionRule;
 import java.util.List;
 import java.util.Map;
@@ -41,4 +42,8 @@ public interface IPromotionService {
     Integer saveImgForBanner(Promotion promotion);
 
     Promotion getPromotion(Long promotionId);
+
+    List<PromotionBrandHot> getPromotionBrandHot(Long promotionId);
+
+    Integer updatePromotionBrandHot(List<PromotionBrandHot> listPromotionBrandHot);
 }
