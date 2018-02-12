@@ -154,6 +154,23 @@ public class ApiCreateProductService {
         if (brandFilterMap != null && brandFilterMap.size() > 0) {
             throw new FilterException("brand_filter_msg:" + JSONObject.toJSONString(brandFilterMap));
         }
+
+        if (season_code.equalsIgnoreCase("Closeout")) {
+            List<ProductEDSManagement.SkuOptions> skuOptions = productOptions.getSkus();
+            if (skuOptions != null && skuOptions.size() > 0) {
+                boolean flag = true;
+                for (int i = 0; i < skuOptions.size(); i++) {
+                    int stock = Integer.parseInt(skuOptions.get(i).getStock());
+                    if (stock >= 1) {
+                        flag = false;
+                        break;
+                    }
+                }
+                if (flag) {
+                    throw new FilterException("closeout_filter_msg:" + JSONObject.toJSONString(productOptions));
+                }
+            }
+        }
     }
 
     private void setBrandCategory(Connection conn) throws Exception {
