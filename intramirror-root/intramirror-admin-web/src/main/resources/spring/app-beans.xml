@@ -87,6 +87,7 @@
     <bean id="redisHttpSessionConfiguration" class="org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration">
         <property name="redisNamespace" value="micro-service"/>
         <property name="httpSessionStrategy" ref="headerHttpSessionStrategy"/>
+        <property name="maxInactiveIntervalInSeconds" value="172800"/>
     </bean>
 
     <bean id="headerHttpSessionStrategy" class="org.springframework.session.web.http.HeaderHttpSessionStrategy">
