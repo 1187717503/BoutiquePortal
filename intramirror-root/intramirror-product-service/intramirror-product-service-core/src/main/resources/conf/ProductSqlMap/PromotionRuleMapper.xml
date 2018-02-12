@@ -504,7 +504,7 @@
         <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
             #{item}
         </foreach>
-        order by banner_id,start_time
+        order by banner_id,start_time DESC
     </select>
 
     <update id="updateBannerImg" parameterType="com.intramirror.product.api.model.PromotionExclude">
