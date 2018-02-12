@@ -66,9 +66,13 @@ public interface PromotionRuleMapper {
 
     int insertBrandSort(BrandSort brandSort);
 
-    int insertVendSort(VendorSort vendorSort);
+    int insertVendorSort(VendorSort vendorSort);
 
     int insertCategorySort(CategorySort categorySort);
+
+    List<Map<String, Object>> listBannerPos();
+
+    List<Map<String, Object>> listPromotionByBannerIds(List<Long> bannerIds);
 
 }
 

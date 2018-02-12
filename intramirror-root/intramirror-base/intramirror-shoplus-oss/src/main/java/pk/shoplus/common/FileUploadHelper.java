@@ -41,7 +41,6 @@ import spark.Request;
 
 /**
  * 文件上传
- *
  * @author mingfly
  */
 public class FileUploadHelper {
@@ -92,7 +91,6 @@ public class FileUploadHelper {
 
     /**
      * hepler for file/image upload
-     *
      * @param req
      */
     public static void setFileStoreAttr(Request req) {
@@ -102,7 +100,6 @@ public class FileUploadHelper {
 
     /**
      * helper for file/image upload
-     *
      * @param req
      * @return
      */
@@ -237,7 +234,6 @@ public class FileUploadHelper {
 
     /**
      * compress image
-     *
      * @param input
      * @param quantity
      * @return
@@ -342,7 +338,6 @@ public class FileUploadHelper {
 
     /**
      * Get file access url
-     *
      * @param key
      * @return
      */
