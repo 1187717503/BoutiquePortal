@@ -24,7 +24,7 @@ public class ColtoriStockMapping implements IStockMapping{
         StockOption stockOption = new StockOption();
         try {
             stockOption.setProductCode(bodyDataMap.get("product_code").toString());
-            stockOption.setQuantity(bodyDataMap.get("stock").toString());
+            stockOption.setQuantity(new Double(bodyDataMap.get("stock").toString()).intValue()+"");
             stockOption.setVendor_id(bodyDataMap.get("vendor_id").toString());
             stockOption.setSizeValue(bodyDataMap.get("size").toString());
             stockOption.setLast_check(new Date());
