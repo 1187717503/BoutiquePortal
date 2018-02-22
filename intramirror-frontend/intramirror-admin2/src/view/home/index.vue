@@ -83,7 +83,7 @@
       this.$store.dispatch('getUser').then(res => {
         if (res.data.status === 1) {
           this.userInfo = res.data.user;
-          localStorage.setItem('userName')=this.userInfo.email;
+          localStorage.setItem('userName',this.userInfo.email);
         } else {
           Materialize.toast('获取用户信息出错', 4000);
         }
