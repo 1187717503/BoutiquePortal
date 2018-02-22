@@ -179,7 +179,7 @@ public class CloudStoreAllUpdateBySkuController implements InitializingBean {
         tony2_all_updateProduct.put("merchantId", "55f707f6b49dbbe14ec6354d");
         tony2_all_updateProduct.put("token", "7a8f88efd4d0e244cb1c196f1d916cb4");
         tony2_all_updateProduct.put("executor", executor);
-        tony2_all_updateProduct.put("vendor_id", "16"); // TODO
+        tony2_all_updateProduct.put("vendor_id", "43");
         tony2_all_updateProduct.put("threadNum", "5");
         tony2_all_updateProduct.put("eventName", "product_all_update");
         tony2_all_updateProduct.put("fileUtils", new ApiDataFileUtils("tony2", "product_all_update"));

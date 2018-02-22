@@ -26,7 +26,7 @@ import pk.shoplus.util.ExceptionUtils;
 /**
  * Created by dingyifan on 2017/8/28.
  */
-public class GetPostRequestUtil{
+public class GetPostRequestUtil {
 
     private static Logger logger = Logger.getLogger(GetPostRequestUtil.class);
 
@@ -52,13 +52,12 @@ public class GetPostRequestUtil{
     public static final int READ_TIME_OUT = 500000;
 
     /**
-     *
      * @param requestType
-     *            请求类型
+     *         请求类型
      * @param urlStr
-     *            请求地址
+     *         请求地址
      * @param body
-     *            请求发送内容
+     *         请求发送内容
      * @return 返回内容
      */
     public String requestMethod(String requestType, String urlStr, String body) {
@@ -114,8 +113,7 @@ public class GetPostRequestUtil{
                 outputStreamWriter.flush();// 刷新
             }
             if (httpURLConnection.getResponseCode() >= 300) {
-                throw new Exception(
-                        "HTTP Request is not success, Response code is " + httpURLConnection.getResponseCode());
+                throw new Exception("HTTP Request is not success, Response code is " + httpURLConnection.getResponseCode());
             }
 
             if (httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
@@ -131,7 +129,7 @@ public class GetPostRequestUtil{
 
         } catch (Exception e) {
             e.printStackTrace();
-            logger.info("GetPostRequestUtilRequestMethod,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
+            logger.info("GetPostRequestUtilRequestMethod,errorMessage:" + ExceptionUtils.getExceptionDetail(e));
         } finally {// 关闭流
 
             try {
@@ -178,150 +176,142 @@ public class GetPostRequestUtil{
         return resultBuffer.toString();
     }
 
-
-
-
-
     /**
-    *
-    * @param requestType
-    *            请求类型
-    * @param urlStr
-    *            请求地址
-    * @param body
-    *            请求发送内容
-    * @return 返回内容
-    */
-   public String requestMethodType(String requestType, String urlStr, String body) {
+     * @param requestType
+     *         请求类型
+     * @param urlStr
+     *         请求地址
+     * @param body
+     *         请求发送内容
+     * @return 返回内容
+     */
+    public String requestMethodType(String requestType, String urlStr, String body) {
 
-       // 是否有http正文提交
-       boolean isDoInput = false;
-       if (body != null && body.length() > 0)
-           isDoInput = true;
-       OutputStream outputStream = null;
-       OutputStreamWriter outputStreamWriter = null;
-       InputStream inputStream = null;
-       InputStreamReader inputStreamReader = null;
-       BufferedReader reader = null;
-       StringBuffer resultBuffer = new StringBuffer();
-       String tempLine = null;
-       try {
-           // 统一资源
-           URL url = new URL(urlStr);
-           // 连接类的父类，抽象类
-           URLConnection urlConnection = url.openConnection();
-           // http的连接类
-           HttpURLConnection httpURLConnection = (HttpURLConnection) urlConnection;
+        // 是否有http正文提交
+        boolean isDoInput = false;
+        if (body != null && body.length() > 0)
+            isDoInput = true;
+        OutputStream outputStream = null;
+        OutputStreamWriter outputStreamWriter = null;
+        InputStream inputStream = null;
+        InputStreamReader inputStreamReader = null;
+        BufferedReader reader = null;
+        StringBuffer resultBuffer = new StringBuffer();
+        String tempLine = null;
+        try {
+            // 统一资源
+            URL url = new URL(urlStr);
+            // 连接类的父类，抽象类
+            URLConnection urlConnection = url.openConnection();
+            // http的连接类
+            HttpURLConnection httpURLConnection = (HttpURLConnection) urlConnection;
 
-           // 设置是否向httpUrlConnection输出，因为这个是post请求，参数要放在
-           // http正文内，因此需要设为true, 默认情况下是false;
-           if (isDoInput) {
-               httpURLConnection.setDoOutput(true);
-               httpURLConnection.setRequestProperty("Content-Length", String.valueOf(body.length()));
-           }
-           // 设置是否从httpUrlConnection读入，默认情况下是true;
-           httpURLConnection.setDoInput(true);
-           // 设置一个指定的超时值（以毫秒为单位）
-           httpURLConnection.setConnectTimeout(SEND_REQUEST_TIME_OUT);
-           // 将读超时设置为指定的超时，以毫秒为单位。
-           httpURLConnection.setReadTimeout(READ_TIME_OUT);
-           // Post 请求不能使用缓存
-           httpURLConnection.setUseCaches(false);
-           // 设置字符编码
-           httpURLConnection.setRequestProperty("Accept-Charset", CHARSET_UTF_8);
-           // 设置内容类型
-           httpURLConnection.setRequestProperty("Content-Type", CONTENT_TYPE_FORM_URL);
-           // 设定请求的方法，默认是GET
-           httpURLConnection.setRequestMethod(requestType);
+            // 设置是否向httpUrlConnection输出，因为这个是post请求，参数要放在
+            // http正文内，因此需要设为true, 默认情况下是false;
+            if (isDoInput) {
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.setRequestProperty("Content-Length", String.valueOf(body.length()));
+            }
+            // 设置是否从httpUrlConnection读入，默认情况下是true;
+            httpURLConnection.setDoInput(true);
+            // 设置一个指定的超时值（以毫秒为单位）
+            httpURLConnection.setConnectTimeout(SEND_REQUEST_TIME_OUT);
+            // 将读超时设置为指定的超时，以毫秒为单位。
+            httpURLConnection.setReadTimeout(READ_TIME_OUT);
+            // Post 请求不能使用缓存
+            httpURLConnection.setUseCaches(false);
+            // 设置字符编码
+            httpURLConnection.setRequestProperty("Accept-Charset", CHARSET_UTF_8);
+            // 设置内容类型
+            httpURLConnection.setRequestProperty("Content-Type", CONTENT_TYPE_FORM_URL);
+            // 设定请求的方法，默认是GET
+            httpURLConnection.setRequestMethod(requestType);
 
-           // 打开到此 URL 引用的资源的通信链接（如果尚未建立这样的连接）。
-           // 如果在已打开连接（此时 connected 字段的值为 true）的情况下调用 connect 方法，则忽略该调用。
-           httpURLConnection.connect();
+            // 打开到此 URL 引用的资源的通信链接（如果尚未建立这样的连接）。
+            // 如果在已打开连接（此时 connected 字段的值为 true）的情况下调用 connect 方法，则忽略该调用。
+            httpURLConnection.connect();
 
-           if (isDoInput) {
-               outputStream = httpURLConnection.getOutputStream();
-               outputStreamWriter = new OutputStreamWriter(outputStream);
-               outputStreamWriter.write(body);
-               outputStreamWriter.flush();// 刷新
-           }
-           if (httpURLConnection.getResponseCode() >= 300) {
-               throw new Exception(
-                       "HTTP Request is not success, Response code is " + httpURLConnection.getResponseCode());
-           }
+            if (isDoInput) {
+                outputStream = httpURLConnection.getOutputStream();
+                outputStreamWriter = new OutputStreamWriter(outputStream);
+                outputStreamWriter.write(body);
+                outputStreamWriter.flush();// 刷新
+            }
+            if (httpURLConnection.getResponseCode() >= 300) {
+                throw new Exception("HTTP Request is not success, Response code is " + httpURLConnection.getResponseCode());
+            }
 
-           if (httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-               inputStream = httpURLConnection.getInputStream();
-               inputStreamReader = new InputStreamReader(inputStream,"windows-1252");
-               reader = new BufferedReader(inputStreamReader);
+            if (httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                inputStream = httpURLConnection.getInputStream();
+                inputStreamReader = new InputStreamReader(inputStream, "windows-1252");
+                reader = new BufferedReader(inputStreamReader);
 
-               while ((tempLine = reader.readLine()) != null) {
-                   resultBuffer.append(tempLine);
-                   resultBuffer.append("\n");
-               }
-           }
+                while ((tempLine = reader.readLine()) != null) {
+                    resultBuffer.append(tempLine);
+                    resultBuffer.append("\n");
+                }
+            }
 
-       } catch (MalformedURLException e) {
-           // TODO Auto-generated catch block
-           e.printStackTrace();
-       } catch (IOException e) {
-           // TODO Auto-generated catch block
-           e.printStackTrace();
-       } catch (Exception e) {
-           // TODO Auto-generated catch block
-           e.printStackTrace();
-       } finally {// 关闭流
+        } catch (MalformedURLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } finally {// 关闭流
 
-           try {
-               if (outputStreamWriter != null) {
-                   outputStreamWriter.close();
-               }
-           } catch (Exception e) {
-               // TODO Auto-generated catch block
-               e.printStackTrace();
-           }
-           try {
-               if (outputStream != null) {
-                   outputStream.close();
-               }
-           } catch (Exception e) {
-               // TODO Auto-generated catch block
-               e.printStackTrace();
-           }
-           try {
-               if (reader != null) {
-                   reader.close();
-               }
-           } catch (Exception e) {
-               // TODO Auto-generated catch block
-               e.printStackTrace();
-           }
-           try {
-               if (inputStreamReader != null) {
-                   inputStreamReader.close();
-               }
-           } catch (Exception e) {
-               // TODO Auto-generated catch block
-               e.printStackTrace();
-           }
-           try {
-               if (inputStream != null) {
-                   inputStream.close();
-               }
-           } catch (Exception e) {
-               // TODO Auto-generated catch block
-               e.printStackTrace();
-           }
-       }
-       return resultBuffer.toString();
-   }
-
-
+            try {
+                if (outputStreamWriter != null) {
+                    outputStreamWriter.close();
+                }
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            try {
+                if (outputStream != null) {
+                    outputStream.close();
+                }
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            try {
+                if (inputStreamReader != null) {
+                    inputStreamReader.close();
+                }
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            try {
+                if (inputStream != null) {
+                    inputStream.close();
+                }
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        return resultBuffer.toString();
+    }
 
     /**
      * 将map集合的键值对转化成：key1=value1&key2=value2 的形式
      *
      * @param parameterMap
-     *            需要转化的键值对集合
+     *         需要转化的键值对集合
      * @return 字符串
      */
     public static String convertStringParamter(Map parameterMap) {
@@ -346,12 +336,12 @@ public class GetPostRequestUtil{
         return parameterBuffer.toString();
     }
 
-    public String postAuth(String url,String username,String password) throws Exception{
+    public String postAuth(String url, String username, String password) throws Exception {
 
         DefaultHttpClient Client = new DefaultHttpClient();
 
         HttpPost httpGet = new HttpPost(url);
-        String encoding = DatatypeConverter.printBase64Binary((username+":"+password).getBytes("UTF-8"));
+        String encoding = DatatypeConverter.printBase64Binary((username + ":" + password).getBytes("UTF-8"));
         httpGet.setHeader("Authorization", "Basic " + encoding);
 
         HttpResponse response = Client.execute(httpGet);
@@ -371,7 +361,7 @@ public class GetPostRequestUtil{
         return repsonseStr;
     }
 
-    public static String httpsRequest(String requestUrl,String username,String password) {
+    public static String httpsRequest(String requestUrl, String username, String password) {
         StringBuffer buffer = null;
         try {
             // 创建SSLContext
@@ -388,7 +378,7 @@ public class GetPostRequestUtil{
             conn.setDoInput(true);
             conn.setUseCaches(false);
             conn.setRequestMethod("POST");
-            String encoding = DatatypeConverter.printBase64Binary((username+":"+password).getBytes("UTF-8"));
+            String encoding = DatatypeConverter.printBase64Binary((username + ":" + password).getBytes("UTF-8"));
             conn.setRequestProperty("Authorization", "Basic " + encoding);
             // 设置当前实例使用的SSLSoctetFactory
             conn.setSSLSocketFactory(ssf);
@@ -415,5 +405,42 @@ public class GetPostRequestUtil{
         return buffer.toString();
     }
 
+    public static String httpsGetRequest(String requestUrl, String token) {
+        StringBuffer buffer = null;
+        try {
+            // 创建SSLContext
+            SSLContext sslContext = SSLContext.getInstance("SSL");
+            TrustManager[] tm = { new MyX509TrustManager() };
+            // 初始化
+            sslContext.init(null, tm, new java.security.SecureRandom());
+
+            // 获取SSLSocketFactory对象
+            SSLSocketFactory ssf = sslContext.getSocketFactory();
+            URL url = new URL(requestUrl);
+            HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            conn.setUseCaches(false);
+            conn.setRequestMethod("GET");
+            conn.setSSLSocketFactory(ssf);
+            conn.setConnectTimeout(5 * 1000);
+            conn.setReadTimeout(5 * 1000);
+            conn.setRequestProperty("token", token);
+            conn.connect();
+
+            // 读取服务器端返回的内容
+            InputStream is = conn.getInputStream();
+            InputStreamReader isr = new InputStreamReader(is, "utf-8");
+            BufferedReader br = new BufferedReader(isr);
+            buffer = new StringBuffer();
+            String line = null;
+            while ((line = br.readLine()) != null) {
+                buffer.append(line);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return buffer.toString();
+    }
 
 }

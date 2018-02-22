@@ -101,6 +101,24 @@ public class ApiCommonUtils {
         }
     }
 
+    public static List<String> sortImageList(List<String> imageList) {
+        Map<String, String> sortedImages = new TreeMap<>();
+        for (String image : imageList) {
+            String[] ret = image.split("/");
+            if (ret.length <= 1) {
+                logger.info("Skip sort due to no delimiter '/' : " + image);
+                return null;
+            }
+            sortedImages.put(ret[ret.length - 1], image);
+        }
+        List<String> sortedImagesList = new ArrayList<>();
+        Iterator it = sortedImages.keySet().iterator();
+        while (it.hasNext()) {
+            sortedImagesList.add(sortedImages.get(it.next()));
+        }
+        return sortedImagesList;
+    }
+
     public static String sortImageString(String imageJson) {
         List<String> imageList = JsonTransformUtil.readValue(imageJson, ArrayList.class);
         if (imageList == null) {
@@ -110,9 +128,9 @@ public class ApiCommonUtils {
         Map<String, String> sortedImages = new TreeMap<>();
 
         for (String image : imageList) {
-            String[] ret = image.split("_");
+            String[] ret = image.split("/");
             if (ret.length <= 1) {
-                logger.info("Skip sort due to no delimiter '_' : " + image);
+                logger.info("Skip sort due to no delimiter '/' : " + image);
                 return imageJson;
             }
             sortedImages.put(ret[ret.length - 1], image);
@@ -126,6 +144,23 @@ public class ApiCommonUtils {
         String sortedImagesListString = JsonTransformUtil.toJson(sortedImagesList);
         logger.info("Sort image from [ " + imageJson + " ]" + " to " + sortedImagesListString);
         return sortedImagesListString;
+    }
+
+    public static String downloadSingleImg(String originImg) {
+        if (StringUtils.isNotBlank(originImg)) {
+            try {
+                originImg = originImg.replaceAll(" ", "%20");
+                if (checkImgSize(originImg)) {
+                    List<String> downList = FileUploadHelper.uploadFileByImgUrl(originImg);
+                    if (downList != null && downList.size() > 0) {
+                        return downList.get(0);
+                    }
+                }
+            } catch (Exception e) {
+                logger.error("ApiCreateProductService,downloadImgs,errorMessage:" + ExceptionUtils.getExceptionDetail(e) + ",originImg:" + originImg);
+            }
+        }
+        return null;
     }
 
     public static String downloadImgs(String originImg) {
@@ -157,6 +192,8 @@ public class ApiCommonUtils {
         try {
             URL url = new URL(imgUrl);
             URLConnection connection = url.openConnection();
+            connection.setReadTimeout(3 * 1000);
+            connection.setConnectTimeout(3 * 1000);
             connection.setDoOutput(true);
             BufferedImage image = ImageIO.read(connection.getInputStream());
             int srcWidth = image.getWidth();

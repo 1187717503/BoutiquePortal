@@ -152,11 +152,15 @@ public class ColtoriUpdateStockController  implements InitializingBean {
                                 String productCodes = redisService.getKey(coltori_product_code_all).toString();
 
                                 if(productCodes.contains(","+ StringUtils.trim(stockOption.getProductCode())+",")) {
-                                    // 线程池
-                                    logger.info("ColtoriUpdateStockController,execute,startDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(stockMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName+",flag:"+flag);
-                                    CommonThreadPool.execute(eventName,executor,15,new UpdateStockThread(stockOption,apiDataFileUtils,stockMap));
-                                    logger.info("ColtoriUpdateStockController,execute,endDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(stockMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
-                                    flag++;
+
+                                    if(StringUtils.isNotBlank(stockOption.getQuantity()) && Integer.parseInt(stockOption.getQuantity()) > 0) {
+                                        // 线程池
+                                        logger.info("ColtoriUpdateStockController,execute,startDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(stockMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName+",flag:"+flag);
+                                        CommonThreadPool.execute(eventName,executor,15,new UpdateStockThread(stockOption,apiDataFileUtils,stockMap));
+                                        logger.info("ColtoriUpdateStockController,execute,endDate:"+ DateUtils.getStrDate(new Date())+",stockMap:"+new Gson().toJson(stockMap)+",stockOption:"+new Gson().toJson(stockOption)+",eventName:"+eventName);
+                                        flag++;
+                                    }
+
                                 }
                             }
                         }

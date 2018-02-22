@@ -2,21 +2,26 @@ package com.intramirror.web.controller.promotion;
 
 import com.alibaba.fastjson.JSONArray;
 import com.intramirror.common.parameter.StatusType;
+import com.intramirror.core.common.exception.ValidateException;
+import com.intramirror.core.common.response.ErrorResponse;
 import com.intramirror.core.common.response.Response;
 import com.intramirror.product.api.entity.promotion.CategoryEntity;
 import com.intramirror.product.api.enums.PromotionRuleType;
 import com.intramirror.product.api.model.ProductWithBLOBs;
+import com.intramirror.product.api.model.Promotion;
+import com.intramirror.product.api.model.PromotionBrandHot;
 import com.intramirror.product.api.model.PromotionExcludeProduct;
 import com.intramirror.product.api.model.PromotionRule;
 import com.intramirror.product.api.service.IProductService;
 import com.intramirror.product.api.service.promotion.IPromotionExcludeProductService;
-
 import com.intramirror.product.api.service.promotion.IPromotionService;
 import static com.intramirror.utils.transform.JsonTransformUtil.toJson;
 import static com.intramirror.web.common.request.ConstantsEntity.EXCLUDE;
 import static com.intramirror.web.common.request.ConstantsEntity.INCLUDE;
 import com.intramirror.web.common.request.PromotionRuleEntity;
 import com.intramirror.web.controller.cache.CategoryCache;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.annotations.Param;
@@ -175,5 +180,61 @@ public class PromotionManagementController {
         }
         promotionRule.setCategorys(JSONArray.toJSONString(body.getCategorys()));
         return promotionRule;
+    }
+
+    @GetMapping(value = "/banner/bannerPosList")
+    public Response getAllBannerPos() {
+        List<Map<String, Object>> listBannerPos = promotionService.listBannerPos();
+        List<Long> bannerIds = new ArrayList<>();
+        for (int i = 0; i < listBannerPos.size(); i++) {
+            Map<String, Object> banner = listBannerPos.get(i);
+            bannerIds.add((Long) banner.get("bannerId"));
+        }
+
+        List<Map<String, Object>> listPromotions = new ArrayList<>();
+        if (bannerIds.size() > 0) {
+            listPromotions = promotionService.listPromotionByBannerIds(bannerIds);
+        }
+
+        List<Map<String, Object>> listResult = new ArrayList<>();
+        for (Map<String, Object> bannerPos : listBannerPos) {
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("bannerId", bannerPos.get("bannerId"));
+            resultMap.put("bannerPosId", bannerPos.get("bannerPosId"));
+            resultMap.put("bannerName", bannerPos.get("bannerName"));
+            List<Map<String, Object>> listPro = new ArrayList<>();
+            for (Map<String, Object> promotion : listPromotions) {
+                if (promotion.get("bannerId") == bannerPos.get("bannerId")) {
+                    listPro.add(promotion);
+                }
+            }
+            resultMap.put("promotion", listPro);
+            listResult.add(resultMap);
+        }
+
+        return Response.status(StatusType.SUCCESS).data(listResult);
+    }
+
+    @PutMapping(value = "/banner/updateImg", consumes = "application/json")
+    public Response saveImgForBanner(@RequestBody Promotion promotion) {
+        if (promotion == null || promotion.getPromotionId() == null) {
+            throw new ValidateException(new ErrorResponse("Input promotion info could not be null!"));
+        }
+        return Response.status(StatusType.SUCCESS).data(promotionService.saveImgForBanner(promotion));
+    }
+
+    @GetMapping(value = "/banner/promotion/pid")
+    public Response getPromotion(@RequestParam(value = "promotionId", required = true) Long promotionId) {
+        return Response.status(StatusType.SUCCESS).data(promotionService.getPromotion(promotionId));
+    }
+
+    @GetMapping(value = "/banner/promotion/brandhot")
+    public Response getPromotionBrandHot(@RequestParam(value = "promotionId", required = true) Long promotionId) {
+        return Response.status(StatusType.SUCCESS).data(promotionService.getPromotionBrandHot(promotionId));
+    }
+
+    @PutMapping(value = "/banner/promotion/brandhot")
+    public Response updatePromotionBrandHot(@RequestBody List<PromotionBrandHot> listPromotionBrandHot) {
+        return Response.status(StatusType.SUCCESS).data(promotionService.updatePromotionBrandHot(listPromotionBrandHot));
     }
 }
