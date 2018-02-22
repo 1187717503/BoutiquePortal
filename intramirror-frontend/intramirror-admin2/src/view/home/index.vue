@@ -82,7 +82,8 @@
     mounted: function () {
       this.$store.dispatch('getUser').then(res => {
         if (res.data.status === 1) {
-          this.userInfo = res.data.user
+          this.userInfo = res.data.user;
+          localStorage.setItem('userName')=this.userInfo.email;
         } else {
           Materialize.toast('获取用户信息出错', 4000);
         }
@@ -91,6 +92,7 @@
     methods: {
       logout() {
         localStorage.removeItem('token');
+        localStorage.removeItem('userName');
         sessionStorage.removeItem("token");
         this.$router.push({path: '/login'})
       },
