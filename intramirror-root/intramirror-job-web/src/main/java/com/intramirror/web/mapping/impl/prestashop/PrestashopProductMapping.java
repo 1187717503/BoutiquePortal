@@ -24,7 +24,7 @@ public class PrestashopProductMapping implements IProductMapping {
             JSONObject body =  JSONObject.parseObject(bodyDataMap.get("Data").toString()) ;
             productOptions.setName(body.getString("name"))
                     .setCode(body.getString("id_product").trim())
-                    .setSeasonCode(body.getString("season"))
+                    .setSeasonCode(body.getString("season_sign"))
                     .setBrandCode(body.getString("reference").trim())
                     .setCarryOver("")
                     .setBrandName(body.getString("manufacturer").trim())
