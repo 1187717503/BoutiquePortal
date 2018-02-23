@@ -7,7 +7,6 @@ import com.intramirror.core.common.response.Response;
 import com.intramirror.core.common.response.StatusCode;
 import com.intramirror.product.api.service.stock.IUpdateStockService;
 import com.intramirror.utils.transform.JsonTransformUtil;
-import com.intramirror.web.controller.api.eds.EdsUpdateByProductController;
 import com.intramirror.web.mapping.api.IProductMapping;
 import com.intramirror.web.thread.CommonThreadPool;
 import com.intramirror.web.thread.UpdateProductThread;
@@ -43,7 +42,7 @@ import pk.shoplus.util.FileUtil;
 public class GibotProductController {
 
     // logger
-    private static final Logger logger = Logger.getLogger(EdsUpdateByProductController.class);
+    private static final Logger logger = Logger.getLogger(GibotProductController.class);
 
     // getpost util
     private static GetPostRequestUtil getPostRequestUtil = new GetPostRequestUtil();

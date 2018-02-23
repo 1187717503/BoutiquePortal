@@ -17,25 +17,25 @@ import pk.shoplus.util.ExceptionUtils;
  *
  * @author YouFeng.Zhu
  */
-@Service(value = "gibotProductMapping" )
+@Service(value = "gibotProductMapping")
 public class GibotProductMapping implements IProductMapping {
     // logger
     private static final Logger LOGGER = Logger.getLogger(GibotProductMapping.class);
 
     @Override
     public ProductEDSManagement.ProductOptions mapping(Map<String, Object> bodyDataMap) {
-        LOGGER.info("AtelierUpdateByProductMapping,inputParams,bodyDataMap:"+ JSONObject.toJSONString(bodyDataMap));
+        LOGGER.info("AtelierUpdateByProductMapping,inputParams,bodyDataMap:" + JSONObject.toJSONString(bodyDataMap));
         ProductEDSManagement.ProductOptions productOptions = new ProductEDSManagement.ProductOptions();
         try {
-            JSONObject jsonObjectData =  JSONObject.parseObject(JsonTransformUtil.toJson(bodyDataMap.get("product"))) ;
-            productOptions.setName(jsonObjectData.getString("name"))
+            JSONObject jsonObjectData = JSONObject.parseObject(JsonTransformUtil.toJson(bodyDataMap.get("product")));
+            productOptions
+                    .setName(jsonObjectData.getString("name"))
                     .setCode(jsonObjectData.getString("product_id").trim())
-//                    .setSeasonCode(jsonObjectData.getString("season_code")) //todo
+                    .setSeasonCode(jsonObjectData.getString("collection_name"))
                     .setSeasonCode("18SS")
                     .setBrandCode(jsonObjectData.getString("modelcode").trim())
                     .setCarryOver("")
-//                    .setBrandName(jsonObjectData.getString("brand").trim())
-                    .setBrandName("GUCCI")
+                    .setBrandName(jsonObjectData.getString("brand").trim())
                     .setColorCode(jsonObjectData.getString("variantcode"))
                     .setColorDesc("")
                     .setCategory_boutique_id("")
@@ -51,12 +51,9 @@ public class GibotProductMapping implements IProductMapping {
                     .setWidth("")
                     .setHeigit("")
                     .setSalePrice(jsonObjectData.getString("pricewas"))
-//                    .setCategory1(jsonObjectData.getString("gender")) //todo
-//                    .setCategory2(jsonObjectData.getString("c2"))//todo
-//                    .setCategory3(jsonObjectData.getString("page_name"))//todo
-                    .setCategory1("Women") //todo
-                    .setCategory2("Clothing")//todo
-                    .setCategory3("Suits/Jumpsuits")//todo
+                    .setCategory1(jsonObjectData.getString("gender")) //todo
+                    .setCategory2(jsonObjectData.getString("group_name"))//todo
+                    .setCategory3(jsonObjectData.getString("category_name"))//todo
                     .setLast_check(new Date());
 
             JSONArray skus = jsonObjectData.getJSONArray("skus");
@@ -71,7 +68,7 @@ public class GibotProductMapping implements IProductMapping {
             }
 
             String carryOver = jsonObjectData.getString("carry_over");
-            if(StringUtils.isNotBlank(carryOver) && StringUtils.trim(carryOver).equalsIgnoreCase("CO")) {
+            if (StringUtils.isNotBlank(carryOver) && StringUtils.trim(carryOver).equalsIgnoreCase("CO")) {
                 productOptions.setSeasonCode("CO");
             }
 
@@ -94,9 +91,9 @@ public class GibotProductMapping implements IProductMapping {
 
         } catch (Exception e) {
             e.printStackTrace();
-            LOGGER.info("AtelierUpdateByProductMapping,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
+            LOGGER.info("AtelierUpdateByProductMapping,errorMessage:" + ExceptionUtils.getExceptionDetail(e));
         }
-        LOGGER.info("AtelierUpdateByProductMapping,outputParams,productOptions:"+JSONObject.toJSONString(productOptions));
+        LOGGER.info("AtelierUpdateByProductMapping,outputParams,productOptions:" + JSONObject.toJSONString(productOptions));
         return productOptions;
     }
 }
