@@ -7,6 +7,7 @@ import com.intramirror.web.mapping.api.IProductMapping;
 import com.intramirror.web.mapping.impl.gibot.GibotProductMapping;
 import java.util.Date;
 import java.util.Map;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 import pk.shoplus.model.ProductEDSManagement;

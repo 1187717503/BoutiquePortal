@@ -32,7 +32,6 @@ public class GibotProductMapping implements IProductMapping {
                     .setName(jsonObjectData.getString("name"))
                     .setCode(jsonObjectData.getString("product_id").trim())
                     .setSeasonCode(jsonObjectData.getString("collection_name"))
-                    .setSeasonCode("18SS")
                     .setBrandCode(jsonObjectData.getString("modelcode").trim())
                     .setCarryOver("")
                     .setBrandName(jsonObjectData.getString("brand").trim())

@@ -1,11 +1,16 @@
 package com.intramirror.web.controller.api.eb;
 
+import com.google.gson.Gson;
+import com.intramirror.common.utils.DateUtils;
 import com.intramirror.core.common.response.Response;
 import com.intramirror.core.common.response.StatusCode;
+import com.intramirror.core.net.http.OkHttpUtils;
 import com.intramirror.product.api.service.stock.IUpdateStockService;
 import com.intramirror.utils.transform.JsonTransformUtil;
 import com.intramirror.web.mapping.api.IProductMapping;
+import com.intramirror.web.thread.UpdateProductThread;
 import com.intramirror.web.util.ApiDataFileUtils;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.util.ExceptionUtils;
 
 /**
@@ -26,7 +32,7 @@ import pk.shoplus.util.ExceptionUtils;
  * @author YouFeng.Zhu
  */
 @RestController
-@RequestMapping("/eb")
+@RequestMapping("/eb/product")
 public class EleonoraBonucciProductController {
     // logger
     private static final Logger logger = Logger.getLogger(EleonoraBonucciProductController.class);
@@ -86,7 +92,7 @@ public class EleonoraBonucciProductController {
             }
             String response = httpResponse.body().string();
             if (StringUtils.isEmpty(response)) {
-                logger.error("EleonoraBonucci sync all product error , url : " + url + " , response : " + response);
+                logger.error("EleonoraBonucci sync all product error , url : " + appendUrl + " , response : " + response);
                 return Response.status(StatusCode.FAILURE).build();
             }
 
@@ -116,7 +122,6 @@ public class EleonoraBonucciProductController {
                 logger.info("EleonoraBonucci,execute,startDate:" + DateUtils.getStrDate(new Date()) + ",productOptions:" + new Gson().toJson(productOptions)
                         + ",vendorOptions:" + new Gson().toJson(vendorOptions) + ",eventName:" + eventName);
                 executor.submit(new UpdateProductThread(productOptions, vendorOptions, fileUtils, mqDataMap));
-
                 count++;
             }
 
@@ -128,7 +133,7 @@ public class EleonoraBonucciProductController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("GibotProduct,errorMessage:" + ExceptionUtils.getExceptionDetail(e));
+            logger.error("EleonoraBonucci,errorMessage:" + ExceptionUtils.getExceptionDetail(e));
         }
 
         return Response.success();
