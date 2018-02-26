@@ -7,7 +7,6 @@ import com.intramirror.web.mapping.api.IProductMapping;
 import com.intramirror.web.mapping.impl.gibot.GibotProductMapping;
 import java.util.Date;
 import java.util.Map;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 import pk.shoplus.model.ProductEDSManagement;
@@ -39,10 +38,12 @@ public class ebProductMapping implements IProductMapping {
             productOptions
                     .setName(jsonObjectData.getString("Product_Name"))
                     .setCode(jsonObjectData.getString("SKU").trim())
-                    //.setSeasonCode(jsonObjectData.getString("CarryOver").equals("true") ? "Carryover" : jsonObjectData.getString("Season_Code"))
+                    .setSeasonCode(jsonObjectData.getString("CarryOver").equals("true") ? "Carryover" : jsonObjectData.getString("Season_Code"))
+
                     .setBrandCode(designerId)
                     .setCarryOver("") //TODO
                     .setBrandName(jsonObjectData.getString("Product_Brand").trim())
+
                     .setColorCode(colorCode)
                     .setColorDesc("Color")
                     .setCategory_boutique_id("")
@@ -61,6 +62,12 @@ public class ebProductMapping implements IProductMapping {
                     .setCategory1(jsonObjectData.getString("Gender"))
                     .setCategory2(jsonObjectData.getString("group_name"))//todo
                     .setCategory3(jsonObjectData.getString("Category"))
+
+//                    .setSeasonCode("18SS") //test
+                    //                    .setBrandName("GUCCI") //test
+                    //                    .setCategory1("Men")
+                    //                    .setCategory2("Clothing")//todo
+                    //                    .setCategory3("Winter coats")
                     .setLast_check(new Date());
 
             JSONArray skus = jsonObjectData.getJSONArray("Stock_Item");
