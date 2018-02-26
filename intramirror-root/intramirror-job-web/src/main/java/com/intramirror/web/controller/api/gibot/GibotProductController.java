@@ -130,11 +130,12 @@ public class GibotProductController {
 
                 for (int i = 0; i < productList.size(); i++) {
                     if (!(productList.get(i) instanceof Map)) {
-                        logger.warn("GibotProduct error data . " + productList.get(i).toString());
+                        logger.warn("GibotProduct error data . " + ((Object) productList.get(i)).toString());
+                        continue;
                     }
                     Map<String, Object> product = productList.get(i);
 
-                    if (product.get("skus") != null) {
+                    if (product.get("skus") == null) {
                         logger.warn("Skip sync product due to skus missing. " + JsonTransformUtil.toJson(product));
                         continue;
                     }
@@ -267,7 +268,7 @@ public class GibotProductController {
                         logger.warn("Skip sync product due to product format error. " + product);
                         continue;
                     }
-                    if (productEnty.get("skus") != null) {
+                    if (productEnty.get("skus") == null) {
                         logger.warn("Skip sync product due to skus missing. " + JsonTransformUtil.toJson(product));
                         continue;
                     }
