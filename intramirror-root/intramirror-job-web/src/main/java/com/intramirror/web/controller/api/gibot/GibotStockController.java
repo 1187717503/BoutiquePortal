@@ -61,7 +61,7 @@ public class GibotStockController {
         gibotAllProduct.put("executor", gibotAllProductExecutor);
         gibotAllProduct.put("eventName", "stock_all_update");
         gibotAllProduct.put("fileUtils", new ApiDataFileUtils("gibot", "stock_all_update"));
-        configMap.put("gibotAllProduct", gibotAllProduct);
+        configMap.put("gibotAllStock", gibotAllProduct);
 
     }
 

@@ -133,6 +133,17 @@ public class GibotProductController {
                         logger.warn("GibotProduct error data . " + productList.get(i).toString());
                     }
                     Map<String, Object> product = productList.get(i);
+
+                    if (product.get("skus") != null) {
+                        logger.warn("Skip sync product due to skus missing. " + JsonTransformUtil.toJson(product));
+                        continue;
+                    }
+                    List skuList = (List) product.get("skus");
+                    if (skuList.size() == 0) {
+                        logger.warn("Skip sync product due to skus is empty. " + JsonTransformUtil.toJson(product));
+                        continue;
+                    }
+
                     Map<String, Object> mqDataMap = new HashMap<>();
                     mqDataMap.put("product", product);
                     mqDataMap.put("vendor_id", vendor_id);
@@ -250,7 +261,22 @@ public class GibotProductController {
                     if (tag == DiffRow.Tag.DELETE) {
                         mqDataMap.put("stock", "0");
                     }
-                    mqDataMap.put("product", JsonTransformUtil.readValue(product, Map.class));
+
+                    Map<String, Object> productEnty = JsonTransformUtil.readValue(product, Map.class);
+                    if (productEnty == null) {
+                        logger.warn("Skip sync product due to product format error. " + product);
+                        continue;
+                    }
+                    if (productEnty.get("skus") != null) {
+                        logger.warn("Skip sync product due to skus missing. " + JsonTransformUtil.toJson(product));
+                        continue;
+                    }
+                    List skuList = (List) productEnty.get("skus");
+                    if (skuList.size() == 0) {
+                        logger.warn("Skip sync product due to skus is empty. " + JsonTransformUtil.toJson(product));
+                        continue;
+                    }
+                    mqDataMap.put("product", productEnty);
                     mqDataMap.put("vendor_id", vendor_id);
 
                     ProductEDSManagement.ProductOptions productOptions = iProductMapping.mapping(mqDataMap);
