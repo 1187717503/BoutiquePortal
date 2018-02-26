@@ -313,7 +313,7 @@ public class ApiUpdateProductService {
                     //only one
                     List<String> apiImgList = JsonTransformUtil.readValue(productOptions.getCoverImg(), ArrayList.class);
                     String apiImage = apiImgList.get(0);
-//                    logger.info("Product [" + product.product_code + "] ");
+                    //                    logger.info("Product [" + product.product_code + "] ");
                     Map<String, Object> productImages = productService.selProductImage(product.product_id);
                     String image = "[]";
                     String oss_image = "[]";
@@ -574,6 +574,20 @@ public class ApiUpdateProductService {
                 iPriceService.synProductPriceRule(product, product.getMin_retail_price(), conn);
             }
         }
+
+        /* update by yf 2018/02/26 FM , Tony2 , AD , NG  */
+        if (product.vendor_id == 17L || product.vendor_id == 43L || product.vendor_id == 22L || product.vendor_id == 9L) {
+            if (product.season_code.equalsIgnoreCase("17SS")) {
+                product.setSeason_code("Closeout");
+                String sql = "update product set preview_im_price = null where product_id =" + product.getProduct_id();
+                productService.updateBySQL(sql);
+
+                logger.info("17ssToCloseout,product:" + JSONObject.toJSONString(product));
+                IPriceService iPriceService = new PriceServiceImpl();
+                iPriceService.synProductPriceRule(product, product.getMin_retail_price(), conn);
+            }
+        }
+        /* update by yf 2018/02/26 */
 
         product.status = null;
         productService.updateProduct(product);
