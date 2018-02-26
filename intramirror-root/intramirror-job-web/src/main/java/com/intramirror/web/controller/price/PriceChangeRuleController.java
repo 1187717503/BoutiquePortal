@@ -27,7 +27,7 @@ public class PriceChangeRuleController {
     @CrossOrigin
     @RequestMapping("/updatePriceByVendor")
     @ResponseBody
-    public ResultMessage updatePriceByVendor(){
+    public ResultMessage updatePriceByVendor() {
 
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
@@ -35,7 +35,7 @@ public class PriceChangeRuleController {
             resultMessage.successStatus().addMsg("SUCCESS");
         } catch (Exception e) {
             e.printStackTrace();
-            logger.info("PriceChangeRuleController,updatePriceByVendor,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
+            logger.info("PriceChangeRuleController,updatePriceByVendor,errorMessage:" + ExceptionUtils.getExceptionDetail(e));
             resultMessage.errorStatus().addMsg("error message : " + e.getMessage());
         }
         return resultMessage;
@@ -60,13 +60,13 @@ public class PriceChangeRuleController {
     @CrossOrigin
     @RequestMapping("/updatePriceByAdmin")
     @ResponseBody
-    public ResultMessage updatePriceByAdmin(){
+    public ResultMessage updatePriceByAdmin() {
 
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
-            iPriceChangeRule.updateAdminPrice();
-
             iPriceChangeRule.updateVendorPrice();
+
+            iPriceChangeRule.updateAdminPrice();
 
             // sku.im_price -> shop_product_sku.sale_price
             iPriceChangeRule.updateShopPrice();
@@ -85,7 +85,7 @@ public class PriceChangeRuleController {
             resultMessage.successStatus().addMsg("SUCCESS");
         } catch (Exception e) {
             e.printStackTrace();
-            logger.info("PriceChangeRuleController,updatePriceByAdmin,errorMessage:"+ ExceptionUtils.getExceptionDetail(e));
+            logger.info("PriceChangeRuleController,updatePriceByAdmin,errorMessage:" + ExceptionUtils.getExceptionDetail(e));
             resultMessage.errorStatus().addMsg("error message : " + e.getMessage());
         }
         return resultMessage;
