@@ -194,12 +194,6 @@ public class ApiCreateProductService {
     }
 
     private void setSku(Connection conn) throws Exception {
-        SkuService skuService = new SkuService(conn);
-        List<ProductEDSManagement.SkuOptions> skuOptions = productOptions.getSkus();
-        if (skuOptions == null || skuOptions.size() == 0) {
-            return;
-        }
-
         ProductService productService = new ProductService(conn);
         IPriceService iPriceService = new PriceServiceImpl();
         Sku sku1 = iPriceService.getPriceByRule(this.uProduct, this.uProduct.getVendor_id(), this.uProduct.getMax_retail_price(), conn);
@@ -208,6 +202,12 @@ public class ApiCreateProductService {
         this.uProduct.setMax_im_price(sku1.getIm_price());
         this.uProduct.setMin_im_price(sku1.getIm_price());
         productService.updateProduct(uProduct);
+
+        SkuService skuService = new SkuService(conn);
+        List<ProductEDSManagement.SkuOptions> skuOptions = productOptions.getSkus();
+        if (skuOptions == null || skuOptions.size() == 0) {
+            return;
+        }
 
         for (ProductEDSManagement.SkuOptions skuOption : skuOptions) {
             Sku sku = new Sku();
