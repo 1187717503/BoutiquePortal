@@ -1,8 +1,9 @@
 package com.intramirror.web.test.api;
 
+import com.intramirror.core.net.http.OkHttpUtils;
 import com.intramirror.utils.transform.JsonTransformUtil;
-import com.intramirror.web.util.GetPostRequestUtil;
 import com.intramirror.web.util.HttpUtils;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,11 +29,11 @@ public class okhttptest {
     private final Logger LOGGER = LoggerFactory.getLogger(okhttptest.class);
 
     @Test
-    public void testhttp() {
+    public void testhttp() throws IOException {
 
-        String appendUrl = "https://www.gibot.it/mcapi/products/" + "?page_n=" + 1 + "&page_size=" + 100;
-        String resp = GetPostRequestUtil.httpsGetRequest(appendUrl, "Wz9Fye7BfBc6BAhL");
-        LOGGER.info(resp);
+        String appendUrl = "https://eleonorabonucci.com/WS/stock.asmx/Get_Article?JSON={\"Codice_Anagrafica\":\"a6c9eb33-0465-4674-aedc-0615cdf6282e\",\"FULL\":true}";
+        okhttp3.Response httpResponse = OkHttpUtils.get().url(appendUrl).build().connTimeOut(60 * 1000).readTimeOut(60 * 1000).execute();
+        LOGGER.info("{}",httpResponse.body().string());
 
     }
 
