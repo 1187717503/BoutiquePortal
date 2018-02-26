@@ -92,7 +92,7 @@ public class EleonoraBonucciProductController {
             }
             String response = httpResponse.body().string();
             if (StringUtils.isEmpty(response)) {
-                logger.error("EleonoraBonucci sync all product error , url : " + appendUrl + " , response : " + response);
+                logger.error("EleonoraBonucci sync all product error , url : " + url + " , response : " + response);
                 return Response.status(StatusCode.FAILURE).build();
             }
 
