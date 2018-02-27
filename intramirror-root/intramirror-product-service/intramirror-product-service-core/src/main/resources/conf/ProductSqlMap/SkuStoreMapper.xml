@@ -119,7 +119,7 @@
         <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
             #{item.product_id}
         </foreach>
-        AND sku_store.enabled = TRUE ;
+        AND sku_store.enabled = TRUE AND sku.enabled = TRUE ;
     </select>
 
 
