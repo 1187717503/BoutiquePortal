@@ -61,11 +61,11 @@ public class EBProductMapping implements IProductMapping {
                     .setCategory2(jsonObjectData.getString("group_name"))//todo
                     .setCategory3(jsonObjectData.getString("Category"))
 
-                    .setSeasonCode("18SS") //test
-                    .setBrandName("GUCCI") //test
-                    .setCategory1("MAN")
+//                    .setSeasonCode("18SS") //test
+//                    .setBrandName("GUCCI") //test
+//                    .setCategory1("MAN")
                     //                    .setCategory2("Clothing")//test
-                    .setCategory3("UNDERWEAR")//test
+//                    .setCategory3("UNDERWEAR")//test
                     .setLast_check(new Date());
 
             JSONArray skus = jsonObjectData.getJSONArray("Stock_Item");

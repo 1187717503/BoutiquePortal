@@ -679,7 +679,7 @@ public class ApiUpdateProductService {
             productOptions.setCategoryId(categoryId);
         }
 
-        if (productOptions.getVendor_id() == 46 && StringUtils.isBlank(productOptions.getCategoryId()) && StringUtils.isNotBlank(category3)
+        if (vendorOptions.getVendorId() == 46 && StringUtils.isBlank(productOptions.getCategoryId()) && StringUtils.isNotBlank(category3)
                 && StringUtils.isNotBlank(category1) && StringUtils.isBlank(category2)) {
             Map<String, Object> categoryMap = productService.getCategoryWithoutC2(vendorOptions.getVendorId().toString(), category1, category3);
             if (categoryMap != null) {
