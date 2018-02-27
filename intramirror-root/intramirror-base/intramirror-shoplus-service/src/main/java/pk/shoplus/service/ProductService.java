@@ -387,7 +387,7 @@ public class ProductService {
             StringBuilder sql = new StringBuilder("");
             sql.append("select p.*,v.vendor_name vendor_name,c.name category_name,b.chinese_name chinese_name,b.english_name english_name from product p \n")
 
-                    .append("left join vendor v on p.vendor_id = v.vendor_id \n").append("left join category c on p.category_id = c.category_id\n").append(
+               .append("left join vendor v on p.vendor_id = v.vendor_id \n").append("left join category c on p.category_id = c.category_id\n").append(
                     "left join brand b on p.brand_id = b.brand_id \n").append("where p.enabled = :p1 and p.status = :p2");
             Object[] params = { enabled, status };
             List<Map<String, Object>> list = productDao.executeBySql(sql.toString(), params);
@@ -439,10 +439,13 @@ public class ProductService {
         try {
 
             StringBuilder sql = new StringBuilder("");
-            sql.append("select p.*,v.vendor_name vendor_name,c.name category_name,b.chinese_name chinese_name,b.english_name english_name from product p \n")
-                    .append("left join vendor v on p.vendor_id = v.vendor_id \n").append("left join category c on p.category_id = c.category_id\n").append(
-                    "left join brand b on p.brand_id = b.brand_id \n").append("where p.enabled = true ").append(
-                    " and p.created_at >= :p1 and p.created_at <= :p2");
+            sql
+                    .append("select p.*,v.vendor_name vendor_name,c.name category_name,b.chinese_name chinese_name,b.english_name english_name from product p \n")
+                    .append("left join vendor v on p.vendor_id = v.vendor_id \n")
+                    .append("left join category c on p.category_id = c.category_id\n")
+                    .append("left join brand b on p.brand_id = b.brand_id \n")
+                    .append("where p.enabled = true ")
+                    .append(" and p.created_at >= :p1 and p.created_at <= :p2");
             Object[] params = { start, end };
             List<Map<String, Object>> list = productDao.executeBySql(sql.toString(), params);
             return list;
@@ -464,9 +467,11 @@ public class ProductService {
             throws Exception {
         try {
             StringBuilder sql = new StringBuilder("");
-            sql.append("select p.*,v.vendor_name vendor_name,c.name category_name,b.chinese_name chinese_name,b.english_name english_name from product p ")
-                    .append("left join vendor v on p.vendor_id = v.vendor_id ").append("left join category c on p.category_id = c.category_id ").append(
-                    "left join brand b on p.brand_id = b.brand_id " + "where p.enabled = :p1 and p.status = :p2");
+            sql
+                    .append("select p.*,v.vendor_name vendor_name,c.name category_name,b.chinese_name chinese_name,b.english_name english_name from product p ")
+                    .append("left join vendor v on p.vendor_id = v.vendor_id ")
+                    .append("left join category c on p.category_id = c.category_id ")
+                    .append("left join brand b on p.brand_id = b.brand_id " + "where p.enabled = :p1 and p.status = :p2");
             if (vendor_id != null) {
                 sql.append(" and v.vendor_id = " + vendor_id);
             }
@@ -584,8 +589,8 @@ public class ProductService {
 		 */
 
         StringBuilder sb = new StringBuilder();
-        sb.append(
-                "SELECT p.product_id,p.product_code,p.brand_id,p.`name`,p.cover_img,p.valid_at,p.updated_at,p.customer_rating,sk.max_price,sk.min_price,s.stock,s.orders,p.`description`,p.`description_img` FROM `product` p")
+        sb
+                .append("SELECT p.product_id,p.product_code,p.brand_id,p.`name`,p.cover_img,p.valid_at,p.updated_at,p.customer_rating,sk.max_price,sk.min_price,s.stock,s.orders,p.`description`,p.`description_img` FROM `product` p")
                 .append(" LEFT JOIN (SELECT product_id,MAX(sk.`price`) max_price,MIN(sk.`price`) min_price FROM sku sk WHERE sk.`product_id`=:p1 GROUP BY sk.`product_id`) sk ON sk.product_id=p.`product_id`")
                 .append(" LEFT JOIN (SELECT product_id,SUM(store) stock,SUM(ordered) orders FROM sku_store s WHERE s.`product_id`=:p2 GROUP BY product_id) s ON s.product_id=p.product_id")
                 .append(" WHERE p.`enabled`=1 AND p.`product_id`=:p3");
@@ -629,8 +634,8 @@ public class ProductService {
         sb.append("SELECT p.`product_code`,sk.`price`,sk.`sku_id` FROM product p ").append(
                 " INNER JOIN sku sk ON sk.`product_id`=p.`product_id` AND sk.`enabled`=1").append(" WHERE p.`product_id`=:p1");
         StringBuilder sbSub = new StringBuilder();
-        sbSub.append(
-                "SELECT sku_p.sku_property_id,sku_p.sku_id,pro_key.product_sku_property_key_id key_id,pro_key.`name` key_name,pro_val.value pro_value FROM `sku_property` sku_p")
+        sbSub
+                .append("SELECT sku_p.sku_property_id,sku_p.sku_id,pro_key.product_sku_property_key_id key_id,pro_key.`name` key_name,pro_val.value pro_value FROM `sku_property` sku_p")
                 .append(" INNER JOIN product_sku_property_key pro_key on sku_p.product_sku_property_key_id=pro_key.product_sku_property_key_id and pro_key.enabled=1")
                 .append(" INNER JOIN product_sku_property_value pro_val on sku_p.product_sku_property_value_id=pro_val.product_sku_property_value_id and pro_val.enabled=1")
                 .append(" WHERE sku_p.enabled=1 and sku_p.sku_id=:p1");
@@ -1147,6 +1152,24 @@ public class ProductService {
         return null;
     }
 
+    public Map<String, Object> getCategoryWithoutC2(String vendor_id, String one, String three) throws Exception {
+        try {
+            String sql = "select distinct c.category_id from api_category_map acm\n"
+                    + "inner join api_configuration ac on(ac.enabled = 1 and ac.api_configuration_id = acm.api_configuration_id)\n"
+                    + "inner join category c on(c.enabled = 1 and c.category_id = acm.category_id)\n" + "where acm.enabled = 1 and ac.vendor_id = '" + vendor_id
+                    + "'\n" + "and trim(acm.boutique_first_category) = trim(\"" + one + "\")\n" + "and trim(acm.boutique_third_category) = trim(\"" + three
+                    + "\")\n" + " and c.category_id is not null ";
+            logger.info("ProductService,getThreeCategory,sql:" + sql);
+            List<Map<String, Object>> categoryMap = productDao.executeBySql(sql, null);
+            if (categoryMap != null && categoryMap.size() > 0) {
+                return categoryMap.get(0);
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        return null;
+    }
+
     public Map<String, Object> getBrand(String brandName) throws Exception {
         try {
             String sql = "select b.brand_id,b.english_name from brand b where trim(b.english_name) = trim(\"" + brandName + "\") and b.enabled = 1";
@@ -1282,11 +1305,13 @@ public class ProductService {
                         } else if (org.apache.commons.lang3.StringUtils.trim(c2Name).equals("Clothing") && org.apache.commons.lang3.StringUtils.trim(
                                 c2Category_id).equals("1504")) { // 二级为衣服，放入Top,上衣
                             rsCategoryId = "1524";
-                        } else if (org.apache.commons.lang3.StringUtils.trim(c2Name).equals("Shoes") && org.apache.commons.lang3.StringUtils.trim(c2Category_id)
+                        } else if (org.apache.commons.lang3.StringUtils.trim(c2Name).equals("Shoes") && org.apache.commons.lang3.StringUtils
+                                .trim(c2Category_id)
                                 .equals("1506")) { // 二级为鞋，放入休闲商务鞋
                             rsCategoryId = "1653";
                         }
-                    } else if (org.apache.commons.lang3.StringUtils.trim(c1Name).equals("Women") && org.apache.commons.lang3.StringUtils.trim(c1Category_id)
+                    } else if (org.apache.commons.lang3.StringUtils.trim(c1Name).equals("Women") && org.apache.commons.lang3.StringUtils
+                            .trim(c1Category_id)
                             .equals("1568")) {
 
                         if (org.apache.commons.lang3.StringUtils.trim(c2Name).equals("Bags") && org.apache.commons.lang3.StringUtils.trim(c2Category_id).equals(
@@ -1298,7 +1323,8 @@ public class ProductService {
                         } else if (org.apache.commons.lang3.StringUtils.trim(c2Name).equals("Clothing") && org.apache.commons.lang3.StringUtils.trim(
                                 c2Category_id).equals("1569")) { // 二级为衣服，放入Top,上衣
                             rsCategoryId = "1582";
-                        } else if (org.apache.commons.lang3.StringUtils.trim(c2Name).equals("Shoes") && org.apache.commons.lang3.StringUtils.trim(c2Category_id)
+                        } else if (org.apache.commons.lang3.StringUtils.trim(c2Name).equals("Shoes") && org.apache.commons.lang3.StringUtils
+                                .trim(c2Category_id)
                                 .equals("1584")) { // 二级为鞋，放入高跟鞋
                             rsCategoryId = "1594";
                         }

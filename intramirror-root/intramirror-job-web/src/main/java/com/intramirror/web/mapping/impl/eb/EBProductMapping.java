@@ -18,13 +18,13 @@ import pk.shoplus.util.ExceptionUtils;
  * @author YouFeng.Zhu
  */
 @Service(value = "ebProductMapping")
-public class ebProductMapping implements IProductMapping {
+public class EBProductMapping implements IProductMapping {
     // logger
     private static final Logger LOGGER = Logger.getLogger(GibotProductMapping.class);
 
     @Override
     public ProductEDSManagement.ProductOptions mapping(Map<String, Object> bodyDataMap) {
-        LOGGER.info("ebProductMapping,inputParams,bodyDataMap:" + JSONObject.toJSONString(bodyDataMap));
+        LOGGER.info("EBProductMapping,inputParams,bodyDataMap:" + JSONObject.toJSONString(bodyDataMap));
         ProductEDSManagement.ProductOptions productOptions = new ProductEDSManagement.ProductOptions();
         try {
             JSONObject jsonObjectData = JSONObject.parseObject(JsonTransformUtil.toJson(bodyDataMap.get("product")));
@@ -39,11 +39,9 @@ public class ebProductMapping implements IProductMapping {
                     .setName(jsonObjectData.getString("Product_Name"))
                     .setCode(jsonObjectData.getString("SKU").trim())
                     .setSeasonCode(jsonObjectData.getString("CarryOver").equals("true") ? "Carryover" : jsonObjectData.getString("Season_Code"))
-
                     .setBrandCode(designerId)
                     .setCarryOver("") //TODO
                     .setBrandName(jsonObjectData.getString("Product_Brand").trim())
-
                     .setColorCode(colorCode)
                     .setColorDesc("Color")
                     .setCategory_boutique_id("")
@@ -63,11 +61,11 @@ public class ebProductMapping implements IProductMapping {
                     .setCategory2(jsonObjectData.getString("group_name"))//todo
                     .setCategory3(jsonObjectData.getString("Category"))
 
-//                    .setSeasonCode("18SS") //test
-                    //                    .setBrandName("GUCCI") //test
-                    //                    .setCategory1("Men")
-                    //                    .setCategory2("Clothing")//todo
-                    //                    .setCategory3("Winter coats")
+                    .setSeasonCode("18SS") //test
+                    .setBrandName("GUCCI") //test
+                    .setCategory1("MAN")
+                    //                    .setCategory2("Clothing")//test
+                    .setCategory3("UNDERWEAR")//test
                     .setLast_check(new Date());
 
             JSONArray skus = jsonObjectData.getJSONArray("Stock_Item");
@@ -88,9 +86,9 @@ public class ebProductMapping implements IProductMapping {
 
         } catch (Exception e) {
             e.printStackTrace();
-            LOGGER.info("ebProductMapping,errorMessage:" + ExceptionUtils.getExceptionDetail(e));
+            LOGGER.info("EBProductMapping,errorMessage:" + ExceptionUtils.getExceptionDetail(e));
         }
-        LOGGER.info("ebProductMapping,outputParams,productOptions:" + JSONObject.toJSONString(productOptions));
+        LOGGER.info("EBProductMapping,outputParams,productOptions:" + JSONObject.toJSONString(productOptions));
         return productOptions;
     }
 }

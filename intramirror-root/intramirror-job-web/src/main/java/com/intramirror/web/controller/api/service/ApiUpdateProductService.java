@@ -489,8 +489,8 @@ public class ApiUpdateProductService {
 
         }
 
-        if ((StringUtils.isNotBlank(newBrandCode) && !newBrandCode.equalsIgnoreCase(oldBrandCode)) || (StringUtils.isNotBlank(newColorCode) && !newColorCode
-                .equalsIgnoreCase(oldColorCode))) {
+        if ((StringUtils.isNotBlank(newBrandCode) && !newBrandCode.equalsIgnoreCase(oldBrandCode)) || (StringUtils.isNotBlank(newColorCode)
+                && !newColorCode.equalsIgnoreCase(oldColorCode))) {
             if (product.spu_id != null) {
                 logger.info("Try to unbind product [" + product.product_id + "] -- [" + product.spu_id + "]");
                 unbindProductSpu(product.product_id, product.spu_id);
@@ -679,6 +679,13 @@ public class ApiUpdateProductService {
             productOptions.setCategoryId(categoryId);
         }
 
+        if (productOptions.getVendor_id() == 46 && StringUtils.isBlank(productOptions.getCategoryId()) && StringUtils.isNotBlank(category3)
+                && StringUtils.isNotBlank(category1) && StringUtils.isBlank(category2)) {
+            Map<String, Object> categoryMap = productService.getCategoryWithoutC2(vendorOptions.getVendorId().toString(), category1, category3);
+            if (categoryMap != null) {
+                productOptions.setCategoryId(categoryMap.get("category_id").toString());
+            }
+        }
         // get brand
         if (StringUtils.isNotBlank(brandName)) {
             Map<String, Object> brandMap = productService.getBrand(brandName);

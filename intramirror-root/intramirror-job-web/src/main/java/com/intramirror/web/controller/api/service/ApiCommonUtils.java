@@ -205,7 +205,7 @@ public class ApiCommonUtils {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            logger.info("ApiCreateProductService,checkImgSize,errorMessage:" + e);
+            logger.info("ApiCreateProductService,checkImgSize,error: imgUrl: " + imgUrl, e);
         }
         return true;
     }
