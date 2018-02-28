@@ -56,7 +56,7 @@ public class EleonoraBonucciProductController {
         Map<String, Object> ebAllProduct = new HashMap<>();
         ebAllProduct.put("url",
                 "https://eleonorabonucci.com/WS/stock.asmx/Get_Article?JSON={\"Codice_Anagrafica\":\"a6c9eb33-0465-4674-aedc-0615cdf6282e\",\"FULL\":true}");
-        ebAllProduct.put("vendor_id", "46");
+        ebAllProduct.put("vendor_id", "42");
         ebAllProduct.put("executor", allproductRhreadPool);
         ebAllProduct.put("eventName", "product_all_update");
         ebAllProduct.put("fileUtils", new ApiDataFileUtils("eb", "product_all_update"));
@@ -66,7 +66,7 @@ public class EleonoraBonucciProductController {
         Map<String, Object> ebDeltaProduct = new HashMap<>();
         ebDeltaProduct.put("url",
                 "https://eleonorabonucci.com/WS/stock.asmx/Get_Article?JSON={\"Codice_Anagrafica\":\"a6c9eb33-0465-4674-aedc-0615cdf6282e\",\"FULL\":false}");
-        ebDeltaProduct.put("vendor_id", "46");
+        ebDeltaProduct.put("vendor_id", "42");
         ebDeltaProduct.put("executor", deltaProductthreadPool);
         ebDeltaProduct.put("eventName", "product_delta_update");
         ebDeltaProduct.put("fileUtils", new ApiDataFileUtils("eb", "product_delta_update"));
@@ -76,7 +76,7 @@ public class EleonoraBonucciProductController {
         Map<String, Object> ebAllStock = new HashMap<>();
         ebAllStock.put("url",
                 "https://eleonorabonucci.com/WS/stock.asmx/Get_Article?JSON={\"Codice_Anagrafica\":\"a6c9eb33-0465-4674-aedc-0615cdf6282e\",\"FULL\":true}");
-        ebAllStock.put("vendor_id", "46");
+        ebAllStock.put("vendor_id", "42");
         ebAllStock.put("executor", allStockthreadPool);
         ebAllStock.put("eventName", "stock_all_update");
         ebAllStock.put("fileUtils", new ApiDataFileUtils("eb", "stock_all_update"));
@@ -86,7 +86,7 @@ public class EleonoraBonucciProductController {
         Map<String, Object> ebDeltaStock = new HashMap<>();
         ebDeltaStock.put("url",
                 "https://eleonorabonucci.com/WS/stock.asmx/Get_Article?JSON={\"Codice_Anagrafica\":\"a6c9eb33-0465-4674-aedc-0615cdf6282e\",\"FULL\":false}");
-        ebDeltaStock.put("vendor_id", "46");
+        ebDeltaStock.put("vendor_id", "42");
         ebDeltaStock.put("executor", deltaStockthreadPool);
         ebDeltaStock.put("eventName", "stock_delta_update");
         ebDeltaStock.put("fileUtils", new ApiDataFileUtils("eb", "stock_delta_update"));
