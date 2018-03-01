@@ -22,6 +22,7 @@ import pk.shoplus.common.Contants;
 import pk.shoplus.common.utils.StringUtil;
 import pk.shoplus.enums.ApiErrorTypeEnum;
 import pk.shoplus.enums.ProductPropertyEnumKeyName;
+import pk.shoplus.model.BoutiqueImage;
 import pk.shoplus.model.CategoryProductInfo;
 import pk.shoplus.model.Product;
 import pk.shoplus.model.ProductEDSManagement;
@@ -30,6 +31,7 @@ import pk.shoplus.model.ProductProperty;
 import pk.shoplus.model.Vendor;
 import pk.shoplus.parameter.EnabledType;
 import pk.shoplus.parameter.StatusType;
+import pk.shoplus.service.BoutiqueImageService;
 import pk.shoplus.service.CategoryProductInfoService;
 import pk.shoplus.service.CategoryService;
 import pk.shoplus.service.ProductInfoService;
@@ -489,8 +491,8 @@ public class ApiUpdateProductService {
 
         }
 
-        if ((StringUtils.isNotBlank(newBrandCode) && !newBrandCode.equalsIgnoreCase(oldBrandCode)) || (StringUtils.isNotBlank(newColorCode)
-                && !newColorCode.equalsIgnoreCase(oldColorCode))) {
+        if ((StringUtils.isNotBlank(newBrandCode) && !newBrandCode.equalsIgnoreCase(oldBrandCode)) || (StringUtils.isNotBlank(newColorCode) && !newColorCode
+                .equalsIgnoreCase(oldColorCode))) {
             if (product.spu_id != null) {
                 logger.info("Try to unbind product [" + product.product_id + "] -- [" + product.spu_id + "]");
                 unbindProductSpu(product.product_id, product.spu_id);
@@ -591,6 +593,7 @@ public class ApiUpdateProductService {
 
         product.status = null;
         productService.updateProduct(product);
+        this.saveBoutiqueImage(product, conn);
         logger.info("ApiUpdateProductService,setProduct,end,updateProduct,product:" + JSONObject.toJSONString(product));
     }
 
@@ -679,8 +682,8 @@ public class ApiUpdateProductService {
             productOptions.setCategoryId(categoryId);
         }
 
-        if (vendorOptions.getVendorId() == 42 && StringUtils.isBlank(productOptions.getCategoryId()) && StringUtils.isNotBlank(category3)
-                && StringUtils.isNotBlank(category1) && StringUtils.isBlank(category2)) {
+        if (vendorOptions.getVendorId() == 42 && StringUtils.isBlank(productOptions.getCategoryId()) && StringUtils.isNotBlank(category3) && StringUtils
+                .isNotBlank(category1) && StringUtils.isBlank(category2)) {
             Map<String, Object> categoryMap = productService.getCategoryWithoutC2(vendorOptions.getVendorId().toString(), category1, category3);
             if (categoryMap != null) {
                 productOptions.setCategoryId(categoryMap.get("category_id").toString());
@@ -920,6 +923,50 @@ public class ApiUpdateProductService {
         }
 
         warningList.add(warningMap);
+    }
+
+    private void saveBoutiqueImage(Product product, Connection conn) {
+        try {
+            if (product == null) {
+                return;
+            }
+
+            BoutiqueImageService boutiqueImageService = new BoutiqueImageService(conn);
+            Map<String, Object> condition = new HashMap<>();
+            condition.put("product_id", product.getProduct_id());
+
+            BoutiqueImage boutiqueImage = boutiqueImageService.getBoutiqueImageByCondition(condition);
+            List<String> coverImgs = JSONArray.parseArray(this.productOptions.getCoverImg(), String.class);
+
+            if (boutiqueImage == null) {
+                boutiqueImage = new BoutiqueImage();
+                boutiqueImage.setCreated_at(new Date());
+                boutiqueImage.setUpdated_at(new Date());
+                boutiqueImage.setImage(JsonTransformUtil.toJson(coverImgs));
+                boutiqueImage.setProduct_id(product.getProduct_id());
+                boutiqueImageService.createBoutiqueImage(boutiqueImage);
+            } else {
+                List<String> oldImages = JSONArray.parseArray(boutiqueImage.getImage(), String.class);
+                List<String> images = new ArrayList<>();
+                for (String newImage : coverImgs) {
+                    boolean newFlag = true;
+                    for (String oldImage : oldImages) {
+                        if (newImage.equalsIgnoreCase(oldImage)) {
+                            newFlag = false;
+                            break;
+                        }
+                    }
+                    if (newFlag) {
+                        images.add(newImage);
+                    }
+                }
+                oldImages.addAll(images);
+                boutiqueImage.setImage(JsonTransformUtil.toJson(oldImages));
+                boutiqueImageService.updateBoutiqueImage(boutiqueImage);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void printChangeLog(Connection conn) throws Exception {

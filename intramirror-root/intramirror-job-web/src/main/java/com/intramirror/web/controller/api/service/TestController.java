@@ -1,6 +1,8 @@
 package com.intramirror.web.controller.api.service;
 
 import com.google.gson.Gson;
+import com.intramirror.web.distributed.service.ApiUpdateProductImageService;
+import com.intramirror.web.distributed.vo.ProductImageVo;
 import com.intramirror.web.mapping.vo.StockOption;
 import java.util.Date;
 import java.util.Map;
@@ -18,7 +20,7 @@ import pk.shoplus.service.product.impl.ProductServiceImpl;
  */
 @Controller
 @RequestMapping("/api/test")
-public class TestController  {
+public class TestController {
 
     private static final Logger logger = Logger.getLogger(TestController.class);
 
@@ -35,6 +37,20 @@ public class TestController  {
         System.out.println("end:" + new Date().toString() + "," + end);
         System.out.println(start - end + ",map:" + new Gson().toJson(map));
         return map;
+    }
+
+    @RequestMapping("/image")
+    @ResponseBody
+    public Map<String, Object> testStock(@RequestBody ProductImageVo productImageVo) {
+        System.out.println(new Gson().toJson(productImageVo));
+        ApiUpdateProductImageService apiUpdateProductImageService = new ApiUpdateProductImageService(productImageVo);
+        //        stockOption.setLast_check(new Date());
+        long start = System.currentTimeMillis();
+        System.out.println("start:" + new Date().toString() + "," + start);
+        apiUpdateProductImageService.update();
+        long end = System.currentTimeMillis();
+        System.out.println("end:" + new Date().toString() + "," + end);
+        return null;
     }
 
     @RequestMapping("/createProduct")
