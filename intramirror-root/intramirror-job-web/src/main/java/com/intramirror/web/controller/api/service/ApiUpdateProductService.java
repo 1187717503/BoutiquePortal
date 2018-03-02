@@ -273,6 +273,21 @@ public class ApiUpdateProductService {
         productOptions.setVendor_id(product.getVendor_id());
         ApiCommonUtils.sortProductOptionsImage(productOptions);
 
+        if (product.vendor_id == 26L) {
+            if (productService.isClothing(product.category_id)) {
+                try {
+                    List<String> originList = JSONArray.parseArray(productOptions.getCoverImg(), String.class);
+                    String one = originList.get(0);
+                    originList.remove(0);
+                    originList.add(one);
+                    productOptions.setCoverImg(new Gson().toJson(originList));
+                    productOptions.setDescImg(new Gson().toJson(originList));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
         // Image：不予更新。
         String cover_img = product.getCover_img();
         boolean noImg = this.getNoImg(conn);
