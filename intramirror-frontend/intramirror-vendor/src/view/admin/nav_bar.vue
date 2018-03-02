@@ -7,7 +7,7 @@
       <p>PACK<span>{{$store.state.user.orderNum.pack}}</span></p>
     </router-link>
     <router-link class="item" :to="{name:'Ready'}" active-class="hover">
-      <p>PEADY to SHIP<span>{{$store.state.user.orderNum.peady}}</span></p>
+      <p>READY to SHIP<span>{{$store.state.user.orderNum.peady}}</span></p>
     </router-link>
     <router-link class="item" :to="{name:'Shipped'}" active-class="hover">
       <p>SHIPPED<span>{{$store.state.user.orderNum.shipped}}</span></p>

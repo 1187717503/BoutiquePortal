@@ -323,6 +323,7 @@
             o.order_num,
             o.order_id,
             o.created_at,
+            o.updated_at as order_updated_at,
             o.current_rate,
             p.name,
             p.product_id,

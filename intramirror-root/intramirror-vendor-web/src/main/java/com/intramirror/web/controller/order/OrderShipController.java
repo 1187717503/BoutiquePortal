@@ -184,12 +184,11 @@ public class OrderShipController extends BaseController {
                         shipMent.put("shipment_id", container.get("shipment_id").toString());
                         shipMent.put("shipment_no", container.get("shipment_no").toString());
                         shipMent.put("shipment_status", container.get("shipment_status").toString());
-                        shipMent.put("product_qty", container.get("product_qty").toString());
+
                         shipMent.put("ship_to_geography", container.get("ship_to_geography").toString());
                         shipMentList.add(shipMent);
                     }
                 }
-
 
                 if (shipMentList != null && shipMentList.size() > 0) {
                     //将cartonList 存入shipMent详情
@@ -199,6 +198,16 @@ public class OrderShipController extends BaseController {
                     }
                 }
 
+                for (Map<String, Object> shipItem : shipMentList) {
+                    List<Map<String, Object>> cartonList = (List<Map<String, Object>>)shipItem.get("cartonList");
+                    int product_qty_total = 0;
+                    for(Map<String,Object> cartonItem: cartonList){
+                        if(cartonItem.get("product_qty") != null){
+                            product_qty_total = product_qty_total + Integer.parseInt(cartonItem.get("product_qty").toString());
+                        }
+                    }
+                    shipItem.put("product_qty", product_qty_total);
+                }
 
             }
 
