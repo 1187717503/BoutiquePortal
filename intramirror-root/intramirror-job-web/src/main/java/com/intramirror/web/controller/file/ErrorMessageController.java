@@ -412,6 +412,28 @@ public class ErrorMessageController {
                     }
                 }
 
+                if(vendor_id.equals("42")) {
+                    if(name.equals("product_all_update") || name.equals("product_delta_update") ) {
+                        ProductEDSManagement.ProductOptions productOptions = matgentoSynProductMapping.mapping(originDataMap);
+                        ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
+                        vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                        productOptions.setModifyPrice("1");
+                        productOptions.setError_type(error_type);
+                        CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
+                    }
+                }
+
+                if(vendor_id.equals("44")) {
+                    if(name.equals("product_all_update") || name.equals("product_delta_update") ) {
+                        ProductEDSManagement.ProductOptions productOptions = matgentoSynProductMapping.mapping(originDataMap);
+                        ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
+                        vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                        productOptions.setModifyPrice("1");
+                        productOptions.setError_type(error_type);
+                        CommonThreadPool.execute(name,executor,threadNum,new UpdateProductThread(productOptions,vendorOptions,apiDataFileUtils,originDataMap));
+                    }
+                }
+
                 this.updateProcessing(api_error_processing_id);
             }
             mapUtils.putData("status", StatusType.SUCCESS).putData("info", "success");
