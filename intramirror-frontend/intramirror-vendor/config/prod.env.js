@@ -3,9 +3,6 @@ const baseConfig = {
   BASE_URL:''
 };
 switch (process.env.WEB_ENV){
-  case 'loca':
-    baseConfig.BASE_URL = '"http://localhost:8080/"';
-    break;
   case 'test':
     baseConfig.BASE_URL = '"http://test.vendor.intramirror.com:8097/"';
     break;
