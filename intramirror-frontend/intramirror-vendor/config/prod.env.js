@@ -7,7 +7,7 @@ switch (process.env.WEB_ENV){
     baseConfig.BASE_URL = '"http://test.vendor.intramirror.com:8097/"';
     break;
   case 'stag':
-    baseConfig.BASE_URL = '"http://sha.staging.boutique.intramirror.com:8090/"';
+    baseConfig.BASE_URL = '"http://sha.staging.boutique.intramirror.com:8080/"';
     break;
   case 'prd':
     baseConfig.BASE_URL = '"http://boutique.intramirror.com:8087/"';
