@@ -46,4 +46,6 @@ public interface IPromotionService {
     List<PromotionBrandHot> getPromotionBrandHot(Long promotionId);
 
     Integer updatePromotionBrandHot(List<PromotionBrandHot> listPromotionBrandHot);
+
+    void refreshSnapshotProductByPromotion(Long promotionId);
 }

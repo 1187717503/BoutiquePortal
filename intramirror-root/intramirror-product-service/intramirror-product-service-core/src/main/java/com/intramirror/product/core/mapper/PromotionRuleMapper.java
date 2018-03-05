@@ -9,6 +9,7 @@ import com.intramirror.product.api.model.PromotionInclude;
 import com.intramirror.product.api.model.PromotionRule;
 import java.util.List;
 import java.util.Map;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * Created on 2018/1/4.
@@ -74,5 +75,12 @@ public interface PromotionRuleMapper {
 
     List<Map<String, Object>> listPromotionByBannerIds(List<Long> bannerIds);
 
+    void removeSnapshotProduct(Long promotionId);
+
+    void generateRuleToSnapshotProduct(@Param("promotionId") Long promotionId, @Param("promotionRuleId") Long promotionRuleId, @Param("vendorId") Long vendorId,
+            @Param("seasonCode") String seasonCode, @Param("brandId") Long brandId, @Param("category") List<Long> category);
+
+    void removeExcludeSnapshotProduct(@Param("vendorId") Long vendorId, @Param("seasonCode") String seasonCode, @Param("brandId") Long brandId,
+            @Param("category") List<Long> category);
 }
 

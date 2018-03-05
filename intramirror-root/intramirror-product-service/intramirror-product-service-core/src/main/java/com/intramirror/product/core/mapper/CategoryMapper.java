@@ -83,4 +83,6 @@ public interface CategoryMapper {
 
     List<Category> listSubCategoryByCategoryId(Long categoryId);
 
+    Category findCategoryByCategoryId(Long categoryId);
+
 }

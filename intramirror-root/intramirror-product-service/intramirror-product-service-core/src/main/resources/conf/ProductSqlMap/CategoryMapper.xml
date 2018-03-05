@@ -279,6 +279,11 @@
         </if>
     </select>
 
+    <select id="findCategoryByCategoryId" parameterType="Long" resultMap="BaseResultMap">
+        SELECT * FROM  category
+        WHERE enabled = 1 AND category = #{categoryId}
+    </select>
+
     <select id="listSubCategoryByCategoryId" parameterType="Long" resultMap="BaseResultMap">
         SELECT * FROM  category
         WHERE enabled = 1 AND parent_id = #{categoryId}

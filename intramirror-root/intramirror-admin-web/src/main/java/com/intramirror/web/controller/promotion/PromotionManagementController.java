@@ -237,4 +237,12 @@ public class PromotionManagementController {
     public Response updatePromotionBrandHot(@RequestBody List<PromotionBrandHot> listPromotionBrandHot) {
         return Response.status(StatusType.SUCCESS).data(promotionService.updatePromotionBrandHot(listPromotionBrandHot));
     }
+
+    @PutMapping(value = "/promotion/refresh/{promotionId}")
+    public Response refreshSnapshotProduct(@PathVariable("promotionId") Long promotionId) {
+        LOGGER.info("Promotion {} start to refresh snapshot product", promotionId);
+
+        promotionService.refreshSnapshotProductByPromotion(promotionId);
+        return Response.status(StatusType.SUCCESS).data("ok");
+    }
 }
