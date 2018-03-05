@@ -309,9 +309,9 @@ public class ApiUpdateProductService {
                     List<String> apiImgList = JSONArray.parseArray(apiImg, String.class);
                     List<String> coverImgList = JSONArray.parseArray(coverImg, String.class);
 
-                    if (coverImgList.size() <= 3 && apiImgList.size() > coverImgList.size()) {
+                    if (apiImgList.size() > coverImgList.size()) {
                         String downImgs = ApiCommonUtils.downloadImgs(apiImg);
-                        if (downImgs.length() > 5) {
+                        if (product.status == 1 || product.status == 5) {
                             product.cover_img = downImgs;
                             product.description_img = downImgs;
                             logger.info("ApiUpdateProductService,setProduct,updateImg,coverImg:" + coverImg + ",downImgs:" + downImgs + ",product:" + JSONObject
