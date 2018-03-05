@@ -75,8 +75,8 @@ public class ApiUpdateProductImageService {
         ProductService productService = new ProductService(conn);
 
         Map<String, Object> condition = new HashMap<>();
-        condition.put("product_code", productImage.getProduct_code());
-        condition.put("vendor_id", productImage.getVendor_id());
+        condition.put("product_code", productImage.getProductCode());
+        condition.put("vendor_id", productImage.getVendorId());
         condition.put("enabled", EnabledType.USED);
         Product product = productService.getProductByCondition(condition, "*");
 
