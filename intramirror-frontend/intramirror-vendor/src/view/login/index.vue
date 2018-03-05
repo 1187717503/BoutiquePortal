@@ -14,7 +14,7 @@
             <div class="input-field col s12">
               <i class="mdi-social-person-outline prefix im-col"></i>
               <input id="username" type="text" v-model="loginForm.username">
-              <label for="username" class="center-align">Username</label>
+              <label for="username" class="center-align">Usernametest</label>
             </div>
           </div>
           <div class="row margin">
