@@ -87,7 +87,7 @@
             <div>€{{i.price | PriceForm}}</div>
             <div>€{{i.in_price | PriceForm}}</div>
             <div>{{i.order_line_num}}</div>
-            <div>{{i.order_updated_at | formDate}}</div>
+            <div>{{i.order_updated_at | formDate}}test</div>
           </div>
         </div>
 
