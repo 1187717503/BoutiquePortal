@@ -5,6 +5,7 @@ import com.intramirror.common.help.PageUtils;
 import com.intramirror.order.api.model.Order;
 import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.vo.ShippedParam;
+import com.intramirror.order.api.vo.PageListVO;
 
 import java.util.List;
 import java.util.Map;
@@ -144,6 +145,13 @@ public interface IOrderService {
 
     List<Map<String,Object>> atelierSelectOrder(Map<String,Object> conditionMap);
     List<Map<String,Object>> selectOrderInfo(Map<String,Object> conditionMap);
+
+    /**
+     * 获取Cancel列表
+     * @param params
+     * @return
+     */
+    PageListVO getOrderCancelList(Map<String,Object> params);
 
 
 }

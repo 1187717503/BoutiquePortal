@@ -17,6 +17,8 @@ import com.intramirror.order.api.service.IOrderExceptionTypeService;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.service.IShipmentService;
 import com.intramirror.order.api.service.ISubShipmentService;
+import com.intramirror.order.api.model.CancelOrderVO;
+import com.intramirror.order.api.vo.PageListVO;
 import com.intramirror.product.api.model.Product;
 import com.intramirror.product.api.service.IProductService;
 import com.intramirror.product.api.service.ISkuStoreService;
@@ -143,10 +145,18 @@ public class OrderController extends BaseController {
         }
 
         Long vendorId = vendor.getVendorId();
+        String status = map.get("status").toString();
         //根据订单状态查询订单
         logger.info(MessageFormat.format("order getOrderList 调用接口 orderService.getOrderListByStatus 查询订单信息  入参 status:{0},vendorId:{1},sortByName:{2}",
-                map.get("status").toString(), vendorId, sortByName));
-        List<Map<String, Object>> orderList = orderService.getOrderListByStatus(Integer.parseInt(map.get("status").toString()), vendorId, sortByName);
+                status, vendorId, sortByName));
+        List<Map<String, Object>> orderList = null;
+        PageListVO orderCancelList = null;
+        if ("6".equals(status)){
+            //cancel TAB列表查询
+            orderCancelList = orderService.getOrderCancelList(map);
+        }else {
+            orderList = orderService.getOrderListByStatus(Integer.parseInt(status), vendorId, sortByName);
+        }
 
         if (orderList != null && orderList.size() > 0) {
 
@@ -181,33 +191,52 @@ public class OrderController extends BaseController {
             //			/**------------------------------------优化end----------------------------------------*/
 
             logger.info("order getOrderList 解析订单列表信息  ");
-            for (Map<String, Object> info : orderList) {
+            if(orderList!=null&&orderList.size()>0){
+                for (Map<String, Object> info : orderList) {
+                    //计算折扣
+                    Double price = Double.parseDouble(info.get("price").toString());
+                    Double inPrice = Double.parseDouble(info.get("in_price").toString());
 
-                //计算折扣
-                Double price = Double.parseDouble(info.get("price").toString());
-                Double inPrice = Double.parseDouble(info.get("in_price").toString());
+                    BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + 0.22) / price) * 100);
+                    if (supply_price_discount.intValue() > 100 || supply_price_discount.intValue() < 0) {
+                        info.put("supply_price_discount", 0 + " %");
+                    } else {
+                        info.put("supply_price_discount", (100 - supply_price_discount.setScale(0, BigDecimal.ROUND_HALF_UP).intValue()) + " %");
+                    }
 
-                BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + 0.22) / price) * 100);
-                if (supply_price_discount.intValue() > 100 || supply_price_discount.intValue() < 0) {
-                    info.put("supply_price_discount", 0 + " %");
-                } else {
-                    info.put("supply_price_discount", (100 - supply_price_discount.setScale(0, BigDecimal.ROUND_HALF_UP).intValue()) + " %");
+                    //				//添加商品对应的属性
+                    //				if(productPropertyResult.size() > 0 ){
+                    //					if(productPropertyResult.get(info.get("product_id").toString()) != null){
+                    //						info.put("brandID", productPropertyResult.get(info.get("product_id").toString()).get("BrandID"));
+                    //						info.put("colorCode", productPropertyResult.get(info.get("product_id").toString()).get("ColorCode"));
+                    //					}
+                    //				}
+
                 }
+            }
+            if(orderCancelList!=null&&orderCancelList.getTotal()>0){
+                for(Object o:orderCancelList.getData()){
+                    CancelOrderVO co = (CancelOrderVO)o;
+                    Double price = Double.parseDouble(co.getPrice().toString());
+                    Double inPrice = Double.parseDouble(co.getIn_price().toString());
 
-                //				//添加商品对应的属性
-                //				if(productPropertyResult.size() > 0 ){
-                //					if(productPropertyResult.get(info.get("product_id").toString()) != null){
-                //						info.put("brandID", productPropertyResult.get(info.get("product_id").toString()).get("BrandID"));
-                //						info.put("colorCode", productPropertyResult.get(info.get("product_id").toString()).get("ColorCode"));
-                //					}
-                //				}
-
+                    BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + 0.22) / price) * 100);
+                    if (supply_price_discount.intValue() > 100 || supply_price_discount.intValue() < 0) {
+                        co.setSupply_price_discount(0 + " %");
+                    } else {
+                        co.setSupply_price_discount ((100 - supply_price_discount.setScale(0, BigDecimal.ROUND_HALF_UP).intValue()) + " %");
+                    }
+                }
             }
 
         }
 
         result.successStatus();
-        result.setData(orderList);
+        if("6".equals(status)){
+            result.setData(orderCancelList);
+        }else {
+            result.setData(orderList);
+        }
         return result;
     }
 

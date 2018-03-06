@@ -5,13 +5,14 @@ import java.util.Map;
 
 import com.intramirror.order.api.model.Order;
 import com.intramirror.order.api.model.Shipment;
+import com.intramirror.order.api.model.CancelOrderVO;
 
 public interface OrderMapper {
 
     /**
      * 根据子订单状态获取 order 列表
      *
-     * @param status
+     * @param param
      * @return
      */
     List<Map<String, Object>> getOrderList(Map<String, Object> param);
@@ -20,7 +21,7 @@ public interface OrderMapper {
     /**
      * 根据orderNumber 获取子订单列表
      *
-     * @param orderNumber status
+     * @param param
      * @return
      */
     List<Map<String, Object>> getOrderListByOrderNumber(Map<String, Object> param);
@@ -37,7 +38,7 @@ public interface OrderMapper {
     /**
      * 根据status统计各个状态的订单数量
      *
-     * @param status
+     * @param param
      * @return
      */
     int getOrderByIsvalidCount(Map<String, Object> param);
@@ -61,7 +62,7 @@ public interface OrderMapper {
     /**
      * 根据订单获取Shipment
      *
-     * @param orderId
+     * @param logisticsProductId
      * @return
      */
     Shipment getOrderByShipment(int logisticsProductId);
@@ -70,7 +71,7 @@ public interface OrderMapper {
     /**
      * 根据 订单状态获取子订单列表
      *
-     * @param orderNumber status
+     * @param conditionMap
      * @return
      */
     List<Map<String, Object>> getOrderListByStatus(Map<String, Object> conditionMap);
@@ -79,7 +80,7 @@ public interface OrderMapper {
     /**
      * 根据 订单状态获取子订单列表
      *
-     * @param orderNumber status
+     * @param conditionMap
      * @return
      */
     List<Map<String, Object>> getOrderListByStatusAndContainerId(Map<String, Object> conditionMap);
@@ -99,7 +100,7 @@ public interface OrderMapper {
     /**
      * 根据 ShipmentId 查询箱子跟订单信息
      *
-     * @param ShipmentId status vendorId
+     * @param conditionMap
      * @return
      */
     List<Map<String, Object>> getOrderListByShipmentId(Map<String, Object> conditionMap);
@@ -108,7 +109,7 @@ public interface OrderMapper {
     /**
      * 根据 条件获取子订单信息
      *
-     * @param orderNumber status vendor Id
+     * @param conditionMap
      * @return
      */
     List<Map<String, Object>> getOrderInfoByCondition(Map<String, Object> conditionMap);
@@ -142,5 +143,12 @@ public interface OrderMapper {
     
     List<Map<String,Object>> atelierSelectOrder(Map<String,Object> conditionMap);
     List<Map<String,Object>> selectOrderInfo(Map<String,Object> conditionMap);
+
+    /**
+     * 查询子订单列表
+     * @param params
+     * @return
+     */
+    List<CancelOrderVO> getOrderCancelList(Map<String, Object> params);
 
 }

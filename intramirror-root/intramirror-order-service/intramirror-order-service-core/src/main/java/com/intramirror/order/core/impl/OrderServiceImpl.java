@@ -7,20 +7,21 @@ import com.intramirror.common.help.PageUtils;
 import com.intramirror.order.api.model.Order;
 import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.service.IOrderService;
+import com.intramirror.order.api.model.CancelOrderVO;
+import com.intramirror.order.api.model.ProductPropertyVO;
 import com.intramirror.order.api.vo.ShippedParam;
 import com.intramirror.order.core.dao.BaseDao;
 import com.intramirror.order.core.mapper.OrderMapper;
 
+import com.intramirror.order.api.vo.PageListVO;
+import com.intramirror.order.core.mapper.ProductPropertyMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class OrderServiceImpl extends BaseDao implements IOrderService, IPageService {
@@ -28,9 +29,11 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
     private static Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     private OrderMapper orderMapper;
+    private ProductPropertyMapper productPropertyMapper;
 
     public void init() {
         orderMapper = this.getSqlSession().getMapper(OrderMapper.class);
+        productPropertyMapper = this.getSqlSession().getMapper(ProductPropertyMapper.class);
     }
 
     public List<Map<String, Object>> getOrderList(int status) {
@@ -233,4 +236,54 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
 			Long logisticsProductId) {
 		return orderMapper.getOrderLogisticsInfoByIdWithSql(logisticsProductId);
 	}
+
+    @Override
+    public PageListVO getOrderCancelList(Map<String, Object> params) {
+        Integer pageNumber = Integer.valueOf(params.get("pageNumber")==null?"1":params.get("pageNumber").toString());
+        Integer pageSize = Integer.valueOf(params.get("pageSize")==null?"10":params.get("pageSize").toString());
+        params.put("pageNo",(pageNumber-1) * pageSize);
+        List<CancelOrderVO> orderCancelList = orderMapper.getOrderCancelList(params);
+        if(orderCancelList != null && orderCancelList.size()>0){
+            Set<Long> ids = new HashSet<>();
+            for(CancelOrderVO vo :orderCancelList){
+                ids.add(vo.getProduct_id());
+            }
+            Map<String,Object> map = new HashMap<>();
+            map.put("ids",ids);
+            map.put("keyName","ColorCode");
+            List<ProductPropertyVO> vos = productPropertyMapper.getProductProperty(map);
+            if(vos!=null&&vos.size()>0){
+                for(CancelOrderVO vo :orderCancelList){
+                    for(ProductPropertyVO pp:vos){
+                        if(vo.getProduct_id().equals(pp.getProductId())){
+                            vo.setColorCode(pp.getValue());
+                            break;
+                        }
+                    }
+                }
+            }
+            Map<String,Object> map1 = new HashMap<>();
+            map1.put("ids",ids);
+            map1.put("keyName","BrandID");
+            List<ProductPropertyVO> vos1 = productPropertyMapper.getProductProperty(map1);
+            if(vos1!=null&&vos1.size()>0){
+                for(CancelOrderVO vo :orderCancelList){
+                    for(ProductPropertyVO pp:vos1){
+                        if(vo.getProduct_id().equals(pp.getProductId())){
+                            vo.setBrandID(pp.getValue());
+                            break;
+                        }
+                    }
+                }
+            }
+            PageListVO listVO = new PageListVO(orderCancelList);
+            listVO.setCurrPageNo(pageNumber);
+            listVO.setPageSize(pageSize);
+            listVO.calPageTotal();
+            return listVO;
+        }else {
+            return new PageListVO(new ArrayList());
+        }
+
+    }
 }
