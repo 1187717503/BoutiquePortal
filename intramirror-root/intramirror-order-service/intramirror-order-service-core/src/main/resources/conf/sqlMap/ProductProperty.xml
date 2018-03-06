@@ -8,7 +8,7 @@
 	    <result column="PRODUCT_ID" property="productId" jdbcType="BIGINT" />
   	</resultMap>
 
-	<select id="getProductProperty" resultType="BaseResultMap"  parameterType="java.util.Map">
+	<select id="getProductProperty" resultMap="BaseResultMap"  parameterType="java.util.Map">
 		SELECT KEY_NAME,`VALUE`,PRODUCT_ID FROM PRODUCT_PROPERTY
 		WHERE PRODUCT_ID IN
 		<foreach collection="ids" item="productId" open="(" close=")" separator=",">

@@ -242,8 +242,11 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
         Integer pageNumber = Integer.valueOf(params.get("pageNumber")==null?"1":params.get("pageNumber").toString());
         Integer pageSize = Integer.valueOf(params.get("pageSize")==null?"10":params.get("pageSize").toString());
         params.put("pageNo",(pageNumber-1) * pageSize);
+        params.put("pageSize",pageSize);
         List<CancelOrderVO> orderCancelList = orderMapper.getOrderCancelList(params);
         if(orderCancelList != null && orderCancelList.size()>0){
+            PageListVO listVO = new PageListVO();
+            listVO.setTotal(getOrderCancelCount(params));
             Set<Long> ids = new HashSet<>();
             for(CancelOrderVO vo :orderCancelList){
                 ids.add(vo.getProduct_id());
@@ -276,14 +279,24 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
                     }
                 }
             }
-            PageListVO listVO = new PageListVO(orderCancelList);
+            listVO.setData(orderCancelList);
             listVO.setCurrPageNo(pageNumber);
             listVO.setPageSize(pageSize);
             listVO.calPageTotal();
             return listVO;
         }else {
-            return new PageListVO(new ArrayList());
+            return new PageListVO();
         }
 
+    }
+
+    @Override
+    public int getOrderCancelCount(Map<String, Object> params){
+        params.put("count",1);
+        List<CancelOrderVO> count = orderMapper.getOrderCancelList(params);
+        if(count!=null&&count.size()>0){
+            return count.size();
+        }
+        return 0;
     }
 }

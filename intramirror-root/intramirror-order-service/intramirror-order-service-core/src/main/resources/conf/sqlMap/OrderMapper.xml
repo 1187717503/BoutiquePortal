@@ -189,7 +189,7 @@
         </if>
     </select>
 
-    <select id="getOrderCancelList" resultType="BaseResultMap" parameterType="java.util.Map">
+    <select id="getOrderCancelList" resultMap="BaseResultMap" parameterType="java.util.Map">
         SELECT
         o.order_num,
         o.order_id,
@@ -274,7 +274,7 @@
         where pspk.`name` = 'Size' and lp.`status` = #{status,jdbcType=BIGINT} and lp.enabled = 1
         and v.vendor_id = #{vendorId,jdbcType=BIGINT}
         <if test="orderNumber != null">
-            lp.order_line_num = #{orderNumber}
+        AND lp.order_line_num = #{orderNumber}
         </if>
         GROUP BY lp.order_line_num
         <if test="order_line_num != null">

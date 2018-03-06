@@ -153,5 +153,7 @@ public interface IOrderService {
      */
     PageListVO getOrderCancelList(Map<String,Object> params);
 
+    int getOrderCancelCount(Map<String, Object> params);
+
 
 }

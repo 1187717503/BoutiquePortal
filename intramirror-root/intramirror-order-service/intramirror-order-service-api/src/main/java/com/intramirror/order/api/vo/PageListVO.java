@@ -52,10 +52,6 @@ public class PageListVO {
         this.pageSize = pageSize;
     }
 
-    public PageListVO(List data){
-        total = data.size();
-    }
-
     public void calPageTotal(){
         if(total % pageSize != 0){
             pageTotal = total / pageSize + 1;

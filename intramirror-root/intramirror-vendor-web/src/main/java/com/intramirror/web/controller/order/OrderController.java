@@ -153,13 +153,13 @@ public class OrderController extends BaseController {
         PageListVO orderCancelList = null;
         if ("6".equals(status)){
             //cancel TAB列表查询
+            map.put("vendorId",vendorId);
             orderCancelList = orderService.getOrderCancelList(map);
         }else {
             orderList = orderService.getOrderListByStatus(Integer.parseInt(status), vendorId, sortByName);
         }
 
         if (orderList != null && orderList.size() > 0) {
-
             //			/**------------------------------------优化----------------------------------------*/
             //			//遍历获取所有商品ID
             //			String productIds = "";
@@ -191,44 +191,41 @@ public class OrderController extends BaseController {
             //			/**------------------------------------优化end----------------------------------------*/
 
             logger.info("order getOrderList 解析订单列表信息  ");
-            if(orderList!=null&&orderList.size()>0){
-                for (Map<String, Object> info : orderList) {
-                    //计算折扣
-                    Double price = Double.parseDouble(info.get("price").toString());
-                    Double inPrice = Double.parseDouble(info.get("in_price").toString());
+            for (Map<String, Object> info : orderList) {
+                //计算折扣
+                Double price = Double.parseDouble(info.get("price").toString());
+                Double inPrice = Double.parseDouble(info.get("in_price").toString());
 
-                    BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + 0.22) / price) * 100);
-                    if (supply_price_discount.intValue() > 100 || supply_price_discount.intValue() < 0) {
-                        info.put("supply_price_discount", 0 + " %");
-                    } else {
-                        info.put("supply_price_discount", (100 - supply_price_discount.setScale(0, BigDecimal.ROUND_HALF_UP).intValue()) + " %");
-                    }
+                BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + 0.22) / price) * 100);
+                if (supply_price_discount.intValue() > 100 || supply_price_discount.intValue() < 0) {
+                    info.put("supply_price_discount", 0 + " %");
+                } else {
+                    info.put("supply_price_discount", (100 - supply_price_discount.setScale(0, BigDecimal.ROUND_HALF_UP).intValue()) + " %");
+                }
 
-                    //				//添加商品对应的属性
-                    //				if(productPropertyResult.size() > 0 ){
-                    //					if(productPropertyResult.get(info.get("product_id").toString()) != null){
-                    //						info.put("brandID", productPropertyResult.get(info.get("product_id").toString()).get("BrandID"));
-                    //						info.put("colorCode", productPropertyResult.get(info.get("product_id").toString()).get("ColorCode"));
-                    //					}
-                    //				}
+                //				//添加商品对应的属性
+                //				if(productPropertyResult.size() > 0 ){
+                //					if(productPropertyResult.get(info.get("product_id").toString()) != null){
+                //						info.put("brandID", productPropertyResult.get(info.get("product_id").toString()).get("BrandID"));
+                //						info.put("colorCode", productPropertyResult.get(info.get("product_id").toString()).get("ColorCode"));
+                //					}
+                //				}
 
+            }
+        }
+        if(orderCancelList!=null&&orderCancelList.getTotal()>0){
+            for(Object o:orderCancelList.getData()){
+                CancelOrderVO co = (CancelOrderVO)o;
+                Double price = Double.parseDouble(co.getPrice().toString());
+                Double inPrice = Double.parseDouble(co.getIn_price().toString());
+
+                BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + 0.22) / price) * 100);
+                if (supply_price_discount.intValue() > 100 || supply_price_discount.intValue() < 0) {
+                    co.setSupply_price_discount(0 + " %");
+                } else {
+                    co.setSupply_price_discount ((100 - supply_price_discount.setScale(0, BigDecimal.ROUND_HALF_UP).intValue()) + " %");
                 }
             }
-            if(orderCancelList!=null&&orderCancelList.getTotal()>0){
-                for(Object o:orderCancelList.getData()){
-                    CancelOrderVO co = (CancelOrderVO)o;
-                    Double price = Double.parseDouble(co.getPrice().toString());
-                    Double inPrice = Double.parseDouble(co.getIn_price().toString());
-
-                    BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + 0.22) / price) * 100);
-                    if (supply_price_discount.intValue() > 100 || supply_price_discount.intValue() < 0) {
-                        co.setSupply_price_discount(0 + " %");
-                    } else {
-                        co.setSupply_price_discount ((100 - supply_price_discount.setScale(0, BigDecimal.ROUND_HALF_UP).intValue()) + " %");
-                    }
-                }
-            }
-
         }
 
         result.successStatus();
@@ -463,6 +460,10 @@ public class OrderController extends BaseController {
             //shippedCount
             int shippedCount = orderService.getShippedCount(map);
             resultMap.put("shipped", shippedCount);
+
+            //cancel
+            int orderCancelCount = orderService.getOrderCancelCount(map);
+            resultMap.put("canceled",orderCancelCount);
 
             resultMessage.successStatus().putMsg("info", "SUCCESS").setData(resultMap);
         } catch (Exception e) {
