@@ -243,6 +243,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
         Integer pageSize = Integer.valueOf(params.get("pageSize")==null?"10":params.get("pageSize").toString());
         params.put("pageNo",(pageNumber-1) * pageSize);
         params.put("pageSize",pageSize);
+        if(params.get("orderNumber")!=null)
         params.put("orderNumber","%"+params.get("orderNumber").toString()+"%");
         List<CancelOrderVO> orderCancelList = orderMapper.getOrderCancelList(params);
         if(orderCancelList != null && orderCancelList.size()>0){
