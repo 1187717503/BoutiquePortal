@@ -4,6 +4,7 @@ import com.intramirror.web.thread.UpdateProductThread;
 import com.intramirror.web.thread.UpdateStockThread;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class ThreadManager {
 
@@ -11,13 +12,14 @@ public class ThreadManager {
     private static final ExecutorService productImagePool = Executors.newFixedThreadPool(100);
     private static final ExecutorService stockPool = Executors.newFixedThreadPool(100);
 
-    public static void submit(Runnable runnable) {
+    public static Future<?> submit(Runnable runnable) {
         if (runnable instanceof UpdateProductImageThread) {
-            productImagePool.submit(runnable);
+            return productImagePool.submit(runnable);
         } else if (runnable instanceof UpdateProductThread) {
-            productPool.submit(runnable);
+            return productPool.submit(runnable);
         } else if (runnable instanceof UpdateStockThread) {
-            stockPool.submit(runnable);
+            return stockPool.submit(runnable);
         }
+        return null;
     }
 }
