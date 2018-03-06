@@ -438,7 +438,7 @@ public class OrderController extends BaseController {
                 return resultMessage;
             }
             Long vendorId = vendor.getVendorId();
-            int[] item = { OrderStatusType.PENDING, OrderStatusType.COMFIRMED };
+            int[] item = { OrderStatusType.PENDING, OrderStatusType.COMFIRMED ,OrderStatusType.CANCELED};
             Map<String, Object> resultMap = new HashMap<>();
             for (int i = 0; i < item.length; i++) {
                 map = new HashMap<>();
@@ -449,6 +449,11 @@ public class OrderController extends BaseController {
                     resultMap.put("comfirmed", result);
                 if (OrderStatusType.COMFIRMED == item[i])
                     resultMap.put("pack", result);
+                if (OrderStatusType.CANCELED == item[i]){
+                    //cancel
+                    int orderCancelCount = orderService.getOrderCancelCount(map);
+                    resultMap.put("canceled",orderCancelCount);
+                }
             }
 
             //readytoship数量
@@ -460,10 +465,6 @@ public class OrderController extends BaseController {
             //shippedCount
             int shippedCount = orderService.getShippedCount(map);
             resultMap.put("shipped", shippedCount);
-
-            //cancel
-            int orderCancelCount = orderService.getOrderCancelCount(map);
-            resultMap.put("canceled",orderCancelCount);
 
             resultMessage.successStatus().putMsg("info", "SUCCESS").setData(resultMap);
         } catch (Exception e) {
