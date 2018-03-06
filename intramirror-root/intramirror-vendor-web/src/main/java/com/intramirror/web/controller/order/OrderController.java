@@ -213,7 +213,9 @@ public class OrderController extends BaseController {
 
             }
         }
-        if(orderCancelList!=null&&orderCancelList.getTotal()>0){
+        if(orderCancelList!=null
+                &&orderCancelList.getTotal()!=null
+                &&orderCancelList.getTotal()>0){
             for(Object o:orderCancelList.getData()){
                 CancelOrderVO co = (CancelOrderVO)o;
                 Double price = Double.parseDouble(co.getPrice().toString());

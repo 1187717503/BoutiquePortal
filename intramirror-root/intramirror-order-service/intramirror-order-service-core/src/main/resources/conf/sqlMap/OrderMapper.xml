@@ -274,7 +274,7 @@
         where pspk.`name` = 'Size' and lp.`status` = #{status,jdbcType=BIGINT} and lp.enabled = 1
         and v.vendor_id = #{vendorId,jdbcType=BIGINT}
         <if test="orderNumber != null">
-        AND lp.order_line_num = #{orderNumber}
+        AND lp.order_line_num LIKE #{orderNumber}
         </if>
         GROUP BY lp.order_line_num
         <choose>
