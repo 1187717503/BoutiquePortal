@@ -3,7 +3,9 @@ package com.intramirror.web.controller.api.service;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson15.JSONArray;
 import com.google.gson.Gson;
+import com.intramirror.utils.transform.JsonTransformUtil;
 import static com.intramirror.web.controller.api.service.ApiCommonUtils.escape;
+import com.intramirror.web.distributed.utils.KafkaMqUtil;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -50,19 +52,13 @@ import pk.shoplus.util.ExceptionUtils;
 /**
  * 创建商品优化
  */
-public class ApiCreateProductService {
+public class ApiCreateProductService extends AbstractService {
 
     private static final Logger logger = Logger.getLogger(ApiCreateProductService.class);
-
-    private ProductEDSManagement.ProductOptions productOptions;
-
-    private ProductEDSManagement.VendorOptions vendorOptions;
 
     private ProductSkuPropertyKey uProductSkuPropertyKey;
 
     private Boolean no_img;
-
-    private Product uProduct;
 
     public Map<String, Object> createProduct(ProductEDSManagement.ProductOptions productOptions, ProductEDSManagement.VendorOptions vendorOptions) {
         long start = System.currentTimeMillis();
@@ -98,6 +94,7 @@ public class ApiCreateProductService {
             this.setBrandCategory(conn);
 
             resultMap = ApiCommonUtils.successMap();
+            this.printChangeLog(conn);
             if (conn != null) {
                 conn.commit();
                 conn.close();
@@ -131,6 +128,16 @@ public class ApiCreateProductService {
         }
         long end = System.currentTimeMillis();
         logger.info("Job_Run_Time,ApiCreateProductService_createProduct,start:" + start + ",end:" + end + ",time:" + (end - start));
+
+        if (resultMap != null && !resultMap.get("info").equals(ApiErrorTypeEnum.errorType.error_boutique_id_already_exists.getDesc())) {
+            if (StringUtils.isNotBlank(productOptions.getRequestId())) {
+                result.put("id", productOptions.getRequestId());
+                result.put("exceptionData", resultMap);
+                result.put("time", new Date());
+                KafkaMqUtil.sendResultMessage(productOptions.getRequestId(), JsonTransformUtil.toJson(result));
+            }
+        }
+
         return resultMap;
     }
 
@@ -705,19 +712,6 @@ public class ApiCreateProductService {
             skuOption.setSize(size);
         }
 
-    }
-
-    private Product getProduct(Connection conn) throws Exception {
-        if (this.uProduct == null) {
-            ProductService productService = new ProductService(conn);
-            Map<String, Object> condition = new HashMap<>();
-            condition.put("product_code", productOptions.getCode());
-            condition.put("enabled", 1);
-            condition.put("vendor_id", vendorOptions.getVendorId());
-            Product product = productService.getProductByCondition(condition, null);
-            this.uProduct = product;
-        }
-        return this.uProduct;
     }
 
     private boolean getNoImg(Connection conn) throws Exception {

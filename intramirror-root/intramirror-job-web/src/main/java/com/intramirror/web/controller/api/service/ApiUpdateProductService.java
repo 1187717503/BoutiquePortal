@@ -5,6 +5,7 @@ import com.alibaba.fastjson15.JSONArray;
 import com.google.gson.Gson;
 import com.intramirror.utils.transform.JsonTransformUtil;
 import static com.intramirror.web.controller.api.service.ApiCommonUtils.escape;
+import com.intramirror.web.distributed.utils.KafkaMqUtil;
 import com.intramirror.web.mapping.vo.StockOption;
 import com.intramirror.web.util.Facility;
 import com.intramirror.web.util.HttpUtils;
@@ -33,30 +34,26 @@ import pk.shoplus.parameter.EnabledType;
 import pk.shoplus.parameter.StatusType;
 import pk.shoplus.service.BoutiqueImageService;
 import pk.shoplus.service.CategoryProductInfoService;
-import pk.shoplus.service.CategoryService;
 import pk.shoplus.service.ProductInfoService;
 import pk.shoplus.service.ProductPropertyService;
 import pk.shoplus.service.ProductService;
 import pk.shoplus.service.VendorService;
 import pk.shoplus.service.price.api.IPriceService;
 import pk.shoplus.service.price.impl.PriceServiceImpl;
-import pk.shoplus.util.DateUtils;
 import pk.shoplus.util.ExceptionUtils;
 
 /**
  * 修改商品优化
  */
-public class ApiUpdateProductService {
+public class ApiUpdateProductService extends AbstractService{
 
     private static final Logger logger = Logger.getLogger(ApiCreateProductService.class);
 
-    private ProductEDSManagement.ProductOptions productOptions;
 
-    private ProductEDSManagement.VendorOptions vendorOptions;
 
     private List<StockOption> stockOptions;
 
-    private Product uProduct;
+
 
     private Boolean no_img;
 
@@ -131,6 +128,13 @@ public class ApiUpdateProductService {
         }
         long end = System.currentTimeMillis();
         logger.info("Job_Run_Time,ApiUpdateProductService_updateProduct,start:" + start + ",end:" + end + ",time:" + (end - start));
+        if (StringUtils.isNotBlank(productOptions.getRequestId())) {
+            result.put("id", productOptions.getRequestId());
+            result.put("exceptionData", resultMap);
+            result.put("time", new Date());
+            KafkaMqUtil.sendResultMessage(productOptions.getRequestId(), JsonTransformUtil.toJson(result));
+        }
+
         return resultMap;
     }
 
@@ -506,8 +510,8 @@ public class ApiUpdateProductService {
 
         }
 
-        if ((StringUtils.isNotBlank(newBrandCode) && !newBrandCode.equalsIgnoreCase(oldBrandCode)) || (StringUtils.isNotBlank(newColorCode) && !newColorCode
-                .equalsIgnoreCase(oldColorCode))) {
+        if ((StringUtils.isNotBlank(newBrandCode) && !newBrandCode.equalsIgnoreCase(oldBrandCode)) || (StringUtils.isNotBlank(newColorCode)
+                && !newColorCode.equalsIgnoreCase(oldColorCode))) {
             if (product.spu_id != null) {
                 logger.info("Try to unbind product [" + product.product_id + "] -- [" + product.spu_id + "]");
                 unbindProductSpu(product.product_id, product.spu_id);
@@ -697,8 +701,8 @@ public class ApiUpdateProductService {
             productOptions.setCategoryId(categoryId);
         }
 
-        if (vendorOptions.getVendorId() == 42 && StringUtils.isBlank(productOptions.getCategoryId()) && StringUtils.isNotBlank(category3) && StringUtils
-                .isNotBlank(category1) && StringUtils.isBlank(category2)) {
+        if (vendorOptions.getVendorId() == 42 && StringUtils.isBlank(productOptions.getCategoryId()) && StringUtils.isNotBlank(category3)
+                && StringUtils.isNotBlank(category1) && StringUtils.isBlank(category2)) {
             Map<String, Object> categoryMap = productService.getCategoryWithoutC2(vendorOptions.getVendorId().toString(), category1, category3);
             if (categoryMap != null) {
                 productOptions.setCategoryId(categoryMap.get("category_id").toString());
@@ -884,18 +888,7 @@ public class ApiUpdateProductService {
         }
     }
 
-    private Product getProduct(Connection conn) throws Exception {
-        if (this.uProduct == null) {
-            ProductService productService = new ProductService(conn);
-            Map<String, Object> condition = new HashMap<>();
-            condition.put("product_code", productOptions.getCode());
-            condition.put("enabled", 1);
-            condition.put("vendor_id", vendorOptions.getVendorId());
-            Product product = productService.getProductByCondition(condition, null);
-            this.uProduct = product;
-        }
-        return this.uProduct;
-    }
+
 
     private boolean getNoImg(Connection conn) throws Exception {
         if (no_img != null) {
@@ -984,37 +977,4 @@ public class ApiUpdateProductService {
         }
     }
 
-    private void printChangeLog(Connection conn) throws Exception {
-        // 查询Product
-        Product product = this.getProduct(conn);
-        if (product == null) {
-            return;
-        }
-
-        // skuLog
-        CategoryService categoryService = new CategoryService(conn);
-        List<Map<String, Object>> skuList = categoryService.executeSQL(
-                "select s.`sku_id` ,s.`sku_code` ,s.`size` ,s.`in_price` ,s.`im_price` ,s.`price` ,ss.`store` ,ss.`reserved` ,ss.`confirmed`  from `sku`  s\n"
-                        + "left join `sku_store`  ss  on(s.`sku_id` = ss.`sku_id`  and ss.`enabled`  = 1 and s.`enabled`  = 1)\n" + "where s.`product_id`  ="
-                        + product.getProduct_id());
-
-        // productLog
-        Map<String, Object> productMap = new HashMap<>();
-        productMap.put("vendor_id", product.getVendor_id());
-        productMap.put("boutique_id", product.getProduct_code());
-        productMap.put("designer_id", product.getDesigner_id());
-        productMap.put("color_code", product.getColor_code());
-        productMap.put("season_code", product.getSeason_code());
-        productMap.put("category_id", product.getCategory_id());
-        productMap.put("brand_id", product.getBrand_id());
-        productMap.put("cover_img", product.getCover_img());
-        productMap.put("retail_price", product.getMax_retail_price());
-        productMap.put("last_check", product.getLast_check());
-        productMap.put("skus", skuList);
-
-
-        String productLog = "Prodcut Change Record,product:" + JSONObject.toJSONString(productMap) + ",skus:" + JSONObject.toJSONString(skuList) + ",update_at:"
-                + DateUtils.getformatDate(new Date());
-        logger.info(productLog);
-    }
 }
