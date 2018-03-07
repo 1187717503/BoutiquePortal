@@ -282,24 +282,7 @@
 
             </when>
             <otherwise>
-                <if test="order_line_num != null">
-                    order by lp.order_line_num desc
-                </if>
-
-                <if test="created_at != null">
-                    order by o.created_at desc
-                </if>
-
-                <if test="confirmed_at != null">
-                    order by lp.confirmed_at desc
-                </if>
-
-                <if test="est_ship_date != null">
-                    order by lp.est_ship_date desc
-                </if>
-                <if test="geography_name != null">
-                    order by g.english_name asc
-                </if>
+                order by o.created_at desc
                 limit #{pageNo},#{pageSize}
             </otherwise>
         </choose>
