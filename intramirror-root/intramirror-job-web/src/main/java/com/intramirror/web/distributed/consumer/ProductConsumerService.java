@@ -31,12 +31,12 @@ import pk.shoplus.model.ProductEDSManagement;
  * @author YouFeng.Zhu
  */
 @Service
-public class ConsumerService {
+public class ProductConsumerService {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(ConsumerService.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(ProductConsumerService.class);
     private static Properties productConsumerProps = new Properties();
     private volatile AtomicBoolean productConsumerRunning = new AtomicBoolean(false);
-
+    private final static String PRODUCT_RAW_QUEUE = "productRawData";
     private CountDownLatch shutDownCount;
 
     @Autowired
@@ -46,7 +46,7 @@ public class ConsumerService {
     static {
 
         productConsumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "106.15.229.248:9092");
-        productConsumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, "group_raw_data");
+        productConsumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, "group_product_raw_data");
         productConsumerProps.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
         productConsumerProps.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "1000");
         productConsumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
@@ -54,7 +54,7 @@ public class ConsumerService {
 
     }
 
-    public void stopConsumerProduct() {
+    public void stopConsumeProduct() {
         if (!productConsumerRunning.compareAndSet(true, false)) {
             LOGGER.info("Consumer Product is not running");
             return;
@@ -70,19 +70,19 @@ public class ConsumerService {
 
     @PostConstruct
     public void startDefaultConsumerProduct() {
-        startConsumerProduct(3);
+        startConsumeProduct(3);
     }
 
-    public void startConsumerProduct(int concurrency) {
+    public void startConsumeProduct(int concurrency) {
         if (productConsumerRunning.compareAndSet(false, true)) {
-            LOGGER.info("Consumer Product already started");
+            LOGGER.info("Consumer Product already started.");
         }
         ExecutorService consumerThreadPool = Executors.newFixedThreadPool(concurrency);
         shutDownCount = new CountDownLatch(concurrency);
         for (int i = 0; i < concurrency; i++) {
             consumerThreadPool.submit(() -> {
                 KafkaConsumer<String, String> consumer = new KafkaConsumer<>(productConsumerProps);
-                consumer.subscribe(Arrays.asList("rawData"));
+                consumer.subscribe(Arrays.asList(PRODUCT_RAW_QUEUE));
                 while (productConsumerRunning.get()) {
                     ConsumerRecords<String, String> records = consumer.poll(500);
                     for (ConsumerRecord<String, String> record : records) {
@@ -90,9 +90,10 @@ public class ConsumerService {
                         Map<String, Object> productContext = JsonTransformUtil.readValue(record.value(), Map.class);
                         if (productContext == null) {
                             LOGGER.error("ProductContext format error: {}", record.value());
+                            continue;
                         }
                         Long vendorId = Long.parseLong(productContext.get("vendorId").toString());
-                        String eventName = productContext.get("eventName").toString();
+                        String eventName = productContext.get("eventType").toString();
                         String vendorName = productContext.get("vendorName").toString();
                         Map<String, Object> data = (Map<String, Object>) productContext.get("data");
 

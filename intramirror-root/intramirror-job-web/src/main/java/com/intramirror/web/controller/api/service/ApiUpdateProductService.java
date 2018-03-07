@@ -1007,8 +1007,11 @@ public class ApiUpdateProductService {
         productMap.put("season_code", product.getSeason_code());
         productMap.put("category_id", product.getCategory_id());
         productMap.put("brand_id", product.getBrand_id());
-        productMap.put("img:", product.getCover_img());
+        productMap.put("cover_img", product.getCover_img());
         productMap.put("retail_price", product.getMax_retail_price());
+        productMap.put("last_check", product.getLast_check());
+        productMap.put("skus", skuList);
+
 
         String productLog = "Prodcut Change Record,product:" + JSONObject.toJSONString(productMap) + ",skus:" + JSONObject.toJSONString(skuList) + ",update_at:"
                 + DateUtils.getformatDate(new Date());
