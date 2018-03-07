@@ -82,5 +82,15 @@ public interface PromotionRuleMapper {
 
     void removeExcludeSnapshotProduct(@Param("vendorId") Long vendorId, @Param("seasonCode") String seasonCode, @Param("brandId") Long brandId,
             @Param("category") List<Long> category);
+
+    List<Map<String, Object>> addProductForIncludeRule(@Param("promotionId") Long promotionId, @Param("promotionRuleId") Long promotionRuleId,
+            @Param("vendorId") Long vendorId, @Param("seasonCode") String seasonCode, @Param("brandId") Long brandId, @Param("category") List<Long> category,
+            @Param("productId") Long productId);
+
+    List<Map<String, Object>> addProductsForIncludeRule(@Param("promotionId") Long promotionId, @Param("promotionRuleId") Long promotionRuleId,
+            @Param("vendorId") Long vendorId, @Param("seasonCode") String seasonCode, @Param("brandId") Long brandId, @Param("category") List<Long> category,
+            @Param("productIds") List<Long> productIds);
+
+    void removeExcludeProductFromSnapshotProduct(Long promotionId);
 }
 

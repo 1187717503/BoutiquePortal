@@ -573,6 +573,68 @@
 
     </insert>
 
+    <select id="addProductForIncludeRule">
+        INSERT INTO snapshot_product (promotion_id, promotion_include_rule_id, product_id, vendor_sort, brand_sort, category_sort,brand_id, brand_name,
+        season_sort)
+        SELECT #{promotionId, jdbcType=BIGINT} AS promotion_id, #{promotionRuleId, jdbcType=BIGINT} AS promotion_include_rule_id,p.product_id, tpsv.sort AS
+        vendor_sort, tpsb.sort AS brand_sort, tpsc.sort AS category_sort, p.brand_id, b.english_name AS brand_name,
+        CASE
+        WHEN p.season_code like '%ss' THEN concat(substring(p.season_code, 1, 2), 1)
+        WHEN p.season_code like '%fw' THEN concat(substring(p.season_code, 1, 2), 2)
+        WHEN p.season_code like 'CarryOver' THEN
+        CASE WHEN DATE_FORMAT(date_add(now(), interval -6 month), '%c') > 6
+        THEN concat(DATE_FORMAT(date_add(now(), interval -6 month), '%y'), 2)
+        ELSE concat(DATE_FORMAT(date_add(now(), interval -6 month), '%y'), 1) END
+        END AS seasonCode
+        FROM product p
+        INNER JOIN brand b ON b.brand_id = p.brand_id
+        LEFT JOIN t_promotion_seq_brand tpsb ON tpsb.promotion_id = #{promotionId, jdbcType=BIGINT} AND tpsb.brand_id = p.brand_id
+        LEFT JOIN t_promotion_seq_vendor tpsv ON tpsv.promotion_id = #{promotionId, jdbcType=BIGINT} AND tpsv.vendor_id = p.vendor_id
+        LEFT JOIN t_promotion_seq_category tpsc ON tpsc.promotion_id = #{promotionId, jdbcType=BIGINT} AND tpsc.category_id = p.category_id
+        WHERE p.enabled=1 AND p.vendor_id=#{vendorId, jdbcType=BIGINT} AND p.season_code = #{seasonCode, jdbcType=VARCHAR} AND p.category_id IN
+        <foreach item="item" index="index" collection="category" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+        <if test="brandId != null">
+            AND p.brand_id = #{brandId, jdbcType=BIGINT}
+        </if>
+        AND p.product_id = #{productId, jdbcType=BIGINT}
+        AND NOT EXISTS (SELECT product_id FROM snapshot_product where promotion_id=#{promotionId, jdbcType=BIGINT})
+    </select>
+
+    <select id="addProductsForIncludeRule">
+        INSERT INTO snapshot_product (promotion_id, promotion_include_rule_id, product_id, vendor_sort, brand_sort, category_sort,brand_id, brand_name,
+        season_sort)
+        SELECT #{promotionId, jdbcType=BIGINT} AS promotion_id, #{promotionRuleId, jdbcType=BIGINT} AS promotion_include_rule_id,p.product_id, tpsv.sort AS
+        vendor_sort, tpsb.sort AS brand_sort, tpsc.sort AS category_sort, p.brand_id, b.english_name AS brand_name,
+        CASE
+        WHEN p.season_code like '%ss' THEN concat(substring(p.season_code, 1, 2), 1)
+        WHEN p.season_code like '%fw' THEN concat(substring(p.season_code, 1, 2), 2)
+        WHEN p.season_code like 'CarryOver' THEN
+        CASE WHEN DATE_FORMAT(date_add(now(), interval -6 month), '%c') > 6
+        THEN concat(DATE_FORMAT(date_add(now(), interval -6 month), '%y'), 2)
+        ELSE concat(DATE_FORMAT(date_add(now(), interval -6 month), '%y'), 1) END
+        END AS seasonCode
+        FROM product p
+        INNER JOIN brand b ON b.brand_id = p.brand_id
+        LEFT JOIN t_promotion_seq_brand tpsb ON tpsb.promotion_id = #{promotionId, jdbcType=BIGINT} AND tpsb.brand_id = p.brand_id
+        LEFT JOIN t_promotion_seq_vendor tpsv ON tpsv.promotion_id = #{promotionId, jdbcType=BIGINT} AND tpsv.vendor_id = p.vendor_id
+        LEFT JOIN t_promotion_seq_category tpsc ON tpsc.promotion_id = #{promotionId, jdbcType=BIGINT} AND tpsc.category_id = p.category_id
+        WHERE p.enabled=1 AND p.vendor_id=#{vendorId, jdbcType=BIGINT} AND p.season_code = #{seasonCode, jdbcType=VARCHAR} AND p.category_id IN
+        <foreach item="item" index="index" collection="category" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <if test="brandId != null">
+            AND p.brand_id = #{brandId, jdbcType=BIGINT}
+        </if>
+        AND p.product_id IN
+        <foreach item="product" index="index" collection="productIds" open="(" separator="," close=")">
+            #{product}
+        </foreach>
+        AND NOT EXISTS (SELECT product_id FROM snapshot_product where promotion_id=#{promotionId, jdbcType=BIGINT})
+    </select>
+
     <delete id="removeExcludeSnapshotProduct">
         DELETE FROM snapshot_product WHERE exists (
         SELECT p.product_id FROM product p
@@ -589,6 +651,29 @@
             AND p.brand_id = #{brandId, jdbcType=BIGINT}
         </if>
         )
+    </delete>
+
+    <delete id="removeProductForExcludeRule">
+        DELETE FROM snapshot_product WHERE exists (
+        SELECT p.product_id FROM product p
+        INNER JOIN shop_product sp ON p.product_id = sp.product_id
+        WHERE p.season_code = #{seasonCode, jdbcType=VARCHAR}
+        AND p.enabled = 1 AND sp.enabled = 1
+        AND p.vendor_id = #{vendorId, jdbcType=BIGINT}
+        AND p.product_id = snapshot_product.product_id
+        AND p.category_id IN
+        <foreach item="item" index="index" collection="category" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <if test="brandId != null">
+            AND p.brand_id = #{brandId, jdbcType=BIGINT}
+        </if>
+        AND p.product_id= #{productId, jdbcType=BIGINT}
+        )
+    </delete>
+
+    <delete id="removeExcludeProductFromSnapshotProduct" parameterType="java.lang.Long">
+        DELETE FROM snapshot_product WHERE product_id IN (SELECT product_id FROM t_promotion_exclude_product WHERE promotion_id=#{promotionId, jdbcType=BIGINT})
     </delete>
 
 </mapper>

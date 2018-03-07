@@ -7,6 +7,7 @@ import com.intramirror.product.api.model.ShopProductSku;
 import com.intramirror.product.api.model.ShopProductWithBLOBs;
 import com.intramirror.product.api.model.Sku;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
+import com.intramirror.product.api.service.promotion.IPromotionService;
 import com.intramirror.product.core.mapper.ProductManagementMapper;
 import com.intramirror.product.core.mapper.ProductMapper;
 import com.intramirror.product.core.mapper.ShopProductMapper;
@@ -25,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created on 2017/10/30.
- *
  * @author YouFeng.Zhu
  */
 @Service
@@ -43,6 +43,9 @@ public class ProductManagementServiceImpl implements ProductManagementService {
     private ShopProductSkuMapper shopProductSkuMapper;
     @Autowired
     private SkuMapper skuMapper;
+
+    @Autowired
+    private IPromotionService promotionService;
 
     @Override
     public Map<String, Object> getProductStateByProductId(Long product_id) {
@@ -93,6 +96,7 @@ public class ProductManagementServiceImpl implements ProductManagementService {
     @Override
     @Transactional
     public void addToShop(int status, int shopStatus, Long productId) {
+        promotionService.refreshSnapshotForAddProduct(productId);
         updateProductStatusOnly(status, productId);
         createShopProductStatus(shopStatus, productId);
     }
@@ -100,6 +104,7 @@ public class ProductManagementServiceImpl implements ProductManagementService {
     @Override
     @Transactional
     public void batchAddToShop(int status, int shopStatus, List<Long> productIds) {
+        promotionService.refreshBatchSnapshotForAddProduct(productIds);
         batchUpdateProductStatusOnly(status, productIds);
         batchCreateShopProductStatus(shopStatus, productIds);
     }

@@ -245,4 +245,10 @@ public class PromotionManagementController {
         promotionService.refreshSnapshotProductByPromotion(promotionId);
         return Response.status(StatusType.SUCCESS).data("ok");
     }
+
+    @GetMapping(value = "/promotion/addtoshop/{productId}")
+    public Response addtoShop(@PathVariable("productId") Long productId) {
+        promotionService.refreshSnapshotForAddProduct(productId);
+        return Response.status(StatusType.SUCCESS).data("ok");
+    }
 }

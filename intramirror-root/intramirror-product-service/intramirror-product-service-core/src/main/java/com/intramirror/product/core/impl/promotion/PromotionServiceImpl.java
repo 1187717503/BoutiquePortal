@@ -251,20 +251,6 @@ public class PromotionServiceImpl implements IPromotionService {
         return promotionRuleMapper.updateSimpleSort(sortPromotion) > 0;
     }
 
-    private void removeSubCategoryInList(List<CategoryEntity> list, Long parentId, int level) {
-        for (CategoryEntity category : list) {
-            if (category.getDel()) {
-                continue;
-            }
-            if (category.getParentId().longValue() == parentId.longValue()) {
-                if (level < 3) {
-                    removeSubCategoryInList(list, category.getCategoryId(), level + 1);
-                }
-                category.setDel(true);
-            }
-        }
-    }
-
     private List<PromotionRuleDetail> insertRuleDetailByRule(PromotionRule rule, PromotionRuleType ruleType) {
         List<BrandEntity> listBrand = JSONObject.parseArray(rule.getBrands(), BrandEntity.class);
         List<CategoryEntity> listCategory = JSONObject.parseArray(rule.getCategorys(), CategoryEntity.class);
@@ -301,32 +287,6 @@ public class PromotionServiceImpl implements IPromotionService {
                     category.setDel(true);
                 }
             }
-
-            //            for (CategoryEntity category : listCategory) {
-            //                if (category.getLevel() == 1) {
-            //                    removeSubCategoryInList(listCategory, category.getCategoryId(), 1);
-            //                }
-            //            }
-            //
-            //            for (CategoryEntity category : listCategory) {
-            //                if (category.getDel()) {
-            //                    continue;
-            //                }
-            //
-            //                if (category.getLevel() == 2) {
-            //                    removeSubCategoryInList(listCategory, category.getCategoryId(), 2);
-            //                }
-            //            }
-            //
-            //            for (CategoryEntity category : listCategory) {
-            //                if (category.getDel()) {
-            //                    continue;
-            //                }
-            //
-            //                if (category.getLevel() == 3) {
-            //                    removeSubCategoryInList(listCategory, category.getCategoryId(), 3);
-            //                }
-            //            }
 
             listRuleCategory = listCategory;
         }
@@ -404,40 +364,6 @@ public class PromotionServiceImpl implements IPromotionService {
         }
     }
 
-    private List<Category> getSubCategoryListByParentId(Long categoryId) {
-        if (categoryId == -1L) {
-            Category condition = new Category();
-            condition.setEnabled(true);
-            condition.setLevel(new Byte("3"));
-            return categoryMapper.listAllCategoryByConditions(condition);
-        }
-
-        Category category = categoryMapper.findCategoryByCategoryId(categoryId);
-        if (category == null) {
-            return null;
-        }
-
-        if (category.getLevel() == 2L) {
-            return categoryMapper.listSubCategoryByCategoryId(categoryId);
-        }
-
-        List<Category> listCategory = new ArrayList<>();
-        if (category.getLevel() == 3L) {
-            listCategory.add(category);
-            return listCategory;
-        }
-
-        if (category.getLevel() == 1L) {
-            List<Category> secondCategory = categoryMapper.listSubCategoryByCategoryId(categoryId);
-            for (Category category2 : secondCategory) {
-                listCategory.addAll(categoryMapper.listSubCategoryByCategoryId(category2.getCategoryId()));
-            }
-            return listCategory;
-        }
-
-        return null;
-    }
-
     private void removeExcludeProduct(Long promotionId) {
         Category param = new Category();
         param.setEnabled(true);
@@ -470,6 +396,7 @@ public class PromotionServiceImpl implements IPromotionService {
                 }
             }
         }
+        promotionRuleMapper.removeExcludeProductFromSnapshotProduct(promotionId);
     }
 
     @Transactional
@@ -513,6 +440,93 @@ public class PromotionServiceImpl implements IPromotionService {
         }
 
         removeExcludeProduct(promotionId);
+    }
 
+    private void addProductForIncludeRule(Long promotionId, Long productId) {
+        List<Map<String, Object>> listIncludeRule = promotionRuleMapper.listIncludeRulePromotion(promotionId);
+
+        Category param = new Category();
+        param.setEnabled(true);
+        List<Category> listDBCategory = categoryMapper.listAllCategoryByConditions(param);
+
+        for (Map<String, Object> includeRule : listIncludeRule) {
+            List<BrandEntity> listBrand = JSONObject.parseArray((String) includeRule.get("brands"), BrandEntity.class);
+            List<CategoryEntity> listCategory = JSONObject.parseArray((String) includeRule.get("categorys"), CategoryEntity.class);
+            Long vendorId = (Long) includeRule.get("vendorId");
+            for (CategoryEntity category : listCategory) {
+                for (Category dbCategory : listDBCategory) {
+                    if (dbCategory.getCategoryId().longValue() == category.getCategoryId().longValue()) {
+                        category.setLevel(dbCategory.getLevel());
+                    }
+                }
+            }
+
+            for (BrandEntity brand : listBrand) {
+                Long brandId = brand.getBrandId() == -1 ? null : brand.getBrandId();
+                List<Long> listCategoryId = new ArrayList<>();
+                for (CategoryEntity category : listCategory) {
+                    if (category.getLevel() == 3) {
+                        listCategoryId.add(category.getCategoryId());
+                    }
+                }
+                promotionRuleMapper.addProductForIncludeRule(promotionId, (Long) includeRule.get("ruleId"), vendorId, (String) includeRule.get("seasonCode"),
+                        brandId, listCategoryId, productId);
+            }
+        }
+    }
+
+    private void addProductsForIncludeRule(Long promotionId, List<Long> productIds) {
+        List<Map<String, Object>> listIncludeRule = promotionRuleMapper.listIncludeRulePromotion(promotionId);
+
+        Category param = new Category();
+        param.setEnabled(true);
+        List<Category> listDBCategory = categoryMapper.listAllCategoryByConditions(param);
+
+        for (Map<String, Object> includeRule : listIncludeRule) {
+            List<BrandEntity> listBrand = JSONObject.parseArray((String) includeRule.get("brands"), BrandEntity.class);
+            List<CategoryEntity> listCategory = JSONObject.parseArray((String) includeRule.get("categorys"), CategoryEntity.class);
+            Long vendorId = (Long) includeRule.get("vendorId");
+            for (CategoryEntity category : listCategory) {
+                for (Category dbCategory : listDBCategory) {
+                    if (dbCategory.getCategoryId().longValue() == category.getCategoryId().longValue()) {
+                        category.setLevel(dbCategory.getLevel());
+                    }
+                }
+            }
+
+            for (BrandEntity brand : listBrand) {
+                Long brandId = brand.getBrandId() == -1 ? null : brand.getBrandId();
+                List<Long> listCategoryId = new ArrayList<>();
+                for (CategoryEntity category : listCategory) {
+                    if (category.getLevel() == 3) {
+                        listCategoryId.add(category.getCategoryId());
+                    }
+                }
+                promotionRuleMapper.addProductsForIncludeRule(promotionId, (Long) includeRule.get("ruleId"), vendorId, (String) includeRule.get("seasonCode"),
+                        brandId, listCategoryId, productIds);
+            }
+        }
+    }
+
+    @Transactional
+    @Override
+    public void refreshSnapshotForAddProduct(Long productId) {
+        List<Promotion> listPromotion = promotionMapper.getAllPromotion();
+
+        for (Promotion promotion : listPromotion) {
+            addProductForIncludeRule(promotion.getPromotionId(), productId);
+            removeExcludeProduct(promotion.getPromotionId());
+        }
+    }
+
+    @Transactional
+    @Override
+    public void refreshBatchSnapshotForAddProduct(List<Long> productIds) {
+        List<Promotion> listPromotion = promotionMapper.getAllPromotion();
+
+        for (Promotion promotion : listPromotion) {
+            addProductsForIncludeRule(promotion.getPromotionId(), productIds);
+            removeExcludeProduct(promotion.getPromotionId());
+        }
     }
 }

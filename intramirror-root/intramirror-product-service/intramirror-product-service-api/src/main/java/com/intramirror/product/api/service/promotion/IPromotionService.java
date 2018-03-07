@@ -48,4 +48,8 @@ public interface IPromotionService {
     Integer updatePromotionBrandHot(List<PromotionBrandHot> listPromotionBrandHot);
 
     void refreshSnapshotProductByPromotion(Long promotionId);
+
+    void refreshSnapshotForAddProduct(Long productId);
+
+    void refreshBatchSnapshotForAddProduct(List<Long> productIds);
 }
