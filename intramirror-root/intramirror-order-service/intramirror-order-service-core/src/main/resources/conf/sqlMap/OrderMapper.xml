@@ -2,6 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.intramirror.order.core.mapper.OrderMapper">
 
+    <resultMap id="BaseResultMap" type="com.intramirror.order.api.model.CancelOrderVO" >
+        <result column="cover_img" property="cover_img" jdbcType="VARCHAR" />
+        <result column="product_id" property="product_id" jdbcType="BIGINT" />
+        <result column="size" property="size" jdbcType="VARCHAR" />
+        <result column="brandName" property="brandName" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="BIGINT" />
+        <result column="price" property="price" jdbcType="DECIMAL" />
+        <result column="in_price" property="in_price" jdbcType="DECIMAL" />
+        <result column="order_line_num" property="order_line_num" jdbcType="VARCHAR" />
+        <result column="created_at" property="created_at" jdbcType="TIMESTAMP" />
+        <result column="cancel_at" property="cancel_at" jdbcType="TIMESTAMP" />
+    </resultMap>
+
     <select id="getOrderList" resultType="java.util.HashMap" parameterType="java.util.Map">
         SELECT
             DISTINCT
@@ -174,6 +187,105 @@
         <if test="geography_name != null">
             order by g.english_name asc
         </if>
+    </select>
+
+    <select id="getOrderCancelList" resultMap="BaseResultMap" parameterType="java.util.Map">
+        SELECT
+        o.order_num,
+        o.order_id,
+        o.created_at,
+        o.current_rate,
+        p. `NAME`,
+        p.product_id,
+        pspv.`value` AS `size`,
+        p.category_id,
+        lp.`retail_price` AS price,
+        lp.`in_price`,
+        lp.`sale_price`,
+        lp.amount,
+        lp.shipping_fee,
+        lp.tax_fee,
+        lp.order_line_num,
+        lp.`status`,
+        lp.confirmed_at,
+        lp.est_ship_date,
+        lp.packed_at,
+        lp.shipped_at,
+        s.sku_code,
+        b.english_name AS brandName,
+        l.user_rec_name,
+        l.user_rec_province,
+        l.user_rec_city,
+        l.user_rec_area,
+        l.user_rec_addr,
+        l.user_rec_country,
+        l.geography_id,
+        v.vendor_name,
+        v.vendor_id,
+        v.skip_confirm,
+        v.address_country_id AS vendor_address_country_id,
+        p.cover_img,
+        lp.logistics_product_id,
+        lp.updated_at as cancel_at
+        FROM
+        logistics_product lp
+        INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+        INNER JOIN `order` o ON ol.order_id = o.order_id
+        LEFT JOIN logistics l ON (
+        lp.order_logistics_id = l.order_logistics_id
+        AND l.enabled = 1
+        )
+        INNER JOIN shop_product_sku sps ON (
+        lp.shop_product_sku_id = sps.shop_product_sku_id
+        )
+        INNER JOIN shop_product sp ON (
+        sps.shop_product_id = sp.shop_product_id
+        )
+        INNER JOIN product p ON (
+        sp.product_id = p.product_id
+        AND p.enabled = 1
+        )
+        INNER JOIN brand b ON (
+        p.brand_id = b.brand_id
+        AND b.enabled = 1
+        )
+        INNER JOIN sku s ON (
+        s.sku_id = sps.sku_id
+        AND s.enabled = 1
+        )
+        INNER JOIN sku_property skup ON (
+        skup.sku_id = s.sku_id
+        AND skup.enabled = 1
+        )
+        INNER JOIN product_sku_property_key pspk ON (
+        pspk.product_id = p.product_id
+        AND pspk.product_sku_property_key_id = skup.product_sku_property_key_id
+        AND pspk.enabled = 1
+        )
+        INNER JOIN product_sku_property_value pspv ON (
+        pspv.product_sku_property_key_id = skup.product_sku_property_key_id
+        AND pspv.product_sku_property_value_id = skup.product_sku_property_value_id
+        AND pspv.enabled = 1
+        )
+        INNER JOIN vendor v ON (
+        lp.vendor_id = v.vendor_id
+        AND v.enabled = 1
+        )
+        where pspk.`name` = 'Size' and lp.`status` = #{status,jdbcType=BIGINT} and lp.enabled = 1
+        and v.vendor_id = #{vendorId,jdbcType=BIGINT}
+        <if test="orderNumber != null">
+        AND lp.order_line_num LIKE #{orderNumber}
+        </if>
+        GROUP BY lp.order_line_num
+        <choose>
+            <when test="count == 1">
+
+            </when>
+            <otherwise>
+                order by o.created_at desc
+                limit #{pageNo},#{pageSize}
+            </otherwise>
+        </choose>
     </select>
 
     <select id="getOrderListByStatusAndContainerId" resultType="java.util.HashMap" parameterType="java.util.Map">

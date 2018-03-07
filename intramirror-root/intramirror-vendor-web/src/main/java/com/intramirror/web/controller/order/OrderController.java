@@ -17,6 +17,8 @@ import com.intramirror.order.api.service.IOrderExceptionTypeService;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.service.IShipmentService;
 import com.intramirror.order.api.service.ISubShipmentService;
+import com.intramirror.order.api.model.CancelOrderVO;
+import com.intramirror.order.api.vo.PageListVO;
 import com.intramirror.product.api.model.Product;
 import com.intramirror.product.api.service.IProductService;
 import com.intramirror.product.api.service.ISkuStoreService;
@@ -143,13 +145,21 @@ public class OrderController extends BaseController {
         }
 
         Long vendorId = vendor.getVendorId();
+        String status = map.get("status").toString();
         //根据订单状态查询订单
         logger.info(MessageFormat.format("order getOrderList 调用接口 orderService.getOrderListByStatus 查询订单信息  入参 status:{0},vendorId:{1},sortByName:{2}",
-                map.get("status").toString(), vendorId, sortByName));
-        List<Map<String, Object>> orderList = orderService.getOrderListByStatus(Integer.parseInt(map.get("status").toString()), vendorId, sortByName);
+                status, vendorId, sortByName));
+        List<Map<String, Object>> orderList = null;
+        PageListVO orderCancelList = null;
+        if ("6".equals(status)){
+            //cancel TAB列表查询
+            map.put("vendorId",vendorId);
+            orderCancelList = orderService.getOrderCancelList(map);
+        }else {
+            orderList = orderService.getOrderListByStatus(Integer.parseInt(status), vendorId, sortByName);
+        }
 
         if (orderList != null && orderList.size() > 0) {
-
             //			/**------------------------------------优化----------------------------------------*/
             //			//遍历获取所有商品ID
             //			String productIds = "";
@@ -182,7 +192,6 @@ public class OrderController extends BaseController {
 
             logger.info("order getOrderList 解析订单列表信息  ");
             for (Map<String, Object> info : orderList) {
-
                 //计算折扣
                 Double price = Double.parseDouble(info.get("price").toString());
                 Double inPrice = Double.parseDouble(info.get("in_price").toString());
@@ -203,11 +212,30 @@ public class OrderController extends BaseController {
                 //				}
 
             }
+        }
+        if(orderCancelList!=null
+                &&orderCancelList.getTotal()!=null
+                &&orderCancelList.getTotal()>0){
+            for(Object o:orderCancelList.getData()){
+                CancelOrderVO co = (CancelOrderVO)o;
+                Double price = Double.parseDouble(co.getPrice().toString());
+                Double inPrice = Double.parseDouble(co.getIn_price().toString());
 
+                BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + 0.22) / price) * 100);
+                if (supply_price_discount.intValue() > 100 || supply_price_discount.intValue() < 0) {
+                    co.setSupply_price_discount(0 + " %");
+                } else {
+                    co.setSupply_price_discount ((100 - supply_price_discount.setScale(0, BigDecimal.ROUND_HALF_UP).intValue()) + " %");
+                }
+            }
         }
 
         result.successStatus();
-        result.setData(orderList);
+        if("6".equals(status)){
+            result.setData(orderCancelList);
+        }else {
+            result.setData(orderList);
+        }
         return result;
     }
 
@@ -412,7 +440,7 @@ public class OrderController extends BaseController {
                 return resultMessage;
             }
             Long vendorId = vendor.getVendorId();
-            int[] item = { OrderStatusType.PENDING, OrderStatusType.COMFIRMED };
+            int[] item = { OrderStatusType.PENDING, OrderStatusType.COMFIRMED ,OrderStatusType.CANCELED};
             Map<String, Object> resultMap = new HashMap<>();
             for (int i = 0; i < item.length; i++) {
                 map = new HashMap<>();
@@ -423,6 +451,11 @@ public class OrderController extends BaseController {
                     resultMap.put("comfirmed", result);
                 if (OrderStatusType.COMFIRMED == item[i])
                     resultMap.put("pack", result);
+                if (OrderStatusType.CANCELED == item[i]){
+                    //cancel
+                    int orderCancelCount = orderService.getOrderCancelCount(map);
+                    resultMap.put("canceled",orderCancelCount);
+                }
             }
 
             //readytoship数量

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.intramirror.order.core.mapper.ProductPropertyMapper" >
+
+   	<resultMap id="BaseResultMap" type="com.intramirror.order.api.model.ProductPropertyVO" >
+	    <result column="KEY_NAME" property="keyName" jdbcType="VARCHAR" />
+	    <result column="VALUE" property="value" jdbcType="VARCHAR" />
+	    <result column="PRODUCT_ID" property="productId" jdbcType="BIGINT" />
+  	</resultMap>
+
+	<select id="getProductProperty" resultMap="BaseResultMap"  parameterType="java.util.Map">
+		SELECT KEY_NAME,`VALUE`,PRODUCT_ID FROM PRODUCT_PROPERTY
+		WHERE PRODUCT_ID IN
+		<foreach collection="ids" item="productId" open="(" close=")" separator=",">
+			#{productId}
+		</foreach>
+		 AND KEY_NAME = #{keyName,jdbcType=VARCHAR}
+		 AND ENABLED = 1
+	</select>
+</mapper>
