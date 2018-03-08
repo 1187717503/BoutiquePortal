@@ -29,7 +29,6 @@ import pk.shoplus.model.Product;
 import pk.shoplus.model.ProductEDSManagement;
 import pk.shoplus.model.ProductInfo;
 import pk.shoplus.model.ProductProperty;
-import pk.shoplus.model.Vendor;
 import pk.shoplus.parameter.EnabledType;
 import pk.shoplus.parameter.StatusType;
 import pk.shoplus.service.BoutiqueImageService;
@@ -37,7 +36,6 @@ import pk.shoplus.service.CategoryProductInfoService;
 import pk.shoplus.service.ProductInfoService;
 import pk.shoplus.service.ProductPropertyService;
 import pk.shoplus.service.ProductService;
-import pk.shoplus.service.VendorService;
 import pk.shoplus.service.price.api.IPriceService;
 import pk.shoplus.service.price.impl.PriceServiceImpl;
 import pk.shoplus.util.ExceptionUtils;
@@ -271,9 +269,9 @@ public class ApiUpdateProductService extends AbstractService {
             iPriceService.synProductPriceRule(product,product.getMin_retail_price(),conn);
         }*/
         productOptions.setVendor_id(product.getVendor_id());
-        ApiCommonUtils.sortProductOptionsImage(productOptions);
+        //        ApiCommonUtils.sortProductOptionsImage(productOptions);
 
-        if (product.vendor_id == 26L) {
+        /*if (product.vendor_id == 26L) {
             if (productService.isClothing(product.category_id)) {
                 try {
                     List<String> originList = JSONArray.parseArray(productOptions.getCoverImg(), String.class);
@@ -286,9 +284,9 @@ public class ApiUpdateProductService extends AbstractService {
                     e.printStackTrace();
                 }
             }
-        }
+        }*/
 
-        // Image：不予更新。
+        /*// Image：不予更新。
         String cover_img = product.getCover_img();
         boolean noImg = this.getNoImg(conn);
         if (StringUtils.isBlank(cover_img) || cover_img.length() < 5) {
@@ -324,7 +322,7 @@ public class ApiUpdateProductService extends AbstractService {
                 }
             }
 
-            /** FM 接口特殊判断*/
+            *//** FM 接口特殊判断*//*
             if (product.vendor_id == 17 && product.status == 1) {
                 try {
                     //only one
@@ -400,7 +398,7 @@ public class ApiUpdateProductService extends AbstractService {
                     logger.error("ApiUpdateProductService,FM,setProduct,Error:" + e);
                 }
             }
-        }
+        }*/
 
         // 新数据为空或者不能找到season code Mapping则报Error不更新已有season code，但其他字段继续更新。判断只有当新season比现有season新时才更新。
         String seasonCode = productOptions.getSeasonCode();
@@ -607,6 +605,8 @@ public class ApiUpdateProductService extends AbstractService {
         /* update by yf 2018/02/26 */
 
         product.status = null;
+        product.cover_img = null;
+        product.description_img = null;
         productService.updateProduct(product);
         this.saveBoutiqueImage(product, conn);
         logger.info("ApiUpdateProductService,setProduct,end,updateProduct,product:" + JSONObject.toJSONString(product));

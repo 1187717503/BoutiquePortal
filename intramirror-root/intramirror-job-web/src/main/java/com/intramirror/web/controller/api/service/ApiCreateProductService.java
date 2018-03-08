@@ -1,8 +1,6 @@
 package com.intramirror.web.controller.api.service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson15.JSONArray;
-import com.google.gson.Gson;
 import com.intramirror.utils.transform.JsonTransformUtil;
 import static com.intramirror.web.controller.api.service.ApiCommonUtils.escape;
 import com.intramirror.web.distributed.utils.KafkaMqUtil;
@@ -418,9 +416,9 @@ public class ApiCreateProductService extends AbstractService {
         product.enabled = EnabledType.USED;
 
         productOptions.setVendor_id(product.getVendor_id());
-        ApiCommonUtils.sortProductOptionsImage(productOptions);
+        //        ApiCommonUtils.sortProductOptionsImage(productOptions);
 
-        /* 由于Julian的服装的第一张图不是正面照，需要将其放到所有图片的最后一张,只处理成人的男士、女士的服装，不更改包、鞋和配饰*/
+        /* 由于Julian的服装的第一张图不是正面照，需要将其放到所有图片的最后一张,只处理成人的男士、女士的服装，不更改包、鞋和配饰*//*
         if (product.vendor_id == 26L) {
             if (productService.isClothing(product.category_id)) {
                 try {
@@ -435,9 +433,9 @@ public class ApiCreateProductService extends AbstractService {
                 }
             }
         }
-        /* end*/
+        *//* end*/
 
-        boolean noImg = this.getNoImg(conn);
+        /*boolean noImg = this.getNoImg(conn);
         if (noImg) {
             product.cover_img = "[]";
             product.description_img = "[]";
@@ -445,7 +443,9 @@ public class ApiCreateProductService extends AbstractService {
             String coverImg = ApiCommonUtils.downloadImgs(productOptions.getCoverImg());
             product.cover_img = coverImg;
             product.description_img = coverImg;
-        }
+        }*/
+        product.cover_img = "[]";
+        product.description_img = "[]";
         product.season_code = productOptions.getSeasonCode();
         product.max_retail_price = new BigDecimal(productOptions.getSalePrice());
         product.min_retail_price = new BigDecimal(productOptions.getSalePrice());
@@ -500,8 +500,8 @@ public class ApiCreateProductService extends AbstractService {
             productOptions.setCategoryId(categoryId);
         }
 
-        if (vendorOptions.getVendorId() == 42 && StringUtils.isBlank(productOptions.getCategoryId()) && StringUtils.isNotBlank(category3)
-                && StringUtils.isNotBlank(category1) && StringUtils.isBlank(category2)) {
+        if (vendorOptions.getVendorId() == 42 && StringUtils.isBlank(productOptions.getCategoryId()) && StringUtils.isNotBlank(category3) && StringUtils
+                .isNotBlank(category1) && StringUtils.isBlank(category2)) {
             Map<String, Object> categoryMap = productService.getCategoryWithoutC2(vendorOptions.getVendorId().toString(), category1, category3);
             if (categoryMap != null) {
                 productOptions.setCategoryId(categoryMap.get("category_id").toString());
