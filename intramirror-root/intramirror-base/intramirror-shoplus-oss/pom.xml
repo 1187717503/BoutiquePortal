@@ -58,6 +58,18 @@
             <artifactId>jmimemagic</artifactId>
             <version>0.1.4</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.intramirror</groupId>
+            <artifactId>lib-web-common</artifactId>
+            <version>1.0.11-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-webmvc</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>eu.medsea.mimeutil</groupId>
             <artifactId>mime-util</artifactId>

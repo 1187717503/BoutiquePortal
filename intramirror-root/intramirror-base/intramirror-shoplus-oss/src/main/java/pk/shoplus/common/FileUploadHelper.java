@@ -3,6 +3,7 @@ package pk.shoplus.common;
 import com.aliyun.oss.ClientConfiguration;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.common.utils.DateUtil;
+import com.intramirror.core.net.http.OkHttpUtils;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -29,6 +30,7 @@ import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.Part;
+import okhttp3.Response;
 import org.apache.catalina.core.ApplicationPart;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -208,13 +210,18 @@ public class FileUploadHelper {
         MediaStorangeRespVo mediaStorangeRespVo;
 
         try {
-            imgUrl = imgUrl.replace("https:", "http:");
-            url = new URL(imgUrl);
-            httpUrl = (HttpURLConnection) url.openConnection();
-            httpUrl.setConnectTimeout(5 * 1000);
-            httpUrl.setReadTimeout(5 * 1000);
-            httpUrl.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:37.0) Gecko/20100101 Firefox/37.0");
-            inputStream = httpUrl.getInputStream();
+
+            if (imgUrl.startsWith("https:")) {
+                Response response = OkHttpUtils.get().url(imgUrl).build().execute();
+                inputStream = response.body().byteStream();
+            } else {
+                url = new URL(imgUrl);
+                httpUrl = (HttpURLConnection) url.openConnection();
+                httpUrl.setConnectTimeout(5 * 1000);
+                httpUrl.setReadTimeout(5 * 1000);
+                httpUrl.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:37.0) Gecko/20100101 Firefox/37.0");
+                inputStream = httpUrl.getInputStream();
+            }
             if (null != inputStream) {
                 String path = storeFolderName + '/' + UUID.randomUUID();
                 String fileName = DateUtil.formatAlternativeIso8601Date(new Date());
@@ -227,7 +234,9 @@ public class FileUploadHelper {
             e.printStackTrace();
             logger.info("uploadFileByImgUrl2,e:" + e + ",imageUrl:" + imgUrl);
         } finally {
-            httpUrl.disconnect();
+            if (httpUrl != null) {
+                httpUrl.disconnect();
+            }
             if (inputStream != null) {
                 inputStream.close();
             }
