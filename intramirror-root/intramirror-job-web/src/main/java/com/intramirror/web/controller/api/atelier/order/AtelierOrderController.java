@@ -35,7 +35,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/")
 public class AtelierOrderController {
 
-    /** logger **/
+    /**
+     * logger
+     **/
     private static final Logger logger = Logger.getLogger(AtelierOrderController.class);
 
     private static final String atelier_version = "1.0";
@@ -47,7 +49,7 @@ public class AtelierOrderController {
     private static final String response_success = "1000";
 
     private static final String error_code_1 = "1";
-    private static final String error_desc_1 ="E001: ";
+    private static final String error_desc_1 = "E001: ";
 
     @Resource(name = "atelierUpdateByProductService")
     private AtelierUpdateByProductService atelierUpdateByProductService;
@@ -60,65 +62,70 @@ public class AtelierOrderController {
 
     @RequestMapping("/getOrderByDate")
     @ResponseBody
-    public Object getOrderByDate(
-            @Param(value = "Version")String Version,
-            @Param(value = "StoreID")String StoreID,
-            @Param(value = "offset")String offset,
-            @Param(value = "limit")String limit,
-            @Param(value = "date")String date
-            ){
+    public Object getOrderByDate(@Param(value = "Version") String Version, @Param(value = "StoreID") String StoreID, @Param(value = "offset") String offset,
+            @Param(value = "limit") String limit, @Param(value = "date") String date, @Param(value = "status") String status,
+            @Param(value = "barcode") String barcode) {
         List<GetOrderByDateResultVO> result = new ArrayList<GetOrderByDateResultVO>();
 
         try {
             ApiInputParam apiInputParam = new ApiInputParam();
-            String checkResult = apiInputParam.checkGetOrderByDateParams(Version,StoreID,offset,limit,date);
-            logger.info("AtelierOrderControllerGetOrderByDate,checkGetOrderByDateParams,end,checkResult:"+checkResult+",apiInputParam:"+JSONObject.toJSONString(apiInputParam));
+            String checkResult = apiInputParam.checkGetOrderByDateParams(Version, StoreID, offset, limit, date);
+            logger.info("AtelierOrderControllerGetOrderByDate,checkGetOrderByDateParams,end,checkResult:" + checkResult + ",apiInputParam:" + JSONObject
+                    .toJSONString(apiInputParam));
 
-            if(checkResult.equals(atelier_success)) {
+            if (checkResult.equals(atelier_success)) {
 
-                Map<String,Object> conditionMap = new HashMap<>();
-                conditionMap.put("create_at",apiInputParam.getDate());
-                conditionMap.put("vendor_id",apiInputParam.getVendorId());
-                conditionMap.put("offset",apiInputParam.getIntOffset());
-                conditionMap.put("limit",apiInputParam.getIntLimit());
+                Map<String, Object> conditionMap = new HashMap<>();
+                conditionMap.put("create_at", apiInputParam.getDate());
+                conditionMap.put("vendor_id", apiInputParam.getVendorId());
+                conditionMap.put("offset", apiInputParam.getIntOffset());
+                conditionMap.put("limit", apiInputParam.getIntLimit());
+                if (StringUtils.isNotBlank(status)) {
+                    conditionMap.put("status", status.split(","));
+                } else {
+                    conditionMap.put("status", status);
+                }
 
-                logger.info("AtelierOrderControllerGetOrderByDate,start,atelierSelectOrder,conditionMap:"+JSONObject.toJSONString(conditionMap));
-                List<Map<String,Object>> dataMap = iOrderService.atelierSelectOrder(conditionMap);
-                logger.info("AtelierOrderControllerGetOrderByDate,end,atelierSelectOrder,conditionMap:"+JSONObject.toJSONString(conditionMap)+",dataMap:"+JSONObject.toJSONString(dataMap));
+                conditionMap.put("barcode", barcode);
 
-                logger.info("AtelierOrderControllerGetOrderByDate,start,convertByGetDate,dataMap:"+JSONObject.toJSONString(dataMap));
+                logger.info("AtelierOrderControllerGetOrderByDate,start,atelierSelectOrder,conditionMap:" + JSONObject.toJSONString(conditionMap));
+                List<Map<String, Object>> dataMap = iOrderService.atelierSelectOrder(conditionMap);
+                logger.info("AtelierOrderControllerGetOrderByDate,end,atelierSelectOrder,conditionMap:" + JSONObject.toJSONString(conditionMap) + ",dataMap:"
+                        + JSONObject.toJSONString(dataMap));
+
+                logger.info("AtelierOrderControllerGetOrderByDate,start,convertByGet Date,dataMap:" + JSONObject.toJSONString(dataMap));
                 result = this.convertByGetDate(dataMap);
-                logger.info("AtelierOrderControllerGetOrderByDate,end,convertByGetDate,result:"+JSONObject.toJSONString(result)+",dataMap:"+JSONObject.toJSONString(dataMap));
+                logger.info("AtelierOrderControllerGetOrderByDate,end,convertByGetDate,result:" + JSONObject.toJSONString(result) + ",dataMap:" + JSONObject
+                        .toJSONString(dataMap));
                 return result;
             }
 
-            return this.result(response_error,error_code_1,error_desc_1+checkResult);
+            return this.result(response_error, error_code_1, error_desc_1 + checkResult);
         } catch (Exception e) {
             e.printStackTrace();
-            logger.info("AtelierOrderControllerGetOrderByDate,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
+            logger.info("AtelierOrderControllerGetOrderByDate,errorMessage:" + ExceptionUtils.getExceptionDetail(e));
         }
-        logger.info("AtelierOrderControllerGetOrderByDate,outputParams,result:"+JSONObject.toJSONString(result));
+        logger.info("AtelierOrderControllerGetOrderByDate,outputParams,result:" + JSONObject.toJSONString(result));
         return result;
     }
 
-
     @RequestMapping("/updateOrderStatus")
     @ResponseBody
-    public Map<String,Object> updateOrderStatus(HttpServletRequest request){
-        Map<String,Object> result = new HashMap<>();
+    public Map<String, Object> updateOrderStatus(HttpServletRequest request) {
+        Map<String, Object> result = new HashMap<>();
         try {
             InputStream is = request.getInputStream();
             String body = IOUtils.toString(is, "utf-8");
             String storeID = request.getParameter("StoreID");
             String version = request.getParameter("Version");
-            logger.info("AtelierOrderControllerUpdateOrderStatus,inputParams,body:"+body+",storeID:"+storeID+",version:"+version);
+            logger.info("AtelierOrderControllerUpdateOrderStatus,inputParams,body:" + body + ",storeID:" + storeID + ",version:" + version);
 
             UpdateOrderStatusVO updateOrderStatusVO = new UpdateOrderStatusVO();
-            String checkResult = updateOrderStatusVO.checkUpdateOrderStatusParams(body,storeID,version);
-            logger.info("AtelierOrderControllerUpdateOrderStatus,checkUpdateOrderStatusParams,updateOrderStatusVO:"+JSONObject.toJSONString(
-                    updateOrderStatusVO));
+            String checkResult = updateOrderStatusVO.checkUpdateOrderStatusParams(body, storeID, version);
+            logger.info(
+                    "AtelierOrderControllerUpdateOrderStatus,checkUpdateOrderStatusParams,updateOrderStatusVO:" + JSONObject.toJSONString(updateOrderStatusVO));
 
-            if(atelier_success.equals(checkResult)) {
+            if (atelier_success.equals(checkResult)) {
                 String status = updateOrderStatusVO.getStatus();
 
                 OrderState.StatusEnum statusEnum = null;
@@ -130,46 +137,50 @@ public class AtelierOrderController {
                 stateParams.setTracking_num(updateOrderStatusVO.getTracking_number());
                 stateParams.setVat_num(updateOrderStatusVO.getInvoice_number());
 
-                if(status.equals(OrderState.StatusEnum.Confirmed.getCode())) {
+                if (status.equals(OrderState.StatusEnum.Confirmed.getCode())) {
                     statusEnum = OrderState.StatusEnum.Confirmed;
-                } else if(status.equals(OrderState.StatusEnum.Cancelled.getCode())){
+                } else if (status.equals(OrderState.StatusEnum.Cancelled.getCode())) {
                     statusEnum = OrderState.StatusEnum.Cancelled;
-                } else if(status.equals(OrderState.StatusEnum.Shipped.getCode())){
+                } else if (status.equals(OrderState.StatusEnum.Shipped.getCode())) {
                     statusEnum = OrderState.StatusEnum.Shipped;
                 }
 
-                logger.info("AtelierOrderControllerUpdateOrderStatus,OrderStateChange,start,status:"+status+",stateParams:"+JSONObject.toJSONString(stateParams));
-                ResultMessage resultMessage = orderState.change(statusEnum,stateParams).execute();
-                logger.info("AtelierOrderControllerUpdateOrderStatus,OrderStateChange,end,status:"+status+",stateParams:"+JSONObject.toJSONString(stateParams)+",resultMessage:"+JSONObject.toJSONString(resultMessage));
+                logger.info("AtelierOrderControllerUpdateOrderStatus,OrderStateChange,start,status:" + status + ",stateParams:" + JSONObject
+                        .toJSONString(stateParams));
+                ResultMessage resultMessage = orderState.change(statusEnum, stateParams).execute();
+                logger.info(
+                        "AtelierOrderControllerUpdateOrderStatus,OrderStateChange,end,status:" + status + ",stateParams:" + JSONObject.toJSONString(stateParams)
+                                + ",resultMessage:" + JSONObject.toJSONString(resultMessage));
 
-                if(resultMessage.isSUCCESS()){
-                    result = this.result(response_success,null,null);
+                if (resultMessage.isSUCCESS()) {
+                    result = this.result(response_success, null, null);
                 } else {
-                    result = this.result(response_error,error_code_1,resultMessage.getMsg());
+                    result = this.result(response_error, error_code_1, resultMessage.getMsg());
                 }
             } else {
-                result = this.result(response_error,error_code_1,error_desc_1+checkResult);
+                result = this.result(response_error, error_code_1, error_desc_1 + checkResult);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            result = this.result(response_error,error_code_1,error_desc_1+"ErrorMessage:"+e.getMessage());
-            logger.info("AtelierOrderControllerUpdateOrderStatus,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
+            result = this.result(response_error, error_code_1, error_desc_1 + "ErrorMessage:" + e.getMessage());
+            logger.info("AtelierOrderControllerUpdateOrderStatus,errorMessage:" + ExceptionUtils.getExceptionDetail(e));
         }
-        logger.info("AtelierOrderControllerUpdateOrderStatus,outputParams,result:"+JSONObject.toJSONString(result));
+        logger.info("AtelierOrderControllerUpdateOrderStatus,outputParams,result:" + JSONObject.toJSONString(result));
         return result;
     }
 
-    public List<GetOrderByDateResultVO> convertByGetDate(List<Map<String,Object>> data){
+    public List<GetOrderByDateResultVO> convertByGetDate(List<Map<String, Object>> data) {
         List<GetOrderByDateResultVO> result = new ArrayList<>();
-        if(data != null && data.size() > 0) {
+        if (data != null && data.size() > 0) {
 
-            for(Map<String,Object> map:data) {
-                GetOrderByDateResultVO  getOrderByDateResultVO = new GetOrderByDateResultVO();
-                String order_line_num = map.get("order_line_num") == null?"":map.get("order_line_num").toString();
-                String product_code = map.get("product_code") == null?"":map.get("product_code").toString();
-                String value = map.get("value") == null?"":map.get("value").toString();
-                String in_price = map.get("in_price") == null?"":map.get("in_price").toString();
-                String created_at = map.get("created_at") == null?"":map.get("created_at").toString();
+            for (Map<String, Object> map : data) {
+                GetOrderByDateResultVO getOrderByDateResultVO = new GetOrderByDateResultVO();
+                String order_line_num = map.get("order_line_num") == null ? "" : map.get("order_line_num").toString();
+                String product_code = map.get("product_code") == null ? "" : map.get("product_code").toString();
+                String value = map.get("value") == null ? "" : map.get("value").toString();
+                String in_price = map.get("in_price") == null ? "" : map.get("in_price").toString();
+                String created_at = map.get("created_at") == null ? "" : map.get("created_at").toString();
+                String status = map.get("status") == null ? "" : map.get("status").toString();
 
                 getOrderByDateResultVO.setBoutique_id(product_code);
                 getOrderByDateResultVO.setCreate_date(created_at);
@@ -177,29 +188,30 @@ public class AtelierOrderController {
                 getOrderByDateResultVO.setPurchase_price(new BigDecimal(in_price));
                 getOrderByDateResultVO.setQty(1);
                 getOrderByDateResultVO.setSize(value);
+                getOrderByDateResultVO.setStatus(status);
                 result.add(getOrderByDateResultVO);
             }
         }
         return result;
     }
 
-    private Map<String,Object> result(String responseCode,String errorCode,String errorMsg){
-        Map<String,Object> responseMap = new HashMap<>();
-        Map<String,Object> errorMap = new HashMap<>();
+    private Map<String, Object> result(String responseCode, String errorCode, String errorMsg) {
+        Map<String, Object> responseMap = new HashMap<>();
+        Map<String, Object> errorMap = new HashMap<>();
 
-        responseMap.put("ResponseStatus",responseCode);
+        responseMap.put("ResponseStatus", responseCode);
 
-        if(responseCode.equals(response_error)) {
-            errorMap.put("ErrorCode",errorCode);
-            errorMap.put("ErrorMsg",errorMsg);
-            errorMap.put("TimeStamp", DateUtils.getStrDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
+        if (responseCode.equals(response_error)) {
+            errorMap.put("ErrorCode", errorCode);
+            errorMap.put("ErrorMsg", errorMsg);
+            errorMap.put("TimeStamp", DateUtils.getStrDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
 
-            responseMap.put("Error",errorMap);
+            responseMap.put("Error", errorMap);
         }
         return responseMap;
     }
 
-    class ApiInputParam{
+    class ApiInputParam {
         private String version;
         private String storeId;
         private String offset;
@@ -283,19 +295,19 @@ public class AtelierOrderController {
             this.intLimit = intLimit;
         }
 
-        private String checkGetOrderByDateParams(String version, String storeId, String offset, String limit, String date){
+        private String checkGetOrderByDateParams(String version, String storeId, String offset, String limit, String date) {
             this.version = version;
             this.storeId = storeId;
             this.offset = offset;
             this.limit = limit;
             this.date = date;
 
-            logger.info("checkGetOrderByDateParams,start,inputParams:"+ JSONObject.toJSONString(this));
-            if(StringUtils.isBlank(version) || !atelier_version.equals(version)) {
+            logger.info("checkGetOrderByDateParams,start,inputParams:" + JSONObject.toJSONString(this));
+            if (StringUtils.isBlank(version) || !atelier_version.equals(version)) {
                 return "Invalid Version";
             }
 
-            if(StringUtils.isBlank(storeId)) {
+            if (StringUtils.isBlank(storeId)) {
                 return "Invalid StoreID";
             }
 
@@ -311,33 +323,33 @@ public class AtelierOrderController {
                 return "Invalid limit";
             }
 
-            if(StringUtils.isBlank(offset)) {
+            if (StringUtils.isBlank(offset)) {
                 this.intOffset = 0;
             } else {
                 this.intOffset = Integer.parseInt(offset);
             }
 
-            if(StringUtils.isBlank(limit)) {
+            if (StringUtils.isBlank(limit)) {
                 this.intLimit = 20;
             } else {
                 this.intLimit = Integer.parseInt(limit);
-                if(this.intLimit > 50 || this.intLimit < 0) {
-//                    this.intLimit = 50;
+                if (this.intLimit > 50 || this.intLimit < 0) {
+                    //                    this.intLimit = 50;
                     return "Invalid limit";
                 }
             }
 
-            if(!isValidDate(date)) {
+            if (!isValidDate(date)) {
                 return "Invalid date";
             }
 
-            Map<String,Object> paramMap = atelierUpdateByProductService.getParamsMap();
-            if(paramMap.get(storeId) == null) {
+            Map<String, Object> paramMap = atelierUpdateByProductService.getParamsMap();
+            if (paramMap.get(storeId) == null) {
                 return "Invalid StoreID";
             }
-            Map<String,Object> dataMap = (Map<String, Object>) paramMap.get(storeId);
+            Map<String, Object> dataMap = (Map<String, Object>) paramMap.get(storeId);
             this.vendorId = Long.parseLong(dataMap.get("vendor_id").toString());
-            logger.info("checkGetOrderByDateParams,end,inputParams:"+ JSONObject.toJSONString(this));
+            logger.info("checkGetOrderByDateParams,end,inputParams:" + JSONObject.toJSONString(this));
             return atelier_success;
         }
     }
@@ -345,20 +357,22 @@ public class AtelierOrderController {
     public boolean isValidDate(String str) {
         //String str = "2007-01-02";
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        try{
-            Date date = (Date)formatter.parse(str);
+        try {
+            Date date = (Date) formatter.parse(str);
             return str.equals(formatter.format(date));
-        }catch(Exception e){
+        } catch (Exception e) {
             return false;
         }
     }
-    class GetOrderByDateResultVO{
+
+    class GetOrderByDateResultVO {
         private String order_number;
         private String create_date;
         private String boutique_id;
         private String size;
         private int qty;
         private BigDecimal purchase_price;
+        private String status;
 
         public String getOrder_number() {
             return order_number;
@@ -407,7 +421,16 @@ public class AtelierOrderController {
         public void setPurchase_price(BigDecimal purchase_price) {
             this.purchase_price = purchase_price;
         }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String status) {
+            this.status = status;
+        }
     }
+
     class UpdateOrderStatusVO {
         private String Version;
         private String StoreID;
@@ -473,40 +496,41 @@ public class AtelierOrderController {
             this.vendorId = vendorId;
         }
 
-        public String checkUpdateOrderStatusParams(String body,String storeId,String version){
-            if(StringUtils.isBlank(body)) {
+        public String checkUpdateOrderStatusParams(String body, String storeId, String version) {
+            if (StringUtils.isBlank(body)) {
                 return "body is null.";
             }
 
-            if(StringUtils.isBlank(storeId)){
+            if (StringUtils.isBlank(storeId)) {
                 return "Invalid StoreID";
             }
 
-            if(StringUtils.isBlank(version) || !atelier_version.equals(version)) {
+            if (StringUtils.isBlank(version) || !atelier_version.equals(version)) {
                 return "Invalid Version";
             }
 
-            Map<String,Object> paramMap = atelierUpdateByProductService.getParamsMap();
-            if(paramMap.get(storeId) == null) {
+            Map<String, Object> paramMap = atelierUpdateByProductService.getParamsMap();
+            if (paramMap.get(storeId) == null) {
                 return "Invalid StoreID";
             }
 
-            Map<String,Object> dataMap = (Map<String, Object>) paramMap.get(storeId);
+            Map<String, Object> dataMap = (Map<String, Object>) paramMap.get(storeId);
             this.vendorId = Long.parseLong(dataMap.get("vendor_id").toString());
 
             JSONObject jsonObjectBody = JSON.parseObject(body);
             this.order_number = jsonObjectBody.getString("order_number");
             this.status = jsonObjectBody.getString("status");
 
-            if(StringUtils.isBlank(this.order_number)) {
+            if (StringUtils.isBlank(this.order_number)) {
                 return "Invalid order_number";
             }
 
-            if(StringUtils.isBlank(this.status)) {
+            if (StringUtils.isBlank(this.status)) {
                 return "Invalid status";
             }
 
-            if(!(OrderState.StatusEnum.Cancelled.getCode().equals(this.status) || OrderState.StatusEnum.Confirmed.getCode().equals(this.status) || OrderState.StatusEnum.Shipped.getCode().equals(this.status))) {
+            if (!(OrderState.StatusEnum.Cancelled.getCode().equals(this.status) || OrderState.StatusEnum.Confirmed.getCode().equals(this.status)
+                    || OrderState.StatusEnum.Shipped.getCode().equals(this.status))) {
                 return "Invalid status";
             }
 
