@@ -632,7 +632,8 @@
         <foreach item="product" index="index" collection="productIds" open="(" separator="," close=")">
             #{product}
         </foreach>
-        AND NOT EXISTS (SELECT product_id FROM snapshot_product where promotion_id=#{promotionId, jdbcType=BIGINT})
+        AND NOT EXISTS (SELECT product_id FROM snapshot_product where promotion_id=#{promotionId, jdbcType=BIGINT} AND product_id=#{productId, jdbcType=BIGINT}
+        )
     </select>
 
     <delete id="removeExcludeSnapshotProduct">
