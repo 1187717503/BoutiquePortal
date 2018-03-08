@@ -653,7 +653,9 @@
         <if test="brandId != null">
             AND p.brand_id = #{brandId, jdbcType=BIGINT}
         </if>
+        AND snapshot_product.promotion_id = #{promotionId, jdbcType=BIGINT}
         )
+        AND promotion_id = #{promotionId, jdbcType=BIGINT}
     </delete>
 
     <delete id="removeProductForExcludeRule">

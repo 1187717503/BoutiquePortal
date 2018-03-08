@@ -392,7 +392,7 @@ public class PromotionServiceImpl implements IPromotionService {
                             LOGGER.info("Category id {}", category.getCategoryId());
                         }
                     }
-                    promotionRuleMapper.removeExcludeSnapshotProduct(vendorId, (String) excludeRule.get("seasonCode"), brandId, listCategoryId);
+                    promotionRuleMapper.removeExcludeSnapshotProduct(promotionId, vendorId, (String) excludeRule.get("seasonCode"), brandId, listCategoryId);
                 }
             }
         }
