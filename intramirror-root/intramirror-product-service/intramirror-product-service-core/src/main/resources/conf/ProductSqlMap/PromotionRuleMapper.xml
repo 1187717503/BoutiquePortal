@@ -642,9 +642,8 @@
     <delete id="removeExcludeSnapshotProduct">
         DELETE FROM snapshot_product WHERE exists (
         SELECT p.product_id FROM product p
-        INNER JOIN shop_product sp ON p.product_id = sp.product_id
         WHERE p.season_code = #{seasonCode, jdbcType=VARCHAR}
-        AND p.enabled = 1 AND sp.enabled = 1
+        AND p.enabled = 1
         AND p.vendor_id = #{vendorId, jdbcType=BIGINT}
         AND p.product_id = snapshot_product.product_id
         AND p.category_id IN
@@ -660,9 +659,8 @@
     <delete id="removeProductForExcludeRule">
         DELETE FROM snapshot_product WHERE exists (
         SELECT p.product_id FROM product p
-        INNER JOIN shop_product sp ON p.product_id = sp.product_id
         WHERE p.season_code = #{seasonCode, jdbcType=VARCHAR}
-        AND p.enabled = 1 AND sp.enabled = 1
+        AND p.enabled = 1
         AND p.vendor_id = #{vendorId, jdbcType=BIGINT}
         AND p.product_id = snapshot_product.product_id
         AND p.category_id IN
