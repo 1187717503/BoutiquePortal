@@ -106,6 +106,7 @@
         <property name="baseUrl" value="${micro.baseUrl}"/>
         <property name="username" value="${micro.job.username}"/>
         <property name="password" value="${micro.job.password}"/>
+        <property name="bootstrapServers" value="${kafka.bootstrap.servers}"/>
     </bean>
 
     <beans profile="test">

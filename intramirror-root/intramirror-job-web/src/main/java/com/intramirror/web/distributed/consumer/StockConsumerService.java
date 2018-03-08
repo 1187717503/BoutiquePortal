@@ -4,6 +4,7 @@ import com.intramirror.utils.transform.JsonTransformUtil;
 import com.intramirror.web.distributed.thread.ThreadManager;
 import com.intramirror.web.mapping.api.IStockMapping;
 import com.intramirror.web.mapping.vo.StockOption;
+import com.intramirror.web.properties.MicroProperties;
 import com.intramirror.web.thread.UpdateStockThread;
 import com.intramirror.web.util.ApiDataFileUtils;
 import java.util.Arrays;
@@ -46,9 +47,12 @@ public class StockConsumerService {
     @Qualifier("atelierStockMapping")
     private IStockMapping iStockMapping;
 
-    static {
+    @Autowired
+    private MicroProperties properties;
 
-        stockConsumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "106.15.229.248:9092");
+    @PostConstruct
+    public void init() {
+        stockConsumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, properties.getBootstrapServers());
         stockConsumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, "group_stock_raw_data");
         stockConsumerProps.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
         stockConsumerProps.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "1000");

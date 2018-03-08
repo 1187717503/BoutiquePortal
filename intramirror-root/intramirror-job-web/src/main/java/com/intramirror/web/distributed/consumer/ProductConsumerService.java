@@ -3,6 +3,7 @@ package com.intramirror.web.distributed.consumer;
 import com.intramirror.utils.transform.JsonTransformUtil;
 import com.intramirror.web.distributed.thread.ThreadManager;
 import com.intramirror.web.mapping.impl.atelier.AtelierProductMapping;
+import com.intramirror.web.properties.MicroProperties;
 import com.intramirror.web.thread.UpdateProductThread;
 import com.intramirror.web.util.ApiDataFileUtils;
 import java.util.Arrays;
@@ -43,9 +44,12 @@ public class ProductConsumerService {
     @Qualifier("atelierProductMapping")
     private AtelierProductMapping atelierProductMapping;
 
-    static {
+    @Autowired
+    private MicroProperties properties;
 
-        productConsumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "106.15.229.248:9092");
+    @PostConstruct
+    public void init() {
+        productConsumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, properties.getBootstrapServers());
         productConsumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, "group_product_raw_data");
         productConsumerProps.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
         productConsumerProps.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "1000");
