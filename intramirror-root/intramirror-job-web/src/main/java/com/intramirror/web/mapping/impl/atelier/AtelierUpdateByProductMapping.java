@@ -1,9 +1,9 @@
 package com.intramirror.web.mapping.impl.atelier;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson15.JSONArray;
+import com.alibaba.fastjson15.JSONObject;
 import com.intramirror.web.mapping.api.IProductMapping;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -15,7 +15,7 @@ import pk.shoplus.util.ExceptionUtils;
  * Created by dingyifan on 2017/9/19.
  */
 @Service(value = "atelierUpdateByProductMapping")
-public class AtelierUpdateByProductMapping implements IProductMapping {
+public class AtelierUpdateByProductMapping implements IProductMapping{
 
     // logger
     private static final Logger logger = Logger.getLogger(AtelierUpdateByProductMapping.class);
@@ -25,53 +25,53 @@ public class AtelierUpdateByProductMapping implements IProductMapping {
 
     @Override
     public ProductEDSManagement.ProductOptions mapping(Map<String, Object> bodyDataMap) {
-        logger.info("AtelierUpdateByProductMapping,inputParams,bodyDataMap:" + JSONObject.toJSONString(bodyDataMap));
-
+        logger.info("AtelierProductMapping,inputParams,bodyDataMap:"+JSONObject.toJSONString(bodyDataMap));
         ProductEDSManagement.ProductOptions productOptions = productEDSManagement.getProductOptions();
         try {
-            productOptions
-                    .setName(getString(bodyDataMap, "product_name"))
-                    .setCode(getString(bodyDataMap, "boutique_id").trim())
-                    .setSeasonCode(getString(bodyDataMap, "season_code"))
-                    .setBrandCode(getString(bodyDataMap, "brand_id").trim())
-                    .setCarryOver(getString(bodyDataMap, "carry_over"))
-                    .setBrandName(getString(bodyDataMap, "brand").trim())
-                    .setColorCode(getString(bodyDataMap, "color_code"))
-                    .setColorDesc(getString(bodyDataMap, "color_description"))
-                    .setCategory_boutique_id(getString(bodyDataMap, "category_id"))
-                    .setCategoryId(getString(bodyDataMap, "category_id"))
-                    .setDesc(getString(bodyDataMap, "product_description"))
-                    .setComposition(getString(bodyDataMap, "composition"))
-                    .setMadeIn(getString(bodyDataMap, "made_in"))
-                    .setSizeFit(getString(bodyDataMap, "size_fit"))
-                    .setCoverImg(getString(bodyDataMap, "cover_img"))
-                    .setDescImg(getString(bodyDataMap, "description_img"))
-                    .setWeight(getString(bodyDataMap, "weight"))
-                    .setLength(getString(bodyDataMap, "length"))
-                    .setWidth(getString(bodyDataMap, "width"))
-                    .setHeigit(getString(bodyDataMap, "height"))
-                    .setSalePrice(getString(bodyDataMap, "sale_price"))
-                    .setCategory1(getString(bodyDataMap, "category_l1"))
-                    .setCategory2(getString(bodyDataMap, "category_l2"))
-                    .setCategory3(getString(bodyDataMap, "category_l3"))
+            JSONObject jsonObjectData =  JSONObject.parseObject(bodyDataMap.get("Data").toString()) ;
+            productOptions.setName(jsonObjectData.getString("product_name"))
+                    .setCode(jsonObjectData.getString("boutique_id").trim())
+                    .setSeasonCode(jsonObjectData.getString("season_code"))
+                    .setBrandCode(jsonObjectData.getString("brand_id").trim())
+                    .setCarryOver(jsonObjectData.getString("carry_over"))
+                    .setBrandName(jsonObjectData.getString("brand").trim())
+                    .setColorCode(jsonObjectData.getString("color_code"))
+                    .setColorDesc(jsonObjectData.getString("color_description"))
+                    .setCategory_boutique_id(jsonObjectData.getString("category_id"))
+                    .setCategoryId(jsonObjectData.getString("category_id"))
+                    .setDesc(jsonObjectData.getString("product_description"))
+                    .setComposition(jsonObjectData.getString("composition"))
+                    .setMadeIn(jsonObjectData.getString("made_in"))
+                    .setSizeFit(jsonObjectData.getString("size_fit"))
+                    .setCoverImg(jsonObjectData.getString("cover_img"))
+                    .setDescImg(jsonObjectData.getString("description_img"))
+                    .setWeight(jsonObjectData.getString("weight"))
+                    .setLength(jsonObjectData.getString("length"))
+                    .setWidth(jsonObjectData.getString("width"))
+                    .setHeigit(jsonObjectData.getString("height"))
+                    .setSalePrice(jsonObjectData.getString("sale_price"))
+                    .setCategory1(jsonObjectData.getString("category_l1"))
+                    .setCategory2(jsonObjectData.getString("category_l2"))
+                    .setCategory3(jsonObjectData.getString("category_l3"))
                     .setLast_check(new Date());
 
-            List<Map<String, Object>> skus = (List<Map<String, Object>>) bodyDataMap.get("sku");
-            for (Map<String, Object> item : skus) {
+            JSONArray skus = JSONArray.parseArray(jsonObjectData.getString("sku"));
+            for (Object it : skus) {
+                JSONObject item = (JSONObject) it;
                 ProductEDSManagement.SkuOptions sku = productEDSManagement.getSkuOptions();
-                sku.setBarcodes(getString(item, "barcode"));
-                sku.setSize(getString(item, "size"));
-                sku.setStock(getString(item, "stock"));
+                sku.setBarcodes(item.getString("barcode"));
+                sku.setSize(item.getString("size"));
+                sku.setStock(item.getString("stock"));
                 productOptions.getSkus().add(sku);
             }
 
-            String carryOver = getString(bodyDataMap, "carry_over");
-            if (StringUtils.isNotBlank(carryOver) && StringUtils.trim(carryOver).equalsIgnoreCase("CO")) {
+            String carryOver = jsonObjectData.getString("carry_over");
+            if(StringUtils.isNotBlank(carryOver) && StringUtils.trim(carryOver).equalsIgnoreCase("CO")) {
                 productOptions.setSeasonCode("CO");
             }
 
             /*try {
-                String vendor_id = getString("vendor_id").toString();
+                String vendor_id = bodyDataMap.get("vendor_id").toString();
 
                 if(vendor_id.equals("26")) {
                     List<String> originList = JSONArray.parseArray(productOptions.getCoverImg(), String.class);
@@ -89,15 +89,11 @@ public class AtelierUpdateByProductMapping implements IProductMapping {
 
         } catch (Exception e) {
             e.printStackTrace();
-            logger.info("AtelierUpdateByProductMapping,errorMessage:" + ExceptionUtils.getExceptionDetail(e));
+            logger.info("AtelierProductMapping,errorMessage:"+ExceptionUtils.getExceptionDetail(e));
         }
-        logger.info("AtelierUpdateByProductMapping,outputParams,productOptions:" + JSONObject.toJSONString(productOptions));
+        logger.info("AtelierProductMapping,outputParams,productOptions:"+JSONObject.toJSONString(productOptions));
         return productOptions;
     }
 
-    private String getString(Map<String, Object> map, String key) {
-        Object value = map.get(key);
-        return value == null ? null : value.toString();
-    }
 
 }

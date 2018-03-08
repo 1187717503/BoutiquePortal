@@ -34,71 +34,80 @@ import pk.shoplus.util.ExceptionUtils;
 
 /**
  * 创建商品
- * @author dingyifan
  *
+ * @author dingyifan
  */
 public class ProductEDSManagement {
 
     private static Logger logger = Logger.getLogger(ProductEDSManagement.class);
-	
-	public Map<String,Object> createProduct(ProductOptions productOptions,VendorOptions vendorOptions){
-		Map<String,Object> resultMap = new HashMap<String,Object>();
 
-		// ProductOptions转换成List对象
-		List<String> productList = this.convertProductList(productOptions);
-		this.populateResult(productOptions,productList, vendorOptions.getVendorId(), resultMap);
-		return resultMap;
-	}
-	
-	/**
+    public Map<String, Object> createProduct(ProductOptions productOptions, VendorOptions vendorOptions) {
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+
+        // ProductOptions转换成List对象
+        List<String> productList = this.convertProductList(productOptions);
+        this.populateResult(productOptions, productList, vendorOptions.getVendorId(), resultMap);
+        return resultMap;
+    }
+
+    /**
      * 根据发来的数据增加商品信息
-     *
      *
      * @param columnDataList
      * @param vendorId
      * @return
      */
-	protected boolean populateResult(ProductOptions productOptions,List<String> columnDataList, Long vendorId, Map<String, Object> result) {
-        Connection conn = null ;
+    protected boolean populateResult(ProductOptions productOptions, List<String> columnDataList, Long vendorId, Map<String, Object> result) {
+        Connection conn = null;
         try {
             conn = DBConnector.sql2o.beginTransaction();
 
-            result.put("status",StatusType.FAILURE);
+            result.put("status", StatusType.FAILURE);
 
             //check params
-            boolean b = validateParam(conn, columnDataList, result,vendorId,productOptions);
+            boolean b = validateParam(conn, columnDataList, result, vendorId, productOptions);
             if (b) {
-                if(conn != null) {conn.rollback();conn.close();}
+                if (conn != null) {
+                    conn.rollback();
+                    conn.close();
+                }
                 return b;
             }
 
             Vendor vendor = this.getVendor(conn, vendorId, result);
             if (null == vendor) {
-                result.put("info","create product - " + ApiErrorTypeEnum.errorType.vendor_is_null.getDesc() + "vendor_id:"+vendorId );
+                result.put("info", "create product - " + ApiErrorTypeEnum.errorType.vendor_is_null.getDesc() + "vendor_id:" + vendorId);
                 result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null);
-                result.put("key","vendor_id");
-                result.put("value",vendorId);
-                if(conn != null) {conn.rollback();conn.close();}
+                result.put("key", "vendor_id");
+                result.put("value", vendorId);
+                if (conn != null) {
+                    conn.rollback();
+                    conn.close();
+                }
                 return true;
             }
 
             // start update by dingyifan 20171019
             MappingCategoryService mappingCategoryService = new MappingCategoryService(conn);
-            logger.info("ProductEDSManagementCreateProduct,start,selectCategory,productOptions:"+JSONObject.toJSONString(productOptions));
-            String cId = mappingCategoryService.getMappingCategoryInfoByCondition(productOptions.getCategory1(),productOptions.getCategory2(),productOptions.getCategory3());
-            logger.info("ProductEDSManagementCreateProduct,end,selectCategory,productOptions:"+JSONObject.toJSONString(productOptions)+",categoryId:"+cId);
-            if(StringUtils.isNotBlank(cId)) {
+            logger.info("ProductEDSManagementCreateProduct,start,selectCategory,productOptions:" + JSONObject.toJSONString(productOptions));
+            String cId = mappingCategoryService.getMappingCategoryInfoByCondition(productOptions.getCategory1(), productOptions.getCategory2(),
+                    productOptions.getCategory3());
+            logger.info(
+                    "ProductEDSManagementCreateProduct,end,selectCategory,productOptions:" + JSONObject.toJSONString(productOptions) + ",categoryId:" + cId);
+            if (StringUtils.isNotBlank(cId)) {
                 productOptions.setCategoryId(cId);
             }
             // end update by dingyifan 20171019
 
             // start update by dingyifan 20171029
-            if(StringUtils.isBlank(productOptions.getCategoryId()) && StringUtils.isBlank(productOptions.getCategory3())) {
-                logger.info("ProductEDSManagementCreateProduct,start,getDeafultCategory,productOptions:"+JSONObject.toJSONString(productOptions));
-                cId = mappingCategoryService.getDeafultCategory(vendorId,productOptions.getCategory1(),productOptions.getCategory2());
-                logger.info("ProductEDSManagementCreateProduct,end,getDeafultCategory,productOptions:"+JSONObject.toJSONString(productOptions)+",categoryId:"+cId);
+            if (StringUtils.isBlank(productOptions.getCategoryId()) && StringUtils.isBlank(productOptions.getCategory3())) {
+                logger.info("ProductEDSManagementCreateProduct,start,getDeafultCategory,productOptions:" + JSONObject.toJSONString(productOptions));
+                cId = mappingCategoryService.getDeafultCategory(vendorId, productOptions.getCategory1(), productOptions.getCategory2());
+                logger.info(
+                        "ProductEDSManagementCreateProduct,end,getDeafultCategory,productOptions:" + JSONObject.toJSONString(productOptions) + ",categoryId:"
+                                + cId);
 
-                if(StringUtils.isNotBlank(cId)) {
+                if (StringUtils.isNotBlank(cId)) {
                     productOptions.setCategoryId(cId);
                 }
             }
@@ -107,32 +116,42 @@ public class ProductEDSManagement {
             //get category id
             CategoryService categoryService = new CategoryService(conn);
             String categoryId = productOptions.getCategoryId();
-            if(StringUtils.isBlank(categoryId)) {
-                result.put("info","create product - " + ApiErrorTypeEnum.errorType.category_not_exist.getDesc() + "category_id:"+categoryId );
+            if (StringUtils.isBlank(categoryId)) {
+                result.put("info", "create product - " + ApiErrorTypeEnum.errorType.category_not_exist.getDesc() + "category_id:" + categoryId);
                 result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_find_mapping);
-                result.put("key","category_id");
-                result.put("value",productOptions.getCategory_name());
-                if(conn != null) {conn.rollback();conn.close();}
+                result.put("key", "category_id");
+                result.put("value", productOptions.getCategory_name());
+                if (conn != null) {
+                    conn.rollback();
+                    conn.close();
+                }
                 return true;
             }
 
-            Category category = categoryService.getCategoryById(Long.parseLong(categoryId));// this.getCategory(columnDataList, categoryService, mappingCategoryService, result, storeCode);
+            Category category = categoryService.getCategoryById(
+                    Long.parseLong(categoryId));// this.getCategory(columnDataList, categoryService, mappingCategoryService, result, storeCode);
             if (null == category) {
-                result.put("info","create product - " + ApiErrorTypeEnum.errorType.category_not_exist.getDesc() + "category_id:"+categoryId );
+                result.put("info", "create product - " + ApiErrorTypeEnum.errorType.category_not_exist.getDesc() + "category_id:" + categoryId);
                 result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_find_mapping);
-                result.put("key","category_id");
-                result.put("value",productOptions.getCategory_name());
-                if(conn != null) {conn.rollback();conn.close();}
+                result.put("key", "category_id");
+                result.put("value", productOptions.getCategory_name());
+                if (conn != null) {
+                    conn.rollback();
+                    conn.close();
+                }
                 return true;
             }
 
             // 检查category是否是最后一级
             if (!categoryService.isLastNode(category.getCategory_id())) {
-                result.put("info","create product - " + ApiErrorTypeEnum.errorType.category_not_exist.getDesc() + "category_id:"+categoryId );
+                result.put("info", "create product - " + ApiErrorTypeEnum.errorType.category_not_exist.getDesc() + "category_id:" + categoryId);
                 result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_find_mapping);
-                result.put("key","category_id");
-                result.put("value",productOptions.getCategory_name());
-                if(conn != null) {conn.rollback();conn.close();}
+                result.put("key", "category_id");
+                result.put("value", productOptions.getCategory_name());
+                if (conn != null) {
+                    conn.rollback();
+                    conn.close();
+                }
                 return true;
             }
 
@@ -141,14 +160,17 @@ public class ProductEDSManagement {
             String englishName = columnDataList.get(5);
             ApiBrandMapService apiBrandMapService = new ApiBrandMapService(conn);
             String brandId = apiBrandMapService.getBrandNameByBrand(englishName);
-            if(StringUtils.isBlank(brandId)) {
-                brandId = apiBrandMapService.getBrandNameByBrandMapping(englishName,vendorId.toString());
-                if(StringUtils.isBlank(brandId)) {
-                    result.put("info","create product - " + ApiErrorTypeEnum.errorType.brand_not_exist.getDesc() + "brand_name:"+englishName);
+            if (StringUtils.isBlank(brandId)) {
+                brandId = apiBrandMapService.getBrandNameByBrandMapping(englishName, vendorId.toString());
+                if (StringUtils.isBlank(brandId)) {
+                    result.put("info", "create product - " + ApiErrorTypeEnum.errorType.brand_not_exist.getDesc() + "brand_name:" + englishName);
                     result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_find_mapping);
-                    result.put("key","brand_name");
-                    result.put("value",englishName);
-                    if(conn != null) {conn.rollback();conn.close();}
+                    result.put("key", "brand_name");
+                    result.put("value", englishName);
+                    if (conn != null) {
+                        conn.rollback();
+                        conn.close();
+                    }
                     return true;
                 }
 
@@ -157,41 +179,48 @@ public class ProductEDSManagement {
             BrandService brandService = new BrandService(conn);
             Brand brand = brandService.getBrandById(Long.parseLong(brandId));
 
-            if(brand == null) {
-                result.put("info","create product - " + ApiErrorTypeEnum.errorType.brand_not_exist.getDesc() + "brand_name:"+englishName);
+            if (brand == null) {
+                result.put("info", "create product - " + ApiErrorTypeEnum.errorType.brand_not_exist.getDesc() + "brand_name:" + englishName);
                 result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_find_mapping);
-                result.put("key","brand_name");
-                result.put("value",englishName);
-                if(conn != null) {conn.rollback();conn.close();}
+                result.put("key", "brand_name");
+                result.put("value", englishName);
+                if (conn != null) {
+                    conn.rollback();
+                    conn.close();
+                }
                 return true;
             }
 
-            if(brand != null) {
-                List<Map<String, Object>> apiBrandMapList = apiBrandMapService.getApiBrandMapListByCondition(englishName,vendorId.toString());
-                if(apiBrandMapList != null &&  apiBrandMapList.size() > 0) {
+            if (brand != null) {
+                List<Map<String, Object>> apiBrandMapList = apiBrandMapService.getApiBrandMapListByCondition(englishName, vendorId.toString());
+                if (apiBrandMapList != null && apiBrandMapList.size() > 0) {
                     no_img = true;
                 }
             }
             /** end update by dingyifan 2017-06-15 */
 
             // Save to product table and get result product_id
-            Product product = this.setProduct(category, brand, columnDataList, vendor, result, conn,productOptions,no_img);
+            Product product = this.setProduct(category, brand, columnDataList, vendor, result, conn, productOptions, no_img);
             ProductService productService = new ProductService(conn);
             SeasonService seasonService = new SeasonService(conn);
             logger.info(" start productedsmanagement createproduct select season_code by boutiquecode : " + productOptions.getSeasonCode());
             String season_code = seasonService.selSeasonCodeByBoutiqueCode(productOptions.getSeasonCode());
             logger.info(" end productedsmanagement createproduct select season_code by boutiquecode : season_code " + season_code);
 
-            if(org.apache.commons.lang3.StringUtils.isBlank(season_code) || org.apache.commons.lang3.StringUtils.isBlank(productOptions.getSeasonCode())) {
-                result.put("info","create product - " + ApiErrorTypeEnum.errorType.season_not_exist.getDesc() + "season_code:"+productOptions.getSeasonCode() );
+            if (org.apache.commons.lang3.StringUtils.isBlank(season_code) || org.apache.commons.lang3.StringUtils.isBlank(productOptions.getSeasonCode())) {
+                result.put("info",
+                        "create product - " + ApiErrorTypeEnum.errorType.season_not_exist.getDesc() + "season_code:" + productOptions.getSeasonCode());
                 result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_find_mapping);
-                result.put("key","season_code");
-                result.put("value",productOptions.getSeasonCode());
-                if(conn != null) {conn.rollback();conn.close();}
+                result.put("key", "season_code");
+                result.put("value", productOptions.getSeasonCode());
+                if (conn != null) {
+                    conn.rollback();
+                    conn.close();
+                }
                 return true;
             }
 
-            if(StringUtils.isNotBlank(season_code)) {
+            if (StringUtils.isNotBlank(season_code)) {
                 product.season_code = season_code;
             } else {
                 product.season_code = productOptions.getSeasonCode();
@@ -208,10 +237,10 @@ public class ProductEDSManagement {
 
             // 4. 根据sku_list，在sku表,sku_store表以及sku_property表中插入相关数据
             // 4.1) 把sku_list 转换成 array
-            if(productOptions.getSkus()==null ||productOptions.getSkus().size()==0){
-                logger.info("ProductEDSManagementCreateProduct,skuIsNull,productOptions:"+JSONObject.toJSONString(productOptions));
+            if (productOptions.getSkus() == null || productOptions.getSkus().size() == 0) {
+                logger.info("ProductEDSManagementCreateProduct,skuIsNull,productOptions:" + JSONObject.toJSONString(productOptions));
             } else {
-                this.createSku(conn, columnDataList, product, propertyKeyIdArr, result, vendor,productOptions);
+                this.createSku(conn, columnDataList, product, propertyKeyIdArr, result, vendor, productOptions);
             }
 
             // 5. 在vendor_product_cashback表中加入cash_back_list数据
@@ -225,8 +254,7 @@ public class ProductEDSManagement {
             brandCategoryMap.put("category_id", product.category_id);
             brandCategoryMap.put("enabled", EnabledType.USED);
             BrandCategoryService brandCategoryService = new BrandCategoryService(conn);
-            List<BrandCategory> brandCategoryList = brandCategoryService.getBrandCategoryListByCondition(null,
-                    brandCategoryMap);
+            List<BrandCategory> brandCategoryList = brandCategoryService.getBrandCategoryListByCondition(null, brandCategoryMap);
             // 2.如果无加入
             if (brandCategoryList == null || brandCategoryList.size() <= 0) {
                 BrandCategory brandCategory = new BrandCategory();
@@ -254,42 +282,57 @@ public class ProductEDSManagement {
 
             // 为了减少并发情况下当前product已经被其他进程插入，在commit前再做一次校验
             // TODO: commit过程中的发生的不一致性也需要处理
-            Map<String, Object> condition = new HashMap<String,Object>();
+            Map<String, Object> condition = new HashMap<String, Object>();
             condition.put("product_code", product.product_code);
-            condition.put("vendor_id",vendorId);
+            condition.put("vendor_id", vendorId);
             condition.put("enabled", 1);
             long pcount = productService.countProductByCondition(condition);
             logger.info(" create product service by product : " + new Gson().toJson(product));
 
             if (pcount > 1) {
-                result.put("info","create product -- " + ApiErrorTypeEnum.errorType.boutique_create_error.getDesc() + "boutique_id:"+productOptions.getCode() );
+                result.put("info",
+                        "create product -- " + ApiErrorTypeEnum.errorType.boutique_create_error.getDesc() + "boutique_id:" + productOptions.getCode());
                 result.put("error_enum", ApiErrorTypeEnum.errorType.boutique_create_error);
-                result.put("key","info");
-//                result.put("status",StatusType.SUCCESS);
-                result.put("value","product already exists.");
-                if(conn != null) {conn.rollback();conn.close();}
+                result.put("key", "info");
+                //                result.put("status",StatusType.SUCCESS);
+                result.put("value", "product already exists.");
+                if (conn != null) {
+                    conn.rollback();
+                    conn.close();
+                }
             } else {
                 result.put("product", product);
                 result.put("status", StatusType.SUCCESS);
-                result.put("info","success");
-                if(conn != null) {conn.commit();conn.close();}
+                result.put("info", "success");
+                if (conn != null) {
+                    conn.commit();
+                    conn.close();
+                }
             }
             return false;
         } catch (Exception e) {
-            if(conn != null) {conn.rollback();conn.close();}
+            if (conn != null) {
+                conn.rollback();
+                conn.close();
+            }
             e.printStackTrace();
-            result.put("status",StatusType.FAILURE);
-            result.put("key","exception");
-            result.put("value",ExceptionUtils.getExceptionDetail(e));
-            result.put("info","create product - " + ApiErrorTypeEnum.errorType.Runtime_exception.getDesc() + " error message:" + ExceptionUtils.getExceptionDetail(e));
+            result.put("status", StatusType.FAILURE);
+            result.put("key", "exception");
+            result.put("value", ExceptionUtils.getExceptionDetail(e));
+            result.put("info",
+                    "create product - " + ApiErrorTypeEnum.errorType.Runtime_exception.getDesc() + " error message:" + ExceptionUtils.getExceptionDetail(e));
             result.put("error_enum", ApiErrorTypeEnum.errorType.Runtime_exception);
-            logger.info("ProductEDSManagementCreateProduct,errorMessage:"+ExceptionUtils.getExceptionDetail(e)+",productOptions:"+ JSONObject.toJSONString(productOptions));
+            logger.info("ProductEDSManagementCreateProduct,errorMessage:" + ExceptionUtils.getExceptionDetail(e) + ",productOptions:" + JSONObject.toJSONString(
+                    productOptions));
             return true;
         } finally {
-            if(conn != null) {conn.close();}
+            if (conn != null) {
+                conn.close();
+            }
         }
     }
-	/**
+
+    /**
      * 获取value值
      *
      * @param keyName
@@ -299,34 +342,35 @@ public class ProductEDSManagement {
     public String getValue(String keyName, List<String> columnDataList) {
         String value = "";
         switch (keyName) {
-            case "Composition":
-                value = columnDataList.get(12);
-                break;
-            case "CarryOver":
-                value = columnDataList.get(4);
-                break;
-            case "ColorDescription":
-                value = columnDataList.get(7);
-                break;
-            case "MadeIn":
-                value = columnDataList.get(13);
-                break;
-            case "SizeFit":
-                value = columnDataList.get(14);
-                break;
-            case "ColorCode":
-                value = columnDataList.get(6);
-                break;
-            case "BrandID":
-                value = columnDataList.get(2);
-                break;
-            case "SeasonCode":
-                value = columnDataList.get(3);
-                break;
+        case "Composition":
+            value = columnDataList.get(12);
+            break;
+        case "CarryOver":
+            value = columnDataList.get(4);
+            break;
+        case "ColorDescription":
+            value = columnDataList.get(7);
+            break;
+        case "MadeIn":
+            value = columnDataList.get(13);
+            break;
+        case "SizeFit":
+            value = columnDataList.get(14);
+            break;
+        case "ColorCode":
+            value = columnDataList.get(6);
+            break;
+        case "BrandID":
+            value = columnDataList.get(2);
+            break;
+        case "SeasonCode":
+            value = columnDataList.get(3);
+            break;
         }
         return value;
     }
-	 /**
+
+    /**
      * 创建商品属性
      *
      * @param conn
@@ -334,7 +378,8 @@ public class ProductEDSManagement {
      * @param columnDataList
      * @param product
      */
-    public void createProductProperty(Connection conn, List<CategoryProductProperty> categoryProductPropertyList, List<String> columnDataList, Product product, Map<String, Object> result) throws Exception{
+    public void createProductProperty(Connection conn, List<CategoryProductProperty> categoryProductPropertyList, List<String> columnDataList, Product product,
+            Map<String, Object> result) throws Exception {
         if (null != categoryProductPropertyList && categoryProductPropertyList.size() > 0) {
             for (CategoryProductProperty categoryProductProperty : categoryProductPropertyList) {
                 if (null != categoryProductProperty) {
@@ -349,8 +394,8 @@ public class ProductEDSManagement {
                     productProperty.remark = "eds";
                     productProperty.enabled = EnabledType.USED;
 
-                    if(StringUtils.isNotBlank(productProperty.value)) {
-                    	// 创建productproperty
+                    if (StringUtils.isNotBlank(productProperty.value)) {
+                        // 创建productproperty
                         ProductInfoPropertyService productInfoPropertyService = new ProductInfoPropertyService(conn);
                         productProperty = productInfoPropertyService.createProductInfoProperty(productProperty);
                         if (productProperty == null) {
@@ -362,15 +407,15 @@ public class ProductEDSManagement {
             }
         }
     }
-	
-	/**
+
+    /**
      * 获取类目信息
      *
      * @param conn
      * @param category
      * @return
      */
-    public List<CategoryProductProperty> getCategoryProductProperty(Connection conn, Category category) throws Exception{
+    public List<CategoryProductProperty> getCategoryProductProperty(Connection conn, Category category) throws Exception {
         List<CategoryProductProperty> cppList = null;
         CategoryProductPropertyService cppService = new CategoryProductPropertyService(conn);
 
@@ -382,8 +427,8 @@ public class ProductEDSManagement {
 
         return cppList;
     }
-	
-	/**
+
+    /**
      * 创建商品基本信息
      *
      * @param costList
@@ -394,14 +439,13 @@ public class ProductEDSManagement {
      * @return
      */
     public ProductInfo createProductInfo(List<Map<String, String>> costList, CategoryProductInfoService categoryProductInfoService,
-                                         ProductInfoService productInfoService, Product product, Map<String, Object> result) throws Exception {
+            ProductInfoService productInfoService, Product product, Map<String, Object> result) throws Exception {
 
         JsonArray costListArray = new JsonParser().parse(JSONArray.toJSONString(costList)).getAsJsonArray();
         JsonObject costObj = costListArray.get(0).getAsJsonObject();
 
-        if ("".equals(costObj.get("weight").getAsString()) && "".equals(costObj.get("len").getAsString())
-                && "".equals(costObj.get("width").getAsString()) && "".equals(costObj.get("height").getAsString())
-                && "".equals(costObj.get("size").getAsString())) {
+        if ("".equals(costObj.get("weight").getAsString()) && "".equals(costObj.get("len").getAsString()) && "".equals(costObj.get("width").getAsString()) && ""
+                .equals(costObj.get("height").getAsString()) && "".equals(costObj.get("size").getAsString())) {
             result.put("product", null);
             result.put("status", StatusType.PARAMETEREXIST);
             //return result;
@@ -412,10 +456,8 @@ public class ProductEDSManagement {
         categoryProductInfoCondition.put("enabled", EnabledType.USED);
         categoryProductInfoCondition.put("category_product_info_id", costObj.get("id").getAsLong());
 
-
         List<CategoryProductInfo> categoryProductInfoList = null;
-        categoryProductInfoList = categoryProductInfoService
-                    .getCategoryProductInfoListByCondition(categoryProductInfoCondition);
+        categoryProductInfoList = categoryProductInfoService.getCategoryProductInfoListByCondition(categoryProductInfoCondition);
 
         CategoryProductInfo categoryProductInfo = null;
         if (categoryProductInfoList.size() > 0) {
@@ -492,8 +534,8 @@ public class ProductEDSManagement {
 
         return productInfo;
     }
-	
-	/**
+
+    /**
      * 获取cost list
      *
      * @param columnDataList
@@ -508,8 +550,7 @@ public class ProductEDSManagement {
         categoryProductInfoCondition.put("enabled", EnabledType.USED);
         categoryProductInfoCondition.put("category_id", category.getCategory_id());
         try {
-            List<CategoryProductInfo> categoryProductInfoList = categoryProductInfoService
-                    .getCategoryProductInfoListByCondition(categoryProductInfoCondition);
+            List<CategoryProductInfo> categoryProductInfoList = categoryProductInfoService.getCategoryProductInfoListByCondition(categoryProductInfoCondition);
             if (null != categoryProductInfoList && categoryProductInfoList.size() > 0) {
                 costList = new ArrayList<>();
                 CategoryProductInfo categoryProductInfo = categoryProductInfoList.get(0);
@@ -528,7 +569,7 @@ public class ProductEDSManagement {
         }
         return costList;
     }
-    
+
     /**
      * 获取返点信息
      *
@@ -546,107 +587,102 @@ public class ProductEDSManagement {
 
         return cashBackList;
     }
-	
-	 public void createCashBack(Product product, Connection conn, Map<String, Object> result) {
-	        List<Map<String, String>> cashBackList = getCashBackList();
-	        JsonArray cashBackArray = new JsonParser().parse(JSONArray.toJSONString(cashBackList)).getAsJsonArray();
 
-	        // 5.2) 添加记录到表 vendor_product_cashback_level中
-	        for (int i = 0; i < cashBackArray.size(); i++) {
-	            VendorProductCashbackLevel vendorProductCashbackLevel = new VendorProductCashbackLevel();
-	            vendorProductCashbackLevel.vendor_id = product.vendor_id;
-	            vendorProductCashbackLevel.product_id = product.product_id;
-	            vendorProductCashbackLevel.shop_grade = 0l;
-	            vendorProductCashbackLevel.type = cashBackArray.get(i).getAsJsonObject().get("type").getAsInt();
-	            vendorProductCashbackLevel.name = "";
-	            vendorProductCashbackLevel.full = cashBackArray.get(i).getAsJsonObject().get("full").getAsInt();
-	            if (vendorProductCashbackLevel.type == 1001) {
-	                vendorProductCashbackLevel.back = cashBackArray.get(i).getAsJsonObject().get("back")
-	                        .getAsBigDecimal();
-	            }
-	            if (vendorProductCashbackLevel.type == 1000) {
-	                vendorProductCashbackLevel.back = cashBackArray.get(i).getAsJsonObject().get("back")
-	                        .getAsBigDecimal().divide(new BigDecimal(100));
-	            }
-	            vendorProductCashbackLevel.begin_at = product.publish_at;
-	            vendorProductCashbackLevel.valid_at = product.valid_at;
-	            vendorProductCashbackLevel.last_cash_back_at = product.publish_at;
-	            vendorProductCashbackLevel.period = 0;
-	            vendorProductCashbackLevel.remark = "eds";
-	            vendorProductCashbackLevel.status = 0;
-	            vendorProductCashbackLevel.created_at = Helper.getCurrentTimeToUTCWithDate();
-	            vendorProductCashbackLevel.updated_at = Helper.getCurrentTimeToUTCWithDate();
-	            vendorProductCashbackLevel.enabled = EnabledType.USED;
-	            VendorProductCashbackLevelService vendorProductCashbackLevelService = new VendorProductCashbackLevelService(
-	                    conn);
-	            try {
-	                vendorProductCashbackLevel = vendorProductCashbackLevelService
-	                        .createVendorProductCashbackLevel(vendorProductCashbackLevel);
-	            } catch (Exception e) {
-	                e.printStackTrace();
-	            }
-	            if (vendorProductCashbackLevel == null) {
-	                // 返回状态， product实体
-	                result.put("info", "failed to create cash back");
-	                result.put("status", StatusType.DATABASE_ERROR);
-	            }
-	        }
-	    }
-	 public List<Map<String, Object>> getSkuList(List<String> rowDataList) {
-	        List<Map<String, Object>> skuList = null;
-	        String price = rowDataList.get(21);
-	        String store = "";
-	        String skuCode = "";
-	        String size = "";
-	        Map<String, Object> map = null;
-	        List<String> sizeList = null;
+    public void createCashBack(Product product, Connection conn, Map<String, Object> result) {
+        List<Map<String, String>> cashBackList = getCashBackList();
+        JsonArray cashBackArray = new JsonParser().parse(JSONArray.toJSONString(cashBackList)).getAsJsonArray();
 
-	        if (null != rowDataList && rowDataList.size() > 22) {
-	            skuList = new ArrayList<>();
-	            for (int i = 22; i < rowDataList.size(); i = i + 3) {
+        // 5.2) 添加记录到表 vendor_product_cashback_level中
+        for (int i = 0; i < cashBackArray.size(); i++) {
+            VendorProductCashbackLevel vendorProductCashbackLevel = new VendorProductCashbackLevel();
+            vendorProductCashbackLevel.vendor_id = product.vendor_id;
+            vendorProductCashbackLevel.product_id = product.product_id;
+            vendorProductCashbackLevel.shop_grade = 0l;
+            vendorProductCashbackLevel.type = cashBackArray.get(i).getAsJsonObject().get("type").getAsInt();
+            vendorProductCashbackLevel.name = "";
+            vendorProductCashbackLevel.full = cashBackArray.get(i).getAsJsonObject().get("full").getAsInt();
+            if (vendorProductCashbackLevel.type == 1001) {
+                vendorProductCashbackLevel.back = cashBackArray.get(i).getAsJsonObject().get("back").getAsBigDecimal();
+            }
+            if (vendorProductCashbackLevel.type == 1000) {
+                vendorProductCashbackLevel.back = cashBackArray.get(i).getAsJsonObject().get("back").getAsBigDecimal().divide(new BigDecimal(100));
+            }
+            vendorProductCashbackLevel.begin_at = product.publish_at;
+            vendorProductCashbackLevel.valid_at = product.valid_at;
+            vendorProductCashbackLevel.last_cash_back_at = product.publish_at;
+            vendorProductCashbackLevel.period = 0;
+            vendorProductCashbackLevel.remark = "eds";
+            vendorProductCashbackLevel.status = 0;
+            vendorProductCashbackLevel.created_at = Helper.getCurrentTimeToUTCWithDate();
+            vendorProductCashbackLevel.updated_at = Helper.getCurrentTimeToUTCWithDate();
+            vendorProductCashbackLevel.enabled = EnabledType.USED;
+            VendorProductCashbackLevelService vendorProductCashbackLevelService = new VendorProductCashbackLevelService(conn);
+            try {
+                vendorProductCashbackLevel = vendorProductCashbackLevelService.createVendorProductCashbackLevel(vendorProductCashbackLevel);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (vendorProductCashbackLevel == null) {
+                // 返回状态， product实体
+                result.put("info", "failed to create cash back");
+                result.put("status", StatusType.DATABASE_ERROR);
+            }
+        }
+    }
 
+    public List<Map<String, Object>> getSkuList(List<String> rowDataList) {
+        List<Map<String, Object>> skuList = null;
+        String price = rowDataList.get(21);
+        String store = "";
+        String skuCode = "";
+        String size = "";
+        Map<String, Object> map = null;
+        List<String> sizeList = null;
 
-	                size = rowDataList.get(i);
+        if (null != rowDataList && rowDataList.size() > 22) {
+            skuList = new ArrayList<>();
+            for (int i = 22; i < rowDataList.size(); i = i + 3) {
 
-	                if ((i + 1) < rowDataList.size()) {
-	                    skuCode = rowDataList.get(i + 1);
-	                } else {
-	                    skuCode = "";
-	                    break;
-	                }
-	                if ((i + 2) < rowDataList.size()) {
-	                    store = rowDataList.get(i + 2);
-	                } else {
-	                    store = "";
-	                    break;
-	                }
+                size = rowDataList.get(i);
 
-	                if (StringUtils.isNotBlank(size)
-	                        && StringUtils.isNotBlank(skuCode)
-	                        && StringUtils.isNotBlank(store)
-	                        && StringUtils.isNotBlank(price)) {
-	                    int storeNum = (new Double(store)).intValue();
-	                    sizeList = new ArrayList<>();
-	                    sizeList.add(size);
+                if ((i + 1) < rowDataList.size()) {
+                    skuCode = rowDataList.get(i + 1);
+                } else {
+                    skuCode = "";
+                    break;
+                }
+                if ((i + 2) < rowDataList.size()) {
+                    store = rowDataList.get(i + 2);
+                } else {
+                    store = "";
+                    break;
+                }
 
-	                    map = new HashMap<>();
-	                    map.put("property", sizeList);
-	                    map.put("skuCode", skuCode);
-	                    map.put("store", storeNum < 0 ? 0 : storeNum);
-	                    map.put("price", price);
-	                    map.put("storeMini", 0);
-	                    map.put("inPrice", 0);
+                if (StringUtils.isNotBlank(size) && StringUtils.isNotBlank(skuCode) && StringUtils.isNotBlank(store) && StringUtils.isNotBlank(price)) {
+                    int storeNum = (new Double(store)).intValue();
+                    sizeList = new ArrayList<>();
+                    sizeList.add(size);
 
-	                    skuList.add(map);
-	                } else {
-	                    //TODO 异常日志
-	                }
-	            }
-	        }
+                    map = new HashMap<>();
+                    map.put("property", sizeList);
+                    map.put("skuCode", skuCode);
+                    map.put("store", storeNum < 0 ? 0 : storeNum);
+                    map.put("price", price);
+                    map.put("storeMini", 0);
+                    map.put("inPrice", 0);
 
-	        return skuList;
-	    }
-	public void createSku(Connection conn, List<String> columnDataList, Product product, List<ProductSkuPropertyKey> propertyKeyIdArr, Map<String, Object> result, Vendor vendor,ProductOptions productOptions) throws Exception {
+                    skuList.add(map);
+                } else {
+                    //TODO 异常日志
+                }
+            }
+        }
+
+        return skuList;
+    }
+
+    public void createSku(Connection conn, List<String> columnDataList, Product product, List<ProductSkuPropertyKey> propertyKeyIdArr,
+            Map<String, Object> result, Vendor vendor, ProductOptions productOptions) throws Exception {
         List<Map<String, Object>> skuList = this.getSkuList(columnDataList);
         JsonArray skuArray = new JsonParser().parse(JSONArray.toJSONString(skuList)).getAsJsonArray();
         CategoryProductInfoService categoryProductInfoService = new CategoryProductInfoService(conn);
@@ -656,10 +692,7 @@ public class ProductEDSManagement {
         Integer vendorDiscount = 100;
         Integer adminDiscount = 100;
         //获取商品的折扣率
-        if (null != product.getCategory_id()
-                && null != product.getBrand_id()
-                && null != product.getProduct_code()
-                && !"".equals(product.getProduct_code())) {
+        if (null != product.getCategory_id() && null != product.getBrand_id() && null != product.getProduct_code() && !"".equals(product.getProduct_code())) {
             priceRuleList = priceChangeRuleService.getCurrentChangeRuleByProduct(product);
         }
 
@@ -678,7 +711,7 @@ public class ProductEDSManagement {
             sku.coverpic = product.cover_img;
             sku.introduction = product.description;
             sku.price = new BigDecimal(skuObj.get("price").getAsString().trim());
-//            sku.price = new BigDecimal(skuObj.get("price").getAsString().trim());
+            //            sku.price = new BigDecimal(skuObj.get("price").getAsString().trim());
             sku.in_price = new BigDecimal(sku.price.doubleValue() * vendorDiscount / ((1 + 0.22) * 100));
             sku.im_price = new BigDecimal(sku.price.doubleValue() * adminDiscount / ((1) * 100));
             sku.created_at = Helper.getCurrentTimeToUTCWithDate();
@@ -686,8 +719,8 @@ public class ProductEDSManagement {
             sku.enabled = EnabledType.USED;
             sku.last_check = new Date();
 
-            if(StringUtils.isNotBlank(productOptions.getFullUpdateProductFlag())){
-                if(productOptions.getFullUpdateProductFlag().equals("1")) {
+            if (StringUtils.isNotBlank(productOptions.getFullUpdateProductFlag())) {
+                if (productOptions.getFullUpdateProductFlag().equals("1")) {
                     sku.full_modify_date = new Date();
                     logger.info("createProduct set full modify date sku : " + new Gson().toJson(sku));
                 }
@@ -708,18 +741,15 @@ public class ProductEDSManagement {
             categoryProductInfoCondition.put("enabled", EnabledType.USED);
             categoryProductInfoCondition.put("category_id", product.category_id);
 
-
             List<CategoryProductInfo> categoryProductInfoList = null;
-            categoryProductInfoList = categoryProductInfoService
-                        .getCategoryProductInfoListByCondition(categoryProductInfoCondition);
-
+            categoryProductInfoList = categoryProductInfoService.getCategoryProductInfoListByCondition(categoryProductInfoCondition);
 
             if (categoryProductInfoList.size() > 0) {
                 categoryProductInfo = categoryProductInfoList.get(0);
             } else {
                 result.put("info", "failed to get the category of product information");
                 result.put("status", StatusType.DATABASE_ERROR);
-//                return result;
+                //                return result;
             }
 
             // 4.3) 每个sku 实体的数据加入sku_store表
@@ -767,10 +797,8 @@ public class ProductEDSManagement {
                         // 5.3) 填入 sku_property 表
                         SkuProperty skuProperty = new SkuProperty();
                         skuProperty.sku_id = sku.sku_id;
-                        skuProperty.product_sku_property_key_id = propertyKeyIdArr
-                                .get(j).product_sku_property_key_id;
-                        skuProperty.product_sku_property_value_id = propertyKeyIdArr.get(j).getPropertyValueList()
-                                .get(k).product_sku_property_value_id;
+                        skuProperty.product_sku_property_key_id = propertyKeyIdArr.get(j).product_sku_property_key_id;
+                        skuProperty.product_sku_property_value_id = propertyKeyIdArr.get(j).getPropertyValueList().get(k).product_sku_property_value_id;
                         skuProperty.name = sku.name;
                         skuProperty.remark = "eds";
                         skuProperty.created_at = Helper.getCurrentTimeToUTCWithDate();
@@ -778,7 +806,6 @@ public class ProductEDSManagement {
                         skuProperty.enabled = EnabledType.USED;
 
                         skuProperty = skuPropertyService.createSkuProperty(skuProperty);
-
 
                         if (skuProperty == null) {
                             result.put("info", "failed to create sku property");
@@ -790,116 +817,117 @@ public class ProductEDSManagement {
 
         }
     }
-	/**
+
+    /**
      * 获取分类类目下的属性key列表
-    *
-    * @param category
-    * @param categorySkuPropertyKeyService
-    * @return
-    */
-   public List<String> getPropertyKeyArray(Category category, CategorySkuPropertyKeyService categorySkuPropertyKeyService) {
-       List<String> propertyKeyList = null;
-       try {
-           propertyKeyList = categorySkuPropertyKeyService.getCategoryPropertyKeyNameListByCategory(category.getCategory_id());
-       } catch (Exception e) {
-           e.printStackTrace();
-       }
-       return propertyKeyList;
-   }
-	
-	 public List<ProductSkuPropertyKey> createProductSku(Connection conn, Category category, Product product, Map<String, Object> result, List<String> cloumnDataList) {
-	        // 2. 获取product_id，根据property_key_list 在 product_sku_property_key
-	        // 插入数据
-	        // 2.1) 把property_key_list转换成数组
-	        CategorySkuPropertyKeyService categorySkuPropertyKeyService = new CategorySkuPropertyKeyService(conn);
-	        List<String> keyList = getPropertyKeyArray(category, categorySkuPropertyKeyService);
-	        JsonArray propertyKeyArray = new JsonParser().parse(JSONArray.toJSONString(keyList)).getAsJsonArray();
+     *
+     * @param category
+     * @param categorySkuPropertyKeyService
+     * @return
+     */
+    public List<String> getPropertyKeyArray(Category category, CategorySkuPropertyKeyService categorySkuPropertyKeyService) {
+        List<String> propertyKeyList = null;
+        try {
+            propertyKeyList = categorySkuPropertyKeyService.getCategoryPropertyKeyNameListByCategory(category.getCategory_id());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return propertyKeyList;
+    }
 
-	        // 2.2) 把property_value_list转换成数组
-	        //CategorySkuPropertyValueService categorySkuPropertyValueService = new CategorySkuPropertyValueService(conn);
-	        //List<Map<String, List<String>>> valueList = getPropertyValueArray(category, categorySkuPropertyValueService);
-	        List<Map<String, List<String>>> valueList = null;
-	        List<String> list = new ArrayList<>();
-	        Map<String, List<String>> map = new HashMap<>();
-	        String size = "";
-	        for (int i = 22; i < cloumnDataList.size(); i = i + 3) {
-	            size = cloumnDataList.get(i);
-	            list.add(size);
-	        }
-	        map.put("Size", list);
+    public List<ProductSkuPropertyKey> createProductSku(Connection conn, Category category, Product product, Map<String, Object> result,
+            List<String> cloumnDataList) {
+        // 2. 获取product_id，根据property_key_list 在 product_sku_property_key
+        // 插入数据
+        // 2.1) 把property_key_list转换成数组
+        CategorySkuPropertyKeyService categorySkuPropertyKeyService = new CategorySkuPropertyKeyService(conn);
+        List<String> keyList = getPropertyKeyArray(category, categorySkuPropertyKeyService);
+        JsonArray propertyKeyArray = new JsonParser().parse(JSONArray.toJSONString(keyList)).getAsJsonArray();
 
-	        valueList = new ArrayList<Map<String, List<String>>>();
-	        valueList.add(map);
+        // 2.2) 把property_value_list转换成数组
+        //CategorySkuPropertyValueService categorySkuPropertyValueService = new CategorySkuPropertyValueService(conn);
+        //List<Map<String, List<String>>> valueList = getPropertyValueArray(category, categorySkuPropertyValueService);
+        List<Map<String, List<String>>> valueList = null;
+        List<String> list = new ArrayList<>();
+        Map<String, List<String>> map = new HashMap<>();
+        String size = "";
+        for (int i = 22; i < cloumnDataList.size(); i = i + 3) {
+            size = cloumnDataList.get(i);
+            list.add(size);
+        }
+        map.put("Size", list);
 
-	        JsonArray propertyValueArray = new JsonParser().parse(JSONArray.toJSONString(valueList)).getAsJsonArray();
+        valueList = new ArrayList<Map<String, List<String>>>();
+        valueList.add(map);
 
-	        // 2.3) 把每个key 插入到 product_sku_property_key表中
-	        List<ProductSkuPropertyKey> propertyKeyIdArr = new ArrayList<ProductSkuPropertyKey>();
-	        ProductPropertyKeyService productPropertyKeyService = new ProductPropertyKeyService(conn);
-	        ProductPropertyValueService productPropertyValueService = new ProductPropertyValueService(conn);
-	        for (int i = 0; i < propertyKeyArray.size(); i++) {
-	            // 插入数据库
-	            ProductSkuPropertyKey productSkuPropertyKey = new ProductSkuPropertyKey();
-	            productSkuPropertyKey.product_id = product.product_id;
-	            productSkuPropertyKey.name = propertyKeyArray.get(i).getAsString();
-	            productSkuPropertyKey.remark = "eds";
-	            productSkuPropertyKey.created_at = Helper.getCurrentTimeToUTCWithDate();
-	            productSkuPropertyKey.updated_at = Helper.getCurrentTimeToUTCWithDate();
-	            productSkuPropertyKey.enabled = EnabledType.USED;
+        JsonArray propertyValueArray = new JsonParser().parse(JSONArray.toJSONString(valueList)).getAsJsonArray();
 
-	            try {
-	                productSkuPropertyKey = productPropertyKeyService.createProductPropertyKey(productSkuPropertyKey);
-	            } catch (Exception e) {
-	                e.printStackTrace();
-	            }
-	            if (productSkuPropertyKey == null) {
-	                result.put("info", "Failed to create commodity SKU property key");
-	                result.put("status", StatusType.DATABASE_ERROR);
-	            }
+        // 2.3) 把每个key 插入到 product_sku_property_key表中
+        List<ProductSkuPropertyKey> propertyKeyIdArr = new ArrayList<ProductSkuPropertyKey>();
+        ProductPropertyKeyService productPropertyKeyService = new ProductPropertyKeyService(conn);
+        ProductPropertyValueService productPropertyValueService = new ProductPropertyValueService(conn);
+        for (int i = 0; i < propertyKeyArray.size(); i++) {
+            // 插入数据库
+            ProductSkuPropertyKey productSkuPropertyKey = new ProductSkuPropertyKey();
+            productSkuPropertyKey.product_id = product.product_id;
+            productSkuPropertyKey.name = propertyKeyArray.get(i).getAsString();
+            productSkuPropertyKey.remark = "eds";
+            productSkuPropertyKey.created_at = Helper.getCurrentTimeToUTCWithDate();
+            productSkuPropertyKey.updated_at = Helper.getCurrentTimeToUTCWithDate();
+            productSkuPropertyKey.enabled = EnabledType.USED;
 
-	            productSkuPropertyKey.propertyValueList = new ArrayList<>();
-	            // 2.4) 根据不同的key 把每个value 插入到 product_sku_property_value表中
-	            // 3.
-	            // 获取每条propery_key的纪录，获取product_sku_property_key_id，根据property_value_list，
-	            // 在 product_propery_value表插入数据
-	            for (int j = 0; j < propertyValueArray.size(); j++) {
-	                // 如果有
-	                if (propertyValueArray.get(j).getAsJsonObject().has(productSkuPropertyKey.name)) {
-	                    JsonArray valueArray = propertyValueArray.get(j).getAsJsonObject()
-	                            .get(productSkuPropertyKey.name).getAsJsonArray();
-	                    for (int k = 0; k < valueArray.size(); k++) {
-	                        ProductSkuPropertyValue productPropertyValue = new ProductSkuPropertyValue();
-	                        productPropertyValue.product_sku_property_key_id = productSkuPropertyKey.product_sku_property_key_id;
-	                        productPropertyValue.value = valueArray.get(k).getAsString();
-	                        productPropertyValue.remark = cloumnDataList.get(8) == null ? "eds" : cloumnDataList.get(8);
-	                        productPropertyValue.created_at = Helper.getCurrentTimeToUTCWithDate();
-	                        productPropertyValue.updated_at = Helper.getCurrentTimeToUTCWithDate();
-	                        productPropertyValue.enabled = EnabledType.USED;
+            try {
+                productSkuPropertyKey = productPropertyKeyService.createProductPropertyKey(productSkuPropertyKey);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (productSkuPropertyKey == null) {
+                result.put("info", "Failed to create commodity SKU property key");
+                result.put("status", StatusType.DATABASE_ERROR);
+            }
 
-	                        try {
-	                            productPropertyValue = productPropertyValueService
-	                                    .createProductPropertyValue(productPropertyValue);
-	                        } catch (Exception e) {
-	                            e.printStackTrace();
-	                        }
-	                        if (productPropertyValue.product_sku_property_value_id == null) {
-	                            result.put("info", "Failed to create commodity SKU property value");
-	                            result.put("status", StatusType.DATABASE_ERROR);
-	                        }
+            productSkuPropertyKey.propertyValueList = new ArrayList<>();
+            // 2.4) 根据不同的key 把每个value 插入到 product_sku_property_value表中
+            // 3.
+            // 获取每条propery_key的纪录，获取product_sku_property_key_id，根据property_value_list，
+            // 在 product_propery_value表插入数据
+            for (int j = 0; j < propertyValueArray.size(); j++) {
+                // 如果有
+                if (propertyValueArray.get(j).getAsJsonObject().has(productSkuPropertyKey.name)) {
+                    JsonArray valueArray = propertyValueArray.get(j).getAsJsonObject().get(productSkuPropertyKey.name).getAsJsonArray();
+                    for (int k = 0; k < valueArray.size(); k++) {
+                        ProductSkuPropertyValue productPropertyValue = new ProductSkuPropertyValue();
+                        productPropertyValue.product_sku_property_key_id = productSkuPropertyKey.product_sku_property_key_id;
+                        productPropertyValue.value = valueArray.get(k).getAsString();
+                        productPropertyValue.remark = cloumnDataList.get(8) == null ? "eds" : cloumnDataList.get(8);
+                        productPropertyValue.created_at = Helper.getCurrentTimeToUTCWithDate();
+                        productPropertyValue.updated_at = Helper.getCurrentTimeToUTCWithDate();
+                        productPropertyValue.enabled = EnabledType.USED;
 
-	                        productSkuPropertyKey.propertyValueList.add(productPropertyValue);
-	                    }
-	                }
-	            }
+                        try {
+                            productPropertyValue = productPropertyValueService.createProductPropertyValue(productPropertyValue);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        if (productPropertyValue.product_sku_property_value_id == null) {
+                            result.put("info", "Failed to create commodity SKU property value");
+                            result.put("status", StatusType.DATABASE_ERROR);
+                        }
 
-	            // 记录插入productPropertyKey数据
-	            propertyKeyIdArr.add(productSkuPropertyKey);
-	        }
+                        productSkuPropertyKey.propertyValueList.add(productPropertyValue);
+                    }
+                }
+            }
 
-	        return propertyKeyIdArr;
-	    }
-	
-	public Product setProduct(Category category, Brand brand, List<String> cloumnDataList, Vendor vendor, Map<String, Object> result,Connection conn,ProductOptions productOptions,boolean no_img) throws Exception{
+            // 记录插入productPropertyKey数据
+            propertyKeyIdArr.add(productSkuPropertyKey);
+        }
+
+        return propertyKeyIdArr;
+    }
+
+    public Product setProduct(Category category, Brand brand, List<String> cloumnDataList, Vendor vendor, Map<String, Object> result, Connection conn,
+            ProductOptions productOptions, boolean no_img) throws Exception {
         Product product = null;
         try {
             product = new Product();
@@ -911,9 +939,9 @@ public class ProductEDSManagement {
             String coverImgs = convertImgPath(cloumnDataList.get(15));
 
             /** start update by dingyifan 2017-07-31 */
-            if(StringUtils.isBlank(coverImgs) || "[]".equals(coverImgs)) {
+            if (StringUtils.isBlank(coverImgs) || "[]".equals(coverImgs)) {
                 // 记录上传图片出错日志
-                if(org.apache.commons.lang3.StringUtils.isNotBlank(productOptions.getCoverImg())) {
+                if (org.apache.commons.lang3.StringUtils.isNotBlank(productOptions.getCoverImg())) {
                     ApiLogImageErrorService apiLogImageErrorService = new ApiLogImageErrorService(conn);
                     ApiLogImageError apiLogImageError = new ApiLogImageError();
                     apiLogImageError.setBoutique_id(productOptions.getCode());
@@ -925,26 +953,26 @@ public class ProductEDSManagement {
             }
             /** start update by dingyifan 2017-07-31 */
 
-            if(!no_img) {
+            if (!no_img) {
                 product.cover_img = coverImgs;
             }
 
-            if(StringUtils.isNotBlank(product.cover_img)) {
+            if (StringUtils.isNotBlank(product.cover_img)) {
                 logger.info(" start record create picture !!!");
                 ApiLogBatchService apiLogBatchService = new ApiLogBatchService(conn);
-                apiLogBatchService.createApiLogBatch(product.product_code,productOptions.getImgByFilippo());
+                apiLogBatchService.createApiLogBatch(product.product_code, productOptions.getImgByFilippo());
                 logger.info(" end record create picture !!!");
             }
 
             product.name = cloumnDataList.get(0);
 
-            if(StringUtils.isBlank(product.name)) {
+            if (StringUtils.isBlank(product.name)) {
                 product.name = category.getName();
             }
 
             product.description = cloumnDataList.get(11);
-            if(!no_img) {
-//                product.description_img = convertImgPath(cloumnDataList.get(16));
+            if (!no_img) {
+                //                product.description_img = convertImgPath(cloumnDataList.get(16));
                 product.description_img = coverImgs;
             }
             product.remark = "eds";
@@ -968,14 +996,14 @@ public class ProductEDSManagement {
 
         return product;
     }
-	
-	/**
+
+    /**
      * 转换图片路径,读取图片流写入到OSS
      *
      * @param imgPaths
      * @return
      */
-    public String convertImgPath (String imgPaths) {
+    public String convertImgPath(String imgPaths) {
         List<String> converImgPathList = null;
         if (StringUtils.isNotBlank(imgPaths)) {
 
@@ -983,11 +1011,11 @@ public class ProductEDSManagement {
                 List<String> imgList = JSONArray.parseArray(imgPaths, String.class);
                 if (null != imgList && imgList.size() > 0) {
                     converImgPathList = new ArrayList<>(imgList.size());
-                    for (String imgPath: imgList) {
-                        imgPath = imgPath.replace(" ","%20");
+                    for (String imgPath : imgList) {
+                        imgPath = imgPath.replace(" ", "%20");
                         List<String> list = FileUploadHelper.uploadFileByImgUrl2(imgPath);
                         imgPath = list.get(0);
-                        if(StringUtils.isNotBlank(imgPath)) {
+                        if (StringUtils.isNotBlank(imgPath)) {
                             converImgPathList.add(imgPath);
                         }
                     }
@@ -998,24 +1026,24 @@ public class ProductEDSManagement {
             } catch (Exception e) {
                 e.printStackTrace();
                 converImgPathList = new ArrayList<>();
-                logger.info("convertImgPath,errorMessage:"+imgPaths);
+                logger.info("convertImgPath,errorMessage:" + imgPaths);
             }
         }
 
         return JSON.toJSONString(converImgPathList);
     }
 
-    public List<String> convertImgPathList (String imgPaths) {
+    public List<String> convertImgPathList(String imgPaths) {
         List<String> converImgPathList = null;
         if (StringUtils.isNotBlank(imgPaths)) {
             List<String> imgList = JSONArray.parseArray(imgPaths, String.class);
             try {
                 if (null != imgList && imgList.size() > 0) {
                     converImgPathList = new ArrayList<>(imgList.size());
-                    for (String imgPath: imgList) {
+                    for (String imgPath : imgList) {
                         List<String> list = FileUploadHelper.uploadFileByImgUrl2(imgPath);
                         imgPath = list.get(0);
-                        if(StringUtils.isNotBlank(imgPath)) {
+                        if (StringUtils.isNotBlank(imgPath)) {
                             converImgPathList.add(imgPath);
                         }
                     }
@@ -1032,17 +1060,17 @@ public class ProductEDSManagement {
         return converImgPathList;
     }
 
-	 public boolean checkVendorAcitived(Vendor vendor, Map<String, Object> result) {
-	        boolean b = false;
-	        if (vendor.status != VendorStatus.ACTIVED) {
-	            result.put("info", "Current supplier non effective supplier!");
-	            result.put("status", StatusType.VENDOR_NOT_ACTIVED);
-	            b = true;
-	        }
-	        return b;
-	    }
-	
-	public Vendor getVendor(Connection conn, Long vendorId, Map<String, Object> result) {
+    public boolean checkVendorAcitived(Vendor vendor, Map<String, Object> result) {
+        boolean b = false;
+        if (vendor.status != VendorStatus.ACTIVED) {
+            result.put("info", "Current supplier non effective supplier!");
+            result.put("status", StatusType.VENDOR_NOT_ACTIVED);
+            b = true;
+        }
+        return b;
+    }
+
+    public Vendor getVendor(Connection conn, Long vendorId, Map<String, Object> result) {
         // Get vendor
         Vendor vendor = null;
         try {
@@ -1055,14 +1083,14 @@ public class ProductEDSManagement {
         }
 
         if (vendor == null) {
-            result.put("info",  "Cannot find supplier!");
+            result.put("info", "Cannot find supplier!");
             result.put("status", StatusType.VENDOR_NULL_BY_USERID);
         }
 
         return vendor;
     }
-	
-	 /**
+
+    /**
      * 查询品牌信息
      *
      * @param englishName
@@ -1083,7 +1111,7 @@ public class ProductEDSManagement {
                 brand = brands.get(0);
             } else {
                 condition = new HashMap<>();
-                condition.put("boutique_brand_name",englishName);
+                condition.put("boutique_brand_name", englishName);
                 condition.put("api_configuration_id", apiConfigurationId);
                 List<ApiBrandMap> apiBrandMapList = apiBrandMapService.getApiBrandMapListByCondition(condition);
                 if (null != apiBrandMapList && apiBrandMapList.size() > 0) {
@@ -1101,15 +1129,15 @@ public class ProductEDSManagement {
 
         return brand;
     }
-	
-	/**
+
+    /**
      * 检查校验参数合法性
      *
      * @param columnDataList
      * @param result
      * @return
      */
-    public boolean validateParam(Connection conn, List<String> columnDataList, Map<String, Object> result,Long vendorId,ProductOptions productOptions) {
+    public boolean validateParam(Connection conn, List<String> columnDataList, Map<String, Object> result, Long vendorId, ProductOptions productOptions) {
         /*String productName = columnDataList.get(0);
         if (StringUtils.isBlank(productName)) {
             result.put("info","create product - "+ ApiErrorTypeEnum.errorType.boutique_name_is_null.getDesc()+"boutique_name:null");
@@ -1121,27 +1149,27 @@ public class ProductEDSManagement {
         result.put("status", StatusType.FAILURE);
         String boutiqueId = columnDataList.get(1);
         if (StringUtils.isBlank(boutiqueId)) {
-            result.put("info","create product - "+ ApiErrorTypeEnum.errorType.boutique_id_is_null.getDesc()+"boutique_id:null");
+            result.put("info", "create product - " + ApiErrorTypeEnum.errorType.boutique_id_is_null.getDesc() + "boutique_id:null");
             result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null);
-            result.put("key","boutique_id");
-            result.put("value","null");
+            result.put("key", "boutique_id");
+            result.put("value", "null");
             return true;
         } else {
             ProductService productService = new ProductService(conn);
             Map<String, Object> condition = new HashMap<>();
             condition.put("product_code", boutiqueId);
             condition.put("enabled", 1);
-            condition.put("vendor_id",vendorId);
+            condition.put("vendor_id", vendorId);
             try {
-                logger.info("ProductEDSManagementValidateParam,getProductByCondition,condition:"+new Gson().toJson(condition));
+                logger.info("ProductEDSManagementValidateParam,getProductByCondition,condition:" + new Gson().toJson(condition));
                 Product product = productService.getProductByCondition(condition, null);
-                logger.info("ProductEDSManagementValidateParam,getProductByCondition,product:"+new Gson().toJson(product));
+                logger.info("ProductEDSManagementValidateParam,getProductByCondition,product:" + new Gson().toJson(product));
                 if (null != product) {
-                    result.put("status",StatusType.PRODUCT_ALREADY_EXISTS);
-                    result.put("info","create product - "+ ApiErrorTypeEnum.errorType.boutique_id_already_exist.getDesc()+"boutique_id:"+boutiqueId);
+                    result.put("status", StatusType.PRODUCT_ALREADY_EXISTS);
+                    result.put("info", "create product - " + ApiErrorTypeEnum.errorType.boutique_id_already_exist.getDesc() + "boutique_id:" + boutiqueId);
                     result.put("error_enum", ApiErrorTypeEnum.errorType.Data_is_duplicated);
-                    result.put("key","boutique_id");
-                    result.put("value",boutiqueId);
+                    result.put("key", "boutique_id");
+                    result.put("value", boutiqueId);
                     return true;
                 }
             } catch (Exception e) {
@@ -1151,73 +1179,73 @@ public class ProductEDSManagement {
 
         String brandId = columnDataList.get(2);
         if (StringUtils.isBlank(brandId)) {
-            result.put("info","create product - "+ ApiErrorTypeEnum.errorType.brandID_is_null.getDesc()+"BrandID:null");
+            result.put("info", "create product - " + ApiErrorTypeEnum.errorType.brandID_is_null.getDesc() + "BrandID:null");
             result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null);
-            result.put("key","BrandID");
-            result.put("value","null");
+            result.put("key", "BrandID");
+            result.put("value", "null");
             return true;
         }
 
         String brand = columnDataList.get(5);
         if (StringUtils.isBlank(brand)) {
-            result.put("info","create product - "+ ApiErrorTypeEnum.errorType.brand_name_is_null.getDesc()+"brand_name:null");
+            result.put("info", "create product - " + ApiErrorTypeEnum.errorType.brand_name_is_null.getDesc() + "brand_name:null");
             result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null);
-            result.put("key","brand");
-            result.put("value","null");
+            result.put("key", "brand");
+            result.put("value", "null");
             return true;
         }
 
         String colorCode = columnDataList.get(6);
         if (StringUtils.isBlank(colorCode)) {
-            result.put("info","create product - "+ ApiErrorTypeEnum.errorType.colorCode_is_null.getDesc()+"colorCode:null");
+            result.put("info", "create product - " + ApiErrorTypeEnum.errorType.colorCode_is_null.getDesc() + "colorCode:null");
             result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null);
-            result.put("key","ColorCode");
-            result.put("value","null");
+            result.put("key", "ColorCode");
+            result.put("value", "null");
             return true;
         }
 
-//        String threeCategoryId = columnDataList.get(10);
-//        if (StringUtils.isBlank(threeCategoryId)) {
-//            result.put("info","create product - "+ ApiErrorTypeEnum.errorType.category_is_null.getDesc()+"category_id:null");
-//            result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_find_mapping);
-//            result.put("key","category_id");
-//            result.put("value",productOptions.getCategory_name());
-//            return true;
-//        }
+        //        String threeCategoryId = columnDataList.get(10);
+        //        if (StringUtils.isBlank(threeCategoryId)) {
+        //            result.put("info","create product - "+ ApiErrorTypeEnum.errorType.category_is_null.getDesc()+"category_id:null");
+        //            result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_find_mapping);
+        //            result.put("key","category_id");
+        //            result.put("value",productOptions.getCategory_name());
+        //            return true;
+        //        }
 
         String coverImage = columnDataList.get(15);
         if (StringUtils.isBlank(coverImage)) {
-            result.put("info","create product - "+ ApiErrorTypeEnum.errorType.coverImage_is_null.getDesc()+"coverImage:null");
+            result.put("info", "create product - " + ApiErrorTypeEnum.errorType.coverImage_is_null.getDesc() + "coverImage:null");
             result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null);
-            result.put("key","coverImage");
-            result.put("value","null");
+            result.put("key", "coverImage");
+            result.put("value", "null");
             return true;
         }
 
         String descriptionImage = columnDataList.get(16);
         if (StringUtils.isBlank(descriptionImage)) {
-            result.put("info","create product - "+ ApiErrorTypeEnum.errorType.descImage_is_null.getDesc()+"descImage:null");
+            result.put("info", "create product - " + ApiErrorTypeEnum.errorType.descImage_is_null.getDesc() + "descImage:null");
             result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null);
-            result.put("key","descImage");
-            result.put("value","null");
+            result.put("key", "descImage");
+            result.put("value", "null");
             return true;
         }
 
         String weight = columnDataList.get(17);
         if (StringUtils.isBlank(weight)) {
-            result.put("info","create product - "+ ApiErrorTypeEnum.errorType.weight_is_null.getDesc()+"descImage:null");
+            result.put("info", "create product - " + ApiErrorTypeEnum.errorType.weight_is_null.getDesc() + "descImage:null");
             result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null);
-            result.put("key","weight");
-            result.put("value","null");
+            result.put("key", "weight");
+            result.put("value", "null");
             return true;
         }
 
         String salePrice = columnDataList.get(21);
         if (StringUtils.isBlank(salePrice) || "0".equals(StringUtils.trim(salePrice))) {
-            result.put("info","create product - "+ ApiErrorTypeEnum.errorType.retail_price_is_zero.getDesc()+"salePrice:"+salePrice);
+            result.put("info", "create product - " + ApiErrorTypeEnum.errorType.retail_price_is_zero.getDesc() + "salePrice:" + salePrice);
             result.put("error_enum", ApiErrorTypeEnum.errorType.retail_price_is_zero);
-            result.put("key","price");
-            result.put("value",salePrice);
+            result.put("key", "price");
+            result.put("value", salePrice);
             return true;
         }
 
@@ -1227,187 +1255,191 @@ public class ProductEDSManagement {
         for (int i = 22; i < columnDataList.size(); i = i + 3) {
             size = columnDataList.get(i);
             if (StringUtils.isBlank(size)) {
-                result.put("info","create product - "+ ApiErrorTypeEnum.errorType.skuSize_is_null.getDesc()+"size:null");
+                result.put("info", "create product - " + ApiErrorTypeEnum.errorType.skuSize_is_null.getDesc() + "size:null");
                 result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null);
-                result.put("key","size");
-                result.put("value","null");
+                result.put("key", "size");
+                result.put("value", "null");
                 return true;
             }
             barcode = columnDataList.get(i + 1);
             if (StringUtils.isBlank(barcode)) {
-                result.put("info","create product - "+ ApiErrorTypeEnum.errorType.skuCode_is_null.getDesc()+"barcode:null");
+                result.put("info", "create product - " + ApiErrorTypeEnum.errorType.skuCode_is_null.getDesc() + "barcode:null");
                 result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null);
-                result.put("key","barcode");
-                result.put("value","null");
+                result.put("key", "barcode");
+                result.put("value", "null");
                 return true;
             }
             stock = columnDataList.get(i + 2);
             if (StringUtils.isBlank(stock)) {
-                result.put("info","create product - "+ ApiErrorTypeEnum.errorType.skuStock_is_null.getDesc()+"stock:null");
+                result.put("info", "create product - " + ApiErrorTypeEnum.errorType.skuStock_is_null.getDesc() + "stock:null");
                 result.put("error_enum", ApiErrorTypeEnum.errorType.Data_can_not_be_null);
-                result.put("key","stock");
-                result.put("value","null");
+                result.put("key", "stock");
+                result.put("value", "null");
                 return true;
             }
         }
         return false;
     }
-	
-	/**
-	 * ProductOptions转换成List对象
-	 * @param productOptions
-	 * @return List
-	 */
-	public List<String> convertProductList(ProductOptions productOptions){
-		// 初始化属性
-		List<String> productList = new ArrayList<String>();
-		
-		// 转换ProductOptions
-		productList.add(0,productOptions.getName()); // item_name
-		
-		productList.add(1,productOptions.getCode()); // product_id
-		
-		productList.add(2,productOptions.getBrandCode()); // product_reference
-		
-		productList.add(3,productOptions.getSeasonCode()); // season_year + season_reference
-		
-		productList.add(4,productOptions.getCarryOver()); // atelier 
-		
-		productList.add(5,productOptions.getBrandName()); // brand
-		
-		productList.add(6,productOptions.getColorCode()); // color_reference
-		
-		productList.add(7,productOptions.getColorDesc()); // color
-		if(productOptions.getSkus() != null&& productOptions.getSkus().size()!=0) {
-            productList.add(8,productOptions.getSkus().get(0).getSizeid()); // 注意 - sizeid for filippo
-        } else {
-            productList.add(8,"");
-        }
-		productList.add(9,""); // 注意 - first_category 
-		
-		productList.add(10,productOptions.getCategoryId()); // 注意 - second_category
-		
-		productList.add(11,productOptions.getDesc()); // item_description
-		
-		productList.add(12, productOptions.getComposition()); // 注意 technical_info
-		
-		productList.add(13, productOptions.getMadeIn()); // made_In
-		
-		productList.add(14,productOptions.getSizeFit()); // 注意 suitable
-		
-		if(StringUtils.isNotBlank(productOptions.getCoverImg())) { // item_images
-			productList.add(15,productOptions.getCoverImg()); 
-		} else {
-			productList.add(15,"[]"); 
-		}
 
-        if(StringUtils.isNotBlank(productOptions.getDescImg())) { // item_images
-            productList.add(16,productOptions.getDescImg());
+    /**
+     * ProductOptions转换成List对象
+     *
+     * @param productOptions
+     * @return List
+     */
+    public List<String> convertProductList(ProductOptions productOptions) {
+        // 初始化属性
+        List<String> productList = new ArrayList<String>();
+
+        // 转换ProductOptions
+        productList.add(0, productOptions.getName()); // item_name
+
+        productList.add(1, productOptions.getCode()); // product_id
+
+        productList.add(2, productOptions.getBrandCode()); // product_reference
+
+        productList.add(3, productOptions.getSeasonCode()); // season_year + season_reference
+
+        productList.add(4, productOptions.getCarryOver()); // atelier
+
+        productList.add(5, productOptions.getBrandName()); // brand
+
+        productList.add(6, productOptions.getColorCode()); // color_reference
+
+        productList.add(7, productOptions.getColorDesc()); // color
+        if (productOptions.getSkus() != null && productOptions.getSkus().size() != 0) {
+            productList.add(8, productOptions.getSkus().get(0).getSizeid()); // 注意 - sizeid for filippo
         } else {
-            productList.add(16,"[]");
+            productList.add(8, "");
         }
-		
-		if(StringUtils.isNotBlank(productOptions.getWeight())) { // weight
-			productList.add(17,productOptions.getWeight());
-		} else {
-			productList.add(17,"1");
-		}
-		
-		if(StringUtils.isNotBlank(productOptions.getLength())) { // length
-			productList.add(18,productOptions.getLength());
-		} else {
-			productList.add(18,"1");
-		}
-		
-		if(StringUtils.isNotBlank(productOptions.getWidth())) { // width
-			productList.add(19,productOptions.getWidth());
-		} else {
-			productList.add(19,"1");
-		}
-		
-		if(StringUtils.isNotBlank(productOptions.getHeigit())) { // height
-			productList.add(20,productOptions.getHeigit());
-		} else {
-			productList.add(20,"1");
-		}
-		
-		productList.add(21, productOptions.getSalePrice()); // retail_price
-		
-		List<SkuOptions> skus = productOptions.getSkus(); // variants
-		if(skus != null && skus.size() != 0) {
-			for(SkuOptions sku : skus) {
-				productList.add(sku.getSize());
-				if(StringUtils.isBlank(sku.getBarcodes())) {
-				    sku.setBarcodes("#");
+        productList.add(9, ""); // 注意 - first_category
+
+        productList.add(10, productOptions.getCategoryId()); // 注意 - second_category
+
+        productList.add(11, productOptions.getDesc()); // item_description
+
+        productList.add(12, productOptions.getComposition()); // 注意 technical_info
+
+        productList.add(13, productOptions.getMadeIn()); // made_In
+
+        productList.add(14, productOptions.getSizeFit()); // 注意 suitable
+
+        if (StringUtils.isNotBlank(productOptions.getCoverImg())) { // item_images
+            productList.add(15, productOptions.getCoverImg());
+        } else {
+            productList.add(15, "[]");
+        }
+
+        if (StringUtils.isNotBlank(productOptions.getDescImg())) { // item_images
+            productList.add(16, productOptions.getDescImg());
+        } else {
+            productList.add(16, "[]");
+        }
+
+        if (StringUtils.isNotBlank(productOptions.getWeight())) { // weight
+            productList.add(17, productOptions.getWeight());
+        } else {
+            productList.add(17, "1");
+        }
+
+        if (StringUtils.isNotBlank(productOptions.getLength())) { // length
+            productList.add(18, productOptions.getLength());
+        } else {
+            productList.add(18, "1");
+        }
+
+        if (StringUtils.isNotBlank(productOptions.getWidth())) { // width
+            productList.add(19, productOptions.getWidth());
+        } else {
+            productList.add(19, "1");
+        }
+
+        if (StringUtils.isNotBlank(productOptions.getHeigit())) { // height
+            productList.add(20, productOptions.getHeigit());
+        } else {
+            productList.add(20, "1");
+        }
+
+        productList.add(21, productOptions.getSalePrice()); // retail_price
+
+        List<SkuOptions> skus = productOptions.getSkus(); // variants
+        if (skus != null && skus.size() != 0) {
+            for (SkuOptions sku : skus) {
+                productList.add(sku.getSize());
+                if (StringUtils.isBlank(sku.getBarcodes())) {
+                    sku.setBarcodes("#");
                 }
-				productList.add(sku.getBarcodes());
-				productList.add(sku.getStock());
-			}
-		}
-		
-		return productList;
-	}
+                productList.add(sku.getBarcodes());
+                productList.add(sku.getStock());
+            }
+        }
 
-	public ProductOptions getProductOptions(){
-		return new ProductOptions();
-	}
-	
-	public SkuOptions getSkuOptions(){
-		return new SkuOptions();
-	}
-	
-	public VendorOptions getVendorOptions(){
-		return new VendorOptions();
-	}
-	
-	public static class ProductOptions{
-		public String name = ""; 
-		
-		public String code = "";
-		
-		public String brandCode = "";
-		
-		public String seasonCode = "";
-		
-		public String carryOver = "";
-		
-		public String brandName = "";
-		
-		public String colorCode = "";
-		
-		public String colorDesc = "";
-		
-		public String categoryId = "";
-		
-		public String desc = "";
-		
-		public String composition = "";
-		
-		public String madeIn = "";
-		
-		public String sizeFit = "";
-		
-		public String coverImg = "";
-		
-		public String descImg = "";
-		
-		public String weight = "";
-		
-		public String length = "";
-		
-		public String width = "";
+        return productList;
+    }
 
-		public String heigit = "";
-		
-		public String retailPrice = "";
-		
-		public String salePrice = "";
+    public ProductOptions getProductOptions() {
+        return new ProductOptions();
+    }
 
-		public String imgByFilippo;
+    public SkuOptions getSkuOptions() {
+        return new SkuOptions();
+    }
 
-		public String fullUpdateProductFlag = "";
+    public VendorOptions getVendorOptions() {
+        return new VendorOptions();
+    }
 
-		public String category_name = "";
+    public static class ProductOptions {
+
+        private String requestId;
+
+        public String name = "";
+
+        public String code = "";
+
+        public String brandCode = "";
+
+        public String seasonCode = "";
+
+        public String carryOver = "";
+
+        public String brandName = "";
+
+        public String colorCode = "";
+
+        public String colorDesc = "";
+
+        public String categoryId = "";
+
+        public String desc = "";
+
+        public String composition = "";
+
+        public String madeIn = "";
+
+        public String sizeFit = "";
+
+        public String coverImg = "";
+
+        public String descImg = "";
+
+        public String weight = "";
+
+        public String length = "";
+
+        public String width = "";
+
+        public String heigit = "";
+
+        public String retailPrice = "";
+
+        public String salePrice = "";
+
+        public String imgByFilippo;
+
+        public String fullUpdateProductFlag = "";
+
+        public String category_name = "";
 
         public Date last_check;
 
@@ -1469,118 +1501,118 @@ public class ProductEDSManagement {
         }
 
         public List<SkuOptions> skus = new ArrayList<>();
-		
-		public String getName() {
-			return StringUtils.trim(name);
-		}
 
-		public ProductOptions setName(String name) {
-			this.name = StringUtils.trim(name);
-			return this;
-		}
+        public String getName() {
+            return StringUtils.trim(name);
+        }
 
-		public String getCode() {
-			return StringUtils.trim(code);
-		}
+        public ProductOptions setName(String name) {
+            this.name = StringUtils.trim(name);
+            return this;
+        }
 
-		public ProductOptions setCode(String code) {
-			this.code = StringUtils.trim(code);
-			return this;
-		}
+        public String getCode() {
+            return StringUtils.trim(code);
+        }
 
-		public String getBrandCode() {
-			return StringUtils.trim(brandCode);
-		}
+        public ProductOptions setCode(String code) {
+            this.code = StringUtils.trim(code);
+            return this;
+        }
 
-		public ProductOptions setBrandCode(String brandCode) {
-			this.brandCode = StringUtils.trim(brandCode);
-			return this;
-		}
+        public String getBrandCode() {
+            return StringUtils.trim(brandCode);
+        }
 
-		public String getSeasonCode() {
-			return StringUtils.trim(seasonCode);
-		}
+        public ProductOptions setBrandCode(String brandCode) {
+            this.brandCode = StringUtils.trim(brandCode);
+            return this;
+        }
 
-		public ProductOptions setSeasonCode(String seasonCode) {
-			this.seasonCode = StringUtils.trim(seasonCode);
-			return this;
-		}
+        public String getSeasonCode() {
+            return StringUtils.trim(seasonCode);
+        }
 
-		public String getCarryOver() {
-			return StringUtils.trim(carryOver);
-		}
+        public ProductOptions setSeasonCode(String seasonCode) {
+            this.seasonCode = StringUtils.trim(seasonCode);
+            return this;
+        }
 
-		public ProductOptions setCarryOver(String carryOver) {
-			this.carryOver = StringUtils.trim(carryOver);
-			return this;
-		}
+        public String getCarryOver() {
+            return StringUtils.trim(carryOver);
+        }
 
-		public String getBrandName() {
-			return StringUtils.trim(brandName);
-		}
+        public ProductOptions setCarryOver(String carryOver) {
+            this.carryOver = StringUtils.trim(carryOver);
+            return this;
+        }
 
-		public ProductOptions setBrandName(String brandName) {
-			this.brandName = StringUtils.trim(brandName);
-			return this;
-		}
+        public String getBrandName() {
+            return StringUtils.trim(brandName);
+        }
 
-		public String getColorCode() {
-			return StringUtils.trim(colorCode);
-		}
+        public ProductOptions setBrandName(String brandName) {
+            this.brandName = StringUtils.trim(brandName);
+            return this;
+        }
 
-		public ProductOptions setColorCode(String colorCode) {
-			this.colorCode = StringUtils.trim(colorCode);
-			return this;
-		}
+        public String getColorCode() {
+            return StringUtils.trim(colorCode);
+        }
 
-		public String getColorDesc() {
-			return StringUtils.trim(colorDesc);
-		}
+        public ProductOptions setColorCode(String colorCode) {
+            this.colorCode = StringUtils.trim(colorCode);
+            return this;
+        }
 
-		public ProductOptions setColorDesc(String colorDesc) {
-			this.colorDesc = StringUtils.trim(colorDesc);
-			return this;
-		}
+        public String getColorDesc() {
+            return StringUtils.trim(colorDesc);
+        }
 
-		public String getCategoryId() {
-			return StringUtils.trim(categoryId);
-		}
+        public ProductOptions setColorDesc(String colorDesc) {
+            this.colorDesc = StringUtils.trim(colorDesc);
+            return this;
+        }
 
-		public ProductOptions setCategoryId(String categoryId) {
-			this.categoryId = StringUtils.trim(categoryId);
-			return this;
-		}
+        public String getCategoryId() {
+            return StringUtils.trim(categoryId);
+        }
 
-		public String getDesc() {
-			return StringUtils.trim(desc);
-		}
+        public ProductOptions setCategoryId(String categoryId) {
+            this.categoryId = StringUtils.trim(categoryId);
+            return this;
+        }
 
-		public ProductOptions setDesc(String desc) {
-			this.desc = StringUtils.trim(desc);
-			return this;
-		}
+        public String getDesc() {
+            return StringUtils.trim(desc);
+        }
 
-		public String getComposition() {
-			return StringUtils.trim(composition);
-		}
+        public ProductOptions setDesc(String desc) {
+            this.desc = StringUtils.trim(desc);
+            return this;
+        }
 
-		public ProductOptions setComposition(String composition) {
-			this.composition = StringUtils.trim(composition);
-			return this;
-		}
+        public String getComposition() {
+            return StringUtils.trim(composition);
+        }
 
-		public String getMadeIn() {
-			return StringUtils.trim(madeIn);
-		}
+        public ProductOptions setComposition(String composition) {
+            this.composition = StringUtils.trim(composition);
+            return this;
+        }
 
-		public ProductOptions setMadeIn(String madeIn) {
-			this.madeIn = StringUtils.trim(madeIn);
-			return this;
-		}
+        public String getMadeIn() {
+            return StringUtils.trim(madeIn);
+        }
 
-		public String getSizeFit() {
-			return StringUtils.trim(sizeFit);
-		}
+        public ProductOptions setMadeIn(String madeIn) {
+            this.madeIn = StringUtils.trim(madeIn);
+            return this;
+        }
+
+        public String getSizeFit() {
+            return StringUtils.trim(sizeFit);
+        }
 
         public String getError_type() {
             return error_type;
@@ -1591,27 +1623,27 @@ public class ProductEDSManagement {
         }
 
         public ProductOptions setSizeFit(String sizeFit) {
-			this.sizeFit = StringUtils.trim(sizeFit);
-			return this;
-		}
+            this.sizeFit = StringUtils.trim(sizeFit);
+            return this;
+        }
 
-		public String getCoverImg() {
-			return StringUtils.trim(coverImg);
-		}
+        public String getCoverImg() {
+            return StringUtils.trim(coverImg);
+        }
 
-		public ProductOptions setCoverImg(String coverImg) {
-			this.coverImg = StringUtils.trim(coverImg);
-			return this;
-		}
+        public ProductOptions setCoverImg(String coverImg) {
+            this.coverImg = StringUtils.trim(coverImg);
+            return this;
+        }
 
-		public String getDescImg() {
-			return StringUtils.trim(descImg);
-		}
+        public String getDescImg() {
+            return StringUtils.trim(descImg);
+        }
 
-		public ProductOptions setDescImg(String descImg) {
-			this.descImg = StringUtils.trim(descImg);
-			return this;
-		}
+        public ProductOptions setDescImg(String descImg) {
+            this.descImg = StringUtils.trim(descImg);
+            return this;
+        }
 
         public String getCategory1() {
             return StringUtils.trim(category1);
@@ -1641,62 +1673,62 @@ public class ProductEDSManagement {
         }
 
         public String getWeight() {
-			return StringUtils.trim(weight);
-		}
+            return StringUtils.trim(weight);
+        }
 
-		public ProductOptions setWeight(String weight) {
-			this.weight = StringUtils.trim(weight);
-			return this;
-		}
+        public ProductOptions setWeight(String weight) {
+            this.weight = StringUtils.trim(weight);
+            return this;
+        }
 
-		public String getLength() {
-			return StringUtils.trim(length);
-		}
+        public String getLength() {
+            return StringUtils.trim(length);
+        }
 
-		public ProductOptions setLength(String length) {
-			this.length = StringUtils.trim(length);
-			return this;
-		}
+        public ProductOptions setLength(String length) {
+            this.length = StringUtils.trim(length);
+            return this;
+        }
 
-		public String getWidth() {
-			return StringUtils.trim(width);
-		}
+        public String getWidth() {
+            return StringUtils.trim(width);
+        }
 
-		public ProductOptions setWidth(String width) {
-			this.width = StringUtils.trim(width);
-			return this;
-		}
+        public ProductOptions setWidth(String width) {
+            this.width = StringUtils.trim(width);
+            return this;
+        }
 
-		public String getHeigit() {
-			return StringUtils.trim(heigit);
-		}
+        public String getHeigit() {
+            return StringUtils.trim(heigit);
+        }
 
-		public ProductOptions setHeigit(String heigit) {
-			this.heigit = StringUtils.trim(heigit);
-			return this;
-		}
+        public ProductOptions setHeigit(String heigit) {
+            this.heigit = StringUtils.trim(heigit);
+            return this;
+        }
 
-		public String getRetailPrice() {
-			return StringUtils.trim(retailPrice);
-		}
+        public String getRetailPrice() {
+            return StringUtils.trim(retailPrice);
+        }
 
-		public ProductOptions setRetailPrice(String retailPrice) {
-			this.retailPrice = StringUtils.trim(retailPrice);
-			return this;
-		}
+        public ProductOptions setRetailPrice(String retailPrice) {
+            this.retailPrice = StringUtils.trim(retailPrice);
+            return this;
+        }
 
-		public String getSalePrice() {
-			return StringUtils.trim(salePrice.replaceAll(",","."));
-		}
+        public String getSalePrice() {
+            return StringUtils.trim(salePrice.replaceAll(",", "."));
+        }
 
-		public ProductOptions setSalePrice(String salePrice) {
-			this.salePrice = StringUtils.trim(salePrice);
-			return this;
-		}
+        public ProductOptions setSalePrice(String salePrice) {
+            this.salePrice = StringUtils.trim(salePrice);
+            return this;
+        }
 
-		public List<SkuOptions> getSkus() {
-			return skus;
-		}
+        public List<SkuOptions> getSkus() {
+            return skus;
+        }
 
         public String getBrand_name() {
             return brand_name;
@@ -1706,20 +1738,28 @@ public class ProductEDSManagement {
             this.brand_name = brand_name;
         }
 
+        public String getRequestId() {
+            return requestId;
+        }
+
+        public void setRequestId(String requestId) {
+            this.requestId = requestId;
+        }
+
         public ProductOptions setSkus(List<SkuOptions> skus) {
-		    List<SkuOptions> newSkus = new ArrayList<>();
-			List<String> stringList = new ArrayList<>();
-			for(SkuOptions skuOptions : skus) {
-                if(StringUtils.isNotBlank(skuOptions.getSize())) {
+            List<SkuOptions> newSkus = new ArrayList<>();
+            List<String> stringList = new ArrayList<>();
+            for (SkuOptions skuOptions : skus) {
+                if (StringUtils.isNotBlank(skuOptions.getSize())) {
                     boolean ifSave = false;
-                    for(String str : stringList) {
-                        if(str.equals(skuOptions.getSize())) {
+                    for (String str : stringList) {
+                        if (str.equals(skuOptions.getSize())) {
                             this.duplicateSkus = skus;
                             ifSave = true;
                         }
                     }
 
-                    if(ifSave == false) {
+                    if (ifSave == false) {
                         newSkus.add(skuOptions);
                         stringList.add(skuOptions.getSize());
                     }
@@ -1727,9 +1767,9 @@ public class ProductEDSManagement {
             }
             this.skus = newSkus;
             return this;
-		}
+        }
 
-		private List<SkuOptions> duplicateSkus;
+        private List<SkuOptions> duplicateSkus;
 
         public List<SkuOptions> getDuplicateSkus() {
             return duplicateSkus;
@@ -1766,42 +1806,42 @@ public class ProductEDSManagement {
             this.vendor_id = vendor_id;
         }
     }
-	
-	public static class SkuOptions{
-		
-		public String size;
-		
-		public String stock;
-		
-		public String barcodes;
 
-		public String sizeid; // filippo
+    public static class SkuOptions {
+
+        public String size;
+
+        public String stock;
+
+        public String barcodes;
+
+        public String sizeid; // filippo
 
         public String boutique_sku_id;
 
-		public String getSize() {
-			return StringUtils.trim(size);
-		}
+        public String getSize() {
+            return StringUtils.trim(size);
+        }
 
-		public void setSize(String size) {
-			this.size = StringUtils.trim(size);
-		}
+        public void setSize(String size) {
+            this.size = StringUtils.trim(size);
+        }
 
-		public String getStock() {
-			return StringUtils.trim(stock);
-		}
+        public String getStock() {
+            return StringUtils.trim(stock);
+        }
 
-		public void setStock(String stock) {
-			this.stock = StringUtils.trim(stock);
-		}
+        public void setStock(String stock) {
+            this.stock = StringUtils.trim(stock);
+        }
 
-		public String getBarcodes() {
-			return StringUtils.trim(barcodes);
-		}
+        public String getBarcodes() {
+            return StringUtils.trim(barcodes);
+        }
 
-		public void setBarcodes(String barcodes) {
-			this.barcodes = StringUtils.trim(barcodes);
-		}
+        public void setBarcodes(String barcodes) {
+            this.barcodes = StringUtils.trim(barcodes);
+        }
 
         public String getSizeid() {
             return StringUtils.trim(sizeid);
@@ -1823,17 +1863,17 @@ public class ProductEDSManagement {
         }
     }
 
-	public static class VendorOptions{
+    public static class VendorOptions {
 
-		public Long vendorId;
+        public Long vendorId;
 
-		public Long getVendorId() {
-			return vendorId;
-		}
+        public Long getVendorId() {
+            return vendorId;
+        }
 
-		public void setVendorId(Long vendorId) {
-			this.vendorId = vendorId;
-		}
+        public void setVendorId(Long vendorId) {
+            this.vendorId = vendorId;
+        }
 
         public VendorOptions(Long vendorId) {
             this.vendorId = vendorId;

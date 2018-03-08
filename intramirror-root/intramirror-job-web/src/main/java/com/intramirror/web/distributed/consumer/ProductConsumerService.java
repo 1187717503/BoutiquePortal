@@ -2,7 +2,7 @@ package com.intramirror.web.distributed.consumer;
 
 import com.intramirror.utils.transform.JsonTransformUtil;
 import com.intramirror.web.distributed.thread.ThreadManager;
-import com.intramirror.web.mapping.impl.atelier.AtelierUpdateByProductMapping;
+import com.intramirror.web.mapping.impl.atelier.AtelierProductMapping;
 import com.intramirror.web.thread.UpdateProductThread;
 import com.intramirror.web.util.ApiDataFileUtils;
 import java.util.Arrays;
@@ -40,8 +40,8 @@ public class ProductConsumerService {
     private CountDownLatch shutDownCount;
 
     @Autowired
-    @Qualifier("atelierUpdateByProductMapping")
-    private AtelierUpdateByProductMapping atelierUpdateByProductMapping;
+    @Qualifier("atelierProductMapping")
+    private AtelierProductMapping atelierProductMapping;
 
     static {
 
@@ -81,29 +81,33 @@ public class ProductConsumerService {
         shutDownCount = new CountDownLatch(concurrency);
         for (int i = 0; i < concurrency; i++) {
             consumerThreadPool.submit(() -> {
-                KafkaConsumer<String, String> consumer = new KafkaConsumer<>(productConsumerProps);
-                consumer.subscribe(Arrays.asList(PRODUCT_RAW_QUEUE));
-                while (productConsumerRunning.get()) {
-                    ConsumerRecords<String, String> records = consumer.poll(500);
-                    for (ConsumerRecord<String, String> record : records) {
-                        LOGGER.info("partition = {} , offset = {}, key = {}, value = {}", record.partition(), record.offset(), record.key(), record.value());
-                        Map<String, Object> productContext = JsonTransformUtil.readValue(record.value(), Map.class);
-                        if (productContext == null) {
-                            LOGGER.error("ProductContext format error: {}", record.value());
-                            continue;
+                try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(productConsumerProps)) {
+                    consumer.subscribe(Arrays.asList(PRODUCT_RAW_QUEUE));
+                    while (productConsumerRunning.get()) {
+                        ConsumerRecords<String, String> records = consumer.poll(500);
+                        for (ConsumerRecord<String, String> record : records) {
+                            LOGGER.info("partition = {} , offset = {}, key = {}, value = {}", record.partition(), record.offset(), record.key(),
+                                    record.value());
+                            Map<String, Object> productContext = JsonTransformUtil.readValue(record.value(), Map.class);
+                            if (productContext == null) {
+                                LOGGER.error("ProductContext format error: {}", record.value());
+                                continue;
+                            }
+                            Long vendorId = Long.parseLong(productContext.get("vendorId").toString());
+                            String eventName = productContext.get("eventType").toString();
+                            String vendorName = productContext.get("vendorName").toString();
+                            Map<String, Object> data = (Map<String, Object>) productContext.get("data");
+                            ProductEDSManagement.ProductOptions productOptions = atelierProductMapping.mapping(data);
+                            productOptions.setRequestId(productContext.get("id").toString());
+                            ProductEDSManagement.VendorOptions vendorOptions = new ProductEDSManagement.VendorOptions();
+                            vendorOptions.setVendorId(vendorId);
+                            ThreadManager.submit(new UpdateProductThread(productOptions, vendorOptions, new ApiDataFileUtils(vendorName, eventName), data));
                         }
-                        Long vendorId = Long.parseLong(productContext.get("vendorId").toString());
-                        String eventName = productContext.get("eventType").toString();
-                        String vendorName = productContext.get("vendorName").toString();
-                        Map<String, Object> data = (Map<String, Object>) productContext.get("data");
-
-                        ProductEDSManagement.ProductOptions productOptions = atelierUpdateByProductMapping.mapping(data);
-                        ProductEDSManagement.VendorOptions vendorOptions = new ProductEDSManagement.VendorOptions();
-                        vendorOptions.setVendorId(vendorId);
-                        ThreadManager.submit(new UpdateProductThread(productOptions, vendorOptions, new ApiDataFileUtils(vendorName, eventName), data));
                     }
+                } catch (Exception e) {
+                    LOGGER.error("Stock Consumer Thread exception.", e);
                 }
-                consumer.close();
+
                 shutDownCount.countDown();
 
             });
