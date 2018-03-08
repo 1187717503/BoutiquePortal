@@ -81,11 +81,56 @@ public class AtelierOrderController {
                 conditionMap.put("offset", apiInputParam.getIntOffset());
                 conditionMap.put("limit", apiInputParam.getIntLimit());
                 if (StringUtils.isNotBlank(status)) {
-                    conditionMap.put("status", status.split(","));
+                    String[] strs = status.split(",");
+
+                    String newStatus = "";
+                    for (String str : strs) {
+
+                        if (str.trim().equalsIgnoreCase("pending payment")) {
+                            newStatus += ",-1";
+                        }
+                        if (str.trim().equalsIgnoreCase("invalid")) {
+                            newStatus += ",-2";
+                        }
+                        if (str.trim().equalsIgnoreCase("payment submit success")) {
+                            newStatus += ",-3";
+                        }
+                        if (str.trim().equalsIgnoreCase("refund submit")) {
+                            newStatus += ",-4";
+                        }
+                        if (str.trim().equalsIgnoreCase("payment exception")) {
+                            newStatus += ",-5";
+                        }
+                        if (str.trim().equalsIgnoreCase("pending")) {
+                            newStatus += ",1";
+                        }
+                        if (str.trim().equalsIgnoreCase("confirmed")) {
+                            newStatus += ",2";
+                        }
+                        if (str.trim().equalsIgnoreCase("shipped")) {
+                            newStatus += ",3";
+                        }
+                        if (str.trim().equalsIgnoreCase("delivered")) {
+                            newStatus += ",4";
+                        }
+                        if (str.trim().equalsIgnoreCase("closed")) {
+                            newStatus += ",5";
+                        }
+                        if (str.trim().equalsIgnoreCase("cancelled")) {
+                            newStatus += ",6";
+                        }
+                        if (str.trim().equalsIgnoreCase("ready to ship")) {
+                            newStatus += ",7";
+                        }
+                        if (str.trim().equalsIgnoreCase("picking")) {
+                            newStatus += ",8";
+                        }
+                    }
+
+                    conditionMap.put("status", newStatus.split(","));
                 } else {
                     conditionMap.put("status", status);
                 }
-
                 conditionMap.put("barcode", barcode);
 
                 logger.info("AtelierOrderControllerGetOrderByDate,start,atelierSelectOrder,conditionMap:" + JSONObject.toJSONString(conditionMap));
@@ -181,6 +226,49 @@ public class AtelierOrderController {
                 String in_price = map.get("in_price") == null ? "" : map.get("in_price").toString();
                 String created_at = map.get("created_at") == null ? "" : map.get("created_at").toString();
                 String status = map.get("status") == null ? "" : map.get("status").toString();
+                String sku_code = map.get("sku_code") == null ? "#" : map.get("sku_code").toString();
+
+                switch (status) {
+                case "-1":
+                    status = "pending payment";
+                    break;
+                case "-2":
+                    status = "invalid";
+                    break;
+                case "-3":
+                    status = "payment submit success";
+                    break;
+                case "-4":
+                    status = "refund submit";
+                    break;
+                case "-5":
+                    status = "payment exception";
+                    break;
+                case "1":
+                    status = "pending";
+                    break;
+                case "2":
+                    status = "confirmed";
+                    break;
+                case "3":
+                    status = "shipped";
+                    break;
+                case "4":
+                    status = "delivered";
+                    break;
+                case "5":
+                    status = "closed";
+                    break;
+                case "6":
+                    status = "cancelled";
+                    break;
+                case "7":
+                    status = "ready to ship";
+                    break;
+                case "8":
+                    status = "picking";
+                    break;
+                }
 
                 getOrderByDateResultVO.setBoutique_id(product_code);
                 getOrderByDateResultVO.setCreate_date(created_at);
@@ -189,6 +277,7 @@ public class AtelierOrderController {
                 getOrderByDateResultVO.setQty(1);
                 getOrderByDateResultVO.setSize(value);
                 getOrderByDateResultVO.setStatus(status);
+                getOrderByDateResultVO.setBarcode(sku_code);
                 result.add(getOrderByDateResultVO);
             }
         }
@@ -373,6 +462,7 @@ public class AtelierOrderController {
         private int qty;
         private BigDecimal purchase_price;
         private String status;
+        private String barcode;
 
         public String getOrder_number() {
             return order_number;
@@ -428,6 +518,14 @@ public class AtelierOrderController {
 
         public void setStatus(String status) {
             this.status = status;
+        }
+
+        public String getBarcode() {
+            return barcode;
+        }
+
+        public void setBarcode(String barcode) {
+            this.barcode = barcode;
         }
     }
 
