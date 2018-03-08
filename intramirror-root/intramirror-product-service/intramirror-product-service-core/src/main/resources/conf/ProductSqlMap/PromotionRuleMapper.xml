@@ -674,7 +674,7 @@
     </delete>
 
     <delete id="removeExcludeProductFromSnapshotProduct" parameterType="java.lang.Long">
-        DELETE FROM snapshot_product WHERE product_id IN (SELECT product_id FROM t_promotion_exclude_product WHERE promotion_id=#{promotionId, jdbcType=BIGINT})
+        DELETE FROM snapshot_product WHERE product_id IN (SELECT product_id FROM t_promotion_exclude_product WHERE promotion_id=#{promotionId, jdbcType=BIGINT} AND product_id=#{productId, jdbcType=BIGINT)
     </delete>
 
 </mapper>
