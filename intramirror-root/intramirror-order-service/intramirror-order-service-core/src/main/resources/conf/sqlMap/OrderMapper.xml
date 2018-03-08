@@ -107,7 +107,7 @@
         ) pp ON p.product_id = pp.product_id
         WHERE o.order_num in
         <foreach collection="orderNumbers" item="orderNumber" index="index"
-                 open="(" close=")" separator=",">
+                open="(" close=")" separator=",">
             #{orderNumber}
         </foreach>
 
@@ -904,20 +904,29 @@
     <select id="atelierSelectOrder" parameterType="java.util.Map" resultType="java.util.Map">
 
         SELECT DISTINCT
-            lp.`order_line_num`,
-            DATE_FORMAT(lp.`created_at`, '%Y-%m-%d') AS created_at,
-            p.`product_code`,
-            pspv.`value`,
-            ss.`store`,
-            ROUND(sku.`in_price`, 2)                 AS in_price
+        lp.`order_line_num`,
+        DATE_FORMAT(lp.`created_at`, '%Y-%m-%d') AS created_at,
+        p.`product_code`,
+        sku.`size` as 'value',
+        sku.`sku_code`,
+        ss.`store`,
+        lp.`status`,
+        ROUND(sku.`in_price`, 2) AS in_price
         FROM `logistics_product` lp
-            INNER JOIN `shop_product_sku` sps ON (lp.`shop_product_sku_id` = sps.`shop_product_sku_id` AND sps.`enabled` = 1)
-            INNER JOIN `sku` ON (sps.`sku_id` = sku.`sku_id` AND sku.`enabled` = 1)
-            INNER JOIN `sku_property` sk ON (sku.`sku_id` = sk.`sku_id` AND sk.`enabled` = 1)
-            INNER JOIN `product_sku_property_value` pspv ON (sk.`product_sku_property_value_id` = pspv.`product_sku_property_value_id`)
-            INNER JOIN `sku_store` ss ON (sku.`sku_id` = ss.`sku_id` AND ss.`enabled` = 1)
-            INNER JOIN `product` p ON (sku.`product_id` = p.`product_id` AND p.`enabled` = 1)
+        INNER JOIN `shop_product_sku` sps ON (lp.`shop_product_sku_id` = sps.`shop_product_sku_id` AND sps.`enabled` = 1)
+        INNER JOIN `sku` ON (sps.`sku_id` = sku.`sku_id` AND sku.`enabled` = 1)
+        INNER JOIN `sku_store` ss ON (sku.`sku_id` = ss.`sku_id` AND ss.`enabled` = 1)
+        INNER JOIN `product` p ON (sku.`product_id` = p.`product_id` AND p.`enabled` = 1)
         WHERE DATE_FORMAT(lp.`created_at`, '%Y-%m-%d') = #{create_at,jdbcType=VARCHAR} AND p.`vendor_id` = #{vendor_id,jdbcType=VARCHAR} AND lp.`enabled` = 1
+        <if test="status != null and status != ''">
+            and lp.`status` in
+            <foreach item="item" index="index" collection="status" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="barcode != null and barcode != ''">
+            and sku.`sku_code` = #{barcode,jdbcType=VARCHAR}
+        </if>
         LIMIT #{offset,jdbcType=INTEGER}, #{limit,jdbcType=INTEGER}
     </select>
 

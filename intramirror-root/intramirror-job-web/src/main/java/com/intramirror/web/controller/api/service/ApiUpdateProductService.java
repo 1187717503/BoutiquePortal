@@ -45,15 +45,11 @@ import pk.shoplus.util.ExceptionUtils;
 /**
  * 修改商品优化
  */
-public class ApiUpdateProductService extends AbstractService{
+public class ApiUpdateProductService extends AbstractService {
 
     private static final Logger logger = Logger.getLogger(ApiCreateProductService.class);
 
-
-
     private List<StockOption> stockOptions;
-
-
 
     private Boolean no_img;
 
@@ -510,8 +506,8 @@ public class ApiUpdateProductService extends AbstractService{
 
         }
 
-        if ((StringUtils.isNotBlank(newBrandCode) && !newBrandCode.equalsIgnoreCase(oldBrandCode)) || (StringUtils.isNotBlank(newColorCode)
-                && !newColorCode.equalsIgnoreCase(oldColorCode))) {
+        if ((StringUtils.isNotBlank(newBrandCode) && !newBrandCode.equalsIgnoreCase(oldBrandCode)) || (StringUtils.isNotBlank(newColorCode) && !newColorCode
+                .equalsIgnoreCase(oldColorCode))) {
             if (product.spu_id != null) {
                 logger.info("Try to unbind product [" + product.product_id + "] -- [" + product.spu_id + "]");
                 unbindProductSpu(product.product_id, product.spu_id);
@@ -701,8 +697,8 @@ public class ApiUpdateProductService extends AbstractService{
             productOptions.setCategoryId(categoryId);
         }
 
-        if (vendorOptions.getVendorId() == 42 && StringUtils.isBlank(productOptions.getCategoryId()) && StringUtils.isNotBlank(category3)
-                && StringUtils.isNotBlank(category1) && StringUtils.isBlank(category2)) {
+        if (vendorOptions.getVendorId() == 42 && StringUtils.isBlank(productOptions.getCategoryId()) && StringUtils.isNotBlank(category3) && StringUtils
+                .isNotBlank(category1) && StringUtils.isBlank(category2)) {
             Map<String, Object> categoryMap = productService.getCategoryWithoutC2(vendorOptions.getVendorId().toString(), category1, category3);
             if (categoryMap != null) {
                 productOptions.setCategoryId(categoryMap.get("category_id").toString());
@@ -888,8 +884,6 @@ public class ApiUpdateProductService extends AbstractService{
         }
     }
 
-
-
     private boolean getNoImg(Connection conn) throws Exception {
         if (no_img != null) {
             return no_img;
@@ -947,12 +941,14 @@ public class ApiUpdateProductService extends AbstractService{
             List<String> coverImgs = JSONArray.parseArray(this.productOptions.getCoverImg(), String.class);
 
             if (boutiqueImage == null) {
-                boutiqueImage = new BoutiqueImage();
-                boutiqueImage.setCreated_at(new Date());
-                boutiqueImage.setUpdated_at(new Date());
-                boutiqueImage.setImage(JsonTransformUtil.toJson(coverImgs));
-                boutiqueImage.setProduct_id(product.getProduct_id());
-                boutiqueImageService.createBoutiqueImage(boutiqueImage);
+                if (coverImgs != null && coverImgs.size() > 0) {
+                    boutiqueImage = new BoutiqueImage();
+                    boutiqueImage.setCreated_at(new Date());
+                    boutiqueImage.setUpdated_at(new Date());
+                    boutiqueImage.setImage(JsonTransformUtil.toJson(coverImgs));
+                    boutiqueImage.setProduct_id(product.getProduct_id());
+                    boutiqueImageService.createBoutiqueImage(boutiqueImage);
+                }
             } else {
                 List<String> oldImages = JSONArray.parseArray(boutiqueImage.getImage(), String.class);
                 List<String> images = new ArrayList<>();
@@ -970,10 +966,12 @@ public class ApiUpdateProductService extends AbstractService{
                 }
                 oldImages.addAll(images);
                 boutiqueImage.setImage(JsonTransformUtil.toJson(oldImages));
+                boutiqueImage.setUpdated_at(new Date());
                 boutiqueImageService.updateBoutiqueImage(boutiqueImage);
             }
         } catch (Exception e) {
             e.printStackTrace();
+            logger.info("saveBoutiqueImage,ErrorMessage:" + e);
         }
     }
 
