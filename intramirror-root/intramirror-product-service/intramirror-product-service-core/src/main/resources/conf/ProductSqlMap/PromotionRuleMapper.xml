@@ -658,26 +658,9 @@
         AND promotion_id = #{promotionId, jdbcType=BIGINT}
     </delete>
 
-    <delete id="removeProductForExcludeRule">
-        DELETE FROM snapshot_product WHERE exists (
-        SELECT p.product_id FROM product p
-        WHERE p.season_code = #{seasonCode, jdbcType=VARCHAR}
-        AND p.enabled = 1
-        AND p.vendor_id = #{vendorId, jdbcType=BIGINT}
-        AND p.product_id = snapshot_product.product_id
-        AND p.category_id IN
-        <foreach item="item" index="index" collection="category" open="(" separator="," close=")">
-            #{item}
-        </foreach>
-        <if test="brandId != null">
-            AND p.brand_id = #{brandId, jdbcType=BIGINT}
-        </if>
-        AND p.product_id= #{productId, jdbcType=BIGINT}
-        )
-    </delete>
 
     <delete id="removeExcludeProductFromSnapshotProduct" parameterType="java.lang.Long">
-        DELETE FROM snapshot_product WHERE product_id IN (SELECT product_id FROM t_promotion_exclude_product WHERE promotion_id=#{promotionId, jdbcType=BIGINT})
+        DELETE FROM snapshot_product WHERE promotion_id=#{promotionId, jdbcType=BIGINT} AND product_id IN (SELECT product_id FROM t_promotion_exclude_product WHERE promotion_id=#{promotionId, jdbcType=BIGINT})
     </delete>
 
 </mapper>
