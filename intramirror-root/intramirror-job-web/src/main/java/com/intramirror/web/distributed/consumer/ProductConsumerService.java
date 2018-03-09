@@ -77,14 +77,15 @@ public class ProductConsumerService {
 
     @PostConstruct
     public void startDefaultConsumerProduct() {
-        startConsumeProduct(3);
+        startConsumeProduct(3, 50);
     }
 
-    public void startConsumeProduct(int concurrency) {
+    public void startConsumeProduct(int concurrency, int workThreads) {
         if (productConsumerRunning.compareAndSet(false, true)) {
             LOGGER.info("Consumer Product already started.");
         }
         ExecutorService consumerThreadPool = Executors.newFixedThreadPool(concurrency);
+        ExecutorService workThreadPool = ThreadManager.newFixedBlockingThreadPool(workThreads);
         shutDownCount = new CountDownLatch(concurrency);
         for (int i = 0; i < concurrency; i++) {
             consumerThreadPool.submit(() -> {
@@ -108,7 +109,7 @@ public class ProductConsumerService {
                             productOptions.setRequestId(productContext.get("id").toString());
                             ProductEDSManagement.VendorOptions vendorOptions = new ProductEDSManagement.VendorOptions();
                             vendorOptions.setVendorId(vendorId);
-                            ThreadManager.submit(new UpdateProductThread(productOptions, vendorOptions, new ApiDataFileUtils(vendorName, eventName), data));
+                            workThreadPool.submit(new UpdateProductThread(productOptions, vendorOptions, new ApiDataFileUtils(vendorName, eventName), data));
                         }
                     }
                 } catch (Exception e) {

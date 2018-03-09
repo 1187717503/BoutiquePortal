@@ -79,14 +79,15 @@ public class StockConsumerService {
 
     @PostConstruct
     public void startDefaultConsumeStock() {
-        startConsumeStock(3);
+        startConsumeStock(3,50);
     }
 
-    public void startConsumeStock(int concurrency) {
+    public void startConsumeStock(int concurrency,int workThreads) {
         if (stockConsumerRunning.compareAndSet(false, true)) {
             LOGGER.info("Consumer Stock already started.");
         }
         ExecutorService consumerThreadPool = Executors.newFixedThreadPool(concurrency);
+        ExecutorService workThreadPool = ThreadManager.newFixedBlockingThreadPool(workThreads);
         shutDownCount = new CountDownLatch(concurrency);
         for (int i = 0; i < concurrency; i++) {
             consumerThreadPool.submit(() -> {
@@ -110,7 +111,7 @@ public class StockConsumerService {
                             for (Map<String, Object> sku : skuList) {
                                 sku.put("vendor_id", vendorId);
                                 StockOption stockOption = iStockMapping.mapping(sku);
-                                ThreadManager.submit(new UpdateStockThread(stockOption, new ApiDataFileUtils(vendorName, eventName), sku));
+                                workThreadPool.submit(new UpdateStockThread(stockOption, new ApiDataFileUtils(vendorName, eventName), sku));
                             }
                         }
                     }

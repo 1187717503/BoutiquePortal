@@ -5,6 +5,9 @@ import com.intramirror.web.thread.UpdateStockThread;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class ThreadManager {
 
@@ -21,5 +24,9 @@ public class ThreadManager {
             return stockPool.submit(runnable);
         }
         return null;
+    }
+
+    public static ExecutorService newFixedBlockingThreadPool(int nThreads) {
+        return new ThreadPoolExecutor(nThreads, nThreads, 0L, TimeUnit.MILLISECONDS, new SynchronousQueue<>(), new ThreadPoolExecutor.CallerRunsPolicy());
     }
 }

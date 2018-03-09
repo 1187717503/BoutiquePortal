@@ -26,7 +26,17 @@ public class AsyncController {
 
     @PutMapping("/product/start")
     public Response startProductConsumer(@RequestBody Map<String, Object> body) {
-        productConsumerService.startConsumeProduct(Integer.valueOf(body.get("concurrency").toString()));
+
+        int concurrency = 3;
+        int workThreads = 50;
+        if (body.get("concurrency") != null) {
+            concurrency = Integer.valueOf(body.get("concurrency").toString());
+        }
+
+        if (body.get("workThreads") != null) {
+            workThreads = Integer.valueOf(body.get("workThreads").toString());
+        }
+        productConsumerService.startConsumeProduct(concurrency, workThreads);
         return Response.success();
     }
 
@@ -38,7 +48,16 @@ public class AsyncController {
 
     @PutMapping("/stock/start")
     public Response startStockConsumer(@RequestBody Map<String, Object> body) {
-        stockConsumerService.startConsumeStock(Integer.valueOf(body.get("concurrency").toString()));
+        int concurrency = 3;
+        int workThreads = 50;
+        if (body.get("concurrency") != null) {
+            concurrency = Integer.valueOf(body.get("concurrency").toString());
+        }
+
+        if (body.get("workThreads") != null) {
+            workThreads = Integer.valueOf(body.get("workThreads").toString());
+        }
+        stockConsumerService.startConsumeStock(concurrency, workThreads);
         return Response.success();
     }
 

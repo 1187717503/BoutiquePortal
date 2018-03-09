@@ -9,9 +9,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import static junit.framework.TestCase.assertTrue;
 import org.junit.Test;
@@ -29,11 +34,40 @@ public class okhttptest {
     private final Logger LOGGER = LoggerFactory.getLogger(okhttptest.class);
 
     @Test
+    public void testThreadPool() {
+        BlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<>(1);
+        //        ExecutorService executors =Executors.newWorkStealingPool()
+
+        RejectedExecutionHandler rejectedExecutionHandler = new ThreadPoolExecutor.CallerRunsPolicy();
+        ExecutorService executorService = new ThreadPoolExecutor(5, 5, 0L, TimeUnit.MILLISECONDS, new SynchronousQueue<>(), new ThreadPoolExecutor.CallerRunsPolicy());
+        Runnable run = new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        };
+
+        run.run();
+
+
+        for (int i = 0; i < 10; i++) {
+            executorService.submit(() -> {
+                try {
+                    LOGGER.info("start.");
+                    Thread.sleep(60 * 1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+    }
+
+    @Test
     public void testhttp() throws IOException {
 
         String appendUrl = "https://eleonorabonucci.com/WS/stock.asmx/Get_Article?JSON={\"Codice_Anagrafica\":\"a6c9eb33-0465-4674-aedc-0615cdf6282e\",\"FULL\":true}";
         okhttp3.Response httpResponse = OkHttpUtils.get().url(appendUrl).build().connTimeOut(60 * 1000).readTimeOut(60 * 1000).execute();
-        LOGGER.info("{}",httpResponse.body().string());
+        LOGGER.info("{}", httpResponse.body().string());
 
     }
 
