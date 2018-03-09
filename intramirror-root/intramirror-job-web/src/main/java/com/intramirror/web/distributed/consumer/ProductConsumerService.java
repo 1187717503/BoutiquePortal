@@ -15,6 +15,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.PostConstruct;
+import org.apache.commons.lang.StringUtils;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -37,7 +38,7 @@ public class ProductConsumerService {
     private final static Logger LOGGER = LoggerFactory.getLogger(ProductConsumerService.class);
     private static Properties productConsumerProps = new Properties();
     private volatile AtomicBoolean productConsumerRunning = new AtomicBoolean(false);
-    private final static String PRODUCT_RAW_QUEUE = "productRawData";
+    private static String PRODUCT_RAW_QUEUE;
     private CountDownLatch shutDownCount;
 
     @Autowired
@@ -49,6 +50,8 @@ public class ProductConsumerService {
 
     @PostConstruct
     public void init() {
+        PRODUCT_RAW_QUEUE = StringUtils.isBlank(System.getProperty("kafka.topic.productRawData")) ? "productRawData" : System.getProperty(
+                "kafka.topic.productRawData");
         productConsumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, properties.getBootstrapServers());
         productConsumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, "group_product_raw_data");
         productConsumerProps.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");

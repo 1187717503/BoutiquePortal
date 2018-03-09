@@ -107,6 +107,9 @@
         <property name="username" value="${micro.job.username}"/>
         <property name="password" value="${micro.job.password}"/>
         <property name="bootstrapServers" value="${kafka.bootstrap.servers}"/>
+        <property name="topicProductRawData" value="${kafka.topic.productRawData}"/>
+        <property name="topicStockRawData" value="${kafka.topic.stockRawData}"/>
+        <property name="topicResultData" value="${kafka.topic.resultData}"/>
     </bean>
 
     <beans profile="test">

@@ -17,6 +17,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.PostConstruct;
+import org.apache.commons.lang.StringUtils;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -39,7 +40,8 @@ public class StockConsumerService {
     private static Properties stockConsumerProps = new Properties();
     private volatile AtomicBoolean stockConsumerRunning = new AtomicBoolean(false);
 
-    private final static String STOCK_RAW_QUEUE = "stockRawData";
+    private final static String STOCK_RAW_QUEUE = StringUtils.isBlank(System.getProperty("kafka.topic.stockRawData")) ? "stockRawData" : System.getProperty(
+            "kafka.topic.stockRawData");
 
     private CountDownLatch shutDownCount;
 

@@ -8,9 +8,9 @@ import java.util.concurrent.Future;
 
 public class ThreadManager {
 
-    private static final ExecutorService productPool = Executors.newFixedThreadPool(100);
-    private static final ExecutorService productImagePool = Executors.newFixedThreadPool(100);
-    private static final ExecutorService stockPool = Executors.newFixedThreadPool(100);
+    private static final ExecutorService productPool = Executors.newFixedThreadPool(50);
+    private static final ExecutorService productImagePool = Executors.newFixedThreadPool(50);
+    private static final ExecutorService stockPool = Executors.newFixedThreadPool(50);
 
     public static Future<?> submit(Runnable runnable) {
         if (runnable instanceof UpdateProductImageThread) {

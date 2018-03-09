@@ -1,6 +1,7 @@
 package com.intramirror.web.distributed.utils;
 
 import java.util.Properties;
+import org.apache.commons.lang.StringUtils;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -36,7 +37,8 @@ public final class KafkaMqUtil {
     }
 
     private static final String IMAGE_QUEUE = "image_url_data";
-    private static final String RESULT_QUEUE = "resultData";
+    private static final String RESULT_QUEUE = StringUtils.isBlank(System.getProperty("kafka.topic.resultData")) ? "resultData" : System.getProperty(
+            "kafka.topic.resultData");
 
     public static void sendImageMessage(String key, String value) {
         producer.send(new ProducerRecord<String, String>(IMAGE_QUEUE, key, value));

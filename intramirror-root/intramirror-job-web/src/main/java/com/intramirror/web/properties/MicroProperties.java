@@ -1,7 +1,6 @@
 package com.intramirror.web.properties;
 
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
 
 /**
  * Created on 2018/2/5.
@@ -9,18 +8,19 @@ import org.springframework.beans.factory.annotation.Value;
  * @author YouFeng.Zhu
  */
 
-public class MicroProperties implements InitializingBean{
-    @Value("${micro.baseUrl}")
+public class MicroProperties implements InitializingBean {
+
     private String baseUrl;
 
-    @Value("${micro.job.username}")
     private String username;
 
-    @Value("${micro.job.password}")
     private String password;
 
-    @Value("${kafka.bootstrap.servers}")
     private String bootstrapServers;
+
+    private String topicProductRawData;
+    private String topicStockRawData;
+    private String topicResultData;
 
     public String getBaseUrl() {
         return baseUrl;
@@ -54,10 +54,36 @@ public class MicroProperties implements InitializingBean{
         this.bootstrapServers = bootstrapServers;
     }
 
+    public String getTopicProductRawData() {
+        return topicProductRawData;
+    }
 
+    public void setTopicProductRawData(String topicProductRawData) {
+        this.topicProductRawData = topicProductRawData;
+    }
+
+    public String getTopicStockRawData() {
+        return topicStockRawData;
+    }
+
+    public void setTopicStockRawData(String topicStockRawData) {
+        this.topicStockRawData = topicStockRawData;
+    }
+
+    public String getTopicResultData() {
+        return topicResultData;
+    }
+
+    public void setTopicResultData(String topicResultData) {
+        this.topicResultData = topicResultData;
+    }
 
     @Override
     public void afterPropertiesSet() throws Exception {
         System.setProperty("bootstrap.servers", this.bootstrapServers);
+        System.setProperty("kafka.topic.productRawData", this.topicProductRawData);
+        System.setProperty("kafka.topic.stockRawData", this.topicStockRawData);
+        System.setProperty("kafka.topic.resultData", this.topicResultData);
     }
+
 }
