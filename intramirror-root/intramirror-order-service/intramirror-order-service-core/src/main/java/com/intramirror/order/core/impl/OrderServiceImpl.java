@@ -310,7 +310,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
             for(Map<String, Object> vo :orderList){
                 for(ProductPropertyVO pp:vos){
                     if(Long.valueOf(vo.get("product_id").toString()).equals(pp.getProductId())){
-                        vo.put("ColorCode",pp.getValue());
+                        vo.put("colorCode",pp.getValue());
                         break;
                     }
                 }
@@ -324,7 +324,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
             for(Map<String, Object> vo :orderList){
                 for(ProductPropertyVO pp:vos1){
                     if(Long.valueOf(vo.get("product_id").toString()).equals(pp.getProductId())){
-                        vo.put("BrandID",pp.getValue());
+                        vo.put("brandID",pp.getValue());
                         break;
                     }
                 }
