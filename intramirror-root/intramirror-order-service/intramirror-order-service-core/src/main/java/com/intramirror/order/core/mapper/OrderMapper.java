@@ -41,7 +41,7 @@ public interface OrderMapper {
      * @param param
      * @return
      */
-    int getOrderByIsvalidCount(Map<String, Object> param);
+    Integer getOrderByIsvalidCount(Map<String, Object> param);
 
     /**
      * 根据订单号查询物流ID

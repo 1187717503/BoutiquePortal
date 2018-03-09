@@ -463,12 +463,12 @@ public class OrderController extends BaseController {
             //readytoship数量
             map = new HashMap<>();
             map.put("vendorId", vendorId);
-            int result = containerService.getContainerCount(map);
-            resultMap.put("readyToship", result);
+            Integer result = containerService.getContainerCount(map);
+            resultMap.put("readyToship", result==null?0:result);
 
             //shippedCount
-            int shippedCount = orderService.getShippedCount(map);
-            resultMap.put("shipped", shippedCount);
+            Integer shippedCount = orderService.getShippedCount(map);
+            resultMap.put("shipped", shippedCount==null?0:shippedCount);
 
             resultMessage.successStatus().putMsg("info", "SUCCESS").setData(resultMap);
         } catch (Exception e) {

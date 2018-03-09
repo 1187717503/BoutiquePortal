@@ -67,7 +67,8 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
      * @return Integer
      */
     public int getOrderByIsvalidCount(Map<String, Object> param) {
-        return orderMapper.getOrderByIsvalidCount(param);
+        Integer count = orderMapper.getOrderByIsvalidCount(param);
+        return count==null?0:count;
     }
 
     /**

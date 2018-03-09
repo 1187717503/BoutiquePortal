@@ -308,12 +308,16 @@ public class OrderService {
 		
 		return result;
 	}
-	
-	
+
+
 	/**
 	 * 订单装箱
-	 * @param map
+	 * @param orderMap
+	 * @param shipMentMap
+	 * @param ischeck
+	 * @param isSaveSubShipment
 	 * @return
+	 * @throws Exception
 	 */
 	@Transactional  
 	public ResultMessage updateLogisticsProduct(Map<String,Object> orderMap,Map<String,Object> shipMentMap,boolean ischeck,boolean isSaveSubShipment) throws Exception{
