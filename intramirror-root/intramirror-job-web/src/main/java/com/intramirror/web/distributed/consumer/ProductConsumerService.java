@@ -77,7 +77,7 @@ public class ProductConsumerService {
 
     @PostConstruct
     public void startDefaultConsumerProduct() {
-        startConsumeProduct(3, 50);
+        startConsumeProduct(3, 10);
     }
 
     public void startConsumeProduct(int concurrency, int workThreads) {

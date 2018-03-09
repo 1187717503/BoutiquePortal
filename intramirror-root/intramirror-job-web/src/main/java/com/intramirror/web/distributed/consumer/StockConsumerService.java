@@ -79,10 +79,10 @@ public class StockConsumerService {
 
     @PostConstruct
     public void startDefaultConsumeStock() {
-        startConsumeStock(3,50);
+        startConsumeStock(3, 10);
     }
 
-    public void startConsumeStock(int concurrency,int workThreads) {
+    public void startConsumeStock(int concurrency, int workThreads) {
         if (stockConsumerRunning.compareAndSet(false, true)) {
             LOGGER.info("Consumer Stock already started.");
         }
