@@ -156,4 +156,10 @@ public interface IOrderService {
     int getOrderCancelCount(Map<String, Object> params);
 
 
+    /**
+     * 添加productProperty属性
+     * @param orderList
+     */
+    void addProductPropertyMap(List<Map<String, Object>> orderList);
+
 }

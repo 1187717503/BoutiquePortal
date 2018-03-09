@@ -190,6 +190,8 @@ public class OrderController extends BaseController {
             //			}
             //			/**------------------------------------优化end----------------------------------------*/
 
+            orderService.addProductPropertyMap(orderList);
+
             logger.info("order getOrderList 解析订单列表信息  ");
             for (Map<String, Object> info : orderList) {
                 //计算折扣
@@ -585,7 +587,7 @@ public class OrderController extends BaseController {
         try {
             //获取PackOrderorder列表
             logger.info(MessageFormat
-                    .format("order getPackOrderList 调用接口getOrderListByStatusAndContainerId 获取箱子内订单列表 入参 containerId:{0},containerId:{1},containerId:{2}",
+                    .format("order getPackOrderList 调用接口getOrderListByStatusAndContainerId 获取箱子内订单列表 入参 containerId:{0},status:{1},vendorId:{2}",
                             map.get("containerId").toString(), map.get("status").toString(), vendor.getVendorId()));
             List<Map<String, Object>> packList = orderService.getOrderListByStatusAndContainerId(Integer.parseInt(map.get("containerId").toString()),
                     Integer.parseInt(map.get("status").toString()), vendor.getVendorId());

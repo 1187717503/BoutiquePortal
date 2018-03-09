@@ -81,7 +81,9 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			if (result == 1){
 				//根据段生成subshipment
 				Map<String, Object> typeMap = new HashMap<String, Object>();
-				typeMap.put("consigner_country_id",Long.parseLong(map.get("consigner_country_id").toString()));	
+				if(map.get("consigner_country_id")!=null)
+				typeMap.put("consigner_country_id",Long.parseLong(map.get("consigner_country_id").toString()));
+				if(map.get("consignee_country_id")!=null)
 				typeMap.put("consignee_country_id",Long.parseLong(map.get("consignee_country_id").toString()));
 				typeMap.put("vendor_id",vendorId);
 				logger.info("getShipmentId :" + new Gson().toJson(typeMap));
@@ -97,7 +99,9 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			shipmentId = shipment.getShipmentId();
 			if (null != shipment){
 				Map<String, Object> typeMap = new HashMap<String, Object>();
-				typeMap.put("consigner_country_id",Long.parseLong(map.get("consigner_country_id").toString()));	
+				if(map.get("consigner_country_id")!=null)
+				typeMap.put("consigner_country_id",Long.parseLong(map.get("consigner_country_id").toString()));
+				if(map.get("consignee_country_id")!=null)
 				typeMap.put("consignee_country_id",Long.parseLong(map.get("consignee_country_id").toString()));
 				typeMap.put("vendor_id",shipment.getVendorId());
 				logger.info("getShipmentId :" + new Gson().toJson(typeMap));
@@ -288,7 +292,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	
 	/**
 	 * 根据vendorId查询vendorCode
-	 * @param map
+	 * @param vendorId
 	 * @return
 	 */
 	public String getVendorCodeById(Long vendorId) {
@@ -297,7 +301,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	
 	/**
 	 * 根据条件查询shipment
-	 * @param map
+	 * @param shipment
 	 * @return
 	 */
 	public Long getShipmentId(Shipment shipment) {

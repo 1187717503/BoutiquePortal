@@ -172,7 +172,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
         if (list != null && list.size() > 0) {
             return list.get(0);
         }
-        return null;
+        return new HashMap<>();
     }
 
     @Override
@@ -249,38 +249,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
         if(orderCancelList != null && orderCancelList.size()>0){
             PageListVO listVO = new PageListVO();
             listVO.setTotal(getOrderCancelCount(params));
-            Set<Long> ids = new HashSet<>();
-            for(CancelOrderVO vo :orderCancelList){
-                ids.add(vo.getProduct_id());
-            }
-            Map<String,Object> map = new HashMap<>();
-            map.put("ids",ids);
-            map.put("keyName","ColorCode");
-            List<ProductPropertyVO> vos = productPropertyMapper.getProductProperty(map);
-            if(vos!=null&&vos.size()>0){
-                for(CancelOrderVO vo :orderCancelList){
-                    for(ProductPropertyVO pp:vos){
-                        if(vo.getProduct_id().equals(pp.getProductId())){
-                            vo.setColorCode(pp.getValue());
-                            break;
-                        }
-                    }
-                }
-            }
-            Map<String,Object> map1 = new HashMap<>();
-            map1.put("ids",ids);
-            map1.put("keyName","BrandID");
-            List<ProductPropertyVO> vos1 = productPropertyMapper.getProductProperty(map1);
-            if(vos1!=null&&vos1.size()>0){
-                for(CancelOrderVO vo :orderCancelList){
-                    for(ProductPropertyVO pp:vos1){
-                        if(vo.getProduct_id().equals(pp.getProductId())){
-                            vo.setBrandID(pp.getValue());
-                            break;
-                        }
-                    }
-                }
-            }
+            addProductProperty(orderCancelList);
             listVO.setData(orderCancelList);
             listVO.setCurrPageNo(pageNumber);
             listVO.setPageSize(pageSize);
@@ -290,6 +259,77 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
             return new PageListVO();
         }
 
+    }
+
+    public void addProductProperty(List<CancelOrderVO> orderCancelList) {
+        Set<Long> ids = new HashSet<>();
+        for(CancelOrderVO vo :orderCancelList){
+            ids.add(vo.getProduct_id());
+        }
+        Map<String,Object> map = new HashMap<>();
+        map.put("ids",ids);
+        map.put("keyName","ColorCode");
+        List<ProductPropertyVO> vos = productPropertyMapper.getProductProperty(map);
+        if(vos!=null&&vos.size()>0){
+            for(CancelOrderVO vo :orderCancelList){
+                for(ProductPropertyVO pp:vos){
+                    if(vo.getProduct_id().equals(pp.getProductId())){
+                        vo.setColorCode(pp.getValue());
+                        break;
+                    }
+                }
+            }
+        }
+        Map<String,Object> map1 = new HashMap<>();
+        map1.put("ids",ids);
+        map1.put("keyName","BrandID");
+        List<ProductPropertyVO> vos1 = productPropertyMapper.getProductProperty(map1);
+        if(vos1!=null&&vos1.size()>0){
+            for(CancelOrderVO vo :orderCancelList){
+                for(ProductPropertyVO pp:vos1){
+                    if(vo.getProduct_id().equals(pp.getProductId())){
+                        vo.setBrandID(pp.getValue());
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void addProductPropertyMap(List<Map<String, Object>> orderList){
+        Set<Long> ids = new HashSet<>();
+        for(Map<String, Object> vo :orderList){
+            ids.add(Long.valueOf(vo.get("product_id").toString()));
+        }
+        Map<String,Object> map = new HashMap<>();
+        map.put("ids",ids);
+        map.put("keyName","ColorCode");
+        List<ProductPropertyVO> vos = productPropertyMapper.getProductProperty(map);
+        if(vos!=null&&vos.size()>0){
+            for(Map<String, Object> vo :orderList){
+                for(ProductPropertyVO pp:vos){
+                    if(Long.valueOf(vo.get("product_id").toString()).equals(pp.getProductId())){
+                        vo.put("ColorCode",pp.getValue());
+                        break;
+                    }
+                }
+            }
+        }
+        Map<String,Object> map1 = new HashMap<>();
+        map1.put("ids",ids);
+        map1.put("keyName","BrandID");
+        List<ProductPropertyVO> vos1 = productPropertyMapper.getProductProperty(map1);
+        if(vos1!=null&&vos1.size()>0){
+            for(Map<String, Object> vo :orderList){
+                for(ProductPropertyVO pp:vos1){
+                    if(Long.valueOf(vo.get("product_id").toString()).equals(pp.getProductId())){
+                        vo.put("BrandID",pp.getValue());
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     @Override

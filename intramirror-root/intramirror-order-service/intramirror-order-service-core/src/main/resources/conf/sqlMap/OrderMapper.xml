@@ -118,7 +118,7 @@
 
     <select id="getOrderListByStatus" resultType="java.util.HashMap" parameterType="java.util.Map">
         SELECT
-        o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id,pp.colorCode,pp.brandID,pspv.`value` as
+        o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id,pspv.`value` as
         size,p.category_id,
         /*s.price,lp.in_price,sps.sale_price,*/
         lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
@@ -151,14 +151,14 @@
         and pspv.product_sku_property_value_id = skup.product_sku_property_value_id
         and pspv.enabled = 1
         ) INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
-        LEFT JOIN (
+        /*LEFT JOIN (
         SELECT t_pp.product_id,
         max(case t_pp.key_name when 'ColorCode' then t_pp.`value` else '' end) as colorCode,
         max(case t_pp.key_name when 'BrandID' then t_pp.`value` else '' end) as brandID
         from product_property t_pp
         where t_pp.enabled = 1 and (t_pp.key_name='BrandID' or t_pp.key_name = 'ColorCode')
         group by t_pp.product_id
-        ) pp ON p.product_id = pp.product_id
+        ) pp ON p.product_id = pp.product_id*/
         LEFT JOIN order_exception oe ON(oe.logistics_product_id=lp.logistics_product_id AND oe.order_exception_id =
         (SELECT MAX(oe1.order_exception_id) FROM order_exception oe1 WHERE oe1.logistics_product_id = oe.logistics_product_id))
         LEFT JOIN order_exception_type oet ON(oet.order_exception_type_id=oe.order_exception_type_id)
@@ -590,51 +590,9 @@
         SELECT COUNT(1)
         FROM (
                  SELECT
-                     o.order_num,
-                     o.order_id,
-                     o.created_at,
-                     o.current_rate,
-                     p.name,
-                     p.product_id,
-                     pp.colorCode,
-                     pp.brandID,
-                     pspv.`value`         AS
-                                             size,
-                     p.category_id,
-                     /*s.price,
-                     s.in_price,
-                     sps.sale_price,*/
-                     lp.`retail_price` as price,lp.`in_price`,
-                     lp.amount,
-                     lp.shipping_fee,
-                     lp.tax_fee,
-                     lp.order_line_num,
-                     lp.`status`,
-                     lp.confirmed_at,
-                     lp.est_ship_date,
-                     lp.packed_at,
-                     lp.shipped_at,
-                     s.sku_code,
-                     usa.address_country_id,
-                     b.english_name       AS
-                                             brandName,
-                     l.user_rec_name,
-                     l.user_rec_province,
-                     l.user_rec_city,
-                     l.user_rec_area,
-                     l.user_rec_addr,
-                     l.user_rec_country,
-                     l.geography_id,
-                     v.vendor_name,
-                     v.vendor_id,
-                     g.english_name       AS geography_name,
-                     v.address_country_id AS
-                                             vendor_address_country_id,
-                     p.cover_img,
-                     lp.logistics_product_id
+                     o.order_num
                  FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
                      INNER JOIN `order` o ON ol.order_id = o.order_id
-                     LEFT JOIN user_ship_address usa ON o.user_id = usa.user_id
                      LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
                      INNER JOIN geography g ON l.geography_id = g.geography_id
                      INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
@@ -654,7 +612,7 @@
                          AND pspv.enabled = 1
                          )
                      INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
-                     LEFT JOIN (
+                     /*LEFT JOIN (
                                    SELECT
                                        t_pp.product_id,
                                        max(CASE t_pp.key_name
@@ -668,7 +626,7 @@
                                    FROM product_property t_pp
                                    WHERE t_pp.enabled = 1 AND (t_pp.key_name = 'BrandID' OR t_pp.key_name = 'ColorCode')
                                    GROUP BY t_pp.product_id
-                               ) pp ON p.product_id = pp.product_id
+                               ) pp ON p.product_id = pp.product_id*/
                  WHERE pspk.`name` = 'Size' AND lp.`status` = #{status,jdbcType=BIGINT}
                        AND v.vendor_id = #{vendorId,jdbcType=BIGINT}
                  GROUP BY lp.order_line_num
@@ -842,7 +800,6 @@
                  SELECT lp.order_line_num
                  FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
                      INNER JOIN `order` o ON ol.order_id = o.order_id
-                     LEFT JOIN user_ship_address usa ON o.user_id = usa.user_id
                      LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
                      INNER JOIN geography g ON l.geography_id = g.geography_id
                      INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
@@ -862,7 +819,7 @@
                          AND pspv.enabled = 1
                          )
                      INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
-                     LEFT JOIN (
+                     /*LEFT JOIN (
                                    SELECT
                                        t_pp.product_id,
                                        max(CASE t_pp.key_name
@@ -876,7 +833,7 @@
                                    FROM product_property t_pp
                                    WHERE t_pp.enabled = 1 AND (t_pp.key_name = 'BrandID' OR t_pp.key_name = 'ColorCode')
                                    GROUP BY t_pp.product_id
-                               ) pp ON p.product_id = pp.product_id
+                               ) pp ON p.product_id = pp.product_id*/
                      LEFT JOIN shipment sm ON sm.vendor_id = v.vendor_id
                  WHERE pspk.`name` = 'Size' AND (lp.`status` = 3 OR lp.`status` = 4) AND v.vendor_id = #{vendorId,jdbcType=BIGINT}
                  GROUP BY lp.order_line_num
