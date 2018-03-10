@@ -239,7 +239,44 @@ public class XmagSynAllStockController implements InitializingBean {
 				.putData("eventName","spinnakerPortofino_stock_all_update")
 				.putData("fileUtils",new ApiDataFileUtils("spinnakerPortofino","stock_all_update")).getMap());
 
+		// statu
+		paramsMap.put("satu_stock_all_update",new MapUtils(new HashMap<String, Object>())
+				.putData("url","http://net13server2.net/SatuAPI/MyApi/Productslist/GetAllStockForSync")
+				.putData("DBContext","Default")
+				.putData("SeasonCode","080")
+				.putData("typeSync","api")
+				.putData("Key","7R3FbSYqQo")
+				.putData("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool())
+				.putData("vendor_id","46")
+				.putData("threadNum","5")
+				.putData("eventName","satu_stock_all_update")
+				.putData("fileUtils",new ApiDataFileUtils("satu","stock_all_update")).getMap());
 
+		// suite
+		paramsMap.put("suite_stock_all_update",new MapUtils(new HashMap<String, Object>())
+				.putData("url","http://www.net13server3.it/suitapi/MyApi/Productslist/GetAllStockForSync")
+				.putData("DBContext","Default")
+				.putData("SeasonCode","080")
+				.putData("typeSync","api")
+				.putData("Key","nLRqWwYf3t")
+				.putData("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool())
+				.putData("vendor_id","47")
+				.putData("threadNum","5")
+				.putData("eventName","suite_stock_all_update")
+				.putData("fileUtils",new ApiDataFileUtils("suite","stock_all_update")).getMap());
+
+		// Gallery
+		paramsMap.put("gallery_stock_all_update",new MapUtils(new HashMap<String, Object>())
+				.putData("url","http://www.net13server3.it/galleryapi/MyApi/Productslist/GetAllStockForSync")
+				.putData("DBContext","Default")
+				.putData("SeasonCode","080")
+				.putData("typeSync","api")
+				.putData("Key","8Cx6IGcfrc")
+				.putData("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool())
+				.putData("vendor_id","48")
+				.putData("threadNum","5")
+				.putData("eventName","gallery_stock_all_update")
+				.putData("fileUtils",new ApiDataFileUtils("gallery","stock_all_update")).getMap());
 	}
 
 }

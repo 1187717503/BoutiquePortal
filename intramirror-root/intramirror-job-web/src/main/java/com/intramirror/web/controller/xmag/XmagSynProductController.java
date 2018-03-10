@@ -10,7 +10,6 @@ import com.intramirror.web.properties.MicroProperties;
 import com.intramirror.web.thread.CommonThreadPool;
 import com.intramirror.web.thread.UpdateProductThread;
 import com.intramirror.web.util.ApiDataFileUtils;
-import com.intramirror.web.util.Facility;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -482,7 +481,98 @@ public class XmagSynProductController implements InitializingBean {
 				.putData("eventName","spinnakerPortofino_product_delta_update")
 				.putData("fileUtils",new ApiDataFileUtils("spinnakerPortofino", "product_delta_update")).getMap());
 
+		// Satu
+		paramsMap.put("satu_product_all_update",new MapUtils(new HashMap<String, Object>())
+				.putData("url","http://net13server2.net/SatuAPI/MyApi/Productslist/GetProducts")
+				.putData("DBContext","Default")
+				.putData("BrandId","")
+				.putData("StartIndex","1")
+				.putData("EndIndex","50")
+				.putData("Key","7R3FbSYqQo")
+				.putData("CategoryId","")
+				.putData("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool())
+				.putData("vendor_id","46")
+				.putData("threadNum","5")
+				.putData("eventName","satu_product_all_update")
+				.putData("fileUtils",new ApiDataFileUtils("satu", "product_all_update")).getMap());
 
+		paramsMap.put("satu_product_delta_update",new MapUtils(new HashMap<String, Object>())
+				.putData("url","http://net13server2.net/SatuAPI/MyApi/Productslist/GetProducts")
+				.putData("DBContext","Default")
+				.putData("BrandId","")
+				.putData("StartIndex","1")
+				.putData("EndIndex","50")
+				.putData("Key","7R3FbSYqQo")
+				.putData("CategoryId","")
+				.putData("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool())
+				.putData("vendor_id","46")
+				.putData("threadNum","5")
+				.putData("redisStartIndex","satu_start_index_bydate")
+				.putData("redisEndIndex","satu_end_index_bydate")
+				.putData("eventName","satu_product_delta_update")
+				.putData("fileUtils",new ApiDataFileUtils("satu", "product_delta_update")).getMap());
+
+		// suite
+		paramsMap.put("suite_product_all_update",new MapUtils(new HashMap<String, Object>())
+				.putData("url","http://www.net13server3.it/suitapi/MyApi/Productslist/GetProducts")
+				.putData("DBContext","Default")
+				.putData("BrandId","")
+				.putData("StartIndex","1")
+				.putData("EndIndex","50")
+				.putData("Key","nLRqWwYf3t")
+				.putData("CategoryId","")
+				.putData("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool())
+				.putData("vendor_id","47")
+				.putData("threadNum","5")
+				.putData("eventName","suite_product_all_update")
+				.putData("fileUtils",new ApiDataFileUtils("suite", "product_all_update")).getMap());
+
+		paramsMap.put("suite_product_delta_update",new MapUtils(new HashMap<String, Object>())
+				.putData("url","http://www.net13server3.it/suitapi/MyApi/Productslist/GetProducts")
+				.putData("DBContext","Default")
+				.putData("BrandId","")
+				.putData("StartIndex","1")
+				.putData("EndIndex","50")
+				.putData("Key","nLRqWwYf3t")
+				.putData("CategoryId","")
+				.putData("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool())
+				.putData("vendor_id","47")
+				.putData("threadNum","5")
+				.putData("redisStartIndex","suite_start_index_bydate")
+				.putData("redisEndIndex","suite_end_index_bydate")
+				.putData("eventName","suite_product_delta_update")
+				.putData("fileUtils",new ApiDataFileUtils("suite", "product_delta_update")).getMap());
+
+		// Gallery
+		paramsMap.put("gallery_product_all_update",new MapUtils(new HashMap<String, Object>())
+				.putData("url","http://www.net13server3.it/galleryapi/MyApi/Productslist/GetProducts")
+				.putData("DBContext","Default")
+				.putData("BrandId","")
+				.putData("StartIndex","1")
+				.putData("EndIndex","50")
+				.putData("Key","8Cx6IGcfrc")
+				.putData("CategoryId","")
+				.putData("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool())
+				.putData("vendor_id","48")
+				.putData("threadNum","5")
+				.putData("eventName","gallery_product_all_update")
+				.putData("fileUtils",new ApiDataFileUtils("gallery", "product_all_update")).getMap());
+
+		paramsMap.put("gallery_product_delta_update",new MapUtils(new HashMap<String, Object>())
+				.putData("url","http://www.net13server3.it/galleryapi/MyApi/Productslist/GetProducts")
+				.putData("DBContext","Default")
+				.putData("BrandId","")
+				.putData("StartIndex","1")
+				.putData("EndIndex","50")
+				.putData("Key","8Cx6IGcfrc")
+				.putData("CategoryId","")
+				.putData("executor",(ThreadPoolExecutor) Executors.newCachedThreadPool())
+				.putData("vendor_id","48")
+				.putData("threadNum","5")
+				.putData("redisStartIndex","gallery_start_index_bydate")
+				.putData("redisEndIndex","gallery_end_index_bydate")
+				.putData("eventName","gallery_product_delta_update")
+				.putData("fileUtils",new ApiDataFileUtils("gallery", "product_delta_update")).getMap());
 	}
 
 }

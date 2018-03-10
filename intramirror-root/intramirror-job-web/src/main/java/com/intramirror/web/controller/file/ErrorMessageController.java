@@ -342,6 +342,81 @@ public class ErrorMessageController {
                     }
                 }
 
+                if (vendor_id.equals("40")) {
+                    if (name.equals("spinnakerSanremo_product_all_update") || name.equals("spinnakerSanremo_product_delta_update")) {
+                        ProductEDSManagement.ProductOptions productOptions = xmagSynProductAllMapper.mapping(originDataMap);
+                        ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
+                        vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                        productOptions.setModifyPrice("1");
+                        productOptions.setError_type(error_type);
+                        CommonThreadPool.execute(name, executor, threadNum,
+                                new UpdateProductThread(productOptions, vendorOptions, apiDataFileUtils, originDataMap));
+                    } else if (name.equals("spinnakerSanremo_stock_all_update")) {
+                        StockOption stockOption = xmagSynAllStockMapping.mapping(originDataMap);
+                        CommonThreadPool.execute(name, executor, threadNum, new UpdateStockThread(stockOption, apiDataFileUtils, originDataMap));
+                    }
+                }
+
+                if (vendor_id.equals("41")) {
+                    if (name.equals("spinnakerPortofino_product_all_update") || name.equals("spinnakerPortofino_product_all_update")) {
+                        ProductEDSManagement.ProductOptions productOptions = xmagSynProductAllMapper.mapping(originDataMap);
+                        ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
+                        vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                        productOptions.setModifyPrice("1");
+                        productOptions.setError_type(error_type);
+                        CommonThreadPool.execute(name, executor, threadNum,
+                                new UpdateProductThread(productOptions, vendorOptions, apiDataFileUtils, originDataMap));
+                    } else if (name.equals("spinnakerPortofino_stock_all_update")) {
+                        StockOption stockOption = xmagSynAllStockMapping.mapping(originDataMap);
+                        CommonThreadPool.execute(name, executor, threadNum, new UpdateStockThread(stockOption, apiDataFileUtils, originDataMap));
+                    }
+                }
+
+                if (vendor_id.equals("46")) {
+                    if (name.equals("satu_product_all_update") || name.equals("satu_product_delta_update")) {
+                        ProductEDSManagement.ProductOptions productOptions = xmagSynProductAllMapper.mapping(originDataMap);
+                        ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
+                        vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                        productOptions.setModifyPrice("1");
+                        productOptions.setError_type(error_type);
+                        CommonThreadPool.execute(name, executor, threadNum,
+                                new UpdateProductThread(productOptions, vendorOptions, apiDataFileUtils, originDataMap));
+                    } else if (name.equals("satu_stock_all_update")) {
+                        StockOption stockOption = xmagSynAllStockMapping.mapping(originDataMap);
+                        CommonThreadPool.execute(name, executor, threadNum, new UpdateStockThread(stockOption, apiDataFileUtils, originDataMap));
+                    }
+                }
+
+                if (vendor_id.equals("47")) {
+                    if (name.equals("suite_product_all_update") || name.equals("suite_product_delta_update")) {
+                        ProductEDSManagement.ProductOptions productOptions = xmagSynProductAllMapper.mapping(originDataMap);
+                        ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
+                        vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                        productOptions.setModifyPrice("1");
+                        productOptions.setError_type(error_type);
+                        CommonThreadPool.execute(name, executor, threadNum,
+                                new UpdateProductThread(productOptions, vendorOptions, apiDataFileUtils, originDataMap));
+                    } else if (name.equals("suite_stock_all_update")) {
+                        StockOption stockOption = xmagSynAllStockMapping.mapping(originDataMap);
+                        CommonThreadPool.execute(name, executor, threadNum, new UpdateStockThread(stockOption, apiDataFileUtils, originDataMap));
+                    }
+                }
+
+                if (vendor_id.equals("48")) {
+                    if (name.equals("gallery_product_all_update") || name.equals("gallery_product_delta_update")) {
+                        ProductEDSManagement.ProductOptions productOptions = xmagSynProductAllMapper.mapping(originDataMap);
+                        ProductEDSManagement.VendorOptions vendorOptions = productEDSManagement.getVendorOptions();
+                        vendorOptions.setVendorId(Long.parseLong(vendor_id));
+                        productOptions.setModifyPrice("1");
+                        productOptions.setError_type(error_type);
+                        CommonThreadPool.execute(name, executor, threadNum,
+                                new UpdateProductThread(productOptions, vendorOptions, apiDataFileUtils, originDataMap));
+                    } else if (name.equals("gallery_stock_all_update")) {
+                        StockOption stockOption = xmagSynAllStockMapping.mapping(originDataMap);
+                        CommonThreadPool.execute(name, executor, threadNum, new UpdateStockThread(stockOption, apiDataFileUtils, originDataMap));
+                    }
+                }
+
                 // alduca
                 if (vendor_id.equals("22")) {
                     if (name.equals("alduca_product_delta_update") || name.equals("alduca_product_all_update")) {
