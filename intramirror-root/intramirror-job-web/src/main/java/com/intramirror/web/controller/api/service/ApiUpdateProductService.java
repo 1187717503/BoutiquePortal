@@ -126,7 +126,7 @@ public class ApiUpdateProductService extends AbstractService {
             result.put("id", productOptions.getRequestId());
             result.put("exceptionData", resultMap);
             result.put("time", new Date());
-            KafkaMqUtil.sendResultMessage(productOptions.getRequestId(), JsonTransformUtil.toJson(result));
+            KafkaMqUtil.sendProductResultMessage(productOptions.getRequestId(), JsonTransformUtil.toJson(result));
         }
 
         return resultMap;

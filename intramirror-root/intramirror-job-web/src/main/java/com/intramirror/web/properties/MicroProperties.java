@@ -20,7 +20,9 @@ public class MicroProperties implements InitializingBean {
 
     private String topicProductRawData;
     private String topicStockRawData;
-    private String topicResultData;
+
+    private String topicProductResultData;
+    private String topicStockResultData;
 
     public String getBaseUrl() {
         return baseUrl;
@@ -70,12 +72,20 @@ public class MicroProperties implements InitializingBean {
         this.topicStockRawData = topicStockRawData;
     }
 
-    public String getTopicResultData() {
-        return topicResultData;
+    public String getTopicProductResultData() {
+        return topicProductResultData;
     }
 
-    public void setTopicResultData(String topicResultData) {
-        this.topicResultData = topicResultData;
+    public void setTopicProductResultData(String topicProductResultData) {
+        this.topicProductResultData = topicProductResultData;
+    }
+
+    public String getTopicStockResultData() {
+        return topicStockResultData;
+    }
+
+    public void setTopicStockResultData(String topicStockResultData) {
+        this.topicStockResultData = topicStockResultData;
     }
 
     @Override
@@ -83,7 +93,8 @@ public class MicroProperties implements InitializingBean {
         System.setProperty("bootstrap.servers", this.bootstrapServers);
         System.setProperty("kafka.topic.productRawData", this.topicProductRawData);
         System.setProperty("kafka.topic.stockRawData", this.topicStockRawData);
-        System.setProperty("kafka.topic.resultData", this.topicResultData);
+        System.setProperty("kafka.topic.productResultData", this.topicProductResultData);
+        System.setProperty("kafka.topic.stockResultData", this.topicProductResultData);
     }
 
 }

@@ -37,15 +37,21 @@ public final class KafkaMqUtil {
     }
 
     private static final String IMAGE_QUEUE = "image_url_data";
-    private static final String RESULT_QUEUE = StringUtils.isBlank(System.getProperty("kafka.topic.resultData")) ? "resultData" : System.getProperty(
-            "kafka.topic.resultData");
+    private static final String PRODUCT_RESULT_QUEUE = StringUtils.isBlank(
+            System.getProperty("kafka.topic.productResultData")) ? "resultData" : System.getProperty("kafka.topic.productResultData");
+    private static final String STOCK_RESULT_QUEUE = StringUtils.isBlank(System.getProperty("kafka.topic.stockResultData")) ? "resultData" : System.getProperty(
+            "kafka.topic.stockResultData");
 
     public static void sendImageMessage(String key, String value) {
-        producer.send(new ProducerRecord<String, String>(IMAGE_QUEUE, key, value));
+        producer.send(new ProducerRecord<>(IMAGE_QUEUE, key, value));
     }
 
-    public static void sendResultMessage(String key, String value) {
-        producer.send(new ProducerRecord<String, String>(RESULT_QUEUE, key, value));
+    public static void sendProductResultMessage(String key, String value) {
+        producer.send(new ProducerRecord<>(PRODUCT_RESULT_QUEUE, key, value));
+    }
+
+    public static void sendStockResultMessage(String key, String value) {
+        producer.send(new ProducerRecord<>(STOCK_RESULT_QUEUE, key, value));
     }
 
 }
