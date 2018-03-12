@@ -109,8 +109,8 @@
         <property name="bootstrapServers" value="${kafka.bootstrap.servers}"/>
         <property name="topicProductRawData" value="${kafka.topic.productRawData}"/>
         <property name="topicStockRawData" value="${kafka.topic.stockRawData}"/>
-        <property name="topicProductResultData" value="${kafka.topic.resultProductData}"/>
-        <property name="topicStockResultData" value="${kafka.topic.resultStockData}"/>
+        <property name="topicProductResultData" value="${kafka.topic.productResultData}"/>
+        <property name="topicStockResultData" value="${kafka.topic.stockResultData}"/>
     </bean>
 
     <beans profile="test">
