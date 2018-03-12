@@ -8,8 +8,11 @@ import com.intramirror.product.api.model.BlockTagRel;
 import com.intramirror.product.api.model.Tag;
 import com.intramirror.product.api.service.BlockService;
 import com.intramirror.product.api.service.content.ContentManagementService;
+import com.intramirror.user.api.model.User;
 import com.intramirror.web.common.request.Content;
+import com.intramirror.web.controller.BaseController;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/content/operation")
-public class ContentOperationController {
+public class ContentOperationController extends BaseController {
     private final static Logger LOGGER = LoggerFactory.getLogger(ContentOperationController.class);
 
     @Autowired
@@ -35,13 +38,20 @@ public class ContentOperationController {
     private ContentManagementService contentManagementService;
 
     @PutMapping(value = "/save", consumes = "application/json")
-    public Response saveContent(@RequestBody Content content) {
+    public Response saveContent(HttpServletRequest httpRequest, @RequestBody Content content) throws Exception {
         validate(content);
+
+        User user = null;
+        user = getUserInfo(httpRequest);
+
         if (content.getIsNew().equals("1")) {
             BlockTagRel btRel = contentManagementService.createBlockWithDefaultTag(content.getBlock());
             content.getBlock().setBlockId(btRel.getBlockId());
             content.getTag().setTagId(btRel.getTagId());
         } else {
+            LOGGER.info(
+                    "user[" + user.getUserId() + "] modify block[" + content.getBlock().getBlockId() + "]" + " which content length is [" + content.getBlock()
+                            .getContent().length + "]");
             contentManagementService.updateContent(content.getBlock(), content.getTag(), content.getSort());
         }
         return Response.success();
