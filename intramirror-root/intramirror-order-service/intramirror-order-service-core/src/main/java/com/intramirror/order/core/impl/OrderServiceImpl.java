@@ -227,19 +227,24 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
                 return mapList;
             }
             for (Map<String, Object> map : mapList){
-                if (brandID !=null && colorCode ==null)
+                if (brandID !=null && colorCode ==null){
                     if(brandID.equals(map.get("brandID"))){
                         list.add(map);
                     }
-                if (brandID !=null && colorCode !=null)
+                }
+                if (brandID !=null && colorCode !=null){
                     if(brandID.equals(map.get("brandID"))
                             &&colorCode.equals(map.get("colorCode"))){
                         list.add(map);
                     }
-                if (brandID ==null && colorCode !=null)
+                }
+
+                if (brandID ==null && colorCode !=null){
                     if(colorCode.equals(map.get("colorCode"))){
                         list.add(map);
                     }
+                }
+
             }
         }else {
             return mapList;
