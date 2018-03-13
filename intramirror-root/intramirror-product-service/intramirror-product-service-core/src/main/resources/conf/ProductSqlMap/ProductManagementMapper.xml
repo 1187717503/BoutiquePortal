@@ -18,6 +18,7 @@
         product.season_code AS season_code,
         product.cover_img,
         boutique_image.image,
+        boutique_image.fail_image,
         product.description_img,
         product.category_id,
         <if test="(stock != null and stock != 0) or (minStock !=null and maxStock !=null)">
