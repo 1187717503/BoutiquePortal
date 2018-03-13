@@ -17,6 +17,7 @@
         product.product_code AS boutique_id,
         product.season_code AS season_code,
         product.cover_img,
+        boutique_image.image,
         product.description_img,
         product.category_id,
         <if test="(stock != null and stock != 0) or (minStock !=null and maxStock !=null)">
@@ -37,6 +38,7 @@
         CONVERT(1 - product.preview_im_price / product.min_retail_price , DECIMAL(10, 2)) AS preview_discount,
         CONVERT(1 - shop_product.min_sale_price / product.min_retail_price, DECIMAL(10, 2)) AS sale_discount
         FROM product
+        LEFT JOIN boutique_image ON boutique_image.product_id = product.product_id
         LEFT JOIN shop_product ON shop_product.shop_id = 65 AND shop_product.enabled = TRUE AND shop_product.product_id = product.product_id
         INNER JOIN vendor ON product.vendor_id = vendor.vendor_id AND product.enabled = TRUE
         INNER JOIN brand ON brand.brand_id = product.brand_id AND brand.enabled = TRUE
