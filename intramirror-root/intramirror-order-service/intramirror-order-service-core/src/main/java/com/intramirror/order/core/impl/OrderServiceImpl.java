@@ -122,7 +122,9 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
         if (sortByName != null && StringUtils.isNoneBlank(sortByName)) {
             conditionMap.put(sortByName, sortByName);
         }
-        return orderMapper.getOrderListByStatus(conditionMap);
+        List<Map<String, Object>> mapList = orderMapper.getOrderListByStatus(conditionMap);
+        addProductPropertyMap(mapList);
+        return mapList;
     }
 
     /**
@@ -164,7 +166,41 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
     public List<Map<String, Object>> getOrderListByShipmentId(
             Map<String, Object> conditionMap) {
 
-        return orderMapper.getOrderListByShipmentId(conditionMap);
+        List<Map<String, Object>> mapList = orderMapper.getOrderListByShipmentId(conditionMap);
+        addProductPropertyMap(mapList);
+        Set<Long> ids = new HashSet<>();
+        for(Map<String, Object> vo :mapList){
+            ids.add(Long.valueOf(vo.get("product_id").toString()));
+        }
+        Map<String,Object> map = new HashMap<>();
+        map.put("ids",ids);
+        map.put("keyName","MadeIn");
+        List<ProductPropertyVO> vos = productPropertyMapper.getProductProperty(map);
+        if(vos!=null&&vos.size()>0){
+            for(Map<String, Object> vo :mapList){
+                for(ProductPropertyVO pp:vos){
+                    if(Long.valueOf(vo.get("product_id").toString()).equals(pp.getProductId())){
+                        vo.put("MadeIn",pp.getValue());
+                        break;
+                    }
+                }
+            }
+        }
+        Map<String,Object> map1 = new HashMap<>();
+        map1.put("ids",ids);
+        map1.put("keyName","Composition");
+        List<ProductPropertyVO> vos1 = productPropertyMapper.getProductProperty(map1);
+        if(vos1!=null&&vos1.size()>0){
+            for(Map<String, Object> vo :mapList){
+                for(ProductPropertyVO pp:vos1){
+                    if(Long.valueOf(vo.get("product_id").toString()).equals(pp.getProductId())){
+                        vo.put("Composition",pp.getValue());
+                        break;
+                    }
+                }
+            }
+        }
+        return mapList;
     }
 
     @Override
@@ -178,7 +214,9 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
 
     @Override
     public List<Map<String, Object>> getResult(Map<String, Object> params) {
-        return orderMapper.getShippedOrderListByStatus(params);
+        List<Map<String, Object>> mapList = orderMapper.getShippedOrderListByStatus(params);
+        addProductPropertyMap(mapList);
+        return mapList;
     }
 
     @Override
@@ -299,6 +337,9 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
 
     @Override
     public void addProductPropertyMap(List<Map<String, Object>> orderList){
+        if(orderList == null){
+            return;
+        }
         Set<Long> ids = new HashSet<>();
         for(Map<String, Object> vo :orderList){
             ids.add(Long.valueOf(vo.get("product_id").toString()));

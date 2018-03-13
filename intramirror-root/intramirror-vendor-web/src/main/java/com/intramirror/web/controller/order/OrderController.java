@@ -190,8 +190,6 @@ public class OrderController extends BaseController {
             //			}
             //			/**------------------------------------优化end----------------------------------------*/
 
-            orderService.addProductPropertyMap(orderList);
-
             logger.info("order getOrderList 解析订单列表信息  ");
             for (Map<String, Object> info : orderList) {
                 //计算折扣

@@ -439,10 +439,10 @@
             o.current_rate,
             p.name,
             p.product_id,
-            pp.colorCode,
+           /* pp.colorCode,
             pp.brandID,
             pp.MadeIn,
-            pp.Composition,
+            pp.Composition,*/
             pspv.`value`   AS size,
             p.category_id,
             /*s.price,
@@ -488,7 +488,7 @@
                 AND pspv.enabled = 1
                 )
             INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
-            LEFT JOIN (
+            /* LEFT JOIN (
                           SELECT
                               t_pp.product_id,
                               max(CASE t_pp.key_name
@@ -511,7 +511,7 @@
                           WHERE t_pp.enabled = 1 AND
                                 (t_pp.key_name = 'BrandID' OR t_pp.key_name = 'ColorCode' OR t_pp.key_name = 'MadeIn' OR t_pp.key_name = 'Composition')
                           GROUP BY t_pp.product_id
-                      ) pp ON p.product_id = pp.product_id
+                      ) pp ON p.product_id = pp.product_id */
         WHERE pspk.`name` = 'Size'
               AND c.shipment_id = #{shipment_id,jdbcType=BIGINT}
               AND lp.`status` = #{status,jdbcType=BIGINT}
@@ -680,15 +680,14 @@
 
         <choose>
             <when test="count == 1">
-                lp.order_line_num
+                lp.order_line_num,p.product_id
             </when>
             <otherwise>
-                o.created_at AS order_date,o.current_rate,pp.colorCode,pp.brandID,pspv.`value` as size,
-                /*s.price,s.in_price,sps.sale_price,*/
+                o.created_at AS order_date,o.current_rate,pspv.`value` as size,
                 lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
                 lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
                 lp.shipped_at AS shipped_date,sm.shipment_no,s.sku_code,b.english_name as brandName,
-                v.vendor_name,g.english_name as geography_name,p.cover_img
+                v.vendor_name,g.english_name as geography_name,p.cover_img,p.product_id
             </otherwise>
         </choose>
 
@@ -712,14 +711,6 @@
         and pspv.product_sku_property_value_id = skup.product_sku_property_value_id
         and pspv.enabled = 1
         ) INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
-        LEFT JOIN (
-        SELECT t_pp.product_id,
-        max(case t_pp.key_name when 'ColorCode' then t_pp.`value` else '' end) as colorCode,
-        max(case t_pp.key_name when 'BrandID' then t_pp.`value` else '' end) as brandID
-        from product_property t_pp
-        where t_pp.enabled = 1 and (t_pp.key_name='BrandID' or t_pp.key_name = 'ColorCode')
-        group by t_pp.product_id
-        ) pp ON p.product_id = pp.product_id
         LEFT JOIN shipment sm on sm.vendor_id = v.vendor_id
         where pspk.`name` = 'Size' and (lp.`status` = 3 OR lp.`status` = 4)
         and v.vendor_id = #{vendorId,jdbcType=BIGINT}
