@@ -717,12 +717,6 @@
         <if test="shippedParam.orderLineNo!=null and shippedParam.orderLineNo!=''">
             and lp.order_line_num=#{shippedParam.orderLineNo}
         </if>
-        <if test="shippedParam.brandID!=null and shippedParam.brandID!=''">
-            and pp.brandID=#{shippedParam.brandID}
-        </if>
-        <if test="shippedParam.colorCode!=null and shippedParam.colorCode!=''">
-            and pp.colorCode=#{shippedParam.colorCode}
-        </if>
         <if test="shippedParam.dateType!= null and shippedParam.dateType!='' and shippedParam.dateType == '0'.toString()">
             and (o.created_at between #{shippedParam.startDate} and #{shippedParam.endDate})
         </if>

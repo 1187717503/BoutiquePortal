@@ -216,7 +216,33 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
     public List<Map<String, Object>> getResult(Map<String, Object> params) {
         List<Map<String, Object>> mapList = orderMapper.getShippedOrderListByStatus(params);
         addProductPropertyMap(mapList);
-        return mapList;
+        Object shippedParamObj = params.get("shippedParam");
+        List<Map<String, Object>> list = new ArrayList<>();
+        if(shippedParamObj != null){
+            ShippedParam shippedParam = (ShippedParam)params.get("shippedParam");
+            String brandID = shippedParam.getBrandID();
+            String colorCode = shippedParam.getColorCode();
+            if(brandID==null&&colorCode==null){
+                return mapList;
+            }
+            for (Map<String, Object> map : mapList){
+                if (brandID !=null && colorCode ==null)
+                    if(brandID.equals(map.get("brandID"))){
+                        list.add(map);
+                    }
+                if (brandID !=null && colorCode !=null)
+                    if(brandID.equals(map.get("brandID"))
+                            &&colorCode.equals(map.get("colorCode"))){
+                        list.add(map);
+                    }
+                if (brandID ==null && colorCode !=null)
+                    if(colorCode.equals(map.get("colorCode"))){
+                        list.add(map);
+                    }
+
+            }
+        }
+        return list;
     }
 
     @Override
@@ -337,7 +363,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
 
     @Override
     public void addProductPropertyMap(List<Map<String, Object>> orderList){
-        if(orderList == null){
+        if(orderList == null || orderList.size() <= 0){
             return;
         }
         Set<Long> ids = new HashSet<>();
