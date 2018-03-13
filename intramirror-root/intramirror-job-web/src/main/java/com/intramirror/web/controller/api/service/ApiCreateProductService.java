@@ -1,11 +1,13 @@
 package com.intramirror.web.controller.api.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson15.JSONArray;
 import com.intramirror.utils.transform.JsonTransformUtil;
 import static com.intramirror.web.controller.api.service.ApiCommonUtils.escape;
 import com.intramirror.web.distributed.utils.KafkaMqUtil;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -17,6 +19,7 @@ import org.apache.log4j.Logger;
 import org.sql2o.Connection;
 import pk.shoplus.DBConnector;
 import pk.shoplus.enums.ApiErrorTypeEnum;
+import pk.shoplus.model.BoutiqueImage;
 import pk.shoplus.model.BrandCategory;
 import pk.shoplus.model.CategoryProductInfo;
 import pk.shoplus.model.CategoryProductProperty;
@@ -32,6 +35,7 @@ import pk.shoplus.model.SkuStore;
 import pk.shoplus.parameter.EnabledType;
 import pk.shoplus.parameter.ProductFeatureType;
 import pk.shoplus.parameter.ProductStatusType;
+import pk.shoplus.service.BoutiqueImageService;
 import pk.shoplus.service.BrandCategoryService;
 import pk.shoplus.service.CategoryProductInfoService;
 import pk.shoplus.service.CategoryProductPropertyService;
@@ -456,6 +460,7 @@ public class ApiCreateProductService extends AbstractService {
         product = productService.createProduct(product);
         this.uProduct = product;
         logger.info("ApiCreateProductService,setProduct,product:" + JSONObject.toJSONString(product));
+        this.saveBoutiqueImage(product, conn);
     }
 
     private void checkMappingParams(Connection conn) throws Exception {
@@ -567,6 +572,54 @@ public class ApiCreateProductService extends AbstractService {
                         productOptions.getBrandCode() + "," + productOptions.getColorCode() + "," + productOptions.getSeasonCode(),
                         ApiErrorTypeEnum.errorType.error_duplicate_product);
             }
+        }
+    }
+
+    private void saveBoutiqueImage(Product product, Connection conn) {
+        try {
+            if (product == null) {
+                return;
+            }
+
+            BoutiqueImageService boutiqueImageService = new BoutiqueImageService(conn);
+            Map<String, Object> condition = new HashMap<>();
+            condition.put("product_id", product.getProduct_id());
+
+            BoutiqueImage boutiqueImage = boutiqueImageService.getBoutiqueImageByCondition(condition);
+            List<String> coverImgs = JSONArray.parseArray(this.productOptions.getCoverImg(), String.class);
+
+            if (boutiqueImage == null) {
+                if (coverImgs != null && coverImgs.size() > 0) {
+                    boutiqueImage = new BoutiqueImage();
+                    boutiqueImage.setCreated_at(new Date());
+                    boutiqueImage.setUpdated_at(new Date());
+                    boutiqueImage.setImage(JsonTransformUtil.toJson(coverImgs));
+                    boutiqueImage.setProduct_id(product.getProduct_id());
+                    boutiqueImageService.createBoutiqueImage(boutiqueImage);
+                }
+            } else {
+                List<String> oldImages = JSONArray.parseArray(boutiqueImage.getImage(), String.class);
+                List<String> images = new ArrayList<>();
+                for (String newImage : coverImgs) {
+                    boolean newFlag = true;
+                    for (String oldImage : oldImages) {
+                        if (newImage.equalsIgnoreCase(oldImage)) {
+                            newFlag = false;
+                            break;
+                        }
+                    }
+                    if (newFlag) {
+                        images.add(newImage);
+                    }
+                }
+                oldImages.addAll(images);
+                boutiqueImage.setImage(JsonTransformUtil.toJson(oldImages));
+                boutiqueImage.setUpdated_at(new Date());
+                boutiqueImageService.updateBoutiqueImage(boutiqueImage);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("saveBoutiqueImage,ErrorMessage:" + e);
         }
     }
 
