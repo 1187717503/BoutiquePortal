@@ -70,7 +70,7 @@ public class StockConsumerService {
         }
         try {
             if (shutDownCount != null) {
-                shutDownCount.await(60, TimeUnit.SECONDS);
+                shutDownCount.await(120, TimeUnit.SECONDS);
             }
         } catch (InterruptedException e) {
             LOGGER.error("Consumer Stock Thread shutdown time out", e);
@@ -79,7 +79,7 @@ public class StockConsumerService {
 
     @PostConstruct
     public void startDefaultConsumeStock() {
-        startConsumeStock(3, 10);
+        startConsumeStock(3, 70);
     }
 
     public void startConsumeStock(int concurrency, int workThreads) {

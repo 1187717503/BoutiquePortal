@@ -68,7 +68,7 @@ public class ProductConsumerService {
         }
         try {
             if (shutDownCount != null) {
-                shutDownCount.await(60, TimeUnit.SECONDS);
+                shutDownCount.await(120, TimeUnit.SECONDS);
             }
         } catch (InterruptedException e) {
             LOGGER.error("Consumer Product Thread shutdown time out", e);
@@ -77,7 +77,7 @@ public class ProductConsumerService {
 
     @PostConstruct
     public void startDefaultConsumerProduct() {
-        startConsumeProduct(3, 10);
+        startConsumeProduct(3, 70);
     }
 
     public void startConsumeProduct(int concurrency, int workThreads) {
