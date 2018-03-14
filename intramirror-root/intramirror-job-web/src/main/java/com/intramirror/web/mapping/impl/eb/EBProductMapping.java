@@ -83,7 +83,7 @@ public class EBProductMapping implements IProductMapping {
             //            if (StringUtils.isNotBlank(carryOver) && StringUtils.trim(carryOver).equalsIgnoreCase("CO")) {
             //                productOptions.setSeasonCode("CO");
             //            }
-
+            productOptions.setModifyPrice("1");
         } catch (Exception e) {
             e.printStackTrace();
             LOGGER.info("EBProductMapping,errorMessage:" + ExceptionUtils.getExceptionDetail(e));
