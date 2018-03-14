@@ -7,6 +7,7 @@ import com.intramirror.core.common.response.StatusCode;
 import com.intramirror.core.net.http.OkHttpUtils;
 import com.intramirror.product.api.service.stock.IUpdateStockService;
 import com.intramirror.utils.transform.JsonTransformUtil;
+import com.intramirror.web.distributed.thread.ThreadManager;
 import com.intramirror.web.mapping.api.IProductMapping;
 import com.intramirror.web.mapping.api.IStockMapping;
 import com.intramirror.web.mapping.vo.StockOption;
@@ -18,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import javax.annotation.Resource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -52,7 +52,7 @@ public class EleonoraBonucciProductController {
     private static Map<String, Object> configMap = new HashMap<>();
 
     static {
-        final ExecutorService allproductRhreadPool = Executors.newFixedThreadPool(10);
+        final ExecutorService allproductRhreadPool = ThreadManager.newFixedBlockingThreadPool(10);
         Map<String, Object> ebAllProduct = new HashMap<>();
         ebAllProduct.put("url",
                 "https://eleonorabonucci.com/WS/stock.asmx/Get_Article?JSON={\"Codice_Anagrafica\":\"a399c52a-8a43-419f-9d7e-244c32c61e8f\",\"FULL\":true}");
@@ -62,7 +62,7 @@ public class EleonoraBonucciProductController {
         ebAllProduct.put("fileUtils", new ApiDataFileUtils("eb", "product_all_update"));
         configMap.put("ebAllProduct", ebAllProduct);
 
-        final ExecutorService deltaProductthreadPool = Executors.newFixedThreadPool(10);
+        final ExecutorService deltaProductthreadPool = ThreadManager.newFixedBlockingThreadPool(10);
         Map<String, Object> ebDeltaProduct = new HashMap<>();
         ebDeltaProduct.put("url",
                 "https://eleonorabonucci.com/WS/stock.asmx/Get_Article?JSON={\"Codice_Anagrafica\":\"a399c52a-8a43-419f-9d7e-244c32c61e8f\",\"FULL\":false}");
@@ -72,7 +72,7 @@ public class EleonoraBonucciProductController {
         ebDeltaProduct.put("fileUtils", new ApiDataFileUtils("eb", "product_delta_update"));
         configMap.put("ebDeltaProduct", ebDeltaProduct);
 
-        final ExecutorService allStockthreadPool = Executors.newFixedThreadPool(10);
+        final ExecutorService allStockthreadPool = ThreadManager.newFixedBlockingThreadPool(10);
         Map<String, Object> ebAllStock = new HashMap<>();
         ebAllStock.put("url",
                 "https://eleonorabonucci.com/WS/stock.asmx/Get_Article?JSON={\"Codice_Anagrafica\":\"a399c52a-8a43-419f-9d7e-244c32c61e8f\",\"FULL\":true}");
@@ -82,7 +82,7 @@ public class EleonoraBonucciProductController {
         ebAllStock.put("fileUtils", new ApiDataFileUtils("eb", "stock_all_update"));
         configMap.put("ebAllStock", ebAllStock);
 
-        final ExecutorService deltaStockthreadPool = Executors.newFixedThreadPool(10);
+        final ExecutorService deltaStockthreadPool = ThreadManager.newFixedBlockingThreadPool(10);
         Map<String, Object> ebDeltaStock = new HashMap<>();
         ebDeltaStock.put("url",
                 "https://eleonorabonucci.com/WS/stock.asmx/Get_Article?JSON={\"Codice_Anagrafica\":\"a399c52a-8a43-419f-9d7e-244c32c61e8f\",\"FULL\":false}");
