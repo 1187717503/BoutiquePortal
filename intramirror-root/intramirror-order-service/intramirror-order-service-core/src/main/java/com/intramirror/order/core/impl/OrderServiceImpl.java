@@ -224,8 +224,8 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
             ShippedParam shippedParam = (ShippedParam)params.get("shippedParam");
             String brandID = shippedParam.getBrandID();
             String colorCode = shippedParam.getColorCode();
-            if(((brandID==null||"".equals(brandID.trim()))
-                    &&colorCode==null||"".equals(colorCode.trim()))){
+            if((brandID==null||"".equals(brandID.trim()))
+                    &&(colorCode==null||"".equals(colorCode.trim()))){
                 return mapList;
             }
             for (Map<String, Object> map : mapList){
