@@ -94,7 +94,7 @@ public class MicroProperties implements InitializingBean {
         System.setProperty("kafka.topic.productRawData", this.topicProductRawData);
         System.setProperty("kafka.topic.stockRawData", this.topicStockRawData);
         System.setProperty("kafka.topic.productResultData", this.topicProductResultData);
-        System.setProperty("kafka.topic.stockResultData", this.topicProductResultData);
+        System.setProperty("kafka.topic.stockResultData", this.topicStockResultData);
     }
 
 }

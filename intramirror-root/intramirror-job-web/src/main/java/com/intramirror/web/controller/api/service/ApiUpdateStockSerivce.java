@@ -126,7 +126,7 @@ public class ApiUpdateStockSerivce {
             result.put("id", this.stockOption.getRequestId());
             result.put("exceptionData", resultMap);
             result.put("time", new Date());
-            KafkaMqUtil.sendProductResultMessage(this.stockOption.getRequestId(), JsonTransformUtil.toJson(result));
+            KafkaMqUtil.sendStockResultMessage(this.stockOption.getRequestId(), JsonTransformUtil.toJson(result));
         }
         return resultMap;
     }
