@@ -22,7 +22,7 @@ public final class KafkaMqUtil {
 
     static {
         properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, System.getProperty("bootstrap.servers"));
-        properties.put(ProducerConfig.ACKS_CONFIG, "all");
+        properties.put(ProducerConfig.ACKS_CONFIG, "1");
         properties.put(ProducerConfig.RETRIES_CONFIG, 0);
         properties.put(ProducerConfig.BATCH_SIZE_CONFIG, 16384);
         properties.put(ProducerConfig.LINGER_MS_CONFIG, 1);
@@ -39,8 +39,8 @@ public final class KafkaMqUtil {
     private static final String IMAGE_QUEUE = "image_url_data";
     private static final String PRODUCT_RESULT_QUEUE = StringUtils.isBlank(
             System.getProperty("kafka.topic.productResultData")) ? "resultData" : System.getProperty("kafka.topic.productResultData");
-    private static final String STOCK_RESULT_QUEUE = StringUtils.isBlank(System.getProperty("kafka.topic.stockResultData")) ? "stockResultData" : System.getProperty(
-            "kafka.topic.stockResultData");
+    private static final String STOCK_RESULT_QUEUE = StringUtils.isBlank(
+            System.getProperty("kafka.topic.stockResultData")) ? "stockResultData" : System.getProperty("kafka.topic.stockResultData");
 
     public static void sendImageMessage(String key, String value) {
         producer.send(new ProducerRecord<>(IMAGE_QUEUE, key, value));
