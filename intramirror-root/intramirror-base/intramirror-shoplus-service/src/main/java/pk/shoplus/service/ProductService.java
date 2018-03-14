@@ -1,6 +1,5 @@
 package pk.shoplus.service;
 
-import com.alibaba.fastjson15.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1088,7 +1087,6 @@ public class ProductService {
                     + "inner join api_configuration ac on(ac.enabled = 1 and ac.api_configuration_id = acm.api_configuration_id)\n"
                     + "inner join category c on(c.enabled = 1 and c.category_id = acm.category_id)\n" + "where acm.enabled = 1 and ac.vendor_id = '" + vendor_id
                     + "'\n" + "and trim(acm.boutique_category_id) = trim(\"" + boutique_category_id + "\")\n" + " and c.category_id is not null ";
-            logger.info("ProductService,getBoutiqueCategory,sql:" + sql);
             List<Map<String, Object>> categoryMap = productDao.executeBySql(sql, null);
             if (categoryMap != null && categoryMap.size() > 0) {
                 return categoryMap.get(0);
@@ -1106,7 +1104,6 @@ public class ProductService {
                     + "inner join `category`  c3 on(c2.`category_id` = c3.`parent_id` )\n"
                     + "where c1.`enabled`  = 1 and c2.`enabled`  = 1 and c3.`enabled`  = 1 \n" + "and c1.`name`  = trim(\"" + one
                     + "\") and c2.`name` = trim(\"" + two + "\") and c3.`name` = trim(\"" + three + "\")";
-            logger.info("ProductService,getCategory,sql:" + sql);
             List<Map<String, Object>> categoryMap = productDao.executeBySql(sql, null);
             if (categoryMap != null && categoryMap.size() > 0) {
                 return categoryMap.get(0);
@@ -1141,7 +1138,6 @@ public class ProductService {
                     + "inner join category c on(c.enabled = 1 and c.category_id = acm.category_id)\n" + "where acm.enabled = 1 and ac.vendor_id = '" + vendor_id
                     + "'\n" + "and trim(acm.boutique_first_category) = trim(\"" + one + "\")\n" + "and trim(acm.boutique_second_category) = trim(\"" + two
                     + "\")\n" + "and trim(acm.boutique_third_category) = trim(\"" + three + "\")\n" + " and c.category_id is not null ";
-            logger.info("ProductService,getThreeCategory,sql:" + sql);
             List<Map<String, Object>> categoryMap = productDao.executeBySql(sql, null);
             if (categoryMap != null && categoryMap.size() > 0) {
                 return categoryMap.get(0);
@@ -1159,7 +1155,6 @@ public class ProductService {
                     + "inner join category c on(c.enabled = 1 and c.category_id = acm.category_id)\n" + "where acm.enabled = 1 and ac.vendor_id = '" + vendor_id
                     + "'\n" + "and trim(acm.boutique_first_category) = trim(\"" + one + "\")\n" + "and trim(acm.boutique_third_category) = trim(\"" + three
                     + "\")\n" + " and c.category_id is not null ";
-            logger.info("ProductService,getThreeCategory,sql:" + sql);
             List<Map<String, Object>> categoryMap = productDao.executeBySql(sql, null);
             if (categoryMap != null && categoryMap.size() > 0) {
                 return categoryMap.get(0);
@@ -1173,7 +1168,6 @@ public class ProductService {
     public Map<String, Object> getBrand(String brandName) throws Exception {
         try {
             String sql = "select b.brand_id,b.english_name from brand b where trim(b.english_name) = trim(\"" + brandName + "\") and b.enabled = 1";
-            logger.info("ProductService,getBrand,sql:" + sql);
 
             List<Map<String, Object>> brandMap = productDao.executeBySql(sql, null);
             if (brandMap != null && brandMap.size() > 0) {
@@ -1192,7 +1186,6 @@ public class ProductService {
                     + " inner join brand b on(b.brand_id = abm.brand_id and b.enabled = 1)\n"
                     //                    + "where ac.`vendor_id`  = "+vendor_id+" and trim(abm.`boutique_brand_name`)  =trim(\"" + brandName + "\")";
                     + " where trim(abm.`boutique_brand_name`)  = trim(\"" + brandName + "\")";
-            logger.info("ProductService,getThreeCategory,sql:" + sql);
 
             List<Map<String, Object>> brandMap = productDao.executeBySql(sql, null);
             if (brandMap != null && brandMap.size() > 0) {
@@ -1207,7 +1200,6 @@ public class ProductService {
     public boolean ifBrand(String brand_id) throws Exception {
         if (org.apache.commons.lang.StringUtils.isNotBlank(brand_id)) {
             String sql = "select brand_id from brand where brand_id='" + brand_id + "' and enabled = 1";
-            logger.info("ProductService,ifBrand,sql:" + sql);
             List<Map<String, Object>> brandMap = productDao.executeBySql(sql, null);
             if (brandMap == null || brandMap.size() == 0) {
                 return false;
@@ -1220,7 +1212,6 @@ public class ProductService {
     public boolean ifCategory(String category_id) throws Exception {
         if (org.apache.commons.lang.StringUtils.isNotBlank(category_id)) {
             String sql = "select category_id from category where category_id='" + category_id + "' and enabled = 1";
-            logger.info("ProductService,ifCategory,sql:" + sql);
             List<Map<String, Object>> categoryMap = productDao.executeBySql(sql, null);
             if (categoryMap == null || categoryMap.size() == 0) {
                 return false;
@@ -1234,7 +1225,6 @@ public class ProductService {
         try {
             String sql = "select season_code from `season_mapping` where enabled = 1 and (trim(`season_code`)  = trim(\"" + seasonCode
                     + "\") or trim(`boutique_season_code`)  = trim(\"" + seasonCode + "\"))";
-            logger.info("ProductService,getSeason,sql:" + sql);
 
             List<Map<String, Object>> seasonMap = productDao.executeBySql(sql, null);
             if (seasonMap != null && seasonMap.size() > 0) {
@@ -1248,7 +1238,6 @@ public class ProductService {
 
     public String getDeafultCategory(Long vendor_id, String one, String two) throws Exception {
         try {
-            logger.info("ProductService,getDeafultCategory,vendor_id:" + vendor_id + ",one:" + one + ",two:" + two);
 
             String rsCategoryId = null;
 
@@ -1265,11 +1254,7 @@ public class ProductService {
                         + "left join category c on(c.enabled = 1 and c.category_id = acm.category_id)\n" + "where acm.enabled = 1 and ac.vendor_id = '"
                         + vendor_id + "'\n" + "and trim(acm.boutique_first_category) = trim(\"" + one + "\")\n"
                         + "and trim(acm.boutique_second_category) = trim(\"" + two + "\")\n" + " and c.category_id is not null ";
-                logger.info(
-                        "ProductService,getDeafultCategory,selApiCategorySQL:" + selApiCategorySQL + ",vendor_id:" + vendor_id + ",one:" + one + ",two:" + two);
                 listMap = productDao.executeBySql(selApiCategorySQL, null);
-                logger.info("ProductService,getDeafultCategory,listMap:" + JSONObject.toJSONString(listMap) + ",sql:" + selApiCategorySQL + ",vendor_id:"
-                        + vendor_id + ",one:" + one + ",two:" + two);
             }
 
             if (listMap != null && listMap.size() > 0) {
@@ -1281,11 +1266,7 @@ public class ProductService {
                                 + "inner join `category`  c3 on(c2.`category_id` = c3.`parent_id` )\n"
                                 + "where c1.`enabled`  = 1 and c2.`enabled`  = 1 and c3.`enabled`  = 1 \n" + "and c3.`category_id`  = '" + category_id + "'";
 
-                logger.info("ProductService,getDeafultCategory,selCategory,start,sql:" + selCategorySql + ",vendor_id:" + vendor_id + ",one:" + one + ",two:"
-                        + two);
                 List<Map<String, Object>> categoryMap = productDao.executeBySql(selCategorySql, null);
-                logger.info("ProductService,getDeafultCategory,selCategory,end,categoryMap:" + JSONObject.toJSONString(categoryMap) + ",selCategorySql:"
-                        + selCategorySql + ",vendor_id:" + vendor_id + ",one:" + one + ",two:" + two);
                 if (categoryMap != null && categoryMap.size() > 0) {
                     String c1Name = categoryMap.get(0).get("c1Name").toString();
                     String c1Category_id = categoryMap.get(0).get("c1Category_id").toString();
@@ -1331,8 +1312,6 @@ public class ProductService {
                     }
                 }
             }
-            logger.info(
-                    "ProductService,outputParams,getDeafultCategory,vendor_id:" + vendor_id + ",one:" + one + ",two:" + two + ",rsCategoryId:" + rsCategoryId);
             return rsCategoryId;
         } catch (Exception e) {
             throw e;
@@ -1344,7 +1323,6 @@ public class ProductService {
             String sql = "select p.product_id from `product`  p where p.`designer_id`  = \"" + brandID + "\" and p.`color_code`  = \"" + colorCode
                     + "\" and p.`season_code`  = \"" + seasonCode + "\" and p.`vendor_id`  = 22 and p.`enabled`  = 1";
 
-            logger.info("ProductService,outputParams,duplicateColorBrandByADCreate,sql:" + sql);
             List<Map<String, Object>> productMap = productDao.executeBySql(sql, null);
             if (productMap != null && productMap.size() > 0) {
                 return true;
@@ -1360,7 +1338,6 @@ public class ProductService {
             String sql = "select p.product_id from `product`  p where p.`designer_id`  = \"" + brandID + "\" and p.`color_code`  = \"" + colorCode
                     + "\" and p.`season_code`  = \"" + seasonCode + "\" and p.`vendor_id`  = 22 and p.`enabled`  = 1";
 
-            logger.info("ProductService,outputParams,duplicateColorBrandByADUpdate,sql:" + sql);
             List<Map<String, Object>> productMap = productDao.executeBySql(sql, null);
             if (productMap != null && productMap.size() > 1) {
                 return true;
@@ -1374,7 +1351,6 @@ public class ProductService {
     public boolean isClothing(Long categorId) throws Exception {
         String sql =
                 "select c.`category_id`  from `category`  c where c.`enabled`  = 1 and c.`parent_id` in(1504,1569)  and c.`category_id`  = '" + categorId + "'";
-        logger.info("roductService,outputParams,isClothing,sql:" + sql);
         List<Map<String, Object>> categoryMap = productDao.executeBySql(sql, null);
         if (categoryMap != null && categoryMap.size() > 0) {
             return true;
@@ -1411,7 +1387,6 @@ public class ProductService {
             productDao.updateBySQL(insertSql, null);
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("ProductService,outputParams,insertProductImage,errorMessage:" + e);
         }
     }
 

@@ -239,10 +239,6 @@ public class ApiUpdateStockSerivce {
         BigDecimal oldPrice = product.getMax_retail_price();
         int rs = ApiCommonUtils.ifUpdatePrice(oldPrice,newPrice);
 
-        /*if(rs == 0) {
-            this.setWarning(ApiErrorTypeEnum.errorType.warning_price_out_off,"price",price);
-        }*/
-
         if(rs == 1 || stockOption.isModify()) {
             IPriceService iPriceService = new PriceServiceImpl();
             logger.info("ApiUpdateStockSerivce,synProductPriceRule,product:"+JSONObject.toJSONString(product) +",newPrice:"+newPrice);
@@ -318,23 +314,6 @@ public class ApiUpdateStockSerivce {
             sku.last_check = new Date();
             sku.boutique_sku_id = stockOption.getBoutique_sku_id();
             skuService.createSku(sku);
-            logger.info("ApiUpdateStockSerivce,createSku,sku:"+JSONObject.toJSONString(sku));
-
-            /*BigDecimal newPrice = product.getMax_retail_price();
-            BigDecimal im_price = sku.im_price;
-            BigDecimal in_price = sku.in_price;
-            Long product_id = product.getProduct_id();
-            String updatePriceSQL = "update `sku`  s\n"
-                    + "inner join `product`  p on( s.`product_id`  = p.`product_id`  and s.`enabled`  = 1 and p.`enabled`  = 1)\n"
-                    + "left join `shop_product`  sp on(sp.`product_id` = p.`product_id`  and sp.`enabled`  = 1)\n"
-                    + "left join `shop_product_sku`  sps on(sps.`shop_product_id` = sp.`shop_product_id`  and sps.`enabled`  = 1)\n" + "set \n"
-                    + "s.`price` ="+newPrice+" ,s.`in_price` ="+in_price+" ,s.`im_price`  ="+im_price+" ,\n"
-                    + "p.`min_boutique_price` ="+in_price+" ,p.`min_im_price`  ="+im_price+" ,p.`min_retail_price` ="+newPrice+" ,\n"
-                    + "p.`max_boutique_price` ="+in_price+" ,p.`max_im_price` ="+im_price+" , p.`max_retail_price`  ="+newPrice+",\n"
-                    + "sps.`sale_price`  = "+im_price+",\n"
-                    + "sp.`min_sale_price` ="+im_price+" ,sp.`max_sale_price`   ="+im_price+" \n" + "where p.`product_id`  ="+product_id+";";
-            skuService.updateBySQL(updatePriceSQL);
-            logger.info("ApiUpdateStockService,createSku,updateProduct,updatePriceSQL:"+updatePriceSQL);*/
 
             // 2.create sku_store
             SkuStoreService skuStoreService = new SkuStoreService(conn);
@@ -361,7 +340,6 @@ public class ApiUpdateStockSerivce {
                 skuStore.store = 0L;
             }
             skuStoreService.createSkuStore(skuStore);
-            logger.info("ApiUpdateStockSerivce,createSku,sku_store:"+JSONObject.toJSONString(skuStore));
 
             // 3.select product_sku_property_key
             ProductPropertyKeyService productPropertyKeyService = new ProductPropertyKeyService(conn);
@@ -385,7 +363,6 @@ public class ApiUpdateStockSerivce {
             productSkuPropertyValue.updated_at = new Date();
             productSkuPropertyValue.enabled = EnabledType.USED;
             ProductSkuPropertyValue pspv = productPropertyValueService.createProductPropertyValue(productSkuPropertyValue);
-            logger.info("ApiUpdateStockSerivce,createSku,product_sku_property_value:"+JSONObject.toJSONString(pspv));
 
             // 5.create sku_property
             SkuPropertyService skuPropertyService = new SkuPropertyService(conn);
@@ -399,7 +376,6 @@ public class ApiUpdateStockSerivce {
             skuProperty.updated_at = new Date();
             skuProperty.enabled = EnabledType.USED;
             skuPropertyService.createSkuProperty(skuProperty);
-            logger.info("ApiUpdateStockSerivce,createSku,sku_property:"+JSONObject.toJSONString(skuProperty));
 
             // 6.如果商品在shop_product中有,添加这个SKU到SHOP
             ShopProductService shopProductService = new ShopProductService(conn);
@@ -422,7 +398,6 @@ public class ApiUpdateStockSerivce {
                 sps.sale_price = sku.getIm_price();
                 sps.shop_id = shopProduct.getShop_id();
                 shopProductSkuService.create(sps);
-                logger.info("ApiUpdateStockSerivce,createSku,shop_product:"+JSONObject.toJSONString(sps));
             }
         }
 
@@ -460,7 +435,6 @@ public class ApiUpdateStockSerivce {
         if(skuStoreMap.get("last_check") != null) {
             Date date = DateUtils.getDateByStr("yyyy-MM-dd HH:mm:ss",skuStoreMap.get("last_check").toString());
             boolean flag = DateUtils.compareDate(date,msgDate);
-            logger.info("ApiUpdateStockSerivce,updateStock,flag:"+flag+",msgDate:"+DateUtils.getformatDate(msgDate)+",date:"+DateUtils.getformatDate(date));
             if(flag) {return;}
         }
 
@@ -536,14 +510,12 @@ public class ApiUpdateStockSerivce {
             String updateSkuCodeSQL = "update sku set sku_code =\""+stockOption.getSku_code()+"\" where sku_id="+sku_id;
             SkuService skuService = new SkuService(conn);
             skuService.updateBySQL(updateSkuCodeSQL);
-            logger.info("ApiUpdateStockSerivce,updateStock,updateSkuCodeSQL:"+updateSkuCodeSQL);
         }
 
         if(StringUtils.isNotBlank(stockOption.getBoutique_sku_id())) {
             String updateSkuCodeSQL = "update sku set boutique_sku_id =\""+stockOption.getBoutique_sku_id()+"\" where sku_id="+sku_id;
             SkuService skuService = new SkuService(conn);
             skuService.updateBySQL(updateSkuCodeSQL);
-            logger.info("ApiUpdateStockSerivce,updateStock,updateBoutiqueSkuIdSQL:"+updateSkuCodeSQL);
         }
 
         // 当库存小于0，或低于100时，库存在这被清零，然后报警告
@@ -583,7 +555,6 @@ public class ApiUpdateStockSerivce {
             stockOption.setQuantity(quantity);
         } catch (Exception e) {
             e.printStackTrace();
-            logger.info("ApiUpdateStockSerivce,checkParams,stock not parse int,errorMessage:"+ ExceptionUtils.getExceptionDetail(e)+",stockOption:"+ JSONObject.toJSONString(stockOption));
             throw new UpdateException("store",quantity, ApiErrorTypeEnum.errorType.error_data_is_not_number);
         }
 

@@ -31,27 +31,19 @@ public class UpdateProductThread implements Runnable {
     public void run() {
         long start = System.currentTimeMillis();
         try {
-            System.out.println(JSONObject.toJSON(apiDataFileUtils));
-            logger.info("UpdateProductThreadRun,createProduct,start,productOptions:" + JSONObject.toJSONString(productOptions) + ",vendorOptions:"
-                    + JSONObject.toJSONString(vendorOptions));
             ApiCreateProductService apiCreateProductService = new ApiCreateProductService();
             Map<String, Object> resultMap = apiCreateProductService.createProduct(productOptions, vendorOptions);
-            logger.info(
-                    "UpdateProductThreadRun,createProduct,end,resultMap:" + JSONObject.toJSONString(resultMap) + ",productOptions:" + JSONObject.toJSONString(
-                            productOptions) + ",vendorOptions:" + JSONObject.toJSONString(vendorOptions));
+            logger.info("UpdateProductThreadRun,createProduct,end,resultMap:" + JSONObject.toJSONString(resultMap) + ",productOptions:" + JSONObject
+                    .toJSONString(productOptions) + ",vendorOptions:" + JSONObject.toJSONString(vendorOptions));
 
             if (resultMap != null && resultMap.get("info").equals(ApiErrorTypeEnum.errorType.error_boutique_id_already_exists.getDesc())) {
-                logger.info("UpdateProductThreadRun,updateProduct,start,productOptions:" + JSONObject.toJSONString(productOptions) + ",vendorOptions:"
-                        + JSONObject.toJSONString(vendorOptions));
                 ApiUpdateProductService apiUpdateProductService = new ApiUpdateProductService();
                 resultMap = apiUpdateProductService.updateProduct(productOptions, vendorOptions);
-                logger.info("UpdateProductThreadRun,updateProduct,end,resultMap:" + JSONObject.toJSONString(resultMap) + ",productOptions:"
-                        + JSONObject.toJSONString(productOptions) + ",vendorOptions:" + JSONObject.toJSONString(vendorOptions));
+                logger.info("UpdateProductThreadRun,updateProduct,end,resultMap:" + JSONObject.toJSONString(resultMap) + ",productOptions:" + JSONObject
+                        .toJSONString(productOptions) + ",vendorOptions:" + JSONObject.toJSONString(vendorOptions));
             }
 
             if (!resultMap.get("status").toString().equals("1")) {
-                logger.info("UpdateProductThreadRun,FAILUREMessage:" + JSONObject.toJSONString(resultMap) + ",productOptions:" + JSONObject.toJSONString(
-                        productOptions) + ",vendorOptions:" + JSONObject.toJSONString(vendorOptions));
 
                 Map<String, Object> fileData = new HashMap<>();
                 fileData.put("originData", originData);
@@ -67,9 +59,7 @@ public class UpdateProductThread implements Runnable {
                 resultMap.put("sku_size", JSONObject.toJSONString(productOptions.getSkus()));
 
                 String fileDataContent = JSONObject.toJSONString(fileData);
-                logger.info("UpdateProductThreadRun,bakErrorFile,start,fileDataContent:" + fileDataContent);
                 String path = apiDataFileUtils.bakErrorFile("error", fileDataContent);
-                logger.info("UpdateProductThreadRun,bakErrorFile,end,path:" + path + ",fileDataContent:" + fileDataContent);
 
                 this.saveErrorMsg(fileDataContent, vendorOptions.getVendorId().toString(), apiDataFileUtils, resultMap, path);
             }
@@ -97,9 +87,6 @@ public class UpdateProductThread implements Runnable {
             String fileName) {
         long start = System.currentTimeMillis();
 
-        logger.info(
-                "UpdateProductThreadSaveErrorMsg,inputParams,fileDataContent:" + fileDataContent + ",vendor_id:" + vendor_id + ",apiDataFileUtils:" + JSONObject
-                        .toJSONString(apiDataFileUtils) + ",resultMap:" + JSONObject.toJSONString(resultMap) + ",fileName:" + fileName);
         Connection conn = null;
         try {
             conn = DBConnector.sql2o.beginTransaction();
@@ -134,9 +121,6 @@ public class UpdateProductThread implements Runnable {
                 conn.commit();
             }
         } catch (Exception e) {
-            logger.info(
-                    "UpdateProductThreadSaveErrorMsg,insertApiErrorProcessing,errorMessage:" + ExceptionUtils.getExceptionDetail(e) + ",resultMap:" + JSONObject
-                            .toJSON(resultMap));
             e.printStackTrace();
             if (conn != null) {
                 conn.rollback();
@@ -160,9 +144,7 @@ public class UpdateProductThread implements Runnable {
             // 获取vendor_api
             String selectVendorApiSQL =
                     "select * from vendor_api vp where vp.vendor_id = '" + vendor_id + "' and vp.`name` = '" + evnetName + "' and enabled = 1";
-            logger.info("UpdateProductThreadSaveErrorMsg,selectVendorApi,selectVendorApiSQL:" + selectVendorApiSQL);
             List<Map<String, Object>> selectVendorApiMap = categoryService.executeSQL(selectVendorApiSQL);
-            logger.info("UpdateProductThreadSaveErrorMsg,selectVendorApi,selectVendorApiMap:" + JSONObject.toJSONString(selectVendorApiMap));
             if (selectVendorApiMap == null || selectVendorApiMap.size() == 0) {
                 String insertVendorApiSQL =
                         "insert into vendor_api (`vendor_id`,`name`,`file_location`,enabled)values(" + vendor_id + ",'" + evnetName + "','" + file_location
@@ -174,7 +156,6 @@ public class UpdateProductThread implements Runnable {
                         conn.rollback();
                         conn.close();
                     }
-                    logger.info("UpdateProductThreadSaveErrorMsg,vendor_api already exists.");
                     return false;
                 }
             }
@@ -182,14 +163,11 @@ public class UpdateProductThread implements Runnable {
 
             // 获取api_error_type
             String selectApiErrorTypeSQL = "select * from api_error_type where error_type_name = '" + errorType.getCode() + "' and enabled = 1";
-            logger.info("UpdateProductThreadSaveErrorMsg,selectApiErrorType,selectVendorApiSQL:" + selectVendorApiSQL);
             List<Map<String, Object>> selectApiErrorTypeMap = categoryService.executeSQL(selectApiErrorTypeSQL);
-            logger.info("UpdateProductThreadSaveErrorMsg,selectApiErrorType,selectApiErrorTypeMap:" + JSONObject.toJSONString(selectApiErrorTypeMap));
             if (selectApiErrorTypeMap == null || selectApiErrorTypeMap.size() == 0) {
                 String insertApiErrorTypeSQL =
                         "insert into api_error_type(error_type_name,error_type_desc,enabled)values('" + errorType.getCode() + "','" + errorType.getDesc()
                                 + "',1)";
-                logger.info("UpdateProductThreadSaveErrorMsg,insertApiErrorTypeSQL:" + insertApiErrorTypeSQL);
                 categoryService.updateBySQL(insertApiErrorTypeSQL);
                 selectApiErrorTypeMap = categoryService.executeSQL(selectApiErrorTypeSQL);
                 if (selectApiErrorTypeMap.size() > 1) {
@@ -197,7 +175,6 @@ public class UpdateProductThread implements Runnable {
                         conn.rollback();
                         conn.close();
                     }
-                    logger.info("UpdateProductThreadSaveErrorMsg,api_error_type already exists.");
                     return false;
                 }
             }
@@ -209,7 +186,6 @@ public class UpdateProductThread implements Runnable {
                     + "values('0','" + api_error_type_id + "','" + fileName + "','" + product_code + "','" + sku_size + "','" + brand_id + "','" + color_code
                     + "','" + key + "','" + pk.shoplus.util.StringUtils.escapeStr(value) + "',now(),1,1,'" + vendor_api_id + "')";
 
-            logger.info("UpdateProductThreadSaveErrorMsg,insertApiErrorProcessing,insertApiErrorProcessingSQL:" + insertApiErrorProcessingSQL);
             categoryService.updateBySQL(insertApiErrorProcessingSQL);
         } catch (Exception e) {
             throw e;

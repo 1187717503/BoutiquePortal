@@ -2,7 +2,6 @@ package com.intramirror.web.controller.api.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson15.JSONArray;
-import com.google.gson.Gson;
 import com.intramirror.utils.transform.JsonTransformUtil;
 import static com.intramirror.web.controller.api.service.ApiCommonUtils.escape;
 import com.intramirror.web.distributed.utils.KafkaMqUtil;
@@ -210,10 +209,10 @@ public class ApiUpdateProductService extends AbstractService {
         if (this.stockOptions != null && this.stockOptions.size() > 0) {
             for (StockOption stockOption : stockOptions) {
 
-                logger.info("ApiUpdateProductService,setSku,updateStock,stockOption:" + JSONObject.toJSONString(stockOption));
                 ApiUpdateStockSerivce apiUpdateStockSerivce = new ApiUpdateStockSerivce();
                 Map<String, Object> resultMap = apiUpdateStockSerivce.updateStock(stockOption, conn);
-                logger.info("ApiUpdateProductService,setSku,updateStock,resultMap:" + JSONObject.toJSONString(resultMap));
+                logger.info("ApiUpdateProductService,setSku,updateStock,resultMap:" + JSONObject.toJSONString(resultMap) + ",skuOption:"+
+                        JSONObject.toJSONString(stockOption));
 
                 if (resultMap != null && !resultMap.get("status").toString().equals("1")) {
                     if (resultMap.get("warningMaps") != null) {
@@ -250,7 +249,6 @@ public class ApiUpdateProductService extends AbstractService {
                 productInfo.width_amount = new BigDecimal(productOptions.getWeight());
                 productInfo.height_amount = new BigDecimal(productOptions.getHeigit());
                 productInfoService.updateProductInfoById(productInfo);
-                logger.info("ApiUpdateProductService,setProductInfo,productInfo:" + JSONObject.toJSONString(productInfo));
             }
         }
     }
@@ -258,147 +256,8 @@ public class ApiUpdateProductService extends AbstractService {
     private void setProduct(Connection conn) throws Exception {
         ProductService productService = new ProductService(conn);
         Product product = this.getProduct(conn);
-        logger.info("ApiUpdateProductService,setProduct,start,updateProduct,product:" + JSONObject.toJSONString(product));
         product.last_check = new Date();
-
-        /*// updateProduct, brand不一致则报error，error_data_can_not_find_mapping，不修改数据。而且reprocess也不处理
-        String brand_id = productOptions.getBrandId();
-        if(StringUtils.isNotBlank(brand_id) && product.vendor_id == 32 && product.brand_id != Long.parseLong(brand_id)) {
-            product.setBrand_id(Long.parseLong(brand_id));
-            IPriceService iPriceService = new PriceServiceImpl();
-            iPriceService.synProductPriceRule(product,product.getMin_retail_price(),conn);
-        }*/
         productOptions.setVendor_id(product.getVendor_id());
-        //        ApiCommonUtils.sortProductOptionsImage(productOptions);
-
-        /*if (product.vendor_id == 26L) {
-            if (productService.isClothing(product.category_id)) {
-                try {
-                    List<String> originList = JSONArray.parseArray(productOptions.getCoverImg(), String.class);
-                    String one = originList.get(0);
-                    originList.remove(0);
-                    originList.add(one);
-                    productOptions.setCoverImg(new Gson().toJson(originList));
-                    productOptions.setDescImg(new Gson().toJson(originList));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }*/
-
-        /*// Image：不予更新。
-        String cover_img = product.getCover_img();
-        boolean noImg = this.getNoImg(conn);
-        if (StringUtils.isBlank(cover_img) || cover_img.length() < 5) {
-            cover_img = productOptions.getCoverImg();
-            if (StringUtils.isNotBlank(cover_img) && !noImg) {
-                String downImgs = ApiCommonUtils.downloadImgs(cover_img);
-                product.cover_img = downImgs;
-                product.description_img = downImgs;
-            }
-        } else {
-            VendorService vendorService = new VendorService(conn);
-            Vendor vendor = vendorService.getVendorByVendorId(product.getVendor_id());
-
-            if (vendor.getCover_image_flag() && !noImg) {
-                try {
-                    String apiImg = productOptions.getCoverImg();
-                    String coverImg = product.getCover_img();
-                    List<String> apiImgList = JSONArray.parseArray(apiImg, String.class);
-                    List<String> coverImgList = JSONArray.parseArray(coverImg, String.class);
-
-                    if (apiImgList.size() > coverImgList.size()) {
-                        String downImgs = ApiCommonUtils.downloadImgs(apiImg);
-                        if (product.status == 1 || product.status == 5) {
-                            product.cover_img = downImgs;
-                            product.description_img = downImgs;
-                            logger.info("ApiUpdateProductService,setProduct,updateImg,coverImg:" + coverImg + ",downImgs:" + downImgs + ",product:" + JSONObject
-                                    .toJSONString(product));
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    logger.info("ApiUpdateProductService,setProduct,Error:" + e);
-                }
-            }
-
-            *//** FM 接口特殊判断*//*
-            if (product.vendor_id == 17 && product.status == 1) {
-                try {
-                    //only one
-                    List<String> apiImgList = JsonTransformUtil.readValue(productOptions.getCoverImg(), ArrayList.class);
-                    String apiImage = apiImgList.get(0);
-                    //                    logger.info("Product [" + product.product_code + "] ");
-                    Map<String, Object> productImages = productService.selProductImage(product.product_id);
-                    String image = "[]";
-                    String oss_image = "[]";
-                    if (productImages != null) {
-                        image = productImages.get("image") == null ? "[]" : productImages.get("image").toString();
-
-                    }
-                    List<Map<String, String>> imgList = JsonTransformUtil.readValue(image, ArrayList.class);
-                    if (imgList == null) {
-                        imgList = new ArrayList<>();
-                    }
-                    boolean existed = false;
-                    for (Map<String, String> imageEntry : imgList) {
-                        if (imageEntry.get("src_image").equals(apiImage)) {
-                            existed = true;
-                        }
-                    }
-
-                    if (!existed) {
-
-                        String ossImage = ApiCommonUtils.downloadSingleImg(apiImage);
-                        Map<String, String> newImage = new HashMap<>();
-                        newImage.put("src_image", apiImage);
-                        newImage.put("oss_image", ossImage);
-                        imgList.add(newImage);
-
-                        imgList.sort((a, b) -> {
-                            String srcImageA = a.get("src_image");
-                            String srcImageB = b.get("src_image");
-
-                            String[] retA = srcImageA.split("/");
-                            String[] retB = srcImageB.split("/");
-                            String srcImageAName = "", srcImageBName = "";
-                            if (retA.length > 1) {
-                                srcImageAName = retA[retA.length - 1];
-                            }
-                            if (retB.length > 1) {
-                                srcImageBName = retB[retB.length - 1];
-                            }
-
-                            if (srcImageAName.length() != srcImageBName.length()) {
-                                return srcImageAName.length() > srcImageBName.length() ? 1 : -1;
-                            }
-
-                            logger.info("ret : " + srcImageAName.compareTo(srcImageBName));
-
-                            return srcImageAName.compareTo(srcImageBName);
-                        });
-
-                        productService.insertProductImage(product.product_id, JsonTransformUtil.toJson(imgList));
-
-                        List<String> ossImageList = new ArrayList<>();
-                        for (Map<String, String> imageEntry : imgList) {
-                            ossImageList.add(imageEntry.get("oss_image"));
-                        }
-                        oss_image = JsonTransformUtil.toJson(ossImageList);
-
-                        if (StringUtils.isNotBlank(oss_image) && oss_image.length() > 5) {
-                            product.cover_img = oss_image;
-                            product.description_img = oss_image;
-                        }
-
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    logger.error("ApiUpdateProductService,FM,setProduct,Error:" + e);
-                }
-            }
-        }*/
 
         // 新数据为空或者不能找到season code Mapping则报Error不更新已有season code，但其他字段继续更新。判断只有当新season比现有season新时才更新。
         String seasonCode = productOptions.getSeasonCode();
@@ -411,7 +270,6 @@ public class ApiUpdateProductService extends AbstractService {
             String selSeasonCodeSQL =
                     "select * from `season`  s  where s.`season_code`  in(\"" + newSeasonCode + "\",\"" + oldSeasonCode + "\") and s.`enabled`  = 1";
             List<Map<String, Object>> seasonMapList = productService.executeSQL(selSeasonCodeSQL);
-            logger.info("ApiUpdateProductService,seasonMapList:" + JSONObject.toJSONString(seasonMapList));
 
             if (seasonMapList != null && seasonMapList.size() > 0) {
                 int oldSort = 0;
@@ -443,7 +301,6 @@ public class ApiUpdateProductService extends AbstractService {
                 product.setSeason_code(seasonCode);
                 String sql = "update product set preview_im_price = null where product_id =" + product.getProduct_id();
                 productService.updateBySQL(sql);
-                logger.info("ApiUpdateProductService,updatePreviewImPrice,sql:" + sql);
 
                 BigDecimal retailPrice = new BigDecimal(productOptions.getSalePrice());
                 int rs = ApiCommonUtils.ifUpdatePrice(product.getMax_retail_price(), retailPrice);
@@ -463,35 +320,6 @@ public class ApiUpdateProductService extends AbstractService {
 
         String oldBrandCode = product.getDesigner_id();
         String oldColorCode = product.getColor_code();
-
-        /*if(StringUtils.isBlank(oldBrandCode)) {
-            product.designer_id = newBrandCode;
-        }
-
-        if(StringUtils.isBlank(oldColorCode)) {
-            product.color_code = newColorCode;
-        }*/
-
-        // 如果消息重置时,BrandID和ColorCode不为空,直接更新
-        /*if(modify) {
-            if(StringUtils.isNotBlank(newBrandCode)) {
-                product.designer_id = newBrandCode;
-            }
-
-            if(StringUtils.isNotBlank(newColorCode)) {
-                product.color_code = newColorCode;
-            }
-        } else { // 非消息重置时,BrandID和ColorCode和原来不一致或者为空报警告
-            if(StringUtils.isBlank(newBrandCode) || !newBrandCode.equalsIgnoreCase(oldBrandCode)) {
-                this.setWarning(ApiErrorTypeEnum.errorType.error_BrandID_change,"BrandID",newBrandCode);
-            }
-
-            if(oldColorCode.equals("#") && StringUtils.isNotBlank(newColorCode)) {
-                product.color_code = newColorCode;
-            } else if(StringUtils.isBlank(newColorCode) || !newColorCode.equalsIgnoreCase(oldColorCode)) {
-                this.setWarning(ApiErrorTypeEnum.errorType.error_ColorCode_change,"ColorCode",newColorCode);
-            }
-        }*/
 
         // designer_id和Color_code接口里有改变直接覆盖修改，并报Warning。
         if (StringUtils.isBlank(newBrandCode) || !newBrandCode.equalsIgnoreCase(oldBrandCode)) {
@@ -525,50 +353,6 @@ public class ApiUpdateProductService extends AbstractService {
         this.updateProductProperty(conn, product.getProduct_id(), ProductPropertyEnumKeyName.ColorCode.getCode(), product.getColor_code());
         this.updateProductProperty(conn, product.getProduct_id(), ProductPropertyEnumKeyName.CarryOver.getCode(), productOptions.getCarryOver());
 
-        /*if ((productOptions.vendor_id == 12L || productOptions.vendor_id == 37L || productOptions.vendor_id == 38L || productOptions.vendor_id == 39L
-                || productOptions.vendor_id == 40L || productOptions.vendor_id == 41L) && product.status == 1) {
-            String img = productOptions.getCoverImg();
-            if (StringUtils.isNotBlank(cover_img)) {
-                String downImgs = ApiCommonUtils.downloadImgs(img);
-                product.cover_img = downImgs;
-                product.description_img = downImgs;
-            }
-        }*/
-
-        /** 只发一次后面注释*//*
-        if(product.vendor_id == 32L) {
-            if(StringUtils.isNotBlank(newColorCode)) {
-                product.color_code = newColorCode;
-                this.updateProductProperty(conn,product.getProduct_id(),ProductPropertyEnumKeyName.ColorCode.getCode(),newColorCode);
-            }
-        }*/
-        /** 只发一次后面注释
-         if(product.getVendor_id().intValue() == 24 && StringUtils.isNotBlank(productOptions.getCategoryId())) {
-         product.category_id = Long.parseLong(productOptions.getCategoryId());
-         }
-         * 只发一次后面注释 */
-
-        /*// Lungolivigno
-        if(product.getVendor_id().intValue() == 33 && StringUtils.isNotBlank(productOptions.getCategoryId())) {
-            product.category_id = Long.parseLong(productOptions.getCategoryId());
-        }*/
-
-        /*if (product.vendor_id == 37L && product.status == 38L) {
-            String srcImages = productOptions.getCoverImg();
-            if (StringUtils.isNotBlank(srcImages)) {
-                String downImgs = ApiCommonUtils.downloadImgs(srcImages);
-                product.cover_img = downImgs;
-                product.description_img = downImgs;
-            }
-        }*/
-
-        if (product.getVendor_id().intValue() == 20 && StringUtils.isNotBlank(productOptions.getCategoryId())) {
-            product.category_id = Long.parseLong(productOptions.getCategoryId());
-            IPriceService iPriceService = new PriceServiceImpl();
-            iPriceService.synProductPriceRule(product, product.getMin_retail_price(), conn);
-            logger.info("apartment 修改product :" + new Gson().toJson(product));
-        }
-
         if (StringUtils.isNotBlank(productOptions.getError_type()) && modify) {
             if (StringUtils.isNotBlank(productOptions.getBrandId()) && productOptions.getError_type().equals(
                     ApiErrorTypeEnum.errorType.error_Brand_change.getCode()) && product.getBrand_id() != Long.parseLong(productOptions.getBrandId())) {
@@ -597,7 +381,7 @@ public class ApiUpdateProductService extends AbstractService {
                 String sql = "update product set preview_im_price = null where product_id =" + product.getProduct_id();
                 productService.updateBySQL(sql);
 
-                logger.info("17ssToCloseout,product:" + JSONObject.toJSONString(product));
+                logger.info("17ssToCloseout,product:" + product.getProduct_id());
                 IPriceService iPriceService = new PriceServiceImpl();
                 iPriceService.synProductPriceRule(product, product.getMin_retail_price(), conn);
             }
@@ -749,27 +533,19 @@ public class ApiUpdateProductService extends AbstractService {
 
         if (StringUtils.isBlank(productOptions.getCategoryId())) {
             this.setWarning(ApiErrorTypeEnum.errorType.error_data_can_not_find_mapping, "category", JSONObject.toJSONString(mappingCategory));
-            logger.info("ApiUpdateProductService,checkMappingParams,category,categoryIsNull,productOptions:" + new Gson().toJson(productOptions));
         } else if (!productService.ifCategory(productOptions.getCategoryId())) {
             this.setWarning(ApiErrorTypeEnum.errorType.error_data_can_not_find_mapping, "category", JSONObject.toJSONString(mappingCategory));
-            logger.info("ApiUpdateProductService,checkMappingParams,category,categoryIsError,productOptions:" + new Gson().toJson(productOptions));
         } else if (cId != product.getCategory_id().intValue()) {
             this.setWarning(ApiErrorTypeEnum.errorType.error_Category_change, "category", JSONObject.toJSONString(mappingCategory));
-            logger.info("ApiUpdateProductService,checkMappingParams,category,categoryIsChange,productOptions:" + new Gson().toJson(productOptions));
-            //            productOptions.setError_type(ApiErrorTypeEnum.errorType.error_Category_change.getCode());
             error_type = ApiErrorTypeEnum.errorType.error_Category_change.getCode();
         }
 
         if (StringUtils.isBlank(productOptions.getBrandId())) {
             this.setWarning(ApiErrorTypeEnum.errorType.error_data_can_not_find_mapping, "brand", brandName);
-            logger.info("ApiUpdateProductService,checkMappingParams,brand,brandIsNull,productOptions:" + new Gson().toJson(productOptions));
         } else if (!productService.ifBrand(productOptions.getBrandId())) {
             this.setWarning(ApiErrorTypeEnum.errorType.error_data_can_not_find_mapping, "brand", brandName);
-            logger.info("ApiUpdateProductService,checkMappingParams,brand,brandIsError,productOptions:" + new Gson().toJson(productOptions));
         } else if (bId != product.getBrand_id()) {
             this.setWarning(ApiErrorTypeEnum.errorType.error_Brand_change, "brand", brandName);
-            logger.info("ApiUpdateProductService,checkMappingParams,brand,brandIsChange,productOptions:" + new Gson().toJson(productOptions));
-            //            productOptions.setError_type(ApiErrorTypeEnum.errorType.error_Brand_change.getCode());
             error_type = ApiErrorTypeEnum.errorType.error_Brand_change.getCode();
         }
 
@@ -907,8 +683,6 @@ public class ApiUpdateProductService extends AbstractService {
             productPropertyConditions.put("enabled", EnabledType.USED);
 
             productPropertyService.updateProductPropertyByCondition(productProperty, productPropertyConditions);
-            logger.info("ApiUpdateProductSerice,updateProductPropertyByCondition,productProperty:" + JSONObject.toJSONString(productProperty)
-                    + ",productPropertyConditions:" + JSONObject.toJSONString(productPropertyConditions));
         }
     }
 

@@ -77,7 +77,6 @@ public class PriceServiceImpl implements IPriceService{
                     + "sps.`sale_price`  = "+im_price+",\n"
                     + "sp.`min_sale_price` ="+im_price+" ,sp.`max_sale_price`   ="+im_price+" \n" + "where p.`product_id`  ="+product_id+";";
 
-            logger.info("synProductPriceRule,updatePriceSQL,start,SQL:"+updatePriceSQL);
             skuService.updateBySQL(updatePriceSQL);
             logger.info("synProductPriceRule,updatePriceSQL,end,SQL:"+updatePriceSQL);
 
