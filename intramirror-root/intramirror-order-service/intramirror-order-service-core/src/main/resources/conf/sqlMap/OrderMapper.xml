@@ -296,13 +296,8 @@
             o.current_rate,
             p.name,
             p.product_id,
-            pp.colorCode,
-            pp.brandID,
             pspv.`value`   AS size,
             p.category_id,
-            /*s.price,
-            s.in_price,
-            sps.sale_price,*/
             lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
             lp.amount,
             lp.shipping_fee,
@@ -335,7 +330,7 @@
                 AND pspv.enabled = 1
                 )
             INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
-            LEFT JOIN (
+            /*LEFT JOIN (
                           SELECT
                               t_pp.product_id,
                               max(CASE t_pp.key_name
@@ -349,7 +344,7 @@
                           FROM product_property t_pp
                           WHERE t_pp.enabled = 1 AND (t_pp.key_name = 'BrandID' OR t_pp.key_name = 'ColorCode')
                           GROUP BY t_pp.product_id
-                      ) pp ON p.product_id = pp.product_id
+                      ) pp ON p.product_id = pp.product_id*/
         WHERE pspk.`name` = 'Size'
               AND c.container_id = #{containerId,jdbcType=BIGINT}
               AND lp.`status` = #{status,jdbcType=BIGINT}
