@@ -19,6 +19,16 @@ public class StockOption {
     public String updated_by; // 根据product_code,size修改,根据sku_code修改
     public String boutique_sku_id;
 
+    private String requestId;
+
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
+
     public Date getLast_check() {
         return last_check;
     }

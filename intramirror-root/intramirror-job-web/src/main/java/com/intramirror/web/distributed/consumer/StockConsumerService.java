@@ -111,6 +111,7 @@ public class StockConsumerService {
                             for (Map<String, Object> sku : skuList) {
                                 sku.put("vendor_id", vendorId);
                                 StockOption stockOption = iStockMapping.mapping(sku);
+                                stockOption.setRequestId(stockContext.get("id").toString());
                                 workThreadPool.submit(new UpdateStockThread(stockOption, new ApiDataFileUtils(vendorName, eventName), sku));
                             }
                         }
