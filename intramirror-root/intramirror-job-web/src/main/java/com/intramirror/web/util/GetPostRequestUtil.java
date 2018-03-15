@@ -60,7 +60,7 @@ public class GetPostRequestUtil {
      *         请求发送内容
      * @return 返回内容
      */
-    public String requestMethod(String requestType, String urlStr, String body) {
+    public String requestMethod(String requestType, String urlStr, String body) throws Exception {
 
         // 是否有http正文提交
         boolean isDoInput = false;
@@ -130,6 +130,7 @@ public class GetPostRequestUtil {
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("GetPostRequestUtilRequestMethod,errorMessage:" + ExceptionUtils.getExceptionDetail(e));
+            throw e;
         } finally {// 关闭流
 
             try {

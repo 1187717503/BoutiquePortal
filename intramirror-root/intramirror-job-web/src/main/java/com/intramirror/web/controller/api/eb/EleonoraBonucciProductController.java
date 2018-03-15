@@ -7,18 +7,22 @@ import com.intramirror.core.common.response.StatusCode;
 import com.intramirror.core.net.http.OkHttpUtils;
 import com.intramirror.product.api.service.stock.IUpdateStockService;
 import com.intramirror.utils.transform.JsonTransformUtil;
-import com.intramirror.web.distributed.thread.ThreadManager;
 import com.intramirror.web.mapping.api.IProductMapping;
 import com.intramirror.web.mapping.api.IStockMapping;
 import com.intramirror.web.mapping.vo.StockOption;
 import com.intramirror.web.thread.UpdateProductThread;
 import com.intramirror.web.thread.UpdateStockThread;
 import com.intramirror.web.util.ApiDataFileUtils;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.Resource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -52,7 +56,7 @@ public class EleonoraBonucciProductController {
     private static Map<String, Object> configMap = new HashMap<>();
 
     static {
-        final ExecutorService allproductRhreadPool = ThreadManager.newFixedBlockingThreadPool(10);
+        final ExecutorService allproductRhreadPool = new ThreadPoolExecutor(10, 10, 0L, TimeUnit.MILLISECONDS, new SynchronousQueue<>(), new ThreadPoolExecutor.CallerRunsPolicy());
         Map<String, Object> ebAllProduct = new HashMap<>();
         ebAllProduct.put("url",
                 "https://eleonorabonucci.com/WS/stock.asmx/Get_Article?JSON={\"Codice_Anagrafica\":\"a399c52a-8a43-419f-9d7e-244c32c61e8f\",\"FULL\":true}");
@@ -62,7 +66,7 @@ public class EleonoraBonucciProductController {
         ebAllProduct.put("fileUtils", new ApiDataFileUtils("eb", "product_all_update"));
         configMap.put("ebAllProduct", ebAllProduct);
 
-        final ExecutorService deltaProductthreadPool = ThreadManager.newFixedBlockingThreadPool(10);
+        final ExecutorService deltaProductthreadPool = new ThreadPoolExecutor(10, 10, 0L, TimeUnit.MILLISECONDS, new SynchronousQueue<>(), new ThreadPoolExecutor.CallerRunsPolicy());
         Map<String, Object> ebDeltaProduct = new HashMap<>();
         ebDeltaProduct.put("url",
                 "https://eleonorabonucci.com/WS/stock.asmx/Get_Article?JSON={\"Codice_Anagrafica\":\"a399c52a-8a43-419f-9d7e-244c32c61e8f\",\"FULL\":false}");
@@ -72,7 +76,7 @@ public class EleonoraBonucciProductController {
         ebDeltaProduct.put("fileUtils", new ApiDataFileUtils("eb", "product_delta_update"));
         configMap.put("ebDeltaProduct", ebDeltaProduct);
 
-        final ExecutorService allStockthreadPool = ThreadManager.newFixedBlockingThreadPool(10);
+        final ExecutorService allStockthreadPool = new ThreadPoolExecutor(10, 10, 0L, TimeUnit.MILLISECONDS, new SynchronousQueue<>(), new ThreadPoolExecutor.CallerRunsPolicy());
         Map<String, Object> ebAllStock = new HashMap<>();
         ebAllStock.put("url",
                 "https://eleonorabonucci.com/WS/stock.asmx/Get_Article?JSON={\"Codice_Anagrafica\":\"a399c52a-8a43-419f-9d7e-244c32c61e8f\",\"FULL\":true}");
@@ -82,7 +86,7 @@ public class EleonoraBonucciProductController {
         ebAllStock.put("fileUtils", new ApiDataFileUtils("eb", "stock_all_update"));
         configMap.put("ebAllStock", ebAllStock);
 
-        final ExecutorService deltaStockthreadPool = ThreadManager.newFixedBlockingThreadPool(10);
+        final ExecutorService deltaStockthreadPool = new ThreadPoolExecutor(10, 10, 0L, TimeUnit.MILLISECONDS, new SynchronousQueue<>(), new ThreadPoolExecutor.CallerRunsPolicy());
         Map<String, Object> ebDeltaStock = new HashMap<>();
         ebDeltaStock.put("url",
                 "https://eleonorabonucci.com/WS/stock.asmx/Get_Article?JSON={\"Codice_Anagrafica\":\"a399c52a-8a43-419f-9d7e-244c32c61e8f\",\"FULL\":false}");
@@ -91,6 +95,28 @@ public class EleonoraBonucciProductController {
         ebDeltaStock.put("eventName", "stock_delta_update");
         ebDeltaStock.put("fileUtils", new ApiDataFileUtils("eb", "stock_delta_update"));
         configMap.put("ebDeltaStock", ebDeltaProduct);
+    }
+
+    public String streamToString(InputStream stream, boolean close) throws IOException {
+        if (stream == null) {
+            throw new IllegalArgumentException("The stream cannot be null");
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        byte[] data = new byte[512];
+        int read = 0;
+        while ((read = stream.read(data)) > 0) {
+            String tmp = new String(data, 0, read);
+            logger.info(tmp);
+            sb.append(tmp);
+        }
+
+        if (close) {
+            stream.close();
+        }
+
+        return sb.toString();
     }
 
     @GetMapping("/product/sync")
@@ -110,32 +136,47 @@ public class EleonoraBonucciProductController {
         long count = 0;
 
         try {
-
-            okhttp3.Response httpResponse = OkHttpUtils.get().url(url).build().connTimeOut(60 * 1000).readTimeOut(60 * 1000).execute(); //TODO add url
+            logger.info("EleonoraBonucci sync product start " + eventName + ", url : " + url);
+            okhttp3.Response httpResponse = OkHttpUtils
+                    .get()
+                    .url(url)
+                    .build()
+                    .connTimeOut(1800 * 1000)
+                    .readTimeOut(1800 * 1000)
+                    .writeTimeOut(1800 * 1000)
+                    .execute(); //TODO add url
+            logger.info("EleonoraBonucci sync product end " + eventName + ", url : " + url);
             if (!httpResponse.isSuccessful()) {
                 logger.error("EleonoraBonucci sync product error " + eventName + ", url : " + url + " , response : " + httpResponse.body().string());
                 return Response.status(StatusCode.FAILURE).data(httpResponse);
             }
-            String response = httpResponse.body().string();
+            logger.info("EleonoraBonucci step1 ");
+            //            String response = httpResponse.body().string();
+            InputStream in = httpResponse.body().byteStream();
+            String response = streamToString(in, false);
+
+            logger.info("EleonoraBonucci step2 ");
             if (StringUtils.isEmpty(response)) {
                 logger.error("EleonoraBonucci sync product error " + eventName + ", url : " + url + " , response : " + response);
                 return Response.status(StatusCode.FAILURE).build();
             }
+            logger.info("EleonoraBonucci step3 ");
 
             Map<String, Object> responseBody = JsonTransformUtil.readValue(response, Map.class);
             if (!Boolean.parseBoolean(responseBody.get("success").toString())) {
                 logger.error("EleonoraBonucci sync all product error " + eventName + ", url : " + url + " , response : " + response);
                 return Response.status(StatusCode.FAILURE).data(httpResponse);
             }
+            logger.info("EleonoraBonucci step4");
 
             List<Map<String, Object>> productList = (List<Map<String, Object>>) responseBody.get("ARTICLE");
             if (productList == null) {
                 logger.error("EleonoraBonucci sync product error " + eventName + " due to error json , url : " + url + " , response : " + response);
             }
-
-            logger.info("EleonoraBonucci sync  product " + eventName + ", url : " + url + " , response : " + response);
+            logger.info("EleonoraBonucci step5");
+            //            logger.info("EleonoraBonucci sync  product " + eventName + ", url : " + url + " , response : " + response);
             fileUtils.bakPendingFile("all", response);
-
+            logger.info("EleonoraBonucci step6");
             for (Map<String, Object> product : productList) {
                 Map<String, Object> mqDataMap = new HashMap<>();
                 mqDataMap.put("product", product);
@@ -151,7 +192,7 @@ public class EleonoraBonucciProductController {
                 executor.submit(new UpdateProductThread(productOptions, vendorOptions, fileUtils, mqDataMap));
                 count++;
             }
-
+            logger.info("EleonoraBonucci step7");
             if (eventName.equals("product_all_update") && count > 100) {
                 logger.info("EleonoraBonucci,zeroClearing,start,vendor_id:" + vendor_id);
                 iUpdateStockService.zeroClearing(Long.parseLong(vendor_id));
@@ -160,9 +201,11 @@ public class EleonoraBonucciProductController {
 
         } catch (Exception e) {
             e.printStackTrace();
+            logger.info("EleonoraBonucci step8");
             logger.error("EleonoraBonucci,errorMessage:" + ExceptionUtils.getExceptionDetail(e));
         }
 
+        logger.info("EleonoraBonucci sync product finish");
         return Response.success();
     }
 
