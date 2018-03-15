@@ -1,5 +1,7 @@
 package com.intramirror.web.util;
 
+import com.intramirror.order.api.model.ShippingProvider;
+import com.intramirror.order.api.model.SubShipment;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -20,10 +22,12 @@ public class ExcelUtil {
         for (int i = 0; i < 5; i++) {
             sheet.setColumnWidth((short) i, (short) (35.7 * 150));
         }
+        sheet.setColumnWidth((short) 1, (short) (65 * 150));
 
         // 创建两种单元格格式
         CellStyle cs = wb.createCellStyle();
         CellStyle cs2 = wb.createCellStyle();
+        CellStyle cs3 = wb.createCellStyle();
 
         // 创建两种字体
         Font f = wb.createFont();
@@ -54,9 +58,16 @@ public class ExcelUtil {
         cs2.setBorderBottom(CellStyle.BORDER_THIN);
         cs2.setAlignment(CellStyle.ALIGN_LEFT);
 
+        cs3.setFont(f);
+        cs3.setBorderLeft(CellStyle.BORDER_THIN);
+        cs3.setBorderRight(CellStyle.BORDER_THIN);
+        cs3.setBorderTop(CellStyle.BORDER_THIN);
+        cs3.setBorderBottom(CellStyle.BORDER_THIN);
+        cs3.setAlignment(CellStyle.ALIGN_RIGHT);
+
         //设置列名
         // 创建第一行
-        Row row0 = sheet.createRow((short) 0);
+        Row row0 = sheet.createRow(0);
         Cell cell01 = row0.createCell(0);
         cell01.setCellValue("Invoice From");
         cell01.setCellStyle(cs);
@@ -65,7 +76,7 @@ public class ExcelUtil {
         cell02.setCellStyle(cs);
 
         //第二行
-        Row row1 = sheet.createRow((short) 1);
+        Row row1 = sheet.createRow(1);
         Cell cell11 = row1.createCell(0);
         cell11.setCellValue(resultMap.get("ShipCompanyName")!=null?resultMap.get("ShipCompanyName").toString():"");
         cell11.setCellStyle(cs2);
@@ -74,7 +85,7 @@ public class ExcelUtil {
         cell12.setCellStyle(cs2);
 
         //第三行
-        Row row2 = sheet.createRow((short) 2);
+        Row row2 = sheet.createRow(2);
         Cell cell21 = row2.createCell(0);
         cell21.setCellValue(resultMap.get("ShipCompanyName")!=null?resultMap.get("ShipCompanyName").toString():"");
         cell21.setCellStyle(cs2);
@@ -83,37 +94,37 @@ public class ExcelUtil {
         cell22.setCellStyle(cs2);
 
         //第四行
-        Row row3 = sheet.createRow((short) 3);
+        Row row3 = sheet.createRow(3);
         Cell cell31 = row3.createCell(0);
-        cell31.setCellValue("VAT Number: "+resultMap.get("VATNumber")!=null?resultMap.get("VATNumber").toString():"");
+        cell31.setCellValue("VAT Number: "+(resultMap.get("VATNumber")!=null?resultMap.get("VATNumber").toString():""));
         cell31.setCellStyle(cs2);
 
         //第五行
-        Row row4 = sheet.createRow((short) 4);
+        Row row4 = sheet.createRow(4);
         Cell cell41 = row4.createCell(0);
         cell41.setCellValue("");
         cell41.setCellStyle(cs2);
 
         //第六行
-        Row row5 = sheet.createRow((short) 5);
+        Row row5 = sheet.createRow(5);
         Cell cell51 = row5.createCell(0);
-        cell51.setCellValue("Date of Invoice: "+resultMap.get("InvoiceDate")!=null?resultMap.get("InvoiceDate").toString():"");
+        cell51.setCellValue("Date of Invoice: "+(resultMap.get("InvoiceDate")!=null?resultMap.get("InvoiceDate").toString():""));
         cell51.setCellStyle(cs2);
 
         //第七行
-        Row row6 = sheet.createRow((short) 6);
+        Row row6 = sheet.createRow(6);
         Cell cell61 = row6.createCell(0);
-        cell61.setCellValue("Invoice Number: "+resultMap.get("InvoiceNumber")!=null?resultMap.get("InvoiceNumber").toString():"");
+        cell61.setCellValue("Invoice Number: "+(resultMap.get("InvoiceNumber")!=null?resultMap.get("InvoiceNumber").toString():""));
         cell61.setCellStyle(cs2);
 
         //第八行
-        Row row7 = sheet.createRow((short) 7);
+        Row row7 = sheet.createRow(7);
         Cell cell71 = row7.createCell(0);
         cell71.setCellValue("");
         cell71.setCellStyle(cs2);
 
         // 创建第九行
-        Row row8 = sheet.createRow((short) 8);
+        Row row8 = sheet.createRow(8);
         Cell cell81 = row8.createCell(0);
         cell81.setCellValue("Invoice To");
         cell81.setCellStyle(cs);
@@ -122,67 +133,104 @@ public class ExcelUtil {
         cell82.setCellStyle(cs);
 
         //第十行
-        Row row9 = sheet.createRow((short) 9);
+        Row row9 = sheet.createRow(9);
         Cell cell91 = row9.createCell(0);
         cell91.setCellValue(resultMap.get("InvoiceTo")!=null?resultMap.get("InvoiceTo").toString():"");
         cell91.setCellStyle(cs2);
         Cell cell92 = row9.createCell(2);
-        cell92.setCellValue(resultMap.get("DeliverTo")!=null?resultMap.get("DeliverTo").toString():"");
+        String name = "";
+        Object o = resultMap.get("DeliverTo") != null ? resultMap.get("DeliverTo") : null;
+        if(o!=null){
+            if (o instanceof ShippingProvider){
+                name = ((ShippingProvider) o).getName();
+            }else if (o instanceof SubShipment){
+                name = ((SubShipment) o).getConsignee();
+            }
+        }
+        cell92.setCellValue(name);
         cell92.setCellStyle(cs2);
 
         //第十一行
-        Row row10 = sheet.createRow((short) 10);
+        Row row10 = sheet.createRow(10);
         Cell cell101 = row10.createCell(0);
-        cell101.setCellValue("Order No.");
-        cell101.setCellStyle(cs);
-        Cell cell102 = row10.createCell(1);
-        cell102.setCellValue("Product Description");
-        cell102.setCellStyle(cs);
-        Cell cell103 = row10.createCell(2);
-        cell103.setCellValue("Composition");
-        cell103.setCellStyle(cs);
-        Cell cell104 = row10.createCell(3);
-        cell104.setCellValue("Made In");
-        cell104.setCellStyle(cs);
-        Cell cell105 = row10.createCell(4);
-        cell105.setCellValue("Purchase Price");
-        cell105.setCellStyle(cs);
+        cell101.setCellValue("");
+        cell101.setCellStyle(cs2);
 
+        //第十二行
+        Row row11 = sheet.createRow(11);
+        Cell cell111 = row11.createCell(0);
+        cell111.setCellValue("Order No.");
+        cell111.setCellStyle(cs);
+        Cell cell112 = row11.createCell(1);
+        cell112.setCellValue("Product Description");
+        cell112.setCellStyle(cs);
+        Cell cell113 = row11.createCell(2);
+        cell113.setCellValue("Composition");
+        cell113.setCellStyle(cs);
+        Cell cell114 = row11.createCell(3);
+        cell114.setCellValue("Made In");
+        cell114.setCellStyle(cs);
+        Cell cell115 = row11.createCell(4);
+        cell115.setCellValue("Purchase Price");
+        cell115.setCellStyle(cs);
+
+        int i = 11;
         Object cartonList = resultMap.get("cartonList");
         if(cartonList!=null){
             List<Map<String, Object>> containerList = (List<Map<String, Object>>)cartonList;
             if(containerList.size()>0){
-                int i = 10;
                 for (Map<String,Object> map : containerList){
-                    Row row = sheet.createRow(i++);
+                    Row row = sheet.createRow(++i);
                     String brandName = map.get("brandName").toString();
                     String categoryName = map.get("categoryName").toString();
                     String orderLineNum = map.get("order_line_num").toString();
                     String brandID = map.get("brandID").toString();
                     String colorCode = map.get("colorCode").toString();
                     String size = map.get("size").toString();
-                    String total = map.get("Total").toString();
                     String inPrice = map.get("in_price").toString();
-                    for (int j = 0;j<5;j++){
-                        Cell cell1 = row.createCell(j);
-                        cell1.setCellValue(orderLineNum);
-                        cell1.setCellStyle(cs2);
-                        Cell cell2 = row.createCell(j);
-                        cell2.setCellValue(brandName+" "+categoryName+"\\n"+brandID+"/"+colorCode+"/"+size);
-                        cell2.setCellStyle(cs2);
-                        Cell cell3 = row.createCell(j);
-                        cell3.setCellValue("");
-                        cell3.setCellStyle(cs2);
-                        Cell cell4 = row.createCell(j);
-                        cell4.setCellValue("");
-                        cell4.setCellStyle(cs2);
-                        Cell cell5 = row.createCell(j);
-                        cell5.setCellValue(inPrice);
-                        cell5.setCellStyle(cs2);
-                    }
+                    Cell cell1 = row.createCell(0);
+                    cell1.setCellValue(orderLineNum);
+                    cell1.setCellStyle(cs2);
+                    Cell cell2 = row.createCell(1);
+                    cell2.setCellValue(brandName+" "+categoryName+"   "+brandID+"/"+colorCode+"/"+size);
+                    cell2.setCellStyle(cs2);
+                    Cell cell3 = row.createCell(2);
+                    cell3.setCellValue("");
+                    cell3.setCellStyle(cs2);
+                    Cell cell4 = row.createCell(3);
+                    cell4.setCellValue("");
+                    cell4.setCellStyle(cs2);
+                    Cell cell5 = row.createCell(4);
+                    cell5.setCellValue("€"+inPrice);
+                    cell5.setCellStyle(cs2);
+
                 }
             }
         }
+
+        Row rowi1 = sheet.createRow(i+1);
+        Cell celli3 = rowi1.createCell(3);
+        celli3.setCellValue("Total:"+resultMap.get("all_qty").toString());
+        celli3.setCellStyle(cs3);
+        Cell celli4 = rowi1.createCell(4);
+        celli4.setCellValue("€"+resultMap.get("allTotal").toString());
+        celli4.setCellStyle(cs3);
+
+        Row rowi2 = sheet.createRow(i+2);
+        Cell celli23 = rowi2.createCell(3);
+        celli23.setCellValue("VAT:");
+        celli23.setCellStyle(cs3);
+        Cell celli24 = rowi2.createCell(4);
+        celli24.setCellValue("€"+resultMap.get("VAT").toString());
+        celli24.setCellStyle(cs3);
+
+        Row rowi3 = sheet.createRow(i+3);
+        Cell celli33 = rowi3.createCell(3);
+        celli33.setCellValue("Grand Total:");
+        celli33.setCellStyle(cs3);
+        Cell celli34 = rowi3.createCell(4);
+        celli34.setCellValue("€"+resultMap.get("GrandTotal").toString());
+        celli34.setCellStyle(cs3);
 
         // 单元格合并
         // 四个参数分别是：起始行，起始列，结束行，结束列
@@ -201,6 +249,8 @@ public class ExcelUtil {
         sheet.addMergedRegion(new CellRangeAddress(8,8,2,4));
         sheet.addMergedRegion(new CellRangeAddress(9,9,0,1));
         sheet.addMergedRegion(new CellRangeAddress(9,9,2,4));
+        sheet.addMergedRegion(new CellRangeAddress(10,10,0,4));
+        //sheet.getRow()
         return wb;
     }
 }
