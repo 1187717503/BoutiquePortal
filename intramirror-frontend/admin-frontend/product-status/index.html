@@ -496,6 +496,11 @@ Scripts
                 </svg>
             </span>
             {%/if%}
+            {%if order.refresh == 1 %}
+            <span title="Refresh" data-action="refresh" class="waves-effect icon-btn-processing action-icon refresh-text">
+               refresh image
+            </span>
+            {%/if%}
         </div>
     </div>
     <div class="goods show-detail">

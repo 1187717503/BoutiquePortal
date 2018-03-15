@@ -25,5 +25,6 @@ var requestURL = {
     "createBlock" : {"url" : baseUrl + "content/blocks", "method" : "POST"},
     "createTag" : {"url" : baseUrl + "content/tags", "method" : "POST"},
     "getTagByDate" : {"url": baseUrl + "content/tags/bydate", "method": "GET"},
-    "delTag2Rel" : {"url": baseUrl + "content/tags", "method": "DELETE"}
+    "delTag2Rel" : {"url": baseUrl + "content/tags", "method": "DELETE"},
+    "refreshImage" : {"url": refreshImage + "image/", "method": "GET"}
 }

@@ -602,3 +602,7 @@ input[type=text].valid, input[type=text]:focus.valid {
 #edit-tag .row {
     margin-bottom: 0px;
 }
+
+.refresh-text{
+    font-size: 12px !important;
+}
