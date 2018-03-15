@@ -198,15 +198,15 @@ public class ExcelUtil {
                 for (Map<String,Object> map : containerList){
                     Row row = sheet.createRow(++i);
                     row.setHeight((short)550);
-                    String brandName = map.get("brandName").toString();
-                    String categoryName = map.get("categoryName").toString();
-                    String orderLineNum = map.get("order_line_num").toString();
-                    String brandID = map.get("brandID").toString();
-                    String colorCode = map.get("colorCode").toString();
-                    String size = map.get("size").toString();
-                    String inPrice = map.get("in_price").toString();
-                    String composition = map.get("Composition").toString();
-                    String madeIn = map.get("MadeIn").toString();
+                    String brandName = map.get("brandName")!=null?map.get("brandName").toString():"";
+                    String categoryName = map.get("categoryName")!=null?map.get("categoryName").toString():"";
+                    String orderLineNum = map.get("order_line_num")!=null?map.get("order_line_num").toString():"";
+                    String brandID = map.get("brandID")!=null?map.get("brandID").toString():"";
+                    String colorCode = map.get("colorCode")!=null?map.get("colorCode").toString():"";
+                    String size = map.get("size")!=null?map.get("size").toString():"";
+                    String inPrice = map.get("in_price")!=null?map.get("in_price").toString():"";
+                    String composition = map.get("Composition")!=null?map.get("Composition").toString():"";
+                    String madeIn = map.get("MadeIn")!=null?map.get("MadeIn").toString():"";
                     Cell cell1 = row.createCell(0);
                     cell1.setCellValue(orderLineNum);
                     cell1.setCellStyle(cs2);
@@ -229,10 +229,10 @@ public class ExcelUtil {
 
         Row rowi1 = sheet.createRow(i+1);
         Cell celli3 = rowi1.createCell(3);
-        celli3.setCellValue("Total:"+resultMap.get("all_qty").toString());
+        celli3.setCellValue("Total:"+resultMap.get("all_qty"));
         celli3.setCellStyle(cs3);
         Cell celli4 = rowi1.createCell(4);
-        celli4.setCellValue("€"+resultMap.get("allTotal").toString());
+        celli4.setCellValue("€"+resultMap.get("allTotal"));
         celli4.setCellStyle(cs3);
 
         Row rowi2 = sheet.createRow(i+2);
@@ -240,7 +240,7 @@ public class ExcelUtil {
         celli23.setCellValue("VAT:");
         celli23.setCellStyle(cs3);
         Cell celli24 = rowi2.createCell(4);
-        celli24.setCellValue("€"+resultMap.get("VAT").toString());
+        celli24.setCellValue("€"+resultMap.get("VAT"));
         celli24.setCellStyle(cs3);
 
         Row rowi3 = sheet.createRow(i+3);
@@ -248,7 +248,7 @@ public class ExcelUtil {
         celli33.setCellValue("Grand Total:");
         celli33.setCellStyle(cs3);
         Cell celli34 = rowi3.createCell(4);
-        celli34.setCellValue("€"+resultMap.get("GrandTotal").toString());
+        celli34.setCellValue("€"+resultMap.get("GrandTotal"));
         celli34.setCellStyle(cs3);
 
         Row rowi4 = sheet.createRow(i+4);
