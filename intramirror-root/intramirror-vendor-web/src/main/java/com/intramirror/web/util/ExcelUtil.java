@@ -2,6 +2,7 @@ package com.intramirror.web.util;
 
 import com.intramirror.order.api.model.ShippingProvider;
 import com.intramirror.order.api.model.SubShipment;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -20,15 +21,16 @@ public class ExcelUtil {
         Sheet sheet = wb.createSheet();
         // 手动设置列宽。第一个参数表示要为第几列设；，第二个参数表示列的宽度，n为列高的像素数。
         for (int i = 0; i < 5; i++) {
-            sheet.setColumnWidth((short) i, (short) (35.7 * 150));
+            sheet.setColumnWidth( i, 36 * 150);
         }
-        sheet.setColumnWidth((short) 1, (short) (65 * 150));
+        sheet.setColumnWidth(1,75 * 150);
 
         // 创建两种单元格格式
         CellStyle cs = wb.createCellStyle();
         CellStyle cs2 = wb.createCellStyle();
         CellStyle cs3 = wb.createCellStyle();
         CellStyle cs4 = wb.createCellStyle();
+        CellStyle cs5 = wb.createCellStyle();
 
         // 创建两种字体
         Font f = wb.createFont();
@@ -45,7 +47,14 @@ public class ExcelUtil {
 
         // 设置第一种单元格的样式（用于列名）
         cs.setFont(f);
+        cs.setBorderLeft(CellStyle.BORDER_THIN);
+        cs.setBorderRight(CellStyle.BORDER_THIN);
+        cs.setBorderTop(CellStyle.BORDER_THIN);
+        cs.setBorderBottom(CellStyle.BORDER_THIN);
         cs.setAlignment(CellStyle.ALIGN_LEFT);
+
+        cs5.setFont(f);
+        cs5.setAlignment(CellStyle.ALIGN_LEFT);
 
         // 设置第二种单元格的样式（用于值）
         cs2.setFont(f2);
@@ -55,6 +64,7 @@ public class ExcelUtil {
         cs3.setAlignment(CellStyle.ALIGN_RIGHT);
 
         //设置表框
+        cs4.setWrapText(true);
         cs4.setBorderLeft(CellStyle.BORDER_THIN);
         cs4.setBorderRight(CellStyle.BORDER_THIN);
         cs4.setBorderTop(CellStyle.BORDER_THIN);
@@ -76,16 +86,16 @@ public class ExcelUtil {
         cell11.setCellValue(resultMap.get("ShipCompanyName")!=null?resultMap.get("ShipCompanyName").toString():"");
         cell11.setCellStyle(cs2);
         Cell cell12 = row1.createCell(2);
-        cell12.setCellValue(resultMap.get("ShipVendorName")!=null?resultMap.get("ShipVendorName").toString():"");
+        cell12.setCellValue(resultMap.get("ShipCompanyName")!=null?resultMap.get("ShipCompanyName").toString():"");
         cell12.setCellStyle(cs2);
 
         //第三行
         Row row2 = sheet.createRow(2);
         Cell cell21 = row2.createCell(0);
-        cell21.setCellValue(resultMap.get("ShipCompanyName")!=null?resultMap.get("ShipCompanyName").toString():"");
+        cell21.setCellValue(resultMap.get("ShipFrom")!=null?resultMap.get("ShipFrom").toString():"");
         cell21.setCellStyle(cs2);
         Cell cell22 = row2.createCell(2);
-        cell22.setCellValue(resultMap.get("ShipVendorName")!=null?resultMap.get("ShipVendorName").toString():"");
+        cell22.setCellValue(resultMap.get("ShipFrom")!=null?resultMap.get("ShipFrom").toString():"");
         cell22.setCellStyle(cs2);
 
         //第四行
@@ -130,16 +140,27 @@ public class ExcelUtil {
         //第十行
         Row row9 = sheet.createRow(9);
         Cell cell91 = row9.createCell(0);
-        cell91.setCellValue(resultMap.get("InvoiceTo")!=null?resultMap.get("InvoiceTo").toString():"");
+        String value = resultMap.get("InvoiceName") != null ? resultMap.get("InvoiceName").toString() : "";
+        value += " "+ (resultMap.get("InvoiceTo") != null ? resultMap.get("InvoiceTo").toString() : "");
+        cell91.setCellValue(value);
         cell91.setCellStyle(cs2);
         Cell cell92 = row9.createCell(2);
         String name = "";
         Object o = resultMap.get("DeliverTo") != null ? resultMap.get("DeliverTo") : null;
         if(o!=null){
             if (o instanceof ShippingProvider){
-                name = ((ShippingProvider) o).getName();
+                ShippingProvider shippingProvider = (ShippingProvider) o;
+                name = shippingProvider.getTransferConsignee()+" ";
+                name += shippingProvider.getAddrCountry()+" ";
+                name += shippingProvider.getAddrCity();
             }else if (o instanceof SubShipment){
-                name = ((SubShipment) o).getConsignee();
+                SubShipment subShipment = (SubShipment) o;
+                name = subShipment.getConsignee()+" ";
+                name += subShipment.getShipToCountry()+" ";
+                name += subShipment.getShipToProvince()+" ";
+                name += subShipment.getShipToDistrict()+" ";
+                name += subShipment.getShipToCity()+" ";
+                name += subShipment.getShipToAddr()+" ";
             }
         }
         cell92.setCellValue(name);
@@ -176,6 +197,7 @@ public class ExcelUtil {
             if(containerList.size()>0){
                 for (Map<String,Object> map : containerList){
                     Row row = sheet.createRow(++i);
+                    row.setHeight((short)550);
                     String brandName = map.get("brandName").toString();
                     String categoryName = map.get("categoryName").toString();
                     String orderLineNum = map.get("order_line_num").toString();
@@ -183,17 +205,19 @@ public class ExcelUtil {
                     String colorCode = map.get("colorCode").toString();
                     String size = map.get("size").toString();
                     String inPrice = map.get("in_price").toString();
+                    String composition = map.get("Composition").toString();
+                    String madeIn = map.get("MadeIn").toString();
                     Cell cell1 = row.createCell(0);
                     cell1.setCellValue(orderLineNum);
                     cell1.setCellStyle(cs2);
                     Cell cell2 = row.createCell(1);
-                    cell2.setCellValue(brandName+" "+categoryName+"   "+brandID+"/"+colorCode+"/"+size);
+                    cell2.setCellValue(new HSSFRichTextString(brandName+" "+categoryName+"  "+brandID+"/"+colorCode+"/"+size));
                     cell2.setCellStyle(cs2);
                     Cell cell3 = row.createCell(2);
-                    cell3.setCellValue("");
+                    cell3.setCellValue(composition);
                     cell3.setCellStyle(cs2);
                     Cell cell4 = row.createCell(3);
-                    cell4.setCellValue("");
+                    cell4.setCellValue(madeIn);
                     cell4.setCellStyle(cs2);
                     Cell cell5 = row.createCell(4);
                     cell5.setCellValue("€"+inPrice);
@@ -227,16 +251,33 @@ public class ExcelUtil {
         celli34.setCellValue("€"+resultMap.get("GrandTotal").toString());
         celli34.setCellStyle(cs3);
 
+        Row rowi4 = sheet.createRow(i+4);
+        rowi4.setHeight((short)550);
+        Cell celli40 = rowi4.createCell(0);
+        celli40.setCellValue("Shipment exempt from VAT - IVA non imponibile Art. 8 1°C L/A DPR 633/72");
+        celli40.setCellStyle(cs5);
+
         //设置表格边框样式
-        for(int a=0;a<50;a++){
+        for(int a=0;a<i+4;a++){
             Row r = sheet.getRow(a);
             for(int b =0;b<5;b++){
                 if(r!=null){
+                    //设置行高
+                    if(a>11&&a<=i){
+                        r.setHeight((short)550);
+                    }else {
+                        r.setHeight((short)400);
+                    }
+
                     Cell c = r.getCell(b);
                     if(c==null){
                         c = r.createCell(b);
                     }
-                    c.setCellStyle(cs4);
+                    if(a == 0 || a==8|| a==11){
+                        c.setCellStyle(cs);
+                    }else {
+                        c.setCellStyle(cs4);
+                    }
                 }
             }
         }
@@ -273,6 +314,7 @@ public class ExcelUtil {
         sheet.addMergedRegion(new CellRangeAddress(9,9,0,1));
         sheet.addMergedRegion(new CellRangeAddress(9,9,2,4));
         sheet.addMergedRegion(new CellRangeAddress(10,10,0,4));
+        sheet.addMergedRegion(new CellRangeAddress(i+4,i+4,0,4));
         //sheet.addMergedRegion(new CellRangeAddress(i+1,i+1,0,2));
         //sheet.addMergedRegion(new CellRangeAddress(i+2,i+2,0,2));
         //sheet.addMergedRegion(new CellRangeAddress(i+3,i+3,0,2));
