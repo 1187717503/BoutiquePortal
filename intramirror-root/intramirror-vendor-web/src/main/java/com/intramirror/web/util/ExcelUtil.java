@@ -28,6 +28,7 @@ public class ExcelUtil {
         CellStyle cs = wb.createCellStyle();
         CellStyle cs2 = wb.createCellStyle();
         CellStyle cs3 = wb.createCellStyle();
+        CellStyle cs4 = wb.createCellStyle();
 
         // 创建两种字体
         Font f = wb.createFont();
@@ -44,26 +45,20 @@ public class ExcelUtil {
 
         // 设置第一种单元格的样式（用于列名）
         cs.setFont(f);
-        cs.setBorderLeft(CellStyle.BORDER_THIN);
-        cs.setBorderRight(CellStyle.BORDER_THIN);
-        cs.setBorderTop(CellStyle.BORDER_THIN);
-        cs.setBorderBottom(CellStyle.BORDER_THIN);
         cs.setAlignment(CellStyle.ALIGN_LEFT);
 
         // 设置第二种单元格的样式（用于值）
         cs2.setFont(f2);
-        cs2.setBorderLeft(CellStyle.BORDER_THIN);
-        cs2.setBorderRight(CellStyle.BORDER_THIN);
-        cs2.setBorderTop(CellStyle.BORDER_THIN);
-        cs2.setBorderBottom(CellStyle.BORDER_THIN);
         cs2.setAlignment(CellStyle.ALIGN_LEFT);
 
         cs3.setFont(f);
-        cs3.setBorderLeft(CellStyle.BORDER_THIN);
-        cs3.setBorderRight(CellStyle.BORDER_THIN);
-        cs3.setBorderTop(CellStyle.BORDER_THIN);
-        cs3.setBorderBottom(CellStyle.BORDER_THIN);
         cs3.setAlignment(CellStyle.ALIGN_RIGHT);
+
+        //设置表框
+        cs4.setBorderLeft(CellStyle.BORDER_THIN);
+        cs4.setBorderRight(CellStyle.BORDER_THIN);
+        cs4.setBorderTop(CellStyle.BORDER_THIN);
+        cs4.setBorderBottom(CellStyle.BORDER_THIN);
 
         //设置列名
         // 创建第一行
@@ -232,6 +227,34 @@ public class ExcelUtil {
         celli34.setCellValue("€"+resultMap.get("GrandTotal").toString());
         celli34.setCellStyle(cs3);
 
+        //设置表格边框样式
+        for(int a=0;a<50;a++){
+            Row r = sheet.getRow(a);
+            for(int b =0;b<5;b++){
+                if(r!=null){
+                    Cell c = r.getCell(b);
+                    if(c==null){
+                        c = r.createCell(b);
+                    }
+                    c.setCellStyle(cs4);
+                }
+            }
+        }
+
+        for(int c=1;c<=3;c++){
+            Row r = sheet.getRow(i+c);
+            for(int b =0;b<5;b++){
+                if(r!=null){
+                    Cell ce = r.getCell(b);
+                    if(ce==null){
+                        ce = r.createCell(b);
+                    }
+                    ce.setCellStyle(cs3);
+                }
+            }
+        }
+
+
         // 单元格合并
         // 四个参数分别是：起始行，起始列，结束行，结束列
         sheet.addMergedRegion(new CellRangeAddress(0,0,0,1));
@@ -250,7 +273,10 @@ public class ExcelUtil {
         sheet.addMergedRegion(new CellRangeAddress(9,9,0,1));
         sheet.addMergedRegion(new CellRangeAddress(9,9,2,4));
         sheet.addMergedRegion(new CellRangeAddress(10,10,0,4));
-        //sheet.getRow()
+        //sheet.addMergedRegion(new CellRangeAddress(i+1,i+1,0,2));
+        //sheet.addMergedRegion(new CellRangeAddress(i+2,i+2,0,2));
+        //sheet.addMergedRegion(new CellRangeAddress(i+3,i+3,0,2));
+
         return wb;
     }
 }

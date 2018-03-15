@@ -405,7 +405,7 @@ public class OrderShipController extends BaseController {
         return null;
     }
 
-    @RequestMapping(value = "/printShipmentInfo1", method = RequestMethod.GET)
+    /*@RequestMapping(value = "/printShipmentInfo1", method = RequestMethod.GET)
     @ResponseBody
     public ResultMessage printShipmentInfo1(Integer status,Long shipment_id,Integer isExcel, HttpServletRequest httpRequest,HttpServletResponse response) {
         Map<String, Object> resultMap = new HashMap<String, Object>();
@@ -528,7 +528,7 @@ public class OrderShipController extends BaseController {
         }
 
         return result;
-    }
+    }*/
 
 
     /***
