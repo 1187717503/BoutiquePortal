@@ -24,18 +24,19 @@ import com.intramirror.user.api.service.VendorService;
 import com.intramirror.web.common.BarcodeUtil;
 import com.intramirror.web.controller.BaseController;
 import com.intramirror.web.service.LogisticsProductService;
+import com.intramirror.web.util.ExcelUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @CrossOrigin
 @Controller
@@ -365,6 +366,45 @@ public class OrderShipController extends BaseController {
         return result;
     }
 
+
+    private ResultMessage printExcelShipmentInfo(HttpServletResponse response,Map<String, Object> resultMap) throws IOException {
+        String fileName = new Date().getTime() + ".xls";
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        try {
+            ExcelUtil.createWorkBook(resultMap).write(os);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        byte[] content = os.toByteArray();
+        InputStream is = new ByteArrayInputStream(content);
+        // 设置response参数，可以打开下载页面
+        response.reset();
+        response.setContentType("application/vnd.ms-excel;charset=utf-8");
+        response.setHeader("Content-Disposition", "attachment;filename="+ new String(fileName.getBytes(), "iso-8859-1"));
+        ServletOutputStream out = response.getOutputStream();
+        BufferedInputStream bis = null;
+        BufferedOutputStream bos = null;
+        try {
+            bis = new BufferedInputStream(is);
+            bos = new BufferedOutputStream(out);
+            byte[] buff = new byte[2048];
+            int bytesRead;
+            // Simple read/write loop.
+            while (-1 != (bytesRead = bis.read(buff, 0, buff.length))) {
+                bos.write(buff, 0, bytesRead);
+            }
+        } catch (final IOException e) {
+            throw e;
+        } finally {
+            if (bis != null)
+                bis.close();
+            if (bos != null)
+                bos.close();
+        }
+        return null;
+    }
+
+
     /***
      * 打印shipment 详细信息  以及关联的carton 及关联的订单信息
      * @param httpRequest
@@ -372,7 +412,7 @@ public class OrderShipController extends BaseController {
      */
     @RequestMapping(value = "/printShipmentInfo", method = RequestMethod.POST)
     @ResponseBody
-    public ResultMessage printShipmentInfo(@RequestBody Map<String, Object> map, HttpServletRequest httpRequest) {
+    public ResultMessage printShipmentInfo(@RequestBody Map<String, Object> map, HttpServletRequest httpRequest,HttpServletResponse response) {
         Map<String, Object> resultMap = new HashMap<String, Object>();
         ResultMessage result = new ResultMessage();
         result.errorStatus();
@@ -482,7 +522,6 @@ public class OrderShipController extends BaseController {
                                 logger.info("打印Invoice----计算VAT的值");
                                 VAT += Double.parseDouble(container.get("in_price").toString()) * tax.getTaxRate().doubleValue();
                             }
-
                         }
                     }
                     allTotal = allTotal + total;
@@ -499,7 +538,10 @@ public class OrderShipController extends BaseController {
             resultMap.put("VAT", VAT);
             resultMap.put("GrandTotal", VAT + allTotal);
 
-
+            String isExcel = map.get("isExcel")!=null?map.get("isExcel").toString():null;
+            if(isExcel!=null&&"1".equals(isExcel)){
+                printExcelShipmentInfo(response,resultMap);
+            }
             result.successStatus();
             result.setData(resultMap);
 
