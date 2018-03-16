@@ -503,7 +503,7 @@ public class OrderShipController extends BaseController {
 
             if (containerList != null && containerList.size() > 0) {
                 for (Map<String, Object> container : containerList) {
-                    BigDecimal total = new BigDecimal(Double.parseDouble(container.get("in_price").toString()) * Double.parseDouble(container.get("amount").toString()));
+                    BigDecimal total = new BigDecimal(Double.parseDouble(container.get("in_price").toString()) * Double.parseDouble(container.get("amount").toString())).setScale(2,BigDecimal.ROUND_HALF_UP);
                     container.put("in_price",new BigDecimal(container.get("in_price").toString()).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
                     //获取欧盟的信息
                     Geography geography = geographyService.getGeographyById(3l);
@@ -522,7 +522,7 @@ public class OrderShipController extends BaseController {
                             Tax tax = taxService.getTaxByAddressCountryId(addressCountry.getAddressCountryId());
                             if (tax.getTaxRate() != null) {
                                 logger.info("打印Invoice----计算VAT的值");
-                                VAT = VAT.add(new BigDecimal(Double.parseDouble(container.get("in_price").toString())).multiply(tax.getTaxRate()));
+                                VAT = VAT.add(new BigDecimal(Double.parseDouble(container.get("in_price").toString())).multiply(tax.getTaxRate())).setScale(2,BigDecimal.ROUND_HALF_UP);
                             }
                         }
                     }
@@ -536,6 +536,7 @@ public class OrderShipController extends BaseController {
             resultMap.put("all_qty", containerList == null ? 0 : containerList.size());
             resultMap.put("cartonList", containerList);
             resultMap.put("shipmentInfo", shipmentMap);
+            //金额四舍五入
             resultMap.put("allTotal", allTotal.setScale(2,BigDecimal.ROUND_HALF_UP).toString());
             resultMap.put("VAT", VAT.setScale(2,BigDecimal.ROUND_HALF_UP).toString());
             resultMap.put("GrandTotal", (VAT.add(allTotal)).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
