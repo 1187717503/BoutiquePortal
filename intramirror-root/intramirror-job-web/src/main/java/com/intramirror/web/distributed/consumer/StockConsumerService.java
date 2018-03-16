@@ -96,7 +96,7 @@ public class StockConsumerService {
                     while (stockConsumerRunning.get()) {
                         ConsumerRecords<String, String> records = consumer.poll(500);
                         for (ConsumerRecord<String, String> record : records) {
-                            LOGGER.info("partition = {} , offset = {}, key = {}, value = {}", record.partition(), record.offset(), record.key(),
+                            LOGGER.info("Stock partition = {} , offset = {}, key = {}, value = {}", record.partition(), record.offset(), record.key(),
                                     record.value());
                             Map<String, Object> stockContext = JsonTransformUtil.readValue(record.value(), Map.class);
                             if (stockContext == null) {
@@ -117,7 +117,7 @@ public class StockConsumerService {
                         }
                     }
                 } catch (Exception e) {
-                    LOGGER.error("Product Consumer Thread exception.", e);
+                    LOGGER.error("Stock Consumer Thread exception.", e);
                 }
                 shutDownCount.countDown();
 

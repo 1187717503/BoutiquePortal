@@ -47,10 +47,12 @@ public final class KafkaMqUtil {
     }
 
     public static void sendProductResultMessage(String key, String value) {
+        LOGGER.info("Send product result back to {},key: {}", PRODUCT_RESULT_QUEUE, key);
         producer.send(new ProducerRecord<>(PRODUCT_RESULT_QUEUE, key, value));
     }
 
     public static void sendStockResultMessage(String key, String value) {
+        LOGGER.info("Send stock result back to {},key: {}", STOCK_RESULT_QUEUE, key);
         producer.send(new ProducerRecord<>(STOCK_RESULT_QUEUE, key, value));
     }
 
