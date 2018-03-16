@@ -340,11 +340,8 @@ public class OrderService {
 			info.put("code", StatusType.ORDER_ERROR_CODE);
 			result.setInfoMap(info);
 			return result;
-		}
-		
-		//如果大区一致,且不为空箱子,则比较shipment_type(空箱子ischeck 都为false)
-		if(orderMap.get("geography_name").toString().equals(shipMentMap.get("ship_to_geography").toString())){
-			
+		}else{
+			//如果大区一致,且不为空箱子,则比较shipment_type(空箱子ischeck 都为false)
 			//空箱子不需要判断,直接存入   shipment_type 用于判断该箱子是否能存放多个，状态为1 只能存放一个  所以不能在存入
 			if(ischeck && shipMentMap.get("shipment_type_id").toString().equals("1")){
 				result.setMsg("Only one Order can be packed in this carton. ");
@@ -352,7 +349,6 @@ public class OrderService {
 				result.setInfoMap(info);
 				return result;
 			}
-				
 //			//比较具体地址 省市区
 //			}else if(shipMentMap.get("shipment_type_id").toString().equals("2")){
 //				
@@ -360,11 +356,8 @@ public class OrderService {
 //			}else if(shipMentMap.get("shipment_type_id").toString().equals("3")){
 //				
 //			}
-			
-
 		}
-		
-		
+
 		//添加订单跟箱子的关联,并修改状态为READYTOSHIP
 		logger.info("order updateLogisticsProduct 添加订单与箱子的关联  ");
 		LogisticsProduct logisticsProduct = new LogisticsProduct();

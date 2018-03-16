@@ -740,9 +740,6 @@
             l.user_rec_province                      AS shipToProvince,
             l.user_rec_country                       AS shipToCountry,
             v.address_country_id                     AS consigner_country_id,
-            (SELECT addc.address_country_id
-             FROM address_country addc
-             WHERE addc.`name` = l.user_rec_country) AS consignee_country_id,
             g.english_name                           AS shipToGeography,
             lp.logistics_product_id
         FROM logistics_product lp
@@ -964,4 +961,8 @@
         </set>
         where order_id = #{orderId,jdbcType=BIGINT}
     </update>
+
+    <select id="selectAddrByCountry" resultType="java.util.Map" parameterType="string">
+        SELECT * FROM address_country WHERE `name` = #{country,jdbcType=VARCHAR}
+    </select>
 </mapper>

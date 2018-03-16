@@ -151,4 +151,11 @@ public interface OrderMapper {
      */
     List<CancelOrderVO> getOrderCancelList(Map<String, Object> params);
 
+    /**
+     *  根据国家名查询address_country
+     * @param country
+     * @return
+     */
+    Map<String, Object> selectAddrByCountry(String country);
+
 }
