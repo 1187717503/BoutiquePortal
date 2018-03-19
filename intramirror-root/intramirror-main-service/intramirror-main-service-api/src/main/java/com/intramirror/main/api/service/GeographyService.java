@@ -11,4 +11,6 @@ public interface GeographyService {
     List<Map<String,Object>> getGeographyList();
 
     Geography getGeographyById(Long geographyId);
+
+    List<Map<String,Object>> getGeographyGroupList();
 }

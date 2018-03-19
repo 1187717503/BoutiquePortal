@@ -12,6 +12,8 @@
         <result column="tax_fee" jdbcType="DECIMAL" property="taxFee"/>
         <result column="display_order" jdbcType="INTEGER" property="displayOrder"/>
         <result column="english_name" jdbcType="VARCHAR" property="englishName"/>
+        <result column="pack_group" jdbcType="INTEGER" property="packGroup"/>
+        <result column="pack_english_name" jdbcType="VARCHAR" property="packEnglishGroup"/>
     </resultMap>
     <sql id="Base_Column_List">
         <!--
@@ -139,4 +141,7 @@
     <select id="getGeographyList" resultType="java.util.Map">
     select * from geography
   </select>
+    <select id="getGeographyGroupList" resultMap="BaseResultMap">
+      SELECT * FROM geography GROUP BY pack_group
+    </select>
 </mapper>

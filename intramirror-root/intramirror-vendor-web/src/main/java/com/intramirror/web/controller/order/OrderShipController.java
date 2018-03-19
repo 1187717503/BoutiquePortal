@@ -186,8 +186,12 @@ public class OrderShipController extends BaseController {
                         shipMent.put("shipment_id", container.get("shipment_id").toString());
                         shipMent.put("shipment_no", container.get("shipment_no").toString());
                         shipMent.put("shipment_status", container.get("shipment_status").toString());
-
-                        shipMent.put("ship_to_geography", container.get("ship_to_geography").toString());
+                        String shipToGeography = container.get("ship_to_geography").toString();
+                        if ("China Mainland".equals(shipToGeography)
+                                ||"HongKong".equals(shipToGeography)){
+                            shipToGeography = "China exl. Taiwan";
+                        }
+                        shipMent.put("ship_to_geography", shipToGeography);
                         shipMentList.add(shipMent);
                     }
                 }
@@ -354,7 +358,7 @@ public class OrderShipController extends BaseController {
         ResultMessage result = new ResultMessage();
         result.errorStatus();
         try {
-            List<Map<String, Object>> geographyList = geographyService.getGeographyList();
+            List<Map<String, Object>> geographyList = geographyService.getGeographyGroupList();
 
             result.successStatus();
             result.setData(geographyList);
