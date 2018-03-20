@@ -508,7 +508,10 @@
                           GROUP BY t_pp.product_id
                       ) pp ON p.product_id = pp.product_id */
         WHERE pspk.`name` = 'Size'
-              AND c.shipment_id = #{shipment_id,jdbcType=BIGINT}
+              AND c.shipment_id IN
+            <foreach collection="shipmentIds" item="shipmentId" open="(" close=")" separator=",">
+                #{shipmentId,jdbcType=BIGINT}
+            </foreach>
               AND lp.`status` = #{status,jdbcType=BIGINT}
               AND v.vendor_id = #{vendorId,jdbcType=BIGINT}
         GROUP BY lp.order_line_num
