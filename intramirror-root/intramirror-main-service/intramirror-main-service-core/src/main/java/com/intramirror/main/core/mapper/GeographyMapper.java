@@ -55,4 +55,6 @@ public interface GeographyMapper {
     int updateByPrimaryKey(Geography record);
 
     List<Map<String, Object>> getGeographyList();
+
+    List<Map<String, Object>> getGeographyGroupList();
 }

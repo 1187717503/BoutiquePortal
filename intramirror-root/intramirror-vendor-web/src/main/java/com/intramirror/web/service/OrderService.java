@@ -138,13 +138,13 @@ public class OrderService {
 			
 			//判断箱子的geography 跟订单的大区是否一致 
 			logger.info("order packingCheckOrder 校验箱子与订单大区是否一致");
-			if(container != null && !container.getShipToGeography().equals(currentOrder.get("geography_name").toString())){
+			if(checkShipToGeography(currentOrder, container)){
 				result.setMsg("This Order's ship-to geography is different than carton's");
 				infoMap.put("code", StatusType.ORDER_ERROR_CODE);
 				result.setInfoMap(infoMap);
 				return result;
 			}
-			
+
 			//箱子关联Shipment
 			Map<String, Object> updateContainer = new HashMap<String, Object>(); 
 			updateContainer.put("shipment_id",shipment_id);
@@ -157,7 +157,7 @@ public class OrderService {
 				
 				Map<String, Object> shipMentMap = new HashMap<String, Object>();
 				//根据订单大区选择的Shipment   所以只需要用订单的大区即可(只有箱子为空时)
-				shipMentMap.put("ship_to_geography", currentOrder.get("geography_name").toString());
+				shipMentMap.put("ship_to_geography", currentOrder.get("pack_english_name").toString());
 				shipMentMap.put("shipment_id", Long.parseLong(shipment_id));
 //					//获取当前ShipMent 第一段的物流类型(不需要  空箱子不比较shipmentType 直接放入)
 				
@@ -183,16 +183,16 @@ public class OrderService {
 			logger.info("order packingOrder 箱子内订单列表为空    ");
 			logger.info("order packingOrder 校验箱子与订单大区是否一致");
 			//判断箱子的geography 跟订单的大区是否一致 
-			if(container != null && !container.getShipToGeography().equals(currentOrder.get("geography_name").toString())){
+			if(checkShipToGeography(currentOrder, container)){
 				result.setMsg("This Order's ship-to geography is different than carton's");
 				infoMap.put("code", StatusType.ORDER_ERROR_CODE);
 				result.setInfoMap(infoMap);
 				return result;
 			}
-			
+
 
 			Map<String, Object> selectShipmentParam = new HashMap<String, Object>();
-			selectShipmentParam.put("shipToGeography", currentOrder.get("geography_name").toString());
+			selectShipmentParam.put("shipToGeography", currentOrder.get("pack_english_name").toString());
 			
 			//shipment 状态
 			selectShipmentParam.put("status", ContainerType.OPEN);
@@ -229,7 +229,7 @@ public class OrderService {
 					if(updateContainerRow > 0 ){
 						Map<String, Object> shipMentMap = new HashMap<String, Object>();
 						//根据订单大区创建的Shipment   所以只需要用订单的大区即可(只有箱子为空时)
-						shipMentMap.put("ship_to_geography", currentOrder.get("geography_name").toString());
+						shipMentMap.put("ship_to_geography", currentOrder.get("pack_english_name").toString());
 						shipMentMap.put("shipment_id", shipmentId);
 //								//获取当前ShipMent 第一段的物流类型(不需要  空箱子不比较shipmentType 直接放入)
 						
@@ -309,6 +309,33 @@ public class OrderService {
 		return result;
 	}
 
+	private boolean checkShipToGeography(Map<String, Object> currentOrder, Object container) {
+		boolean flag = true;
+		if (container != null){
+			String packEnglishName = currentOrder.get("pack_english_name").toString();
+			String shipToGeography = "";
+			if(container instanceof Container){
+				shipToGeography = ((Container)container).getShipToGeography();
+			}else if (container instanceof Map){
+				shipToGeography = ((Map<String,Object>)container).get("ship_to_geography").toString();
+			}
+			if("1".equals(currentOrder.get("pack_group").toString())){
+				//如果是去往China exl. Taiwan
+				if("China Mainland".equals(shipToGeography)
+						||"HongKong".equals(shipToGeography)
+						||"China exl. Taiwan".equals(shipToGeography)){
+					flag = false;
+				}
+			}else {
+				if (shipToGeography.equals(packEnglishName)){
+					flag = false;
+				}
+			}
+		}
+
+		return flag;
+	}
+
 
 	/**
 	 * 订单装箱
@@ -335,7 +362,7 @@ public class OrderService {
 		logger.info("order updateLogisticsProduct 装箱校验  1.大区是否一致 2.是否为空箱子 3.shipment_type");
 
 		//如果大区不一致，直接返回
-		if(!orderMap.get("geography_name").toString().equals(shipMentMap.get("ship_to_geography").toString())){
+		if(checkShipToGeography(orderMap,shipMentMap)){
 			result.setMsg("This Order's consignee address is different than carton's. ");
 			info.put("code", StatusType.ORDER_ERROR_CODE);
 			result.setInfoMap(info);

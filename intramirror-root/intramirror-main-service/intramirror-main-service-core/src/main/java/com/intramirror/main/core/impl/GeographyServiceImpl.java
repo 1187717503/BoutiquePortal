@@ -32,4 +32,9 @@ public class GeographyServiceImpl extends BaseDao implements GeographyService {
     public Geography getGeographyById(Long geographyId) {
         return geographyMapper.selectByPrimaryKey(geographyId);
     }
+
+    @Override
+    public List<Map<String, Object>> getGeographyGroupList() {
+        return geographyMapper.getGeographyGroupList();
+    }
 }
