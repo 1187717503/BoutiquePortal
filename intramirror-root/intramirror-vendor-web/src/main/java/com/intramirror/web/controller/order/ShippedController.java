@@ -77,21 +77,25 @@ public class ShippedController extends BaseController {
             for (Map<String, Object> info : orderList) {
 
                 //汇率
-                Double rate = Double.parseDouble(info.get("current_rate").toString());
+                String currentRate = info.get("current_rate") != null ? info.get("current_rate").toString() : "0";
+                Double rate = Double.parseDouble(currentRate);
 
                 //按汇率计算人民币价钱
-                Double rmb_sale_price = Double.parseDouble(info.get("sale_price").toString()) * rate;
+                String salePriceStr = info.get("sale_price") != null ? info.get("sale_price").toString() : "0";
+                Double rmb_sale_price = Double.parseDouble(salePriceStr) * rate;
                 info.put("rmb_sale_price", rmb_sale_price);
                 //计算利润
-                Double profit = Double.parseDouble(info.get("sale_price").toString()) - Double.parseDouble(info.get("in_price").toString());
+                String inPriceStr = info.get("in_price") != null ? info.get("in_price").toString() : "0";
+                Double profit = Double.parseDouble(salePriceStr) - Double.parseDouble(inPriceStr);
                 BigDecimal b = new BigDecimal(profit);
                 profit = b.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
                 info.put("profit", profit * rate);
 
                 //计算折扣
-                Double salePrice = Double.parseDouble(info.get("sale_price").toString());
-                Double price = Double.parseDouble(info.get("price").toString());
-                Double inPrice = Double.parseDouble(info.get("in_price").toString());
+                String priceStr = info.get("price") != null ? info.get("price").toString() : "0";
+                Double salePrice = Double.parseDouble(salePriceStr);
+                Double price = Double.parseDouble(priceStr);
+                Double inPrice = Double.parseDouble(inPriceStr);
 
                 BigDecimal sale_price_discount = new BigDecimal((salePrice / price) * 100);
 //				info.put("sale_price_discount",sale_price_discount.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() +" %");
