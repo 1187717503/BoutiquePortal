@@ -97,13 +97,14 @@ public class ShippedController extends BaseController {
                 Double price = Double.parseDouble(priceStr);
                 Double inPrice = Double.parseDouble(inPriceStr);
 
-                BigDecimal sale_price_discount = new BigDecimal((salePrice / price) * 100);
-//				info.put("sale_price_discount",sale_price_discount.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() +" %");
-                info.put("sale_price_discount", (100 - sale_price_discount.intValue()) + " %");
+                if (!"0".equals(priceStr)){
+                    BigDecimal sale_price_discount = new BigDecimal((salePrice / price) * 100);
+    //				info.put("sale_price_discount",sale_price_discount.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() +" %");
+                    info.put("sale_price_discount", (100 - sale_price_discount.intValue()) + " %");
 
-                BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + 0.22) / price) * 100);
-                info.put("supply_price_discount", (100 - supply_price_discount.intValue()) + " %");
-
+                    BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + 0.22) / price) * 100);
+                    info.put("supply_price_discount", (100 - supply_price_discount.intValue()) + " %");
+                }
             }
         }
         result.successStatus();
