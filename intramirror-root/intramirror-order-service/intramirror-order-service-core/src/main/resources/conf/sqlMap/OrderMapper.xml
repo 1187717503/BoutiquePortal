@@ -733,6 +733,8 @@
         SELECT
             o.order_num,
             lp.vendor_id,
+            g.pack_group,
+            g.pack_english_name,
             l.user_rec_name                          AS consignee,
             l.user_rec_addr                          AS shipToAddr,
             l.user_rec_area                          AS shipToDistrict,

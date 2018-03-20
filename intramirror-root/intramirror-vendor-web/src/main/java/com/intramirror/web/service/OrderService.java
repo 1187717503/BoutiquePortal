@@ -157,7 +157,7 @@ public class OrderService {
 				
 				Map<String, Object> shipMentMap = new HashMap<String, Object>();
 				//根据订单大区选择的Shipment   所以只需要用订单的大区即可(只有箱子为空时)
-				shipMentMap.put("ship_to_geography", currentOrder.get("geography_name").toString());
+				shipMentMap.put("ship_to_geography", currentOrder.get("pack_english_name").toString());
 				shipMentMap.put("shipment_id", Long.parseLong(shipment_id));
 //					//获取当前ShipMent 第一段的物流类型(不需要  空箱子不比较shipmentType 直接放入)
 				
@@ -192,7 +192,7 @@ public class OrderService {
 
 
 			Map<String, Object> selectShipmentParam = new HashMap<String, Object>();
-			selectShipmentParam.put("shipToGeography", currentOrder.get("geography_name").toString());
+			selectShipmentParam.put("shipToGeography", currentOrder.get("pack_english_name").toString());
 			
 			//shipment 状态
 			selectShipmentParam.put("status", ContainerType.OPEN);
@@ -229,7 +229,7 @@ public class OrderService {
 					if(updateContainerRow > 0 ){
 						Map<String, Object> shipMentMap = new HashMap<String, Object>();
 						//根据订单大区创建的Shipment   所以只需要用订单的大区即可(只有箱子为空时)
-						shipMentMap.put("ship_to_geography", currentOrder.get("geography_name").toString());
+						shipMentMap.put("ship_to_geography", currentOrder.get("pack_english_name").toString());
 						shipMentMap.put("shipment_id", shipmentId);
 //								//获取当前ShipMent 第一段的物流类型(不需要  空箱子不比较shipmentType 直接放入)
 						
