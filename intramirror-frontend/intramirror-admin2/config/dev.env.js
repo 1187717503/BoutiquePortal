@@ -21,7 +21,7 @@ switch (process.env.WEB_ENV) {
     baseConfig.ERROR_URL2 = '"http://test.api.intramirror.com:8088/"';
     break;
   case "test":
-    baseConfig.BASE_URL = '"http://test.admin2.intramirror.com/"';
+    baseConfig.BASE_URL = '"http://test.admin2.intramirror.com:8096/"';
     baseConfig.ERROR_URL = '"http://test.vendor.intramirror.com:8082/"';
     baseConfig.ERROR_URL2 = '"http://test.api.intramirror.com:8088/"';
     break;
