@@ -1094,7 +1094,7 @@ public class OrderController extends BaseController {
         logger.info("order getExceptionType ");
         ResultMessage message = new ResultMessage();
         try {
-            List<Map<String, Object>> list = orderExceptionTypeService.getExceptionType(null);
+            List<Map<String, Object>> list = orderExceptionTypeService.getExceptionType();
             if (null != list && 0 < list.size()) {
                 message.successStatus().putMsg("INFO", "SUCCESS").setData(list);
                 return message;
