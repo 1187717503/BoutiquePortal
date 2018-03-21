@@ -22,7 +22,7 @@
         product.description_img,
         product.category_id,
         <if test="(stock != null and stock != 0) or (minStock !=null and maxStock !=null)">
-            sum(sku_store.store) AS totalStore,
+            view_prod_store_sum.store AS totalStore,
         </if>
         product.designer_id AS designer_id,
         product.color_code AS color_code,
@@ -44,7 +44,7 @@
         INNER JOIN vendor ON product.vendor_id = vendor.vendor_id AND product.enabled = TRUE
         INNER JOIN brand ON brand.brand_id = product.brand_id AND brand.enabled = TRUE
         <if test="(stock != null and stock != 0) or (minStock !=null and maxStock !=null)">
-            LEFT JOIN sku_store ON sku_store.product_id = product.product_id
+            LEFT JOIN view_prod_store_sum ON view_prod_store_sum.product_id = product.product_id
         </if>
         <if test="exception !=  null and exception != 0">
             LEFT JOIN (SELECT
@@ -55,6 +55,20 @@
             GROUP BY product_id) exception
             ON product.product_id = exception.product_id
         </if>
+        <!--        <if test="minIMDiscount != null or minBoutiqueDiscount != null">
+                    INNER JOIN (
+                    SELECT
+                    sku.price AS retail_price,
+                    sku.in_price AS boutique_price,
+                    sku.im_price AS im_price,
+                    sku.product_id AS product_id,
+                    CONVERT(1 - sku.in_price / sku.price * 1.22, DECIMAL(10, 2)) * 100 AS boutique_discount,
+                    CONVERT(1 - sku.im_price / sku.price, DECIMAL(10, 2)) * 100 AS im_discount
+                    FROM sku
+                    WHERE sku.enabled = TRUE
+                    GROUP BY sku.product_id
+                    ) price ON price.product_id = product.product_id
+                </if>-->
         WHERE 1=1
         <if test="productIds != null">
             AND product.product_id
@@ -93,13 +107,13 @@
 
             </when>
             <when test="minStock !=null and maxStock !=null">
-                AND sum(sku_store.store) BETWEEN #{minStock} AND #{maxStock}
+                AND view_prod_store_sum.store BETWEEN #{minStock} AND #{maxStock}
             </when>
             <when test="stock == 1">
-                AND sum(sku_store.store) > 0
+                AND view_prod_store_sum.store > 0
             </when>
             <otherwise>
-                AND sum(sku_store.store) &lt;= 0
+                AND view_prod_store_sum.store &lt;= 0
             </otherwise>
         </choose>
         <if test="brandId != null">
@@ -190,9 +204,6 @@
         </if>
         <if test="saleAtFrom != null and saleAtTo != null">
             AND unix_timestamp(shop_product.sale_at) BETWEEN #{saleAtFrom} AND #{saleAtTo}
-        </if>
-        <if test="(stock != null and stock != 0) or (minStock !=null and maxStock !=null)">
-            GROUP BY sku_store.product_id
         </if>
         ORDER BY
         <choose>
