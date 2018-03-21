@@ -109,12 +109,12 @@ public class PriceChangeRuleExcelUtils {
         row1cell13.setCellStyle(cellStyle);
 
         HSSFCell row1cell18 = row1.createCell(18);
-        row1cell12.setCellValue("Boys");
-        row1cell12.setCellStyle(cellStyle);
+        row1cell18.setCellValue("Boys");
+        row1cell18.setCellStyle(cellStyle);
 
         HSSFCell row1cell21 = row1.createCell(21);
-        row1cell13.setCellValue("Girls");
-        row1cell13.setCellStyle(cellStyle);
+        row1cell21.setCellValue("Girls");
+        row1cell21.setCellStyle(cellStyle);
 
         sheet.addMergedRegion(new CellRangeAddress(0,0,1,4));
         sheet.addMergedRegion(new CellRangeAddress(0,0,5,8));
@@ -144,7 +144,11 @@ public class PriceChangeRuleExcelUtils {
                 if(StringUtils.isBlank(cId)) {
                     value = data.get("english_name").toString();
                 } else {
-                    value = data.get(cId).toString();
+                    if(data.get(cId) == null){
+                        value = "100"; // 如果不存在  折扣为100 不打折
+                    }else {
+                        value = data.get(cId).toString();
+                    }
 
                     value = ""+(100 - Integer.parseInt(value) );
                 }

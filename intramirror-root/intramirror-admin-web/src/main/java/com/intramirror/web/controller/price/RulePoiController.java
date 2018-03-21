@@ -150,7 +150,7 @@ public class RulePoiController {
         }
 
         int sum = categoryBrandMapList.size();
-        int jsum = set.size() * 8;
+        int jsum = set.size() * 23;
         if (sum != jsum) {
             throw new RuntimeException("Excel品牌数据存在重复。");
         }
