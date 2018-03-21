@@ -70,9 +70,9 @@ public class PriceChangeRuleExcelUtils {
 
     }
 
-    private static final String[] categoryNames = new String[]{"Brand","Clothing","Shoes","Bags","Accessories","Clothing","Shoes","Bags","Accessories","Clothing","Shoes","Accessories","Clothing","Shoes","Accessories","Clothing","Shoes","Accessories"};
+    private static final String[] categoryNames = new String[]{"Brand","Clothing","Shoes","Bags","Accessories","Clothing","Shoes","Bags","Accessories","Clothing","Shoes","Accessories","Clothing","Shoes","Accessories","Clothing","Shoes","Accessories","Clothing","Shoes","Accessories","Clothing","Shoes","Accessories"};
 
-    private static final String[] categoryIds = new String[]{"","1504","1506","1505","1507","1569","1584","1598","1608","1760","1761","1762","1763","1764","1765","1766","1767","1768",};
+    private static final String[] categoryIds = new String[]{"","1504","1506","1505","1507","1569","1584","1598","1608","1760","1761","1762","1763","1764","1765","1766","1767","1768","1845","1846","1847","1848","1849","1850"};
 
     public static String genPriceExcel(String excelName,List<Map<String,Object>> brands,List<Map<String, Object>> datas,String filePath) throws Exception {
         HSSFWorkbook workbook = new HSSFWorkbook();
@@ -101,10 +101,18 @@ public class PriceChangeRuleExcelUtils {
         row1cell9.setCellStyle(cellStyle);
 
         HSSFCell row1cell12 = row1.createCell(12);
-        row1cell12.setCellValue("Boys");
+        row1cell12.setCellValue("Baby Boys");
         row1cell12.setCellStyle(cellStyle);
 
         HSSFCell row1cell13 = row1.createCell(15);
+        row1cell13.setCellValue("Baby Girls");
+        row1cell13.setCellStyle(cellStyle);
+
+        HSSFCell row1cell18 = row1.createCell(18);
+        row1cell12.setCellValue("Boys");
+        row1cell12.setCellStyle(cellStyle);
+
+        HSSFCell row1cell21 = row1.createCell(21);
         row1cell13.setCellValue("Girls");
         row1cell13.setCellStyle(cellStyle);
 
@@ -113,6 +121,8 @@ public class PriceChangeRuleExcelUtils {
         sheet.addMergedRegion(new CellRangeAddress(0,0,9,11));
         sheet.addMergedRegion(new CellRangeAddress(0,0,12,14));
         sheet.addMergedRegion(new CellRangeAddress(0,0,15,17));
+        sheet.addMergedRegion(new CellRangeAddress(0,0,18,20));
+        sheet.addMergedRegion(new CellRangeAddress(0,0,21,23));
         rowLength++;
 
         // 创建第二行数据
@@ -223,14 +233,24 @@ public class PriceChangeRuleExcelUtils {
             readExcelList.add(genMap(brand_id,babies_clothing,9,price_change_rule_id));
             readExcelList.add(genMap(brand_id,babies_shoes,10,price_change_rule_id));
             readExcelList.add(genMap(brand_id,babies_accessores,11,price_change_rule_id));
-            /*boys*/
+            /*Babies boys*/
             readExcelList.add(genMap(brand_id,boys_clothing,12,price_change_rule_id));
             readExcelList.add(genMap(brand_id,boys_shoes,13,price_change_rule_id));
             readExcelList.add(genMap(brand_id,boys_accessores,14,price_change_rule_id));
-            /*girls*/
+
+            /*Babies girls*/
             readExcelList.add(genMap(brand_id,girls_clothing,15,price_change_rule_id));
             readExcelList.add(genMap(brand_id,girls_shoes,16,price_change_rule_id));
             readExcelList.add(genMap(brand_id,girls_accessores,17,price_change_rule_id));
+
+            /*boys*/
+            readExcelList.add(genMap(brand_id,boys_clothing,18,price_change_rule_id));
+            readExcelList.add(genMap(brand_id,boys_shoes,19,price_change_rule_id));
+            readExcelList.add(genMap(brand_id,boys_accessores,20,price_change_rule_id));
+            /*girls*/
+            readExcelList.add(genMap(brand_id,girls_clothing,21,price_change_rule_id));
+            readExcelList.add(genMap(brand_id,girls_shoes,22,price_change_rule_id));
+            readExcelList.add(genMap(brand_id,girls_accessores,23,price_change_rule_id));
         }
         return readExcelList;
     }
