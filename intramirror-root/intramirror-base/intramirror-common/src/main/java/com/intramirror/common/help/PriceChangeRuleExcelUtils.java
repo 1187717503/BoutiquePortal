@@ -70,9 +70,9 @@ public class PriceChangeRuleExcelUtils {
 
     }
 
-    private static final String[] categoryNames = new String[]{"Brand","Clothing","Shoes","Bags","Accessories","Clothing","Shoes","Bags","Accessories"};
+    private static final String[] categoryNames = new String[]{"Brand","Clothing","Shoes","Bags","Accessories","Clothing","Shoes","Bags","Accessories","Clothing","Shoes","Accessories","Clothing","Shoes","Accessories","Clothing","Shoes","Accessories"};
 
-    private static final String[] categoryIds = new String[]{"","1504","1506","1505","1507","1569","1584","1598","1608"};
+    private static final String[] categoryIds = new String[]{"","1504","1506","1505","1507","1569","1584","1598","1608","1760","1761","1762","1763","1764","1765","1766","1767","1768",};
 
     public static String genPriceExcel(String excelName,List<Map<String,Object>> brands,List<Map<String, Object>> datas,String filePath) throws Exception {
         HSSFWorkbook workbook = new HSSFWorkbook();
@@ -96,8 +96,23 @@ public class PriceChangeRuleExcelUtils {
         row1cell5.setCellValue("Women");
         row1cell5.setCellStyle(cellStyle);
 
+        HSSFCell row1cell9 = row1.createCell(9);
+        row1cell9.setCellValue("Babies");
+        row1cell9.setCellStyle(cellStyle);
+
+        HSSFCell row1cell12 = row1.createCell(12);
+        row1cell12.setCellValue("Boys");
+        row1cell12.setCellStyle(cellStyle);
+
+        HSSFCell row1cell13 = row1.createCell(15);
+        row1cell13.setCellValue("Girls");
+        row1cell13.setCellStyle(cellStyle);
+
         sheet.addMergedRegion(new CellRangeAddress(0,0,1,4));
         sheet.addMergedRegion(new CellRangeAddress(0,0,5,8));
+        sheet.addMergedRegion(new CellRangeAddress(0,0,9,11));
+        sheet.addMergedRegion(new CellRangeAddress(0,0,12,14));
+        sheet.addMergedRegion(new CellRangeAddress(0,0,15,17));
         rowLength++;
 
         // 创建第二行数据
@@ -183,15 +198,39 @@ public class PriceChangeRuleExcelUtils {
             String women_bags = row.getCell(7).toString();
             String women_accessores = row.getCell(8).toString();
 
+            String babies_clothing = row.getCell(9).toString();
+            String babies_shoes = row.getCell(10).toString();
+            String babies_accessores = row.getCell(11).toString();
+
+            String boys_clothing = row.getCell(12).toString();
+            String boys_shoes = row.getCell(13).toString();
+            String boys_accessores = row.getCell(14).toString();
+
+            String girls_clothing = row.getCell(15).toString();
+            String girls_shoes = row.getCell(16).toString();
+            String girls_accessores = row.getCell(17).toString();
+            /* Men */
             readExcelList.add(genMap(brand_id,men_clothing,1,price_change_rule_id));
             readExcelList.add(genMap(brand_id,men_shoes,2,price_change_rule_id));
             readExcelList.add(genMap(brand_id,men_bags,3,price_change_rule_id));
             readExcelList.add(genMap(brand_id,men_accessores,4,price_change_rule_id));
-
+            /* Women */
             readExcelList.add(genMap(brand_id,women_clothing,5,price_change_rule_id));
             readExcelList.add(genMap(brand_id,women_shoes,6,price_change_rule_id));
             readExcelList.add(genMap(brand_id,women_bags,7,price_change_rule_id));
             readExcelList.add(genMap(brand_id,women_accessores,8,price_change_rule_id));
+            /* Babies */
+            readExcelList.add(genMap(brand_id,babies_clothing,9,price_change_rule_id));
+            readExcelList.add(genMap(brand_id,babies_shoes,10,price_change_rule_id));
+            readExcelList.add(genMap(brand_id,babies_accessores,11,price_change_rule_id));
+            /*boys*/
+            readExcelList.add(genMap(brand_id,boys_clothing,12,price_change_rule_id));
+            readExcelList.add(genMap(brand_id,boys_shoes,13,price_change_rule_id));
+            readExcelList.add(genMap(brand_id,boys_accessores,14,price_change_rule_id));
+            /*girls*/
+            readExcelList.add(genMap(brand_id,girls_clothing,15,price_change_rule_id));
+            readExcelList.add(genMap(brand_id,girls_shoes,16,price_change_rule_id));
+            readExcelList.add(genMap(brand_id,girls_accessores,17,price_change_rule_id));
         }
         return readExcelList;
     }
