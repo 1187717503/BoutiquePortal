@@ -33,5 +33,5 @@ INSERT INTO `order_exception_type` VALUES ('2', 'Unavailable-Product reserved fo
 INSERT INTO `order_exception_type` VALUES ('3', 'Disalignment-Product in inventory system couldn\'t be found physically');
 INSERT INTO `order_exception_type` VALUES ('4', 'Boutique order interface error');
 INSERT INTO `order_exception_type` VALUES ('5', 'Data error-Product sold in boutique long ago, inconsistent stock');
-INSERT INTO `order_exception_type` VALUES ('6', ' Quality issue-Product verified to be defected');
+INSERT INTO `order_exception_type` VALUES ('6', 'Quality issue-Product verified to be defected');
 INSERT INTO `order_exception_type` VALUES ('7', 'Operation error');
