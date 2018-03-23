@@ -72,7 +72,6 @@ public class PriceChangeRuleController extends BaseController {
     @RequestMapping("/run/im")
     @ResponseBody
     public Response runIm(@Param("price_change_rule_id") String price_change_rule_id) throws Exception {
-
         logger.info("Start running IM discounts,price_change_rule_id:" + price_change_rule_id);
         PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
 
@@ -94,8 +93,8 @@ public class PriceChangeRuleController extends BaseController {
 
         // sku.im_price -> product.min_im_price,product.max_im_price
         priceChangeRule.updateProductImPrice();
-        logger.info("End running IM discounts,price_change_rule_id:" + price_change_rule_id);
 
+        logger.info("End running IM discounts,price_change_rule_id:" + price_change_rule_id);
         return Response.success();
     }
 
@@ -125,6 +124,7 @@ public class PriceChangeRuleController extends BaseController {
         // sku.im_price -> product.min_im_price,product.max_im_price
         priceChangeRule.updateProductImPrice();
         logger.info("End running BOUTIQUE discounts,price_change_rule_id:" + price_change_rule_id);
+
         return Response.success();
     }
 
@@ -154,13 +154,21 @@ public class PriceChangeRuleController extends BaseController {
 
     @RequestMapping("/changepreview")
     @ResponseBody
-    public ResultMessage changePreview(@Param("price_change_rule_id") Long price_change_rule_id, @Param("preview_status") Long preview_status) {
-        logger.info("PriceChangeRuleController,changePreview,inputParams,price_change_rule_id:" + price_change_rule_id + ",preview_status : " + preview_status);
+
+    public ResultMessage changePreview(@Param("price_change_rule_id") Long price_change_rule_id, @Param("preview_status") Long preview_status,
+            @Param("category_type") Integer category_type) {
+        logger.info("PriceChangeRuleController,changePreview,inputParams,price_change_rule_id:{},category_type:{},preview_status:{} ", price_change_rule_id,
+                category_type, preview_status);
+
         ResultMessage resultMessage = ResultMessage.getInstance();
+        if (category_type == null) {
+            resultMessage.errorStatus().putMsg("info", "error message: category type is empty.");
+            return resultMessage;
+        }
+
         try {
             PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(price_change_rule_id);
-
-            priceChangeRule.updatePreviewPrice(pcrModel.getVendorId(), preview_status);
+            priceChangeRule.updatePreviewPrice(pcrModel.getVendorId(), preview_status, category_type);
 
             resultMessage.successStatus().putMsg("info", "success !!!");
         } catch (Exception e) {
@@ -168,8 +176,10 @@ public class PriceChangeRuleController extends BaseController {
             logger.error("error message : " + e.getMessage());
             resultMessage.errorStatus().putMsg("info", "error message : " + e.getMessage());
         }
-        logger.info("PriceChangeRuleController,changePreview,outParams,price_change_rule_id:" + price_change_rule_id + ",preview_status : " + preview_status
-                + ",resultMessage:" + JSONObject.toJSONString(resultMessage));
+
+        logger.info("PriceChangeRuleController,changePreview,inputParams,price_change_rule_id:{},category_type:{},preview_status:{}, resultMsg:{}.",
+                price_change_rule_id, category_type, preview_status, JSONObject.toJSONString(resultMessage));
+
         return resultMessage;
     }
 
@@ -257,7 +267,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 修改PriceChangeRuleCategoryBrand
-     *
      * @param map
      * @return
      */
@@ -328,7 +337,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据品牌ID添加下面所有2级类目的PriceChangeRuleCategoryBrand
-     *
      * @param map
      * @return
      */
@@ -361,7 +369,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据品牌ID删除下面所有2级类目的PriceChangeRuleCategoryBrand
-     *
      * @param map
      * @return
      */
@@ -448,7 +455,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 单个添加PriceChangeRuleCategoryBrand
-     *
      * @param map
      * @return
      */
@@ -509,7 +515,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据price_change_rule_category_brand_id 删除PriceChangeRuleCategoryBrand
-     *
      * @param map
      * @return
      */
@@ -549,7 +554,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 添加priceChangeRuleProductGroup
-     *
      * @param map
      * @return
      */
@@ -604,7 +608,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据price_change_rule_group_id 删除PriceChangeRuleGroup
-     *
      * @param map
      * @return
      */
@@ -644,7 +647,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 添加PriceChangeRuleProduct
-     *
      * @param map
      * @return
      */
@@ -717,7 +719,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据price_change_rule_product_id 删除PriceChangeRuleProduct
-     *
      * @param map
      * @return
      */
@@ -757,7 +758,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 修改 SystemProperty 全局默认折扣
-     *
      * @param map
      * @return
      */
@@ -790,7 +790,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 修改PriceChangeRul 修改有效日期
-     *
      * @param map
      * @return
      * @throws Exception
@@ -816,7 +815,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据price_change_rule_id 删除PriceChangeRule
-     *
      * @param map
      * @return
      */
@@ -983,7 +981,6 @@ public class PriceChangeRuleController extends BaseController {
                 priceChangeRuleCategory.get("discount_percentage").getAsString())) {
             return false;
         }
-
         return true;
     }
 

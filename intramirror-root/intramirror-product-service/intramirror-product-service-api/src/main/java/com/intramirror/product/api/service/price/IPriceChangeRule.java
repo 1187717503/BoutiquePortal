@@ -13,7 +13,6 @@ public interface IPriceChangeRule {
 
     /**
      * 定时job修改vendor价格  update in_price
-     *
      * @return true, false
      * @throws Exception
      */
@@ -23,7 +22,6 @@ public interface IPriceChangeRule {
 
     /**
      * 定时job修改shop价格 update im_price -> shop_product_sku.sale_price
-     *
      * @return true, false
      * @throws Exception
      */
@@ -31,7 +29,6 @@ public interface IPriceChangeRule {
 
     /**
      * 定时job修改admin价格 update im_price
-     *
      * @return true, false
      * @throws Exception
      */
@@ -41,15 +38,13 @@ public interface IPriceChangeRule {
 
     /**
      * 手动触发修改 product.preview_im_price
-     *
      * @return true, false
      * @throws Exception
      */
-    boolean updatePreviewPrice(Long vendor_id, Long preview_status) throws Exception;
+    boolean updatePreviewPrice(Long vendor_id, Long preview_status, Integer category_type) throws Exception;
 
     /**
      * 定时job修改shop_product.max_sale_price,shop_product.min_sale_price
-     *
      * @return
      * @throws Exception
      */
@@ -59,7 +54,6 @@ public interface IPriceChangeRule {
 
     /**
      * 定时job修改product.retail_price
-     *
      * @return
      * @throws Exception
      */
