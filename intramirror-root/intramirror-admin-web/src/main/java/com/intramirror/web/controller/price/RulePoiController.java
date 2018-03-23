@@ -3,6 +3,8 @@ package com.intramirror.web.controller.price;
 import com.intramirror.common.help.ExceptionUtils;
 import com.intramirror.common.help.PriceChangeRuleExcelUtils;
 import com.intramirror.common.utils.DateUtils;
+import com.intramirror.product.api.model.PriceChangeRule;
+import com.intramirror.product.api.service.price.IPriceChangeRule;
 import com.intramirror.product.api.service.rule.IRuleService;
 import com.intramirror.web.common.CommonProperties;
 import java.io.BufferedInputStream;
@@ -42,10 +44,14 @@ public class RulePoiController {
 
     @Resource(name = "productRuleServiceImpl")
     private IRuleService iRuleService;
+    @Resource(name = "productPriceChangeRule")
+    private IPriceChangeRule iPriceChangeRule;
 
     @RequestMapping("/download")
-    public void download(@Param("price_change_rule_id") String price_change_rule_id, @Param("type") String type ,HttpServletResponse response) {
+    public void download(@Param("price_change_rule_id") String price_change_rule_id,HttpServletResponse response) {
         try {
+            PriceChangeRule priceChangeRule=iPriceChangeRule.selectByPrimaryKey(Long.valueOf(price_change_rule_id));
+            String type = String.valueOf(priceChangeRule.getCategoryType());
             // 查询品牌目录映射
             Map<String, Object> params = new HashMap<>();
             params.put("exception_flag", 0);
@@ -112,7 +118,7 @@ public class RulePoiController {
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST, consumes = "multipart/form-data")
     @ResponseBody
-    public Response upload(@RequestParam("file") MultipartFile file, @RequestParam("price_change_rule_id") String price_change_rule_id,@RequestParam("type") String type,
+    public Response upload(@RequestParam("file") MultipartFile file, @RequestParam("price_change_rule_id") String price_change_rule_id,
             HttpServletRequest request) throws Exception {
 
         // 查询所有品牌
@@ -121,6 +127,8 @@ public class RulePoiController {
         brand0.put("english_name", "Default");
         brand0.put("brand_id", "0");
         brandMaps.add(0, brand0);
+        PriceChangeRule priceChangeRule=iPriceChangeRule.selectByPrimaryKey(Long.valueOf(price_change_rule_id));
+        String type = String.valueOf(priceChangeRule.getCategoryType());
 
         String filePath = commonProperties.getRuleExcelPath() + "upload/" + file.getOriginalFilename();
         file.transferTo(new File(filePath));

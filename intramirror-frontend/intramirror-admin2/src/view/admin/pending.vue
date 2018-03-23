@@ -32,44 +32,38 @@
           <div class="waves-effect waves-light btn" @click="showSeason=true;showShade=true;">COPY TO NEW</div>
           <div class="waves-effect waves-light btn" @click="delChangeRule">DELETE SEASON</div>
         </div>
-        <div class="main-center-2">
-          <div class="main-center-1">
-
-            <div class="head-name">
-              <p v-for="title in headerTitles.value" :key="title.name" :style="{width:(100*title.size)/headerTitles.totalSize + '%'}">
-                {{title.name}}
-              </p>
-            </div>
-            <v-app class="vapp">
-              <v-card class="datalist">
-                <v-data-table v-bind:headers="headers" v-bind:pagination.sync="pagination" v-bind:items="items">
-                  <template slot="items" scope="props">
-                    <tr v-bind:class="props.item.english_name">
-                      <td style="width: 300px;">
-                        {{ props.item.english_name }}
-                      </td>
-                      <td class="text-xs-center" v-for="(headerItem,index) in headers" :key="headerItem.value" v-if="index!=0">
-                        <v-edit-dialog lazy>{{ props.item[headerItem.value] | setTableval}}%
-                          <v-text-field slot="input" label="Edit"   single-line v-bind:value="props.item[headerItem.value] | setTableval" v-on:change="ediClothing($event,props.index,props.item.brand_id,index)"></v-text-field>
-                        </v-edit-dialog>
-                      </td>
-                      <td>
-                        <span class="mdi mdi-close" v-if="props.item.english_name!=='Default'" @click="delBrand(props.item.brand_id)"></span>
-                      </td>
-                    </tr>
-                  </template>
-                  <template slot="pageText" scope="{ pageStart, pageStop}">
-                    From {{ pageStart }} to {{ pageStop }} of {{items.length}}
-                  </template>
-                </v-data-table>
-                <div class="im-foot-page">
-                  <select-page v-model="pagination.page" :length="Math.ceil(this.items.length / pagination.rowsPerPage)"></select-page>
-                </div>
-              </v-card>
-            </v-app>
-          </div>
+        <div class="head-name">
+          <p v-for="title in headerTitles.value" :key="title.name" :style="{width:(100*title.size)/headerTitles.totalSize + '%'}">
+            {{title.name}}
+          </p>
         </div>
-
+        <v-app class="vapp">
+          <v-card class="datalist">
+            <v-data-table v-bind:headers="headers" v-bind:pagination.sync="pagination" v-bind:items="items">
+              <template slot="items" scope="props">
+                <tr v-bind:class="props.item.english_name">
+                  <td style="width: 200px;">
+                    {{ props.item.english_name }}
+                  </td>
+                  <td class="text-xs-center" v-for="(headerItem,index) in headers" :key="headerItem.value" v-if="index!=0">
+                    <v-edit-dialog lazy>{{ props.item[headerItem.value] | setTableval}}%
+                      <v-text-field slot="input" label="Edit" single-line v-bind:value="props.item[headerItem.value] | setTableval" v-on:change="ediClothing($event,props.index,props.item.brand_id,index)"></v-text-field>
+                    </v-edit-dialog>
+                  </td>
+                  <td>
+                    <span class="mdi mdi-close" v-if="props.item.english_name!=='Default'" @click="delBrand(props.item.brand_id)"></span>
+                  </td>
+                </tr>
+              </template>
+              <template slot="pageText" scope="{ pageStart, pageStop}">
+                From {{ pageStart }} to {{ pageStop }} of {{items.length}}
+              </template>
+            </v-data-table>
+            <div class="im-foot-page">
+              <select-page v-model="pagination.page" :length="Math.ceil(this.items.length / pagination.rowsPerPage)"></select-page>
+            </div>
+          </v-card>
+        </v-app>
       </div>
       <div class="brand-category">
         <div class="head-input">
@@ -407,13 +401,23 @@ export default {
         this.getTablenav(this.boutiqueVendorid);
       }
     });
-    selectActiveBrands().then(res => {
+    selectActiveBrands(1).then(res => {
       //获取Brands
       this.selectBrands = res.data.data;
     });
     selectActiveCategorys().then(res => {
       //获取Categorys
-      this.selectCategorys = res.data.data;
+      const tempData = _.filter(res.data.data, item => {
+        if (
+          item.categoryId == 1757 ||
+          item.categoryId == 1758 ||
+          item.categoryId == 1759
+        ) {
+          return false;
+        }
+        return true;
+      });
+      this.selectCategorys = tempData;
       this.isLoading = false;
       //设置table head标题
       // let j = 0;
@@ -477,7 +481,7 @@ export default {
         price_type: 3,
         vendorId: this.boutiqueVendorid
       };
-      updatePriceChangeRule(data).then(res => {
+      updatePriceChangeRule(data,1).then(res => {
         if (res.data.status === 1) {
           Materialize.toast("保存成功", 4000);
         } else {
@@ -584,7 +588,7 @@ export default {
       });
     },
     getSesaon(val) {
-      queryRuleByNotHasSesaon(val, 3).then(res => {
+      queryRuleByNotHasSesaon(val, 3, 1).then(res => {
         //COPY TO NEW data
         this.copyData = res.data.data;
       });
@@ -597,7 +601,7 @@ export default {
           this.selectProductGroup = res.data.productGroupList;
         }
       });
-      queryRuleByHasSeason(1, val, 3).then(res => {
+      queryRuleByHasSeason(1, val, 3, 1).then(res => {
         //获取head tab
         this.tableBar = res.data.data;
         if (this.tableBar.length !== 0) {
@@ -1086,7 +1090,7 @@ export default {
         this.showSeason = false;
         this.showShade = false;
         this.isLoading = true;
-        initPriceChangeRule(data).then(res => {
+        initPriceChangeRule(data,1).then(res => {
           if (res.data.status === 1) {
             this.getTablenav(this.boutiqueVendorid);
             this.arrSelectSeason = [];
@@ -1121,7 +1125,7 @@ export default {
     changePreviewStatusAction() {
       this.isLoading = true;
       this.previewToggle = !this.previewToggle;
-      changePreviewStatus(this.priceId, this.previewToggle ? 1 : 0).then(
+      changePreviewStatus(this.priceId, this.previewToggle ? 1 : 0, 1).then(
         res => {
           if (res.data.status === 1) {
             Materialize.toast("Pricing Rule 更新成功", 4000);
@@ -1134,7 +1138,7 @@ export default {
     },
     refreshPreView() {
       this.isLoading = true;
-      changePreviewStatus(this.priceId, 1).then(res => {
+      changePreviewStatus(this.priceId, 1, 1).then(res => {
         if (res.data.status === 1) {
           Materialize.toast("Pricing Rule 刷新成功", 4000);
         } else {
@@ -1145,7 +1149,7 @@ export default {
     },
     activeNow() {
       this.isLoading = true;
-      imActiveRefresh(this.priceId).then(result => {
+      imActiveRefresh(this.priceId,1).then(result => {
         this.getTablenav(this.boutiqueVendorid);
         this.getTable(this.boutiqueVendorid);
         this.isLoading = false;
@@ -1327,20 +1331,6 @@ export default {
   width: 100%;
   background-color: #fafafa;
   box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.12), 0 2px 2px 0 rgba(0, 0, 0, 0.24);
-  .main-center-2 {
-    width: 100%;
-    overflow-x: auto;
-    background-color: #fafafa;
-  }
-  .main-center-1 {
-    display: inline-block;
-    padding-top: 36px;
-  }
-  .application {
-    display: inline-block;
-    background: white;
-    margin-top: 0 !important;
-  }
   .head-btn {
     padding: 14px 0 0 23px;
     .btn {
@@ -1364,7 +1354,8 @@ export default {
     display: block;
     overflow: hidden;
     z-index: 1;
-    padding-left: 104px;
+    padding-left: 200px;
+    padding-right: 100px;
     p {
       text-align: center;
       font-size: 16px;
@@ -1380,8 +1371,6 @@ export default {
     display: inline-block;
   }
   .datalist {
-    display: inline-block;
-    width: auto;
     margin-top: 0;
   }
 }
@@ -1820,7 +1809,6 @@ export default {
 
 .vapp {
   min-height: inherit;
-  margin-top: 37px;
   .card {
     overflow: inherit;
     margin-top: 0;
