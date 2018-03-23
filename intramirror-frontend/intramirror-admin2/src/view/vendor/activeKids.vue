@@ -7,7 +7,7 @@
       <p class="tit">Effective Date: {{RuleDate}}</p>
       <div class="head-search" v-if="tableBar.length !== 0">
         <i class="mdi mdi-magnify"></i>
-        <input type="text" placeholder="Search Brand" @change="searchBrand">
+        <input type="text" placeholder="Brand" @change="searchBrand">
         <span class="mdi mdi-close" @click="searchBrand"></span>
       </div>
     </div>
@@ -80,7 +80,6 @@
 import selectPage from "../component/selectPage.vue";
 import loading from "../component/loading.vue";
 import Multiselect from "vue-multiselect";
-import * as _ from "lodash";
 import {
   searchBrandZero,
   queryRuleByProduct,
@@ -104,11 +103,19 @@ export default {
       BrandIDColorCode: [],
       productGrouplist: [],
       pagination: {},
-      isLoading: false,
       brandList: [],
-      headerTitles: {},
       boutiqueVendorid: null,
+      isLoading: false,
       headers: [
+        // {text: 'Brand', align: 'left', value: 'english_name', sortable: false},
+        // {text: 'Clothing', value: 'calories', align: 'center', sortable: false},
+        // {text: 'Shoes', value: 'fat', align: 'center', sortable: false},
+        // {text: 'Bags', value: 'carbs', align: 'center', sortable: false},
+        // {text: 'Accessory', value: 'protein', align: 'center', sortable: false},
+        // {text: 'Clothings', value: 'sodium', align: 'center', sortable: false},
+        // {text: 'Shoess', value: 'calcium', align: 'center', sortable: false},
+        // {text: 'Bagss', value: 'iron', align: 'center', sortable: false},
+        // {text: 'Accessorys', value: 'men', align: 'center', sortable: false}
       ],
       selectProductGroup: [],
       allVendor: [],
@@ -128,7 +135,7 @@ export default {
   },
   mounted() {
     this.isLoading = true;
-    queryRuleVendor(3).then(res => {
+    queryRuleVendor(1).then(res => {
       if (res.data.status === 1) {
         this.allVendor = res.data.data;
         this.boutiqueVendorid = this.allVendor[0].vendor_id;
@@ -139,18 +146,13 @@ export default {
     selectActiveCategorys().then(res => {
       //获取Categorys
       const tempData = _.filter(res.data.data, item => {
-        if (
-          item.categoryId == 1757 ||
-          item.categoryId == 1758 ||
-          item.categoryId == 1759
-        ) {
+        if (item.categoryId == 1499 || item.categoryId == 1568) {
           return false;
         }
         return true;
       });
       this.selectCategorys = tempData;
       this.isLoading = false;
-      //设置table head标题
       const list = [
         {
           text: "",
@@ -162,20 +164,27 @@ export default {
       const headerTitles = [];
       for (let item in this.selectCategorys) {
         for (let i in this.selectCategorys[item].children) {
+          // j++;
+          // this.headers[j].text = this.selectCategorys[item].children[i].name;
+          // this.headers[j].value = this.selectCategorys[item].children[
+          //   i
+          // ].categoryId;
           list.push({
             text: this.selectCategorys[item].children[i].name,
             value: this.selectCategorys[item].children[i].categoryId,
             align: "center",
             sortable: false
           });
-          // this.headers[j].text = this.selectCategorys[item].children[i].name;
-          // this.headers[j].value = this.selectCategorys[item].children[i].categoryId;
         }
         headerTitles.push({
           name: this.selectCategorys[item].name,
           size: this.selectCategorys[item].children.length
         });
       }
+      // let head2Val = this.headers[2];
+      // let head3Val = this.headers[3];
+      // this.headers[2] = head3Val;
+      // this.headers[3] = head2Val;
       let headerSize = 0;
       headerTitles.forEach(item => {
         headerSize = headerSize + item.size;
@@ -184,13 +193,7 @@ export default {
         totalSize: headerSize,
         value: headerTitles
       };
-      // let head2Val = this.headers[2];
-      // let head3Val = this.headers[3];
-      // this.headers[2] = head3Val;
-      // this.headers[3] = head2Val;
       this.headers = list;
-      console.log("*****");
-      console.log(this.headers);
     });
   },
   methods: {
@@ -212,8 +215,6 @@ export default {
       queryRuleByBrandZero(id).then(res => {
         //获取table列表
         if (res.data.status === 1) {
-          debugger;
-          console.log(res.data.data);
           this.items = res.data.data;
           setTimeout(() => {
             this.isLoading = false;
@@ -224,13 +225,12 @@ export default {
       });
     },
     getTablenav(val) {
-      //console.log(1)
       productGroup(val).then(res => {
         if (res.data.status === 1) {
           this.selectProductGroup = res.data.productGroupList;
         }
       });
-      queryRuleByHasSeason(2, val, 3, 1).then(res => {
+      queryRuleByHasSeason(2, val, 1, 2).then(res => {
         //获取head tab
         this.tableBar = res.data.data;
         if (this.tableBar.length === 0) {
@@ -291,6 +291,7 @@ export default {
 @import "../../assets/css/googlefont.css";
 @import "../../../node_modules/vuetify/dist/vuetify.min.css";
 @import "../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css";
+
 .multiselect__tags {
   background: none;
   border: none;
@@ -310,7 +311,6 @@ export default {
 
 .vapp {
   min-height: inherit;
-  margin-top: 37px;
   input {
     &:hover {
       border-bottom: 1px solid #9e9e9e;
@@ -337,6 +337,12 @@ export default {
   .btn {
     padding: 0;
   }
+}
+
+.datalist {
+  width: 100%;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .input-field {
@@ -508,18 +514,14 @@ export default {
   .application {
     background: white;
   }
-  .datalist{
-    margin-top:0;
-  }
   .head-name {
     border-bottom: 1px solid #4a4a4a;
     line-height: 36px;
     height: 36px;
     display: block;
-    position: relative;
     overflow: hidden;
     z-index: 1;
-    padding-left: 104px;
+    padding-left: 108px;
     p {
       text-align: center;
       font-size: 16px;
@@ -534,7 +536,6 @@ export default {
     overflow-x: visible;
     display: inline-block;
   }
-  
 }
 
 .brand-category {

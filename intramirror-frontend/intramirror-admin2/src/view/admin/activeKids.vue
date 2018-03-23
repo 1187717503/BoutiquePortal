@@ -140,9 +140,8 @@ export default {
       //获取Categorys
       const tempData = _.filter(res.data.data, item => {
         if (
-          item.categoryId == 1757 ||
-          item.categoryId == 1758 ||
-          item.categoryId == 1759
+          item.categoryId == 1499 ||
+          item.categoryId == 1568
         ) {
           return false;
         }
@@ -230,7 +229,7 @@ export default {
           this.selectProductGroup = res.data.productGroupList;
         }
       });
-      queryRuleByHasSeason(2, val, 3, 1).then(res => {
+      queryRuleByHasSeason(2, val, 3, 2).then(res => {
         //获取head tab
         this.tableBar = res.data.data;
         if (this.tableBar.length === 0) {

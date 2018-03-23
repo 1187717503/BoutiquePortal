@@ -3,9 +3,9 @@
  */
 import HTTP from '../http'
 let apiUrl = process.env.API_URL;
-export function queryRuleByHasSeason(id, vendor, type) {
+export function queryRuleByHasSeason(id, vendor, type, categoryType) {
   return HTTP({
-    url: 'rule/select/queryRuleByHasSeason.htm?ruleStatus=' + id + '&vendor_id=' + vendor + '&price_type=' + type
+    url: 'rule/select/queryRuleByHasSeason.htm?ruleStatus=' + id + '&vendor_id=' + vendor + '&price_type=' + type + '&categoryType=' + categoryType
   })
 }
 
@@ -15,9 +15,9 @@ export function queryRuleVendor(type) {
   })
 }
 
-export function queryRuleByNotHasSesaon(id, type) {
+export function queryRuleByNotHasSesaon(id, type, categoryType) {
   return HTTP({
-    url: 'rule/select/queryRuleByNotHasSesaon.htm?ruleStatus=1&vendor_id=' + id + '&price_type=' + type
+    url: 'rule/select/queryRuleByNotHasSesaon.htm?ruleStatus=1&vendor_id=' + id + '&price_type=' + type + '&categoryType=' + categoryType
   })
 }
 
@@ -39,9 +39,9 @@ export function queryRuleByBrandZero(id) {
   })
 }
 
-export function selectActiveBrands() {
+export function selectActiveBrands(categoryType) {
   return HTTP({
-    url: 'brand/selectActiveBrands.htm'
+    url: 'brand/selectActiveBrands.htm?categoryType='+categoryType
   })
 }
 export function selectActiveCategorys() {
@@ -82,7 +82,8 @@ export function queryAllVendor() {
   })
 }
 //创建
-export function initPriceChangeRule(data) {
+export function initPriceChangeRule(data,categoryType) {
+  data.categoryType = categoryType;
   return HTTP({
     url: 'priceChangeRule/initPriceChangeRule.htm',
     method: 'post',
@@ -188,7 +189,8 @@ export function deletePriceChangeRule(data) {
     data: data
   })
 }
-export function updatePriceChangeRule(data) {
+export function updatePriceChangeRule(data,categoryType) {
+  data.categoryType = categoryType;
   return HTTP({
     url: 'priceChangeRule/updatePriceChangeRule.htm',
     method: 'post',
@@ -220,15 +222,15 @@ export function copyRule( vendouid, type, discount = 0) {
   })
 }
 
-export function changePreviewStatus(price_id,priview_status) {
+export function changePreviewStatus(price_id,priview_status,categoryType) {
   return HTTP({
-    url: 'priceChangeRule/changepreview.htm?price_change_rule_id='+price_id+'&preview_status='+priview_status
+    url: 'priceChangeRule/changepreview.htm?price_change_rule_id='+price_id+'&preview_status='+priview_status + '&categoryType='+categoryType
   })
 }
 
-export function imActiveRefresh(priceId) {
+export function imActiveRefresh(priceId, categoryType) {
   return HTTP({
-    url: 'priceChangeRule/run/im.htm?price_change_rule_id=' + priceId
+    url: 'priceChangeRule/run/im.htm?price_change_rule_id=' + priceId + '&categoryType=' + categoryType
   })
 }
 

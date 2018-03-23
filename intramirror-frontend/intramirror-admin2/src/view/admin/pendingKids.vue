@@ -59,7 +59,6 @@
                 From {{ pageStart }} to {{ pageStop }} of {{items.length}}
               </template>
             </v-data-table>
-
             <div class="im-foot-page">
               <select-page v-model="pagination.page" :length="Math.ceil(this.items.length / pagination.rowsPerPage)"></select-page>
             </div>
@@ -131,7 +130,7 @@
           </div>
         </div>
       </div>
-      <div class="foot-btn">
+      <div class="foot-btn position-relative">
         <div class="input-field">
           <i class="mdi mdi-calendar prefix"></i>
           <input id="seleDate" type="text" class="validate" placeholder="Date" @focus="setEffectiveDate" :value="RuleDate">
@@ -139,6 +138,10 @@
         </div>
         <button class="waves-effect waves-light btn" @click="saveDate">SAVE</button>
         <button class="waves-effect waves-light btn">CANCEL</button>
+        <div class="preview-button-group">
+          <v-switch v-bind:label="`Preview`" v-model="previewToggle" class="preview-toggle" :class="{notActive:!previewToggle}" @click="changePreviewStatusAction()"></v-switch>
+          <v-icon class="preview-replay" v-show="previewToggle" @click="refreshPreView()">replay</v-icon>
+        </div>
         <input type="file" @change="getFile($event)" class="file-input" />
         <button class="waves-effect waves-light btn button-no-padding" @click="uploadFile">UPLOAD EXCL</button>
         <button class="waves-effect waves-light btn button-no-padding" @click="downloadFile">DOWNLOAD EXCL</button>
@@ -147,8 +150,18 @@
     </div>
 
     <div class="layer-copy" v-if="showCopy">
-      <p class="tit">Create New Boutique Pricing Rule</p>
+      <p class="tit">Create New IM Pricing Rule</p>
       <div class="head-input">
+        <!--<div class="input-field">-->
+        <!--<multiselect track-by="vendor_name"-->
+        <!--label="vendor_name"-->
+        <!--placeholder="Boutique" :options="allVendor" :show-labels="false"-->
+        <!--@select="selectVendor"></multiselect>-->
+        <!--</div>-->
+        <div class="adjust">
+          <span>Adjust Discount:</span>
+          <input type="text" placeholder="10%" v-model="discount">
+        </div>
       </div>
       <div class="radio-list">
         <p v-for="(i,index) in pricingRulelist">
@@ -224,8 +237,8 @@
       <p class="tit">Select Season</p>
       <div class="list-cent">
         <div v-for="(item,index) in copyData">
-          <input type="checkbox" class="filled-in" :id="'chech-'+index">
-          <label :for="'chech-'+index" data-check="false" @click="SelectSeason($event,item)">{{item.season_code}}</label>
+          <input type="checkbox" class="filled-in" :id="'check-'+item.season_code">
+          <label :for="'check-'+item.season_code" data-check="false" @click="SelectSeason($event,item)">{{item.season_code}}</label>
         </div>
       </div>
       <div class="foot-btn">
@@ -282,15 +295,17 @@ import {
   updatePriceChangeRule,
   getRuleDate,
   copyRule,
+  changePreviewStatus,
+  imActiveRefresh,
   downFileApi,
-  uploadFileApi,
-  boutiqueActiveRefresh
+  uploadFileApi
 } from "../../api/pricingrule";
 
 export default {
   data() {
     return {
       update_files: "",
+      previewToggle: false,
       showShade: false, //是否显示遮罩
       showSeason: false,
       showAddbrand: false,
@@ -311,6 +326,7 @@ export default {
       addBandleft: [],
       brandList: [],
       allVendor: [],
+      headerTitles: {},
       allvendorId: null,
       pricingRule: null,
       imAlert: {
@@ -321,9 +337,26 @@ export default {
 
       pricingRulelist: [
         { name: "Copy Active", text: "Boutique Pricing Rule" },
+        { name: "Copy Pending", text: "Boutique Pricing Rule" },
+        { name: "Copy Active", text: "IM Pricing Rule" },
         { name: "Create From Blank Pricing Rule", text: "" }
       ],
-      headers: [],
+      headers: [
+        // {
+        //   text: "Brand",
+        //   align: "left",
+        //   value: "english_name",
+        //   sortable: false
+        // },
+        // { text: "null", value: "calories", align: "center", sortable: false },
+        // { text: "null", value: "fat", align: "center", sortable: false },
+        // { text: "null", value: "carbs", align: "center", sortable: false },
+        // { text: "null", value: "protein", align: "center", sortable: false },
+        // { text: "null", value: "sodium", align: "center", sortable: false },
+        // { text: "null", value: "calcium", align: "center", sortable: false },
+        // { text: "null", value: "iron", align: "center", sortable: false },
+        // { text: "null", value: "men", align: "center", sortable: false }
+      ],
       items: [],
       addBandright: [],
       listBandright: [],
@@ -368,7 +401,7 @@ export default {
         this.getTablenav(this.boutiqueVendorid);
       }
     });
-    selectActiveBrands(1).then(res => {
+    selectActiveBrands(2).then(res => {
       //获取Brands
       this.selectBrands = res.data.data;
     });
@@ -376,9 +409,8 @@ export default {
       //获取Categorys
       const tempData = _.filter(res.data.data, item => {
         if (
-          item.categoryId == 1757 ||
-          item.categoryId == 1758 ||
-          item.categoryId == 1759
+          item.categoryId == 1499 ||
+          item.categoryId == 1568
         ) {
           return false;
         }
@@ -386,6 +418,8 @@ export default {
       });
       this.selectCategorys = tempData;
       this.isLoading = false;
+      //设置table head标题
+      // let j = 0;
       const list = [
         {
           text: "",
@@ -396,9 +430,6 @@ export default {
       ];
       const headerTitles = [];
       for (let item in this.selectCategorys) {
-        //          this.selectCategorys[item].children.sort(function (a, b) {
-        //            return b.name < a.name
-        //          });
         for (let i in this.selectCategorys[item].children) {
           list.push({
             text: this.selectCategorys[item].children[i].name,
@@ -433,7 +464,7 @@ export default {
         monthsShort: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
         selectMonths: true,
         selectYears: 15,
-        min: new Date(this.year, this.month, this.date + 1),
+        min: new Date(this.year, this.month, this.date),
         format: "dd/mmm/yyyy"
       });
     },
@@ -446,10 +477,10 @@ export default {
       let data = {
         price_change_rule_id: this.priceId,
         valid_from: dateVal,
-        price_type: 1,
+        price_type: 3,
         vendorId: this.boutiqueVendorid
       };
-      updatePriceChangeRule(data,1).then(res => {
+      updatePriceChangeRule(data,2).then(res => {
         if (res.data.status === 1) {
           Materialize.toast("保存成功", 4000);
         } else {
@@ -556,7 +587,7 @@ export default {
       });
     },
     getSesaon(val) {
-      queryRuleByNotHasSesaon(val, 1, 1).then(res => {
+      queryRuleByNotHasSesaon(val, 3, 2).then(res => {
         //COPY TO NEW data
         this.copyData = res.data.data;
       });
@@ -569,7 +600,7 @@ export default {
           this.selectProductGroup = res.data.productGroupList;
         }
       });
-      queryRuleByHasSeason(1, val, 1, 1).then(res => {
+      queryRuleByHasSeason(1, val, 3, 2).then(res => {
         //获取head tab
         this.tableBar = res.data.data;
         if (this.tableBar.length !== 0) {
@@ -609,18 +640,22 @@ export default {
       this.getTable(id);
       this.priceId = id;
       getRuleDate(id).then(res => {
+        debugger;
         if (res.data.status === 1) {
           this.RuleDate = res.data.data.validFromStr;
           this.pagination.page = 1;
+          this.previewToggle = res.data.data.preview_status ? true : false;
         }
       });
     },
     getTable(id) {
+      debugger;
       this.isLoading = true;
       queryRuleByBrandZero(id).then(res => {
         //获取table列表
         if (res.data.status === 1) {
           this.items = res.data.data;
+          console.log(this.items);
           setTimeout(() => {
             this.isLoading = false;
           }, 300);
@@ -687,6 +722,7 @@ export default {
     },
     //      编辑
     ediClothing(event, index, brandid, categoryid) {
+      debugger;
       if (!this.retDiscount(event)) {
         return false;
       }
@@ -882,7 +918,6 @@ export default {
         }
       };
       createPriceChangeRuleCategoryBrand(data).then(res => {
-        this.isLoading = false;
         if (res.data.status === 1) {
           Materialize.toast("添加成功", 4000);
           this.addBrandid = null;
@@ -897,6 +932,7 @@ export default {
         } else {
           Materialize.toast(res.data.info, 4000);
         }
+        this.isLoading = false;
       });
     },
     delBrandCateort(item) {
@@ -916,7 +952,6 @@ export default {
       });
     },
     delPriceChangeRuleGroup(item) {
-      this.isLoading = true;
       let data = {
         price_change_rule_group_id: item.price_change_rule_group_id
       };
@@ -927,7 +962,6 @@ export default {
         } else {
           Materialize.toast(res.data.info, 4000);
         }
-        this.isLoading = false;
       });
     },
     selectVendor(e) {
@@ -939,6 +973,12 @@ export default {
           this.pricingRule = index;
           break;
         case 1:
+          this.pricingRule = index;
+          break;
+        case 2:
+          this.pricingRule = index;
+          break;
+        case 3:
           this.pricingRule = index;
           break;
       }
@@ -959,7 +999,11 @@ export default {
         return false;
       }
       if (this.pricingRule === 0) {
-        copyRule(this.boutiqueVendorid, 1).then(res => {
+        activeVendor(
+          this.allvendorId,
+          this.discount === null ? 0 : this.discount,
+          this.boutiqueVendorid
+        ).then(res => {
           if (res.data.status === 1) {
             this.getTablenav(this.boutiqueVendorid);
             this.showCopy = false;
@@ -975,14 +1019,50 @@ export default {
         });
       }
       if (this.pricingRule === 1) {
+        pengingVendor(
+          this.discount === null ? 0 : this.discount,
+          this.boutiqueVendorid
+        ).then(res => {
+          if (res.data.status === 1) {
+            this.getTablenav(this.boutiqueVendorid);
+            this.showCopy = false;
+            this.showShade = false;
+          } else {
+            this.showCopy = true;
+            this.showShade = true;
+            if (!this.imAlert.show) {
+              this.imAlertfun(res.data.infoMap.info);
+            }
+          }
+          this.pricingRule = null;
+        });
+      }
+      if (this.pricingRule === 2) {
+        copyRule(
+          this.boutiqueVendorid,
+          3,
+          this.discount === null ? 0 : this.discount
+        ).then(res => {
+          if (res.data.status === 1) {
+            this.getTablenav(this.boutiqueVendorid);
+            this.showCopy = false;
+            this.showShade = false;
+          } else {
+            this.showCopy = true;
+            this.showShade = true;
+            if (!this.imAlert.show) {
+              this.imAlertfun(res.data.infoMap.info);
+            }
+          }
+          this.pricingRule = null;
+        });
+      }
+      if (this.pricingRule === 3) {
         this.showCopy = false;
         this.showSeason = true;
         this.coptyNewType = "CREATE";
         this.getSesaon(0);
         this.pricingRule = null;
-      } else {
-        this.showCopy = false;
-        this.showShade = false;
       }
     },
     SelectSeason(event, item) {
@@ -1001,7 +1081,7 @@ export default {
       if (type === "CREATE") {
         let data = {
           name: this.arrSelectSeason.toString(),
-          price_type: 1,
+          price_type: 3,
           status: 1,
           vendorId: this.boutiqueVendorid,
           price_change_rule_season_group_List: this.arrSelectSeason
@@ -1009,16 +1089,16 @@ export default {
         this.showSeason = false;
         this.showShade = false;
         this.isLoading = true;
-        initPriceChangeRule(data,1).then(res => {
+        initPriceChangeRule(data,2).then(res => {
           if (res.data.status === 1) {
             this.getTablenav(this.boutiqueVendorid);
+            this.arrSelectSeason = [];
           } else {
             if (!this.imAlert.show) {
               this.imAlertfun(res.data.info);
             }
           }
           this.coptyNewType = "COPY";
-          this.arrSelectSeason = [];
         });
       } else if (type === "COPY") {
         this.showSeason = false;
@@ -1028,18 +1108,51 @@ export default {
           this.priceId,
           this.arrSelectSeason.join(","),
           this.boutiqueVendorid,
-          1
+          3
         ).then(res => {
           if (res.data.status === 1) {
             this.getTablenav(this.boutiqueVendorid);
+            this.arrSelectSeason = [];
           } else {
             if (!this.imAlert.show) {
               this.imAlertfun(res.data.infoMap.info);
             }
           }
-          this.arrSelectSeason = [];
         });
       }
+    },
+    changePreviewStatusAction() {
+      this.isLoading = true;
+      this.previewToggle = !this.previewToggle;
+      changePreviewStatus(this.priceId, this.previewToggle ? 1 : 0,2).then(
+        res => {
+          if (res.data.status === 1) {
+            Materialize.toast("Pricing Rule 更新成功", 4000);
+          } else {
+            Materialize.toast(res.data.info, 4000);
+          }
+          this.isLoading = false;
+        }
+      );
+    },
+    refreshPreView() {
+      this.isLoading = true;
+      changePreviewStatus(this.priceId, 1, 2).then(res => {
+        if (res.data.status === 1) {
+          Materialize.toast("Pricing Rule 刷新成功", 4000);
+        } else {
+          Materialize.toast(res.data.info, 4000);
+        }
+        this.isLoading = false;
+      });
+    },
+    activeNow() {
+      this.isLoading = true;
+      imActiveRefresh(this.priceId,2).then(result => {
+        this.getTablenav(this.boutiqueVendorid);
+        this.getTable(this.boutiqueVendorid);
+        this.isLoading = false;
+      });
     },
     uploadFile() {
       if (this.update_files) {
@@ -1063,14 +1176,6 @@ export default {
     },
     getFile(event) {
       this.update_files = event.target.files[0];
-    },
-    activeNow() {
-      this.isLoading = true;
-      boutiqueActiveRefresh(this.priceId).then(result => {
-        this.getTablenav(this.boutiqueVendorid);
-        this.getTable(this.boutiqueVendorid);
-        this.isLoading = false;
-      });
     }
   },
   filters: {
@@ -1225,10 +1330,6 @@ export default {
   width: 100%;
   background-color: #fafafa;
   box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.12), 0 2px 2px 0 rgba(0, 0, 0, 0.24);
-  .application {
-    background: white;
-    margin-top: 0 !important;
-  }
   .head-btn {
     padding: 14px 0 0 23px;
     .btn {
@@ -1253,7 +1354,7 @@ export default {
     overflow: hidden;
     z-index: 1;
     padding-left: 200px;
-    padding-right: 100px;
+    padding-right:100px;
     p {
       text-align: center;
       font-size: 16px;
@@ -1382,8 +1483,8 @@ export default {
   position: fixed;
   top: 50%;
   left: 50%;
-  margin: -250px/2 0 0 -598.77px /2;
-  height: 250px;
+  margin: -350px/2 0 0 -598.77px /2;
+  height: 350px;
   width: 598.77px;
   border-radius: 2px;
   background-color: #ffffff;
@@ -1850,6 +1951,47 @@ export default {
   margin-bottom: 0;
 }
 
+.preview-toggle .input-group--selection-controls__toggle {
+  background-color: #9e2976 !important;
+}
+.preview-toggle .input-group--selection-controls__ripple::after {
+  background: #871b55;
+}
+.notActive .input-group--selection-controls__toggle {
+  background-color: rgba(34, 31, 31, 0.26) !important;
+}
+.notActive .input-group--selection-controls__ripple::after {
+  background: #f1f1f1;
+}
+.preview-toggle label {
+  font-size: 16px;
+  color: #424242;
+}
+.preview-button-group {
+  flex: 0 1 auto;
+  display: inline-flex;
+  width: 139px;
+  margin-left: 10px;
+}
+.preview-toggle {
+  margin-top: 10px;
+}
+.preview-replay {
+  color: #4a4a4a;
+  height: 48px;
+  cursor: pointer;
+}
+.active-button {
+  position: absolute;
+  right: 0;
+  margin-right: 0;
+}
+.position-relative {
+  position: relative;
+}
+.hadClicked {
+  background: #9b9b9b !important;
+}
 .file-input {
   display: inline-flex;
   flex: 0 1 auto;
@@ -1859,13 +2001,7 @@ export default {
   position: relative;
   top: 12px;
 }
-
 .button-no-padding {
   padding: 0;
-}
-
-.active-button {
-  position: absolute;
-  right: 12px;
 }
 </style>

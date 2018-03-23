@@ -368,18 +368,14 @@ export default {
         this.getTablenav(this.boutiqueVendorid);
       }
     });
-    selectActiveBrands(1).then(res => {
+    selectActiveBrands(2).then(res => {
       //获取Brands
       this.selectBrands = res.data.data;
     });
     selectActiveCategorys().then(res => {
       //获取Categorys
       const tempData = _.filter(res.data.data, item => {
-        if (
-          item.categoryId == 1757 ||
-          item.categoryId == 1758 ||
-          item.categoryId == 1759
-        ) {
+        if (item.categoryId == 1499 || item.categoryId == 1568) {
           return false;
         }
         return true;
@@ -449,7 +445,7 @@ export default {
         price_type: 1,
         vendorId: this.boutiqueVendorid
       };
-      updatePriceChangeRule(data,1).then(res => {
+      updatePriceChangeRule(data,2).then(res => {
         if (res.data.status === 1) {
           Materialize.toast("保存成功", 4000);
         } else {
@@ -556,7 +552,7 @@ export default {
       });
     },
     getSesaon(val) {
-      queryRuleByNotHasSesaon(val, 1, 1).then(res => {
+      queryRuleByNotHasSesaon(val, 1, 2).then(res => {
         //COPY TO NEW data
         this.copyData = res.data.data;
       });
@@ -569,7 +565,7 @@ export default {
           this.selectProductGroup = res.data.productGroupList;
         }
       });
-      queryRuleByHasSeason(1, val, 1, 1).then(res => {
+      queryRuleByHasSeason(1, val, 1, 2).then(res => {
         //获取head tab
         this.tableBar = res.data.data;
         if (this.tableBar.length !== 0) {
@@ -1009,7 +1005,7 @@ export default {
         this.showSeason = false;
         this.showShade = false;
         this.isLoading = true;
-        initPriceChangeRule(data,1).then(res => {
+        initPriceChangeRule(data,2).then(res => {
           if (res.data.status === 1) {
             this.getTablenav(this.boutiqueVendorid);
           } else {
