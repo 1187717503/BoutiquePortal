@@ -1,7 +1,9 @@
 package com.intramirror.web.controller.brand;
 
 import com.intramirror.common.help.ResultMessage;
+import com.intramirror.common.help.StringUtils;
 import com.intramirror.product.api.service.brand.IBrandService;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -29,10 +31,14 @@ public class BrandController {
 
     @RequestMapping("/selectActiveBrands")
     @ResponseBody
-    public ResultMessage queryActiveBrands() {
+    public ResultMessage queryActiveBrands(@Param("categoryType")String categoryType) {
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
-            List<Map<String, Object>> brands = iBrandService.queryActiveBrand();
+            Integer type = null;
+            if(StringUtils.isBlankStrings(categoryType)){
+                type = Integer.valueOf(categoryType);
+            }
+            List<Map<String, Object>> brands = iBrandService.queryActiveBrand(type);
             resultMessage.successStatus().putMsg("info", "SUCCESS").setData(brands);
         } catch (Exception e) {
             e.printStackTrace();

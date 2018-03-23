@@ -96,6 +96,9 @@ public class PriceChangeRuleExcelUtils {
         HSSFCell row1cell1 = row1.createCell(1);
         row1cell1.setCellValue("Men");
         row1cell1.setCellStyle(cellStyle);
+        HSSFCell row1cell5 = row1.createCell(5);
+        row1cell5.setCellValue("Women");
+        row1cell5.setCellStyle(cellStyle);
 
 
         sheet.addMergedRegion(new CellRangeAddress(0,0,1,4));
@@ -185,35 +188,35 @@ public class PriceChangeRuleExcelUtils {
                 }
             }
             String men_clothing = row.getCell(1).toString();
-            if(men_clothing.equals("0")){
+            if(StringUtils.isBlank(men_clothing)){
                 men_clothing = defaultValues.get(1);
             }
             String men_shoes = row.getCell(2).toString();
-            if(men_shoes.equals("0")){
+            if(StringUtils.isBlank(men_shoes)){
                 men_shoes = defaultValues.get(2);
             }
             String men_bags = row.getCell(3).toString();
-            if(men_bags.equals("0")){
+            if(StringUtils.isBlank(men_bags)){
                 men_bags = defaultValues.get(3);
             }
             String men_accessores = row.getCell(4).toString();
-            if(men_accessores.equals("0")){
+            if(StringUtils.isBlank(men_accessores)){
                 men_accessores = defaultValues.get(4);
             }
             String women_clothing = row.getCell(5).toString();
-            if(women_clothing.equals("0")){
+            if(StringUtils.isBlank(women_clothing)){
                 women_clothing = defaultValues.get(5);
             }
             String women_shoes = row.getCell(6).toString();
-            if(women_shoes.equals("0")){
+            if(StringUtils.isBlank(women_shoes)){
                 women_shoes = defaultValues.get(6);
             }
             String women_bags = row.getCell(7).toString();
-            if(women_bags.equals("0")){
+            if(StringUtils.isBlank(women_bags)){
                 women_bags = defaultValues.get(7);
             }
             String women_accessores = row.getCell(8).toString();
-            if(women_accessores.equals("0")){
+            if(StringUtils.isBlank(women_accessores)){
                 women_accessores = defaultValues.get(8);
             }
             /* Men */
@@ -347,39 +350,39 @@ public class PriceChangeRuleExcelUtils {
             }
 
             String babies_clothing = row.getCell(1).toString();
-            if(babies_clothing.equals("0")){
+            if(StringUtils.isBlank(babies_clothing)){
                 babies_clothing = defaultValues.get(1);
             }
             String babies_shoes = row.getCell(2).toString();
-            if(babies_shoes.equals("0")){
+            if(StringUtils.isBlank(babies_shoes)){
                 babies_shoes = defaultValues.get(2);
             }
             String babies_accessores = row.getCell(3).toString();
-            if(babies_accessores.equals("0")){
+            if(StringUtils.isBlank(babies_accessores)){
                 babies_accessores = defaultValues.get(3);
             }
             String boys_clothing = row.getCell(4).toString();
-            if(boys_clothing.equals("0")){
+            if(StringUtils.isBlank(boys_clothing)){
                 boys_clothing = defaultValues.get(4);
             }
             String boys_shoes = row.getCell(5).toString();
-            if(boys_shoes.equals("0")){
+            if(StringUtils.isBlank(boys_shoes)){
                 boys_shoes = defaultValues.get(5);
             }
             String boys_accessores = row.getCell(6).toString();
-            if(boys_accessores.equals("0")){
+            if(StringUtils.isBlank(boys_accessores)){
                 boys_accessores = defaultValues.get(6);
             }
             String girls_clothing = row.getCell(7).toString();
-            if(girls_clothing.equals("0")){
+            if(StringUtils.isBlank(girls_clothing)){
                 girls_clothing = defaultValues.get(7);
             }
             String girls_shoes = row.getCell(8).toString();
-            if(girls_shoes.equals("0")){
+            if(StringUtils.isBlank(girls_shoes)){
                 girls_shoes = defaultValues.get(8);
             }
             String girls_accessores = row.getCell(9).toString();
-            if(girls_accessores.equals("0")){
+            if(StringUtils.isBlank(girls_accessores)){
                 girls_accessores = defaultValues.get(9);
             }
 
