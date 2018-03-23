@@ -151,18 +151,12 @@
 
     <div class="layer-copy" v-if="showCopy">
       <p class="tit">Create New IM Pricing Rule</p>
-      <div class="head-input">
-        <!--<div class="input-field">-->
-        <!--<multiselect track-by="vendor_name"-->
-        <!--label="vendor_name"-->
-        <!--placeholder="Boutique" :options="allVendor" :show-labels="false"-->
-        <!--@select="selectVendor"></multiselect>-->
-        <!--</div>-->
+      <!-- <div class="head-input">
         <div class="adjust">
           <span>Adjust Discount:</span>
           <input type="text" placeholder="10%" v-model="discount">
         </div>
-      </div>
+      </div> -->
       <div class="radio-list">
         <p v-for="(i,index) in pricingRulelist">
           <input class="with-gap" type="radio" :id="'test'+index" name="Pricing" />
@@ -336,9 +330,6 @@ export default {
       arrSelectSeason: [],
 
       pricingRulelist: [
-        { name: "Copy Active", text: "Boutique Pricing Rule" },
-        { name: "Copy Pending", text: "Boutique Pricing Rule" },
-        { name: "Copy Active", text: "IM Pricing Rule" },
         { name: "Create From Blank Pricing Rule", text: "" }
       ],
       headers: [
@@ -1484,7 +1475,7 @@ export default {
   top: 50%;
   left: 50%;
   margin: -350px/2 0 0 -598.77px /2;
-  height: 350px;
+  height: 200px;
   width: 598.77px;
   border-radius: 2px;
   background-color: #ffffff;
