@@ -28,6 +28,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
         passUrlList = new ArrayList<>();
         passUrlList.add("/login");
         passUrlList.add("/rule");
+        passUrlList.add("/price");
         passUrlList.add("/priceChangeRule");
         //        passUrlList.add("/file");
     }
