@@ -1,3 +1,4 @@
+/*
 package com.intramirror.web.controller.price;
 
 import com.intramirror.common.help.ExceptionUtils;
@@ -11,10 +12,12 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+*/
 /**
  * Created by dingyifan on 2017/7/17.
  * price change rule job
- */
+ *//*
+
 @Controller
 @RequestMapping("/job/price")
 public class PriceChangeRuleController {
@@ -41,7 +44,8 @@ public class PriceChangeRuleController {
         return resultMessage;
     }
 
-    /*@RequestMapping(value = "/updatePriceByShop",method = RequestMethod.GET)
+    */
+/*@RequestMapping(value = "/updatePriceByShop",method = RequestMethod.GET)
     @ResponseBody
     public ResultMessage updatePriceByShop(){
 
@@ -55,7 +59,8 @@ public class PriceChangeRuleController {
             resultMessage.errorStatus().addMsg("error message : " + e.getMessage());
         }
         return resultMessage;
-    }*/
+    }*//*
+
 
     @CrossOrigin
     @RequestMapping("/updatePriceByAdmin")
@@ -91,3 +96,4 @@ public class PriceChangeRuleController {
         return resultMessage;
     }
 }
+*/
