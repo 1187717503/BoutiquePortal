@@ -116,7 +116,9 @@ public class RuleController {
             params.put("exception_flag", 0);
             params.put("english_name",english_name);
             params.put("price_change_rule_id",price_change_rule_id);
-            params.put("categoryType",Integer.valueOf(priceChangeRule.getCategoryType()));
+            if(priceChangeRule != null) {
+                params.put("categoryType", Integer.valueOf(priceChangeRule.getCategoryType()));
+            }
             List<Map<String,Object>> brandMaps =  iRuleService.queryRuleByBrand(params);
             resultMessage.successStatus().putMsg("info","success").setData(brandMaps);
         } catch (Exception e) {
