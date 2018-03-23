@@ -226,6 +226,7 @@
         <foreach item="item" index="index" collection="season_codes" open="(" separator="," close=")">
             #{item}
         </foreach>
+        and category_type = #{categoryType,jdbcType=INTEGER}
     </select>
 
     <insert id="copyPriceChangeRule" parameterType="java.util.Map">

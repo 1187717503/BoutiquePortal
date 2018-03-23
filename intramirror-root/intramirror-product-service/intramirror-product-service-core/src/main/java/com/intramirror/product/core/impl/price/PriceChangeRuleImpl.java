@@ -542,6 +542,9 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         ruleByConditionsMaps.add(params);
 
         /** start checked 该vendor下是否存在该season_code */
+        //根据price_change_rule_id查询PriceChangeRule获取categoryType
+        PriceChangeRule priceChangeRule = priceChangeRuleMapper.selectByPrimaryKey(Long.parseLong(params.get("price_change_rule_id").toString()));
+        params.put("categoryType", priceChangeRule.getCategoryType());
         params.put("season_codes", season_codes);
         List<Map<String, Object>> seasonCodeMaps = seasonMapper.querySeasonByVendor(params);
 
