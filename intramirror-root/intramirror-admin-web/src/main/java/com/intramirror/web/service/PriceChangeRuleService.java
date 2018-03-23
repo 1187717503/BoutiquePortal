@@ -160,8 +160,10 @@ public class PriceChangeRuleService {
 	            throw new RuntimeException("error");
 	        }
 	    }
-	    
-	    
+		//根据类目类型过滤类目数据
+		List<Long> allowedSecondCategoryIds = null;
+		CategoryTypeEnum categoryTypeEnum = CategoryTypeEnum.getCategoryByKey(map.get("categoryType").toString());
+		allowedSecondCategoryIds = categoryTypeEnum == null ? null : categoryTypeEnum.getSecondCategoryIds();
 
 	 	Category category = new Category();
         //类目只有2级
@@ -172,6 +174,10 @@ public class PriceChangeRuleService {
     	List<Map<String,Object>> categoryList = categoryService.queryCategoryListByConditions(category);
 	 	//设置默认值
     	for(Map<String,Object> categoryMap : categoryList){
+			long categoryId = Long.parseLong(categoryMap.get("category_id").toString());
+			if (allowedSecondCategoryIds != null && !allowedSecondCategoryIds.contains(categoryId)) {
+				continue;
+			}
 	        PriceChangeRuleCategoryBrand priceChangeRuleCategoryBrand = new PriceChangeRuleCategoryBrand();
 	        priceChangeRuleCategoryBrand.setPriceChangeRuleId(priceChangeRule.getPriceChangeRuleId());
 	        priceChangeRuleCategoryBrand.setCategoryId(Long.parseLong(categoryMap.get("category_id").toString()));
