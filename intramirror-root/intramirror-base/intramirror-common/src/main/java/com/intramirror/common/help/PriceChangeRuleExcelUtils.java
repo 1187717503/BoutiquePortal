@@ -62,11 +62,23 @@ public class PriceChangeRuleExcelUtils {
         PriceChangeRuleExcelUtils.genPriceExcel("IM Pricing Rule",brandNames,datas);*/
         List<Map<String,Object>> brandNames = new ArrayList<>();
         Map<String,Object> brand1 = new HashMap<>();
-        brand1.put("english_name","032C");
-        brand1.put("brand_id","944");
+        brand1.put("english_name","Default");
+        brand1.put("brand_id","0");
         brandNames.add(brand1);
+        Map<String,Object> brand2 = new HashMap<>();
+        brand2.put("english_name","Free City Kids");
+        brand2.put("brand_id","3636");
+        brandNames.add(brand2);
+        Map<String,Object> brand3 = new HashMap<>();
+        brand3.put("english_name","Frency & Mercury Kids");
+        brand3.put("brand_id","3637");
+        brandNames.add(brand3);
+        Map<String,Object> brand4 = new HashMap<>();
+        brand4.put("english_name","Frescobol Carioca Kids");
+        brand4.put("brand_id","3638");
+        brandNames.add(brand4);
 
-       PriceChangeRuleExcelUtils.readRuleExcel("/Users/dingyifan/Downloads/workbook.xls",brandNames,"12");
+       PriceChangeRuleExcelUtils.readRuleExcelKids("/Users/juzhongzheng/Desktop/20180323165033.xls",brandNames,"12");
 
     }
 
@@ -185,39 +197,63 @@ public class PriceChangeRuleExcelUtils {
             if(brand_id.equals("0")){
                 defaultValues.add(0,"0");
                 for(int i=1;i<9;i++){
-                    defaultValues.add(i,row.getCell(i).toString());
+                    if(row.getCell(i) != null && StringUtils.isNotBlank(row.getCell(i).toString())){
+                        defaultValues.add(i,row.getCell(i).toString());
+                    }else {
+                        defaultValues.add(i,"0");
+                    }
                 }
             }
-            String men_clothing = row.getCell(1).toString();
-            if(StringUtils.isBlank(men_clothing)){
+            String men_clothing ;
+            if(row.getCell(1) != null && StringUtils.isNotBlank(row.getCell(1).toString())){
+                men_clothing = row.getCell(1).toString();
+            }else {
                 men_clothing = defaultValues.get(1);
             }
-            String men_shoes = row.getCell(2).toString();
-            if(StringUtils.isBlank(men_shoes)){
+
+            String men_shoes;
+            if(row.getCell(2) != null && StringUtils.isNotBlank(row.getCell(2).toString())){
+
+                men_shoes = row.getCell(7).toString();
+            }else {
                 men_shoes = defaultValues.get(2);
             }
-            String men_bags = row.getCell(3).toString();
-            if(StringUtils.isBlank(men_bags)){
+            String men_bags;
+            if(row.getCell(3) != null && StringUtils.isNotBlank(row.getCell(3).toString())){
+
+                men_bags = row.getCell(3).toString();
+            }else {
                 men_bags = defaultValues.get(3);
             }
-            String men_accessores = row.getCell(4).toString();
-            if(StringUtils.isBlank(men_accessores)){
+            String men_accessores;
+            if(row.getCell(4) != null && StringUtils.isNotBlank(row.getCell(4).toString())){
+                men_accessores = row.getCell(4).toString();
+            }else {
                 men_accessores = defaultValues.get(4);
             }
-            String women_clothing = row.getCell(5).toString();
-            if(StringUtils.isBlank(women_clothing)){
+            String women_clothing;
+            if(row.getCell(5) != null && StringUtils.isNotBlank(row.getCell(5).toString())){
+                women_clothing = row.getCell(5).toString();
+            }else {
                 women_clothing = defaultValues.get(5);
             }
-            String women_shoes = row.getCell(6).toString();
-            if(StringUtils.isBlank(women_shoes)){
+            String women_shoes;
+            if(row.getCell(6) != null && StringUtils.isNotBlank(row.getCell(6).toString())){
+
+                women_shoes = row.getCell(6).toString();
+            }else {
                 women_shoes = defaultValues.get(6);
             }
-            String women_bags = row.getCell(7).toString();
-            if(StringUtils.isBlank(women_bags)){
+            String women_bags;
+            if(row.getCell(7) != null && StringUtils.isNotBlank(row.getCell(7).toString())){
+                women_bags = row.getCell(7).toString();
+            }else {
                 women_bags = defaultValues.get(7);
             }
-            String women_accessores = row.getCell(8).toString();
-            if(StringUtils.isBlank(women_accessores)){
+            String women_accessores;
+            if(row.getCell(8) != null && StringUtils.isNotBlank(row.getCell(8).toString())){
+                women_accessores = row.getCell(8).toString();
+            }else {
                 women_accessores = defaultValues.get(8);
             }
             /* Men */
@@ -347,44 +383,74 @@ public class PriceChangeRuleExcelUtils {
             String brand_id = getBrandId(brandNames,row.getCell(0).getStringCellValue());
             if(brand_id.equals("0")){ //default brand
                 defaultValues.add(0,"0");
-                for(int i = 1;i<10;i++)
-                    defaultValues.add(i,row.getCell(i).toString());// 设置默认
+                for(int i = 1;i<10;i++) {
+                    if(row.getCell(i) != null && StringUtils.isNotBlank(row.getCell(i).toString())) {
+                        defaultValues.add(i, row.getCell(i).toString());// 设置默认
+                    }else {
+                        defaultValues.add(i,"0");
+                    }
+                }
             }
-
-            String babies_clothing = row.getCell(1).toString();
-            if(StringUtils.isBlank(babies_clothing)){
+            String babies_clothing;
+            if(row.getCell(1) !=null && StringUtils.isNotBlank(row.getCell(1).toString())){
+                babies_clothing = row.getCell(1).toString();
+            }else {
                 babies_clothing = defaultValues.get(1);
             }
-            String babies_shoes = row.getCell(2).toString();
-            if(StringUtils.isBlank(babies_shoes)){
+
+
+            String babies_shoes;
+            if(row.getCell(2) != null && StringUtils.isNotBlank(row.getCell(2).toString())){
+                babies_shoes = row.getCell(2).toString();
+            }else {
                 babies_shoes = defaultValues.get(2);
             }
-            String babies_accessores = row.getCell(3).toString();
-            if(StringUtils.isBlank(babies_accessores)){
+            String babies_accessores;
+            if(row.getCell(3) != null && StringUtils.isNotBlank(row.getCell(3).toString())){
+                babies_accessores = row.getCell(3).toString();
+            }else {
                 babies_accessores = defaultValues.get(3);
             }
-            String boys_clothing = row.getCell(4).toString();
-            if(StringUtils.isBlank(boys_clothing)){
+
+            String boys_clothing;
+            if(row.getCell(4) != null && StringUtils.isNotBlank(row.getCell(4).toString())){
+                boys_clothing = row.getCell(4).toString();
+            }else {
                 boys_clothing = defaultValues.get(4);
             }
-            String boys_shoes = row.getCell(5).toString();
-            if(StringUtils.isBlank(boys_shoes)){
+
+            String boys_shoes;
+            if(row.getCell(5) != null && StringUtils.isNotBlank(row.getCell(5).toString())){
+                boys_shoes = row.getCell(5).toString();
+            }else {
                 boys_shoes = defaultValues.get(5);
             }
-            String boys_accessores = row.getCell(6).toString();
-            if(StringUtils.isBlank(boys_accessores)){
+
+            String boys_accessores;
+            if(row.getCell(6) != null && StringUtils.isNotBlank(row.getCell(6).toString())){
+                boys_accessores = row.getCell(6).toString();
+            }else {
                 boys_accessores = defaultValues.get(6);
             }
-            String girls_clothing = row.getCell(7).toString();
-            if(StringUtils.isBlank(girls_clothing)){
+
+            String girls_clothing;
+            if(row.getCell(7) != null && StringUtils.isNotBlank(row.getCell(7).toString())){
+                girls_clothing = row.getCell(7).toString();
+            }else {
                 girls_clothing = defaultValues.get(7);
             }
-            String girls_shoes = row.getCell(8).toString();
-            if(StringUtils.isBlank(girls_shoes)){
+
+            String girls_shoes;
+            if(row.getCell(8) != null && StringUtils.isNotBlank(row.getCell(8).toString())){
+                girls_shoes = row.getCell(8).toString();
+            }else {
                 girls_shoes = defaultValues.get(8);
             }
-            String girls_accessores = row.getCell(9).toString();
-            if(StringUtils.isBlank(girls_accessores)){
+
+            String girls_accessores;
+            if(row.getCell(9) != null && StringUtils.isNotBlank(row.getCell(9).toString())){
+                girls_accessores = row.getCell(9).toString();
+            }else {
                 girls_accessores = defaultValues.get(9);
             }
 
