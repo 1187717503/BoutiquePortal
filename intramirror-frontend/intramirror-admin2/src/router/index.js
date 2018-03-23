@@ -6,9 +6,13 @@ import HomeView from '../view/home/index.vue'
 import Default from '../view/admin/default.vue'
 import Active from '../view/admin/active.vue'
 import Pending from '../view/admin/pending.vue'
+import ActiveKids from '../view/admin/activeKids.vue'
+import PendingKids from '../view/admin/pendingKids.vue'
 
 import VendorActive from '../view/vendor/active.vue'
 import VendorPending from '../view/vendor/pending.vue'
+import VendorActiveKids from '../view/vendor/activeKids.vue'
+import VendorPendingKids from '../view/vendor/pendingKids.vue'
 
 import ApiError from '../view/error/index.vue'
 
@@ -51,6 +55,24 @@ const routes = [
         },
         component: Default
       },
+      ,
+      {
+        path: 'admin/activeKids',
+        name: 'Active Kids',
+        meta: {
+          title: 'IM Pricing Rule - Active Kids'
+        },
+        component: ActiveKids
+      }
+      ,
+      {
+        path: 'admin/pendingKids',
+        name: 'Pending Kids',
+        meta: {
+          title: 'IM Pricing Rule - Pending Kids'
+        },
+        component: PendingKids
+      },
       {
         path: 'vendor/active',
         name: 'VendorActive',
@@ -67,7 +89,22 @@ const routes = [
         },
         component: VendorPending
       },
-
+      {
+        path: 'vendor/activeKids',
+        name: 'VendorActiveKids',
+        meta: {
+          title: 'Boutique Pricing Rule - Active Kids'
+        },
+        component: VendorActiveKids
+      },
+      {
+        path: 'vendor/pendingKids',
+        name: 'VendorPendingKids',
+        meta: {
+          title: 'Boutique Pricing Rule - Pending Kids'
+        },
+        component: VendorPendingKids
+      },
       {
         path: 'error',
         name: 'ApiError',

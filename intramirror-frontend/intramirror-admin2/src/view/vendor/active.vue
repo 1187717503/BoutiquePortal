@@ -22,7 +22,6 @@
         </div>
       </div>
       <div class="main-center">
-        <div class="main-center-1">
           <div class="head-name">
             <p v-for="title in headerTitles.value" :key="title.name" :style="{width:(100*title.size)/headerTitles.totalSize + '%'}">
               {{title.name}}
@@ -50,7 +49,6 @@
               </div>
             </v-card>
           </v-app>
-        </div>
       </div>
       <div class="brand-category">
         <p class="tit">Exception - Brand & Category</p>
@@ -147,7 +145,17 @@ export default {
 
     selectActiveCategorys().then(res => {
       //获取Categorys
-      this.selectCategorys = res.data.data;
+      const tempData = _.filter(res.data.data, item => {
+        if (
+          item.categoryId == 1757 ||
+          item.categoryId == 1758 ||
+          item.categoryId == 1759
+        ) {
+          return false;
+        }
+        return true;
+      });
+      this.selectCategorys = tempData;
       this.isLoading = false;
       const list = [
         {
@@ -226,7 +234,7 @@ export default {
           this.selectProductGroup = res.data.productGroupList;
         }
       });
-      queryRuleByHasSeason(2, val, 1).then(res => {
+      queryRuleByHasSeason(2, val, 1,1).then(res => {
         //获取head tab
         this.tableBar = res.data.data;
         if (this.tableBar.length === 0) {
@@ -307,7 +315,6 @@ export default {
 
 .vapp {
   min-height: inherit;
-  margin-top: 37px;
   input {
     &:hover {
       border-bottom: 1px solid #9e9e9e;
@@ -338,6 +345,8 @@ export default {
 
 .datalist {
   width: 100%;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .input-field {
@@ -505,15 +514,8 @@ export default {
   width: 100%;
   background-color: #fafafa;
   box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.12), 0 2px 2px 0 rgba(0, 0, 0, 0.24);
-  overflow-x: auto;
   position: relative;
-  .main-center-1 {
-    display: inline-block;
-    position: relative;
-    padding-top: 36px;
-  }
   .application {
-    display: inline-block;
     background: white;
   }
   .head-name {
@@ -521,13 +523,9 @@ export default {
     line-height: 36px;
     height: 36px;
     display: block;
-    position: absolute;
     overflow: hidden;
     z-index: 1;
-    padding-left: 104px;
-    top: 0;
-    left: 0;
-    right: 0;
+    padding-left: 108px;
     p {
       text-align: center;
       font-size: 16px;
@@ -541,12 +539,6 @@ export default {
   .table__overflow {
     overflow-x: visible;
     display: inline-block;
-  }
-  .datalist {
-    display: inline-block;
-    width: auto;
-    margin-top: 0;
-    box-shadow: none !important;
   }
 }
 
