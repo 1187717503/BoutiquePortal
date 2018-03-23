@@ -329,9 +329,7 @@ export default {
       },
       arrSelectSeason: [],
 
-      pricingRulelist: [
-        { name: "Create From Blank Pricing Rule", text: "" }
-      ],
+      pricingRulelist: [{ name: "Create From Blank Pricing Rule", text: "" }],
       headers: [
         // {
         //   text: "Brand",
@@ -399,10 +397,7 @@ export default {
     selectActiveCategorys().then(res => {
       //获取Categorys
       const tempData = _.filter(res.data.data, item => {
-        if (
-          item.categoryId == 1499 ||
-          item.categoryId == 1568
-        ) {
+        if (item.categoryId == 1499 || item.categoryId == 1568) {
           return false;
         }
         return true;
@@ -471,7 +466,7 @@ export default {
         price_type: 3,
         vendorId: this.boutiqueVendorid
       };
-      updatePriceChangeRule(data,2).then(res => {
+      updatePriceChangeRule(data, 2).then(res => {
         if (res.data.status === 1) {
           Materialize.toast("保存成功", 4000);
         } else {
@@ -959,20 +954,20 @@ export default {
       this.allvendorId = e.vendor_id;
     },
     selectPricingRule(index) {
-      switch (index) {
-        case 0:
-          this.pricingRule = index;
-          break;
-        case 1:
-          this.pricingRule = index;
-          break;
-        case 2:
-          this.pricingRule = index;
-          break;
-        case 3:
-          this.pricingRule = index;
-          break;
-      }
+      // switch (index) {
+      //   case 0:
+      //     this.pricingRule = index;
+      //     break;
+      //   case 1:
+      //     this.pricingRule = index;
+      //     break;
+      //   case 2:
+      //     this.pricingRule = index;
+      //     break;
+      // case 3:
+      this.pricingRule = 3;
+      //     break;
+      // }
     },
     cancelCopy() {
       //        if (this.tableBar.length === 0) {
@@ -1080,7 +1075,7 @@ export default {
         this.showSeason = false;
         this.showShade = false;
         this.isLoading = true;
-        initPriceChangeRule(data,2).then(res => {
+        initPriceChangeRule(data, 2).then(res => {
           if (res.data.status === 1) {
             this.getTablenav(this.boutiqueVendorid);
             this.arrSelectSeason = [];
@@ -1115,7 +1110,7 @@ export default {
     changePreviewStatusAction() {
       this.isLoading = true;
       this.previewToggle = !this.previewToggle;
-      changePreviewStatus(this.priceId, this.previewToggle ? 1 : 0,2).then(
+      changePreviewStatus(this.priceId, this.previewToggle ? 1 : 0, 2).then(
         res => {
           if (res.data.status === 1) {
             Materialize.toast("Pricing Rule 更新成功", 4000);
@@ -1139,7 +1134,7 @@ export default {
     },
     activeNow() {
       this.isLoading = true;
-      imActiveRefresh(this.priceId,2).then(result => {
+      imActiveRefresh(this.priceId, 2).then(result => {
         this.getTablenav(this.boutiqueVendorid);
         this.getTable(this.boutiqueVendorid);
         this.isLoading = false;
@@ -1345,7 +1340,7 @@ export default {
     overflow: hidden;
     z-index: 1;
     padding-left: 200px;
-    padding-right:100px;
+    padding-right: 100px;
     p {
       text-align: center;
       font-size: 16px;
