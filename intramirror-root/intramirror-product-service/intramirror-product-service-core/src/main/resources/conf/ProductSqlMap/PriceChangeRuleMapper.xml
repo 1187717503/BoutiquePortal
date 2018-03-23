@@ -711,19 +711,7 @@
         inner join `sku` s on(s.`product_id` = p.`product_id`  and s.`enabled`  = 1 and p.`enabled`  = 1)
         /*inner join `price_change_rule`  pcr on(p.`vendor_id` = pcr.`vendor_id` )*/
         set p.`preview_im_price`  = null
-        where p.`vendor_id`  = #{vendor_id,jdbcType=BIGINT} <![CDATA[ and p.`preview_im_price`  >=  s.`im_price`
-
-
-
-
-
-
-
-
-
-
-
-        ]]>
+        where p.`vendor_id`  = #{vendor_id,jdbcType=BIGINT} <![CDATA[ and p.`preview_im_price`  >=  s.`im_price`]]>
     </update>
 
     <update id="updateProductImPrice">
@@ -740,7 +728,7 @@
     </update>
 
     <update id="updatePriceChangeRulePreviewStatus">
-        update `price_change_rule`  set `preview_status` = #{preview_status,jdbcType=BIGINT} where `status`  = 1 and price_type = 3 and `vendor_id`  = #{vendor_id,jdbcType=BIGINT};
+        update `price_change_rule`  set `preview_status` = #{preview_status,jdbcType=BIGINT} where `category_type` = #{category_type,jdbcType=BIGINT} and `status`  = 1 and price_type = 3 and `vendor_id`  = #{vendor_id,jdbcType=BIGINT};
     </update>
     <!-- end dingyifan -->
 </mapper>
