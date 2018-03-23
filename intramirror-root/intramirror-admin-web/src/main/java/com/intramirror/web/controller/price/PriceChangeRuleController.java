@@ -142,15 +142,20 @@ public class PriceChangeRuleController extends BaseController {
 
     @RequestMapping("/changepreview")
     @ResponseBody
-    public ResultMessage changePreview(@Param("price_change_rule_id") Long price_change_rule_id, @Param("preview_status") Long preview_status) {
+    public ResultMessage changePreview(@Param("price_change_rule_id") Long price_change_rule_id, @Param("preview_status") Long preview_status,
+            @Param("category_type") Integer category_type) {
         logger.info("PriceChangeRuleController,changePreview,inputParams,price_change_rule_id:{},category_type:{},preview_status:{} ", price_change_rule_id,
-                preview_status);
+                category_type, preview_status);
 
         ResultMessage resultMessage = ResultMessage.getInstance();
+        if (category_type == null) {
+            resultMessage.errorStatus().putMsg("info", "error message: category type is empty.");
+            return resultMessage;
+        }
 
         try {
             PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(price_change_rule_id);
-            priceChangeRule.updatePreviewPrice(pcrModel.getVendorId(), preview_status, pcrModel.getCategoryType());
+            priceChangeRule.updatePreviewPrice(pcrModel.getVendorId(), preview_status, category_type);
             resultMessage.successStatus().putMsg("info", "success !!!");
         } catch (Exception e) {
             e.printStackTrace();
@@ -158,8 +163,8 @@ public class PriceChangeRuleController extends BaseController {
             resultMessage.errorStatus().putMsg("info", "error message : " + e.getMessage());
         }
 
-        logger.info("PriceChangeRuleController,changePreview,inputParams,price_change_rule_id:{},preview_status:{}, resultMsg:{}.", price_change_rule_id,
-                preview_status, JSONObject.toJSONString(resultMessage));
+        logger.info("PriceChangeRuleController,changePreview,inputParams,price_change_rule_id:{},category_type:{},preview_status:{}, resultMsg:{}.",
+                price_change_rule_id, category_type, preview_status, JSONObject.toJSONString(resultMessage));
         return resultMessage;
     }
 
