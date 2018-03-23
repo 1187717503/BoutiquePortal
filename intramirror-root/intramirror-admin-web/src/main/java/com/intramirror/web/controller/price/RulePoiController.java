@@ -44,7 +44,7 @@ public class RulePoiController {
     private IRuleService iRuleService;
 
     @RequestMapping("/download")
-    public void download(@Param("price_change_rule_id") String price_change_rule_id, HttpServletResponse response) {
+    public void download(@Param("price_change_rule_id") String price_change_rule_id, @Param("type") String type ,HttpServletResponse response) {
         try {
             // 查询品牌目录映射
             Map<String, Object> params = new HashMap<>();
@@ -65,7 +65,11 @@ public class RulePoiController {
             String filePath = commonProperties.getRuleExcelPath() + "download/" + fileName;
 
             logger.info("RulePoiController,download,filePath:" + filePath);
-            PriceChangeRuleExcelUtils.genPriceExcel("Pricing Rule", brandMaps, dataMaps, filePath);
+            if("1".equals(type)) {
+                PriceChangeRuleExcelUtils.genPriceExcel("Pricing Rule", brandMaps, dataMaps, filePath);
+            }else if("2".equals(type)){
+                PriceChangeRuleExcelUtils.genPriceExcelKids("Pricing Rule", brandMaps, dataMaps, filePath);
+            }
             File file = new File(filePath);
             response.setContentType("application/force-download");
             response.addHeader("Content-Disposition", "attachment;fileName=" + fileName);
@@ -108,7 +112,7 @@ public class RulePoiController {
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST, consumes = "multipart/form-data")
     @ResponseBody
-    public Response upload(@RequestParam("file") MultipartFile file, @RequestParam("price_change_rule_id") String price_change_rule_id,
+    public Response upload(@RequestParam("file") MultipartFile file, @RequestParam("price_change_rule_id") String price_change_rule_id,@RequestParam("type") String type,
             HttpServletRequest request) throws Exception {
 
         // 查询所有品牌
@@ -120,18 +124,22 @@ public class RulePoiController {
 
         String filePath = commonProperties.getRuleExcelPath() + "upload/" + file.getOriginalFilename();
         file.transferTo(new File(filePath));
+        List<Map<String, Object>> categoryBrandMapList = null;
+        if("1".equals(type)) {
+             categoryBrandMapList = PriceChangeRuleExcelUtils.readRuleExcel(filePath, brandMaps, price_change_rule_id);
 
-        List<Map<String, Object>> categoryBrandMapList = PriceChangeRuleExcelUtils.readRuleExcel(filePath, brandMaps, price_change_rule_id);
-
+        }else if("2".equals(type)) {
+            categoryBrandMapList = PriceChangeRuleExcelUtils.readRuleExcelKids(filePath, brandMaps, price_change_rule_id);
+        }
         //  检查Excel数据的可用性
-        this.checkExcelData(categoryBrandMapList);
+        this.checkExcelData(categoryBrandMapList,type);
 
         iRuleService.changeRule(price_change_rule_id, categoryBrandMapList);
 
         return Response.success();
     }
 
-    private void checkExcelData(List<Map<String, Object>> categoryBrandMapList) throws Exception {
+    private void checkExcelData(List<Map<String, Object>> categoryBrandMapList,String type) throws Exception {
         if (categoryBrandMapList == null || categoryBrandMapList.size() == 0) {
             throw new RuntimeException("没有读取到Excel的数据。");
         }
@@ -150,7 +158,12 @@ public class RulePoiController {
         }
 
         int sum = categoryBrandMapList.size();
-        int jsum = set.size() * 23;
+        int jsum = 0;
+        if("1".equals(type)) {
+            jsum = set.size() * 8; // men women 导出
+        }else if("2".equals(type)){
+            jsum = set.size() * 9; // kids 校验
+        }
         if (sum != jsum) {
             throw new RuntimeException("Excel品牌数据存在重复。");
         }
