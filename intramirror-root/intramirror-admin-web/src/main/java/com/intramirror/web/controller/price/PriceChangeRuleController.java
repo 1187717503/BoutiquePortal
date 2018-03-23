@@ -872,6 +872,10 @@ public class PriceChangeRuleController extends BaseController {
             return false;
         }
 
+        if (params.get("categoryType") == null || StringUtils.isBlank(params.get("categoryType").toString())) {
+            return false;
+        }
+
         return true;
     }
 

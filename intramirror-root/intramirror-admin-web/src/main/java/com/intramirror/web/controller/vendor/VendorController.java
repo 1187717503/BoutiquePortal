@@ -60,7 +60,9 @@ public class VendorController {
 //            params.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
             params.put("price_type", Integer.parseInt(price_type));
             params.put("status",status);
-            params.put("categoryType",categoryType);
+            if(StringUtils.isNotBlank(categoryType)) {
+                params.put("categoryType", categoryType);
+            }
             List<Map<String,Object>> allVendorMaps = iQueryVendorService.queryRuleVendor(params);
             if(allVendorMaps != null && allVendorMaps.size() > 0) {
                 resultMessage.successStatus().putMsg("info","success").setData(allVendorMaps);
