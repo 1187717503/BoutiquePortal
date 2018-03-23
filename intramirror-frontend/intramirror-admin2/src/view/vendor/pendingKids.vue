@@ -320,7 +320,7 @@ export default {
       arrSelectSeason: [],
 
       pricingRulelist: [
-        { name: "Copy Active", text: "Boutique Pricing Rule" },
+        // { name: "Copy Active", text: "Boutique Pricing Rule" },
         { name: "Create From Blank Pricing Rule", text: "" }
       ],
       headers: [],
@@ -1379,7 +1379,7 @@ export default {
   top: 50%;
   left: 50%;
   margin: -250px/2 0 0 -598.77px /2;
-  height: 250px;
+  height: 200px;
   width: 598.77px;
   border-radius: 2px;
   background-color: #ffffff;
