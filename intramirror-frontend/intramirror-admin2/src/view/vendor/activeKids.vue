@@ -510,7 +510,6 @@ export default {
   width: 100%;
   background-color: #fafafa;
   box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.12), 0 2px 2px 0 rgba(0, 0, 0, 0.24);
-  position: relative;
   .application {
     background: white;
   }

@@ -372,7 +372,8 @@
 
     <select id="selectSecondCategoryRule" resultType="java.util.Map" parameterType="java.util.Map">
 
-        select pcrcb.discount_percentage,pcr.vendor_id,pcr.shop_id,pcrcb.category_id,pcrcb.`level`,pcr.price_change_rule_id,pcrcb.brand_id from price_change_rule pcr
+        select pcrcb.discount_percentage,pcr.vendor_id,pcr.shop_id,pcrcb.category_id,pcrcb.`level`,pcr.price_change_rule_id,pcrcb.brand_id from
+        price_change_rule pcr
         inner join price_change_rule_category_brand pcrcb on (pcr.price_change_rule_id = pcrcb.price_change_rule_id and pcrcb.`level` = 2)
         where 1=1
         and pcr.price_type = #{price_type,jdbcType=BIGINT}
@@ -390,7 +391,8 @@
 
     <select id="selectAllCategoryRule" resultType="java.util.Map" parameterType="java.util.Map">
 
-        select pcrcb.discount_percentage,pcr.vendor_id,pcr.shop_id,pcrcb.category_id,pcrcb.`level`,pcrcb.brand_id,pcr.price_change_rule_id from price_change_rule pcr
+        select pcrcb.discount_percentage,pcr.vendor_id,pcr.shop_id,pcrcb.category_id,pcrcb.`level`,pcrcb.brand_id,pcr.price_change_rule_id from
+        price_change_rule pcr
         inner join price_change_rule_category_brand pcrcb on (pcr.price_change_rule_id = pcrcb.price_change_rule_id)
         where 1=1
         and pcr.price_type = #{price_type,jdbcType=BIGINT}
@@ -706,23 +708,11 @@
     </update>
 
     <update id="updateProductPreviewPrice">
-
         update `product`  p
         inner join `sku` s on(s.`product_id` = p.`product_id`  and s.`enabled`  = 1 and p.`enabled`  = 1)
         /*inner join `price_change_rule`  pcr on(p.`vendor_id` = pcr.`vendor_id` )*/
         set p.`preview_im_price`  = null
         where p.`vendor_id`  = #{vendor_id,jdbcType=BIGINT} <![CDATA[ and p.`preview_im_price`  >=  s.`im_price`
-
-
-
-
-
-
-
-
-
-
-
         ]]>
     </update>
 
@@ -733,14 +723,22 @@
     </update>
 
     <update id="clearProductPreviewPrice">
-
-        update `product`  p
-        set p.`preview_im_price`  = null
-        where p.`vendor_id`  = #{vendor_id,jdbcType=BIGINT}
+        update `product` p
+        set p.`preview_im_price` = null
+        where p.`vendor_id` = #{vendor_id,jdbcType=BIGINT}
+        <if test="category_type == 1">
+            and category_id in (select category_id from category where parent_id in (select category_id from category where parent_id in (1499,1568) and
+            enabled=1) and enabled=1)
+        </if>
+        <if test="category_type == 2">
+            and category_id in (select category_id from category where parent_id in (select category_id from category where parent_id not in (1499,1568) and
+            level =1 and
+            enabled=1) and enabled=1)
+        </if>
     </update>
 
     <update id="updatePriceChangeRulePreviewStatus">
-        update `price_change_rule`  set `preview_status` = #{preview_status,jdbcType=BIGINT} where `status`  = 1 and price_type = 3 and `vendor_id`  = #{vendor_id,jdbcType=BIGINT};
+        update `price_change_rule`  set `preview_status` = #{preview_status,jdbcType=BIGINT} where `category_type` = #{category_type,jdbcType=BIGINT} and `status`  = 1 and price_type = 3 and `vendor_id`  = #{vendor_id,jdbcType=BIGINT};
     </update>
     <!-- end dingyifan -->
 </mapper>
