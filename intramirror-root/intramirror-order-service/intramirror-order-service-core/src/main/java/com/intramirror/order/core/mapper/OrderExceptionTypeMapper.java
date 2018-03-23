@@ -14,8 +14,7 @@ public interface OrderExceptionTypeMapper {
 
 	/**
 	 * 保存订单当前的用户留言
-	 * @param map
 	 * @return
 	 */
-	List<Map<String, Object>> getExceptionType(Map<String, Object> map);
+	List<Map<String, Object>> getExceptionType();
 }

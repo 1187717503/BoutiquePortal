@@ -109,7 +109,12 @@ values(#{containerType,jdbcType=VARCHAR}, #{shipToGeography,jdbcType=VARCHAR},#{
     </choose>
     
     <if test="ship_to_geography != null" >
-      	and c.ship_to_geography = #{ship_to_geography,jdbcType=VARCHAR}
+		and (c.ship_to_geography = #{ship_to_geography,jdbcType=VARCHAR}
+		<if test="ship_to_geography == 'China exl. Taiwan'">
+			OR c.ship_to_geography = 'HongKong' OR c.ship_to_geography = 'China Mainland'
+		</if
+		>
+		)
     </if>
 	
 			

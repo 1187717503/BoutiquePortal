@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.intramirror.order.core.mapper.OrderExceptionTypeMapper">
   
-	<select id="getExceptionType" resultType="java.util.HashMap" parameterType="java.util.Map">
-		SELECT * FROM order_exception_type;
+	<select id="getExceptionType" resultType="java.util.HashMap">
+		SELECT * FROM order_exception_type ORDER BY order_exception_type_id ASC;
 	</select>
 </mapper>

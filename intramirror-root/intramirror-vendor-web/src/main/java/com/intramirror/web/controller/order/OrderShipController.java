@@ -169,8 +169,27 @@ public class OrderShipController extends BaseController {
 //					}
 //				}
 
+                //获取product列表
+                Set<Long> shipmentIds =  new HashSet<>();
+                for (Map<String, Object> container:containerList){
+                    shipmentIds.add(Long.parseLong(container.get("shipment_id").toString()));
+                }
+                paramtMap.put("shipmentIds",shipmentIds);
+                paramtMap.put("status",7);
+                List<Map<String, Object>> orderList = orderService.getOrderListByShipmentId(paramtMap);
+
 
                 for (Map<String, Object> container : containerList) {
+                    List<Map<String,Object>> orderListContain = new LinkedList<>();
+                    String containerId = container.get("container_id").toString();
+                    if(orderList!=null&&orderList.size()>0){
+                        for (Map<String, Object> order :orderList){
+                            if(containerId.equals(order.get("container_id").toString())){
+                                orderListContain.add(order);
+                            }
+                        }
+                    }
+                    container.put("orderList",orderListContain);
 
                     //根据shipment_id 分组
                     if (shipMentCartonList.containsKey(container.get("shipment_id").toString())) {
@@ -186,8 +205,12 @@ public class OrderShipController extends BaseController {
                         shipMent.put("shipment_id", container.get("shipment_id").toString());
                         shipMent.put("shipment_no", container.get("shipment_no").toString());
                         shipMent.put("shipment_status", container.get("shipment_status").toString());
-
-                        shipMent.put("ship_to_geography", container.get("ship_to_geography").toString());
+                        String shipToGeography = container.get("ship_to_geography").toString();
+                        if ("China Mainland".equals(shipToGeography)
+                                ||"HongKong".equals(shipToGeography)){
+                            shipToGeography = "China exl. Taiwan";
+                        }
+                        shipMent.put("ship_to_geography", shipToGeography);
                         shipMentList.add(shipMent);
                     }
                 }
@@ -283,8 +306,10 @@ public class OrderShipController extends BaseController {
                 shipmentMap.put("invoice_date", sdf2.format(sdf.parse(shipmentMap.get("invoice_date").toString())));
             }
 
-
             //获取carton列表
+            Set<Long> shipmentIds =  new HashSet<>();
+            shipmentIds.add(Long.parseLong(map.get("shipment_id").toString()));
+            map.put("shipmentIds",shipmentIds);
             List<Map<String, Object>> containerList = orderService.getOrderListByShipmentId(map);
             Map<String, Object> resultMap = new HashMap<String, Object>();
 
@@ -315,10 +340,7 @@ public class OrderShipController extends BaseController {
                         shipMentCartonList.add(cartonInfo);
 
                     }
-
-
                 }
-
                 if (shipMentCartonList != null && shipMentCartonList.size() > 0) {
                     //将orderList 存入container详情
                     for (Map<String, Object> carton : shipMentCartonList) {
@@ -354,7 +376,7 @@ public class OrderShipController extends BaseController {
         ResultMessage result = new ResultMessage();
         result.errorStatus();
         try {
-            List<Map<String, Object>> geographyList = geographyService.getGeographyList();
+            List<Map<String, Object>> geographyList = geographyService.getGeographyGroupList();
 
             result.successStatus();
             result.setData(geographyList);
@@ -496,6 +518,9 @@ public class OrderShipController extends BaseController {
                 return result;
             }
             //获取carton列表
+            Set<Long> shipmentIds =  new HashSet<>();
+            shipmentIds.add(Long.parseLong(map.get("shipment_id").toString()));
+            map.put("shipmentIds",shipmentIds);
             List<Map<String, Object>> containerList = orderService.getOrderListByShipmentId(map);
 
             BigDecimal allTotal = new BigDecimal(0);
@@ -609,6 +634,9 @@ public class OrderShipController extends BaseController {
 
             //获取carton列表
             logger.info("打印PackList----获取carton列表");
+            Set<Long> shipmentIds =  new HashSet<>();
+            shipmentIds.add(Long.parseLong(map.get("shipment_id").toString()));
+            map.put("shipmentIds",shipmentIds);
             List<Map<String, Object>> containerList = orderService.getOrderListByShipmentId(map);
             Map<String, Object> resultMap = new HashMap<String, Object>();
 
