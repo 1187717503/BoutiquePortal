@@ -135,7 +135,7 @@ export default {
   },
   mounted() {
     this.isLoading = true;
-    queryRuleVendor(1).then(res => {
+    queryRuleVendor(1,2).then(res => {
       if (res.data.status === 1) {
         this.allVendor = res.data.data;
         this.boutiqueVendorid = this.allVendor[0].vendor_id;
@@ -239,6 +239,7 @@ export default {
           this.priceId = 0;
           return false;
         } else {
+          debugger;
           this.setTablebar(this.tableBar[0].price_change_rule_id);
         }
       });

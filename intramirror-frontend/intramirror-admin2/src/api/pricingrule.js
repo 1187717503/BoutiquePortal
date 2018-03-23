@@ -9,9 +9,9 @@ export function queryRuleByHasSeason(id, vendor, type, categoryType) {
   })
 }
 
-export function queryRuleVendor(type) {
+export function queryRuleVendor(type,categoryType) {
   return HTTP({
-    url: 'vendor/select/queryRuleVendor.htm?status=2&price_type='+type
+    url: 'vendor/select/queryRuleVendor.htm?status=2&price_type='+type + '&categoryType=' + categoryType
   })
 }
 

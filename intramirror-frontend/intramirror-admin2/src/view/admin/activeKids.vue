@@ -128,7 +128,7 @@ export default {
   },
   mounted() {
     this.isLoading = true;
-    queryRuleVendor(3).then(res => {
+    queryRuleVendor(3,2).then(res => {
       if (res.data.status === 1) {
         this.allVendor = res.data.data;
         this.boutiqueVendorid = this.allVendor[0].vendor_id;
