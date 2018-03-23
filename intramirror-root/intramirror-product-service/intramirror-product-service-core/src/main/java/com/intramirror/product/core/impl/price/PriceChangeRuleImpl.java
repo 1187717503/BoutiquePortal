@@ -48,6 +48,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         List<Map<String, Object>> paramsList = new ArrayList<>();
         paramsMap.put("price_type", PriceChangeRuleEnum.PriceType.SUPPLY_PRICE.getCode());
         paramsMap.put("preview_status", "0");
+        paramsMap.put("category_type", categoryType);
 
         List<Map<String, Object>> selSeasonGroupRuleMaps = priceChangeRuleMapper.selectSeasonGroupRule(paramsMap);
         logger.info("vendor selSeasonGroupRuleMaps : " + selSeasonGroupRuleMaps.size());
@@ -96,6 +97,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         paramsMap.put("price_type", PriceChangeRuleEnum.PriceType.SUPPLY_PRICE.getCode());
         paramsMap.put("preview_status", "1");
         paramsMap.put("vendor_id", vendor_id);
+        paramsMap.put("category_type", categoryType);
 
         List<Map<String, Object>> selSeasonGroupRuleMaps = priceChangeRuleMapper.selectSeasonGroupRule(paramsMap);
         if (selSeasonGroupRuleMaps != null && selSeasonGroupRuleMaps.size() > 0) {
@@ -126,6 +128,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         paramsMap.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
         paramsMap.put("preview_status", "1");
         paramsMap.put("vendor_id", vendor_id);
+        paramsMap.put("category_type", categoryType);
 
         List<Map<String, Object>> selSeasonGroupRuleMaps = priceChangeRuleMapper.selectSeasonGroupRule(paramsMap);
         if (selSeasonGroupRuleMaps != null && selSeasonGroupRuleMaps.size() > 0) {
@@ -287,6 +290,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         List<Map<String, Object>> paramsList = new ArrayList<>();
         paramsMap.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
         paramsMap.put("preview_status", "0");
+        paramsMap.put("category_type", categoryType);
 
         List<Map<String, Object>> selSeasonGroupRuleMaps = priceChangeRuleMapper.selectSeasonGroupRule(paramsMap);
         logger.info("admin selSeasonGroupRuleMaps : " + selSeasonGroupRuleMaps.size());
