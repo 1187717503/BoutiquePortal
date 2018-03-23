@@ -186,7 +186,7 @@
     <select id="queryNotRuleByBrand" resultType="java.util.Map" parameterType="java.util.Map">
         select distinct brand_id,english_name from brand where enabled = 1
         <if test="categoryType != null">
-            and category_type = #{category_type,jdbcType=INTEGER}
+            and category_type = #{categoryType,jdbcType=INTEGER}
         </if>
         and brand_id not in (
         select pcrcb.brand_id from price_change_rule_category_brand pcrcb

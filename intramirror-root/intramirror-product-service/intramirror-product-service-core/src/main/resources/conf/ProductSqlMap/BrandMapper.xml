@@ -275,6 +275,9 @@
         <if test="enabled != null">
             and enabled = #{enabled,jdbcType=BIT}
         </if>
+        <if test="categoryType != null">
+            and category_type = #{categoryType,jdbcType=INTEGER}
+        </if>
     </select>
 
     <select id="listActiveBrand" resultType="java.util.Map">
