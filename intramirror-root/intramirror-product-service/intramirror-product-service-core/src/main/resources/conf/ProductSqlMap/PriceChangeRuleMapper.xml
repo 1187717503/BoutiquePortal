@@ -58,10 +58,10 @@
         -->
         insert into price_change_rule (name, price_type,
         valid_from, status, vendor_id,
-        shop_id,user_id)
+        shop_id,user_id,category_type)
         values (#{name,jdbcType=VARCHAR}, #{priceType,jdbcType=TINYINT},
         #{validFrom,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER}, #{vendorId,jdbcType=BIGINT},
-        #{shopId,jdbcType=BIGINT},#{userId,jdbcType=BIGINT})
+        #{shopId,jdbcType=BIGINT},#{userId,jdbcType=BIGINT}, #{categoryType,jdbcType=TINYINT})
     </insert>
     <insert id="insertSelective" parameterType="com.intramirror.product.api.model.PriceChangeRule"
             keyProperty="priceChangeRuleId">
@@ -157,6 +157,9 @@
             <if test="shopId != null">
                 shop_id = #{shopId,jdbcType=BIGINT},
             </if>
+            <if test="categoryType != null">
+                #{categoryType,jdbcType=TINYINT},
+            </if>
         </set>
         where price_change_rule_id = #{priceChangeRuleId,jdbcType=BIGINT}
     </update>
@@ -173,7 +176,8 @@
         preview_status = #{preview_status,jdbcType=INTEGER},
         vendor_id = #{vendorId,jdbcType=BIGINT},
         shop_id = #{shopId,jdbcType=BIGINT},
-        user_id = #{userId,jdbcType=BIGINT}
+        user_id = #{userId,jdbcType=BIGINT},
+        category_type = #{categoryType,jdbcType=TINYINT}
         where price_change_rule_id = #{priceChangeRuleId,jdbcType=BIGINT}
     </update>
 

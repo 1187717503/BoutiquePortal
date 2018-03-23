@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.intramirror.product.api.enums.CategoryTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,6 +127,7 @@ public class PriceChangeRuleService {
 		}
 	
 	    priceChangeRule.setStatus(Integer.parseInt(map.get("status").toString()));
+		priceChangeRule.setCategoryType(Byte.valueOf(map.get("categoryType").toString()));
 
 	    //添加 priceChangeRule
 	    priceChangeRuleService.insertSelective(priceChangeRule);
@@ -211,25 +213,52 @@ public class PriceChangeRuleService {
 	    JsonArray priceChangeRuleCategoryListArray = new JsonParser().parse(map.get("price_change_rule_category_brand_list").toString()).getAsJsonArray();
 	    Long priceChangeRuleId =Long.parseLong(map.get("price_change_rule_id").toString());
 
-	 	Category category = new Category();
+		//根据类目类型过滤类目数据
+		PriceChangeRule priceChangeRule = priceChangeRuleService.selectByPrimaryKey(priceChangeRuleId);
+		Byte categoryType = priceChangeRule.getCategoryType();
+		List<Long> allowedSecondCategoryIds = null;
+		CategoryTypeEnum categoryTypeEnum = CategoryTypeEnum.getCategoryByKey(categoryType.toString());
+		allowedSecondCategoryIds = categoryTypeEnum == null ? null : categoryTypeEnum.getSecondCategoryIds();
+
+		Category category = new Category();
         //类目只有2级
 	 	category.setLevel(Byte.valueOf("2"));
 	 	category.setEnabled(EnabledType.USED);
-	 	
-	 	//获取brand列表
+
+		//根据price_change_rule_id和brand_id=0确定default的pricing_rule并生成类目id对应折扣的map
+		PriceChangeRuleCategoryBrand condition = new PriceChangeRuleCategoryBrand();
+		condition.setPriceChangeRuleId(priceChangeRuleId);
+		//brand_id为0的是默认设置
+		condition.setBrandId(0L);
+		Map<Long, Long> defaultCategoryIdDiscountMap = new HashMap<>();
+		List<PriceChangeRuleCategoryBrand> defaultPriceChangeRuleCategoryBrands = priceChangeRuleCategoryBrandService.queryPriceChangeRuleCategoryBrandByConditions(condition);
+		if (defaultPriceChangeRuleCategoryBrands != null) {
+			for (PriceChangeRuleCategoryBrand priceChangeRuleCategoryBrand : defaultPriceChangeRuleCategoryBrands) {
+				defaultCategoryIdDiscountMap.put(priceChangeRuleCategoryBrand.getCategoryId(), priceChangeRuleCategoryBrand.getDiscountPercentage());
+			}
+		}
+
+		//获取brand列表
 	    for (int i = 0; i < priceChangeRuleCategoryListArray.size(); i++) {
 	    	
 	    	//获取类目列表
 	    	List<Map<String,Object>> categoryList = categoryService.queryCategoryListByConditions(category);
-	    	for(Map<String,Object> categoryMap : categoryList){
+			for(Map<String,Object> categoryMap : categoryList) {
+				long categoryId = Long.parseLong(categoryMap.get("category_id").toString());
+				if (allowedSecondCategoryIds != null && !allowedSecondCategoryIds.contains(categoryId)) {
+					continue;
+				}
+
 		        PriceChangeRuleCategoryBrand priceChangeRuleCategoryBrand = new PriceChangeRuleCategoryBrand();
 		        priceChangeRuleCategoryBrand.setPriceChangeRuleId(priceChangeRuleId);
-		        priceChangeRuleCategoryBrand.setCategoryId(Long.parseLong(categoryMap.get("category_id").toString()));
+		        priceChangeRuleCategoryBrand.setCategoryId(categoryId);
 		        //类目只有2级
 		        priceChangeRuleCategoryBrand.setLevel(Byte.valueOf("2"));
 		        priceChangeRuleCategoryBrand.setBrandId(priceChangeRuleCategoryListArray.get(i).getAsLong());
 		        //折扣默认值
-		        priceChangeRuleCategoryBrand.setDiscountPercentage(100l);
+				//根据默认值设置折扣值
+				Long defaultDiscount = defaultCategoryIdDiscountMap.get(categoryId);
+				priceChangeRuleCategoryBrand.setDiscountPercentage(defaultDiscount == null ? 100L : defaultDiscount);
 		        priceChangeRuleCategoryBrand.setExceptionFlag (0);
 
 				priceChangeRuleCategoryBrandService.createPriceChangeRuleCategoryBrand(priceChangeRuleCategoryBrand);

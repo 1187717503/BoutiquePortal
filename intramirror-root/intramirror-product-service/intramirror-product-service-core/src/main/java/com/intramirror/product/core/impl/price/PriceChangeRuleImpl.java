@@ -604,6 +604,8 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         for(Map<String,Object> map : ruleByConditionsMaps){
             String price_change_rule_id = map.get("price_change_rule_id").toString();
             String name = map.get("name").toString();
+            //查询被复制的price_change_rule信息
+            PriceChangeRule oldPriceChangeRule = priceChangeRuleMapper.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
 
             /** start copy price_change_rule */
             PriceChangeRule priceChangeRule = new PriceChangeRule();
@@ -612,6 +614,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             priceChangeRule.setStatus(PriceChangeRuleEnum.Status.PENDING.getCode());
             priceChangeRule.setVendorId(Long.parseLong(vendor_id));
             priceChangeRule.setUserId(user_id);
+            priceChangeRule.setCategoryType(oldPriceChangeRule.getCategoryType());
             priceChangeRuleMapper.insert(priceChangeRule);
             price_change_rule_id_new = priceChangeRule.getPriceChangeRuleId();
             /** end copy price_change_rule */
