@@ -35,7 +35,7 @@ public class BrandController {
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
             Integer type = null;
-            if(StringUtils.isBlankStrings(categoryType)){
+            if(StringUtils.isNotBlank(categoryType)){
                 type = Integer.valueOf(categoryType);
             }
             List<Map<String, Object>> brands = iBrandService.queryActiveBrand(type);
