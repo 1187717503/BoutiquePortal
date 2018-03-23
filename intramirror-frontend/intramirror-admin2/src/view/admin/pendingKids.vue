@@ -236,7 +236,7 @@
         </div>
       </div>
       <div class="foot-btn">
-        <span @click="showSeason=false;showShade=false;">CANCEL</span>
+        <span @click="showSeason=false;showShade=false;arrSelectSeason=[]">CANCEL</span>
         <span @click="createSeason(coptyNewType)">CREATE</span>
       </div>
     </div>
