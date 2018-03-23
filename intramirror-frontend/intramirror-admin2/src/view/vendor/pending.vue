@@ -934,14 +934,14 @@ export default {
       this.allvendorId = e.vendor_id;
     },
     selectPricingRule(index) {
-      switch (index) {
-        case 0:
-          this.pricingRule = index;
-          break;
-        case 1:
-          this.pricingRule = index;
-          break;
-      }
+      // switch (index) {
+      //   case 0:
+      //     this.pricingRule = index;
+      //     break;
+      //   case 1:
+          this.pricingRule = 1;
+      //     break;
+      // }
     },
     cancelCopy() {
       //        if (this.tableBar.length === 0) {

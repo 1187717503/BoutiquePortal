@@ -475,7 +475,7 @@ export default {
         price_type: 3,
         vendorId: this.boutiqueVendorid
       };
-      updatePriceChangeRule(data,1).then(res => {
+      updatePriceChangeRule(data, 1).then(res => {
         if (res.data.status === 1) {
           Materialize.toast("保存成功", 4000);
         } else {
@@ -963,20 +963,20 @@ export default {
       this.allvendorId = e.vendor_id;
     },
     selectPricingRule(index) {
-      switch (index) {
-        case 0:
-          this.pricingRule = index;
-          break;
-        case 1:
-          this.pricingRule = index;
-          break;
-        case 2:
-          this.pricingRule = index;
-          break;
-        case 3:
-          this.pricingRule = index;
-          break;
-      }
+      // switch (index) {
+      //   case 0:
+      //     this.pricingRule = index;
+      //     break;
+      //   case 1:
+      //     this.pricingRule = index;
+      //     break;
+      //   case 2:
+      //     this.pricingRule = index;
+      //     break;
+      //   case 3:
+      this.pricingRule = 3;
+      //     break;
+      // }
     },
     cancelCopy() {
       //        if (this.tableBar.length === 0) {
@@ -1084,7 +1084,7 @@ export default {
         this.showSeason = false;
         this.showShade = false;
         this.isLoading = true;
-        initPriceChangeRule(data,1).then(res => {
+        initPriceChangeRule(data, 1).then(res => {
           if (res.data.status === 1) {
             this.getTablenav(this.boutiqueVendorid);
             this.arrSelectSeason = [];
@@ -1143,7 +1143,7 @@ export default {
     },
     activeNow() {
       this.isLoading = true;
-      imActiveRefresh(this.priceId,1).then(result => {
+      imActiveRefresh(this.priceId, 1).then(result => {
         this.getTablenav(this.boutiqueVendorid);
         this.getTable(this.boutiqueVendorid);
         this.isLoading = false;
