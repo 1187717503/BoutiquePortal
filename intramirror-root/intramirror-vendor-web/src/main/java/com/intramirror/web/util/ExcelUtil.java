@@ -211,7 +211,7 @@ public class ExcelUtil {
                     cell1.setCellValue(orderLineNum);
                     cell1.setCellStyle(cs2);
                     Cell cell2 = row.createCell(1);
-                    cell2.setCellValue(new HSSFRichTextString(brandName+" "+categoryName+"  "+brandID+"/"+colorCode+"/"+size));
+                    cell2.setCellValue(new HSSFRichTextString(brandName+" "+categoryName+"\r"+brandID+"/"+colorCode+"/"+size));
                     cell2.setCellStyle(cs2);
                     Cell cell3 = row.createCell(2);
                     cell3.setCellValue(composition);
