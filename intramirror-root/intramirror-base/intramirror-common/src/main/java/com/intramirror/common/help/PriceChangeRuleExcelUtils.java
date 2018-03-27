@@ -60,27 +60,28 @@ public class PriceChangeRuleExcelUtils {
         datas.add(map2);
 
         PriceChangeRuleExcelUtils.genPriceExcel("IM Pricing Rule",brandNames,datas);*/
-        List<Map<String,Object>> brandNames = new ArrayList<>();
-        Map<String,Object> brand1 = new HashMap<>();
-        brand1.put("english_name","032C");
-        brand1.put("brand_id","944");
+        List<Map<String, Object>> brandNames = new ArrayList<>();
+        Map<String, Object> brand1 = new HashMap<>();
+        brand1.put("english_name", "032C");
+        brand1.put("brand_id", "944");
         brandNames.add(brand1);
 
-       PriceChangeRuleExcelUtils.readRuleExcel("/Users/dingyifan/Downloads/workbook.xls",brandNames,"12");
+        PriceChangeRuleExcelUtils.readRuleExcel("/Users/dingyifan/Downloads/workbook.xls", brandNames, "12");
 
     }
 
-    private static final String[] categoryNames = new String[]{"Brand","Clothing","Shoes","Bags","Accessories","Clothing","Shoes","Bags","Accessories"};
+    private static final String[] categoryNames = new String[] { "Brand", "Clothing", "Shoes", "Bags", "Accessories", "Clothing", "Shoes", "Bags",
+            "Accessories" };
 
-    private static final String[] categoryIds = new String[]{"","1504","1506","1505","1507","1569","1584","1598","1608"};
+    private static final String[] categoryIds = new String[] { "", "1504", "1506", "1505", "1507", "1569", "1584", "1598", "1608" };
 
-    public static String genPriceExcel(String excelName,List<Map<String,Object>> brands,List<Map<String, Object>> datas,String filePath) throws Exception {
+    public static String genPriceExcel(String excelName, List<Map<String, Object>> brands, List<Map<String, Object>> datas, String filePath) throws Exception {
         HSSFWorkbook workbook = new HSSFWorkbook();
 
         // set sheet name
         int rowLength = 0;
         HSSFSheet sheet = workbook.createSheet(excelName);
-        HSSFCellStyle cellStyle =workbook.createCellStyle();
+        HSSFCellStyle cellStyle = workbook.createCellStyle();
         cellStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
 
         // 创建第一行数据
@@ -96,13 +97,13 @@ public class PriceChangeRuleExcelUtils {
         row1cell5.setCellValue("Women");
         row1cell5.setCellStyle(cellStyle);
 
-        sheet.addMergedRegion(new CellRangeAddress(0,0,1,4));
-        sheet.addMergedRegion(new CellRangeAddress(0,0,5,8));
+        sheet.addMergedRegion(new CellRangeAddress(0, 0, 1, 4));
+        sheet.addMergedRegion(new CellRangeAddress(0, 0, 5, 8));
         rowLength++;
 
         // 创建第二行数据
         HSSFRow row2 = sheet.createRow(rowLength);
-        for(int i =0,iLen=categoryNames.length;i<iLen;i++){
+        for (int i = 0, iLen = categoryNames.length; i < iLen; i++) {
             HSSFCell cell = row2.createCell(i);
             cell.setCellValue(categoryNames[i]);
             cell.setCellStyle(cellStyle);
@@ -110,18 +111,18 @@ public class PriceChangeRuleExcelUtils {
         rowLength++;
 
         // 创建折扣数据
-        for(Map<String,Object> data : datas) {
+        for (Map<String, Object> data : datas) {
             HSSFRow row = sheet.createRow(rowLength);
 
-            for(int i=0,iLen=categoryIds.length;i<iLen;i++){
+            for (int i = 0, iLen = categoryIds.length; i < iLen; i++) {
                 String cId = categoryIds[i];
                 String value = "";
-                if(StringUtils.isBlank(cId)) {
+                if (StringUtils.isBlank(cId)) {
                     value = data.get("english_name").toString();
                 } else {
                     value = data.get(cId).toString();
 
-                    value = ""+(100 - Integer.parseInt(value) );
+                    value = "" + (100 - Integer.parseInt(value));
                 }
                 HSSFCell cell = row.createCell(i);
                 cell.setCellValue(new HSSFRichTextString(value));
@@ -142,7 +143,7 @@ public class PriceChangeRuleExcelUtils {
         String[] strs = getBrands(brands);
         HSSFSheet hidden = workbook.createSheet("hidden");
         HSSFCell cell = null;
-        for (int i = 0, length= strs.length; i < length; i++) {
+        for (int i = 0, length = strs.length; i < length; i++) {
             String name = strs[i];
             HSSFRow row = hidden.createRow(i);
             cell = row.createCell(0);
@@ -163,15 +164,15 @@ public class PriceChangeRuleExcelUtils {
         return filePath;
     }
 
-    public static List<Map<String,Object>> readRuleExcel(String filePath,List<Map<String,Object>> brandNames,String price_change_rule_id) throws Exception {
+    public static List<Map<String, Object>> readRuleExcel(String filePath, List<Map<String, Object>> brandNames, String price_change_rule_id) throws Exception {
 
-        List<Map<String,Object>> readExcelList = new ArrayList<>();
-        HSSFWorkbook workbook=new HSSFWorkbook(new FileInputStream(new File(filePath)));
-        HSSFSheet sheet=workbook.getSheetAt(0);
+        List<Map<String, Object>> readExcelList = new ArrayList<>();
+        HSSFWorkbook workbook = new HSSFWorkbook(new FileInputStream(new File(filePath)));
+        HSSFSheet sheet = workbook.getSheetAt(0);
         for (int j = 2; j < sheet.getPhysicalNumberOfRows(); j++) {//获取每行
-            HSSFRow row=sheet.getRow(j);
+            HSSFRow row = sheet.getRow(j);
 
-            String brand_id = getBrandId(brandNames,row.getCell(0).getStringCellValue());
+            String brand_id = getBrandId(brandNames, row.getCell(0).getStringCellValue());
 
             String men_clothing = row.getCell(1).toString();
             String men_shoes = row.getCell(2).toString();
@@ -183,47 +184,47 @@ public class PriceChangeRuleExcelUtils {
             String women_bags = row.getCell(7).toString();
             String women_accessores = row.getCell(8).toString();
 
-            readExcelList.add(genMap(brand_id,men_clothing,1,price_change_rule_id));
-            readExcelList.add(genMap(brand_id,men_shoes,2,price_change_rule_id));
-            readExcelList.add(genMap(brand_id,men_bags,3,price_change_rule_id));
-            readExcelList.add(genMap(brand_id,men_accessores,4,price_change_rule_id));
+            readExcelList.add(genMap(brand_id, men_clothing, 1, price_change_rule_id));
+            readExcelList.add(genMap(brand_id, men_shoes, 2, price_change_rule_id));
+            readExcelList.add(genMap(brand_id, men_bags, 3, price_change_rule_id));
+            readExcelList.add(genMap(brand_id, men_accessores, 4, price_change_rule_id));
 
-            readExcelList.add(genMap(brand_id,women_clothing,5,price_change_rule_id));
-            readExcelList.add(genMap(brand_id,women_shoes,6,price_change_rule_id));
-            readExcelList.add(genMap(brand_id,women_bags,7,price_change_rule_id));
-            readExcelList.add(genMap(brand_id,women_accessores,8,price_change_rule_id));
+            readExcelList.add(genMap(brand_id, women_clothing, 5, price_change_rule_id));
+            readExcelList.add(genMap(brand_id, women_shoes, 6, price_change_rule_id));
+            readExcelList.add(genMap(brand_id, women_bags, 7, price_change_rule_id));
+            readExcelList.add(genMap(brand_id, women_accessores, 8, price_change_rule_id));
         }
         return readExcelList;
     }
 
-    private static Map<String,Object> genMap(String brand_id,String discount,int i,String price_change_rule_id) {
-        int dis = 100-(int)Double.parseDouble(discount);
-        if(dis < 0 || dis > 100) {
+    private static Map<String, Object> genMap(String brand_id, String discount, int i, String price_change_rule_id) {
+        int dis = 100 - (int) Double.parseDouble(discount);
+        if (dis < 0 || dis > 100) {
             throw new RuntimeException("折扣设置错误");
         }
-        Map<String,Object> map = new HashMap<>();
-        map.put("category_id",categoryIds[i]);
-        map.put("brand_id",brand_id);
-        map.put("discount_percentage",dis);
-        map.put("exception_flag","0");
-        map.put("level","2");
-        map.put("price_change_rule_id",price_change_rule_id);
+        Map<String, Object> map = new HashMap<>();
+        map.put("category_id", categoryIds[i]);
+        map.put("brand_id", brand_id);
+        map.put("discount_percentage", dis);
+        map.put("exception_flag", "0");
+        map.put("level", "2");
+        map.put("price_change_rule_id", price_change_rule_id);
         return map;
     }
 
-    private static String getBrandId(List<Map<String,Object>> brands,String name) throws Exception {
-        for(Map<String,Object> map : brands) {
+    private static String getBrandId(List<Map<String, Object>> brands, String name) throws Exception {
+        for (Map<String, Object> map : brands) {
             String eName = map.get("english_name").toString();
-            if(StringUtils.trim(eName).equals(StringUtils.trim(name))) {
+            if (StringUtils.trim(eName).equalsIgnoreCase(StringUtils.trim(name))) {
                 return map.get("brand_id").toString();
             }
         }
         throw new RuntimeException("找不到这个品牌:" + name);
     }
 
-    private static String[] getBrands(List<Map<String,Object>> brands) throws Exception {
+    private static String[] getBrands(List<Map<String, Object>> brands) throws Exception {
         String[] strings = new String[brands.size()];
-        for(int i =0,iLen=brands.size();i<iLen;i++) {
+        for (int i = 0, iLen = brands.size(); i < iLen; i++) {
             strings[i] = brands.get(i).get("english_name").toString();
         }
         return strings;
