@@ -34,10 +34,10 @@ public class BrandController {
     public ResultMessage queryActiveBrands(@Param("categoryType")String categoryType) {
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
-            Integer type = null;
-            if(StringUtils.isNotBlank(categoryType)){
+            Integer type = null; // brand 类型 暂时不用
+            /*if(StringUtils.isNotBlank(categoryType)){
                 type = Integer.valueOf(categoryType);
-            }
+            }*/
             List<Map<String, Object>> brands = iBrandService.queryActiveBrand(type);
             resultMessage.successStatus().putMsg("info", "SUCCESS").setData(brands);
         } catch (Exception e) {
