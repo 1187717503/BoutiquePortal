@@ -440,7 +440,7 @@ public class OrderController extends BaseController {
                 return resultMessage;
             }
             Long vendorId = vendor.getVendorId();
-            int[] item = { OrderStatusType.PENDING, OrderStatusType.COMFIRMED ,OrderStatusType.CANCELED};
+            int[] item = { OrderStatusType.PENDING, OrderStatusType.COMFIRMED ,OrderStatusType.CANCELED,OrderStatusType.PICKING};
             Map<String, Object> resultMap = new HashMap<>();
             for (int i = 0; i < item.length; i++) {
                 map = new HashMap<>();
@@ -455,6 +455,9 @@ public class OrderController extends BaseController {
                     //cancel
                     int orderCancelCount = orderService.getOrderCancelCount(map);
                     resultMap.put("canceled",orderCancelCount);
+                }
+                if(OrderStatusType.PICKING == item[i]){
+                    resultMap.put("picking", result);
                 }
             }
 

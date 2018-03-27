@@ -53,18 +53,23 @@ public class LogisticsProductService{
 	        
 	        //获取当前状态的上一个状态，校验状态机
 	        int lastStatus= OrderStatusType.getLastStatus(status);
-	        
-			
+
 			//校验是否按状态机流转,如果不是则提示错误
-			if(lastStatus != oldLogisticsProduct.getStatus()){
-				resultMap.put("info","The status check failed, please modify the status in order of order");
-				return resultMap;
+			Integer oldStatus = oldLogisticsProduct.getStatus();
+			if(lastStatus != oldStatus){
+				if(status == OrderStatusType.COMFIRMED
+						&&(oldStatus==OrderStatusType.PENDING||oldStatus==OrderStatusType.PICKING)){
+					//状态机正常流转，不处理
+				}else {
+					resultMap.put("info","The status check failed, please modify the status in order of order");
+					return resultMap;
+				}
 			}
 			
-			oldLogisticsProduct.setStatus(status);
+			//oldLogisticsProduct.setStatus(status);
 			//校验通过，修改状态
 			logisticsProductService.updateOrderLogisticsStatusById(logistics_product_id,status);
-			
+
 //			if(num <= 0){
 //				resultMap.put("info","Status modification failed");
 //				return resultMap;

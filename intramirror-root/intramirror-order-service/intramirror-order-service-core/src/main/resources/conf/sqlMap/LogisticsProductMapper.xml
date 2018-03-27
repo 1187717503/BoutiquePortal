@@ -19,6 +19,7 @@
         <result column="created_at" property="created_at" jdbcType="TIMESTAMP"/>
         <result column="updated_at" property="updated_at" jdbcType="TIMESTAMP"/>
         <result column="confirmed_at" property="confirmed_at" jdbcType="TIMESTAMP"/>
+        <result column="picking_at" property="picking_at" jdbcType="TIMESTAMP"/>
         <result column="est_ship_date" property="est_ship_date" jdbcType="TIMESTAMP"/>
 
         <result column="packed_at" property="packed_at" jdbcType="TIMESTAMP"/>
@@ -93,6 +94,10 @@
 
             <if test="confirmed_at != null">
                 confirmed_at = #{confirmed_at,jdbcType=TIMESTAMP},
+            </if>
+
+            <if test="picking_at != null">
+                picking_at = #{picking_at,jdbcType=TIMESTAMP},
             </if>
 
             <if test="est_ship_date != null">

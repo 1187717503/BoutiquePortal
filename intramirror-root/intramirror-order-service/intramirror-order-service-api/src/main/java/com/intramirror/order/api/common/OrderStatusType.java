@@ -48,6 +48,11 @@ public class OrderStatusType {
     public static final int REFUND = -4;
 
     /**
+     * picking
+     */
+    public static final int PICKING = 8;
+
+    /**
      * 判断是否在ProductStatuType 内
      * @param input
      */

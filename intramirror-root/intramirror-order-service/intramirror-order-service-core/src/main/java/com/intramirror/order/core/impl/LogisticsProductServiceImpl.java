@@ -10,10 +10,9 @@ import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.core.dao.BaseDao;
 import com.intramirror.order.core.mapper.LogisticsProductMapper;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,12 +46,18 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
         logisticsProduct.setStatus(status);
 
         // JPush 2017-12-28
-        sendJPushMsg(logisticsProduct);
-        logger.info("JPush 已经塞入线程池处理");
+        // 变更为picking状态不需要push
+        if (status != OrderStatusType.PICKING){
+            sendJPushMsg(logisticsProduct);
+            logger.info("JPush 已经塞入线程池处理");
+        }
 
-        //如果修改状态为shipped修改shippedat
-        if (status == 3) {
+        if (status == OrderStatusType.ORDERED) {
+            //如果修改状态为shipped修改shippedat
             logisticsProduct.setShipped_at(Helper.getCurrentUTCTime());
+        }else if(status == OrderStatusType.PICKING){
+            //记录picking时间
+            logisticsProduct.setPicking_at(Helper.getCurrentUTCTime());
         }
         return logisticsProductMapper.updateByLogisticsProduct(logisticsProduct);
 
@@ -174,7 +179,7 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
         osu.setLogisticsProductId(logisticsProduct.getLogistics_product_id());
         listOsuEntity.add(osu);
         try {
-            logger.info("JPush通知 取消订单的LP ID: " + logisticsProduct.getLogistics_product_id());
+            logger.info("JPush通知 订单的LP ID: " + logisticsProduct.getLogistics_product_id());
             jpushService.sendOrderNotification(listOsuEntity);
         } catch (UnSupportActionTypeException e) {
             logger.info("JPush Failed： sendOrderNotification异常" + e.getMessage());

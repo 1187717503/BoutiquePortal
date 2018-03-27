@@ -35,8 +35,17 @@ public class LogisticsProduct {
     private Date packed_at;
     private Date shipped_at;
     private BigDecimal retail_price;
+    private Date picking_at;
 
     private String stock_location;
+
+    public Date getPicking_at() {
+        return picking_at;
+    }
+
+    public void setPicking_at(Date picking_at) {
+        this.picking_at = picking_at;
+    }
 
     public Integer getAmount() {
         return amount;
