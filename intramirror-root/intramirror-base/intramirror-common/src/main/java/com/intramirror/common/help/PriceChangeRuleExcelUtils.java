@@ -495,7 +495,7 @@ public class PriceChangeRuleExcelUtils {
     private static String getBrandId(List<Map<String,Object>> brands,String name) throws Exception {
         for(Map<String,Object> map : brands) {
             String eName = map.get("english_name").toString();
-            if(StringUtils.trim(eName).equals(StringUtils.trim(name))) {
+            if(StringUtils.trim(eName).toLowerCase().equals(StringUtils.trim(name).toLowerCase())) {
                 return map.get("brand_id").toString();
             }
         }
