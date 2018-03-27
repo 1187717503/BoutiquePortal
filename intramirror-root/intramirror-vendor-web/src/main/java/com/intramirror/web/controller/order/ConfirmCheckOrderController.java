@@ -137,7 +137,7 @@ public class ConfirmCheckOrderController {
                     String mapColorCode = maps.get("colorCode") == null ? "" : maps.get("colorCode").toString();
 
                     //如果是当前自己的brandId喝colorCode保存
-                    if (mapBrandId.equals(brandId) && mapColorCode.equals(mapColorCode)) {
+                    if (mapBrandId.equals(brandId) && mapColorCode.equals(colorCode)) {
                         if (logis != null) {
                             LogisticsProduct upLogis = new LogisticsProduct();
                             upLogis.setLogistics_product_id(logis.getLogistics_product_id());
