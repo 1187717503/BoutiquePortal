@@ -56,7 +56,7 @@ public class RulePoiController {
             Map<String, Object> params = new HashMap<>();
             params.put("exception_flag", 0);
             params.put("price_change_rule_id", price_change_rule_id);
-            params.put("categoryType",Integer.valueOf(type));
+            /*params.put("categoryType",Integer.valueOf(type));*/
             List<Map<String, Object>> dataMaps = iRuleService.queryRuleByBrand(params);
 
             // 查询所有品牌
