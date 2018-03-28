@@ -7,7 +7,7 @@
       <p class="tit">Effective Date: {{RuleDate}}</p>
       <div class="head-search" v-if="tableBar.length !== 0">
         <i class="mdi mdi-magnify"></i>
-        <input type="text" placeholder="Brand" @change="searchBrand">
+        <input type="text" placeholder="Brand" v-model="searchInput" @change="searchBrand">
         <span class="mdi mdi-close" @click="searchBrand"></span>
       </div>
     </div>
@@ -99,6 +99,7 @@ export default {
       priceId: 0,
       tableBar: [],
       items: [],
+      searchInput: "",
       boutiqueData: [],
       BrandIDColorCode: [],
       productGrouplist: [],
@@ -204,6 +205,7 @@ export default {
     setTablebar(id) {
       //设置选择的head tab
       this.priceId = id;
+      this.searchInput = '';
       getRuleDate(id).then(res => {
         if (res.data.status === 1) {
           this.RuleDate = res.data.data.validFromStr;
@@ -239,7 +241,6 @@ export default {
           this.priceId = 0;
           return false;
         } else {
-          debugger;
           this.setTablebar(this.tableBar[0].price_change_rule_id);
         }
       });

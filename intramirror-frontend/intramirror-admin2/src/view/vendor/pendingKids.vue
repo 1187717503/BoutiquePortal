@@ -8,7 +8,7 @@
       </button>
       <div class="head-search" v-if="tableBar.length !== 0">
         <i class="mdi mdi-magnify"></i>
-        <input type="text" placeholder="Brand" @change="searchBrand">
+        <input type="text" placeholder="Brand" v-model="searchInput" @change="searchBrand">
         <span class="mdi mdi-close" @click="searchBrand"></span>
       </div>
     </div>
@@ -300,6 +300,7 @@ export default {
       isMultistep: false,
       boutiqueVendorid: null,
       tableBar: [],
+      searchInput: "",
       priceId: 0,
       categoryName: "",
       selectBrands: [],
@@ -604,6 +605,7 @@ export default {
       //设置选择的head tab
       this.getTable(id);
       this.priceId = id;
+      this.searchInput = '';
       getRuleDate(id).then(res => {
         if (res.data.status === 1) {
           this.RuleDate = res.data.data.validFromStr;
@@ -946,6 +948,7 @@ export default {
       //        }
       this.showCopy = false;
       this.showShade = false;
+      this.pricingRule === null;
     },
     createPricingRule() {
       if (this.pricingRule === null) {
