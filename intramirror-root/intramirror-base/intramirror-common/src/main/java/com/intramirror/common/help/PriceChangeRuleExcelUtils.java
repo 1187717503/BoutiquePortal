@@ -82,9 +82,9 @@ public class PriceChangeRuleExcelUtils {
 
     }
 
-    private static final String[] categoryNames = new String[]{"Brand","Clothing","Bags","Shoes","Accessories","Clothing","Shoes","Bags","Accessories"};
+    private static final String[] categoryNames = new String[]{"Brand","Clothing","Shoes","Bags","Accessories","Clothing","Shoes","Bags","Accessories"};
 
-    private static final String[] categoryIds = new String[]{"","1504","1505","1506","1507","1569","1584","1598","1608"};
+    private static final String[] categoryIds = new String[]{"","1504","1506","1505","1507","1569","1584","1598","1608"};
 
 
     private static final String[] categoryKidsNames = new String[]{"Brand","Clothing","Shoes","Accessories","Clothing","Shoes","Accessories","Clothing","Shoes","Accessories"};
