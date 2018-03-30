@@ -51,7 +51,7 @@ public class CategoryController {
                             childs.add(1,tmpS);
                             childs.add(2,tmpB);
                             childs.remove(3);
-                            childs.remove(4);
+                            childs.remove(3);
                         }
                         break;
                     }
