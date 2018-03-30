@@ -624,6 +624,9 @@
 
         select * from price_change_rule pcr where
         pcr.price_type = #{price_type,jdbcType=BIGINT} and pcr.vendor_id = #{vendor_id,jdbcType=BIGINT} and pcr.`status` = #{status,jdbcType=BIGINT}
+        <if test="category_type != null and category_type != ''">
+            and pcr.category_type=#{category_type,jdbcType=BIGINT}
+        </if>
     </select>
 
     <update id="updateRuleActive" parameterType="java.util.Map">

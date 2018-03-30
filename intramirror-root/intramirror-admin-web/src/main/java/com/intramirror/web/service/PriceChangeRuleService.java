@@ -1,32 +1,14 @@
 package com.intramirror.web.service;
 
-import java.text.MessageFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.intramirror.product.api.enums.CategoryTypeEnum;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.intramirror.common.Helper;
 import com.intramirror.common.enums.PriceChangeRuleEnum;
 import com.intramirror.common.enums.SystemPropertyEnum;
 import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.common.parameter.StatusType;
+import com.intramirror.product.api.enums.CategoryTypeEnum;
 import com.intramirror.product.api.model.Category;
 import com.intramirror.product.api.model.PriceChangeRule;
 import com.intramirror.product.api.model.PriceChangeRuleCategoryBrand;
@@ -43,9 +25,19 @@ import com.intramirror.product.api.service.IShopService;
 import com.intramirror.product.api.service.ISystemPropertyService;
 import com.intramirror.product.api.service.category.ICategoryService;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
-import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.VendorService;
-import com.intramirror.web.controller.price.PriceChangeRuleController;
+import java.text.MessageFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PriceChangeRuleService {
@@ -53,55 +45,55 @@ public class PriceChangeRuleService {
 
 	@Autowired
 	private IPriceChangeRuleCategoryBrandService priceChangeRuleCategoryBrandService;
-	
+
 	@Autowired
 	private IPriceChangeRule priceChangeRuleService;
-	
+
 	@Autowired
 	private IPriceChangeRuleProductService priceChangeRuleProductService;
-	
+
 	@Autowired
 	private IPriceChangeRuleGroupService priceChangeRuleGroupService;
-	
+
 	@Autowired
 	private IPriceChangeRuleSeasonGroupService priceChangeRuleSeasonGroupService;
-	
+
 	@Autowired
 	private IShopService shopService;
-	
+
 	@Autowired
 	private VendorService vendorService;
-	
+
 	@Autowired
     private ICategoryService categoryService;
-	
+
 	@Autowired
 	private ISystemPropertyService systemPropertyService;
-	
-	
-	
-	
-	
+
+
+
+
+
 	/**
 	 * 初始化 PriceChangeRule
 	 * @return
-	 * @throws ParseException 
+	 * @throws ParseException
 	 */
 	@Transactional(rollbackFor = Exception.class)
 	public Map<String,Object> initPriceChangeRule(Map<String,Object> map) throws Exception{
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
-		
+
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("userId", map.get("userId"));
 		param.put("enabled", 1);
-		
+
 		Shop shop = shopService.selectByParameter(param);
 //		Vendor vendor = vendorService.getVendorByUserId(Long.parseLong(map.getStatus("userId").toString()));
-		
+
 		//添加PriceChangeRule
 		PriceChangeRule priceChangeRule = new PriceChangeRule();
-		
+
 		//设置名称
 		String name = map.get("name").toString();
 		if(name.contains(",")){
@@ -116,16 +108,16 @@ public class PriceChangeRuleService {
 		priceChangeRule.setName(name);
 		priceChangeRule.setPriceType(Byte.valueOf(map.get("price_type").toString()));
 		Long vendorId =Long.parseLong(map.get("vendorId").toString());
-		
+
 //		if(vendor != null ){
 //			vendorId = vendor.getVendorId();
 //		}
 		priceChangeRule.setVendorId(vendorId);
-		
+
 		if(shop != null){
 			priceChangeRule.setShopId(shop.getShopId());
 		}
-	
+
 	    priceChangeRule.setStatus(Integer.parseInt(map.get("status").toString()));
 		priceChangeRule.setCategoryType(Byte.valueOf(map.get("categoryType").toString()));
 
@@ -136,7 +128,7 @@ public class PriceChangeRuleService {
 	    	logger.error("add priceChangeRule fail parameter:"+new Gson().toJson(priceChangeRule));
 	    	return result;
 	    }
-	    
+
 	    //添加price_change_rule_season_group
 	    JsonArray priceChangeRuleSeasonGroupArray = new JsonParser().parse(map.get("price_change_rule_season_group_List").toString()).getAsJsonArray();
 
@@ -169,7 +161,7 @@ public class PriceChangeRuleService {
         //类目只有2级
 	 	category.setLevel(Byte.valueOf("2"));
 	 	category.setEnabled(EnabledType.USED);
-	 	
+
     	//获取类目列表
     	List<Map<String,Object>> categoryList = categoryService.queryCategoryListByConditions(category);
 	 	//设置默认值
@@ -189,23 +181,23 @@ public class PriceChangeRuleService {
 	        priceChangeRuleCategoryBrand.setExceptionFlag (0);
 
 			priceChangeRuleCategoryBrandService.createPriceChangeRuleCategoryBrand(priceChangeRuleCategoryBrand);
-			
+
 	        if (priceChangeRuleCategoryBrand.getPriceChangeRuleCategoryBrandId() == null) {
 	        	result.put("info","parameter is incorrect");
 	        	logger.error("create priceChangeRuleCategoryBrand fail parameter:"+ new Gson().toJson(priceChangeRuleCategoryBrand));
 	            throw new RuntimeException("error");
 	        }
     	}
-	   
-	    
+
+
 	    result.put("status", StatusType.SUCCESS);
 	    return result;
 	}
-	
-	
-	
-	
-	
+
+
+
+
+
 	/**
 	 * 添加PriceChangeRuleCategoryBrandBatch
 	 * @param map
@@ -246,7 +238,7 @@ public class PriceChangeRuleService {
 
 		//获取brand列表
 	    for (int i = 0; i < priceChangeRuleCategoryListArray.size(); i++) {
-	    	
+
 	    	//获取类目列表
 	    	List<Map<String,Object>> categoryList = categoryService.queryCategoryListByConditions(category);
 			for(Map<String,Object> categoryMap : categoryList) {
@@ -268,7 +260,7 @@ public class PriceChangeRuleService {
 		        priceChangeRuleCategoryBrand.setExceptionFlag (0);
 
 				priceChangeRuleCategoryBrandService.createPriceChangeRuleCategoryBrand(priceChangeRuleCategoryBrand);
-				
+
 		        if (priceChangeRuleCategoryBrand.getPriceChangeRuleCategoryBrandId() == null) {
 		        	result.put("info","parameter is incorrect");
 		        	logger.error("create priceChangeRuleCategoryBrand fail parameter:"+ new Gson().toJson(priceChangeRuleCategoryBrand));
@@ -281,11 +273,11 @@ public class PriceChangeRuleService {
         result.put("status", StatusType.SUCCESS);
 		return result;
 	}
-	
-	
-	
-	
-	
+
+
+
+
+
 	/**
 	 * 删除PriceChangeRuleCategoryBrandBatch
 	 * @param map
@@ -303,10 +295,10 @@ public class PriceChangeRuleService {
         //类目只有2级
 	 	category.setLevel(Byte.valueOf("2"));
 	 	category.setEnabled(EnabledType.USED);
-	 	
+
 	 	//获取brand列表
 	    for (int i = 0; i < priceChangeRuleCategoryListArray.size(); i++) {
-	    	
+
 	    	//获取类目列表
 	    	List<Map<String,Object>> categoryList = categoryService.queryCategoryListByConditions(category);
 	    	for(Map<String,Object> categoryMap : categoryList){
@@ -317,16 +309,16 @@ public class PriceChangeRuleService {
 		        priceChangeRuleCategoryBrand.setLevel(Byte.valueOf("2"));
 		        priceChangeRuleCategoryBrand.setBrandId(priceChangeRuleCategoryListArray.get(i).getAsLong());
 		        priceChangeRuleCategoryBrand.setExceptionFlag (0);
-		        
+
 				int row = priceChangeRuleCategoryBrandService.deleteByParameter(priceChangeRuleCategoryBrand);
-				
+
 //		        if (row == 0) {
 //		        	result.put("info","parameter is incorrect");
 //		        	logger.error("delete priceChangeRuleCategoryBrand fail parameter:"+ new Gson().toJson(priceChangeRuleCategoryBrand));
 //		            throw new RuntimeException("error");
 //		        }
-		        
-		        
+
+
 //			    /** start checked 数据 */
 //			    Map<String,Object> paramMaps = new HashMap<>();
 //			    paramMaps.put("catgeory_id", priceChangeRuleCategoryBrand.getCategoryId());
@@ -336,12 +328,12 @@ public class PriceChangeRuleService {
 //			    paramMaps.put("price_change_rule_id", priceChangeRuleCategoryBrand.getPriceChangeRuleId());
 //				List<Map<String,Object>> brandCategoryMaps = priceChangeRuleCategoryBrandService.selectPriceChangeRuleCategoryBrandExists(paramMaps);
 //				/** end checked 数据 */
-//				
-//				
+//
+//
 //				//存在才删除
 //				if(brandCategoryMaps != null && brandCategoryMaps.size() > 0) {
 //					int row = priceChangeRuleCategoryBrandService.deleteByParameter(priceChangeRuleCategoryBrand);
-//					
+//
 //			        if (row == 0) {
 //			        	result.put("info","parameter is incorrect");
 //			        	logger.error("delete priceChangeRuleCategoryBrand fail parameter:"+ new Gson().toJson(priceChangeRuleCategoryBrand));
@@ -357,11 +349,11 @@ public class PriceChangeRuleService {
         result.put("status", StatusType.SUCCESS);
 		return result;
 	}
-	
-	
-	
-	
-	
+
+
+
+
+
 	/**
 	 * 修改SystemProperty  默认全局规则修改
 	 * @param map
@@ -371,30 +363,30 @@ public class PriceChangeRuleService {
 	public Map<String, Object> updateSystemPropertyByName(Map<String, Object> map) throws Exception{
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
-		
+
 		//获取参数
 	    long boutiqueDiscountDefault =Long.parseLong(map.get("boutique_discount_default").toString());
 	    long imDiscountDefault =Long.parseLong(map.get("im_discount_default").toString());
-	    
+
 	    //修改Boutique_discount_default
 		SystemProperty systemProperty = new SystemProperty();
 		systemProperty.setSystemPropertyName(SystemPropertyEnum.propertyName.BOUTIQUE_DISCOUNT_DEFAULT.getCode());
 		systemProperty.setSystemPropertyValue((Long.valueOf("100") - boutiqueDiscountDefault)+"");
 		int boutiqueRow = systemPropertyService.updateByNameSelective(systemProperty);
-		
+
 		//判断影响行数,确认是否成功
 		if(boutiqueRow == 0){
         	result.put("info","parameter is incorrect");
         	logger.error("update SystemProperty fail parameter:"+ new Gson().toJson(systemProperty));
             throw new RuntimeException("error");
 		}
-		
-		
+
+
 	    //修改Im_discount_default
 		systemProperty.setSystemPropertyName(SystemPropertyEnum.propertyName.IM_DISCOUNT_DEFAULT.getCode());
 		systemProperty.setSystemPropertyValue((Long.valueOf("100") - imDiscountDefault)+"");
 		int imRow = systemPropertyService.updateByNameSelective(systemProperty);
-		
+
 		//判断影响行数,确认是否成功
 		if(imRow == 0){
         	result.put("info","parameter is incorrect");
@@ -405,12 +397,12 @@ public class PriceChangeRuleService {
         result.put("status", StatusType.SUCCESS);
 		return result;
 	}
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
 	/**
 	 * 删除PriceChangeRul
 	 * @param map
@@ -421,7 +413,7 @@ public class PriceChangeRuleService {
 	public Map<String,Object> deletePriceChangeRule(Map<String,Object> map) throws Exception{
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
-		
+
 		Long priceChangeRuleId =Long.parseLong(map.get("price_change_rule_id").toString());
 
 		//查询判断是否存在
@@ -429,7 +421,7 @@ public class PriceChangeRuleService {
 		if(priceChangeRuleProductList != null && priceChangeRuleProductList.size() > 0){
 			//删除priceChangeRuleProduct
 			int ProductRow = priceChangeRuleProductService.deleteBypriceChangeRuleId(priceChangeRuleId);
-			
+
 			//判断影响行数,确认是否成功
 			if(ProductRow <= 0){
 	        	result.put("info","parameter is incorrect");
@@ -438,14 +430,14 @@ public class PriceChangeRuleService {
 			}
 		}
 
-		
-		
+
+
 		//查询判断是否存在
 		List<PriceChangeRuleGroup> priceChangeRuleGroupList =  priceChangeRuleGroupService.selectByPriceChangeRuleId(priceChangeRuleId);
 		if(priceChangeRuleGroupList != null && priceChangeRuleGroupList.size() > 0){
 			//删除priceChangeRuleGroup
 			int groupRow = priceChangeRuleGroupService.deleteByPriceChangeRuleId(priceChangeRuleId);
-			
+
 			//判断影响行数,确认是否成功
 			if(groupRow <= 0){
 	        	result.put("info","parameter is incorrect");
@@ -453,37 +445,37 @@ public class PriceChangeRuleService {
 	            throw new RuntimeException("error  delete priceChangeRuleGroup fail");
 			}
 		}
-		
 
-		
-		
+
+
+
 		//删除priceChangeRuleCategoryBrand
 		int categoryBrandRow = priceChangeRuleCategoryBrandService.deleteByPriceChangeRuleId(priceChangeRuleId);
-		
+
 		//判断影响行数,确认是否成功
 		if(categoryBrandRow <= 0){
         	result.put("info","parameter is incorrect");
         	logger.error("delete priceChangeRuleCategoryBrand fail parameter:"+ new Gson().toJson(priceChangeRuleId));
             throw new RuntimeException("error  delete priceChangeRuleCategoryBrand fail");
 		}
-		
-		
-		
+
+
+
 		//删除priceChangeRuleSeasonGroup
 		int seasonGroupRow = priceChangeRuleSeasonGroupService.deleteByPriceChangeRuleId(priceChangeRuleId);
-		
+
 		//判断影响行数,确认是否成功
 		if(seasonGroupRow <= 0){
         	result.put("info","parameter is incorrect");
         	logger.error("delete priceChangeRuleSeasonGroup fail parameter:"+ new Gson().toJson(priceChangeRuleId));
             throw new RuntimeException("error  delete priceChangeRuleSeasonGroup fail");
 		}
-		
-		
-		
+
+
+
 		//删除priceChangeRule
 		int priceChangeRuleRow = priceChangeRuleService.deleteByPrimaryKey(priceChangeRuleId);
-		
+
 		//判断影响行数,确认是否成功
 		if(priceChangeRuleRow <= 0){
         	result.put("info","parameter is incorrect");
@@ -494,40 +486,41 @@ public class PriceChangeRuleService {
 	    result.put("status", StatusType.SUCCESS);
 	    return result;
 	}
-	
-	
-	
+
+
+
 	/**
 	 * 修改PriceChangeRul 修改有效日期
 	 * @param map
 	 * @return
 	 * @throws Exception
-	 */ 
-	@Transactional  
+	 */
+	@Transactional
 	public Map<String, Object> updatePriceChangeRuleDate(Map<String, Object> map) throws Exception{
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
-		
+
 		//根据参数获取所有的price_change_rule列表
 	    Map<String,Object> params = new HashMap<String, Object>();
 	    params.put("price_type", map.get("price_type").toString());
 	    params.put("vendor_id", map.get("vendorId").toString());
 	    params.put("status", PriceChangeRuleEnum.Status.PENDING.getCode());
+		params.put("category_type", map.get("categoryType").toString());
 	    List<Map<String,Object>> list = priceChangeRuleService.selRuleByVendorPriceType(params);
-	    
+
 	    //循环修改列表的有效期
 	    if(list != null && list.size() > 0){
 	    	for(Map<String,Object> info : list){
-	    		
+
 	    		//根据price_change_rule_id  修改有效期
 	    		PriceChangeRule priceChangeRuleInfo = new PriceChangeRule();
 	    		priceChangeRuleInfo.setPriceChangeRuleId(Long.valueOf(info.get("price_change_rule_id").toString()));
 	    	    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 	    	    priceChangeRuleInfo.setValidFrom(simpleDateFormat.parse(map.get("valid_from").toString()));
-	    	    
+
 	    	    logger.info(MessageFormat.format("updatePriceChangeRuleDate price_change_rule_id:{0},valid_from:{1}",priceChangeRuleInfo.getPriceChangeRuleId(),priceChangeRuleInfo.getValidFromStr()));
 	    	    int row = priceChangeRuleService.updateByPrimaryKeySelective(priceChangeRuleInfo);
-	    	    
+
 	    	    //修改有效期
 	            if (row  <= 0) {
 	            	result.put("info","parameter is incorrect");
@@ -541,20 +534,20 @@ public class PriceChangeRuleService {
         result.put("status", StatusType.SUCCESS);
 		return result;
 	}
-	
-	
-	
-	
+
+
+
+
 	/**
 	 * 创建 PriceChangeRule
 	 * @return
-	 * @throws ParseException 
+	 * @throws ParseException
 	 */
 	@Transactional(rollbackFor = Exception.class)
 	public Map<String,Object> createPriceChangeRule(Map<String,Object> map) throws Exception{
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
-		
+
 		/**-------------------------------------PriceChangeRule-------------------------------------------------*/
 		PriceChangeRule priceChangeRule = new PriceChangeRule();
 
@@ -566,20 +559,20 @@ public class PriceChangeRuleService {
 	    priceChangeRule.setValidFrom(simpleDateFormat.parse(map.get("valid_from").toString()));
 	    priceChangeRule.setStatus(Integer.parseInt(map.get("status").toString()));
 
-	    
+
 	    priceChangeRuleService.insertSelective(priceChangeRule);
 	    if(priceChangeRule.getPriceChangeRuleId() == null || priceChangeRule.getPriceChangeRuleId() == 0 ){
 	    	result.put("info", "add priceChangeRule fail");
 	    	return result;
 	    }
-		
-		
-	    
+
+
+
 		/**-------------------------------------priceChangeRuleCategoryBrand-----------------------------------*/
 	    JsonArray priceChangeRuleAllBrandListArray = new JsonParser().parse(map.get("price_change_rule_all_brand_list").toString()).getAsJsonArray();
 
 	    for (int i = 0; i < priceChangeRuleAllBrandListArray.size(); i++) {
-	    	
+
 			PriceChangeRuleCategoryBrand priceChangeRuleCategoryBrand = new PriceChangeRuleCategoryBrand();
 			priceChangeRuleCategoryBrand.setPriceChangeRuleId(priceChangeRule.getPriceChangeRuleId());
 			priceChangeRuleCategoryBrand.setCategoryId(priceChangeRuleAllBrandListArray.get(i).getAsJsonObject().get("category_id").getAsLong());
@@ -589,15 +582,15 @@ public class PriceChangeRuleService {
 			priceChangeRuleCategoryBrand.setExceptionFlag(0);
 
 			priceChangeRuleCategoryBrandService.createPriceChangeRuleCategoryBrand(priceChangeRuleCategoryBrand);
-			
+
 	        if (priceChangeRuleCategoryBrand.getPriceChangeRuleCategoryBrandId() == null) {
 	            result.put("status", StatusType.DATABASE_ERROR);
 	            throw new RuntimeException("error");
 	        }
 	    }
 
-	    
-	    
+
+
 		/**-------------------------------------priceChangeRuleCategoryBrand  EXCEPTIONS -----------------------*/
 	    JsonArray priceChangeRuleCategoryListArray = new JsonParser().parse(map.get("price_change_rule_category_brand_list").toString()).getAsJsonArray();
 
@@ -612,16 +605,16 @@ public class PriceChangeRuleService {
 	        priceChangeRuleCategoryBrand.setExceptionFlag (1);
 
 			priceChangeRuleCategoryBrandService.createPriceChangeRuleCategoryBrand(priceChangeRuleCategoryBrand);
-			
+
 	        if (priceChangeRuleCategoryBrand.getPriceChangeRuleCategoryBrandId() == null) {
 	            result.put("status", StatusType.DATABASE_ERROR);
 	            throw new RuntimeException("error");
 	        }
 	    }
-	    
-	    
-	    
-	    
+
+
+
+
 		/**-------------------------------------priceChangeRuleProduct ---------------- -----------------------*/
 	    JsonArray priceChangeRuleProductListArray = new JsonParser().parse(map.get("price_change_rule_product_list").toString()).getAsJsonArray();
 
@@ -640,8 +633,8 @@ public class PriceChangeRuleService {
 	        }
 	    }
 
-	    
-	    
+
+
 
 		/**-------------------------------------priceChangeRuleGroup ---------------- -----------------------*/
 	    JsonArray priceChangeRuleGroupListArray = new JsonParser().parse(map.get("price_change_rule_group_list").toString()).getAsJsonArray();
@@ -658,12 +651,12 @@ public class PriceChangeRuleService {
 	            throw new RuntimeException("error");
 	        }
 	    }
-	    
+
 	    result.put("status", StatusType.SUCCESS);
 	    return result;
 	}
-	
-	
+
+
 	/**
 	 * 修改PriceChangeRul
 	 * @param map
@@ -674,7 +667,7 @@ public class PriceChangeRuleService {
 	public Map<String,Object> updatePriceChangeRule(Map<String,Object> map) throws Exception{
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("status", StatusType.FAILURE);
-		
+
 		/**-------------------------------------PriceChangeRule-------------------------------------------------*/
 		PriceChangeRule priceChangeRule = new PriceChangeRule();
 		priceChangeRule.setPriceChangeRuleId(Long.valueOf(map.get("price_change_rule_id").toString()));
@@ -683,43 +676,43 @@ public class PriceChangeRuleService {
 	    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	    priceChangeRule.setValidFrom(simpleDateFormat.parse(map.get("valid_from").toString()));
 	    PriceChangeRule oldPriceChangeRule = priceChangeRuleService.selectByPrimaryKey(priceChangeRule.getPriceChangeRuleId());
-	    
+
 	    //修改之前的状态
         if (oldPriceChangeRule.getStatus() == 3) {
         	 priceChangeRule.setStatus(1);
         }
 
-	    
+
 	    int resultNum = priceChangeRuleService.updateByPrimaryKeySelective(priceChangeRule);
 //	    if(priceChangeRule.getPriceChangeRuleId() == null || priceChangeRule.getPriceChangeRuleId() == 0 ){
 //	    	result.put("info", "add priceChangeRule fail");
 //	    	return result;
 //	    }
-		
-		
-	    
+
+
+
 		/**-------------------------------------priceChangeRuleCategoryBrand-----------------------------------*/
 	    JsonArray priceChangeRuleAllBrandListArray = new JsonParser().parse(map.get("price_change_rule_all_brand_list").toString()).getAsJsonArray();
 
 	    for (int i = 0; i < priceChangeRuleAllBrandListArray.size(); i++) {
-	    	
+
 			PriceChangeRuleCategoryBrand priceChangeRuleCategoryBrand = new PriceChangeRuleCategoryBrand();
 			priceChangeRuleCategoryBrand.setPriceChangeRuleCategoryBrandId(priceChangeRuleAllBrandListArray.get(i).getAsJsonObject().get("price_change_rule_category_brand_id").getAsLong());
 			priceChangeRuleCategoryBrand.setDiscountPercentage(Long.valueOf("100") - priceChangeRuleAllBrandListArray.get(i).getAsJsonObject().get("discount_percentage").getAsLong());
 
 			priceChangeRuleCategoryBrandService.updateByPrimaryKeySelective(priceChangeRuleCategoryBrand);
-			
+
 //	        if (priceChangeRuleCategoryBrand.getPriceChangeRuleCategoryBrandId() == null) {
 //	            result.put("status", StatusType.DATABASE_ERROR);
 //	            throw new RuntimeException("error");
 //	        }
 	    }
-		
-		
+
+
 	    result.put("status", StatusType.SUCCESS);
 	    return result;
 	}
-	
 
-    
+
+
 }
