@@ -30,9 +30,12 @@ public class BrandServiceImpl extends BaseDao implements IBrandService {
     }
 
     @Override
-    public List<Map<String, Object>> queryActiveBrand() {
+    public List<Map<String, Object>> queryActiveBrand(Integer categoryType) {
         Brand brand = new Brand();
         brand.setEnabled(EnabledType.USED);
+        if(categoryType!=null) {
+            brand.setCategoryType(categoryType.byteValue());
+        }
         List<Map<String, Object>> brands = brandMapper.selBrandByConditions(brand);
         Collections.sort(brands, new Comparator() {
             @Override

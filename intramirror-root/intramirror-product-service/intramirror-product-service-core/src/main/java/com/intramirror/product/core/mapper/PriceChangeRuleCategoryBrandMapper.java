@@ -80,4 +80,11 @@ public interface PriceChangeRuleCategoryBrandMapper {
 
     List<Map<String,Object>> selectPriceChangeRuleCategoryBrandExists(Map<String,Object> map);
     List<PriceChangeRuleCategoryBrand> getPriceChangeRuleGroupListByPriceChangeRuleIdAndExceptionFlag(@Param("priceChangeRuleId") Long priceChangeRuleId, @Param("exceptionFlag") Integer exceptionFlag);
+
+    /**
+     * 根据条件查询折扣信息
+     * @param condition
+     * @return
+     */
+    List<PriceChangeRuleCategoryBrand> queryPriceChangeRuleCategoryBrandByConditions(PriceChangeRuleCategoryBrand condition);
 }

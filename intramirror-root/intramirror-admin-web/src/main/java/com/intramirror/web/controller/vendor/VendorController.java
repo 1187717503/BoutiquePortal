@@ -49,7 +49,7 @@ public class VendorController {
 
     @RequestMapping("/select/queryRuleVendor")
     @ResponseBody
-    public ResultMessage queryRuleVendor(@Param("status") String status,@Param("price_type")String price_type){
+    public ResultMessage queryRuleVendor(@Param("status") String status,@Param("price_type")String price_type,@Param("categoryType")String categoryType){
         ResultMessage resultMessage = new ResultMessage();
         try {
             if(StringUtils.isBlank(status)) {
@@ -60,6 +60,9 @@ public class VendorController {
 //            params.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
             params.put("price_type", Integer.parseInt(price_type));
             params.put("status",status);
+            if(StringUtils.isNotBlank(categoryType)) {
+                params.put("categoryType", categoryType);
+            }
             List<Map<String,Object>> allVendorMaps = iQueryVendorService.queryRuleVendor(params);
             if(allVendorMaps != null && allVendorMaps.size() > 0) {
                 resultMessage.successStatus().putMsg("info","success").setData(allVendorMaps);

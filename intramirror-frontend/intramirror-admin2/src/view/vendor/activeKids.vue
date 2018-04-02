@@ -22,33 +22,33 @@
         </div>
       </div>
       <div class="main-center">
-          <div class="head-name">
-            <p v-for="title in headerTitles.value" :key="title.name" :style="{width:(100*title.size)/headerTitles.totalSize + '%'}">
-              {{title.name}}
-            </p>
-          </div>
-          <v-app class="vapp" style="margin-top:0">
-            <v-card class="datalist">
-              <v-data-table v-bind:headers="headers" v-bind:pagination.sync="pagination" v-bind:items="items">
-                <template slot="items" scope="props">
-                  <tr v-bind:class="props.item.english_name">
-                    <td>
-                      {{ props.item.english_name }}
-                    </td>
-                    <td class="text-xs-center" v-for="(headerItem,index) in headers" :key="headerItem.value" v-if="index!=0">
-                      {{ props.item[headerItem.value] | setTableval}}
-                    </td>
-                  </tr>
-                </template>
-                <template slot="pageText" scope="{ pageStart, pageStop }">
-                  From {{ pageStart }} to {{ pageStop }} of {{items.length}}
-                </template>
-              </v-data-table>
-              <div class="im-foot-page">
-                <select-page v-model="pagination.page" :length="Math.ceil(this.items.length / pagination.rowsPerPage)"></select-page>
-              </div>
-            </v-card>
-          </v-app>
+        <div class="head-name">
+          <p v-for="title in headerTitles.value" :key="title.name" :style="{width:(100*title.size)/headerTitles.totalSize + '%'}">
+            {{title.name}}
+          </p>
+        </div>
+        <v-app class="vapp" style="margin-top:0">
+          <v-card class="datalist">
+            <v-data-table v-bind:headers="headers" v-bind:pagination.sync="pagination" v-bind:items="items">
+              <template slot="items" scope="props">
+                <tr v-bind:class="props.item.english_name">
+                  <td>
+                    {{ props.item.english_name }}
+                  </td>
+                  <td class="text-xs-center" v-for="(headerItem,index) in headers" :key="headerItem.value" v-if="index!=0">
+                    {{ props.item[headerItem.value] | setTableval}}
+                  </td>
+                </tr>
+              </template>
+              <template slot="pageText" scope="{ pageStart, pageStop }">
+                From {{ pageStart }} to {{ pageStop }} of {{items.length}}
+              </template>
+            </v-data-table>
+            <div class="im-foot-page">
+              <select-page v-model="pagination.page" :length="Math.ceil(this.items.length / pagination.rowsPerPage)"></select-page>
+            </div>
+          </v-card>
+        </v-app>
       </div>
       <div class="brand-category">
         <p class="tit">Exception - Brand & Category</p>
@@ -99,12 +99,12 @@ export default {
       priceId: 0,
       tableBar: [],
       items: [],
+      searchInput: "",
       boutiqueData: [],
       BrandIDColorCode: [],
       productGrouplist: [],
       pagination: {},
       brandList: [],
-      searchInput: "",
       boutiqueVendorid: null,
       isLoading: false,
       headers: [
@@ -136,7 +136,7 @@ export default {
   },
   mounted() {
     this.isLoading = true;
-    queryRuleVendor(1,1).then(res => {
+    queryRuleVendor(1,2).then(res => {
       if (res.data.status === 1) {
         this.allVendor = res.data.data;
         this.boutiqueVendorid = this.allVendor[0].vendor_id;
@@ -147,11 +147,7 @@ export default {
     selectActiveCategorys().then(res => {
       //获取Categorys
       const tempData = _.filter(res.data.data, item => {
-        if (
-          item.categoryId == 1757 ||
-          item.categoryId == 1758 ||
-          item.categoryId == 1759
-        ) {
+        if (item.categoryId == 1499 || item.categoryId == 1568) {
           return false;
         }
         return true;
@@ -236,7 +232,7 @@ export default {
           this.selectProductGroup = res.data.productGroupList;
         }
       });
-      queryRuleByHasSeason(2, val, 1,1).then(res => {
+      queryRuleByHasSeason(2, val, 1, 2).then(res => {
         //获取head tab
         this.tableBar = res.data.data;
         if (this.tableBar.length === 0) {
@@ -542,7 +538,6 @@ export default {
     display: inline-block;
   }
 }
-
 
 .brand-category {
   width: 100%;

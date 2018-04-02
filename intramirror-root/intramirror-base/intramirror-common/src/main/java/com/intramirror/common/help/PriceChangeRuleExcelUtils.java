@@ -62,11 +62,23 @@ public class PriceChangeRuleExcelUtils {
         PriceChangeRuleExcelUtils.genPriceExcel("IM Pricing Rule",brandNames,datas);*/
         List<Map<String, Object>> brandNames = new ArrayList<>();
         Map<String, Object> brand1 = new HashMap<>();
-        brand1.put("english_name", "032C");
-        brand1.put("brand_id", "944");
+        brand1.put("english_name", "Default");
+        brand1.put("brand_id", "0");
         brandNames.add(brand1);
+        Map<String, Object> brand2 = new HashMap<>();
+        brand2.put("english_name", "Free City Kids");
+        brand2.put("brand_id", "3636");
+        brandNames.add(brand2);
+        Map<String, Object> brand3 = new HashMap<>();
+        brand3.put("english_name", "Frency & Mercury Kids");
+        brand3.put("brand_id", "3637");
+        brandNames.add(brand3);
+        Map<String, Object> brand4 = new HashMap<>();
+        brand4.put("english_name", "Frescobol Carioca Kids");
+        brand4.put("brand_id", "3638");
+        brandNames.add(brand4);
 
-        PriceChangeRuleExcelUtils.readRuleExcel("/Users/dingyifan/Downloads/workbook.xls", brandNames, "12");
+        PriceChangeRuleExcelUtils.readRuleExcelKids("/Users/juzhongzheng/Desktop/20180323165033.xls", brandNames, "12");
 
     }
 
@@ -75,7 +87,13 @@ public class PriceChangeRuleExcelUtils {
 
     private static final String[] categoryIds = new String[] { "", "1504", "1506", "1505", "1507", "1569", "1584", "1598", "1608" };
 
+    private static final String[] categoryKidsNames = new String[] { "Brand", "Clothing", "Shoes", "Accessories", "Clothing", "Shoes", "Accessories",
+            "Clothing", "Shoes", "Accessories" };
+
+    private static final String[] categoryKidsIds = new String[] { "", "1760", "1761", "1762", "1766", "1767", "1768", "1763", "1764", "1765" };
+
     public static String genPriceExcel(String excelName, List<Map<String, Object>> brands, List<Map<String, Object>> datas, String filePath) throws Exception {
+
         HSSFWorkbook workbook = new HSSFWorkbook();
 
         // set sheet name
@@ -92,13 +110,13 @@ public class PriceChangeRuleExcelUtils {
         HSSFCell row1cell1 = row1.createCell(1);
         row1cell1.setCellValue("Men");
         row1cell1.setCellStyle(cellStyle);
-
         HSSFCell row1cell5 = row1.createCell(5);
         row1cell5.setCellValue("Women");
         row1cell5.setCellStyle(cellStyle);
 
         sheet.addMergedRegion(new CellRangeAddress(0, 0, 1, 4));
         sheet.addMergedRegion(new CellRangeAddress(0, 0, 5, 8));
+
         rowLength++;
 
         // 创建第二行数据
@@ -120,7 +138,11 @@ public class PriceChangeRuleExcelUtils {
                 if (StringUtils.isBlank(cId)) {
                     value = data.get("english_name").toString();
                 } else {
-                    value = data.get(cId).toString();
+                    if (data.get(cId) == null) {
+                        value = "100"; // 如果不存在  折扣为100 不打折
+                    } else {
+                        value = data.get(cId).toString();
+                    }
 
                     value = "" + (100 - Integer.parseInt(value));
                 }
@@ -169,41 +191,299 @@ public class PriceChangeRuleExcelUtils {
         List<Map<String, Object>> readExcelList = new ArrayList<>();
         HSSFWorkbook workbook = new HSSFWorkbook(new FileInputStream(new File(filePath)));
         HSSFSheet sheet = workbook.getSheetAt(0);
+        List<String> defaultValues = new ArrayList<>(10);
         for (int j = 2; j < sheet.getPhysicalNumberOfRows(); j++) {//获取每行
             HSSFRow row = sheet.getRow(j);
 
             String brand_id = getBrandId(brandNames, row.getCell(0).getStringCellValue());
+            if (brand_id.equals("0")) {
+                defaultValues.add(0, "0");
+                for (int i = 1; i < 9; i++) {
+                    if (row.getCell(i) != null && StringUtils.isNotBlank(row.getCell(i).toString())) {
+                        defaultValues.add(i, row.getCell(i).toString());
+                    } else {
+                        defaultValues.add(i, "0");
+                    }
+                }
+            }
+            String men_clothing;
+            if (row.getCell(1) != null && StringUtils.isNotBlank(row.getCell(1).toString())) {
+                men_clothing = row.getCell(1).toString();
+            } else {
+                men_clothing = defaultValues.get(1);
+            }
 
-            String men_clothing = row.getCell(1).toString();
-            String men_shoes = row.getCell(2).toString();
-            String men_bags = row.getCell(3).toString();
-            String men_accessores = row.getCell(4).toString();
+            String men_shoes;
+            if (row.getCell(2) != null && StringUtils.isNotBlank(row.getCell(2).toString())) {
 
-            String women_clothing = row.getCell(5).toString();
-            String women_shoes = row.getCell(6).toString();
-            String women_bags = row.getCell(7).toString();
-            String women_accessores = row.getCell(8).toString();
+                men_shoes = row.getCell(2).toString();
+            } else {
+                men_shoes = defaultValues.get(2);
+            }
+            String men_bags;
+            if (row.getCell(3) != null && StringUtils.isNotBlank(row.getCell(3).toString())) {
 
-            readExcelList.add(genMap(brand_id, men_clothing, 1, price_change_rule_id));
-            readExcelList.add(genMap(brand_id, men_shoes, 2, price_change_rule_id));
-            readExcelList.add(genMap(brand_id, men_bags, 3, price_change_rule_id));
-            readExcelList.add(genMap(brand_id, men_accessores, 4, price_change_rule_id));
+                men_bags = row.getCell(3).toString();
+            } else {
+                men_bags = defaultValues.get(3);
+            }
+            String men_accessores;
+            if (row.getCell(4) != null && StringUtils.isNotBlank(row.getCell(4).toString())) {
+                men_accessores = row.getCell(4).toString();
+            } else {
+                men_accessores = defaultValues.get(4);
+            }
+            String women_clothing;
+            if (row.getCell(5) != null && StringUtils.isNotBlank(row.getCell(5).toString())) {
+                women_clothing = row.getCell(5).toString();
+            } else {
+                women_clothing = defaultValues.get(5);
+            }
+            String women_shoes;
+            if (row.getCell(6) != null && StringUtils.isNotBlank(row.getCell(6).toString())) {
 
-            readExcelList.add(genMap(brand_id, women_clothing, 5, price_change_rule_id));
-            readExcelList.add(genMap(brand_id, women_shoes, 6, price_change_rule_id));
-            readExcelList.add(genMap(brand_id, women_bags, 7, price_change_rule_id));
-            readExcelList.add(genMap(brand_id, women_accessores, 8, price_change_rule_id));
+                women_shoes = row.getCell(6).toString();
+            } else {
+                women_shoes = defaultValues.get(6);
+            }
+            String women_bags;
+            if (row.getCell(7) != null && StringUtils.isNotBlank(row.getCell(7).toString())) {
+                women_bags = row.getCell(7).toString();
+            } else {
+                women_bags = defaultValues.get(7);
+            }
+            String women_accessores;
+            if (row.getCell(8) != null && StringUtils.isNotBlank(row.getCell(8).toString())) {
+                women_accessores = row.getCell(8).toString();
+            } else {
+                women_accessores = defaultValues.get(8);
+            }
+            /* Men */
+            readExcelList.add(genMap(brand_id, men_clothing, 1, price_change_rule_id, "1"));
+            readExcelList.add(genMap(brand_id, men_shoes, 2, price_change_rule_id, "1"));
+            readExcelList.add(genMap(brand_id, men_bags, 3, price_change_rule_id, "1"));
+            readExcelList.add(genMap(brand_id, men_accessores, 4, price_change_rule_id, "1"));
+            /* Women */
+            readExcelList.add(genMap(brand_id, women_clothing, 5, price_change_rule_id, "1"));
+            readExcelList.add(genMap(brand_id, women_shoes, 6, price_change_rule_id, "1"));
+            readExcelList.add(genMap(brand_id, women_bags, 7, price_change_rule_id, "1"));
+            readExcelList.add(genMap(brand_id, women_accessores, 8, price_change_rule_id, "1"));
         }
         return readExcelList;
     }
 
-    private static Map<String, Object> genMap(String brand_id, String discount, int i, String price_change_rule_id) {
+    public static String genPriceExcelKids(String excelName, List<Map<String, Object>> brands, List<Map<String, Object>> datas, String filePath)
+            throws Exception {
+        HSSFWorkbook workbook = new HSSFWorkbook();
+
+        // set sheet name
+        int rowLength = 0;
+        HSSFSheet sheet = workbook.createSheet(excelName);
+        HSSFCellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+
+        // 创建第一行数据
+        HSSFRow row1 = sheet.createRow(rowLength);
+        HSSFCell row1cell0 = row1.createCell(0);
+        row1cell0.setCellValue("");
+
+        HSSFCell row1cell1 = row1.createCell(1);
+        row1cell1.setCellValue("Babies");
+        row1cell1.setCellStyle(cellStyle);
+
+        HSSFCell row1cell4 = row1.createCell(4);
+        row1cell4.setCellValue("Boys");
+        row1cell4.setCellStyle(cellStyle);
+
+        HSSFCell row1cell7 = row1.createCell(7);
+        row1cell7.setCellValue("Girls");
+        row1cell7.setCellStyle(cellStyle);
+
+        sheet.addMergedRegion(new CellRangeAddress(0, 0, 1, 3));
+        sheet.addMergedRegion(new CellRangeAddress(0, 0, 4, 6));
+        sheet.addMergedRegion(new CellRangeAddress(0, 0, 7, 9));
+        rowLength++;
+
+        // 创建第二行数据
+        HSSFRow row2 = sheet.createRow(rowLength);
+        for (int i = 0, iLen = categoryKidsNames.length; i < iLen; i++) {
+            HSSFCell cell = row2.createCell(i);
+            cell.setCellValue(categoryKidsNames[i]);
+            cell.setCellStyle(cellStyle);
+        }
+        rowLength++;
+
+        // 创建折扣数据
+        for (Map<String, Object> data : datas) {
+            HSSFRow row = sheet.createRow(rowLength);
+
+            for (int i = 0, iLen = categoryKidsIds.length; i < iLen; i++) {
+                String cId = categoryKidsIds[i];
+                String value = "";
+                if (StringUtils.isBlank(cId)) {
+                    value = data.get("english_name").toString();
+                } else {
+                    if (data.get(cId) == null) {
+                        value = "100"; // 如果不存在  折扣为100 不打折
+                    } else {
+                        value = data.get(cId).toString();
+                    }
+
+                    value = "" + (100 - Integer.parseInt(value));
+                }
+                HSSFCell cell = row.createCell(i);
+                cell.setCellValue(new HSSFRichTextString(value));
+                cell.setCellStyle(cellStyle);
+            }
+
+            rowLength++;
+        }
+
+        //设置品牌下拉菜单
+        /*CellRangeAddressList regions = new CellRangeAddressList(2,500,0,0);
+        String[] strs = getBrands(brands);
+        DVConstraint constraint = DVConstraint.createExplicitListConstraint(strs);
+        HSSFDataValidation data_validation = new HSSFDataValidation(regions,constraint);
+        sheet.addValidationData(data_validation);*/
+
+        //设置品牌下拉菜单
+        String[] strs = getBrands(brands);
+        HSSFSheet hidden = workbook.createSheet("hidden");
+        HSSFCell cell = null;
+        for (int i = 0, length = strs.length; i < length; i++) {
+            String name = strs[i];
+            HSSFRow row = hidden.createRow(i);
+            cell = row.createCell(0);
+            cell.setCellValue(name);
+        }
+        Name namedCell = workbook.createName();
+        namedCell.setNameName("hidden");
+        namedCell.setRefersToFormula("hidden!A1:A" + strs.length);
+        DVConstraint constraint = DVConstraint.createFormulaListConstraint("hidden");
+        CellRangeAddressList addressList = new CellRangeAddressList(2, 500, 0, 0);
+        HSSFDataValidation validation = new HSSFDataValidation(addressList, constraint);
+        workbook.setSheetHidden(1, true);
+        sheet.addValidationData(validation);
+        FileOutputStream fileOut;
+        fileOut = new FileOutputStream(filePath);
+        workbook.write(fileOut);
+        fileOut.close();
+        return filePath;
+    }
+
+    public static List<Map<String, Object>> readRuleExcelKids(String filePath, List<Map<String, Object>> brandNames, String price_change_rule_id)
+            throws Exception {
+
+        List<Map<String, Object>> readExcelList = new ArrayList<>();
+        HSSFWorkbook workbook = new HSSFWorkbook(new FileInputStream(new File(filePath)));
+        HSSFSheet sheet = workbook.getSheetAt(0);
+        List<String> defaultValues = new ArrayList<>(10);
+
+        for (int j = 2; j < sheet.getPhysicalNumberOfRows(); j++) {//获取每行
+            HSSFRow row = sheet.getRow(j);
+
+            String brand_id = getBrandId(brandNames, row.getCell(0).getStringCellValue());
+            if (brand_id.equals("0")) { //default brand
+                defaultValues.add(0, "0");
+                for (int i = 1; i < 10; i++) {
+                    if (row.getCell(i) != null && StringUtils.isNotBlank(row.getCell(i).toString())) {
+                        defaultValues.add(i, row.getCell(i).toString());// 设置默认
+                    } else {
+                        defaultValues.add(i, "0");
+                    }
+                }
+            }
+            String babies_clothing;
+            if (row.getCell(1) != null && StringUtils.isNotBlank(row.getCell(1).toString())) {
+                babies_clothing = row.getCell(1).toString();
+            } else {
+                babies_clothing = defaultValues.get(1);
+            }
+
+            String babies_shoes;
+            if (row.getCell(2) != null && StringUtils.isNotBlank(row.getCell(2).toString())) {
+                babies_shoes = row.getCell(2).toString();
+            } else {
+                babies_shoes = defaultValues.get(2);
+            }
+            String babies_accessores;
+            if (row.getCell(3) != null && StringUtils.isNotBlank(row.getCell(3).toString())) {
+                babies_accessores = row.getCell(3).toString();
+            } else {
+                babies_accessores = defaultValues.get(3);
+            }
+
+            String boys_clothing;
+            if (row.getCell(4) != null && StringUtils.isNotBlank(row.getCell(4).toString())) {
+                boys_clothing = row.getCell(4).toString();
+            } else {
+                boys_clothing = defaultValues.get(4);
+            }
+
+            String boys_shoes;
+            if (row.getCell(5) != null && StringUtils.isNotBlank(row.getCell(5).toString())) {
+                boys_shoes = row.getCell(5).toString();
+            } else {
+                boys_shoes = defaultValues.get(5);
+            }
+
+            String boys_accessores;
+            if (row.getCell(6) != null && StringUtils.isNotBlank(row.getCell(6).toString())) {
+                boys_accessores = row.getCell(6).toString();
+            } else {
+                boys_accessores = defaultValues.get(6);
+            }
+
+            String girls_clothing;
+            if (row.getCell(7) != null && StringUtils.isNotBlank(row.getCell(7).toString())) {
+                girls_clothing = row.getCell(7).toString();
+            } else {
+                girls_clothing = defaultValues.get(7);
+            }
+
+            String girls_shoes;
+            if (row.getCell(8) != null && StringUtils.isNotBlank(row.getCell(8).toString())) {
+                girls_shoes = row.getCell(8).toString();
+            } else {
+                girls_shoes = defaultValues.get(8);
+            }
+
+            String girls_accessores;
+            if (row.getCell(9) != null && StringUtils.isNotBlank(row.getCell(9).toString())) {
+                girls_accessores = row.getCell(9).toString();
+            } else {
+                girls_accessores = defaultValues.get(9);
+            }
+
+            /* Babies */
+            readExcelList.add(genMap(brand_id, babies_clothing, 1, price_change_rule_id, "2"));
+            readExcelList.add(genMap(brand_id, babies_shoes, 2, price_change_rule_id, "2"));
+            readExcelList.add(genMap(brand_id, babies_accessores, 3, price_change_rule_id, "2"));
+            /*boys*/
+            readExcelList.add(genMap(brand_id, boys_clothing, 4, price_change_rule_id, "2"));
+            readExcelList.add(genMap(brand_id, boys_shoes, 5, price_change_rule_id, "2"));
+            readExcelList.add(genMap(brand_id, boys_accessores, 6, price_change_rule_id, "2"));
+
+            /*girls*/
+            readExcelList.add(genMap(brand_id, girls_clothing, 7, price_change_rule_id, "2"));
+            readExcelList.add(genMap(brand_id, girls_shoes, 8, price_change_rule_id, "2"));
+            readExcelList.add(genMap(brand_id, girls_accessores, 9, price_change_rule_id, "2"));
+
+        }
+        return readExcelList;
+    }
+
+    private static Map<String, Object> genMap(String brand_id, String discount, int i, String price_change_rule_id, String type) {
         int dis = 100 - (int) Double.parseDouble(discount);
         if (dis < 0 || dis > 100) {
             throw new RuntimeException("折扣设置错误");
         }
         Map<String, Object> map = new HashMap<>();
-        map.put("category_id", categoryIds[i]);
+        if ("1".equals(type)) {
+            map.put("category_id", categoryIds[i]);
+        } else if ("2".equals(type)) {
+            map.put("category_id", categoryKidsIds[i]);
+        }
         map.put("brand_id", brand_id);
         map.put("discount_percentage", dis);
         map.put("exception_flag", "0");
@@ -215,7 +495,8 @@ public class PriceChangeRuleExcelUtils {
     private static String getBrandId(List<Map<String, Object>> brands, String name) throws Exception {
         for (Map<String, Object> map : brands) {
             String eName = map.get("english_name").toString();
-            if (StringUtils.trim(eName).equalsIgnoreCase(StringUtils.trim(name))) {
+
+            if (StringUtils.trim(eName).toLowerCase().equals(StringUtils.trim(name).toLowerCase())) {
                 return map.get("brand_id").toString();
             }
         }

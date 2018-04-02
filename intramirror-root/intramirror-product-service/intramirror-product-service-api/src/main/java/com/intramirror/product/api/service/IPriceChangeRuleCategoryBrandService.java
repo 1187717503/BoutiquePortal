@@ -69,4 +69,11 @@ public interface IPriceChangeRuleCategoryBrandService {
 
     List<PriceChangeRuleCategoryBrand> getPriceChangeRuleGroupListByPriceChangeRuleIdAndExceptionFlag(Long priceChangeRuleId, Integer exceptionFlag);
 
+    /**
+     * 根据条件查询价格规则
+     * @param condition
+     * @return
+     */
+    List<PriceChangeRuleCategoryBrand> queryPriceChangeRuleCategoryBrandByConditions(PriceChangeRuleCategoryBrand condition);
+
 }

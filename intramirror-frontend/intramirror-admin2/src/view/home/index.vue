@@ -20,6 +20,8 @@
             <router-link to="/admin/default" active-class="hover">Default Rule</router-link>
             <router-link to="/admin/active" active-class="hover">Active Rule</router-link>
             <router-link to="/admin/pending" active-class="hover">Pending Rule</router-link>
+            <router-link to="/admin/activeKids" active-class="hover">Active Rule Kids</router-link>
+            <router-link to="/admin/pendingKids" active-class="hover">Pending Rule Kids</router-link>
           </div>
         </div>
         <div class="item">
@@ -28,6 +30,8 @@
           <div class="tow-nav">
             <router-link to="/vendor/active" active-class="hover">Active Rule</router-link>
             <router-link to="/vendor/pending" active-class="hover">Pending Rule</router-link>
+            <router-link to="/vendor/activeKids" active-class="hover">Active Rule Kids</router-link>
+            <router-link to="/vendor/pendingKids" active-class="hover">Pending Rule Kids</router-link>
           </div>
         </div>
         <div class="item">
