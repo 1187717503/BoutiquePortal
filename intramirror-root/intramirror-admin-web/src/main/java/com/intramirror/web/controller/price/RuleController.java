@@ -3,6 +3,8 @@ package com.intramirror.web.controller.price;
 import com.intramirror.common.enums.PriceChangeRuleEnum;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.help.StringUtils;
+import com.intramirror.product.api.model.PriceChangeRule;
+import com.intramirror.product.api.service.price.IPriceChangeRule;
 import com.intramirror.product.api.service.rule.IRuleService;
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
@@ -29,7 +31,8 @@ public class RuleController {
 
     @Resource(name = "productRuleServiceImpl")
     private IRuleService iRuleService;
-
+    @Resource(name = "productPriceChangeRule")
+    private IPriceChangeRule iPriceChangeRule;
     /**
      * 查询vendor不同status规则中包含的season
      * @param ruleStatus
@@ -39,7 +42,8 @@ public class RuleController {
      */
     @RequestMapping("/select/queryRuleByHasSeason")
     @ResponseBody
-    public ResultMessage queryRuleByHasSeason(@Param("ruleStatus") String ruleStatus,@Param("vendor_id")String vendor_id,@Param("price_type")String price_type){
+    public ResultMessage queryRuleByHasSeason(@Param("ruleStatus") String ruleStatus,@Param("vendor_id")String vendor_id,
+                                              @Param("price_type")String price_type,@Param("categoryType")String categoryType){
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
             if(StringUtils.isBlank(ruleStatus) || StringUtils.isBlank(vendor_id))
@@ -50,6 +54,7 @@ public class RuleController {
             params.put("price_type",price_type);
             params.put("status",ruleStatus);
             params.put("vendor_id",vendor_id);
+            params.put("categoryType",categoryType);
             List<Map<String,Object>> hasSeasonMaps =  iRuleService.queryRuleByHasSeason(params);
             resultMessage.successStatus().putMsg("info","success").setData(hasSeasonMaps);
         } catch (Exception e) {
@@ -69,7 +74,8 @@ public class RuleController {
      */
     @RequestMapping("/select/queryRuleByNotHasSesaon")
     @ResponseBody
-    public ResultMessage queryRuleByNotHasSesaon(@Param("ruleStatus") String ruleStatus,@Param("vendor_id") String vendor_id,@Param("price_type")String price_type){
+    public ResultMessage queryRuleByNotHasSesaon(@Param("ruleStatus") String ruleStatus,@Param("vendor_id") String vendor_id,
+                                                 @Param("price_type")String price_type,@Param("categoryType")String categoryType){
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
             if(StringUtils.isBlank(ruleStatus) || StringUtils.isBlank(vendor_id))
@@ -80,6 +86,7 @@ public class RuleController {
             params.put("price_type",price_type);
             params.put("status",ruleStatus);
             params.put("vendor_id",vendor_id);
+            params.put("categoryType",categoryType);
             List<Map<String,Object>> notHasSeasonMaps =  iRuleService.queryRuleByNotHasSesaon(params);
             resultMessage.successStatus().putMsg("info","success").setData(notHasSeasonMaps);
         } catch (Exception e) {
@@ -104,11 +111,14 @@ public class RuleController {
             if(StringUtils.isBlank(price_change_rule_id)) {
                 return resultMessage.errorStatus().putMsg("info","price_change_rule_id is null !!!");
             }
-
+            //PriceChangeRule priceChangeRule=iPriceChangeRule.selectByPrimaryKey(Long.valueOf(price_change_rule_id));
             Map<String,Object> params = new HashMap<>();
             params.put("exception_flag", 0);
             params.put("english_name",english_name);
             params.put("price_change_rule_id",price_change_rule_id);
+            /*if(priceChangeRule != null) {
+                params.put("categoryType", Integer.valueOf(priceChangeRule.getCategoryType()));
+            }*/
             List<Map<String,Object>> brandMaps =  iRuleService.queryRuleByBrand(params);
             resultMessage.successStatus().putMsg("info","success").setData(brandMaps);
         } catch (Exception e) {
@@ -138,6 +148,10 @@ public class RuleController {
             params.put("exception_flag", 0);
             params.put("english_name",english_name);
             params.put("price_change_rule_id",price_change_rule_id);
+            /*PriceChangeRule priceChangeRule = iPriceChangeRule.selectByPrimaryKey(Long.valueOf(price_change_rule_id));
+            if(priceChangeRule != null) {
+                params.put("categoryType", Integer.valueOf(priceChangeRule.getCategoryType()));
+            }*/
             List<Map<String,Object>> brandMaps =  iRuleService.queryNotRuleByBrand(params);
             resultMessage.successStatus().putMsg("info","success").setData(brandMaps);
         } catch (Exception e) {

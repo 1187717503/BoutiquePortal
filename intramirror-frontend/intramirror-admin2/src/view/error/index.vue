@@ -1001,7 +1001,6 @@ export default {
       }
     },
     loadBoutique(vid, pid, etp, field) {
-      debugger;
       let data = {
         vid: "",
         pid: "",

@@ -126,15 +126,23 @@
     <select id="queryRuleByHasSeason" resultType="java.util.Map" parameterType="java.util.Map">
 
     select pcrsg.`name`,pcrsg.price_change_rule_id,pcrsg.season_code from price_change_rule_season_group pcrsg where pcrsg.price_change_rule_id in (
-                select pcr.price_change_rule_id from price_change_rule pcr where pcr.price_type = #{price_type,jdbcType=INTEGER} and pcr.status = #{status,jdbcType=INTEGER} and vendor_id = #{vendor_id,jdbcType=INTEGER}
+                select pcr.price_change_rule_id from price_change_rule pcr
+                where pcr.price_type = #{price_type,jdbcType=INTEGER}
+                and pcr.status = #{status,jdbcType=INTEGER}
+                and pcr.vendor_id = #{vendor_id,jdbcType=INTEGER}
+                and pcr.category_type = #{categoryType,jdbcType=INTEGER}
     ) and pcrsg.enabled = 1
   </select>
 
-    <select id="queryRuleByNotHasSesaon" resultType="java.util.Map" parameterType="java.util.Map">
+  <select id="queryRuleByNotHasSesaon" resultType="java.util.Map" parameterType="java.util.Map">
 
     select season_code from season where enabled = 1 and season_code not in (
                     select distinct season_code from price_change_rule_season_group pcrsg where pcrsg.price_change_rule_id in (
-                select pcr.price_change_rule_id from price_change_rule pcr where pcr.price_type =  #{price_type,jdbcType=INTEGER} and pcr.status = #{status,jdbcType=INTEGER} and vendor_id = #{vendor_id,jdbcType=INTEGER}
+                select pcr.price_change_rule_id from price_change_rule pcr
+                where pcr.price_type =  #{price_type,jdbcType=INTEGER}
+                and pcr.status = #{status,jdbcType=INTEGER}
+                and pcr.vendor_id = #{vendor_id,jdbcType=INTEGER}
+                and pcr.category_type = #{categoryType,jdbcType=INTEGER}
             ) and pcrsg.enabled = 1
     )
   </select>
@@ -176,7 +184,11 @@
     </select>
 
     <select id="queryNotRuleByBrand" resultType="java.util.Map" parameterType="java.util.Map">
-        select distinct brand_id,english_name from brand where enabled = 1 and brand_id not in (
+        select distinct brand_id,english_name from brand where enabled = 1
+        <if test="categoryType != null">
+            and category_type = #{categoryType,jdbcType=INTEGER}
+        </if>
+        and brand_id not in (
         select pcrcb.brand_id from price_change_rule_category_brand pcrcb
         inner join category c on (c.category_id = pcrcb.category_id and c.enabled = 1)
         inner join brand b on (b.brand_id = pcrcb.brand_id and b.enabled = 1)
@@ -218,6 +230,7 @@
         <foreach item="item" index="index" collection="season_codes" open="(" separator="," close=")">
             #{item}
         </foreach>
+        and category_type = #{categoryType,jdbcType=INTEGER}
     </select>
 
     <insert id="copyPriceChangeRule" parameterType="java.util.Map">

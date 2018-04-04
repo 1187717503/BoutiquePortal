@@ -19,6 +19,7 @@
         <result column="status" jdbcType="TINYINT" property="status"/>
         <result column="vendor_application_id" jdbcType="BIGINT" property="vendorApplicationId"/>
         <result column="hot_brand" jdbcType="INTEGER" property="hotBrand"/>
+        <result column="category_type" jdbcType="TINYINT" property="categoryType"/>
     </resultMap>
     <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.intramirror.product.api.model.Brand">
         <!--
@@ -273,6 +274,9 @@
         where 1=1
         <if test="enabled != null">
             and enabled = #{enabled,jdbcType=BIT}
+        </if>
+        <if test="categoryType != null">
+            and category_type = #{categoryType,jdbcType=INTEGER}
         </if>
     </select>
 

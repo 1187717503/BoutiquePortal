@@ -2,16 +2,13 @@
   <div>
     <div class="select-boutique">
       <div class="input-field">
-        <multiselect track-by="vendor_name"
-                     label="vendor_name"
-                     placeholder="Boutique" :options="allVendor" :show-labels="false"
-                     @select="getBoutiqueid($event)" :allow-empty="false" :value="allVendor[0]"></multiselect>
+        <multiselect track-by="vendor_name" label="vendor_name" placeholder="Boutique" :options="allVendor" :show-labels="false" @select="getBoutiqueid($event)" :allow-empty="false" :value="allVendor[0]"></multiselect>
       </div>
       <button v-if="tableBar.length === 0" class="waves-effect waves-light btn" @click="CREATENEWRULE">CREATE NEW RULE
       </button>
       <div class="head-search" v-if="tableBar.length !== 0">
         <i class="mdi mdi-magnify"></i>
-        <input type="text" placeholder="Brand" @change="searchBrand">
+        <input type="text" placeholder="Brand" v-model="searchInput" @change="searchBrand">
         <span class="mdi mdi-close" @click="searchBrand"></span>
       </div>
     </div>
@@ -19,9 +16,7 @@
     <div v-if="tableBar.length !== 0">
       <div class="table-bar">
         <div class="item">
-          <div class="lists" v-for="(i,index) in tableBar"
-               :class="{hover:i.price_change_rule_id===priceId||priceId===0}"
-               @click="setTablebar(i.price_change_rule_id)">
+          <div class="lists" v-for="(i,index) in tableBar" :class="{hover:i.price_change_rule_id===priceId||priceId===0}" @click="setTablebar(i.price_change_rule_id)">
             {{i.name}}
             <div>
               <p v-for="j in i.season_codes">{{j}}</p>
@@ -31,113 +26,32 @@
       </div>
       <div class="main-center">
         <div class="head-btn">
-          <div class="waves-effect waves-light btn"
-               @click="showAddbrand=true;showShade=true;getaddBran(priceId,'');listBandright=[];addBandright=[]">
+          <div class="waves-effect waves-light btn" @click="showAddbrand=true;showShade=true;getaddBran(priceId,'');listBandright=[];addBandright=[]">
             ADD BRAND
           </div>
           <div class="waves-effect waves-light btn" @click="showSeason=true;showShade=true;">COPY TO NEW</div>
           <div class="waves-effect waves-light btn" @click="delChangeRule">DELETE SEASON</div>
         </div>
         <div class="head-name">
-          <p>Men</p>
-          <p>Women</p>
+          <p v-for="title in headerTitles.value" :key="title.name" :style="{width:(100*title.size)/headerTitles.totalSize + '%'}">
+            {{title.name}}
+          </p>
         </div>
         <v-app class="vapp">
           <v-card class="datalist">
-            <v-data-table
-              v-bind:headers="headers"
-              v-bind:pagination.sync="pagination"
-              v-bind:items="items">
+            <v-data-table v-bind:headers="headers" v-bind:pagination.sync="pagination" v-bind:items="items">
               <template slot="items" scope="props">
                 <tr v-bind:class="props.item.english_name">
-                  <td style="width: 300px;">
+                  <td style="width: 200px;">
                     {{ props.item.english_name }}
                   </td>
-                  <td class="text-xs-center">
-                    <v-edit-dialog lazy>{{ props.item[headers[1].value] | setTableval}}%
-                      <v-text-field
-                        slot="input"
-                        label="Edit"
-                        v-bind:value="props.item[headers[1].value] | setTableval"
-                        v-on:change="ediClothing($event,props.index,props.item.brand_id,1)"
-                      ></v-text-field>
-                    </v-edit-dialog>
-                  </td>
-                  <td class="text-xs-center">
-                    <v-edit-dialog lazy>{{ props.item[headers[2].value] | setTableval }}%
-                      <v-text-field
-                        slot="input"
-                        label="Edit"
-                        v-bind:value="props.item[headers[2].value] | setTableval"
-                        v-on:change="ediClothing($event,props.index,props.item.brand_id,2)"
-                      ></v-text-field>
-                    </v-edit-dialog>
-
-                  </td>
-                  <td class="text-xs-center">
-                    <v-edit-dialog lazy>{{ props.item[headers[3].value] | setTableval }}%
-                      <v-text-field
-                        slot="input"
-                        label="Edit"
-                        v-bind:value="props.item[headers[3].value] | setTableval"
-                        v-on:change="ediClothing($event,props.index,props.item.brand_id,3)"
-                      ></v-text-field>
-                    </v-edit-dialog>
-                  </td>
-                  <td class="text-xs-center">
-                    <v-edit-dialog lazy>{{ props.item[headers[4].value] | setTableval}}%
-                      <v-text-field
-                        slot="input"
-                        label="Edit"
-                        v-bind:value="props.item[headers[4].value] | setTableval"
-                        v-on:change="ediClothing($event,props.index,props.item.brand_id,4)"
-                      ></v-text-field>
-                    </v-edit-dialog>
-                  </td>
-                  <td class="text-xs-center">
-                    <v-edit-dialog lazy>{{ props.item[headers[5].value] | setTableval }}%
-                      <v-text-field
-                        slot="input"
-                        label="Edit"
-                        v-bind:value="props.item[headers[5].value] | setTableval"
-                        v-on:change="ediClothing($event,props.index,props.item.brand_id,5)"
-                      ></v-text-field>
-                    </v-edit-dialog>
-                  </td>
-                  <td class="text-xs-center">
-                    <v-edit-dialog lazy>{{ props.item[headers[6].value] | setTableval }}%
-                      <v-text-field
-                        slot="input"
-                        label="Edit"
-                        v-bind:value="props.item[headers[6].value] | setTableval"
-                        v-on:change="ediClothing($event,props.index,props.item.brand_id,6)"
-                      ></v-text-field>
-                    </v-edit-dialog>
-                  </td>
-                  <td class="text-xs-center">
-                    <v-edit-dialog lazy>{{ props.item[headers[7].value] | setTableval }}%
-                      <v-text-field
-                        slot="input"
-                        label="Edit"
-                        v-bind:value="props.item[headers[7].value] | setTableval"
-                        v-on:change="ediClothing($event,props.index,props.item.brand_id,7)"
-                      ></v-text-field>
-                    </v-edit-dialog>
-                  </td>
-                  <td class="text-xs-center">
-                    <v-edit-dialog lazy>
-                      {{ props.item[headers[8].value] | setTableval }}%
-                      <v-text-field
-                        slot="input"
-                        label="Edit"
-                        v-bind:value="props.item[headers[8].value] | setTableval"
-                        v-on:change="ediClothing($event,props.index,props.item.brand_id,8)"
-                      ></v-text-field>
+                  <td class="text-xs-center" v-for="(headerItem,index) in headers" :key="headerItem.value" v-if="index!=0">
+                    <v-edit-dialog lazy>{{ props.item[headerItem.value] | setTableval}}%
+                      <v-text-field slot="input" label="Edit" single-line v-bind:value="props.item[headerItem.value] | setTableval" v-on:change="ediClothing($event,props.index,props.item.brand_id,index)"></v-text-field>
                     </v-edit-dialog>
                   </td>
                   <td>
-                    <span class="mdi mdi-close" v-if="props.item.english_name!=='Default'"
-                          @click="delBrand(props.item.brand_id)"></span>
+                    <span class="mdi mdi-close" v-if="props.item.english_name!=='Default'" @click="delBrand(props.item.brand_id)"></span>
                   </td>
                 </tr>
               </template>
@@ -147,8 +61,7 @@
             </v-data-table>
 
             <div class="im-foot-page">
-              <select-page v-model="pagination.page"
-                           :length="Math.ceil(this.items.length / pagination.rowsPerPage)"></select-page>
+              <select-page v-model="pagination.page" :length="Math.ceil(this.items.length / pagination.rowsPerPage)"></select-page>
             </div>
           </v-card>
         </v-app>
@@ -156,17 +69,12 @@
       <div class="brand-category">
         <div class="head-input">
           <div class="input-field">
-            <multiselect track-by="english_name" style="z-index:1;"
-                         label="english_name"
-                         :max-height="400"
-                         placeholder="Brand" :options="selectBrands" @select="getBrandid($event)"
-                         :show-labels="false"></multiselect>
+            <multiselect track-by="english_name" style="z-index:1;" label="english_name" :max-height="400" placeholder="Brand" :options="selectBrands" @select="getBrandid($event)" :show-labels="false"></multiselect>
           </div>
           <div class="input-field select-tow">
             <div class="multiselect">
               <div class="multiselect__select"></div>
-              <input type="text" readonly placeholder="Category" class="multiselect__input"
-                     @focus="isMultistep = true" :value="categoryName" @blur="hideMultistep">
+              <input type="text" readonly placeholder="Category" class="multiselect__input" @focus="isMultistep = true" :value="categoryName" @blur="hideMultistep">
             </div>
             <div class="multistep" v-if="isMultistep">
               <div v-for="item in selectCategorys">
@@ -184,18 +92,16 @@
         </div>
         <div class="tag" v-for="item in brandList">
           <div>
-            {{item.english_name}}　{{item.c1Name}} > {{item.c2Name}} > {{item.cName}}　{{item.discount_percentage | setTableval}}% Off<span
-            class="mdi mdi-close" @click="delBrandCateort(item)"></span></div>
+            {{item.english_name}}　{{item.c1Name}} > {{item.c2Name}} > {{item.cName}}　{{item.discount_percentage | setTableval}}% Off
+            <span class="mdi mdi-close" @click="delBrandCateort(item)"></span>
+          </div>
         </div>
       </div>
       <div class="foot-row">
         <div class="product-group">
           <div class="head-input">
             <div class="input-field">
-              <multiselect track-by="name" style="z-index:2"
-                           label="name"
-                           placeholder="Product Group" @select="getProductGroup($event)" :options="selectProductGroup"
-                           :show-labels="false"></multiselect>
+              <multiselect track-by="name" style="z-index:2" label="name" placeholder="Product Group" @select="getProductGroup($event)" :options="selectProductGroup" :show-labels="false"></multiselect>
             </div>
             <div class="input-field">
               <input type="text" class="validate" placeholder="10%" v-model="addProductGroupVal">
@@ -203,8 +109,8 @@
             <button class="waves-effect waves-light btn" @click="addPriceChangeRuleGroup($event)">ADD</button>
           </div>
           <div class="tag" v-for="item in productGrouplist">
-            <div>{{item.name}}　{{item.discount_percentage | setTableval }}% Off<span class="mdi mdi-close"
-                                                                                     @click="delPriceChangeRuleGroup(item)"></span>
+            <div>{{item.name}}　{{item.discount_percentage | setTableval }}% Off
+              <span class="mdi mdi-close" @click="delPriceChangeRuleGroup(item)"></span>
             </div>
           </div>
         </div>
@@ -219,21 +125,21 @@
             <button class="waves-effect waves-light btn" @click="addBrandIDColorCode">ADD</button>
           </div>
           <div class="tag" v-for="item in BrandIDColorCode">
-            <div>{{item.boutique_id}}　{{item.discount_percentage | setTableval}}% Off<span
-              class="mdi mdi-close" @click="delBrandIDColorCode(item)"></span></div>
+            <div>{{item.boutique_id}}　{{item.discount_percentage | setTableval}}% Off
+              <span class="mdi mdi-close" @click="delBrandIDColorCode(item)"></span>
+            </div>
           </div>
         </div>
       </div>
       <div class="foot-btn">
         <div class="input-field">
           <i class="mdi mdi-calendar prefix"></i>
-          <input id="seleDate" type="text" class="validate" placeholder="Date" @focus="setEffectiveDate"
-                 :value="RuleDate">
+          <input id="seleDate" type="text" class="validate" placeholder="Date" @focus="setEffectiveDate" :value="RuleDate">
           <label for="icon_prefix" class="active">Effective Date</label>
         </div>
         <button class="waves-effect waves-light btn" @click="saveDate">SAVE</button>
         <button class="waves-effect waves-light btn">CANCEL</button>
-        <input type="file" @change="getFile($event)" class="file-input"/>
+        <input type="file" @change="getFile($event)" class="file-input" />
         <button class="waves-effect waves-light btn button-no-padding" @click="uploadFile">UPLOAD EXCL</button>
         <button class="waves-effect waves-light btn button-no-padding" @click="downloadFile">DOWNLOAD EXCL</button>
         <button class="waves-effect waves-light btn active-button" @click="activeNow">ACTIVE NOW</button>
@@ -246,8 +152,10 @@
       </div>
       <div class="radio-list">
         <p v-for="(i,index) in pricingRulelist">
-          <input class="with-gap" type="radio" :id="'test'+index" name="Pricing"/>
-          <label :for="'test'+index" @click="selectPricingRule(index)">{{i.name}} <b>{{i.text}}</b></label>
+          <input class="with-gap" type="radio" :id="'test'+index" name="Pricing" />
+          <label :for="'test'+index" @click="selectPricingRule(index)">{{i.name}}
+            <b>{{i.text}}</b>
+          </label>
         </p>
       </div>
       <div class="foot-btn">
@@ -283,8 +191,7 @@
           <div class="rows" v-for="(item,index) in addBandleft">
             <div>
               <input type="checkbox" class="filled-in" :id="'filled-in-box'+index">
-              <label :for="'filled-in-box'+index"
-                     @click.stop="addBandrightarr($event,item)">{{item.english_name}}</label>
+              <label :for="'filled-in-box'+index" @click.stop="addBandrightarr($event,item)">{{item.english_name}}</label>
             </div>
           </div>
         </div>
@@ -318,12 +225,11 @@
       <div class="list-cent">
         <div v-for="(item,index) in copyData">
           <input type="checkbox" class="filled-in" :id="'chech-'+index">
-          <label :for="'chech-'+index" data-check="false"
-                 @click="SelectSeason($event,item)">{{item.season_code}}</label>
+          <label :for="'chech-'+index" data-check="false" @click="SelectSeason($event,item)">{{item.season_code}}</label>
         </div>
       </div>
       <div class="foot-btn">
-        <span @click="showSeason=false;showShade=false;">CANCEL</span>
+        <span @click="showSeason=false;showShade=false;arrSelectSeason=[]">CANCEL</span>
         <span @click="createSeason(coptyNewType)">CREATE</span>
       </div>
     </div>
@@ -391,6 +297,7 @@ export default {
       showCopy: false,
       isLoading: false,
       pagination: {},
+      searchInput: "",
       isMultistep: false,
       boutiqueVendorid: null,
       tableBar: [],
@@ -414,25 +321,10 @@ export default {
       arrSelectSeason: [],
 
       pricingRulelist: [
-        { name: "Copy Active", text: "Boutique Pricing Rule" },
+        // { name: "Copy Active", text: "Boutique Pricing Rule" },
         { name: "Create From Blank Pricing Rule", text: "" }
       ],
-      headers: [
-        {
-          text: "Brand",
-          align: "left",
-          value: "english_name",
-          sortable: false
-        },
-        { text: "null", value: "calories", align: "center", sortable: false },
-        { text: "null", value: "fat", align: "center", sortable: false },
-        { text: "null", value: "carbs", align: "center", sortable: false },
-        { text: "null", value: "protein", align: "center", sortable: false },
-        { text: "null", value: "sodium", align: "center", sortable: false },
-        { text: "null", value: "calcium", align: "center", sortable: false },
-        { text: "null", value: "iron", align: "center", sortable: false },
-        { text: "null", value: "men", align: "center", sortable: false }
-      ],
+      headers: [],
       items: [],
       addBandright: [],
       listBandright: [],
@@ -477,32 +369,59 @@ export default {
         this.getTablenav(this.boutiqueVendorid);
       }
     });
-    selectActiveBrands().then(res => {
+    selectActiveBrands(1).then(res => {
       //获取Brands
       this.selectBrands = res.data.data;
     });
     selectActiveCategorys().then(res => {
       //获取Categorys
-      this.selectCategorys = res.data.data;
+      const tempData = _.filter(res.data.data, item => {
+        if (
+          item.categoryId == 1757 ||
+          item.categoryId == 1758 ||
+          item.categoryId == 1759
+        ) {
+          return false;
+        }
+        return true;
+      });
+      this.selectCategorys = tempData;
       this.isLoading = false;
-      //设置table head标题
-      let j = 0;
+      const list = [
+        {
+          text: "",
+          value: "",
+          align: "center",
+          sortable: false
+        }
+      ];
+      const headerTitles = [];
       for (let item in this.selectCategorys) {
         //          this.selectCategorys[item].children.sort(function (a, b) {
         //            return b.name < a.name
         //          });
         for (let i in this.selectCategorys[item].children) {
-          j++;
-          this.headers[j].text = this.selectCategorys[item].children[i].name;
-          this.headers[j].value = this.selectCategorys[item].children[
-            i
-          ].categoryId;
+          list.push({
+            text: this.selectCategorys[item].children[i].name,
+            value: this.selectCategorys[item].children[i].categoryId,
+            align: "center",
+            sortable: false
+          });
         }
+        headerTitles.push({
+          name: this.selectCategorys[item].name,
+          size: this.selectCategorys[item].children.length
+        });
       }
-      let head2Val = this.headers[2];
-      let head3Val = this.headers[3];
-      this.headers[2] = head3Val;
-      this.headers[3] = head2Val;
+      this.headers = list;
+      let headerSize = 0;
+      headerTitles.forEach(item => {
+        headerSize = headerSize + item.size;
+      });
+      this.headerTitles = {
+        totalSize: headerSize,
+        value: headerTitles
+      };
     });
   },
   methods: {
@@ -531,7 +450,7 @@ export default {
         price_type: 1,
         vendorId: this.boutiqueVendorid
       };
-      updatePriceChangeRule(data).then(res => {
+      updatePriceChangeRule(data,1).then(res => {
         if (res.data.status === 1) {
           Materialize.toast("保存成功", 4000);
         } else {
@@ -638,7 +557,7 @@ export default {
       });
     },
     getSesaon(val) {
-      queryRuleByNotHasSesaon(val, 1).then(res => {
+      queryRuleByNotHasSesaon(val, 1, 1).then(res => {
         //COPY TO NEW data
         this.copyData = res.data.data;
       });
@@ -651,7 +570,7 @@ export default {
           this.selectProductGroup = res.data.productGroupList;
         }
       });
-      queryRuleByHasSeason(1, val, 1).then(res => {
+      queryRuleByHasSeason(1, val, 1, 1).then(res => {
         //获取head tab
         this.tableBar = res.data.data;
         if (this.tableBar.length !== 0) {
@@ -690,6 +609,7 @@ export default {
       //设置选择的head tab
       this.getTable(id);
       this.priceId = id;
+      this.searchInput = '';
       getRuleDate(id).then(res => {
         if (res.data.status === 1) {
           this.RuleDate = res.data.data.validFromStr;
@@ -1016,20 +936,21 @@ export default {
       this.allvendorId = e.vendor_id;
     },
     selectPricingRule(index) {
-      switch (index) {
-        case 0:
-          this.pricingRule = index;
-          break;
-        case 1:
-          this.pricingRule = index;
-          break;
-      }
+      // switch (index) {
+      //   case 0:
+      //     this.pricingRule = index;
+      //     break;
+      //   case 1:
+          this.pricingRule = 1;
+      //     break;
+      // }
     },
     cancelCopy() {
       //        if (this.tableBar.length === 0) {
       //          this.showCopy = true;
       //          this.showShade = true;
       //        }
+      this.pricingRule === null;
       this.showCopy = false;
       this.showShade = false;
     },
@@ -1091,7 +1012,7 @@ export default {
         this.showSeason = false;
         this.showShade = false;
         this.isLoading = true;
-        initPriceChangeRule(data).then(res => {
+        initPriceChangeRule(data,1).then(res => {
           if (res.data.status === 1) {
             this.getTablenav(this.boutiqueVendorid);
           } else {
@@ -1307,6 +1228,10 @@ export default {
   width: 100%;
   background-color: #fafafa;
   box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.12), 0 2px 2px 0 rgba(0, 0, 0, 0.24);
+  .application {
+    background: white;
+    margin-top: 0 !important;
+  }
   .head-btn {
     padding: 14px 0 0 23px;
     .btn {
@@ -1324,17 +1249,30 @@ export default {
     }
   }
   .head-name {
-    float: right;
-    width: 81%;
     border-bottom: 1px solid #4a4a4a;
     line-height: 36px;
+    height: 36px;
+    display: block;
+    overflow: hidden;
+    z-index: 1;
+    padding-left: 200px;
+    padding-right: 100px;
     p {
-      float: left;
-      width: 50%;
       text-align: center;
       font-size: 16px;
+      line-height: 36px;
+      height: 36px;
       font-weight: bold;
+      float: left;
+      width: 25%;
     }
+  }
+  .table__overflow {
+    overflow-x: visible;
+    display: inline-block;
+  }
+  .datalist {
+    margin-top: 0;
   }
 }
 
@@ -1448,7 +1386,7 @@ export default {
   top: 50%;
   left: 50%;
   margin: -250px/2 0 0 -598.77px /2;
-  height: 250px;
+  height: 200px;
   width: 598.77px;
   border-radius: 2px;
   background-color: #ffffff;
@@ -1772,7 +1710,6 @@ export default {
 
 .vapp {
   min-height: inherit;
-  margin-top: 37px;
   .card {
     overflow: inherit;
     margin-top: 0;

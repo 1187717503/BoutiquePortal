@@ -320,10 +320,10 @@ public class OrderService {
 				shipToGeography = ((Map<String,Object>)container).get("ship_to_geography").toString();
 			}
 			if("1".equals(currentOrder.get("pack_group").toString())){
-				//如果是去往China exl. Taiwan
+				//如果是去往China excl. Taiwan
 				if("China Mainland".equals(shipToGeography)
 						||"HongKong".equals(shipToGeography)
-						||"China exl. Taiwan".equals(shipToGeography)){
+						||"China excl. Taiwan".equals(shipToGeography)){
 					flag = false;
 				}
 			}else {

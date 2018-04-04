@@ -299,11 +299,11 @@ export default {
   data() {
     return {
       update_files: "",
-      searchInput: "",
       previewToggle: false,
       showShade: false, //是否显示遮罩
       showSeason: false,
       showAddbrand: false,
+      searchInput: "",
       showCopy: false,
       isLoading: false,
       pagination: {},
@@ -330,12 +330,7 @@ export default {
       },
       arrSelectSeason: [],
 
-      pricingRulelist: [
-        // { name: "Copy Active", text: "Boutique Pricing Rule" },
-        // { name: "Copy Pending", text: "Boutique Pricing Rule" },
-        // { name: "Copy Active", text: "IM Pricing Rule" },
-        { name: "Create From Blank Pricing Rule", text: "" }
-      ],
+      pricingRulelist: [{ name: "Create From Blank Pricing Rule", text: "" }],
       headers: [
         // {
         //   text: "Brand",
@@ -396,18 +391,14 @@ export default {
         this.getTablenav(this.boutiqueVendorid);
       }
     });
-    selectActiveBrands(1).then(res => {
+    selectActiveBrands(2).then(res => {
       //获取Brands
       this.selectBrands = res.data.data;
     });
     selectActiveCategorys().then(res => {
       //获取Categorys
       const tempData = _.filter(res.data.data, item => {
-        if (
-          item.categoryId == 1757 ||
-          item.categoryId == 1758 ||
-          item.categoryId == 1759
-        ) {
+        if (item.categoryId == 1499 || item.categoryId == 1568) {
           return false;
         }
         return true;
@@ -476,7 +467,7 @@ export default {
         price_type: 3,
         vendorId: this.boutiqueVendorid
       };
-      updatePriceChangeRule(data, 1).then(res => {
+      updatePriceChangeRule(data, 2).then(res => {
         if (res.data.status === 1) {
           Materialize.toast("保存成功", 4000);
         } else {
@@ -583,7 +574,7 @@ export default {
       });
     },
     getSesaon(val) {
-      queryRuleByNotHasSesaon(val, 3, 1).then(res => {
+      queryRuleByNotHasSesaon(val, 3, 2).then(res => {
         //COPY TO NEW data
         this.copyData = res.data.data;
       });
@@ -596,7 +587,7 @@ export default {
           this.selectProductGroup = res.data.productGroupList;
         }
       });
-      queryRuleByHasSeason(1, val, 3, 1).then(res => {
+      queryRuleByHasSeason(1, val, 3, 2).then(res => {
         //获取head tab
         this.tableBar = res.data.data;
         if (this.tableBar.length !== 0) {
@@ -972,7 +963,7 @@ export default {
       //   case 2:
       //     this.pricingRule = index;
       //     break;
-      //   case 3:
+      // case 3:
       this.pricingRule = 3;
       //     break;
       // }
@@ -1084,7 +1075,7 @@ export default {
         this.showSeason = false;
         this.showShade = false;
         this.isLoading = true;
-        initPriceChangeRule(data, 1).then(res => {
+        initPriceChangeRule(data, 2).then(res => {
           if (res.data.status === 1) {
             this.getTablenav(this.boutiqueVendorid);
             this.arrSelectSeason = [];
@@ -1119,7 +1110,7 @@ export default {
     changePreviewStatusAction() {
       this.isLoading = true;
       this.previewToggle = !this.previewToggle;
-      changePreviewStatus(this.priceId, this.previewToggle ? 1 : 0, 1).then(
+      changePreviewStatus(this.priceId, this.previewToggle ? 1 : 0, 2).then(
         res => {
           if (res.data.status === 1) {
             Materialize.toast("Pricing Rule 更新成功", 4000);
@@ -1132,7 +1123,7 @@ export default {
     },
     refreshPreView() {
       this.isLoading = true;
-      changePreviewStatus(this.priceId, 1, 1).then(res => {
+      changePreviewStatus(this.priceId, 1, 2).then(res => {
         if (res.data.status === 1) {
           Materialize.toast("Pricing Rule 刷新成功", 4000);
         } else {
@@ -1143,7 +1134,7 @@ export default {
     },
     activeNow() {
       this.isLoading = true;
-      imActiveRefresh(this.priceId, 1).then(result => {
+      imActiveRefresh(this.priceId, 2).then(result => {
         this.getTablenav(this.boutiqueVendorid);
         this.getTable(this.boutiqueVendorid);
         this.isLoading = false;

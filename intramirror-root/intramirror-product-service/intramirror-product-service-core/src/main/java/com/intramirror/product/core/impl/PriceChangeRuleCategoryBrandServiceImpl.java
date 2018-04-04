@@ -74,4 +74,8 @@ public class PriceChangeRuleCategoryBrandServiceImpl extends BaseDao implements 
 		return priceChangeRuleCategoryBrandMapper.deleteByPriceChangeRuleId(priceChangeRuleId);
 	}
 
+	@Override
+	public List<PriceChangeRuleCategoryBrand> queryPriceChangeRuleCategoryBrandByConditions(PriceChangeRuleCategoryBrand condition) {
+		return priceChangeRuleCategoryBrandMapper.queryPriceChangeRuleCategoryBrandByConditions(condition);
+	}
 }
