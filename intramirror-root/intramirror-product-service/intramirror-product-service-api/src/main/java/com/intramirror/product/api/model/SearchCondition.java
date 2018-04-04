@@ -42,6 +42,7 @@ public class SearchCondition {
     private Long saleAtTo;
     private Long tagId;
     private List<Long> productIds;
+    private String spuModifyFilter;
 
     public Integer getProductStatus() {
         return productStatus;
@@ -283,4 +284,11 @@ public class SearchCondition {
         this.maxPrice = maxPrice;
     }
 
+    public String getSpuModifyFilter() {
+        return spuModifyFilter;
+    }
+
+    public void setSpuModifyFilter(String spuModifyFilter) {
+        this.spuModifyFilter = spuModifyFilter;
+    }
 }

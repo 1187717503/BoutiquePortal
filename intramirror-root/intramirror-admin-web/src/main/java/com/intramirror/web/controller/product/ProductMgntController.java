@@ -188,6 +188,17 @@ public class ProductMgntController {
             }
             setState(product);
 
+            getSpuModify(product);
+        }
+    }
+
+    private void getSpuModify(Map<String, Object> product) {
+        if ((product.get("desc_modify") != null && (Boolean)product.get("desc_modify"))
+                || (product.get("img_modified") != null && (Boolean)product.get("img_modified"))
+                || (product.get("vendor_id") != null && product.get("vendor_id").equals("-1"))) {
+            product.put("spuModified", "1");
+        } else {
+            product.put("spuModified", "0");
         }
     }
 

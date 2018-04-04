@@ -34,6 +34,9 @@
         product.img_modified AS modelImage,
         product.updated_at,
         product.last_check,
+        spu.desc_modify,
+        spu.img_modified,
+        spu.vendor_id,
         CONVERT(1 - product.min_boutique_price / product.min_retail_price * 1.22, DECIMAL(10, 2)) AS boutique_discount,
         CONVERT(1 - product.min_im_price / product.min_retail_price , DECIMAL(10, 2)) AS im_discount,
         CONVERT(1 - product.preview_im_price / product.min_retail_price , DECIMAL(10, 2)) AS preview_discount,
@@ -55,6 +58,21 @@
             GROUP BY product_id) exception
             ON product.product_id = exception.product_id
         </if>
+        <choose>
+            <when test="spuModifyFilter ==  null or spuModifyFilter == 0">
+                LEFT JOIN spu ON spu.spu_id=product.spu_id
+            </when>
+            <when test="spuModifyFilter == 1">
+                INNER JOIN spu ON spu.spu_id=product.spu_id
+                AND (spu.desc_modify = TRUE OR spu.img_modified = TRUE OR spu.vendor_id = -1)
+            </when>
+            <otherwise>
+                INNER JOIN spu ON spu.spu_id=product.spu_id
+                AND (spu.desc_modify IS NULL OR spu.desc_modify =FALSE )
+                AND (spu.img_modified IS NULL OR spu.img_modified =FALSE )
+                AND (spu.vendor_id != '-1' )
+            </otherwise>
+        </choose>
         <!--        <if test="minIMDiscount != null or minBoutiqueDiscount != null">
                     INNER JOIN (
                     SELECT
