@@ -10,6 +10,7 @@ import com.intramirror.main.api.model.Tax;
 import com.intramirror.main.api.service.AddressCountryService;
 import com.intramirror.main.api.service.GeographyService;
 import com.intramirror.main.api.service.TaxService;
+import com.intramirror.order.api.common.OrderStatusType;
 import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.model.ShippingProvider;
 import com.intramirror.order.api.model.SubShipment;
@@ -127,7 +128,6 @@ public class OrderShipController extends BaseController {
             return result;
         }
 
-
         try {
             Map<String, Object> paramtMap = new HashMap<String, Object>();
             paramtMap.put("vendorId", vendor.getVendorId());
@@ -175,7 +175,7 @@ public class OrderShipController extends BaseController {
                     shipmentIds.add(Long.parseLong(container.get("shipment_id").toString()));
                 }
                 paramtMap.put("shipmentIds",shipmentIds);
-                paramtMap.put("status",7);
+                paramtMap.put("status", OrderStatusType.READYTOSHIP);
                 List<Map<String, Object>> orderList = orderService.getOrderListByShipmentId(paramtMap);
 
 
