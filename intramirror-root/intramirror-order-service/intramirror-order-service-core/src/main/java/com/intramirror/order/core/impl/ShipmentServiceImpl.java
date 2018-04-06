@@ -371,7 +371,13 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		//获取当前时间
 		Date currentDate = new Date();
 		//保存对象信息
-		shipment.setShipToGeography(map.get("shipToGeography")==null?" ":map.get("shipToGeography").toString());
+		//todo 临时方案，后面多传一个shipmentId
+		String shipToGeography = map.get("shipToGeography") == null ? " " : map.get("shipToGeography").toString();
+		if("China Mainland".equals(shipToGeography)||
+				"HongKong".equals(shipToGeography)){
+			shipToGeography = "China excl. Taiwan";
+		}
+		shipment.setShipToGeography(shipToGeography);
 		Long vendorId = Long.parseLong(map.get("vendor_id").toString());
 		String top = shipmentMapper.getVendorCodeById(vendorId);
 		Map<String, Object> noMap = new HashMap<>();
