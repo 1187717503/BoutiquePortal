@@ -432,4 +432,12 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
         }
         return 0;
     }
+
+    @Override
+    public void updateOrderByOrderLogisticsId(Long orderLogisticsId, int status) {
+        Map<String,Object> params = new HashMap<>();
+        params.put("orderLogisticsId",orderLogisticsId);
+        params.put("status",status);
+        orderMapper.updateOrderByOrderLogisticsId(params);
+    }
 }

@@ -5,6 +5,7 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.intramirror.order.api.service.IOrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,6 @@ import com.intramirror.common.parameter.StatusType;
 import com.intramirror.order.api.common.OrderStatusType;
 import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.service.ILogisticsProductService;
-import com.intramirror.product.api.service.ISkuStoreService;
 
 @Service
 public class LogisticsProductService{
@@ -25,7 +25,8 @@ public class LogisticsProductService{
 	private ILogisticsProductService logisticsProductService;
 
 	@Autowired
-	private ISkuStoreService skuStoreService;
+	//private ISkuStoreService skuStoreService;
+	private IOrderService orderService;
 	
 	/**
 	 * 根据logistics_product_id 修改相关信息
@@ -69,7 +70,8 @@ public class LogisticsProductService{
 			//oldLogisticsProduct.setStatus(status);
 			//校验通过，修改状态
 			logisticsProductService.updateOrderLogisticsStatusById(logistics_product_id,status);
-
+			//同时修改order表状态
+			orderService.updateOrderByOrderLogisticsId(oldLogisticsProduct.getOrder_logistics_id(),status);
 //			if(num <= 0){
 //				resultMap.put("info","Status modification failed");
 //				return resultMap;

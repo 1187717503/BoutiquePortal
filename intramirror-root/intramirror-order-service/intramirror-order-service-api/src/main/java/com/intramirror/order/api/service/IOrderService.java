@@ -162,4 +162,11 @@ public interface IOrderService {
      */
     void addProductPropertyMap(List<Map<String, Object>> orderList);
 
+    /**
+     * 修改order状态
+     * @param orderLogisticsId
+     * @param status
+     */
+    void updateOrderByOrderLogisticsId(Long orderLogisticsId , int status);
+
 }
