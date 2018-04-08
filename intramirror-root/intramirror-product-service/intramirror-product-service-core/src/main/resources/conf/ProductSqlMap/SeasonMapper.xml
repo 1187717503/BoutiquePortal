@@ -220,6 +220,10 @@
 
     select price_change_rule_id,`name` from price_change_rule pcr
     where pcr.price_type = #{price_type,jdbcType=INTEGER} and `status` = #{status,jdbcType=INTEGER} and vendor_id = #{vendor_id,jdbcType=INTEGER}
+
+    <if test="category_type != null and category_type != ''">
+        and pcr.category_type=#{category_type,jdbcType=BIGINT}
+    </if>
   </select>
 
     <select id="querySeasonByVendor" resultType="java.util.Map" parameterType="java.util.Map">
