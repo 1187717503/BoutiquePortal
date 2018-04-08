@@ -15,7 +15,6 @@ import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -36,7 +35,7 @@ public class CopyRuleController extends BaseController {
 
     @RequestMapping("/activeVendor")
     @ResponseBody
-    public ResultMessage activeVendor(@Param("discount") String discount, @Param("to_vendor_id") String to_vendor_id, HttpServletRequest httpRequest) {
+    public ResultMessage activeVendor(@Param("discount") String discount, @Param("to_vendor_id") String to_vendor_id, HttpServletRequest httpRequest,@Param("category_type") String category_type) {
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
             if (!this.checkParams(to_vendor_id)) {
@@ -48,6 +47,7 @@ public class CopyRuleController extends BaseController {
             params.put("discount", discount);
             params.put("status", PriceChangeRuleEnum.Status.ACTIVE.getCode());
             params.put("to_vendor_id", to_vendor_id);
+            params.put("category_type",category_type);
 
             // select user_id
             Vendor vendor = iQueryVendorService.queryVendorByVendorId(params);
@@ -66,7 +66,7 @@ public class CopyRuleController extends BaseController {
 
     @RequestMapping("/pengingVendor")
     @ResponseBody
-    public ResultMessage pengingVendor(@Param("discount") String discount, @Param("to_vendor_id") String to_vendor_id, HttpServletRequest httpRequest) {
+    public ResultMessage pengingVendor(@Param("discount") String discount, @Param("to_vendor_id") String to_vendor_id, HttpServletRequest httpRequest,@Param("category_type") String category_type) {
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
             if (!this.checkParams(to_vendor_id)) {
@@ -78,6 +78,7 @@ public class CopyRuleController extends BaseController {
             params.put("discount", discount);
             params.put("to_vendor_id", to_vendor_id);
             params.put("status", PriceChangeRuleEnum.Status.PENDING.getCode());
+            params.put("category_type",category_type);
 
             // select user_id
             Vendor vendor = iQueryVendorService.queryVendorByVendorId(params);
@@ -129,7 +130,8 @@ public class CopyRuleController extends BaseController {
 
     @RequestMapping("/copyRule")
     @ResponseBody
-    public ResultMessage copyRule(@Param("vendor_id") String vendor_id, @Param("price_type") String price_type, @Param("discount") String discount) {
+    public ResultMessage copyRule(@Param("vendor_id") String vendor_id, @Param("price_type") String price_type, @Param("discount") String discount,
+            @Param("category_type") String category_type) {
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
             if (StringUtils.isBlank(vendor_id) || StringUtils.isBlank(price_type)) {
@@ -139,6 +141,7 @@ public class CopyRuleController extends BaseController {
             params.put("vendor_id", vendor_id);
             params.put("price_type", price_type);
             params.put("discount", discount == null ? "0" : discount);
+            params.put("category_type", category_type);
 
             // select user_id
             Vendor vendor = iQueryVendorService.queryVendorByVendorId(params);
