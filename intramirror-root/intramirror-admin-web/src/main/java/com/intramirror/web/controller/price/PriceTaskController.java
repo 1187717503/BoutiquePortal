@@ -20,8 +20,8 @@ public class PriceTaskController {
     private IPriceChangeRule iPriceChangeRule;
 
     @GetMapping("/run/{type}")
-    public Response execute(@PathVariable(name = "type") String type) {
-
+    public Response run(@PathVariable(name = "type") String type) {
+        long start = System.currentTimeMillis();
         logger.info("start run price rule by type:{}", type);
         try {
 
@@ -44,7 +44,33 @@ public class PriceTaskController {
             e.printStackTrace();
             logger.info("Execution of discounts,e:{}", e);
         }
-        logger.info("end run price rule by type:{}", type);
+        long end = System.currentTimeMillis();
+        logger.info("end run price rule by type:{},execution time : {}", type, (start - end) / 1000);
+        return Response.success();
+    }
+
+    @GetMapping("/sync/preview")
+    public Response synPreview() {
+        long start = System.currentTimeMillis();
+        logger.info("Start synchronous activity price.");
+        try {
+            // product.preview_im_price -> sku.im_price
+            iPriceChangeRule.updateSkuImPrice();
+
+            // sku.im_price -> product.min_im_price,product.max_im_price
+            iPriceChangeRule.updateProductImPrice();
+
+            // sku.im_price -> shop_product_sku.sale_price
+            iPriceChangeRule.updateShopPrice();
+
+            // shop_product_sku.sale_price -> shop_product.min_sale_price,shop_product.max_sale_price
+            iPriceChangeRule.updateShopProductSalePrice();
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("Execution of discounts,e:{}", e);
+        }
+        long end = System.currentTimeMillis();
+        logger.info("end synchronous activity price. execution time : {}", (start - end) / 1000);
         return Response.success();
     }
 
