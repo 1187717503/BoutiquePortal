@@ -158,4 +158,10 @@ public interface OrderMapper {
      */
     Map<String, Object> selectAddrByCountry(String country);
 
+    /**
+     * 修改order状态
+     * @param params
+     */
+    void updateOrderByOrderLogisticsId(Map<String, Object> params);
+
 }

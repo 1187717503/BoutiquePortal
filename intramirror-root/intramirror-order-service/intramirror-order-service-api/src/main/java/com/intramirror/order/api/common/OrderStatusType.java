@@ -87,9 +87,7 @@ public class OrderStatusType {
         //获取当前状态的上一个状态，校验状态机
         switch (status) {
         case PENDING:
-            lastStatus = PENDING;
-            break;
-
+        case PICKING:
         case COMFIRMED:
             lastStatus = PENDING;
             break;

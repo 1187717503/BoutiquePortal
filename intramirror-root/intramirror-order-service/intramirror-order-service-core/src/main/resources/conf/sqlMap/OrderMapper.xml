@@ -970,4 +970,9 @@
     <select id="selectAddrByCountry" resultType="java.util.Map" parameterType="string">
         SELECT * FROM address_country WHERE `name` = #{country,jdbcType=VARCHAR}
     </select>
+
+    <update id="updateOrderByOrderLogisticsId" parameterType="java.util.Map">
+        UPDATE `order` o,order_logistics ol SET o.`status` = #{status,jdbcType=INTEGER}
+        WHERE ol.order_logistics_id = #{orderLogisticsId,jdbcType=INTEGER} and ol.order_id = o.order_id
+    </update>
 </mapper>
