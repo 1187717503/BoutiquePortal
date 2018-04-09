@@ -504,8 +504,8 @@ public class PromotionServiceImpl implements IPromotionService {
                     }
                 }
 
-                LOGGER.info("====>Start to add products for promotion={} rule={}, vendor={} brandId={} seasonCode={}.", promotionId, includeRule.get("ruleId"),
-                        vendorId, brandId, includeRule.get("seasonCode"));
+                LOGGER.info("====>Start to add products for promotion={} rule={}, vendor={} brandId={} seasonCode={},category={}.", promotionId,
+                        includeRule.get("ruleId"), vendorId, brandId, includeRule.get("seasonCode"), listCategoryId.toArray());
                 promotionRuleMapper.addProductsForIncludeRule(promotionId, (Long) includeRule.get("ruleId"), vendorId, (String) includeRule.get("seasonCode"),
                         brandId, listCategoryId, productIds);
             }
