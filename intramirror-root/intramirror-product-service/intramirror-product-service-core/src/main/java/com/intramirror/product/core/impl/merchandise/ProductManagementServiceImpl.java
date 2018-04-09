@@ -102,7 +102,7 @@ public class ProductManagementServiceImpl implements ProductManagementService {
     }
 
     @Override
-    @Transactional
+    // @Transactional
     public void batchAddToShop(int status, int shopStatus, List<Long> productIds) {
         promotionService.refreshBatchSnapshotForAddProduct(productIds);
         batchUpdateProductStatusOnly(status, productIds);
