@@ -523,6 +523,7 @@ public class PromotionServiceImpl implements IPromotionService {
         }
     }
 
+    @Transactional
     @Override
     public void refreshBatchSnapshotForAddProduct(List<Long> productIds) {
         List<Promotion> listPromotion = promotionMapper.getAllPromotion();
