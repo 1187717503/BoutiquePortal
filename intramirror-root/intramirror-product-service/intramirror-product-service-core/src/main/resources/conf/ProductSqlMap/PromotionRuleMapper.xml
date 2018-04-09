@@ -621,7 +621,7 @@
         LEFT JOIN t_promotion_seq_brand tpsb ON tpsb.promotion_id = #{promotionId, jdbcType=BIGINT} AND tpsb.brand_id = p.brand_id
         LEFT JOIN t_promotion_seq_vendor tpsv ON tpsv.promotion_id = #{promotionId, jdbcType=BIGINT} AND tpsv.vendor_id = p.vendor_id
         LEFT JOIN t_promotion_seq_category tpsc ON tpsc.promotion_id = #{promotionId, jdbcType=BIGINT} AND tpsc.category_id = p.category_id
-        WHERE p.enabled=1 AND p.vendor_id=#{vendorId, jdbcType=BIGINT} AND p.season_code = #{seasonCode, jdbcType=VARCHAR} AND p.category_id IN
+        WHERE p.enabled=1 AND p.season_code = #{seasonCode, jdbcType=VARCHAR} AND p.category_id IN
         <foreach item="item" index="index" collection="category" open="(" separator="," close=")">
             #{item}
         </foreach>
