@@ -307,11 +307,11 @@
 
     <select id="getVendorSortItem" parameterType="Long" resultType="java.util.Map">
         SELECT
-        promotion_vendor_id AS promotionVendorId,
-        promotion_id AS promotionId,
-        vendor_id AS vendorId,
-        vendor_name AS name,
-        sort
+          promotion_vendor_id AS promotionVendorId,
+          promotion_id AS promotionId,
+          vendor_id AS vendorId,
+          vendor_name AS name,
+          sort
         FROM t_promotion_seq_vendor
         WHERE promotion_id = #{promotionId}
     </select>
@@ -337,15 +337,15 @@
     </select>
 
     <select id="getSimpleSort" parameterType="com.intramirror.product.api.entity.promotion.SortPromotion" resultType="java.util.Map">
-        SELECT promotion_seq_id AS promotionSeqId,
-        promotion_id AS promotionId,
-        `column_name` AS columnName,
-        seq_type AS seqType,
-        `sort`,
-        enabled,
-        description
-        FROM t_promotion_seq
-        WHERE promotion_id = #{promotionId} AND column_name = #{columnName}
+         SELECT promotion_seq_id AS promotionSeqId,
+          promotion_id AS promotionId,
+          `column_name` AS columnName,
+          seq_type AS seqType,
+          `sort`,
+          enabled,
+          description
+      FROM t_promotion_seq
+      WHERE promotion_id = #{promotionId} AND column_name = #{columnName}
     </select>
 
     <update id="updateSimpleSort" parameterType="com.intramirror.product.api.entity.promotion.SortPromotion">
@@ -632,7 +632,11 @@
         <foreach item="product" index="index" collection="productIds" open="(" separator="," close=")">
             #{product}
         </foreach>
-      
+        AND p.product_id NOT IN (SELECT product_id FROM snapshot_product where promotion_id=#{promotionId, jdbcType=BIGINT} AND product_id IN
+        <foreach item="product1" index="index" collection="productIds" open="(" separator="," close=")">
+            #{product1}
+        </foreach>
+        )
     </select>
 
     <delete id="removeExcludeSnapshotProduct">
