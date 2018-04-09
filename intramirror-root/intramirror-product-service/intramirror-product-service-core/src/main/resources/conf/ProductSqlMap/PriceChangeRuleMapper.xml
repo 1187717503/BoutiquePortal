@@ -723,8 +723,16 @@
     <update id="updateProductImPrice">
 
         update `product`  p,sku set p.`min_im_price` = sku.`im_price`,p.`max_im_price` = sku.`im_price`
-        where p.`enabled`  = 1 and sku.`enabled`  = 1 and p.`product_id`  = sku.`product_id` ;
+        where p.`enabled`  = 1 and sku.`enabled`  = 1 and p.`product_id`  = sku.`product_id`
     </update>
+
+
+    <update id="updateSkuImPrice">
+
+        update sku,product set sku.im_price = product.preview_im_price
+        where sku.product_id = product.product_id and product.preview_im_price is not null and product.preview_im_price != '' and product.enabled = 1 and sku.enabled = 1
+    </update>
+
 
     <update id="clearProductPreviewPrice">
         update `product` p
