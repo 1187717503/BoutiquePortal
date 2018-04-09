@@ -485,7 +485,7 @@ public class PromotionServiceImpl implements IPromotionService {
         for (Map<String, Object> includeRule : listIncludeRule) {
             List<BrandEntity> listBrand = JSONObject.parseArray((String) includeRule.get("brands"), BrandEntity.class);
             List<CategoryEntity> listCategory = JSONObject.parseArray((String) includeRule.get("categorys"), CategoryEntity.class);
-            
+            Long vendorId = (Long) includeRule.get("vendorId");
             for (CategoryEntity category : listCategory) {
                 for (Category dbCategory : listDBCategory) {
                     if (dbCategory.getCategoryId().longValue() == category.getCategoryId().longValue()) {
@@ -502,8 +502,8 @@ public class PromotionServiceImpl implements IPromotionService {
                         listCategoryId.add(category.getCategoryId());
                     }
                 }
-                promotionRuleMapper.addProductsForIncludeRule(promotionId, (Long) includeRule.get("ruleId"), (String) includeRule.get("seasonCode"), brandId,
-                        listCategoryId, productIds);
+                promotionRuleMapper.addProductsForIncludeRule(promotionId, (Long) includeRule.get("ruleId"), vendorId, (String) includeRule.get("seasonCode"),
+                        brandId, listCategoryId, productIds);
             }
         }
     }
