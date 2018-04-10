@@ -632,7 +632,7 @@
         <foreach item="product" index="index" collection="productIds" open="(" separator="," close=")">
             #{product}
         </foreach>
-        AND NOT EXISTS (SELECT product_id FROM snapshot_product where promotion_id=#{promotionId, jdbcType=BIGINT} AND product_id IN
+        AND p.product_id NOT IN (SELECT product_id FROM snapshot_product where promotion_id=#{promotionId, jdbcType=BIGINT} AND product_id IN
         <foreach item="product1" index="index" collection="productIds" open="(" separator="," close=")">
             #{product1}
         </foreach>
