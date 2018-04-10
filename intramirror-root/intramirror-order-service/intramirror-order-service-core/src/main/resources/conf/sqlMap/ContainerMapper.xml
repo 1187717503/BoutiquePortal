@@ -27,13 +27,16 @@ values(#{containerType,jdbcType=VARCHAR}, #{shipToGeography,jdbcType=VARCHAR},#{
 		UPDATE container
 		<trim prefix="set" suffixOverrides=","  suffix=" WHERE barcode = #{barcode,jdbcType=VARCHAR} ">
 			<if test="length != null" >
-			 length =  #{length,jdbcType=BIGINT},
+			length =  #{length,jdbcType=BIGINT},
 			</if>
 			<if test="width != null" >
 			width =   #{width,jdbcType=DECIMAL},
 			</if>
 			<if test="height != null" >
 			height =   #{height,jdbcType=BIGINT},
+			</if>
+			<if test="weight != null" >
+			weight =   #{weight,jdbcType=BIGINT},
 			</if>
 		</trim>
   	</update>
@@ -163,6 +166,9 @@ values(#{containerType,jdbcType=VARCHAR}, #{shipToGeography,jdbcType=VARCHAR},#{
 			</if>
 			<if test="height != null" >
 			height =   #{height,jdbcType=BIGINT},
+			</if>
+			<if test="weight != null" >
+			weight =   #{weight,jdbcType=BIGINT},
 			</if>
 			<if test="updated_at != null" >
 			 updated_at =  #{updated_at,jdbcType=TIMESTAMP},

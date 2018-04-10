@@ -278,6 +278,7 @@ public class ShipmentController extends BaseController{
 				paramMap.put("orderNumber", list.get(0).getOrder_line_num());
 				paramMap.put("shipmentId", "");
 				Map<String, Object> orderResult = orderService.getShipmentDetails(paramMap);
+				orderResult.put("shipmentId",map.get("shipmentId"));
 				Long shipmentId = iShipmentService.newShipment(orderResult);
 				if (shipmentId != null){
 					Map<String, Object> containerMap = new HashMap<>();

@@ -53,6 +53,11 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		logger.info("shimentSaveService parameter " + new Gson().toJson(map));
 		//如果shipment为null创建新的shipment 如果有直接拿shipment生成SUBshipment
 		Long shipmentId = Long.parseLong(map.get("shipmentId")==null?"0":map.get("shipmentId").toString());
+		//默认为2发往用户
+		Integer shipmentCategory = Integer.parseInt(map.get("shipment_category")==null?"2":map.get("shipment_category").toString());
+		if( 1 == shipmentCategory){
+			map.put("pack_english_name","Transit Warehouse");
+		}
 		int result = 0;
 		Shipment shipment = new Shipment();
 		if (shipmentId == 0){
@@ -75,16 +80,13 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			shipment.setStatus(ContainerType.OPEN);
 			shipment.setCreatedAt(currentDate);
 			shipment.setUpdatedAt(currentDate);
+			shipment.setShipmentCategory(shipmentCategory);
 			logger.info("parameter :" + new Gson().toJson(shipment));
 			result = shipmentMapper.saveShipmentByOrderId(shipment);
 			logger.info("insert shipment result : " +result);
 			if (result == 1){
 				//根据段生成subshipment
-				Map<String, Object> typeMap = new HashMap<String, Object>();
-				if(map.get("consigner_country_id")!=null)
-				typeMap.put("consigner_country_id",Long.parseLong(map.get("consigner_country_id").toString()));
-				if(map.get("consignee_country_id")!=null)
-				typeMap.put("consignee_country_id",Long.parseLong(map.get("consignee_country_id").toString()));
+				Map<String, Object> typeMap = addCountryNum(map, shipmentCategory);
 				typeMap.put("vendor_id",vendorId);
 				logger.info("getShipmentId :" + new Gson().toJson(typeMap));
 				List<Map<String, Object>> listMap = shipmentMapper.getShippmentByType(typeMap);
@@ -96,13 +98,10 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			}
 		}else{
 			shipment = shipmentMapper.selectShipmentById(map);
+			//判断是否发往质检仓
 			shipmentId = shipment.getShipmentId();
 			if (null != shipment){
-				Map<String, Object> typeMap = new HashMap<String, Object>();
-				if(map.get("consigner_country_id")!=null)
-				typeMap.put("consigner_country_id",Long.parseLong(map.get("consigner_country_id").toString()));
-				if(map.get("consignee_country_id")!=null)
-				typeMap.put("consignee_country_id",Long.parseLong(map.get("consignee_country_id").toString()));
+				Map<String, Object> typeMap = addCountryNum(map, shipment.getShipmentCategory());
 				typeMap.put("vendor_id",shipment.getVendorId());
 				logger.info("getShipmentId :" + new Gson().toJson(typeMap));
 				List<Map<String, Object>> listMap = shipmentMapper.getShippmentByType(typeMap);
@@ -113,6 +112,21 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			}
 		}
 		return null;
+	}
+
+	private Map<String, Object> addCountryNum(Map<String, Object> map, Integer shipmentCategory) {
+		Map<String, Object> typeMap = new HashMap<>();
+		if (1 == shipmentCategory){
+            //如果是发往质检仓
+            typeMap.put("consigner_country_id",19);
+            typeMap.put("consignee_country_id",19);
+        }else {
+            if (map.get("consigner_country_id") != null)
+                typeMap.put("consigner_country_id", Long.parseLong(map.get("consigner_country_id").toString()));
+            if (map.get("consignee_country_id") != null)
+                typeMap.put("consignee_country_id", Long.parseLong(map.get("consignee_country_id").toString()));
+        }
+		return typeMap;
 	}
 
 	/**
@@ -371,11 +385,15 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		//获取当前时间
 		Date currentDate = new Date();
 		//保存对象信息
-		//todo 临时方案，后面多传一个shipmentId
-		String shipToGeography = map.get("shipToGeography") == null ? " " : map.get("shipToGeography").toString();
+		/*String shipToGeography = map.get("shipToGeography") == null ? " " : map.get("shipToGeography").toString();
 		if("China Mainland".equals(shipToGeography)||
 				"HongKong".equals(shipToGeography)){
 			shipToGeography = "China excl. Taiwan";
+		}*/
+		String shipToGeography = "";
+		Shipment oldShipment = shipmentMapper.selectShipmentById(map);
+		if (oldShipment != null){
+			shipToGeography = oldShipment.getShipToGeography();
 		}
 		shipment.setShipToGeography(shipToGeography);
 		Long vendorId = Long.parseLong(map.get("vendor_id").toString());

@@ -638,7 +638,7 @@
 
     <update id="updateRuleInActive" parameterType="java.util.Map">
 
-        update price_change_rule pcr,price_change_rule_season_group pcrsg set `status` = 3 where
+        update price_change_rule pcr,price_change_rule_season_group pcrsg set `status` = 3,backup_at=now() where
         pcr.price_type = #{price_type,jdbcType=BIGINT}
         and pcr.`category_type` = #{category_type,jdbcType=BIGINT}
         and pcr.`status` = 2
@@ -717,14 +717,24 @@
         set p.`preview_im_price`  = null
         where p.`vendor_id`  = #{vendor_id,jdbcType=BIGINT} <![CDATA[ and p.`preview_im_price`  >=  s.`im_price`
 
+
+
         ]]>
     </update>
 
     <update id="updateProductImPrice">
 
         update `product`  p,sku set p.`min_im_price` = sku.`im_price`,p.`max_im_price` = sku.`im_price`
-        where p.`enabled`  = 1 and sku.`enabled`  = 1 and p.`product_id`  = sku.`product_id` ;
+        where p.`enabled`  = 1 and sku.`enabled`  = 1 and p.`product_id`  = sku.`product_id`
     </update>
+
+
+    <update id="updateSkuImPrice">
+
+        update sku,product set sku.im_price = product.preview_im_price
+        where sku.product_id = product.product_id and product.preview_im_price is not null and product.preview_im_price != '' and product.enabled = 1 and sku.enabled = 1
+    </update>
+
 
     <update id="clearProductPreviewPrice">
         update `product` p

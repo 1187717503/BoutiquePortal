@@ -111,6 +111,10 @@ public class ContainerController {
 				message.successStatus().putMsg("info", "height cannot be null");
 				return message;
 			}
+			if (null == map.get("weight") || StringUtils.isBlank(map.get("weight").toString())){
+				message.successStatus().putMsg("info", "weight cannot be null");
+				return message;
+			}
 			int result = containerService.updateContainerBybarcode(map);
 			message.successStatus().putMsg("info","SUCCESS").setData(result);
 		} catch (Exception e) {

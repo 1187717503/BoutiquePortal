@@ -142,6 +142,6 @@
     select * from geography
   </select>
     <select id="getGeographyGroupList" resultMap="BaseResultMap">
-      SELECT * FROM geography GROUP BY pack_group
+      SELECT * FROM geography WHERE enabled = 1 GROUP BY pack_group
     </select>
 </mapper>

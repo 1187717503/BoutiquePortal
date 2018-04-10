@@ -18,8 +18,10 @@ VALUES( #{shipToGeography,jdbcType=VARCHAR},#{consignee,jdbcType=VARCHAR},#{ship
 	
 	</insert>
 	<insert id="saveShipmentByOrderId" parameterType="com.intramirror.order.api.model.Shipment" >
-    	INSERT INTO shipment(ship_to_geography,`status`,created_at,updated_at,shipment_no,vendor_id)
-VALUES(#{shipToGeography,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},#{createdAt,jdbcType=TIMESTAMP},#{updatedAt,jdbcType=TIMESTAMP},#{shipmentNo,jdbcType=VARCHAR},#{vendorId,jdbcType=BIGINT});
+    	INSERT INTO shipment(ship_to_geography,`status`,created_at,updated_at,shipment_no,vendor_id,shipment_category)
+VALUES(#{shipToGeography,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},
+#{createdAt,jdbcType=TIMESTAMP},#{updatedAt,jdbcType=TIMESTAMP},
+#{shipmentNo,jdbcType=VARCHAR},#{vendorId,jdbcType=BIGINT},#{shipmentCategory,jdbcType=BIGINT});
   	</insert>
   
   <select id="selectShipmentByOrder" resultType="java.util.HashMap"  parameterType="java.util.Map">
