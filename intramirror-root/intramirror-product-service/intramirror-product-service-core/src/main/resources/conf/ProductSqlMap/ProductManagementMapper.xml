@@ -318,6 +318,21 @@
             GROUP BY product_id) exception
             ON product.product_id = exception.product_id
         </if>
+        <choose>
+            <when test="spuModifyFilter ==  null or spuModifyFilter == 0">
+                LEFT JOIN spu ON spu.spu_id=product.spu_id
+            </when>
+            <when test="spuModifyFilter == 1">
+                INNER JOIN spu ON spu.spu_id=product.spu_id
+                AND (spu.desc_modify = TRUE OR spu.img_modified = TRUE OR spu.vendor_id = -1)
+            </when>
+            <otherwise>
+                INNER JOIN spu ON spu.spu_id=product.spu_id
+                AND (spu.desc_modify IS NULL OR spu.desc_modify =FALSE )
+                AND (spu.img_modified IS NULL OR spu.img_modified =FALSE )
+                AND (spu.vendor_id != '-1' )
+            </otherwise>
+        </choose>
         WHERE product.enabled = TRUE
         <if test="productIds != null">
             AND product.product_id
