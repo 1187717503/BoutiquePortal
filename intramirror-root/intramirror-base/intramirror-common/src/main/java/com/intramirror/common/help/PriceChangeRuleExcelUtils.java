@@ -193,6 +193,10 @@ public class PriceChangeRuleExcelUtils {
         for (int j = 2; j < sheet.getPhysicalNumberOfRows(); j++) {//获取每行
             HSSFRow row=sheet.getRow(j);
 
+            if(row == null || row.getCell(0) == null) {
+                break;
+            }
+
             String brand_id = getBrandId(brandNames,row.getCell(0).getStringCellValue());
             if(brand_id.equals("0")){
                 defaultValues.add(0,"0");
@@ -379,6 +383,10 @@ public class PriceChangeRuleExcelUtils {
         List<String> defaultValues = new ArrayList<>(10);
         for (int j = 2; j < sheet.getPhysicalNumberOfRows(); j++) {//获取每行
             HSSFRow row=sheet.getRow(j);
+
+            if(row == null || row.getCell(0) == null) {
+                break;
+            }
 
             String brand_id = getBrandId(brandNames,row.getCell(0).getStringCellValue());
             if(brand_id.equals("0")){ //default brand
