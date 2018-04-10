@@ -82,11 +82,9 @@ public class OrderService {
 		//0 校验   2返回shipment列表  3箱子为空时  4不为空时  
 		infoMap.put("statusType", StatusType.ORDER_CHECK_ORDER);
 		
-
         String orderLineNum = map.get("orderLineNum").toString();
         Map<String,Object> currentOrder = null;
         
-		
 		Long vendorId =Long.parseLong(map.get("vendorId").toString());
 		//根据订单状态查询订单
 		logger.info(MessageFormat.format("order packingOrder 调用接口getOrderListByStatus 查询订单信息 入参  status:{0},vendorId:{1}",map.get("status").toString(),vendorId));
@@ -155,11 +153,12 @@ public class OrderService {
 			//关联成功，则往箱子里存入订单
 			if(row > 0 ){
 				
-				Map<String, Object> shipMentMap = new HashMap<String, Object>();
+				Map<String, Object> shipMentMap = new HashMap<>();
 				//根据订单大区选择的Shipment   所以只需要用订单的大区即可(只有箱子为空时)
-				shipMentMap.put("ship_to_geography", currentOrder.get("pack_english_name").toString());
+				//shipMentMap.put("ship_to_geography", currentOrder.get("pack_english_name").toString());
+				shipMentMap.put("ship_to_geography", container.getShipToGeography());
 				shipMentMap.put("shipment_id", Long.parseLong(shipment_id));
-//					//获取当前ShipMent 第一段的物流类型(不需要  空箱子不比较shipmentType 直接放入)
+				//获取当前ShipMent 第一段的物流类型(不需要  空箱子不比较shipmentType 直接放入)
 				
 				//订单加入箱子
 				logger.info("order packingOrder updateLogisticsProduct");
@@ -174,9 +173,7 @@ public class OrderService {
 			logger.info("已经选择过shipMent 直接关联，并加入箱子 end");
 			return result;
 		}
-		
-		
-		
+
 		//如果是新箱子，则需要关联Shipment,如果存在符合条件的Shipment有多个则返回列表供选择,如果只有一个则默认存入，没有则需要新建Shipment
 		if(list == null || list.size() == 0){
 			infoMap.put("statusType", StatusType.ORDER_CONTAINER_EMPTY);
@@ -191,9 +188,10 @@ public class OrderService {
 			}
 
 
-			Map<String, Object> selectShipmentParam = new HashMap<String, Object>();
-			selectShipmentParam.put("shipToGeography", currentOrder.get("pack_english_name").toString());
-			
+			Map<String, Object> selectShipmentParam = new HashMap<>();
+			//selectShipmentParam.put("shipToGeography", currentOrder.get("pack_english_name").toString());
+			selectShipmentParam.put("shipToGeography", container.getShipToGeography());
+
 			//shipment 状态
 			selectShipmentParam.put("status", ContainerType.OPEN);
 			selectShipmentParam.put("vendorId", vendorId);
@@ -213,6 +211,12 @@ public class OrderService {
 				Map<String, Object> orderResult = orderService.getShipmentDetails(saveShipmentParam);
 				//默认为0
 				orderResult.put("shipmentId", 0);
+				//如果是发往质检仓
+				if("Transit Warehouse".equals(container.getShipToGeography())){
+					orderResult.put("shipment_category",1);
+				}else {
+					orderResult.put("shipment_category",2);
+				}
 				//接口返回shipmentId
 				logger.info("order packingOrder 添加sub_shipment物流信息   调用接口   iShipmentService.saveShipmentByOrderId 入参:"+new Gson().toJson(orderResult));
 				String shipmentId = iShipmentService.saveShipmentByOrderId(orderResult);
@@ -229,7 +233,8 @@ public class OrderService {
 					if(updateContainerRow > 0 ){
 						Map<String, Object> shipMentMap = new HashMap<String, Object>();
 						//根据订单大区创建的Shipment   所以只需要用订单的大区即可(只有箱子为空时)
-						shipMentMap.put("ship_to_geography", currentOrder.get("pack_english_name").toString());
+						//shipMentMap.put("ship_to_geography", currentOrder.get("pack_english_name").toString());
+						shipMentMap.put("ship_to_geography", container.getShipToGeography());
 						shipMentMap.put("shipment_id", shipmentId);
 //								//获取当前ShipMent 第一段的物流类型(不需要  空箱子不比较shipmentType 直接放入)
 						
@@ -309,6 +314,7 @@ public class OrderService {
 		return result;
 	}
 
+	//检验发货大区与订单是否一致
 	private boolean checkShipToGeography(Map<String, Object> currentOrder, Object container) {
 		boolean flag = true;
 		if (container != null){
@@ -319,7 +325,10 @@ public class OrderService {
 			}else if (container instanceof Map){
 				shipToGeography = ((Map<String,Object>)container).get("ship_to_geography").toString();
 			}
-			if("1".equals(currentOrder.get("pack_group").toString())){
+			if ("Transit Warehouse".equals(shipToGeography)){
+				//如果是发往质检仓就不需要验证
+				flag = false;
+			}else if("1".equals(currentOrder.get("pack_group").toString())){
 				//如果是去往China excl. Taiwan
 				if("China Mainland".equals(shipToGeography)
 						||"HongKong".equals(shipToGeography)
@@ -350,7 +359,7 @@ public class OrderService {
 	public ResultMessage updateLogisticsProduct(Map<String,Object> orderMap,Map<String,Object> shipMentMap,boolean ischeck,boolean isSaveSubShipment) throws Exception{
 		logger.info(MessageFormat.format("order updateLogisticsProduct 订单装箱 入参信息   orderMap:{0},shipMentMap:{1},ischeck:{2},isSaveSubShipment:{3}",new Gson().toJson(orderMap),new Gson().toJson(shipMentMap),ischeck,isSaveSubShipment));
 		ResultMessage result= new ResultMessage();
-		Map<String, Object> info = new HashMap<String, Object>();
+		Map<String, Object> info = new HashMap<>();
 		if(ischeck){
 			info.put("statusType", StatusType.ORDER_CONTAINER_NOT_EMPTY);
 		}else{
@@ -370,7 +379,8 @@ public class OrderService {
 		}else{
 			//如果大区一致,且不为空箱子,则比较shipment_type(空箱子ischeck 都为false)
 			//空箱子不需要判断,直接存入   shipment_type 用于判断该箱子是否能存放多个，状态为1 只能存放一个  所以不能在存入
-			if(ischeck && shipMentMap.get("shipment_type_id").toString().equals("1")){
+			if(ischeck && shipMentMap.get("shipment_type_id").toString().equals("1")
+					&&!"Transit Warehouse".equals(shipMentMap.get("ship_to_geography"))){
 				result.setMsg("Only one Order can be packed in this carton. ");
 				info.put("code", StatusType.ORDER_ERROR_CODE);
 				result.setInfoMap(info);
@@ -398,12 +408,12 @@ public class OrderService {
 		if(row > 0){
 			result.successStatus();
 			
-			Map<String, Object> saveShipmentParam = new HashMap<String, Object>();
+			Map<String, Object> saveShipmentParam = new HashMap<>();
 			saveShipmentParam.put("orderNumber", orderMap.get("order_line_num").toString());
 			saveShipmentParam.put("shipmentId", Long.parseLong(shipMentMap.get("shipment_id").toString()));
 			Map<String, Object> orderResult = orderService.getShipmentDetails(saveShipmentParam);
 			orderResult.put("shipmentId", Long.parseLong(shipMentMap.get("shipment_id").toString()));
-			
+
 			if(isSaveSubShipment){
 				//添加第三段物流
 				logger.info("order updateLogisticsProduct 添加sub_shipment物流信息   调用接口   iShipmentService.saveShipmentByOrderId 入参:"+new Gson().toJson(orderResult));

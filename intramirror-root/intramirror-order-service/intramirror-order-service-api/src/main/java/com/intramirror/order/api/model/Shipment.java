@@ -29,6 +29,10 @@ public class Shipment {
 	 */
 	private Long vendorId;
 	/**
+	 * shipment分类 1.发往质检仓  2.发往用户
+	 */
+	private Integer shipmentCategory;
+	/**
 	 * @Fields 装货条码
 	 */
 	private String shipmentNo;
@@ -83,7 +87,11 @@ public class Shipment {
 	public void setVendorId(Long vendorId) {
 		this.vendorId = vendorId;
 	}
-	
-	
-	
+	public Integer getShipmentCategory() {
+		return shipmentCategory;
+	}
+
+	public void setShipmentCategory(Integer shipmentCategory) {
+		this.shipmentCategory = shipmentCategory;
+	}
 }

@@ -6,9 +6,11 @@ import com.intramirror.logistics.api.model.Invoice;
 import com.intramirror.logistics.api.service.IInvoiceService;
 import com.intramirror.main.api.model.AddressCountry;
 import com.intramirror.main.api.model.Geography;
+import com.intramirror.main.api.model.StockLocation;
 import com.intramirror.main.api.model.Tax;
 import com.intramirror.main.api.service.AddressCountryService;
 import com.intramirror.main.api.service.GeographyService;
+import com.intramirror.main.api.service.StockLocationService;
 import com.intramirror.main.api.service.TaxService;
 import com.intramirror.order.api.common.OrderStatusType;
 import com.intramirror.order.api.model.Shipment;
@@ -17,14 +19,11 @@ import com.intramirror.order.api.model.SubShipment;
 import com.intramirror.order.api.service.*;
 import com.intramirror.product.api.model.Shop;
 import com.intramirror.product.api.service.IShopService;
-import com.intramirror.product.api.service.ISkuStoreService;
-import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.VendorService;
 import com.intramirror.web.common.BarcodeUtil;
 import com.intramirror.web.controller.BaseController;
-import com.intramirror.web.service.LogisticsProductService;
 import com.intramirror.web.util.ExcelUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -50,20 +49,9 @@ public class OrderShipController extends BaseController {
     @Autowired
     private IOrderService orderService;
 
-    @Autowired
-    private LogisticsProductService logisticsProductService;
-
-    @Autowired
-    private ProductPropertyService productPropertyService;
 
     @Autowired
     private VendorService vendorService;
-
-    @Autowired
-    private ISkuStoreService skuStoreService;
-
-    @Autowired
-    private ILogisticsProductService iLogisticsProductService;
 
     @Autowired
     private IShipmentService iShipmentService;
@@ -91,6 +79,9 @@ public class OrderShipController extends BaseController {
 
     @Autowired
     private AddressCountryService addressCountryService;
+
+    @Autowired
+    private StockLocationService stockLocationService;
 
     /**
      * 获取所有箱子信息
@@ -382,10 +373,31 @@ public class OrderShipController extends BaseController {
             result.setData(geographyList);
         } catch (Exception e) {
             e.printStackTrace();
-            result.setMsg("Query container list fail,Check parameters, please ");
+            result.setMsg("Query geography list fail,Check parameters, please ");
             return result;
         }
 
+        return result;
+    }
+
+    @RequestMapping(value = "/getStockLocation", method = RequestMethod.GET)
+    @ResponseBody
+    public ResultMessage getStockLocation(Long vendorId) {
+        ResultMessage result = new ResultMessage();
+        result.errorStatus();
+        if (vendorId == null || vendorId == 0){
+            result.setMsg("parameters vendorId is null ");
+            return result;
+        }
+        try {
+            List<StockLocation> stockLocationList = stockLocationService.getStockLocation(vendorId);
+            result.successStatus();
+            result.setData(stockLocationList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setMsg("Query StockLocation list fail,Check parameters, please ");
+            return result;
+        }
         return result;
     }
 

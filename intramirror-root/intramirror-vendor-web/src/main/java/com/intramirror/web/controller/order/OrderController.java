@@ -954,12 +954,8 @@ public class OrderController extends BaseController {
         return message;
     }
 
-    /**
-     * 订单装箱
-     * @param orderMap
-     * @return
-     */
-    public ResultMessage updateLogisticsProduct(Map<String, Object> orderMap, Map<String, Object> shipMentMap, boolean ischeck, boolean isSaveSubShipment) {
+    /*
+   public ResultMessage updateLogisticsProduct(Map<String, Object> orderMap, Map<String, Object> shipMentMap, boolean ischeck, boolean isSaveSubShipment) {
         logger.info(MessageFormat
                 .format("order updateLogisticsProduct 订单装箱 入参信息   orderMap:{0},shipMentMap:{1},ischeck:{2},isSaveSubShipment:{3}", new Gson().toJson(orderMap),
                         new Gson().toJson(shipMentMap), ischeck, isSaveSubShipment));
@@ -1038,7 +1034,7 @@ public class OrderController extends BaseController {
         }
         result.setInfoMap(info);
         return result;
-    }
+    }*/
 
     @RequestMapping(value = "/saveUserComment", method = RequestMethod.POST)
     @ResponseBody

@@ -5,7 +5,7 @@
 
     <!-- mybatis-generator:generate -->
     <classPathEntry
-            location="C:\Users\Admin\.m2\repository\mysql\mysql-connector-java\5.1.39\mysql-connector-java-5.1.39.jar"/> <!-- 配置JAR驱动 -->
+            location="d:\repository\mysql\mysql-connector-java\5.1.39\mysql-connector-java-5.1.39.jar"/> <!-- 配置JAR驱动 -->
 
     <context id="context1" targetRuntime="MyBatis3">
         <commentGenerator>
@@ -14,8 +14,8 @@
         </commentGenerator>
 
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://rm-j6ca0o19fn5755pu8o.mysql.rds.aliyuncs.com:3306/intra-mirror-prd?useUnicode=true&amp;characterEncoding=UTF-8"
-                        userId="intramirror_db" password="Com105980%"/> <!-- JDBC连接 -->
+                        connectionURL="jdbc:mysql://rm-uf66f4a55b173k4cwo.mysql.rds.aliyuncs.com:3306/ger_sh_staging_db?useUnicode=true&amp;characterEncoding=UTF-8"
+                        userId="sh_staging_db" password="Sh@Intr@mi55o5"/> <!-- JDBC连接 -->
 
         <javaTypeResolver>
             <property name="forceBigDecimals"
@@ -23,19 +23,19 @@
         </javaTypeResolver>
 
         <javaModelGenerator targetPackage="com.intramirror.main.api.model"
-                            targetProject="D:\Work\BoutiquePortal\intramirror-root\intramirror-main-service\intramirror-main-service-api\src\main\java"> <!-- 生成实体地址 -->
+                            targetProject="D:\workspace\BoutiquePortal\intramirror-root\intramirror-main-service\intramirror-main-service-api\src\main\java"> <!-- 生成实体地址 -->
             <property name="trimStrings" value="true"/> <!-- 设置string时是否使用trim调用 -->
         </javaModelGenerator>
 
         <sqlMapGenerator targetPackage="conf.MainSqlMap"
-                         targetProject="D:\Work\BoutiquePortal\intramirror-root\intramirror-main-service\intramirror-main-service-core\src\main\resources"/> <!-- 生成MapXML文件 -->
+                         targetProject="D:\workspace\BoutiquePortal\intramirror-root\intramirror-main-service\intramirror-main-service-core\src\main\resources"/> <!-- 生成MapXML文件 -->
 
         <!-- XMLMAPPER,ANNOTATEDMAPPER -->
         <javaClientGenerator targetPackage="com.intramirror.main.core.mapper"
-                             targetProject="D:\Work\BoutiquePortal\intramirror-root\intramirror-main-service\intramirror-main-service-core\src\main\java"
+                             targetProject="D:\workspace\BoutiquePortal\intramirror-root\intramirror-main-service\intramirror-main-service-core\src\main\java"
                              type="XMLMAPPER"/> <!-- 生成MAP对应Client -->
 
-        <table schema="intra-mirror-prd" tableName="shipping_rule" domainObjectName="ShippingRule"
+        <!--<table schema="intra-mirror-prd" tableName="shipping_rule" domainObjectName="ShippingRule"
                enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
                enableSelectByExample="false" selectByExampleQueryId="false">
             <property name="useActualColumnNames" value="false"/>
@@ -54,6 +54,11 @@
         </table>
 
         <table schema="intra-mirror-prd" tableName="tax" domainObjectName="Tax"
+               enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
+               enableSelectByExample="false" selectByExampleQueryId="false">
+            <property name="useActualColumnNames" value="false"/>
+        </table>-->
+        <table schema="intra-mirror-prd" tableName="stock_location" domainObjectName="StockLocation"
                enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
                enableSelectByExample="false" selectByExampleQueryId="false">
             <property name="useActualColumnNames" value="false"/>
