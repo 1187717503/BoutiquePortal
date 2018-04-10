@@ -66,6 +66,8 @@ public interface IPriceChangeRule {
     int insert(PriceChangeRule record);
 
     int insertSelective(PriceChangeRule record);
+    int updateSkuImPrice();
+
 
     PriceChangeRule selectByPrimaryKey(Long priceChangeRuleId);
 

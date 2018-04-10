@@ -492,6 +492,11 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     }
 
     @Override
+    public int updateSkuImPrice() {
+        return priceChangeRuleMapper.updateSkuImPrice();
+    }
+
+    @Override
     public PriceChangeRule selectByPrimaryKey(Long priceChangeRuleId) {
         return priceChangeRuleMapper.selectByPrimaryKey(priceChangeRuleId);
     }

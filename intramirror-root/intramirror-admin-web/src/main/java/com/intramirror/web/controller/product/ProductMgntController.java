@@ -1,5 +1,6 @@
 package com.intramirror.web.controller.product;
 
+import com.intramirror.common.help.StringUtils;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.product.api.model.SearchCondition;
 import com.intramirror.product.api.service.ISkuStoreService;
@@ -189,9 +190,14 @@ public class ProductMgntController {
             setState(product);
 
             getSpuModify(product);
+            //如果关联spu有图片，则展示spu的图片
+            if (product.get("spu_cover_img") != null && StringUtils.isNotBlank(product.get("spu_cover_img").toString())) {
+                product.put("cover_img", product.get("spu_cover_img"));
+            }
         }
     }
 
+    //判断spu是否修改过
     private void getSpuModify(Map<String, Object> product) {
         if ((product.get("desc_modify") != null && (Boolean)product.get("desc_modify"))
                 || (product.get("img_modified") != null && (Boolean)product.get("img_modified"))

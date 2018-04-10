@@ -1,5 +1,6 @@
 package com.intramirror.web.controller.content;
 
+import com.intramirror.common.help.StringUtils;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.core.common.exception.ValidateException;
 import com.intramirror.core.common.response.ErrorResponse;
@@ -240,6 +241,10 @@ public class ContentMgntController {
             }
 
             //            setPriceDiscount(product, priceList);
+            //如果关联spu有图片，则展示spu的图片
+            if (product.get("spu_cover_img") != null && StringUtils.isNotBlank(product.get("spu_cover_img").toString())) {
+                product.put("cover_img", product.get("spu_cover_img"));
+            }
         }
 
     }

@@ -14,11 +14,14 @@
             product.min_im_price                                                             AS im_price,
             product.preview_im_price                                                         AS preview_im_price,
             CONVERT(1 - product.min_im_price / product.min_retail_price, DECIMAL(10, 2))     AS im_discount,
-            CONVERT(1 - product.preview_im_price / product.min_retail_price, DECIMAL(10, 2)) AS preview_discount
+            CONVERT(1 - product.preview_im_price / product.min_retail_price, DECIMAL(10, 2)) AS preview_discount,
+            spu.`cover_img` AS spu_cover_img,
+            vendor.vendor_name
         FROM tag_product_rel
             INNER JOIN product ON tag_product_rel.product_id = product.product_id AND product.enabled = TRUE
             INNER JOIN brand ON brand.brand_id = product.brand_id AND brand.enabled = TRUE
-
+            LEFT JOIN spu ON product.`spu_id` = spu.`spu_id` AND spu.`enabled` = TRUE
+            LEFT JOIN vendor ON product.`vendor_id` = vendor.`vendor_id` AND vendor.`enabled` = TRUE
         WHERE tag_product_rel.tag_id = #{tagId};
     </select>
     <select id="getTagAndBlockRelByTagId" resultType="java.util.Map">

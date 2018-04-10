@@ -30,7 +30,7 @@ public class CategoryServiceImpl extends BaseDao implements ICategoryService {
         Category category = new Category();
         category.setEnabled(EnabledType.USED);
         List<Map<String, Object>> categoryMaps = categoryMapper.selCategoryByConditions(category);
-        List<Category> categories = this.convertMapToCategory(categoryMaps, new ArrayList<Category>(), -1L);
+        List<Category> categories = this.convertMapToCategoryWithPath(categoryMaps, new ArrayList<Category>(), -1L, null);
         return categories;
     }
 
@@ -39,6 +39,35 @@ public class CategoryServiceImpl extends BaseDao implements ICategoryService {
         Category category = new Category();
         category.setEnabled(EnabledType.USED);
         return categoryMapper.listAllCategoryByConditions(category);
+    }
+
+    // 封装Category
+    private List<Category> convertMapToCategoryWithPath(List<Map<String, Object>> mapList, List<Category> categorys, Long bl_parentId, String parentPath) {
+        for (int i = 0; i < mapList.size(); i++) {
+            Map<String, Object> map = mapList.get(i);
+            Long parentId = Long.parseLong(map.get("parent_id").toString());
+            String name = map.get("name").toString();
+            Long categoryId = Long.parseLong(map.get("category_id").toString());
+
+            if (bl_parentId.equals(parentId)) {
+                Category category = new Category();
+                category.setName(name);
+                category.setCategoryId(categoryId);
+                category.setLevel(Byte.parseByte(map.get("level").toString()));
+                category.setParentId(parentId);
+
+                if (parentPath != null) {
+                    category.setCategoryPath(parentPath + "=>" + name);
+                } else {
+                    category.setCategoryPath(name);
+                }
+
+                //				mapList.remove(i);
+                category.setChildren(this.convertMapToCategoryWithPath(mapList, new ArrayList<Category>(), categoryId, category.getCategoryPath()));
+                categorys.add(category);
+            }
+        }
+        return categorys;
     }
 
     // 封装Category
