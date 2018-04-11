@@ -660,11 +660,12 @@
 
     <update id="updateRuleInActive" parameterType="java.util.Map">
 
-        update price_change_rule pcr set `status` = 3,backup_at=#{now,jdbcType=VARCHAR} where
+        update price_change_rule pcr ,price_change_rule_season_group pcrsg  set `status` = 3,backup_at=#{now,jdbcType=VARCHAR} where
         pcr.price_type = #{price_type,jdbcType=BIGINT}
         and pcr.`category_type` = #{category_type,jdbcType=BIGINT}
         and pcr.`status` = 2
         and pcr.vendor_id = #{vendor_id,jdbcType=BIGINT}
+        pcr.price_change_rule_id = pcrsg.price_change_rule_id
         and pcrsg.season_code in (
           select season_code from price_change_rule_season_group where price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
         )
