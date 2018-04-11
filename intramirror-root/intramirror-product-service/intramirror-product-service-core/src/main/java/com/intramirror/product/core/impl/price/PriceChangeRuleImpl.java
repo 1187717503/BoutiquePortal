@@ -452,6 +452,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
 
     private boolean updateRuleStatus(Map<String, Object> params) {
         List<Map<String, Object>> selNowRuleMaps = priceChangeRuleMapper.selNowRule(params);
+        List<Map<String, Object>> selectRuleInActiveMaps = priceChangeRuleMapper.selectRuleInActive(params);
         if (selNowRuleMaps != null && selNowRuleMaps.size() > 0) {
             for (Map<String, Object> map : selNowRuleMaps) {
                 //                params.put("price_change_rule_id",map.get("price_change_rule_id"));
@@ -462,6 +463,17 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             for (Map<String, Object> map : selNowRuleMaps) {
                 params.put("price_change_rule_id", map.get("price_change_rule_id"));
                 priceChangeRuleMapper.updateRuleActive(params);
+            }
+        }
+
+        for (Map<String, Object> activeMap : selectRuleInActiveMaps) {
+            List<Map<String, Object>> activeMaps = new ArrayList<>();
+            try {
+                activeMaps.add(activeMap);
+                this.copyAllRuleByActivePending(activeMaps, activeMap.get("vendor_id").toString(), "0", true, 999L,
+                        Integer.parseInt(activeMap.get("price_type").toString()));
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         return true;
