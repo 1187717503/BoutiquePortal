@@ -634,7 +634,7 @@
             and date_format(valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d')
         </if>
         <if test="price_change_rule_id != null and price_change_rule_id != ''">
-            and pcr.price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
+            and price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
         </if>
     </select>
 
