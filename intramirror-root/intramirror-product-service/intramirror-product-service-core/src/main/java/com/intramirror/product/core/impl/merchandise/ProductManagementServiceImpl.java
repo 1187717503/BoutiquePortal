@@ -1,5 +1,8 @@
 package com.intramirror.product.core.impl.merchandise;
 
+import com.google.gson.Gson;
+import com.intramirror.common.CommonProperties;
+import com.intramirror.common.IKafkaService;
 import com.intramirror.product.api.model.ProductWithBLOBs;
 import com.intramirror.product.api.model.SearchCondition;
 import com.intramirror.product.api.model.ShopProduct;
@@ -13,6 +16,7 @@ import com.intramirror.product.core.mapper.ProductMapper;
 import com.intramirror.product.core.mapper.ShopProductMapper;
 import com.intramirror.product.core.mapper.ShopProductSkuMapper;
 import com.intramirror.product.core.mapper.SkuMapper;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -45,7 +49,10 @@ public class ProductManagementServiceImpl implements ProductManagementService {
     private SkuMapper skuMapper;
 
     @Autowired
-    private IPromotionService promotionService;
+    CommonProperties commonProperties;
+
+    @Autowired
+    IKafkaService kafkaService;
 
     @Override
     public Map<String, Object> getProductStateByProductId(Long product_id) {
@@ -96,7 +103,13 @@ public class ProductManagementServiceImpl implements ProductManagementService {
     @Override
     @Transactional
     public void addToShop(int status, int shopStatus, Long productId) {
-        promotionService.refreshSnapshotForAddProduct(productId);
+        // promotionService.refreshSnapshotForAddProduct(productId);
+
+        List<Long> productList = new ArrayList<>();
+        productList.add(productId);
+        String message = new Gson().toJson(productList);
+        LOGGER.info("Start to send {} to kafaka {}--->{}", message, commonProperties.getKafakaTopicSnapshot(), commonProperties.getKafakaServer());
+        kafkaService.sendMsgToKafka(message, commonProperties.getKafakaTopicSnapshot(), commonProperties.getKafakaServer());
         updateProductStatusOnly(status, productId);
         createShopProductStatus(shopStatus, productId);
     }
@@ -104,7 +117,10 @@ public class ProductManagementServiceImpl implements ProductManagementService {
     @Override
     @Transactional
     public void batchAddToShop(int status, int shopStatus, List<Long> productIds) {
-        promotionService.refreshBatchSnapshotForAddProduct(productIds);
+        // promotionService.refreshBatchSnapshotForAddProduct(productIds);
+        String message = new Gson().toJson(productIds);
+        LOGGER.info("Start to send {} to kafaka {}--->{}", message, commonProperties.getKafakaTopicSnapshot(), commonProperties.getKafakaServer());
+        kafkaService.sendMsgToKafka(message, commonProperties.getKafakaTopicSnapshot(), commonProperties.getKafakaServer());
         batchUpdateProductStatusOnly(status, productIds);
         batchCreateShopProductStatus(shopStatus, productIds);
     }

@@ -65,12 +65,13 @@
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
     </context:component-scan>
 
-    <bean name="orderProperties" class="com.intramirror.web.common.CommonProperties">
+    <bean name="commonProperties" class="com.intramirror.common.CommonProperties">
         <property name="appOrderUrl" value="${app.order.url}"></property>
         <property name="appCheckUrl" value="${app.check.url}"></property>
         <property name="ruleExcelPath" value="${price.rule.path}"></property>
+        <property name="kafakaServer" value="${kafka.server}"></property>
+        <property name="kafakaTopicSnapshot" value="${kafka.topic.snapshot}"></property>
     </bean>
-
 
     <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
     </bean>
