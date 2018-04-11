@@ -1,12 +1,12 @@
 package com.intramirror.web.controller.price;
 
+import com.intramirror.common.CommonProperties;
 import com.intramirror.common.help.ExceptionUtils;
 import com.intramirror.common.help.PriceChangeRuleExcelUtils;
 import com.intramirror.common.utils.DateUtils;
 import com.intramirror.product.api.model.PriceChangeRule;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
 import com.intramirror.product.api.service.rule.IRuleService;
-import com.intramirror.web.common.CommonProperties;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,9 +48,9 @@ public class RulePoiController {
     private IPriceChangeRule iPriceChangeRule;
 
     @RequestMapping("/download")
-    public void download(@Param("price_change_rule_id") String price_change_rule_id,HttpServletResponse response) {
+    public void download(@Param("price_change_rule_id") String price_change_rule_id, HttpServletResponse response) {
         try {
-            PriceChangeRule priceChangeRule=iPriceChangeRule.selectByPrimaryKey(Long.valueOf(price_change_rule_id));
+            PriceChangeRule priceChangeRule = iPriceChangeRule.selectByPrimaryKey(Long.valueOf(price_change_rule_id));
             String type = String.valueOf(priceChangeRule.getCategoryType());
             // 查询品牌目录映射
             Map<String, Object> params = new HashMap<>();
@@ -72,9 +72,9 @@ public class RulePoiController {
             String filePath = commonProperties.getRuleExcelPath() + "download/" + fileName;
 
             logger.info("RulePoiController,download,filePath:" + filePath);
-            if("1".equals(type)) {
+            if ("1".equals(type)) {
                 PriceChangeRuleExcelUtils.genPriceExcel("Pricing Rule", brandMaps, dataMaps, filePath);
-            }else if("2".equals(type)){
+            } else if ("2".equals(type)) {
                 PriceChangeRuleExcelUtils.genPriceExcelKids("Pricing Rule", brandMaps, dataMaps, filePath);
             }
             File file = new File(filePath);
@@ -128,27 +128,27 @@ public class RulePoiController {
         brand0.put("english_name", "Default");
         brand0.put("brand_id", "0");
         brandMaps.add(0, brand0);
-        PriceChangeRule priceChangeRule=iPriceChangeRule.selectByPrimaryKey(Long.valueOf(price_change_rule_id));
+        PriceChangeRule priceChangeRule = iPriceChangeRule.selectByPrimaryKey(Long.valueOf(price_change_rule_id));
         String type = String.valueOf(priceChangeRule.getCategoryType());
 
         String filePath = commonProperties.getRuleExcelPath() + "upload/" + file.getOriginalFilename();
         file.transferTo(new File(filePath));
         List<Map<String, Object>> categoryBrandMapList = null;
-        if("1".equals(type)) {
-             categoryBrandMapList = PriceChangeRuleExcelUtils.readRuleExcel(filePath, brandMaps, price_change_rule_id);
+        if ("1".equals(type)) {
+            categoryBrandMapList = PriceChangeRuleExcelUtils.readRuleExcel(filePath, brandMaps, price_change_rule_id);
 
-        }else if("2".equals(type)) {
+        } else if ("2".equals(type)) {
             categoryBrandMapList = PriceChangeRuleExcelUtils.readRuleExcelKids(filePath, brandMaps, price_change_rule_id);
         }
         //  检查Excel数据的可用性
-        this.checkExcelData(categoryBrandMapList,type);
+        this.checkExcelData(categoryBrandMapList, type);
 
         iRuleService.changeRule(price_change_rule_id, categoryBrandMapList);
 
         return Response.success();
     }
 
-    private void checkExcelData(List<Map<String, Object>> categoryBrandMapList,String type) throws Exception {
+    private void checkExcelData(List<Map<String, Object>> categoryBrandMapList, String type) throws Exception {
         if (categoryBrandMapList == null || categoryBrandMapList.size() == 0) {
             throw new RuntimeException("没有读取到Excel的数据。");
         }
@@ -168,9 +168,9 @@ public class RulePoiController {
 
         int sum = categoryBrandMapList.size();
         int jsum = 0;
-        if("1".equals(type)) {
+        if ("1".equals(type)) {
             jsum = set.size() * 8; // men women 导出
-        }else if("2".equals(type)){
+        } else if ("2".equals(type)) {
             jsum = set.size() * 9; // kids 校验
         }
         if (sum != jsum) {
