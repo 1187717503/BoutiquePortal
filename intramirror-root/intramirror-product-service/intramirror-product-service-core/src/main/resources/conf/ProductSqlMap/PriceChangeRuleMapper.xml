@@ -627,10 +627,10 @@
         <if test="category_type != null and category_type != ''">
             and pcr.category_type=#{category_type,jdbcType=BIGINT}
         </if>
-        <if test="price_change_rule_id != null or price_change_rule_id != ''">
+        <if test="price_change_rule_id != null and price_change_rule_id != ''">
             and pcr.price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
         </if>
-        
+
     </select>
 
     <update id="updateRuleActive" parameterType="java.util.Map">
