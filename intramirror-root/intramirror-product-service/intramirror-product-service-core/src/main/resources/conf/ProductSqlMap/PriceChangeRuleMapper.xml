@@ -652,7 +652,6 @@
         and pcr.`category_type` = #{category_type,jdbcType=BIGINT}
         and pcr.`status` = 2
         and pcr.vendor_id = #{vendor_id,jdbcType=BIGINT}
-        and pcr.price_change_rule_id = pcrsg.price_change_rule_id
     </select>
     <!--
         and pcrsg.season_code in (
