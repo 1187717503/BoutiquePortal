@@ -76,7 +76,7 @@ public class PriceChangeRuleController extends BaseController {
         PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
 
         logger.info("Begin to refresh the discounts of IM goods,pcrModel:" + JSONObject.toJSONString(pcrModel));
-        priceChangeRule.updateAdminPrice(pcrModel.getVendorId(), pcrModel.getCategoryType().intValue());
+        priceChangeRule.updateAdminPrice(pcrModel.getVendorId(), pcrModel.getCategoryType().intValue(),pcrModel.getPriceChangeRuleId());
         logger.info("End the discounts of IM goods:" + JSONObject.toJSONString(pcrModel));
 
         // sku.im_price -> shop_product_sku.sale_price
@@ -106,7 +106,7 @@ public class PriceChangeRuleController extends BaseController {
         PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
 
         logger.info("Begin to refresh the discounts of BOUTIQUE goods,pcrModel:" + JSONObject.toJSONString(pcrModel));
-        priceChangeRule.updateVendorPrice(pcrModel.getVendorId(), pcrModel.getCategoryType());
+        priceChangeRule.updateVendorPrice(pcrModel.getVendorId(), pcrModel.getCategoryType(),pcrModel.getPriceChangeRuleId());
         logger.info("End the discounts of BOUTIQUE goods:" + JSONObject.toJSONString(pcrModel));
 
         // sku.im_price -> shop_product_sku.sale_price

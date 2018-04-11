@@ -360,6 +360,9 @@
         <if test="preview_status == 0">
             and date_format(pcr.valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d')
         </if>
+        <if test="price_change_rule_id != null and price_change_rule_id != ''">
+            and pcr.price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
+        </if>
     </select>
 
     <select id="selectActiveSeasonGroupRule" resultType="java.util.Map" parameterType="java.util.Map">
@@ -386,6 +389,9 @@
         <if test="preview_status == 0">
             and date_format(pcr.valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d')
         </if>
+        <if test="price_change_rule_id != null and price_change_rule_id != ''">
+            and pcr.price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
+        </if>
         order by `brand_id` asc
     </select>
 
@@ -405,6 +411,9 @@
         <if test="preview_status == 0">
             and date_format(pcr.valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d')
         </if>
+        <if test="price_change_rule_id != null and price_change_rule_id != ''">
+            and pcr.price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
+        </if>
     </select>
 
     <select id="selectProductGroupRule" resultType="java.util.Map" parameterType="java.util.Map">
@@ -419,6 +428,9 @@
         </if>
         <if test="preview_status == 0">
             and date_format(pcr.valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d')
+        </if>
+        <if test="price_change_rule_id != null and price_change_rule_id != ''">
+            and pcr.price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
         </if>
     </select>
 
@@ -435,6 +447,9 @@
         </if>
         <if test="preview_status == 0">
             and date_format(pcr.valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d')
+        </if>
+        <if test="price_change_rule_id != null and price_change_rule_id != ''">
+            and pcr.price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
         </if>
     </select>
 
@@ -618,6 +633,9 @@
         <if test="preview_status == 0">
             and date_format(valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d')
         </if>
+        <if test="price_change_rule_id != null and price_change_rule_id != ''">
+            and pcr.price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
+        </if>
     </select>
 
     <select id="selRuleByVendorPriceType" resultType="java.util.Map" parameterType="java.util.Map">
@@ -642,20 +660,20 @@
 
     <update id="updateRuleInActive" parameterType="java.util.Map">
 
-        update price_change_rule pcr,price_change_rule_season_group pcrsg set `status` = 3,backup_at=now() where
+        update price_change_rule pcr set `status` = 3,backup_at=#{now,jdbcType=VARCHAR} where
         pcr.price_type = #{price_type,jdbcType=BIGINT}
         and pcr.`category_type` = #{category_type,jdbcType=BIGINT}
         and pcr.`status` = 2
         and pcr.vendor_id = #{vendor_id,jdbcType=BIGINT}
-        and pcr.price_change_rule_id = pcrsg.price_change_rule_id
+        and pcrsg.season_code in (
+          select season_code from price_change_rule_season_group where price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
+        )
     </update>
 
     <select id="selectRuleInActive" resultType="java.util.Map"  parameterType="java.util.Map">
         select * from price_change_rule pcr where
-        pcr.price_type = #{price_type,jdbcType=BIGINT}
-        and pcr.`category_type` = #{category_type,jdbcType=BIGINT}
-        and pcr.`status` = 2
-        and pcr.vendor_id = #{vendor_id,jdbcType=BIGINT}
+        and pcr.`status` = 3
+        and pcr.backup_at = #{now,jdbcType=VARCHAR}
     </select>
     <!--
         and pcrsg.season_code in (
