@@ -673,7 +673,7 @@
 
     <select id="selectRuleInActive" resultType="java.util.Map"  parameterType="java.util.Map">
         select * from price_change_rule pcr where
-        and pcr.`status` = 3
+        pcr.`status` = 3
         and pcr.backup_at = #{now,jdbcType=VARCHAR}
     </select>
     <!--
