@@ -1,7 +1,8 @@
-package com.intramirror.common;
+package com.intramirror.web.common;
 
 /**
  * Created by dingyifan on 2017/10/17.
+ *
  */
 public class CommonProperties {
 
@@ -11,25 +12,6 @@ public class CommonProperties {
     private String appCheckUrl;
 
     private String ruleExcelPath;
-
-    private String kafakaServer;
-    private String kafakaTopicSnapshot;
-
-    public String getKafakaServer() {
-        return kafakaServer;
-    }
-
-    public void setKafakaServer(String kafakaServer) {
-        this.kafakaServer = kafakaServer;
-    }
-
-    public String getKafakaTopicSnapshot() {
-        return kafakaTopicSnapshot;
-    }
-
-    public void setKafakaTopicSnapshot(String kafakaTopicSnapshot) {
-        this.kafakaTopicSnapshot = kafakaTopicSnapshot;
-    }
 
     public String getAppOrderUrl() {
         return appOrderUrl;
