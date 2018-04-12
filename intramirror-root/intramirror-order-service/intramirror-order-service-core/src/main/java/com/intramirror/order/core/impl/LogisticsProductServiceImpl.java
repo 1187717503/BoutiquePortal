@@ -2,6 +2,7 @@ package com.intramirror.order.core.impl;
 
 import com.google.gson.Gson;
 import com.intramirror.common.Helper;
+import com.intramirror.common.IKafkaService;
 import com.intramirror.jpush.JPushService;
 import com.intramirror.jpush.UnSupportActionTypeException;
 import com.intramirror.jpush.entity.OrderStatusUpdateEntity;
@@ -26,6 +27,9 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
 
     @Autowired
     JPushService jpushService;
+
+    @Autowired
+    IKafkaService kafkaService;
 
     private static Logger logger = LoggerFactory.getLogger(LogisticsProductServiceImpl.class);
 
@@ -83,7 +87,7 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
         orderStatusChangeMsgDTO.setTriggerTime((new Date()).getTime());
 
         String msg = gson.toJson(orderStatusChangeMsgDTO);
-        KafkaMessageUtil.sendMsgToOrderChangeKafka(msg);
+        KafkaMessageUtil.sendMsgToOrderChangeKafka(msg, kafkaService);
     }
 
     //	/**
