@@ -2,17 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.intramirror.order.core.mapper.OrderMapper">
 
-    <resultMap id="BaseResultMap" type="com.intramirror.order.api.model.CancelOrderVO" >
-        <result column="cover_img" property="cover_img" jdbcType="VARCHAR" />
-        <result column="product_id" property="product_id" jdbcType="BIGINT" />
-        <result column="size" property="size" jdbcType="VARCHAR" />
-        <result column="brandName" property="brandName" jdbcType="VARCHAR" />
-        <result column="name" property="name" jdbcType="BIGINT" />
-        <result column="price" property="price" jdbcType="DECIMAL" />
-        <result column="in_price" property="in_price" jdbcType="DECIMAL" />
-        <result column="order_line_num" property="order_line_num" jdbcType="VARCHAR" />
-        <result column="created_at" property="created_at" jdbcType="TIMESTAMP" />
-        <result column="cancel_at" property="cancel_at" jdbcType="TIMESTAMP" />
+    <resultMap id="BaseResultMap" type="com.intramirror.order.api.model.CancelOrderVO">
+        <result column="cover_img" property="cover_img" jdbcType="VARCHAR"/>
+        <result column="product_id" property="product_id" jdbcType="BIGINT"/>
+        <result column="size" property="size" jdbcType="VARCHAR"/>
+        <result column="brandName" property="brandName" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="BIGINT"/>
+        <result column="price" property="price" jdbcType="DECIMAL"/>
+        <result column="in_price" property="in_price" jdbcType="DECIMAL"/>
+        <result column="order_line_num" property="order_line_num" jdbcType="VARCHAR"/>
+        <result column="created_at" property="created_at" jdbcType="TIMESTAMP"/>
+        <result column="cancel_at" property="cancel_at" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <select id="getOrderList" resultType="java.util.HashMap" parameterType="java.util.Map">
@@ -107,7 +107,7 @@
         ) pp ON p.product_id = pp.product_id
         WHERE o.order_num in
         <foreach collection="orderNumbers" item="orderNumber" index="index"
-                open="(" close=")" separator=",">
+                 open="(" close=")" separator=",">
             #{orderNumber}
         </foreach>
 
@@ -118,9 +118,7 @@
 
     <select id="getOrderListByStatus" resultType="java.util.HashMap" parameterType="java.util.Map">
         SELECT p.product_id,g.pack_group,g.pack_english_name,
-        o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id,pspv.`value` as
-        size,p.category_id,
-        /*s.price,lp.in_price,sps.sale_price,*/
+        o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id, s.`size` as size,p.category_id,
         lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
         lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
         lp.confirmed_at,lp.est_ship_date,lp.packed_at,lp.shipped_at,s.sku_code,usa.address_country_id,b.english_name as
@@ -141,24 +139,7 @@
         INNER JOIN product p ON (sp.product_id = p.product_id and p.enabled = 1)
         INNER JOIN brand b ON (p.brand_id = b.brand_id and b.enabled = 1 )
         INNER JOIN sku s ON (s.sku_id = sps.sku_id and s.enabled = 1)
-        INNER JOIN sku_property skup on (skup.sku_id = s.sku_id and skup.enabled = 1)
-        INNER JOIN product_sku_property_key pspk ON (
-        pspk.product_id = p.product_id
-        and pspk.product_sku_property_key_id = skup.product_sku_property_key_id
-        and pspk.enabled = 1
-        ) INNER JOIN product_sku_property_value pspv ON (
-        pspv.product_sku_property_key_id = skup.product_sku_property_key_id
-        and pspv.product_sku_property_value_id = skup.product_sku_property_value_id
-        and pspv.enabled = 1
-        ) INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
-        /*LEFT JOIN (
-        SELECT t_pp.product_id,
-        max(case t_pp.key_name when 'ColorCode' then t_pp.`value` else '' end) as colorCode,
-        max(case t_pp.key_name when 'BrandID' then t_pp.`value` else '' end) as brandID
-        from product_property t_pp
-        where t_pp.enabled = 1 and (t_pp.key_name='BrandID' or t_pp.key_name = 'ColorCode')
-        group by t_pp.product_id
-        ) pp ON p.product_id = pp.product_id*/
+        INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
         LEFT JOIN order_exception oe ON(oe.logistics_product_id=lp.logistics_product_id AND oe.order_exception_id =
         (SELECT MAX(oe1.order_exception_id) FROM order_exception oe1 WHERE oe1.logistics_product_id = oe.logistics_product_id))
         LEFT JOIN order_exception_type oet ON(oet.order_exception_type_id=oe.order_exception_type_id)
@@ -286,7 +267,7 @@
         where pspk.`name` = 'Size' and lp.`status` = #{status,jdbcType=BIGINT} and lp.enabled = 1
         and v.vendor_id = #{vendorId,jdbcType=BIGINT}
         <if test="orderNumber != null">
-        AND lp.order_line_num LIKE #{orderNumber}
+            AND lp.order_line_num LIKE #{orderNumber}
         </if>
         GROUP BY lp.order_line_num
         <choose>
@@ -439,93 +420,93 @@
 
     <select id="getOrderListByShipmentId" resultType="java.util.HashMap" parameterType="java.util.Map">
         SELECT
-            o.order_num,
-            o.order_id,
-            o.created_at,
-            o.updated_at as order_updated_at,
-            o.current_rate,
-            p.name,
-            p.product_id,
-           /* pp.colorCode,
-            pp.brandID,
-            pp.MadeIn,
-            pp.Composition,*/
-            pspv.`value`   AS size,
-            p.category_id,
-            /*s.price,
-            s.in_price,
-            sps.sale_price,*/
-            lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
-            lp.amount,
-            lp.shipping_fee,
-            lp.tax_fee,
-            lp.order_line_num,
-            lp.`status`,
-            b.english_name AS brandName,
-            v.vendor_name,
-            p.cover_img,
-            lp.logistics_product_id,
-            c.*,
-            c3.name        AS categoryName,
-            l.logistics_id,
-            l.user_rec_country,
-            l.geography_id
+        o.order_num,
+        o.order_id,
+        o.created_at,
+        o.updated_at as order_updated_at,
+        o.current_rate,
+        p.name,
+        p.product_id,
+        /* pp.colorCode,
+        pp.brandID,
+        pp.MadeIn,
+        pp.Composition,*/
+        pspv.`value` AS size,
+        p.category_id,
+        /*s.price,
+        s.in_price,
+        sps.sale_price,*/
+        lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
+        lp.amount,
+        lp.shipping_fee,
+        lp.tax_fee,
+        lp.order_line_num,
+        lp.`status`,
+        b.english_name AS brandName,
+        v.vendor_name,
+        p.cover_img,
+        lp.logistics_product_id,
+        c.*,
+        c3.name AS categoryName,
+        l.logistics_id,
+        l.user_rec_country,
+        l.geography_id
         FROM logistics_product lp
-            INNER JOIN container c ON lp.container_id = c.container_id
-            INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
-            INNER JOIN `order` o ON ol.order_id = o.order_id
-            LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
-            INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
-            INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
-            INNER JOIN product p ON (sp.product_id = p.product_id and p.enabled = 1)
-            LEFT JOIN (SELECT *
-                       FROM category
-                       WHERE `level` = 3 AND enabled = 1) c3 ON (c3.category_id = p.category_id)
-            INNER JOIN brand b ON (p.brand_id = b.brand_id AND b.enabled = 1)
-            INNER JOIN sku s ON (s.sku_id = sps.sku_id AND s.enabled = 1)
-            INNER JOIN sku_property skup ON (skup.sku_id = s.sku_id AND skup.enabled = 1)
-            INNER JOIN product_sku_property_key pspk ON (
-                pspk.product_id = p.product_id
-                AND pspk.product_sku_property_key_id = skup.product_sku_property_key_id
-                AND pspk.enabled = 1
-                )
-            INNER JOIN product_sku_property_value pspv ON (
-                pspv.product_sku_property_key_id = skup.product_sku_property_key_id
-                AND pspv.product_sku_property_value_id = skup.product_sku_property_value_id
-                AND pspv.enabled = 1
-                )
-            INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
-            /* LEFT JOIN (
-                          SELECT
-                              t_pp.product_id,
-                              max(CASE t_pp.key_name
-                                  WHEN 'ColorCode'
-                                      THEN t_pp.`value`
-                                  ELSE '' END) AS colorCode,
-                              max(CASE t_pp.key_name
-                                  WHEN 'BrandID'
-                                      THEN t_pp.`value`
-                                  ELSE '' END) AS brandID,
-                              max(CASE t_pp.key_name
-                                  WHEN 'MadeIn'
-                                      THEN t_pp.`value`
-                                  ELSE '' END) AS MadeIn,
-                              max(CASE t_pp.key_name
-                                  WHEN 'Composition'
-                                      THEN t_pp.`value`
-                                  ELSE '' END) AS Composition
-                          FROM product_property t_pp
-                          WHERE t_pp.enabled = 1 AND
-                                (t_pp.key_name = 'BrandID' OR t_pp.key_name = 'ColorCode' OR t_pp.key_name = 'MadeIn' OR t_pp.key_name = 'Composition')
-                          GROUP BY t_pp.product_id
-                      ) pp ON p.product_id = pp.product_id */
+        INNER JOIN container c ON lp.container_id = c.container_id
+        INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+        INNER JOIN `order` o ON ol.order_id = o.order_id
+        LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
+        INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
+        INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
+        INNER JOIN product p ON (sp.product_id = p.product_id and p.enabled = 1)
+        LEFT JOIN (SELECT *
+        FROM category
+        WHERE `level` = 3 AND enabled = 1) c3 ON (c3.category_id = p.category_id)
+        INNER JOIN brand b ON (p.brand_id = b.brand_id AND b.enabled = 1)
+        INNER JOIN sku s ON (s.sku_id = sps.sku_id AND s.enabled = 1)
+        INNER JOIN sku_property skup ON (skup.sku_id = s.sku_id AND skup.enabled = 1)
+        INNER JOIN product_sku_property_key pspk ON (
+        pspk.product_id = p.product_id
+        AND pspk.product_sku_property_key_id = skup.product_sku_property_key_id
+        AND pspk.enabled = 1
+        )
+        INNER JOIN product_sku_property_value pspv ON (
+        pspv.product_sku_property_key_id = skup.product_sku_property_key_id
+        AND pspv.product_sku_property_value_id = skup.product_sku_property_value_id
+        AND pspv.enabled = 1
+        )
+        INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
+        /* LEFT JOIN (
+        SELECT
+        t_pp.product_id,
+        max(CASE t_pp.key_name
+        WHEN 'ColorCode'
+        THEN t_pp.`value`
+        ELSE '' END) AS colorCode,
+        max(CASE t_pp.key_name
+        WHEN 'BrandID'
+        THEN t_pp.`value`
+        ELSE '' END) AS brandID,
+        max(CASE t_pp.key_name
+        WHEN 'MadeIn'
+        THEN t_pp.`value`
+        ELSE '' END) AS MadeIn,
+        max(CASE t_pp.key_name
+        WHEN 'Composition'
+        THEN t_pp.`value`
+        ELSE '' END) AS Composition
+        FROM product_property t_pp
+        WHERE t_pp.enabled = 1 AND
+        (t_pp.key_name = 'BrandID' OR t_pp.key_name = 'ColorCode' OR t_pp.key_name = 'MadeIn' OR t_pp.key_name = 'Composition')
+        GROUP BY t_pp.product_id
+        ) pp ON p.product_id = pp.product_id */
         WHERE pspk.`name` = 'Size'
-              AND c.shipment_id IN
-            <foreach collection="shipmentIds" item="shipmentId" open="(" close=")" separator=",">
-                #{shipmentId,jdbcType=BIGINT}
-            </foreach>
-              AND lp.`status` = #{status,jdbcType=BIGINT}
-              AND v.vendor_id = #{vendorId,jdbcType=BIGINT}
+        AND c.shipment_id IN
+        <foreach collection="shipmentIds" item="shipmentId" open="(" close=")" separator=",">
+            #{shipmentId,jdbcType=BIGINT}
+        </foreach>
+        AND lp.`status` = #{status,jdbcType=BIGINT}
+        AND v.vendor_id = #{vendorId,jdbcType=BIGINT}
         GROUP BY lp.order_line_num
     </select>
 
