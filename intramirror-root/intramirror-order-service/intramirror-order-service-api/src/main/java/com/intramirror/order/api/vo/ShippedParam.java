@@ -11,7 +11,42 @@ public class ShippedParam {
     private String dateType;
     private Integer pageSize;
     private Integer pageNum;
+    private String stockLocation;
+    private String shipToGeography;
+    private String shippedAtOrderBy;
+    private String statusOrderBy;
 
+    public String getStockLocation() {
+        return stockLocation;
+    }
+
+    public void setStockLocation(String stockLocation) {
+        this.stockLocation = stockLocation;
+    }
+
+    public String getShipToGeography() {
+        return shipToGeography;
+    }
+
+    public void setShipToGeography(String shipToGeography) {
+        this.shipToGeography = shipToGeography;
+    }
+
+    public String getShippedAtOrderBy() {
+        return shippedAtOrderBy;
+    }
+
+    public void setShippedAtOrderBy(String shippedAtOrderBy) {
+        this.shippedAtOrderBy = shippedAtOrderBy;
+    }
+
+    public String getStatusOrderBy() {
+        return statusOrderBy;
+    }
+
+    public void setStatusOrderBy(String statusOrderBy) {
+        this.statusOrderBy = statusOrderBy;
+    }
 
     public String getOrderLineNo() {
         return orderLineNo;

@@ -252,4 +252,11 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
         return logisticsProductMapper.invalidOrderById(logisticsProductId);
     }
 
+    @Override
+    public void addStockLocation(Long logisProductId, String stockLocation) {
+        Map<String,Object> map = new HashMap<>();
+        map.put("logisProductId",logisProductId);
+        map.put("stockLocation",stockLocation);
+        logisticsProductMapper.addStockLocation(map);
+    }
 }

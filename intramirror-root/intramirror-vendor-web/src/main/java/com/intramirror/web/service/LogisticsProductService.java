@@ -86,5 +86,5 @@ public class LogisticsProductService{
 		return logisticsProductService.selectById(logisProductId);
 	}
 
-	
+
 }

@@ -395,6 +395,7 @@ public class OrderController extends BaseController {
 
             Long logisProductId = Long.parseLong(map.get("logisProductId").toString());
             int status = Integer.parseInt(map.get("status").toString());
+            String stockLocation = map.get("stockLocation").toString();
 
             //调用修改订单状态
             //根据id获取当前数据库旧的对象信息
@@ -409,6 +410,10 @@ public class OrderController extends BaseController {
                         skuStoreService.updateConfirmStoreByShopProductSkuId(shopProductSkuId);
                         logger.info("订单 " + shopProductSkuId + " confirm操作, 修改confirm库存成功");
                     }
+                }
+                //picking时保存stock_location
+                if(OrderStatusType.PICKING == status){
+                    iLogisticsProductService.addStockLocation(logisProductId,stockLocation);
                 }
                 message.successStatus().putMsg("Info", "SUCCESS").setData(resultMap);
                 return message;

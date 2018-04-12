@@ -85,5 +85,7 @@ public interface ILogisticsProductService {
 	LogisticsProduct createLogisticsProduct(LogisticsProduct logisticsProduct);
 
 	int invalidOrderById(Long logisticsProductId);
+
+	void addStockLocation(Long logisProductId,String stockLocation);
 }
 

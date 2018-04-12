@@ -446,6 +446,7 @@
             o.current_rate,
             p.name,
             p.product_id,
+            lp.stock_location,
            /* pp.colorCode,
             pp.brandID,
             pp.MadeIn,
@@ -733,7 +734,33 @@
         <if test="shippedParam.dateType!= null and shippedParam.dateType!='' and shippedParam.dateType == '1'.toString()">
             and (lp.shipped_at between #{shippedParam.startDate} and #{shippedParam.endDate})
         </if>
+        <if test="shippedParam.stockLocation != null">
+            AND lp.stock_location = #{shippedParam.stockLocation}
+        </if>
+        <if test="shippedParam.shipToGeography != null">
+            AND sm.ship_to_geography = #{shippedParam.shipToGeography}
+        </if>
         GROUP BY lp.order_line_num
+        <if test="shippedParam.shippedAtOrderBy != null">
+            <choose>
+                <when test="shippedParam.shippedAtOrderBy == 'desc'">
+                    ORDER BY lp.shipped_at DESC
+                </when>
+                <otherwise>
+                    ORDER BY lp.shipped_at ASC
+                </otherwise>
+            </choose>
+        </if>
+        <if test="shippedParam.statusOrderBy != null">
+            <choose>
+                <when test="shippedParam.statusOrderBy == 'desc'">
+                    ORDER BY lp.status DESC
+                </when>
+                <otherwise>
+                    ORDER BY lp.status ASC
+                </otherwise>
+            </choose>
+        </if>
         <choose>
             <when test="count == 1">
 

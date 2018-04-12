@@ -321,4 +321,9 @@
               status = -1 AND
               logistics_product_id = #{logisticsProductId,jdbcType=BIGINT}
     </update>
+
+    <update id="addStockLocation" parameterType="map">
+        UPDATE logistics_product SET stock_location = #{stockLocation,jdbcType=VARCHAR}
+        WHERE logistics_product_id = #{logisProductId,jdbcType=BIGINT}
+    </update>
 </mapper>

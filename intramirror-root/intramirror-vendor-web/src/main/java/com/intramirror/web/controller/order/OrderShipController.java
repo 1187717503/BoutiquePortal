@@ -319,7 +319,6 @@ public class OrderShipController extends BaseController {
                         cons.add(container);
                         orderList.put(container.get("container_id").toString(), cons);
 
-
                         //获取container信息
                         Map<String, Object> cartonInfo = new HashMap<String, Object>();
                         cartonInfo.put("container_id", container.get("container_id").toString());
@@ -327,6 +326,9 @@ public class OrderShipController extends BaseController {
                         cartonInfo.put("height", container.get("height").toString());
                         cartonInfo.put("width", container.get("width").toString());
                         cartonInfo.put("length", container.get("length").toString());
+                        String weight = container.get("weight").toString();
+                        BigDecimal decimal = new BigDecimal(weight);
+                        cartonInfo.put("weight",decimal.setScale(2,BigDecimal.ROUND_HALF_UP).toString());
                         shipMentCartonList.add(cartonInfo);
 
                     }
@@ -688,6 +690,9 @@ public class OrderShipController extends BaseController {
                         cartonInfo.put("height", container.get("height").toString());
                         cartonInfo.put("width", container.get("width").toString());
                         cartonInfo.put("length", container.get("length").toString());
+                        String weight = container.get("weight").toString();
+                        BigDecimal decimal = new BigDecimal(weight);
+                        cartonInfo.put("weight",decimal.setScale(2,BigDecimal.ROUND_HALF_UP).toString());
                         shipMentCartonList.add(cartonInfo);
 
                     }
