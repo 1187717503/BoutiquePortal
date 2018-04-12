@@ -591,34 +591,8 @@
                      INNER JOIN product p ON (sp.product_id = p.product_id and p.enabled = 1)
                      INNER JOIN brand b ON (p.brand_id = b.brand_id AND b.enabled = 1)
                      INNER JOIN sku s ON (s.sku_id = sps.sku_id AND s.enabled = 1)
-                     INNER JOIN sku_property skup ON (skup.sku_id = s.sku_id AND skup.enabled = 1)
-                     INNER JOIN product_sku_property_key pspk ON (
-                         pspk.product_id = p.product_id
-                         AND pspk.product_sku_property_key_id = skup.product_sku_property_key_id
-                         AND pspk.enabled = 1
-                         )
-                     INNER JOIN product_sku_property_value pspv ON (
-                         pspv.product_sku_property_key_id = skup.product_sku_property_key_id
-                         AND pspv.product_sku_property_value_id = skup.product_sku_property_value_id
-                         AND pspv.enabled = 1
-                         )
                      INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
-                     /*LEFT JOIN (
-                                   SELECT
-                                       t_pp.product_id,
-                                       max(CASE t_pp.key_name
-                                           WHEN 'ColorCode'
-                                               THEN t_pp.`value`
-                                           ELSE '' END) AS colorCode,
-                                       max(CASE t_pp.key_name
-                                           WHEN 'BrandID'
-                                               THEN t_pp.`value`
-                                           ELSE '' END) AS brandID
-                                   FROM product_property t_pp
-                                   WHERE t_pp.enabled = 1 AND (t_pp.key_name = 'BrandID' OR t_pp.key_name = 'ColorCode')
-                                   GROUP BY t_pp.product_id
-                               ) pp ON p.product_id = pp.product_id*/
-                 WHERE pspk.`name` = 'Size' AND lp.`status` = #{status,jdbcType=BIGINT}
+                 WHERE  lp.`status` = #{status,jdbcType=BIGINT}
                        AND v.vendor_id = #{vendorId,jdbcType=BIGINT}
                  GROUP BY lp.order_line_num
              ) AS DD
