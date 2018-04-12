@@ -549,7 +549,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             if (valueList.contains(seasons[0])) {
                 for (String seasonCode : seasons) {
                     if (!valueList.contains(seasonCode)) {
-                        return "SUCCESS";
+                        return "Already exist multiple.";
                     }
                 }
 
