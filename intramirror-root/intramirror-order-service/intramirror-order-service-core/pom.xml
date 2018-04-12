@@ -120,6 +120,12 @@
             <version>1.0.11-SNAPSHOT</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.intramirror</groupId>
+            <artifactId>lib-web-common</artifactId>
+            <version>1.0.11-SNAPSHOT</version>
+        </dependency>
+
     </dependencies>
     <build>
         <finalName>intramirror-product-service-core</finalName>

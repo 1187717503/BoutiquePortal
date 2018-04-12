@@ -237,7 +237,11 @@ public class ContentMgntController {
             product.put("totalStock", productStock.get(Long.parseLong(product.get("product_id").toString())));
             Category rootCategory = categoryCache.getRootCategory(Long.parseLong(product.get("category_id").toString()));
             if (rootCategory != null) {
-                product.put("gender", rootCategory.getName());
+                if (rootCategory.getName().equals("Baby") || rootCategory.getName().equals("Boy")) {
+                    product.put("gender", rootCategory.getName());
+                } else {
+                    product.put("gender", rootCategory.getName().substring(0, 1));
+                }
             }
 
             //            setPriceDiscount(product, priceList);

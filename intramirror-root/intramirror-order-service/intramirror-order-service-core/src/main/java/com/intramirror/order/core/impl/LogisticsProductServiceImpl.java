@@ -1,11 +1,13 @@
 package com.intramirror.order.core.impl;
 
+import com.google.gson.Gson;
 import com.intramirror.common.Helper;
 import com.intramirror.jpush.JPushService;
 import com.intramirror.jpush.UnSupportActionTypeException;
 import com.intramirror.jpush.entity.OrderStatusUpdateEntity;
 import com.intramirror.jpush.enums.EmActionType;
 import com.intramirror.order.api.common.OrderStatusType;
+import com.intramirror.order.api.dto.OrderStatusChangeMsgDTO;
 import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.core.dao.BaseDao;
@@ -13,6 +15,7 @@ import com.intramirror.order.core.mapper.LogisticsProductMapper;
 
 import java.util.*;
 
+import com.intramirror.order.core.utils.KafkaMessageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +55,9 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
             logger.info("JPush 已经塞入线程池处理");
         }
 
+        // 发送订单状态变化消息
+        sendOrderStatusChangeBroadcastMsg(logisticsProduct);
+
         if (status == OrderStatusType.ORDERED) {
             //如果修改状态为shipped修改shippedat
             logisticsProduct.setShipped_at(Helper.getCurrentUTCTime());
@@ -61,6 +67,23 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
         }
         return logisticsProductMapper.updateByLogisticsProduct(logisticsProduct);
 
+    }
+
+    private void sendOrderStatusChangeBroadcastMsg(LogisticsProduct logisticsProduct) {
+        if(logisticsProduct == null){
+            return;
+        }
+
+        Gson gson = new Gson();
+
+        OrderStatusChangeMsgDTO orderStatusChangeMsgDTO = new OrderStatusChangeMsgDTO();
+        orderStatusChangeMsgDTO.setLogisticsProductId(logisticsProduct.getLogistics_product_id());
+        orderStatusChangeMsgDTO.setOrderLineNum(logisticsProduct.getOrder_line_num());
+        orderStatusChangeMsgDTO.setStatus(logisticsProduct.getStatus());
+        orderStatusChangeMsgDTO.setTriggerTime((new Date()).getTime());
+
+        String msg = gson.toJson(orderStatusChangeMsgDTO);
+        KafkaMessageUtil.sendMsgToOrderChangeKafka(msg);
     }
 
     //	/**

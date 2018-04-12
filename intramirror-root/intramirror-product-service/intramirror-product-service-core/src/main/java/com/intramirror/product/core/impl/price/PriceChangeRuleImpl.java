@@ -8,6 +8,7 @@ import com.intramirror.common.enums.PriceChangeRuleEnum;
 import com.intramirror.common.enums.SystemPropertyEnum;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.help.StringUtils;
+import com.intramirror.common.utils.DateUtils;
 import com.intramirror.product.api.model.PriceChangeRule;
 import com.intramirror.product.api.model.PriceChangeRuleSeasonGroup;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
@@ -93,13 +94,14 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
 
     @Override
 
-    public boolean updateVendorPrice(Long vendor_id, int categoryType) throws Exception {
+    public boolean updateVendorPrice(Long vendor_id, int categoryType,long price_change_rule_id) throws Exception {
         Map<String, Object> paramsMap = new HashMap<>();
         List<Map<String, Object>> paramsList = new ArrayList<>();
         paramsMap.put("price_type", PriceChangeRuleEnum.PriceType.SUPPLY_PRICE.getCode());
         paramsMap.put("preview_status", "1");
         paramsMap.put("vendor_id", vendor_id);
         paramsMap.put("category_type", categoryType);
+        paramsMap.put("price_change_rule_id",price_change_rule_id);
         List<Map<String, Object>> selSeasonGroupRuleMaps = priceChangeRuleMapper.selectSeasonGroupRule(paramsMap);
         if (selSeasonGroupRuleMaps != null && selSeasonGroupRuleMaps.size() > 0) {
             List<Map<String, Object>> selSecondCategoryRuleMaps = priceChangeRuleMapper.selectSecondCategoryRule(paramsMap);
@@ -123,13 +125,14 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     }
 
     @Override
-    public boolean updateAdminPrice(Long vendor_id, int categoryType) {
+    public boolean updateAdminPrice(Long vendor_id, int categoryType,long price_change_rule_id) {
         Map<String, Object> paramsMap = new HashMap<>();
         List<Map<String, Object>> paramsList = new ArrayList<>();
         paramsMap.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
         paramsMap.put("preview_status", "1");
         paramsMap.put("vendor_id", vendor_id);
         paramsMap.put("category_type", categoryType);
+        paramsMap.put("price_change_rule_id",price_change_rule_id);
 
         List<Map<String, Object>> selSeasonGroupRuleMaps = priceChangeRuleMapper.selectSeasonGroupRule(paramsMap);
         if (selSeasonGroupRuleMaps != null && selSeasonGroupRuleMaps.size() > 0) {
@@ -452,16 +455,31 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
 
     private boolean updateRuleStatus(Map<String, Object> params) {
         List<Map<String, Object>> selNowRuleMaps = priceChangeRuleMapper.selNowRule(params);
+//        List<Map<String, Object>> selectRuleInActiveMaps = priceChangeRuleMapper.selectRuleInActive(params);
+        params.put("now", DateUtils.getformatDate(new Date()));
         if (selNowRuleMaps != null && selNowRuleMaps.size() > 0) {
             for (Map<String, Object> map : selNowRuleMaps) {
                 //                params.put("price_change_rule_id",map.get("price_change_rule_id"));
                 params.put("vendor_id", map.get("vendor_id"));
+                params.put("price_change_rule_id", map.get("price_change_rule_id"));
                 priceChangeRuleMapper.updateRuleInActive(params);
             }
 
             for (Map<String, Object> map : selNowRuleMaps) {
                 params.put("price_change_rule_id", map.get("price_change_rule_id"));
                 priceChangeRuleMapper.updateRuleActive(params);
+            }
+        }
+
+        List<Map<String, Object>> selectRuleInActiveMaps = priceChangeRuleMapper.selectRuleInActive(params);
+        for (Map<String, Object> activeMap : selectRuleInActiveMaps) {
+            List<Map<String, Object>> activeMaps = new ArrayList<>();
+            try {
+                activeMaps.add(activeMap);
+                this.copyAllRuleByActivePending(activeMaps, activeMap.get("vendor_id").toString(), "0", true, 999L,
+                        Integer.parseInt(activeMap.get("price_type").toString()));
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         return true;

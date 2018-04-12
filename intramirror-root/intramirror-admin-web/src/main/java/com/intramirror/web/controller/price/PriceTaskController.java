@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,7 +39,7 @@ public class PriceTaskController {
                 this.syncIm();
             }
 
-            this.syncRedundantTable();
+            this.syncAllRedundantTable();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -49,22 +50,12 @@ public class PriceTaskController {
         return Response.success();
     }
 
-    @GetMapping("/sync/preview")
+    @PostMapping("/sync/preview")
     public Response synPreview() {
         long start = System.currentTimeMillis();
         logger.info("Start synchronous activity price.");
         try {
-            // product.preview_im_price -> sku.im_price
-            iPriceChangeRule.updateSkuImPrice();
-
-            // sku.im_price -> product.min_im_price,product.max_im_price
-            iPriceChangeRule.updateProductImPrice();
-
-            // sku.im_price -> shop_product_sku.sale_price
-            iPriceChangeRule.updateShopPrice();
-
-            // shop_product_sku.sale_price -> shop_product.min_sale_price,shop_product.max_sale_price
-            iPriceChangeRule.updateShopProductSalePrice();
+            this.syncPreviewRedundantTable();
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("Execution of discounts,e:{}", e);
@@ -89,7 +80,7 @@ public class PriceTaskController {
      *
      * @throws Exception
      */
-    private void syncRedundantTable() throws Exception {
+    public synchronized void syncAllRedundantTable() throws Exception {
         // sku.im_price -> shop_product_sku.sale_price
         iPriceChangeRule.updateShopPrice();
 
@@ -104,6 +95,20 @@ public class PriceTaskController {
 
         // sku.im_price -> product.min_im_price,product.max_im_price
         iPriceChangeRule.updateProductImPrice();
+    }
+
+    public synchronized void syncPreviewRedundantTable() throws Exception {
+        // product.preview_im_price -> sku.im_price
+        iPriceChangeRule.updateSkuImPrice();
+
+        // sku.im_price -> product.min_im_price,product.max_im_price
+        iPriceChangeRule.updateProductImPrice();
+
+        // sku.im_price -> shop_product_sku.sale_price
+        iPriceChangeRule.updateShopPrice();
+
+        // shop_product_sku.sale_price -> shop_product.min_sale_price,shop_product.max_sale_price
+        iPriceChangeRule.updateShopProductSalePrice();
     }
 
 }

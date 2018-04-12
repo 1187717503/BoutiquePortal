@@ -69,6 +69,9 @@ public class PriceChangeRuleController extends BaseController {
     @Autowired
     private ISystemPropertyService iSystemPropertyService;
 
+    @Autowired
+    private PriceTaskController priceTaskController;
+
     @RequestMapping("/run/im")
     @ResponseBody
     public Response runIm(@Param("price_change_rule_id") String price_change_rule_id) throws Exception {
@@ -76,10 +79,10 @@ public class PriceChangeRuleController extends BaseController {
         PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
 
         logger.info("Begin to refresh the discounts of IM goods,pcrModel:" + JSONObject.toJSONString(pcrModel));
-        priceChangeRule.updateAdminPrice(pcrModel.getVendorId(), pcrModel.getCategoryType().intValue());
+        priceChangeRule.updateAdminPrice(pcrModel.getVendorId(), pcrModel.getCategoryType().intValue(),pcrModel.getPriceChangeRuleId());
         logger.info("End the discounts of IM goods:" + JSONObject.toJSONString(pcrModel));
 
-        // sku.im_price -> shop_product_sku.sale_price
+        /*// sku.im_price -> shop_product_sku.sale_price
         priceChangeRule.updateShopPrice();
 
         // shop_product_sku.sale_price -> shop_product.min_sale_price,shop_product.max_sale_price
@@ -92,7 +95,8 @@ public class PriceChangeRuleController extends BaseController {
         priceChangeRule.updateProductBoutiquePrice();
 
         // sku.im_price -> product.min_im_price,product.max_im_price
-        priceChangeRule.updateProductImPrice();
+        priceChangeRule.updateProductImPrice();*/
+        priceTaskController.syncPreviewRedundantTable();
 
         logger.info("End running IM discounts,price_change_rule_id:" + price_change_rule_id);
         return Response.success();
@@ -106,10 +110,10 @@ public class PriceChangeRuleController extends BaseController {
         PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
 
         logger.info("Begin to refresh the discounts of BOUTIQUE goods,pcrModel:" + JSONObject.toJSONString(pcrModel));
-        priceChangeRule.updateVendorPrice(pcrModel.getVendorId(), pcrModel.getCategoryType());
+        priceChangeRule.updateVendorPrice(pcrModel.getVendorId(), pcrModel.getCategoryType(),pcrModel.getPriceChangeRuleId());
         logger.info("End the discounts of BOUTIQUE goods:" + JSONObject.toJSONString(pcrModel));
 
-        // sku.im_price -> shop_product_sku.sale_price
+        /*// sku.im_price -> shop_product_sku.sale_price
         priceChangeRule.updateShopPrice();
 
         // shop_product_sku.sale_price -> shop_product.min_sale_price,shop_product.max_sale_price
@@ -122,7 +126,8 @@ public class PriceChangeRuleController extends BaseController {
         priceChangeRule.updateProductBoutiquePrice();
 
         // sku.im_price -> product.min_im_price,product.max_im_price
-        priceChangeRule.updateProductImPrice();
+        priceChangeRule.updateProductImPrice();*/
+        priceTaskController.syncPreviewRedundantTable();
         logger.info("End running BOUTIQUE discounts,price_change_rule_id:" + price_change_rule_id);
 
         return Response.success();
