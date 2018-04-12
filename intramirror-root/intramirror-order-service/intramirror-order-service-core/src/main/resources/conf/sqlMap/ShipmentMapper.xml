@@ -6,6 +6,7 @@
 	    <id column="shipment_id" property="shipmentId" jdbcType="BIGINT" />
 	    <result column="ship_to_geography" property="shipToGeography" jdbcType="VARCHAR" />
 	    <result column="status" property="status" jdbcType="BIGINT" />
+	    <result column="shipment_category" property="shipmentCategory" jdbcType="BIGINT" />
 	    <result column="vendor_id" property="vendorId" jdbcType="BIGINT" />
 	    <result column="shipment_no" property="shipmentNo" jdbcType="VARCHAR" />
 	    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />

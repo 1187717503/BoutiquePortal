@@ -409,6 +409,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		shipment.setShipmentNo(top+"SP"+maxNo);
 		shipment.setVendorId(vendorId);
 		shipment.setStatus(ContainerType.OPEN);
+		shipment.setShipmentCategory(oldShipment.getShipmentCategory());
 		shipment.setCreatedAt(currentDate);
 		shipment.setUpdatedAt(currentDate);
 		logger.info("parameter :" + new Gson().toJson(shipment));
