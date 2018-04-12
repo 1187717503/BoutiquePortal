@@ -52,10 +52,10 @@
         <constructor-arg index="1" value="SIMPLE"/>
     </bean>
 
-    <!--<bean id="kafkaMessageUtil" class="com.intramirror.order.core.utils.KafkaMessageUtil" lazy-init="false">
+    <bean id="kafkaMessageUtil" class="com.intramirror.order.core.utils.KafkaMessageUtil" lazy-init="false">
         <property name="kafkaServer" value="${kafka.server}"></property>
         <property name="orderStatusChangeTopic" value="${kafka.topic.order.status}"></property>
-    </bean>-->
+    </bean>
 
     <beans profile="test">
         <context:property-placeholder location="classpath:/test/databases.properties" ignore-unresolvable="true"/>
