@@ -42,7 +42,7 @@ public interface IPriceChangeRule {
      * @throws Exception
      */
     boolean updatePreviewPrice(Long vendor_id, Long preview_status, Integer category_type) throws Exception;
-
+    public String checkSeasonExists(Map<String, Object> params, String season) ;
     /**
      * 定时job修改shop_product.max_sale_price,shop_product.min_sale_price
      * @return

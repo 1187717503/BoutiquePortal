@@ -79,7 +79,7 @@ public class PriceChangeRuleController extends BaseController {
         PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
 
         logger.info("Begin to refresh the discounts of IM goods,pcrModel:" + JSONObject.toJSONString(pcrModel));
-        priceChangeRule.updateAdminPrice(pcrModel.getVendorId(), pcrModel.getCategoryType().intValue(),pcrModel.getPriceChangeRuleId());
+        priceChangeRule.updateAdminPrice(pcrModel.getVendorId(), pcrModel.getCategoryType().intValue(), pcrModel.getPriceChangeRuleId());
         logger.info("End the discounts of IM goods:" + JSONObject.toJSONString(pcrModel));
 
         /*// sku.im_price -> shop_product_sku.sale_price
@@ -110,7 +110,7 @@ public class PriceChangeRuleController extends BaseController {
         PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
 
         logger.info("Begin to refresh the discounts of BOUTIQUE goods,pcrModel:" + JSONObject.toJSONString(pcrModel));
-        priceChangeRule.updateVendorPrice(pcrModel.getVendorId(), pcrModel.getCategoryType(),pcrModel.getPriceChangeRuleId());
+        priceChangeRule.updateVendorPrice(pcrModel.getVendorId(), pcrModel.getCategoryType(), pcrModel.getPriceChangeRuleId());
         logger.info("End the discounts of BOUTIQUE goods:" + JSONObject.toJSONString(pcrModel));
 
         /*// sku.im_price -> shop_product_sku.sale_price
@@ -250,6 +250,11 @@ public class PriceChangeRuleController extends BaseController {
             result.put("info", "parameter is incorrect");
             return result;
         }
+        String checkSeasonExists = priceChangeRule.checkSeasonExists(map, map.get("name").toString());
+        if (!checkSeasonExists.equalsIgnoreCase("SUCCESS")) {
+            result.put("info", checkSeasonExists);
+            return result;
+        }
 
         //调用service 创建 事物管理
         try {
@@ -266,6 +271,7 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 修改PriceChangeRuleCategoryBrand
+     *
      * @param map
      * @return
      */
@@ -336,6 +342,7 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据品牌ID添加下面所有2级类目的PriceChangeRuleCategoryBrand
+     *
      * @param map
      * @return
      */
@@ -368,6 +375,7 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据品牌ID删除下面所有2级类目的PriceChangeRuleCategoryBrand
+     *
      * @param map
      * @return
      */
@@ -454,6 +462,7 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 单个添加PriceChangeRuleCategoryBrand
+     *
      * @param map
      * @return
      */
@@ -514,6 +523,7 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据price_change_rule_category_brand_id 删除PriceChangeRuleCategoryBrand
+     *
      * @param map
      * @return
      */
@@ -553,6 +563,7 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 添加priceChangeRuleProductGroup
+     *
      * @param map
      * @return
      */
@@ -607,6 +618,7 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据price_change_rule_group_id 删除PriceChangeRuleGroup
+     *
      * @param map
      * @return
      */
@@ -646,6 +658,7 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 添加PriceChangeRuleProduct
+     *
      * @param map
      * @return
      */
@@ -718,6 +731,7 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据price_change_rule_product_id 删除PriceChangeRuleProduct
+     *
      * @param map
      * @return
      */
@@ -757,6 +771,7 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 修改 SystemProperty 全局默认折扣
+     *
      * @param map
      * @return
      */
@@ -789,6 +804,7 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 修改PriceChangeRul 修改有效日期
+     *
      * @param map
      * @return
      * @throws Exception
@@ -814,6 +830,7 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据price_change_rule_id 删除PriceChangeRule
+     *
      * @param map
      * @return
      */

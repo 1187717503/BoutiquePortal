@@ -93,15 +93,14 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     }
 
     @Override
-
-    public boolean updateVendorPrice(Long vendor_id, int categoryType,long price_change_rule_id) throws Exception {
+    public boolean updateVendorPrice(Long vendor_id, int categoryType, long price_change_rule_id) throws Exception {
         Map<String, Object> paramsMap = new HashMap<>();
         List<Map<String, Object>> paramsList = new ArrayList<>();
         paramsMap.put("price_type", PriceChangeRuleEnum.PriceType.SUPPLY_PRICE.getCode());
         paramsMap.put("preview_status", "1");
         paramsMap.put("vendor_id", vendor_id);
         paramsMap.put("category_type", categoryType);
-        paramsMap.put("price_change_rule_id",price_change_rule_id);
+        paramsMap.put("price_change_rule_id", price_change_rule_id);
         List<Map<String, Object>> selSeasonGroupRuleMaps = priceChangeRuleMapper.selectSeasonGroupRule(paramsMap);
         if (selSeasonGroupRuleMaps != null && selSeasonGroupRuleMaps.size() > 0) {
             List<Map<String, Object>> selSecondCategoryRuleMaps = priceChangeRuleMapper.selectSecondCategoryRule(paramsMap);
@@ -125,14 +124,14 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     }
 
     @Override
-    public boolean updateAdminPrice(Long vendor_id, int categoryType,long price_change_rule_id) {
+    public boolean updateAdminPrice(Long vendor_id, int categoryType, long price_change_rule_id) {
         Map<String, Object> paramsMap = new HashMap<>();
         List<Map<String, Object>> paramsList = new ArrayList<>();
         paramsMap.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
         paramsMap.put("preview_status", "1");
         paramsMap.put("vendor_id", vendor_id);
         paramsMap.put("category_type", categoryType);
-        paramsMap.put("price_change_rule_id",price_change_rule_id);
+        paramsMap.put("price_change_rule_id", price_change_rule_id);
 
         List<Map<String, Object>> selSeasonGroupRuleMaps = priceChangeRuleMapper.selectSeasonGroupRule(paramsMap);
         if (selSeasonGroupRuleMaps != null && selSeasonGroupRuleMaps.size() > 0) {
@@ -455,7 +454,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
 
     private boolean updateRuleStatus(Map<String, Object> params) {
         List<Map<String, Object>> selNowRuleMaps = priceChangeRuleMapper.selNowRule(params);
-//        List<Map<String, Object>> selectRuleInActiveMaps = priceChangeRuleMapper.selectRuleInActive(params);
+        //        List<Map<String, Object>> selectRuleInActiveMaps = priceChangeRuleMapper.selectRuleInActive(params);
         params.put("now", DateUtils.getformatDate(new Date()));
         if (selNowRuleMaps != null && selNowRuleMaps.size() > 0) {
             for (Map<String, Object> map : selNowRuleMaps) {
@@ -524,6 +523,45 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         return priceChangeRuleMapper.updateByPrimaryKeySelective(record);
     }
 
+    public String checkSeasonExists(Map<String, Object> params, String season) {
+        String[] seasons = season.split(",");
+        List<Map<String, Object>> datas = priceChangeRuleMapper.selectActiveSeason(params);
+        if (datas == null || datas.size() == 0) {
+            return "SUCCESS";
+        }
+
+        Map<String, List<String>> seasonRules = new HashMap<>();
+        for (Map<String, Object> data : datas) {
+            String price_rule_id = data.get("price_change_rule_id").toString();
+            String season_code = data.get("season_code").toString();
+
+            if (seasonRules.get(price_rule_id) == null) {
+                List<String> seasonList = new ArrayList<>();
+                seasonList.add(season_code);
+                seasonRules.put(price_rule_id, seasonList);
+            } else {
+                seasonRules.get(price_rule_id).add(season_code);
+            }
+        }
+
+        for (String key : seasonRules.keySet()) {
+            List<String> valueList = seasonRules.get(key);
+            if (valueList.contains(seasons[0])) {
+                for (String seasonCode : seasons) {
+                    if (!valueList.contains(seasonCode)) {
+                        return "SUCCESS";
+                    }
+                }
+
+                if (valueList.size() != seasons.length) {
+                    return "Already exist multiple.";
+                }
+            }
+        }
+
+        return "SUCCESS";
+    }
+
     @Transactional
     @Override
     public ResultMessage copyRuleByVendor(Map<String, Object> params) throws Exception {
@@ -573,6 +611,16 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         PriceChangeRule priceChangeRule = priceChangeRuleMapper.selectByPrimaryKey(Long.parseLong(params.get("price_change_rule_id").toString()));
         params.put("categoryType", priceChangeRule.getCategoryType());
         params.put("season_codes", season_codes);
+
+        Map<String, Object> checkParam = new HashMap<>();
+        checkParam.put("vendorId", vendor_id);
+        checkParam.put("price_type", params.get("price_type").toString());
+        checkParam.put("categoryType", priceChangeRule.getCategoryType());
+        String check = checkSeasonExists(params, seasons);
+        if (!check.equalsIgnoreCase("SUCCESS")) {
+            return resultMessage.errorStatus().putMsg("info", check);
+        }
+
         List<Map<String, Object>> seasonCodeMaps = seasonMapper.querySeasonByVendor(params);
 
         if (seasonCodeMaps != null && seasonCodeMaps.size() > 0) {

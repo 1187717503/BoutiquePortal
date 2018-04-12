@@ -676,6 +676,14 @@
         pcr.`status` = 3
         and pcr.backup_at = #{now,jdbcType=VARCHAR}
     </select>
+
+
+    <select id="selectActiveSeason" resultType="java.util.Map"  parameterType="java.util.Map">
+        select pcr.price_change_rule_id,pcrsg.season_code from price_change_rule pcr
+        inner join price_change_rule_season_group pcrsg on(pcr.price_change_rule_id = pcrsg.price_change_rule_id)
+        where pcr.vendor_id = #{vendorId,jdbcType=BIGINT} and pcr.`status` = 2 and pcr.price_type = #{price_type,jdbcType=BIGINT} and pcr.category_type = #{categoryType,jdbcType=BIGINT}
+    </select>
+
     <!--
         and pcrsg.season_code in (
         select season_code from price_change_rule_season_group where price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
