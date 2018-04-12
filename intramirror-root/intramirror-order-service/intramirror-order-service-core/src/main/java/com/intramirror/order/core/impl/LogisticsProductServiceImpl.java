@@ -80,7 +80,7 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
         orderStatusChangeMsgDTO.setLogisticsProductId(logisticsProduct.getLogistics_product_id());
         orderStatusChangeMsgDTO.setOrderLineNum(logisticsProduct.getOrder_line_num());
         orderStatusChangeMsgDTO.setStatus(logisticsProduct.getStatus());
-        orderStatusChangeMsgDTO.setTriggerTime(new Date());
+        orderStatusChangeMsgDTO.setTriggerTime((new Date()).getTime());
 
         String msg = gson.toJson(orderStatusChangeMsgDTO);
         KafkaMessageUtil.sendMsgToOrderChangeKafka(msg);
