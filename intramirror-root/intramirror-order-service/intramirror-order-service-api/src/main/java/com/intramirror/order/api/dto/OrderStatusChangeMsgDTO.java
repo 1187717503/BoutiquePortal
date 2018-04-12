@@ -12,7 +12,7 @@ public class OrderStatusChangeMsgDTO {
     private String parentOrderNum;
     private Integer status;
     private Long userId;
-    private Date triggerTime;
+    private Long triggerTime;
 
     public Long getLogisticsProductId() {
         return logisticsProductId;
@@ -62,11 +62,11 @@ public class OrderStatusChangeMsgDTO {
         this.userId = userId;
     }
 
-    public Date getTriggerTime() {
+    public Long getTriggerTime() {
         return triggerTime;
     }
 
-    public void setTriggerTime(Date triggerTime) {
+    public void setTriggerTime(Long triggerTime) {
         this.triggerTime = triggerTime;
     }
 
