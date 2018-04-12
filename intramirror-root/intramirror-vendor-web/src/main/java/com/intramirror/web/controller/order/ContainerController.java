@@ -302,6 +302,7 @@ public class ContainerController {
 					Map<String, Object> submap = new HashMap<>();
 					for (SubShipment subShipment : subList) {
 						submap.put("sub_shipment_id", subShipment.getSubShipmentId());
+						submap.put("container_id",container.getContainerId());
 						List<LogisticProductShipment> lpsList = logisticProductShipmentService.selectById(submap);
 						if (null != lpsList && 0 < lpsList.size()){
 							for (LogisticProductShipment lps : lpsList) {

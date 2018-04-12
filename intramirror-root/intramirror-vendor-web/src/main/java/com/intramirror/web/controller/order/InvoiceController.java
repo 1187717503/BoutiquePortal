@@ -54,7 +54,6 @@ public class InvoiceController extends BaseController{
 	
 	/**
 	 * 创建invoice
-	 * @param invoice invoiceDate shipmentId
 	 * @param httpRequest
 	 * @return
 	 */
@@ -115,7 +114,7 @@ public class InvoiceController extends BaseController{
 			invoice.setEnabled(EnabledType.USED);
 			invoice.setInvoiceNum(map.get("invoiceNo").toString());
 			invoice.setInvoiceDate(sdf2.parse(map.get("invoiceDate").toString()));
-			invoice.setVatNum(0l);
+			invoice.setVatNum(Long.parseLong(vendor.getBusinessLicenseNumber()));
 			invoice.setVendorId(vendor.getVendorId());
 			
 			invoiceService.insertSelective(invoice);

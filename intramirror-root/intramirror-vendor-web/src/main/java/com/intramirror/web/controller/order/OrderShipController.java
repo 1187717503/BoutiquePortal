@@ -169,7 +169,6 @@ public class OrderShipController extends BaseController {
                 paramtMap.put("status", OrderStatusType.READYTOSHIP);
                 List<Map<String, Object>> orderList = orderService.getOrderListByShipmentId(paramtMap);
 
-
                 for (Map<String, Object> container : containerList) {
                     List<Map<String,Object>> orderListContain = new LinkedList<>();
                     String containerId = container.get("container_id").toString();
@@ -382,17 +381,23 @@ public class OrderShipController extends BaseController {
 
     @RequestMapping(value = "/getStockLocation", method = RequestMethod.GET)
     @ResponseBody
-    public ResultMessage getStockLocation(Long vendorId) {
+    public ResultMessage getStockLocation(Long userId) {
         ResultMessage result = new ResultMessage();
         result.errorStatus();
-        if (vendorId == null || vendorId == 0){
+        if (userId == null || userId == 0){
             result.setMsg("parameters vendorId is null ");
             return result;
         }
         try {
-            List<StockLocation> stockLocationList = stockLocationService.getStockLocation(vendorId);
-            result.successStatus();
-            result.setData(stockLocationList);
+            Vendor vendor = vendorService.getVendorByUserId(userId);
+            if (vendor != null){
+                List<StockLocation> stockLocationList = stockLocationService.getStockLocation(vendor.getVendorId());
+                result.successStatus();
+                result.setData(stockLocationList);
+            }else {
+                result.setMsg("此用户未注册买手店");
+                return result;
+            }
         } catch (Exception e) {
             e.printStackTrace();
             result.setMsg("Query StockLocation list fail,Check parameters, please ");

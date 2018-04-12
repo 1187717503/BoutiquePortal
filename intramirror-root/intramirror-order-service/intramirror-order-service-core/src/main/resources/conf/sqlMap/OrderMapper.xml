@@ -166,7 +166,7 @@
         LEFT JOIN `user` uu on(uu.user_id=oe.modified_by_user_id)
         where pspk.`name` = 'Size' and lp.`status` = #{status,jdbcType=BIGINT} and lp.enabled = 1
         and v.vendor_id = #{vendorId,jdbcType=BIGINT}
-        <if test="categoryIds != null">
+        <if test="categoryIds != null and categoryIds.size > 0">
             and p.category_id in
             <foreach item="item" index="index" collection="categoryIds" open="(" separator="," close=")">
                 #{item}
@@ -174,6 +174,9 @@
         </if>
         <if test="brandId != null">
             and p.brand_id = #{brandId}
+        </if>
+        <if test="stockLocation != null">
+            and lp.stock_Location = #{stockLocation,jdbcType=VARCHAR}
         </if>
         GROUP BY lp.order_line_num
 

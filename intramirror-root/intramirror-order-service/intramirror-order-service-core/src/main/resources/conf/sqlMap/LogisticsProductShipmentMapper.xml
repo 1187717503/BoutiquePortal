@@ -13,8 +13,9 @@
   </insert>
 
   <select id="selectById" resultMap="BaseResultMap" parameterType="java.lang.Long" >
-   select *  from logistic_product_shipment 
-		where sub_shipment_id = #{sub_shipment_id,jdbcType=BIGINT}
+	select lps.*  from logistic_product_shipment lps
+      INNER JOIN logistics_product lp on lp.logistics_product_id = lps.logistic_product_id
+	  where lps.sub_shipment_id =#{sub_shipment_id,jdbcType=BIGINT}  and lp.container_id = #{container_id,jdbcType=BIGINT}
   </select>
   
    <select id="selectByCondition" resultMap="BaseResultMap" parameterType="java.util.Map" >
