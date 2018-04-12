@@ -27,6 +27,7 @@ import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.VendorService;
 import com.intramirror.web.controller.BaseController;
+import com.intramirror.web.common.cache.CategoryCache;
 import com.intramirror.web.service.LogisticsProductService;
 import com.intramirror.web.service.OrderRefund;
 import com.intramirror.web.service.OrderService;
@@ -34,10 +35,8 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.text.MessageFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -102,6 +101,9 @@ public class OrderController extends BaseController {
     @Autowired
     private IProductService productService;
 
+    @Autowired
+    private CategoryCache categoryCache;
+
     /**
      * 获取订单列表
      * @param map
@@ -143,6 +145,10 @@ public class OrderController extends BaseController {
         } else {
             sortByName = "created_at";
         }
+        List<Long> categoryIds = new ArrayList<>();
+        if (map.get("categoryId") != null) {
+            categoryIds = categoryCache.getAllChildCategory(Long.parseLong(map.get("categoryId").toString()));
+        }
 
         Long vendorId = vendor.getVendorId();
         String status = map.get("status").toString();
@@ -156,7 +162,13 @@ public class OrderController extends BaseController {
             map.put("vendorId",vendorId);
             orderCancelList = orderService.getOrderCancelList(map);
         }else {
-            orderList = orderService.getOrderListByStatus(Integer.parseInt(status), vendorId, sortByName);
+            Map<String, Object> params = new HashMap<>();
+            params.put("status", status);
+            params.put("vendorId", vendorId);
+            params.put("sortByName", sortByName);
+            params.put("categoryIds", categoryIds);
+            params.put("brandId", map.get("brandId"));
+            orderList = orderService.getOrderListByParams(params);
         }
 
         if (orderList != null && orderList.size() > 0) {

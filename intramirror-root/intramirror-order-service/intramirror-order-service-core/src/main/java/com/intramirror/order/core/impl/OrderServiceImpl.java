@@ -440,4 +440,31 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
         params.put("status",status);
         orderMapper.updateOrderByOrderLogisticsId(params);
     }
+
+    @Override
+    public List<Map<String, Object>> getOrderListByParams(Map<String, Object> params) {
+        Map<String, Object> conditionMap = new HashMap<String, Object>();
+        if (paramCheck(params.get("status"))) {
+            conditionMap.put("status", params.get("status"));
+        }
+        if (paramCheck(params.get("vendorId"))) {
+            conditionMap.put("vendorId", params.get("vendorId"));
+        }
+        if (paramCheck(params.get("sortByName"))) {
+            conditionMap.put(params.get("sortByName").toString(), params.get("sortByName"));
+        }
+        if (params.get("categoryIds") != null) {
+            conditionMap.put("categoryIds", params.get("categoryIds"));
+        }
+        if (paramCheck(params.get("brandId"))) {
+            conditionMap.put("brandId", params.get("brandId"));
+        }
+        List<Map<String, Object>> mapList = orderMapper.getOrderListByStatus(conditionMap);
+        addProductPropertyMap(mapList);
+        return mapList;
+    }
+
+    private boolean paramCheck(Object obj) {
+        return obj != null && StringUtils.isNoneBlank(obj.toString());
+    }
 }

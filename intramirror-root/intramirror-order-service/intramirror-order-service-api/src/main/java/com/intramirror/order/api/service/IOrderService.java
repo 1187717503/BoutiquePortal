@@ -169,4 +169,12 @@ public interface IOrderService {
      */
     void updateOrderByOrderLogisticsId(Long orderLogisticsId , int status);
 
+    /**
+     * 根据 订单状态获取子订单列表
+     *
+     * @param params
+     * @return
+     */
+    List<Map<String, Object>> getOrderListByParams(Map<String, Object> params);
+
 }
