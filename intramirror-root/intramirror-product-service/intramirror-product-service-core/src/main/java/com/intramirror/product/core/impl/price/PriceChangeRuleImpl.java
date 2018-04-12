@@ -616,7 +616,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         checkParam.put("vendorId", vendor_id);
         checkParam.put("price_type", params.get("price_type").toString());
         checkParam.put("categoryType", priceChangeRule.getCategoryType());
-        String check = checkSeasonExists(params, seasons);
+        String check = checkSeasonExists(checkParam, seasons);
         if (!check.equalsIgnoreCase("SUCCESS")) {
             return resultMessage.errorStatus().putMsg("info", check);
         }
