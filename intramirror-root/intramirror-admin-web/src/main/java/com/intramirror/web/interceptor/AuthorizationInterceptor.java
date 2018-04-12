@@ -1,6 +1,7 @@
 package com.intramirror.web.interceptor;
 
 import com.intramirror.core.common.exception.StandardExceptions;
+import com.intramirror.core.servlet.interceptor.AuthenticationInterceptor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
  */
 public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(AuthorizationInterceptor.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(AuthenticationInterceptor.class);
 
     private static List<String> passUrlList;
 
