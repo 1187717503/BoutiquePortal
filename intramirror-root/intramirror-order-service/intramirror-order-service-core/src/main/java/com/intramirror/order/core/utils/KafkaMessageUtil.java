@@ -26,4 +26,20 @@ public class KafkaMessageUtil {
     public static void sendMsgToOrderChangeKafka(String msg) {
         sendMsgToKafka(msg, orderStatusChangeTopic, kafkaServer);
     }
+
+    public static String getOrderStatusChangeTopic() {
+        return orderStatusChangeTopic;
+    }
+
+    public static void setOrderStatusChangeTopic(String orderStatusChangeTopic) {
+        KafkaMessageUtil.orderStatusChangeTopic = orderStatusChangeTopic;
+    }
+
+    public static String getKafkaServer() {
+        return kafkaServer;
+    }
+
+    public static void setKafkaServer(String kafkaServer) {
+        KafkaMessageUtil.kafkaServer = kafkaServer;
+    }
 }
