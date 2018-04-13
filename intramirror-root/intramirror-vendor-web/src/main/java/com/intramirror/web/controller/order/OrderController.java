@@ -47,6 +47,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.apache.poi.hssf.usermodel.*;
@@ -183,6 +184,8 @@ public class OrderController extends BaseController {
             params.put("sortByName", sortByName);
             params.put("categoryIds", categoryIds);
             params.put("brandId", map.get("brandId"));
+            params.put("stockLocation", map.get("stockLocation"));
+            params.put("logisticsProductIds", map.get("logisticsProductIds"));
             orderList = orderService.getOrderListByParams(params);
         }
 
@@ -1194,16 +1197,14 @@ public class OrderController extends BaseController {
     /**
      * 导出订单列表
      * @param status
-     * @param sortByName
-     * @param categoryId
-     * @param brandId
+     * @param logisticsProductIds
      * @param httpRequest
      * @param httpResponse
      * @return
      */
     @RequestMapping(value = "/exportOrderList")
-    public void exportOrderList(@Param("status") String status, @Param("sortByName") String sortByName, @Param("categoryId") String categoryId,
-                                         @Param("brandId") String brandId, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+    public void exportOrderList(@Param("status") String status, @Param("logisticsProductIds") String logisticsProductIds,
+                                HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
         User user = this.getUser(httpRequest);
 
         Vendor vendor = null;
@@ -1213,25 +1214,20 @@ public class OrderController extends BaseController {
             e.printStackTrace();
         }
 
-        if (StringUtil.isEmpty(sortByName)) {
-            sortByName = "created_at";
-        }
-        List<Long> categoryIds = new ArrayList<>();
-        if (StringUtil.isNotEmpty(categoryId)) {
-            categoryIds = categoryCache.getAllChildCategory(Long.parseLong(categoryId));
+        List<Long> logisticsProductIdList = new ArrayList<>();
+        if (StringUtil.isNotEmpty(logisticsProductIds)) {
+            logisticsProductIdList = Arrays.asList((Long[]) ConvertUtils.convert(logisticsProductIds.split(","), Long.class));
         }
 
         Long vendorId = vendor.getVendorId();
         //根据订单状态查询订单
-        logger.info(MessageFormat.format("order getOrderList 调用接口 orderService.getOrderListByStatus 查询订单信息  入参 status:{0},vendorId:{1},sortByName:{2}",
-                status, vendorId, sortByName));
+        logger.info(MessageFormat.format("order getOrderList 调用接口 orderService.getOrderListByParams 查询订单信息  入参 status:{0},vendorId:{1},logisticsProductIdList:{2}",
+                status, vendorId, logisticsProductIdList));
         List<Map<String, Object>> orderList = null;
         Map<String, Object> params = new HashMap<>();
         params.put("status", status);
         params.put("vendorId", vendorId);
-        params.put("sortByName", sortByName);
-        params.put("categoryIds", categoryIds);
-        params.put("brandId", brandId);
+        params.put("logisticsProductIds", logisticsProductIdList);
         orderList = orderService.getOrderListByParams(params);
 
         if (orderList != null && orderList.size() > 0) {
