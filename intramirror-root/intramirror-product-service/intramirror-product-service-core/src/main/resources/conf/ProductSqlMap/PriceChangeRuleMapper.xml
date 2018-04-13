@@ -370,7 +370,7 @@
         select pcr.`vendor_id` , GROUP_CONCAT(pcrsg.`season_code`) as season_codes  from price_change_rule pcr
         inner join price_change_rule_season_group pcrsg on (pcrsg.price_change_rule_id = pcr.price_change_rule_id and pcrsg.enabled = 1)
         where pcr.price_type = #{price_type,jdbcType=BIGINT} and pcrsg.`season_code`  is not null
-        and pcr.`status` = 2  group by pcr.`vendor_id`
+        and pcr.`status` = 2 and category_type =  #{category_type,jdbcType=BIGINT} group by pcr.`vendor_id`
     </select>
 
     <select id="selectSecondCategoryRule" resultType="java.util.Map" parameterType="java.util.Map">
@@ -671,14 +671,14 @@
         )
     </update>
 
-    <select id="selectRuleInActive" resultType="java.util.Map"  parameterType="java.util.Map">
+    <select id="selectRuleInActive" resultType="java.util.Map" parameterType="java.util.Map">
         select * from price_change_rule pcr where
         pcr.`status` = 3
         and pcr.backup_at = #{now,jdbcType=VARCHAR}
     </select>
 
 
-    <select id="selectActiveSeason" resultType="java.util.Map"  parameterType="java.util.Map">
+    <select id="selectActiveSeason" resultType="java.util.Map" parameterType="java.util.Map">
         select pcr.price_change_rule_id,pcrsg.season_code from price_change_rule pcr
         inner join price_change_rule_season_group pcrsg on(pcr.price_change_rule_id = pcrsg.price_change_rule_id)
         where pcr.vendor_id = #{vendorId,jdbcType=BIGINT} and pcr.`status` = 2 and pcr.price_type = #{price_type,jdbcType=BIGINT} and pcr.category_type = #{categoryType,jdbcType=BIGINT}
@@ -693,6 +693,12 @@
 
         update sku
         inner join `product` p on(sku.`product_id` = p.`product_id` )
+        <if test="category_type == 1">
+            inner join category c3 on(c3.category_id = p.category_id and c3.enabled = 1 and c3.parent_id in (1504,1505,1506,1507,1569,1584,1598,1608))
+        </if>
+        <if test="category_type == 2">
+            inner join category c3 on(c3.category_id = p.category_id and c3.enabled = 1 and c3.parent_id in (1760,1761,1762,1763,1764,1765,1766,1767,1768))
+        </if>
         set sku.`in_price` = sku.price * #{default_discount_percentage,jdbcType=BIGINT}/((1+0.22)*100)
         where p.`enabled` =1 and sku.`enabled` =1 and p.`vendor_id` = #{vendor_id,jdbcType=BIGINT}
         and p.`season_code` not in
@@ -705,6 +711,12 @@
 
         update sku
         inner join `product` p on(sku.`product_id` = p.`product_id` )
+        <if test="category_type == 1">
+            inner join category c3 on(c3.category_id = p.category_id and c3.enabled = 1 and c3.parent_id in (1504,1505,1506,1507,1569,1584,1598,1608))
+        </if>
+        <if test="category_type == 2">
+            inner join category c3 on(c3.category_id = p.category_id and c3.enabled = 1 and c3.parent_id in (1760,1761,1762,1763,1764,1765,1766,1767,1768))
+        </if>
         set sku.`im_price` = sku.price * #{default_discount_percentage,jdbcType=BIGINT}/100
         where p.`enabled` =1 and sku.`enabled` =1 and p.`vendor_id` = #{vendor_id,jdbcType=BIGINT}
         and p.`season_code` not in
@@ -755,6 +767,9 @@
         /*inner join `price_change_rule`  pcr on(p.`vendor_id` = pcr.`vendor_id` )*/
         set p.`preview_im_price`  = null
         where p.`vendor_id`  = #{vendor_id,jdbcType=BIGINT} <![CDATA[ and p.`preview_im_price`  >=  s.`im_price`
+
+
+
 
 
 
