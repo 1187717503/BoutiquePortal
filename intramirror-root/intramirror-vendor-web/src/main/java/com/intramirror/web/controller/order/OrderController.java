@@ -1322,6 +1322,7 @@ public class OrderController extends BaseController {
 
         int rowLength = 0;
         HSSFSheet sheet = workbook.createSheet(excelName);
+        sheet.setDefaultColumnWidth(16);
 
         //图片处理
         HSSFPatriarch patriarch = sheet.createDrawingPatriarch();
@@ -1340,7 +1341,8 @@ public class OrderController extends BaseController {
         HSSFCell cell = null;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm");
         for (Map<String, Object> order : orderList) {
-            row = sheet.createRow(rowLength++);
+            row = sheet.createRow(rowLength);
+            row.setHeightInPoints(125F);
             String[] values = {
                     transforNullValue(order.get("order_line_num")),
                     transforNullValue(sdf.format(order.get("created_at"))),
@@ -1361,11 +1363,12 @@ public class OrderController extends BaseController {
                 if (i == 2) {
                     String urlList = values[i];
                     JsonArray urlJsonArray = new JsonParser().parse(urlList).getAsJsonArray();
-                    generateProductImage(workbook, patriarch, new Gson().fromJson(urlJsonArray.get(0), String.class), i);
+                    generateProductImage(workbook, patriarch, new Gson().fromJson(urlJsonArray.get(0), String.class), i, rowLength);
                 } else {
                     cell.setCellValue(values[i]);
                 }
             }
+            rowLength++;
         }
 
         FileOutputStream fileOut = null;
@@ -1387,7 +1390,7 @@ public class OrderController extends BaseController {
         return filePath;
     }
 
-    private void generateProductImage(HSSFWorkbook workbook, HSSFPatriarch patriarch, String pictureUrl, int i) {
+    private void generateProductImage(HSSFWorkbook workbook, HSSFPatriarch patriarch, String pictureUrl, int i, int j) {
         //处理商品图片
         if (StringUtils.isNotBlank(pictureUrl)) {
             try {
@@ -1407,7 +1410,7 @@ public class OrderController extends BaseController {
                 inStream.close();
                 byte[] data = outStream.toByteArray();
                 //anchor主要用于设置图片的属性
-                HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 98, 125, (short) 0, i, (short) 0, i);
+                HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, (short) i, j, (short) (i + 1), j + 1);
                 //Sets the anchor type （图片在单元格的位置）
                 //0 = Move and size with Cells, 2 = Move but don't size with cells, 3 = Don't move or size with cells.
                 anchor.setAnchorType(0);
