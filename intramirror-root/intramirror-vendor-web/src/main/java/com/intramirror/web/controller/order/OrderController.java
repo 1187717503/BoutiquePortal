@@ -1198,16 +1198,28 @@ public class OrderController extends BaseController {
 
     /**
      * 导出订单列表
-     * @param status
-     * @param logisticsProductIds
+     * @param map
      * @param httpRequest
      * @param httpResponse
      * @return
      */
-    @RequestMapping(value = "/exportOrderList")
-    public void exportOrderList(@Param("status") String status, @Param("logisticsProductIds") String logisticsProductIds,
-                                HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+    @RequestMapping(value = "/exportOrderList", method = RequestMethod.POST)
+    @ResponseBody
+    public ResultMessage exportOrderList(@RequestBody Map<String, Object> map, HttpServletRequest httpRequest,HttpServletResponse httpResponse) {
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        ResultMessage result = new ResultMessage();
+        result.errorStatus();
+
+        if (map == null || map.size() == 0 || map.get("status") == null || StringUtils.isBlank(map.get("status").toString())) {
+            result.setMsg("Parameter cannot be empty");
+            return result;
+        }
+
         User user = this.getUser(httpRequest);
+        if (user == null) {
+            result.setMsg("Please log in again");
+            return result;
+        }
 
         Vendor vendor = null;
         try {
@@ -1215,13 +1227,18 @@ public class OrderController extends BaseController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        if (vendor == null) {
+            result.setMsg("Please log in again");
+            return result;
+        }
 
         List<Long> logisticsProductIdList = new ArrayList<>();
-        if (StringUtil.isNotEmpty(logisticsProductIds)) {
-            logisticsProductIdList = Arrays.asList((Long[]) ConvertUtils.convert(logisticsProductIds.split(","), Long.class));
+        if (map.get("logisticsProductIds") != null && StringUtil.isNotEmpty(map.get("logisticsProductIds").toString())) {
+            logisticsProductIdList = Arrays.asList((Long[]) ConvertUtils.convert(map.get("logisticsProductIds").toString().split(","), Long.class));
         }
 
         Long vendorId = vendor.getVendorId();
+        String status = map.get("status").toString();
         //根据订单状态查询订单
         logger.info(MessageFormat.format("order getOrderList 调用接口 orderService.getOrderListByParams 查询订单信息  入参 status:{0},vendorId:{1},logisticsProductIdList:{2}",
                 status, vendorId, logisticsProductIdList));
@@ -1231,23 +1248,25 @@ public class OrderController extends BaseController {
         params.put("vendorId", vendorId);
         params.put("logisticsProductIds", logisticsProductIdList);
         orderList = orderService.getOrderListByParams(params);
+        if (orderList == null || orderList.size() == 0) {
+            logger.info("获取失败");
+            result.setMsg("Query order fail,Check parameters, please ");
+            return result;
+        }
+        logger.info("exportOrderList 解析订单列表信息");
+        for (Map<String, Object> info : orderList) {
+            //计算折扣
+            Double price = Double.parseDouble(info.get("price").toString());
+            Double inPrice = Double.parseDouble(info.get("in_price").toString());
 
-        if (orderList != null && orderList.size() > 0) {
-            logger.info("order getOrderList 解析订单列表信息  ");
-            for (Map<String, Object> info : orderList) {
-                //计算折扣
-                Double price = Double.parseDouble(info.get("price").toString());
-                Double inPrice = Double.parseDouble(info.get("in_price").toString());
-
-                BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + 0.22) / price) * 100);
-                if (supply_price_discount.intValue() > 100 || supply_price_discount.intValue() < 0) {
-                    info.put("supply_price_discount", 0 + " %");
-                } else {
-                    info.put("supply_price_discount", (100 - supply_price_discount.setScale(0, BigDecimal.ROUND_HALF_UP).intValue()) + " %");
-                }
+            BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + 0.22) / price) * 100);
+            if (supply_price_discount.intValue() > 100 || supply_price_discount.intValue() < 0) {
+                info.put("supply_price_discount", 0 + " %");
+            } else {
+                info.put("supply_price_discount", (100 - supply_price_discount.setScale(0, BigDecimal.ROUND_HALF_UP).intValue()) + " %");
             }
         }
-        // 设置文件目录路径
+        logger.info("exportOrderList 设置文件目录路径");
         String dateStr = DateUtils.getStrDate(new Date(), "yyyyMMddHHmmss");
         String fileName = dateStr + ".xls";
         String path = commonsProperties.getOrderPath() + "download/";
@@ -1257,12 +1276,13 @@ public class OrderController extends BaseController {
         }
         String filePath = path + fileName;
 
+        logger.info("exportOrderList 生成订单文件");
         generateOrderExcel("Order", orderList, filePath);
 
         File newFile = new File(filePath);
-        httpResponse.setContentType("application/force-download");
-        httpResponse.addHeader("Content-Disposition", "attachment;fileName=" + fileName);
-
+        httpResponse.setHeader("Access-Control-Allow-Origin", "*");
+        httpResponse.setContentType("application/vnd.ms-excel;charset=utf-8");
+        httpResponse.setHeader("Content-Disposition", "attachment;filename=" + fileName);
         byte[] buffer = new byte[1024];
         FileInputStream fis = null;
         BufferedInputStream bis = null;
@@ -1293,6 +1313,8 @@ public class OrderController extends BaseController {
                 }
             }
         }
+        result.successStatus();
+        return result;
     }
 
     private String generateOrderExcel(String excelName, List<Map<String, Object>> orderList, String filePath) {
@@ -1337,7 +1359,9 @@ public class OrderController extends BaseController {
             for (int i = 0; i < excelHeaders.length; i++) {
                 cell = row.createCell(i);
                 if (i == 2) {
-                    generateProductImage(workbook, patriarch, values[i], i);
+                    String urlList = values[i];
+                    JsonArray urlJsonArray = new JsonParser().parse(urlList).getAsJsonArray();
+                    generateProductImage(workbook, patriarch, new Gson().fromJson(urlJsonArray.get(0), String.class), i);
                 } else {
                     cell.setCellValue(values[i]);
                 }
@@ -1363,9 +1387,8 @@ public class OrderController extends BaseController {
         return filePath;
     }
 
-    private void generateProductImage(HSSFWorkbook workbook, HSSFPatriarch patriarch, String value, int i) {
+    private void generateProductImage(HSSFWorkbook workbook, HSSFPatriarch patriarch, String pictureUrl, int i) {
         //处理商品图片
-        String pictureUrl = value;
         if (StringUtils.isNotBlank(pictureUrl)) {
             try {
                 //获取网络图片
