@@ -520,7 +520,7 @@
 
     <select id="getOrderInfoByCondition" resultType="java.util.HashMap" parameterType="java.util.Map">
         SELECT
-        o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id,pp.colorCode,pp.brandID,pspv.`value` as
+        o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id,pspv.`value` as
         size,p.category_id,
         /*s.price,lp.in_price,sps.sale_price,*/
         lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
@@ -546,15 +546,8 @@
         pspv.product_sku_property_key_id = skup.product_sku_property_key_id
         and pspv.product_sku_property_value_id = skup.product_sku_property_value_id
         and pspv.enabled = 1
-        ) INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
-        LEFT JOIN (
-        SELECT t_pp.product_id,
-        max(case t_pp.key_name when 'ColorCode' then t_pp.`value` else '' end) as colorCode,
-        max(case t_pp.key_name when 'BrandID' then t_pp.`value` else '' end) as brandID
-        from product_property t_pp
-        where t_pp.enabled = 1 and (t_pp.key_name='BrandID' or t_pp.key_name = 'ColorCode')
-        group by t_pp.product_id
-        ) pp ON p.product_id = pp.product_id
+        )
+        INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
         where pspk.`name` = 'Size' and lp.enabled = 1
 
         <if test="status != null">
@@ -659,7 +652,7 @@
                 lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
                 lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
                 lp.shipped_at AS shipped_date,sm.shipment_no,s.sku_code,b.english_name as brandName,
-                v.vendor_name,g.english_name as geography_name,p.cover_img,p.product_id
+                v.vendor_name,sm.ship_to_geography as geography_name,p.cover_img,p.product_id,lp.stock_location
             </otherwise>
         </choose>
 
@@ -683,26 +676,25 @@
         and pspv.product_sku_property_value_id = skup.product_sku_property_value_id
         and pspv.enabled = 1
         ) INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
-        LEFT JOIN shipment sm on sm.vendor_id = v.vendor_id
+        LEFT JOIN container c on (c.container_id = lp.container_id)
+        LEFT JOIN shipment sm on ( sm.shipment_id =c.shipment_id )
         where pspk.`name` = 'Size' and (lp.`status` = 3 OR lp.`status` = 4)
         and v.vendor_id = #{vendorId,jdbcType=BIGINT}
         <if test="shippedParam.orderLineNo!=null and shippedParam.orderLineNo!=''">
             and lp.order_line_num=#{shippedParam.orderLineNo}
         </if>
-        <if test="shippedParam.dateType!= null and shippedParam.dateType!='' and shippedParam.dateType == '0'.toString()">
-            and (o.created_at between #{shippedParam.startDate} and #{shippedParam.endDate})
-        </if>
-        <if test="shippedParam.dateType!= null and shippedParam.dateType!='' and shippedParam.dateType == '1'.toString()">
+
+        <if test="shippedParam.startDate!= null and shippedParam.endDate != null and shippedParam.startDate!= '' and shippedParam.endDate != ''">
             and (lp.shipped_at between #{shippedParam.startDate} and #{shippedParam.endDate})
         </if>
-        <if test="shippedParam.stockLocation != null">
+        <if test="shippedParam.stockLocation != null and shippedParam.stockLocation != ''">
             AND lp.stock_location = #{shippedParam.stockLocation}
         </if>
-        <if test="shippedParam.shipToGeography != null">
+        <if test="shippedParam.shipToGeography != null and shippedParam.shipToGeography != ''">
             AND sm.ship_to_geography = #{shippedParam.shipToGeography}
         </if>
         GROUP BY lp.order_line_num
-        <if test="shippedParam.shippedAtOrderBy != null">
+        <if test="shippedParam.shippedAtOrderBy != null and shippedParam.shippedAtOrderBy != ''">
             <choose>
                 <when test="shippedParam.shippedAtOrderBy == 'desc'">
                     ORDER BY lp.shipped_at DESC
@@ -712,7 +704,7 @@
                 </otherwise>
             </choose>
         </if>
-        <if test="shippedParam.statusOrderBy != null">
+        <if test="shippedParam.statusOrderBy != null and shippedParam.statusOrderBy != ''">
             <choose>
                 <when test="shippedParam.statusOrderBy == 'desc'">
                     ORDER BY lp.status DESC

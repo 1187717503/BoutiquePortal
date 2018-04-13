@@ -150,6 +150,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
             Map<String, Object> map) {
         List<Map<String, Object>> list = orderMapper.getOrderInfoByCondition(map);
         if (list != null && list.size() > 0) {
+            addProductPropertyMap(list);
             return list.get(0);
         }
         return null;
