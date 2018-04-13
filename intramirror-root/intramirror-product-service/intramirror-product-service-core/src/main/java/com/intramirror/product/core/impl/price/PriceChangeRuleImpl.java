@@ -156,7 +156,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         return true;
     }
 
-    private void updateDefaultPrice(PriceChangeRuleEnum.PriceType priceType, Map<String, Object> paramsMap) {
+    public void updateDefaultPrice(PriceChangeRuleEnum.PriceType priceType, Map<String, Object> paramsMap) {
         // update default discount
         int default_discount = this.getDeafultDisscount(priceType);
         if (default_discount > 0) {
@@ -172,7 +172,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
                     String season_codes = map.get("season_codes").toString();
                     map.put("season_codes", season_codes.split(","));
                     map.put("default_discount_percentage", default_discount);
-                    map.put("category_type", paramsMap.get("category_type").toString());
+                    map.put("category_type", map.get("category_type").toString());
                     if (priceType.getCode().intValue() == PriceChangeRuleEnum.PriceType.SUPPLY_PRICE.getCode().intValue()) {
                         int i = priceChangeRuleMapper.updateDefaultPriceByVendor(map);
                         logger.info("update vendor price by default discount : " + i + ",map:" + JSONObject.toJSONString(map));
