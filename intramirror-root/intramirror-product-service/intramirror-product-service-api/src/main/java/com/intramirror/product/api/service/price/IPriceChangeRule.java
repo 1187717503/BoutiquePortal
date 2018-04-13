@@ -38,7 +38,7 @@ public interface IPriceChangeRule {
      */
     boolean updateAdminPrice(int categoryType) throws Exception;
 
-    boolean updateAdminPrice(Long vendor_id, int categoryType, long price_change_rule_id) throws Exception;
+    boolean updateAdminPrice(Long vendor_id, int categoryType, Long price_change_rule_id) throws Exception;
 
     void updateDefaultPrice(PriceChangeRuleEnum.PriceType priceType, Map<String, Object> paramsMap);
 

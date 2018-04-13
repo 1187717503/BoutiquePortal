@@ -122,7 +122,7 @@ public class PriceChangeRuleController extends BaseController {
 
         // sku.im_price -> product.min_im_price,product.max_im_price
         priceChangeRule.updateProductImPrice();*/
-        priceTaskController.syncPreviewRedundantTable();
+        priceTaskController.syncAllRedundantTable();
 
         logger.info("End running IM discounts,price_change_rule_id:" + price_change_rule_id);
         return Response.success();
@@ -156,7 +156,7 @@ public class PriceChangeRuleController extends BaseController {
 
         // sku.im_price -> product.min_im_price,product.max_im_price
         priceChangeRule.updateProductImPrice();*/
-        priceTaskController.syncPreviewRedundantTable();
+        priceTaskController.syncAllRedundantTable();
         logger.info("End running BOUTIQUE discounts,price_change_rule_id:" + price_change_rule_id);
 
         return Response.success();
