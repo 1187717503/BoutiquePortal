@@ -74,11 +74,14 @@ public class PriceChangeRuleController extends BaseController {
 
     @RequestMapping("/run/im")
     @ResponseBody
-    public Response runIm(@Param("price_change_rule_id") String price_change_rule_id) throws Exception {
+    public Response runIm(@Param("price_change_rule_id") String price_change_rule_id, @Param("flag") String flag) throws Exception {
         logger.info("Start running IM discounts,price_change_rule_id:" + price_change_rule_id);
         PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
 
         logger.info("Begin to refresh the discounts of IM goods,pcrModel:" + JSONObject.toJSONString(pcrModel));
+        if (StringUtils.isNotBlank(flag) && flag.equalsIgnoreCase("all")) {
+            pcrModel.setPriceChangeRuleId(null);
+        }
         priceChangeRule.updateAdminPrice(pcrModel.getVendorId(), pcrModel.getCategoryType().intValue(), pcrModel.getPriceChangeRuleId());
         logger.info("End the discounts of IM goods:" + JSONObject.toJSONString(pcrModel));
 
@@ -104,12 +107,15 @@ public class PriceChangeRuleController extends BaseController {
 
     @RequestMapping("/run/boutique")
     @ResponseBody
-    public Response runBoutique(@Param("price_change_rule_id") String price_change_rule_id) throws Exception {
+    public Response runBoutique(@Param("price_change_rule_id") String price_change_rule_id, @Param("flag") String flag) throws Exception {
 
         logger.info("Start running BOUTIQUE discounts,price_change_rule_id:" + price_change_rule_id);
         PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
 
         logger.info("Begin to refresh the discounts of BOUTIQUE goods,pcrModel:" + JSONObject.toJSONString(pcrModel));
+        if (StringUtils.isNotBlank(flag) && flag.equalsIgnoreCase("all")) {
+            pcrModel.setPriceChangeRuleId(null);
+        }
         priceChangeRule.updateVendorPrice(pcrModel.getVendorId(), pcrModel.getCategoryType(), pcrModel.getPriceChangeRuleId());
         logger.info("End the discounts of BOUTIQUE goods:" + JSONObject.toJSONString(pcrModel));
 
