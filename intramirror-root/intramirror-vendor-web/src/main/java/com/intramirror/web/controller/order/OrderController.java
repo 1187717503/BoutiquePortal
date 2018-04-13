@@ -1258,9 +1258,9 @@ public class OrderController extends BaseController {
         generateOrderExcel("Order", orderList, filePath);
 
         File newFile = new File(filePath);
-        httpResponse.setContentType("application/force-download");
-        httpResponse.addHeader("Content-Disposition", "attachment;fileName=" + fileName);
-
+        httpResponse.setHeader("Access-Control-Allow-Origin", "*");
+        httpResponse.setContentType("application/vnd.ms-excel;charset=utf-8");
+        httpResponse.setHeader("Content-Disposition", "attachment;filename=" + fileName);
         byte[] buffer = new byte[1024];
         FileInputStream fis = null;
         BufferedInputStream bis = null;
