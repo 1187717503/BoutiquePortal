@@ -124,7 +124,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     }
 
     @Override
-    public boolean updateAdminPrice(Long vendor_id, int categoryType, long price_change_rule_id) {
+    public boolean updateAdminPrice(Long vendor_id, int categoryType, Long price_change_rule_id) {
         Map<String, Object> paramsMap = new HashMap<>();
         List<Map<String, Object>> paramsList = new ArrayList<>();
         paramsMap.put("price_type", PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
