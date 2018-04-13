@@ -1322,14 +1322,13 @@ public class OrderController extends BaseController {
 
         int rowLength = 0;
         HSSFSheet sheet = workbook.createSheet(excelName);
-        sheet.setDefaultColumnWidth(16);
 
         //图片处理
         HSSFPatriarch patriarch = sheet.createDrawingPatriarch();
 
         String[] excelHeaders = new String[]{"Order Line No.", "Order Date", "Picture", "Brand", "Name", "Designer ID", "Color Code", "Size", "Retail Price", "Purchase Price", "VAT?", "Purchase Discount", "Consignee Geography"};
 
-        // 创建第一行数据
+        // 创建表头
         HSSFRow row1 = sheet.createRow(rowLength);
         for (int i = 0, iLen = excelHeaders.length; i < iLen; i++) {
             HSSFCell cell = row1.createCell(i);
@@ -1358,6 +1357,7 @@ public class OrderController extends BaseController {
                     transforNullValue(order.get("supply_price_discount")),
                     transforNullValue(order.get("geography_name"))
             };
+            //将数据放到excel中，第三列是图片需要特殊处理
             for (int i = 0; i < excelHeaders.length; i++) {
                 cell = row.createCell(i);
                 if (i == 2) {
@@ -1369,6 +1369,14 @@ public class OrderController extends BaseController {
                 }
             }
             rowLength++;
+        }
+        //宽度自适应
+        for (int i = 0; i < excelHeaders.length; i++) {
+            if (i != 2) {
+                sheet.autoSizeColumn(i, true);
+            } else {
+                sheet.setColumnWidth(i, 16 * 256);
+            }
         }
 
         FileOutputStream fileOut = null;
