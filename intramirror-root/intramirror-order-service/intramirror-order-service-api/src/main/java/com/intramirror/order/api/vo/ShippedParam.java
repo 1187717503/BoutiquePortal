@@ -6,8 +6,8 @@ public class ShippedParam {
     private String orderLineNo;
     private String brandID;
     private String colorCode;
-    private Date startDate;
-    private Date endDate;
+    private String startDate;
+    private String endDate;
     private String dateType;
     private Integer pageSize;
     private Integer pageNum;
@@ -72,19 +72,19 @@ public class ShippedParam {
         this.colorCode = colorCode;
     }
 
-    public Date getStartDate() {
+    public String getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(String startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public String getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(String endDate) {
         this.endDate = endDate;
     }
 

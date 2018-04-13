@@ -522,7 +522,8 @@
         INNER JOIN brand b ON (p.brand_id = b.brand_id and b.enabled = 1 )
         INNER JOIN sku s ON (s.sku_id = sps.sku_id and s.enabled = 1)
         INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
-        LEFT JOIN shipment sm on sm.vendor_id = v.vendor_id
+        LEFT JOIN container c ON (c.container_id = lp.container_id)
+        LEFT JOIN shipment sm on (sm.shipment_id = c.shipment_id)
         where (lp.`status` = 3 OR lp.`status` = 4)
         and v.vendor_id = #{vendorId,jdbcType=BIGINT}
         <if test="shippedParam.orderLineNo!=null and shippedParam.orderLineNo!=''">
