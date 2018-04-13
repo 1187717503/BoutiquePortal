@@ -7,6 +7,8 @@ import com.google.gson.JsonParser;
 import com.intramirror.common.Helper;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.parameter.StatusType;
+import com.intramirror.common.utils.DateUtils;
+import com.intramirror.main.api.enums.GeographyEnum;
 import com.intramirror.order.api.common.OrderStatusType;
 import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.service.IContainerService;
@@ -26,19 +28,29 @@ import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.VendorService;
+import com.intramirror.web.common.CommonsProperties;
 import com.intramirror.web.controller.BaseController;
 import com.intramirror.web.common.cache.CategoryCache;
 import com.intramirror.web.service.LogisticsProductService;
 import com.intramirror.web.service.OrderRefund;
 import com.intramirror.web.service.OrderService;
-import java.io.UnsupportedEncodingException;
+
+import java.io.*;
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Param;
+import org.apache.poi.hssf.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +60,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import pk.shoplus.common.utils.StringUtil;
 
 @CrossOrigin
 @Controller
@@ -103,6 +116,9 @@ public class OrderController extends BaseController {
 
     @Autowired
     private CategoryCache categoryCache;
+
+    @Autowired
+    private CommonsProperties commonsProperties;
 
     /**
      * 获取订单列表
@@ -168,6 +184,8 @@ public class OrderController extends BaseController {
             params.put("sortByName", sortByName);
             params.put("categoryIds", categoryIds);
             params.put("brandId", map.get("brandId"));
+            params.put("stockLocation", map.get("stockLocation"));
+            params.put("logisticsProductIds", map.get("logisticsProductIds"));
             orderList = orderService.getOrderListByParams(params);
         }
 
@@ -1174,6 +1192,215 @@ public class OrderController extends BaseController {
             message.errorStatus().putMsg("errorMsg", e.getMessage());
         }
         return message;
+    }
+
+
+
+    /**
+     * 导出订单列表
+     * @param status
+     * @param logisticsProductIds
+     * @param httpRequest
+     * @param httpResponse
+     * @return
+     */
+    @RequestMapping(value = "/exportOrderList")
+    public void exportOrderList(@Param("status") String status, @Param("logisticsProductIds") String logisticsProductIds,
+                                HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+        User user = this.getUser(httpRequest);
+
+        Vendor vendor = null;
+        try {
+            vendor = vendorService.getVendorByUserId(user.getUserId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        List<Long> logisticsProductIdList = new ArrayList<>();
+        if (StringUtil.isNotEmpty(logisticsProductIds)) {
+            logisticsProductIdList = Arrays.asList((Long[]) ConvertUtils.convert(logisticsProductIds.split(","), Long.class));
+        }
+
+        Long vendorId = vendor.getVendorId();
+        //根据订单状态查询订单
+        logger.info(MessageFormat.format("order getOrderList 调用接口 orderService.getOrderListByParams 查询订单信息  入参 status:{0},vendorId:{1},logisticsProductIdList:{2}",
+                status, vendorId, logisticsProductIdList));
+        List<Map<String, Object>> orderList = null;
+        Map<String, Object> params = new HashMap<>();
+        params.put("status", status);
+        params.put("vendorId", vendorId);
+        params.put("logisticsProductIds", logisticsProductIdList);
+        orderList = orderService.getOrderListByParams(params);
+
+        if (orderList != null && orderList.size() > 0) {
+            logger.info("order getOrderList 解析订单列表信息  ");
+            for (Map<String, Object> info : orderList) {
+                //计算折扣
+                Double price = Double.parseDouble(info.get("price").toString());
+                Double inPrice = Double.parseDouble(info.get("in_price").toString());
+
+                BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + 0.22) / price) * 100);
+                if (supply_price_discount.intValue() > 100 || supply_price_discount.intValue() < 0) {
+                    info.put("supply_price_discount", 0 + " %");
+                } else {
+                    info.put("supply_price_discount", (100 - supply_price_discount.setScale(0, BigDecimal.ROUND_HALF_UP).intValue()) + " %");
+                }
+            }
+        }
+        // 设置文件目录路径
+        String dateStr = DateUtils.getStrDate(new Date(), "yyyyMMddHHmmss");
+        String fileName = dateStr + ".xls";
+        String path = commonsProperties.getOrderPath() + "download/";
+        File file = new File(path);
+        if (!file.exists() && !file.isDirectory()) {
+            file.mkdirs();
+        }
+        String filePath = path + fileName;
+
+        generateOrderExcel("Order", orderList, filePath);
+
+        File newFile = new File(filePath);
+        httpResponse.setContentType("application/force-download");
+        httpResponse.addHeader("Content-Disposition", "attachment;fileName=" + fileName);
+
+        byte[] buffer = new byte[1024];
+        FileInputStream fis = null;
+        BufferedInputStream bis = null;
+        try {
+            fis = new FileInputStream(newFile);
+            bis = new BufferedInputStream(fis);
+            OutputStream os = httpResponse.getOutputStream();
+            int i = bis.read(buffer);
+            while (i != -1) {
+                os.write(buffer, 0, i);
+                i = bis.read(buffer);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (bis != null) {
+                try {
+                    bis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private String generateOrderExcel(String excelName, List<Map<String, Object>> orderList, String filePath) {
+        HSSFWorkbook workbook = new HSSFWorkbook();
+
+        int rowLength = 0;
+        HSSFSheet sheet = workbook.createSheet(excelName);
+
+        //图片处理
+        HSSFPatriarch patriarch = sheet.createDrawingPatriarch();
+
+        String[] excelHeaders = new String[]{"Order Line No.", "Order Date", "Picture", "Brand", "Name", "Designer ID", "Color Code", "Size", "Retail Price", "Purchase Price", "VAT?", "Purchase Discount", "Consignee Geography"};
+
+        // 创建第一行数据
+        HSSFRow row1 = sheet.createRow(rowLength);
+        for (int i = 0, iLen = excelHeaders.length; i < iLen; i++) {
+            HSSFCell cell = row1.createCell(i);
+            cell.setCellValue(excelHeaders[i]);
+        }
+
+        rowLength++;
+        HSSFRow row = null;
+        HSSFCell cell = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm");
+        for (Map<String, Object> order : orderList) {
+            row = sheet.createRow(rowLength++);
+            String[] values = {
+                    transforNullValue(order.get("order_line_num")),
+                    transforNullValue(sdf.format(order.get("created_at"))),
+                    transforNullValue(order.get("cover_img")),
+                    transforNullValue(order.get("brandName")),
+                    transforNullValue(order.get("name")),
+                    transforNullValue(order.get("brandID")),
+                    transforNullValue(order.get("colorCode")),
+                    transforNullValue(order.get("size")),
+                    transforNullValue("€ " + new BigDecimal(order.get("price").toString()).setScale(2, BigDecimal.ROUND_HALF_UP).toString()),
+                    transforNullValue("€ " + new BigDecimal(order.get("in_price").toString()).setScale(2, BigDecimal.ROUND_HALF_UP).toString()),
+                    transforNullValue(GeographyEnum.EUROPEAN_UNION.getId().equals(order.get("geography_id").toString()) ? "incld. VAT" : "excld. VAT"),
+                    transforNullValue(order.get("supply_price_discount")),
+                    transforNullValue(order.get("geography_name"))
+            };
+            for (int i = 0; i < excelHeaders.length; i++) {
+                cell = row.createCell(i);
+                if (i == 2) {
+                    generateProductImage(workbook, patriarch, values[i], i);
+                } else {
+                    cell.setCellValue(values[i]);
+                }
+            }
+        }
+
+        FileOutputStream fileOut = null;
+        try {
+
+            fileOut = new FileOutputStream(filePath);
+            workbook.write(fileOut);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (fileOut != null) {
+                try {
+                    fileOut.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return filePath;
+    }
+
+    private void generateProductImage(HSSFWorkbook workbook, HSSFPatriarch patriarch, String value, int i) {
+        //处理商品图片
+        String pictureUrl = value;
+        if (StringUtils.isNotBlank(pictureUrl)) {
+            try {
+                //获取网络图片
+                URL url = new URL(pictureUrl);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                //超时响应时间为5秒
+                conn.setConnectTimeout(5 * 1000);
+                InputStream inStream = conn.getInputStream();
+                ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                int len = 0;
+                while ((len = inStream.read(buffer)) != -1) {
+                    outStream.write(buffer, 0, len);
+                }
+                inStream.close();
+                byte[] data = outStream.toByteArray();
+                //anchor主要用于设置图片的属性
+                HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 98, 125, (short) 0, i, (short) 0, i);
+                //Sets the anchor type （图片在单元格的位置）
+                //0 = Move and size with Cells, 2 = Move but don't size with cells, 3 = Don't move or size with cells.
+                anchor.setAnchorType(0);
+                patriarch.createPicture(anchor, workbook.addPicture(data, HSSFWorkbook.PICTURE_TYPE_JPEG));
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private String transforNullValue(Object obj) {
+        if(obj == null) {
+            return "";
+        }
+        return String.valueOf(obj);
     }
 
 }
