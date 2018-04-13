@@ -159,6 +159,12 @@
         <if test="stockLocation != null">
             and lp.stock_Location = #{stockLocation,jdbcType=VARCHAR}
         </if>
+        <if test="logisticsProductIds != null and logisticsProductIds.size > 0">
+            and lp.logistics_product_id in
+            <foreach item="item" index="index" collection="logisticsProductIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
         GROUP BY lp.order_line_num
 
         <if test="order_line_num != null">
