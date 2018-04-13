@@ -191,9 +191,9 @@ public class ProductMgntController {
 
             getSpuModify(product);
             //如果关联spu有图片，则展示spu的图片
-            if (product.get("spu_cover_img") != null && StringUtils.isNotBlank(product.get("spu_cover_img").toString())) {
-                product.put("cover_img", product.get("spu_cover_img"));
-            }
+//            if (product.get("spu_cover_img") != null && StringUtils.isNotBlank(product.get("spu_cover_img").toString())) {
+//                product.put("cover_img", product.get("spu_cover_img"));
+//            }
         }
     }
 
