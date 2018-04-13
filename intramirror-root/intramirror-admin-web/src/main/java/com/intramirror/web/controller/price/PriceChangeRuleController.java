@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.intramirror.common.enums.PriceChangeRuleEnum;
 import com.intramirror.common.enums.SystemPropertyEnum;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.parameter.EnabledType;
@@ -33,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -71,6 +73,27 @@ public class PriceChangeRuleController extends BaseController {
 
     @Autowired
     private PriceTaskController priceTaskController;
+
+    @RequestMapping(value = "/del/{price_change_rule_id}", method = RequestMethod.POST)
+    @ResponseBody
+    public Response delActive(@PathVariable(name = "price_change_rule_id") Long price_change_rule_id) {
+        logger.info("Start del discounts,price_change_rule_id:" + price_change_rule_id);
+        PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(price_change_rule_id);
+
+        PriceChangeRuleEnum.PriceType priceType = null;
+        if (pcrModel.getPriceType().intValue() == PriceChangeRuleEnum.PriceType.IM_PRICE.getCode().intValue()) {
+            priceType = PriceChangeRuleEnum.PriceType.IM_PRICE;
+        } else {
+            priceType = PriceChangeRuleEnum.PriceType.SUPPLY_PRICE;
+        }
+        priceChangeRule.deleteByPrimaryKey(pcrModel.getPriceChangeRuleId());
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("category_type", pcrModel.getCategoryType());
+        params.put("price_type", pcrModel.getPriceType());
+        priceChangeRule.updateDefaultPrice(priceType, params);
+        return Response.success();
+    }
 
     @RequestMapping("/run/im")
     @ResponseBody

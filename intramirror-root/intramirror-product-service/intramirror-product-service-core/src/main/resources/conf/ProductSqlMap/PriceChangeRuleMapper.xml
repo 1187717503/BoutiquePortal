@@ -367,10 +367,10 @@
 
     <select id="selectActiveSeasonGroupRule" resultType="java.util.Map" parameterType="java.util.Map">
 
-        select pcr.`vendor_id` , GROUP_CONCAT(pcrsg.`season_code`) as season_codes  from price_change_rule pcr
+        select pcr.`vendor_id` ,pcr.category_type, GROUP_CONCAT(pcrsg.`season_code`) as season_codes  from price_change_rule pcr
         inner join price_change_rule_season_group pcrsg on (pcrsg.price_change_rule_id = pcr.price_change_rule_id and pcrsg.enabled = 1)
         where pcr.price_type = #{price_type,jdbcType=BIGINT} and pcrsg.`season_code`  is not null
-        and pcr.`status` = 2 and category_type =  #{category_type,jdbcType=BIGINT} group by pcr.`vendor_id`
+        and pcr.`status` = 2 and category_type =  #{category_type,jdbcType=BIGINT} group by pcr.`vendor_id`,pcr.category_type
     </select>
 
     <select id="selectSecondCategoryRule" resultType="java.util.Map" parameterType="java.util.Map">
