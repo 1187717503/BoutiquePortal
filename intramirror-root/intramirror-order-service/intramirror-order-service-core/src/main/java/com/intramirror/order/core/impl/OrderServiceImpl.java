@@ -215,8 +215,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
             if(shipToCountry!=null){
                 String country = "";
                 if("China".equals(shipToCountry.toString())
-                        ||"中国大陆".equals(shipToCountry.toString())
-                        ||"中国".equals(shipToCountry.toString())){
+                        ||"中国大陆".equals(shipToCountry.toString())){
                     country = "中国";
                 }else {
                     country = shipToCountry.toString();
