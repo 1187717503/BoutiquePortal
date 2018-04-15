@@ -108,7 +108,7 @@
         sku_store.reserved,
         sku_store.confirmed,
         sku_store.last_check,
-        func_size_map_new(sku.`size`) as size,
+        func_size_map_new(sku_store.product_id,sku.`size`) as size,
         sku.sku_code as bar_code,
         product_exception.status as exceptionStatus,
         product_exception.created_at AS exceptionDate
