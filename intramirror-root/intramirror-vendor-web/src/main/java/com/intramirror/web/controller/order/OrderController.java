@@ -1109,10 +1109,6 @@ public class OrderController extends BaseController {
             map.put("status", 1);
             Date currentDate = new Date();
             map.put("created_at", currentDate);
-            if (map.get("cancel_file") != null) {
-                String cancel_file = map.get("cancel_file").toString();
-                map.put("cancel_file", cancel_file);
-            }
 
             System.out.println(user.getEmail());
             int result = orderExceptionService.saveOrderComments(map);
