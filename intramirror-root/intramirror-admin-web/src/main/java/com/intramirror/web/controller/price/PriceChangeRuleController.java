@@ -76,7 +76,7 @@ public class PriceChangeRuleController extends BaseController {
 
     @RequestMapping(value = "/del/{price_change_rule_id}", method = RequestMethod.POST)
     @ResponseBody
-    public Response delActive(@PathVariable(name = "price_change_rule_id") Long price_change_rule_id) {
+    public Response delActive(@PathVariable(name = "price_change_rule_id") Long price_change_rule_id) throws Exception {
         logger.info("Start del discounts,price_change_rule_id:" + price_change_rule_id);
         PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(price_change_rule_id);
 
@@ -92,6 +92,7 @@ public class PriceChangeRuleController extends BaseController {
         params.put("category_type", pcrModel.getCategoryType());
         params.put("price_type", pcrModel.getPriceType());
         priceChangeRule.updateDefaultPrice(priceType, params);
+        priceTaskController.syncAllRedundantTable();
         return Response.success();
     }
 
