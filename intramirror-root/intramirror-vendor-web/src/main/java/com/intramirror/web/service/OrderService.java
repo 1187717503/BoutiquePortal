@@ -379,8 +379,7 @@ public class OrderService {
 		}else{
 			//如果大区一致,且不为空箱子,则比较shipment_type(空箱子ischeck 都为false)
 			//空箱子不需要判断,直接存入   shipment_type 用于判断该箱子是否能存放多个，状态为1 只能存放一个  所以不能在存入
-			if(ischeck && shipMentMap.get("shipment_type_id").toString().equals("1")
-					&&!"Transit Warehouse".equals(shipMentMap.get("ship_to_geography"))){
+			if(ischeck && shipMentMap.get("shipment_type_id").toString().equals("1")){
 				result.setMsg("Only one Order can be packed in this carton. ");
 				info.put("code", StatusType.ORDER_ERROR_CODE);
 				result.setInfoMap(info);
