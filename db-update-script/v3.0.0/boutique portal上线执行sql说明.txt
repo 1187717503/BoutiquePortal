@@ -1,0 +1,2 @@
+先执行完sql脚本
+然后调用存储过程proc_vendor_routing
