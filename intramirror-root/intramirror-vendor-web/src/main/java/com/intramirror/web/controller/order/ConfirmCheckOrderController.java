@@ -112,9 +112,6 @@ public class ConfirmCheckOrderController {
 
         if (map.get("stockLocation") != null && StringUtils.isNotBlank(map.get("stockLocation").toString())) {
             stockLocation = map.get("stockLocation").toString();
-        }else {
-            result.setMsg("stockLocation id Mandatory Field");
-            return result;
         }
 
         Sku sku = null;
