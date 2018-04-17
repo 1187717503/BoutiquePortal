@@ -115,7 +115,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 
 	private Map<String, Object> addCountryNum(Map<String, Object> map, Integer shipmentCategory) {
 		Map<String, Object> typeMap = new HashMap<>();
-		if (1 == shipmentCategory){
+		if (shipmentCategory!=null&&1 == shipmentCategory){
             //如果是发往质检仓
             typeMap.put("consigner_country_id",19);
             typeMap.put("consignee_country_id",52);
