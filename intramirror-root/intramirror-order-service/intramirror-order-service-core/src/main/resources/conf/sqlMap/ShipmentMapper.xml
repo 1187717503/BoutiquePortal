@@ -133,4 +133,23 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 		SELECT shipment_no FROM shipment
 		where shipment_id = #{shipmentId,jdbcType=BIGINT};
 </select>
+
+	<select id="getShipmentList" resultMap="BaseResultMap" parameterType="java.util.Map">
+		SELECT s.* FROM shipment s
+		INNER JOIN container c ON c.shipment_id = s.shipment_id
+		INNER JOIN logistics_product lp on lp.container_id = c.container_id
+		WHERE lp.`status` = 7 and s.vendor_id = #{vendorId}
+		GROUP BY s.shipment_no
+		<if test="sortByName!=null">
+			<if test="sortByName == 'shipment_status'">
+				ORDER BY s.`status`
+			</if>
+			<if test="sortByName == 'geography_name'">
+				ORDER BY s.ship_to_geography
+			</if>
+			<if test="sortByName == 'shipment_no'">
+				ORDER BY s.shipment_no
+			</if>
+		</if>
+	</select>
 </mapper>

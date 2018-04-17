@@ -120,4 +120,6 @@ public interface ShipmentMapper {
 	 * @return
 	 */
 	String getShipmentNoById(Map<String, Object> map);
+
+	List<Shipment> getShipmentList(Map<String, Object> map);
 }

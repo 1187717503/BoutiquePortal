@@ -138,27 +138,17 @@ public class OrderShipController extends BaseController {
             //获取箱子列表信息
             logger.info("order getReadyToShipCartonList 获取container 列表信息   调用接口containerService.getContainerList 入参:" + new Gson().toJson(paramtMap));
             List<Map<String, Object>> containerList = containerService.getContainerList(paramtMap);
+            List<Shipment> shipmentListSort = null;
+            if(paramtMap.get("sortByName")!=null){
+                //查询出有序的shipment的列表
+                shipmentListSort = iShipmentService.getShipmentList(paramtMap);
+            }
 
             Map<String, List<Map<String, Object>>> shipMentCartonList = new HashMap<String, List<Map<String, Object>>>();
             List<Map<String, Object>> shipMentList = new ArrayList<Map<String, Object>>();
 
             if (containerList != null && containerList.size() > 0) {
                 logger.info("order getReadyToShipCartonList 解析container 列表信息 ");
-//				for(Map<String, Object> container : containerList){
-//					
-//					//根据shipment_id 分组
-//					if(!shipMentCartonList.containsKey(container.get("shipment_id").toString())){
-//						//获取shipMent信息
-//						Map<String, Object> shipMent = new HashMap<String, Object>();
-//						shipMent.put("shipment_id", container.get("shipment_id").toString());
-//						shipMent.put("shipment_no", container.get("shipment_no").toString());
-//						shipMent.put("shipment_type", container.get("shipment_type").toString());
-//						shipMent.put("product_qty", container.get("product_qty").toString());
-//						shipMent.put("ship_to_geography", container.get("ship_to_geography").toString());
-////						shipMent.put("cartonList", );
-//						shipMentList.add(shipMent);
-//					}
-//				}
 
                 //获取product列表
                 Set<Long> shipmentIds =  new HashSet<>();
@@ -174,6 +164,10 @@ public class OrderShipController extends BaseController {
                     String containerId = container.get("container_id").toString();
                     if(orderList!=null&&orderList.size()>0){
                         for (Map<String, Object> order :orderList){
+                            String price = order.get("price")!=null?order.get("price").toString():"0";
+                            order.put("price",(new BigDecimal(price).setScale(2, BigDecimal.ROUND_HALF_UP)).toString());
+                            String in_price = order.get("in_price")!=null?order.get("in_price").toString():"0";
+                            order.put("in_price",(new BigDecimal(in_price).setScale(2, BigDecimal.ROUND_HALF_UP)).toString());
                             if(containerId.equals(order.get("container_id").toString())){
                                 orderListContain.add(order);
                             }
@@ -223,12 +217,25 @@ public class OrderShipController extends BaseController {
                     }
                     shipItem.put("product_qty", product_qty_total);
                 }
-
+            }
+            //shipment排序
+            List<Map<String, Object>> shipmentListMapSort = new ArrayList<>();
+            if(shipmentListSort!=null&&shipmentListSort.size()>0){
+                for (Shipment shipment:shipmentListSort){
+                    Long shipmentId = shipment.getShipmentId();
+                    for (Map<String, Object> shipmentMap:shipMentList){
+                        if(shipmentId.equals(Long.parseLong(shipmentMap.get("shipment_id").toString()))){
+                            shipmentListMapSort.add(shipmentMap);
+                            break;
+                        }
+                    }
+                }
+            }else {
+                shipmentListMapSort = shipMentList;
             }
 
-
             result.successStatus();
-            result.setData(shipMentList);
+            result.setData(shipmentListMapSort);
 
         } catch (Exception e) {
             e.printStackTrace();
