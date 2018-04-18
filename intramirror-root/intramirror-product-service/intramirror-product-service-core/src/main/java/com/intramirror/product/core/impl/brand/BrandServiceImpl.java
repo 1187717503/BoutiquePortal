@@ -5,14 +5,13 @@ import com.intramirror.product.api.model.Brand;
 import com.intramirror.product.api.service.brand.IBrandService;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.BrandMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 /**
  * Created by dingyifan on 2017/7/19.
@@ -33,7 +32,7 @@ public class BrandServiceImpl extends BaseDao implements IBrandService {
     public List<Map<String, Object>> queryActiveBrand(Integer categoryType) {
         Brand brand = new Brand();
         brand.setEnabled(EnabledType.USED);
-        if(categoryType!=null) {
+        if (categoryType != null) {
             brand.setCategoryType(categoryType.byteValue());
         }
         List<Map<String, Object>> brands = brandMapper.selBrandByConditions(brand);
@@ -51,13 +50,18 @@ public class BrandServiceImpl extends BaseDao implements IBrandService {
     }
 
     @Override
-    public List<Map<String, Object>>  listActiveBrand(){
-       return brandMapper.listActiveBrand();
+    public List<Map<String, Object>> listActiveBrand() {
+        return brandMapper.listActiveBrand();
     }
 
     @Override
     public Brand getBrandById(Long brandId) {
         return brandMapper.selectByPrimaryKey(brandId);
+    }
+
+    @Override
+    public List<Map<String, Object>> getBrandByName(String brandName) {
+        return brandMapper.getBrandByName(brandName);
     }
 
 }

@@ -34,7 +34,7 @@ public class GeographyServiceImpl extends BaseDao implements GeographyService {
     }
 
     @Override
-    public List<Map<String, Object>> getGeographyGroupList() {
+    public List<Geography> getGeographyGroupList() {
         return geographyMapper.getGeographyGroupList();
     }
 }

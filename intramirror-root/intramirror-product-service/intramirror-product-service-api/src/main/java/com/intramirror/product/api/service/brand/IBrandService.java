@@ -19,4 +19,5 @@ public interface IBrandService {
 
     List<Map<String, Object>> listActiveBrand();
 
+    List<Map<String, Object>> getBrandByName(String brandName);
 }

@@ -70,4 +70,17 @@ public class PromotionRule {
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
+
+    @Override
+    public String toString() {
+        return "PromotionRule{" +
+                "ruleId=" + ruleId +
+                ", promotionId=" + promotionId +
+                ", vendorId=" + vendorId +
+                ", seasonCode='" + seasonCode + '\'' +
+                ", brands='" + brands + '\'' +
+                ", categorys='" + categorys + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
+    }
 }

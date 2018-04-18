@@ -127,4 +127,10 @@ public interface IShipmentService {
 	 * @return
 	 */
 	String getShipmentNoById(Map<String, Object> map);
+
+	/**
+	 * @param map
+	 * @return
+	 */
+	List<Shipment> getShipmentList(Map<String, Object> map);
 }

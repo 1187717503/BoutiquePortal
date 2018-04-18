@@ -709,14 +709,16 @@ public class PriceChangeRuleController extends BaseController {
             String productCode = map.get("product_code").toString();
             String price_change_rule_id = map.get("price_change_rule_id").toString();
 
+            PriceChangeRule pcr = priceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
+
             //查询是否存在该商品
             ProductWithBLOBs nproductWithBLOBs = null;
             if (StringUtils.isNotBlank(productCode)) {
                 ProductWithBLOBs productWithBLOBs = new ProductWithBLOBs();
                 productWithBLOBs.setProductCode(productCode);
                 productWithBLOBs.setEnabled(EnabledType.USED);
+                productWithBLOBs.setVendorId(pcr.getVendorId());
                 nproductWithBLOBs = productService.selectByParameter(productWithBLOBs);
-
             }
 
             if (nproductWithBLOBs == null) {

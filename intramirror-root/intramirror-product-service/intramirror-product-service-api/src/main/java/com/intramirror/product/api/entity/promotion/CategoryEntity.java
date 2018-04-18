@@ -50,4 +50,15 @@ public class CategoryEntity {
     public void setName(String name) {
         this.name = name;
     }
+
+    @Override
+    public String toString() {
+        return "CategoryEntity{" +
+                "categoryId=" + categoryId +
+                ", name='" + name + '\'' +
+                ", level=" + level +
+                ", parentId=" + parentId +
+                ", isDel=" + isDel +
+                '}';
+    }
 }
