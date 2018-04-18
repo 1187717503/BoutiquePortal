@@ -151,6 +151,10 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	public void saveSubShipment(List<Map<String, Object>> map, Map<String, Object> lastMap, Long shipmentId, Long logisticProductId){
 		//打印入参段
 		logger.info("pararmeter " + new Gson().toJson(map));
+		Map<String, Object> getShipment = new HashMap<>();
+		getShipment.put("shipmentId",shipmentId);
+		Shipment shipment = shipmentMapper.selectShipmentById(getShipment);
+		String shipToGeography = shipment.getShipToGeography();
 		Date currentDate = new Date();
 		//根据不同段生成不同sub-shipment
 		if (null != map && 0 < map.size()){
@@ -159,13 +163,18 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			if (map.size() == 1){
 //				if (1==Long.parseLong(shipmentType)){
 				Long segmentSequence = Long.parseLong(map.get(0).get("segment_sequence").toString());
-				//subShipmentMapper.insertSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence));
-				SubShipment subShipment = saveBeanVO(map.get(0), currentDate, shipmentId, segmentSequence);
-				subShipmentMapper.insertSubshipmentVO(subShipment);
+				Long subShipmentId = null;
+				if ("Transit Warehouse".equals(shipToGeography)){
+					SubShipment subShipment = saveBeanVO(map.get(0), currentDate, shipmentId, segmentSequence);
+					subShipmentMapper.insertSubshipmentVO(subShipment);
+					subShipmentId = subShipment.getSubShipmentId();
+				}else {
+					subShipmentMapper.insertSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence));
+					subShipmentId = subShipmentMapper.getSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence));
+				}
 				Map<String, Object> lpsMap = new HashMap<>();
-				//Long subShipmentId = subShipmentMapper.getSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence));
 				lpsMap.put("logisticProductId", logisticProductId);
-				lpsMap.put("subShipmentId", subShipment.getShipmentId());
+				lpsMap.put("subShipmentId", subShipmentId);
 				logisticProductShipmentMapper.insertlpShipment(lpsMap);
 //				}else {
 //					Long segmentSequence = Long.parseLong(map.get(0).get("segment_sequence").toString());
