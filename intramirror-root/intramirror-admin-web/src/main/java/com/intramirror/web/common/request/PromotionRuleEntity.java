@@ -2,6 +2,7 @@ package com.intramirror.web.common.request;
 
 import com.intramirror.product.api.entity.promotion.BrandEntity;
 import com.intramirror.product.api.entity.promotion.CategoryEntity;
+import com.intramirror.product.api.entity.promotion.ImportDataEntity;
 import java.util.List;
 
 /**
@@ -11,10 +12,19 @@ import java.util.List;
 public class PromotionRuleEntity {
     List<BrandEntity> brands;
     List<CategoryEntity> categorys;
+    List<ImportDataEntity> importData;
     Long promotionId;
     Long vendorId;
     String seasonCode;
     Long ruleId;
+
+    public List<ImportDataEntity> getImportData() {
+        return importData;
+    }
+
+    public void setImportData(List<ImportDataEntity> importData) {
+        this.importData = importData;
+    }
 
     public Long getRuleId() {
         return ruleId;
@@ -66,7 +76,14 @@ public class PromotionRuleEntity {
 
     @Override
     public String toString() {
-        return "PromotionRuleEntity{" + "brands=" + brands + ", categorys=" + categorys + ", promotionId=" + promotionId + ", vendorId=" + vendorId
-                + ", seasonCode='" + seasonCode + '\'' + ", ruleId=" + ruleId + '}';
+        return "PromotionRuleEntity{" +
+                "brands=" + brands +
+                ", categorys=" + categorys +
+                ", importData=" + importData +
+                ", promotionId=" + promotionId +
+                ", vendorId=" + vendorId +
+                ", seasonCode='" + seasonCode + '\'' +
+                ", ruleId=" + ruleId +
+                '}';
     }
 }
