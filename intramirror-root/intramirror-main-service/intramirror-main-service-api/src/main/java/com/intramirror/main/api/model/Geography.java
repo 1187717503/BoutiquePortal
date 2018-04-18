@@ -56,6 +56,16 @@ public class Geography {
 
     private String packEnglishGroup;
 
+    //大区描述
+    private String   description;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public Integer getPackGroup() {
         return packGroup;

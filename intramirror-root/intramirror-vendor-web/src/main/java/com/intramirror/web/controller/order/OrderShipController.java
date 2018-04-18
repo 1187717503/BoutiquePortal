@@ -375,7 +375,7 @@ public class OrderShipController extends BaseController {
         ResultMessage result = new ResultMessage();
         result.errorStatus();
         try {
-            List<Map<String, Object>> geographyList = geographyService.getGeographyGroupList();
+            List<Geography> geographyList = geographyService.getGeographyGroupList();
 
             result.successStatus();
             result.setData(geographyList);

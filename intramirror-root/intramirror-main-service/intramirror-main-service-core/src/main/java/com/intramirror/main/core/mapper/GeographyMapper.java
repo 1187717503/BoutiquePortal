@@ -56,5 +56,5 @@ public interface GeographyMapper {
 
     List<Map<String, Object>> getGeographyList();
 
-    List<Map<String, Object>> getGeographyGroupList();
+    List<Geography> getGeographyGroupList();
 }

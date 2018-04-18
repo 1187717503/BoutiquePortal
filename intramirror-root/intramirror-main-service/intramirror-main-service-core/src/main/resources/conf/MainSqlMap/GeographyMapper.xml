@@ -14,6 +14,7 @@
         <result column="english_name" jdbcType="VARCHAR" property="englishName"/>
         <result column="pack_group" jdbcType="INTEGER" property="packGroup"/>
         <result column="pack_english_name" jdbcType="VARCHAR" property="packEnglishGroup"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
     </resultMap>
     <sql id="Base_Column_List">
         <!--
