@@ -70,7 +70,7 @@ public class PromotionServiceImpl implements IPromotionService {
     @Override
     public PromotionRule processPromotionRule(PromotionRule rule, PromotionRuleType ruleType) {
         LOGGER.info("Start to save promotion include rule.");
-        if (ruleType == PromotionRuleType.INCLUDE_RULE) {
+        if (ruleType == PromotionRuleType.INCLUDE_RULE || ruleType == PromotionRuleType.INCLUDE_IMPORT_RULE) {
             promotionRuleMapper.insertIncludeRule(rule);
         } else {
             promotionRuleMapper.insertExcludeRule(rule);

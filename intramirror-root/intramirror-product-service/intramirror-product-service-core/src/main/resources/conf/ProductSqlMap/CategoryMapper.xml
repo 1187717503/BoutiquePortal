@@ -330,4 +330,12 @@
                     and acm.boutique_first_category = #{boutique_first_category,jdbcType=VARCHAR}
                     and c.category_id is not null;
   </select>
+
+    <select id="getSubCidByPid" parameterType="java.lang.Long" resultType="java.util.Map">
+        select
+          category_id
+        from category
+        where `parent_id` = #{categoryId,jdbcType=BIGINT} and enabled = 1;
+    </select>
+
 </mapper>

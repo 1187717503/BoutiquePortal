@@ -38,5 +38,7 @@ public interface ICategoryService {
     List<Map<String, Object>> getCategoryByCondition(Map<String, Object> map);
 
     //    List<Category> listCategoryByConditions(Category category);
+    
+    List<Map<String, Object>> getSubCidByPid(Long categoryId);
 
 }

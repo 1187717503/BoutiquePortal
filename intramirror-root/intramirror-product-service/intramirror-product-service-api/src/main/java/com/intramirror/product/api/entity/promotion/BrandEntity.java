@@ -23,4 +23,12 @@ public class BrandEntity {
     public void setName(String name) {
         this.name = name;
     }
+
+    @Override
+    public String toString() {
+        return "BrandEntity{" +
+                "brandId=" + brandId +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

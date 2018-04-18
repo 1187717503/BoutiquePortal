@@ -104,9 +104,6 @@ public class ConfirmCheckOrderController {
 
         if (map.get("estShipDate") != null && StringUtils.isNotBlank(map.get("estShipDate").toString())) {
             estShipDate = map.get("estShipDate").toString();
-        }else {
-            result.setMsg("estShipDate id Mandatory Field");
-            return result;
         }
 
         if (map.get("logisticsProductId") != null && StringUtils.isNotBlank(map.get("logisticsProductId").toString())) {
@@ -115,9 +112,6 @@ public class ConfirmCheckOrderController {
 
         if (map.get("stockLocation") != null && StringUtils.isNotBlank(map.get("stockLocation").toString())) {
             stockLocation = map.get("stockLocation").toString();
-        }else {
-            result.setMsg("stockLocation id Mandatory Field");
-            return result;
         }
 
         Sku sku = null;

@@ -289,5 +289,22 @@
             brand.enabled = 1
     </select>
 
+    <select id="getBrandByName" parameterType="java.lang.String" resultType="java.util.Map">
+        select
+        brand_id,english_name
+        from brand
+        where enabled = 1
+        <if test="_parameter != null">
+            and english_name = #{brandName,jdbcType=VARCHAR}
+        </if>
+    </select>
+
+    <select id="selectByName" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from api_error_type
+        where enabled = 1 and error_type_name = #{errorTypeName,jdbcType=VARCHAR}
+    </select>
+
 
 </mapper>
