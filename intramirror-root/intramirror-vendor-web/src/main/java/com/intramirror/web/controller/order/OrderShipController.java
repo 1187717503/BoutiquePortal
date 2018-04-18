@@ -501,6 +501,7 @@ public class OrderShipController extends BaseController {
                 result.setMsg("Query Shipment fail,Check parameters, please ");
                 return result;
             }
+            resultMap.put("shipmentNo",shipmentMap.get("shipment_no"));
             logger.info("打印Invoice----获取shipment相关信息及物流第一段类型成功");
             //获取Invoice 信息
             logger.info("打印Invoice----获取Invoice信息");
@@ -551,9 +552,11 @@ public class OrderShipController extends BaseController {
 
             BigDecimal allTotal = new BigDecimal(0);
             BigDecimal VAT = new BigDecimal(0);
-
+            BigDecimal totalWeight = new BigDecimal(0);
+            Map<String,BigDecimal> decimalMap = new HashMap<>();
             if (containerList != null && containerList.size() > 0) {
                 for (Map<String, Object> container : containerList) {
+                    decimalMap.put(container.get("container_id").toString(),new BigDecimal(container.get("weight").toString()));
                     BigDecimal total = new BigDecimal(Double.parseDouble(container.get("in_price").toString()) * Double.parseDouble(container.get("amount").toString())).setScale(2,BigDecimal.ROUND_HALF_UP);
                     container.put("in_price",new BigDecimal(container.get("in_price").toString()).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
                     //获取欧盟的信息
@@ -581,8 +584,14 @@ public class OrderShipController extends BaseController {
                     container.put("Total", total);
                 }
             }
-
-
+            if(decimalMap.size()>0){
+                Set<String> strings = decimalMap.keySet();
+                for (String key:strings){
+                    totalWeight = totalWeight.add(decimalMap.get(key));
+                }
+            }
+            resultMap.put("totalWeight",totalWeight.setScale(2,BigDecimal.ROUND_HALF_UP).toString());
+            resultMap.put("cartonQty",decimalMap.size());
             shipmentMap.put("all_qty", containerList == null ? 0 : containerList.size());
             resultMap.put("all_qty", containerList == null ? 0 : containerList.size());
             resultMap.put("cartonList", containerList);

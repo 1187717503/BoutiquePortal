@@ -61,6 +61,7 @@ public interface SubShipmentMapper {
      * @param sub
      * @return
      */
+    int insertSubshipmentVO(SubShipment sub);
     int insertSubshipment(Map<String, Object> map);
 
     /**
