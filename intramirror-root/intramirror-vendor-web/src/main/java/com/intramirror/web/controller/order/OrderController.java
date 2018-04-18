@@ -1091,8 +1091,8 @@ public class OrderController extends BaseController {
             }
             if (map.get("comments") == null || StringUtils.isBlank(map.get("comments").toString())) {
                 logger.info("comments cannot be null");
-                message.errorStatus().putMsg("info", "comments cannot be null");
-                return message;
+                //message.errorStatus().putMsg("info", "comments cannot be null");
+                //return message;
             }
             if (map.get("order_exception_type_id") == null || StringUtils.isBlank(map.get("order_exception_type_id").toString())) {
                 logger.info("order_exception_type_id cannot be null");
