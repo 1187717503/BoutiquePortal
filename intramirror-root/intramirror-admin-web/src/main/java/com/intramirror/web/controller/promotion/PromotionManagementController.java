@@ -5,7 +5,9 @@ import com.intramirror.common.parameter.StatusType;
 import com.intramirror.core.common.exception.ValidateException;
 import com.intramirror.core.common.response.ErrorResponse;
 import com.intramirror.core.common.response.Response;
+import com.intramirror.product.api.entity.promotion.BrandEntity;
 import com.intramirror.product.api.entity.promotion.CategoryEntity;
+import com.intramirror.product.api.entity.promotion.ImportDataEntity;
 import com.intramirror.product.api.enums.PromotionRuleType;
 import com.intramirror.product.api.model.ProductWithBLOBs;
 import com.intramirror.product.api.model.Promotion;
@@ -13,11 +15,14 @@ import com.intramirror.product.api.model.PromotionBrandHot;
 import com.intramirror.product.api.model.PromotionExcludeProduct;
 import com.intramirror.product.api.model.PromotionRule;
 import com.intramirror.product.api.service.IProductService;
+import com.intramirror.product.api.service.brand.IBrandService;
+import com.intramirror.product.api.service.category.ICategoryService;
 import com.intramirror.product.api.service.promotion.IPromotionExcludeProductService;
 import com.intramirror.product.api.service.promotion.IPromotionService;
 import static com.intramirror.utils.transform.JsonTransformUtil.toJson;
 import static com.intramirror.web.common.request.ConstantsEntity.EXCLUDE;
 import static com.intramirror.web.common.request.ConstantsEntity.INCLUDE;
+import static com.intramirror.web.common.request.ConstantsEntity.INCLUDE_IMPORT;
 import com.intramirror.web.common.request.PromotionRuleEntity;
 import com.intramirror.web.controller.cache.CategoryCache;
 import java.util.ArrayList;
@@ -57,6 +62,12 @@ public class PromotionManagementController {
     @Autowired
     IProductService productService;
 
+    @Autowired
+    IBrandService productBrandServiceImpl;
+
+    @Autowired
+    ICategoryService productCategoryServiceImpl;
+
     @GetMapping(value = "/banner/promotion")
     public Response getAllPromotion(@Param(value = "bannerId") Long bannerId) {
         List<Map<String, Object>> result = promotionService.listPromotionByBanner(bannerId);
@@ -75,14 +86,61 @@ public class PromotionManagementController {
             type = PromotionRuleType.INCLUDE_RULE;
         } else if (EXCLUDE.equals(ruleType)) {
             type = PromotionRuleType.EXCLUDE_RULE;
+        } else if (INCLUDE_IMPORT.equals(ruleType)) {
+            type = PromotionRuleType.INCLUDE_IMPORT_RULE;
+
+            //2018-4-16 支持Excel导入Rule Shang
+            if (type == PromotionRuleType.INCLUDE_IMPORT_RULE) {
+                LOGGER.info("==Jian >>before<< add brand and category the body is [{}].", body);
+                body = dealImportBody(body);
+                LOGGER.info("==Jian >>after<< add brand and category the body is [{}].", body);
+            }
+
         } else {
             return Response.status(StatusType.PARAM_NOT_POSITIVE).build();
         }
 
-        PromotionRule promotionRule = transformPromotionRule(body);
+        PromotionRule promotionRule = transformPromotionRule(body, type);
 
         return Response.status(StatusType.SUCCESS).data(promotionService.processPromotionRule(promotionRule, type));
 
+    }
+
+    private PromotionRuleEntity dealImportBody(PromotionRuleEntity body) {
+        List<BrandEntity> listBrand = new ArrayList<BrandEntity>();
+        List<CategoryEntity> listCategory = new ArrayList<CategoryEntity>();
+        List<ImportDataEntity> listImportData = body.getImportData();
+
+        for (ImportDataEntity idata : listImportData) {
+            BrandEntity be = new BrandEntity();
+            List<Map<String, Object>> listBrandTmp = productBrandServiceImpl.getBrandByName(idata.getBrandName());
+            if (listBrandTmp.size() == 1) {
+                Map<String, Object> brandMap = listBrandTmp.get(0);
+                be.setBrandId(Long.parseLong(brandMap.get("brand_id").toString()));
+                be.setName((String) brandMap.get("english_name"));
+                listBrand.add(be);
+                LOGGER.info("==Jian add brandEntity [{}].", be);
+            }
+
+            List<CategoryEntity> listCategoryTmp = idata.getCategorys();
+            LOGGER.info("==Jian listCategoryTmp.size() is [{}].", listCategoryTmp.size());
+            for (CategoryEntity ce : listCategoryTmp) {
+                List<Map<String, Object>> listCategoryTmp1 = productCategoryServiceImpl.getSubCidByPid(ce.getCategoryId());
+                listCategory.add(ce);
+                LOGGER.info("==Jian add categoryEntity [{}].", ce);
+                if (listCategoryTmp1.size() >= 1) {
+                    for (Map<String, Object> it : listCategoryTmp1) {
+                        CategoryEntity ceTmp = new CategoryEntity();
+                        ceTmp.setCategoryId(Long.parseLong(it.get("category_id").toString()));
+                        listCategory.add(ceTmp);
+                        LOGGER.info("==Jian add categoryEntity [{}].", ceTmp);
+                    }
+                }
+            }
+        }
+        body.setBrands(listBrand);
+        body.setCategorys(listCategory);
+        return body;
     }
 
     @DeleteMapping(value = "/promotion/{ruleType}/{ruleId}")
@@ -158,19 +216,19 @@ public class PromotionManagementController {
             return Response.status(StatusType.PARAM_NOT_POSITIVE).build();
         }
 
-        PromotionRule promotionRule = transformPromotionRule(body);
+        PromotionRule promotionRule = transformPromotionRule(body, type);
 
         return Response.status(StatusType.SUCCESS).data(promotionService.updatePromotionRule(type, promotionRule));
     }
 
-    private PromotionRule transformPromotionRule(PromotionRuleEntity body) {
+    private PromotionRule transformPromotionRule(PromotionRuleEntity body, PromotionRuleType type) {
         PromotionRule promotionRule = new PromotionRule();
         promotionRule.setRuleId(body.getRuleId());
-        promotionRule.setBrands(JSONArray.toJSONString(body.getBrands()));
         promotionRule.setPromotionId(body.getPromotionId());
         promotionRule.setVendorId(body.getVendorId());
         promotionRule.setSeasonCode(body.getSeasonCode());
 
+        promotionRule.setBrands(JSONArray.toJSONString(body.getBrands()));
         for (CategoryEntity category : body.getCategorys()) {
             if (category.getCategoryId() == -1L) {
                 category.setName("All Category");
@@ -178,6 +236,7 @@ public class PromotionManagementController {
                 category.setName(categoryCache.getAbsolutelyCategoryPath(category.getCategoryId()));
             }
         }
+
         promotionRule.setCategorys(JSONArray.toJSONString(body.getCategorys()));
         return promotionRule;
     }

@@ -7,4 +7,5 @@ package com.intramirror.web.common.request;
 public class ConstantsEntity {
     public static final String INCLUDE = "include";
     public static final String EXCLUDE = "exclude";
+    public static final String INCLUDE_IMPORT = "include_import";
 }

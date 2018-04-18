@@ -5,5 +5,5 @@ package com.intramirror.product.api.enums;
  * @author 123
  */
 public enum PromotionRuleType {
-    INCLUDE_RULE, EXCLUDE_RULE
+    INCLUDE_RULE, EXCLUDE_RULE, INCLUDE_IMPORT_RULE
 }

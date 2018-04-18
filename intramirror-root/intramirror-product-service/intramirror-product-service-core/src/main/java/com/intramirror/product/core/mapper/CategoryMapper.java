@@ -85,4 +85,6 @@ public interface CategoryMapper {
 
     Category findCategoryByCategoryId(Long categoryId);
 
+    List<Map<String, Object>> getSubCidByPid(Long categoryId);
+
 }
