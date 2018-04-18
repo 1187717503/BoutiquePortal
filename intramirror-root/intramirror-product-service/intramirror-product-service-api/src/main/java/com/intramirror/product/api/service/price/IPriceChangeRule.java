@@ -20,7 +20,7 @@ public interface IPriceChangeRule {
      */
     boolean updateVendorPrice(int categoryType) throws Exception;
 
-    boolean updateVendorPrice(Long vendor_id, int categoryType, long price_change_rule_id) throws Exception;
+    boolean updateVendorPrice(Long vendor_id, int categoryType, Long price_change_rule_id) throws Exception;
 
     /**
      * 定时job修改shop价格 update im_price -> shop_product_sku.sale_price
