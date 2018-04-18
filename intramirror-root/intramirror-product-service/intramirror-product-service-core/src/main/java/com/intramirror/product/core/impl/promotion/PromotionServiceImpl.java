@@ -82,6 +82,16 @@ public class PromotionServiceImpl implements IPromotionService {
 
     @Transactional
     @Override
+    public boolean processImportPromotionRule(List<PromotionRule> listRule) {
+        LOGGER.info("Start to save <<import>> promotion include rule.");
+        for (PromotionRule rule : listRule) {
+            promotionRuleMapper.insertIncludeRule(rule);
+        }
+        return true;
+    }
+
+    @Transactional
+    @Override
     public Boolean removePromotionRule(Long ruleId, PromotionRuleType ruleType) {
         Boolean flag = false;
         if (ruleType == PromotionRuleType.INCLUDE_RULE) {
