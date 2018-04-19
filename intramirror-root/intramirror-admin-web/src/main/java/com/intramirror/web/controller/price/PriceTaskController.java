@@ -77,7 +77,6 @@ public class PriceTaskController {
 
     /**
      * 同步价格到 shop_product, product
-     *
      * @throws Exception
      */
     public synchronized void syncAllRedundantTable() throws Exception {

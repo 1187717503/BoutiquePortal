@@ -392,6 +392,10 @@ public class PriceChangeRuleExcelUtils {
                 break;
             }
 
+            if(row == null || row.getCell(0) == null) {
+                break;
+            }
+
             String brand_id = getBrandId(brandNames,row.getCell(0).getStringCellValue());
             if(brand_id.equals("0")){ //default brand
                 defaultValues.add(0,"0");
