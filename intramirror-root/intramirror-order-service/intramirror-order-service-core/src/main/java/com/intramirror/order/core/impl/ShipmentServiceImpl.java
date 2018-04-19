@@ -164,18 +164,27 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 //				if (1==Long.parseLong(shipmentType)){
 				Long segmentSequence = Long.parseLong(map.get(0).get("segment_sequence").toString());
 				Long subShipmentId = null;
+				Long oldSubShipmentId = null;
 				if ("Transit Warehouse".equals(shipToGeography)){
-					SubShipment subShipment = saveBeanVO(map.get(0), currentDate, shipmentId, segmentSequence);
-					subShipmentMapper.insertSubshipmentVO(subShipment);
-					subShipmentId = subShipment.getSubShipmentId();
+					oldSubShipmentId = subShipmentMapper.getSubshipment(saveBeanByMap(map.get(0), currentDate, shipmentId , segmentSequence));
+					if(oldSubShipmentId==null){
+						SubShipment subShipment = saveBeanVO(map.get(0), currentDate, shipmentId, segmentSequence);
+						subShipmentMapper.insertSubshipmentVO(subShipment);
+						subShipmentId = subShipment.getSubShipmentId();
+					}
 				}else {
-					subShipmentMapper.insertSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence));
-					subShipmentId = subShipmentMapper.getSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence));
+					oldSubShipmentId = subShipmentMapper.getSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence));
+					if(oldSubShipmentId==null){
+						subShipmentMapper.insertSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence));
+						subShipmentId = subShipmentMapper.getSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence));
+					}
 				}
-				Map<String, Object> lpsMap = new HashMap<>();
-				lpsMap.put("logisticProductId", logisticProductId);
-				lpsMap.put("subShipmentId", subShipmentId);
-				logisticProductShipmentMapper.insertlpShipment(lpsMap);
+				if(oldSubShipmentId==null){
+					Map<String, Object> lpsMap = new HashMap<>();
+					lpsMap.put("logisticProductId", logisticProductId);
+					lpsMap.put("subShipmentId", subShipmentId);
+					logisticProductShipmentMapper.insertlpShipment(lpsMap);
+				}
 //				}else {
 //					Long segmentSequence = Long.parseLong(map.get(0).get("segment_sequence").toString());
 //					//插入物流订单关联查询是否已有记录
