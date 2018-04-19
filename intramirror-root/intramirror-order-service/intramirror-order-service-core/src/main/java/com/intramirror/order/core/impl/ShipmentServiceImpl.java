@@ -158,9 +158,9 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		Date currentDate = new Date();
 		//根据不同段生成不同sub-shipment
 		if (null != map && 0 < map.size()){
-			lastMap.put("shippingSegmentId", Long.parseLong(map.get(0).get("shipping_segment_id").toString()));
 			//每条路线生成不同sub-shipment
-			if (map.size() == 1){
+            if (map.size() == 1){
+                lastMap.put("shippingSegmentId", Long.parseLong(map.get(0).get("shipping_segment_id").toString()));
 //				if (1==Long.parseLong(shipmentType)){
 				Long segmentSequence = Long.parseLong(map.get(0).get("segment_sequence").toString());
 				Long subShipmentId = null;
@@ -192,6 +192,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 				
 			}
 			if (map.size() == 2){
+                lastMap.put("shippingSegmentId", Long.parseLong(map.get(1).get("shipping_segment_id").toString()));
 				Map<String, Object> thisMap = map.get(0);
 				Long segmentSequence = Long.parseLong(map.get(0).get("segment_sequence").toString());
 				//如果该段没有数据生成
@@ -218,6 +219,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 //				}
 			}
 			if (map.size() == 3){
+                lastMap.put("shippingSegmentId", Long.parseLong(map.get(2).get("shipping_segment_id").toString()));
 				Map<String, Object> oneMap = map.get(0);
 				Map<String, Object> twoMap = map.get(1);
 				Long segmentSequence1 = Long.parseLong(map.get(0).get("segment_sequence").toString());

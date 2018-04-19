@@ -180,7 +180,7 @@
 	SELECT sub_shipment_id FROM sub_shipment
 WHERE  shipping_segment_id = #{shippingSegmentId,jdbcType=BIGINT} AND segment_sequence=#{segmentSequence,jdbcType=BIGINT} AND consignee=#{consignee,jdbcType=VARCHAR} 
 AND ship_to_addr=#{shipToAddr,jdbcType=VARCHAR} AND ship_to_district =#{shipToDistrict,jdbcType=VARCHAR} AND ship_to_city = #{shipToCity,jdbcType=VARCHAR}
-AND ship_to_province= #{shipToProvince,jdbcType=VARCHAR} AND ship_to_country=#{shipToCountry,jdbcType=VARCHAR} AND `status` = #{status,jdbcType=BIGINT} ORDER BY created_at DESC LIMIT 1;
+AND ship_to_province= #{shipToProvince,jdbcType=VARCHAR} AND ship_to_country=#{shipToCountry,jdbcType=VARCHAR} AND `status` = #{status,jdbcType=BIGINT} AND shipment_id =#{shipmentId,jdbcType=BIGINT} ORDER BY created_at DESC LIMIT 1;
 </select>
 
     <delete id="deleteSubShipmentByShipmentId" parameterType="java.util.Map">

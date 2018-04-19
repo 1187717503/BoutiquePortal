@@ -246,7 +246,12 @@ public class ShipmentController extends BaseController{
 		}
 		return message;
 	}
-	
+
+	/**
+	 * TODO newShipment逻辑有待修改
+	 * @param map
+	 * @return
+	 */
 	@RequestMapping(value="/newShipment", method=RequestMethod.POST)
 	@ResponseBody
 	public ResultMessage newShipment(@RequestBody Map<String, Object> map){
