@@ -502,6 +502,7 @@ public class OrderShipController extends BaseController {
             invoice.setInvoiceNum(maxDdtNo+"");
             invoice.setShipmentId(shipment_id);
             invoice.setVendorId(vendor.getVendorId());
+            invoice.setInvoiceDate(new Date());
             invoiceService.insertSelective(invoice);
         }else {
             //获取Invoice To信息
