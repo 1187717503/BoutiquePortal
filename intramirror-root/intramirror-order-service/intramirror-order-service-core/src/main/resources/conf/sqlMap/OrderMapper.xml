@@ -97,7 +97,7 @@
 
 
     <select id="getOrderListByStatus" resultType="java.util.HashMap" parameterType="java.util.Map">
-        SELECT p.product_id,g.pack_group,g.pack_english_name,
+        SELECT p.product_id,g.pack_group,g.pack_english_name,lp.stock_Location,
         o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id, s.`size` as size,p.category_id,
         lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
         lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
