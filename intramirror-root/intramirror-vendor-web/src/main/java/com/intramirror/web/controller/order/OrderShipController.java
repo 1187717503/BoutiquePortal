@@ -490,25 +490,31 @@ public class OrderShipController extends BaseController {
 
         //获取ddt number
         long shipment_id = Long.parseLong(map.get("shipment_id").toString());
+        //获取Invoice 信息
+        logger.info("打印Invoice----获取Invoice信息");
+        Invoice invoice = invoiceService.getInvoiceByShipmentId(shipment_id);
         if(map.get("shipmentCategory")!=null&&"1".equals(map.get("shipmentCategory").toString())){
-            Map<String, Object> ddtNo = invoiceService.getMaxDdtNo();
-            int maxDdtNo = ddtNo.get("maxddtNum")!=null?Integer.parseInt(ddtNo.get("maxddtNum").toString()):0;
-            long s = ddtNo.get("shipment_id") != null ? Long.parseLong(ddtNo.get("shipment_id").toString()) : 0;
-            if (s!=shipment_id){
-                Invoice invoice = new Invoice();
-                if(maxDdtNo<10000){
-                    maxDdtNo = 10000;
-                }else {
-                    maxDdtNo++;
+            if (invoice==null){
+                Map<String, Object> ddtNo = invoiceService.getMaxDdtNo();
+                int maxDdtNo = ddtNo.get("maxddtNum")!=null?Integer.parseInt(ddtNo.get("maxddtNum").toString()):0;
+                long s = ddtNo.get("shipment_id") != null ? Long.parseLong(ddtNo.get("shipment_id").toString()) : 0;
+                if (s!=shipment_id){
+                    Invoice newInvoice = new Invoice();
+                    if(maxDdtNo<10000){
+                        maxDdtNo = 10000;
+                    }else {
+                        maxDdtNo++;
+                    }
+                    newInvoice.setEnabled(true);
+                    newInvoice.setDdtNum(maxDdtNo);
+                    newInvoice.setInvoiceNum("");
+                    newInvoice.setShipmentId(shipment_id);
+                    newInvoice.setVendorId(vendor.getVendorId());
+                    newInvoice.setInvoiceDate(new Date());
+                    newInvoice.setVatNum(0l);
+                    invoiceService.insertSelective(newInvoice);
+                    invoice = newInvoice;
                 }
-                invoice.setEnabled(true);
-                invoice.setDdtNum(maxDdtNo);
-                invoice.setInvoiceNum("");
-                invoice.setShipmentId(shipment_id);
-                invoice.setVendorId(vendor.getVendorId());
-                invoice.setInvoiceDate(new Date());
-                invoice.setVatNum(0l);
-                invoiceService.insertSelective(invoice);
             }
         }else {
             //获取Invoice To信息
@@ -533,9 +539,7 @@ public class OrderShipController extends BaseController {
             }
             resultMap.put("shipmentNo",shipmentMap.get("shipment_no"));
             logger.info("打印Invoice----获取shipment相关信息及物流第一段类型成功");
-            //获取Invoice 信息
-            logger.info("打印Invoice----获取Invoice信息");
-            Invoice invoice = invoiceService.getInvoiceByShipmentId(shipment_id);
+
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
             if(map.get("shipmentCategory")!=null&&"1".equals(map.get("shipmentCategory").toString())){
