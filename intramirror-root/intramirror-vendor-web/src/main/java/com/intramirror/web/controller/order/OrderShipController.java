@@ -491,19 +491,25 @@ public class OrderShipController extends BaseController {
         //获取ddt number
         long shipment_id = Long.parseLong(map.get("shipment_id").toString());
         if(map.get("shipmentCategory")!=null&&"1".equals(map.get("shipmentCategory").toString())){
-            int maxDdtNo = invoiceService.getMaxDdtNo();
-            Invoice invoice = new Invoice();
-            if(maxDdtNo<10000){
-                maxDdtNo = 10000;
-            }else {
-                maxDdtNo++;
+            Map<String, Object> ddtNo = invoiceService.getMaxDdtNo();
+            int maxDdtNo = ddtNo.get("maxddtNum")!=null?Integer.parseInt(ddtNo.get("maxddtNum").toString()):0;
+            long s = ddtNo.get("shipment_id") != null ? Long.parseLong(ddtNo.get("shipment_id").toString()) : 0;
+            if (s!=shipment_id){
+                Invoice invoice = new Invoice();
+                if(maxDdtNo<10000){
+                    maxDdtNo = 10000;
+                }else {
+                    maxDdtNo++;
+                }
+                invoice.setEnabled(true);
+                invoice.setDdtNum(maxDdtNo);
+                invoice.setInvoiceNum("");
+                invoice.setShipmentId(shipment_id);
+                invoice.setVendorId(vendor.getVendorId());
+                invoice.setInvoiceDate(new Date());
+                invoice.setVatNum(0l);
+                invoiceService.insertSelective(invoice);
             }
-            invoice.setEnabled(true);
-            invoice.setInvoiceNum(maxDdtNo+"");
-            invoice.setShipmentId(shipment_id);
-            invoice.setVendorId(vendor.getVendorId());
-            invoice.setInvoiceDate(new Date());
-            invoiceService.insertSelective(invoice);
         }else {
             //获取Invoice To信息
             logger.info("打印Invoice----获取Invoice To信息");
@@ -532,7 +538,11 @@ public class OrderShipController extends BaseController {
             Invoice invoice = invoiceService.getInvoiceByShipmentId(shipment_id);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
-            resultMap.put("InvoiceNumber", invoice.getInvoiceNum());
+            if(map.get("shipmentCategory")!=null&&"1".equals(map.get("shipmentCategory").toString())){
+                resultMap.put("InvoiceNumber", invoice.getDdtNum());
+            }else {
+                resultMap.put("InvoiceNumber", invoice.getInvoiceNum());
+            }
             if (invoice.getInvoiceDate() != null) {
                 String invoiceDate = sdf.format(invoice.getInvoiceDate());
                 resultMap.put("InvoiceDate", sdf2.format(sdf.parse(invoiceDate)));

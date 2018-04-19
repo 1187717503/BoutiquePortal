@@ -9,6 +9,8 @@ import com.intramirror.logistics.core.dao.BaseDao;
 import com.intramirror.logistics.core.mapper.InvoiceMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 public class InvoiceServiceImpl extends BaseDao implements IInvoiceService{
 	
@@ -70,7 +72,7 @@ public class InvoiceServiceImpl extends BaseDao implements IInvoiceService{
 	}
 
 	@Override
-	public int getMaxDdtNo() {
+	public Map<String,Object> getMaxDdtNo() {
 		return invoiceMapper.getMaxNum();
 	}
 }

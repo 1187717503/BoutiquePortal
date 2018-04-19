@@ -2,6 +2,8 @@ package com.intramirror.logistics.api.service;
 
 import com.intramirror.logistics.api.model.Invoice;
 
+import java.util.Map;
+
 public interface IInvoiceService {
 	
     /**
@@ -76,6 +78,6 @@ public interface IInvoiceService {
      * 获取最大ddt num
      * @return
      */
-    int getMaxDdtNo();
+    Map<String,Object> getMaxDdtNo();
 
 }
