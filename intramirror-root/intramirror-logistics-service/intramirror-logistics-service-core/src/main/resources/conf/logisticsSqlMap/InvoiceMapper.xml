@@ -193,9 +193,8 @@
     </select>
 
     <select id="getMaxNum" resultType="map">
-        SELECT ddt_num as maxddtNum,s.shipment_id FROM invoice i
-        INNER JOIN shipment s on s.shipment_id = i.shipment_id
-        WHERE s.shipment_category = 1
+        SELECT ddt_num as maxddtNum,i.shipment_id FROM invoice i
+        WHERE i.enabled = 1
         ORDER BY ddt_num DESC LIMIT 1
     </select>
 </mapper>
