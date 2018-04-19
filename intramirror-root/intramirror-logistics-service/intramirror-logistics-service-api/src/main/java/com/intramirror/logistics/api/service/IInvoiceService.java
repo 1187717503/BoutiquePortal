@@ -72,4 +72,10 @@ public interface IInvoiceService {
      */
     Invoice getInvoiceByShipmentId(Long shipmentId);
 
+    /**
+     * 获取最大ddt num
+     * @return
+     */
+    int getMaxDdtNo();
+
 }

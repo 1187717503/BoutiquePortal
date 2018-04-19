@@ -488,10 +488,33 @@ public class OrderShipController extends BaseController {
             return result;
         }
 
+        //获取ddt number
+        long shipment_id = Long.parseLong(map.get("shipment_id").toString());
+        if(map.get("shipmentCategory")!=null&&"1".equals(map.get("shipmentCategory").toString())){
+            int maxDdtNo = invoiceService.getMaxDdtNo();
+            Invoice invoice = new Invoice();
+            if(maxDdtNo<10000){
+                maxDdtNo = 10000;
+            }else {
+                maxDdtNo++;
+            }
+            invoice.setEnabled(true);
+            invoice.setInvoiceNum(maxDdtNo+"");
+            invoice.setShipmentId(shipment_id);
+            invoice.setVendorId(vendor.getVendorId());
+            invoiceService.insertSelective(invoice);
+        }else {
+            //获取Invoice To信息
+            logger.info("打印Invoice----获取Invoice To信息");
+            Shop shop = shopService.selectByPrimaryKey(65l);
+            resultMap.put("InvoiceTo", shop.getBusinessLicenseLocation());
+            resultMap.put("InvoiceName", shop.getShopName());
+        }
+
         try {
             map.put("vendorId", vendor.getVendorId());
             Map<String, Object> getShipment = new HashMap<String, Object>();
-            getShipment.put("shipmentId", Long.parseLong(map.get("shipment_id").toString()));
+            getShipment.put("shipmentId", shipment_id);
 
             //根据shipmentId 获取shipment 相关信息及物流第一段类型
             logger.info("打印Invoice----根据shipmentId 获取shipment 相关信息及物流第一段类型,开始获取");
@@ -505,7 +528,7 @@ public class OrderShipController extends BaseController {
             logger.info("打印Invoice----获取shipment相关信息及物流第一段类型成功");
             //获取Invoice 信息
             logger.info("打印Invoice----获取Invoice信息");
-            Invoice invoice = invoiceService.getInvoiceByShipmentId(Long.parseLong(map.get("shipment_id").toString()));
+            Invoice invoice = invoiceService.getInvoiceByShipmentId(shipment_id);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
             resultMap.put("InvoiceNumber", invoice.getInvoiceNum());
@@ -527,16 +550,12 @@ public class OrderShipController extends BaseController {
             resultMap.put("ShipCompanyName", shipVendor.getCompanyName());
             resultMap.put("ShipVendorName", shipVendor.getVendorName());
 
-            //获取Invoice To信息
-            logger.info("打印Invoice----获取Invoice To信息");
-            Shop shop = shopService.selectByPrimaryKey(65l);
-            resultMap.put("InvoiceTo", shop.getBusinessLicenseLocation());
-            resultMap.put("InvoiceName", shop.getShopName());
+
 
             logger.info("打印Invoice----获取Deliver To信息");
-            List<SubShipment> subShipmentList = subShipmentService.getSubShipmentByShipmentId(Long.parseLong(map.get("shipment_id").toString()));
+            List<SubShipment> subShipmentList = subShipmentService.getSubShipmentByShipmentId(shipment_id);
             if (subShipmentList.size() > 1) {
-                ShippingProvider shippingProvider = shippingProviderService.getShippingProviderByShipmentId(Long.parseLong(map.get("shipment_id").toString()));
+                ShippingProvider shippingProvider = shippingProviderService.getShippingProviderByShipmentId(shipment_id);
                 resultMap.put("DeliverTo", shippingProvider);
             } else if (subShipmentList.size() == 1) {
                 resultMap.put("DeliverTo", subShipmentList.get(0));
@@ -546,7 +565,7 @@ public class OrderShipController extends BaseController {
             }
             //获取carton列表
             Set<Long> shipmentIds =  new HashSet<>();
-            shipmentIds.add(Long.parseLong(map.get("shipment_id").toString()));
+            shipmentIds.add(shipment_id);
             map.put("shipmentIds",shipmentIds);
             List<Map<String, Object>> containerList = orderService.getOrderListByShipmentId(map);
 
@@ -564,7 +583,7 @@ public class OrderShipController extends BaseController {
                     logger.info("打印Invoice----获取VAT信息");
                     //获取当前shipment的信息
                     Map<String, Object> shipmentPramMap = new HashMap<>();
-                    shipmentPramMap.put("shipmentId", Long.parseLong(map.get("shipment_id").toString()));
+                    shipmentPramMap.put("shipmentId", shipment_id);
                     Shipment shipment = iShipmentService.selectShipmentById(shipmentPramMap);
                     if (geography != null && shipment != null && geography.getGeographyId().toString().equals(container.get("geography_id").toString())) {
                         if (geography.getEnglishName().equals(shipment.getShipToGeography())) {

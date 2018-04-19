@@ -184,4 +184,10 @@
         where shipment_id = #{shipmentId,jdbcType=BIGINT}
         and enabled = 1
     </select>
+
+    <select id="getMaxNum" resultType="int">
+        SELECT max(invoice_num) FROM invoice i
+        INNER JOIN shipment s on s.shipment_id = i.shipment_id
+        WHERE s.shipment_category = 1
+    </select>
 </mapper>

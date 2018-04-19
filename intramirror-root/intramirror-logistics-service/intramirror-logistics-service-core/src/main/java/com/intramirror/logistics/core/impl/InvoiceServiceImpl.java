@@ -68,6 +68,9 @@ public class InvoiceServiceImpl extends BaseDao implements IInvoiceService{
 		
 		return invoiceMapper.updateByShipmentId(record);
 	}
-	
 
+	@Override
+	public int getMaxDdtNo() {
+		return invoiceMapper.getMaxNum();
+	}
 }

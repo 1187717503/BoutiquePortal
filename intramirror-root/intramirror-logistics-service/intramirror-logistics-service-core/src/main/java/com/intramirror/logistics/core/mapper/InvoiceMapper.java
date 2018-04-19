@@ -73,4 +73,10 @@ public interface InvoiceMapper {
     int updateByPrimaryKey(Invoice record);
 
     Invoice getInvoiceByShipmentId(Long shipmentId);
+
+    /**
+     * 获取最大的ddt num
+     * @return
+     */
+    int getMaxNum();
 }
