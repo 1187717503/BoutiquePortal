@@ -58,15 +58,15 @@
 
     <update id="confirmSkuStore" parameterType="java.lang.Long">
         UPDATE sku_store s
-        SET s.reserved  = s.reserved - 1,
-            s.confirmed = s.confirmed + 1
+        SET s.reserved = s.reserved - 1,
+        s.confirmed = s.confirmed + 1
         WHERE sku_store_id = #{skuStoreId,jdbcType=BIGINT}
     </update>
 
     <update id="confirmSkuStoreByNegativeStore" parameterType="java.lang.Long">
         UPDATE sku_store s
-        SET s.store     = s.store + 1,
-            s.confirmed = s.confirmed - 1
+        SET s.store = s.store + 1,
+        s.confirmed = s.confirmed - 1
         WHERE sku_store_id = #{skuStoreId,jdbcType=BIGINT}
     </update>
 
@@ -74,28 +74,28 @@
         UPDATE sku_store ss, sku s, shop_product_sku sps
         SET SS.confirmed = SS.confirmed - 1, SS.store = 0
         WHERE SS.enabled = 1 AND SS.sku_id = s.sku_id
-              AND s.enabled = 1 AND s.sku_id = sps.sku_id
-              AND sps.enabled = 1 AND sps.shop_product_sku_id = #{shopProductSkuId,jdbcType=BIGINT}
+        AND s.enabled = 1 AND s.sku_id = sps.sku_id
+        AND sps.enabled = 1 AND sps.shop_product_sku_id = #{shopProductSkuId,jdbcType=BIGINT}
     </update>
 
     <select id="selectSkuStoreByShopProductSkuId" resultMap="BaseResultMap" parameterType="java.lang.Long">
         SELECT ss.*
         FROM sku_store ss
-            INNER JOIN sku s ON (ss.sku_id = s.sku_id AND s.enabled = 1)
-            INNER JOIN shop_product_sku sps ON (s.sku_id = sps.sku_id AND sps.enabled = 1)
+        INNER JOIN sku s ON (ss.sku_id = s.sku_id AND s.enabled = 1)
+        INNER JOIN shop_product_sku sps ON (s.sku_id = sps.sku_id AND sps.enabled = 1)
         WHERE sps.enabled = 1 AND sps.shop_product_sku_id = #{shopProductSkuId,jdbcType=BIGINT}
     </select>
 
     <select id="listSkuStoreByProductId" resultType="java.util.HashMap" parameterType="java.lang.Long">
         SELECT
-            sku_store.sku_id,
-            sku_store.sku_store_id,
-            sku_store.store,
-            sku_store.reserved,
-            sku_store.confirmed,
-            sku.`size`
+        sku_store.sku_id,
+        sku_store.sku_store_id,
+        sku_store.store,
+        sku_store.reserved,
+        sku_store.confirmed,
+        sku.`size`
         FROM sku_store
-            INNER JOIN sku ON sku.sku_id = sku_store.sku_id
+        INNER JOIN sku ON sku.sku_id = sku_store.sku_id
         WHERE sku_store.product_id = #{productId} AND sku_store.enabled = 1;
     </select>
 
@@ -108,7 +108,7 @@
         sku_store.reserved,
         sku_store.confirmed,
         sku_store.last_check,
-        func_size_map(sku.`size`) as size,
+        func_size_map_new(sku_store.product_id,sku.`size`) as size,
         sku.sku_code as bar_code,
         product_exception.status as exceptionStatus,
         product_exception.created_at AS exceptionDate

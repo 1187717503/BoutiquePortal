@@ -488,10 +488,46 @@ public class OrderShipController extends BaseController {
             return result;
         }
 
+        //获取ddt number
+        long shipment_id = Long.parseLong(map.get("shipment_id").toString());
+        //获取Invoice 信息
+        logger.info("打印Invoice----获取Invoice信息");
+        Invoice invoice = invoiceService.getInvoiceByShipmentId(shipment_id);
+        if(map.get("shipmentCategory")!=null&&"1".equals(map.get("shipmentCategory").toString())){
+            if (invoice==null){
+                Map<String, Object> ddtNo = invoiceService.getMaxDdtNo();
+                int maxDdtNo = ddtNo.get("maxddtNum")!=null?Integer.parseInt(ddtNo.get("maxddtNum").toString()):0;
+                long s = ddtNo.get("shipment_id") != null ? Long.parseLong(ddtNo.get("shipment_id").toString()) : 0;
+                if (s!=shipment_id){
+                    Invoice newInvoice = new Invoice();
+                    if(maxDdtNo<10000){
+                        maxDdtNo = 10000;
+                    }else {
+                        maxDdtNo++;
+                    }
+                    newInvoice.setEnabled(true);
+                    newInvoice.setDdtNum(maxDdtNo);
+                    newInvoice.setInvoiceNum("");
+                    newInvoice.setShipmentId(shipment_id);
+                    newInvoice.setVendorId(vendor.getVendorId());
+                    newInvoice.setInvoiceDate(new Date());
+                    newInvoice.setVatNum(0l);
+                    invoiceService.insertSelective(newInvoice);
+                    invoice = newInvoice;
+                }
+            }
+        }else {
+            //获取Invoice To信息
+            logger.info("打印Invoice----获取Invoice To信息");
+            Shop shop = shopService.selectByPrimaryKey(65l);
+            resultMap.put("InvoiceTo", shop.getBusinessLicenseLocation());
+            resultMap.put("InvoiceName", shop.getShopName());
+        }
+
         try {
             map.put("vendorId", vendor.getVendorId());
             Map<String, Object> getShipment = new HashMap<String, Object>();
-            getShipment.put("shipmentId", Long.parseLong(map.get("shipment_id").toString()));
+            getShipment.put("shipmentId", shipment_id);
 
             //根据shipmentId 获取shipment 相关信息及物流第一段类型
             logger.info("打印Invoice----根据shipmentId 获取shipment 相关信息及物流第一段类型,开始获取");
@@ -501,13 +537,16 @@ public class OrderShipController extends BaseController {
                 result.setMsg("Query Shipment fail,Check parameters, please ");
                 return result;
             }
+            resultMap.put("shipmentNo",shipmentMap.get("shipment_no"));
             logger.info("打印Invoice----获取shipment相关信息及物流第一段类型成功");
-            //获取Invoice 信息
-            logger.info("打印Invoice----获取Invoice信息");
-            Invoice invoice = invoiceService.getInvoiceByShipmentId(Long.parseLong(map.get("shipment_id").toString()));
+
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
-            resultMap.put("InvoiceNumber", invoice.getInvoiceNum());
+            if(map.get("shipmentCategory")!=null&&"1".equals(map.get("shipmentCategory").toString())){
+                resultMap.put("InvoiceNumber", invoice.getDdtNum());
+            }else {
+                resultMap.put("InvoiceNumber", invoice.getInvoiceNum());
+            }
             if (invoice.getInvoiceDate() != null) {
                 String invoiceDate = sdf.format(invoice.getInvoiceDate());
                 resultMap.put("InvoiceDate", sdf2.format(sdf.parse(invoiceDate)));
@@ -526,16 +565,12 @@ public class OrderShipController extends BaseController {
             resultMap.put("ShipCompanyName", shipVendor.getCompanyName());
             resultMap.put("ShipVendorName", shipVendor.getVendorName());
 
-            //获取Invoice To信息
-            logger.info("打印Invoice----获取Invoice To信息");
-            Shop shop = shopService.selectByPrimaryKey(65l);
-            resultMap.put("InvoiceTo", shop.getBusinessLicenseLocation());
-            resultMap.put("InvoiceName", shop.getShopName());
+
 
             logger.info("打印Invoice----获取Deliver To信息");
-            List<SubShipment> subShipmentList = subShipmentService.getSubShipmentByShipmentId(Long.parseLong(map.get("shipment_id").toString()));
+            List<SubShipment> subShipmentList = subShipmentService.getSubShipmentByShipmentId(shipment_id);
             if (subShipmentList.size() > 1) {
-                ShippingProvider shippingProvider = shippingProviderService.getShippingProviderByShipmentId(Long.parseLong(map.get("shipment_id").toString()));
+                ShippingProvider shippingProvider = shippingProviderService.getShippingProviderByShipmentId(shipment_id);
                 resultMap.put("DeliverTo", shippingProvider);
             } else if (subShipmentList.size() == 1) {
                 resultMap.put("DeliverTo", subShipmentList.get(0));
@@ -545,15 +580,17 @@ public class OrderShipController extends BaseController {
             }
             //获取carton列表
             Set<Long> shipmentIds =  new HashSet<>();
-            shipmentIds.add(Long.parseLong(map.get("shipment_id").toString()));
+            shipmentIds.add(shipment_id);
             map.put("shipmentIds",shipmentIds);
             List<Map<String, Object>> containerList = orderService.getOrderListByShipmentId(map);
 
             BigDecimal allTotal = new BigDecimal(0);
             BigDecimal VAT = new BigDecimal(0);
-
+            BigDecimal totalWeight = new BigDecimal(0);
+            Map<String,BigDecimal> decimalMap = new HashMap<>();
             if (containerList != null && containerList.size() > 0) {
                 for (Map<String, Object> container : containerList) {
+                    decimalMap.put(container.get("container_id").toString(),new BigDecimal(container.get("weight").toString()));
                     BigDecimal total = new BigDecimal(Double.parseDouble(container.get("in_price").toString()) * Double.parseDouble(container.get("amount").toString())).setScale(2,BigDecimal.ROUND_HALF_UP);
                     container.put("in_price",new BigDecimal(container.get("in_price").toString()).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
                     //获取欧盟的信息
@@ -561,7 +598,7 @@ public class OrderShipController extends BaseController {
                     logger.info("打印Invoice----获取VAT信息");
                     //获取当前shipment的信息
                     Map<String, Object> shipmentPramMap = new HashMap<>();
-                    shipmentPramMap.put("shipmentId", Long.parseLong(map.get("shipment_id").toString()));
+                    shipmentPramMap.put("shipmentId", shipment_id);
                     Shipment shipment = iShipmentService.selectShipmentById(shipmentPramMap);
                     if (geography != null && shipment != null && geography.getGeographyId().toString().equals(container.get("geography_id").toString())) {
                         if (geography.getEnglishName().equals(shipment.getShipToGeography())) {
@@ -581,8 +618,14 @@ public class OrderShipController extends BaseController {
                     container.put("Total", total);
                 }
             }
-
-
+            if(decimalMap.size()>0){
+                Set<String> strings = decimalMap.keySet();
+                for (String key:strings){
+                    totalWeight = totalWeight.add(decimalMap.get(key));
+                }
+            }
+            resultMap.put("totalWeight",totalWeight.setScale(2,BigDecimal.ROUND_HALF_UP).toString());
+            resultMap.put("cartonQty",decimalMap.size());
             shipmentMap.put("all_qty", containerList == null ? 0 : containerList.size());
             resultMap.put("all_qty", containerList == null ? 0 : containerList.size());
             resultMap.put("cartonList", containerList);

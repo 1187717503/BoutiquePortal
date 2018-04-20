@@ -2,6 +2,8 @@ package com.intramirror.logistics.api.service;
 
 import com.intramirror.logistics.api.model.Invoice;
 
+import java.util.Map;
+
 public interface IInvoiceService {
 	
     /**
@@ -71,5 +73,11 @@ public interface IInvoiceService {
      * @return
      */
     Invoice getInvoiceByShipmentId(Long shipmentId);
+
+    /**
+     * 获取最大ddt num
+     * @return
+     */
+    Map<String,Object> getMaxDdtNo();
 
 }

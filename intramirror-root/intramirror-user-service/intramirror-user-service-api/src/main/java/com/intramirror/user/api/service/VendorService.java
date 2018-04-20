@@ -18,4 +18,6 @@ public interface VendorService {
     Map<String, String> getProductSkuVendorIdMap(String[] shopProductSkuIds);
 
     List<Map<String, Object>> getAllVendorCountryById(String[] vendorIds);
+
+
 }

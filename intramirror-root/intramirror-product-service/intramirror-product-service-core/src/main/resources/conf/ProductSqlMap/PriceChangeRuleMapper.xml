@@ -768,11 +768,6 @@
         set p.`preview_im_price`  = null
         where p.`vendor_id`  = #{vendor_id,jdbcType=BIGINT} <![CDATA[ and p.`preview_im_price`  >=  s.`im_price`
 
-
-
-
-
-
         ]]>
     </update>
 
@@ -799,7 +794,8 @@
             enabled=1) and enabled=1)
         </if>
         <if test="category_type == 2">
-            and category_id in (select category_id from category where parent_id in (select category_id from category where parent_id in (select category_id from category where category_id not in(1499,1568) and level=1 and enabled=1) and
+            and category_id in (select category_id from category where parent_id in (select category_id from category where parent_id in (select category_id
+            from category where category_id not in(1499,1568) and level=1 and enabled=1) and
             enabled=1) and enabled=1)
         </if>
     </update>

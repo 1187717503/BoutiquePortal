@@ -82,6 +82,16 @@ public class PromotionServiceImpl implements IPromotionService {
 
     @Transactional
     @Override
+    public boolean processImportPromotionRule(List<PromotionRule> listRule) {
+        LOGGER.info("Start to save <<import>> promotion include rule.");
+        for (PromotionRule rule : listRule) {
+            promotionRuleMapper.insertIncludeRule(rule);
+        }
+        return true;
+    }
+
+    @Transactional
+    @Override
     public Boolean removePromotionRule(Long ruleId, PromotionRuleType ruleType) {
         Boolean flag = false;
         if (ruleType == PromotionRuleType.INCLUDE_RULE) {
@@ -506,6 +516,7 @@ public class PromotionServiceImpl implements IPromotionService {
 
                 LOGGER.info("====>Start to add products for promotion={} rule={}, vendor={} brandId={} seasonCode={},category={}.", promotionId,
                         includeRule.get("ruleId"), vendorId, brandId, includeRule.get("seasonCode"), listCategoryId.toArray());
+
                 promotionRuleMapper.addProductsForIncludeRule(promotionId, (Long) includeRule.get("ruleId"), vendorId, (String) includeRule.get("seasonCode"),
                         brandId, listCategoryId, productIds);
             }
