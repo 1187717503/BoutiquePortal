@@ -17,6 +17,7 @@
         <result column="ship_to_city" property="shipToCity" jdbcType="VARCHAR"/>
         <result column="ship_to_province" property="shipToProvince" jdbcType="VARCHAR"/>
         <result column="ship_to_country" property="shipToCountry" jdbcType="VARCHAR"/>
+        <result column="ship_to_country_code" property="shipToCountryCode" jdbcType="VARCHAR"/>
         <result column="status" property="status" jdbcType="INTEGER"/>
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
         <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP"/>
