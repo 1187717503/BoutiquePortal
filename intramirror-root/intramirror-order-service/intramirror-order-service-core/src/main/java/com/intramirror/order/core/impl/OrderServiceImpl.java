@@ -222,6 +222,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
                 }
                 Map<String, Object> addrCountry = orderMapper.selectAddrByCountry(country);
                 map.put("consignee_country_id",Integer.valueOf(addrCountry.get("address_country_id").toString()));
+                map.put("countryCode",addrCountry.get("country_code").toString());
                 return map;
             }
         }

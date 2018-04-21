@@ -16,10 +16,9 @@ public interface IShipmentService {
 
 	/**
 	 * 根据Confirmed的Order生成Shipment 新的Shipment默认有一个carton
-	 * @param shipment
 	 * @return
 	 */
-	String saveShipmentByOrderId(Map<String, Object> map);
+	Shipment saveShipmentByOrderId(Map<String, Object> map);
 	
 	
 	/**

@@ -50,7 +50,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	 * Confirmed的Order生成Shipment 新的Shipment默认有一个carton
 	 */
 	@Override
-	public String saveShipmentByOrderId(Map<String, Object> map) {
+	public Shipment saveShipmentByOrderId(Map<String, Object> map) {
 		logger.info("shimentSaveService parameter " + new Gson().toJson(map));
 		//如果shipment为null创建新的shipment 如果有直接拿shipment生成SUBshipment
 		Long shipmentId = Long.parseLong(map.get("shipmentId")==null?"0":map.get("shipmentId").toString());
@@ -67,6 +67,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			//保存对象信息
 			shipment.setShipToGeography(map.get("pack_english_name")==null?" ":map.get("pack_english_name").toString());
 			Long vendorId = Long.parseLong(map.get("vendor_id").toString());
+			Integer stockLocationId = Integer.parseInt(map.get("stock_location_id").toString());
 			String top = shipmentMapper.getVendorCodeById(vendorId);
 			Map<String, Object> noMap = new HashMap<>();
 			noMap.put("topName", top+"SP");
@@ -79,6 +80,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			shipment.setShipmentNo(top+"SP"+maxNo);
 			shipment.setVendorId(vendorId);
 			shipment.setStatus(ContainerType.OPEN);
+			shipment.setStockLocationId(stockLocationId);
 			shipment.setCreatedAt(currentDate);
 			shipment.setUpdatedAt(currentDate);
 			shipment.setShipmentCategory(shipmentCategory);
@@ -95,7 +97,8 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 				shipmentId = shipmentMapper.getShipmentId(shipment);
 				saveSubShipment(listMap, map,shipmentId,Long.parseLong(
 						map.get("logistics_product_id")==null?"0":map.get("logistics_product_id").toString()));
-				return ""+shipmentId;
+				shipment.setShipmentId(shipmentId);
+				return shipment;
 			}
 		}else{
 			shipment = shipmentMapper.selectShipmentById(map);
@@ -108,7 +111,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 				logger.info("result shipmentType:" + new Gson().toJson(listMap));
 				saveSubShipment(listMap, map,shipmentId,Long.parseLong(
 						map.get("logistics_product_id")==null?"0":map.get("logistics_product_id").toString()));
-				return ""+shipment.getShipmentId();
+				return shipment;
 			}
 		}
 		return null;
@@ -281,6 +284,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		beanMap.put("status", ContainerType.RECEIVED);
 		beanMap.put("updatedAt", currentDate);
 		beanMap.put("createdAt", currentDate);
+		beanMap.put("countryCode",map.get("countryCode")==null?" ":map.get("countryCode").toString());
 		return beanMap;
 	}
 
@@ -298,6 +302,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		subShipment.setShipmentId(shipmentId);
 		subShipment.setCreatedAt(currentDate);
 		subShipment.setStatus(ContainerType.RECEIVED);
+		subShipment.setShipToCountryCode(map.get("country_code")==null?"":map.get("country_code").toString());
 		return subShipment;
 	}
 	

@@ -59,11 +59,21 @@ public class SubShipment {
 	 * @Fields 国家
 	 */
 	private String shipToCountry;
+
+	private String shipToCountryCode;
 	
 	/**
 	 * @Fields shipment ID
 	 */
 	private Long shipmentId;
+
+    public String getShipToCountryCode() {
+        return shipToCountryCode;
+    }
+
+    public void setShipToCountryCode(String shipToCountryCode) {
+        this.shipToCountryCode = shipToCountryCode;
+    }
 
     public String getConsignee() {
 		return consignee;

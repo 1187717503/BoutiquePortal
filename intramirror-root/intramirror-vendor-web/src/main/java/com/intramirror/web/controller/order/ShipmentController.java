@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.intramirror.order.api.model.Shipment;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,9 +93,9 @@ public class ShipmentController extends BaseController{
 			}
 			orderResult.put("shipmentId", map.get("shipmentId").toString());
 			//新的入参
-			String result = iShipmentService.saveShipmentByOrderId(orderResult);
-			if (StringUtils.isNotBlank(result)){
-				message.successStatus().putMsg("info","SUCCESS").setData(result);
+			Shipment result = iShipmentService.saveShipmentByOrderId(orderResult);
+			if (result!=null){
+				message.successStatus().putMsg("info","SUCCESS").setData(result.getShipmentId());
 				return message;
 			}
 			message.errorStatus().putMsg("info","SUCCESS").setData(null);

@@ -12,19 +12,15 @@ import com.intramirror.main.api.enums.GeographyEnum;
 import com.intramirror.order.api.common.OrderStatusType;
 import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.service.IContainerService;
-import com.intramirror.order.api.service.ILogisticProductShipmentService;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderExceptionService;
 import com.intramirror.order.api.service.IOrderExceptionTypeService;
 import com.intramirror.order.api.service.IOrderService;
-import com.intramirror.order.api.service.IShipmentService;
-import com.intramirror.order.api.service.ISubShipmentService;
 import com.intramirror.order.api.model.CancelOrderVO;
 import com.intramirror.order.api.vo.PageListVO;
 import com.intramirror.product.api.model.Product;
 import com.intramirror.product.api.service.IProductService;
 import com.intramirror.product.api.service.ISkuStoreService;
-import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.VendorService;
@@ -43,13 +39,11 @@ import java.net.URLDecoder;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.annotations.Param;
 import org.apache.poi.hssf.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,9 +70,6 @@ public class OrderController extends BaseController {
     private LogisticsProductService logisticsProductService;
 
     @Autowired
-    private ProductPropertyService productPropertyService;
-
-    @Autowired
     private VendorService vendorService;
 
     @Autowired
@@ -94,16 +85,7 @@ public class OrderController extends BaseController {
     private ILogisticsProductService iLogisticsProductService;
 
     @Autowired
-    private IShipmentService iShipmentService;
-
-    @Autowired
     private IContainerService containerService;
-
-    @Autowired
-    private ISubShipmentService subShipmentService;
-
-    @Autowired
-    private ILogisticProductShipmentService logisticProductShipmentService;
 
     @Autowired
     private IOrderExceptionService orderExceptionService;
@@ -190,57 +172,12 @@ public class OrderController extends BaseController {
         }
 
         if (orderList != null && orderList.size() > 0) {
-            //			/**------------------------------------优化----------------------------------------*/
-            //			//遍历获取所有商品ID
-            //			String productIds = "";
-            //			for(Map<String, Object> info : orderList){
-            //				productIds +=info.get("product_id").toString()+",";
-            //			}
-            //
-            //			if(StringUtils.isNoneBlank(productIds)){
-            //				productIds = productIds.substring(0,productIds.length() -1);
-            //			}
-            //
-            //			//根据ID列表获取商品属性
-            //			List<Map<String, Object>> productPropertyList = productPropertyService.getProductPropertyListByProductId(productIds);
-            //			Map<String, Map<String, String>> productPropertyResult= new HashMap<String, Map<String, String>>();
-            //
-            //			for(Map<String, Object> productProperty : productPropertyList){
-            //
-            //				//如果存在
-            //				if(productPropertyResult.containsKey(productProperty.get("product_id").toString())){
-            //					Map<String, String> info = productPropertyResult.get(productProperty.get("product_id").toString());
-            //				    info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
-            //				}else{
-            //					Map<String, String> info = new HashMap<String, String>();
-            //					info.put(productProperty.get("key_name").toString(), productProperty.get("value").toString());
-            //					productPropertyResult.put(productProperty.get("product_id").toString(), info);
-            //				}
-            //
-            //			}
-            //			/**------------------------------------优化end----------------------------------------*/
+
 
             logger.info("order getOrderList 解析订单列表信息  ");
             for (Map<String, Object> info : orderList) {
                 //计算折扣
-                Double price = Double.parseDouble(info.get("price").toString());
-                Double inPrice = Double.parseDouble(info.get("in_price").toString());
-
-                BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + 0.22) / price) * 100);
-                if (supply_price_discount.intValue() > 100 || supply_price_discount.intValue() < 0) {
-                    info.put("supply_price_discount", 0 + " %");
-                } else {
-                    info.put("supply_price_discount", (100 - supply_price_discount.setScale(0, BigDecimal.ROUND_HALF_UP).intValue()) + " %");
-                }
-
-                //				//添加商品对应的属性
-                //				if(productPropertyResult.size() > 0 ){
-                //					if(productPropertyResult.get(info.get("product_id").toString()) != null){
-                //						info.put("brandID", productPropertyResult.get(info.get("product_id").toString()).get("BrandID"));
-                //						info.put("colorCode", productPropertyResult.get(info.get("product_id").toString()).get("ColorCode"));
-                //					}
-                //				}
-
+                arithmeticalDiscount(info);
             }
         }
         if(orderCancelList!=null
@@ -267,6 +204,18 @@ public class OrderController extends BaseController {
             result.setData(orderList);
         }
         return result;
+    }
+
+    private void arithmeticalDiscount(Map<String, Object> info) {
+        Double price = Double.parseDouble(info.get("price").toString());
+        Double inPrice = Double.parseDouble(info.get("in_price").toString());
+
+        BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + 0.22) / price) * 100);
+        if (supply_price_discount.intValue() > 100 || supply_price_discount.intValue() < 0) {
+            info.put("supply_price_discount", 0 + " %");
+        } else {
+            info.put("supply_price_discount", (100 - supply_price_discount.setScale(0, BigDecimal.ROUND_HALF_UP).intValue()) + " %");
+        }
     }
 
     /**
@@ -426,13 +375,6 @@ public class OrderController extends BaseController {
                         logger.info("订单 " + shopProductSkuId + " , 用户 " + JSON.toJSONString(user.getUsername()) + " confirm操作, 修改confirm库存开始");
                         skuStoreService.updateConfirmStoreByShopProductSkuId(shopProductSkuId);
                         logger.info("订单 " + shopProductSkuId + " confirm操作, 修改confirm库存成功");
-                    }
-                }
-                //picking时保存stock_location
-                if(OrderStatusType.PICKING == status){
-                    if (map.get("stockLocation") !=null){
-                        String stockLocation = map.get("stockLocation").toString();
-                        iLogisticsProductService.addStockLocation(logisProductId,stockLocation);
                     }
                 }
                 message.successStatus().putMsg("Info", "SUCCESS").setData(resultMap);
@@ -1256,15 +1198,7 @@ public class OrderController extends BaseController {
         logger.info("exportOrderList 解析订单列表信息");
         for (Map<String, Object> info : orderList) {
             //计算折扣
-            Double price = Double.parseDouble(info.get("price").toString());
-            Double inPrice = Double.parseDouble(info.get("in_price").toString());
-
-            BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + 0.22) / price) * 100);
-            if (supply_price_discount.intValue() > 100 || supply_price_discount.intValue() < 0) {
-                info.put("supply_price_discount", 0 + " %");
-            } else {
-                info.put("supply_price_discount", (100 - supply_price_discount.setScale(0, BigDecimal.ROUND_HALF_UP).intValue()) + " %");
-            }
+            arithmeticalDiscount(info);
         }
         logger.info("exportOrderList 设置文件目录路径");
         String dateStr = DateUtils.getStrDate(new Date(), "yyyyMMddHHmmss");

@@ -148,6 +148,10 @@
                 stock_location = #{stock_location,jdbcType=VARCHAR},
             </if>
 
+            <if test="stock_location_id != null">
+                stock_location_id = #{stock_location_id},
+            </if>
+
         </set>
         where logistics_product_id = #{logistics_product_id,jdbcType=BIGINT}
     </update>

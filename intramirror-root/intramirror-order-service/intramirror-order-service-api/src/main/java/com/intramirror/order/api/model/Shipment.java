@@ -20,6 +20,11 @@ public class Shipment {
 	 * @Fields 地理区域
 	 */
 	private String shipToGeography;
+
+	/**
+	 * 发货地id
+	 */
+	private Integer stockLocationId;
 	/**
 	 * @Fields 状态
 	 */
@@ -44,7 +49,15 @@ public class Shipment {
 	 * @Fields 修改时间
 	 */
 	private Date updatedAt;
-	
+
+	public Integer getStockLocationId() {
+		return stockLocationId;
+	}
+
+	public void setStockLocationId(Integer stockLocationId) {
+		this.stockLocationId = stockLocationId;
+	}
+
 	public Long getShipmentId() {
 		return shipmentId;
 	}

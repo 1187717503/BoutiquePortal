@@ -5,6 +5,7 @@
 	<resultMap id="BaseResultMap" type="com.intramirror.order.api.model.Shipment" >
 	    <id column="shipment_id" property="shipmentId" jdbcType="BIGINT" />
 	    <result column="ship_to_geography" property="shipToGeography" jdbcType="VARCHAR" />
+	    <result column="stock_location_id" property="stockLocationId" jdbcType="INTEGER" />
 	    <result column="status" property="status" jdbcType="BIGINT" />
 	    <result column="shipment_category" property="shipmentCategory" jdbcType="BIGINT" />
 	    <result column="vendor_id" property="vendorId" jdbcType="BIGINT" />
@@ -19,10 +20,10 @@ VALUES( #{shipToGeography,jdbcType=VARCHAR},#{consignee,jdbcType=VARCHAR},#{ship
 	
 	</insert>
 	<insert id="saveShipmentByOrderId" parameterType="com.intramirror.order.api.model.Shipment" >
-    	INSERT INTO shipment(ship_to_geography,`status`,created_at,updated_at,shipment_no,vendor_id,shipment_category)
+    	INSERT INTO shipment(ship_to_geography,`status`,created_at,updated_at,shipment_no,vendor_id,shipment_category,stock_location_id)
 VALUES(#{shipToGeography,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},
 #{createdAt,jdbcType=TIMESTAMP},#{updatedAt,jdbcType=TIMESTAMP},
-#{shipmentNo,jdbcType=VARCHAR},#{vendorId,jdbcType=BIGINT},#{shipmentCategory,jdbcType=BIGINT});
+#{shipmentNo,jdbcType=VARCHAR},#{vendorId,jdbcType=BIGINT},#{shipmentCategory,jdbcType=BIGINT},#{stockLocationId});
   	</insert>
   
   <select id="selectShipmentByOrder" resultType="java.util.HashMap"  parameterType="java.util.Map">
@@ -68,7 +69,9 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
   
   <select id="getShipmentsByVendor" resultType="java.util.HashMap"  parameterType="java.util.Map">
   SELECT * FROM shipment
-	WHERE vendor_id = #{vendorId,jdbcType=BIGINT} AND `status` = #{status,jdbcType=BIGINT} AND ship_to_geography = #{shipToGeography,jdbcType=VARCHAR};
+	WHERE vendor_id = #{vendorId,jdbcType=BIGINT} AND `status` = #{status,jdbcType=BIGINT}
+	AND ship_to_geography = #{shipToGeography,jdbcType=VARCHAR}
+	AND stock_location_id = #{stockLocationId,jdbcType=INTEGER};
   </select>
   
   <select id="getShipmentTypeById" resultType="java.util.HashMap"  parameterType="java.util.Map">

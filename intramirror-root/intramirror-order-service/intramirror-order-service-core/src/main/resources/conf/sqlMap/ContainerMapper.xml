@@ -6,6 +6,7 @@
 	    <id column="container_id" property="containerId" jdbcType="BIGINT" />
 	    <result column="container_type" property="containerType" jdbcType="VARCHAR" />
 	    <result column="ship_to_geography" property="shipToGeography" jdbcType="VARCHAR" />
+	    <result column="stock_location_id" property="stockLocationId" jdbcType="INTEGER" />
 	    <result column="status" property="status" jdbcType="INTEGER" />
 	    <result column="height" property="height" jdbcType="BIGINT" />
 	    <result column="width" property="width" jdbcType="BIGINT" />
@@ -68,6 +69,9 @@ values(#{containerType,jdbcType=VARCHAR}, #{shipToGeography,jdbcType=VARCHAR},#{
       <if test="shipment_id != null" >
         shipment_id = #{shipment_id,jdbcType=BIGINT},
       </if>
+	  <if test="stock_location_id != null">
+		  stock_location_id = #{stock_location_id,jdbcType=INTEGER}
+	  </if>
     </set>
      where 1=1
      

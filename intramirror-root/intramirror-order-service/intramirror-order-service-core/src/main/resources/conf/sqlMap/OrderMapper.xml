@@ -97,7 +97,7 @@
 
 
     <select id="getOrderListByStatus" resultType="java.util.HashMap" parameterType="java.util.Map">
-        SELECT p.product_id,g.pack_group,g.pack_english_name,lp.stock_Location,
+        SELECT p.product_id,g.pack_group,g.pack_english_name,lp.stock_Location,lp.stock_location_id,
         o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id, s.`size` as size,p.category_id,
         lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
         lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
@@ -584,7 +584,8 @@
             l.user_rec_country                       AS shipToCountry,
             v.address_country_id                     AS consigner_country_id,
             g.english_name                           AS shipToGeography,
-            lp.logistics_product_id
+            lp.logistics_product_id,
+            lp.stock_location_id
         FROM logistics_product lp
             INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
             INNER JOIN `order` o ON ol.order_id = o.order_id

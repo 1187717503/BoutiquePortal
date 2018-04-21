@@ -37,7 +37,6 @@ public class ContainerServiceImpl extends BaseDao implements IContainerService{
 	
 	/**
 	 * 新增箱子
-	 * @param container
 	 * @return int
 	 */
 	public int saveContainerByShipment(Map<String, Object> map) {
@@ -95,7 +94,6 @@ public class ContainerServiceImpl extends BaseDao implements IContainerService{
 
 	/**
 	 * 查询箱子
-	 * @param barcode
 	 * @return Container
 	 */
 	public Container getContainerBybarcode(Map<String, Object> map) {
@@ -104,7 +102,6 @@ public class ContainerServiceImpl extends BaseDao implements IContainerService{
 
 	/**
 	 * 修改箱子
-	 * @param barcode
 	 * @return Container
 	 */
 	public int updateContainerBybarcode(Map<String, Object> map) {
