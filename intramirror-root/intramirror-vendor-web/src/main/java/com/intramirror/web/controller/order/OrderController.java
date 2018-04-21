@@ -1336,6 +1336,8 @@ public class OrderController extends BaseController {
         //处理商品图片
         if (StringUtils.isNotBlank(pictureUrl)) {
             try {
+                //添加域名替换
+                pictureUrl = pictureUrl.replace("image.intramirror.com", "sha-oss-static.oss-cn-shanghai.aliyuncs.com");
                 //获取网络图片
                 URL url = new URL(pictureUrl);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
