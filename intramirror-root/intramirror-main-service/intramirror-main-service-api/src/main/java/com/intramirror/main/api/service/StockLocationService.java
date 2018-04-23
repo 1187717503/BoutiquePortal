@@ -10,4 +10,6 @@ import java.util.List;
 public interface StockLocationService {
 
     List<StockLocation> getStockLocation(Long vendorId);
+
+    StockLocation getShipFromLocation(Long shipmentId);
 }

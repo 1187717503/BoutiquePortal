@@ -83,7 +83,7 @@ public interface SubShipmentMapper {
     List<SubShipment> getSubShipmentByShipmentId(Long shipmentId);
     
     /**
-     * 根据shipmentId修改subshipment关联
+     * 根据shipmentId修改awb
      * @param map
      * @return
      */
@@ -102,5 +102,6 @@ public interface SubShipmentMapper {
      * @return
      */
     int updateSubShipmentById(Map<String, Object> map);
-    
+
+    SubShipment getDHLShipment(Long shipment);
 }

@@ -67,6 +67,32 @@ public class SubShipment {
 	 */
 	private Long shipmentId;
 
+    /**
+     * 联系方式
+     */
+	private String contact;
+
+    /**
+     * 税号
+     */
+	private String piva;
+
+    public String getContact() {
+        return contact;
+    }
+
+    public void setContact(String contact) {
+        this.contact = contact;
+    }
+
+    public String getPiva() {
+        return piva;
+    }
+
+    public void setPiva(String piva) {
+        this.piva = piva;
+    }
+
     public String getShipToCountryCode() {
         return shipToCountryCode;
     }

@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.intramirror.order.api.model.Shipment;
+import com.intramirror.user.api.model.User;
+import com.intramirror.web.util.DHLHttpClient;
+import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +34,9 @@ import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.service.IShipmentService;
 import com.intramirror.order.api.service.ISubShipmentService;
 import com.intramirror.web.controller.BaseController;
+import pk.shoplus.common.utils.StringUtil;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author 袁孟亮
@@ -193,7 +199,7 @@ public class ShipmentController extends BaseController{
 	
 	@RequestMapping(value="/updateShipmentById", method=RequestMethod.POST)
 	@ResponseBody
-	public ResultMessage updateShipmentById(@RequestBody Map<String, Object> map){
+	public ResultMessage updateShipmentById(@RequestBody Map<String, Object> map,HttpServletRequest httpRequest){
 		logger.info("getShipmentTypeById parameter : "+new Gson().toJson(map));
 		ResultMessage message = ResultMessage.getInstance();
 		try {
@@ -213,11 +219,37 @@ public class ShipmentController extends BaseController{
 				return message;
 			}
 			int result = iShipmentService.updateShipmentStatus(map);
-			logger.info("result :" + new Gson().toJson(result));
 			if (0==result){
 				message.errorStatus().putMsg("Info", "update fail").setData(0);
 				return message;
 			}
+			//如果shipment操作reopen,需要删除awb
+			if (1 == Long.parseLong(map.get("status").toString())){
+				SubShipment dhlShipment = subShipmentService.getDHLShipment(Long.parseLong(map.get("shipmentId").toString()));
+				if (dhlShipment!=null){
+					if (StringUtil.isNotEmpty(dhlShipment.getAwbNum())){
+						User user = this.getUser(httpRequest);
+						if (user == null) {
+							message.setMsg("Please log in again");
+							return message;
+						}
+						Map<String,Object> params = new HashMap<>();
+						params.put("awbNo",dhlShipment.getAwbNum());
+						params.put("requestorName",user.getUsername());
+						params.put("reason","008");
+						String s = DHLHttpClient.httpPost(JSONObject.fromObject(params), DHLHttpClient.deleteAWBUrl);
+						if (StringUtil.isEmpty(s)){
+							logger.error("deleteAWB fail");
+							message.errorStatus().putMsg("Info", "deleteAWB fail");
+							return message;
+						}
+						params.put("shipmentId",map.get("shipmentId"));
+						params.put("awbNo","");
+						subShipmentService.updateSubShipment(params);
+					}
+				}
+			}
+
 			//状态修改成功修改container状态
 			logger.info("update container status");
 			List<Map<String, Object>> container = containerService.getShipmentList(map);

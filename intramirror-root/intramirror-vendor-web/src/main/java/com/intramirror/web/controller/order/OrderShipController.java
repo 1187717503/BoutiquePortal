@@ -22,14 +22,18 @@ import com.intramirror.product.api.service.IShopService;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.VendorService;
+import com.intramirror.web.VO.DHLInputVO;
 import com.intramirror.web.common.BarcodeUtil;
 import com.intramirror.web.controller.BaseController;
+import com.intramirror.web.util.DHLHttpClient;
 import com.intramirror.web.util.ExcelUtil;
+import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import pk.shoplus.common.utils.StringUtil;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -48,7 +52,6 @@ public class OrderShipController extends BaseController {
 
     @Autowired
     private IOrderService orderService;
-
 
     @Autowired
     private VendorService vendorService;
@@ -82,7 +85,6 @@ public class OrderShipController extends BaseController {
 
     @Autowired
     private StockLocationService stockLocationService;
-
     /**
      * 获取所有箱子信息
      *
@@ -557,15 +559,18 @@ public class OrderShipController extends BaseController {
             resultMap.put("VATNumber", invoice.getVatNum());
 
             //获取Ship From信息
-            logger.info("打印Invoice----获取Ship From信息");
-            Map<String, Object> vendorParams = new HashMap<>();
-            vendorParams.put("vendor_id", shipmentMap.get("vendor_id"));
-            Vendor shipVendor = vendorService.getVendorByVendorId(vendorParams);
-            resultMap.put("ShipFrom", shipVendor.getBusinessLicenseLocation());
-            resultMap.put("ShipCompanyName", shipVendor.getCompanyName());
-            resultMap.put("ShipVendorName", shipVendor.getVendorName());
-
-
+            //Map<String, Object> vendorParams = new HashMap<>();
+            //vendorParams.put("vendor_id", shipmentMap.get("vendor_id"));
+            //Vendor shipVendor = vendorService.getVendorByVendorId(vendorParams);
+            //resultMap.put("ShipFrom", shipVendor.getBusinessLicenseLocation());
+            //resultMap.put("ShipCompanyName", shipVendor.getCompanyName());
+            //resultMap.put("ShipVendorName", shipVendor.getVendorName());
+            StockLocation location = stockLocationService.getShipFromLocation(shipment_id);
+            resultMap.put("companyName",location.getContactCompanyname());
+            resultMap.put("contact",location.getContactPhonenumber());
+            resultMap.put("address",location.getAddressStreetlines());
+            resultMap.put("city",location.getAddressCity());
+            resultMap.put("country","Italy");
 
             logger.info("打印Invoice----获取Deliver To信息");
             List<SubShipment> subShipmentList = subShipmentService.getSubShipmentByShipmentId(shipment_id);
@@ -574,6 +579,10 @@ public class OrderShipController extends BaseController {
                 resultMap.put("DeliverTo", shippingProvider);
             } else if (subShipmentList.size() == 1) {
                 resultMap.put("DeliverTo", subShipmentList.get(0));
+                //发往质检仓的取DHL税号
+                if(map.get("shipmentCategory")!=null&&"1".equals(map.get("shipmentCategory").toString())){
+                    resultMap.put("VATNumber",subShipmentList.get(0).getPiva());
+                }
             } else {
                 result.setMsg("DeliverTo is null ");
                 return result;
@@ -709,9 +718,8 @@ public class OrderShipController extends BaseController {
             List<Map<String, Object>> containerList = orderService.getOrderListByShipmentId(map);
             Map<String, Object> resultMap = new HashMap<String, Object>();
 
-            Map<String, List<Map<String, Object>>> orderList = new HashMap<String, List<Map<String, Object>>>();
-            List<Map<String, Object>> shipMentCartonList = new ArrayList<Map<String, Object>>();
-
+            Map<String, List<Map<String, Object>>> orderList = new HashMap<>();
+            List<Map<String, Object>> shipMentCartonList = new ArrayList<>();
 
             if (containerList != null && containerList.size() > 0) {
 
@@ -744,9 +752,7 @@ public class OrderShipController extends BaseController {
                         BigDecimal decimal = new BigDecimal(weight);
                         cartonInfo.put("weight",decimal.setScale(2,BigDecimal.ROUND_HALF_UP).toString());
                         shipMentCartonList.add(cartonInfo);
-
                     }
-
                 }
 
                 if (shipMentCartonList != null && shipMentCartonList.size() > 0) {
@@ -763,19 +769,14 @@ public class OrderShipController extends BaseController {
                             carton.put("allTotal", list == null ? 0 : list.size());
                             carton.put("allTotalNum", allTotal);
                         }
-
-
                         carton.put("order_qty", orderList.get(carton.get("container_id").toString()).size());
                     }
                 }
-
-
             }
 
             shipmentMap.put("carton_qty", shipMentCartonList == null ? 0 : shipMentCartonList.size());
             resultMap.put("cartonList", shipMentCartonList);
             resultMap.put("shipmentInfo", shipmentMap);
-
 
             result.successStatus();
             result.setData(resultMap);
@@ -785,8 +786,90 @@ public class OrderShipController extends BaseController {
             result.setMsg("Query container list fail,Check parameters, please ");
             return result;
         }
+        return result;
+    }
 
+    @RequestMapping(value = "/printAWBNum", method = RequestMethod.POST)
+    @ResponseBody
+    public ResultMessage printAWBNum(@RequestBody Map<String, Object> map, HttpServletRequest httpRequest){
+        ResultMessage result = new ResultMessage();
+        result.errorStatus();
+
+        if (map == null || map.get("shipment_id") == null) {
+            result.setMsg("shipment_id cannot be empty");
+            return result;
+        }
+
+        User user = this.getUser(httpRequest);
+        if (user == null) {
+            result.setMsg("Please log in again");
+            return result;
+        }
+
+        Vendor vendor = null;
+        try {
+            vendor = vendorService.getVendorByUserId(user.getUserId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (vendor == null) {
+            result.setMsg("Please log in again");
+            return result;
+        }
+
+        Long shipmentId = Long.parseLong(map.get("shipment_id").toString());
+        SubShipment dhlShipment = subShipmentService.getDHLShipment(shipmentId);
+        if(dhlShipment!=null){
+            if(dhlShipment.getAwbNum()!=null&&StringUtil.isNotEmpty(dhlShipment.getAwbNum())){
+                //获取awb文档
+                String s = DHLHttpClient.httpGet(DHLHttpClient.queryAWBUrl + dhlShipment.getAwbNum());
+                if(StringUtil.isNotEmpty(s)){
+                    result.successStatus();
+                    result.setData(s);
+                    return result;
+                }
+            }
+
+            StockLocation fromLocation = stockLocationService.getShipFromLocation(shipmentId);
+            Map<String,Object> params = new HashMap<>();
+            //查询close状态纸箱
+            params.put("status",2);
+            params.put("shipmentId",shipmentId);
+            List<Map<String, Object>> containerList = containerService.getListByShipmentId(params);
+            Shipment shipment = iShipmentService.selectShipmentById(params);
+            DHLInputVO inputVO = new DHLInputVO();
+            if (shipment!=null){
+                String shipToGeography = shipment.getShipToGeography();
+                if ("European Union".equals(shipToGeography)){
+                    inputVO.setServiceType("U");
+                }else if ("Transit Warehouse".equals(shipToGeography)){
+                    inputVO.setServiceType("N");
+                }else {
+                    inputVO.setServiceType("P");
+                }
+            }
+            addParams(inputVO,dhlShipment,fromLocation,containerList);
+
+            String resultStr = DHLHttpClient.httpPost(JSONObject.fromObject(inputVO), DHLHttpClient.createAWBUrl);
+            if(StringUtil.isNotEmpty(resultStr)){
+                JSONObject jo = JSONObject.fromObject(resultStr);
+                String awbNo = jo.optString("awbNo");
+                //保存到subShipment
+                params.put("awbNo",awbNo);
+                subShipmentService.updateSubShipment(params);
+                result.successStatus();
+                result.setData(resultStr);
+                return result;
+            }
+
+        }
 
         return result;
     }
+
+    private void addParams(DHLInputVO inputVO, SubShipment dhlShipment,StockLocation fromLocation, List<Map<String, Object>> containerList) {
+
+    }
+
+
 }

@@ -303,6 +303,8 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		subShipment.setCreatedAt(currentDate);
 		subShipment.setStatus(ContainerType.RECEIVED);
 		subShipment.setShipToCountryCode(map.get("country_code")==null?"":map.get("country_code").toString());
+		subShipment.setContact(map.get("transfer_contact")==null?"":map.get("transfer_contact").toString());
+		subShipment.setPiva(map.get("transfer_piva")==null?"":map.get("transfer_piva").toString());
 		return subShipment;
 	}
 	

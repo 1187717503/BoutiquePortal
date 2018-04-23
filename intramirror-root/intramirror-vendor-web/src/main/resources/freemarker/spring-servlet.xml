@@ -45,5 +45,11 @@
 		<property name="order" value="1" />
 	</bean>
 
+	<bean id="DHLHttpClinet" class="com.intramirror.web.util.DHLHttpClient">
+		<property name="createAWBUrl" value="${createAWBUrl}"/>
+		<property name="queryAWBUrl" value="${queryAWBUrl}"/>
+		<property name="deleteAWBUrl" value="${deleteAWBUrl}"/>
+	</bean>
+
 	<bean class="com.intramirror.web.common.cache.CategoryCache" init-method="init"/>
 </beans>
