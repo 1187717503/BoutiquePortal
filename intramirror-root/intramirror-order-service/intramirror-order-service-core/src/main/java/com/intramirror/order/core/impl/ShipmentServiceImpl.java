@@ -294,6 +294,9 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		subShipment.setShippingSegmentId(Long.parseLong(map.get("shipping_segment_id")==null?"0":map.get("shipping_segment_id").toString()));
 		subShipment.setSegmentSequence(segmentSequence);
 		subShipment.setShipToAddr(map.get("transfer_addr")==null?"":map.get("transfer_addr").toString());
+		subShipment.setShipToAddr2(map.get("transfer_addr2")==null?"":map.get("transfer_addr2").toString());
+		subShipment.setShipToAddr3(map.get("transfer_addr3")==null?"":map.get("transfer_addr3").toString());
+		subShipment.setShipToEamilAddr(map.get("emailAddress")==null?"":map.get("emailAddress").toString());
 		subShipment.setShipToDistrict(map.get("addr_district")==null?"":map.get("addr_district").toString());
 		subShipment.setShipToCity(map.get("addr_city")==null?"":map.get("addr_city").toString());
 		subShipment.setShipToProvince(map.get("addr_province")==null?"":map.get("addr_province").toString());

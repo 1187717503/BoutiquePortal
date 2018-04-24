@@ -218,7 +218,7 @@
 
     <update id="updateContainerById" parameterType="java.lang.Long">
         UPDATE logistics_product
-        SET container_id = 0, `status` = 2 ,stock_location_id = 0 ,stock_location = ''
+        SET container_id = 0, `status` = 2
         WHERE logistics_product_id = #{order_logistics_id,jdbcType=BIGINT}
     </update>
 

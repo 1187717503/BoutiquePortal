@@ -43,6 +43,9 @@ public class SubShipment {
 	 * @Fields 地址
 	 */
 	private String shipToAddr;
+	private String shipToAddr2;
+	private String shipToAddr3;
+	private String shipToEamilAddr;
 	/**
 	 * @Fields 区
 	 */
@@ -76,6 +79,30 @@ public class SubShipment {
      * 税号
      */
 	private String piva;
+
+    public String getShipToAddr2() {
+        return shipToAddr2;
+    }
+
+    public void setShipToAddr2(String shipToAddr2) {
+        this.shipToAddr2 = shipToAddr2;
+    }
+
+    public String getShipToAddr3() {
+        return shipToAddr3;
+    }
+
+    public void setShipToAddr3(String shipToAddr3) {
+        this.shipToAddr3 = shipToAddr3;
+    }
+
+    public String getShipToEamilAddr() {
+        return shipToEamilAddr;
+    }
+
+    public void setShipToEamilAddr(String shipToEamilAddr) {
+        this.shipToEamilAddr = shipToEamilAddr;
+    }
 
     public String getContact() {
         return contact;

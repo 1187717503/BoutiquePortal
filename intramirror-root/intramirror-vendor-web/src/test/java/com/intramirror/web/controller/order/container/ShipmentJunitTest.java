@@ -60,8 +60,8 @@ public class ShipmentJunitTest extends BaseJunit4Test{
 		Map<String, Object> updateShipmentMap = new HashMap<>();
 		updateShipmentMap.put("shipmentId", 123);
 		updateShipmentMap.put("status", 1);
-		ResultMessage updateShipmentMessage = shipmentController.updateShipmentById(updateShipmentMap);
-		System.out.println(updateShipmentMessage.getData());
+		//ResultMessage updateShipmentMessage = shipmentController.updateShipmentById(updateShipmentMap);
+		//System.out.println(updateShipmentMessage.getData());
 		
 		Map<String, Object> newShipmentMap = new HashMap<>();
 		newShipmentMap.put("shipmentId", 123);

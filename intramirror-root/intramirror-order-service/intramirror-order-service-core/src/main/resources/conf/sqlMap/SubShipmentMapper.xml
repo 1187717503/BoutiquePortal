@@ -168,11 +168,13 @@
   </insert>
 
     <insert id="insertSubshipmentVO" parameterType="com.intramirror.order.api.model.SubShipment">
-        INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_addr,ship_to_district,ship_to_city,ship_to_province,ship_to_country,`status`
+        INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_addr,ship_to_addr2,ship_to_addr3,ship_to_emailAddr,
+        ship_to_district,ship_to_city,ship_to_province,ship_to_country,`status`
         ,created_at,updated_at,shipment_id,ship_to_country_code,contact,piva)
         VALUES(
         #{shippingSegmentId,jdbcType=BIGINT},#{segmentSequence,jdbcType=BIGINT},#{consignee,jdbcType=VARCHAR},
-        #{shipToAddr,jdbcType=VARCHAR},#{shipToDistrict,jdbcType=VARCHAR},#{shipToCity,jdbcType=VARCHAR},
+        #{shipToAddr,jdbcType=VARCHAR},#{shipToAddr2,jdbcType=VARCHAR},#{shipToAddr3,jdbcType=VARCHAR},#{shipToEamilAddr,jdbcType=VARCHAR},
+        #{shipToDistrict,jdbcType=VARCHAR},#{shipToCity,jdbcType=VARCHAR},
         #{shipToProvince,jdbcType=VARCHAR},#{shipToCountry,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},#{createdAt,jdbcType=TIMESTAMP},#{updatedAt,jdbcType=TIMESTAMP},#{shipmentId,jdbcType=BIGINT},
         #{shipToCountryCode,jdbcType=VARCHAR},#{contact,jdbcType=VARCHAR},#{piva,jdbcType=VARCHAR});
         <selectKey keyProperty="subShipmentId" resultType="java.lang.Long">
