@@ -3,6 +3,7 @@
  */
 package com.intramirror.order.api.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -66,14 +67,14 @@ public interface IShipmentService {
 	
 	/**
 	 * 根据vendorId查询vendorCode
-	 * @param map
+	 * @param vendorId
 	 * @return
 	 */
 	String getVendorCodeById(Long vendorId);
 	
 	/**
 	 * 根据条件查询shipmentID
-	 * @param map
+	 * @param shipment
 	 * @return
 	 */
 	Long getShipmentId(Shipment shipment);
@@ -132,4 +133,6 @@ public interface IShipmentService {
 	 * @return
 	 */
 	List<Shipment> getShipmentList(Map<String, Object> map);
+
+	BigDecimal getCustomValue(Map<String, Object> map);
 }

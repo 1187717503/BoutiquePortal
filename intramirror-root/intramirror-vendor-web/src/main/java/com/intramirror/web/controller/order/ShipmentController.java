@@ -10,6 +10,7 @@ import java.util.Map;
 
 import com.intramirror.order.api.model.Shipment;
 import com.intramirror.user.api.model.User;
+import com.intramirror.utils.transform.JsonTransformUtil;
 import com.intramirror.web.util.DHLHttpClient;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -237,7 +238,7 @@ public class ShipmentController extends BaseController{
 						params.put("awbNo",dhlShipment.getAwbNum());
 						params.put("requestorName",user.getUsername());
 						params.put("reason","008");
-						String s = DHLHttpClient.httpPost(JSONObject.fromObject(params), DHLHttpClient.deleteAWBUrl);
+						String s = DHLHttpClient.httpPost(JsonTransformUtil.toJson(params), DHLHttpClient.deleteAWBUrl);
 						if (StringUtil.isEmpty(s)){
 							logger.error("deleteAWB fail");
 							message.errorStatus().putMsg("Info", "deleteAWB fail");

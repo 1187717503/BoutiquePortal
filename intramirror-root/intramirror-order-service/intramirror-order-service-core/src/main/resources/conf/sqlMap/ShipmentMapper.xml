@@ -155,4 +155,10 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 			</if>
 		</if>
 	</select>
+
+	<select id="getCustomValue" parameterType="map" resultType="decimal">
+		SELECT sum(lp.in_price) customValue FROM logistics_product lp
+		INNER JOIN container c on c.container_id = lp.container_id
+		WHERE c.shipment_id = #{shipmentId}
+	</select>
 </mapper>

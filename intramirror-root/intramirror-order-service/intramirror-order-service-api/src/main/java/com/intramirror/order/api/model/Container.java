@@ -3,6 +3,7 @@
  */
 package com.intramirror.order.api.model;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -51,7 +52,7 @@ public class Container {
 	/**
 	 * @Fields 重量
 	 */
-	private Long weight;
+	private BigDecimal weight;
 	
 	/**
 	 * @Fields 条形码
@@ -137,11 +138,11 @@ public class Container {
 		this.length = length;
 	}
 
-	public Long getWeight() {
+	public BigDecimal getWeight() {
 		return weight;
 	}
 
-	public void setWeight(Long weight) {
+	public void setWeight(BigDecimal weight) {
 		this.weight = weight;
 	}
 

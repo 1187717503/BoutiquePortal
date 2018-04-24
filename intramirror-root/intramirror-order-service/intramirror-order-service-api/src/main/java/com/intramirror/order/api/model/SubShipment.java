@@ -80,6 +80,19 @@ public class SubShipment {
      */
 	private String piva;
 
+    /**
+     * 邮编
+     */
+	private String postalCode;
+
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+    }
+
     public String getShipToAddr2() {
         return shipToAddr2;
     }

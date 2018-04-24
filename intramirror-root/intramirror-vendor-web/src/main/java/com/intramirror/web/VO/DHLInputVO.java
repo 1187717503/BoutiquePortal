@@ -1,9 +1,9 @@
 package com.intramirror.web.VO;
 
-import com.intramirror.order.api.model.Container;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by caowei on 2018/4/23.
@@ -11,18 +11,18 @@ import java.util.List;
 public class DHLInputVO {
     private String account;
     private String serviceType;
-    private Long shipmentTime;
+    private String shipmentTime;
     private BigDecimal customsValue;
     private String description;
     private ShipperVO shipper;
     private RecipientVO recipient;
-    private List<Container> packageInfos;
+    private List<Map<String,Object>> packageInfos;
 
-    public List<Container> getPackageInfos() {
+    public List<Map<String, Object>> getPackageInfos() {
         return packageInfos;
     }
 
-    public void setPackageInfos(List<Container> packageInfos) {
+    public void setPackageInfos(List<Map<String, Object>> packageInfos) {
         this.packageInfos = packageInfos;
     }
 
@@ -58,11 +58,11 @@ public class DHLInputVO {
         this.serviceType = serviceType;
     }
 
-    public Long getShipmentTime() {
+    public String getShipmentTime() {
         return shipmentTime;
     }
 
-    public void setShipmentTime(Long shipmentTime) {
+    public void setShipmentTime(String shipmentTime) {
         this.shipmentTime = shipmentTime;
     }
 

@@ -3,6 +3,7 @@
  */
 package com.intramirror.order.core.impl;
 
+import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
@@ -84,9 +85,9 @@ public class ContainerServiceImpl extends BaseDao implements IContainerService{
 			container.setShipToGeography("");
 		}
 		if (null != map.get("weight")){
-			container.setWeight(Long.parseLong(map.get("weight").toString()));
+			container.setWeight(new BigDecimal(map.get("weight").toString()));
 		}else{
-			container.setWeight(Long.parseLong("0"));
+			container.setWeight(new BigDecimal("0"));
 		}
 		logger.info("perameter "+new Gson().toJson(container));
 		return containerMapper.saveContainerByShipment(container);

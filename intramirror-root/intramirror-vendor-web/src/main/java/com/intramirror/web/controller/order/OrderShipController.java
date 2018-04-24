@@ -13,6 +13,7 @@ import com.intramirror.main.api.service.GeographyService;
 import com.intramirror.main.api.service.StockLocationService;
 import com.intramirror.main.api.service.TaxService;
 import com.intramirror.order.api.common.OrderStatusType;
+import com.intramirror.order.api.model.Container;
 import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.model.ShippingProvider;
 import com.intramirror.order.api.model.SubShipment;
@@ -22,7 +23,10 @@ import com.intramirror.product.api.service.IShopService;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.VendorService;
+import com.intramirror.utils.transform.JsonTransformUtil;
 import com.intramirror.web.VO.DHLInputVO;
+import com.intramirror.web.VO.RecipientVO;
+import com.intramirror.web.VO.ShipperVO;
 import com.intramirror.web.common.BarcodeUtil;
 import com.intramirror.web.controller.BaseController;
 import com.intramirror.web.util.DHLHttpClient;
@@ -819,25 +823,31 @@ public class OrderShipController extends BaseController {
 
         Long shipmentId = Long.parseLong(map.get("shipment_id").toString());
         SubShipment dhlShipment = subShipmentService.getDHLShipment(shipmentId);
+        Map<String,Object> params = new HashMap<>();
+        //查询close状态纸箱
+        params.put("status",2);
+        params.put("shipmentId",shipmentId);
+        List<Map<String, Object>> containerList = containerService.getListByShipmentId(params);
+        Shipment shipment = iShipmentService.selectShipmentById(params);
         if(dhlShipment!=null){
             if(dhlShipment.getAwbNum()!=null&&StringUtil.isNotEmpty(dhlShipment.getAwbNum())){
                 //获取awb文档
                 String s = DHLHttpClient.httpGet(DHLHttpClient.queryAWBUrl + dhlShipment.getAwbNum());
                 if(StringUtil.isNotEmpty(s)){
+                    JSONObject jo = JSONObject.fromObject(s);
                     result.successStatus();
-                    result.setData(s);
+                    jo.put("shipmentNo",shipment.getShipmentNo());
+                    result.setData(jo);
                     return result;
                 }
             }
 
             StockLocation fromLocation = stockLocationService.getShipFromLocation(shipmentId);
-            Map<String,Object> params = new HashMap<>();
-            //查询close状态纸箱
-            params.put("status",2);
-            params.put("shipmentId",shipmentId);
-            List<Map<String, Object>> containerList = containerService.getListByShipmentId(params);
-            Shipment shipment = iShipmentService.selectShipmentById(params);
+            BigDecimal customValue = iShipmentService.getCustomValue(params);
             DHLInputVO inputVO = new DHLInputVO();
+            if (customValue!=null){
+                inputVO.setCustomsValue(customValue.setScale(2,BigDecimal.ROUND_HALF_UP));
+            }
             if (shipment!=null){
                 String shipToGeography = shipment.getShipToGeography();
                 if ("European Union".equals(shipToGeography)){
@@ -850,7 +860,7 @@ public class OrderShipController extends BaseController {
             }
             addParams(inputVO,dhlShipment,fromLocation,containerList);
 
-            String resultStr = DHLHttpClient.httpPost(JSONObject.fromObject(inputVO), DHLHttpClient.createAWBUrl);
+            String resultStr = DHLHttpClient.httpPost(JsonTransformUtil.toJson(inputVO), DHLHttpClient.createAWBUrl);
             if(StringUtil.isNotEmpty(resultStr)){
                 JSONObject jo = JSONObject.fromObject(resultStr);
                 String awbNo = jo.optString("awbNo");
@@ -858,18 +868,72 @@ public class OrderShipController extends BaseController {
                 params.put("awbNo",awbNo);
                 subShipmentService.updateSubShipment(params);
                 result.successStatus();
-                result.setData(resultStr);
+                jo.put("shipmentNo",shipment.getShipmentNo());
+                result.setData(jo);
                 return result;
             }
 
         }
-
         return result;
     }
 
     private void addParams(DHLInputVO inputVO, SubShipment dhlShipment,StockLocation fromLocation, List<Map<String, Object>> containerList) {
-
+        SimpleDateFormat f1 = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat f2 = new SimpleDateFormat("HH:mm:ssz");
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR, 1);
+        Date currentTime = calendar.getTime();
+        try {
+            //System.out.println(f1.parse("2015-12-12"));
+            f1.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
+            f2.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        inputVO.setAccount("106669563");
+        //获取意大利时间,再往后延一天
+        inputVO.setShipmentTime(f1.format(currentTime)+"T"+f2.format(currentTime));
+        inputVO.setDescription("clothing");
+        if (fromLocation!=null){
+            ShipperVO shipperVO = new ShipperVO();
+            shipperVO.setCity(fromLocation.getAddressCity());
+            shipperVO.setCompanyName(fromLocation.getContactCompanyname());
+            shipperVO.setPersonName(fromLocation.getContactPersonname());
+            shipperVO.setPhoneNumber(fromLocation.getContactPhonenumber());
+            shipperVO.setEmailAddress(fromLocation.getContactEmailaddress());
+            shipperVO.setStreetLines(fromLocation.getAddressStreetlines());
+            shipperVO.setStreetLines2(fromLocation.getAddressStreetlines2());
+            shipperVO.setStreetLines3(fromLocation.getAddressStreetlines3());
+            shipperVO.setPostalCode(fromLocation.getAddressPostalcode());
+            shipperVO.setCountryCode(fromLocation.getAddressCountrycode());
+            inputVO.setShipper(shipperVO);
+        }
+        if (dhlShipment!=null){
+            RecipientVO recipientVO = new RecipientVO();
+            recipientVO.setCity(dhlShipment.getShipToCity());
+            recipientVO.setCompanyName(dhlShipment.getConsignee());
+            recipientVO.setPersonName(dhlShipment.getConsignee());
+            recipientVO.setPhoneNumber(dhlShipment.getContact());
+            recipientVO.setEmailAddress(dhlShipment.getShipToEamilAddr());
+            recipientVO.setStreetLines(dhlShipment.getShipToAddr());
+            recipientVO.setStreetLines2(dhlShipment.getShipToAddr2());
+            recipientVO.setStreetLines3(dhlShipment.getShipToAddr3());
+            recipientVO.setPostalCode(dhlShipment.getPostalCode());
+            recipientVO.setCountryCode(dhlShipment.getShipToCountryCode());
+            inputVO.setRecipient(recipientVO);
+        }
+        if(containerList!=null&&containerList.size()>0){
+            List<Map<String,Object>> list = new ArrayList<>();
+            for (Map<String,Object> map:containerList){
+                Map<String,Object> container = new HashMap<>();
+                container.put("barcode",map.get("barcode"));
+                container.put("length",map.get("length"));
+                container.put("width",map.get("width"));
+                container.put("height",map.get("height"));
+                container.put("weight",new BigDecimal(map.get("weight").toString()).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
+                list.add(container);
+            }
+            inputVO.setPackageInfos(list);
+        }
     }
-
-
 }

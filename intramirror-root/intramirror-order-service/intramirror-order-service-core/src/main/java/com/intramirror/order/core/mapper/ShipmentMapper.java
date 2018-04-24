@@ -3,6 +3,7 @@
  */
 package com.intramirror.order.core.mapper;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -122,4 +123,6 @@ public interface ShipmentMapper {
 	String getShipmentNoById(Map<String, Object> map);
 
 	List<Shipment> getShipmentList(Map<String, Object> map);
+
+	BigDecimal getCustomValue(Map<String, Object> map);
 }

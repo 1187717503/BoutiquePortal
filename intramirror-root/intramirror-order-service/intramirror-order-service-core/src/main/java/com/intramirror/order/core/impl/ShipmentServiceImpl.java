@@ -3,6 +3,7 @@
  */
 package com.intramirror.order.core.impl;
 
+import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -308,6 +309,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		subShipment.setShipToCountryCode(map.get("country_code")==null?"":map.get("country_code").toString());
 		subShipment.setContact(map.get("transfer_contact")==null?"":map.get("transfer_contact").toString());
 		subShipment.setPiva(map.get("transfer_piva")==null?"":map.get("transfer_piva").toString());
+		subShipment.setPostalCode(map.get("zip_code")==null?"":map.get("zip_code").toString());
 		return subShipment;
 	}
 	
@@ -481,5 +483,10 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	@Override
 	public List<Shipment> getShipmentList(Map<String, Object> map) {
 		return shipmentMapper.getShipmentList(map);
+	}
+
+	@Override
+	public BigDecimal getCustomValue(Map<String, Object> map) {
+		return shipmentMapper.getCustomValue(map);
 	}
 }
