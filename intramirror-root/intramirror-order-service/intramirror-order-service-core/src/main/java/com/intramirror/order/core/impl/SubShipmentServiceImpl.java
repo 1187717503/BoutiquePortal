@@ -41,7 +41,7 @@ public class SubShipmentServiceImpl extends BaseDao implements ISubShipmentServi
 	 */
 	@Override
 	public int insertSubshipment(Map<String, Object> map) {
-		logger.info("param : " + new Gson().toJson(map));
+		/*logger.info("param : " + new Gson().toJson(map));
 		Map<String, Object> beanMap = new HashMap<String, Object>();
 		beanMap.put("consignee", map.get("consignee").toString());
 		beanMap.put("segmentSequence", Long.parseLong(map.get("segmentSequence").toString()));
@@ -59,8 +59,8 @@ public class SubShipmentServiceImpl extends BaseDao implements ISubShipmentServi
 		beanMap.put("status", ContainerType.RECEIVED);
 		Date currentDate = new Date();
 		beanMap.put("updatedAt", currentDate);
-		beanMap.put("createdAt", currentDate);
-		return subShipmentMapper.insertSubshipment(beanMap);
+		beanMap.put("createdAt", currentDate);*/
+		return subShipmentMapper.insertSubshipment(map);
 	}
 
 	/**
@@ -72,8 +72,8 @@ public class SubShipmentServiceImpl extends BaseDao implements ISubShipmentServi
 	}
 
 	@Override
-	public int deleteSubShipmentByShipmentId(Map<String, Object> map) {
-		return subShipmentMapper.deleteSubShipmentByShipmentId(map);
+	public int deleteSubShipmentByShipmentId(Long subShipment) {
+		return subShipmentMapper.deleteSubShipmentByShipmentId(subShipment);
 	}
 
 	@Override

@@ -421,7 +421,6 @@ public class OrderShipController extends BaseController {
         return result;
     }
 
-
     private ResultMessage printExcelShipmentInfo(HttpServletResponse response,Map<String, Object> resultMap) throws IOException {
         String fileName = new Date().getTime() + ".xls";
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -571,6 +570,7 @@ public class OrderShipController extends BaseController {
             //resultMap.put("ShipVendorName", shipVendor.getVendorName());
             StockLocation location = stockLocationService.getShipFromLocation(shipment_id);
             resultMap.put("companyName",location.getContactCompanyname());
+            resultMap.put("personName",location.getContactPersonname());
             resultMap.put("contact",location.getContactPhonenumber());
             resultMap.put("address",location.getAddressStreetlines());
             resultMap.put("city",location.getAddressCity());

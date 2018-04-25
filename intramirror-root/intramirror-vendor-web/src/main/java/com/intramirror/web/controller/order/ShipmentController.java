@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -299,12 +300,12 @@ public class ShipmentController extends BaseController{
 	}
 
 	/**
-	 * TODO newShipment逻辑有待修改
 	 * @param map
 	 * @return
 	 */
 	@RequestMapping(value="/newShipment", method=RequestMethod.POST)
 	@ResponseBody
+	@Transactional
 	public ResultMessage newShipment(@RequestBody Map<String, Object> map){
 		logger.info("getShipmentTypeById parameter : "+new Gson().toJson(map));
 		ResultMessage message = ResultMessage.getInstance();
@@ -348,10 +349,16 @@ public class ShipmentController extends BaseController{
 							containerMap.put("segmentSequence", subShipment.getSegmentSequence());
 							containerMap.put("shippingSegmentId", subShipment.getShippingSegmentId());
 							containerMap.put("shipToAddr", subShipment.getShipToAddr());
+							containerMap.put("shipToAddr2", subShipment.getShipToAddr2());
+							containerMap.put("shipToAddr3", subShipment.getShipToAddr3());
+							containerMap.put("shipToEamilAddr", subShipment.getShipToEamilAddr());
 							containerMap.put("shipToCity", subShipment.getShipToCity());
 							containerMap.put("shipToCountry", subShipment.getShipToCountry());
+							containerMap.put("shipToCountryCode",subShipment.getShipToCountryCode());
 							containerMap.put("shipToDistrict", subShipment.getShipToDistrict());
 							containerMap.put("shipToProvince", subShipment.getShipToProvince());
+							containerMap.put("postalCode", subShipment.getPostalCode());
+							containerMap.put("contact",subShipment.getContact());
 							containerMap.put("shipmentId", shipmentId);
 							containerMap.put("status", ContainerType.RECEIVED);
 							Date currentDate = new Date();
@@ -361,7 +368,7 @@ public class ShipmentController extends BaseController{
 							subShipmentService.insertSubshipment(containerMap);
 						}
 					}
-					
+
 					//修改container关联
 					containerMap = new HashMap<>();
 					containerMap.put("shipment_id", shipmentId);

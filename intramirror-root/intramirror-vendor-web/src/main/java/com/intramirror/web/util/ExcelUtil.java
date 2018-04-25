@@ -59,6 +59,8 @@ public class ExcelUtil {
         // 设置第二种单元格的样式（用于值）
         cs2.setFont(f2);
         cs2.setAlignment(CellStyle.ALIGN_LEFT);
+        //自动换行
+        cs2.setWrapText(true);
 
         cs3.setFont(f);
         cs3.setAlignment(CellStyle.ALIGN_RIGHT);
@@ -81,21 +83,26 @@ public class ExcelUtil {
         cell02.setCellStyle(cs);
 
         //第二行
+        String companyName = resultMap.get("companyName") != null ? resultMap.get("companyName").toString() : "";
+        String personName = resultMap.get("personName") != null ? resultMap.get("personName").toString() : "";
         Row row1 = sheet.createRow(1);
         Cell cell11 = row1.createCell(0);
-        cell11.setCellValue(resultMap.get("ShipCompanyName")!=null?resultMap.get("ShipCompanyName").toString():"");
+        cell11.setCellValue(new HSSFRichTextString(companyName+"\r\n"+personName));
         cell11.setCellStyle(cs2);
         Cell cell12 = row1.createCell(2);
-        cell12.setCellValue(resultMap.get("ShipCompanyName")!=null?resultMap.get("ShipCompanyName").toString():"");
+        cell12.setCellValue(new HSSFRichTextString(companyName+"\r\n"+personName));
         cell12.setCellStyle(cs2);
 
         //第三行
+        String contact = resultMap.get("contact") != null ? resultMap.get("contact").toString() : "";
+        String address = resultMap.get("address") != null ? resultMap.get("address").toString() : "";
+        String city = resultMap.get("city") != null ? resultMap.get("city").toString() : "";
         Row row2 = sheet.createRow(2);
         Cell cell21 = row2.createCell(0);
-        cell21.setCellValue(resultMap.get("ShipFrom")!=null?resultMap.get("ShipFrom").toString():"");
+        cell21.setCellValue(new HSSFRichTextString(contact+"\r\n"+address+"\r\n"+city));
         cell21.setCellStyle(cs2);
         Cell cell22 = row2.createCell(2);
-        cell22.setCellValue(resultMap.get("ShipFrom")!=null?resultMap.get("ShipFrom").toString():"");
+        cell22.setCellValue(new HSSFRichTextString(contact+"\r\n"+address+"\r\n"+city));
         cell22.setCellStyle(cs2);
 
         //第四行

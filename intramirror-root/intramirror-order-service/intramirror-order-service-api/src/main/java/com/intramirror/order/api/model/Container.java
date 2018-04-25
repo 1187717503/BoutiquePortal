@@ -28,6 +28,8 @@ public class Container {
 	private String shipToGeography;
 
 	private Integer stockLocationId;
+
+	private String stockLocation;
 	
 	/**
 	 * @Fields 状态
@@ -73,6 +75,14 @@ public class Container {
 	 * @Fields 装货ID
 	 */
 	private Long shipmentId;
+
+	public String getStockLocation() {
+		return stockLocation;
+	}
+
+	public void setStockLocation(String stockLocation) {
+		this.stockLocation = stockLocation;
+	}
 
 	public Integer getStockLocationId() {
 		return stockLocationId;

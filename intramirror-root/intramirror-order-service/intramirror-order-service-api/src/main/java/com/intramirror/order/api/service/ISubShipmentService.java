@@ -39,11 +39,11 @@ public interface ISubShipmentService {
 	
 	
 	/**
-	 * 根据shipmentId删除subshipment
-	 * @param map
+	 * 根据subShipmentId删除subshipment
+	 * @param subShipmentId
 	 * @return
 	 */
-	int deleteSubShipmentByShipmentId(Map<String, Object> map);
+	int deleteSubShipmentByShipmentId(Long subShipmentId);
 
 	List<SubShipment> getSubShipmentByShipmentId(Long shipmentId);
 	

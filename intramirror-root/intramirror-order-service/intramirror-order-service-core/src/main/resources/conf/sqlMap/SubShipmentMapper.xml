@@ -163,12 +163,15 @@
     </update>
 
     <insert id="insertSubshipment" parameterType="java.util.Map">
-        INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_addr,ship_to_district,ship_to_city,ship_to_province,ship_to_country,`status`,created_at,updated_at,shipment_id,ship_to_country_code)
+        INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_addr,ship_to_addr2,ship_to_addr3,ship_to_emailAddr,
+        ship_to_district,ship_to_city,ship_to_province,ship_to_country,`status`,created_at,updated_at,shipment_id,ship_to_country_code,
+        contact,postal_code)
          VALUES(
          #{shippingSegmentId,jdbcType=BIGINT},#{segmentSequence,jdbcType=BIGINT},#{consignee,jdbcType=VARCHAR},
-         #{shipToAddr,jdbcType=VARCHAR},#{shipToDistrict,jdbcType=VARCHAR},#{shipToCity,jdbcType=VARCHAR},
+         #{shipToAddr,jdbcType=VARCHAR},#{shipToAddr2,jdbcType=VARCHAR},#{shipToAddr3,jdbcType=VARCHAR},#{shipToEamilAddr,jdbcType=VARCHAR},
+         #{shipToDistrict,jdbcType=VARCHAR},#{shipToCity,jdbcType=VARCHAR},
          #{shipToProvince,jdbcType=VARCHAR},#{shipToCountry,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},#{createdAt,jdbcType=TIMESTAMP},#{updatedAt,jdbcType=TIMESTAMP},#{shipmentId,jdbcType=BIGINT},
-        #{countryCode,jdbcType=VARCHAR});
+        #{shipToCountryCode,jdbcType=VARCHAR},#{contact,jdbcType=VARCHAR},#{postalCode,jdbcType=VARCHAR});
   </insert>
 
     <insert id="insertSubshipmentVO" parameterType="com.intramirror.order.api.model.SubShipment">
@@ -193,9 +196,9 @@ AND ship_to_addr=#{shipToAddr,jdbcType=VARCHAR} AND ship_to_district =#{shipToDi
 AND ship_to_province= #{shipToProvince,jdbcType=VARCHAR} AND ship_to_country=#{shipToCountry,jdbcType=VARCHAR} AND `status` = #{status,jdbcType=BIGINT} AND shipment_id =#{shipmentId,jdbcType=BIGINT} ORDER BY created_at DESC LIMIT 1;
 </select>
 
-    <delete id="deleteSubShipmentByShipmentId" parameterType="java.util.Map">
+    <delete id="deleteSubShipmentByShipmentId" parameterType="long">
 	DELETE FROM sub_shipment
-	WHERE shipment_id=#{shipmentId,jdbcType=BIGINT}
+	WHERE sub_shipment_id=#{subShipmentId,jdbcType=BIGINT}
 </delete>
 
     <select id="getSubShipmentByShipmentId" resultMap="BaseResultMap" parameterType="java.lang.Long">
