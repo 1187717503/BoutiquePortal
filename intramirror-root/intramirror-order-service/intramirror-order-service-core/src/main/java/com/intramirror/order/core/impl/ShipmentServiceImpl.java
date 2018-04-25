@@ -68,7 +68,8 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			//保存对象信息
 			shipment.setShipToGeography(map.get("pack_english_name")==null?" ":map.get("pack_english_name").toString());
 			Long vendorId = Long.parseLong(map.get("vendor_id").toString());
-			Integer stockLocationId = Integer.parseInt(map.get("stock_location_id").toString());
+			Object locationId = map.get("stock_location_id");
+			Integer stockLocationId = Integer.parseInt(locationId!=null?locationId.toString():"0");
 			String top = shipmentMapper.getVendorCodeById(vendorId);
 			Map<String, Object> noMap = new HashMap<>();
 			noMap.put("topName", top+"SP");

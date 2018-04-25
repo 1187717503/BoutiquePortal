@@ -103,5 +103,5 @@ public interface SubShipmentMapper {
      */
     int updateSubShipmentById(Map<String, Object> map);
 
-    SubShipment getDHLShipment(Long shipment);
+    SubShipment getDHLShipment(Map<String, Object> map);
 }

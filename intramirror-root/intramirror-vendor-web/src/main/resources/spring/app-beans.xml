@@ -30,6 +30,12 @@
     <!-- 开启事务控制的注解支持 -->
     <tx:annotation-driven transaction-manager="transactionManager"/>
 
+    <bean id="DHLHttpClinet" class="com.intramirror.web.util.DHLHttpClient">
+        <property name="createAWBUrl" value="${createAWBUrl}"/>
+        <property name="queryAWBUrl" value="${queryAWBUrl}"/>
+        <property name="deleteAWBUrl" value="${deleteAWBUrl}"/>
+    </bean>
+
 
     <!-- start spring 自动注解,及解决ReponseBody中文乱码问题 -->
     <mvc:annotation-driven>

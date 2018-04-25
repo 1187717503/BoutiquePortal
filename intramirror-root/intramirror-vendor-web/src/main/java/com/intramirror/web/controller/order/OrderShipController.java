@@ -820,15 +820,18 @@ public class OrderShipController extends BaseController {
             result.setMsg("Please log in again");
             return result;
         }
-
+        DHLInputVO inputVO = new DHLInputVO();
         Long shipmentId = Long.parseLong(map.get("shipment_id").toString());
-        SubShipment dhlShipment = subShipmentService.getDHLShipment(shipmentId);
         Map<String,Object> params = new HashMap<>();
         //查询close状态纸箱
         params.put("status",2);
         params.put("shipmentId",shipmentId);
+        //查询第一段
+        params.put("sequence",1);
+        SubShipment dhlShipment = subShipmentService.getDHLShipment(params);
         List<Map<String, Object>> containerList = containerService.getListByShipmentId(params);
         Shipment shipment = iShipmentService.selectShipmentById(params);
+
         if(dhlShipment!=null){
             if(dhlShipment.getAwbNum()!=null&&StringUtil.isNotEmpty(dhlShipment.getAwbNum())){
                 //获取awb文档
@@ -842,22 +845,32 @@ public class OrderShipController extends BaseController {
                 }
             }
 
-            StockLocation fromLocation = stockLocationService.getShipFromLocation(shipmentId);
-            BigDecimal customValue = iShipmentService.getCustomValue(params);
-            DHLInputVO inputVO = new DHLInputVO();
-            if (customValue!=null){
-                inputVO.setCustomsValue(customValue.setScale(2,BigDecimal.ROUND_HALF_UP));
-            }
             if (shipment!=null){
                 String shipToGeography = shipment.getShipToGeography();
                 if ("European Union".equals(shipToGeography)){
                     inputVO.setServiceType("U");
+                    //查询第三段
+                    params.put("sequence",3);
+                    dhlShipment = subShipmentService.getDHLShipment(params);
+                    if (dhlShipment==null){
+                        //查询第二段
+                        params.put("sequence",2);
+                        dhlShipment = subShipmentService.getDHLShipment(params);
+                    }
                 }else if ("Transit Warehouse".equals(shipToGeography)){
                     inputVO.setServiceType("N");
                 }else {
                     inputVO.setServiceType("P");
                 }
             }
+
+            StockLocation fromLocation = stockLocationService.getShipFromLocation(shipmentId);
+            BigDecimal customValue = iShipmentService.getCustomValue(params);
+
+            if (customValue!=null){
+                inputVO.setCustomsValue(customValue.setScale(2,BigDecimal.ROUND_HALF_UP));
+            }
+
             addParams(inputVO,dhlShipment,fromLocation,containerList);
 
             String resultStr = DHLHttpClient.httpPost(JsonTransformUtil.toJson(inputVO), DHLHttpClient.createAWBUrl);
@@ -915,10 +928,22 @@ public class OrderShipController extends BaseController {
             recipientVO.setPersonName(dhlShipment.getConsignee());
             recipientVO.setPhoneNumber(dhlShipment.getContact());
             recipientVO.setEmailAddress(dhlShipment.getShipToEamilAddr());
-            recipientVO.setStreetLines(dhlShipment.getShipToAddr());
-            recipientVO.setStreetLines2(dhlShipment.getShipToAddr2());
-            recipientVO.setStreetLines3(dhlShipment.getShipToAddr3());
-            recipientVO.setPostalCode(dhlShipment.getPostalCode());
+            String shipToAddr = dhlShipment.getShipToAddr();
+            if (shipToAddr.length()>35){
+                shipToAddr = shipToAddr.substring(0,34);
+            }
+            recipientVO.setStreetLines(shipToAddr);
+            if (StringUtil.isNotEmpty(dhlShipment.getShipToAddr2())){
+                recipientVO.setStreetLines2(dhlShipment.getShipToAddr2());
+            }
+            if (StringUtil.isNotEmpty(dhlShipment.getShipToAddr3())){
+                recipientVO.setStreetLines3(dhlShipment.getShipToAddr3());
+            }
+            if(dhlShipment.getPostalCode()!=null){
+                recipientVO.setPostalCode(dhlShipment.getPostalCode());
+            }else {
+                recipientVO.setPostalCode("101731");
+            }
             recipientVO.setCountryCode(dhlShipment.getShipToCountryCode());
             inputVO.setRecipient(recipientVO);
         }

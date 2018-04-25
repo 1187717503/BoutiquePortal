@@ -3,13 +3,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context
     	http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
 	<!-- 配置转义符 -->
 	<bean id="fmXmlEscape" class="freemarker.template.utility.XmlEscape" />
 	<context:component-scan base-package="com.intramirror.web.common"/>
-	
+
 	<!--引入属性文件 -->
     <context:property-placeholder location="classpath:/commons.properties"/>
 
@@ -45,11 +45,7 @@
 		<property name="order" value="1" />
 	</bean>
 
-	<bean id="DHLHttpClinet" class="com.intramirror.web.util.DHLHttpClient">
-		<property name="createAWBUrl" value="${createAWBUrl}"/>
-		<property name="queryAWBUrl" value="${queryAWBUrl}"/>
-		<property name="deleteAWBUrl" value="${deleteAWBUrl}"/>
-	</bean>
+
 
 	<bean class="com.intramirror.web.common.cache.CategoryCache" init-method="init"/>
 </beans>

@@ -106,7 +106,7 @@ public class SubShipmentServiceImpl extends BaseDao implements ISubShipmentServi
 	}
 
 	@Override
-	public SubShipment getDHLShipment(Long shipmentId) {
-		return subShipmentMapper.getDHLShipment(shipmentId);
+	public SubShipment getDHLShipment(Map<String, Object> map) {
+		return subShipmentMapper.getDHLShipment(map);
 	}
 }

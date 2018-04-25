@@ -224,10 +224,10 @@ AND ship_to_province= #{shipToProvince,jdbcType=VARCHAR} AND ship_to_country=#{s
 		where shipment_id = #{shipment_id,jdbcType=BIGINT} and sub_shipment_id=#{subShipmentId,jdbcType=BIGINT} 
     </update>
 
-    <select id="getDHLShipment" resultMap="BaseResultMap" parameterType="long">
+    <select id="getDHLShipment" resultMap="BaseResultMap" parameterType="map">
         SELECT ss.*,s.stock_location_id FROM sub_shipment ss
         INNER JOIN shipment s on ss.shipment_id = s.shipment_id
         WHERE s.shipment_id = #{shipmentId,jdbcType=BIGINT}
-        AND ss.segment_sequence = 1
+        AND ss.segment_sequence = #{sequence,jdbcType=BIGINT}
     </select>
 </mapper>

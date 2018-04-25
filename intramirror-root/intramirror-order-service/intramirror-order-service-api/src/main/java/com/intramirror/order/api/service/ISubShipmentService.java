@@ -73,5 +73,5 @@ public interface ISubShipmentService {
 	 * @param shipmentId
 	 * @return
 	 */
-	SubShipment getDHLShipment(Long shipmentId);
+	SubShipment getDHLShipment(Map<String, Object> map);
 }
