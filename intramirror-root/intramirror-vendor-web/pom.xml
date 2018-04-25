@@ -46,6 +46,11 @@
             <properties>
                 <profiles.active>staging_local</profiles.active>
             </properties>
+            <build>
+                <filters>
+                    <filter>src/main/resources/staging_local/dhl.properties</filter>
+                </filters>
+            </build>
         </profile>
         <profile>
             <id>prd</id>
