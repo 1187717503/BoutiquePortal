@@ -138,7 +138,7 @@ public class ContentManagementServiceImpl implements ContentManagementService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public BlockTagRel createBlockWithDefaultTag(Block block) {
         List<Block> blockList = blockMapper.listBlockBySort(block.getSortOrder());
         block.setStatus((byte) 1);
