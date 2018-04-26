@@ -39,6 +39,8 @@ public class SubShipment {
 	 * @Fields 收货人
 	 */
 	private String consignee;
+
+	private String personName;
 	/**
 	 * @Fields 地址
 	 */
@@ -84,6 +86,14 @@ public class SubShipment {
      * 邮编
      */
 	private String postalCode;
+
+    public String getPersonName() {
+        return personName;
+    }
+
+    public void setPersonName(String personName) {
+        this.personName = personName;
+    }
 
     public String getPostalCode() {
         return postalCode;

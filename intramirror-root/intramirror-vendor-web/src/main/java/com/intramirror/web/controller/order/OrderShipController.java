@@ -13,7 +13,6 @@ import com.intramirror.main.api.service.GeographyService;
 import com.intramirror.main.api.service.StockLocationService;
 import com.intramirror.main.api.service.TaxService;
 import com.intramirror.order.api.common.OrderStatusType;
-import com.intramirror.order.api.model.Container;
 import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.model.ShippingProvider;
 import com.intramirror.order.api.model.SubShipment;
@@ -31,9 +30,11 @@ import com.intramirror.web.common.BarcodeUtil;
 import com.intramirror.web.controller.BaseController;
 import com.intramirror.web.util.DHLHttpClient;
 import com.intramirror.web.util.ExcelUtil;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -52,7 +53,7 @@ import java.util.*;
 @RequestMapping("/orderShip")
 public class OrderShipController extends BaseController {
 
-    private static Logger logger = Logger.getLogger(OrderShipController.class);
+    private static Logger logger = LoggerFactory.getLogger(OrderShipController.class);
 
     @Autowired
     private IOrderService orderService;
@@ -231,6 +232,7 @@ public class OrderShipController extends BaseController {
                     Long shipmentId = shipment.getShipmentId();
                     for (Map<String, Object> shipmentMap:shipMentList){
                         if(shipmentId.equals(Long.parseLong(shipmentMap.get("shipment_id").toString()))){
+                            shipmentMap.put("stockLocation",shipment.getStockLocation());
                             shipmentListMapSort.add(shipmentMap);
                             break;
                         }
@@ -353,14 +355,11 @@ public class OrderShipController extends BaseController {
                         carton.put("order_qty", orderList.get(carton.get("container_id").toString()).size());
                     }
                 }
-
-
             }
 
             shipmentMap.put("carton_qty", shipMentCartonList == null ? 0 : shipMentCartonList.size());
             resultMap.put("cartonList", shipMentCartonList);
             resultMap.put("shipmentInfo", shipmentMap);
-
 
             result.successStatus();
             result.setData(resultMap);
@@ -531,7 +530,7 @@ public class OrderShipController extends BaseController {
 
         try {
             map.put("vendorId", vendor.getVendorId());
-            Map<String, Object> getShipment = new HashMap<String, Object>();
+            Map<String, Object> getShipment = new HashMap<>();
             getShipment.put("shipmentId", shipment_id);
 
             //根据shipmentId 获取shipment 相关信息及物流第一段类型
@@ -834,8 +833,15 @@ public class OrderShipController extends BaseController {
 
         if(dhlShipment!=null){
             if(dhlShipment.getAwbNum()!=null&&StringUtil.isNotEmpty(dhlShipment.getAwbNum())){
-                //获取awb文档
-                String s = DHLHttpClient.httpGet(DHLHttpClient.queryAWBUrl + dhlShipment.getAwbNum());
+                String s;
+                try {
+                    //获取awb文档
+                    s = DHLHttpClient.httpGet(DHLHttpClient.queryAWBUrl + dhlShipment.getAwbNum());
+                }catch (Exception e){
+                    result.addMsg("DHL service invocation failed");
+                    logger.error("request fail,params={},url={}",JsonTransformUtil.toJson(inputVO),DHLHttpClient.createAWBUrl);
+                    return result;
+                }
                 if(StringUtil.isNotEmpty(s)){
                     JSONObject jo = JSONObject.fromObject(s);
                     result.successStatus();
@@ -850,13 +856,13 @@ public class OrderShipController extends BaseController {
                 if ("European Union".equals(shipToGeography)){
                     inputVO.setServiceType("U");
                     //查询第三段
-                    params.put("sequence",3);
+                    /*params.put("sequence",3);
                     dhlShipment = subShipmentService.getDHLShipment(params);
                     if (dhlShipment==null){
                         //查询第二段
                         params.put("sequence",2);
                         dhlShipment = subShipmentService.getDHLShipment(params);
-                    }
+                    }*/
                 }else if ("Transit Warehouse".equals(shipToGeography)){
                     inputVO.setServiceType("N");
                 }else {
@@ -871,10 +877,30 @@ public class OrderShipController extends BaseController {
                 inputVO.setCustomsValue(customValue.setScale(2,BigDecimal.ROUND_HALF_UP));
             }
 
-            addParams(inputVO,dhlShipment,fromLocation,containerList);
-
-            String resultStr = DHLHttpClient.httpPost(JsonTransformUtil.toJson(inputVO), DHLHttpClient.createAWBUrl);
+            addParams(inputVO,dhlShipment,fromLocation,containerList,shipment);
+            String resultStr;
+            try{
+                resultStr = DHLHttpClient.httpPost(JsonTransformUtil.toJson(inputVO), DHLHttpClient.createAWBUrl);
+            }catch (Exception e){
+                result.addMsg("DHL service invocation failed");
+                logger.error("request fail,params={},url={}",JsonTransformUtil.toJson(inputVO),DHLHttpClient.createAWBUrl);
+                return result;
+            }
             if(StringUtil.isNotEmpty(resultStr)){
+                JSONObject object = JSONObject.fromObject(resultStr);
+                if(object.optInt("status")!=1) {
+                    //获取DHL报错信息
+                    String msg = object.optString("msg");
+                    JSONObject jsonObject = JSONObject.fromObject(msg);
+                    JSONObject shipmentResponse = jsonObject.optJSONObject("ShipmentResponse");
+                    JSONArray notification = shipmentResponse.optJSONArray("Notification");
+                    msg = notification.get(0).toString();
+                    String message = JSONObject.fromObject(msg).optString("Message");
+                    //int i = message.indexOf("-");
+                    //message = message.substring(0,i);
+                    result.addMsg(message);
+                    return result;
+                }
                 JSONObject jo = JSONObject.fromObject(resultStr);
                 String awbNo = jo.optString("awbNo");
                 //保存到subShipment
@@ -882,6 +908,7 @@ public class OrderShipController extends BaseController {
                 subShipmentService.updateSubShipment(params);
                 result.successStatus();
                 jo.put("shipmentNo",shipment.getShipmentNo());
+                jo.remove("status");
                 result.setData(jo);
                 return result;
             }
@@ -890,7 +917,7 @@ public class OrderShipController extends BaseController {
         return result;
     }
 
-    private void addParams(DHLInputVO inputVO, SubShipment dhlShipment,StockLocation fromLocation, List<Map<String, Object>> containerList) {
+    private void addParams(DHLInputVO inputVO, SubShipment dhlShipment,StockLocation fromLocation, List<Map<String, Object>> containerList,Shipment shipment) {
         SimpleDateFormat f1 = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat f2 = new SimpleDateFormat("HH:mm:ssz");
         Calendar calendar = Calendar.getInstance();
@@ -925,7 +952,7 @@ public class OrderShipController extends BaseController {
             RecipientVO recipientVO = new RecipientVO();
             recipientVO.setCity(dhlShipment.getShipToCity());
             recipientVO.setCompanyName(dhlShipment.getConsignee());
-            recipientVO.setPersonName(dhlShipment.getConsignee());
+            recipientVO.setPersonName(dhlShipment.getPersonName());
             recipientVO.setPhoneNumber(dhlShipment.getContact());
             recipientVO.setEmailAddress(dhlShipment.getShipToEamilAddr());
             String shipToAddr = dhlShipment.getShipToAddr();
@@ -951,7 +978,7 @@ public class OrderShipController extends BaseController {
             List<Map<String,Object>> list = new ArrayList<>();
             for (Map<String,Object> map:containerList){
                 Map<String,Object> container = new HashMap<>();
-                container.put("barcode",map.get("barcode"));
+                container.put("barcode",shipment.getShipmentNo()+"/"+map.get("barcode"));
                 container.put("length",map.get("length"));
                 container.put("width",map.get("width"));
                 container.put("height",map.get("height"));

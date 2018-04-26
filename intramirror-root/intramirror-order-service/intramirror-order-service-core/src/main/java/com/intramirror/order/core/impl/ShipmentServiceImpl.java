@@ -296,6 +296,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	private SubShipment saveBeanVO(Map<String, Object> map, Date currentDate, Long shipmentId,Long segmentSequence){
 		SubShipment subShipment = new SubShipment();
 		subShipment.setConsignee(map.get("transfer_consignee")==null?"":map.get("transfer_consignee").toString());
+		subShipment.setPersonName(map.get("person_name")==null?"":map.get("person_name").toString());
 		subShipment.setShippingSegmentId(Long.parseLong(map.get("shipping_segment_id")==null?"0":map.get("shipping_segment_id").toString()));
 		subShipment.setSegmentSequence(segmentSequence);
 		subShipment.setShipToAddr(map.get("transfer_addr")==null?"":map.get("transfer_addr").toString());

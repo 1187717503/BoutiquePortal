@@ -6,6 +6,7 @@
 	    <id column="shipment_id" property="shipmentId" jdbcType="BIGINT" />
 	    <result column="ship_to_geography" property="shipToGeography" jdbcType="VARCHAR" />
 	    <result column="stock_location_id" property="stockLocationId" jdbcType="INTEGER" />
+	    <result column="stock_location" property="stockLocation" jdbcType="VARCHAR" />
 	    <result column="status" property="status" jdbcType="BIGINT" />
 	    <result column="shipment_category" property="shipmentCategory" jdbcType="BIGINT" />
 	    <result column="vendor_id" property="vendorId" jdbcType="BIGINT" />
@@ -84,11 +85,12 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
   </select>
   
    <select id="getShipmentInfoById" resultType="java.util.HashMap"  parameterType="java.util.Map">
-	  SELECT ss.shipment_type_id,s.*,i.invoice_num,i.invoice_date  FROM sub_shipment sub
+	  SELECT ss.shipment_type_id,s.*,i.invoice_num,i.invoice_date,sl.stock_location  FROM sub_shipment sub
 		INNER JOIN shipment s ON (sub.shipment_id = s.shipment_id)
 		INNER JOIN shipping_segment ss ON (sub.shipping_segment_id = ss.shipping_segment_id)
 		INNER JOIN shipment_type st ON (ss.shipment_type_id = st.shipment_type_id)
-		LEFT JOIN invoice i ON (s.shipment_id = i.shipment_id and i.enabled = 1) 
+		LEFT JOIN invoice i ON (s.shipment_id = i.shipment_id and i.enabled = 1)
+		left JOIN stock_location sl on sl.location_id = s.stock_location_id
 		WHERE sub.shipment_id=#{shipmentId,jdbcType=BIGINT}
 		GROUP BY ss.segment_sequence ASC LIMIT 1;
   </select>
@@ -138,9 +140,10 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 </select>
 
 	<select id="getShipmentList" resultMap="BaseResultMap" parameterType="java.util.Map">
-		SELECT s.* FROM shipment s
+		SELECT s.*,sl.stock_location FROM shipment s
 		INNER JOIN container c ON c.shipment_id = s.shipment_id
 		INNER JOIN logistics_product lp on lp.container_id = c.container_id
+		LEFT JOIN stock_location sl ON sl.location_id = s.stock_location_id
 		WHERE lp.`status` = 7 and s.vendor_id = #{vendorId}
 		GROUP BY s.shipment_no
 		<if test="sortByName!=null">

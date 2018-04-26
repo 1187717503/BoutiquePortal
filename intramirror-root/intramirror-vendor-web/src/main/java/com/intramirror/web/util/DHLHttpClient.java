@@ -61,9 +61,11 @@ public class DHLHttpClient {
                 String jsonString = EntityUtils.toString(responseEntity);
                 JSONObject object = JSONObject.fromObject(jsonString);
                 if(object.optInt("status")!=1){
-                    LOGGER.error("mag={}",object.optString("msg"));
+                    LOGGER.error("msg={}",object.optString("msg"));
+                    return object.toString();
                 }else {
                     JSONObject data = object.optJSONObject("data");
+                    data.put("status",1);
                     return data!=null?data.toString():"request success";
                 }
             }
@@ -96,7 +98,8 @@ public class DHLHttpClient {
             LOGGER.info("result={}",result);
             JSONObject object = JSONObject.fromObject(result);
             if(object.optInt("status")!=1){
-                LOGGER.error("mag={}",object.optString("msg"));
+                LOGGER.error("msg={}",object.optString("msg"));
+                return object.toString();
             }else {
                 JSONObject data = object.optJSONObject("data");
                 return data.toString();

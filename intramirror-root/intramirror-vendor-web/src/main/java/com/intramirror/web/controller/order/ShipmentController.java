@@ -12,9 +12,9 @@ import com.intramirror.order.api.model.Shipment;
 import com.intramirror.user.api.model.User;
 import com.intramirror.utils.transform.JsonTransformUtil;
 import com.intramirror.web.util.DHLHttpClient;
-import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,7 +49,7 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/shipment")
 public class ShipmentController extends BaseController{
 
-	private static Logger logger = Logger.getLogger(ShipmentController.class);
+	private static Logger logger = LoggerFactory.getLogger(ShipmentController.class);
 
 	@Autowired
 	private IShipmentService iShipmentService;
@@ -233,13 +233,13 @@ public class ShipmentController extends BaseController{
 					String shipToGeography = shipment.getShipToGeography();
 					if ("European Union".equals(shipToGeography)) {
 						//查询第三段
-						map.put("sequence", 3);
+						/*map.put("sequence", 3);
 						dhlShipment = subShipmentService.getDHLShipment(map);
 						if (dhlShipment == null) {
 							//查询第二段
 							map.put("sequence", 2);
 							dhlShipment = subShipmentService.getDHLShipment(map);
-						}
+						}*/
 					}else {
 						map.put("sequence", 1);
 						dhlShipment = subShipmentService.getDHLShipment(map);
@@ -256,7 +256,14 @@ public class ShipmentController extends BaseController{
 						params.put("awbNo",dhlShipment.getAwbNum());
 						params.put("requestorName",user.getUsername());
 						params.put("reason","008");
-						String s = DHLHttpClient.httpPost(JsonTransformUtil.toJson(params), DHLHttpClient.deleteAWBUrl);
+						String s ;
+						try{
+						s = DHLHttpClient.httpPost(JsonTransformUtil.toJson(params), DHLHttpClient.deleteAWBUrl);
+						}catch (Exception e){
+							message.setMsg("DHL service invocation failed");
+							logger.error("request fail,params={},url={}",JsonTransformUtil.toJson(params),DHLHttpClient.deleteAWBUrl);
+							return message;
+						}
 						if (StringUtil.isEmpty(s)){
 							logger.error("deleteAWB fail");
 							message.errorStatus().putMsg("Info", "deleteAWB fail");
