@@ -141,19 +141,19 @@ public class ContentManagementServiceImpl implements ContentManagementService {
     @Transactional(rollbackFor = Exception.class)
     public BlockTagRel createBlockWithDefaultTag(Block block) throws Exception {
         List<Block> blockList = blockMapper.listBlockBySort(block.getSortOrder());
-        block.setStatus((byte) 1);
-        block.setEnabled(true);
-        blockMapper.insertSelective(block);
-        if (blockList.size() != 0) {
-            blockMapper.batchUpdateSort(blockList);
-        }
-
         Tag tag = new Tag();
         tag.setTagName(block.getBlockName());
 
         if (tagMapper.getTagsByName(tag) != null) {
             LOGGER.error("Tag name is duplicate {}.", block.getBlockName());
             throw new Exception("Tag name is duplicate");
+        }
+
+        block.setStatus((byte) 1);
+        block.setEnabled(true);
+        blockMapper.insertSelective(block);
+        if (blockList.size() != 0) {
+            blockMapper.batchUpdateSort(blockList);
         }
 
         tag.setEnabled(true);
