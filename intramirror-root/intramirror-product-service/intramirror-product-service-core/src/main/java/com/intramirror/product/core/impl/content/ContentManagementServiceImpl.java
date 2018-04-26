@@ -139,7 +139,7 @@ public class ContentManagementServiceImpl implements ContentManagementService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public BlockTagRel createBlockWithDefaultTag(Block block) {
+    public BlockTagRel createBlockWithDefaultTag(Block block) throws Exception {
         List<Block> blockList = blockMapper.listBlockBySort(block.getSortOrder());
         block.setStatus((byte) 1);
         block.setEnabled(true);
@@ -149,8 +149,15 @@ public class ContentManagementServiceImpl implements ContentManagementService {
         }
 
         Tag tag = new Tag();
-        tag.setEnabled(true);
         tag.setTagName(block.getBlockName());
+
+        if (tagMapper.getTagsByName(tag) != null) {
+            LOGGER.error("Tag name is duplicate {}.", block.getBlockName());
+            throw new Exception("Tag name is duplicate");
+        }
+
+        tag.setEnabled(true);
+
         int rowNum = tagMapper.insertSelective(tag);
         LOGGER.info("Create tag for name {}, effect {} rows.", block.getBlockName(), rowNum);
 
