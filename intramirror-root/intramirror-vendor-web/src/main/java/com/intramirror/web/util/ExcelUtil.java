@@ -20,7 +20,7 @@ public class ExcelUtil {
         // 创建第一个sheet（页），并命名
         Sheet sheet = wb.createSheet();
         // 手动设置列宽。第一个参数表示要为第几列设；，第二个参数表示列的宽度，n为列高的像素数。
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 6; i++) {
             sheet.setColumnWidth( i, 36 * 150);
         }
         sheet.setColumnWidth(1,75 * 150);
@@ -192,10 +192,12 @@ public class ExcelUtil {
         cell113.setCellStyle(cs);
         Cell cell114 = row11.createCell(3);
         cell114.setCellValue("Made In");
-        cell114.setCellStyle(cs);
         Cell cell115 = row11.createCell(4);
-        cell115.setCellValue("Purchase Price");
+        cell115.setCellValue("address country");
         cell115.setCellStyle(cs);
+        Cell cell116 = row11.createCell(5);
+        cell116.setCellValue("Purchase Price");
+        cell116.setCellStyle(cs);
 
         int i = 11;
         Object cartonList = resultMap.get("cartonList");
@@ -214,6 +216,7 @@ public class ExcelUtil {
                     String inPrice = map.get("in_price")!=null?map.get("in_price").toString():"";
                     String composition = map.get("Composition")!=null?map.get("Composition").toString():"";
                     String madeIn = map.get("MadeIn")!=null?map.get("MadeIn").toString():"";
+                    String country = map.get("user_rec_country")!=null?map.get("user_rec_country").toString():"";
                     Cell cell1 = row.createCell(0);
                     cell1.setCellValue(orderLineNum);
                     cell1.setCellStyle(cs2);
@@ -227,34 +230,37 @@ public class ExcelUtil {
                     cell4.setCellValue(madeIn);
                     cell4.setCellStyle(cs2);
                     Cell cell5 = row.createCell(4);
-                    cell5.setCellValue("€"+inPrice);
+                    cell5.setCellValue(country);
                     cell5.setCellStyle(cs2);
+                    Cell cell6 = row.createCell(5);
+                    cell6.setCellValue("€"+inPrice);
+                    cell6.setCellStyle(cs2);
 
                 }
             }
         }
 
         Row rowi1 = sheet.createRow(i+1);
-        Cell celli3 = rowi1.createCell(3);
+        Cell celli3 = rowi1.createCell(4);
         celli3.setCellValue("Total:"+resultMap.get("all_qty"));
         celli3.setCellStyle(cs3);
-        Cell celli4 = rowi1.createCell(4);
+        Cell celli4 = rowi1.createCell(5);
         celli4.setCellValue("€"+resultMap.get("allTotal"));
         celli4.setCellStyle(cs3);
 
         Row rowi2 = sheet.createRow(i+2);
-        Cell celli23 = rowi2.createCell(3);
+        Cell celli23 = rowi2.createCell(4);
         celli23.setCellValue("VAT:");
         celli23.setCellStyle(cs3);
-        Cell celli24 = rowi2.createCell(4);
+        Cell celli24 = rowi2.createCell(5);
         celli24.setCellValue("€"+resultMap.get("VAT"));
         celli24.setCellStyle(cs3);
 
         Row rowi3 = sheet.createRow(i+3);
-        Cell celli33 = rowi3.createCell(3);
+        Cell celli33 = rowi3.createCell(4);
         celli33.setCellValue("Grand Total:");
         celli33.setCellStyle(cs3);
-        Cell celli34 = rowi3.createCell(4);
+        Cell celli34 = rowi3.createCell(5);
         celli34.setCellValue("€"+resultMap.get("GrandTotal"));
         celli34.setCellStyle(cs3);
 
@@ -267,7 +273,7 @@ public class ExcelUtil {
         //设置表格边框样式
         for(int a=0;a<i+4;a++){
             Row r = sheet.getRow(a);
-            for(int b =0;b<5;b++){
+            for(int b =0;b<6;b++){
                 if(r!=null){
                     //设置行高
                     if(a>11&&a<=i){
@@ -291,7 +297,7 @@ public class ExcelUtil {
 
         for(int c=1;c<=3;c++){
             Row r = sheet.getRow(i+c);
-            for(int b =0;b<5;b++){
+            for(int b =0;b<6;b++){
                 if(r!=null){
                     Cell ce = r.getCell(b);
                     if(ce==null){
