@@ -225,56 +225,6 @@ public class ShipmentController extends BaseController{
 				message.errorStatus().putMsg("Info", "update fail").setData(0);
 				return message;
 			}
-			//如果shipment操作reopen,需要删除awb
-			if (1 == Long.parseLong(map.get("status").toString())){
-				Shipment shipment = iShipmentService.selectShipmentById(map);
-				SubShipment dhlShipment = null;
-				if (shipment!=null){
-					String shipToGeography = shipment.getShipToGeography();
-					if ("European Union".equals(shipToGeography)) {
-						//查询第三段
-						/*map.put("sequence", 3);
-						dhlShipment = subShipmentService.getDHLShipment(map);
-						if (dhlShipment == null) {
-							//查询第二段
-							map.put("sequence", 2);
-							dhlShipment = subShipmentService.getDHLShipment(map);
-						}*/
-					}else {
-						map.put("sequence", 1);
-						dhlShipment = subShipmentService.getDHLShipment(map);
-					}
-				}
-				if (dhlShipment!=null){
-					if (StringUtil.isNotEmpty(dhlShipment.getAwbNum())){
-						User user = this.getUser(httpRequest);
-						if (user == null) {
-							message.setMsg("Please log in again");
-							return message;
-						}
-						Map<String,Object> params = new HashMap<>();
-						params.put("awbNo",dhlShipment.getAwbNum());
-						params.put("requestorName",user.getUsername());
-						params.put("reason","008");
-						String s ;
-						try{
-						s = DHLHttpClient.httpPost(JsonTransformUtil.toJson(params), DHLHttpClient.deleteAWBUrl);
-						}catch (Exception e){
-							message.setMsg("DHL service invocation failed");
-							logger.error("request fail,params={},url={}",JsonTransformUtil.toJson(params),DHLHttpClient.deleteAWBUrl);
-							return message;
-						}
-						if (StringUtil.isEmpty(s)){
-							logger.error("deleteAWB fail");
-							message.errorStatus().putMsg("Info", "deleteAWB fail");
-							return message;
-						}
-						params.put("shipmentId",map.get("shipmentId"));
-						params.put("awbNo","");
-						subShipmentService.updateSubShipment(params);
-					}
-				}
-			}
 
 			//状态修改成功修改container状态
 			logger.info("update container status");
@@ -298,6 +248,57 @@ public class ShipmentController extends BaseController{
 				}
 			}
 			message.successStatus().putMsg("Info", "SUCCESS").setData(1);
+
+			//如果shipment操作reopen,需要删除awb
+			if (1 == Long.parseLong(map.get("status").toString())){
+				Shipment shipment = iShipmentService.selectShipmentById(map);
+				SubShipment dhlShipment = null;
+				if (shipment!=null){
+					//String shipToGeography = shipment.getShipToGeography();
+					//if ("European Union".equals(shipToGeography)) {
+						//查询第三段
+						/*map.put("sequence", 3);
+						dhlShipment = subShipmentService.getDHLShipment(map);
+						if (dhlShipment == null) {
+							//查询第二段
+							map.put("sequence", 2);
+							dhlShipment = subShipmentService.getDHLShipment(map);
+						}*/
+					//}else {
+						map.put("sequence", 1);
+						dhlShipment = subShipmentService.getDHLShipment(map);
+					//}
+				}
+				if (dhlShipment!=null){
+					if (StringUtil.isNotEmpty(dhlShipment.getAwbNum())){
+						User user = this.getUser(httpRequest);
+						if (user == null) {
+							message.setMsg("Please log in again");
+							return message;
+						}
+						Map<String,Object> params = new HashMap<>();
+						params.put("awbNo",dhlShipment.getAwbNum());
+						params.put("requestorName",user.getUsername());
+						params.put("reason","008");
+						String s;
+						try{
+							s = DHLHttpClient.httpPost(JsonTransformUtil.toJson(params), DHLHttpClient.deleteAWBUrl);
+						}catch (Exception e){
+							logger.error("request fail,params={},url={}",JsonTransformUtil.toJson(params),DHLHttpClient.deleteAWBUrl);
+							message.setMsg("DHL service invocation failed");
+							return message;
+						}
+						if (StringUtil.isEmpty(s)){
+							logger.error("deleteAWB fail");
+							message.errorStatus().putMsg("Info", "deleteAWB fail");
+							return message;
+						}
+						params.put("shipmentId",map.get("shipmentId"));
+						params.put("awbNo","");
+						subShipmentService.updateSubShipment(params);
+					}
+				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.info("Error Message : " + e.getMessage());
