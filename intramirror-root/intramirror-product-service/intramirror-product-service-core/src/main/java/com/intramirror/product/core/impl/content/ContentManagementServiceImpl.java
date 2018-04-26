@@ -151,7 +151,8 @@ public class ContentManagementServiceImpl implements ContentManagementService {
         Tag tag = new Tag();
         tag.setEnabled(true);
         tag.setTagName(block.getBlockName());
-        tagMapper.insertSelective(tag);
+        int rowNum = tagMapper.insertSelective(tag);
+        LOGGER.info("Create tag for name {}, effect {} rows.", block.getBlockName(), rowNum);
 
         BlockTagRel btRel = new BlockTagRel();
         btRel.setTagId(tag.getTagId());
