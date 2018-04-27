@@ -184,7 +184,10 @@ values(#{containerType,jdbcType=VARCHAR}, #{shipToGeography,jdbcType=VARCHAR},#{
   	
   	<select id="getListByShipmentId" resultType="java.util.HashMap"  parameterType="java.util.Map">
 		SELECT * FROM container where shipment_id = #{shipmentId,jdbcType=BIGINT}
-		and `status`=#{status} GROUP BY created_at ASC;
+		<if test="status != null" >
+		and `status`=#{status}
+		</if>
+		GROUP BY created_at ASC;
 	</select>
 	
 	<select id="getContainerById" resultType="java.util.HashMap"  parameterType="java.util.Map">

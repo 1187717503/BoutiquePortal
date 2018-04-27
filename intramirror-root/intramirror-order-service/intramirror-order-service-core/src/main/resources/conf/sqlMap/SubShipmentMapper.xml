@@ -233,5 +233,6 @@ AND ship_to_province= #{shipToProvince,jdbcType=VARCHAR} AND ship_to_country=#{s
         INNER JOIN shipment s on ss.shipment_id = s.shipment_id
         WHERE s.shipment_id = #{shipmentId,jdbcType=BIGINT}
         AND ss.segment_sequence = #{sequence,jdbcType=BIGINT}
+        limit 1
     </select>
 </mapper>

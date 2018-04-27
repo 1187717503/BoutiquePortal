@@ -823,7 +823,7 @@ public class OrderShipController extends BaseController {
         Long shipmentId = Long.parseLong(map.get("shipment_id").toString());
         Map<String,Object> params = new HashMap<>();
         //查询close状态纸箱
-        params.put("status",2);
+        //params.put("status",2);
         params.put("shipmentId",shipmentId);
         //查询第一段
         params.put("sequence",1);
@@ -934,6 +934,8 @@ public class OrderShipController extends BaseController {
         //获取意大利时间,再往后延一天
         inputVO.setShipmentTime(f1.format(currentTime)+"T"+f2.format(currentTime));
         inputVO.setDescription("clothing");
+        inputVO.setLabelType("PDF");
+        inputVO.setLabelTemplate("ECOM26_A4_001");
         if (fromLocation!=null){
             ShipperVO shipperVO = new ShipperVO();
             shipperVO.setCity(fromLocation.getAddressCity());

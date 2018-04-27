@@ -17,6 +17,24 @@ public class DHLInputVO {
     private ShipperVO shipper;
     private RecipientVO recipient;
     private List<Map<String,Object>> packageInfos;
+    private String labelType;
+    private String labelTemplate;
+
+    public String getLabelType() {
+        return labelType;
+    }
+
+    public void setLabelType(String labelType) {
+        this.labelType = labelType;
+    }
+
+    public String getLabelTemplate() {
+        return labelTemplate;
+    }
+
+    public void setLabelTemplate(String labelTemplate) {
+        this.labelTemplate = labelTemplate;
+    }
 
     public List<Map<String, Object>> getPackageInfos() {
         return packageInfos;
