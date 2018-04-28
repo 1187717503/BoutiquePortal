@@ -190,14 +190,14 @@ public class PriceChangeRuleController extends BaseController {
     @RequestMapping("/changepreview")
     @ResponseBody
 
-    public ResultMessage changePreview(@Param("price_change_rule_id") Long price_change_rule_id, @Param("preview_status") Long preview_status) {
+    public ResultMessage changePreview(@Param("price_change_rule_id") Long price_change_rule_id, @Param("preview_status") Long preview_status,@Param("flag")String flag) {
         logger.info("PriceChangeRuleController,changePreview,inputParams,price_change_rule_id:{},preview_status:{} ", price_change_rule_id, preview_status);
 
         ResultMessage resultMessage = ResultMessage.getInstance();
 
         try {
             PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(price_change_rule_id);
-            priceChangeRule.updatePreviewPrice(pcrModel.getVendorId(), preview_status, pcrModel.getCategoryType().intValue());
+            priceChangeRule.updatePreviewPrice(pcrModel.getVendorId(), preview_status, pcrModel.getCategoryType().intValue(),pcrModel.getPriceChangeRuleId(),flag);
 
             resultMessage.successStatus().putMsg("info", "success !!!");
         } catch (Exception e) {

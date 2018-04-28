@@ -44,7 +44,7 @@ public interface IPriceChangeRule {
      * @return true, false
      * @throws Exception
      */
-    boolean updatePreviewPrice(Long vendor_id, Long preview_status, Integer category_type) throws Exception;
+    boolean updatePreviewPrice(Long vendor_id, Long preview_status, Integer category_type,Long price_change_rule_id,String flag) throws Exception;
 
     public String checkSeasonExists(Map<String, Object> params, String season);
 

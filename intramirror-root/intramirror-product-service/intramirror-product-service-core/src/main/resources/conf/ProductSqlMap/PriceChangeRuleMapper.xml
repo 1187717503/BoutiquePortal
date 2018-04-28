@@ -798,10 +798,19 @@
             from category where category_id not in(1499,1568) and level=1 and enabled=1) and
             enabled=1) and enabled=1)
         </if>
+        <if test="price_change_rule_id != null and price_change_rule_id != ''">
+            and price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
+        </if>
     </update>
 
     <update id="updatePriceChangeRulePreviewStatus">
-        update `price_change_rule`  set `preview_status` = #{preview_status,jdbcType=BIGINT} where `category_type` = #{category_type,jdbcType=BIGINT} and `status`  = 1 and price_type = 3 and `vendor_id`  = #{vendor_id,jdbcType=BIGINT};
+        update `price_change_rule`  set `preview_status` = #{preview_status,jdbcType=BIGINT} where
+        `category_type` = #{category_type,jdbcType=BIGINT}
+        and `status`  = 1 and price_type = 3
+        and `vendor_id`  = #{vendor_id,jdbcType=BIGINT}
+        <if test="price_change_rule_id != null and price_change_rule_id != ''">
+            and price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
+        </if>
     </update>
     <!-- end dingyifan -->
 </mapper>
