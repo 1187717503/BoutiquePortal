@@ -96,7 +96,7 @@ public class PriceChangeRuleController extends BaseController {
         return Response.success();
     }
 
-    @RequestMapping("/run/im")
+    @RequestMapping(value = "/run/im",method = RequestMethod.GET)
     @ResponseBody
     public Response runIm(@Param("price_change_rule_id") String price_change_rule_id, @Param("flag") String flag) throws Exception {
         logger.info("Start running IM discounts,price_change_rule_id:" + price_change_rule_id);
@@ -129,7 +129,7 @@ public class PriceChangeRuleController extends BaseController {
         return Response.success();
     }
 
-    @RequestMapping("/run/boutique")
+    @RequestMapping(value = "/run/boutique",method = RequestMethod.GET)
     @ResponseBody
     public Response runBoutique(@Param("price_change_rule_id") String price_change_rule_id, @Param("flag") String flag) throws Exception {
 
