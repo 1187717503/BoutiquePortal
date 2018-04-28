@@ -193,7 +193,7 @@ public class ExcelUtil {
         Cell cell114 = row11.createCell(3);
         cell114.setCellValue("Made In");
         Cell cell115 = row11.createCell(4);
-        cell115.setCellValue("geography");
+        cell115.setCellValue("country");
         cell115.setCellStyle(cs);
         Cell cell116 = row11.createCell(5);
         cell116.setCellValue("Purchase Price");
@@ -216,7 +216,7 @@ public class ExcelUtil {
                     String inPrice = map.get("in_price")!=null?map.get("in_price").toString():"";
                     String composition = map.get("Composition")!=null?map.get("Composition").toString():"";
                     String madeIn = map.get("MadeIn")!=null?map.get("MadeIn").toString():"";
-                    String country = map.get("english_name")!=null?map.get("english_name").toString():"";
+                    String country = map.get("user_rec_country")!=null?map.get("user_rec_country").toString():"";
                     Cell cell1 = row.createCell(0);
                     cell1.setCellValue(orderLineNum);
                     cell1.setCellStyle(cs2);
