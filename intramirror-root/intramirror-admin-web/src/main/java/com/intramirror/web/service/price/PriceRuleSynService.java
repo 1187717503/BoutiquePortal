@@ -1,6 +1,7 @@
 package com.intramirror.web.service.price;
 
 import com.intramirror.product.api.service.price.IPriceChangeRule;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,21 +47,21 @@ public class PriceRuleSynService {
     }
 
     // 根据日期运行Boutique
-    public void syncBoutique() throws Exception {
+    public void syncBoutique(Map<String, Object> params) throws Exception {
         synchronized (this) {
             logger.info("syncBoutiqueStart");
-            iPriceChangeRule.updateVendorPrice(1);
-            iPriceChangeRule.updateVendorPrice(2);
+            iPriceChangeRule.updateVendorPrice(1, params.get("startTime").toString(), params.get("endTime").toString());
+            iPriceChangeRule.updateVendorPrice(2, params.get("startTime").toString(), params.get("endTime").toString());
             logger.info("syncBoutiqueEnd");
         }
     }
 
     // 根据日期运行IM
-    public void syncIm() throws Exception {
+    public void syncIm(Map<String, Object> params) throws Exception {
         synchronized (this) {
             logger.info("syncImStart");
-            iPriceChangeRule.updateAdminPrice(1);
-            iPriceChangeRule.updateAdminPrice(2);
+            iPriceChangeRule.updateAdminPrice(1, params.get("startTime").toString(), params.get("endTime").toString());
+            iPriceChangeRule.updateAdminPrice(2, params.get("startTime").toString(), params.get("endTime").toString());
             logger.info("syncImEnd");
         }
     }
