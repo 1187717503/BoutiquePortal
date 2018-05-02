@@ -9,6 +9,7 @@ import com.intramirror.common.enums.SystemPropertyEnum;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.common.parameter.StatusType;
+import com.intramirror.core.common.response.StatusCode;
 import com.intramirror.product.api.model.PriceChangeRule;
 import com.intramirror.product.api.model.PriceChangeRuleCategoryBrand;
 import com.intramirror.product.api.model.PriceChangeRuleGroup;
@@ -101,11 +102,16 @@ public class PriceChangeRuleController extends BaseController {
         return Response.success();
     }
 
-    @RequestMapping("/run/im")
+    @RequestMapping(value = "/run/im",method = RequestMethod.GET)
     @ResponseBody
     public Response runIm(@Param("price_change_rule_id") String price_change_rule_id, @Param("flag") String flag) throws Exception {
         logger.info("Start running IM discounts,price_change_rule_id:" + price_change_rule_id);
         PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
+
+        if(pcrModel.getStatus().intValue() != 1) {
+            logger.info("Start running IM discounts Error,price_change_rule_id:" + price_change_rule_id);
+            return Response.status(StatusCode.FAILURE).data("不允许执行非Pending的IM折扣");
+        }
 
         logger.info("Begin to refresh the discounts of IM goods,pcrModel:" + JSONObject.toJSONString(pcrModel));
         if (StringUtils.isNotBlank(flag) && flag.equalsIgnoreCase("all")) {
@@ -135,12 +141,17 @@ public class PriceChangeRuleController extends BaseController {
         return Response.success();
     }
 
-    @RequestMapping("/run/boutique")
+    @RequestMapping(value = "/run/boutique",method = RequestMethod.GET)
     @ResponseBody
     public Response runBoutique(@Param("price_change_rule_id") String price_change_rule_id, @Param("flag") String flag) throws Exception {
 
         logger.info("Start running BOUTIQUE discounts,price_change_rule_id:" + price_change_rule_id);
         PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
+
+        if(pcrModel.getStatus().intValue() != 1) {
+            logger.info("Start running IM discounts Error,price_change_rule_id:" + price_change_rule_id);
+            return Response.status(StatusCode.FAILURE).data("不允许执行非Pending的Boutique折扣");
+        }
 
         logger.info("Begin to refresh the discounts of BOUTIQUE goods,pcrModel:" + JSONObject.toJSONString(pcrModel));
         if (StringUtils.isNotBlank(flag) && flag.equalsIgnoreCase("all")) {
