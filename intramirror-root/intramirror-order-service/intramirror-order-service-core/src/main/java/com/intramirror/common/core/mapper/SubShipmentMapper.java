@@ -73,17 +73,17 @@ public interface SubShipmentMapper {
     Long getSubshipment(Map<String, Object> map);
 
     /**
-     * 根据shipmentId删除subshipment
+     * 根据subShipmentId删除subshipment
      *
-     * @param map
+     * @param subShipmentId
      * @return
      */
-    int deleteSubShipmentByShipmentId(Map<String, Object> map);
+    int deleteSubShipmentByShipmentId(Long subShipmentId);
 
     List<SubShipment> getSubShipmentByShipmentId(Long shipmentId);
     
     /**
-     * 根据shipmentId修改subshipment关联
+     * 根据shipmentId修改awb
      * @param map
      * @return
      */
@@ -102,5 +102,6 @@ public interface SubShipmentMapper {
      * @return
      */
     int updateSubShipmentById(Map<String, Object> map);
-    
+
+    SubShipment getDHLShipment(Map<String, Object> map);
 }

@@ -3,6 +3,7 @@
  */
 package com.intramirror.order.core.impl;
 
+import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -50,7 +51,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	 * Confirmed的Order生成Shipment 新的Shipment默认有一个carton
 	 */
 	@Override
-	public Shipment saveShipmentByOrderId(Map<String, Object> map) {
+	public synchronized Shipment saveShipmentByOrderId(Map<String, Object> map) {
 		logger.info("shimentSaveService parameter " + new Gson().toJson(map));
 		//如果shipment为null创建新的shipment 如果有直接拿shipment生成SUBshipment
 		Long shipmentId = Long.parseLong(map.get("shipmentId")==null?"0":map.get("shipmentId").toString());
@@ -67,7 +68,8 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			//保存对象信息
 			shipment.setShipToGeography(map.get("pack_english_name")==null?" ":map.get("pack_english_name").toString());
 			Long vendorId = Long.parseLong(map.get("vendor_id").toString());
-			Integer stockLocationId = Integer.parseInt(map.get("stock_location_id").toString());
+			Object locationId = map.get("stock_location_id");
+			Integer stockLocationId = Integer.parseInt(locationId!=null?locationId.toString():"0");
 			String top = shipmentMapper.getVendorCodeById(vendorId);
 			Map<String, Object> noMap = new HashMap<>();
 			noMap.put("topName", top+"SP");
@@ -276,6 +278,9 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		beanMap.put("segmentSequence", segmentSequence);
 		beanMap.put("shippingSegmentId", Long.parseLong(map.get("shippingSegmentId")==null?"0":map.get("shippingSegmentId").toString()));
 		beanMap.put("shipToAddr", map.get("shipToAddr")==null?" ":map.get("shipToAddr").toString());
+		//beanMap.put("shipToAddr2", map.get("shipToAddr2")==null?" ":map.get("shipToAddr2").toString());
+		//beanMap.put("shipToAddr3", map.get("shipToAddr3")==null?" ":map.get("shipToAddr3").toString());
+		//beanMap.put("shipToEmailAddr", map.get("shipToEmailAddr")==null?" ":map.get("shipToEmailAddr").toString());
 		beanMap.put("shipToCity", map.get("shipToCity")==null?" ":map.get("shipToCity").toString());
 		beanMap.put("shipToCountry", map.get("shipToCountry")==null?" ":map.get("shipToCountry").toString());
 		beanMap.put("shipToDistrict", map.get("shipToDistrict")==null?" ":map.get("shipToDistrict").toString());
@@ -284,16 +289,20 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		beanMap.put("status", ContainerType.RECEIVED);
 		beanMap.put("updatedAt", currentDate);
 		beanMap.put("createdAt", currentDate);
-		beanMap.put("countryCode",map.get("countryCode")==null?" ":map.get("countryCode").toString());
+		beanMap.put("shipToCountryCode",map.get("countryCode")==null?" ":map.get("countryCode").toString());
 		return beanMap;
 	}
 
 	private SubShipment saveBeanVO(Map<String, Object> map, Date currentDate, Long shipmentId,Long segmentSequence){
 		SubShipment subShipment = new SubShipment();
 		subShipment.setConsignee(map.get("transfer_consignee")==null?"":map.get("transfer_consignee").toString());
+		subShipment.setPersonName(map.get("person_name")==null?"":map.get("person_name").toString());
 		subShipment.setShippingSegmentId(Long.parseLong(map.get("shipping_segment_id")==null?"0":map.get("shipping_segment_id").toString()));
 		subShipment.setSegmentSequence(segmentSequence);
 		subShipment.setShipToAddr(map.get("transfer_addr")==null?"":map.get("transfer_addr").toString());
+		subShipment.setShipToAddr2(map.get("transfer_addr2")==null?"":map.get("transfer_addr2").toString());
+		subShipment.setShipToAddr3(map.get("transfer_addr3")==null?"":map.get("transfer_addr3").toString());
+		subShipment.setShipToEamilAddr(map.get("emailAddress")==null?"":map.get("emailAddress").toString());
 		subShipment.setShipToDistrict(map.get("addr_district")==null?"":map.get("addr_district").toString());
 		subShipment.setShipToCity(map.get("addr_city")==null?"":map.get("addr_city").toString());
 		subShipment.setShipToProvince(map.get("addr_province")==null?"":map.get("addr_province").toString());
@@ -303,6 +312,9 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		subShipment.setCreatedAt(currentDate);
 		subShipment.setStatus(ContainerType.RECEIVED);
 		subShipment.setShipToCountryCode(map.get("country_code")==null?"":map.get("country_code").toString());
+		subShipment.setContact(map.get("transfer_contact")==null?"":map.get("transfer_contact").toString());
+		subShipment.setPiva(map.get("transfer_piva")==null?"":map.get("transfer_piva").toString());
+		subShipment.setPostalCode(map.get("zip_code")==null?"":map.get("zip_code").toString());
 		return subShipment;
 	}
 	
@@ -458,6 +470,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		shipment.setShipmentCategory(oldShipment.getShipmentCategory());
 		shipment.setCreatedAt(currentDate);
 		shipment.setUpdatedAt(currentDate);
+		shipment.setStockLocationId(oldShipment.getStockLocationId());
 		logger.info("parameter :" + new Gson().toJson(shipment));
 		int result = shipmentMapper.saveShipmentByOrderId(shipment);
 		logger.info("insert shipment result : " +result);
@@ -476,5 +489,10 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	@Override
 	public List<Shipment> getShipmentList(Map<String, Object> map) {
 		return shipmentMapper.getShipmentList(map);
+	}
+
+	@Override
+	public BigDecimal getCustomValue(Map<String, Object> map) {
+		return shipmentMapper.getCustomValue(map);
 	}
 }

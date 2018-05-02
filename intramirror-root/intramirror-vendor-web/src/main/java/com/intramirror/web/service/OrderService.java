@@ -403,27 +403,30 @@ public class OrderService {
 		logger.info("order updateLogisticsProduct 装箱校验  1.大区是否一致 2.是否为空箱子 3.shipment_type");
 		//如果大区不一致，直接返回
 		if(checkShipToGeography(orderMap,shipMentMap)){
-			result.setMsg("This Order's consignee address is different than carton's. ");
-			info.put("code", StatusType.ORDER_ERROR_CODE);
-			result.setInfoMap(info);
-			return result;
+			//result.setMsg("This Order's consignee address is different than carton's. ");
+			//info.put("code", StatusType.ORDER_ERROR_CODE);
+			//result.setInfoMap(info);
+			//return result;
+			throw new RuntimeException("This Order's consignee address is different than carton's. ");
 		}else{
 			//如果大区一致,且不为空箱子,则比较shipment_type(空箱子ischeck 都为false)
 			//空箱子不需要判断,直接存入   shipment_type 用于判断该箱子是否能存放多个，状态为1 只能存放一个  所以不能在存入
 			if(ischeck && shipMentMap.get("shipment_type_id").toString().equals("1")){
-				result.setMsg("Only one Order can be packed in this carton. ");
-				info.put("code", StatusType.ORDER_ERROR_CODE);
-				result.setInfoMap(info);
-				return result;
+				//result.setMsg("Only one Order can be packed in this carton. ");
+				//info.put("code", StatusType.ORDER_ERROR_CODE);
+				//result.setInfoMap(info);
+				//return result;
+				throw new RuntimeException("Only one Order can be packed in this carton.");
 			}
 		}
 
 		//校验该订单跟箱子所属的Shipment的发货地是否一致,一致则加入
 		if(checkStockLocation(orderMap,shipMentMap)){
-			result.setMsg("This Order's stock location is different than carton's. ");
-			info.put("code", StatusType.ORDER_ERROR_CODE);
-			result.setInfoMap(info);
-			return result;
+			//result.setMsg("This Order's stock location is different than carton's. ");
+			//info.put("code", StatusType.ORDER_ERROR_CODE);
+			//result.setInfoMap(info);
+			//return result;
+			throw new RuntimeException("This Order's stock location is different than carton's. ");
 		}
 
 
@@ -452,7 +455,6 @@ public class OrderService {
 				iShipmentService.saveShipmentByOrderId(orderResult);
 			}
 
-			
 		}else{
 			info.put("code", StatusType.ORDER_ERROR_CODE);
 			result.setMsg("Package failure");

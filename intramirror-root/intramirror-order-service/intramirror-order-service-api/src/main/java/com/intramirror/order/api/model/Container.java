@@ -3,6 +3,7 @@
  */
 package com.intramirror.order.api.model;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -27,6 +28,8 @@ public class Container {
 	private String shipToGeography;
 
 	private Integer stockLocationId;
+
+	private String stockLocation;
 	
 	/**
 	 * @Fields 状态
@@ -51,7 +54,7 @@ public class Container {
 	/**
 	 * @Fields 重量
 	 */
-	private Long weight;
+	private BigDecimal weight;
 	
 	/**
 	 * @Fields 条形码
@@ -72,6 +75,14 @@ public class Container {
 	 * @Fields 装货ID
 	 */
 	private Long shipmentId;
+
+	public String getStockLocation() {
+		return stockLocation;
+	}
+
+	public void setStockLocation(String stockLocation) {
+		this.stockLocation = stockLocation;
+	}
 
 	public Integer getStockLocationId() {
 		return stockLocationId;
@@ -137,11 +148,11 @@ public class Container {
 		this.length = length;
 	}
 
-	public Long getWeight() {
+	public BigDecimal getWeight() {
 		return weight;
 	}
 
-	public void setWeight(Long weight) {
+	public void setWeight(BigDecimal weight) {
 		this.weight = weight;
 	}
 

@@ -665,7 +665,7 @@ public class OrderController extends BaseController {
             result = orderServiceImpl.packingOrder(map);
         } catch (Exception e) {
             e.printStackTrace();
-            result.setMsg("Package failed. Please check parameters");
+            result.setMsg(e.getMessage());
             infoMap.put("code", StatusType.ORDER_ERROR_CODE);
             result.setInfoMap(infoMap);
             return result;

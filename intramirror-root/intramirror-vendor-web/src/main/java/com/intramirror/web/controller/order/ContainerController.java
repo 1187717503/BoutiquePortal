@@ -419,6 +419,8 @@ public class ContainerController {
 				message.errorStatus().putMsg("info", "shipmentId cannot be null");
 				return message;
 			}
+			//查询open状态
+			map.put("status",1);
 			List<Map<String, Object>> list = containerService.getListByShipmentId(map);
 			if (null != list && 0 < list.size()){
 				message.successStatus().putMsg("info", "success").setData(list);

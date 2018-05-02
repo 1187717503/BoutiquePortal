@@ -7,6 +7,7 @@
 	    <result column="container_type" property="containerType" jdbcType="VARCHAR" />
 	    <result column="ship_to_geography" property="shipToGeography" jdbcType="VARCHAR" />
 	    <result column="stock_location_id" property="stockLocationId" jdbcType="INTEGER" />
+	    <result column="stock_location" property="stockLocation" jdbcType="INTEGER" />
 	    <result column="status" property="status" jdbcType="INTEGER" />
 	    <result column="height" property="height" jdbcType="BIGINT" />
 	    <result column="width" property="width" jdbcType="BIGINT" />
@@ -43,8 +44,9 @@ values(#{containerType,jdbcType=VARCHAR}, #{shipToGeography,jdbcType=VARCHAR},#{
   	</update>
   
   <select id="selectContainerByBarcode" resultMap="BaseResultMap" parameterType="java.util.Map" >
-  		select * from container
-		where barcode =  #{barcode,jdbcType=VARCHAR} and status = #{status,jdbcType=INTEGER}
+  		select c.*,sl.stock_location from container c
+  		LEFT JOIN stock_location sl ON sl.location_id = c.stock_location_id
+		where c.barcode =  #{barcode,jdbcType=VARCHAR} and c.status = #{status,jdbcType=INTEGER}
   </select>
   
    <select id="selectContainerById" resultMap="BaseResultMap" parameterType="java.util.Map" >
@@ -181,7 +183,11 @@ values(#{containerType,jdbcType=VARCHAR}, #{shipToGeography,jdbcType=VARCHAR},#{
   	</update>
   	
   	<select id="getListByShipmentId" resultType="java.util.HashMap"  parameterType="java.util.Map">
-		SELECT * FROM container where shipment_id = #{shipmentId,jdbcType=BIGINT} and `status`=1 GROUP BY created_at ASC;
+		SELECT * FROM container where shipment_id = #{shipmentId,jdbcType=BIGINT}
+		<if test="status != null" >
+		and `status`=#{status}
+		</if>
+		GROUP BY created_at ASC;
 	</select>
 	
 	<select id="getContainerById" resultType="java.util.HashMap"  parameterType="java.util.Map">

@@ -3,6 +3,7 @@
  */
 package com.intramirror.order.api.service;
 
+import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.model.SubShipment;
 
 import java.util.List;
@@ -25,7 +26,6 @@ public interface ISubShipmentService {
 
 	 /**
 	 * 新增subshipment
-	 * @param sub
 	 * @return
 	 */
 	int insertSubshipment(Map<String, Object> map);
@@ -39,16 +39,16 @@ public interface ISubShipmentService {
 	
 	
 	/**
-	 * 根据shipmentId删除subshipment
-	 * @param map
+	 * 根据subShipmentId删除subshipment
+	 * @param subShipmentId
 	 * @return
 	 */
-	int deleteSubShipmentByShipmentId(Map<String, Object> map);
+	int deleteSubShipmentByShipmentId(Long subShipmentId);
 
 	List<SubShipment> getSubShipmentByShipmentId(Long shipmentId);
 	
 	/**
-     * 根据shipmentId修改subshipment关联
+     * 根据shipmentId修改awb
      * @param map
      * @return
      */
@@ -67,4 +67,11 @@ public interface ISubShipmentService {
      * @return
      */
     int updateSubShipmentById(Map<String, Object> map);
+
+	/**
+	 * 获取DHL航运信息
+	 * @param shipmentId
+	 * @return
+	 */
+	SubShipment getDHLShipment(Map<String, Object> map);
 }

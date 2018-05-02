@@ -24,24 +24,44 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+            <build>
+                <filters>
+                    <filter>src/main/resources/test/dhl.properties</filter>
+                </filters>
+            </build>
         </profile>
         <profile>
             <id>staging</id>
             <properties>
                 <profiles.active>staging</profiles.active>
             </properties>
+            <build>
+                <filters>
+                    <filter>src/main/resources/staging/dhl.properties</filter>
+                </filters>
+            </build>
         </profile>
         <profile>
             <id>staging_local</id>
             <properties>
                 <profiles.active>staging_local</profiles.active>
             </properties>
+            <build>
+                <filters>
+                    <filter>src/main/resources/staging_local/dhl.properties</filter>
+                </filters>
+            </build>
         </profile>
         <profile>
             <id>prd</id>
             <properties>
                 <profiles.active>prd</profiles.active>
             </properties>
+            <build>
+                <filters>
+                    <filter>src/main/resources/prd/dhl.properties</filter>
+                </filters>
+            </build>
         </profile>
     </profiles>
 

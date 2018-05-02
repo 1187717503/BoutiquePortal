@@ -361,12 +361,14 @@
         c3.name AS categoryName,
         l.logistics_id,
         l.user_rec_country,
-        l.geography_id
+        l.geography_id,
+        g.english_name
         FROM logistics_product lp
         INNER JOIN container c ON lp.container_id = c.container_id
         INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
         INNER JOIN `order` o ON ol.order_id = o.order_id
         LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
+        LEFT JOIN geography g ON l.geography_id = g.geography_id
         INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
         INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
         INNER JOIN product p ON (sp.product_id = p.product_id and p.enabled = 1)

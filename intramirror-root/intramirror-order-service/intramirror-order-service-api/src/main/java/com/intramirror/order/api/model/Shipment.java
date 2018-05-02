@@ -25,6 +25,8 @@ public class Shipment {
 	 * 发货地id
 	 */
 	private Integer stockLocationId;
+
+	private String stockLocation;
 	/**
 	 * @Fields 状态
 	 */
@@ -49,6 +51,14 @@ public class Shipment {
 	 * @Fields 修改时间
 	 */
 	private Date updatedAt;
+
+	public String getStockLocation() {
+		return stockLocation;
+	}
+
+	public void setStockLocation(String stockLocation) {
+		this.stockLocation = stockLocation;
+	}
 
 	public Integer getStockLocationId() {
 		return stockLocationId;

@@ -22,14 +22,23 @@ import com.intramirror.product.api.service.IShopService;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.VendorService;
+import com.intramirror.utils.transform.JsonTransformUtil;
+import com.intramirror.web.VO.DHLInputVO;
+import com.intramirror.web.VO.RecipientVO;
+import com.intramirror.web.VO.ShipperVO;
 import com.intramirror.web.common.BarcodeUtil;
 import com.intramirror.web.controller.BaseController;
+import com.intramirror.web.util.DHLHttpClient;
 import com.intramirror.web.util.ExcelUtil;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import pk.shoplus.common.utils.StringUtil;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -44,11 +53,10 @@ import java.util.*;
 @RequestMapping("/orderShip")
 public class OrderShipController extends BaseController {
 
-    private static Logger logger = Logger.getLogger(OrderShipController.class);
+    private static Logger logger = LoggerFactory.getLogger(OrderShipController.class);
 
     @Autowired
     private IOrderService orderService;
-
 
     @Autowired
     private VendorService vendorService;
@@ -82,7 +90,6 @@ public class OrderShipController extends BaseController {
 
     @Autowired
     private StockLocationService stockLocationService;
-
     /**
      * 获取所有箱子信息
      *
@@ -225,6 +232,7 @@ public class OrderShipController extends BaseController {
                     Long shipmentId = shipment.getShipmentId();
                     for (Map<String, Object> shipmentMap:shipMentList){
                         if(shipmentId.equals(Long.parseLong(shipmentMap.get("shipment_id").toString()))){
+                            shipmentMap.put("stockLocation",shipment.getStockLocation());
                             shipmentListMapSort.add(shipmentMap);
                             break;
                         }
@@ -347,14 +355,11 @@ public class OrderShipController extends BaseController {
                         carton.put("order_qty", orderList.get(carton.get("container_id").toString()).size());
                     }
                 }
-
-
             }
 
             shipmentMap.put("carton_qty", shipMentCartonList == null ? 0 : shipMentCartonList.size());
             resultMap.put("cartonList", shipMentCartonList);
             resultMap.put("shipmentInfo", shipmentMap);
-
 
             result.successStatus();
             result.setData(resultMap);
@@ -414,7 +419,6 @@ public class OrderShipController extends BaseController {
         }
         return result;
     }
-
 
     private ResultMessage printExcelShipmentInfo(HttpServletResponse response,Map<String, Object> resultMap) throws IOException {
         String fileName = new Date().getTime() + ".xls";
@@ -526,7 +530,7 @@ public class OrderShipController extends BaseController {
 
         try {
             map.put("vendorId", vendor.getVendorId());
-            Map<String, Object> getShipment = new HashMap<String, Object>();
+            Map<String, Object> getShipment = new HashMap<>();
             getShipment.put("shipmentId", shipment_id);
 
             //根据shipmentId 获取shipment 相关信息及物流第一段类型
@@ -557,15 +561,19 @@ public class OrderShipController extends BaseController {
             resultMap.put("VATNumber", invoice.getVatNum());
 
             //获取Ship From信息
-            logger.info("打印Invoice----获取Ship From信息");
-            Map<String, Object> vendorParams = new HashMap<>();
-            vendorParams.put("vendor_id", shipmentMap.get("vendor_id"));
-            Vendor shipVendor = vendorService.getVendorByVendorId(vendorParams);
-            resultMap.put("ShipFrom", shipVendor.getBusinessLicenseLocation());
-            resultMap.put("ShipCompanyName", shipVendor.getCompanyName());
-            resultMap.put("ShipVendorName", shipVendor.getVendorName());
-
-
+            //Map<String, Object> vendorParams = new HashMap<>();
+            //vendorParams.put("vendor_id", shipmentMap.get("vendor_id"));
+            //Vendor shipVendor = vendorService.getVendorByVendorId(vendorParams);
+            //resultMap.put("ShipFrom", shipVendor.getBusinessLicenseLocation());
+            //resultMap.put("ShipCompanyName", shipVendor.getCompanyName());
+            //resultMap.put("ShipVendorName", shipVendor.getVendorName());
+            StockLocation location = stockLocationService.getShipFromLocation(shipment_id);
+            resultMap.put("companyName",location.getContactCompanyname());
+            resultMap.put("personName",location.getContactPersonname());
+            resultMap.put("contact",location.getContactPhonenumber());
+            resultMap.put("address",location.getAddressStreetlines());
+            resultMap.put("city",location.getAddressCity());
+            resultMap.put("country","Italy");
 
             logger.info("打印Invoice----获取Deliver To信息");
             List<SubShipment> subShipmentList = subShipmentService.getSubShipmentByShipmentId(shipment_id);
@@ -574,6 +582,10 @@ public class OrderShipController extends BaseController {
                 resultMap.put("DeliverTo", shippingProvider);
             } else if (subShipmentList.size() == 1) {
                 resultMap.put("DeliverTo", subShipmentList.get(0));
+                //发往质检仓的取DHL税号
+                if(map.get("shipmentCategory")!=null&&"1".equals(map.get("shipmentCategory").toString())){
+                    resultMap.put("VATNumber",subShipmentList.get(0).getPiva());
+                }
             } else {
                 result.setMsg("DeliverTo is null ");
                 return result;
@@ -709,9 +721,8 @@ public class OrderShipController extends BaseController {
             List<Map<String, Object>> containerList = orderService.getOrderListByShipmentId(map);
             Map<String, Object> resultMap = new HashMap<String, Object>();
 
-            Map<String, List<Map<String, Object>>> orderList = new HashMap<String, List<Map<String, Object>>>();
-            List<Map<String, Object>> shipMentCartonList = new ArrayList<Map<String, Object>>();
-
+            Map<String, List<Map<String, Object>>> orderList = new HashMap<>();
+            List<Map<String, Object>> shipMentCartonList = new ArrayList<>();
 
             if (containerList != null && containerList.size() > 0) {
 
@@ -744,9 +755,7 @@ public class OrderShipController extends BaseController {
                         BigDecimal decimal = new BigDecimal(weight);
                         cartonInfo.put("weight",decimal.setScale(2,BigDecimal.ROUND_HALF_UP).toString());
                         shipMentCartonList.add(cartonInfo);
-
                     }
-
                 }
 
                 if (shipMentCartonList != null && shipMentCartonList.size() > 0) {
@@ -763,19 +772,14 @@ public class OrderShipController extends BaseController {
                             carton.put("allTotal", list == null ? 0 : list.size());
                             carton.put("allTotalNum", allTotal);
                         }
-
-
                         carton.put("order_qty", orderList.get(carton.get("container_id").toString()).size());
                     }
                 }
-
-
             }
 
             shipmentMap.put("carton_qty", shipMentCartonList == null ? 0 : shipMentCartonList.size());
             resultMap.put("cartonList", shipMentCartonList);
             resultMap.put("shipmentInfo", shipmentMap);
-
 
             result.successStatus();
             result.setData(resultMap);
@@ -785,8 +789,205 @@ public class OrderShipController extends BaseController {
             result.setMsg("Query container list fail,Check parameters, please ");
             return result;
         }
-
-
         return result;
+    }
+
+    @RequestMapping(value = "/printAWBNum", method = RequestMethod.POST)
+    @ResponseBody
+    public ResultMessage printAWBNum(@RequestBody Map<String, Object> map, HttpServletRequest httpRequest){
+        ResultMessage result = new ResultMessage();
+        result.errorStatus();
+
+        if (map == null || map.get("shipment_id") == null) {
+            result.setMsg("shipment_id cannot be empty");
+            return result;
+        }
+
+        User user = this.getUser(httpRequest);
+        if (user == null) {
+            result.setMsg("Please log in again");
+            return result;
+        }
+
+        Vendor vendor = null;
+        try {
+            vendor = vendorService.getVendorByUserId(user.getUserId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (vendor == null) {
+            result.setMsg("Please log in again");
+            return result;
+        }
+        DHLInputVO inputVO = new DHLInputVO();
+        Long shipmentId = Long.parseLong(map.get("shipment_id").toString());
+        Map<String,Object> params = new HashMap<>();
+        //查询close状态纸箱
+        //params.put("status",2);
+        params.put("shipmentId",shipmentId);
+        //查询第一段
+        params.put("sequence",1);
+        SubShipment dhlShipment = subShipmentService.getDHLShipment(params);
+        List<Map<String, Object>> containerList = containerService.getListByShipmentId(params);
+        Shipment shipment = iShipmentService.selectShipmentById(params);
+
+        if(dhlShipment!=null){
+            if(dhlShipment.getAwbNum()!=null&&StringUtil.isNotEmpty(dhlShipment.getAwbNum())){
+                String s;
+                try {
+                    //获取awb文档
+                    s = DHLHttpClient.httpGet(DHLHttpClient.queryAWBUrl + dhlShipment.getAwbNum());
+                }catch (Exception e){
+                    result.addMsg("DHL service invocation failed");
+                    logger.error("request fail,params={},url={}",JsonTransformUtil.toJson(inputVO),DHLHttpClient.createAWBUrl);
+                    return result;
+                }
+                if(StringUtil.isNotEmpty(s)){
+                    JSONObject jo = JSONObject.fromObject(s);
+                    result.successStatus();
+                    jo.put("shipmentNo",shipment.getShipmentNo());
+                    result.setData(jo);
+                    return result;
+                }
+            }
+
+            if (shipment!=null){
+                String shipToGeography = shipment.getShipToGeography();
+                if ("European Union".equals(shipToGeography)){
+                    inputVO.setServiceType("U");
+                    //查询第三段
+                    /*params.put("sequence",3);
+                    dhlShipment = subShipmentService.getDHLShipment(params);
+                    if (dhlShipment==null){
+                        //查询第二段
+                        params.put("sequence",2);
+                        dhlShipment = subShipmentService.getDHLShipment(params);
+                    }*/
+                }else if ("Transit Warehouse".equals(shipToGeography)){
+                    inputVO.setServiceType("N");
+                }else {
+                    inputVO.setServiceType("P");
+                }
+            }
+
+            StockLocation fromLocation = stockLocationService.getShipFromLocation(shipmentId);
+            BigDecimal customValue = iShipmentService.getCustomValue(params);
+
+            if (customValue!=null){
+                inputVO.setCustomsValue(customValue.setScale(2,BigDecimal.ROUND_HALF_UP));
+            }
+
+            addParams(inputVO,dhlShipment,fromLocation,containerList,shipment);
+            String resultStr;
+            try{
+                resultStr = DHLHttpClient.httpPost(JsonTransformUtil.toJson(inputVO), DHLHttpClient.createAWBUrl);
+            }catch (Exception e){
+                result.addMsg("DHL service invocation failed");
+                logger.error("request fail,params={},url={}",JsonTransformUtil.toJson(inputVO),DHLHttpClient.createAWBUrl);
+                return result;
+            }
+            if(StringUtil.isNotEmpty(resultStr)){
+                JSONObject object = JSONObject.fromObject(resultStr);
+                if(object.optInt("status")!=1) {
+                    //获取DHL报错信息
+                    String msg = object.optString("msg");
+                    JSONObject jsonObject = JSONObject.fromObject(msg);
+                    JSONObject shipmentResponse = jsonObject.optJSONObject("ShipmentResponse");
+                    JSONArray notification = shipmentResponse.optJSONArray("Notification");
+                    msg = notification.get(0).toString();
+                    String message = JSONObject.fromObject(msg).optString("Message");
+                    //int i = message.indexOf("-");
+                    //message = message.substring(0,i);
+                    result.addMsg(message);
+                    return result;
+                }
+                JSONObject jo = JSONObject.fromObject(resultStr);
+                String awbNo = jo.optString("awbNo");
+                //保存到subShipment
+                params.put("awbNo",awbNo);
+                subShipmentService.updateSubShipment(params);
+                result.successStatus();
+                jo.put("shipmentNo",shipment.getShipmentNo());
+                jo.remove("status");
+                result.setData(jo);
+                return result;
+            }
+
+        }
+        return result;
+    }
+
+    private void addParams(DHLInputVO inputVO, SubShipment dhlShipment,StockLocation fromLocation, List<Map<String, Object>> containerList,Shipment shipment) {
+        SimpleDateFormat f1 = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat f2 = new SimpleDateFormat("HH:mm:ssz");
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR, 1);
+        Date currentTime = calendar.getTime();
+        try {
+            //System.out.println(f1.parse("2015-12-12"));
+            f1.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
+            f2.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        inputVO.setAccount("106669563");
+        //获取意大利时间,再往后延一天
+        inputVO.setShipmentTime(f1.format(currentTime)+"T"+f2.format(currentTime));
+        inputVO.setDescription("clothing");
+        inputVO.setLabelType("PDF");
+        inputVO.setLabelTemplate("ECOM26_A4_RU_002");
+        if (fromLocation!=null){
+            ShipperVO shipperVO = new ShipperVO();
+            shipperVO.setCity(fromLocation.getAddressCity());
+            shipperVO.setCompanyName(fromLocation.getContactCompanyname());
+            shipperVO.setPersonName(fromLocation.getContactPersonname());
+            shipperVO.setPhoneNumber(fromLocation.getContactPhonenumber());
+            shipperVO.setEmailAddress(fromLocation.getContactEmailaddress());
+            shipperVO.setStreetLines(fromLocation.getAddressStreetlines());
+            shipperVO.setStreetLines2(fromLocation.getAddressStreetlines2());
+            shipperVO.setStreetLines3(fromLocation.getAddressStreetlines3());
+            shipperVO.setPostalCode(fromLocation.getAddressPostalcode());
+            shipperVO.setCountryCode(fromLocation.getAddressCountrycode());
+            inputVO.setShipper(shipperVO);
+        }
+        if (dhlShipment!=null){
+            RecipientVO recipientVO = new RecipientVO();
+            recipientVO.setCity(dhlShipment.getShipToCity());
+            recipientVO.setCompanyName(dhlShipment.getConsignee());
+            recipientVO.setPersonName(dhlShipment.getPersonName());
+            recipientVO.setPhoneNumber(dhlShipment.getContact());
+            recipientVO.setEmailAddress(dhlShipment.getShipToEamilAddr());
+            String shipToAddr = dhlShipment.getShipToAddr();
+            if (shipToAddr.length()>35){
+                shipToAddr = shipToAddr.substring(0,34);
+            }
+            recipientVO.setStreetLines(shipToAddr);
+            if (StringUtil.isNotEmpty(dhlShipment.getShipToAddr2())){
+                recipientVO.setStreetLines2(dhlShipment.getShipToAddr2());
+            }
+            if (StringUtil.isNotEmpty(dhlShipment.getShipToAddr3())){
+                recipientVO.setStreetLines3(dhlShipment.getShipToAddr3());
+            }
+            if(dhlShipment.getPostalCode()!=null){
+                recipientVO.setPostalCode(dhlShipment.getPostalCode());
+            }else {
+                recipientVO.setPostalCode("101731");
+            }
+            recipientVO.setCountryCode(dhlShipment.getShipToCountryCode());
+            inputVO.setRecipient(recipientVO);
+        }
+        if(containerList!=null&&containerList.size()>0){
+            List<Map<String,Object>> list = new ArrayList<>();
+            for (Map<String,Object> map:containerList){
+                Map<String,Object> container = new HashMap<>();
+                container.put("barcode",shipment.getShipmentNo()+"/"+map.get("barcode"));
+                container.put("length",map.get("length"));
+                container.put("width",map.get("width"));
+                container.put("height",map.get("height"));
+                container.put("weight",new BigDecimal(map.get("weight").toString()).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
+                list.add(container);
+            }
+            inputVO.setPackageInfos(list);
+        }
     }
 }
