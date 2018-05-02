@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.multipart.MultipartFile;
 import pk.shoplus.common.FileUploadHelper;
 
@@ -27,14 +28,14 @@ public class FileController {
     private final static Logger LOGGER = LoggerFactory.getLogger(FileController.class);
 
     @PostMapping(value = "")
-    public Response uploadFile(@RequestParam("file") MultipartFile file) {
+    public Response uploadFile(@RequestParam("file") MultipartFile file, @SessionAttribute(value = "sessionStorage", required = false) Long userId) {
 
         if (file.isEmpty()) {
             throw new ValidateException(new ErrorResponse(StatusType.PARAM_EMPTY_OR_NULL, "File is empty."));
         }
         try {
             String url = FileUploadHelper.uploadFile(file.getInputStream(), file.getContentType(), file.getSize());
-            LOGGER.info("Upload file successful. URL: [{}]", url);
+            LOGGER.info("Upload file successful. URL: [{}], UserId : [{}]", url, userId);
             return Response.status(StatusType.SUCCESS).data(url);
         } catch (IOException e) {
             throw new ValidateException(new ErrorResponse(e.getMessage()));
