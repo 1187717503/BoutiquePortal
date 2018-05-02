@@ -105,7 +105,9 @@
         brandName,
         l.user_rec_name,l.user_rec_province,l.user_rec_city,l.user_rec_area,l.user_rec_addr,l.user_rec_country,l.geography_id,
         v.vendor_name,v.vendor_id,v.skip_confirm,g.english_name as geography_name,v.address_country_id as
-        vendor_address_country_id,p.cover_img,lp.logistics_product_id,
+        vendor_address_country_id,
+        CASE WHEN p.spu_id IS NULL THEN p.cover_img ELSE spu.cover_img END AS cover_img,
+        lp.logistics_product_id,
         oe.created_at as oeCreatedAt,oet.description as oeDescription,oe.comments as oeComments,u.email as
         oeCreatedByuser,
         oe.modified_at as oeModified,oe.`status` as oeStatus,oe.resolution as oeResolution, uu.email as Resolved
@@ -117,6 +119,7 @@
         INNER JOIN shop_product_sku sps ON (lp.shop_product_sku_id = sps.shop_product_sku_id)
         INNER JOIN shop_product sp ON (sps.shop_product_id = sp.shop_product_id)
         INNER JOIN product p ON (sp.product_id = p.product_id and p.enabled = 1)
+        LEFT JOIN spu on(spu.spu_id = p.spu_id and spu.enabled = 1)
         INNER JOIN brand b ON (p.brand_id = b.brand_id and b.enabled = 1 )
         INNER JOIN sku s ON (s.sku_id = sps.sku_id and s.enabled = 1)
         INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
@@ -203,7 +206,7 @@
         v.vendor_id,
         v.skip_confirm,
         v.address_country_id AS vendor_address_country_id,
-        p.cover_img,
+        CASE WHEN p.spu_id IS NULL THEN p.cover_img ELSE spu.cover_img END AS cover_img,
         lp.logistics_product_id,
         lp.updated_at as cancel_at
         FROM
@@ -224,6 +227,7 @@
         sp.product_id = p.product_id
         AND p.enabled = 1
         )
+        LEFT JOIN spu on(spu.spu_id = p.spu_id and spu.enabled = 1)
         INNER JOIN brand b ON (
         p.brand_id = b.brand_id
         AND b.enabled = 1
