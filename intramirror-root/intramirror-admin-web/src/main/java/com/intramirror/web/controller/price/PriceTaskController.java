@@ -2,6 +2,7 @@ package com.intramirror.web.controller.price;
 
 import com.intramirror.core.common.response.Response;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
+import com.intramirror.web.service.price.PriceRuleSynService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,9 @@ public class PriceTaskController {
     @Autowired
     private IPriceChangeRule iPriceChangeRule;
 
+    @Autowired
+    private PriceRuleSynService priceRuleSynService;
+
     @GetMapping("/run/{type}")
     public Response run(@PathVariable(name = "type") String type) {
         long start = System.currentTimeMillis();
@@ -27,19 +31,24 @@ public class PriceTaskController {
         try {
 
             if (type.equals("im")) {
-                this.syncIm();
+                //                this.syncIm();
+                priceRuleSynService.syncIm();
             }
 
             if (type.equals("boutique")) {
-                this.syncBoutique();
+                //                this.syncBoutique();
+                priceRuleSynService.syncBoutique();
             }
 
             if (type.equals("imAndBoutique")) {
-                this.syncBoutique();
-                this.syncIm();
+                //                this.syncBoutique();
+                //                this.syncIm();
+                priceRuleSynService.syncBoutique();
+                priceRuleSynService.syncIm();
             }
 
-            this.syncAllRedundantTable();
+            //            this.syncAllRedundantTable();
+            priceRuleSynService.syncAllPriceByTable();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -55,7 +64,8 @@ public class PriceTaskController {
         long start = System.currentTimeMillis();
         logger.info("Start synchronous activity price.");
         try {
-            this.syncPreviewRedundantTable();
+            //            this.syncPreviewRedundantTable();
+            priceRuleSynService.syncActivePreview();
         } catch (Exception e) {
             e.printStackTrace();
             logger.info("Execution of discounts,e:{}", e);
@@ -65,21 +75,21 @@ public class PriceTaskController {
         return Response.success();
     }
 
-    private void syncBoutique() throws Exception {
+    /*private void syncBoutique() throws Exception {
         iPriceChangeRule.updateVendorPrice(1);
         iPriceChangeRule.updateVendorPrice(2);
-    }
+    }*/
 
-    private void syncIm() throws Exception {
+    /*private void syncIm() throws Exception {
         iPriceChangeRule.updateAdminPrice(1);
         iPriceChangeRule.updateAdminPrice(2);
-    }
+    }*/
 
     /**
      * 同步价格到 shop_product, product
      * @throws Exception
      */
-    public synchronized void syncAllRedundantTable() throws Exception {
+    /*public synchronized void syncAllRedundantTable() throws Exception {
         // sku.im_price -> shop_product_sku.sale_price
         iPriceChangeRule.updateShopPrice();
 
@@ -94,9 +104,9 @@ public class PriceTaskController {
 
         // sku.im_price -> product.min_im_price,product.max_im_price
         iPriceChangeRule.updateProductImPrice();
-    }
+    }*/
 
-    public synchronized void syncPreviewRedundantTable() throws Exception {
+    /*public synchronized void syncPreviewRedundantTable() throws Exception {
         // product.preview_im_price -> sku.im_price
         iPriceChangeRule.updateSkuImPrice();
 
@@ -108,6 +118,6 @@ public class PriceTaskController {
 
         // shop_product_sku.sale_price -> shop_product.min_sale_price,shop_product.max_sale_price
         iPriceChangeRule.updateShopProductSalePrice();
-    }
+    }*/
 
 }

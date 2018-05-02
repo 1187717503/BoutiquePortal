@@ -799,7 +799,9 @@
             enabled=1) and enabled=1)
         </if>
         <if test="price_change_rule_id != null and price_change_rule_id != ''">
-            and price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
+            and p.season_code in (
+              select pcrsg.season_code from price_change_rule_season_group pcrsg where pcrsg.price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
+            )
         </if>
     </update>
 
