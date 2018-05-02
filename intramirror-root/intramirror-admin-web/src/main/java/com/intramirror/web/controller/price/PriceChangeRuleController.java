@@ -102,13 +102,13 @@ public class PriceChangeRuleController extends BaseController {
         return Response.success();
     }
 
-    @RequestMapping(value = "/run/im",method = RequestMethod.GET)
+    @RequestMapping(value = "/run/im", method = RequestMethod.GET)
     @ResponseBody
     public Response runIm(@Param("price_change_rule_id") String price_change_rule_id, @Param("flag") String flag) throws Exception {
         logger.info("Start running IM discounts,price_change_rule_id:" + price_change_rule_id);
         PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
 
-        if(pcrModel.getStatus().intValue() != 1) {
+        if (pcrModel.getStatus().intValue() != 1) {
             logger.info("Start running IM discounts Error,price_change_rule_id:" + price_change_rule_id);
             return Response.status(StatusCode.FAILURE).data("不允许执行非Pending的IM折扣");
         }
@@ -141,14 +141,14 @@ public class PriceChangeRuleController extends BaseController {
         return Response.success();
     }
 
-    @RequestMapping(value = "/run/boutique",method = RequestMethod.GET)
+    @RequestMapping(value = "/run/boutique", method = RequestMethod.GET)
     @ResponseBody
     public Response runBoutique(@Param("price_change_rule_id") String price_change_rule_id, @Param("flag") String flag) throws Exception {
 
         logger.info("Start running BOUTIQUE discounts,price_change_rule_id:" + price_change_rule_id);
         PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
 
-        if(pcrModel.getStatus().intValue() != 1) {
+        if (pcrModel.getStatus().intValue() != 1) {
             logger.info("Start running IM discounts Error,price_change_rule_id:" + price_change_rule_id);
             return Response.status(StatusCode.FAILURE).data("不允许执行非Pending的Boutique折扣");
         }
@@ -218,6 +218,9 @@ public class PriceChangeRuleController extends BaseController {
             PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(price_change_rule_id);
             //            priceChangeRule.updatePreviewPrice(pcrModel.getVendorId(), preview_status, pcrModel.getCategoryType().intValue(), pcrModel.getPriceChangeRuleId(),
             //                    flag);
+            if (StringUtils.isBlank(flag)) {
+                flag = "";
+            }
             priceRuleSynService.syncPreview(pcrModel.getVendorId(), preview_status, pcrModel.getCategoryType().intValue(), pcrModel.getPriceChangeRuleId(),
                     flag);
             resultMessage.successStatus().putMsg("info", "success !!!");
