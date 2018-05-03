@@ -83,9 +83,8 @@ public class PriceTaskController {
                             JsonTransformUtil.toJson(activeRules));
                     priceRuleSynService.syncBoutique(params);
                     priceRuleSynService.syncIm(params);
+                    priceRuleSynService.syncAllPriceByTable();
                 }
-
-                priceRuleSynService.syncAllPriceByTable();
             }
 
         } catch (Exception e) {
