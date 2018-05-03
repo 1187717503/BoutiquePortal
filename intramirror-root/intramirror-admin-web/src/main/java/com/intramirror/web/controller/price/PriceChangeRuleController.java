@@ -215,15 +215,17 @@ public class PriceChangeRuleController extends BaseController {
         ResultMessage resultMessage = ResultMessage.getInstance();
 
         try {
-            PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(price_change_rule_id);
-            //            priceChangeRule.updatePreviewPrice(pcrModel.getVendorId(), preview_status, pcrModel.getCategoryType().intValue(), pcrModel.getPriceChangeRuleId(),
-            //                    flag);
-            if (StringUtils.isBlank(flag)) {
-                flag = "";
+            synchronized (this) {
+                PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(price_change_rule_id);
+                //            priceChangeRule.updatePreviewPrice(pcrModel.getVendorId(), preview_status, pcrModel.getCategoryType().intValue(), pcrModel.getPriceChangeRuleId(),
+                //                    flag);
+                if (StringUtils.isBlank(flag)) {
+                    flag = "";
+                }
+                priceRuleSynService.syncPreview(pcrModel.getVendorId(), preview_status, pcrModel.getCategoryType().intValue(), pcrModel.getPriceChangeRuleId(),
+                        flag);
+                resultMessage.successStatus().putMsg("info", "success !!!");
             }
-            priceRuleSynService.syncPreview(pcrModel.getVendorId(), preview_status, pcrModel.getCategoryType().intValue(), pcrModel.getPriceChangeRuleId(),
-                    flag);
-            resultMessage.successStatus().putMsg("info", "success !!!");
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("error message : " + e.getMessage());

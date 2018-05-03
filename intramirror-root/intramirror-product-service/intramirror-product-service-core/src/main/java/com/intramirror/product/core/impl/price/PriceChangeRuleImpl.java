@@ -346,7 +346,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     public boolean updatePreviewPrice(Long vendor_id, Long preview_status, Integer category_type, Long price_change_rule_id, String flag) throws Exception {
 
         if (preview_status.intValue() == 0) {
-            if (!flag.equals("all")) {
+            if (flag.equals("all")) {
                 price_change_rule_id = null;
             }
             priceChangeRuleMapper.clearProductPreviewPrice(vendor_id, category_type, price_change_rule_id);
@@ -361,9 +361,9 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             paramsMap.put("category_type", category_type);
             paramsMap.put("vendor_id", vendor_id);
             if (flag.equals("all")) {
-                paramsMap.put("price_change_rule_id", price_change_rule_id);
-            } else {
                 price_change_rule_id = null;
+            } else {
+                paramsMap.put("price_change_rule_id", price_change_rule_id);
             }
 
             List<Map<String, Object>> selSeasonGroupRuleMaps = priceChangeRuleMapper.selectSeasonGroupRule(paramsMap);
