@@ -645,7 +645,7 @@
         </if>
         <if test="preview_status == 0">
             <!--and date_format(valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d')-->
-            and pcr.valid_from between #{startTime,jdbcType=VARCHAR} and #{endTime,jdbcType=VARCHAR}
+            and valid_from between #{startTime,jdbcType=VARCHAR} and #{endTime,jdbcType=VARCHAR}
         </if>
         <if test="price_change_rule_id != null and price_change_rule_id != ''">
             and price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
