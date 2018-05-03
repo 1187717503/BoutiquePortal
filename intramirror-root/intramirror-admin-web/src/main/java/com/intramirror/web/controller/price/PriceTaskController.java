@@ -69,7 +69,7 @@ public class PriceTaskController {
                 Calendar startCalendar = Calendar.getInstance();
 
                 Calendar endCalendar = Calendar.getInstance();
-                endCalendar.add(Calendar.MINUTE, 1);
+                endCalendar.add(Calendar.MINUTE, 5);
 
                 Map<String, Object> params = new HashMap<>();
                 params.put("startTime", DateFormatUtils.format(startCalendar.getTime(), "yyyy-MM-dd HH:mm:00"));
