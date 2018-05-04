@@ -145,14 +145,8 @@ values(#{containerType,jdbcType=VARCHAR}, #{shipToGeography,jdbcType=VARCHAR},#{
 		SELECT * FROM container where shipment_id = #{shipmentId,jdbcType=BIGINT} GROUP BY created_at ASC;
 	</select>
 	
-	<select id="getContainerCount" resultType="java.lang.Integer">
-		SELECT sum(product_qty) FROM(
-		SELECT (SELECT count(lp.logistics_product_id) FROM logistics_product lp
-			WHERE lp.container_id = c.container_id AND lp.enabled = 1) as product_qty
-			FROM container c
-			INNER JOIN shipment s ON c.shipment_id = s.shipment_id
-			WHERE s.vendor_id = #{vendorId,jdbcType=BIGINT}    and (s.`status` = 1 or s.`status` = 2)
-		)AS DD
+	<select id="getContainerCount" resultType="java.lang.Integer" parameterType="long">
+		SELECT count(1) FROM logistics_product lp WHERE vendor_id = #{vendorId,jdbcType=BIGINT} and `status` = 7
 	</select>
 	
 	<update id="updateContainerShipment" parameterType="java.util.Map">
