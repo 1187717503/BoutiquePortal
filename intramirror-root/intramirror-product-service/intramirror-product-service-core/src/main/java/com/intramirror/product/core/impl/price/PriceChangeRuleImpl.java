@@ -471,7 +471,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             }
         }
 
-        List<Map<String, Object>> selectRuleInActiveMaps = priceChangeRuleMapper.selectRuleInActive(params);
+        /*List<Map<String, Object>> selectRuleInActiveMaps = priceChangeRuleMapper.selectRuleInActive(params);
 
         for (Map<String, Object> activeMap : selectRuleInActiveMaps) {
             List<Map<String, Object>> activeMaps = new ArrayList<>();
@@ -482,7 +482,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
+        }*/
         return true;
     }
 
