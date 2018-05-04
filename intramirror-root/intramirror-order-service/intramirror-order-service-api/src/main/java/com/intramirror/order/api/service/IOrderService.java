@@ -84,7 +84,7 @@ public interface IOrderService {
      * @param status
      * @return
      */
-    List<Map<String, Object>> getOrderListByStatusAndContainerId(int containerId, int status, Long vendorId);
+    List<Map<String, Object>> getOrderListByStatusAndContainerId(long containerId, int status, Long vendorId);
     
     
     

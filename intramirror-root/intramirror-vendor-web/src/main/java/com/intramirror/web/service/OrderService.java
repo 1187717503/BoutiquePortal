@@ -1,10 +1,12 @@
 package com.intramirror.web.service;
 
 import java.text.MessageFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.intramirror.order.api.model.LogisticProductContainer;
 import com.intramirror.order.api.model.Shipment;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -118,7 +120,8 @@ public class OrderService {
 		Map<String, Object> conditionMap = new HashMap<String, Object>();
 		conditionMap.put("container_id", Long.parseLong(map.get("containerId").toString()));
 		conditionMap.put("status", OrderStatusType.READYTOSHIP);
-		currentOrder.put("containerId", Long.parseLong(map.get("containerId").toString())); 
+		currentOrder.put("containerId", Long.parseLong(map.get("containerId").toString()));
+		currentOrder.put("vendorId",vendorId);
 		
 		//检查判断该箱子是否存在订单
 		logger.info(MessageFormat.format("order packingOrder 获取箱子内订单列表 判断是否为空箱  iLogisticsProductService.selectByCondition 入参:{0}",new Gson().toJson(conditionMap)));
@@ -432,22 +435,38 @@ public class OrderService {
 
 		//添加订单跟箱子的关联,并修改状态为READYTOSHIP
 		logger.info("order updateLogisticsProduct 添加订单与箱子的关联  ");
+		long containerId = Long.parseLong(orderMap.get("containerId").toString());
+		long logisticsProductId = Long.parseLong(orderMap.get("logistics_product_id").toString());
 		LogisticsProduct logisticsProduct = new LogisticsProduct();
-		logisticsProduct.setLogistics_product_id(Long.parseLong(orderMap.get("logistics_product_id").toString()));
-		logisticsProduct.setContainer_id(Long.parseLong(orderMap.get("containerId").toString()));
+		logisticsProduct.setLogistics_product_id(logisticsProductId);
+		logisticsProduct.setContainer_id(containerId);
 		logisticsProduct.setStatus(OrderStatusType.READYTOSHIP);
 		logisticsProduct.setPacked_at(Helper.getCurrentUTCTime());
 		logger.info("order updateLogisticsProduct 添加订单与箱子的关联 并修改状态  调用接口iLogisticsProductService.updateByLogisticsProduct 订单修改前状态:"+orderMap.get("status").toString()+"  入参:"+new Gson().toJson(logisticsProduct));
 		int row = iLogisticsProductService.updateByLogisticsProduct(logisticsProduct);
+		//添加订单跟箱子的关联,与wms系统关联
+		long shipmentId = Long.parseLong(shipMentMap.get("shipment_id").toString());
+		long vendorId = Long.parseLong(orderMap.get("vendorId").toString());
+		String orderLineNum = orderMap.get("order_line_num").toString();
+		LogisticProductContainer productContainer = new LogisticProductContainer();
+		productContainer.setContainerId(containerId);
+		productContainer.setLogisticsProductId(logisticsProductId);
+		productContainer.setShipmentId(shipmentId);
+		productContainer.setRecieveStatus(1);
+		productContainer.setOrderLineNum(orderLineNum);
+		productContainer.setVendorId(vendorId);
+		productContainer.setCreateTime(new Date());
+		productContainer.setUpdateTime(new Date());
+		iLogisticsProductService.insertLogisticProductContainer(productContainer);
 		
 		if(row > 0){
 			result.successStatus();
 			
 			Map<String, Object> saveShipmentParam = new HashMap<>();
-			saveShipmentParam.put("orderNumber", orderMap.get("order_line_num").toString());
-			saveShipmentParam.put("shipmentId", Long.parseLong(shipMentMap.get("shipment_id").toString()));
+			saveShipmentParam.put("orderNumber", orderLineNum);
+			saveShipmentParam.put("shipmentId", shipmentId);
 			Map<String, Object> orderResult = orderService.getShipmentDetails(saveShipmentParam);
-			orderResult.put("shipmentId", Long.parseLong(shipMentMap.get("shipment_id").toString()));
+			orderResult.put("shipmentId", shipmentId);
 
 			if(isSaveSubShipment){
 				//添加第三段物流
@@ -472,34 +491,41 @@ public class OrderService {
 	 */
 	@Transactional  
 	public ResultMessage deleteOrder(Map<String,Object> map) throws Exception{
-    	logger.info(MessageFormat.format("order deleteOrder 入参:{0}", new Gson().toJson(map)));
+		logger.info(MessageFormat.format("order deleteOrder 入参:{0}", new Gson().toJson(map)));
 		ResultMessage result= new ResultMessage();
 		result.errorStatus();
-		
+
+		Long containerId = Long.parseLong(map.get("container_id").toString());
 		Map<String, Object> conditionMap = new HashMap<String, Object>();
 		conditionMap.put("logistics_product_id", Long.parseLong(map.get("logistics_product_id").toString()));
-		conditionMap.put("container_id", Long.parseLong(map.get("container_id").toString()));
+		conditionMap.put("container_id", containerId);
 		conditionMap.put("status", OrderStatusType.READYTOSHIP);
-		
+
 		//检查判断该箱子是否存在订单
 		List<LogisticsProduct> list = iLogisticsProductService.selectByCondition(conditionMap);
 		if(list == null || list.size() == 0){
 			result.setMsg("Order does not exist ");
 			return result;
 		}
-		
+
 		//取消订单跟箱子的关联,并修改状态为CONFIRMED
 		LogisticsProduct logisticsProduct = new LogisticsProduct();
-		logisticsProduct.setLogistics_product_id(Long.parseLong(map.get("logistics_product_id").toString()));
+		long logisticsProductId = Long.parseLong(map.get("logistics_product_id").toString());
+		logisticsProduct.setLogistics_product_id(logisticsProductId);
 		logisticsProduct.setContainer_id(0l);
 		logisticsProduct.setStatus(OrderStatusType.COMFIRMED);
 		logger.info("order deleteOrder 取消订单与箱子的关联 并修改状态  调用接口iLogisticsProductService.updateByLogisticsProduct 订单修改前状态:"+OrderStatusType.READYTOSHIP+"  入参:"+new Gson().toJson(logisticsProduct));
 		int row = iLogisticsProductService.updateByLogisticsProduct(logisticsProduct);
-		
+		//删除关联（wms系统）
+		LogisticProductContainer logisticProductContainer = new LogisticProductContainer();
+		logisticProductContainer.setLogisticsProductId(logisticsProductId);
+		logisticProductContainer.setContainerId(containerId);
+		iLogisticsProductService.updateLogisticProductContainer(logisticProductContainer);
+
 		if(row > 0){
 			//查询相关的logisProShipmentInfo 表获取sub_shipment_id
 			Map<String,Object> logisProShipmentInfo = iLogisticsProductService.selectLogisProShipmentById(Long.parseLong(map.get("logistics_product_id").toString()));
-			
+
 			//根据sub_shipment_id 删除sub_shipment
 			if(logisProShipmentInfo != null && logisProShipmentInfo.get("sub_shipment_id") != null ){
 				logger.info("order deleteOrder 删除订单相关联的 sub_shipment 调用接口  subShipmentService.deleteByPrimaryKey sub_shipment_id:"+logisProShipmentInfo.get("sub_shipment_id").toString());
@@ -509,8 +535,6 @@ public class OrderService {
 				logisticProductShipmentService.deleteById(Long.parseLong(logisProShipmentInfo.get("sub_shipment_id").toString()));
 			}
 			//如果当前数据为container里面的最后一个商品删除container与shipment关联
-			
-			int containerId = Integer.parseInt(map.get("container_id").toString());
 			Long vendor_id = list.get(0).getVendor_id();
 			int status = OrderStatusType.READYTOSHIP;
 			List<Map<String, Object>> orderMap = orderService.getOrderListByStatusAndContainerId(containerId, status, vendor_id);

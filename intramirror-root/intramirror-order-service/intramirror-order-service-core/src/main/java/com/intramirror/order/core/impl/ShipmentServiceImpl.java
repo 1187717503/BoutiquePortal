@@ -51,7 +51,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	 * Confirmed的Order生成Shipment 新的Shipment默认有一个carton
 	 */
 	@Override
-	public synchronized Shipment saveShipmentByOrderId(Map<String, Object> map) {
+	public Shipment saveShipmentByOrderId(Map<String, Object> map) {
 		logger.info("shimentSaveService parameter " + new Gson().toJson(map));
 		//如果shipment为null创建新的shipment 如果有直接拿shipment生成SUBshipment
 		Long shipmentId = Long.parseLong(map.get("shipmentId")==null?"0":map.get("shipmentId").toString());
@@ -63,44 +63,58 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		int result = 0;
 		Shipment shipment = new Shipment();
 		if (shipmentId == 0){
-			//获取当前时间
-			Date currentDate = new Date();
-			//保存对象信息
-			shipment.setShipToGeography(map.get("pack_english_name")==null?" ":map.get("pack_english_name").toString());
-			Long vendorId = Long.parseLong(map.get("vendor_id").toString());
-			Object locationId = map.get("stock_location_id");
-			Integer stockLocationId = Integer.parseInt(locationId!=null?locationId.toString():"0");
-			String top = shipmentMapper.getVendorCodeById(vendorId);
-			Map<String, Object> noMap = new HashMap<>();
-			noMap.put("topName", top+"SP");
-			Integer maxNo = shipmentMapper.getMaxShipmentNo(noMap);
-			if (null == maxNo)
-				maxNo = 1000001;
-			else 
-				maxNo ++;
-			//生成shipmentNo
-			shipment.setShipmentNo(top+"SP"+maxNo);
-			shipment.setVendorId(vendorId);
-			shipment.setStatus(ContainerType.OPEN);
-			shipment.setStockLocationId(stockLocationId);
-			shipment.setCreatedAt(currentDate);
-			shipment.setUpdatedAt(currentDate);
-			shipment.setShipmentCategory(shipmentCategory);
-			logger.info("parameter :" + new Gson().toJson(shipment));
-			result = shipmentMapper.saveShipmentByOrderId(shipment);
-			logger.info("insert shipment result : " +result);
-			if (result == 1){
-				//根据段生成subshipment
-				Map<String, Object> typeMap = addCountryNum(map, shipmentCategory);
-				typeMap.put("vendor_id",vendorId);
-				logger.info("getShipmentId :" + new Gson().toJson(typeMap));
-				List<Map<String, Object>> listMap = shipmentMapper.getShippmentByType(typeMap);
-				logger.info("result shipmentType:" + new Gson().toJson(listMap));
-				shipmentId = shipmentMapper.getShipmentId(shipment);
-				saveSubShipment(listMap, map,shipmentId,Long.parseLong(
-						map.get("logistics_product_id")==null?"0":map.get("logistics_product_id").toString()));
-				shipment.setShipmentId(shipmentId);
-				return shipment;
+			synchronized (shipment){
+				//获取当前时间
+				Date currentDate = new Date();
+				//保存对象信息
+				shipment.setShipToGeography(map.get("pack_english_name")==null?" ":map.get("pack_english_name").toString());
+				Long vendorId = Long.parseLong(map.get("vendor_id").toString());
+				Object locationId = map.get("stock_location_id");
+				Integer stockLocationId = Integer.parseInt(locationId!=null?locationId.toString():"0");
+				String top = shipmentMapper.getVendorCodeById(vendorId);
+				Map<String, Object> noMap = new HashMap<>();
+				noMap.put("topName", top+"SP");
+				Integer maxNo = shipmentMapper.getMaxShipmentNo(noMap);
+				if (null == maxNo)
+					maxNo = 1000001;
+				else
+					maxNo ++;
+				//生成shipmentNo
+				shipment.setShipmentNo(top+"SP"+maxNo);
+				shipment.setVendorId(vendorId);
+				shipment.setStatus(ContainerType.OPEN);
+				shipment.setStockLocationId(stockLocationId);
+				shipment.setCreatedAt(currentDate);
+				shipment.setUpdatedAt(currentDate);
+				shipment.setShipmentCategory(shipmentCategory);
+				//wms需要的信息
+				shipment.setFromType(1); //买手店发货
+				shipment.setFromRefId(vendorId);
+				if( 1 == shipmentCategory) {
+					shipment.setToType(2);  //发给质检仓
+					shipment.setToRefId(1L);  //质检仓id
+				}else {
+					//发给用户的默认为0
+					shipment.setToType(0);
+					shipment.setToRefId(0L);
+				}
+				shipment.setGeographyId(Long.parseLong(map.get("geography_id").toString()));
+				logger.info("parameter :" + new Gson().toJson(shipment));
+				result = shipmentMapper.saveShipmentByOrderId(shipment);
+				logger.info("insert shipment result : " +result);
+				if (result == 1){
+					//根据段生成subshipment
+					Map<String, Object> typeMap = addCountryNum(map, shipmentCategory);
+					typeMap.put("vendor_id",vendorId);
+					logger.info("getShipmentId :" + new Gson().toJson(typeMap));
+					List<Map<String, Object>> listMap = shipmentMapper.getShippmentByType(typeMap);
+					logger.info("result shipmentType:" + new Gson().toJson(listMap));
+					shipmentId = shipmentMapper.getShipmentId(shipment);
+					saveSubShipment(listMap, map,shipmentId,Long.parseLong(
+							map.get("logistics_product_id")==null?"0":map.get("logistics_product_id").toString()));
+					shipment.setShipmentId(shipmentId);
+					return shipment;
+				}
 			}
 		}else{
 			shipment = shipmentMapper.selectShipmentById(map);

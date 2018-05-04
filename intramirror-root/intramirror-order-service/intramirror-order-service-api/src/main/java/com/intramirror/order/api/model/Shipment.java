@@ -21,6 +21,8 @@ public class Shipment {
 	 */
 	private String shipToGeography;
 
+	private Long geographyId;
+
 	/**
 	 * 发货地id
 	 */
@@ -51,6 +53,54 @@ public class Shipment {
 	 * @Fields 修改时间
 	 */
 	private Date updatedAt;
+
+	private Integer fromType;
+
+	private Long fromRefId;
+
+	private Integer toType;
+
+	private Long toRefId;
+
+	public Long getGeographyId() {
+		return geographyId;
+	}
+
+	public void setGeographyId(Long geographyId) {
+		this.geographyId = geographyId;
+	}
+
+	public Integer getFromType() {
+		return fromType;
+	}
+
+	public void setFromType(Integer fromType) {
+		this.fromType = fromType;
+	}
+
+	public Long getFromRefId() {
+		return fromRefId;
+	}
+
+	public void setFromRefId(Long fromRefId) {
+		this.fromRefId = fromRefId;
+	}
+
+	public Integer getToType() {
+		return toType;
+	}
+
+	public void setToType(Integer toType) {
+		this.toType = toType;
+	}
+
+	public Long getToRefId() {
+		return toRefId;
+	}
+
+	public void setToRefId(Long toRefId) {
+		this.toRefId = toRefId;
+	}
 
 	public String getStockLocation() {
 		return stockLocation;

@@ -590,6 +590,7 @@
             l.user_rec_country                       AS shipToCountry,
             v.address_country_id                     AS consigner_country_id,
             g.english_name                           AS shipToGeography,
+            g.geography_id,
             lp.logistics_product_id,
             lp.stock_location_id
         FROM logistics_product lp

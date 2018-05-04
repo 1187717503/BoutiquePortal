@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.intramirror.order.api.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +20,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 import com.intramirror.common.help.ResultMessage;
-import com.intramirror.order.api.model.Container;
-import com.intramirror.order.api.model.LogisticProductShipment;
-import com.intramirror.order.api.model.LogisticsProduct;
-import com.intramirror.order.api.model.SubShipment;
 import com.intramirror.order.api.service.IContainerService;
 import com.intramirror.order.api.service.ILogisticProductShipmentService;
 import com.intramirror.order.api.service.ILogisticsProductService;
@@ -310,7 +307,12 @@ public class ContainerController {
 								logisticProductService.updateContainerById(lps.getLogisticProductId());
 								logisticProductShipmentService.deleteById(lps.getSubShipmentId());
 								subShipmentService.deleteByPrimaryKey(lps.getSubShipmentId());
-							}
+								//删除关联（wms）
+                                LogisticProductContainer logisticProductContainer = new LogisticProductContainer();
+                                logisticProductContainer.setLogisticsProductId(lps.getLogisticProductId());
+                                logisticProductContainer.setContainerId(container.getContainerId());
+                                logisticProductService.updateLogisticProductContainer(logisticProductContainer);
+                            }
 						}
 					}
 					shipmentService.deleteShipmentById(setShipment);

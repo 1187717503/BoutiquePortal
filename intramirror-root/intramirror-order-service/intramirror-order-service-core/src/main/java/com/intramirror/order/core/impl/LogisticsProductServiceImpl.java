@@ -9,9 +9,12 @@ import com.intramirror.jpush.entity.OrderStatusUpdateEntity;
 import com.intramirror.jpush.enums.EmActionType;
 import com.intramirror.order.api.common.OrderStatusType;
 import com.intramirror.order.api.dto.OrderStatusChangeMsgDTO;
+import com.intramirror.order.api.model.LogisticProductContainer;
+import com.intramirror.order.api.model.LogisticProductContainerExample;
 import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.core.dao.BaseDao;
+import com.intramirror.order.core.mapper.LogisticProductContainerMapper;
 import com.intramirror.order.core.mapper.LogisticsProductMapper;
 
 import java.util.*;
@@ -35,8 +38,11 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
 
     private LogisticsProductMapper logisticsProductMapper;
 
+    private LogisticProductContainerMapper logisticProductContainerMapper;
+
     public void init() {
         logisticsProductMapper = this.getSqlSession().getMapper(LogisticsProductMapper.class);
+        logisticProductContainerMapper = this.getSqlSession().getMapper(LogisticProductContainerMapper.class);
     }
 
     /**
@@ -262,5 +268,22 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
         map.put("logisProductId",logisProductId);
         map.put("stockLocation",stockLocation);
         logisticsProductMapper.addStockLocation(map);
+    }
+
+    @Override
+    public void insertLogisticProductContainer(LogisticProductContainer logisticProductContainer) {
+        logisticProductContainerMapper.insertSelective(logisticProductContainer);
+    }
+
+    @Override
+    public void updateLogisticProductContainer(LogisticProductContainer logisticProductContainer) {
+        LogisticProductContainer record = new LogisticProductContainer();
+        record.setIsDeleted(1);
+
+        LogisticProductContainerExample example = new LogisticProductContainerExample();
+        LogisticProductContainerExample.Criteria criteria = example.createCriteria();
+        criteria.andContainerIdEqualTo(logisticProductContainer.getContainerId());
+        criteria.andLogisticsProductIdEqualTo(logisticProductContainer.getLogisticsProductId());
+        logisticProductContainerMapper.updateByExampleSelective(record,example);
     }
 }

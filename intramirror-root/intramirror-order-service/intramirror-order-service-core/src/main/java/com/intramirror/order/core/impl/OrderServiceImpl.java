@@ -135,7 +135,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
      */
     @Override
     public List<Map<String, Object>> getOrderListByStatusAndContainerId(
-            int containerId, int status, Long vendorId) {
+            long containerId, int status, Long vendorId) {
         Map<String, Object> conditionMap = new HashMap<String, Object>();
         conditionMap.put("status", status);
         conditionMap.put("vendorId", vendorId);

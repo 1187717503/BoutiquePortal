@@ -4,6 +4,7 @@ package com.intramirror.order.api.service;
 import java.util.List;
 import java.util.Map;
 
+import com.intramirror.order.api.model.LogisticProductContainer;
 import com.intramirror.order.api.model.LogisticsProduct;
 
 public interface ILogisticsProductService {
@@ -18,7 +19,7 @@ public interface ILogisticsProductService {
 	
 	/**
 	 * 根据containerId 修改相关信息
-	 * @param invoice id  containerId 数组
+	 * @param conditionMap
 	 * @return
 	 */
 	int updateByContainerId (Map<String, Object> conditionMap);
@@ -43,7 +44,7 @@ public interface ILogisticsProductService {
 	
 	/**
 	 * 根据 logistics_product_id vendorID查询关联logistic_product详情
-	 * @param logistics_product_id vendorId
+	 * @param conditionMap
 	 * @return
 	 */
 	Map<String,Object> getOrderInfoByVendorId(Map<String, Object> conditionMap);
@@ -69,14 +70,14 @@ public interface ILogisticsProductService {
 	
 	/**
 	 * 根据logistics_product_id 修改相关信息
-	 * @param LogisticsProduct
+	 * @param logisticsProduct
 	 * @return
 	 */
 	int updateByLogisticsProduct (LogisticsProduct logisticsProduct);
 	
 	/**
 	 * 根据Id修改container关联
-	 * @param LogisticsProduct
+	 * @param order_logistics_id
 	 * @return
 	 */
 	int updateContainerById(Long order_logistics_id);
@@ -87,5 +88,19 @@ public interface ILogisticsProductService {
 	int invalidOrderById(Long logisticsProductId);
 
 	void addStockLocation(Long logisProductId,String stockLocation);
+
+	/**
+	 * 添加carton和订单关联表
+	 * @param logisticProductContainer
+	 */
+	void insertLogisticProductContainer(LogisticProductContainer logisticProductContainer);
+
+	/**
+	 * 删除关联表
+	 * @param logisticProductContainer
+	 */
+	void updateLogisticProductContainer(LogisticProductContainer logisticProductContainer);
+
+
 }
 
