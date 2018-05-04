@@ -935,7 +935,7 @@ public class OrderShipController extends BaseController {
         inputVO.setShipmentTime(f1.format(currentTime)+"T"+f2.format(currentTime));
         inputVO.setDescription("clothing");
         inputVO.setLabelType("PDF");
-        inputVO.setLabelTemplate("ECOM26_A4_RU_002");
+        inputVO.setLabelTemplate("ECOM26_A4_001");
         if (fromLocation!=null){
             ShipperVO shipperVO = new ShipperVO();
             shipperVO.setCity(fromLocation.getAddressCity());
