@@ -116,6 +116,9 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 	<update id="updateShipmentStatus" parameterType="java.util.Map">
 		UPDATE shipment
 		SET `status` = #{status,jdbcType=BIGINT}
+		<if test="ship_at != null">
+			, shiped_time = #{ship_at,jdbcType=TIMESTAMP}
+		</if>
 		WHERE shipment_id=#{shipmentId,jdbcType=BIGINT}
 	</update>
 	

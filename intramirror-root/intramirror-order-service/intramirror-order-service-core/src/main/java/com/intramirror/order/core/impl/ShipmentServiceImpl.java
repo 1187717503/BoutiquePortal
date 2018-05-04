@@ -419,6 +419,10 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	        }
 			//获取上一个状态
 			int lastStatus= ContainerType.getLastStatus(status);
+			if (status == 3){
+				//记录发货时间
+				map.put("ship_at",new Date());
+			}
 			//如果一直修改状态
 			if (lastStatus == shipment.getStatus()){
 				result = shipmentMapper.updateShipmentStatus(map);
