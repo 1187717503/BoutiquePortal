@@ -14,6 +14,15 @@
 	    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
 	    <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
   	</resultMap>
+
+	<resultMap id="BaseResultMap1" type="com.intramirror.order.api.vo.LogisticsProductVO">
+		<result column="logistics_product_id" property="logisticsProductId" jdbcType="VARCHAR" />
+		<result column="order_line_num" property="orderLineNum" jdbcType="VARCHAR" />
+		<result column="order_num" property="orderNum" jdbcType="VARCHAR" />
+		<result column="order_id" property="orderId" jdbcType="BIGINT" />
+		<result column="user_id" property="userId" jdbcType="BIGINT" />
+	</resultMap>
+
 	<insert id="save" parameterType="com.intramirror.order.api.model.Shipment" >
 	INSERT INTO shipment(ship_to_geography,consignee,ship_to_addr,ship_to_district,ship_to_city,ship_to_province,ship_to_country,`status`,created_at,updated_at)
 VALUES( #{shipToGeography,jdbcType=VARCHAR},#{consignee,jdbcType=VARCHAR},#{shipToAddr,jdbcType=VARCHAR},#{shipToDistrict,jdbcType=VARCHAR},
@@ -169,4 +178,18 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 		INNER JOIN container c on c.container_id = lp.container_id
 		WHERE c.shipment_id = #{shipmentId}
 	</select>
+	
+	<select id="getlogisticsMilestone" parameterType="long" resultMap="BaseResultMap1">
+		SELECT lp.logistics_product_id,lp.order_line_num,o.order_id,o.order_num,o.user_id FROM logistics_product lp
+		INNER JOIN order_logistics ol on ol.order_logistics_id = lp.order_logistics_id
+		INNER JOIN `order` o on ol.order_id = o.order_id
+		INNER JOIN container c on c.container_id = lp.container_id
+		WHERE c.shipment_id = #{shipmentId}
+	</select>
+
+	<insert id="saveMilestone" parameterType="com.intramirror.order.api.vo.LogisticsProductVO">
+		INSERT INTO logistics_milestone(logistics_product_id,order_num,ref_order_id,ref_order_num,
+		user_id,time,type,shipment_code,shipment_type,is_complete,create_time,update_time)
+		VALUE (#{},#{},#{})
+	</insert>
 </mapper>

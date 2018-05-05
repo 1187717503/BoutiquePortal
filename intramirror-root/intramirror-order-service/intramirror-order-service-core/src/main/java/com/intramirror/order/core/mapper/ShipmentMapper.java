@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.intramirror.order.api.model.Shipment;
+import com.intramirror.order.api.vo.LogisticsProductVO;
 
 /**
  * @author 123
@@ -125,4 +126,6 @@ public interface ShipmentMapper {
 	List<Shipment> getShipmentList(Map<String, Object> map);
 
 	BigDecimal getCustomValue(Map<String, Object> map);
+
+	List<LogisticsProductVO> getlogisticsMilestone(Long shipmentId);
 }

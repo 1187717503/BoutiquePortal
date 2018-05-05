@@ -10,7 +10,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.intramirror.common.help.StringUtils;
 import com.intramirror.order.api.model.SubShipment;
+import com.intramirror.order.api.service.ISubShipmentService;
+import com.intramirror.order.api.vo.LogisticsProductVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -39,6 +42,8 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	private SubShipmentMapper subShipmentMapper;
 	
 	private LogisticProductShipmentMapper logisticProductShipmentMapper;
+
+	private ISubShipmentService subShipmentService;
 	
 	@Override
 	public void init() {
@@ -418,10 +423,19 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	        	return result;
 	        }
 			//获取上一个状态
-			int lastStatus= ContainerType.getLastStatus(status);
+			int lastStatus = ContainerType.getLastStatus(status);
 			if (status == 3){
 				//记录发货时间
 				map.put("ship_at",new Date());
+
+				//校验是否生成AWB
+				String awb = checkAWB(shipment);
+				//记录AWB单号，用于生成物流轨迹
+				List<LogisticsProductVO> milestones = shipmentMapper.getlogisticsMilestone(shipment.getShipmentId());
+				if (milestones!=null&&milestones.size()>0){
+
+				}
+
 			}
 			//如果一直修改状态
 			if (lastStatus == shipment.getStatus()){
@@ -433,6 +447,20 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			}
 		}
 		return result;
+	}
+
+	private String checkAWB(Shipment shipment) {
+		Map<String,Object> params = new HashMap<>();
+		params.put("shipmentId",shipment.getShipmentId());
+		//查询第一段
+		params.put("sequence",1);
+		SubShipment dhlShipment = subShipmentService.getDHLShipment(params);
+		if(dhlShipment!=null) {
+            if (dhlShipment.getAwbNum() != null && StringUtils.isNotBlank(dhlShipment.getAwbNum())) {
+				return dhlShipment.getAwbNum();
+            }
+        }
+        throw new  RuntimeException("No AWB is not allowed to be shipped");
 	}
 
 	@Override
