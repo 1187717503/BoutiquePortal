@@ -515,7 +515,7 @@ public class OrderShipController extends BaseController {
                     newInvoice.setShipmentId(shipment_id);
                     newInvoice.setVendorId(vendor.getVendorId());
                     newInvoice.setInvoiceDate(new Date());
-                    newInvoice.setVatNum(0l);
+                    newInvoice.setVatNum("");
                     invoiceService.insertSelective(newInvoice);
                     invoice = newInvoice;
                 }
