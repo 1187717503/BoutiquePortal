@@ -97,7 +97,7 @@
                 #{ddtNum,jdbcType=BIGINT},
             </if>
             <if test="vatNum != null">
-                #{vatNum,jdbcType=BIGINT},
+                #{vatNum,jdbcType=VARCHAR},
             </if>
             <if test="vendorId != null">
                 #{vendorId,jdbcType=BIGINT},

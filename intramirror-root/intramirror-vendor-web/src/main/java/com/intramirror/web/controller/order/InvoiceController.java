@@ -114,7 +114,7 @@ public class InvoiceController extends BaseController{
 			invoice.setEnabled(EnabledType.USED);
 			invoice.setInvoiceNum(map.get("invoiceNo").toString());
 			invoice.setInvoiceDate(sdf2.parse(map.get("invoiceDate").toString()));
-			invoice.setVatNum(Long.parseLong(vendor.getBusinessLicenseNumber()));
+			invoice.setVatNum(vendor.getBusinessLicenseNumber());
 			invoice.setVendorId(vendor.getVendorId());
 			
 			invoiceService.insertSelective(invoice);
