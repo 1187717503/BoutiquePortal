@@ -16,6 +16,7 @@ import com.intramirror.order.api.service.ISubShipmentService;
 import com.intramirror.order.api.vo.LogisticsProductVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
@@ -43,6 +44,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	
 	private LogisticProductShipmentMapper logisticProductShipmentMapper;
 
+	@Autowired
 	private ISubShipmentService subShipmentService;
 	
 	@Override
@@ -433,7 +435,13 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 				//记录AWB单号，用于生成物流轨迹
 				List<LogisticsProductVO> milestones = shipmentMapper.getlogisticsMilestone(shipment.getShipmentId());
 				if (milestones!=null&&milestones.size()>0){
-
+					for (LogisticsProductVO vo:milestones){
+						vo.setAwb(awb);
+						vo.setIsComplete(0);
+						vo.setShipmentType(3);
+						vo.setType(4);
+						shipmentMapper.saveMilestone(vo);
+					}
 				}
 
 			}

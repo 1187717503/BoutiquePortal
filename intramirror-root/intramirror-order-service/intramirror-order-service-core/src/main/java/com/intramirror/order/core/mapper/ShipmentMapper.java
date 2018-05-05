@@ -128,4 +128,6 @@ public interface ShipmentMapper {
 	BigDecimal getCustomValue(Map<String, Object> map);
 
 	List<LogisticsProductVO> getlogisticsMilestone(Long shipmentId);
+
+	void saveMilestone(LogisticsProductVO logisticsProductVO);
 }

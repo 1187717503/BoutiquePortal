@@ -1,6 +1,5 @@
 package com.intramirror.order.api.vo;
 
-import java.util.Date;
 
 /**
  * Created by caowei on 2018/5/5.
@@ -19,15 +18,35 @@ public class LogisticsProductVO {
 
     private String awb;
 
-    private Date time;
-
     private Integer type;
 
     private Integer shipmentType;
 
     private Integer isComplete;
 
-    //private
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
+
+    public Integer getShipmentType() {
+        return shipmentType;
+    }
+
+    public void setShipmentType(Integer shipmentType) {
+        this.shipmentType = shipmentType;
+    }
+
+    public Integer getIsComplete() {
+        return isComplete;
+    }
+
+    public void setIsComplete(Integer isComplete) {
+        this.isComplete = isComplete;
+    }
 
     public String getLogisticsProductId() {
         return logisticsProductId;
