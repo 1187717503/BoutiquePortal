@@ -175,7 +175,7 @@
     <select id="getShippingProviderByShipmentId" resultMap="BaseResultMap" parameterType="java.lang.Long">
     SELECT * FROM
     shipping_provider sp
-    WHERE sp.shipping_provider_id =(
+    WHERE sp.shipping_provider_id in (
     SELECT shipping_provider_id FROM shipping_segment ss
     WHERE ss.custom = 1 AND ss.enabled=1 AND ss.shipping_segment_id in
     (SELECT subs.shipping_segment_id FROM sub_shipment subs where subs.shipment_id = #{shipmentId,jdbcType=BIGINT}))

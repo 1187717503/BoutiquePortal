@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * 订单装箱service
  * @author yuan
@@ -32,6 +34,10 @@ public class ShippingProviderServiceImpl extends BaseDao implements IShippingPro
 
 	@Override
 	public ShippingProvider getShippingProviderByShipmentId(Long shipmentId) {
-		return shippingProviderMapper.getShippingProviderByShipmentId(shipmentId);
+		List<ShippingProvider> providers = shippingProviderMapper.getShippingProviderByShipmentId(shipmentId);
+		if (providers!=null&&providers.size()>0){
+			return providers.get(0);
+		}
+		return new ShippingProvider();
 	}
 }
