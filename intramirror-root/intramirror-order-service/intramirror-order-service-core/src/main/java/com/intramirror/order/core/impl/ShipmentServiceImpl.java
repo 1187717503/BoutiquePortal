@@ -205,12 +205,14 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 						subShipmentId = subShipmentMapper.getSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence));
 					}
 				}
+				Map<String, Object> lpsMap = new HashMap<>();
 				if(oldSubShipmentId==null){
-					Map<String, Object> lpsMap = new HashMap<>();
 					lpsMap.put("logisticProductId", logisticProductId);
 					lpsMap.put("subShipmentId", subShipmentId);
-					logisticProductShipmentMapper.insertlpShipment(lpsMap);
+				}else {
+					lpsMap.put("subShipmentId", oldSubShipmentId);
 				}
+				logisticProductShipmentMapper.insertlpShipment(lpsMap);
 //				}else {
 //					Long segmentSequence = Long.parseLong(map.get(0).get("segment_sequence").toString());
 //					//插入物流订单关联查询是否已有记录

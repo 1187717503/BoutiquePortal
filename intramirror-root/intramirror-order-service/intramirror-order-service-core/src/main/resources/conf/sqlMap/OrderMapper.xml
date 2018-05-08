@@ -399,7 +399,9 @@
         lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
         lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,s.sku_code,b.english_name
         as brandName,l.user_rec_country as userRecCountry,
-        v.vendor_name,p.cover_img,g.english_name as geography_name ,lp.logistics_product_id,v.vendor_id
+        v.vendor_name,
+        CASE WHEN p.spu_id IS NULL THEN p.cover_img ELSE spu.cover_img END AS cover_img,
+        g.english_name as geography_name ,lp.logistics_product_id,v.vendor_id
         FROM logistics_product lp
         INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
         INNER JOIN `order` o ON ol.order_id = o.order_id
@@ -408,6 +410,7 @@
         INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
         INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
         INNER JOIN product p ON (sp.product_id = p.product_id and p.enabled = 1 )
+        LEFT JOIN spu on(spu.spu_id = p.spu_id and spu.enabled = 1)
         INNER JOIN brand b ON (p.brand_id = b.brand_id and b.enabled = 1 )
         INNER JOIN sku s ON (s.sku_id = sps.sku_id and s.enabled = 1)
         INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
