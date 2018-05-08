@@ -206,8 +206,8 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 					}
 				}
 				Map<String, Object> lpsMap = new HashMap<>();
+				lpsMap.put("logisticProductId", logisticProductId);
 				if(oldSubShipmentId==null){
-					lpsMap.put("logisticProductId", logisticProductId);
 					lpsMap.put("subShipmentId", subShipmentId);
 				}else {
 					lpsMap.put("subShipmentId", oldSubShipmentId);
