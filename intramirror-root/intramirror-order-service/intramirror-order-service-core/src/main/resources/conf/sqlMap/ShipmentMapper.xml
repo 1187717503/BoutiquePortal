@@ -66,7 +66,8 @@ VALUES(#{shipToGeography,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},
 	INNER JOIN geography g ON (ac.geography_id = g.geography_id)
 	INNER JOIN shipping_provider  sp ON (sp.shipping_provider_id = ss.shipping_provider_id)
 	WHERE ss.shipping_routing_id = (SELECT shipping_routing_id FROM shipping_routing 
-	WHERE consigner_country_id = #{consigner_country_id,jdbcType=BIGINT} and consignee_country_id =#{consignee_country_id,jdbcType=BIGINT}) AND vsr.vendor_id=#{vendor_id,jdbcType=BIGINT} AND ss.segment_sequence IN (1,2,3) GROUP BY ss.segment_sequence ASC;
+	WHERE consigner_country_id = #{consigner_country_id,jdbcType=BIGINT} and consignee_country_id =#{consignee_country_id,jdbcType=BIGINT})
+	AND vsr.vendor_id=#{vendor_id,jdbcType=BIGINT} AND ss.segment_sequence IN (1,2,3) and ss.enabled = 1 GROUP BY ss.segment_sequence ASC;
   </select>
   
   

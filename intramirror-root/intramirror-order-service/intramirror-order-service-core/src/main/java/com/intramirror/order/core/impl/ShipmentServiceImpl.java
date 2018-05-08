@@ -298,12 +298,13 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	public Map<String, Object> saveBean(Map<String, Object> map, Date currentDate, Long shipmentId,Long segmentSequence){
 		Map<String, Object> beanMap = new HashMap<String, Object>();
 		beanMap.put("consignee", map.get("consignee")==null?" ":map.get("consignee").toString());
+		beanMap.put("personName", map.get("consignee")==null?" ":map.get("consignee").toString());
 		beanMap.put("segmentSequence", segmentSequence);
 		beanMap.put("shippingSegmentId", Long.parseLong(map.get("shippingSegmentId")==null?"0":map.get("shippingSegmentId").toString()));
 		beanMap.put("shipToAddr", map.get("shipToAddr")==null?" ":map.get("shipToAddr").toString());
 		//beanMap.put("shipToAddr2", map.get("shipToAddr2")==null?" ":map.get("shipToAddr2").toString());
 		//beanMap.put("shipToAddr3", map.get("shipToAddr3")==null?" ":map.get("shipToAddr3").toString());
-		//beanMap.put("shipToEmailAddr", map.get("shipToEmailAddr")==null?" ":map.get("shipToEmailAddr").toString());
+		beanMap.put("shipToEamilAddr", "shipment@intramirror.com");
 		beanMap.put("shipToCity", map.get("shipToCity")==null?" ":map.get("shipToCity").toString());
 		beanMap.put("shipToCountry", map.get("shipToCountry")==null?" ":map.get("shipToCountry").toString());
 		beanMap.put("shipToDistrict", map.get("shipToDistrict")==null?" ":map.get("shipToDistrict").toString());
@@ -313,6 +314,8 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		beanMap.put("updatedAt", currentDate);
 		beanMap.put("createdAt", currentDate);
 		beanMap.put("shipToCountryCode",map.get("countryCode")==null?" ":map.get("countryCode").toString());
+		beanMap.put("postalCode",map.get("zip_code")==null?"":map.get("zip_code").toString());
+		beanMap.put("contact",map.get("contact")==null?"":map.get("contact").toString());
 		return beanMap;
 	}
 
