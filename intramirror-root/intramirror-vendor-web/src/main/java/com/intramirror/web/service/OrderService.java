@@ -6,8 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.intramirror.order.api.model.LogisticProductContainer;
-import com.intramirror.order.api.model.Shipment;
+import com.intramirror.order.api.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +19,6 @@ import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.order.api.common.ContainerType;
 import com.intramirror.order.api.common.OrderStatusType;
-import com.intramirror.order.api.model.Container;
-import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.service.IContainerService;
 import com.intramirror.order.api.service.ILogisticProductShipmentService;
 import com.intramirror.order.api.service.ILogisticsProductService;
@@ -40,21 +37,6 @@ public class OrderService {
 	private IOrderService orderService;
 	
 	@Autowired
-	private LogisticsProductService logisticsProductService;
-	
-	@Autowired
-	private ProductPropertyService productPropertyService;
-	
-	@Autowired
-	private VendorService vendorService;
-	
-	@Autowired
-	private OrderRefund orderRefund;
-	
-	@Autowired
-	private ISkuStoreService skuStoreService;
-	
-	@Autowired
 	private ILogisticsProductService iLogisticsProductService;
 	
 	@Autowired
@@ -62,9 +44,6 @@ public class OrderService {
 	
 	@Autowired
 	private IContainerService containerService;
-	
-	@Autowired
-	private ISubShipmentService subShipmentService;
 	
 	@Autowired
 	private ILogisticProductShipmentService logisticProductShipmentService;
@@ -432,6 +411,19 @@ public class OrderService {
 			throw new RuntimeException("This Order's stock location is different than carton's. ");
 		}
 
+		long shipmentId = Long.parseLong(shipMentMap.get("shipment_id").toString());
+		/*if (shipMentMap.get("shipment_type_id").toString().equals("2")){
+			//按用户收货地址校验打包
+			SubShipment subShipment = iShipmentService.getSubShipmentByShipmentId(shipmentId);
+			Map<String, Object> saveShipmentParam = new HashMap<String, Object>();
+			saveShipmentParam.put("orderNumber", orderMap.get("order_line_num"));
+			Map<String, Object> orderResult = orderService.getShipmentDetails(saveShipmentParam);
+
+			if (subShipment!=null){
+				orderMap.get("");
+			}
+		}*/
+
 
 		//添加订单跟箱子的关联,并修改状态为READYTOSHIP
 		logger.info("order updateLogisticsProduct 添加订单与箱子的关联  ");
@@ -445,7 +437,6 @@ public class OrderService {
 		logger.info("order updateLogisticsProduct 添加订单与箱子的关联 并修改状态  调用接口iLogisticsProductService.updateByLogisticsProduct 订单修改前状态:"+orderMap.get("status").toString()+"  入参:"+new Gson().toJson(logisticsProduct));
 		int row = iLogisticsProductService.updateByLogisticsProduct(logisticsProduct);
 		//添加订单跟箱子的关联,与wms系统关联
-		long shipmentId = Long.parseLong(shipMentMap.get("shipment_id").toString());
 		long vendorId = Long.parseLong(orderMap.get("vendorId").toString());
 		String orderLineNum = orderMap.get("order_line_num").toString();
 		LogisticProductContainer productContainer = new LogisticProductContainer();

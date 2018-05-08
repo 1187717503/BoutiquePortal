@@ -554,4 +554,13 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	public BigDecimal getCustomValue(Map<String, Object> map) {
 		return shipmentMapper.getCustomValue(map);
 	}
+
+    @Override
+    public SubShipment getSubShipmentByShipmentId(Long shipmentId) {
+        List<SubShipment> subShipments = subShipmentService.getSubShipmentByShipmentId(shipmentId);
+        if (subShipments!=null&&subShipments.size()>0){
+            return subShipments.get(0);
+        }
+        return null;
+    }
 }

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.intramirror.order.api.model.Shipment;
+import com.intramirror.order.api.model.SubShipment;
 
 /**
  * @author yuan
@@ -135,4 +136,12 @@ public interface IShipmentService {
 	List<Shipment> getShipmentList(Map<String, Object> map);
 
 	BigDecimal getCustomValue(Map<String, Object> map);
+
+	/**
+	 * 根据shipmentId查询用户收货地址信息
+	 * @param shipmentId
+	 * @return
+	 */
+	SubShipment getSubShipmentByShipmentId(Long shipmentId);
+
 }
