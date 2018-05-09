@@ -187,7 +187,6 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			//每条路线生成不同sub-shipment
             if (map.size() == 1){
                 lastMap.put("shippingSegmentId", Long.parseLong(map.get(0).get("shipping_segment_id").toString()));
-//				if (1==Long.parseLong(shipmentType)){
 				Long segmentSequence = Long.parseLong(map.get(0).get("segment_sequence").toString());
 				Long subShipmentId = null;
 				Long oldSubShipmentId = null;
@@ -213,20 +212,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 					lpsMap.put("subShipmentId", oldSubShipmentId);
 				}
 				logisticProductShipmentMapper.insertlpShipment(lpsMap);
-//				}else {
-//					Long segmentSequence = Long.parseLong(map.get(0).get("segment_sequence").toString());
-//					//插入物流订单关联查询是否已有记录
-//					Long subShipmentId1 = subShipmentMapper.getSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence));
-//					if (null == subShipmentId1){
-//						subShipmentMapper.insertSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence));
-//						Map<String, Object> lpsMap = new HashMap<>();
-//						Long subShipmentId = subShipmentMapper.getSubshipment(saveBean(lastMap, currentDate, shipmentId, segmentSequence));
-//						lpsMap.put("logisticProductId", logisticProductId);
-//						lpsMap.put("subShipmentId", subShipmentId);
-//						logisticProductShipmentMapper.insertlpShipment(lpsMap);
-//					}
-//				}
-				
+
 			}
 			if (map.size() == 2){
                 lastMap.put("shippingSegmentId", Long.parseLong(map.get(1).get("shipping_segment_id").toString()));

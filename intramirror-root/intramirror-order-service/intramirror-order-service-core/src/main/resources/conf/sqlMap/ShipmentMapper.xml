@@ -81,10 +81,14 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
   </insert>
   
   <select id="getShipmentsByVendor" resultType="java.util.HashMap"  parameterType="java.util.Map">
-  SELECT * FROM shipment
-	WHERE vendor_id = #{vendorId,jdbcType=BIGINT} AND `status` = #{status,jdbcType=BIGINT}
-	AND ship_to_geography = #{shipToGeography,jdbcType=VARCHAR}
-	AND stock_location_id = #{stockLocationId,jdbcType=INTEGER};
+  SELECT s.* FROM shipment s
+  INNER JOIN sub_shipment sub on sub.shipment_id = s.shipment_id
+  INNER JOIN shipping_segment ss ON sub.shipping_segment_id = ss.shipping_segment_id
+	WHERE s.vendor_id = #{vendorId,jdbcType=BIGINT} AND s.`status` = #{status,jdbcType=BIGINT}
+	AND s.ship_to_geography = #{shipToGeography,jdbcType=VARCHAR}
+	AND s.stock_location_id = #{stockLocationId,jdbcType=INTEGER}
+	AND ss.enabled = 1 AND ss.shipment_type_id != 2
+	GROUP BY s.shipment_no
   </select>
   
   <select id="getShipmentTypeById" resultType="java.util.HashMap"  parameterType="java.util.Map">
@@ -92,7 +96,7 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 		INNER JOIN shipment s ON (sub.shipment_id = s.shipment_id)
 		INNER JOIN shipping_segment ss ON (sub.shipping_segment_id = ss.shipping_segment_id)
 		INNER JOIN shipment_type st ON (ss.shipment_type_id = st.shipment_type_id)
-		WHERE sub.shipment_id=#{shipmentId,jdbcType=BIGINT}
+		WHERE sub.shipment_id=#{shipmentId,jdbcType=BIGINT} AND ss.enabled = 1
 		GROUP BY ss.segment_sequence ASC LIMIT 1;
   </select>
   

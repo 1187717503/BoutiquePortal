@@ -285,7 +285,7 @@ public class OrderService {
 			logger.info("order packingCheckOrder 箱子不为空    ");
 			infoMap.put("statusType", StatusType.ORDER_CONTAINER_NOT_EMPTY);
 			
-			Map<String, Object> getShipment = new HashMap<String, Object>();
+			Map<String, Object> getShipment = new HashMap<>();
 			getShipment.put("shipmentId", Long.parseLong(shipment_id));
 			
 			//根据shipmentId 获取shipment 相关信息及物流第一段类型
@@ -412,17 +412,47 @@ public class OrderService {
 		}
 
 		long shipmentId = Long.parseLong(shipMentMap.get("shipment_id").toString());
-		/*if (shipMentMap.get("shipment_type_id").toString().equals("2")){
-			//按用户收货地址校验打包
-			SubShipment subShipment = iShipmentService.getSubShipmentByShipmentId(shipmentId);
-			Map<String, Object> saveShipmentParam = new HashMap<String, Object>();
-			saveShipmentParam.put("orderNumber", orderMap.get("order_line_num"));
-			Map<String, Object> orderResult = orderService.getShipmentDetails(saveShipmentParam);
+		if (shipMentMap.get("shipment_type_id")!=null){
+			if (shipMentMap.get("shipment_type_id").toString().equals("2")){
+				//按用户收货地址校验打包
+				SubShipment subShipment = iShipmentService.getSubShipmentByShipmentId(shipmentId);
+				Map<String, Object> saveShipmentParam = new HashMap<>();
+				saveShipmentParam.put("orderNumber", orderMap.get("order_line_num"));
+				Map<String, Object> map = orderService.getShipmentDetails(saveShipmentParam);
 
-			if (subShipment!=null){
-				orderMap.get("");
+				if (subShipment != null){
+					String consignee = map.get("consignee") == null ? " " : map.get("consignee").toString();
+					if (!subShipment.getPersonName().equalsIgnoreCase(consignee)){
+						throw new RuntimeException("The personName is not consistent with the harvest address information.");
+					}
+					String shipToAddr = map.get("shipToAddr") == null ? " " : map.get("shipToAddr").toString();
+					if (!subShipment.getShipToAddr().equalsIgnoreCase(shipToAddr)){
+						throw new RuntimeException("The shipToAddr is not consistent with the harvest address information.");
+					}
+					if (!subShipment.getShipToEamilAddr().equals("shipment@intramirror.com")){
+						throw new RuntimeException("The shipToEamilAddr is not consistent with the harvest address information.");
+					}
+					String shipToCity = map.get("shipToCity") == null ? " " : map.get("shipToCity").toString();
+					if (!subShipment.getShipToCity().equalsIgnoreCase(shipToCity)){
+						throw new RuntimeException("The shipToCity is not consistent with the harvest address information.");
+					}
+					String countryCode = map.get("countryCode") == null ? " " : map.get("countryCode").toString();
+					if (!subShipment.getShipToCountryCode().equalsIgnoreCase(countryCode)){
+						throw new RuntimeException("The countryCode is not consistent with the harvest address information.");
+					}
+					String postalCode = map.get("zip_code") == null ? "" : map.get("zip_code").toString();
+					if (!subShipment.getPostalCode().equalsIgnoreCase(postalCode)){
+						throw new RuntimeException("The postalCode is not consistent with the harvest address information.");
+					}
+					String contact = map.get("contact") == null ? "" : map.get("contact").toString();
+					contact = contact.replace(" ","");
+					if (!subShipment.getContact().replace(" ","").equalsIgnoreCase(contact)){
+						throw new RuntimeException("The contact is not consistent with the harvest address information.");
+					}
+
+				}
 			}
-		}*/
+		}
 
 
 		//添加订单跟箱子的关联,并修改状态为READYTOSHIP
