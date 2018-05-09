@@ -423,31 +423,31 @@ public class OrderService {
 				if (subShipment != null){
 					String consignee = map.get("consignee") == null ? " " : map.get("consignee").toString();
 					if (!subShipment.getPersonName().equalsIgnoreCase(consignee)){
-						throw new RuntimeException("The personName is not consistent with the harvest address information.");
+						throw new RuntimeException("The personName is not consistent with the receiver address information.");
 					}
 					String shipToAddr = map.get("shipToAddr") == null ? " " : map.get("shipToAddr").toString();
 					if (!subShipment.getShipToAddr().equalsIgnoreCase(shipToAddr)){
-						throw new RuntimeException("The shipToAddr is not consistent with the harvest address information.");
+						throw new RuntimeException("The shipToAddr is not consistent with the receiver address information.");
 					}
 					if (!subShipment.getShipToEamilAddr().equals("shipment@intramirror.com")){
-						throw new RuntimeException("The shipToEamilAddr is not consistent with the harvest address information.");
+						throw new RuntimeException("The shipToEamilAddr is not consistent with the receiver address information.");
 					}
 					String shipToCity = map.get("shipToCity") == null ? " " : map.get("shipToCity").toString();
 					if (!subShipment.getShipToCity().equalsIgnoreCase(shipToCity)){
-						throw new RuntimeException("The shipToCity is not consistent with the harvest address information.");
+						throw new RuntimeException("The shipToCity is not consistent with the receiver address information.");
 					}
 					String countryCode = map.get("countryCode") == null ? " " : map.get("countryCode").toString();
 					if (!subShipment.getShipToCountryCode().equalsIgnoreCase(countryCode)){
-						throw new RuntimeException("The countryCode is not consistent with the harvest address information.");
+						throw new RuntimeException("The countryCode is not consistent with the receiver address information.");
 					}
 					String postalCode = map.get("zip_code") == null ? "" : map.get("zip_code").toString();
 					if (!subShipment.getPostalCode().equalsIgnoreCase(postalCode)){
-						throw new RuntimeException("The postalCode is not consistent with the harvest address information.");
+						throw new RuntimeException("The postalCode is not consistent with the receiver address information.");
 					}
 					String contact = map.get("contact") == null ? "" : map.get("contact").toString();
 					contact = contact.replace(" ","");
 					if (!subShipment.getContact().replace(" ","").equalsIgnoreCase(contact)){
-						throw new RuntimeException("The contact is not consistent with the harvest address information.");
+						throw new RuntimeException("The contact is not consistent with the receiver address information.");
 					}
 
 				}
