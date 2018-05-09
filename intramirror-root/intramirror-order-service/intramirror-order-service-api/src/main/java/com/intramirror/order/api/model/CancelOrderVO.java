@@ -15,9 +15,9 @@ public class CancelOrderVO {
     private String size;
     private String brandName;
     private String name;
-    private BigDecimal price;
+    private Object price;
     private String supply_price_discount;
-    private BigDecimal in_price;
+    private Object in_price;
     private String order_line_num;
     private Date created_at;
     private Date cancel_at;
@@ -78,14 +78,6 @@ public class CancelOrderVO {
         this.name = name;
     }
 
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
     public String getSupply_price_discount() {
         return supply_price_discount;
     }
@@ -94,11 +86,19 @@ public class CancelOrderVO {
         this.supply_price_discount = supply_price_discount;
     }
 
-    public BigDecimal getIn_price() {
+    public Object getPrice() {
+        return price;
+    }
+
+    public void setPrice(Object price) {
+        this.price = price;
+    }
+
+    public Object getIn_price() {
         return in_price;
     }
 
-    public void setIn_price(BigDecimal in_price) {
+    public void setIn_price(Object in_price) {
         this.in_price = in_price;
     }
 

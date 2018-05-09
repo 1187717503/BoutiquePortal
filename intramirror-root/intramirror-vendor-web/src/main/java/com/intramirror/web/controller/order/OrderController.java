@@ -194,6 +194,8 @@ public class OrderController extends BaseController {
                 } else {
                     co.setSupply_price_discount ((100 - supply_price_discount.setScale(0, BigDecimal.ROUND_HALF_UP).intValue()) + " %");
                 }
+                co.setPrice(new BigDecimal(co.getPrice().toString()).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
+                co.setIn_price(new BigDecimal(co.getIn_price().toString()).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
             }
         }
 
@@ -207,8 +209,10 @@ public class OrderController extends BaseController {
     }
 
     private void arithmeticalDiscount(Map<String, Object> info) {
-        Double price = Double.parseDouble(info.get("price").toString());
-        Double inPrice = Double.parseDouble(info.get("in_price").toString());
+        String priceStr = info.get("price").toString();
+        String inPriceStr = info.get("in_price").toString();
+        Double price = Double.parseDouble(priceStr);
+        Double inPrice = Double.parseDouble(inPriceStr);
 
         BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + 0.22) / price) * 100);
         if (supply_price_discount.intValue() > 100 || supply_price_discount.intValue() < 0) {
@@ -216,6 +220,9 @@ public class OrderController extends BaseController {
         } else {
             info.put("supply_price_discount", (100 - supply_price_discount.setScale(0, BigDecimal.ROUND_HALF_UP).intValue()) + " %");
         }
+        //四舍五入金额
+        info.put("price",new BigDecimal(price).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
+        info.put("in_price",new BigDecimal(inPriceStr).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
     }
 
     /**
