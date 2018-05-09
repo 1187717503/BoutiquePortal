@@ -67,14 +67,13 @@ public class PriceTaskController {
 
             synchronized (this) {
                 Calendar startCalendar = Calendar.getInstance();
-                startCalendar.add(Calendar.MINUTE, -1);
 
-                Calendar endCalendar = Calendar.getInstance();
-                endCalendar.add(Calendar.MINUTE, 1);
+                /*Calendar endCalendar = Calendar.getInstance();
+                endCalendar.add(Calendar.MINUTE, 1);*/
 
                 Map<String, Object> params = new HashMap<>();
                 params.put("startTime", DateFormatUtils.format(startCalendar.getTime(), "yyyy-MM-dd HH:mm:00"));
-                params.put("endTime", DateFormatUtils.format(endCalendar.getTime(), "yyyy-MM-dd HH:mm:00"));
+                params.put("endTime", DateFormatUtils.format(startCalendar.getTime(), "yyyy-MM-dd HH:mm:59"));
 
                 logger.info("start selectNowActiveRule,{},params:{}", type, JsonTransformUtil.toJson(params));
                 List<Map<String, Object>> activeRules = iPriceChangeRule.selectNowActiveRule(params);
