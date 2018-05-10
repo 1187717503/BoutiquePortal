@@ -707,11 +707,73 @@ public class OrderShipController extends BaseController {
         shipmentIds.add(shipment_id);
         map.put("shipmentIds",shipmentIds);
         map.put("packGroup",1);
-        List<Map<String, Object>> list = orderService.getOrderListByShipmentId(map);
+        List<Map<String, Object>> chinaList = orderService.getOrderListByShipmentId(map);
         InvoiceVO chinaInovice = new InvoiceVO();
-        chinaInovice.setList(list);
+        chinaInovice.setList(chinaList);
         //获取shipTo地址信息
         List<SubShipment> subShipmentList = subShipmentService.getSubShipmentByShipmentId(shipment_id);
+        if (subShipmentList!=null&&subShipmentList.size()>0){
+            RecipientVO recipientVO = new RecipientVO();
+            SubShipment subShipment = subShipmentList.get(0);
+            recipientVO.setCity(subShipment.getShipToCity());
+            recipientVO.setCompanyName(subShipment.getConsignee());
+            recipientVO.setPersonName(subShipment.getPersonName());
+            recipientVO.setStreetLines(subShipment.getShipToAddr());
+            recipientVO.setStreetLines2(subShipment.getShipToAddr2());
+            recipientVO.setStreetLines3(subShipment.getShipToAddr3());
+            recipientVO.setPostalCode(subShipment.getPostalCode());
+            recipientVO.setPhoneNumber(subShipment.getContact());
+            recipientVO.setCountry("Italy");
+            chinaInovice.setRecipientVO(recipientVO);
+        }
+
+        //获取Ship From信息
+        StockLocation location = stockLocationService.getShipFromLocation(shipment_id);
+        ShipperVO shipperVO = new ShipperVO();
+        shipperVO.setCompanyName(location.getContactCompanyname());
+        shipperVO.setPersonName(location.getContactPersonname());
+        shipperVO.setPhoneNumber(location.getContactPhonenumber());
+        shipperVO.setStreetLines(location.getAddressStreetlines());
+        shipperVO.setStreetLines2(location.getAddressStreetlines2());
+        shipperVO.setStreetLines3(location.getAddressStreetlines3());
+        shipperVO.setCity(location.getAddressCity());
+        shipperVO.setCountry("Italy");
+        chinaInovice.setShipperVO(shipperVO);
+
+        //获取欧盟国家的订单
+        map.put("shipmentIds",shipmentIds);
+        map.put("packGroup",2);
+        List<Map<String, Object>> UNlist = orderService.getOrderListByShipmentId(map);
+        List<InvoiceVO> UNInvoiceList = new ArrayList<>();
+        if (UNlist!=null&&UNlist.size()>0){
+            for (Map<String,Object> UNOrder: UNlist){
+                InvoiceVO UNInvoiceVO = new InvoiceVO();
+                List<Map<String, Object>> list = new ArrayList<>();
+                list.add(UNOrder);
+                UNInvoiceVO.setList(list);
+                UNInvoiceVO.setShipperVO(shipperVO);
+                RecipientVO recipientVO = new RecipientVO();
+                String country = UNOrder.get("user_rec_country") != null ? UNOrder.get("user_rec_country").toString() : "";
+                recipientVO.setCountry(country);
+                String personName = UNOrder.get("user_rec_name") != null ? UNOrder.get("user_rec_name").toString() : "";
+                recipientVO.setPersonName(personName);
+                String province = UNOrder.get("user_rec_province") != null ? UNOrder.get("user_rec_province").toString() : "";
+                recipientVO.setProvince(province);
+                String city = UNOrder.get("user_rec_city") != null ? UNOrder.get("user_rec_city").toString() : "";
+                recipientVO.setCity(city);
+                String addr = UNOrder.get("user_rec_addr") != null ? UNOrder.get("user_rec_addr").toString() : "";
+                recipientVO.setStreetLines(addr);
+                String mobile = UNOrder.get("user_rec_mobile") != null ? UNOrder.get("user_rec_mobile").toString() : "";
+                recipientVO.setPhoneNumber(mobile);
+                String postalCode = UNOrder.get("user_rec_code") != null ? UNOrder.get("user_rec_code").toString() : "";
+                recipientVO.setPostalCode(postalCode);
+
+                UNInvoiceList.add(UNInvoiceVO);
+            }
+        }
+
+
+
 
         //获取ddt number
 
@@ -779,14 +841,7 @@ public class OrderShipController extends BaseController {
             }
             resultMap.put("VATNumber", invoice.getVatNum());
 
-            //获取Ship From信息
-            StockLocation location = stockLocationService.getShipFromLocation(shipment_id);
-            resultMap.put("companyName",location.getContactCompanyname());
-            resultMap.put("personName",location.getContactPersonname());
-            resultMap.put("contact",location.getContactPhonenumber());
-            resultMap.put("address",location.getAddressStreetlines());
-            resultMap.put("city",location.getAddressCity());
-            resultMap.put("country","Italy");
+
 
             logger.info("打印Invoice----获取Deliver To信息");
             //List<SubShipment> subShipmentList = subShipmentService.getSubShipmentByShipmentId(shipment_id);
