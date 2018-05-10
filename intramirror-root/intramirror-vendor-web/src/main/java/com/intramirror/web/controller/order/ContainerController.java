@@ -98,15 +98,15 @@ public class ContainerController {
 			}
 			if (null == map.get("length") || StringUtils.isBlank(map.get("length").toString())){
 				message.successStatus().putMsg("info", "length cannot be null");
-				//return message;
+				return message;
 			}
 			if (null == map.get("width") || StringUtils.isBlank(map.get("width").toString())){
 				message.successStatus().putMsg("info", "width cannot be null");
-				//return message;
+				return message;
 			}
 			if (null == map.get("height") || StringUtils.isBlank(map.get("height").toString())){
 				message.successStatus().putMsg("info", "height cannot be null");
-				//return message;
+				return message;
 			}
 			/*if (null == map.get("weight") || StringUtils.isBlank(map.get("weight").toString())){
 				message.successStatus().putMsg("info", "weight cannot be null");
