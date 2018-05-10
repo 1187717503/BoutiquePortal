@@ -81,7 +81,7 @@ public class OrderService {
 		//校验order_line_num  是否在CONFIRMED中存在
 		logger.info("order packingOrder 校验订单是否存在   orderLineNum:"+orderLineNum);
 		for(Map<String,Object> info :orderList){
-			if(orderLineNum.equals(info.get("order_line_num").toString())){
+			if(orderLineNum.equalsIgnoreCase(info.get("order_line_num").toString())){
 				currentOrder = info;
 				result.successStatus();
 				break;
