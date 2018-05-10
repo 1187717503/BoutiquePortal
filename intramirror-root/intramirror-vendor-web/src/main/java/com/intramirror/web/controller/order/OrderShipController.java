@@ -23,9 +23,7 @@ import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.VendorService;
 import com.intramirror.utils.transform.JsonTransformUtil;
-import com.intramirror.web.VO.DHLInputVO;
-import com.intramirror.web.VO.RecipientVO;
-import com.intramirror.web.VO.ShipperVO;
+import com.intramirror.web.VO.*;
 import com.intramirror.web.common.BarcodeUtil;
 import com.intramirror.web.controller.BaseController;
 import com.intramirror.web.util.DHLHttpClient;
@@ -669,7 +667,7 @@ public class OrderShipController extends BaseController {
     }
 
     /***
-     * 打印shipment 详细信息  以及关联的carton 及关联的订单信息
+     * 打印去transit warehouse的发票
      * @param httpRequest
      * @return
      */
@@ -702,33 +700,44 @@ public class OrderShipController extends BaseController {
             return result;
         }
 
-        //获取ddt number
+        TransitWarehouseInvoiceVO inovice = new TransitWarehouseInvoiceVO();
         long shipment_id = Long.parseLong(map.get("shipment_id").toString());
+        //获取发往中国大陆，香港，澳门的订单列表
+        Set<Long> shipmentIds =  new HashSet<>();
+        shipmentIds.add(shipment_id);
+        map.put("shipmentIds",shipmentIds);
+        map.put("packGroup",1);
+        List<Map<String, Object>> list = orderService.getOrderListByShipmentId(map);
+        InvoiceVO chinaInovice = new InvoiceVO();
+        chinaInovice.setList(list);
+        //获取shipTo地址信息
+        List<SubShipment> subShipmentList = subShipmentService.getSubShipmentByShipmentId(shipment_id);
+
+        //获取ddt number
+
         //获取Invoice 信息
         logger.info("打印Invoice----获取Invoice信息");
         Invoice invoice = invoiceService.getInvoiceByShipmentId(shipment_id);
-        if(map.get("shipmentCategory")!=null&&"1".equals(map.get("shipmentCategory").toString())){
-            if (invoice==null){
-                Map<String, Object> ddtNo = invoiceService.getMaxDdtNo();
-                int maxDdtNo = ddtNo.get("maxddtNum")!=null?Integer.parseInt(ddtNo.get("maxddtNum").toString()):0;
-                long s = ddtNo.get("shipment_id") != null ? Long.parseLong(ddtNo.get("shipment_id").toString()) : 0;
-                if (s!=shipment_id){
-                    Invoice newInvoice = new Invoice();
-                    if(maxDdtNo<10000){
-                        maxDdtNo = 10000;
-                    }else {
-                        maxDdtNo++;
-                    }
-                    newInvoice.setEnabled(true);
-                    newInvoice.setDdtNum(maxDdtNo);
-                    newInvoice.setInvoiceNum("");
-                    newInvoice.setShipmentId(shipment_id);
-                    newInvoice.setVendorId(vendor.getVendorId());
-                    newInvoice.setInvoiceDate(new Date());
-                    newInvoice.setVatNum("");
-                    invoiceService.insertSelective(newInvoice);
-                    invoice = newInvoice;
+        if (invoice==null){
+            Map<String, Object> ddtNo = invoiceService.getMaxDdtNo();
+            int maxDdtNo = ddtNo.get("maxddtNum")!=null?Integer.parseInt(ddtNo.get("maxddtNum").toString()):0;
+            long s = ddtNo.get("shipment_id") != null ? Long.parseLong(ddtNo.get("shipment_id").toString()) : 0;
+            if (s!=shipment_id){
+                Invoice newInvoice = new Invoice();
+                if(maxDdtNo<10000){
+                    maxDdtNo = 10000;
+                }else {
+                    maxDdtNo++;
                 }
+                newInvoice.setEnabled(true);
+                newInvoice.setDdtNum(maxDdtNo);
+                newInvoice.setInvoiceNum("");
+                newInvoice.setShipmentId(shipment_id);
+                newInvoice.setVendorId(vendor.getVendorId());
+                newInvoice.setInvoiceDate(new Date());
+                newInvoice.setVatNum("");
+                invoiceService.insertSelective(newInvoice);
+                invoice = newInvoice;
             }
         }else {
             //获取Invoice To信息
@@ -771,12 +780,6 @@ public class OrderShipController extends BaseController {
             resultMap.put("VATNumber", invoice.getVatNum());
 
             //获取Ship From信息
-            //Map<String, Object> vendorParams = new HashMap<>();
-            //vendorParams.put("vendor_id", shipmentMap.get("vendor_id"));
-            //Vendor shipVendor = vendorService.getVendorByVendorId(vendorParams);
-            //resultMap.put("ShipFrom", shipVendor.getBusinessLicenseLocation());
-            //resultMap.put("ShipCompanyName", shipVendor.getCompanyName());
-            //resultMap.put("ShipVendorName", shipVendor.getVendorName());
             StockLocation location = stockLocationService.getShipFromLocation(shipment_id);
             resultMap.put("companyName",location.getContactCompanyname());
             resultMap.put("personName",location.getContactPersonname());
@@ -786,7 +789,7 @@ public class OrderShipController extends BaseController {
             resultMap.put("country","Italy");
 
             logger.info("打印Invoice----获取Deliver To信息");
-            List<SubShipment> subShipmentList = subShipmentService.getSubShipmentByShipmentId(shipment_id);
+            //List<SubShipment> subShipmentList = subShipmentService.getSubShipmentByShipmentId(shipment_id);
             if (subShipmentList.size() > 1) {
                 ShippingProvider shippingProvider = shippingProviderService.getShippingProviderByShipmentId(shipment_id);
                 resultMap.put("DeliverTo", shippingProvider);
@@ -801,9 +804,9 @@ public class OrderShipController extends BaseController {
                 return result;
             }
             //获取carton列表
-            Set<Long> shipmentIds =  new HashSet<>();
-            shipmentIds.add(shipment_id);
-            map.put("shipmentIds",shipmentIds);
+            //Set<Long> shipmentIds =  new HashSet<>();
+            //shipmentIds.add(shipment_id);
+            //map.put("shipmentIds",shipmentIds);
             List<Map<String, Object>> containerList = orderService.getOrderListByShipmentId(map);
 
             BigDecimal allTotal = new BigDecimal(0);

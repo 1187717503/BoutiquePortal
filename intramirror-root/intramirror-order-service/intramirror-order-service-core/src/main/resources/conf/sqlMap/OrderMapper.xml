@@ -388,6 +388,9 @@
         </foreach>
         AND lp.`status` = #{status,jdbcType=BIGINT}
         AND v.vendor_id = #{vendorId,jdbcType=BIGINT}
+        <if test="packGroup != null">
+            AND g.pack_group = #{packGroup}
+        </if>
         GROUP BY lp.order_line_num
     </select>
 
