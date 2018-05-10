@@ -221,7 +221,7 @@ public class OrderController extends BaseController {
             info.put("supply_price_discount", (100 - supply_price_discount.setScale(0, BigDecimal.ROUND_HALF_UP).intValue()) + " %");
         }
         //四舍五入金额
-        info.put("price",new BigDecimal(price).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
+        info.put("price",new BigDecimal(priceStr).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
         info.put("in_price",new BigDecimal(inPriceStr).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
     }
 

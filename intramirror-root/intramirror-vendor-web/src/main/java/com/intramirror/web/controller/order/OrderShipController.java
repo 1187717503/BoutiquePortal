@@ -324,6 +324,11 @@ public class OrderShipController extends BaseController {
             if (containerList != null && containerList.size() > 0) {
 
                 for (Map<String, Object> container : containerList) {
+                    String priceStr = container.get("price").toString();
+                    String inPriceStr = container.get("in_price").toString();
+                    //四舍五入金额
+                    container.put("price",new BigDecimal(priceStr).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
+                    container.put("in_price",new BigDecimal(inPriceStr).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
 
                     //根据shipment_id 分组
                     if (orderList.containsKey(container.get("container_id").toString())) {
@@ -616,7 +621,7 @@ public class OrderShipController extends BaseController {
                         if (geography.getEnglishName().equals(shipment.getShipToGeography())) {
                             logger.info("打印Invoice----查询当前订单的到货国家");
                             //查询当前订单的到货国家
-                            AddressCountry addressCountry = addressCountryService.getAddressCountryByName(container.get("user_rec_country").toString());
+                            AddressCountry addressCountry = addressCountryService.getAddressCountryByName(container.get("countryName").toString());
                             logger.info("打印Invoice----查询当前到货国家的tax_rate");
                             //查询当前到货国家的tax_rate
                             Tax tax = taxService.getTaxByAddressCountryId(addressCountry.getAddressCountryId());

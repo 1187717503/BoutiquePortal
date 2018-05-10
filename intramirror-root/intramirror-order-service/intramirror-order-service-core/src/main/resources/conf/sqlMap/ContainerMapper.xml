@@ -103,7 +103,7 @@ values(#{containerType,jdbcType=VARCHAR}, #{shipToGeography,jdbcType=VARCHAR},#{
 	SELECT c.container_id,c.barcode,c.ship_to_geography,s.`status` as shipment_status,s.shipment_no,s.shipment_id,
 	c.`status` as container_status,c.barcode,
 	(SELECT count(lp.logistics_product_id) FROM logistics_product lp 
-	WHERE lp.container_id = c.container_id AND lp.enabled = 1) as product_qty
+	WHERE lp.container_id = c.container_id AND lp.enabled = 1 and lp.status = 7) as product_qty
 	FROM container c
 	INNER JOIN shipment s ON c.shipment_id = s.shipment_id
 	WHERE s.vendor_id =  #{vendorId,jdbcType=BIGINT}  

@@ -364,6 +364,7 @@
         c3.name AS categoryName,
         l.logistics_id,
         func_country_mapper(l.user_rec_country) as user_rec_country,
+        l.user_rec_country as countryName,
         l.geography_id,
         g.english_name
         FROM logistics_product lp
