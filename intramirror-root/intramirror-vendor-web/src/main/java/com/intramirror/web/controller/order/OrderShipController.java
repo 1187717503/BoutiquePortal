@@ -668,6 +668,210 @@ public class OrderShipController extends BaseController {
         return result;
     }
 
+    /***
+     * 打印shipment 详细信息  以及关联的carton 及关联的订单信息
+     * @param httpRequest
+     * @return
+     */
+    @RequestMapping(value = "/printInvoice", method = RequestMethod.POST)
+    @ResponseBody
+    public ResultMessage printInvoice(@RequestBody Map<String, Object> map, HttpServletRequest httpRequest,HttpServletResponse response) {
+        Map<String, Object> resultMap = new HashMap<>();
+        ResultMessage result = new ResultMessage();
+        result.errorStatus();
+
+        if (map == null || map.size() == 0 || map.get("status") == null || map.get("shipment_id") == null) {
+            result.setMsg("Parameter cannot be empty");
+            return result;
+        }
+
+        User user = this.getUser(httpRequest);
+        if (user == null) {
+            result.setMsg("Please log in again");
+            return result;
+        }
+
+        Vendor vendor = null;
+        try {
+            vendor = vendorService.getVendorByUserId(user.getUserId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (vendor == null) {
+            result.setMsg("Please log in again");
+            return result;
+        }
+
+        //获取ddt number
+        long shipment_id = Long.parseLong(map.get("shipment_id").toString());
+        //获取Invoice 信息
+        logger.info("打印Invoice----获取Invoice信息");
+        Invoice invoice = invoiceService.getInvoiceByShipmentId(shipment_id);
+        if(map.get("shipmentCategory")!=null&&"1".equals(map.get("shipmentCategory").toString())){
+            if (invoice==null){
+                Map<String, Object> ddtNo = invoiceService.getMaxDdtNo();
+                int maxDdtNo = ddtNo.get("maxddtNum")!=null?Integer.parseInt(ddtNo.get("maxddtNum").toString()):0;
+                long s = ddtNo.get("shipment_id") != null ? Long.parseLong(ddtNo.get("shipment_id").toString()) : 0;
+                if (s!=shipment_id){
+                    Invoice newInvoice = new Invoice();
+                    if(maxDdtNo<10000){
+                        maxDdtNo = 10000;
+                    }else {
+                        maxDdtNo++;
+                    }
+                    newInvoice.setEnabled(true);
+                    newInvoice.setDdtNum(maxDdtNo);
+                    newInvoice.setInvoiceNum("");
+                    newInvoice.setShipmentId(shipment_id);
+                    newInvoice.setVendorId(vendor.getVendorId());
+                    newInvoice.setInvoiceDate(new Date());
+                    newInvoice.setVatNum("");
+                    invoiceService.insertSelective(newInvoice);
+                    invoice = newInvoice;
+                }
+            }
+        }else {
+            //获取Invoice To信息
+            logger.info("打印Invoice----获取Invoice To信息");
+            Shop shop = shopService.selectByPrimaryKey(65l);
+            resultMap.put("InvoiceTo", shop.getBusinessLicenseLocation());
+            resultMap.put("InvoiceName", shop.getShopName());
+        }
+
+        try {
+            map.put("vendorId", vendor.getVendorId());
+            Map<String, Object> getShipment = new HashMap<>();
+            getShipment.put("shipmentId", shipment_id);
+
+            //根据shipmentId 获取shipment 相关信息及物流第一段类型
+            logger.info("打印Invoice----根据shipmentId 获取shipment 相关信息及物流第一段类型,开始获取");
+            Map<String, Object> shipmentMap = iShipmentService.getShipmentTypeById(getShipment);
+            if (shipmentMap == null || shipmentMap.size() == 0) {
+                logger.info("获取失败");
+                result.setMsg("Query Shipment fail,Check parameters, please ");
+                return result;
+            }
+            resultMap.put("shipmentNo",shipmentMap.get("shipment_no"));
+            logger.info("打印Invoice----获取shipment相关信息及物流第一段类型成功");
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
+            if(map.get("shipmentCategory")!=null&&"1".equals(map.get("shipmentCategory").toString())){
+                resultMap.put("InvoiceNumber", invoice.getDdtNum());
+            }else {
+                resultMap.put("InvoiceNumber", invoice.getInvoiceNum());
+            }
+            if (invoice.getInvoiceDate() != null) {
+                String invoiceDate = sdf.format(invoice.getInvoiceDate());
+                resultMap.put("InvoiceDate", sdf2.format(sdf.parse(invoiceDate)));
+            } else {
+                result.setMsg("invoiceDate is null ");
+                return result;
+            }
+            resultMap.put("VATNumber", invoice.getVatNum());
+
+            //获取Ship From信息
+            //Map<String, Object> vendorParams = new HashMap<>();
+            //vendorParams.put("vendor_id", shipmentMap.get("vendor_id"));
+            //Vendor shipVendor = vendorService.getVendorByVendorId(vendorParams);
+            //resultMap.put("ShipFrom", shipVendor.getBusinessLicenseLocation());
+            //resultMap.put("ShipCompanyName", shipVendor.getCompanyName());
+            //resultMap.put("ShipVendorName", shipVendor.getVendorName());
+            StockLocation location = stockLocationService.getShipFromLocation(shipment_id);
+            resultMap.put("companyName",location.getContactCompanyname());
+            resultMap.put("personName",location.getContactPersonname());
+            resultMap.put("contact",location.getContactPhonenumber());
+            resultMap.put("address",location.getAddressStreetlines());
+            resultMap.put("city",location.getAddressCity());
+            resultMap.put("country","Italy");
+
+            logger.info("打印Invoice----获取Deliver To信息");
+            List<SubShipment> subShipmentList = subShipmentService.getSubShipmentByShipmentId(shipment_id);
+            if (subShipmentList.size() > 1) {
+                ShippingProvider shippingProvider = shippingProviderService.getShippingProviderByShipmentId(shipment_id);
+                resultMap.put("DeliverTo", shippingProvider);
+            } else if (subShipmentList.size() == 1) {
+                resultMap.put("DeliverTo", subShipmentList.get(0));
+                //发往质检仓的取DHL税号
+                if(map.get("shipmentCategory")!=null&&"1".equals(map.get("shipmentCategory").toString())){
+                    resultMap.put("VATNumber",subShipmentList.get(0).getPiva());
+                }
+            } else {
+                result.setMsg("DeliverTo is null ");
+                return result;
+            }
+            //获取carton列表
+            Set<Long> shipmentIds =  new HashSet<>();
+            shipmentIds.add(shipment_id);
+            map.put("shipmentIds",shipmentIds);
+            List<Map<String, Object>> containerList = orderService.getOrderListByShipmentId(map);
+
+            BigDecimal allTotal = new BigDecimal(0);
+            BigDecimal VAT = new BigDecimal(0);
+            BigDecimal totalWeight = new BigDecimal(0);
+            Map<String,BigDecimal> decimalMap = new HashMap<>();
+            if (containerList != null && containerList.size() > 0) {
+                for (Map<String, Object> container : containerList) {
+                    decimalMap.put(container.get("container_id").toString(),new BigDecimal(container.get("weight").toString()));
+                    BigDecimal total = new BigDecimal(Double.parseDouble(container.get("in_price").toString()) * Double.parseDouble(container.get("amount").toString())).setScale(2,BigDecimal.ROUND_HALF_UP);
+                    container.put("in_price",new BigDecimal(container.get("in_price").toString()).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
+                    //获取欧盟的信息
+                    Geography geography = geographyService.getGeographyById(3l);
+                    logger.info("打印Invoice----获取VAT信息");
+                    //获取当前shipment的信息
+                    Map<String, Object> shipmentPramMap = new HashMap<>();
+                    shipmentPramMap.put("shipmentId", shipment_id);
+                    Shipment shipment = iShipmentService.selectShipmentById(shipmentPramMap);
+                    if (geography != null && shipment != null && geography.getGeographyId().toString().equals(container.get("geography_id").toString())) {
+                        if (geography.getEnglishName().equals(shipment.getShipToGeography())) {
+                            logger.info("打印Invoice----查询当前订单的到货国家");
+                            //查询当前订单的到货国家
+                            AddressCountry addressCountry = addressCountryService.getAddressCountryByName(container.get("countryName").toString());
+                            logger.info("打印Invoice----查询当前到货国家的tax_rate");
+                            //查询当前到货国家的tax_rate
+                            Tax tax = taxService.getTaxByAddressCountryId(addressCountry.getAddressCountryId());
+                            if (tax.getTaxRate() != null) {
+                                logger.info("打印Invoice----计算VAT的值");
+                                VAT = VAT.add(new BigDecimal(Double.parseDouble(container.get("in_price").toString())).multiply(tax.getTaxRate())).setScale(2,BigDecimal.ROUND_HALF_UP);
+                            }
+                        }
+                    }
+                    allTotal = allTotal.add(total);
+                    container.put("Total", total);
+                }
+            }
+            if(decimalMap.size()>0){
+                Set<String> strings = decimalMap.keySet();
+                for (String key:strings){
+                    totalWeight = totalWeight.add(decimalMap.get(key));
+                }
+            }
+            resultMap.put("totalWeight",totalWeight.setScale(2,BigDecimal.ROUND_HALF_UP).toString());
+            resultMap.put("cartonQty",decimalMap.size());
+            shipmentMap.put("all_qty", containerList == null ? 0 : containerList.size());
+            resultMap.put("all_qty", containerList == null ? 0 : containerList.size());
+            resultMap.put("cartonList", containerList);
+            resultMap.put("shipmentInfo", shipmentMap);
+            //金额四舍五入
+            resultMap.put("allTotal", allTotal.setScale(2,BigDecimal.ROUND_HALF_UP).toString());
+            resultMap.put("VAT", VAT.setScale(2,BigDecimal.ROUND_HALF_UP).toString());
+            resultMap.put("GrandTotal", (VAT.add(allTotal)).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
+
+            String isExcel = map.get("isExcel")!=null?map.get("isExcel").toString():null;
+            if(isExcel!=null&&"1".equals(isExcel)){
+                printExcelShipmentInfo(response,resultMap);
+            }
+            result.successStatus();
+            result.setData(resultMap);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setMsg("Query container list fail,Check parameters, please ");
+            return result;
+        }
+
+        return result;
+    }
 
     /**
      * packingList
