@@ -118,6 +118,7 @@ public class ExcelUtil {
         String companyName = safeStr(shipperVO.getCompanyName());
         String personName = safeStr(shipperVO.getPersonName());
         Row row1 = sheet.createRow(1);
+        row1.setHeight((short)550);
         Cell cell11 = row1.createCell(0);
         cell11.setCellValue(new HSSFRichTextString(companyName+"\r\n"+personName));
         cell11.setCellStyle(cs2);
@@ -130,6 +131,7 @@ public class ExcelUtil {
         String address = safeStr(shipperVO.getStreetLines()) + safeStr(shipperVO.getStreetLines2()) + safeStr(shipperVO.getStreetLines3());
         String city = safeStr(shipperVO.getCity());
         Row row2 = sheet.createRow(2);
+        row2.setHeight((short)780);
         Cell cell21 = row2.createCell(0);
         cell21.setCellValue(new HSSFRichTextString(contact+"\r\n"+address+"\r\n"+city));
         cell21.setCellStyle(cs2);
@@ -178,6 +180,7 @@ public class ExcelUtil {
 
         //第十行
         Row row9 = sheet.createRow(9);
+        row9.setHeight((short)1560);
         Cell cell91 = row9.createCell(0);
         String value = safeStr(invoiceVO.getInvoiceName()) + "\r\n" + safeStr(invoiceVO.getInvoiceTo()) + "\r\n" + safeStr(invoiceVO.getInvoicePersonName());
         cell91.setCellValue(new HSSFRichTextString(value));
