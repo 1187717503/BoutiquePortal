@@ -264,7 +264,7 @@ public class ExcelUtil {
                     cell5.setCellValue(country);
                     cell5.setCellStyle(cs2);
                     Cell cell6 = row.createCell(5);
-                    cell6.setCellValue(retailPrice);
+                    cell6.setCellValue("€"+retailPrice);
                     cell6.setCellStyle(cs2);
                     Cell cell7 = row.createCell(6);
                     cell7.setCellValue(discount);
