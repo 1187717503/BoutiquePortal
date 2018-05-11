@@ -97,11 +97,11 @@ public class ExcelUtil {
         cs3.setAlignment(CellStyle.ALIGN_RIGHT);
 
         //设置表框
-        cs4.setWrapText(true);
+        /*cs4.setWrapText(true);
         cs4.setBorderLeft(CellStyle.BORDER_THIN);
         cs4.setBorderRight(CellStyle.BORDER_THIN);
         cs4.setBorderTop(CellStyle.BORDER_THIN);
-        cs4.setBorderBottom(CellStyle.BORDER_THIN);
+        cs4.setBorderBottom(CellStyle.BORDER_THIN);*/
 
         //设置列名
         // 创建第一行
