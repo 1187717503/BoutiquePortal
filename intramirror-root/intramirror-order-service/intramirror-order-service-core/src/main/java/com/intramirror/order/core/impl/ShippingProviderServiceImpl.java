@@ -40,4 +40,13 @@ public class ShippingProviderServiceImpl extends BaseDao implements IShippingPro
 		}
 		return new ShippingProvider();
 	}
+
+	@Override
+	public ShippingProvider getShippingProviderByName(String name) {
+		List<ShippingProvider> providers = shippingProviderMapper.getShippingProviderByName(name);
+		if (providers!=null&&providers.size()>0){
+			return providers.get(0);
+		}
+		return new ShippingProvider();
+	}
 }
