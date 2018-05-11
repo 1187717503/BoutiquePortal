@@ -78,10 +78,10 @@ public class ExcelUtil {
 
         // 设置第一种单元格的样式（用于列名）
         cs.setFont(f);
-        cs.setBorderLeft(CellStyle.BORDER_THIN);
+        /*cs.setBorderLeft(CellStyle.BORDER_THIN);
         cs.setBorderRight(CellStyle.BORDER_THIN);
         cs.setBorderTop(CellStyle.BORDER_THIN);
-        cs.setBorderBottom(CellStyle.BORDER_THIN);
+        cs.setBorderBottom(CellStyle.BORDER_THIN);*/
         cs.setAlignment(CellStyle.ALIGN_LEFT);
 
         cs5.setFont(f);
