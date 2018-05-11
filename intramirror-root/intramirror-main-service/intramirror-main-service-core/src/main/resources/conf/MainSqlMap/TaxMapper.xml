@@ -204,6 +204,6 @@
         select
         <include refid="Base_Column_List"/>
         from tax
-        where address_country_id = #{addressCountryId,jdbcType=BIGINT}
+        where address_country_id = #{addressCountryId,jdbcType=BIGINT} and tax_type = 1
     </select>
 </mapper>
