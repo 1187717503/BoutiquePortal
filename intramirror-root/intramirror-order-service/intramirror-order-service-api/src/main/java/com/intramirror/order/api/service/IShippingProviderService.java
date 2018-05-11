@@ -11,4 +11,6 @@ import com.intramirror.order.api.model.ShippingProvider;
 public interface IShippingProviderService {
 
     ShippingProvider getShippingProviderByShipmentId(Long shipmentId);
+
+    ShippingProvider getShippingProviderByName(String zsy);
 }

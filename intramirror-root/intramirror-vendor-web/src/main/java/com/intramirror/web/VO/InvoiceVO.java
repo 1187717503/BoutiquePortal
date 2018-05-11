@@ -24,6 +24,16 @@ public class InvoiceVO {
 
     private String invoiceNum;
 
+    private String shipmentNo;
+
+    private String grandTotal;
+
+    private String vat;
+
+    private String allTotal;
+
+    private String allQty;
+
     private List<Map<String,Object>> list;
 
     private String remark = "Shipment exempt from VAT - IVA non imponibile Art. 8 1°C L/A DPR 633/72";
@@ -106,5 +116,45 @@ public class InvoiceVO {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getShipmentNo() {
+        return shipmentNo;
+    }
+
+    public void setShipmentNo(String shipmentNo) {
+        this.shipmentNo = shipmentNo;
+    }
+
+    public String getGrandTotal() {
+        return grandTotal;
+    }
+
+    public void setGrandTotal(String grandTotal) {
+        this.grandTotal = grandTotal;
+    }
+
+    public String getVat() {
+        return vat;
+    }
+
+    public void setVat(String vat) {
+        this.vat = vat;
+    }
+
+    public String getAllTotal() {
+        return allTotal;
+    }
+
+    public void setAllTotal(String allTotal) {
+        this.allTotal = allTotal;
+    }
+
+    public String getAllQty() {
+        return allQty;
+    }
+
+    public void setAllQty(String allQty) {
+        this.allQty = allQty;
     }
 }
