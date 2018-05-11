@@ -12,6 +12,8 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import pk.shoplus.common.utils.StringUtil;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 
@@ -218,8 +220,14 @@ public class ExcelUtil {
         cell115.setCellValue("country");
         cell115.setCellStyle(cs);
         Cell cell116 = row11.createCell(5);
-        cell116.setCellValue("Purchase Price");
+        cell116.setCellValue("Retail price");
         cell116.setCellStyle(cs);
+        Cell cell117 = row11.createCell(6);
+        cell117.setCellValue("Discount");
+        cell117.setCellStyle(cs);
+        Cell cell118 = row11.createCell(7);
+        cell118.setCellValue("Purchase Price");
+        cell118.setCellStyle(cs);
 
         int i = 11;
         List<Map<String, Object>> orderList = invoiceVO.getList();
@@ -235,9 +243,11 @@ public class ExcelUtil {
                     String colorCode = map.get("colorCode")!=null?map.get("colorCode").toString():"";
                     String size = map.get("size")!=null?map.get("size").toString():"";
                     String inPrice = map.get("in_price")!=null?map.get("in_price").toString():"";
+                    String retailPrice = map.get("price")!=null?map.get("price").toString():"";
                     String composition = map.get("Composition")!=null?map.get("Composition").toString():"";
                     String madeIn = map.get("MadeIn")!=null?map.get("MadeIn").toString():"";
                     String country = map.get("user_rec_country")!=null?map.get("user_rec_country").toString():"";
+                    BigDecimal discount = (new BigDecimal(1)).subtract((new BigDecimal(inPrice)).multiply(new BigDecimal("1.22")).divide(new BigDecimal(retailPrice), 2, RoundingMode.HALF_UP));
                     Cell cell1 = row.createCell(0);
                     cell1.setCellValue(orderLineNum);
                     cell1.setCellStyle(cs2);
@@ -254,34 +264,40 @@ public class ExcelUtil {
                     cell5.setCellValue(country);
                     cell5.setCellStyle(cs2);
                     Cell cell6 = row.createCell(5);
-                    cell6.setCellValue("€"+inPrice);
+                    cell6.setCellValue(retailPrice);
                     cell6.setCellStyle(cs2);
+                    Cell cell7 = row.createCell(6);
+                    cell7.setCellValue(discount.toString());
+                    cell7.setCellStyle(cs2);
+                    Cell cell8 = row.createCell(7);
+                    cell8.setCellValue("€"+inPrice);
+                    cell8.setCellStyle(cs2);
 
                 }
             }
         }
 
         Row rowi1 = sheet.createRow(i+1);
-        Cell celli3 = rowi1.createCell(4);
+        Cell celli3 = rowi1.createCell(6);
         celli3.setCellValue("Total:" + safeStr(invoiceVO.getAllQty()));
         celli3.setCellStyle(cs3);
-        Cell celli4 = rowi1.createCell(5);
+        Cell celli4 = rowi1.createCell(7);
         celli4.setCellValue("€"+ safeStr(invoiceVO.getAllTotal()));
         celli4.setCellStyle(cs3);
 
         Row rowi2 = sheet.createRow(i+2);
-        Cell celli23 = rowi2.createCell(4);
+        Cell celli23 = rowi2.createCell(6);
         celli23.setCellValue("VAT:");
         celli23.setCellStyle(cs3);
-        Cell celli24 = rowi2.createCell(5);
+        Cell celli24 = rowi2.createCell(7);
         celli24.setCellValue("€"+ safeStr(invoiceVO.getVat()));
         celli24.setCellStyle(cs3);
 
         Row rowi3 = sheet.createRow(i+3);
-        Cell celli33 = rowi3.createCell(4);
+        Cell celli33 = rowi3.createCell(6);
         celli33.setCellValue("Grand Total:");
         celli33.setCellStyle(cs3);
-        Cell celli34 = rowi3.createCell(5);
+        Cell celli34 = rowi3.createCell(7);
         celli34.setCellValue("€" + safeStr(invoiceVO.getGrandTotal()));
         celli34.setCellStyle(cs3);
 

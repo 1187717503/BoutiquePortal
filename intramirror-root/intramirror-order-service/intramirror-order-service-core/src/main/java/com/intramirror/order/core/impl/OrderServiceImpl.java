@@ -175,6 +175,11 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
         for(Map<String, Object> vo :mapList){
             ids.add(Long.valueOf(vo.get("product_id").toString()));
         }
+
+        if(ids.size() <= 0){
+            return mapList;
+        }
+
         Map<String,Object> map = new HashMap<>();
         map.put("ids",ids);
         map.put("keyName","MadeIn");

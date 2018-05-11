@@ -42,6 +42,11 @@ public class TaxServiceImpl extends BaseDao implements TaxService {
 
     @Override
     public Tax getTaxByAddressCountryId(Long addressCountryId) {
-        return taxMapper.getTaxByAddressCountryId(addressCountryId);
+        List<Tax> taxByAddressCountryId = taxMapper.getTaxByAddressCountryId(addressCountryId);
+        if(taxByAddressCountryId != null && taxByAddressCountryId.size() > 0){
+            return taxByAddressCountryId.get(0);
+        }
+
+        return new Tax();
     }
 }

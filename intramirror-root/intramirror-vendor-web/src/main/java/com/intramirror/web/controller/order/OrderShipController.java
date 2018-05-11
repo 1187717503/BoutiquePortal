@@ -803,7 +803,7 @@ public class OrderShipController extends BaseController {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
-        if(map.get("shipmentCategory")!=null&&"1".equals(map.get("shipmentCategory").toString())){
+        if(map.get("ddtFlag")!=null&&"1".equals(map.get("ddtFlag").toString())){
             resultMap.put("InvoiceNumber", invoice.getDdtNum());
         }else {
             resultMap.put("InvoiceNumber", invoice.getInvoiceNum());
@@ -828,7 +828,9 @@ public class OrderShipController extends BaseController {
         Set<Long> shipmentIds =  new HashSet<>();
         shipmentIds.add(shipment_id);
         Map<String, Object> conditionMap = new HashMap<>();
-        conditionMap.put("shipmentIds",shipmentIds);
+        conditionMap.put("status", map.get("status"));
+        conditionMap.put("vendorId", vendor.getVendorId());
+        conditionMap.put("shipmentIds", shipmentIds);
         conditionMap.put("packGroup", 1);
         List<Map<String, Object>> chinaList = orderService.getOrderListByShipmentId(conditionMap);
         if( chinaList != null && chinaList.size() > 0 ){
@@ -853,8 +855,9 @@ public class OrderShipController extends BaseController {
             for(Map<String, Object> chinaOrder : chinaList){
                 AddressCountry addressCountry = addressCountryService.getAddressCountryByName(chinaOrder.get("countryName").toString());
                 Tax tax = taxService.getTaxByAddressCountryId(addressCountry.getAddressCountryId());
+                BigDecimal taxRate = tax.getTaxRate() == null ? new BigDecimal("0") : tax.getTaxRate();
                 BigDecimal total = new BigDecimal(Double.parseDouble(chinaOrder.get("in_price").toString()) * Double.parseDouble(chinaOrder.get("amount").toString())).setScale(2, BigDecimal.ROUND_HALF_UP);
-                VAT = VAT.add(total.multiply(tax.getTaxRate()).setScale(2, BigDecimal.ROUND_HALF_UP));
+                VAT = VAT.add(total.multiply(taxRate).setScale(2, BigDecimal.ROUND_HALF_UP));
                 allTotal = allTotal.add(total);
             }
 
@@ -904,8 +907,9 @@ public class OrderShipController extends BaseController {
 
                 AddressCountry addressCountry = addressCountryService.getAddressCountryByName(UNOrder.get("countryName").toString());
                 Tax tax = taxService.getTaxByAddressCountryId(addressCountry.getAddressCountryId());
+                BigDecimal taxRate = tax.getTaxRate() == null ? new BigDecimal("0") : tax.getTaxRate();
                 BigDecimal total = new BigDecimal(Double.parseDouble(UNOrder.get("in_price").toString()) * Double.parseDouble(UNOrder.get("amount").toString())).setScale(2, BigDecimal.ROUND_HALF_UP);
-                BigDecimal VAT = total.multiply(tax.getTaxRate()).setScale(2, BigDecimal.ROUND_HALF_UP);
+                BigDecimal VAT = total.multiply(taxRate).setScale(2, BigDecimal.ROUND_HALF_UP);
                 BigDecimal grandTotal = (VAT.add(total)).setScale(2,BigDecimal.ROUND_HALF_UP);
 
                 List<Map<String, Object>> list = new ArrayList<>();
@@ -957,8 +961,9 @@ public class OrderShipController extends BaseController {
 
                 AddressCountry addressCountry = addressCountryService.getAddressCountryByName(elseOrder.get("countryName").toString());
                 Tax tax = taxService.getTaxByAddressCountryId(addressCountry.getAddressCountryId());
+                BigDecimal taxRate = tax.getTaxRate() == null ? new BigDecimal("0") : tax.getTaxRate();
                 BigDecimal total = new BigDecimal(Double.parseDouble(elseOrder.get("in_price").toString()) * Double.parseDouble(elseOrder.get("amount").toString())).setScale(2, BigDecimal.ROUND_HALF_UP);
-                BigDecimal VAT = total.multiply(tax.getTaxRate()).setScale(2, BigDecimal.ROUND_HALF_UP);
+                BigDecimal VAT = total.multiply(taxRate).setScale(2, BigDecimal.ROUND_HALF_UP);
                 BigDecimal grandTotal = (VAT.add(total)).setScale(2,BigDecimal.ROUND_HALF_UP);
 
                 List<Map<String, Object>> list = new ArrayList<>();
@@ -987,7 +992,7 @@ public class OrderShipController extends BaseController {
                 printExcelShipmentInfo(response, transitWarehouseInvoiceVO);
             }
             result.successStatus();
-            result.setData(resultMap);
+            result.setData(transitWarehouseInvoiceVO);
 
         } catch (Exception e) {
             e.printStackTrace();
