@@ -64,17 +64,12 @@ public class PriceTaskController {
         long start = System.currentTimeMillis();
         logger.info("start run price rule by type:{}", type);
         try {
+            Calendar startCalendar = Calendar.getInstance();
+            Map<String, Object> params = new HashMap<>();
+            params.put("startTime", DateFormatUtils.format(startCalendar.getTime(), "yyyy-MM-dd HH:mm:00"));
+            params.put("endTime", DateFormatUtils.format(startCalendar.getTime(), "yyyy-MM-dd HH:mm:59"));
 
             synchronized (this) {
-                Calendar startCalendar = Calendar.getInstance();
-
-                /*Calendar endCalendar = Calendar.getInstance();
-                endCalendar.add(Calendar.MINUTE, 1);*/
-
-                Map<String, Object> params = new HashMap<>();
-                params.put("startTime", DateFormatUtils.format(startCalendar.getTime(), "yyyy-MM-dd HH:mm:00"));
-                params.put("endTime", DateFormatUtils.format(startCalendar.getTime(), "yyyy-MM-dd HH:mm:59"));
-
                 logger.info("start selectNowActiveRule,{},params:{}", type, JsonTransformUtil.toJson(params));
                 List<Map<String, Object>> activeRules = iPriceChangeRule.selectNowActiveRule(params);
 
