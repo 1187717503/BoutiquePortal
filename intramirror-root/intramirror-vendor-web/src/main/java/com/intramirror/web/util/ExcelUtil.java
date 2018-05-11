@@ -308,7 +308,7 @@ public class ExcelUtil {
         celli40.setCellStyle(cs5);
 
         //设置表格边框样式
-        for(int a=0;a<i+4;a++){
+        /*for(int a=0;a<i+4;a++){
             Row r = sheet.getRow(a);
             for(int b =0;b<6;b++){
                 if(r!=null){
@@ -343,7 +343,7 @@ public class ExcelUtil {
                     ce.setCellStyle(cs3);
                 }
             }
-        }
+        }*/
 
 
         // 单元格合并

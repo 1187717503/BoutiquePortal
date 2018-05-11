@@ -865,6 +865,8 @@ public class OrderShipController extends BaseController {
                 String retailPrice = chinaOrder.get("price")!=null?chinaOrder.get("price").toString():"";
                 BigDecimal discount = (new BigDecimal(1)).subtract((new BigDecimal(inPrice)).multiply(new BigDecimal("1.22")).divide(new BigDecimal(retailPrice), 2, RoundingMode.HALF_UP));
                 chinaOrder.put("discount", discount.toString());
+                chinaOrder.put("in_price", (new BigDecimal(inPrice).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+                chinaOrder.put("price", (new BigDecimal(retailPrice).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
             }
 
             BigDecimal grandTotal = (VAT.add(allTotal)).setScale(2,BigDecimal.ROUND_HALF_UP);
@@ -915,6 +917,8 @@ public class OrderShipController extends BaseController {
                 String retailPrice = UNOrder.get("price")!=null?UNOrder.get("price").toString():"";
                 BigDecimal discount = (new BigDecimal(1)).subtract((new BigDecimal(inPrice)).multiply(new BigDecimal("1.22")).divide(new BigDecimal(retailPrice), 2, RoundingMode.HALF_UP));
                 UNOrder.put("discount", discount.toString());
+                UNOrder.put("in_price", (new BigDecimal(inPrice).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+                UNOrder.put("price", (new BigDecimal(retailPrice).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
 
                 AddressCountry addressCountry = addressCountryService.getAddressCountryByName(UNOrder.get("countryName").toString());
                 Tax tax = taxService.getTaxByAddressCountryId(addressCountry.getAddressCountryId());
@@ -973,6 +977,8 @@ public class OrderShipController extends BaseController {
                 String retailPrice = elseOrder.get("price")!=null?elseOrder.get("price").toString():"";
                 BigDecimal discount = (new BigDecimal(1)).subtract((new BigDecimal(inPrice)).multiply(new BigDecimal("1.22")).divide(new BigDecimal(retailPrice), 2, RoundingMode.HALF_UP));
                 elseOrder.put("discount", discount.toString());
+                elseOrder.put("in_price", (new BigDecimal(inPrice).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+                elseOrder.put("price", (new BigDecimal(retailPrice).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
 
                 AddressCountry addressCountry = addressCountryService.getAddressCountryByName(elseOrder.get("countryName").toString());
                 Tax tax = taxService.getTaxByAddressCountryId(addressCountry.getAddressCountryId());
