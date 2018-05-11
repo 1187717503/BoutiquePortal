@@ -120,10 +120,10 @@ public class ExcelUtil {
         Row row1 = sheet.createRow(1);
         row1.setHeight((short)550);
         Cell cell11 = row1.createCell(0);
-        cell11.setCellValue(new HSSFRichTextString(companyName+"\r\n"+personName));
+        cell11.setCellValue(new HSSFRichTextString(companyName+"\n"+personName));
         cell11.setCellStyle(cs2);
         Cell cell12 = row1.createCell(2);
-        cell12.setCellValue(new HSSFRichTextString(companyName+"\r\n"+personName));
+        cell12.setCellValue(new HSSFRichTextString(companyName+"\n"+personName));
         cell12.setCellStyle(cs2);
 
         //第三行
@@ -133,10 +133,10 @@ public class ExcelUtil {
         Row row2 = sheet.createRow(2);
         row2.setHeight((short)780);
         Cell cell21 = row2.createCell(0);
-        cell21.setCellValue(new HSSFRichTextString(contact+"\r\n"+address+"\r\n"+city));
+        cell21.setCellValue(new HSSFRichTextString(contact+"\n"+address+"\n"+city));
         cell21.setCellStyle(cs2);
         Cell cell22 = row2.createCell(2);
-        cell22.setCellValue(new HSSFRichTextString(contact+"\r\n"+address+"\r\n"+city));
+        cell22.setCellValue(new HSSFRichTextString(contact+"\n"+address+"\n"+city));
         cell22.setCellStyle(cs2);
 
         //第四行
@@ -182,7 +182,7 @@ public class ExcelUtil {
         Row row9 = sheet.createRow(9);
         row9.setHeight((short)1560);
         Cell cell91 = row9.createCell(0);
-        String value = safeStr(invoiceVO.getInvoiceName()) + "\r\n" + safeStr(invoiceVO.getInvoiceTo()) + "\r\n" + safeStr(invoiceVO.getInvoicePersonName());
+        String value = safeStr(invoiceVO.getInvoiceName()) + "\n" + safeStr(invoiceVO.getInvoiceTo()) + "\n" + safeStr(invoiceVO.getInvoicePersonName());
         cell91.setCellValue(new HSSFRichTextString(value));
         cell91.setCellStyle(cs2);
         Cell cell92 = row9.createCell(2);
@@ -191,10 +191,10 @@ public class ExcelUtil {
         String name = "";
         //Object o = resultMap.get("DeliverTo") != null ? resultMap.get("DeliverTo") : null;
         if(recipientVO != null){
-            name = safeStr(recipientVO.getPersonName()) + " " + safeStr(recipientVO.getPhoneNumber()) + "\r\n";
-            name += safeStr(recipientVO.getCompanyName()) + "\r\n";
-            name += safeStr(recipientVO.getProvince()) + "\r\n";
-            name += safeStr(recipientVO.getStreetLines()) + safeStr(recipientVO.getStreetLines2()) + safeStr(recipientVO.getStreetLines3()) + "\r\n";
+            name = safeStr(recipientVO.getPersonName()) + " " + safeStr(recipientVO.getPhoneNumber()) + "\n";
+            name += safeStr(recipientVO.getCompanyName()) + "\n";
+            name += safeStr(recipientVO.getProvince()) + "\n";
+            name += safeStr(recipientVO.getStreetLines()) + safeStr(recipientVO.getStreetLines2()) + safeStr(recipientVO.getStreetLines3()) + "\n";
             name += safeStr(recipientVO.getCity()) + safeStr(recipientVO.getProvince()) + safeStr(recipientVO.getCountry()) + safeStr(recipientVO.getPostalCode());
         }
         cell92.setCellValue(new HSSFRichTextString(name));
@@ -255,7 +255,7 @@ public class ExcelUtil {
                     cell1.setCellValue(orderLineNum);
                     cell1.setCellStyle(cs2);
                     Cell cell2 = row.createCell(1);
-                    cell2.setCellValue(new HSSFRichTextString(brandName+" "+categoryName+"\r"+brandID+"/"+colorCode+"/"+size));
+                    cell2.setCellValue(new HSSFRichTextString(brandName+" "+categoryName+"\n"+brandID+"/"+colorCode+"/"+size));
                     cell2.setCellStyle(cs2);
                     Cell cell3 = row.createCell(2);
                     cell3.setCellValue(composition);
@@ -447,10 +447,10 @@ public class ExcelUtil {
         String personName = resultMap.get("personName") != null ? resultMap.get("personName").toString() : "";
         Row row1 = sheet.createRow(1);
         Cell cell11 = row1.createCell(0);
-        cell11.setCellValue(new HSSFRichTextString(companyName+"\r\n"+personName));
+        cell11.setCellValue(new HSSFRichTextString(companyName+"\n"+personName));
         cell11.setCellStyle(cs2);
         Cell cell12 = row1.createCell(2);
-        cell12.setCellValue(new HSSFRichTextString(companyName+"\r\n"+personName));
+        cell12.setCellValue(new HSSFRichTextString(companyName+"\n"+personName));
         cell12.setCellStyle(cs2);
 
         //第三行
@@ -459,10 +459,10 @@ public class ExcelUtil {
         String city = resultMap.get("city") != null ? resultMap.get("city").toString() : "";
         Row row2 = sheet.createRow(2);
         Cell cell21 = row2.createCell(0);
-        cell21.setCellValue(new HSSFRichTextString(contact+"\r\n"+address+"\r\n"+city));
+        cell21.setCellValue(new HSSFRichTextString(contact+"\n"+address+"\n"+city));
         cell21.setCellStyle(cs2);
         Cell cell22 = row2.createCell(2);
-        cell22.setCellValue(new HSSFRichTextString(contact+"\r\n"+address+"\r\n"+city));
+        cell22.setCellValue(new HSSFRichTextString(contact+"\n"+address+"\n"+city));
         cell22.setCellStyle(cs2);
 
         //第四行
@@ -581,7 +581,7 @@ public class ExcelUtil {
                     cell1.setCellValue(orderLineNum);
                     cell1.setCellStyle(cs2);
                     Cell cell2 = row.createCell(1);
-                    cell2.setCellValue(new HSSFRichTextString(brandName+" "+categoryName+"\r"+brandID+"/"+colorCode+"/"+size));
+                    cell2.setCellValue(new HSSFRichTextString(brandName+" "+categoryName+"\n"+brandID+"/"+colorCode+"/"+size));
                     cell2.setCellStyle(cs2);
                     Cell cell3 = row.createCell(2);
                     cell3.setCellValue(composition);
