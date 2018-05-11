@@ -859,7 +859,11 @@ public class OrderShipController extends BaseController {
             if (shipment!=null){
                 String shipToGeography = shipment.getShipToGeography();
                 if ("European Union".equals(shipToGeography)){
-                    inputVO.setServiceType("U");
+                    if ("IT".equalsIgnoreCase(dhlShipment.getShipToCountryCode())){
+                        inputVO.setServiceType("N");
+                    }else {
+                        inputVO.setServiceType("U");
+                    }
                     //查询第三段
                     /*params.put("sequence",3);
                     dhlShipment = subShipmentService.getDHLShipment(params);
