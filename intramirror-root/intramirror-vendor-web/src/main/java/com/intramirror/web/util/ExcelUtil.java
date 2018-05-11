@@ -173,14 +173,14 @@ public class ExcelUtil {
         cell81.setCellValue("Invoice To");
         cell81.setCellStyle(cs);
         Cell cell82 = row8.createCell(2);
-        cell82.setCellValue("Deliver To");
+        cell82.setCellValue("Ship To");
         cell82.setCellStyle(cs);
 
         //第十行
         Row row9 = sheet.createRow(9);
         Cell cell91 = row9.createCell(0);
-        String value = safeStr(invoiceVO.getInvoiceName()) + " " + safeStr(invoiceVO.getInvoiceTo());
-        cell91.setCellValue(value);
+        String value = safeStr(invoiceVO.getInvoiceName()) + "\r\n" + safeStr(invoiceVO.getInvoiceTo()) + "\r\n" + safeStr(invoiceVO.getInvoicePersonName());
+        cell91.setCellValue(new HSSFRichTextString(value));
         cell91.setCellStyle(cs2);
         Cell cell92 = row9.createCell(2);
 
@@ -188,13 +188,13 @@ public class ExcelUtil {
         String name = "";
         //Object o = resultMap.get("DeliverTo") != null ? resultMap.get("DeliverTo") : null;
         if(recipientVO != null){
-            name = safeStr(recipientVO.getPersonName()) + " ";
-            name += safeStr(recipientVO.getCountry()) + " ";
-            name += safeStr(recipientVO.getProvince()) + " ";
-            name += safeStr(recipientVO.getCity()) + " ";
-            name += safeStr(recipientVO.getStreetLines()) + safeStr(recipientVO.getStreetLines2()) + safeStr(recipientVO.getStreetLines3()) + " ";
+            name = safeStr(recipientVO.getPersonName()) + " " + safeStr(recipientVO.getPhoneNumber()) + "\r\n";
+            name += safeStr(recipientVO.getCompanyName()) + "\r\n";
+            name += safeStr(recipientVO.getProvince()) + "\r\n";
+            name += safeStr(recipientVO.getStreetLines()) + safeStr(recipientVO.getStreetLines2()) + safeStr(recipientVO.getStreetLines3()) + "\r\n";
+            name += safeStr(recipientVO.getCity()) + safeStr(recipientVO.getProvince()) + safeStr(recipientVO.getCountry()) + safeStr(recipientVO.getPostalCode());
         }
-        cell92.setCellValue(name);
+        cell92.setCellValue(new HSSFRichTextString(name));
         cell92.setCellStyle(cs2);
 
         //第十一行

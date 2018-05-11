@@ -785,6 +785,7 @@ public class OrderShipController extends BaseController {
             Shop shop = shopService.selectByPrimaryKey(65l);
             resultMap.put("InvoiceTo", shop.getBusinessLicenseLocation());
             resultMap.put("InvoiceName", shop.getShopName());
+            resultMap.put("contactPersonName", shop.getContactPersonName());
         }
 
         map.put("vendorId", vendor.getVendorId());
@@ -805,7 +806,7 @@ public class OrderShipController extends BaseController {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
         if(map.get("ddtFlag")!=null&&"1".equals(map.get("ddtFlag").toString())){
-            resultMap.put("InvoiceNumber", invoice.getDdtNum());
+            resultMap.put("InvoiceNumber", String.valueOf(invoice.getDdtNum()));
         }else {
             resultMap.put("InvoiceNumber", invoice.getInvoiceNum());
         }
@@ -854,7 +855,8 @@ public class OrderShipController extends BaseController {
             BigDecimal allTotal = new BigDecimal("0");
             BigDecimal VAT = new BigDecimal("0");
             for(Map<String, Object> chinaOrder : chinaList){
-                AddressCountry addressCountry = addressCountryService.getAddressCountryByName(chinaOrder.get("countryName").toString());
+                Object countryName = chinaOrder.get("countryName").equals("中国大陆") ? "中国" : chinaOrder.get("countryName");
+                AddressCountry addressCountry = addressCountryService.getAddressCountryByName(countryName.toString());
                 Tax tax = taxService.getTaxByAddressCountryId(addressCountry.getAddressCountryId());
                 BigDecimal taxRate = tax.getTaxRate() == null ? new BigDecimal("0") : tax.getTaxRate();
                 BigDecimal total = new BigDecimal(Double.parseDouble(chinaOrder.get("in_price").toString()) * Double.parseDouble(chinaOrder.get("amount").toString())).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -876,6 +878,7 @@ public class OrderShipController extends BaseController {
             chinaInovice.setShipperVO(shipperVO);
             chinaInovice.setInvoiceTo((String) resultMap.get("InvoiceTo"));
             chinaInovice.setInvoiceName((String) resultMap.get("InvoiceName"));
+            chinaInovice.setInvoicePersonName((String)resultMap.get("contactPersonName"));
             chinaInovice.setVatNum((String) resultMap.get("VATNumber"));
             chinaInovice.setInvoiceDate((String) resultMap.get("InvoiceDate"));
             chinaInovice.setInvoiceNum((String) resultMap.get("InvoiceNumber"));
@@ -934,6 +937,7 @@ public class OrderShipController extends BaseController {
                 UNInvoiceVO.setRecipientVO(recipientVO);
                 UNInvoiceVO.setInvoiceTo((String) resultMap.get("InvoiceTo"));
                 UNInvoiceVO.setInvoiceName((String) resultMap.get("InvoiceName"));
+                UNInvoiceVO.setInvoicePersonName((String) resultMap.get("contactPersonName"));
                 UNInvoiceVO.setVatNum((String) resultMap.get("VATNumber"));
                 UNInvoiceVO.setInvoiceDate((String) resultMap.get("InvoiceDate"));
                 UNInvoiceVO.setInvoiceNum((String) resultMap.get("InvoiceNumber"));
@@ -994,6 +998,7 @@ public class OrderShipController extends BaseController {
                 elseInvoiceVO.setRecipientVO(recipientVO);
                 elseInvoiceVO.setInvoiceTo((String) resultMap.get("InvoiceTo"));
                 elseInvoiceVO.setInvoiceName((String) resultMap.get("InvoiceName"));
+                elseInvoiceVO.setInvoicePersonName((String) resultMap.get("contactPersonName"));
                 elseInvoiceVO.setVatNum((String) resultMap.get("VATNumber"));
                 elseInvoiceVO.setInvoiceDate((String) resultMap.get("InvoiceDate"));
                 elseInvoiceVO.setInvoiceNum((String) resultMap.get("InvoiceNumber"));
