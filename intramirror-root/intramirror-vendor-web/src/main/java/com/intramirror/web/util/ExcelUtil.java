@@ -247,7 +247,7 @@ public class ExcelUtil {
                     String composition = map.get("Composition")!=null?map.get("Composition").toString():"";
                     String madeIn = map.get("MadeIn")!=null?map.get("MadeIn").toString():"";
                     String country = map.get("user_rec_country")!=null?map.get("user_rec_country").toString():"";
-                    BigDecimal discount = (new BigDecimal(1)).subtract((new BigDecimal(inPrice)).multiply(new BigDecimal("1.22")).divide(new BigDecimal(retailPrice), 2, RoundingMode.HALF_UP));
+                    String discount = map.get("discount")!=null?map.get("discount").toString():"";
                     Cell cell1 = row.createCell(0);
                     cell1.setCellValue(orderLineNum);
                     cell1.setCellStyle(cs2);
@@ -267,7 +267,7 @@ public class ExcelUtil {
                     cell6.setCellValue(retailPrice);
                     cell6.setCellStyle(cs2);
                     Cell cell7 = row.createCell(6);
-                    cell7.setCellValue(discount.toString());
+                    cell7.setCellValue(discount);
                     cell7.setCellStyle(cs2);
                     Cell cell8 = row.createCell(7);
                     cell8.setCellValue("€"+inPrice);

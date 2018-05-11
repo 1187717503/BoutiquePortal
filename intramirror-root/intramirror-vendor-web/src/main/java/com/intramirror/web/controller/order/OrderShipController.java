@@ -43,6 +43,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -859,6 +860,11 @@ public class OrderShipController extends BaseController {
                 BigDecimal total = new BigDecimal(Double.parseDouble(chinaOrder.get("in_price").toString()) * Double.parseDouble(chinaOrder.get("amount").toString())).setScale(2, BigDecimal.ROUND_HALF_UP);
                 VAT = VAT.add(total.multiply(taxRate).setScale(2, BigDecimal.ROUND_HALF_UP));
                 allTotal = allTotal.add(total);
+
+                String inPrice = chinaOrder.get("in_price")!=null?chinaOrder.get("in_price").toString():"";
+                String retailPrice = chinaOrder.get("price")!=null?chinaOrder.get("price").toString():"";
+                BigDecimal discount = (new BigDecimal(1)).subtract((new BigDecimal(inPrice)).multiply(new BigDecimal("1.22")).divide(new BigDecimal(retailPrice), 2, RoundingMode.HALF_UP));
+                chinaOrder.put("discount", discount.toString());
             }
 
             BigDecimal grandTotal = (VAT.add(allTotal)).setScale(2,BigDecimal.ROUND_HALF_UP);
@@ -904,6 +910,11 @@ public class OrderShipController extends BaseController {
                 recipientVO.setPhoneNumber(mobile);
                 String postalCode = UNOrder.get("user_rec_code") != null ? UNOrder.get("user_rec_code").toString() : "";
                 recipientVO.setPostalCode(postalCode);
+
+                String inPrice = UNOrder.get("in_price")!=null?UNOrder.get("in_price").toString():"";
+                String retailPrice = UNOrder.get("price")!=null?UNOrder.get("price").toString():"";
+                BigDecimal discount = (new BigDecimal(1)).subtract((new BigDecimal(inPrice)).multiply(new BigDecimal("1.22")).divide(new BigDecimal(retailPrice), 2, RoundingMode.HALF_UP));
+                UNOrder.put("discount", discount.toString());
 
                 AddressCountry addressCountry = addressCountryService.getAddressCountryByName(UNOrder.get("countryName").toString());
                 Tax tax = taxService.getTaxByAddressCountryId(addressCountry.getAddressCountryId());
@@ -958,6 +969,10 @@ public class OrderShipController extends BaseController {
                 recipientVO.setPhoneNumber(mobile);
                 String postalCode = elseOrder.get("user_rec_code") != null ? elseOrder.get("user_rec_code").toString() : "";
                 recipientVO.setPostalCode(postalCode);
+                String inPrice = elseOrder.get("in_price")!=null?elseOrder.get("in_price").toString():"";
+                String retailPrice = elseOrder.get("price")!=null?elseOrder.get("price").toString():"";
+                BigDecimal discount = (new BigDecimal(1)).subtract((new BigDecimal(inPrice)).multiply(new BigDecimal("1.22")).divide(new BigDecimal(retailPrice), 2, RoundingMode.HALF_UP));
+                elseOrder.put("discount", discount.toString());
 
                 AddressCountry addressCountry = addressCountryService.getAddressCountryByName(elseOrder.get("countryName").toString());
                 Tax tax = taxService.getTaxByAddressCountryId(addressCountry.getAddressCountryId());
