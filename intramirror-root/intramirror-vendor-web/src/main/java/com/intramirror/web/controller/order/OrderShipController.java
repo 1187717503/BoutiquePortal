@@ -866,7 +866,7 @@ public class OrderShipController extends BaseController {
                 String inPrice = chinaOrder.get("in_price")!=null?chinaOrder.get("in_price").toString():"";
                 String retailPrice = chinaOrder.get("price")!=null?chinaOrder.get("price").toString():"";
                 BigDecimal discount = (new BigDecimal(1)).subtract((new BigDecimal(inPrice)).multiply(new BigDecimal("1.22")).divide(new BigDecimal(retailPrice), 2, RoundingMode.HALF_UP));
-                chinaOrder.put("discount", discount.toString());
+                chinaOrder.put("discount", discount.multiply(new BigDecimal("100")).toString() + "%");
                 chinaOrder.put("in_price", (new BigDecimal(inPrice).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
                 chinaOrder.put("price", (new BigDecimal(retailPrice).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
             }
@@ -919,7 +919,7 @@ public class OrderShipController extends BaseController {
                 String inPrice = UNOrder.get("in_price")!=null?UNOrder.get("in_price").toString():"";
                 String retailPrice = UNOrder.get("price")!=null?UNOrder.get("price").toString():"";
                 BigDecimal discount = (new BigDecimal(1)).subtract((new BigDecimal(inPrice)).multiply(new BigDecimal("1.22")).divide(new BigDecimal(retailPrice), 2, RoundingMode.HALF_UP));
-                UNOrder.put("discount", discount.toString());
+                UNOrder.put("discount", discount.multiply(new BigDecimal("100")).toString() + "%");
                 UNOrder.put("in_price", (new BigDecimal(inPrice).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
                 UNOrder.put("price", (new BigDecimal(retailPrice).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
 
@@ -980,7 +980,7 @@ public class OrderShipController extends BaseController {
                 String inPrice = elseOrder.get("in_price")!=null?elseOrder.get("in_price").toString():"";
                 String retailPrice = elseOrder.get("price")!=null?elseOrder.get("price").toString():"";
                 BigDecimal discount = (new BigDecimal(1)).subtract((new BigDecimal(inPrice)).multiply(new BigDecimal("1.22")).divide(new BigDecimal(retailPrice), 2, RoundingMode.HALF_UP));
-                elseOrder.put("discount", discount.toString());
+                elseOrder.put("discount", discount.multiply(new BigDecimal("100")).toString() + "%");
                 elseOrder.put("in_price", (new BigDecimal(inPrice).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
                 elseOrder.put("price", (new BigDecimal(retailPrice).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
 
