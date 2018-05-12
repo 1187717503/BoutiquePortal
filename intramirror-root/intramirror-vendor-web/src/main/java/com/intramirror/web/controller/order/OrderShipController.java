@@ -772,7 +772,7 @@ public class OrderShipController extends BaseController {
         if (invoice==null){
             Map<String, Object> ddtNo = invoiceService.getMaxDdtNo();
             int maxDdtNo = ddtNo.get("maxddtNum")!=null?Integer.parseInt(ddtNo.get("maxddtNum").toString()):0;
-            
+
             Invoice newInvoice = new Invoice();
             if(maxDdtNo<10000){
                 maxDdtNo = 10000;

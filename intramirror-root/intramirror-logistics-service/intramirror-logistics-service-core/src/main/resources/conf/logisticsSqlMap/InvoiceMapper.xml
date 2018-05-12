@@ -181,7 +181,7 @@
         vat_num = #{vatNum,jdbcType=BIGINT},
         vendor_id = #{vendorId,jdbcType=BIGINT},
         shipment_id = #{shipmentId,jdbcType=BIGINT},
-        invoice_date = #{invoiceDate,jdbcType=TIMESTAMP}
+        invoice_date = #{invoiceDate,jdbcType=TIMESTAMP},
         ddt_num = #{ddtNum,jdbcType=BIGINT},
         where invoice_id = #{invoiceId,jdbcType=BIGINT}
     </update>
