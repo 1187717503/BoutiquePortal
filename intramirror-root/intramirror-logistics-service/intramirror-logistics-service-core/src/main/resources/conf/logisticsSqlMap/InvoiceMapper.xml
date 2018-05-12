@@ -67,6 +67,9 @@
             <if test="invoiceNum != null">
                 invoice_num,
             </if>
+            <if test="type != null">
+                type,
+            </if>
             <if test="ddtNum != null">
                 ddt_num,
             </if>
@@ -93,6 +96,9 @@
             </if>
             <if test="invoiceNum != null">
                 #{invoiceNum,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=INTEGER},
             </if>
             <if test="ddtNum != null">
                 #{ddtNum,jdbcType=BIGINT},
