@@ -182,7 +182,7 @@
         vendor_id = #{vendorId,jdbcType=BIGINT},
         shipment_id = #{shipmentId,jdbcType=BIGINT},
         invoice_date = #{invoiceDate,jdbcType=TIMESTAMP},
-        ddt_num = #{ddtNum,jdbcType=BIGINT},
+        ddt_num = #{ddtNum,jdbcType=BIGINT}
         where invoice_id = #{invoiceId,jdbcType=BIGINT}
     </update>
 
