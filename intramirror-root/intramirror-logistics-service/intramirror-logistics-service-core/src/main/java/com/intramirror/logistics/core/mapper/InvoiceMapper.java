@@ -76,6 +76,8 @@ public interface InvoiceMapper {
 
     Invoice getInvoiceByShipmentId(Long shipmentId);
 
+    Invoice getInvoiceByMap(Map map);
+
     /**
      * 获取最大的ddt num
      * @return

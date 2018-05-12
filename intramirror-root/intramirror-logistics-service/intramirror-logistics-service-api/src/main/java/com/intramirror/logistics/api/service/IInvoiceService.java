@@ -48,8 +48,10 @@ public interface IInvoiceService {
      * @mbggenerated
      */
     int updateByPrimaryKeySelective(Invoice record);
-    
-    
+
+
+    Invoice getInvoiceByMap(Map map);
+
     /**
      * 根据ShipmentId 修改  Invoice信息
      * @param Invoice 

@@ -90,6 +90,10 @@ public class OrderShipController extends BaseController {
 
     @Autowired
     private StockLocationService stockLocationService;
+
+    @Autowired
+    private ILogisticsProductService iLogisticsProductService;
+
     /**
      * 获取所有箱子信息
      *
@@ -757,29 +761,49 @@ public class OrderShipController extends BaseController {
 
         //获取Invoice 信息
         logger.info("打印Invoice----获取Invoice信息");
-        Invoice invoice = invoiceService.getInvoiceByShipmentId(shipment_id);
+        Map<String, Object> invoiceMap = new HashMap<>();
+        if(map.get("ddtFlag")!=null&&"1".equals(map.get("ddtFlag").toString())){
+            invoiceMap.put("type", 2);
+        }else{
+            invoiceMap.put("type", 1);
+        }
+        invoiceMap.put("shipmentId", shipment_id);
+        Invoice invoice = invoiceService.getInvoiceByMap(invoiceMap);
         if (invoice==null){
             Map<String, Object> ddtNo = invoiceService.getMaxDdtNo();
             int maxDdtNo = ddtNo.get("maxddtNum")!=null?Integer.parseInt(ddtNo.get("maxddtNum").toString()):0;
-            long s = ddtNo.get("shipment_id") != null ? Long.parseLong(ddtNo.get("shipment_id").toString()) : 0;
-            if (s!=shipment_id){
-                Invoice newInvoice = new Invoice();
-                if(maxDdtNo<10000){
-                    maxDdtNo = 10000;
-                }else {
-                    maxDdtNo++;
-                }
-                newInvoice.setEnabled(true);
-                newInvoice.setDdtNum(maxDdtNo);
-                newInvoice.setInvoiceNum("");
-                newInvoice.setShipmentId(shipment_id);
-                newInvoice.setVendorId(vendor.getVendorId());
-                newInvoice.setInvoiceDate(new Date());
-                newInvoice.setVatNum("");
-                invoiceService.insertSelective(newInvoice);
-                invoice = newInvoice;
+            
+            Invoice newInvoice = new Invoice();
+            if(maxDdtNo<10000){
+                maxDdtNo = 10000;
+            }else {
+                maxDdtNo++;
             }
+            newInvoice.setEnabled(true);
+            newInvoice.setDdtNum(maxDdtNo);
+            newInvoice.setInvoiceNum("");
+            newInvoice.setShipmentId(shipment_id);
+            newInvoice.setVendorId(vendor.getVendorId());
+            newInvoice.setInvoiceDate(new Date());
+            newInvoice.setVatNum("");
+            newInvoice.setType(2);
+            invoiceService.insertSelective(newInvoice);
+            invoice = newInvoice;
         }else {
+            if(map.get("ddtFlag")!=null&&"1".equals(map.get("ddtFlag").toString())){
+                if(invoice.getDdtNum() == null){
+                    Map<String, Object> ddtNo = invoiceService.getMaxDdtNo();
+                    int maxDdtNo = ddtNo.get("maxddtNum")!=null?Integer.parseInt(ddtNo.get("maxddtNum").toString()):0;
+                    if(maxDdtNo<10000){
+                        maxDdtNo = 10000;
+                    }else {
+                        maxDdtNo++;
+                    }
+                    invoice.setDdtNum(maxDdtNo);
+
+                    invoiceService.updateByPrimaryKey(invoice);
+                }
+            }
             //获取Invoice To信息
             logger.info("打印Invoice----获取Invoice To信息");
             Shop shop = shopService.selectByPrimaryKey(65l);
