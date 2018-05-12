@@ -105,9 +105,9 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 		INNER JOIN shipment s ON (sub.shipment_id = s.shipment_id)
 		INNER JOIN shipping_segment ss ON (sub.shipping_segment_id = ss.shipping_segment_id)
 		INNER JOIN shipment_type st ON (ss.shipment_type_id = st.shipment_type_id)
-		LEFT JOIN invoice i ON (s.shipment_id = i.shipment_id and i.enabled = 1)
+		LEFT JOIN invoice i ON (s.shipment_id = i.shipment_id and i.enabled = 1 and i.type = 1)
 		left JOIN stock_location sl on sl.location_id = s.stock_location_id
-		WHERE sub.shipment_id=#{shipmentId,jdbcType=BIGINT} and type = 1
+		WHERE sub.shipment_id=#{shipmentId,jdbcType=BIGINT}
 		GROUP BY ss.segment_sequence ASC LIMIT 1;
   </select>
   
