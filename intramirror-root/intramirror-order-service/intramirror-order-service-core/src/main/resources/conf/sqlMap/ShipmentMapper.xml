@@ -162,7 +162,7 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 		SELECT s.*,sl.stock_location FROM shipment s
 		INNER JOIN container c ON c.shipment_id = s.shipment_id
 		INNER JOIN logistics_product lp on lp.container_id = c.container_id
-		LEFT JOIN stock_location sl ON sl.ship_from_location_id = s.ship_from_location_id
+		LEFT JOIN stock_location sl ON sl.location_id = s.ship_from_location_id
 		WHERE lp.`status` = 7 and s.vendor_id = #{vendorId}
 		GROUP BY s.shipment_no
 		<if test="sortByName!=null">

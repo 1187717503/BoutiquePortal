@@ -201,10 +201,6 @@ public class OrderShipController extends BaseController {
                         shipMent.put("shipment_no", container.get("shipment_no").toString());
                         shipMent.put("shipment_status", container.get("shipment_status").toString());
                         String shipToGeography = container.get("ship_to_geography").toString();
-                        if ("China Mainland".equals(shipToGeography)
-                                ||"HongKong".equals(shipToGeography)){
-                            shipToGeography = "China excl. Taiwan";
-                        }
                         shipMent.put("ship_to_geography", shipToGeography);
                         shipMentList.add(shipMent);
                     }
