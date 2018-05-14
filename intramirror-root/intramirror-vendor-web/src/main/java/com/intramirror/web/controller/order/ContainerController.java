@@ -290,43 +290,30 @@ public class ContainerController {
 			Container container = containerService.selectContainerById(map);
 			int result = containerService.deleteContainerById(map);
 			if (result == 1){
+				//删除订单与carton关联并回退到confirmed状态
 				Map<String, Object> setShipment = new HashMap<>();
 				setShipment.put("shipmentId", container.getShipmentId());
+				Map<String, Object> submap = new HashMap<>();
+				submap.put("container_id", Long.parseLong(map.get("containerId").toString()));
+				List<LogisticsProduct> lpList = logisticProductService.selectByCondition(submap);
+				if (null != lpList && 0 < lpList.size()){
+					for (LogisticsProduct logisticsProduct : lpList) {
+						submap = new HashMap<>();
+						submap.put("logisticProductId", logisticsProduct.getLogistics_product_id());
+						logisticProductShipmentService.deleteBylogisticProductId(submap);
+						logisticProductService.updateContainerById(logisticsProduct.getLogistics_product_id());
+						//删除关联（wms）
+						LogisticProductContainer logisticProductContainer = new LogisticProductContainer();
+						logisticProductContainer.setLogisticsProductId(logisticsProduct.getLogistics_product_id());
+						logisticProductContainer.setContainerId(container.getContainerId());
+						logisticProductService.updateLogisticProductContainer(logisticProductContainer);
+					}
+				}
 				List<Map<String, Object>> list = containerService.getShipmentList(setShipment);
 				//最后一个箱子的时候删除shipment
 				if (list.size() == 0){
-					List<SubShipment> subList = subShipmentService.getSubShipmentByShipmentId(container.getShipmentId());
-					Map<String, Object> submap = new HashMap<>();
-					for (SubShipment subShipment : subList) {
-						submap.put("sub_shipment_id", subShipment.getSubShipmentId());
-						List<LogisticProductShipment> lpsList = logisticProductShipmentService.selectById(submap);
-						if (null != lpsList && 0 < lpsList.size()){
-							for (LogisticProductShipment lps : lpsList) {
-								//删除关联关系
-								logisticProductService.updateContainerById(lps.getLogisticProductId());
-								logisticProductShipmentService.deleteById(lps.getSubShipmentId());
-								subShipmentService.deleteByPrimaryKey(lps.getSubShipmentId());
-								//删除关联（wms）
-                                LogisticProductContainer logisticProductContainer = new LogisticProductContainer();
-                                logisticProductContainer.setLogisticsProductId(lps.getLogisticProductId());
-                                logisticProductContainer.setContainerId(container.getContainerId());
-                                logisticProductService.updateLogisticProductContainer(logisticProductContainer);
-                            }
-						}
-					}
+					subShipmentService.deleteSubShipmentByShipmentId(container.getShipmentId());
 					shipmentService.deleteShipmentById(setShipment);
-				}else{
-					Map<String, Object> submap = new HashMap<>();
-					submap.put("container_id", Long.parseLong(map.get("containerId").toString()));
-					List<LogisticsProduct> lpList = logisticProductService.selectByCondition(submap);
-					if (null != lpList && 0 < lpList.size()){
-						for (LogisticsProduct logisticsProduct : lpList) {
-							submap = new HashMap<>();
-							submap.put("logisticProductId", logisticsProduct.getLogistics_product_id());
-							logisticProductShipmentService.deleteBylogisticProductId(submap);
-							logisticProductService.updateContainerById(logisticsProduct.getLogistics_product_id());
-						}
-					}
 				}
 				logger.info("update logisticProduct ");
 				message.successStatus().putMsg("info", "SUCCESS").setData(result);
