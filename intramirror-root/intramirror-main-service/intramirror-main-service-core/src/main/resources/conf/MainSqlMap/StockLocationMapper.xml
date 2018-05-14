@@ -263,7 +263,7 @@
 
   <select id="getShipFromLocation" parameterType="long" resultMap="BaseResultMap">
     select sl.* from stock_location sl
-    INNER JOIN shipment s on s.stock_location_id = sl.location_id
+    INNER JOIN shipment s on s.ship_from_location_id = sl.location_id
     WHERE s.shipment_id = #{shipmentId,jdbcType=BIGINT}
   </select>
 

@@ -212,8 +212,8 @@
         select
         <include refid="Base_Column_List"/>
         from sub_shipment
-        where shipment_id = #{shipmentId,jdbcType=BIGINT} AND segment_sequence = 1
-        limit 1;
+        where shipment_id = #{shipmentId,jdbcType=BIGINT}
+        ORDER by segment_sequence ASC
     </select>
     
     <update id="updateSubShipment" parameterType="java.util.Map">
@@ -236,7 +236,7 @@
     </update>
 
     <select id="getDHLShipment" resultMap="BaseResultMap" parameterType="map">
-        SELECT ss.*,s.stock_location_id FROM sub_shipment ss
+        SELECT ss.*,s.ship_from_location_id FROM sub_shipment ss
         INNER JOIN shipment s on ss.shipment_id = s.shipment_id
         WHERE s.shipment_id = #{shipmentId,jdbcType=BIGINT}
         AND ss.segment_sequence = #{sequence,jdbcType=BIGINT}

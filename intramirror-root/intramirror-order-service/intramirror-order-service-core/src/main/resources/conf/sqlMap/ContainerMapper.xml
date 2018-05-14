@@ -45,7 +45,7 @@ values(#{containerType,jdbcType=VARCHAR}, #{shipToGeography,jdbcType=VARCHAR},#{
   
   <select id="selectContainerByBarcode" resultMap="BaseResultMap" parameterType="java.util.Map" >
   		select c.*,sl.stock_location from container c
-  		LEFT JOIN stock_location sl ON sl.location_id = c.stock_location_id
+  		LEFT JOIN stock_location sl ON sl.location_id = c.ship_from_location_id
 		where c.barcode =  #{barcode,jdbcType=VARCHAR} and c.status = #{status,jdbcType=INTEGER}
   </select>
   
@@ -71,8 +71,8 @@ values(#{containerType,jdbcType=VARCHAR}, #{shipToGeography,jdbcType=VARCHAR},#{
       <if test="shipment_id != null" >
         shipment_id = #{shipment_id,jdbcType=BIGINT},
       </if>
-	  <if test="stock_location_id != null">
-		  stock_location_id = #{stock_location_id,jdbcType=INTEGER}
+	  <if test="ship_from_location_id != null">
+		  ship_from_location_id = #{ship_from_location_id,jdbcType=INTEGER}
 	  </if>
     </set>
      where 1=1
@@ -118,12 +118,7 @@ values(#{containerType,jdbcType=VARCHAR}, #{shipToGeography,jdbcType=VARCHAR},#{
     </choose>
     
     <if test="ship_to_geography != null" >
-		and (c.ship_to_geography = #{ship_to_geography,jdbcType=VARCHAR}
-		<if test="ship_to_geography == 'China excl. Taiwan'">
-			OR c.ship_to_geography = 'HongKong' OR c.ship_to_geography = 'China Mainland'
-		</if
-		>
-		)
+		and (c.ship_to_geography = #{ship_to_geography,jdbcType=VARCHAR})
     </if>
 	
 			

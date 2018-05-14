@@ -5,7 +5,7 @@
 	<resultMap id="BaseResultMap" type="com.intramirror.order.api.model.Shipment" >
 	    <id column="shipment_id" property="shipmentId" jdbcType="BIGINT" />
 	    <result column="ship_to_geography" property="shipToGeography" jdbcType="VARCHAR" />
-	    <result column="stock_location_id" property="stockLocationId" jdbcType="INTEGER" />
+	    <result column="ship_from_location_id" property="shipFromLocationId" jdbcType="INTEGER" />
 	    <result column="stock_location" property="stockLocation" jdbcType="VARCHAR" />
 	    <result column="status" property="status" jdbcType="BIGINT" />
 	    <result column="shipment_category" property="shipmentCategory" jdbcType="BIGINT" />
@@ -30,11 +30,11 @@ VALUES( #{shipToGeography,jdbcType=VARCHAR},#{consignee,jdbcType=VARCHAR},#{ship
 	
 	</insert>
 	<insert id="saveShipmentByOrderId" parameterType="com.intramirror.order.api.model.Shipment" >
-    	INSERT INTO shipment(ship_to_geography,`status`,created_at,updated_at,shipment_no,vendor_id,shipment_category,stock_location_id
+    	INSERT INTO shipment(ship_to_geography,`status`,created_at,updated_at,shipment_no,vendor_id,shipment_category,ship_from_location_id
     	,geography_id,from_type,from_ref_id,to_type,to_ref_id)
 VALUES(#{shipToGeography,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},
 #{createdAt,jdbcType=TIMESTAMP},#{updatedAt,jdbcType=TIMESTAMP},
-#{shipmentNo,jdbcType=VARCHAR},#{vendorId,jdbcType=BIGINT},#{shipmentCategory,jdbcType=BIGINT},#{stockLocationId}
+#{shipmentNo,jdbcType=VARCHAR},#{vendorId,jdbcType=BIGINT},#{shipmentCategory,jdbcType=BIGINT},#{shipFromLocationId}
 ,#{geographyId},#{fromType},#{fromRefId},#{toType},#{toRefId});
   	</insert>
   
@@ -86,7 +86,7 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
   INNER JOIN shipping_segment ss ON sub.shipping_segment_id = ss.shipping_segment_id
 	WHERE s.vendor_id = #{vendorId,jdbcType=BIGINT} AND s.`status` = #{status,jdbcType=BIGINT}
 	AND s.ship_to_geography = #{shipToGeography,jdbcType=VARCHAR}
-	AND s.stock_location_id = #{stockLocationId,jdbcType=INTEGER}
+	AND s.ship_from_location_id = #{shipFromLocationId,jdbcType=INTEGER}
 	AND ss.enabled = 1 AND ss.shipment_type_id != 2
 	GROUP BY s.shipment_no
   </select>
@@ -106,7 +106,7 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 		INNER JOIN shipping_segment ss ON (sub.shipping_segment_id = ss.shipping_segment_id)
 		INNER JOIN shipment_type st ON (ss.shipment_type_id = st.shipment_type_id)
 		LEFT JOIN invoice i ON (s.shipment_id = i.shipment_id and i.enabled = 1 and i.type = 1)
-		left JOIN stock_location sl on sl.location_id = s.stock_location_id
+		left JOIN stock_location sl on sl.ship_from_location_id = s.ship_from_location_id
 		WHERE sub.shipment_id=#{shipmentId,jdbcType=BIGINT}
 		GROUP BY ss.segment_sequence ASC LIMIT 1;
   </select>
@@ -162,7 +162,7 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 		SELECT s.*,sl.stock_location FROM shipment s
 		INNER JOIN container c ON c.shipment_id = s.shipment_id
 		INNER JOIN logistics_product lp on lp.container_id = c.container_id
-		LEFT JOIN stock_location sl ON sl.location_id = s.stock_location_id
+		LEFT JOIN stock_location sl ON sl.ship_from_location_id = s.ship_from_location_id
 		WHERE lp.`status` = 7 and s.vendor_id = #{vendorId}
 		GROUP BY s.shipment_no
 		<if test="sortByName!=null">

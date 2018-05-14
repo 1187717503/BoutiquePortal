@@ -608,12 +608,6 @@ public class OrderShipController extends BaseController {
             resultMap.put("VATNumber", invoice.getVatNum());
 
             //获取Ship From信息
-            //Map<String, Object> vendorParams = new HashMap<>();
-            //vendorParams.put("vendor_id", shipmentMap.get("vendor_id"));
-            //Vendor shipVendor = vendorService.getVendorByVendorId(vendorParams);
-            //resultMap.put("ShipFrom", shipVendor.getBusinessLicenseLocation());
-            //resultMap.put("ShipCompanyName", shipVendor.getCompanyName());
-            //resultMap.put("ShipVendorName", shipVendor.getVendorName());
             StockLocation location = stockLocationService.getShipFromLocation(shipment_id);
             resultMap.put("companyName",location.getContactCompanyname());
             resultMap.put("personName",location.getContactPersonname());
@@ -624,7 +618,17 @@ public class OrderShipController extends BaseController {
 
             logger.info("打印Invoice----获取Deliver To信息");
             List<SubShipment> subShipmentList = subShipmentService.getSubShipmentByShipmentId(shipment_id);
-            if (subShipmentList.size() > 1) {
+            if (subShipmentList!=null&&subShipmentList.size()>0){
+                resultMap.put("DeliverTo", subShipmentList.get(0));
+                //发往质检仓的取DHL税号
+                if(map.get("shipmentCategory")!=null&&"1".equals(map.get("shipmentCategory").toString())){
+                    resultMap.put("VATNumber",subShipmentList.get(0).getPiva());
+                }
+            }else {
+                result.setMsg("DeliverTo is null ");
+                return result;
+            }
+            /*if (subShipmentList.size() > 1) {
                 ShippingProvider shippingProvider = shippingProviderService.getShippingProviderByShipmentId(shipment_id);
                 resultMap.put("DeliverTo", shippingProvider);
             } else if (subShipmentList.size() == 1) {
@@ -636,7 +640,7 @@ public class OrderShipController extends BaseController {
             } else {
                 result.setMsg("DeliverTo is null ");
                 return result;
-            }
+            }*/
             //获取carton列表
             Set<Long> shipmentIds =  new HashSet<>();
             shipmentIds.add(shipment_id);

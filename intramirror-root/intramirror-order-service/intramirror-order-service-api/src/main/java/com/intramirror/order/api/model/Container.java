@@ -27,7 +27,7 @@ public class Container {
 	 */
 	private String shipToGeography;
 
-	private Integer stockLocationId;
+	private Integer shipFromLocationId;
 
 	private String stockLocation;
 	
@@ -84,12 +84,12 @@ public class Container {
 		this.stockLocation = stockLocation;
 	}
 
-	public Integer getStockLocationId() {
-		return stockLocationId;
+	public Integer getShipFromLocationId() {
+		return shipFromLocationId;
 	}
 
-	public void setStockLocationId(Integer stockLocationId) {
-		this.stockLocationId = stockLocationId;
+	public void setShipFromLocationId(Integer shipFromLocationId) {
+		this.shipFromLocationId = shipFromLocationId;
 	}
 
 	public Long getContainerId() {

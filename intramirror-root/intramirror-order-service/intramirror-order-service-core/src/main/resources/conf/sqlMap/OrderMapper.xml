@@ -97,7 +97,7 @@
 
 
     <select id="getOrderListByStatus" resultType="java.util.HashMap" parameterType="java.util.Map">
-        SELECT p.product_id,g.pack_group,g.pack_english_name,lp.stock_Location,lp.stock_location_id,
+        SELECT p.product_id,g.pack_group,g.pack_english_name,lp.stock_Location,lp.stock_location_id,sl.ship_from_location_id,
         o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id, s.`size` as size,p.category_id,
         lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
         lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
@@ -117,6 +117,7 @@
         oeCreatedByuser,
         oe.modified_at as oeModified,oe.`status` as oeStatus,oe.resolution as oeResolution, uu.email as Resolved
         FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+        LEFT JOIN stock_location sl on sl.location_id = lp.stock_location_id
         INNER JOIN `order` o ON ol.order_id = o.order_id
         LEFT JOIN user_ship_address usa ON o.user_id = usa.user_id
         LEFT JOIN logistics l ON (lp.order_logistics_id = l.order_logistics_id and l.enabled = 1)
@@ -614,7 +615,8 @@
             if(lp.user_rec_flag=0, l.user_rec_mobile, lp.user_rec_mobile)                        as contact,
             g.geography_id,
             lp.logistics_product_id,
-            lp.stock_location_id
+            lp.stock_location_id,
+            sl.ship_from_location_id
         FROM logistics_product lp
             INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
             INNER JOIN `order` o ON ol.order_id = o.order_id
@@ -628,6 +630,7 @@
             INNER JOIN brand b ON (p.brand_id = b.brand_id AND b.enabled = 1)
             INNER JOIN sku s ON (s.sku_id = sps.sku_id AND s.enabled = 1)
             INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
+            INNER JOIN stock_location sl on sl.location_id = lp.stock_location_id
         WHERE lp.enabled = 1
               AND lp.order_line_num = #{orderNumber,jdbcType=VARCHAR}
         GROUP BY o.order_num;

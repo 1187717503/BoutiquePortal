@@ -299,7 +299,6 @@ public class ContainerController {
 					Map<String, Object> submap = new HashMap<>();
 					for (SubShipment subShipment : subList) {
 						submap.put("sub_shipment_id", subShipment.getSubShipmentId());
-						submap.put("container_id",container.getContainerId());
 						List<LogisticProductShipment> lpsList = logisticProductShipmentService.selectById(submap);
 						if (null != lpsList && 0 < lpsList.size()){
 							for (LogisticProductShipment lps : lpsList) {
@@ -317,19 +316,6 @@ public class ContainerController {
 					}
 					shipmentService.deleteShipmentById(setShipment);
 				}else{
-//					List<SubShipment> subList = subShipmentService.getSubShipmentByShipmentId(container.getShipmentId());
-//					Map<String, Object> submap = new HashMap<>();
-//					for (SubShipment subShipment : subList) {
-//						submap.put("sub_shipment_id", subShipment.getSubShipmentId());
-//						List<LogisticProductShipment> lpsList = logisticProductShipmentService.selectById(submap);
-//						if (null != lpsList && 0 < lpsList.size()){
-//							for (LogisticProductShipment lps : lpsList) {
-//								subShipmentService.deleteByPrimaryKey(lps.getSubShipmentId());
-//								logisticProductShipmentService.deleteById(lps.getSubShipmentId());
-//								logisticProductService.updateContainerById(lps.getLogisticProductId());
-//							}
-//						}
-//					}
 					Map<String, Object> submap = new HashMap<>();
 					submap.put("container_id", Long.parseLong(map.get("containerId").toString()));
 					List<LogisticsProduct> lpList = logisticProductService.selectByCondition(submap);
