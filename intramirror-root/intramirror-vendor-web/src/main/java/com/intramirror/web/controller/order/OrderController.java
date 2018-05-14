@@ -426,8 +426,7 @@ public class OrderController extends BaseController {
                 return resultMessage;
             }
             Long vendorId = vendor.getVendorId();
-            int[] item = { OrderStatusType.PENDING, OrderStatusType.COMFIRMED ,OrderStatusType.CANCELED,OrderStatusType.PICKING
-            ,OrderStatusType.READYTOSHIP};
+            int[] item = { OrderStatusType.PENDING, OrderStatusType.COMFIRMED ,OrderStatusType.CANCELED,OrderStatusType.PICKING};
             Map<String, Object> resultMap = new HashMap<>();
             for (int i = 0; i < item.length; i++) {
                 map = new HashMap<>();
@@ -446,17 +445,18 @@ public class OrderController extends BaseController {
                 if(OrderStatusType.PICKING == item[i]){
                     resultMap.put("picking", result);
                 }
-                if (OrderStatusType.READYTOSHIP == item[i]){
+                /*if (OrderStatusType.READYTOSHIP == item[i]){
                     resultMap.put("readyToship",result);
-                }
+                }*/
             }
 
             //readytoship数量
-            //Integer result = containerService.getContainerCount(map);
-            //resultMap.put("readyToship", result==null?0:result);
+            map = new HashMap<>();
+            map.put("vendorId", vendorId);
+            Integer result = containerService.getContainerCount(map);
+            resultMap.put("readyToship", result==null?0:result);
 
             //shippedCount
-            map = new HashMap<>();
             map.put("vendorId", vendorId);
             Integer shippedCount = orderService.getShippedCount(map);
             resultMap.put("shipped", shippedCount==null?0:shippedCount);
