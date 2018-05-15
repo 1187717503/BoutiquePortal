@@ -2,6 +2,8 @@ package com.intramirror.product.core.impl.merchandise;
 
 import com.google.gson.Gson;
 import com.intramirror.common.IKafkaService;
+import com.intramirror.core.common.exception.ValidateException;
+import com.intramirror.core.common.response.ErrorResponse;
 import com.intramirror.product.api.model.ProductWithBLOBs;
 import com.intramirror.product.api.model.SearchCondition;
 import com.intramirror.product.api.model.ShopProduct;
@@ -101,27 +103,44 @@ public class ProductManagementServiceImpl implements ProductManagementService {
 
     @Override
     @Transactional
-    public void addToShop(int status, int shopStatus, Long productId) {
-        // promotionService.refreshSnapshotForAddProduct(productId);
-
+    public void addToShop(int status, int shopStatus, Long productId) throws Exception {
         List<Long> productList = new ArrayList<>();
         productList.add(productId);
+        updateProductStatusOnly(status, productId);
+        createShopProductStatus(shopStatus, productId);
+
         String message = new Gson().toJson(productList);
         LOGGER.info("Start to send {} to kafaka {}--->{}", message, kafkaProperties.getTopic(), kafkaProperties.getServerName());
         kafkaService.sendMsgToKafka(message, kafkaProperties.getTopic(), kafkaProperties.getServerName());
-        updateProductStatusOnly(status, productId);
-        createShopProductStatus(shopStatus, productId);
     }
 
     @Override
     @Transactional
-    public void batchAddToShop(int status, int shopStatus, List<Long> productIds) {
-        // promotionService.refreshBatchSnapshotForAddProduct(productIds);
-        String message = new Gson().toJson(productIds);
+    public List<ProductWithBLOBs> batchAddToShop(int status, int shopStatus, List<Long> productIds) {
+        batchUpdateProductStatusOnly(status, productIds);
+        List<ProductWithBLOBs> exceptionProductIds = batchCreateShopProductStatus(shopStatus, productIds);
+
+        List<Long> successProductIds = new ArrayList<>();
+        for (Long productId : productIds) {
+            boolean contain = false;
+            for (ProductWithBLOBs product : exceptionProductIds) {
+                if (product.getProductId().longValue() == productId) {
+                    contain = true;
+                }
+            }
+            if (contain) {
+                successProductIds.add(productId);
+            }
+        }
+
+        if (successProductIds.size() == 0) {
+            return exceptionProductIds;
+        }
+
+        String message = new Gson().toJson(successProductIds);
         LOGGER.info("Start to send {} to kafaka {}--->{}", message, kafkaProperties.getTopic(), kafkaProperties.getServerName());
         kafkaService.sendMsgToKafka(message, kafkaProperties.getTopic(), kafkaProperties.getServerName());
-        batchUpdateProductStatusOnly(status, productIds);
-        batchCreateShopProductStatus(shopStatus, productIds);
+        return exceptionProductIds;
     }
 
     @Override
@@ -297,25 +316,42 @@ public class ProductManagementServiceImpl implements ProductManagementService {
         shopProductMapper.batchDisableShopProductStatus(shopProductIds);
     }
 
-    private void createShopProductStatus(int status, Long productId) {
+    private void createShopProductStatus(int status, Long productId) throws Exception {
         ProductWithBLOBs product = productMapper.selectByPrimaryKey(productId);
         List<Sku> skuList = skuMapper.listSkuInfoByProductId(productId);
         if (skuList.isEmpty()) {
             LOGGER.error("Failed to get sku of product_id [{}]", productId);
-            // throw exception?
+            throw new ValidateException(new ErrorResponse("Product " + productId + " have not any sku"));
         }
         Long shopProductId = createShopProduct(status, product, skuList.get(0));
         insertShopProductSkus(skuList, shopProductId);
 
     }
 
-    private void batchCreateShopProductStatus(int shopStatus, List<Long> productIds) {
-        List<ProductWithBLOBs> products = productMapper.listProductByProductIds(productIds);
+    private List<ProductWithBLOBs> batchCreateShopProductStatus(int shopStatus, List<Long> productIds) {
+
         List<Sku> skuList = skuMapper.listSkuInfoByProductIds(productIds);
         Map<Long, List<Sku>> skuMap = skuList2MapByProductId(skuList);
+
+        List<Long> haveSkuProductIds = new ArrayList<>();
+        List<Long> exceptionProductIds = new ArrayList<>();
+        for (Long productId : productIds) {
+            if (skuMap.containsKey(productId)) {
+                haveSkuProductIds.add(productId);
+            } else {
+                exceptionProductIds.add(productId);
+            }
+        }
+
+        if (haveSkuProductIds.size() == 0) {
+            return productMapper.listProductByProductIds(exceptionProductIds);
+        }
+
+        List<ProductWithBLOBs> products = productMapper.listProductByProductIds(haveSkuProductIds);
         batchCreateShopProduct(shopStatus, products, skuMap);
-        List<ShopProductSku> shopProductSkuList = mergeShopProductSkuBatch(skuList, productIds);
+        List<ShopProductSku> shopProductSkuList = mergeShopProductSkuBatch(skuList, haveSkuProductIds);
         shopProductSkuMapper.batchInsertShopProductSku(shopProductSkuList);
+        return productMapper.listProductByProductIds(exceptionProductIds);
     }
 
     private Map<Long, List<Sku>> skuList2MapByProductId(List<Sku> skuList) {

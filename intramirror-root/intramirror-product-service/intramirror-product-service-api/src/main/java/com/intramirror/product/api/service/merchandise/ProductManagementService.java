@@ -1,12 +1,12 @@
 package com.intramirror.product.api.service.merchandise;
 
+import com.intramirror.product.api.model.ProductWithBLOBs;
 import com.intramirror.product.api.model.SearchCondition;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Created on 2017/10/30.
- *
  * @author YouFeng.Zhu
  */
 public interface ProductManagementService {
@@ -53,9 +53,9 @@ public interface ProductManagementService {
 
     void batchRemove(int status, List<Long> productIds);
 
-    void addToShop(int status, int shopStatus, Long productId);
+    void addToShop(int status, int shopStatus, Long productId) throws Exception;
 
-    void batchAddToShop(int status, int shopStatus, List<Long> productIds);
+    List<ProductWithBLOBs> batchAddToShop(int status, int shopStatus, List<Long> productIds);
 
     void removeFromShop(int status, Long productId, Long shopProductId);
 

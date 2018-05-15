@@ -1,16 +1,16 @@
 package com.intramirror.web.controller.product;
 
 import com.intramirror.common.parameter.StatusType;
+import com.intramirror.core.common.exception.ValidateException;
+import com.intramirror.core.common.response.ErrorResponse;
+import com.intramirror.core.common.response.Response;
+import com.intramirror.product.api.model.ProductWithBLOBs;
 import com.intramirror.product.api.model.Sku;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.SkuService;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
-import com.intramirror.user.api.model.User;
 import com.intramirror.web.common.response.BatchResponseItem;
 import com.intramirror.web.common.response.BatchResponseMessage;
-import com.intramirror.core.common.response.ErrorResponse;
-import com.intramirror.core.common.exception.ValidateException;
-import com.intramirror.core.common.response.Response;
 import static com.intramirror.web.controller.product.StateMachineCoreRule.map2StateEnum;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -22,18 +22,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 /**
  * Created on 2017/10/25.
- *
  * @author YouFeng.Zhu
  */
 @RestController
@@ -54,7 +50,7 @@ public class StateMachineController {
 
     @PutMapping(value = "/single/{action}", consumes = "application/json")
     public Response operateProduct(@SessionAttribute(value = "sessionStorage", required = false) Long userId, @PathVariable(value = "action") String action,
-            @RequestBody Map<String, Object> body) {
+            @RequestBody Map<String, Object> body) throws Exception {
         Long productId = Long.parseLong(body.get("productId").toString());
         Long shopProductId = body.get("shopProductId") == null ? null : Long.parseLong(body.get("shopProductId").toString());
         Map<String, Object> currentState = productManagementService.getProductStateByProductId(productId);
@@ -71,7 +67,7 @@ public class StateMachineController {
         return Response.success();
     }
 
-    private void updateProductState(Long userId, Map<String, Object> currentState, String action, Long productId, Long shopProductId) {
+    private void updateProductState(Long userId, Map<String, Object> currentState, String action, Long productId, Long shopProductId) throws Exception {
         OperationEnum operation = ProductStateOperationMap.getOperation(action);
         StateEnum currentStateEnum = map2StateEnum(currentState);
         StateEnum newStateEnum = StateMachineCoreRule.getNewState(currentStateEnum, operation);
@@ -303,7 +299,13 @@ public class StateMachineController {
             break;
 
         case ADD_TO_SHOP:
-            productManagementService.batchAddToShop(newStateEnum.getProductStatus(), newStateEnum.getShopProductStatus(), productIds);
+            List<ProductWithBLOBs> failedProducts = productManagementService.batchAddToShop(newStateEnum.getProductStatus(),
+                    newStateEnum.getShopProductStatus(), productIds);
+            for (ProductWithBLOBs product : failedProducts) {
+                BatchResponseItem item = new BatchResponseItem(product.getProductId(), null,
+                        "vendorId:" + product.getVendorId() + ",[" + product.getDesignerId() + "]-[" + product.getColorCode() + "] Add to shop failed ");
+                responseMessage.getFailed().add(item);
+            }
             break;
         case REMOVE_FROM_SHOP:
             productManagementService.batchRemoveFromShop(newStateEnum.getProductStatus(), productIds, shopProductIds);
