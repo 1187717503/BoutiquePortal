@@ -386,7 +386,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             paramsList = this.handleMap(new ArrayList<Map<String, Object>>(), selProductRuleMaps, Contants.num_four, selSeasonGroupRuleMaps);
             this.updateProductPreviewImPrice(paramsList, paramsMap);
 
-            priceChangeRuleMapper.updateProductPreviewPrice(vendor_id);
+            priceChangeRuleMapper.updateProductPreviewPrice(vendor_id,category_type,price_change_rule_id);
             priceChangeRuleMapper.updatePriceChangeRulePreviewStatus(vendor_id, preview_status, category_type, price_change_rule_id);
         }
         return true;
