@@ -1262,12 +1262,14 @@ public class OrderShipController extends BaseController {
                     inputVO.setServiceType("P");
                 }
             }
-
             StockLocation fromLocation = stockLocationService.getShipFromLocation(shipmentId);
-            BigDecimal customValue = iShipmentService.getCustomValue(params);
 
-            if (customValue!=null){
-                inputVO.setCustomsValue(customValue.setScale(2,BigDecimal.ROUND_HALF_UP));
+            if ("P".equalsIgnoreCase(inputVO.getServiceType())){
+                //只有类型ServiceType=P时才需要customsValue
+                BigDecimal customValue = iShipmentService.getCustomValue(params);
+                if (customValue!=null){
+                    inputVO.setCustomsValue(customValue.setScale(2,BigDecimal.ROUND_HALF_UP));
+                }
             }
 
             addParams(inputVO,dhlShipment,fromLocation,containerList,shipment);
