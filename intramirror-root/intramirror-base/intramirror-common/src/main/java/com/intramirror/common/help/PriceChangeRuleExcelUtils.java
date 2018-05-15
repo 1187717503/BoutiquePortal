@@ -488,7 +488,7 @@ public class PriceChangeRuleExcelUtils {
     }
 
     private static Map<String, Object> genMap(String brand_id, String discount, int i, String price_change_rule_id, String type) {
-        int dis = 100 - (int) Double.parseDouble(discount);
+        int dis = 100 - (int) Double.parseDouble(StringUtils.trim(discount));
         if (dis < 0 || dis > 100) {
             throw new RuntimeException("折扣设置错误");
         }
