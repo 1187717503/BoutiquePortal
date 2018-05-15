@@ -76,8 +76,8 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 				//保存对象信息
 				shipment.setShipToGeography(map.get("pack_english_name")==null?" ":map.get("pack_english_name").toString());
 				Long vendorId = Long.parseLong(map.get("vendor_id").toString());
-				Object locationId = map.get("stock_location_id");
-				Integer stockLocationId = Integer.parseInt(locationId!=null?locationId.toString():"0");
+				Object shipFromLocation_id = map.get("ship_from_location_id");
+				Integer locationId = Integer.parseInt(shipFromLocation_id!=null?shipFromLocation_id.toString():"0");
 				String top = shipmentMapper.getVendorCodeById(vendorId);
 				Map<String, Object> noMap = new HashMap<>();
 				noMap.put("topName", top+"SP");
@@ -90,7 +90,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 				shipment.setShipmentNo(top+"SP"+maxNo);
 				shipment.setVendorId(vendorId);
 				shipment.setStatus(ContainerType.OPEN);
-				shipment.setStockLocationId(stockLocationId);
+				shipment.setShipFromLocationId(locationId);
 				shipment.setCreatedAt(currentDate);
 				shipment.setUpdatedAt(currentDate);
 				shipment.setShipmentCategory(shipmentCategory);
@@ -340,6 +340,10 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		beanMap.put("shipToCity", map.get("addr_city")==null?" ":map.get("addr_city").toString());
 		beanMap.put("shipToProvince", map.get("addr_province")==null?" ":map.get("addr_province").toString());
 		beanMap.put("shipToCountry", map.get("addr_country")==null?" ":map.get("addr_country").toString());
+		beanMap.put("shipToCountryCode", map.get("country_code")==null?" ":map.get("country_code").toString());
+		beanMap.put("contact", map.get("transfer_contact")==null?" ":map.get("transfer_contact").toString());
+		beanMap.put("postalCode", map.get("zip_code")==null?" ":map.get("zip_code").toString());
+		beanMap.put("shipToEamilAddr", map.get("emailAddress")==null?" ":map.get("emailAddress").toString());
 		beanMap.put("shipmentId", shipmentId);
 		beanMap.put("status", ContainerType.RECEIVED);
 		beanMap.put("updatedAt", currentDate);
@@ -515,7 +519,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		shipment.setShipmentCategory(oldShipment.getShipmentCategory());
 		shipment.setCreatedAt(currentDate);
 		shipment.setUpdatedAt(currentDate);
-		shipment.setStockLocationId(oldShipment.getStockLocationId());
+		shipment.setShipFromLocationId(oldShipment.getShipFromLocationId());
 		logger.info("parameter :" + new Gson().toJson(shipment));
 		int result = shipmentMapper.saveShipmentByOrderId(shipment);
 		logger.info("insert shipment result : " +result);

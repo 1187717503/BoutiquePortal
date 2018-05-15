@@ -72,8 +72,8 @@ public class SubShipmentServiceImpl extends BaseDao implements ISubShipmentServi
 	}
 
 	@Override
-	public int deleteSubShipmentByShipmentId(Long subShipment) {
-		return subShipmentMapper.deleteSubShipmentByShipmentId(subShipment);
+	public int deleteSubShipmentByShipmentId(Long shipmentId) {
+		return subShipmentMapper.deleteSubShipmentByShipmentId(shipmentId);
 	}
 
 	@Override

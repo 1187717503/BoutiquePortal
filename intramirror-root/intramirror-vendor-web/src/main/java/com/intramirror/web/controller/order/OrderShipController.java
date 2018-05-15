@@ -201,10 +201,6 @@ public class OrderShipController extends BaseController {
                         shipMent.put("shipment_no", container.get("shipment_no").toString());
                         shipMent.put("shipment_status", container.get("shipment_status").toString());
                         String shipToGeography = container.get("ship_to_geography").toString();
-                        if ("China Mainland".equals(shipToGeography)
-                                ||"HongKong".equals(shipToGeography)){
-                            shipToGeography = "China excl. Taiwan";
-                        }
                         shipMent.put("ship_to_geography", shipToGeography);
                         shipMentList.add(shipMent);
                     }
@@ -608,23 +604,27 @@ public class OrderShipController extends BaseController {
             resultMap.put("VATNumber", invoice.getVatNum());
 
             //获取Ship From信息
-            //Map<String, Object> vendorParams = new HashMap<>();
-            //vendorParams.put("vendor_id", shipmentMap.get("vendor_id"));
-            //Vendor shipVendor = vendorService.getVendorByVendorId(vendorParams);
-            //resultMap.put("ShipFrom", shipVendor.getBusinessLicenseLocation());
-            //resultMap.put("ShipCompanyName", shipVendor.getCompanyName());
-            //resultMap.put("ShipVendorName", shipVendor.getVendorName());
             StockLocation location = stockLocationService.getShipFromLocation(shipment_id);
-            resultMap.put("companyName",location.getContactCompanyname());
-            resultMap.put("personName",location.getContactPersonname());
-            resultMap.put("contact",location.getContactPhonenumber());
+            resultMap.put("companyName",location.getContactCompanyName());
+            resultMap.put("personName",location.getContactPersonName());
+            resultMap.put("contact",location.getContactPhoneNumber());
             resultMap.put("address",location.getAddressStreetlines());
             resultMap.put("city",location.getAddressCity());
             resultMap.put("country","Italy");
 
             logger.info("打印Invoice----获取Deliver To信息");
             List<SubShipment> subShipmentList = subShipmentService.getSubShipmentByShipmentId(shipment_id);
-            if (subShipmentList.size() > 1) {
+            if (subShipmentList!=null&&subShipmentList.size()>0){
+                resultMap.put("DeliverTo", subShipmentList.get(0));
+                //发往质检仓的取DHL税号
+                if(map.get("shipmentCategory")!=null&&"1".equals(map.get("shipmentCategory").toString())){
+                    resultMap.put("VATNumber",subShipmentList.get(0).getPiva());
+                }
+            }else {
+                result.setMsg("DeliverTo is null ");
+                return result;
+            }
+            /*if (subShipmentList.size() > 1) {
                 ShippingProvider shippingProvider = shippingProviderService.getShippingProviderByShipmentId(shipment_id);
                 resultMap.put("DeliverTo", shippingProvider);
             } else if (subShipmentList.size() == 1) {
@@ -636,7 +636,7 @@ public class OrderShipController extends BaseController {
             } else {
                 result.setMsg("DeliverTo is null ");
                 return result;
-            }
+            }*/
             //获取carton列表
             Set<Long> shipmentIds =  new HashSet<>();
             shipmentIds.add(shipment_id);
@@ -750,9 +750,9 @@ public class OrderShipController extends BaseController {
         //获取Ship From信息
         StockLocation location = stockLocationService.getShipFromLocation(shipment_id);
         ShipperVO shipperVO = new ShipperVO();
-        shipperVO.setCompanyName(location.getContactCompanyname());
-        shipperVO.setPersonName(location.getContactPersonname());
-        shipperVO.setPhoneNumber(location.getContactPhonenumber());
+        shipperVO.setCompanyName(location.getContactCompanyName());
+        shipperVO.setPersonName(location.getContactPersonName());
+        shipperVO.setPhoneNumber(location.getContactPhoneNumber());
         shipperVO.setStreetLines(location.getAddressStreetlines());
         shipperVO.setStreetLines2(location.getAddressStreetlines2());
         shipperVO.setStreetLines3(location.getAddressStreetlines3());
@@ -1334,15 +1334,15 @@ public class OrderShipController extends BaseController {
         if (fromLocation!=null){
             ShipperVO shipperVO = new ShipperVO();
             shipperVO.setCity(fromLocation.getAddressCity());
-            shipperVO.setCompanyName(fromLocation.getContactCompanyname());
-            shipperVO.setPersonName(fromLocation.getContactPersonname());
-            shipperVO.setPhoneNumber(fromLocation.getContactPhonenumber());
-            shipperVO.setEmailAddress(fromLocation.getContactEmailaddress());
+            shipperVO.setCompanyName(fromLocation.getContactCompanyName());
+            shipperVO.setPersonName(fromLocation.getContactPersonName());
+            shipperVO.setPhoneNumber(fromLocation.getContactPhoneNumber());
+            shipperVO.setEmailAddress(fromLocation.getContactEmailAddress());
             shipperVO.setStreetLines(fromLocation.getAddressStreetlines());
             shipperVO.setStreetLines2(fromLocation.getAddressStreetlines2());
             shipperVO.setStreetLines3(fromLocation.getAddressStreetlines3());
-            shipperVO.setPostalCode(fromLocation.getAddressPostalcode());
-            shipperVO.setCountryCode(fromLocation.getAddressCountrycode());
+            shipperVO.setPostalCode(fromLocation.getAddressPostalCode());
+            shipperVO.setCountryCode(fromLocation.getAddressCountryCode());
             inputVO.setShipper(shipperVO);
         }
         if (dhlShipment!=null){
