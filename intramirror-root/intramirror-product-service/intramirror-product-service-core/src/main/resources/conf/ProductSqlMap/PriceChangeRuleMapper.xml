@@ -786,7 +786,7 @@
             )
         </if>
 
-        <if test="price_change_rule_id = -1">
+        <if test="price_change_rule_id == -1">
             and p.season_code in (
             select distinct pcrsg.season_code from price_change_rule pcr
             inner join price_change_rule_season_group pcrsg on (pcr.price_change_rule_id = pcrsg.price_change_rule_id and pcrsg.enabled = 1)
@@ -827,7 +827,7 @@
               select pcrsg.season_code from price_change_rule_season_group pcrsg where pcrsg.price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
             )
         </if>
-        <if test="price_change_rule_id = -1">
+        <if test="price_change_rule_id == -1">
             and p.season_code in (
                 select distinct pcrsg.season_code from price_change_rule pcr
                 inner join price_change_rule_season_group pcrsg on (pcr.price_change_rule_id = pcrsg.price_change_rule_id and pcrsg.enabled = 1)
