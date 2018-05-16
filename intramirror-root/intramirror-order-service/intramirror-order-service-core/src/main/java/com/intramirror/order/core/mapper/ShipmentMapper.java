@@ -70,14 +70,14 @@ public interface ShipmentMapper {
 	
 	/**
 	 * 根据vendorId查询vendorCode
-	 * @param map
+	 * @param vendorId
 	 * @return
 	 */
 	String getVendorCodeById(Long vendorId);
 	
 	/**
 	 * 根据条件查询shipment
-	 * @param map
+	 * @param shipment
 	 * @return
 	 */
 	Long getShipmentId(Shipment shipment);
@@ -130,4 +130,8 @@ public interface ShipmentMapper {
 	List<LogisticsProductVO> getlogisticsMilestone(Long shipmentId);
 
 	void saveMilestone(LogisticsProductVO logisticsProductVO);
+
+	void deleteMilestone(String awbNo);
+
+	List<Shipment> getShipmentListByAwbNo(List<String> awbNos);
 }

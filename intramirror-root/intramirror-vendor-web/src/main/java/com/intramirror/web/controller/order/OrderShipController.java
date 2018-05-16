@@ -17,6 +17,7 @@ import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.model.ShippingProvider;
 import com.intramirror.order.api.model.SubShipment;
 import com.intramirror.order.api.service.*;
+import com.intramirror.order.api.vo.LogisticsProductVO;
 import com.intramirror.product.api.model.Shop;
 import com.intramirror.product.api.service.IShopService;
 import com.intramirror.user.api.model.User;
@@ -1305,6 +1306,18 @@ public class OrderShipController extends BaseController {
                 jo.put("shipmentNo",shipment.getShipmentNo());
                 jo.remove("status");
                 result.setData(jo);
+
+                //保存awb单号
+                List<LogisticsProductVO> productVOList = iShipmentService.getlogisticsMilestone(shipmentId);
+                if (productVOList!=null&&productVOList.size()>0){
+                    for (LogisticsProductVO vo:productVOList){
+                        vo.setAwb(awbNo);
+                        vo.setIsComplete(0);
+                        vo.setShipmentType(3);
+                        vo.setType(4);
+                        iShipmentService.saveMilestone(vo);
+                    }
+                }
                 return result;
             }
 

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.intramirror.order.api.model.Shipment;
+import com.intramirror.order.api.vo.ShippedParam;
 import com.intramirror.user.api.model.User;
 import com.intramirror.utils.transform.JsonTransformUtil;
 import com.intramirror.web.util.DHLHttpClient;
@@ -201,6 +202,7 @@ public class ShipmentController extends BaseController{
 	
 	@RequestMapping(value="/updateShipmentById", method=RequestMethod.POST)
 	@ResponseBody
+	@Transactional
 	public ResultMessage updateShipmentById(@RequestBody Map<String, Object> map,HttpServletRequest httpRequest){
 		logger.info("getShipmentTypeById parameter : "+new Gson().toJson(map));
 		ResultMessage message = ResultMessage.getInstance();
@@ -225,28 +227,8 @@ public class ShipmentController extends BaseController{
 				message.errorStatus().putMsg("Info", "update fail").setData(0);
 				return message;
 			}
+			updateContainerStatus(map);
 
-			//状态修改成功修改container状态
-			logger.info("update container status");
-			List<Map<String, Object>> container = containerService.getShipmentList(map);
-			for (Map<String, Object> map2 : container) {
-				Map<String, Object> uMap = new HashMap<>();
-				uMap.put("status", map.get("status").toString());
-				uMap.put("containerId", map2.get("container_id").toString());
-				logger.info("update container param" + new Gson().toJson(uMap));
-				containerService.updateContainerBystatus(uMap);
-				uMap = new HashMap<>();
-				uMap.put("container_id", map2.get("container_id").toString());
-				List<LogisticsProduct> list  = logisticsProductService.selectByCondition(uMap);
-				logger.info("update LogisticsProduct param" + new Gson().toJson(uMap));
-				if (3 == Long.parseLong(map.get("status").toString())){
-					for (LogisticsProduct logisticsProduct : list) {
-						logger.info("update LogisticsProduct param Logistics_product_id" + logisticsProduct.getLogistics_product_id());
-						logisticsProductService.updateOrderLogisticsStatusById(logisticsProduct.getLogistics_product_id(),
-								Integer.parseInt(map.get("status").toString()));
-					}
-				}
-			}
 			message.successStatus().putMsg("Info", "SUCCESS").setData(1);
 
 			//如果shipment操作reopen,需要删除awb
@@ -296,6 +278,9 @@ public class ShipmentController extends BaseController{
 						params.put("shipmentId",map.get("shipmentId"));
 						params.put("awbNo","");
 						subShipmentService.updateSubShipment(params);
+
+						//删除物流表中awb单号
+						iShipmentService.deleteMilestone(dhlShipment.getAwbNum());
 					}
 				}
 			}
@@ -305,6 +290,30 @@ public class ShipmentController extends BaseController{
 			message.errorStatus().putMsg("error Message", e.getMessage());
 		}
 		return message;
+	}
+
+	private void updateContainerStatus(@RequestBody Map<String, Object> map) {
+		//状态修改成功修改container状态
+		logger.info("update container status");
+		List<Map<String, Object>> container = containerService.getShipmentList(map);
+		for (Map<String, Object> map2 : container) {
+            Map<String, Object> uMap = new HashMap<>();
+            uMap.put("status", map.get("status").toString());
+            uMap.put("containerId", map2.get("container_id").toString());
+            logger.info("update container param" + new Gson().toJson(uMap));
+            containerService.updateContainerBystatus(uMap);
+            uMap = new HashMap<>();
+            uMap.put("container_id", map2.get("container_id").toString());
+            List<LogisticsProduct> list  = logisticsProductService.selectByCondition(uMap);
+            logger.info("update LogisticsProduct param" + new Gson().toJson(uMap));
+            if (3 == Long.parseLong(map.get("status").toString())){
+                for (LogisticsProduct logisticsProduct : list) {
+                    logger.info("update LogisticsProduct param Logistics_product_id" + logisticsProduct.getLogistics_product_id());
+                    logisticsProductService.updateOrderLogisticsStatusById(logisticsProduct.getLogistics_product_id(),
+                            Integer.parseInt(map.get("status").toString()));
+                }
+            }
+        }
 	}
 
 	/**
@@ -408,6 +417,34 @@ public class ShipmentController extends BaseController{
 			e.printStackTrace();
 			logger.info("Error Message : " + e.getMessage());
 			message.errorStatus().putMsg("error Message", e.getMessage());
+		}
+		return message;
+	}
+
+	@RequestMapping(value="/shipped", method=RequestMethod.POST)
+	@ResponseBody
+	@Transactional
+	public ResultMessage shipped(@RequestBody ShippedParam param) {
+		logger.info("shipped parameter : " + new Gson().toJson(param));
+		ResultMessage message = ResultMessage.getInstance();
+		List<String> awbNos = param.getAwbNos();
+		if (null == awbNos || 0 == awbNos.size()){
+			logger.info("awbNos cannot be null");
+			message.errorStatus().putMsg("Info", "awbNos cannot be null");
+			return message;
+		}
+		List<Shipment> shipmentList = iShipmentService.getShipmentList(awbNos);
+		if (shipmentList!=null&&shipmentList.size()>0){
+			for (Shipment shipment:shipmentList){
+				if (3!=shipment.getStatus()){
+					iShipmentService.shipmentToShip(shipment.getShipmentId());
+					//修改carton状态
+					Map<String,Object> map = new HashMap<>();
+					map.put("shipmentId",shipment.getShipmentId());
+					map.put("status",3);
+					updateContainerStatus(map);
+				}
+			}
 		}
 		return message;
 	}

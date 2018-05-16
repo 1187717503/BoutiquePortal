@@ -53,7 +53,8 @@ public class LoginFilter implements Filter {
         String reqUrl = request.getRequestURI().replace(request.getContextPath(), "");
 
         //当url地址为登录的url的时候跳过拦截器  
-        if (reqUrl.contains("/login") || reqUrl.contains("demo_test")|| reqUrl.contains("/image")) {
+        if (reqUrl.contains("/login") || reqUrl.contains("demo_test")|| reqUrl.contains("/image")
+                ||reqUrl.contains("/shipment/shipped")) {
 
             //会请求两次，第一次是options 类型,但第一次状态返回200 才会第二次请求
             //先请求OPTIONS，得到许可后就可以跨域访问POST请求

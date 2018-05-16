@@ -198,4 +198,18 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 		VALUE (#{logisticsProductId},#{orderLineNum},#{orderId},#{orderNum},#{userId}
 		,NOW(),#{type},#{awb},#{shipmentType},#{isComplete},NOW(),NOW(),1)
 	</insert>
+
+	<update id="deleteMilestone" parameterType="string">
+		UPDATE logistics_milestone SET is_deleted = 1 WHERE dhl_type = 1 and shipment_code = #{awbNo}
+	</update>
+
+	<select id="getShipmentListByAwbNo" parameterType="string" resultMap="BaseResultMap">
+		SELECT s.* FROM shipment s
+		INNER JOIN sub_shipment ss on ss.shipment_id = s.shipment_id
+		WHERE ss.awb_num in
+		<foreach collection="list" item="awbNo" open="(" close=")" separator=",">
+			#{awbNo}
+		</foreach>
+		GROUP BY s.shipment_id
+	</select>
 </mapper>

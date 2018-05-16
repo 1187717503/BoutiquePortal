@@ -426,9 +426,9 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 				map.put("ship_at",new Date());
 
 				//校验是否生成AWB
-				String awb = checkAWB(shipment);
+				String awb = checkAWB(shipment.getShipmentId());
 				//记录AWB单号，用于生成物流轨迹
-				List<LogisticsProductVO> milestones = shipmentMapper.getlogisticsMilestone(shipment.getShipmentId());
+				/*List<LogisticsProductVO> milestones = shipmentMapper.getlogisticsMilestone(shipment.getShipmentId());
 				if (milestones!=null&&milestones.size()>0){
 					for (LogisticsProductVO vo:milestones){
 						vo.setAwb(awb);
@@ -437,8 +437,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 						vo.setType(4);
 						shipmentMapper.saveMilestone(vo);
 					}
-				}
-
+				}*/
 			}
 			//如果一直修改状态
 			if (lastStatus == shipment.getStatus()){
@@ -452,9 +451,9 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		return result;
 	}
 
-	private String checkAWB(Shipment shipment) {
+	private String checkAWB(Long shipmentId) {
 		Map<String,Object> params = new HashMap<>();
-		params.put("shipmentId",shipment.getShipmentId());
+		params.put("shipmentId",shipmentId);
 		//查询第一段
 		params.put("sequence",1);
 		SubShipment dhlShipment = subShipmentService.getDHLShipment(params);
@@ -553,4 +552,34 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
         }
         return null;
     }
+
+	@Override
+	public List<LogisticsProductVO> getlogisticsMilestone(Long shipmentId) {
+		return shipmentMapper.getlogisticsMilestone(shipmentId);
+	}
+
+	@Override
+	public void saveMilestone(LogisticsProductVO vo) {
+		shipmentMapper.saveMilestone(vo);
+	}
+
+	@Override
+	public void deleteMilestone(String awbNo) {
+		shipmentMapper.deleteMilestone(awbNo);
+	}
+
+	@Override
+	public List<Shipment> getShipmentList(List awbNos) {
+		return shipmentMapper.getShipmentListByAwbNo(awbNos);
+	}
+
+	@Override
+	public void shipmentToShip(Long shipmentId) {
+		checkAWB(shipmentId);
+
+		Map<String,Object> map = new HashMap<>();
+		map.put("shipmentId",shipmentId);
+		map.put("status",3);
+		shipmentMapper.updateShipmentStatus(map);
+	}
 }
