@@ -339,7 +339,7 @@ public class ContainerController {
 				maxCode = 1000001;
 			else 
 				maxCode ++;
-			barCode+=(maxCode+1);
+			barCode+=maxCode;
 			message.successStatus().addMsg("info SUCCESS").setData(barCode);
 			return message;
 		} catch (Exception e) {

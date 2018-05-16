@@ -87,7 +87,7 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 	WHERE s.vendor_id = #{vendorId,jdbcType=BIGINT} AND s.`status` = #{status,jdbcType=BIGINT}
 	AND s.ship_to_geography = #{shipToGeography,jdbcType=VARCHAR}
 	AND s.ship_from_location_id = #{shipFromLocationId,jdbcType=INTEGER}
-	AND ss.enabled = 1 AND ss.shipment_type_id != 2
+	AND ss.enabled = 1 AND ss.shipment_type_id = 3
 	GROUP BY s.shipment_no
   </select>
   
