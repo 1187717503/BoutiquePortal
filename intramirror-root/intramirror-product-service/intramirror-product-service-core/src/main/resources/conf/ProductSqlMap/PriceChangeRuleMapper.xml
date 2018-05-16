@@ -780,13 +780,13 @@
         inner join `sku` s on(s.`product_id` = p.`product_id`  and s.`enabled`  = 1 and p.`enabled`  = 1)
         set p.`preview_im_price`  = null
         where p.`vendor_id`  = #{vendor_id,jdbcType=BIGINT} <![CDATA[ and p.`preview_im_price`  >=  s.`im_price` ]]>
-        <if test="price_change_rule_id != null and price_change_rule_id != ''">
+        <if test="price_change_rule_id != -1">
             and p.season_code in (
             select pcrsg.season_code from price_change_rule_season_group pcrsg where pcrsg.price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
             )
         </if>
 
-        <if test="price_change_rule_id = null or price_change_rule_id = ''">
+        <if test="price_change_rule_id = -1">
             and p.season_code in (
             select distinct pcrsg.season_code from price_change_rule pcr
             inner join price_change_rule_season_group pcrsg on (pcr.price_change_rule_id = pcrsg.price_change_rule_id and pcrsg.enabled = 1)
@@ -822,12 +822,12 @@
             from category where category_id not in(1499,1568) and level=1 and enabled=1) and
             enabled=1) and enabled=1)
         </if>
-        <if test="price_change_rule_id != null and price_change_rule_id != ''">
+        <if test="price_change_rule_id != -1">
             and p.season_code in (
               select pcrsg.season_code from price_change_rule_season_group pcrsg where pcrsg.price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
             )
         </if>
-        <if test="price_change_rule_id = null or price_change_rule_id = ''">
+        <if test="price_change_rule_id = -1">
             and p.season_code in (
                 select distinct pcrsg.season_code from price_change_rule pcr
                 inner join price_change_rule_season_group pcrsg on (pcr.price_change_rule_id = pcrsg.price_change_rule_id and pcrsg.enabled = 1)
@@ -841,7 +841,7 @@
         `category_type` = #{category_type,jdbcType=BIGINT}
         and `status`  = 1 and price_type = 3
         and `vendor_id`  = #{vendor_id,jdbcType=BIGINT}
-        <if test="price_change_rule_id != null and price_change_rule_id != ''">
+        <if test="price_change_rule_id != -1">
             and price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
         </if>
     </update>
