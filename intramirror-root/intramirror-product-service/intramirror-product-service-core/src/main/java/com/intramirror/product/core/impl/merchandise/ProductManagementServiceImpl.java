@@ -351,7 +351,11 @@ public class ProductManagementServiceImpl implements ProductManagementService {
         batchCreateShopProduct(shopStatus, products, skuMap);
         List<ShopProductSku> shopProductSkuList = mergeShopProductSkuBatch(skuList, haveSkuProductIds);
         shopProductSkuMapper.batchInsertShopProductSku(shopProductSkuList);
-        return productMapper.listProductByProductIds(exceptionProductIds);
+        if (exceptionProductIds.size() == 0) {
+            return new ArrayList<ProductWithBLOBs>();
+        } else {
+            return productMapper.listProductByProductIds(exceptionProductIds);
+        }
     }
 
     private Map<Long, List<Sku>> skuList2MapByProductId(List<Sku> skuList) {

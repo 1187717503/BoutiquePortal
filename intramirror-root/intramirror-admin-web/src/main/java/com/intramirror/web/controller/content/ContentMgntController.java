@@ -117,7 +117,7 @@ public class ContentMgntController {
      */
     @PostMapping(value = "/blocks", consumes = "application/json")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public Response createBlock(@RequestBody Block block) {
+    public Response createBlock(@RequestBody Block block) throws Exception {
         contentManagementService.createBlockWithDefaultTag(block);
         return Response.success();
     }

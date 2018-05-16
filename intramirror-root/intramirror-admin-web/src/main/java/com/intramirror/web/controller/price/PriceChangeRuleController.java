@@ -24,6 +24,7 @@ import com.intramirror.product.api.service.price.IPriceChangeRule;
 import com.intramirror.user.api.model.User;
 import com.intramirror.web.controller.BaseController;
 import com.intramirror.web.service.PriceChangeRuleService;
+import com.intramirror.web.service.price.PriceRuleSynService;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -56,6 +57,9 @@ public class PriceChangeRuleController extends BaseController {
 
     @Autowired
     private IPriceChangeRule priceChangeRule;
+
+    @Autowired
+    private PriceRuleSynService priceRuleSynService;
 
     @Autowired
     private IPriceChangeRuleProductService priceChangeRuleProductService;
@@ -93,17 +97,18 @@ public class PriceChangeRuleController extends BaseController {
         params.put("category_type", pcrModel.getCategoryType());
         params.put("price_type", pcrModel.getPriceType());
         priceChangeRule.updateDefaultPrice(priceType, params);
-        priceTaskController.syncAllRedundantTable();
+        //        priceTaskController.syncAllRedundantTable();
+        priceRuleSynService.syncAllPriceByTable();
         return Response.success();
     }
 
-    @RequestMapping(value = "/run/im",method = RequestMethod.GET)
+    @RequestMapping(value = "/run/im", method = RequestMethod.GET)
     @ResponseBody
     public Response runIm(@Param("price_change_rule_id") String price_change_rule_id, @Param("flag") String flag) throws Exception {
         logger.info("Start running IM discounts,price_change_rule_id:" + price_change_rule_id);
         PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
 
-        if(pcrModel.getStatus().intValue() != 1) {
+        if (pcrModel.getStatus().intValue() != 1) {
             logger.info("Start running IM discounts Error,price_change_rule_id:" + price_change_rule_id);
             return Response.status(StatusCode.FAILURE).data("不允许执行非Pending的IM折扣");
         }
@@ -112,7 +117,8 @@ public class PriceChangeRuleController extends BaseController {
         if (StringUtils.isNotBlank(flag) && flag.equalsIgnoreCase("all")) {
             pcrModel.setPriceChangeRuleId(null);
         }
-        priceChangeRule.updateAdminPrice(pcrModel.getVendorId(), pcrModel.getCategoryType().intValue(), pcrModel.getPriceChangeRuleId());
+        //        priceChangeRule.updateAdminPrice(pcrModel.getVendorId(), pcrModel.getCategoryType().intValue(), pcrModel.getPriceChangeRuleId());
+        priceRuleSynService.syncIm(pcrModel.getVendorId(), pcrModel.getCategoryType().intValue(), pcrModel.getPriceChangeRuleId());
         logger.info("End the discounts of IM goods:" + JSONObject.toJSONString(pcrModel));
 
         /*// sku.im_price -> shop_product_sku.sale_price
@@ -129,20 +135,20 @@ public class PriceChangeRuleController extends BaseController {
 
         // sku.im_price -> product.min_im_price,product.max_im_price
         priceChangeRule.updateProductImPrice();*/
-        priceTaskController.syncAllRedundantTable();
+        //        priceTaskController.syncAllRedundantTable();
 
         logger.info("End running IM discounts,price_change_rule_id:" + price_change_rule_id);
         return Response.success();
     }
 
-    @RequestMapping(value = "/run/boutique",method = RequestMethod.GET)
+    @RequestMapping(value = "/run/boutique", method = RequestMethod.GET)
     @ResponseBody
     public Response runBoutique(@Param("price_change_rule_id") String price_change_rule_id, @Param("flag") String flag) throws Exception {
 
         logger.info("Start running BOUTIQUE discounts,price_change_rule_id:" + price_change_rule_id);
         PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
 
-        if(pcrModel.getStatus().intValue() != 1) {
+        if (pcrModel.getStatus().intValue() != 1) {
             logger.info("Start running IM discounts Error,price_change_rule_id:" + price_change_rule_id);
             return Response.status(StatusCode.FAILURE).data("不允许执行非Pending的Boutique折扣");
         }
@@ -151,7 +157,8 @@ public class PriceChangeRuleController extends BaseController {
         if (StringUtils.isNotBlank(flag) && flag.equalsIgnoreCase("all")) {
             pcrModel.setPriceChangeRuleId(null);
         }
-        priceChangeRule.updateVendorPrice(pcrModel.getVendorId(), pcrModel.getCategoryType(), pcrModel.getPriceChangeRuleId());
+        //        priceChangeRule.updateVendorPrice(pcrModel.getVendorId(), pcrModel.getCategoryType(), pcrModel.getPriceChangeRuleId());
+        priceRuleSynService.syncBoutique(pcrModel.getVendorId(), pcrModel.getCategoryType(), pcrModel.getPriceChangeRuleId());
         logger.info("End the discounts of BOUTIQUE goods:" + JSONObject.toJSONString(pcrModel));
 
         /*// sku.im_price -> shop_product_sku.sale_price
@@ -168,7 +175,7 @@ public class PriceChangeRuleController extends BaseController {
 
         // sku.im_price -> product.min_im_price,product.max_im_price
         priceChangeRule.updateProductImPrice();*/
-        priceTaskController.syncAllRedundantTable();
+        //        priceTaskController.syncAllRedundantTable();
         logger.info("End running BOUTIQUE discounts,price_change_rule_id:" + price_change_rule_id);
 
         return Response.success();
@@ -201,16 +208,24 @@ public class PriceChangeRuleController extends BaseController {
     @RequestMapping("/changepreview")
     @ResponseBody
 
-    public ResultMessage changePreview(@Param("price_change_rule_id") Long price_change_rule_id, @Param("preview_status") Long preview_status) {
+    public ResultMessage changePreview(@Param("price_change_rule_id") Long price_change_rule_id, @Param("preview_status") Long preview_status,
+            @Param("flag") String flag) {
         logger.info("PriceChangeRuleController,changePreview,inputParams,price_change_rule_id:{},preview_status:{} ", price_change_rule_id, preview_status);
 
         ResultMessage resultMessage = ResultMessage.getInstance();
 
         try {
-            PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(price_change_rule_id);
-            priceChangeRule.updatePreviewPrice(pcrModel.getVendorId(), preview_status, pcrModel.getCategoryType().intValue());
-
-            resultMessage.successStatus().putMsg("info", "success !!!");
+            synchronized (this) {
+                PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(price_change_rule_id);
+                //            priceChangeRule.updatePreviewPrice(pcrModel.getVendorId(), preview_status, pcrModel.getCategoryType().intValue(), pcrModel.getPriceChangeRuleId(),
+                //                    flag);
+                if (StringUtils.isBlank(flag)) {
+                    flag = "";
+                }
+                priceRuleSynService.syncPreview(pcrModel.getVendorId(), preview_status, pcrModel.getCategoryType().intValue(), pcrModel.getPriceChangeRuleId(),
+                        flag);
+                resultMessage.successStatus().putMsg("info", "success !!!");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("error message : " + e.getMessage());
