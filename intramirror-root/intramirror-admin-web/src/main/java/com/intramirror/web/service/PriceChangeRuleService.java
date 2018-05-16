@@ -487,7 +487,7 @@ public class PriceChangeRuleService {
                 //根据price_change_rule_id  修改有效期
                 PriceChangeRule priceChangeRuleInfo = new PriceChangeRule();
                 priceChangeRuleInfo.setPriceChangeRuleId(Long.valueOf(info.get("price_change_rule_id").toString()));
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 priceChangeRuleInfo.setValidFrom(simpleDateFormat.parse(map.get("valid_from").toString()));
 
                 logger.info(MessageFormat

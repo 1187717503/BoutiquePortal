@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import org.apache.commons.lang.time.DateFormatUtils;
 
 /**
  * Created by dingyifan on 2017/8/31.
@@ -39,8 +40,16 @@ public class DateUtils {
     }
 
     public static void main(String[] args) {
-        System.out.println(getTimeByMinute(0));;
+        Calendar start = Calendar.getInstance();
 
+        Calendar end = Calendar.getInstance();
+        end.add(Calendar.MINUTE,1);
+
+        String startTime = DateFormatUtils.format(start.getTime(),"yyyy-MM-dd HH:mm:00");
+        String endTime = DateFormatUtils.format(end.getTime(),"yyyy-MM-dd HH:mm:00");
+
+        System.out.println(startTime);
+        System.out.println(endTime);
     }
 
     public static String getformatDate(Date date){
