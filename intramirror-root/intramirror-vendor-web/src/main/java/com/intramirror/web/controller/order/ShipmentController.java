@@ -448,7 +448,7 @@ public class ShipmentController extends BaseController{
 			}
 		}
 		if (shipmentList==null||shipmentList.size()<awbNos.size()){
-			logger.warn("awb Number list:{}包含不存的shipment",new Gson().toJson(awbNos));
+			logger.warn("awb Number list:{}包含不存在的shipment",new Gson().toJson(awbNos));
 		}
 		return message;
 	}
