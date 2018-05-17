@@ -443,8 +443,12 @@ public class ShipmentController extends BaseController{
 					map.put("shipmentId",shipment.getShipmentId());
 					map.put("status",3);
 					updateContainerStatus(map);
+					message.successStatus();
 				}
 			}
+		}
+		if (shipmentList==null||shipmentList.size()<awbNos.size()){
+			logger.warn("awb Number list:{}包含不存的shipment",new Gson().toJson(awbNos));
 		}
 		return message;
 	}
