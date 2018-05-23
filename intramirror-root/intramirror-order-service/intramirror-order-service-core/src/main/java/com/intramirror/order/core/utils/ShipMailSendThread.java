@@ -1,5 +1,6 @@
 package com.intramirror.order.core.utils;
 
+import com.google.gson.Gson;
 import com.intramirror.common.utils.DateUtils;
 import com.intramirror.order.api.service.IViewOrderLinesService;
 import com.intramirror.order.api.vo.MailAttachmentVO;
@@ -34,8 +35,10 @@ public class ShipMailSendThread implements Runnable {
     @Override
     public void run() {
         logger.info("----------Start to send ship mail.----------");
+        logger.info("ShipMailSendThread shipmentNo={}", shipment.getShipmentNo());
 
         //根据AWB单号查询视图order_line_view获取数据
+        logger.info("ShipMailSendThread 查询shipment下的订单列表");
         List<ViewOrderLinesVO> shipmentList = viewOrderLinesService.getShipmentListByShipmentNo(shipment.getShipmentNo());
         if (shipment.getDestination() == null) {
             shipment.setDestination(shipmentList.get(0).getShip_to_country());
@@ -120,11 +123,15 @@ public class ShipMailSendThread implements Runnable {
         mailContent.setAttachments(mailAttachmentVOs);
 
         try {
+            logger.info("ShipMailSendThread 开始发送邮件 content={}", new Gson().toJson(mailContent));
             MailSendUtil.sendMail(mailContent);
+            logger.info("ShipMailSendThread 邮件发送完成");
         } catch (MessagingException e) {
             e.printStackTrace();
+            logger.error("ShipMailSendThread 邮件发送失败", e);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
+            logger.error("ShipMailSendThread 邮件发送失败", e);
         }
         logger.info("----------Send mail finished.----------");
     }

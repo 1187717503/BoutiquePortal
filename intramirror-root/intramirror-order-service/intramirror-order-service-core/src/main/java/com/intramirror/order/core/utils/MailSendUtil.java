@@ -58,47 +58,34 @@ public class MailSendUtil {
         messageHelper.setFrom(MailConfig.emailFrom);
         // 处理收件人地址
         if (mailModelVO.getToEmails() != null) {
-            String[] toEmailArray = mailModelVO.getToEmails().split(";");
-            List<String> toEmailList = new ArrayList<String>();
-            if (toEmailArray.length == 0) {
-                logger.error("收件人邮箱不得为空！");
-            } else {
-                for (String s : toEmailArray) {
-                    if (s != null && !s.equals("")) {
-                        toEmailList.add(s);
-                    }
-                }
-                if (toEmailList.size() <= 0) {
-                    logger.error("收件人邮箱不得为空！");
-                } else {
-                    toEmailArray = new String[toEmailList.size()];
-                    for (int i = 0; i < toEmailList.size(); i++) {
-                        toEmailArray[i] = toEmailList.get(i);
-                    }
-                }
-            }
-            messageHelper.setTo(toEmailArray);
+            messageHelper.setTo(mailModelVO.getToEmails().split(";"));
         } else {
             messageHelper.setTo(MailConfig.emailTo.split(";"));
         }
         if (StringUtils.isNotBlank(mailModelVO.getSubject())) {
             messageHelper.setSubject(mailModelVO.getSubject());
         } else {
-            logger.error("邮件主题不能为空！");
+            logger.warn("Subject is blank.");
+            messageHelper.setSubject("IntraMirror Mail");
         }
         messageHelper.setText(mailModelVO.getContent(), true);
 
         // 添加附件
         if (!CollectionUtils.isEmpty(mailModelVO.getAttachments())) {
             for (MailAttachmentVO mailAttachmentVO : mailModelVO.getAttachments()) {
-                if (null == mailAttachmentVO.getFileName() || null == mailAttachmentVO.getFileUrl()) {
-                    throw new RuntimeException("请确认每个附件的名称和地址是否齐全！");
+                if (StringUtils.isBlank(mailAttachmentVO.getFileUrl())) {
+                    logger.warn("Attachment file url is blank.");
+                    continue;
                 }
                 File file = new File(mailAttachmentVO.getFileUrl());
                 if (!file.exists()) {
-                    throw new RuntimeException("附件" + mailAttachmentVO.getFileUrl() + "不存在！");
+                    logger.warn("Attachment file is not exists.");
+                    continue;
                 }
-
+                if (null == mailAttachmentVO.getFileName()) {
+                    logger.warn("Attachment file name is null.");
+                    mailAttachmentVO.setFileName(String.valueOf(System.currentTimeMillis()));
+                }
                 FileSystemResource fileResource = new FileSystemResource(file);
                 messageHelper.addAttachment(mailAttachmentVO.getFileName(), fileResource);
             }
