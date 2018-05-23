@@ -20,6 +20,7 @@
         <result column="product_group_id" jdbcType="BIGINT" property="productGroupId"/>
         <result column="min_sale_price" jdbcType="DECIMAL" property="minSalePrice"/>
         <result column="max_sale_price" jdbcType="DECIMAL" property="maxSalePrice"/>
+        <result column="season_sn" jdbcType="TINYINT" property="seasonSn"/>
     </resultMap>
     <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.intramirror.product.api.model.ShopProductWithBLOBs">
         <!--
@@ -379,6 +380,9 @@
             <if test="introduction != null">
                 introduction,
             </if>
+            <if test="seasonSn != null">
+                season_sn,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="shopProductId != null">
@@ -425,6 +429,9 @@
             <if test="introduction != null">
                 #{introduction,jdbcType=LONGVARCHAR},
             </if>
+            <if test="seasonSn != null">
+                #{seasonSn,jdbcType=LONGVARCHAR},
+            </if>
         </trim>
     </insert>
 
@@ -468,7 +475,8 @@
         updated_at,
         enabled,
         min_sale_price,
-        max_sale_price
+        max_sale_price,
+        season_sn
         )
         VALUES
         <foreach collection="list" item="item" index="index" separator=",">
@@ -484,7 +492,8 @@
             now(),
             #{item.enabled},
             #{item.minSalePrice},
-            #{item.maxSalePrice}
+            #{item.maxSalePrice},
+            #{item.seasonSn}
             )
         </foreach>
     </insert>

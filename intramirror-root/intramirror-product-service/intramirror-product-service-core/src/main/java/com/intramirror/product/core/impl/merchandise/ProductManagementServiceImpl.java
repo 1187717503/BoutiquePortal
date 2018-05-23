@@ -6,6 +6,7 @@ import com.intramirror.core.common.exception.ValidateException;
 import com.intramirror.core.common.response.ErrorResponse;
 import com.intramirror.product.api.model.ProductWithBLOBs;
 import com.intramirror.product.api.model.SearchCondition;
+import com.intramirror.product.api.model.Season;
 import com.intramirror.product.api.model.ShopProduct;
 import com.intramirror.product.api.model.ShopProductSku;
 import com.intramirror.product.api.model.ShopProductWithBLOBs;
@@ -14,6 +15,7 @@ import com.intramirror.product.api.service.merchandise.ProductManagementService;
 import com.intramirror.product.common.KafkaProperties;
 import com.intramirror.product.core.mapper.ProductManagementMapper;
 import com.intramirror.product.core.mapper.ProductMapper;
+import com.intramirror.product.core.mapper.SeasonMapper;
 import com.intramirror.product.core.mapper.ShopProductMapper;
 import com.intramirror.product.core.mapper.ShopProductSkuMapper;
 import com.intramirror.product.core.mapper.SkuMapper;
@@ -31,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created on 2017/10/30.
+ *
  * @author YouFeng.Zhu
  */
 @Service
@@ -48,6 +51,9 @@ public class ProductManagementServiceImpl implements ProductManagementService {
     private ShopProductSkuMapper shopProductSkuMapper;
     @Autowired
     private SkuMapper skuMapper;
+
+    @Autowired
+    private SeasonMapper seasonMapper;
 
     @Autowired
     IKafkaService kafkaService;
@@ -389,6 +395,7 @@ public class ProductManagementServiceImpl implements ProductManagementService {
     }
 
     private ShopProductWithBLOBs makeInputShopProductWithBLOBs(int status, Sku sku, ProductWithBLOBs product) {
+        Season season = seasonMapper.selectByPrimaryKey(product.getSeasonCode());
         ShopProductWithBLOBs shopProduct = new ShopProductWithBLOBs();
         shopProduct.setShopId(shopId);
         shopProduct.setShopCategoryId(product.getCategoryId());
@@ -400,6 +407,7 @@ public class ProductManagementServiceImpl implements ProductManagementService {
         shopProduct.setEnabled(true);
         shopProduct.setMinSalePrice(sku.getImPrice());
         shopProduct.setMaxSalePrice(sku.getImPrice());
+        shopProduct.setSeasonSn(season.getSeasonSn());
         return shopProduct;
     }
 

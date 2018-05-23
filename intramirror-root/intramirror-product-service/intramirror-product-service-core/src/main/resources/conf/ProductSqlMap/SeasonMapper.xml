@@ -11,6 +11,7 @@
         <result column="enabled" property="enabled" jdbcType="INTEGER"/>
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
         <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP"/>
+        <result column="season_sn" property="seasonSn" jdbcType="INTEGER"/>
     </resultMap>
     <sql id="Base_Column_List">
         <!--
