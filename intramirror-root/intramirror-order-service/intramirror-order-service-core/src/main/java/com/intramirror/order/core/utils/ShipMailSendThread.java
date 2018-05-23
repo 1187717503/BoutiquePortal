@@ -126,10 +126,7 @@ public class ShipMailSendThread implements Runnable {
             logger.info("ShipMailSendThread 开始发送邮件 content={}", new Gson().toJson(mailContent));
             MailSendUtil.sendMail(mailContent);
             logger.info("ShipMailSendThread 邮件发送完成");
-        } catch (MessagingException e) {
-            e.printStackTrace();
-            logger.error("ShipMailSendThread 邮件发送失败", e);
-        } catch (UnsupportedEncodingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             logger.error("ShipMailSendThread 邮件发送失败", e);
         }
@@ -158,7 +155,7 @@ public class ShipMailSendThread implements Runnable {
             row = sheet.createRow(rowLength);
             BigDecimal boutiquePrice = new BigDecimal(order.getBoutique_price());
             BigDecimal retailPrice = new BigDecimal(order.getRetail_price());
-            String boutiqueDiscountOff = new BigDecimal(100).subtract(boutiquePrice.multiply(new BigDecimal(122)).divide(retailPrice, 4, BigDecimal.ROUND_HALF_DOWN)).setScale(0, BigDecimal.ROUND_HALF_UP).toString() + "%";
+            String boutiqueDiscountOff = new BigDecimal(100).subtract(boutiquePrice.multiply(new BigDecimal(122)).divide(retailPrice, 4, BigDecimal.ROUND_HALF_DOWN)).setScale(2, BigDecimal.ROUND_HALF_UP).toString() + "%";
             String[] values = {
                     transforNullValue(order.getVendor_name()),
                     transforNullValue(order.getStock_location()),
