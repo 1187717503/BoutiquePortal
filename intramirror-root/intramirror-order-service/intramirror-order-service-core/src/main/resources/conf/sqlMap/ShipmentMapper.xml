@@ -11,6 +11,7 @@
 	    <result column="shipment_category" property="shipmentCategory" jdbcType="BIGINT" />
 	    <result column="vendor_id" property="vendorId" jdbcType="BIGINT" />
 	    <result column="shipment_no" property="shipmentNo" jdbcType="VARCHAR" />
+	    <result column="to_type" property="toType" jdbcType="INTEGER" />
 	    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
 	    <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
   	</resultMap>
