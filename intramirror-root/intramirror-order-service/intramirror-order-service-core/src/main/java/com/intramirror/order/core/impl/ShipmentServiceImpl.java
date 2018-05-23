@@ -449,6 +449,10 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 				vo.setShipmentNo(shipment.getShipmentNo());
 				if (shipment.getToType() == 2) {
 					vo.setDestination("Transit Warehouse");
+				} else if("China Mainland".equals(shipment.getShipToGeography())
+						||"HongKong".equals(shipment.getShipToGeography())
+						||"China excl. Taiwan".equals(shipment.getShipToGeography())) {
+					vo.setDestination("China");
 				}
                 sendMail(vo);
 			}
