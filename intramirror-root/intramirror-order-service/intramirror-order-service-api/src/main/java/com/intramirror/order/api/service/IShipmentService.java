@@ -10,6 +10,7 @@ import java.util.Map;
 import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.model.SubShipment;
 import com.intramirror.order.api.vo.LogisticsProductVO;
+import com.intramirror.order.api.vo.ShipmentSendMailVO;
 
 /**
  * @author yuan
@@ -163,5 +164,11 @@ public interface IShipmentService {
 	 * @param shipmentId
 	 */
 	void shipmentToShip(Long shipmentId);
+
+    /**
+     * shipped状态发邮件
+     * @param shipment
+     */
+	void sendMailForShipped(ShipmentSendMailVO shipment);
 
 }

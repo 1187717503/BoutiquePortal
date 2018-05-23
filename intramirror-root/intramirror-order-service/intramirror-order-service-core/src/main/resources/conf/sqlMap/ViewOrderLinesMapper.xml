@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.intramirror.common.core.mapper.ViewOrderLinesMapper">
+	<resultMap id="BaseResultMap" type="com.intramirror.order.api.vo.ViewOrderLinesVO" >
+		<result column="order_line_num" property="order_line_num" jdbcType="VARCHAR"/>
+		<result column="created_at" property="created_at" jdbcType="VARCHAR"/>
+		<result column="created_hour" property="created_hour" jdbcType="VARCHAR"/>
+		<result column="weekday" property="weekday" jdbcType="VARCHAR"/>
+		<result column="created_at_datetime" property="created_at_datetime" jdbcType="VARCHAR"/>
+		<result column="confirmed_at" property="confirmed_at" jdbcType="VARCHAR"/>
+		<result column="confirmed_at_datetime" property="confirmed_at_datetime" jdbcType="VARCHAR"/>
+		<result column="confirmed_lead_time" property="confirmed_lead_time" jdbcType="VARCHAR"/>
+		<result column="packed_at" property="packed_at" jdbcType="VARCHAR"/>
+		<result column="packed_at_datetime" property="packed_at_datetime" jdbcType="VARCHAR"/>
+		<result column="packed_lead_time" property="packed_lead_time" jdbcType="VARCHAR"/>
+		<result column="shipped_at" property="shipped_at" jdbcType="VARCHAR"/>
+		<result column="shipped_at_datetime" property="shipped_at_datetime" jdbcType="VARCHAR"/>
+		<result column="shipped_lead_time" property="shipped_lead_time" jdbcType="VARCHAR"/>
+		<result column="boutique_lead_time" property="boutique_lead_time" jdbcType="VARCHAR"/>
+		<result column="status" property="status" jdbcType="VARCHAR"/>
+		<result column="qty" property="qty" jdbcType="VARCHAR"/>
+		<result column="Status Desc" property="status_desc" jdbcType="VARCHAR"/>
+		<result column="vendor_name" property="vendor_name" jdbcType="VARCHAR"/>
+		<result column="brand" property="brand" jdbcType="VARCHAR"/>
+		<result column="l1 category" property="l1_category" jdbcType="VARCHAR"/>
+		<result column="l2 category" property="l2_category" jdbcType="VARCHAR"/>
+		<result column="l3 category" property="l3_category" jdbcType="VARCHAR"/>
+		<result column="product_code" property="product_code" jdbcType="VARCHAR"/>
+		<result column="designer_id" property="designer_id" jdbcType="VARCHAR"/>
+		<result column="color_code" property="color_code" jdbcType="VARCHAR"/>
+		<result column="season_code" property="season_code" jdbcType="VARCHAR"/>
+		<result column="product_name" property="product_name" jdbcType="VARCHAR"/>
+		<result column="product_desc" property="product_desc" jdbcType="VARCHAR"/>
+		<result column="size" property="size" jdbcType="VARCHAR"/>
+		<result column="sale_price" property="sale_price" jdbcType="VARCHAR"/>
+		<result column="boutique_price" property="boutique_price" jdbcType="VARCHAR"/>
+		<result column="retail_price" property="retail_price" jdbcType="VARCHAR"/>
+		<result column="shipping_fee" property="shipping_fee" jdbcType="VARCHAR"/>
+		<result column="tax_fee" property="tax_fee" jdbcType="VARCHAR"/>
+		<result column="cancel_reason" property="cancel_reason" jdbcType="VARCHAR"/>
+		<result column="updated_at" property="updated_at" jdbcType="VARCHAR"/>
+		<result column="conversion rate" property="conversion_rate" jdbcType="VARCHAR"/>
+		<result column="order number" property="order_number" jdbcType="VARCHAR"/>
+		<result column="store" property="store" jdbcType="VARCHAR"/>
+		<result column="reserved" property="reserved" jdbcType="VARCHAR"/>
+		<result column="confirmed" property="confirmed" jdbcType="VARCHAR"/>
+		<result column="last_check" property="last_check" jdbcType="VARCHAR"/>
+		<result column="stock_location" property="stock_location" jdbcType="VARCHAR"/>
+		<result column="geography" property="geography" jdbcType="VARCHAR"/>
+		<result column="certificate_amount" property="certificate_amount" jdbcType="VARCHAR"/>
+		<result column="username" property="username" jdbcType="VARCHAR"/>
+		<result column="telephone" property="telephone" jdbcType="VARCHAR"/>
+		<result column="buyer_name" property="buyer_name" jdbcType="VARCHAR"/>
+		<result column="buyer_contact" property="buyer_contact" jdbcType="VARCHAR"/>
+		<result column="consignee" property="consignee" jdbcType="VARCHAR"/>
+		<result column="consignee mobile" property="consignee_mobile" jdbcType="VARCHAR"/>
+		<result column="ship-to country" property="ship_to_country" jdbcType="VARCHAR"/>
+		<result column="ship-to province" property="ship_to_province" jdbcType="VARCHAR"/>
+		<result column="ship-to area" property="ship_to_area" jdbcType="VARCHAR"/>
+		<result column="ship-to city" property="ship_to_city" jdbcType="VARCHAR"/>
+		<result column="ship-to address" property="ship_to_address" jdbcType="VARCHAR"/>
+		<result column="zip code" property="zip_code" jdbcType="VARCHAR"/>
+		<result column="container_nr" property="container_nr" jdbcType="VARCHAR"/>
+		<result column="height" property="height" jdbcType="VARCHAR"/>
+		<result column="length" property="length" jdbcType="VARCHAR"/>
+		<result column="width" property="width" jdbcType="VARCHAR"/>
+		<result column="weight" property="weight" jdbcType="VARCHAR"/>
+		<result column="shipment_nr" property="shipment_nr" jdbcType="VARCHAR"/>
+		<result column="shipment_status_nr" property="shipment_status_nr" jdbcType="VARCHAR"/>
+		<result column="shipment_status" property="shipment_status" jdbcType="VARCHAR"/>
+		<result column="awb_nb" property="awb_nbr" jdbcType="VARCHAR"/>
+  	</resultMap>
+
+	<select id="getShipmentListByShipmentNo" parameterType="string" resultMap="BaseResultMap">
+		SELECT * FROM `view_order_lines` v WHERE v.`shipment_nr`=#{shipmentNo}
+	</select>
+</mapper>
