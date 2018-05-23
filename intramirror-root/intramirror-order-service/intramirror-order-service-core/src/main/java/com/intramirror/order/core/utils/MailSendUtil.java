@@ -1,5 +1,6 @@
 package com.intramirror.order.core.utils;
 
+import com.google.gson.Gson;
 import com.intramirror.common.help.StringUtils;
 import com.intramirror.order.api.vo.MailAttachmentVO;
 import com.intramirror.order.api.vo.MailModelVO;
@@ -52,25 +53,30 @@ public class MailSendUtil {
      * @throws UnsupportedEncodingException 异常
      */
     public static void sendMail(MailModelVO mailModelVO) throws MessagingException,UnsupportedEncodingException {
+        logger.info("sendMail params={}", new Gson().toJson(mailModelVO));
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         // 设置utf-8或GBK编码，否则邮件会有乱码
         MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
         messageHelper.setFrom(MailConfig.emailFrom);
+        logger.info("sendMail 处理收件人地址");
         // 处理收件人地址
         if (mailModelVO.getToEmails() != null) {
             messageHelper.setTo(mailModelVO.getToEmails().split(";"));
         } else {
             messageHelper.setTo(MailConfig.emailTo.split(";"));
         }
+        logger.info("sendMail 设置邮件标题");
         if (StringUtils.isNotBlank(mailModelVO.getSubject())) {
             messageHelper.setSubject(mailModelVO.getSubject());
         } else {
             logger.warn("Subject is blank.");
             messageHelper.setSubject("IntraMirror Mail");
         }
+        logger.info("sendMail 设置邮件内容");
         messageHelper.setText(mailModelVO.getContent(), true);
 
         // 添加附件
+        logger.info("sendMail 设置邮件附件");
         if (!CollectionUtils.isEmpty(mailModelVO.getAttachments())) {
             for (MailAttachmentVO mailAttachmentVO : mailModelVO.getAttachments()) {
                 if (StringUtils.isBlank(mailAttachmentVO.getFileUrl())) {
@@ -90,6 +96,7 @@ public class MailSendUtil {
                 messageHelper.addAttachment(mailAttachmentVO.getFileName(), fileResource);
             }
         }
+        logger.info("sendMail 开始发送邮件");
         mailSender.send(mimeMessage);
     }
 
