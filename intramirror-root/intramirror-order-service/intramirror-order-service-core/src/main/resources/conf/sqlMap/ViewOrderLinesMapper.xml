@@ -108,6 +108,6 @@
 		    ON ((`ship`.`shipment_id` = `con`.`shipment_id`)))
 		 LEFT JOIN `sub_shipment` `sub_ship`
 		   ON ((`sub_ship`.`shipment_id` = `ship`.`shipment_id` AND `sub_ship`.`segment_sequence` = 1)))
-		GROUP BY `lp`.`order_line_num`) `view_order_lines` WHERE v.`shipment_nr`=#{shipmentNo}
+		GROUP BY `lp`.`order_line_num`) `view_order_lines` WHERE `shipment_nr`=#{shipmentNo}
 	</select>
 </mapper>
