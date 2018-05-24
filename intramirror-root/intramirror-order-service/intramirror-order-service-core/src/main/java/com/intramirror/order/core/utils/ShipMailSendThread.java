@@ -1,6 +1,7 @@
 package com.intramirror.order.core.utils;
 
 import com.google.gson.Gson;
+import com.intramirror.common.help.StringUtils;
 import com.intramirror.common.utils.DateUtils;
 import com.intramirror.order.api.service.IViewOrderLinesService;
 import com.intramirror.order.api.vo.MailAttachmentVO;
@@ -48,7 +49,11 @@ public class ShipMailSendThread implements Runnable {
         Map<String, List<ViewOrderLinesVO>> buyerContactOrderListMap = new HashMap<>();
         Set<String> orderLineNums = new HashSet<>();
         List<ViewOrderLinesVO> orders = new ArrayList<>();
+        String awbNo = "";
         for (ViewOrderLinesVO viewOrderLinesVO : shipmentList) {
+            if (StringUtils.isBlank(awbNo)) {
+                awbNo = viewOrderLinesVO.getAwb_nbr();
+            }
             String consignee = viewOrderLinesVO.getConsignee();
             List<ViewOrderLinesVO> nameOrderList = null;
             if(consigneeOrderListMap.containsKey(consignee)) {
@@ -107,7 +112,7 @@ public class ShipMailSendThread implements Runnable {
 
         MailModelVO mailContent = new MailModelVO();
         //设置邮件标题，邮件标题为Shipment No. XXXXX + 【国家】/【Transit warehouse】
-        mailContent.setSubject("Shipment No. " + shipment.getShipmentNo() + "【" + shipment.getDestination() + "】");
+        mailContent.setSubject("Shipment No. " + shipment.getShipmentNo() +"AWB No." + awbNo + "【" + shipment.getDestination() + "】");
         //设置邮件正文
         if (!orders.isEmpty()) {
             mailContent.setContent(getContent(orders));
@@ -153,9 +158,7 @@ public class ShipMailSendThread implements Runnable {
         HSSFCell cell = null;
         for (ViewOrderLinesVO order : shipmentList) {
             row = sheet.createRow(rowLength);
-            BigDecimal boutiquePrice = new BigDecimal(order.getBoutique_price());
-            BigDecimal retailPrice = new BigDecimal(order.getRetail_price());
-            String boutiqueDiscountOff = new BigDecimal(100).subtract(boutiquePrice.multiply(new BigDecimal(122)).divide(retailPrice, 4, BigDecimal.ROUND_HALF_DOWN)).setScale(2, BigDecimal.ROUND_HALF_UP).toString() + "%";
+            String boutiqueDiscountOff = new BigDecimal(100).subtract(order.getBoutique_price().multiply(new BigDecimal(122)).divide(order.getRetail_price(), 4, BigDecimal.ROUND_HALF_DOWN)).setScale(2, BigDecimal.ROUND_HALF_UP).toString() + "%";
             String[] values = {
                     transforNullValue(order.getVendor_name()),
                     transforNullValue(order.getStock_location()),
@@ -190,9 +193,9 @@ public class ShipMailSendThread implements Runnable {
                     transforNullValue(order.getPacked_at_datetime()),
                     transforNullValue(order.getShipped_at_datetime()),
                     transforNullValue(order.getQty()),
-                    transforNullValue(order.getRetail_price()),
+                    transforNullValue(order.getRetail_price() == null ? null :order.getRetail_price().setScale(2, BigDecimal.ROUND_HALF_UP)),
                     transforNullValue(boutiqueDiscountOff),
-                    transforNullValue(order.getBoutique_price())
+                    transforNullValue(order.getBoutique_price() == null ? null :order.getBoutique_price().setScale(2, BigDecimal.ROUND_HALF_UP))
             };
             //将数据放到excel中
             for (int i = 0; i < excelHeaders.length; i++) {
