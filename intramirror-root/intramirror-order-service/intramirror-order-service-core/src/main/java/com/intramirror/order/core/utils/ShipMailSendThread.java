@@ -112,7 +112,7 @@ public class ShipMailSendThread implements Runnable {
 
         MailModelVO mailContent = new MailModelVO();
         //设置邮件标题，邮件标题为Shipment No. XXXXX + 【国家】/【Transit warehouse】
-        mailContent.setSubject("Shipment No. " + shipment.getShipmentNo() +"AWB No." + awbNo + "【" + shipment.getDestination() + "】");
+        mailContent.setSubject("Shipment No. " + shipment.getShipmentNo() +" AWB No. " + awbNo + "【" + shipment.getDestination() + "】");
         //设置邮件正文
         if (!orders.isEmpty()) {
             mailContent.setContent(getContent(orders));
