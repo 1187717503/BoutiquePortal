@@ -13,6 +13,7 @@
         <result column="order_line_num" property="order_line_num" jdbcType="VARCHAR"/>
         <result column="created_at" property="created_at" jdbcType="TIMESTAMP"/>
         <result column="cancel_at" property="cancel_at" jdbcType="TIMESTAMP"/>
+        <result column="change_flag" property="change_flag" jdbcType="INTEGER"/>
     </resultMap>
 
     <select id="getOrderList" resultType="java.util.HashMap" parameterType="java.util.Map">
