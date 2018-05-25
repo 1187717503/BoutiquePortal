@@ -13,6 +13,7 @@
         <result column="order_line_num" property="order_line_num" jdbcType="VARCHAR"/>
         <result column="created_at" property="created_at" jdbcType="TIMESTAMP"/>
         <result column="cancel_at" property="cancel_at" jdbcType="TIMESTAMP"/>
+        <result column="change_flag" property="change_flag" jdbcType="INTEGER"/>
     </resultMap>
 
     <select id="getOrderList" resultType="java.util.HashMap" parameterType="java.util.Map">
@@ -97,7 +98,7 @@
 
 
     <select id="getOrderListByStatus" resultType="java.util.HashMap" parameterType="java.util.Map">
-        SELECT p.product_id,g.pack_group,g.pack_english_name,lp.stock_Location,lp.stock_location_id,sl.ship_from_location_id,
+        SELECT p.product_id,g.pack_group,g.pack_english_name,lp.stock_Location,lp.stock_location_id,sl.ship_from_location_id, lp.change_flag,
         o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id, s.`size` as size,p.category_id,
         lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
         lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
@@ -199,6 +200,7 @@
         lp.est_ship_date,
         lp.packed_at,
         lp.shipped_at,
+        lp.change_flag,
         s.sku_code,
         b.english_name AS brandName,
         if(lp.user_rec_flag=0, l.user_rec_name, lp.user_rec_name) as user_rec_name,
@@ -364,6 +366,7 @@
         lp.tax_fee,
         lp.order_line_num,
         lp.`status`,
+        lp.change_flag,
         b.english_name AS brandName,
         v.vendor_name,
         p.cover_img,
@@ -531,7 +534,7 @@
             </when>
             <otherwise>
                 o.created_at AS order_date,o.current_rate, s.`size` as size,
-                lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
+                lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,lp.`change_flag`,
                 lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
                 lp.shipped_at AS shipped_date,sm.shipment_no,s.sku_code,b.english_name as brandName,
                 v.vendor_name,sm.ship_to_geography as geography_name,
