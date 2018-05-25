@@ -13,7 +13,10 @@ import java.util.Map;
 import com.intramirror.common.help.StringUtils;
 import com.intramirror.order.api.model.SubShipment;
 import com.intramirror.order.api.service.ISubShipmentService;
+import com.intramirror.order.api.service.IViewOrderLinesService;
 import com.intramirror.order.api.vo.LogisticsProductVO;
+import com.intramirror.order.api.vo.ShipmentSendMailVO;
+import com.intramirror.order.core.utils.ShipMailSendThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +49,9 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 
 	@Autowired
 	private ISubShipmentService subShipmentService;
+
+	@Autowired
+	private IViewOrderLinesService viewOrderLinesService;
 	
 	@Override
 	public void init() {
@@ -438,6 +444,17 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 						shipmentMapper.saveMilestone(vo);
 					}
 				}*/
+				// 起线程发邮件
+				ShipmentSendMailVO vo = new ShipmentSendMailVO();
+				vo.setShipmentNo(shipment.getShipmentNo());
+				if (shipment.getToType() == 2) {
+					vo.setDestination("Transit Warehouse");
+				} else if("China Mainland".equals(shipment.getShipToGeography())
+						||"HongKong".equals(shipment.getShipToGeography())
+						||"China excl. Taiwan".equals(shipment.getShipToGeography())) {
+					vo.setDestination("China");
+				}
+                sendMail(vo);
 			}
 			//如果一直修改状态
 			if (lastStatus == shipment.getStatus()){
@@ -463,6 +480,16 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
             }
         }
         throw new  RuntimeException("No AWB is not allowed to be shipped");
+	}
+
+    private void sendMail(ShipmentSendMailVO shipment){
+        ShipMailSendThread thread = new ShipMailSendThread(shipment, viewOrderLinesService);
+        thread.run();
+    }
+
+	@Override
+	public void sendMailForShipped(ShipmentSendMailVO shipment) {
+		sendMail(shipment);
 	}
 
 	@Override

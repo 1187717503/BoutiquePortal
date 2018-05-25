@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.intramirror.order.api.model.Shipment;
+import com.intramirror.order.api.vo.ShipmentSendMailVO;
 import com.intramirror.order.api.vo.ShippedParam;
 import com.intramirror.user.api.model.User;
 import com.intramirror.utils.transform.JsonTransformUtil;
@@ -443,6 +444,17 @@ public class ShipmentController extends BaseController{
 					map.put("shipmentId",shipment.getShipmentId());
 					map.put("status",3);
 					updateContainerStatus(map);
+					// 起线程发邮件
+					ShipmentSendMailVO vo = new ShipmentSendMailVO();
+					vo.setShipmentNo(shipment.getShipmentNo());
+					if (shipment.getToType() == 2) {
+						vo.setDestination("Transit Warehouse");
+					} else if("China Mainland".equals(shipment.getShipToGeography())
+                            ||"HongKong".equals(shipment.getShipToGeography())
+                            ||"China excl. Taiwan".equals(shipment.getShipToGeography())) {
+                        vo.setDestination("China");
+                    }
+					iShipmentService.sendMailForShipped(vo);
 					message.successStatus();
 				}
 			}
