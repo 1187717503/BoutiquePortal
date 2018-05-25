@@ -97,7 +97,7 @@
 
 
     <select id="getOrderListByStatus" resultType="java.util.HashMap" parameterType="java.util.Map">
-        SELECT p.product_id,g.pack_group,g.pack_english_name,lp.stock_Location,lp.stock_location_id,lp.change_flag,
+        SELECT p.product_id,g.pack_group,g.pack_english_name,lp.stock_Location,lp.stock_location_id,sl.ship_from_location_id, lp.change_flag,
         o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id, s.`size` as size,p.category_id,
         lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
         lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
@@ -117,6 +117,7 @@
         oeCreatedByuser,
         oe.modified_at as oeModified,oe.`status` as oeStatus,oe.resolution as oeResolution, uu.email as Resolved
         FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+        LEFT JOIN stock_location sl on sl.location_id = lp.stock_location_id
         INNER JOIN `order` o ON ol.order_id = o.order_id
         LEFT JOIN user_ship_address usa ON o.user_id = usa.user_id
         LEFT JOIN logistics l ON (lp.order_logistics_id = l.order_logistics_id and l.enabled = 1)
@@ -124,7 +125,7 @@
         INNER JOIN shop_product_sku sps ON (lp.shop_product_sku_id = sps.shop_product_sku_id)
         INNER JOIN shop_product sp ON (sps.shop_product_id = sp.shop_product_id)
         INNER JOIN product p ON (sp.product_id = p.product_id and p.enabled = 1)
-        LEFT JOIN spu on(spu.spu_id = p.spu_id and spu.enabled = 1)
+        LEFT JOIN spu on (spu.spu_id = p.spu_id and spu.enabled = 1)
         INNER JOIN brand b ON (p.brand_id = b.brand_id and b.enabled = 1 )
         INNER JOIN sku s ON (s.sku_id = sps.sku_id and s.enabled = 1)
         INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
@@ -233,7 +234,7 @@
         sp.product_id = p.product_id
         AND p.enabled = 1
         )
-        LEFT JOIN spu on(spu.spu_id = p.spu_id and spu.enabled = 1)
+        LEFT JOIN spu on (spu.spu_id = p.spu_id and spu.enabled = 1)
         INNER JOIN brand b ON (
         p.brand_id = b.brand_id
         AND b.enabled = 1
@@ -428,7 +429,7 @@
         INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
         INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
         INNER JOIN product p ON (sp.product_id = p.product_id and p.enabled = 1 )
-        LEFT JOIN spu on(spu.spu_id = p.spu_id and spu.enabled = 1)
+        LEFT JOIN spu on (spu.spu_id = p.spu_id and spu.enabled = 1)
         INNER JOIN brand b ON (p.brand_id = b.brand_id and b.enabled = 1 )
         INNER JOIN sku s ON (s.sku_id = sps.sku_id and s.enabled = 1)
         INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
@@ -534,7 +535,9 @@
                 lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,lp.`change_flag`,
                 lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
                 lp.shipped_at AS shipped_date,sm.shipment_no,s.sku_code,b.english_name as brandName,
-                v.vendor_name,sm.ship_to_geography as geography_name,p.cover_img,p.product_id,lp.stock_location
+                v.vendor_name,sm.ship_to_geography as geography_name,
+                CASE WHEN p.spu_id IS NULL THEN p.cover_img ELSE spu.cover_img END AS cover_img,
+                p.product_id,lp.stock_location
             </otherwise>
         </choose>
 
@@ -549,6 +552,7 @@
         INNER JOIN brand b ON (p.brand_id = b.brand_id and b.enabled = 1 )
         INNER JOIN sku s ON (s.sku_id = sps.sku_id and s.enabled = 1)
         INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
+        LEFT JOIN spu on (spu.spu_id = p.spu_id and spu.enabled = 1)
         LEFT JOIN container c ON (c.container_id = lp.container_id)
         LEFT JOIN shipment sm on (sm.shipment_id = c.shipment_id)
         where (lp.`status` = 3 OR lp.`status` = 4)
@@ -615,7 +619,8 @@
             if(lp.user_rec_flag=0, l.user_rec_mobile, lp.user_rec_mobile)                        as contact,
             g.geography_id,
             lp.logistics_product_id,
-            lp.stock_location_id
+            lp.stock_location_id,
+            sl.ship_from_location_id
         FROM logistics_product lp
             INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
             INNER JOIN `order` o ON ol.order_id = o.order_id
@@ -629,6 +634,7 @@
             INNER JOIN brand b ON (p.brand_id = b.brand_id AND b.enabled = 1)
             INNER JOIN sku s ON (s.sku_id = sps.sku_id AND s.enabled = 1)
             INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
+            INNER JOIN stock_location sl on sl.location_id = lp.stock_location_id
         WHERE lp.enabled = 1
               AND lp.order_line_num = #{orderNumber,jdbcType=VARCHAR}
         GROUP BY o.order_num;

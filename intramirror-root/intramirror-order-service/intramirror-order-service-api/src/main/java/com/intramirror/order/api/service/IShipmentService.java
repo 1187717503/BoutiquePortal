@@ -9,6 +9,8 @@ import java.util.Map;
 
 import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.model.SubShipment;
+import com.intramirror.order.api.vo.LogisticsProductVO;
+import com.intramirror.order.api.vo.ShipmentSendMailVO;
 
 /**
  * @author yuan
@@ -143,5 +145,30 @@ public interface IShipmentService {
 	 * @return
 	 */
 	SubShipment getSubShipmentByShipmentId(Long shipmentId);
+
+	List<LogisticsProductVO> getlogisticsMilestone(Long shipmentId);
+
+	void saveMilestone(LogisticsProductVO vo);
+
+	void deleteMilestone(String awbNo);
+
+	/**
+	 * 根据awbNo查询shipment列表
+	 * @param awbNos
+	 * @return
+	 */
+	List<Shipment> getShipmentList(List awbNos);
+
+	/**
+	 * shipment发货
+	 * @param shipmentId
+	 */
+	void shipmentToShip(Long shipmentId);
+
+    /**
+     * shipped状态发邮件
+     * @param shipment
+     */
+	void sendMailForShipped(ShipmentSendMailVO shipment);
 
 }

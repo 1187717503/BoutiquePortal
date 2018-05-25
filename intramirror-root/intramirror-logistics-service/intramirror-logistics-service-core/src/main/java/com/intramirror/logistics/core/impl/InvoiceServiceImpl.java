@@ -66,6 +66,11 @@ public class InvoiceServiceImpl extends BaseDao implements IInvoiceService{
 	}
 
 	@Override
+	public Invoice getInvoiceByMap(Map map) {
+		return invoiceMapper.getInvoiceByMap(map);
+	}
+
+	@Override
 	public int updateByShipmentId(Invoice record) {
 		
 		return invoiceMapper.updateByShipmentId(record);

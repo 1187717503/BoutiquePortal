@@ -20,14 +20,14 @@ public class Container {
 	/**
 	 * @Fields 容器类型
 	 */
-	private String containerType;
+	private Integer containerType;
 	
 	/**
 	 * @Fields 地理区域
 	 */
 	private String shipToGeography;
 
-	private Integer stockLocationId;
+	private Integer shipFromLocationId;
 
 	private String stockLocation;
 	
@@ -84,12 +84,12 @@ public class Container {
 		this.stockLocation = stockLocation;
 	}
 
-	public Integer getStockLocationId() {
-		return stockLocationId;
+	public Integer getShipFromLocationId() {
+		return shipFromLocationId;
 	}
 
-	public void setStockLocationId(Integer stockLocationId) {
-		this.stockLocationId = stockLocationId;
+	public void setShipFromLocationId(Integer shipFromLocationId) {
+		this.shipFromLocationId = shipFromLocationId;
 	}
 
 	public Long getContainerId() {
@@ -100,11 +100,11 @@ public class Container {
 		this.containerId = containerId;
 	}
 
-	public String getContainerType() {
+	public Integer getContainerType() {
 		return containerType;
 	}
 
-	public void setContainerType(String containerType) {
+	public void setContainerType(Integer containerType) {
 		this.containerType = containerType;
 	}
 

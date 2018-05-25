@@ -148,7 +148,7 @@ public class OrderService {
 				//shipMentMap.put("ship_to_geography", currentOrder.get("pack_english_name").toString());
 				shipMentMap.put("ship_to_geography", container.getShipToGeography());
 				shipMentMap.put("shipment_id", Long.parseLong(shipment_id));
-				shipMentMap.put("stock_location_id", container.getStockLocationId());
+				shipMentMap.put("ship_from_location_id", container.getShipFromLocationId());
 				//获取当前ShipMent 第一段的物流类型(不需要  空箱子不比较shipmentType 直接放入)
 				
 				//订单加入箱子
@@ -186,7 +186,7 @@ public class OrderService {
 			//shipment 状态
 			selectShipmentParam.put("status", ContainerType.OPEN);
 			selectShipmentParam.put("vendorId", vendorId);
-			selectShipmentParam.put("stockLocationId",currentOrder.get("stock_location_id"));
+			selectShipmentParam.put("shipFromLocationId",currentOrder.get("ship_from_location_id"));
 			
 			//查询shipment
 			logger.info("order packingOrder 查询shipment 列表  iShipmentService.getShipmentsByVendor 入参:"+new Gson().toJson(selectShipmentParam));
@@ -218,7 +218,7 @@ public class OrderService {
 					Map<String, Object> updateContainer = new HashMap<String, Object>(); 
 					updateContainer.put("shipment_id", shipmentId);
 					updateContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
-					updateContainer.put("stock_location_id",shipment.getStockLocationId());
+					updateContainer.put("ship_from_location_id",shipment.getShipFromLocationId());
 					logger.info("order packingOrder 箱子关联Shipment 调用接口 containerService.updateContainerByCondition 入参"+new Gson().toJson(updateContainer));
 					int updateContainerRow = containerService.updateContainerByCondition(updateContainer);
 					
@@ -229,7 +229,7 @@ public class OrderService {
 						//shipMentMap.put("ship_to_geography", currentOrder.get("pack_english_name").toString());
 						shipMentMap.put("ship_to_geography", container.getShipToGeography());
 						shipMentMap.put("shipment_id", shipmentId);
-						shipMentMap.put("stock_location_id", shipment.getStockLocationId());
+						shipMentMap.put("ship_from_location_id", shipment.getShipFromLocationId());
 
 						//订单加入箱子(已经调用过saveShipmentByOrderId 方法  不需要再次创建)
 						result =  updateLogisticsProduct(currentOrder,shipMentMap,false,false);
@@ -253,7 +253,7 @@ public class OrderService {
 					Map<String, Object> updateContainer = new HashMap<>();
 					updateContainer.put("shipment_id", Long.parseLong(shipmentMapList.get(0).get("shipment_id").toString()));
 					updateContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
-					updateContainer.put("stock_location_id", shipmentMapList.get(0).get("stock_location_id"));
+					updateContainer.put("ship_from_location_id", shipmentMapList.get(0).get("ship_from_location_id"));
 					logger.info("order packingOrder 箱子关联Shipment 调用接口 containerService.updateContainerByCondition 入参"+new Gson().toJson(updateContainer));
 					int row = containerService.updateContainerByCondition(updateContainer);
 					
@@ -311,12 +311,12 @@ public class OrderService {
 	private boolean checkStockLocation(Map<String, Object> currentOrder, Object container) {
 		boolean flag = true;
 		if (container != null) {
-			String stock_location_id = currentOrder.get("stock_location_id")!=null?currentOrder.get("stock_location_id").toString():"0";
+			String stock_location_id = currentOrder.get("ship_from_location_id")!=null?currentOrder.get("ship_from_location_id").toString():"0";
 			Integer stockLocationId =null;
 			if (container instanceof Container){
-				stockLocationId = ((Container)container).getStockLocationId();
+				stockLocationId = ((Container)container).getShipFromLocationId();
 			}else if (container instanceof Map){
-				String id =((Map<String,Object>)container).get("stock_location_id")!=null?((Map<String,Object>)container).get("stock_location_id").toString():"0";
+				String id =((Map<String,Object>)container).get("ship_from_location_id")!=null?((Map<String,Object>)container).get("ship_from_location_id").toString():"0";
 				stockLocationId = Integer.parseInt(id);
 			}
 			if ( stockLocationId!= null&&stockLocationId!=0) {
@@ -390,17 +390,13 @@ public class OrderService {
 			//result.setInfoMap(info);
 			//return result;
 			throw new RuntimeException("This Order's consignee address is different than carton's. ");
-		}else{
-			//如果大区一致,且不为空箱子,则比较shipment_type(空箱子ischeck 都为false)
-			//空箱子不需要判断,直接存入   shipment_type 用于判断该箱子是否能存放多个，状态为1 只能存放一个  所以不能在存入
+		}
+		/*else{
+			//shipment_type 用于判断该箱子是否能存放多个，状态为1 只能存放一个  所以不能在存入
 			if(ischeck && shipMentMap.get("shipment_type_id").toString().equals("1")){
-				//result.setMsg("Only one Order can be packed in this carton. ");
-				//info.put("code", StatusType.ORDER_ERROR_CODE);
-				//result.setInfoMap(info);
-				//return result;
 				throw new RuntimeException("Only one Order can be packed in this carton.");
 			}
-		}
+		}*/
 
 		//校验该订单跟箱子所属的Shipment的发货地是否一致,一致则加入
 		if(checkStockLocation(orderMap,shipMentMap)){
@@ -449,9 +445,14 @@ public class OrderService {
 					if (!subShipment.getContact().replace(" ","").equalsIgnoreCase(contact)){
 						throw new RuntimeException("The contact is not consistent with the receiver address information.");
 					}
-
 				}
 			}
+
+			//shipment_type 用于判断该箱子是否能存放多个，状态为1 只能存放一个  所以不能在存入
+			if ("1".equals(shipMentMap.get("shipment_type_id").toString())){
+				throw new RuntimeException("Only one Order can be packed in this carton.");
+			}
+
 		}
 
 

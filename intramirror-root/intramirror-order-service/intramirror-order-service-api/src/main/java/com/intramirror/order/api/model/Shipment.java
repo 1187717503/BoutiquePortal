@@ -26,7 +26,7 @@ public class Shipment {
 	/**
 	 * 发货地id
 	 */
-	private Integer stockLocationId;
+	private Integer shipFromLocationId;
 
 	private String stockLocation;
 	/**
@@ -110,12 +110,12 @@ public class Shipment {
 		this.stockLocation = stockLocation;
 	}
 
-	public Integer getStockLocationId() {
-		return stockLocationId;
+	public Integer getShipFromLocationId() {
+		return shipFromLocationId;
 	}
 
-	public void setStockLocationId(Integer stockLocationId) {
-		this.stockLocationId = stockLocationId;
+	public void setShipFromLocationId(Integer shipFromLocationId) {
+		this.shipFromLocationId = shipFromLocationId;
 	}
 
 	public Long getShipmentId() {

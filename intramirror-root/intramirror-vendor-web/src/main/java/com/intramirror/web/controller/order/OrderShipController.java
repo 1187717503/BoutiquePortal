@@ -17,6 +17,7 @@ import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.model.ShippingProvider;
 import com.intramirror.order.api.model.SubShipment;
 import com.intramirror.order.api.service.*;
+import com.intramirror.order.api.vo.LogisticsProductVO;
 import com.intramirror.product.api.model.Shop;
 import com.intramirror.product.api.service.IShopService;
 import com.intramirror.user.api.model.User;
@@ -90,6 +91,10 @@ public class OrderShipController extends BaseController {
 
     @Autowired
     private StockLocationService stockLocationService;
+
+    @Autowired
+    private ILogisticsProductService iLogisticsProductService;
+
     /**
      * 获取所有箱子信息
      *
@@ -197,10 +202,6 @@ public class OrderShipController extends BaseController {
                         shipMent.put("shipment_no", container.get("shipment_no").toString());
                         shipMent.put("shipment_status", container.get("shipment_status").toString());
                         String shipToGeography = container.get("ship_to_geography").toString();
-                        if ("China Mainland".equals(shipToGeography)
-                                ||"HongKong".equals(shipToGeography)){
-                            shipToGeography = "China excl. Taiwan";
-                        }
                         shipMent.put("ship_to_geography", shipToGeography);
                         shipMentList.add(shipMent);
                     }
@@ -604,23 +605,27 @@ public class OrderShipController extends BaseController {
             resultMap.put("VATNumber", invoice.getVatNum());
 
             //获取Ship From信息
-            //Map<String, Object> vendorParams = new HashMap<>();
-            //vendorParams.put("vendor_id", shipmentMap.get("vendor_id"));
-            //Vendor shipVendor = vendorService.getVendorByVendorId(vendorParams);
-            //resultMap.put("ShipFrom", shipVendor.getBusinessLicenseLocation());
-            //resultMap.put("ShipCompanyName", shipVendor.getCompanyName());
-            //resultMap.put("ShipVendorName", shipVendor.getVendorName());
             StockLocation location = stockLocationService.getShipFromLocation(shipment_id);
-            resultMap.put("companyName",location.getContactCompanyname());
-            resultMap.put("personName",location.getContactPersonname());
-            resultMap.put("contact",location.getContactPhonenumber());
+            resultMap.put("companyName",location.getContactCompanyName());
+            resultMap.put("personName",location.getContactPersonName());
+            resultMap.put("contact",location.getContactPhoneNumber());
             resultMap.put("address",location.getAddressStreetlines());
             resultMap.put("city",location.getAddressCity());
             resultMap.put("country","Italy");
 
             logger.info("打印Invoice----获取Deliver To信息");
             List<SubShipment> subShipmentList = subShipmentService.getSubShipmentByShipmentId(shipment_id);
-            if (subShipmentList.size() > 1) {
+            if (subShipmentList!=null&&subShipmentList.size()>0){
+                resultMap.put("DeliverTo", subShipmentList.get(0));
+                //发往质检仓的取DHL税号
+                if(map.get("shipmentCategory")!=null&&"1".equals(map.get("shipmentCategory").toString())){
+                    resultMap.put("VATNumber",subShipmentList.get(0).getPiva());
+                }
+            }else {
+                result.setMsg("DeliverTo is null ");
+                return result;
+            }
+            /*if (subShipmentList.size() > 1) {
                 ShippingProvider shippingProvider = shippingProviderService.getShippingProviderByShipmentId(shipment_id);
                 resultMap.put("DeliverTo", shippingProvider);
             } else if (subShipmentList.size() == 1) {
@@ -632,7 +637,7 @@ public class OrderShipController extends BaseController {
             } else {
                 result.setMsg("DeliverTo is null ");
                 return result;
-            }
+            }*/
             //获取carton列表
             Set<Long> shipmentIds =  new HashSet<>();
             shipmentIds.add(shipment_id);
@@ -746,9 +751,9 @@ public class OrderShipController extends BaseController {
         //获取Ship From信息
         StockLocation location = stockLocationService.getShipFromLocation(shipment_id);
         ShipperVO shipperVO = new ShipperVO();
-        shipperVO.setCompanyName(location.getContactCompanyname());
-        shipperVO.setPersonName(location.getContactPersonname());
-        shipperVO.setPhoneNumber(location.getContactPhonenumber());
+        shipperVO.setCompanyName(location.getContactCompanyName());
+        shipperVO.setPersonName(location.getContactPersonName());
+        shipperVO.setPhoneNumber(location.getContactPhoneNumber());
         shipperVO.setStreetLines(location.getAddressStreetlines());
         shipperVO.setStreetLines2(location.getAddressStreetlines2());
         shipperVO.setStreetLines3(location.getAddressStreetlines3());
@@ -757,29 +762,49 @@ public class OrderShipController extends BaseController {
 
         //获取Invoice 信息
         logger.info("打印Invoice----获取Invoice信息");
-        Invoice invoice = invoiceService.getInvoiceByShipmentId(shipment_id);
+        Map<String, Object> invoiceMap = new HashMap<>();
+        if(map.get("ddtFlag")!=null&&"1".equals(map.get("ddtFlag").toString())){
+            invoiceMap.put("type", 2);
+        }else{
+            invoiceMap.put("type", 1);
+        }
+        invoiceMap.put("shipmentId", shipment_id);
+        Invoice invoice = invoiceService.getInvoiceByMap(invoiceMap);
         if (invoice==null){
             Map<String, Object> ddtNo = invoiceService.getMaxDdtNo();
             int maxDdtNo = ddtNo.get("maxddtNum")!=null?Integer.parseInt(ddtNo.get("maxddtNum").toString()):0;
-            long s = ddtNo.get("shipment_id") != null ? Long.parseLong(ddtNo.get("shipment_id").toString()) : 0;
-            if (s!=shipment_id){
-                Invoice newInvoice = new Invoice();
-                if(maxDdtNo<10000){
-                    maxDdtNo = 10000;
-                }else {
-                    maxDdtNo++;
-                }
-                newInvoice.setEnabled(true);
-                newInvoice.setDdtNum(maxDdtNo);
-                newInvoice.setInvoiceNum("");
-                newInvoice.setShipmentId(shipment_id);
-                newInvoice.setVendorId(vendor.getVendorId());
-                newInvoice.setInvoiceDate(new Date());
-                newInvoice.setVatNum("");
-                invoiceService.insertSelective(newInvoice);
-                invoice = newInvoice;
+
+            Invoice newInvoice = new Invoice();
+            if(maxDdtNo<10000){
+                maxDdtNo = 10000;
+            }else {
+                maxDdtNo++;
             }
+            newInvoice.setEnabled(true);
+            newInvoice.setDdtNum(maxDdtNo);
+            newInvoice.setInvoiceNum("");
+            newInvoice.setShipmentId(shipment_id);
+            newInvoice.setVendorId(vendor.getVendorId());
+            newInvoice.setInvoiceDate(new Date());
+            newInvoice.setVatNum("");
+            newInvoice.setType(2);
+            invoiceService.insertSelective(newInvoice);
+            invoice = newInvoice;
         }else {
+            if(map.get("ddtFlag")!=null&&"1".equals(map.get("ddtFlag").toString())){
+                if(invoice.getDdtNum() == null){
+                    Map<String, Object> ddtNo = invoiceService.getMaxDdtNo();
+                    int maxDdtNo = ddtNo.get("maxddtNum")!=null?Integer.parseInt(ddtNo.get("maxddtNum").toString()):0;
+                    if(maxDdtNo<10000){
+                        maxDdtNo = 10000;
+                    }else {
+                        maxDdtNo++;
+                    }
+                    invoice.setDdtNum(maxDdtNo);
+
+                    invoiceService.updateByPrimaryKey(invoice);
+                }
+            }
             //获取Invoice To信息
             logger.info("打印Invoice----获取Invoice To信息");
             Shop shop = shopService.selectByPrimaryKey(65l);
@@ -1238,12 +1263,14 @@ public class OrderShipController extends BaseController {
                     inputVO.setServiceType("P");
                 }
             }
-
             StockLocation fromLocation = stockLocationService.getShipFromLocation(shipmentId);
-            BigDecimal customValue = iShipmentService.getCustomValue(params);
 
-            if (customValue!=null){
-                inputVO.setCustomsValue(customValue.setScale(2,BigDecimal.ROUND_HALF_UP));
+            if ("P".equalsIgnoreCase(inputVO.getServiceType())){
+                //只有类型ServiceType=P时才需要customsValue
+                BigDecimal customValue = iShipmentService.getCustomValue(params);
+                if (customValue!=null){
+                    inputVO.setCustomsValue(customValue.setScale(2,BigDecimal.ROUND_HALF_UP));
+                }
             }
 
             addParams(inputVO,dhlShipment,fromLocation,containerList,shipment);
@@ -1279,6 +1306,18 @@ public class OrderShipController extends BaseController {
                 jo.put("shipmentNo",shipment.getShipmentNo());
                 jo.remove("status");
                 result.setData(jo);
+
+                //保存awb单号
+                List<LogisticsProductVO> productVOList = iShipmentService.getlogisticsMilestone(shipmentId);
+                if (productVOList!=null&&productVOList.size()>0){
+                    for (LogisticsProductVO vo:productVOList){
+                        vo.setAwb(awbNo);
+                        vo.setIsComplete(0);
+                        vo.setShipmentType(3);
+                        vo.setType(4);
+                        iShipmentService.saveMilestone(vo);
+                    }
+                }
                 return result;
             }
 
@@ -1308,15 +1347,15 @@ public class OrderShipController extends BaseController {
         if (fromLocation!=null){
             ShipperVO shipperVO = new ShipperVO();
             shipperVO.setCity(fromLocation.getAddressCity());
-            shipperVO.setCompanyName(fromLocation.getContactCompanyname());
-            shipperVO.setPersonName(fromLocation.getContactPersonname());
-            shipperVO.setPhoneNumber(fromLocation.getContactPhonenumber());
-            shipperVO.setEmailAddress(fromLocation.getContactEmailaddress());
+            shipperVO.setCompanyName(fromLocation.getContactCompanyName());
+            shipperVO.setPersonName(fromLocation.getContactPersonName());
+            shipperVO.setPhoneNumber(fromLocation.getContactPhoneNumber());
+            shipperVO.setEmailAddress(fromLocation.getContactEmailAddress());
             shipperVO.setStreetLines(fromLocation.getAddressStreetlines());
             shipperVO.setStreetLines2(fromLocation.getAddressStreetlines2());
             shipperVO.setStreetLines3(fromLocation.getAddressStreetlines3());
-            shipperVO.setPostalCode(fromLocation.getAddressPostalcode());
-            shipperVO.setCountryCode(fromLocation.getAddressCountrycode());
+            shipperVO.setPostalCode(fromLocation.getAddressPostalCode());
+            shipperVO.setCountryCode(fromLocation.getAddressCountryCode());
             inputVO.setShipper(shipperVO);
         }
         if (dhlShipment!=null){
