@@ -479,8 +479,11 @@ public class OrderService {
 		productContainer.setVendorId(vendorId);
 		productContainer.setCreateTime(new Date());
 		productContainer.setUpdateTime(new Date());
-		iLogisticsProductService.insertLogisticProductContainer(productContainer);
-		
+		LogisticProductContainer logisticProductContainer = iLogisticsProductService.getLogisticProductContainer(productContainer);
+		if (logisticProductContainer==null){
+			iLogisticsProductService.insertLogisticProductContainer(productContainer);
+		}
+
 		if(row > 0){
 			result.successStatus();
 			
