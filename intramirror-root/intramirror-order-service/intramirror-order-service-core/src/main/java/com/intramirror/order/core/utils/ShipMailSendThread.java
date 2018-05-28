@@ -127,6 +127,14 @@ public class ShipMailSendThread implements Runnable {
         mailAttachmentVOs.add(attachmentVO);
         mailContent.setAttachments(mailAttachmentVOs);
 
+        //设置发送对象
+        //如果是发给质检仓的邮件
+        if ("Transit Warehouse".equals(shipment.getDestination())) {
+            mailContent.setToEmails(MailConfig.emailToWarehouse);
+        } else {
+            mailContent.setToEmails(MailConfig.emailTo);
+        }
+
         try {
             logger.info("ShipMailSendThread 开始发送邮件 content={}", new Gson().toJson(mailContent));
             MailSendUtil.sendMail(mailContent);
@@ -144,7 +152,7 @@ public class ShipMailSendThread implements Runnable {
         int rowLength = 0;
         HSSFSheet sheet = workbook.createSheet(excelName);
 
-        String[] excelHeaders = new String[]{"vendor_name", "stock_location", "order_line_num", "designer_id", "brand", "l1_category", "l2_category", "l3_category", "color_code", "size", "product_name", "buyer_name", "buyer_contact", "ship_to_address", "ship_to_province", "ship_to_city", "ship_to_area", "ship_to_country", "zip_code", "consignee", "consignee_mobile", "container_nr", "height", "length", "width", "weight", "shipment_nr", "shipment_status", "created_at_datetime", "confirmed_at_datetime", "packed_at_datetime", "shipped_at(day)", "qty", "retail_price", "boutique_discount_off", "boutique_price"};
+        String[] excelHeaders = new String[]{"awb_num", "vendor_name", "stock_location", "order_line_num", "designer_id", "brand", "l1_category", "l2_category", "l3_category", "color_code", "size", "product_name", "buyer_name", "buyer_contact", "ship_to_address", "ship_to_province", "ship_to_city", "ship_to_area", "ship_to_country", "zip_code", "consignee", "consignee_mobile", "container_nr", "height", "length", "width", "weight", "shipment_nr", "shipment_status", "created_at_datetime", "confirmed_at_datetime", "packed_at_datetime", "shipped_at(day)", "qty", "retail_price", "boutique_discount_off", "boutique_price"};
 
         // 创建表头
         HSSFRow row1 = sheet.createRow(rowLength);
@@ -160,6 +168,7 @@ public class ShipMailSendThread implements Runnable {
             row = sheet.createRow(rowLength);
             String boutiqueDiscountOff = new BigDecimal(100).subtract(order.getBoutique_price().multiply(new BigDecimal(122)).divide(order.getRetail_price(), 4, BigDecimal.ROUND_HALF_DOWN)).setScale(2, BigDecimal.ROUND_HALF_UP).toString() + "%";
             String[] values = {
+                    transforNullValue(order.getAwb_nbr()),
                     transforNullValue(order.getVendor_name()),
                     transforNullValue(order.getStock_location()),
                     transforNullValue(order.getOrder_line_num()),

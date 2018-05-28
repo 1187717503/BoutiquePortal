@@ -11,6 +11,7 @@ public class MailConfig {
     public static String emailFrom;
     public static String timeout;
     public static String emailTo;
+    public static String emailToWarehouse;
 
     public static String getHost() {
         return host;
@@ -66,5 +67,13 @@ public class MailConfig {
 
     public static void setEmailTo(String emailTo) {
         MailConfig.emailTo = emailTo;
+    }
+
+    public static String getEmailToWarehouse() {
+        return emailToWarehouse;
+    }
+
+    public static void setEmailToWarehouse(String emailToWarehouse) {
+        MailConfig.emailToWarehouse = emailToWarehouse;
     }
 }
