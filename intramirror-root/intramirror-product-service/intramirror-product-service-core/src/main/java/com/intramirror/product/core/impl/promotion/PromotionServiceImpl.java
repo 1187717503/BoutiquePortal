@@ -82,11 +82,18 @@ public class PromotionServiceImpl implements IPromotionService {
 
     @Transactional
     @Override
-    public boolean processImportPromotionRule(List<PromotionRule> listRule) {
+    public boolean processImportPromotionRule(Integer type, List<PromotionRule> listRule) {
         LOGGER.info("Start to save <<import>> promotion include rule.");
-        for (PromotionRule rule : listRule) {
-            promotionRuleMapper.insertIncludeRule(rule);
+        if(type.equals(0)){
+            for (PromotionRule rule : listRule) {
+                promotionRuleMapper.insertIncludeRule(rule);
+            }
+        }else{
+            for (PromotionRule rule : listRule) {
+                promotionRuleMapper.insertExcludeRule(rule);
+            }
         }
+        LOGGER.info("==Jian processImportPromotionRule== Type:[{}]  Count:[{}]",type, listRule.size());
         return true;
     }
 

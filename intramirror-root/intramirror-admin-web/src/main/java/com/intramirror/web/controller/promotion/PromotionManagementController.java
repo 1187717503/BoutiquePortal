@@ -68,6 +68,9 @@ public class PromotionManagementController {
     @Autowired
     ICategoryService productCategoryServiceImpl;
 
+    static final String PR_INC_LIST = "ListIncPromotionRule";
+    static final String PR_EXC_LIST = "ListExcPromotionRule";
+
     @GetMapping(value = "/banner/promotion")
     public Response getAllPromotion(@Param(value = "bannerId") Long bannerId) {
         List<Map<String, Object>> result = promotionService.listPromotionByBanner(bannerId);
@@ -88,9 +91,28 @@ public class PromotionManagementController {
             type = PromotionRuleType.EXCLUDE_RULE;
         } else if (INCLUDE_IMPORT.equals(ruleType)) {
             //2018-4-18 Jian
-            List<PromotionRule> listRule = transformImportRule(body);
-            promotionService.processImportPromotionRule(listRule);
-            return Response.status(StatusType.SUCCESS).data(listRule);
+            Map<String,List<PromotionRuleEntity>> mapRule2Import = dealImportRule(body);
+
+            //deal include rule
+            List<PromotionRuleEntity> listPreInc = mapRule2Import.get(PR_INC_LIST);
+            List<PromotionRule> listRuleInc = new ArrayList<>();
+            if(listPreInc != null) {
+                for(int i=0;i<listPreInc.size();i++){
+                    listRuleInc.add(transformPromotionRule(listPreInc.get(i)));
+                }
+                promotionService.processImportPromotionRule(0,listRuleInc);
+            }
+
+            //deal exclude rule
+            List<PromotionRuleEntity> listPreExc = mapRule2Import.get(PR_EXC_LIST);
+            List<PromotionRule> listRuleExc = new ArrayList<>();
+            if(listPreExc != null){
+                for(int i=0;i<listPreExc.size();i++){
+                    listRuleExc.add(transformPromotionRule(listPreExc.get(i)));
+                }
+                promotionService.processImportPromotionRule(1, listRuleExc);
+            }
+            return Response.status(StatusType.SUCCESS).data(mapRule2Import);
 
         } else {
             return Response.status(StatusType.PARAM_NOT_POSITIVE).build();
@@ -103,52 +125,118 @@ public class PromotionManagementController {
 
     }
 
-    private List<PromotionRule> transformImportRule(PromotionRuleEntity body) throws Exception {
+    private Map<String,List<PromotionRuleEntity>> dealImportRule(PromotionRuleEntity body) {
         List<ImportDataEntity> listImportData = body.getImportData();
-        List<PromotionRule> listRule = new ArrayList<>();
+        Map<Long,String> defaultStatus = new HashMap<>();
+        Map<String,List<PromotionRuleEntity>> prMap = new HashMap<>();
 
+        List<PromotionRuleEntity> listPreInclude = new ArrayList<>();
+        List<PromotionRuleEntity> listPreExclude = new ArrayList<>();
+
+        for (ImportDataEntity idata : listImportData) {
+            Boolean hasInc = false;
+            Boolean hasExc = false;
+            BrandEntity be = new BrandEntity();
+            List<BrandEntity> listBrandInc = new ArrayList<>();
+            List<BrandEntity> listBrandExc = new ArrayList<>();
+            List<CategoryEntity> listCategoryInc = new ArrayList<>();
+            List<CategoryEntity> listCategoryExc = new ArrayList<>();
+
+            if (idata.getBrandName().equals("Default")){
+                List<CategoryEntity> listCategoryTmp = idata.getCategorys();
+                for (CategoryEntity ce : listCategoryTmp) {
+                    //记录每个default的类目对应的状态
+                    defaultStatus.put(ce.getCategoryId(),ce.getStatus());
+
+                    if(ce.getStatus().equals("Y")){
+                        //Include需考虑default配置all brand，Exclude不需要考虑配置All brand
+                        if(listBrandInc.size()<1){
+                            be.setName("ALL");
+                            be.setBrandId(-1L);
+                            listBrandInc.add(be);
+                        }
+
+                        //同时添加2，3级类目
+                        listCategoryInc.add(ce);
+                        setCategoryList(ce.getCategoryId(),listCategoryInc);
+                    }
+                }
+
+                listPreInclude.add(initPromotionRuleEntity(body,listBrandInc,listCategoryInc));
+            }else{
+
+                List<CategoryEntity> listCategoryTmp = idata.getCategorys();
+                for (CategoryEntity ce : listCategoryTmp) {
+                    if(!defaultStatus.get(ce.getCategoryId()).equals(ce.getStatus())){
+                        if(ce.getStatus().equals("Y")){
+                            generateBrand2CategoryList(idata.getBrandName(),ce,listBrandInc,listCategoryInc);
+                            hasInc = true;
+                        }else{
+                            generateBrand2CategoryList(idata.getBrandName(),ce,listBrandExc,listCategoryExc);
+                            hasExc = true;
+                        }
+                    }
+                }
+
+                if(hasInc){
+                    listPreInclude.add(initPromotionRuleEntity(body,listBrandInc,listCategoryInc));
+                }
+
+                if(hasExc){
+                    listPreExclude.add(initPromotionRuleEntity(body,listBrandExc,listCategoryExc));
+                }
+            }
+        }
+        prMap.put(PR_INC_LIST,listPreInclude);
+        prMap.put(PR_EXC_LIST,listPreExclude);
+        return prMap;
+    }
+
+    private PromotionRuleEntity initPromotionRuleEntity(PromotionRuleEntity body,
+                                                        List<BrandEntity> listBrand,
+                                                        List<CategoryEntity> listCategory) {
         PromotionRuleEntity pre = new PromotionRuleEntity();
         pre.setPromotionId(body.getPromotionId());
         pre.setRuleId(body.getRuleId());
         pre.setSeasonCode(body.getSeasonCode());
         pre.setVendorId(body.getVendorId());
+        pre.setBrands(listBrand);
+        pre.setCategorys(listCategory);
+        return pre;
+    }
 
-        for (ImportDataEntity idata : listImportData) {
-            BrandEntity be = new BrandEntity();
-            List<BrandEntity> listBrand = new ArrayList<BrandEntity>();
-            List<CategoryEntity> listCategory = new ArrayList<CategoryEntity>();
-
-            List<Map<String, Object>> listBrandTmp = productBrandServiceImpl.getBrandByName(idata.getBrandName());
-            if (listBrandTmp.size() == 1) {
-                Map<String, Object> brandMap = listBrandTmp.get(0);
-                be.setBrandId(Long.parseLong(brandMap.get("brand_id").toString()));
-                be.setName((String) brandMap.get("english_name"));
-                listBrand.add(be);
-            }
-            pre.setBrands(listBrand);
-            LOGGER.info("==Jian add brandEntity [{}].", listBrand);
-
-            List<CategoryEntity> listCategoryTmp = idata.getCategorys();
-            LOGGER.info("==Jian listCategoryTmp.size() is [{}].", listCategoryTmp.size());
-            for (CategoryEntity ce : listCategoryTmp) {
-                List<Map<String, Object>> listCategoryTmp1 = productCategoryServiceImpl.getSubCidByPid(ce.getCategoryId());
-                listCategory.add(ce);
-                LOGGER.info("==Jian add categoryEntity [{}].", ce);
-                if (listCategoryTmp1.size() >= 1) {
-                    for (Map<String, Object> it : listCategoryTmp1) {
-                        CategoryEntity ceTmp = new CategoryEntity();
-                        ceTmp.setCategoryId(Long.parseLong(it.get("category_id").toString()));
-                        listCategory.add(ceTmp);
-                    }
-                }
-            }
-            pre.setCategorys(listCategory);
-            LOGGER.info("==Jian add categoryEntity [{}].", listCategory);
-
-            PromotionRule promotionRule = transformPromotionRule(pre);
-            listRule.add(promotionRule);
+    private void generateBrand2CategoryList(String brandName, CategoryEntity ce,
+                             List<BrandEntity> listBrand, List<CategoryEntity> listCategory){
+        //记录include
+        if(listBrand.size() < 1){
+            setBrandList(brandName,listBrand);
         }
-        return listRule;
+
+        //同时添加2，3级类目
+        listCategory.add(ce);
+        setCategoryList(ce.getCategoryId(),listCategory);
+    }
+
+    private void setBrandList(String brandName,List<BrandEntity> listBrand){
+        BrandEntity be = new BrandEntity();
+        List<Map<String, Object>> listBrandTmp = productBrandServiceImpl.getBrandByName(brandName);
+        if (listBrandTmp.size() == 1) {
+            Map<String, Object> brandMap = listBrandTmp.get(0);
+            be.setBrandId(Long.parseLong(brandMap.get("brand_id").toString()));
+            be.setName((String) brandMap.get("english_name"));
+            listBrand.add(be);
+        }
+    }
+
+    private void setCategoryList(Long categoryId, List<CategoryEntity> listCategory){
+        List<Map<String, Object>> listCategoryTmp = productCategoryServiceImpl.getSubCidByPid(categoryId);
+        if (listCategoryTmp.size() >= 1) {
+            for (Map<String, Object> it : listCategoryTmp) {
+                CategoryEntity ce = new CategoryEntity();
+                ce.setCategoryId(Long.parseLong(it.get("category_id").toString()));
+                listCategory.add(ce);
+            }
+        }
     }
 
     @DeleteMapping(value = "/promotion/{ruleType}/{ruleId}")
