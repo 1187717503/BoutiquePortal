@@ -455,6 +455,7 @@ public class PriceChangeRuleService {
             throw new RuntimeException("error  delete priceChangeRule fail");
         }
 
+        priceChangeRuleService.deleteSnapshot(priceChangeRuleId);
         result.put("status", StatusType.SUCCESS);
         return result;
     }

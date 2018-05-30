@@ -769,6 +769,11 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         return priceChangeRuleMapper.selRuleByVendorPriceType(params);
     }
 
+    @Override
+    public int deleteSnapshot(Long price_change_rule_id) {
+        return priceChangeRuleMapper.deleteSnapshot(price_change_rule_id);
+    }
+
     ;
 
 }

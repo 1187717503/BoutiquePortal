@@ -826,4 +826,8 @@
         </if>
     </update>
     <!-- end dingyifan -->
+
+    <update id="deleteSnapshot">
+        update snapshot_price_detail spd,snapshot_price_rule spr set spd.enabled = 0,spr.enabled = 0 where spd.snapshot_price_rule_id = spr.snapshot_price_rule_id and spr.price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
+    </update>
 </mapper>
