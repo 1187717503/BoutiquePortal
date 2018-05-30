@@ -159,10 +159,13 @@ public class PromotionManagementController {
                         //同时添加2，3级类目
                         listCategoryInc.add(ce);
                         setCategoryList(ce.getCategoryId(),listCategoryInc);
+                        hasInc = true;
                     }
                 }
 
-                listPreInclude.add(initPromotionRuleEntity(body,listBrandInc,listCategoryInc));
+                if(hasInc){
+                    listPreInclude.add(initPromotionRuleEntity(body,listBrandInc,listCategoryInc));
+                }
             }else{
 
                 List<CategoryEntity> listCategoryTmp = idata.getCategorys();
