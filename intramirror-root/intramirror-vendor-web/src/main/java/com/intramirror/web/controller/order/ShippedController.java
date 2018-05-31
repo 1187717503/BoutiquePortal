@@ -41,6 +41,16 @@ public class ShippedController extends BaseController {
         ResultMessage result = new ResultMessage();
         result.errorStatus();
 
+        if (shippedParam.getBrandID()!=null){
+            shippedParam.setBrandID(shippedParam.getBrandID().trim());
+        }
+        if (shippedParam.getColorCode()!=null){
+            shippedParam.setColorCode(shippedParam.getColorCode().trim());
+        }
+        if (shippedParam.getOrderLineNo()!=null){
+            shippedParam.setOrderLineNo(shippedParam.getOrderLineNo().trim());
+        }
+
         User user = this.getUser(httpRequest);
         if (user == null) {
             result.setMsg("Please log in again");

@@ -115,6 +115,10 @@ public class OrderController extends BaseController {
         ResultMessage result = new ResultMessage();
         result.errorStatus();
 
+        if (map.get("orderNumber")!=null){
+            map.put("orderNumber",map.get("orderNumber").toString().trim());
+        }
+
         if (map == null || map.size() == 0 || map.get("status") == null || StringUtils.isBlank(map.get("status").toString())) {
             result.setMsg("Parameter cannot be empty");
             return result;
