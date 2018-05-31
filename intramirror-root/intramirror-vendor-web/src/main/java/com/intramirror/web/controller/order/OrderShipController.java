@@ -924,7 +924,8 @@ public class OrderShipController extends BaseController {
 
             for (Map<String,Object> UNOrder: UNlist){
                 InvoiceVO UNInvoiceVO = new InvoiceVO();
-
+                //欧盟的不显示remake
+                UNInvoiceVO.setRemark(null);
                 RecipientVO recipientVO = new RecipientVO();
                 String country = UNOrder.get("user_rec_country") != null ? UNOrder.get("user_rec_country").toString() : "";
                 recipientVO.setCountry(country);
