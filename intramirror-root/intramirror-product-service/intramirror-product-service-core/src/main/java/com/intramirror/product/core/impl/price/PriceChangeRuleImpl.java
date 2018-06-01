@@ -510,6 +510,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         seasonMapper = this.getSqlSession().getMapper(SeasonMapper.class);
         systemPropertyMapper = this.getSqlSession().getMapper(SystemPropertyMapper.class);
         priceChangeRuleSeasonGroupMapper = this.getSqlSession().getMapper(PriceChangeRuleSeasonGroupMapper.class);
+        imPriceAlgorithmMapper = this.getSqlSession().getMapper(ImPriceAlgorithmMapper.class);
 
     }
 

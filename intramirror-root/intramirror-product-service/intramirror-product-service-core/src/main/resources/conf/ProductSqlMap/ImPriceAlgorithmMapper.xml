@@ -152,9 +152,9 @@
     select
     <include refid="Base_Column_List" />
     from im_price_algorithm
-    where 1=1
+    where enabled=1
     <if test="categoryType != null">
-      and category_type = #{category_type,jdbcType=TINYINT},
+      and category_type = #{categoryType,jdbcType=TINYINT}
     </if>
     <if test="seasonCode != null">
       and season_code in
