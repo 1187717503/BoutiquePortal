@@ -117,6 +117,7 @@ public class PriceChangeRuleService {
 
         priceChangeRule.setStatus(Integer.parseInt(map.get("status").toString()));
         priceChangeRule.setCategoryType(Byte.valueOf(map.get("categoryType").toString()));
+        priceChangeRule.setImPriceAlgorithmId(Long.parseLong(map.get("imPriceAlgorithmId").toString()));
 
         //添加 priceChangeRule
         priceChangeRuleService.insertSelective(priceChangeRule);
@@ -185,6 +186,9 @@ public class PriceChangeRuleService {
                 throw new RuntimeException("error");
             }
         }
+
+        // todo 添加snapshot_price_rule数据
+        // todo refresh
 
         result.put("status", StatusType.SUCCESS);
         return result;
@@ -671,6 +675,28 @@ public class PriceChangeRuleService {
             //	            throw new RuntimeException("error");
             //	        }
         }
+
+        result.put("status", StatusType.SUCCESS);
+        return result;
+    }
+
+    /**
+     * 修改PriceChangeRul
+     *
+     * @param map
+     * @return
+     * @throws Exception
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> updatePriceChangeRuleImAlgorithm(Map<String, Object> map) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        result.put("status", StatusType.FAILURE);
+
+        PriceChangeRule priceChangeRule = new PriceChangeRule();
+        priceChangeRule.setPriceChangeRuleId(Long.valueOf(map.get("priceChangeRuleId").toString()));
+        priceChangeRule.setImPriceAlgorithmId(Long.valueOf(map.get("imPriceAlgorithmId").toString()));
+
+        priceChangeRuleService.updateByPrimaryKeySelective(priceChangeRule);
 
         result.put("status", StatusType.SUCCESS);
         return result;

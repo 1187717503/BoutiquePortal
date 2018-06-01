@@ -147,4 +147,20 @@
       enabled = #{enabled,jdbcType=BIT}
     where im_price_algorithm_id = #{imPriceAlgorithmId,jdbcType=BIGINT}
   </update>
+
+  <select id="selectByParams" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select
+    <include refid="Base_Column_List" />
+    from im_price_algorithm
+    where 1=1
+    <if test="categoryType != null">
+      and category_type = #{category_type,jdbcType=TINYINT},
+    </if>
+    <if test="seasonCode != null">
+      and season_code in
+      <foreach collection="seasonCode" item="item" index="index" open="(" close=")" separator=",">
+        #{item}
+      </foreach>
+    </if>
+  </select>
 </mapper>

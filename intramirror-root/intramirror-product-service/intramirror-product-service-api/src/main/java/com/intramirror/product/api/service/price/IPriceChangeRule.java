@@ -2,6 +2,7 @@ package com.intramirror.product.api.service.price;
 
 import com.intramirror.common.enums.PriceChangeRuleEnum;
 import com.intramirror.common.help.ResultMessage;
+import com.intramirror.product.api.model.ImPriceAlgorithm;
 import com.intramirror.product.api.model.PriceChangeRule;
 
 import java.util.List;
@@ -98,4 +99,6 @@ public interface IPriceChangeRule {
 
     int deleteSnapshot(Long price_change_rule_id);
 
+    List<ImPriceAlgorithm> selectAlgorithmsByConditions(Map<String, Object> params);
+    ImPriceAlgorithm getAlgorithmById(Long id);
 }

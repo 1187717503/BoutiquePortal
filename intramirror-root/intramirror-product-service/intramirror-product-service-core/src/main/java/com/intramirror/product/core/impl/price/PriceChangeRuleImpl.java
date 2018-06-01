@@ -9,14 +9,13 @@ import com.intramirror.common.enums.SystemPropertyEnum;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.help.StringUtils;
 import com.intramirror.common.utils.DateUtils;
+import com.intramirror.product.api.model.ImPriceAlgorithm;
 import com.intramirror.product.api.model.PriceChangeRule;
 import com.intramirror.product.api.model.PriceChangeRuleSeasonGroup;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
 import com.intramirror.product.core.dao.BaseDao;
-import com.intramirror.product.core.mapper.PriceChangeRuleMapper;
-import com.intramirror.product.core.mapper.PriceChangeRuleSeasonGroupMapper;
-import com.intramirror.product.core.mapper.SeasonMapper;
-import com.intramirror.product.core.mapper.SystemPropertyMapper;
+import com.intramirror.product.core.mapper.*;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -41,6 +40,8 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     private SystemPropertyMapper systemPropertyMapper;
 
     private PriceChangeRuleSeasonGroupMapper priceChangeRuleSeasonGroupMapper;
+
+    private ImPriceAlgorithmMapper imPriceAlgorithmMapper;
 
     @Override
     public boolean updateVendorPrice(int categoryType, String startTime, String endTime) {
@@ -715,6 +716,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             priceChangeRule.setVendorId(Long.parseLong(vendor_id));
             priceChangeRule.setUserId(user_id);
             priceChangeRule.setCategoryType(oldPriceChangeRule.getCategoryType());
+            priceChangeRule.setImPriceAlgorithmId(oldPriceChangeRule.getImPriceAlgorithmId());
             priceChangeRuleMapper.insert(priceChangeRule);
             price_change_rule_id_new = priceChangeRule.getPriceChangeRuleId();
             /** end copy price_change_rule */
@@ -774,6 +776,13 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         return priceChangeRuleMapper.deleteSnapshot(price_change_rule_id);
     }
 
-    ;
+    @Override
+    public List<ImPriceAlgorithm> selectAlgorithmsByConditions(Map<String, Object> params) {
+        return imPriceAlgorithmMapper.selectByParams(params);
+    }
 
+    @Override
+    public ImPriceAlgorithm getAlgorithmById(Long id) {
+        return imPriceAlgorithmMapper.selectByPrimaryKey(id);
+    }
 }

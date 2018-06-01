@@ -10,11 +10,7 @@ import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.core.common.response.StatusCode;
-import com.intramirror.product.api.model.PriceChangeRule;
-import com.intramirror.product.api.model.PriceChangeRuleCategoryBrand;
-import com.intramirror.product.api.model.PriceChangeRuleGroup;
-import com.intramirror.product.api.model.PriceChangeRuleProduct;
-import com.intramirror.product.api.model.ProductWithBLOBs;
+import com.intramirror.product.api.model.*;
 import com.intramirror.product.api.service.IPriceChangeRuleCategoryBrandService;
 import com.intramirror.product.api.service.IPriceChangeRuleGroupService;
 import com.intramirror.product.api.service.IPriceChangeRuleProductService;
@@ -192,8 +188,16 @@ public class PriceChangeRuleController extends BaseController {
 
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-            if (pcrModel != null && pcrModel.getValidFrom() != null) {
-                pcrModel.setValidFromStr(simpleDateFormat.format(pcrModel.getValidFrom()));
+            if (pcrModel != null) {
+                if (pcrModel.getValidFrom() != null) {
+                    pcrModel.setValidFromStr(simpleDateFormat.format(pcrModel.getValidFrom()));
+                }
+                if (pcrModel.getImPriceAlgorithmId() != null) {
+                    ImPriceAlgorithm algorithm = priceChangeRule.getAlgorithmById(pcrModel.getImPriceAlgorithmId());
+                    if (algorithm != null) {
+                        pcrModel.setImPriceAlgorithmName(algorithm.getName());
+                    }
+                }
             }
 
             resultMessage.successStatus().putMsg("info", "success !!!").setData(pcrModel);
@@ -952,7 +956,7 @@ public class PriceChangeRuleController extends BaseController {
             return false;
         }
 
-        if (params.get("categoryType") == null || StringUtils.isBlank(params.get("categoryType").toString())) {
+        if (params.get("imPriceAlgorithmId") == null || StringUtils.isBlank(params.get("imPriceAlgorithmId").toString())) {
             return false;
         }
 
@@ -1119,4 +1123,36 @@ public class PriceChangeRuleController extends BaseController {
         return false;
     }
 
+
+    /**
+     * 更新ImPriceAlgorithm
+     * @param map
+     * @return
+     */
+    @RequestMapping(value = "/updatePriceRuleImAlgorithm", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> updatePriceRuleImAlgorithm(@RequestBody Map<String, Object> map) {
+        logger.info("updatePriceRuleImAlgorithm param:" + new Gson().toJson(map));
+        Map<String, Object> result = new HashMap<String, Object>();
+        result.put("status", StatusType.FAILURE);
+
+        //校验
+        if (map.get("priceChangeRuleId") == null || StringUtils.isBlank(map.get("priceChangeRuleId").toString())) {
+            result.put("info", "Parameter cannot be null");
+            return result;
+        }
+        if (map.get("imPriceAlgorithmId") == null || StringUtils.isBlank(map.get("imPriceAlgorithmId").toString())) {
+            result.put("info", "Parameter cannot be null");
+            return result;
+        }
+        try {
+            result = priceChangeRuleService.updatePriceChangeRuleImAlgorithm(map);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("info", "Update ImPriceAlgorithm fail ");
+            return result;
+        }
+
+        return result;
+    }
 }
