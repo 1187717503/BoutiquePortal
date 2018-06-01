@@ -51,6 +51,15 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
                 map.put("name",name);
                 map.put("season_codes",stringList);
                 map.put("price_change_rule_id",seasonMap.get("price_change_rule_id"));
+                //根据price_change_rule_id查找im_price_algorithm_id 然后 根据id查找name
+                Map<String,Object>  algorithmMap= seasonMapper.queryImPriceAlgorithm(seasonMap.get("price_change_rule_id"));
+                if(algorithmMap != null){
+                    map.put("im_price_algorithm_name",algorithmMap.get("name"));
+                    map.put("im_price_algorithm_id",algorithmMap.get("im_price_algorithm_id"));
+                }else{
+                    map.put("im_price_algorithm_name","");
+                    map.put("im_price_algorithm_id","");
+                }
                 handleMaps.add(map);
             }
         }

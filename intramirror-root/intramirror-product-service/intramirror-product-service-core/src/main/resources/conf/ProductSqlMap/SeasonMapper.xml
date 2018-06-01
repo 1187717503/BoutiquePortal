@@ -334,4 +334,14 @@
             insert into `price_change_rule_category_brand`(`price_change_rule_id` ,`category_id` ,`level` ,`brand_id` ,`discount_percentage` ,`exception_flag` )
             values(#{price_change_rule_id,jdbcType=BIGINT},#{category_id,jdbcType=BIGINT},2,#{brand_id,jdbcType=BIGINT},#{discount_percentage,jdbcType=BIGINT},0);
     </update>
+
+
+    <!-- //根据price_change_rule_id查找im_price_algorithm_id 然后 根据id查找name -->
+    <select id="queryImPriceAlgorithm" parameterType="java.lang.Object" resultType="java.util.Map">
+          select a.im_price_algorithm_id,a.`name` from price_change_rule p
+            inner join im_price_algorithm a
+            on p.im_price_algorithm_id=a.im_price_algorithm_id
+            where p.price_change_rule_id = #{priceChangeRuleId,jdbcType=BIGINT}
+            and a.enabled = 1
+    </select>
 </mapper>
