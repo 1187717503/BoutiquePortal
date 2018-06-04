@@ -153,13 +153,13 @@
             and tag_name = #{tagName,jdbcType=VARCHAR}
         </if>
         <if test="tagId != null">
-            and tag_id = #{tagId}
+            and tag_id = #{tagId,jdbcType=BIGINT}
         </if>
         <if test="vendorId != null">
-            vendor_id = #{vendorId}
+            AND vendor_id = #{vendorId,jdbcType=BIGINT}
         </if>
         <if test="tagType != null">
-            tag_type = #{tagType}
+            AND tag_type = #{tagType,jdbcType=INTEGER}
         </if>
         <if test="orderBy != null">
             <choose>
