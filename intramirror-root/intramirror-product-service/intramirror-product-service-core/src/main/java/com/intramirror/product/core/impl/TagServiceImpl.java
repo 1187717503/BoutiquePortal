@@ -68,4 +68,11 @@ public class TagServiceImpl implements ITagService {
         return tagMapper.getTags(orderBy);
     }
 
+    @Override
+    public List<Tag> getTagsByParam(Map<String,Object> param) {
+        if(param == null) return null;
+        List<Tag> tags = tagMapper.getTagsByParam(param);
+        return tags;
+    }
+
 }

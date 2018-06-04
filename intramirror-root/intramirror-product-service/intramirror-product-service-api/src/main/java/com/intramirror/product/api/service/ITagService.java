@@ -10,4 +10,6 @@ public interface ITagService {
 
     List<Tag> getTags(String orderBy);
 
+    List<Tag> getTagsByParam(Map<String,Object> param);
+
 }

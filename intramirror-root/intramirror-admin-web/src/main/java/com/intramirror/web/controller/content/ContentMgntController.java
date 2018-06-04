@@ -14,6 +14,7 @@ import com.intramirror.product.api.service.BlockService;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ITagService;
 import com.intramirror.product.api.service.content.ContentManagementService;
+import com.intramirror.product.api.vo.tag.TagRequestVO;
 import com.intramirror.web.controller.cache.CategoryCache;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -160,6 +161,18 @@ public class ContentMgntController {
         return Response.status(StatusType.SUCCESS).data(iTagService.getTags(orderBy));
     }
 
+    @PostMapping(value = "/tags/list", produces = "application/json")
+    public Response getTags(@RequestBody TagRequestVO vo) {
+        Map<String,Object> param = new HashMap<>();
+        param.put("tagId",vo.getTagId());
+        param.put("vendorId",vo.getVendorId());
+        param.put("tagType",vo.getTagType());
+        param.put("tagName",vo.getTagName());
+        param.put("orderBy",vo.getOrderBy());
+        List<Tag> tags = iTagService.getTagsByParam(param);
+        return Response.status(StatusType.SUCCESS).data(tags);
+    }
+
     @DeleteMapping(value = "/tags/{tagId}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public Response deleteTag(@PathVariable Long tagId) {
@@ -190,6 +203,7 @@ public class ContentMgntController {
         }
         return Response.status(StatusType.SUCCESS).data(productList);
     }
+
 
     @DeleteMapping(value = "/tags/{tagId}/products/{productId}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
