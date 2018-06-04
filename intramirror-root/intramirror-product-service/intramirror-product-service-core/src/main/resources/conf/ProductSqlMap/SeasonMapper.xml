@@ -206,8 +206,8 @@
 
     <select id="queryRuleByGroup" resultType="java.util.Map" parameterType="java.util.Map">
 
-    select pcrg.price_change_rule_group_id,pg.`name`,pcrg.discount_percentage from price_change_rule_group pcrg
-        inner join product_group pg on (pcrg.product_group_id = pg.product_group_id)
+    select pcrg.price_change_rule_group_id,t.`tag_name` as `name`,pcrg.discount_percentage from price_change_rule_group pcrg
+        inner join tag t on (pcrg.product_group_id = t.tag_id)
         where pcrg.price_change_rule_id = #{price_change_rule_id,jdbcType=INTEGER}
   </select>
 
