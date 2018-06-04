@@ -55,5 +55,7 @@ public interface IPriceChangeRuleProductService {
      * @return
      */
     List<PriceChangeRuleProduct>  selectByParameter(PriceChangeRuleProduct record);
-    
+
+
+    PriceChangeRuleProduct selectByPrimaryKey(Long id);
 }

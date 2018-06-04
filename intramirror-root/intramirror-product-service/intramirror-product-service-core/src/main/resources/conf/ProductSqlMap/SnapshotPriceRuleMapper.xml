@@ -160,4 +160,14 @@
       enabled = #{enabled,jdbcType=BIT}
     where snapshot_price_rule_id = #{snapshotPriceRuleId,jdbcType=BIGINT}
   </update>
+  <update id="updateSaveAtByPriceChangeRuleId" parameterType="com.intramirror.product.api.model.SnapshotPriceRule" >
+    update snapshot_price_rule
+    set save_at = #{saveAt,jdbcType=TIMESTAMP}
+    where price_change_rule_id = #{priceChangeRuleId,jdbcType=BIGINT} and enabled = 1
+  </update>
+  <update id="deleteByPriceChangeRuleId" parameterType="com.intramirror.product.api.model.SnapshotPriceRule" >
+    update snapshot_price_rule
+    set enabled = 0
+    where price_change_rule_id = #{priceChangeRuleId,jdbcType=BIGINT} and enabled = 1
+  </update>
 </mapper>

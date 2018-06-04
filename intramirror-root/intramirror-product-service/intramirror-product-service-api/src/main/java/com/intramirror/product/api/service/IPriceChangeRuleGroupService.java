@@ -57,5 +57,7 @@ public interface IPriceChangeRuleGroupService {
      * @return
      */
     List<PriceChangeRuleGroup>  selectByParameter(PriceChangeRuleGroup record);
+
+    PriceChangeRuleGroup selectByPrimaryKey(Long id);
     
 }

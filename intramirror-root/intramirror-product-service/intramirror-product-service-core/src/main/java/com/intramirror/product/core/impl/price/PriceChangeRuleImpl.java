@@ -9,9 +9,11 @@ import com.intramirror.common.enums.SystemPropertyEnum;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.help.StringUtils;
 import com.intramirror.common.utils.DateUtils;
+import com.intramirror.product.api.exception.BusinessException;
 import com.intramirror.product.api.model.ImPriceAlgorithm;
 import com.intramirror.product.api.model.PriceChangeRule;
 import com.intramirror.product.api.model.PriceChangeRuleSeasonGroup;
+import com.intramirror.product.api.model.SnapshotPriceRule;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.*;
@@ -42,6 +44,8 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     private PriceChangeRuleSeasonGroupMapper priceChangeRuleSeasonGroupMapper;
 
     private ImPriceAlgorithmMapper imPriceAlgorithmMapper;
+
+    private SnapshotPriceRuleMapper snapshotPriceRuleMapper;
 
     @Override
     public boolean updateVendorPrice(int categoryType, String startTime, String endTime) {
@@ -511,6 +515,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         systemPropertyMapper = this.getSqlSession().getMapper(SystemPropertyMapper.class);
         priceChangeRuleSeasonGroupMapper = this.getSqlSession().getMapper(PriceChangeRuleSeasonGroupMapper.class);
         imPriceAlgorithmMapper = this.getSqlSession().getMapper(ImPriceAlgorithmMapper.class);
+        snapshotPriceRuleMapper = this.getSqlSession().getMapper(SnapshotPriceRuleMapper.class);
 
     }
 
@@ -717,6 +722,10 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             priceChangeRule.setVendorId(Long.parseLong(vendor_id));
             priceChangeRule.setUserId(user_id);
             priceChangeRule.setCategoryType(oldPriceChangeRule.getCategoryType());
+            if (oldPriceChangeRule.getImPriceAlgorithmId() == null) {
+                logger.error("oldPriceChangeRule.getImPriceAlgorithmId() is null. price_change_rule_id=" + price_change_rule_id);
+                throw new BusinessException("Im price algorithm can not be empty.");
+            }
             priceChangeRule.setImPriceAlgorithmId(oldPriceChangeRule.getImPriceAlgorithmId());
             priceChangeRuleMapper.insert(priceChangeRule);
             price_change_rule_id_new = priceChangeRule.getPriceChangeRuleId();
@@ -754,6 +763,14 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
                 seasonMapper.copyPriceChangeRuleSeasonGroup(insert_price_change_rule_season_group_maps);
                 /** end copy price_change_rule_season_group */
             }
+
+            // 添加snapshot_price_rule数据
+            SnapshotPriceRule snapshotPriceRule = new SnapshotPriceRule();
+            snapshotPriceRule.setPriceChangeRuleId(priceChangeRule.getPriceChangeRuleId());
+            snapshotPriceRule.setSaveAt(new Date());
+            snapshotPriceRule.setCreatedAt(new Date());
+            snapshotPriceRule.setStatus(new Byte("0"));
+            snapshotPriceRuleMapper.insertSelective(snapshotPriceRule);
         }
         return price_change_rule_id_new;
     }

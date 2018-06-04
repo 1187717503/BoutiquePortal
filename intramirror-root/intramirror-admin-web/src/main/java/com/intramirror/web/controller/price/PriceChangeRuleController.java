@@ -11,17 +11,14 @@ import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.core.common.response.StatusCode;
 import com.intramirror.product.api.model.*;
-import com.intramirror.product.api.service.IPriceChangeRuleCategoryBrandService;
-import com.intramirror.product.api.service.IPriceChangeRuleGroupService;
-import com.intramirror.product.api.service.IPriceChangeRuleProductService;
-import com.intramirror.product.api.service.IProductService;
-import com.intramirror.product.api.service.ISystemPropertyService;
+import com.intramirror.product.api.service.*;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
 import com.intramirror.user.api.model.User;
 import com.intramirror.web.controller.BaseController;
 import com.intramirror.web.service.PriceChangeRuleService;
 import com.intramirror.web.service.price.PriceRuleSynService;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +68,9 @@ public class PriceChangeRuleController extends BaseController {
 
     @Autowired
     private ISystemPropertyService iSystemPropertyService;
+
+    @Autowired
+    private ISnapshotPriceRuleService iSnapshotPriceRuleService;
 
     @Autowired
     private PriceTaskController priceTaskController;
@@ -378,6 +378,9 @@ public class PriceChangeRuleController extends BaseController {
                     result.put("info", "parameter is incorrect");
                     return result;
                 }
+                // 更新snapshot_price_rule数据
+                updateSnapshotPriceRuleSaveAt(priceChangeRuleCategory.get("price_change_rule_id").getAsLong());
+                // todo refresh
 
                 //修改
             } else {
@@ -388,6 +391,9 @@ public class PriceChangeRuleController extends BaseController {
                     result.put("info", "parameter is incorrect");
                     return result;
                 }
+                // 更新snapshot_price_rule数据
+                updateSnapshotPriceRuleSaveAt(priceChangeRuleCategory.get("price_change_rule_id").getAsLong());
+                // todo refresh
             }
 
         } catch (Exception e) {
@@ -570,6 +576,9 @@ public class PriceChangeRuleController extends BaseController {
                 result.put("info", "parameter is incorrect");
                 return result;
             }
+            // 更新snapshot_price_rule数据
+            updateSnapshotPriceRuleSaveAt(priceChangeRuleCategory.get("price_change_rule_id").getAsLong());
+            // todo refresh
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -603,6 +612,7 @@ public class PriceChangeRuleController extends BaseController {
         try {
             //根据ID删除
             String priceChangeRuleCategoryBrandId = map.get("price_change_rule_category_brand_id").toString();
+            PriceChangeRuleCategoryBrand priceChangeRuleCategoryBrand = priceChangeRuleCategoryBrandService.selectByPrimaryKey(Long.parseLong(priceChangeRuleCategoryBrandId));
             int row = priceChangeRuleCategoryBrandService.deletePriceChangeRuleCategoryBrand(Long.parseLong(priceChangeRuleCategoryBrandId));
 
             //判断是否成功
@@ -611,6 +621,9 @@ public class PriceChangeRuleController extends BaseController {
             } else {
                 result.put("info", "delete priceChangeRuleCategoryBrand fail");
             }
+            // 更新snapshot_price_rule数据
+            updateSnapshotPriceRuleSaveAt(priceChangeRuleCategoryBrand.getPriceChangeRuleId());
+            // todo refresh
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -665,6 +678,9 @@ public class PriceChangeRuleController extends BaseController {
                 result.put("info", "parameter is incorrect");
                 return result;
             }
+            // 更新snapshot_price_rule数据
+            updateSnapshotPriceRuleSaveAt(priceChangeRuleGroupjson.get("price_change_rule_id").getAsLong());
+            // todo refresh
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -698,6 +714,7 @@ public class PriceChangeRuleController extends BaseController {
         try {
             //根据ID删除
             String priceChangeRuleGroupId = map.get("price_change_rule_group_id").toString();
+            PriceChangeRuleGroup priceChangeRuleGroup = priceChangeRuleGroupService.selectByPrimaryKey(Long.parseLong(priceChangeRuleGroupId));
             int row = priceChangeRuleGroupService.deleteByPrimaryKey(Long.parseLong(priceChangeRuleGroupId));
 
             //判断是否成功
@@ -706,6 +723,9 @@ public class PriceChangeRuleController extends BaseController {
             } else {
                 result.put("info", "delete priceChangeRuleGroup fail");
             }
+            // 更新snapshot_price_rule数据
+            updateSnapshotPriceRuleSaveAt(priceChangeRuleGroup.getPriceChangeRuleId());
+            // todo refresh
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -780,6 +800,9 @@ public class PriceChangeRuleController extends BaseController {
                 result.put("info", "parameter is incorrect");
                 return result;
             }
+            // 更新snapshot_price_rule数据
+            updateSnapshotPriceRuleSaveAt(Long.valueOf(price_change_rule_id));
+            // todo refresh
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -813,6 +836,7 @@ public class PriceChangeRuleController extends BaseController {
         try {
             //根据ID删除
             String priceChangeRuleProductId = map.get("price_change_rule_product_id").toString();
+            PriceChangeRuleProduct priceChangeRuleProduct = priceChangeRuleProductService.selectByPrimaryKey(Long.parseLong(priceChangeRuleProductId));
             int row = priceChangeRuleProductService.deleteByPrimaryKey(Long.parseLong(priceChangeRuleProductId));
 
             //判断是否成功
@@ -821,6 +845,9 @@ public class PriceChangeRuleController extends BaseController {
             } else {
                 result.put("info", "delete priceChangeRuleProduct fail");
             }
+            // 更新snapshot_price_rule数据
+            updateSnapshotPriceRuleSaveAt(priceChangeRuleProduct.getPriceChangeRuleId());
+            // todo refresh
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -1154,5 +1181,13 @@ public class PriceChangeRuleController extends BaseController {
         }
 
         return result;
+    }
+
+    private int updateSnapshotPriceRuleSaveAt(Long priceChangeRuleId) {
+        // 更新snapshot_price_rule数据
+        SnapshotPriceRule snapshotPriceRule = new SnapshotPriceRule();
+        snapshotPriceRule.setPriceChangeRuleId(priceChangeRuleId);
+        snapshotPriceRule.setSaveAt(new Date());
+        return iSnapshotPriceRuleService.updateSaveAtByPriceChangeRuleId(snapshotPriceRule);
     }
 }

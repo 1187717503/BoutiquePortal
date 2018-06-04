@@ -9,20 +9,9 @@ import com.intramirror.common.enums.SystemPropertyEnum;
 import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.product.api.enums.CategoryTypeEnum;
-import com.intramirror.product.api.model.Category;
-import com.intramirror.product.api.model.PriceChangeRule;
-import com.intramirror.product.api.model.PriceChangeRuleCategoryBrand;
-import com.intramirror.product.api.model.PriceChangeRuleGroup;
-import com.intramirror.product.api.model.PriceChangeRuleProduct;
-import com.intramirror.product.api.model.PriceChangeRuleSeasonGroup;
-import com.intramirror.product.api.model.Shop;
-import com.intramirror.product.api.model.SystemProperty;
-import com.intramirror.product.api.service.IPriceChangeRuleCategoryBrandService;
-import com.intramirror.product.api.service.IPriceChangeRuleGroupService;
-import com.intramirror.product.api.service.IPriceChangeRuleProductService;
-import com.intramirror.product.api.service.IPriceChangeRuleSeasonGroupService;
-import com.intramirror.product.api.service.IShopService;
-import com.intramirror.product.api.service.ISystemPropertyService;
+import com.intramirror.product.api.exception.BusinessException;
+import com.intramirror.product.api.model.*;
+import com.intramirror.product.api.service.*;
 import com.intramirror.product.api.service.category.ICategoryService;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
 import com.intramirror.user.api.service.VendorService;
@@ -69,6 +58,9 @@ public class PriceChangeRuleService {
 
     @Autowired
     private ISystemPropertyService systemPropertyService;
+
+    @Autowired
+    private ISnapshotPriceRuleService snapshotPriceRuleService;
 
     /**
      * 初始化 PriceChangeRule
@@ -117,6 +109,11 @@ public class PriceChangeRuleService {
 
         priceChangeRule.setStatus(Integer.parseInt(map.get("status").toString()));
         priceChangeRule.setCategoryType(Byte.valueOf(map.get("categoryType").toString()));
+
+        if (map.get("imPriceAlgorithmId") == null) {
+            logger.error("oldPriceChangeRule.getImPriceAlgorithmId() is null. price_change_rule_id=" + map.get("imPriceAlgorithmId"));
+            throw new BusinessException("Im price algorithm can not be empty.");
+        }
         priceChangeRule.setImPriceAlgorithmId(Long.parseLong(map.get("imPriceAlgorithmId").toString()));
 
         //添加 priceChangeRule
@@ -187,7 +184,13 @@ public class PriceChangeRuleService {
             }
         }
 
-        // todo 添加snapshot_price_rule数据
+        // 添加snapshot_price_rule数据
+        SnapshotPriceRule snapshotPriceRule = new SnapshotPriceRule();
+        snapshotPriceRule.setPriceChangeRuleId(priceChangeRule.getPriceChangeRuleId());
+        snapshotPriceRule.setSaveAt(new Date());
+        snapshotPriceRule.setCreatedAt(new Date());
+        snapshotPriceRule.setStatus(new Byte("0"));
+        snapshotPriceRuleService.insertSelective(snapshotPriceRule);
         // todo refresh
 
         result.put("status", StatusType.SUCCESS);
@@ -267,6 +270,9 @@ public class PriceChangeRuleService {
             }
 
         }
+        // 更新snapshot_price_rule数据
+        updateSnapshotPriceRuleSaveAt(priceChangeRuleId);
+        // todo refresh
 
         result.put("status", StatusType.SUCCESS);
         return result;
@@ -338,6 +344,9 @@ public class PriceChangeRuleService {
             }
 
         }
+        // 更新snapshot_price_rule数据
+        updateSnapshotPriceRuleSaveAt(priceChangeRuleId);
+        // todo refresh
 
         result.put("status", StatusType.SUCCESS);
         return result;
@@ -460,6 +469,12 @@ public class PriceChangeRuleService {
         }
 
         priceChangeRuleService.deleteSnapshot(priceChangeRuleId);
+
+        //将对应的SnapshotPriceRule表的数据删除
+        SnapshotPriceRule record = new SnapshotPriceRule();
+        record.setPriceChangeRuleId(Long.parseLong(map.get("price_change_rule_id").toString()));
+        snapshotPriceRuleService.deleteByPriceChangeRuleId(record);
+
         result.put("status", StatusType.SUCCESS);
         return result;
     }
@@ -697,9 +712,20 @@ public class PriceChangeRuleService {
         priceChangeRule.setImPriceAlgorithmId(Long.valueOf(map.get("imPriceAlgorithmId").toString()));
 
         priceChangeRuleService.updateByPrimaryKeySelective(priceChangeRule);
+        // 更新snapshot_price_rule数据
+        updateSnapshotPriceRuleSaveAt(Long.parseLong(map.get("priceChangeRuleId").toString()));
+        // todo refresh
 
         result.put("status", StatusType.SUCCESS);
         return result;
+    }
+
+    private int updateSnapshotPriceRuleSaveAt(Long priceChangeRuleId) {
+        // 更新snapshot_price_rule数据
+        SnapshotPriceRule snapshotPriceRule = new SnapshotPriceRule();
+        snapshotPriceRule.setPriceChangeRuleId(priceChangeRuleId);
+        snapshotPriceRule.setSaveAt(new Date());
+        return snapshotPriceRuleService.updateSaveAtByPriceChangeRuleId(snapshotPriceRule);
     }
 
 }
