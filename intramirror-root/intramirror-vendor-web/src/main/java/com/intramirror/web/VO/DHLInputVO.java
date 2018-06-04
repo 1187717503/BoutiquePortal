@@ -12,6 +12,7 @@ public class DHLInputVO {
     private String account;
     private String serviceType;
     private String shipmentTime;
+    private Long shipmentDate;
     private BigDecimal customsValue;
     private String description;
     private ShipperVO shipper;
@@ -19,6 +20,32 @@ public class DHLInputVO {
     private List<Map<String,Object>> packageInfos;
     private String labelType;
     private String labelTemplate;
+    private String specialPickupInstruction;
+    private String pickupLocation;
+
+    public String getSpecialPickupInstruction() {
+        return specialPickupInstruction;
+    }
+
+    public void setSpecialPickupInstruction(String specialPickupInstruction) {
+        this.specialPickupInstruction = specialPickupInstruction;
+    }
+
+    public String getPickupLocation() {
+        return pickupLocation;
+    }
+
+    public void setPickupLocation(String pickupLocation) {
+        this.pickupLocation = pickupLocation;
+    }
+
+    public Long getShipmentDate() {
+        return shipmentDate;
+    }
+
+    public void setShipmentDate(Long shipmentDate) {
+        this.shipmentDate = shipmentDate;
+    }
 
     public String getLabelType() {
         return labelType;

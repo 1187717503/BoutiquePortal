@@ -65,6 +65,10 @@ public class DHLHttpClient {
                     return object.toString();
                 }else {
                     JSONObject data = object.optJSONObject("data");
+                    if (data==null){
+                        data = new JSONObject();
+                        data.put("data",object.optString("data"));
+                    }
                     data.put("status",1);
                     return data!=null?data.toString():"request success";
                 }

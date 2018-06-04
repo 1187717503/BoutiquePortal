@@ -297,7 +297,7 @@ public class OrderShipController extends BaseController {
         try {
             map.put("vendorId", vendor.getVendorId());
 
-            Map<String, Object> getShipment = new HashMap<String, Object>();
+            Map<String, Object> getShipment = new HashMap<>();
             getShipment.put("shipmentId", Long.parseLong(map.get("shipment_id").toString()));
 
             //根据shipmentId 获取shipment 相关信息及物流第一段类型
@@ -310,6 +310,7 @@ public class OrderShipController extends BaseController {
             SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
             if (shipmentMap.get("invoice_date") != null && StringUtils.isNotBlank(shipmentMap.get("invoice_date").toString())) {
                 shipmentMap.put("invoice_date", sdf2.format(sdf.parse(shipmentMap.get("invoice_date").toString())));
+                shipmentMap.put("invoice_num",shipmentMap.get("invoiceNum"));
             }
 
             //获取carton列表
@@ -1212,6 +1213,16 @@ public class OrderShipController extends BaseController {
         }
         DHLInputVO inputVO = new DHLInputVO();
         Long shipmentId = Long.parseLong(map.get("shipment_id").toString());
+        if (map.get("shipmentDate")!=null){
+            Long shipmentDate = Long.parseLong(map.get("shipmentDate").toString());
+            inputVO.setShipmentDate(shipmentDate);
+        }
+        if (map.get("specialPickupInstruction")!=null){
+            inputVO.setSpecialPickupInstruction(map.get("specialPickupInstruction").toString());
+        }
+        if (map.get("pickupLocation")!=null){
+            inputVO.setPickupLocation(map.get("pickupLocation").toString());
+        }
         Map<String,Object> params = new HashMap<>();
         //查询close状态纸箱
         //params.put("status",2);
@@ -1329,9 +1340,11 @@ public class OrderShipController extends BaseController {
     private void addParams(DHLInputVO inputVO, SubShipment dhlShipment,StockLocation fromLocation, List<Map<String, Object>> containerList,Shipment shipment) {
         SimpleDateFormat f1 = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat f2 = new SimpleDateFormat("HH:mm:ssz");
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_YEAR, 1);
-        Date currentTime = calendar.getTime();
+        //Calendar calendar = Calendar.getInstance();
+        //calendar.add(Calendar.DAY_OF_YEAR, 1);
+        //Date currentTime = calendar.getTime();
+        Date currentTime = new Date(inputVO.getShipmentDate());
+        inputVO.setShipmentDate(null);
         try {
             //System.out.println(f1.parse("2015-12-12"));
             f1.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
@@ -1340,7 +1353,6 @@ public class OrderShipController extends BaseController {
             e.printStackTrace();
         }
         inputVO.setAccount("106669563");
-        //获取意大利时间,再往后延一天
         inputVO.setShipmentTime(f1.format(currentTime)+"T"+f2.format(currentTime));
         inputVO.setDescription("clothing");
         inputVO.setLabelType("PDF");
