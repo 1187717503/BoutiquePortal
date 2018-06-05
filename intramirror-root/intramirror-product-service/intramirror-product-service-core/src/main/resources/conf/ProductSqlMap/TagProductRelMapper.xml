@@ -127,10 +127,11 @@
         INSERT INTO tag_product_rel(
         tag_id,
         product_id,
-        sort_num)
+        sort_num,
+        tag_type)
         VALUES
         <foreach collection="productIdList" index="index" item="item" separator=",">
-            (#{tag_id,jdbcType=BIGINT},#{item,jdbcType=BIGINT},#{sort_num,jdbcType=BIGINT})
+            (#{tag_id,jdbcType=BIGINT},#{item,jdbcType=BIGINT},#{sort_num,jdbcType=BIGINT},#{tagType,jdbcType=INTEGER})
         </foreach>
     </insert>
 
@@ -142,6 +143,9 @@
         WHERE
         <if test="tag_id != null">
             tag_id = #{tag_id} AND
+        </if>
+        <if test="tagType != null">
+            tag_type = #{tagType} AND
         </if>
         product_id IN
         <foreach close=")" collection="productIdList" index="index" item="item" open="(" separator=",">

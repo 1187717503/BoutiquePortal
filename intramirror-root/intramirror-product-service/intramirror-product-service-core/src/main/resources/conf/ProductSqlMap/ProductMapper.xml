@@ -72,7 +72,7 @@
         ,
         <include refid="Blob_Column_List"/>
         from product
-        where product_id = #{productId,jdbcType=BIGINT}
+        where product_id = #{productId,jdbcType=BIGINT} limit 1
     </select>
 
     <select id="selectByParameter" resultMap="ResultMapWithBLOBs" parameterType="com.intramirror.product.api.model.ProductWithBLOBs">

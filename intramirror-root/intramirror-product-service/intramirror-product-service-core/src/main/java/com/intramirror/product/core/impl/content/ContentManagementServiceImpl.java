@@ -10,6 +10,8 @@ import com.intramirror.product.core.mapper.BlockTagRelMapper;
 import com.intramirror.product.core.mapper.ContentManagementMapper;
 import com.intramirror.product.core.mapper.TagMapper;
 import com.intramirror.product.core.mapper.TagProductRelMapper;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -64,8 +66,10 @@ public class ContentManagementServiceImpl implements ContentManagementService {
     }
 
     @Override
-    public List<Long> listTagProductIds(Long tagId) {
-        return contentManagementMapper.listTagProductIds(tagId);
+    public List<Long> listTagProductIds(List<Long> tagIds) {
+        Map<String,Object> param = new HashMap<>();
+        param.put("tagIds",tagIds);
+        return contentManagementMapper.listTagProductIds(param);
     }
 
     @Override
@@ -74,8 +78,15 @@ public class ContentManagementServiceImpl implements ContentManagementService {
     }
 
     @Override
-    public List<Long> listAllTagProductIds() {
-        return contentManagementMapper.listAllTagProductIds();
+    public List<Map<String, Object>> listTagsByProductIdsAndType(Map<String, Object> param) {
+        return contentManagementMapper.listTagsByProductIdsAndType(param);
+    }
+
+    @Override
+    public List<Long> listAllTagProductIds(List<Integer> tagTypes) {
+        Map<String,Object> param = new HashMap<>();
+        param.put("types",tagTypes);
+        return contentManagementMapper.listAllTagProductIds(param);
     }
 
     @Override
