@@ -761,31 +761,36 @@ public class PriceChangeRuleController extends BaseController {
         }
 
         try {
-            String productCode = map.get("product_code").toString();
+            String designerId = map.get("designer_id").toString();
+            String colorCode = map.get("color_code").toString();
             String price_change_rule_id = map.get("price_change_rule_id").toString();
 
             PriceChangeRule pcr = priceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
 
             //查询是否存在该商品
-            ProductWithBLOBs nproductWithBLOBs = null;
-            if (StringUtils.isNotBlank(productCode)) {
+            List<ProductWithBLOBs> productWithBLOBsList = null;
+            if (StringUtils.isNotBlank(designerId) && StringUtils.isNotBlank(colorCode) ) {
                 ProductWithBLOBs productWithBLOBs = new ProductWithBLOBs();
-                productWithBLOBs.setProductCode(productCode);
+                productWithBLOBs.setDesignerId(designerId);
+                productWithBLOBs.setColorCode(colorCode);
                 productWithBLOBs.setEnabled(EnabledType.USED);
                 productWithBLOBs.setVendorId(pcr.getVendorId());
-                nproductWithBLOBs = productService.selectByParameter(productWithBLOBs);
+                productWithBLOBsList = productService.getProductByParameter(productWithBLOBs);
             }
 
-            if (nproductWithBLOBs == null) {
+            if (productWithBLOBsList == null) {
                 result.put("info", "Can't find the goods");
                 return result;
-
+            } else if (productWithBLOBsList.size() > 1) {
+                result.put("info", "Duplicate products exist.");
+                return result;
             }
-
+            ProductWithBLOBs productWithBLOBs = productWithBLOBsList.get(0);
             //判断是否已经存在规则
             PriceChangeRuleProduct priceChangeRuleProductParam = new PriceChangeRuleProduct();
             priceChangeRuleProductParam.setPriceChangeRuleId(Long.valueOf(price_change_rule_id));
-            priceChangeRuleProductParam.setBoutiqueId(productCode);
+            priceChangeRuleProductParam.setDesignerId(designerId);
+            priceChangeRuleProductParam.setColorCode(colorCode);
             List<PriceChangeRuleProduct> list = priceChangeRuleProductService.selectByParameter(priceChangeRuleProductParam);
             if (list != null && list.size() > 0) {
                 result.put("info", "Records already exist");
@@ -795,9 +800,11 @@ public class PriceChangeRuleController extends BaseController {
             //添加 priceChangeRuleProduct
             PriceChangeRuleProduct priceChangeRuleProduct = new PriceChangeRuleProduct();
             priceChangeRuleProduct.setPriceChangeRuleId(Long.valueOf(price_change_rule_id));
-            priceChangeRuleProduct.setProductId(nproductWithBLOBs.getProductId());
-            priceChangeRuleProduct.setBoutiqueId(nproductWithBLOBs.getProductCode());
-            priceChangeRuleProduct.setProductName(nproductWithBLOBs.getName());
+            priceChangeRuleProduct.setProductId(productWithBLOBs.getProductId());
+            priceChangeRuleProduct.setDesignerId(designerId);
+            priceChangeRuleProduct.setColorCode(colorCode);
+            priceChangeRuleProduct.setBoutiqueId(productWithBLOBs.getProductCode());
+            priceChangeRuleProduct.setProductName(productWithBLOBs.getName());
             priceChangeRuleProduct.setDiscountPercentage(Long.valueOf("100") - Long.valueOf(map.get("discount_percentage").toString()));
             priceChangeRuleProductService.insertSelective(priceChangeRuleProduct);
 
@@ -1042,7 +1049,10 @@ public class PriceChangeRuleController extends BaseController {
      */
     public static boolean checkCreatePriceChangeRuleProductParams(Map<String, Object> params) {
 
-        if (params.get("product_code") == null || StringUtils.isBlank(params.get("product_code").toString())) {
+        if (params.get("designer_id") == null || StringUtils.isBlank(params.get("designer_id").toString())) {
+            return false;
+        }
+        if (params.get("color_code") == null || StringUtils.isBlank(params.get("color_code").toString())) {
             return false;
         }
 
