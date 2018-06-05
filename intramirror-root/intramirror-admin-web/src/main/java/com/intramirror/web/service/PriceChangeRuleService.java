@@ -475,7 +475,7 @@ public class PriceChangeRuleService {
         Map<String, Object> params = new HashMap<>();
         params.put("priceChangeRuleIdList", Collections.singleton(priceChangeRuleId));
         List<SnapshotPriceRule> snapshotPriceRuleList = snapshotPriceRuleService.getSnapshotPriceRuleByPriceChangeRuleIds(params);
-        if (CollectionUtils.isEmpty(snapshotPriceRuleList)) {
+        if (!CollectionUtils.isEmpty(snapshotPriceRuleList)) {
             snapshotPriceRuleService.deleteByPriceChangeRuleId(record);
             SnapshotPriceDetail detail = new SnapshotPriceDetail();
             detail.setSnapshotPriceRuleId(snapshotPriceRuleList.get(0).getSnapshotPriceRuleId());
