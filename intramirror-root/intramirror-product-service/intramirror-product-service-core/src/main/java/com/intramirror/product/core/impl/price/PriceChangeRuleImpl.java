@@ -15,11 +15,10 @@ import com.intramirror.product.api.service.price.IPriceChangeRule;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.util.*;
+
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -219,7 +218,13 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     }
 
     public static void main(String[] args) {
-        System.out.println(JSONObject.toJSON("12".split(",")));
+//        System.out.println(JSONObject.toJSON("12".split(",")));
+//        BigDecimal a = new BigDecimal(1);
+//        BigDecimal b = new BigDecimal(2);
+        Map<String,Object> map = new HashedMap();
+        map.put("info",12);
+        Long info = Long.parseLong(map.get("info").toString());
+        System.out.println(info);
     }
 
     private int updatePriceByVendor(List<Map<String, Object>> paramsList, Map<String, Object> paramsMap) {
@@ -358,17 +363,32 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         //更新price_change_rule 的 preview——status  为0 非活动折扣 1 活动折扣
         paramsMap.put("preview_status",preview_status);
         priceChangeRuleMapper.updatePriceChangeRuleById(paramsMap);
+
+
         if(snapshotLists != null && snapshotLists.size() > 0){
             if(preview_status.intValue() == 1) {
                 for (Map<String, Object> snapshot : snapshotLists) {
+                    Long pk = Long.parseLong(snapshot.get("product_id").toString());
+                    ProductWithBLOBs product = productMapper.selectByPrimaryKey(pk);
+                    if(product.getMaxRetailPrice().compareTo(new BigDecimal(snapshot.get("im_price").toString())) == -1){
+                        snapshot.put("im_price",null);
+                    }
                     priceChangeRuleMapper.updateProductImPriceByPrimaryKey(snapshot);
                 }
             }
             if(preview_status.intValue() == 0){
                 //关闭preview 更新所有vendor——id  category——type为1的product的preview im price的值为null
+                Set<Long> productIds = new HashSet<Long>();
                 for (Map<String, Object> snapshot : snapshotLists) {
-                    snapshot.put("im_price",null);
-                    priceChangeRuleMapper.updateProductImPriceByPrimaryKey(snapshot);
+                    productIds.add(Long.parseLong(snapshot.get("product_id").toString()));
+//                    priceChangeRuleMapper.updateProductImPriceByPrimaryKey(snapshot);
+                }
+                if(productIds.size() > 0){
+                    //update product  im_price wei null
+                    Map<String,Object> productParams = new HashMap<String,Object>();
+                    productParams.put("im_price",null);
+                    productParams.put("set",productIds);
+                    priceChangeRuleMapper.updateProductImPriceByProductIds(productParams);
                 }
             }
         }
@@ -543,6 +563,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         systemPropertyMapper = this.getSqlSession().getMapper(SystemPropertyMapper.class);
         priceChangeRuleSeasonGroupMapper = this.getSqlSession().getMapper(PriceChangeRuleSeasonGroupMapper.class);
         imPriceAlgorithmMapper = this.getSqlSession().getMapper(ImPriceAlgorithmMapper.class);
+        productMapper = this.getSqlSession().getMapper(ProductMapper.class);
 
     }
 

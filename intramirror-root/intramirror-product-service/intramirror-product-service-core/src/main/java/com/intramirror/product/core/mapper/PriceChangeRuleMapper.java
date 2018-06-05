@@ -177,4 +177,10 @@ public interface PriceChangeRuleMapper {
      * @param paramsMap
      */
     void updatePriceChangeRuleById(Map<String,Object> paramsMap);
+
+    /**
+     *  piliang gengxin
+     * @param productParams
+     */
+    void updateProductImPriceByProductIds(Map<String,Object> productParams);
 }
