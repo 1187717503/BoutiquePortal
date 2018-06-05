@@ -144,11 +144,14 @@ public interface PriceChangeRuleMapper {
     /**
      * 修改product.preview_im_price
      */
-    int updateProductPreviewPrice(Long vendor_id);
 
-    int updateSkuImPrice();
 
     int deleteSnapshot(@Param("price_change_rule_id") Long price_change_rule_id);
+
+    int updateProductPreviewPrice(@Param(value = "vendor_id") Long vendor_id, @Param(value = "category_type") Integer category_type,
+            @Param("price_change_rule_id") Long price_change_rule_id);
+
+    int updateSkuImPrice();
 
     int clearProductPreviewPrice(@Param(value = "vendor_id") Long vendor_id, @Param(value = "category_type") Integer category_type,
             @Param("price_change_rule_id") Long price_change_rule_id);
