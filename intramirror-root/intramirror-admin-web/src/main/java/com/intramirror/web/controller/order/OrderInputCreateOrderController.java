@@ -70,7 +70,7 @@ public class OrderInputCreateOrderController extends BaseController {
 				strings[i] = checkoutEntity.getShop_product_sku_id().toString();
 			}
 			List<Map<String,Object>> skuMap = shopProductSkuService.getSkuIdByShopProductSkuId(strings);
-			/*for(Map<String,Object> sku : skuMap) {
+			for(Map<String,Object> sku : skuMap) {
 				String skuId = sku.get("sku_id").toString();
 				String url = commonProperties.getAppCheckUrl()+"?skuId="+skuId;
 				logger.info("OrderInputCreateOrderServiceOrderInputCheckOrder,start,requestMethod,url:"+url);
@@ -80,7 +80,7 @@ public class OrderInputCreateOrderController extends BaseController {
 					results.put("error", "quantity not available in the stock。");
 					return results;
 				}
-			}*/
+			}
 
 			logger.info("OrderInputCreateOrderController,orderInputCreateOrder,start,paramMap:"+ JSONObject.toJSONString(paramMap)+",user:"+JSONObject.toJSONString(user));
 			results = orderInputCreateOrderService.orderInputCreateOrder(paramMap, user);
