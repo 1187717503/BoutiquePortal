@@ -1,5 +1,3 @@
-
-
 package com.intramirror.product.core.impl.price;
 
 import com.alibaba.fastjson.JSONObject;
@@ -13,6 +11,7 @@ import com.intramirror.product.api.exception.BusinessException;
 import com.intramirror.product.api.model.ImPriceAlgorithm;
 import com.intramirror.product.api.model.PriceChangeRule;
 import com.intramirror.product.api.model.PriceChangeRuleSeasonGroup;
+import com.intramirror.product.api.model.ProductWithBLOBs;
 import com.intramirror.product.api.model.SnapshotPriceRule;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
 import com.intramirror.product.core.dao.BaseDao;
@@ -44,6 +43,8 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     private PriceChangeRuleSeasonGroupMapper priceChangeRuleSeasonGroupMapper;
 
     private ImPriceAlgorithmMapper imPriceAlgorithmMapper;
+
+    private ProductMapper productMapper;
 
     private SnapshotPriceRuleMapper snapshotPriceRuleMapper;
 
@@ -344,6 +345,37 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         logger.info("updatePriceByAdmin updateRuleStatus end !");
 
         this.updateDefaultPrice(PriceChangeRuleEnum.PriceType.IM_PRICE, paramsMap);
+        return true;
+    }
+
+    @Override
+    public  boolean updatePreviewPriceByBoutique(Long vendor_id, Long preview_status, Integer category_type, Long price_change_rule_id, String flag) throws Exception {
+        if (flag.equalsIgnoreCase("all")) {
+            price_change_rule_id = null;
+        }
+        Map<String, Object> paramsMap = new HashMap<>();
+        paramsMap.put("category_type", category_type);
+        paramsMap.put("vendor_id", vendor_id);
+        paramsMap.put("price_change_rule_id", price_change_rule_id);
+        //根据参数查询snapshot对应的product id 和 im price snapshot_price_detail_id的值
+        List<Map<String, Object>> snapshotLists = priceChangeRuleMapper.selectSnapshotByChangeRuleId(paramsMap);
+        //更新price_change_rule 的 preview——status  为0 非活动折扣 1 活动折扣
+        paramsMap.put("preview_status",preview_status);
+        priceChangeRuleMapper.updatePriceChangeRuleById(paramsMap);
+        if(snapshotLists != null && snapshotLists.size() > 0){
+            if(preview_status.intValue() == 1) {
+                for (Map<String, Object> snapshot : snapshotLists) {
+                    priceChangeRuleMapper.updateProductImPriceByPrimaryKey(snapshot);
+                }
+            }
+            if(preview_status.intValue() == 0){
+                //关闭preview 更新所有vendor——id  category——type为1的product的preview im price的值为null
+                for (Map<String, Object> snapshot : snapshotLists) {
+                    snapshot.put("im_price",null);
+                    priceChangeRuleMapper.updateProductImPriceByPrimaryKey(snapshot);
+                }
+            }
+        }
         return true;
     }
 
