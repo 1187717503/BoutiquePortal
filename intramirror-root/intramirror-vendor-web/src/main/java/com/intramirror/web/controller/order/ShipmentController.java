@@ -260,7 +260,7 @@ public class ShipmentController extends BaseController{
 						Map<String,Object> params = new HashMap<>();
 						params.put("awbNo",dhlShipment.getAwbNum());
 						params.put("requestorName",user.getUsername());
-						params.put("reason","008");
+						params.put("reason","001");
 						String s;
 						try{
 							s = DHLHttpClient.httpPost(JsonTransformUtil.toJson(params), DHLHttpClient.deleteAWBUrl);
