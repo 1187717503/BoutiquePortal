@@ -1,6 +1,7 @@
 package com.intramirror.product.core.impl.price;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.gson.Gson;
 import com.intramirror.common.Contants;
 import com.intramirror.common.enums.PriceChangeRuleEnum;
 import com.intramirror.common.enums.SystemPropertyEnum;
@@ -20,8 +21,9 @@ import com.intramirror.product.core.mapper.*;
 import java.math.BigDecimal;
 import java.util.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.commons.collections.map.HashedMap;
-import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service(value = "productPriceChangeRule")
 public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
 
-    private static Logger logger = Logger.getLogger(PriceChangeRuleImpl.class);
+    private static Logger logger = LoggerFactory.getLogger(PriceChangeRuleImpl.class);
 
     private PriceChangeRuleMapper priceChangeRuleMapper;
 
@@ -668,7 +670,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         }
         /** end checked 新规则是否存在 */
 
-        this.copyAllRuleByActivePending(ruleByConditionsMaps, to_vendor_id, discount, true, user_id, PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
+        this.copyAllRuleByActivePending(ruleByConditionsMaps, to_vendor_id, discount, true, user_id, PriceChangeRuleEnum.PriceType.IM_PRICE.getCode(), null);
         resultMessage.successStatus().putMsg("info", "SUCCESS !!!");
         return resultMessage;
     }
@@ -708,7 +710,8 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         /** end checked 该vendor下是否存在该season_code */
 
         Integer price_type = Integer.parseInt(params.get("price_type").toString());
-        Long price_change_rule_id_new = this.copyAllRuleByActivePending(ruleByConditionsMaps, vendor_id, "0", false, user_id, price_type);
+        Long im_price_algorithm_id = Long.parseLong(params.get("im_price_algorithm_id").toString());
+        Long price_change_rule_id_new = this.copyAllRuleByActivePending(ruleByConditionsMaps, vendor_id, "0", false, user_id, price_type, im_price_algorithm_id);
 
         // create price_season_group
         for (String season_code : season_codes) {
@@ -752,14 +755,14 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
 
         // copy
         Long new_price_change_rule_id = this.copyAllRuleByActivePending(activeMaps, params.get("vendor_id").toString(), "0", true,
-                Long.parseLong(params.get("user_id").toString()), Integer.parseInt(params.get("price_type").toString()));
+                Long.parseLong(params.get("user_id").toString()), Integer.parseInt(params.get("price_type").toString()), null);
         logger.info(" new_price_change_rule_id : " + new_price_change_rule_id);
         resultMessage.successStatus().putMsg("info", "success");
         return resultMessage;
     }
 
     private Long copyAllRuleByActivePending(List<Map<String, Object>> ruleByConditionsMaps, String vendor_id, String discount, boolean insert_season_group_flag,
-            Long user_id, Integer priceType) throws Exception {
+            Long user_id, Integer priceType, Long im_price_algorithm_id) throws Exception {
         Long price_change_rule_id_new = 0L;
         for (Map<String, Object> map : ruleByConditionsMaps) {
             String price_change_rule_id = map.get("price_change_rule_id").toString();
@@ -775,11 +778,11 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             priceChangeRule.setVendorId(Long.parseLong(vendor_id));
             priceChangeRule.setUserId(user_id);
             priceChangeRule.setCategoryType(oldPriceChangeRule.getCategoryType());
-            if (oldPriceChangeRule.getImPriceAlgorithmId() == null) {
+            if (im_price_algorithm_id == null && oldPriceChangeRule.getImPriceAlgorithmId() == null) {
                 logger.error("oldPriceChangeRule.getImPriceAlgorithmId() is null. price_change_rule_id=" + price_change_rule_id);
                 throw new BusinessException("Im price algorithm can not be empty.");
             }
-            priceChangeRule.setImPriceAlgorithmId(oldPriceChangeRule.getImPriceAlgorithmId());
+            priceChangeRule.setImPriceAlgorithmId(im_price_algorithm_id == null ? oldPriceChangeRule.getImPriceAlgorithmId() : im_price_algorithm_id);
             priceChangeRuleMapper.insert(priceChangeRule);
             price_change_rule_id_new = priceChangeRule.getPriceChangeRuleId();
             /** end copy price_change_rule */
