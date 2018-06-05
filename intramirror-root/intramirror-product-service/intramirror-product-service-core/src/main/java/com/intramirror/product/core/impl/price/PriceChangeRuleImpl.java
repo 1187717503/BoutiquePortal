@@ -355,6 +355,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         return true;
     }
 
+    @Transactional
     @Override
     public  boolean updatePreviewPriceByBoutique(Long vendor_id, Long preview_status, Integer category_type, Long price_change_rule_id, String flag) throws Exception {
         if (flag.equalsIgnoreCase("all")) {
@@ -373,16 +374,18 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
 
         if(snapshotLists != null && snapshotLists.size() > 0){
             if(preview_status.intValue() == 1) {
-                for (Map<String, Object> snapshot : snapshotLists) {
-                    Long pk = Long.parseLong(snapshot.get("product_id").toString());
-                    ProductWithBLOBs product = productMapper.selectByPrimaryKey(pk);
-                    if(product.getMaxRetailPrice().compareTo(new BigDecimal(snapshot.get("im_price").toString())) == -1){
-                        snapshot.put("im_price",null);
-                    }
-                    priceChangeRuleMapper.updateProductImPriceByPrimaryKey(snapshot);
-                }
+//                for (Map<String, Object> snapshot : snapshotLists) {
+//                    Long pk = Long.parseLong(snapshot.get("product_id").toString());
+//                    ProductWithBLOBs product = productMapper.selectByPrimaryKey(pk);
+//                    if(product.getMaxRetailPrice().compareTo(new BigDecimal(snapshot.get("im_price").toString())) == -1){
+//                        snapshot.put("im_price",null);
+//                    }
+//                    priceChangeRuleMapper.updateProductImPriceByPrimaryKey(snapshot);
+//                }
+                priceChangeRuleMapper.updateProductImPriceByConditions(paramsMap);
             }
             if(preview_status.intValue() == 0){
+
                 //关闭preview 更新所有vendor——id  category——type为1的product的preview im price的值为null
                 Set<Long> productIds = new HashSet<Long>();
                 for (Map<String, Object> snapshot : snapshotLists) {
