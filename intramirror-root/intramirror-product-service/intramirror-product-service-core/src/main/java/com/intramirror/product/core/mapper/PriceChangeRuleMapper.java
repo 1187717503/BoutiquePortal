@@ -4,6 +4,8 @@ import com.intramirror.product.api.model.PriceChangeRule;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
 import org.apache.ibatis.annotations.Param;
 
 public interface PriceChangeRuleMapper {
@@ -154,4 +156,22 @@ public interface PriceChangeRuleMapper {
     int updatePriceChangeRulePreviewStatus(@Param(value = "vendor_id") Long vendor_id, @Param(value = "preview_status") Long preview_status,
             @Param(value = "category_type") Integer category_type, @Param("price_change_rule_id") Long price_change_rule_id);
 
+    /**
+     * 根据price rule id查询对应的preview的im price的值
+     * @param paramsMap
+     * @return
+     */
+    List<Map<String,Object>> selectSnapshotByChangeRuleId(Map<String,Object> paramsMap);
+
+    /**
+     * 更新preview的imprice的值
+     * @param paramsMap
+     */
+    void updateProductImPriceByPrimaryKey(Map<String,Object> paramsMap);
+
+    /**
+     *  更新preview——status 0 非活动折扣 1 活动折扣
+     * @param paramsMap
+     */
+    void updatePriceChangeRuleById(Map<String,Object> paramsMap);
 }

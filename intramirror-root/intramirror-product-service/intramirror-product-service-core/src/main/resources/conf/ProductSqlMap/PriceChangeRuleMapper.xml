@@ -841,4 +841,42 @@
     <update id="deleteSnapshot">
         update snapshot_price_detail spd,snapshot_price_rule spr set spd.enabled = 0,spr.enabled = 0 where spd.snapshot_price_rule_id = spr.snapshot_price_rule_id and spr.price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
     </update>
+
+
+    <!-- linna pending open preview -->
+    <select id="selectSnapshotByChangeRuleId" resultType="java.util.Map" parameterType="java.util.Map">
+        select sh.product_id,sh.im_price,sh.snapshot_price_detail_id  from snapshot_price_rule sn
+        inner join snapshot_price_detail sh
+        on sn.snapshot_price_rule_id = sh.snapshot_price_rule_id
+        where sn.status = 0 and sn.enabled = 1 and sh.enabled = 1
+        <if test="price_change_rule_id != null and price_change_rule_id != ''">
+            and sn.price_change_rule_id =  #{price_change_rule_id,jdbcType=BIGINT}
+        </if>
+        <if test="price_change_rule_id == null and price_change_rule_id == ''">
+            and sn.price_change_rule_id
+            in (select price_change_rule_id from price_change_rule where vendor_id = #{vendor_id,jdbcType=BIGINT}
+            and category_type = #{category_type,jdbcType=TINYINT})
+        </if>
+    </select>
+
+    <update id="updateProductImPriceByPrimaryKey" parameterType="java.util.Map">
+        update product set preview_im_price = #{im_price,jdbcType=DECIMAL}
+        WHERE   product_id = #{product_id,jdbcType=BIGINT} and enabled = 1
+    </update>
+
+
+    <update id="updatePriceChangeRuleById" parameterType="java.util.Map">
+        update price_change_rule set preview_status = #{preview_status,jdbcType=INTEGER}
+        <where>
+            <if test="price_change_rule_id != null and price_change_rule_id != ''">
+                price_change_rule_id =  #{price_change_rule_id,jdbcType=BIGINT}
+            </if>
+            <if test="price_change_rule_id == null and price_change_rule_id == ''">
+                vendor_id = #{vendor_id,jdbcType=BIGINT}
+                and category_type = #{category_type,jdbcType=TINYINT}
+            </if>
+
+        </where>
+
+    </update>
 </mapper>

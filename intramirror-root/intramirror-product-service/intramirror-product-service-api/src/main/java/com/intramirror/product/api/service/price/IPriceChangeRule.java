@@ -101,4 +101,16 @@ public interface IPriceChangeRule {
 
     List<ImPriceAlgorithm> selectAlgorithmsByConditions(Map<String, Object> params);
     ImPriceAlgorithm getAlgorithmById(Long id);
+
+    /**
+     * boutique pending 页面 open / close preview
+     * @param vendor_id
+     * @param preview_status
+     * @param category_type
+     * @param price_change_rule_id
+     * @param flag
+     * @return
+     * @throws Exception
+     */
+    boolean updatePreviewPriceByBoutique(Long vendor_id, Long preview_status, Integer category_type, Long price_change_rule_id, String flag) throws Exception;
 }

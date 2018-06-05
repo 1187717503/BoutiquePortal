@@ -184,6 +184,7 @@ public class PriceChangeRuleController extends BaseController {
         try {
             if (StringUtils.isBlank(price_change_rule_id))
                 return resultMessage.errorStatus().putMsg("info", "params is null !!!");
+            //查询price_change_rule信息
             PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
 
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -198,6 +199,11 @@ public class PriceChangeRuleController extends BaseController {
                         pcrModel.setImPriceAlgorithmName(algorithm.getName());
                     }
                 }
+                Map<String, Object> paramsMap = new HashMap<>();
+                paramsMap.put("price_change_rule_id", price_change_rule_id);
+                //根据参数查询snapshot对应的product id 和 im price的值
+                boolean preview = pcrModel.getPreview_status() == 0? false : true;
+                pcrModel.setPreviewImPrice(preview);
             }
 
             resultMessage.successStatus().putMsg("info", "success !!!").setData(pcrModel);
@@ -211,7 +217,6 @@ public class PriceChangeRuleController extends BaseController {
 
     @RequestMapping("/changepreview")
     @ResponseBody
-
     public ResultMessage changePreview(@Param("price_change_rule_id") Long price_change_rule_id, @Param("preview_status") Long preview_status,
             @Param("flag") String flag) {
         logger.info("PriceChangeRuleController,changePreview,inputParams,price_change_rule_id:{},preview_status:{} ", price_change_rule_id, preview_status);
@@ -1155,4 +1160,41 @@ public class PriceChangeRuleController extends BaseController {
 
         return result;
     }
+
+    /**
+     * changePreviewByBoutique
+     * boutique pending open / close preview
+     * @param price_change_rule_id
+     * @param preview_status
+     * @param flag
+     * @return
+     */
+    @RequestMapping(value = "/changePreviewByBoutique")
+    @ResponseBody
+    public ResultMessage changePreviewByBoutique(@Param("price_change_rule_id") Long price_change_rule_id, @Param("preview_status") Long preview_status,
+                                       @Param("flag") String flag) {
+        logger.info("PriceChangeRuleController,changePreviewByBoutique,inputParams,price_change_rule_id:{},preview_status:{} ", price_change_rule_id, preview_status);
+
+        ResultMessage resultMessage = ResultMessage.getInstance();
+
+        try{
+            synchronized (this){
+                PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(price_change_rule_id);
+                if(StringUtils.isBlank(flag)){
+                    flag = "";
+                }
+                priceRuleSynService.syncPreviewByBoutique(pcrModel.getVendorId(), preview_status, pcrModel.getCategoryType().intValue(),pcrModel.getPriceChangeRuleId(),flag );
+                resultMessage.successStatus().putMsg("info", "success !!!");
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+            logger.error("error message : " +e.getMessage());
+            resultMessage.errorStatus().putMsg("info", "error message : " + e.getMessage());
+        }
+        logger.info("PriceChangeRuleController,changePreviewByBoutique,inputParams,price_change_rule_id:{},preview_status:{}, resultMsg:{}.", price_change_rule_id,
+                preview_status, JSONObject.toJSONString(resultMessage));
+        return resultMessage;
+    }
+
 }

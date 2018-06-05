@@ -109,4 +109,14 @@ public class PriceRuleSynService {
         }
     }
 
+    // boutique pending页面点击preview
+    public void syncPreviewByBoutique(Long vendorId, Long previewStatus, int categoryType, Long priceChangeRuleId, String flag) throws Exception {
+        synchronized (this) {
+            logger.info("SyncPreviewByBoutiqueStart,vendorId:{},previewStatus:{},categoryType:{},priceChangeRuleId:{},flag:{}", vendorId, previewStatus, categoryType,
+                    priceChangeRuleId, flag);
+            iPriceChangeRule.updatePreviewPriceByBoutique(vendorId, previewStatus, categoryType, priceChangeRuleId, flag);
+            logger.info("SyncPreviewByBoutiqueEnd,vendorId:{},previewStatus:{},categoryType:{},priceChangeRuleId:{},flag:{}", vendorId, previewStatus, categoryType,
+                    priceChangeRuleId, flag);
+        }
+    }
 }
