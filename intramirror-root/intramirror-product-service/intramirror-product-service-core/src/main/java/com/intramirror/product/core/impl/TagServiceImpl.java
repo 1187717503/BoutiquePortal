@@ -59,6 +59,7 @@ public class TagServiceImpl implements ITagService {
         mapToSave.put("tag_id", map.get("tag_id"));
         mapToSave.put("productIdList", map.get("productIdList"));
         mapToSave.put("sort_num", map.get("sort_num"));
+        mapToSave.put("tagType",map.get("tagType"));
 
         return tagProductRelMapper.saveTagProductRel(mapToSave);
     }

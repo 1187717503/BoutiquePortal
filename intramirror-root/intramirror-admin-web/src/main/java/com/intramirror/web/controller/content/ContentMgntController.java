@@ -14,13 +14,19 @@ import com.intramirror.product.api.service.BlockService;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ITagService;
 import com.intramirror.product.api.service.content.ContentManagementService;
+import com.intramirror.product.api.vo.tag.ProductGroupVO;
 import com.intramirror.product.api.vo.tag.TagRequestVO;
+import com.intramirror.product.api.vo.tag.VendorTagVO;
+import com.intramirror.user.api.model.Vendor;
+import com.intramirror.user.api.service.VendorService;
 import com.intramirror.web.controller.cache.CategoryCache;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +65,9 @@ public class ContentMgntController {
 
     @Autowired
     private CategoryCache categoryCache;
+
+    @Autowired
+    private VendorService vendorService;
 
     /**
      * Return block info with bind tag.
@@ -164,13 +173,81 @@ public class ContentMgntController {
     @PostMapping(value = "/tags/list", produces = "application/json")
     public Response getTags(@RequestBody TagRequestVO vo) {
         Map<String,Object> param = new HashMap<>();
+        List<Long> vendors = vo.getVendorIds();
+        if(CollectionUtils.isEmpty(vendors)){
+            if(vo.getVendorId()!=null){
+                vendors = new ArrayList<>();
+                vendors.add(vo.getVendorId());
+            }
+        }else {
+            vendors.add(vo.getVendorId());
+        }
+        List<Integer> types = vo.getTagTypes();
+        if(CollectionUtils.isEmpty(types)){
+            if(vo.getTagType() !=null){
+                types = new ArrayList<>();
+                types.add(vo.getTagType());
+            }
+
+        }else {
+            types.add(vo.getTagType());
+        }
         param.put("tagId",vo.getTagId());
-        param.put("vendorId",vo.getVendorId());
-        param.put("tagType",vo.getTagType());
+        param.put("vendorIds",vendors);
+        param.put("tagTypes",types);
         param.put("tagName",vo.getTagName());
         param.put("orderBy",vo.getOrderBy());
         List<Tag> tags = iTagService.getTagsByParam(param);
         return Response.status(StatusType.SUCCESS).data(tags);
+    }
+    @PostMapping(value = "/vendor/productGroup/list", produces = "application/json")
+    public Response getVendorTags(@RequestBody TagRequestVO vo) {
+        ProductGroupVO resultVo = new ProductGroupVO();
+
+        List<Tag> tags = null;
+        Response response = getTags(vo);
+        if(response != null){
+            tags = (List<Tag>)response.getData();
+        }
+        if(CollectionUtils.isNotEmpty(tags)){
+            Map<Long,List<Tag>> venTagMap = new HashMap<>();
+            Map<Long,List<Long>> ventTadIdMap = new HashMap<>();
+            for(Tag tag : tags){
+                if(tag.getTagType() == 3){ // 爆款
+                    resultVo.setHot(tag);
+                    continue;
+                }
+                if(tag.getVendorId()==null) continue;
+                List<Tag> list = venTagMap.get(tag.getVendorId());
+                List<Long> tagIds = ventTadIdMap.get(tag.getVendorId());
+                if(list == null){
+                    list = new ArrayList<>();
+                    tagIds = new ArrayList<>();
+                    venTagMap.put(tag.getVendorId(),list);
+                    ventTadIdMap.put(tag.getVendorId(),tagIds);
+                }
+                list.add(tag);
+                tagIds.add(tag.getTagId());
+            }
+            List<Vendor> vendors = null;
+            if(venTagMap.size()>0){
+                vendors = vendorService.getVendorByIds(new ArrayList<Long>(venTagMap.keySet()));
+            }
+            if(CollectionUtils.isNotEmpty(vendors)){
+                List<VendorTagVO> vendorTagVOS = new ArrayList<>();
+                resultVo.setVendorTagVOs(vendorTagVOS);
+                for(Vendor vendor : vendors){
+                    VendorTagVO tagVO = new VendorTagVO();
+                    tagVO.setVendorId(vendor.getVendorId());
+                    tagVO.setVendorName(vendor.getVendorName());
+                    tagVO.setTags(venTagMap.get(vendor.getVendorId()));
+                    tagVO.setTagIds(ventTadIdMap.get(vendor.getVendorId()));
+                    vendorTagVOS.add(tagVO);
+                }
+            }
+
+        }
+        return Response.status(StatusType.SUCCESS).data(resultVo);
     }
 
     @DeleteMapping(value = "/tags/{tagId}")
@@ -222,6 +299,7 @@ public class ContentMgntController {
     @PostMapping(value = "/tags/{tagId}/products", consumes = "application/json")
     public Response saveTagProductRel(@PathVariable(value = "tagId") Long tagId, @RequestBody Map<String, Object> body) {
         Long sortNum = body.get("sortNum") == null ? -1 : Long.parseLong(body.get("sortNum").toString());
+        Integer tagType = body.get("tagType") == null ? 1 : Integer.valueOf(body.get("tagType").toString());
         List<String> productIdList = (List<String>) body.get("productIdList");
 
         if (productIdList.size() <= 0 || null == tagId) {
@@ -232,6 +310,7 @@ public class ContentMgntController {
         map.put("productIdList", productIdList);
         map.put("tag_id", tagId);
         map.put("sort_num", sortNum);
+        map.put("tagType",tagType);
         iTagService.saveTagProductRel(map);
         return Response.success();
     }

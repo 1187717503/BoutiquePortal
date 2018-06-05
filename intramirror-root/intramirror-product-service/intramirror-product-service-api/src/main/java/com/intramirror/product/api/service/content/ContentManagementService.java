@@ -20,11 +20,13 @@ public interface ContentManagementService {
 
     List<Map<String, Object>> listUnbindTag(Long blockId);
 
-    List<Long> listTagProductIds(Long tagId);
+    List<Long> listTagProductIds(List<Long> tagIds);
 
     List<Map<String, Object>> listTagsByProductIds(List<Map<String, Object>> products);
 
-    List<Long> listAllTagProductIds();
+    List<Map<String, Object>> listTagsByProductIdsAndType(Map<String,Object> param);
+
+    List<Long> listAllTagProductIds(List<Integer> tagTypes);
 
     List<Map<String, Object>> listBlockWithTag(String blockName, Integer status, Long tagId, Long modifiedAtFrom, Long modifiedAtTo, int start, int limit,
             int desc);

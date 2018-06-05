@@ -155,11 +155,17 @@
         <if test="tagId != null">
             and tag_id = #{tagId,jdbcType=BIGINT}
         </if>
-        <if test="vendorId != null">
-            AND vendor_id = #{vendorId,jdbcType=BIGINT}
+        <if test="vendorIds != null">
+            and vendor_id in
+            <foreach collection="vendorIds" item="vendorIds" open="(" close=")" separator=",">
+                #{vendorIds}
+            </foreach>
         </if>
-        <if test="tagType != null">
-            AND tag_type = #{tagType,jdbcType=INTEGER}
+        <if test="tagTypes != null">
+            and tag_type in
+            <foreach collection="tagTypes" item="tagTypes" open="(" close=")" separator=",">
+                #{tagTypes}
+            </foreach>
         </if>
         <if test="orderBy != null">
             <choose>

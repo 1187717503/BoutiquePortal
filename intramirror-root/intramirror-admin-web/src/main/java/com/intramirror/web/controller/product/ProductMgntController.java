@@ -12,10 +12,9 @@ import com.intramirror.core.common.response.Response;
 import com.intramirror.web.controller.cache.CategoryCache;
 import com.intramirror.utils.transform.JsonTransformUtil;
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,11 +56,12 @@ public class ProductMgntController {
     public Response listAllProductStateCount(
             // @formatter:off
             @RequestParam(value = "categoryId", required = false) Long categoryId,
+            @RequestParam(value = "tagType", required = false) Integer tagType,
             SearchCondition searchParams
             // @formatter:on
     ) {
 
-        SearchCondition searchCondition = initCondition(searchParams, null, categoryId, null, null);
+        SearchCondition searchCondition = initCondition(searchParams, null, categoryId, tagType,null, null);
         LOGGER.info("Search condition : {}", JsonTransformUtil.toJson(searchCondition));
         Map<StateEnum, Long> productStateCountMap = initiateCountMap();
         if (isEmptyTag(searchCondition)) {
@@ -120,10 +120,11 @@ public class ProductMgntController {
             @PathVariable(value = "state") String state,
             @RequestParam(value = "categoryId", required = false) Long categoryId,
             @RequestParam(value = "pageSize",required = false) Integer pageSize,
-            @RequestParam(value = "pageNo",required = false) Integer pageNo
+            @RequestParam(value = "pageNo",required = false) Integer pageNo,
+            @RequestParam(value = "tagType",required = false) Integer tagType
             // @formatter:on
     ) {
-        SearchCondition searchCondition = initCondition(searchParams, state, categoryId, pageSize, pageNo);
+        SearchCondition searchCondition = initCondition(searchParams, state, categoryId,tagType, pageSize, pageNo);
         LOGGER.info("Search condition : {}", JsonTransformUtil.toJson(searchCondition));
 
         if (isEmptyTag(searchCondition)) {
@@ -138,7 +139,7 @@ public class ProductMgntController {
         return Response.status(StatusType.SUCCESS).data(productList);
     }
 
-    private SearchCondition initCondition(SearchCondition searchParams, String state, Long categoryId, Integer pageSize, Integer pageNo) {
+    private SearchCondition initCondition(SearchCondition searchParams, String state, Long categoryId,Integer tagType, Integer pageSize, Integer pageNo) {
         SearchCondition searchCondition = searchParams;
         searchCondition.setBoutiqueId(escapeLikeParams(searchParams.getBoutiqueId()));
         searchCondition.setCategoryId(categoryId == null ? null : categoryCache.getAllChildCategory(categoryId));
@@ -147,14 +148,27 @@ public class ProductMgntController {
             searchCondition.setProductStatus(getStatusEnum(state).getProductStatus());
             searchCondition.setShopProductStatus(getStatusEnum(state).getShopProductStatus());
         }
+        List<Integer> types = searchParams.getTagTypes();
+        if(CollectionUtils.isNotEmpty(types) && tagType != null){
+            types.add(tagType);
+        }else {
+            types = new ArrayList<>();
+            types.add(1);// 默认
+        }
+        List<Long> tagIds = searchParams.getTagIds();
+        if(CollectionUtils.isEmpty(tagIds) || searchCondition.getTagId()>0){
+            tagIds = new ArrayList<>();
+        }
+        tagIds.add(searchCondition.getTagId());
+
         searchCondition.setStart((pageNo == null || pageNo < 0) ? 0 : (pageNo - 1) * pageSize);
         searchCondition.setCount((pageSize == null || pageSize < 0) ? 25 : pageSize);
         if (searchCondition.getTagId() != null) {
             List<Long> productList = null;
             if (searchCondition.getTagId() == 0) {
-                productList = contentManagementService.listAllTagProductIds();
+                productList = contentManagementService.listAllTagProductIds(types);
             } else if (searchCondition.getTagId() > 0) {
-                productList = contentManagementService.listTagProductIds(searchCondition.getTagId());
+                productList = contentManagementService.listTagProductIds(tagIds);
             }
             if (productList != null && productList.size() > 0) {
                 searchCondition.setProductIds(productList);
@@ -179,7 +193,14 @@ public class ProductMgntController {
         List<Map<String, Object>> skuStoreList = iSkuStoreService.listSkuStoreByProductList(productList);
         List<Map<String, Object>> tagsList = null;
         if (searchCondition.getTagId() != null) {
-            tagsList = contentManagementService.listTagsByProductIds(productList);
+            Map<String,Object> param = new HashMap<>();
+            List<Long> pIds = new ArrayList<>();
+            for(Map<String, Object> maps : productList){
+                pIds.add(Long.valueOf(maps.get("product_id").toString()));
+            }
+            param.put("pIds",pIds);
+
+            tagsList = contentManagementService.listTagsByProductIdsAndType(param);
         }
 
         for (Map<String, Object> product : productList) {

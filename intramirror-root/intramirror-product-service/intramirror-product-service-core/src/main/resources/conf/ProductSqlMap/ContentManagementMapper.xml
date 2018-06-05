@@ -60,6 +60,23 @@
         AND tag.enabled = TRUE;
     </select>
 
+    <select id="listTagsByProductIdsAndType" resultType="map">
+        SELECT
+        tag.tag_id,
+        tag_product_rel.product_id,
+        tag.tag_name
+        FROM tag
+        INNER JOIN tag_product_rel ON tag.tag_id = tag_product_rel.tag_id
+        WHERE tag_product_rel.product_id IN
+        <foreach collection="pIds" item="pIds" open="(" close=")" separator=",">
+            #{pIds}
+        </foreach>
+        <if test="tagType != null">
+            and tag.tag_type = #{tagType}
+        </if>
+        AND tag.enabled = TRUE;
+    </select>
+
 
     <select id="getBlockWithTagByBlockId" resultType="map">
         SELECT
@@ -89,13 +106,20 @@
         SELECT product.product_id
         FROM tag_product_rel
             INNER JOIN product ON product.product_id = tag_product_rel.product_id AND product.enabled = TRUE
-        WHERE tag_id = #{tagId}
+        WHERE tag_id IN
+        <foreach collection="tagIds" item="tagIds" open="(" close=")" separator=",">
+            #{tagIds}
+        </foreach>
     </select>
 
-    <select id="listAllTagProductIds" resultType="long">
+    <select id="listAllTagProductIds" resultType="long" parameterType="java.util.Map">
         SELECT product.product_id
         FROM tag_product_rel
             INNER JOIN product ON product.product_id = tag_product_rel.product_id AND product.enabled = TRUE
+        and tag_type IN
+        <foreach collection="types" item="types" open="(" close=")" separator=",">
+            #{types}
+        </foreach>
     </select>
 
     <select id="listBlockWithTag" resultType="map">

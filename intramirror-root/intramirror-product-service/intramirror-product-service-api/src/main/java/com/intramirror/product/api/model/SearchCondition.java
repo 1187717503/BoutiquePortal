@@ -41,6 +41,9 @@ public class SearchCondition {
     private Long saleAtFrom;
     private Long saleAtTo;
     private Long tagId;
+    private List<Long> tagIds;
+    private Integer tagType;
+    private List<Integer> tagTypes;
     private List<Long> productIds;
     private String spuModifyFilter;
 
@@ -288,7 +291,31 @@ public class SearchCondition {
         return spuModifyFilter;
     }
 
+    public Integer getTagType() {
+        return tagType;
+    }
+
+    public void setTagType(Integer tagType) {
+        this.tagType = tagType;
+    }
+
     public void setSpuModifyFilter(String spuModifyFilter) {
         this.spuModifyFilter = spuModifyFilter;
+    }
+
+    public List<Long> getTagIds() {
+        return tagIds;
+    }
+
+    public void setTagIds(List<Long> tagIds) {
+        this.tagIds = tagIds;
+    }
+
+    public List<Integer> getTagTypes() {
+        return tagTypes;
+    }
+
+    public void setTagTypes(List<Integer> tagTypes) {
+        this.tagTypes = tagTypes;
     }
 }

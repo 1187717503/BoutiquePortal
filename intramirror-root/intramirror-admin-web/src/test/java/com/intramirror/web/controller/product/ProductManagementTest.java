@@ -56,7 +56,7 @@ public class ProductManagementTest {
 
         org.apache.ibatis.logging.LogFactory.useLog4JLogging();
         SearchCondition searchCondition = new SearchCondition();
-        Response response = productMgntController.listAllProductStateCount(null, searchCondition);
+        Response response = productMgntController.listAllProductStateCount(null, 1,searchCondition);
         Map<StateEnum, Long> countMap = (Map<StateEnum, Long>) response.getData();
         Assert.assertTrue("Resopnse count error.", exceptedMap.size() == countMap.size());
         for (Map.Entry<StateEnum, Long> count : countMap.entrySet()) {
