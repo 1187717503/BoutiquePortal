@@ -18,15 +18,14 @@ import com.intramirror.user.api.service.VendorService;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import spark.utils.CollectionUtils;
 
 @Service
 public class PriceChangeRuleService {
@@ -470,10 +469,18 @@ public class PriceChangeRuleService {
 
         priceChangeRuleService.deleteSnapshot(priceChangeRuleId);
 
-        //将对应的SnapshotPriceRule表的数据删除
+        //将对应的SnapshotPriceRule表和SnapshotPriceDetail表的数据删除
         SnapshotPriceRule record = new SnapshotPriceRule();
-        record.setPriceChangeRuleId(Long.parseLong(map.get("price_change_rule_id").toString()));
-        snapshotPriceRuleService.deleteByPriceChangeRuleId(record);
+        record.setPriceChangeRuleId(priceChangeRuleId);
+        Map<String, Object> params = new HashMap<>();
+        params.put("priceChangeRuleIdList", Collections.singleton(priceChangeRuleId));
+        List<SnapshotPriceRule> snapshotPriceRuleList = snapshotPriceRuleService.getSnapshotPriceRuleByPriceChangeRuleIds(params);
+        if (CollectionUtils.isEmpty(snapshotPriceRuleList)) {
+            snapshotPriceRuleService.deleteByPriceChangeRuleId(record);
+            SnapshotPriceDetail detail = new SnapshotPriceDetail();
+            detail.setSnapshotPriceRuleId(snapshotPriceRuleList.get(0).getSnapshotPriceRuleId());
+            snapshotPriceRuleService.deleteDetailsBySnapshotPriceRuleId(detail);
+        }
 
         result.put("status", StatusType.SUCCESS);
         return result;
