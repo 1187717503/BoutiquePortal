@@ -206,4 +206,10 @@
       enabled = #{enabled,jdbcType=BIT}
     where snapshot_price_detail_id = #{snapshotPriceDetailId,jdbcType=BIGINT}
   </update>
+
+  <update id="deleteBySnapshotPriceRuleId" parameterType="com.intramirror.product.api.model.SnapshotPriceDetail" >
+    update snapshot_price_detail
+    set enabled = 0
+    where snapshot_price_rule_id = #{snapshotPriceRuleId,jdbcType=BIGINT} and enabled = 1
+  </update>
 </mapper>

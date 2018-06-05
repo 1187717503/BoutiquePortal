@@ -183,4 +183,8 @@ public interface PriceChangeRuleMapper {
      * @param productParams
      */
     void updateProductImPriceByProductIds(Map<String,Object> productParams);
+    int updateSkuPriceBySnapshot(Map<String, Object> params);
+    int updateShopProductPriceBySnapshot(Map<String, Object> params);
+    int updateProductPriceBySnapshot(Map<String, Object> params);
+    int updatePriceBySnapshot(Map<String, Object> params);
 }

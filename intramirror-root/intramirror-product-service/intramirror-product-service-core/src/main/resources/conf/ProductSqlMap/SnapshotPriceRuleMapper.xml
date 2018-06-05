@@ -170,4 +170,15 @@
     set enabled = 0
     where price_change_rule_id = #{priceChangeRuleId,jdbcType=BIGINT} and enabled = 1
   </update>
+
+    <select id="getSnapshotPriceRuleByPriceChangeRuleIds" resultMap="BaseResultMap" parameterType="java.util.Map" >
+        select
+        <include refid="Base_Column_List" />
+        from snapshot_price_rule
+        where enabled = 1
+        and price_change_rule_id IN
+        <foreach item="item" index="index" collection="priceChangeRuleIdList" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
 </mapper>

@@ -30,8 +30,9 @@ public class PriceRuleSynService {
     public void syncBoutique(Long vendorId, int categoryType, Long priceChangeRuleId) throws Exception {
         synchronized (this) {
             logger.info("syncBoutiqueStart,vendorId:{},categoryType:{},priceChangeRuleId:{}", vendorId, categoryType, priceChangeRuleId);
-            iPriceChangeRule.updateVendorPrice(vendorId, categoryType, priceChangeRuleId);
-            this.syncAllPriceByTable();
+//            iPriceChangeRule.updateVendorPrice(vendorId, categoryType, priceChangeRuleId);
+//            this.syncAllPriceByTable();
+            iPriceChangeRule.synUpdateProductPrice(vendorId, categoryType, priceChangeRuleId);
             logger.info("syncBoutiqueEnd,vendorId:{},categoryType:{},priceChangeRuleId:{}", vendorId, categoryType, priceChangeRuleId);
         }
     }

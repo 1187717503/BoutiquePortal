@@ -50,4 +50,5 @@ public interface SnapshotPriceDetailMapper {
      * @mbggenerated
      */
     int updateByPrimaryKey(SnapshotPriceDetail record);
+    int deleteBySnapshotPriceRuleId(SnapshotPriceDetail record);
 }

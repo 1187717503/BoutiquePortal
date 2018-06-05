@@ -859,4 +859,46 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     public ImPriceAlgorithm getAlgorithmById(Long id) {
         return imPriceAlgorithmMapper.selectByPrimaryKey(id);
     }
+
+    @Override
+    public boolean synUpdateProductPrice(Long vendor_id, int categoryType, Long price_change_rule_id) throws Exception {
+        synchronized (this) {
+            Map<String, Object> paramsMap = new HashMap<>();
+            paramsMap.put("price_type", PriceChangeRuleEnum.PriceType.SUPPLY_PRICE.getCode());
+            paramsMap.put("preview_status", "1");
+            paramsMap.put("vendor_id", vendor_id);
+            paramsMap.put("category_type", categoryType);
+            paramsMap.put("price_change_rule_id", price_change_rule_id);
+            List<Map<String, Object>> selSeasonGroupRuleMaps = priceChangeRuleMapper.selectSeasonGroupRule(paramsMap);
+
+            List<Long> priceChangeRuleIdList = new ArrayList<>();
+
+            if (selSeasonGroupRuleMaps != null && selSeasonGroupRuleMaps.size() > 0) {
+                for (Map<String, Object> selSeasonGroupRuleMap : selSeasonGroupRuleMaps) {
+                    priceChangeRuleIdList.add(Long.parseLong(selSeasonGroupRuleMap.get("price_change_rule_id").toString()));
+                }
+                Map<String, Object> snapshotPriceRuleParams = new HashMap<>();
+                snapshotPriceRuleParams.put("priceChangeRuleIdList", priceChangeRuleIdList);
+                List<SnapshotPriceRule> snapshotPriceRules = snapshotPriceRuleMapper.getSnapshotPriceRuleByPriceChangeRuleIds(snapshotPriceRuleParams);
+                List<Long> snapshotPriceRuleIdList = new ArrayList<>();
+                for (SnapshotPriceRule snapshotPriceRule : snapshotPriceRules) {
+                    if (snapshotPriceRule.getSaveAt().after(snapshotPriceRule.getUpdatedAt())) {
+                        logger.info("snapshotPriceRule SaveAt > UpdatedAt,snapshotPriceRuleId:{}", snapshotPriceRule.getSnapshotPriceRuleId());
+                        throw new BusinessException("Active fail. Unrefreshed data Exists.");
+                    }
+                    snapshotPriceRuleIdList.add(snapshotPriceRule.getSnapshotPriceRuleId());
+                }
+                Map<String, Object> params = new HashMap<>();
+                params.put("snapshotPriceRuleIdList", snapshotPriceRuleIdList);
+                logger.info("synUpdateSkuPriceBySnapshot,params:{}", new Gson().toJson(params));
+                priceChangeRuleMapper.updateSkuPriceBySnapshot(params);
+                logger.info("synUpdateShopProductPriceBySnapshot,params:{}", new Gson().toJson(params));
+                priceChangeRuleMapper.updateShopProductPriceBySnapshot(params);
+                logger.info("synUpdateProductPriceBySnapshot,params:{}", new Gson().toJson(params));
+                priceChangeRuleMapper.updateProductPriceBySnapshot(params);
+                logger.info("synUpdateProductPrice is end");
+            }
+            return true;
+        }
+    }
 }

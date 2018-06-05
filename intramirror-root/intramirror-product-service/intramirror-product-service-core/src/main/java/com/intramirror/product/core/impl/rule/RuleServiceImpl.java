@@ -2,11 +2,15 @@ package com.intramirror.product.core.impl.rule;
 
 import com.google.gson.Gson;
 import com.intramirror.common.help.StringUtils;
+import com.intramirror.product.api.model.SnapshotPriceRule;
+import com.intramirror.product.api.service.ISnapshotPriceRuleService;
 import com.intramirror.product.api.service.rule.IRuleService;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.SeasonMapper;
+import com.intramirror.product.core.mapper.SnapshotPriceRuleMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -19,12 +23,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class RuleServiceImpl extends BaseDao implements IRuleService {
 
     private SeasonMapper seasonMapper;
+    private SnapshotPriceRuleMapper snapshotPriceRuleMapper;;
+
+    @Autowired
+    private ISnapshotPriceRuleService snapshotPriceRuleService;
 
     private static Logger logger = LoggerFactory.getLogger(RuleServiceImpl.class);
 
     @Override
     public void init() {
         seasonMapper = this.getSqlSession().getMapper(SeasonMapper.class);
+        snapshotPriceRuleMapper = this.getSqlSession().getMapper(SnapshotPriceRuleMapper.class);
     }
 
     @Override
@@ -171,6 +180,10 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
         for(Map<String,Object> params:list) {
             seasonMapper.insertCategoryBrandRule(params);
         }
+        SnapshotPriceRule snapshotPriceRule = new SnapshotPriceRule();
+        snapshotPriceRule.setPriceChangeRuleId(Long.parseLong(price_change_rule_id));
+        snapshotPriceRule.setSaveAt(new Date());
+        snapshotPriceRuleMapper.updateSaveAtByPriceChangeRuleId(snapshotPriceRule);
         return true;
     }
 }
