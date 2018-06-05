@@ -35,6 +35,8 @@
         <result column="tracking_num" property="tracking_num" jdbcType="LONGVARCHAR"/>
         <result column="vat_num" property="vat_num" jdbcType="LONGVARCHAR"/>
         <result column="stock_location" property="stock_location" jdbcType="VARCHAR"/>
+        <result column="total_rmb" property="total_rmb" jdbcType="DECIMAL"/>
+        <result column="im_price" property="im_price" jdbcType="DECIMAL"/>
     </resultMap>
 
     <update id="updateByLogisticsProduct" parameterType="com.intramirror.order.api.model.LogisticsProduct">
@@ -330,4 +332,10 @@
         UPDATE logistics_product SET stock_location = #{stockLocation,jdbcType=VARCHAR}
         WHERE logistics_product_id = #{logisProductId,jdbcType=BIGINT}
     </update>
+
+    <select id="getLogisticsProductByShipment" parameterType="long" resultMap="logisProductMap">
+        SELECT lp.* FROM logistics_product lp
+        INNER JOIN container c  on c.container_id = lp.container_id
+        WHERE c.shipment_id = #{shipmentId};
+    </select>
 </mapper>

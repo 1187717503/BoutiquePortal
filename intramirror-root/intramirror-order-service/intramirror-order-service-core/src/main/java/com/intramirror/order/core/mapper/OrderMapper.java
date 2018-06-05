@@ -164,4 +164,6 @@ public interface OrderMapper {
      */
     void updateOrderByOrderLogisticsId(Map<String, Object> params);
 
+    Order getOrderByLpID(Long logisticsProductId);
+
 }

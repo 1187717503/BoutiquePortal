@@ -39,6 +39,24 @@ public class LogisticsProduct {
 
     private String stock_location;
     private Integer stock_location_id;
+    private BigDecimal total_rmb;
+    private BigDecimal im_price;
+
+    public BigDecimal getTotal_rmb() {
+        return total_rmb;
+    }
+
+    public void setTotal_rmb(BigDecimal total_rmb) {
+        this.total_rmb = total_rmb;
+    }
+
+    public BigDecimal getIm_price() {
+        return im_price;
+    }
+
+    public void setIm_price(BigDecimal im_price) {
+        this.im_price = im_price;
+    }
 
     public Integer getStock_location_id() {
         return stock_location_id;

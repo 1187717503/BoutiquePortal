@@ -77,4 +77,6 @@ public interface LogisticsProductMapper {
     int invalidOrderById(Long logisticsProductId);
 
     void addStockLocation(Map<String,Object> map);
+
+    List<LogisticsProduct> getLogisticsProductByShipment(Long shipmentId);
 }

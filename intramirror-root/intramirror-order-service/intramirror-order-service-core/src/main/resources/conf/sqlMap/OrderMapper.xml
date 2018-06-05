@@ -17,6 +17,13 @@
         <result column="change_flag" property="change_flag" jdbcType="INTEGER"/>
     </resultMap>
 
+    <resultMap id="orderMap" type="com.intramirror.order.api.model.Order">
+        <result column="channel_id" property="channelId" jdbcType="BIGINT"/>
+        <result column="user_id" property="userId" jdbcType="BIGINT"/>
+        <result column="order_num" property="orderNum" jdbcType="BIGINT"/>
+        <result column="current_rate" property="currentRate" jdbcType="DECIMAL"/>
+    </resultMap>
+
     <select id="getOrderList" resultType="java.util.HashMap" parameterType="java.util.Map">
         SELECT
             DISTINCT
@@ -816,4 +823,11 @@
         UPDATE `order` o,order_logistics ol SET o.`status` = #{status,jdbcType=INTEGER}
         WHERE ol.order_logistics_id = #{orderLogisticsId,jdbcType=INTEGER} and ol.order_id = o.order_id
     </update>
+
+    <select id="getOrderByLpID" parameterType="long" resultMap="orderMap">
+        select o.user_id,o.order_num,o.channel_id,o.current_rate from logistics_product lp
+        inner join order_logistics ol on lp.order_logistics_id = ol.order_logistics_id and ol.enabled = 1
+        inner join `order` o on ol.order_id = o.order_id and o.enabled = 1
+        where lp.logistics_product_id = #{logisticsProductId} and lp.enabled = 1
+    </select>
 </mapper>

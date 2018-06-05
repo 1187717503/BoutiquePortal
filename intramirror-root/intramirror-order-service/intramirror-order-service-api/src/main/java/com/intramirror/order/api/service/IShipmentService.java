@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.model.SubShipment;
 import com.intramirror.order.api.vo.LogisticsProductVO;
@@ -170,5 +171,12 @@ public interface IShipmentService {
      * @param shipment
      */
 	void sendMailForShipped(ShipmentSendMailVO shipment);
+
+	/**
+	 * 查询shipment下的订单
+	 * @param shipmentId
+	 * @return
+	 */
+	List<LogisticsProduct> getLogisticsProductByShipment(Long shipmentId);
 
 }

@@ -11,11 +11,13 @@ import java.util.List;
 import java.util.Map;
 
 import com.intramirror.common.help.StringUtils;
+import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.model.SubShipment;
 import com.intramirror.order.api.service.ISubShipmentService;
 import com.intramirror.order.api.service.IViewOrderLinesService;
 import com.intramirror.order.api.vo.LogisticsProductVO;
 import com.intramirror.order.api.vo.ShipmentSendMailVO;
+import com.intramirror.order.core.mapper.LogisticsProductMapper;
 import com.intramirror.order.core.utils.ShipMailSendThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +46,8 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	private ShipmentMapper shipmentMapper;
 	
 	private SubShipmentMapper subShipmentMapper;
+
+	private LogisticsProductMapper logisticsProductMapper;
 	
 	private LogisticProductShipmentMapper logisticProductShipmentMapper;
 
@@ -52,12 +56,16 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 
 	@Autowired
 	private IViewOrderLinesService viewOrderLinesService;
+
+	@Autowired
+	private KafkaUtilServiceImpl kafkaUtilService;
 	
 	@Override
 	public void init() {
 		shipmentMapper = this.getSqlSession().getMapper(ShipmentMapper.class);
 		subShipmentMapper = this.getSqlSession().getMapper(SubShipmentMapper.class);
 		logisticProductShipmentMapper = this.getSqlSession().getMapper(LogisticProductShipmentMapper.class);
+        logisticsProductMapper = this.getSqlSession().getMapper(LogisticsProductMapper.class);
 	}
 	
 	/**
@@ -433,17 +441,13 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 
 				//校验是否生成AWB
 				String awb = checkAWB(shipment.getShipmentId());
-				//记录AWB单号，用于生成物流轨迹
-				/*List<LogisticsProductVO> milestones = shipmentMapper.getlogisticsMilestone(shipment.getShipmentId());
-				if (milestones!=null&&milestones.size()>0){
-					for (LogisticsProductVO vo:milestones){
-						vo.setAwb(awb);
-						vo.setIsComplete(0);
-						vo.setShipmentType(3);
-						vo.setType(4);
-						shipmentMapper.saveMilestone(vo);
-					}
-				}*/
+				//shipped操作发送消息用来生成资金报表
+                List<LogisticsProduct> logisticsProducts = logisticsProductMapper.getLogisticsProductByShipment(shipment.getShipmentId());
+                if (logisticsProducts!=null && logisticsProducts.size()>0){
+                    for (LogisticsProduct logisticsProduct:logisticsProducts){
+                        kafkaUtilService.saveOrderFinance(logisticsProduct);
+                    }
+                }
 				// 起线程发邮件
 				ShipmentSendMailVO vo = new ShipmentSendMailVO();
 				vo.setShipmentNo(shipment.getShipmentNo());
@@ -608,5 +612,10 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		map.put("shipmentId",shipmentId);
 		map.put("status",3);
 		shipmentMapper.updateShipmentStatus(map);
+	}
+
+	@Override
+	public List<LogisticsProduct> getLogisticsProductByShipment(Long shipmentId) {
+		return logisticsProductMapper.getLogisticsProductByShipment(shipmentId);
 	}
 }
