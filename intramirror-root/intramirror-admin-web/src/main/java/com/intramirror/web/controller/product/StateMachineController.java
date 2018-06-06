@@ -178,8 +178,14 @@ public class StateMachineController {
                 if(tag == null){
                     throw new ValidateException(new ErrorResponse("no product group by tagId: : " + body.get("tagId").toString()));
                 }
+                Map<Long, Long> listMap2Map = listMap2Map((List) body.get("ids"));
+                List<Long> ids = null;
+                if(listMap2Map.size()>0){
+                    ids = new ArrayList<>(listMap2Map.keySet());
+                }
+
                 Map<String, Object> map = new HashMap<>();
-                map.put("productIdList", body.get("ids"));
+                map.put("productIdList", ids);
                 map.put("tag_id", tagId);
                 map.put("sort_num", -1);
                 map.put("tagType",tag.getTagType());
@@ -187,7 +193,12 @@ public class StateMachineController {
             }else { // removeGroup
 
                 List<TagProductRel> tagProductRelList = new ArrayList<>();
-                List<Long> ids = (List<Long>)body.get("ids");
+                Map<Long, Long> listMap2Map = listMap2Map((List) body.get("ids"));
+                List<Long> ids = null;
+                if(listMap2Map.size()>0){
+                    ids = new ArrayList<>(listMap2Map.keySet());
+                }
+
                 if(CollectionUtils.isNotEmpty(ids)){
                     for(Long id : ids){
                         TagProductRel rel = new TagProductRel();

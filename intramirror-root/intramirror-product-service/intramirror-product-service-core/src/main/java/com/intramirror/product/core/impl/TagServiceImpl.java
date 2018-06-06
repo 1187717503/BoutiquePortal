@@ -40,17 +40,13 @@ public class TagServiceImpl implements ITagService {
         // type = 2 时
         //1. 不同boutqiue的商品不能加入到group中
         //2. 同一个商品不能加入两个group中，除非是爆款）
-        List<String> productIdList = (List<String>) map.get("productIdList");
-        List<Long> pIds = new ArrayList<>();
-        for(String product : productIdList){
-            pIds.add(Long.valueOf(product));
-        }
+        List<Long> productIdList = (List<Long>) map.get("productIdList");
         List<Long> vendorTagIds = new ArrayList<>();
         Long tagId = Long.valueOf(map.get("tag_id").toString());
         Tag tag = tagMapper.selectByPrimaryKey(tagId);
         if(tag.getTagType() == 2){ // 爆款 除外 tag 也除外
             Long vendorId = tag.getVendorId();
-            List<ProductWithBLOBs> productWithBLOBs =  productMapper.listProductByProductIds(pIds);
+            List<ProductWithBLOBs> productWithBLOBs =  productMapper.listProductByProductIds(productIdList);
             if(CollectionUtils.isNotEmpty(productWithBLOBs)){
                 for(ProductWithBLOBs p : productWithBLOBs){
                     if(!vendorId.equals(p.getVendorId())){
