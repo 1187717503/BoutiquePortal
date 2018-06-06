@@ -5,12 +5,9 @@ import com.intramirror.common.parameter.StatusType;
 import com.intramirror.core.common.exception.ValidateException;
 import com.intramirror.core.common.response.ErrorResponse;
 import com.intramirror.core.common.response.Response;
-import com.intramirror.product.api.model.Block;
-import com.intramirror.product.api.model.BlockTagRel;
-import com.intramirror.product.api.model.Category;
-import com.intramirror.product.api.model.Tag;
-import com.intramirror.product.api.model.TagProductRel;
+import com.intramirror.product.api.model.*;
 import com.intramirror.product.api.service.BlockService;
+import com.intramirror.product.api.service.IPriceChangeRuleGroupService;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ITagService;
 import com.intramirror.product.api.service.content.ContentManagementService;
@@ -68,6 +65,8 @@ public class ContentMgntController {
 
     @Autowired
     private VendorService vendorService;
+    @Autowired
+    private IPriceChangeRuleGroupService priceChangeRuleGroupService;
 
     /**
      * Return block info with bind tag.
@@ -253,10 +252,23 @@ public class ContentMgntController {
     @DeleteMapping(value = "/tags/{tagId}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public Response deleteTag(@PathVariable Long tagId) {
-        List<BlockTagRel> blockTagRelList = blockService.getBlockTagRelByTagId(tagId);
-        if (blockTagRelList.size() >= 1) {
-            throw new ValidateException(new ErrorResponse("The tag has been bound with block and cannot be removed!"));
+        if(tagId == null){
+            throw new ValidateException(new ErrorResponse("The tagId can not be null !"));
         }
+        Tag tag = iTagService.selectTagByTagId(tagId);
+        if(tag.getTagType()==1){
+            List<BlockTagRel> blockTagRelList = blockService.getBlockTagRelByTagId(tagId);
+            if (blockTagRelList.size() >= 1) {
+                throw new ValidateException(new ErrorResponse("The tag has been bound with block and cannot be removed!"));
+            }
+        }else {
+            List<PriceChangeRuleGroup> ruleLisr = priceChangeRuleGroupService.getChangeRulesByTagId(tagId);
+            if(CollectionUtils.isNotEmpty(ruleLisr)){
+                throw new ValidateException(new ErrorResponse("The product group has been bound with product and cannot be removed!"));
+            }
+
+        }
+
         contentManagementService.deleteTag(tagId);
         return Response.success();
     }
@@ -281,14 +293,14 @@ public class ContentMgntController {
         return Response.status(StatusType.SUCCESS).data(productList);
     }
 
-
+    // 删除tag关联
     @DeleteMapping(value = "/tags/{tagId}/products/{productId}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public Response removeTagProduct(@PathVariable(value = "tagId") Long tagId, @PathVariable(value = "productId") Long productId) {
         contentManagementService.deleteByTagIdAndProductId(tagId, productId);
         return Response.success();
     }
-
+    // 删除product的所有tag
     @DeleteMapping(value = "/tags/{tagId}/products")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public Response removeTagProduct(@RequestBody List<TagProductRel> tagProductRelList) {
@@ -300,18 +312,19 @@ public class ContentMgntController {
     public Response saveTagProductRel(@PathVariable(value = "tagId") Long tagId, @RequestBody Map<String, Object> body) {
         Long sortNum = body.get("sortNum") == null ? -1 : Long.parseLong(body.get("sortNum").toString());
         Integer tagType = body.get("tagType") == null ? 1 : Integer.valueOf(body.get("tagType").toString());
-        List<String> productIdList = (List<String>) body.get("productIdList");
+        List<Long> productIdList = (List<Long>) body.get("productIdList");
 
         if (productIdList.size() <= 0 || null == tagId) {
             throw new ValidateException(new ErrorResponse("Parameter could not be null!"));
         }
 
         Map<String, Object> map = new HashMap<>();
+        Map<String,Object> response = new HashMap<>();
         map.put("productIdList", productIdList);
         map.put("tag_id", tagId);
         map.put("sort_num", sortNum);
         map.put("tagType",tagType);
-        iTagService.saveTagProductRel(map);
+        iTagService.saveTagProductRel(map,response);
         return Response.success();
     }
 

@@ -140,17 +140,20 @@
         tag_product_id,tag_id,product_id,
         created_at,sort_num
         FROM tag_product_rel
-        WHERE
+        WHERE 1=1
         <if test="tag_id != null">
-            tag_id = #{tag_id} AND
+            AND tag_id = #{tag_id}
         </if>
         <if test="tagType != null">
-            tag_type = #{tagType} AND
+            AND tag_type = #{tagType}
         </if>
-        product_id IN
-        <foreach close=")" collection="productIdList" index="index" item="item" open="(" separator=",">
-            #{item}
-        </foreach>
+        <if test="productIdList != null">
+            AND product_id IN
+            <foreach close=")" collection="productIdList" index="index" item="item" open="(" separator=",">
+                #{item}
+            </foreach>
+        </if>
+
     </select>
 
     <insert id="batchInsert" parameterType="java.util.List">

@@ -6,17 +6,21 @@ import com.intramirror.core.common.response.ErrorResponse;
 import com.intramirror.core.common.response.Response;
 import com.intramirror.product.api.model.ProductWithBLOBs;
 import com.intramirror.product.api.model.Sku;
+import com.intramirror.product.api.model.Tag;
+import com.intramirror.product.api.model.TagProductRel;
 import com.intramirror.product.api.service.ISkuStoreService;
+import com.intramirror.product.api.service.ITagService;
 import com.intramirror.product.api.service.SkuService;
+import com.intramirror.product.api.service.content.ContentManagementService;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
 import com.intramirror.web.common.response.BatchResponseItem;
 import com.intramirror.web.common.response.BatchResponseMessage;
 import static com.intramirror.web.controller.product.StateMachineCoreRule.map2StateEnum;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +50,12 @@ public class StateMachineController {
     private ISkuStoreService iSkuStoreService;
 
     @Autowired
+    private ITagService iTagService;
+
+    @Autowired
     private SkuService skuService;
+    @Autowired
+    private ContentManagementService contentManagementService;
 
     @PutMapping(value = "/single/{action}", consumes = "application/json")
     public Response operateProduct(@SessionAttribute(value = "sessionStorage", required = false) Long userId, @PathVariable(value = "action") String action,
@@ -155,7 +164,58 @@ public class StateMachineController {
     @PutMapping(value = "/batch/{action}", consumes = "application/json")
     public Response batchOperateProduct(@SessionAttribute(value = "sessionStorage", required = false) Long userId, HttpServletRequest request,
             @PathVariable(value = "action") String action, @RequestBody Map<String, Object> body) {
+        BatchResponseMessage responseMessage = new BatchResponseMessage();
+        if(body.get("ids") == null){
+            throw new ValidateException(new ErrorResponse("Parameter missed"));
+        }
+        if(body.get("tagId") == null){
+            throw new ValidateException(new ErrorResponse("Parameter missed"));
+        }
+        Long tagId = Long.valueOf(body.get("tagId").toString());
+        if(action.equals("addToGroup") || action.equals("removeGroup")){
+            if(action.equals("addToGroup")){
+                Tag tag = iTagService.selectTagByTagId(tagId);
+                if(tag == null){
+                    throw new ValidateException(new ErrorResponse("no product group by tagId: : " + body.get("tagId").toString()));
+                }
+                Map<Long, Long> listMap2Map = listMap2Map((List) body.get("ids"));
+                List<Long> ids = null;
+                if(listMap2Map.size()>0){
+                    ids = new ArrayList<>(listMap2Map.keySet());
+                }
 
+                Map<String, Object> map = new HashMap<>();
+                Map<String,Object> response = new HashMap<>();
+                map.put("productIdList", ids);
+                map.put("tag_id", tagId);
+                map.put("sort_num", -1);
+                map.put("tagType",tag.getTagType());
+                iTagService.saveTagProductRel(map,response);
+                calResponseMsg(response,responseMessage,listMap2Map);
+                return Response.status(StatusType.SUCCESS).data(responseMessage);
+            }else { // removeGroup
+
+                List<TagProductRel> tagProductRelList = new ArrayList<>();
+                Map<Long, Long> listMap2Map = listMap2Map((List) body.get("ids"));
+                List<Long> ids = null;
+                if(listMap2Map.size()>0){
+                    ids = new ArrayList<>(listMap2Map.keySet());
+                }
+
+                if(CollectionUtils.isNotEmpty(ids)){
+                    for(Long id : ids){
+                        TagProductRel rel = new TagProductRel();
+                        rel.setTagId(tagId);
+                        rel.setTagProductId(id);
+                        tagProductRelList.add(rel);
+                    }
+                }
+                contentManagementService.batchDeleteByTagIdAndProductId(tagProductRelList);
+                return Response.status(StatusType.SUCCESS).data(responseMessage);
+
+            }
+
+        }
         if (body.get("ids") == null) {
             throw new ValidateException(new ErrorResponse("Parameter missed"));
         }
@@ -169,12 +229,32 @@ public class StateMachineController {
         StateMachineCoreRule.validate(originalState, action);
         OperationEnum operation = ProductStateOperationMap.getOperation(action);
 
-        BatchResponseMessage responseMessage = new BatchResponseMessage();
         Map<Long, Long> validIdsMap = batchValidate(originalState, (List) body.get("ids"), operation, responseMessage);
         validIdsMap = batchFilterIncompleteProductIds(originalState, validIdsMap, operation, responseMessage);
         batchUpdateProductState(userId, originalState, action, validIdsMap, responseMessage);
 
         return Response.status(StatusType.SUCCESS).data(responseMessage);
+    }
+
+    private void calResponseMsg(Map<String, Object> response, BatchResponseMessage responseMessage, Map<Long, Long> listMap2Map) {
+        if(response.get("failed")!=null){
+            String msg = "The product supplier does not match the product group";
+            List<Long> failedList = (List<Long>) response.get("failed");
+            if(CollectionUtils.isNotEmpty(failedList)){
+                for(Long id : failedList){
+                    responseMessage.getFailed().add(new BatchResponseItem(id,listMap2Map.get(id),msg));
+                }
+            }
+        }
+        if(response.get("success")!=null){
+            String msg = "success";
+            List<Long> successList = (List<Long>) response.get("success");
+            if(CollectionUtils.isNotEmpty(successList)){
+                for(Long id : successList){
+                    responseMessage.getSuccess().add(new BatchResponseItem(id,listMap2Map.get(id),msg));
+                }
+            }
+        }
     }
 
     private Map<Long, Long> batchValidate(StateEnum originalState, List<Map<String, Object>> idsList, OperationEnum operation,
