@@ -898,6 +898,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
                 priceChangeRuleMapper.updateProductPriceBySnapshot(params);
                 logger.info("synUpdateProductPrice is end");
             }
+            this.updateRuleStatus(paramsMap);
             return true;
         }
     }
