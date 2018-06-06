@@ -77,6 +77,7 @@ public class TagServiceImpl implements ITagService {
         }
         String msg = "";
         if(CollectionUtils.isNotEmpty(listPrdIdDuplicated)){
+            response.put("status","-1");
             msg = "The product supplier does not match the product group，productIds:"+listPrdIdDuplicated.toString();
         }
         response.put("msg",msg);

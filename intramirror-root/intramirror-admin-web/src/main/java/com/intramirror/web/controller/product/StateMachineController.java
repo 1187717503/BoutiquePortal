@@ -192,6 +192,9 @@ public class StateMachineController {
                 map.put("sort_num", -1);
                 map.put("tagType",tag.getTagType());
                 iTagService.saveTagProductRel(map,response);
+                if("-1".equals(response.get("status"))){
+                    return Response.status(StatusType.FAILURE).data(response);
+                }
                 return Response.status(StatusType.SUCCESS).data(response);
             }else { // removeGroup
 
