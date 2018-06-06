@@ -173,6 +173,7 @@ public class StateMachineController {
         }
         Long tagId = Long.valueOf(body.get("tagId").toString());
         if(action.equals("addToGroup") || action.equals("removeGroup")){
+            int result = -1;
             if(action.equals("addToGroup")){
                 Tag tag = iTagService.selectTagByTagId(tagId);
                 if(tag == null){
@@ -189,7 +190,7 @@ public class StateMachineController {
                 map.put("tag_id", tagId);
                 map.put("sort_num", -1);
                 map.put("tagType",tag.getTagType());
-                iTagService.saveTagProductRel(map);
+                result = iTagService.saveTagProductRel(map);
             }else { // removeGroup
 
                 List<TagProductRel> tagProductRelList = new ArrayList<>();
@@ -210,6 +211,10 @@ public class StateMachineController {
                 contentManagementService.batchDeleteByTagIdAndProductId(tagProductRelList);
 
             }
+            if(result == 0){
+                return Response.status(StatusType.SUCCESS).data("The product group does not match the supplier");
+            }
+            return Response.status(StatusType.SUCCESS).data("update success");
         }
         if (body.get("ids") == null) {
             throw new ValidateException(new ErrorResponse("Parameter missed"));

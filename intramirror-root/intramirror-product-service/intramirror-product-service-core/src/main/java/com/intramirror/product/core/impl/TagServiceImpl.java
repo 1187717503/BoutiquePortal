@@ -75,6 +75,10 @@ public class TagServiceImpl implements ITagService {
         if(tag.getTagType() == 2){
             para.remove("tag_id");
         }
+        if(CollectionUtils.isEmpty(productIdList)){
+            logger.info("saveTagProductRel： repeat count [{}]; pass count [{}]", listPrdIdDuplicated.size(), productIdList.size());
+            return 0;
+        }
 
         // 已经有的关系，不用添加，并且作为失败列表返回给前端
         // 1. 根据tag_id和product_id拿到重复的选项
