@@ -365,42 +365,10 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         paramsMap.put("category_type", category_type);
         paramsMap.put("vendor_id", vendor_id);
         paramsMap.put("price_change_rule_id", price_change_rule_id);
-        //根据参数查询snapshot对应的product id 和 im price snapshot_price_detail_id的值
-        List<Map<String, Object>> snapshotLists = priceChangeRuleMapper.selectSnapshotByChangeRuleId(paramsMap);
         //更新price_change_rule 的 preview——status  为0 非活动折扣 1 活动折扣
         paramsMap.put("preview_status",preview_status);
-        priceChangeRuleMapper.updatePriceChangeRuleById(paramsMap);
-
-
-        if(snapshotLists != null && snapshotLists.size() > 0){
-            if(preview_status.intValue() == 1) {
-//                for (Map<String, Object> snapshot : snapshotLists) {
-//                    Long pk = Long.parseLong(snapshot.get("product_id").toString());
-//                    ProductWithBLOBs product = productMapper.selectByPrimaryKey(pk);
-//                    if(product.getMaxRetailPrice().compareTo(new BigDecimal(snapshot.get("im_price").toString())) == -1){
-//                        snapshot.put("im_price",null);
-//                    }
-//                    priceChangeRuleMapper.updateProductImPriceByPrimaryKey(snapshot);
-//                }
-                priceChangeRuleMapper.updateProductImPriceByConditions(paramsMap);
-            }
-            if(preview_status.intValue() == 0){
-
-                //关闭preview 更新所有vendor——id  category——type为1的product的preview im price的值为null
-                Set<Long> productIds = new HashSet<Long>();
-                for (Map<String, Object> snapshot : snapshotLists) {
-                    productIds.add(Long.parseLong(snapshot.get("product_id").toString()));
-//                    priceChangeRuleMapper.updateProductImPriceByPrimaryKey(snapshot);
-                }
-                if(productIds.size() > 0){
-                    //update product  im_price wei null
-                    Map<String,Object> productParams = new HashMap<String,Object>();
-                    productParams.put("im_price",null);
-                    productParams.put("set",productIds);
-                    priceChangeRuleMapper.updateProductImPriceByProductIds(productParams);
-                }
-            }
-        }
+        priceChangeRuleMapper.updatePriceChangeRuleById(paramsMap);//preview_status
+        priceChangeRuleMapper.updateProductImPriceByConditions(paramsMap);//preview_im_price
         return true;
     }
 
