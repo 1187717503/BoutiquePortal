@@ -653,7 +653,9 @@
 
         select price_change_rule_id,vendor_id from price_change_rule where price_type = #{price_type,jdbcType=BIGINT} and `status` = 1
         /*and date_format(valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d')*/
-        and `category_type` = #{category_type,jdbcType=BIGINT}
+        <if test="category_type != null">
+            and `category_type` = #{category_type,jdbcType=BIGINT}
+        </if>
         <if test="preview_status == 1">
             and vendor_id = #{vendor_id,jdbcType=BIGINT}
         </if>
