@@ -68,6 +68,12 @@
             <if test="enabled != null">
                 enabled,
             </if>
+            <if test="vendorId != null">
+                vendor_id,
+            </if>
+            <if test="tagType != null">
+                tag_type,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="tagId != null">
@@ -81,6 +87,12 @@
             </if>
             <if test="enabled != null">
                 #{enabled,jdbcType=BIT},
+            </if>
+            <if test="vendorId != null">
+                #{vendorId,jdbcType=BIGINT},
+            </if>
+            <if test="tagType != null">
+                #{tagType,jdbcType=INTEGER},
             </if>
         </trim>
     </insert>
