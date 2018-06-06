@@ -167,7 +167,7 @@ public class ProductMgntController {
         searchCondition.setCount((pageSize == null || pageSize < 0) ? 25 : pageSize);
         if (searchCondition.getTagId() != null) {
             List<Long> productList = null;
-            if (searchCondition.getTagId() == 0 || searchCondition.getTagId()==1) {
+            if (searchCondition.getTagId() == -2 || searchCondition.getTagId() == 1) {
                 productList = contentManagementService.listAllTagProductIds(types);
             } else if (tagIds.size() > 0) {
                 productList = contentManagementService.listTagProductIds(tagIds);
