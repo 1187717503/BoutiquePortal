@@ -30,6 +30,7 @@ public class CancelOrderVO {
     public void setTax_fee(BigDecimal tax_fee) {
         this.tax_fee = tax_fee;
     }
+    private Integer change_flag;
 
     public Long getProduct_id() {
         return product_id;
@@ -133,5 +134,13 @@ public class CancelOrderVO {
 
     public void setCancel_at(Date cancel_at) {
         this.cancel_at = cancel_at;
+    }
+
+    public Integer getChange_flag() {
+        return change_flag;
+    }
+
+    public void setChange_flag(Integer change_flag) {
+        this.change_flag = change_flag;
     }
 }

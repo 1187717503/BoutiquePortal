@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.intramirror.order.api.model.Shipment;
+import com.intramirror.order.api.service.*;
 import com.intramirror.order.api.vo.ShipmentSendMailVO;
 import com.intramirror.order.api.vo.ShippedParam;
 import com.intramirror.user.api.model.User;
@@ -31,12 +32,6 @@ import com.intramirror.common.help.ResultMessage;
 import com.intramirror.order.api.common.ContainerType;
 import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.model.SubShipment;
-import com.intramirror.order.api.service.IContainerService;
-import com.intramirror.order.api.service.ILogisticProductShipmentService;
-import com.intramirror.order.api.service.ILogisticsProductService;
-import com.intramirror.order.api.service.IOrderService;
-import com.intramirror.order.api.service.IShipmentService;
-import com.intramirror.order.api.service.ISubShipmentService;
 import com.intramirror.web.controller.BaseController;
 import pk.shoplus.common.utils.StringUtil;
 
@@ -70,7 +65,10 @@ public class ShipmentController extends BaseController{
 	
 	@Autowired
 	private ILogisticProductShipmentService logisticProductShipmentService;
-	
+
+	@Autowired
+	private KafkaUtilService kafkaUtilService;
+
 	/**
 	 * 保存shipment
 	 * @author yuan
@@ -293,7 +291,7 @@ public class ShipmentController extends BaseController{
 		return message;
 	}
 
-	private void updateContainerStatus(@RequestBody Map<String, Object> map) {
+	private void updateContainerStatus(Map<String, Object> map) {
 		//状态修改成功修改container状态
 		logger.info("update container status");
 		List<Map<String, Object>> container = containerService.getShipmentList(map);
@@ -444,6 +442,13 @@ public class ShipmentController extends BaseController{
 					map.put("shipmentId",shipment.getShipmentId());
 					map.put("status",3);
 					updateContainerStatus(map);
+					//shipped操作发送消息用来生成资金报表
+					List<LogisticsProduct> logisticsProducts = iShipmentService.getLogisticsProductByShipment(shipment.getShipmentId());
+					if (logisticsProducts!=null && logisticsProducts.size()>0){
+						for (LogisticsProduct logisticsProduct:logisticsProducts){
+							kafkaUtilService.saveOrderFinance(logisticsProduct);
+						}
+					}
 					// 起线程发邮件
 					ShipmentSendMailVO vo = new ShipmentSendMailVO();
 					vo.setShipmentNo(shipment.getShipmentNo());
