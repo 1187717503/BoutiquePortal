@@ -170,21 +170,27 @@ public interface PriceChangeRuleMapper {
      * 更新preview的imprice的值
      * @param paramsMap
      */
-    void updateProductImPriceByPrimaryKey(Map<String,Object> paramsMap);
+    int updateProductImPriceByPrimaryKey(Map<String,Object> paramsMap);
 
     /**
      *  更新preview——status 0 非活动折扣 1 活动折扣
      * @param paramsMap
      */
-    void updatePriceChangeRuleById(Map<String,Object> paramsMap);
+    int updatePriceChangeRuleById(Map<String,Object> paramsMap);
 
     /**
      *  piliang gengxin
      * @param productParams
      */
-    void updateProductImPriceByProductIds(Map<String,Object> productParams);
+    int updateProductImPriceByProductIds(Map<String,Object> productParams);
     int updateSkuPriceBySnapshot(Map<String, Object> params);
     int updateShopProductPriceBySnapshot(Map<String, Object> params);
     int updateProductPriceBySnapshot(Map<String, Object> params);
     int updatePriceBySnapshot(Map<String, Object> params);
+
+    /**
+     *
+     * @param productCondition
+     */
+    int updateProductImPriceByConditions(Map<String,Object> productCondition);
 }
