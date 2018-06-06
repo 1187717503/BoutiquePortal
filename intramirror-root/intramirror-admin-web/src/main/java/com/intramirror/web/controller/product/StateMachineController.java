@@ -164,7 +164,7 @@ public class StateMachineController {
     @PutMapping(value = "/batch/{action}", consumes = "application/json")
     public Response batchOperateProduct(@SessionAttribute(value = "sessionStorage", required = false) Long userId, HttpServletRequest request,
             @PathVariable(value = "action") String action, @RequestBody Map<String, Object> body) {
-
+        BatchResponseMessage responseMessage = new BatchResponseMessage();
         if(body.get("ids") == null){
             throw new ValidateException(new ErrorResponse("Parameter missed"));
         }
@@ -211,9 +211,9 @@ public class StateMachineController {
                 contentManagementService.batchDeleteByTagIdAndProductId(tagProductRelList);
 
             }
-            if(result == 0){
+            /*if(result == 0){
                 return Response.status(StatusType.SUCCESS).data("The product group does not match the supplier");
-            }
+            }*/
             return Response.status(StatusType.SUCCESS).data("update success");
         }
         if (body.get("ids") == null) {
@@ -229,7 +229,6 @@ public class StateMachineController {
         StateMachineCoreRule.validate(originalState, action);
         OperationEnum operation = ProductStateOperationMap.getOperation(action);
 
-        BatchResponseMessage responseMessage = new BatchResponseMessage();
         Map<Long, Long> validIdsMap = batchValidate(originalState, (List) body.get("ids"), operation, responseMessage);
         validIdsMap = batchFilterIncompleteProductIds(originalState, validIdsMap, operation, responseMessage);
         batchUpdateProductState(userId, originalState, action, validIdsMap, responseMessage);
