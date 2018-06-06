@@ -319,11 +319,12 @@ public class ContentMgntController {
         }
 
         Map<String, Object> map = new HashMap<>();
+        Map<String,String> response = new HashMap<>();
         map.put("productIdList", productIdList);
         map.put("tag_id", tagId);
         map.put("sort_num", sortNum);
         map.put("tagType",tagType);
-        iTagService.saveTagProductRel(map);
+        iTagService.saveTagProductRel(map,response);
         return Response.success();
     }
 

@@ -186,11 +186,13 @@ public class StateMachineController {
                 }
 
                 Map<String, Object> map = new HashMap<>();
+                Map<String,String> response = new HashMap<>();
                 map.put("productIdList", ids);
                 map.put("tag_id", tagId);
                 map.put("sort_num", -1);
                 map.put("tagType",tag.getTagType());
-                result = iTagService.saveTagProductRel(map);
+                iTagService.saveTagProductRel(map,response);
+                return Response.status(StatusType.SUCCESS).data(response);
             }else { // removeGroup
 
                 List<TagProductRel> tagProductRelList = new ArrayList<>();
@@ -209,12 +211,10 @@ public class StateMachineController {
                     }
                 }
                 contentManagementService.batchDeleteByTagIdAndProductId(tagProductRelList);
+                return Response.status(StatusType.SUCCESS).data("delete success");
 
             }
-            /*if(result == 0){
-                return Response.status(StatusType.SUCCESS).data("The product group does not match the supplier");
-            }*/
-            return Response.status(StatusType.SUCCESS).data("update success");
+
         }
         if (body.get("ids") == null) {
             throw new ValidateException(new ErrorResponse("Parameter missed"));

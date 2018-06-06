@@ -71,8 +71,11 @@
         <foreach collection="pIds" item="pIds" open="(" close=")" separator=",">
             #{pIds}
         </foreach>
-        <if test="tagType != null">
-            and tag.tag_type = #{tagType}
+        <if test="types != null">
+            and tag.tag_type IN
+            <foreach collection="types" item="types" open="(" close=")" separator=",">
+                #{types}
+            </foreach>
         </if>
         AND tag.enabled = TRUE;
     </select>

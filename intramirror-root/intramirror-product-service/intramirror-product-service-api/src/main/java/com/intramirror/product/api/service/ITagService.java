@@ -6,7 +6,7 @@ import java.util.Map;
 
 public interface ITagService {
 
-    int saveTagProductRel(Map<String, Object> map);
+    int saveTagProductRel(Map<String, Object> map,Map<String,String> response);
 
     List<Tag> getTags(String orderBy);
 

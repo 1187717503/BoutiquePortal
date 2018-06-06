@@ -34,7 +34,7 @@ public class TagServiceImpl implements ITagService {
 
 
     @Override
-    public int saveTagProductRel(Map<String, Object> map) {
+    public int saveTagProductRel(Map<String, Object> map,Map<String,String> response) {
 
         List<String> listPrdIdDuplicated = new ArrayList<>();
         // type = 2 时
@@ -75,8 +75,12 @@ public class TagServiceImpl implements ITagService {
         if(tag.getTagType() == 2){
             para.remove("tag_id");
         }
+        String msg = "";
+        if(CollectionUtils.isNotEmpty(listPrdIdDuplicated)){
+            msg = "The product supplier does not match the product group，productIds:"+listPrdIdDuplicated.toString();
+        }
+        response.put("msg",msg);
         if(CollectionUtils.isEmpty(productIdList)){
-            logger.info("saveTagProductRel： repeat count [{}]; pass count [{}]", listPrdIdDuplicated.size(), productIdList.size());
             return 0;
         }
 

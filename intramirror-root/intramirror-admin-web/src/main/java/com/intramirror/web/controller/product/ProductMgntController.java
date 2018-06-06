@@ -156,6 +156,7 @@ public class ProductMgntController {
         if(tagType != null){
             types.add(tagType);
         }
+        searchCondition.setTagTypes(types);
         List<Long> tagIds = searchParams.getTagIds();
         if(CollectionUtils.isEmpty(tagIds)){
             tagIds = new ArrayList<>();
@@ -163,6 +164,7 @@ public class ProductMgntController {
         if(searchCondition.getTagId()!=null && searchCondition.getTagId() >0){
             tagIds.add(searchCondition.getTagId());
         }
+        searchCondition.setTagIds(tagIds);
         searchCondition.setStart((pageNo == null || pageNo < 0) ? 0 : (pageNo - 1) * pageSize);
         searchCondition.setCount((pageSize == null || pageSize < 0) ? 25 : pageSize);
         if (searchCondition.getTagId() != null) {
@@ -194,20 +196,20 @@ public class ProductMgntController {
         setCategoryPath(productList);
         List<Map<String, Object>> skuStoreList = iSkuStoreService.listSkuStoreByProductList(productList);
         List<Map<String, Object>> tagsList = null;
-        if (searchCondition.getTagId() != null) {
+        if (searchCondition.getTagId() != null || searchCondition.getTagTypes().size()>0) {
             Map<String,Object> param = new HashMap<>();
             List<Long> pIds = new ArrayList<>();
             for(Map<String, Object> maps : productList){
                 pIds.add(Long.valueOf(maps.get("product_id").toString()));
             }
             param.put("pIds",pIds);
-
+            param.put("types",searchCondition.getTagTypes());
             tagsList = contentManagementService.listTagsByProductIdsAndType(param);
         }
 
         for (Map<String, Object> product : productList) {
             setSkuInfo(product, skuStoreList);
-            if (searchCondition.getTagId() != null) {
+            if (searchCondition.getTagId() != null || searchCondition.getTagTypes().size()>0) {
                 setTags(product, tagsList);
             }
             setState(product);
