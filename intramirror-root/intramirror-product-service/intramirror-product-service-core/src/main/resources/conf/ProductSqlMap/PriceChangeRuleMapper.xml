@@ -902,7 +902,7 @@
           </if>
           <if test="preview_status == 1">
               a.preview_im_price =
-              (CASE WHEN (a.max_retail_price > b.im_price) THEN b.im_price ELSE NULL END)
+              (CASE WHEN (a.max_im_price > b.im_price) THEN b.im_price ELSE NULL END)
           </if>
     </update>
 
