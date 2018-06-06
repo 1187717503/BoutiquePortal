@@ -173,7 +173,6 @@ public class StateMachineController {
         }
         Long tagId = Long.valueOf(body.get("tagId").toString());
         if(action.equals("addToGroup") || action.equals("removeGroup")){
-            int result = -1;
             if(action.equals("addToGroup")){
                 Tag tag = iTagService.selectTagByTagId(tagId);
                 if(tag == null){
@@ -186,16 +185,14 @@ public class StateMachineController {
                 }
 
                 Map<String, Object> map = new HashMap<>();
-                Map<String,String> response = new HashMap<>();
+                Map<String,Object> response = new HashMap<>();
                 map.put("productIdList", ids);
                 map.put("tag_id", tagId);
                 map.put("sort_num", -1);
                 map.put("tagType",tag.getTagType());
                 iTagService.saveTagProductRel(map,response);
-                if("-1".equals(response.get("status"))){
-                    return Response.status(StatusType.FAILURE).data(response);
-                }
-                return Response.status(StatusType.SUCCESS).data(response);
+                calResponseMsg(response,responseMessage,listMap2Map);
+                return Response.status(StatusType.SUCCESS).data(responseMessage);
             }else { // removeGroup
 
                 List<TagProductRel> tagProductRelList = new ArrayList<>();
@@ -214,7 +211,7 @@ public class StateMachineController {
                     }
                 }
                 contentManagementService.batchDeleteByTagIdAndProductId(tagProductRelList);
-                return Response.status(StatusType.SUCCESS).data("delete success");
+                return Response.status(StatusType.SUCCESS).data(responseMessage);
 
             }
 
@@ -237,6 +234,27 @@ public class StateMachineController {
         batchUpdateProductState(userId, originalState, action, validIdsMap, responseMessage);
 
         return Response.status(StatusType.SUCCESS).data(responseMessage);
+    }
+
+    private void calResponseMsg(Map<String, Object> response, BatchResponseMessage responseMessage, Map<Long, Long> listMap2Map) {
+        if(response.get("failed")!=null){
+            String msg = "The product supplier does not match the product group";
+            List<Long> failedList = (List<Long>) response.get("failed");
+            if(CollectionUtils.isNotEmpty(failedList)){
+                for(Long id : failedList){
+                    responseMessage.getFailed().add(new BatchResponseItem(id,listMap2Map.get(id),msg));
+                }
+            }
+        }
+        if(response.get("success")!=null){
+            String msg = "success";
+            List<Long> successList = (List<Long>) response.get("success");
+            if(CollectionUtils.isNotEmpty(successList)){
+                for(Long id : successList){
+                    responseMessage.getSuccess().add(new BatchResponseItem(id,listMap2Map.get(id),msg));
+                }
+            }
+        }
     }
 
     private Map<Long, Long> batchValidate(StateEnum originalState, List<Map<String, Object>> idsList, OperationEnum operation,

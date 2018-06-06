@@ -34,9 +34,10 @@ public class TagServiceImpl implements ITagService {
 
 
     @Override
-    public int saveTagProductRel(Map<String, Object> map,Map<String,String> response) {
+    public int saveTagProductRel(Map<String, Object> map,Map<String,Object> response) {
 
         List<String> listPrdIdDuplicated = new ArrayList<>();
+        List<Long> listPrdIdNOVend = new ArrayList<>();
         // type = 2 时
         //1. 不同boutqiue的商品不能加入到group中
         //2. 同一个商品不能加入两个group中，除非是爆款）
@@ -51,7 +52,7 @@ public class TagServiceImpl implements ITagService {
                 for(ProductWithBLOBs p : productWithBLOBs){
                     if(!vendorId.equals(p.getVendorId())){
                         productIdList.remove(p.getProductId()); // 不在一个vendor的不要加
-                        listPrdIdDuplicated.add(p.getProductId().toString());
+                        listPrdIdNOVend.add(p.getProductId());
                     }
                 }
             }
@@ -75,12 +76,10 @@ public class TagServiceImpl implements ITagService {
         if(tag.getTagType() == 2){
             para.remove("tag_id");
         }
-        String msg = "";
-        if(CollectionUtils.isNotEmpty(listPrdIdDuplicated)){
-            response.put("status","-1");
-            msg = "The product supplier does not match the product group，productIds:"+listPrdIdDuplicated.toString();
+        if(CollectionUtils.isNotEmpty(listPrdIdNOVend)){
+            response.put("failed",listPrdIdNOVend);
+            //msg = "The product supplier does not match the product group，productIds:"+listPrdIdNOVend.toString();
         }
-        response.put("msg",msg);
         if(CollectionUtils.isEmpty(productIdList)){
             return 0;
         }
@@ -113,6 +112,7 @@ public class TagServiceImpl implements ITagService {
         if (productIdList.size() <= 0) {
             return 0;
         }
+        response.put("success",productIdList);
 
         Map<String, Object> mapToSave = new HashMap<>();
         mapToSave.put("tag_id", map.get("tag_id"));

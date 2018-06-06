@@ -319,7 +319,7 @@ public class ContentMgntController {
         }
 
         Map<String, Object> map = new HashMap<>();
-        Map<String,String> response = new HashMap<>();
+        Map<String,Object> response = new HashMap<>();
         map.put("productIdList", productIdList);
         map.put("tag_id", tagId);
         map.put("sort_num", sortNum);
