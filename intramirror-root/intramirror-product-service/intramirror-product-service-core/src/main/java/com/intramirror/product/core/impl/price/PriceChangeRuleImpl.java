@@ -882,7 +882,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
                 List<SnapshotPriceRule> snapshotPriceRules = snapshotPriceRuleMapper.getSnapshotPriceRuleByPriceChangeRuleIds(snapshotPriceRuleParams);
                 List<Long> snapshotPriceRuleIdList = new ArrayList<>();
                 for (SnapshotPriceRule snapshotPriceRule : snapshotPriceRules) {
-                    if (snapshotPriceRule.getSaveAt().after(snapshotPriceRule.getUpdatedAt())) {
+                    if (snapshotPriceRule.getUpdatedAt() == null || snapshotPriceRule.getSaveAt().after(snapshotPriceRule.getUpdatedAt())) {
                         logger.info("snapshotPriceRule SaveAt > UpdatedAt,snapshotPriceRuleId:{}", snapshotPriceRule.getSnapshotPriceRuleId());
                         throw new BusinessException("Active fail. Unrefreshed data Exists.");
                     }
