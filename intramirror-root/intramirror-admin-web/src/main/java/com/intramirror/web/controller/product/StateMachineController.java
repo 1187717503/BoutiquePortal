@@ -6,17 +6,21 @@ import com.intramirror.core.common.response.ErrorResponse;
 import com.intramirror.core.common.response.Response;
 import com.intramirror.product.api.model.ProductWithBLOBs;
 import com.intramirror.product.api.model.Sku;
+import com.intramirror.product.api.model.Tag;
+import com.intramirror.product.api.model.TagProductRel;
 import com.intramirror.product.api.service.ISkuStoreService;
+import com.intramirror.product.api.service.ITagService;
 import com.intramirror.product.api.service.SkuService;
+import com.intramirror.product.api.service.content.ContentManagementService;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
 import com.intramirror.web.common.response.BatchResponseItem;
 import com.intramirror.web.common.response.BatchResponseMessage;
 import static com.intramirror.web.controller.product.StateMachineCoreRule.map2StateEnum;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +50,12 @@ public class StateMachineController {
     private ISkuStoreService iSkuStoreService;
 
     @Autowired
+    private ITagService iTagService;
+
+    @Autowired
     private SkuService skuService;
+    @Autowired
+    private ContentManagementService contentManagementService;
 
     @PutMapping(value = "/single/{action}", consumes = "application/json")
     public Response operateProduct(@SessionAttribute(value = "sessionStorage", required = false) Long userId, @PathVariable(value = "action") String action,
@@ -156,6 +165,41 @@ public class StateMachineController {
     public Response batchOperateProduct(@SessionAttribute(value = "sessionStorage", required = false) Long userId, HttpServletRequest request,
             @PathVariable(value = "action") String action, @RequestBody Map<String, Object> body) {
 
+        if(body.get("ids") == null){
+            throw new ValidateException(new ErrorResponse("Parameter missed"));
+        }
+        if(body.get("tagId") == null){
+            throw new ValidateException(new ErrorResponse("Parameter missed"));
+        }
+        Long tagId = Long.valueOf(body.get("tagId").toString());
+        if(action.equals("addToGroup") || action.equals("removeGroup")){
+            if(action.equals("addToGroup")){
+                Tag tag = iTagService.selectTagByTagId(tagId);
+                if(tag == null){
+                    throw new ValidateException(new ErrorResponse("no product group by tagId: : " + body.get("tagId").toString()));
+                }
+                Map<String, Object> map = new HashMap<>();
+                map.put("productIdList", body.get("ids"));
+                map.put("tag_id", tagId);
+                map.put("sort_num", -1);
+                map.put("tagType",tag.getTagType());
+                iTagService.saveTagProductRel(map);
+            }else { // removeGroup
+
+                List<TagProductRel> tagProductRelList = new ArrayList<>();
+                List<Long> ids = (List<Long>)body.get("ids");
+                if(CollectionUtils.isNotEmpty(ids)){
+                    for(Long id : ids){
+                        TagProductRel rel = new TagProductRel();
+                        rel.setTagId(tagId);
+                        rel.setTagProductId(id);
+                        tagProductRelList.add(rel);
+                    }
+                }
+                contentManagementService.batchDeleteByTagIdAndProductId(tagProductRelList);
+
+            }
+        }
         if (body.get("ids") == null) {
             throw new ValidateException(new ErrorResponse("Parameter missed"));
         }

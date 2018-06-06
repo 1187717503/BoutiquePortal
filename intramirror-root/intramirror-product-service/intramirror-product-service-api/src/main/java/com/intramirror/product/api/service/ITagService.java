@@ -12,4 +12,6 @@ public interface ITagService {
 
     List<Tag> getTagsByParam(Map<String,Object> param);
 
+    Tag selectTagByTagId(Long tagId);
+
 }

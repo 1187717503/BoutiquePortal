@@ -69,6 +69,7 @@
                  open="(" close=")" separator=",">
             #{ids}
         </foreach>
+        ORDER BY vendor_name ASC
     </select>
 
     <select id="queryRuleVendor" resultType="java.util.Map" parameterType="java.util.Map">
