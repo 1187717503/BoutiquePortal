@@ -112,7 +112,7 @@ public interface IPriceChangeRule {
      * @return
      * @throws Exception
      */
-    boolean updatePreviewPriceByBoutique(Long vendor_id, Long preview_status, Integer category_type, Long price_change_rule_id, String flag) throws Exception;
+    boolean updateProductPreviewPriceByBoutique(Long vendor_id, Long preview_status, Integer category_type, Long price_change_rule_id, String flag) throws Exception;
 
     boolean synUpdateProductPrice(Long vendor_id, int categoryType, Long price_change_rule_id) throws Exception;
 }

@@ -357,7 +357,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
 
     @Transactional
     @Override
-    public  boolean updatePreviewPriceByBoutique(Long vendor_id, Long preview_status, Integer category_type, Long price_change_rule_id, String flag) throws Exception {
+    public  boolean updateProductPreviewPriceByBoutique(Long vendor_id, Long preview_status, Integer category_type, Long price_change_rule_id, String flag) throws Exception {
         if (flag.equalsIgnoreCase("all")) {
             price_change_rule_id = null;
         }

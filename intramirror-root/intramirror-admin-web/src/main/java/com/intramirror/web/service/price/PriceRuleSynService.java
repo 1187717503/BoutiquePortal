@@ -115,7 +115,7 @@ public class PriceRuleSynService {
         synchronized (this) {
             logger.info("SyncPreviewByBoutiqueStart,vendorId:{},previewStatus:{},categoryType:{},priceChangeRuleId:{},flag:{}", vendorId, previewStatus, categoryType,
                     priceChangeRuleId, flag);
-            iPriceChangeRule.updatePreviewPriceByBoutique(vendorId, previewStatus, categoryType, priceChangeRuleId, flag);
+            iPriceChangeRule.updateProductPreviewPriceByBoutique(vendorId, previewStatus, categoryType, priceChangeRuleId, flag);
             logger.info("SyncPreviewByBoutiqueEnd,vendorId:{},previewStatus:{},categoryType:{},priceChangeRuleId:{},flag:{}", vendorId, previewStatus, categoryType,
                     priceChangeRuleId, flag);
         }
