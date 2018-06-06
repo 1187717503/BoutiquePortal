@@ -51,8 +51,9 @@ public class PriceRuleSynService {
     public void syncBoutique(Map<String, Object> params) throws Exception {
         synchronized (this) {
             logger.info("syncBoutiqueStart");
-            iPriceChangeRule.updateVendorPrice(1, params.get("startTime").toString(), params.get("endTime").toString());
-            iPriceChangeRule.updateVendorPrice(2, params.get("startTime").toString(), params.get("endTime").toString());
+            iPriceChangeRule.synUpdateProductPriceByValidFrom(params.get("startTime").toString(), params.get("endTime").toString());
+//            iPriceChangeRule.updateVendorPrice(1, params.get("startTime").toString(), params.get("endTime").toString());
+//            iPriceChangeRule.updateVendorPrice(2, params.get("startTime").toString(), params.get("endTime").toString());
             logger.info("syncBoutiqueEnd");
         }
     }

@@ -364,7 +364,10 @@
         select pcr.price_change_rule_id,pcrsg.season_code,pcr.vendor_id,pcr.shop_id,pcr.user_id from price_change_rule pcr
         inner join price_change_rule_season_group pcrsg on (pcrsg.price_change_rule_id = pcr.price_change_rule_id and pcrsg.enabled = 1)
         where pcr.price_type = #{price_type,jdbcType=BIGINT}
-        and pcr.`status` = 1 and pcr.`category_type` = #{category_type,jdbcType=BIGINT}
+        and pcr.`status` = 1
+        <if test="category_type != null">
+            and pcr.`category_type` = #{category_type,jdbcType=BIGINT}
+        </if>
         <if test="preview_status == 1">
             and pcr.vendor_id = #{vendor_id,jdbcType=BIGINT}
         </if>
