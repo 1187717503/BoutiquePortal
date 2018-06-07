@@ -336,6 +336,6 @@
     <select id="getLogisticsProductByShipment" parameterType="long" resultMap="logisProductMap">
         SELECT lp.* FROM logistics_product lp
         INNER JOIN container c  on c.container_id = lp.container_id
-        WHERE c.shipment_id = #{shipmentId};
+        WHERE c.shipment_id = #{shipmentId} and lp.change_flag = 0
     </select>
 </mapper>
