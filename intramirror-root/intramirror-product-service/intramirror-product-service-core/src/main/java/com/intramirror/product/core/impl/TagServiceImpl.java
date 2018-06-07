@@ -37,7 +37,7 @@ public class TagServiceImpl implements ITagService {
     public int saveTagProductRel(Map<String, Object> map,Map<String,Object> response) {
 
         List<String> listPrdIdDuplicated = new ArrayList<>();
-        List<Long> listPrdIdNOVend = new ArrayList<>();
+        List<Map<String,Object>> listPrdIdNOVend = new ArrayList<>();
         // type = 2 时
         //1. 不同boutqiue的商品不能加入到group中
         //2. 同一个商品不能加入两个group中，除非是爆款）
@@ -52,7 +52,10 @@ public class TagServiceImpl implements ITagService {
                 for(ProductWithBLOBs p : productWithBLOBs){
                     if(!vendorId.equals(p.getVendorId())){
                         productIdList.remove(p.getProductId()); // 不在一个vendor的不要加
-                        listPrdIdNOVend.add(p.getProductId());
+                        Map<String,Object> map1 = new HashMap<>();
+                        map1.put("productId",p.getProductId());
+                        map1.put("boutiqueId",p.getProductCode());
+                        listPrdIdNOVend.add(map1);
                     }
                 }
             }

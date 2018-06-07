@@ -238,11 +238,11 @@ public class StateMachineController {
 
     private void calResponseMsg(Map<String, Object> response, BatchResponseMessage responseMessage, Map<Long, Long> listMap2Map) {
         if(response.get("failed")!=null){
-            String msg = "The product supplier does not match the product group";
-            List<Long> failedList = (List<Long>) response.get("failed");
+            List<Map<String,Object>> failedList = (List<Map<String,Object>>) response.get("failed");
             if(CollectionUtils.isNotEmpty(failedList)){
-                for(Long id : failedList){
-                    responseMessage.getFailed().add(new BatchResponseItem(id,listMap2Map.get(id),msg));
+                for(Map<String,Object> failed : failedList){
+                    responseMessage.getFailed().add(new BatchResponseItem((Long)failed.get("productId"),listMap2Map.get(failed.get("productId")),
+                            "The supplier for product " + failed.get("boutiqueId") + " does not match the group！"));
                 }
             }
         }
