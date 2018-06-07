@@ -854,7 +854,7 @@
         FROM price_change_rule
         WHERE 1 = 1
         <if test="validFrom != null">
-            AND valid_from = #{validFrom,jdbcType=TIMESTAMP}
+            AND valid_from BETWEEN #{validFrom,jdbcType=TIMESTAMP} AND date_add(#{validFrom,jdbcType=TIMESTAMP}, interval 59 SECOND )
         </if>
         <if test="status != null">
             AND status = #{status,jdbcType=INTEGER}

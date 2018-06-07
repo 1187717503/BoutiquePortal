@@ -213,7 +213,7 @@ public class PriceChangeRuleController extends BaseController {
         PriceChangeRule condition = new PriceChangeRule();
         condition.setPriceType(Byte.valueOf("3"));
         condition.setStatus(1);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
         condition.setValidFrom(sdf.parse(param.get("validFrom")));
 
         List<PriceChangeRule> priceChangeRules = priceChangeRule.selectByCondition(condition);
