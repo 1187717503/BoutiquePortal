@@ -509,11 +509,13 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
                 //                params.put("price_change_rule_id",map.get("price_change_rule_id"));
                 params.put("vendor_id", map.get("vendor_id"));
                 params.put("price_change_rule_id", map.get("price_change_rule_id"));
+                params.put("category_type", map.get("category_type"));
                 priceChangeRuleMapper.updateRuleInActive(params);
             }
 
             for (Map<String, Object> map : selNowRuleMaps) {
                 params.put("price_change_rule_id", map.get("price_change_rule_id"));
+                params.put("category_type", map.get("category_type"));
                 priceChangeRuleMapper.updateRuleActive(params);
             }
         }
@@ -853,7 +855,6 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         synchronized (this) {
             logger.info("updateVendorPrice start");
             Map<String, Object> paramsMap = new HashMap<>();
-            List<Map<String, Object>> paramsList = new ArrayList<>();
             paramsMap.put("price_type", PriceChangeRuleEnum.PriceType.SUPPLY_PRICE.getCode());
             paramsMap.put("preview_status", "0");
             paramsMap.put("startTime", startTime);

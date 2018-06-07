@@ -651,7 +651,7 @@
 
     <select id="selNowRule" resultType="java.util.Map" parameterType="java.util.Map">
 
-        select price_change_rule_id,vendor_id from price_change_rule where price_type = #{price_type,jdbcType=BIGINT} and `status` = 1
+        select price_change_rule_id,vendor_id, category_type from price_change_rule where price_type = #{price_type,jdbcType=BIGINT} and `status` = 1
         /*and date_format(valid_from,'%y-%m-%d') = date_format(now(),'%y-%m-%d')*/
         <if test="category_type != null">
             and `category_type` = #{category_type,jdbcType=BIGINT}
