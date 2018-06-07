@@ -17,7 +17,7 @@ public interface IPriceChangeRule {
      * @return true, false
      * @throws Exception
      */
-    boolean updateVendorPrice(int categoryType,String startTime,String endTime) throws Exception;
+    boolean updateVendorPrice(int categoryType, String startTime, String endTime) throws Exception;
 
     boolean updateVendorPrice(Long vendor_id, int categoryType, Long price_change_rule_id) throws Exception;
 
@@ -33,11 +33,12 @@ public interface IPriceChangeRule {
      * @return true, false
      * @throws Exception
      */
-    boolean updateAdminPrice(int categoryType,String startTime,String endTime) throws Exception;
+    boolean updateAdminPrice(int categoryType, String startTime, String endTime) throws Exception;
 
     boolean updateAdminPrice(Long vendor_id, int categoryType, Long price_change_rule_id) throws Exception;
 
     void updateDefaultPrice(PriceChangeRuleEnum.PriceType priceType, Map<String, Object> paramsMap);
+
     List<Map<String, Object>> selectNowActiveRule(Map<String, Object> params);
 
     /**
@@ -45,7 +46,7 @@ public interface IPriceChangeRule {
      * @return true, false
      * @throws Exception
      */
-    boolean updatePreviewPrice(Long vendor_id, Long preview_status, Integer category_type,Long price_change_rule_id,String flag) throws Exception;
+    boolean updatePreviewPrice(Long vendor_id, Long preview_status, Integer category_type, Long price_change_rule_id, String flag) throws Exception;
 
     public String checkSeasonExists(Map<String, Object> params, String season);
 
@@ -88,5 +89,7 @@ public interface IPriceChangeRule {
     List<PriceChangeRule> selectByName(String name, Long vendorId);
 
     List<Map<String, Object>> selRuleByVendorPriceType(Map<String, Object> params);
+
+    List<PriceChangeRule> selectByCondition(PriceChangeRule priceChangeRule);
 
 }

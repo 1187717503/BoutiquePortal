@@ -25,6 +25,7 @@ import com.intramirror.user.api.model.User;
 import com.intramirror.web.controller.BaseController;
 import com.intramirror.web.service.PriceChangeRuleService;
 import com.intramirror.web.service.price.PriceRuleSynService;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -205,9 +206,28 @@ public class PriceChangeRuleController extends BaseController {
         return resultMessage;
     }
 
+    @RequestMapping(value = "/preview/all/im", method = RequestMethod.POST)
+    public @ResponseBody
+    ResultMessage previewAllBoutique(@RequestBody Map<String, String> param) throws ParseException {
+        ResultMessage resultMessage = ResultMessage.getInstance();
+        PriceChangeRule condition = new PriceChangeRule();
+        condition.setPriceType(Byte.valueOf("3"));
+        condition.setStatus(1);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        condition.setValidFrom(sdf.parse(param.get("validFrom")));
+
+        List<PriceChangeRule> priceChangeRules = priceChangeRule.selectByCondition(condition);
+        if (priceChangeRules != null && priceChangeRules.size() > 0) {
+            for (PriceChangeRule item : priceChangeRules) {
+                changePreview(item.getPriceChangeRuleId(), 1L, "");
+            }
+        }
+        resultMessage.setData(priceChangeRules);
+        return resultMessage;
+    }
+
     @RequestMapping("/changepreview")
     @ResponseBody
-
     public ResultMessage changePreview(@Param("price_change_rule_id") Long price_change_rule_id, @Param("preview_status") Long preview_status,
             @Param("flag") String flag) {
         logger.info("PriceChangeRuleController,changePreview,inputParams,price_change_rule_id:{},preview_status:{} ", price_change_rule_id, preview_status);
@@ -327,7 +347,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 修改PriceChangeRuleCategoryBrand
-     *
      * @param map
      * @return
      */
@@ -398,7 +417,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据品牌ID添加下面所有2级类目的PriceChangeRuleCategoryBrand
-     *
      * @param map
      * @return
      */
@@ -431,7 +449,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据品牌ID删除下面所有2级类目的PriceChangeRuleCategoryBrand
-     *
      * @param map
      * @return
      */
@@ -518,7 +535,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 单个添加PriceChangeRuleCategoryBrand
-     *
      * @param map
      * @return
      */
@@ -579,7 +595,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据price_change_rule_category_brand_id 删除PriceChangeRuleCategoryBrand
-     *
      * @param map
      * @return
      */
@@ -619,7 +634,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 添加priceChangeRuleProductGroup
-     *
      * @param map
      * @return
      */
@@ -674,7 +688,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据price_change_rule_group_id 删除PriceChangeRuleGroup
-     *
      * @param map
      * @return
      */
@@ -714,7 +727,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 添加PriceChangeRuleProduct
-     *
      * @param map
      * @return
      */
@@ -789,7 +801,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据price_change_rule_product_id 删除PriceChangeRuleProduct
-     *
      * @param map
      * @return
      */
@@ -829,7 +840,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 修改 SystemProperty 全局默认折扣
-     *
      * @param map
      * @return
      */
@@ -862,7 +872,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 修改PriceChangeRul 修改有效日期
-     *
      * @param map
      * @return
      * @throws Exception
@@ -888,7 +897,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据price_change_rule_id 删除PriceChangeRule
-     *
      * @param map
      * @return
      */
