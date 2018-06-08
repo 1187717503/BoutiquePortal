@@ -107,7 +107,7 @@ public class TagServiceImpl implements ITagService {
             Iterator it = productIdList.iterator();
             while (it.hasNext()) {
                 String sPrdIdTarget = it.next().toString();
-                if (sPrdIdTarget.equals(sPrdIdRes)) {
+                if (tag.getTagType() == 1 && sPrdIdTarget.equals(sPrdIdRes)) {
                     it.remove();
                     ProductWithBLOBs p = bloBsMap.get(Long.valueOf(sPrdIdTarget));
                     if(p == null) continue;
@@ -115,9 +115,8 @@ public class TagServiceImpl implements ITagService {
                     map1.put("productId",p.getProductId());
                     map1.put("boutiqueId",p.getProductCode());
                     listPrdIdDuplicated.add(map1);
-//                    listPrdIdDuplicated.add(sPrdIdTarget);
                 }
-                if((tag.getTagType() == 2 &&vendorTagIds.contains(tag_id))){
+                if((tag.getTagType() == 2 && vendorTagIds.contains(tag_id))){
                     it.remove();
                     ProductWithBLOBs p = bloBsMap.get(Long.valueOf(sPrdIdTarget));
                     if(p == null) continue;
@@ -125,7 +124,6 @@ public class TagServiceImpl implements ITagService {
                     map1.put("productId",p.getProductId());
                     map1.put("boutiqueId",p.getProductCode());
                     doubleTagIds.add(map1);
-//                    doubleTagIds.add(Long.valueOf(sPrdIdTarget));
                 }
             }
         }
