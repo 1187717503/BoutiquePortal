@@ -116,4 +116,12 @@ public interface IPriceChangeRule {
 
     boolean synUpdateProductPrice(Long vendor_id, int categoryType, Long price_change_rule_id) throws Exception;
     boolean synUpdateProductPriceByValidFrom(String startTime, String endTime) throws Exception;
+
+    /**
+     *
+     * @param id
+     * @return
+     */
+    Map<String,Object> querySnapShotTimeByRuleId(Object id);
+
 }

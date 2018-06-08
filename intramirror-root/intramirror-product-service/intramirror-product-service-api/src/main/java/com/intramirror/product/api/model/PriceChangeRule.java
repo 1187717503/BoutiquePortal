@@ -75,6 +75,7 @@ public class PriceChangeRule {
     private Byte categoryType;
     private Long imPriceAlgorithmId;
     private String imPriceAlgorithmName;
+    private String refreshDate;
 
     private boolean previewImPrice;
 
@@ -300,5 +301,13 @@ public class PriceChangeRule {
 
     public void setPreviewImPrice(boolean previewImPrice) {
         this.previewImPrice = previewImPrice;
+    }
+
+    public String getRefreshDate() {
+        return refreshDate;
+    }
+
+    public void setRefreshDate(String refreshDate) {
+        this.refreshDate = refreshDate;
     }
 }

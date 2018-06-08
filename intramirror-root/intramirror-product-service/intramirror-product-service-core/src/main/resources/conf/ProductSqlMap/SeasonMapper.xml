@@ -345,4 +345,12 @@
             where p.price_change_rule_id = #{priceChangeRuleId,jdbcType=BIGINT}
             and a.enabled = 1
     </select>
+
+    <select id="querySnapShotTimeByRuleId" parameterType="java.lang.Object" resultType="java.util.Map">
+        select save_at,updated_at,
+        (CASE when save_at &lt; updated_at THEN 1 ELSE 0 END) as refresh
+        from snapshot_price_rule where price_change_rule_id = #{priceChangeRuleId,jdbcType=BIGINT}
+        and enabled = 1
+
+    </select>
 </mapper>

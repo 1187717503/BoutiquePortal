@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,6 +70,8 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
                     map.put("im_price_algorithm_name","");
                     map.put("im_price_algorithm_id","");
                 }
+                //snapshot  update_at ||  refresh IM
+                map = this.getSnapShotUpdateTime(seasonMap.get("price_change_rule_id"),map);
                 handleMaps.add(map);
             }
         }
@@ -185,5 +188,18 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
         snapshotPriceRule.setSaveAt(new Date());
         snapshotPriceRuleMapper.updateSaveAtByPriceChangeRuleId(snapshotPriceRule);
         return true;
+    }
+
+    @Override
+    public Map<String,Object> getSnapShotUpdateTime(Object ruleId,Map<String,Object> map){
+        Map<String,Object> snapShotRefreshTime = seasonMapper.querySnapShotTimeByRuleId(ruleId);
+        if(snapShotRefreshTime != null){
+            map.put("updated_at",snapShotRefreshTime.get("updated_at").toString());
+            map.put("refresh_status",snapShotRefreshTime.get("refresh"));// 0  -> false 1 -> true
+        }else{
+            map.put("updated_at",null);
+            map.put("refresh_status",0);
+        }
+        return map;
     }
 }

@@ -12,18 +12,15 @@ import com.intramirror.product.api.exception.BusinessException;
 import com.intramirror.product.api.model.ImPriceAlgorithm;
 import com.intramirror.product.api.model.PriceChangeRule;
 import com.intramirror.product.api.model.PriceChangeRuleSeasonGroup;
-import com.intramirror.product.api.model.ProductWithBLOBs;
 import com.intramirror.product.api.model.SnapshotPriceRule;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.*;
 
-import java.math.BigDecimal;
 import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.commons.collections.map.HashedMap;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -224,13 +221,6 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     }
 
     public static void main(String[] args) {
-//        System.out.println(JSONObject.toJSON("12".split(",")));
-//        BigDecimal a = new BigDecimal(1);
-//        BigDecimal b = new BigDecimal(2);
-        Map<String,Object> map = new HashedMap();
-        map.put("info",12);
-        Long info = Long.parseLong(map.get("info").toString());
-        System.out.println(info);
     }
 
     private int updatePriceByVendor(List<Map<String, Object>> paramsList, Map<String, Object> paramsMap) {
@@ -895,5 +885,10 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             priceChangeRuleMapper.updateProductPriceBySnapshot(params);
             logger.info("synUpdateProductPrice is end");
         }
+    }
+
+    @Override
+    public Map<String,Object> querySnapShotTimeByRuleId(Object id) {
+        return seasonMapper.querySnapShotTimeByRuleId(id);
     }
 }
