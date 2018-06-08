@@ -194,7 +194,12 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
     public Map<String,Object> getSnapShotUpdateTime(Object ruleId,Map<String,Object> map){
         Map<String,Object> snapShotRefreshTime = seasonMapper.querySnapShotTimeByRuleId(ruleId);
         if(snapShotRefreshTime != null){
-            map.put("updated_at",snapShotRefreshTime.get("updated_at").toString());
+            if(snapShotRefreshTime.get("updated_at") != null){
+                map.put("updated_at",snapShotRefreshTime.get("updated_at").toString());
+            }else{
+                map.put("updated_at",null);
+            }
+
             map.put("refresh_status",snapShotRefreshTime.get("refresh"));// 0  -> false 1 -> true
         }else{
             map.put("updated_at",null);
