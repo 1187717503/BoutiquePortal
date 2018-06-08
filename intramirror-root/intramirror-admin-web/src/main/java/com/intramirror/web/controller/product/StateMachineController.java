@@ -244,7 +244,7 @@ public class StateMachineController {
             if(CollectionUtils.isNotEmpty(failedList)){
                 for(Map<String,Object> failed : failedList){
                     responseMessage.getFailed().add(new BatchResponseItem((Long)failed.get("productId"),listMap2Map.get(failed.get("productId")),
-                            "The supplier for product " + failed.get("boutiqueId") + " does not match the group！"));
+                            "The supplier for product boutiqueId = " + failed.get("boutiqueId") + " does not match the group！"));
                 }
             }
         }
@@ -253,7 +253,7 @@ public class StateMachineController {
             if(CollectionUtils.isNotEmpty(failedList)){
                 for(Map<String,Object> failed : failedList){
                     responseMessage.getFailed().add(new BatchResponseItem((Long)failed.get("productId"),listMap2Map.get(failed.get("productId")),
-                            "The supplier for product " + failed.get("boutiqueId") + " has been added product group！"));
+                            "The supplier for product boutiqueId = " + failed.get("boutiqueId") + " has been added product group！"));
                 }
             }
         }
@@ -262,7 +262,7 @@ public class StateMachineController {
             if(CollectionUtils.isNotEmpty(failedList)){
                 for(Map<String,Object> failed : failedList){
                     responseMessage.getFailed().add(new BatchResponseItem((Long)failed.get("productId"),listMap2Map.get(failed.get("productId")),
-                            "The supplier for product " + failed.get("boutiqueId") + " repeat add to product group！"));
+                            "The supplier for product boutiqueId = " + failed.get("boutiqueId") + " repeat add to product group！"));
                 }
             }
         }
@@ -271,7 +271,7 @@ public class StateMachineController {
             if(CollectionUtils.isNotEmpty(failedList)){
                 for(Map<String,Object> failed : failedList){
                     responseMessage.getFailed().add(new BatchResponseItem((Long)failed.get("productId"),listMap2Map.get(failed.get("productId")),
-                            "The supplier for product " + failed.get("boutiqueId") + " is not included in the product group！"));
+                            "The supplier for product boutiqueId = " + failed.get("boutiqueId") + " is not included in the product group！"));
                 }
             }
 
@@ -281,7 +281,7 @@ public class StateMachineController {
             if(CollectionUtils.isNotEmpty(successList)){
                 for(Map<String,Object> su : successList){
                     responseMessage.getSuccess().add(new BatchResponseItem((Long) su.get("productId"),listMap2Map.get(su.get("productId")),
-                            "The supplier for product " +su.get("boutiqueId") + "remove success"));
+                            "The supplier for product boutiqueId = " +su.get("boutiqueId") + "remove success"));
                 }
             }
         }
@@ -290,7 +290,7 @@ public class StateMachineController {
             if(CollectionUtils.isNotEmpty(successList)){
                 for(Map<String,Object> su : successList){
                     responseMessage.getSuccess().add(new BatchResponseItem((Long) su.get("productId"),listMap2Map.get(su.get("productId")),
-                            "The supplier for product " +su.get("boutiqueId") + " add to product group success"));
+                            "The supplier for product boutiqueId = " +su.get("boutiqueId") + " add to product group success"));
                 }
             }
         }
