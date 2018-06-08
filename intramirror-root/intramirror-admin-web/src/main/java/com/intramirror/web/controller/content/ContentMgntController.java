@@ -264,7 +264,7 @@ public class ContentMgntController {
         }else {
             List<PriceChangeRuleGroup> ruleLisr = priceChangeRuleGroupService.getChangeRulesByTagId(tagId);
             if(CollectionUtils.isNotEmpty(ruleLisr)){
-                throw new ValidateException(new ErrorResponse("The product group has been bound with product and cannot be removed!"));
+                throw new ValidateException(new ErrorResponse("The product group has been bound with price rule and cannot be removed!"));
             }
 
         }

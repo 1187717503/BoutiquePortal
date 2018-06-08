@@ -36,8 +36,10 @@ public class TagServiceImpl implements ITagService {
     @Override
     public int saveTagProductRel(Map<String, Object> map,Map<String,Object> response) {
 
-        List<String> listPrdIdDuplicated = new ArrayList<>();
+        List<Map<String,Object>> listPrdIdDuplicated = new ArrayList<>();
         List<Map<String,Object>> listPrdIdNOVend = new ArrayList<>();
+        List<Map<String,Object>> doubleTagIds = new ArrayList<>();
+        List<Map<String,Object>> successTagIds = new ArrayList<>();
         // type = 2 时
         //1. 不同boutqiue的商品不能加入到group中
         //2. 同一个商品不能加入两个group中，除非是爆款）
@@ -45,9 +47,10 @@ public class TagServiceImpl implements ITagService {
         List<Long> vendorTagIds = new ArrayList<>();
         Long tagId = Long.valueOf(map.get("tag_id").toString());
         Tag tag = tagMapper.selectByPrimaryKey(tagId);
+        List<ProductWithBLOBs> productWithBLOBs =  productMapper.listProductByProductIds(productIdList);
+        Map<Long,ProductWithBLOBs> bloBsMap = new HashMap<>();
         if(tag.getTagType() == 2){ // 爆款 除外 tag 也除外
             Long vendorId = tag.getVendorId();
-            List<ProductWithBLOBs> productWithBLOBs =  productMapper.listProductByProductIds(productIdList);
             if(CollectionUtils.isNotEmpty(productWithBLOBs)){
                 for(ProductWithBLOBs p : productWithBLOBs){
                     if(!vendorId.equals(p.getVendorId())){
@@ -57,6 +60,7 @@ public class TagServiceImpl implements ITagService {
                         map1.put("boutiqueId",p.getProductCode());
                         listPrdIdNOVend.add(map1);
                     }
+                    bloBsMap.put(p.getProductId(),p);
                 }
             }
             Map<String,Object> param = new HashMap<>();
@@ -103,19 +107,51 @@ public class TagServiceImpl implements ITagService {
             Iterator it = productIdList.iterator();
             while (it.hasNext()) {
                 String sPrdIdTarget = it.next().toString();
-                if (sPrdIdTarget.equals(sPrdIdRes) || (tag.getTagType() == 2 &&vendorTagIds.contains(tag_id))) {
+                if (sPrdIdTarget.equals(sPrdIdRes)) {
                     it.remove();
-                    listPrdIdDuplicated.add(sPrdIdTarget);
+                    ProductWithBLOBs p = bloBsMap.get(Long.valueOf(sPrdIdTarget));
+                    if(p == null) continue;
+                    Map<String,Object> map1 = new HashMap<>();
+                    map1.put("productId",p.getProductId());
+                    map1.put("boutiqueId",p.getProductCode());
+                    listPrdIdDuplicated.add(map1);
+//                    listPrdIdDuplicated.add(sPrdIdTarget);
+                }
+                if((tag.getTagType() == 2 &&vendorTagIds.contains(tag_id))){
+                    it.remove();
+                    ProductWithBLOBs p = bloBsMap.get(Long.valueOf(sPrdIdTarget));
+                    if(p == null) continue;
+                    Map<String,Object> map1 = new HashMap<>();
+                    map1.put("productId",p.getProductId());
+                    map1.put("boutiqueId",p.getProductCode());
+                    doubleTagIds.add(map1);
+//                    doubleTagIds.add(Long.valueOf(sPrdIdTarget));
                 }
             }
+        }
+        if(doubleTagIds.size()>0){
+            response.put("doubleTag",doubleTagIds);
+        }
+        if(listPrdIdDuplicated.size()>0){
+            response.put("duplicated",listPrdIdDuplicated);
         }
 
         logger.info("saveTagProductRel： repeat count [{}]; pass count [{}]", listPrdIdDuplicated.size(), productIdList.size());
 
         if (productIdList.size() <= 0) {
             return 0;
+        }else {
+            for(Long id : productIdList){
+                ProductWithBLOBs p = bloBsMap.get(id);
+                Map<String,Object> map1 = new HashMap<>();
+                if(p == null) continue;
+                map1.put("productId",p.getProductId());
+                map1.put("boutiqueId",p.getProductCode());
+                successTagIds.add(map1);
+            }
+            response.put("success",successTagIds);
+
         }
-        response.put("success",productIdList);
 
         Map<String, Object> mapToSave = new HashMap<>();
         mapToSave.put("tag_id", map.get("tag_id"));

@@ -47,6 +47,8 @@ public interface ContentManagementService {
 
     int batchDeleteByTagIdAndProductId(List<TagProductRel> listTagProductRel);
 
+    int batchDeleteByTagIdAndProductId1(List<Long> productIds,Long tagId,Map<String,Object> response);
+
     BlockTagRel createBlockWithDefaultTag(Block block) throws Exception;
 
 }

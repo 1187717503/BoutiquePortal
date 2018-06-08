@@ -1,19 +1,16 @@
 package com.intramirror.product.core.impl.content;
 
-import com.intramirror.product.api.model.Block;
-import com.intramirror.product.api.model.BlockTagRel;
-import com.intramirror.product.api.model.Tag;
-import com.intramirror.product.api.model.TagProductRel;
+import com.intramirror.product.api.model.*;
 import com.intramirror.product.api.service.content.ContentManagementService;
-import com.intramirror.product.core.mapper.BlockMapper;
-import com.intramirror.product.core.mapper.BlockTagRelMapper;
-import com.intramirror.product.core.mapper.ContentManagementMapper;
-import com.intramirror.product.core.mapper.TagMapper;
-import com.intramirror.product.core.mapper.TagProductRelMapper;
+import com.intramirror.product.core.mapper.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.collections.ArrayStack;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +38,9 @@ public class ContentManagementServiceImpl implements ContentManagementService {
 
     @Autowired
     private TagMapper tagMapper;
+
+    @Autowired
+    private ProductMapper productMapper;
 
     @Override
     public List<Map<String, Object>> listTagProductInfo(Long tagId) {
@@ -146,6 +146,59 @@ public class ContentManagementServiceImpl implements ContentManagementService {
     @Transactional
     public int batchDeleteByTagIdAndProductId(List<TagProductRel> listTagProductRel) {
         return tagProductRelMapper.batchDeleteByTagIdAndProductId(listTagProductRel);
+    }
+
+    @Override
+    public int batchDeleteByTagIdAndProductId1(List<Long> productIds, Long tagId,Map<String, Object> response) {
+        List<Map<String,Object>> failed = new ArrayList<>();
+        List<Map<String,Object>> success = new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(productIds)){
+            Map<Long,ProductWithBLOBs> bloBsMap = new HashMap<>();
+            List<ProductWithBLOBs> productWithBLOBs =  productMapper.listProductByProductIds(productIds);
+            if(CollectionUtils.isNotEmpty(productWithBLOBs)){
+                for(ProductWithBLOBs p : productWithBLOBs){
+                    bloBsMap.put(p.getProductId(),p);
+                }
+            }
+            Map<Long,Object> tagRelMap = new HashMap<>();
+            Map<String,Object> param = new HashMap<>();
+            param.put("productIdList",productIds);
+            param.put("tag_id",tagId);
+            List<Map<String, Object>> mapList = tagProductRelMapper.getByProductAndTagId(param);
+            if(mapList.size()>0){
+                for(Map<String, Object> map : mapList){
+                    tagRelMap.put(Long.valueOf(map.get("product_id").toString()),map);
+                }
+            }
+            for(Long id : productIds){
+                if(!tagRelMap.containsKey(id)){
+                    ProductWithBLOBs p = bloBsMap.get(id);
+                    if(p!=null){
+                        Map<String,Object> map1 = new HashMap<>();
+                        map1.put("productId",p.getProductId());
+                        map1.put("boutiqueId",p.getProductCode());
+                        failed.add(map1);
+                    }
+
+                }else {
+                    tagProductRelMapper.deleteByTagIdAndProductId(tagId, id);
+                    ProductWithBLOBs p = bloBsMap.get(id);
+                    if(p!=null){
+                        Map<String,Object> map1 = new HashMap<>();
+                        map1.put("productId",p.getProductId());
+                        map1.put("boutiqueId",p.getProductCode());
+                        success.add(map1);
+                    }
+                }
+            }
+            if(failed.size()>0){
+                response.put("tagRelNo",failed);
+            }
+            if(success.size()>0){
+                response.put("tagRelSuccess",success);
+            }
+        }
+        return 0;
     }
 
     @Override
