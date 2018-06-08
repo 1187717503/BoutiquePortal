@@ -96,4 +96,11 @@ public interface SeasonMapper {
      * @return
      */
     Map<String,Object> queryImPriceAlgorithm(Object priceChangeRuleId);
+
+    /**
+     * 查找refresh时间
+     * @param priceChangeRuleId
+     * @return
+     */
+    Map<String,Object> querySnapShotTimeByRuleId(Object priceChangeRuleId);
 }

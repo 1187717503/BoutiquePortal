@@ -75,6 +75,7 @@ public class PriceChangeRuleController extends BaseController {
     @Autowired
     private PriceTaskController priceTaskController;
 
+
     @RequestMapping(value = "/del/{price_change_rule_id}", method = RequestMethod.POST)
     @ResponseBody
     public Response delActive(@PathVariable(name = "price_change_rule_id") Long price_change_rule_id) throws Exception {
@@ -204,6 +205,12 @@ public class PriceChangeRuleController extends BaseController {
                 //根据参数查询snapshot对应的product id 和 im price的值
                 boolean preview = pcrModel.getPreview_status() == 0? false : true;
                 pcrModel.setPreviewImPrice(preview);
+                Map<String,Object> snapShot = priceChangeRule.querySnapShotTimeByRuleId(price_change_rule_id);
+                if(snapShot != null){
+                    pcrModel.setRefreshDate(snapShot.get("updated_at").toString());
+                }else{
+                    pcrModel.setRefreshDate(null);
+                }
             }
 
             resultMessage.successStatus().putMsg("info", "success !!!").setData(pcrModel);
