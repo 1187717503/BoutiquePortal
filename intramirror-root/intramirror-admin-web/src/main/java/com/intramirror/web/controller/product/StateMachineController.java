@@ -173,6 +173,7 @@ public class StateMachineController {
         }
         Long tagId = Long.valueOf(body.get("tagId").toString());
         if(action.equals("addToGroup") || action.equals("removeGroup")){
+            Map<String,Object> response = new HashMap<>();
             if(action.equals("addToGroup")){
                 Tag tag = iTagService.selectTagByTagId(tagId);
                 if(tag == null){
@@ -185,7 +186,6 @@ public class StateMachineController {
                 }
 
                 Map<String, Object> map = new HashMap<>();
-                Map<String,Object> response = new HashMap<>();
                 map.put("productIdList", ids);
                 map.put("tag_id", tagId);
                 map.put("sort_num", -1);
@@ -206,11 +206,13 @@ public class StateMachineController {
                     for(Long id : ids){
                         TagProductRel rel = new TagProductRel();
                         rel.setTagId(tagId);
-                        rel.setTagProductId(id);
+                        rel.setProductId(id);
                         tagProductRelList.add(rel);
                     }
                 }
-                contentManagementService.batchDeleteByTagIdAndProductId(tagProductRelList);
+
+                contentManagementService.batchDeleteByTagIdAndProductId1(ids,tagId,response);
+                calResponseMsg(response,responseMessage,listMap2Map);
                 return Response.status(StatusType.SUCCESS).data(responseMessage);
 
             }
@@ -246,12 +248,49 @@ public class StateMachineController {
                 }
             }
         }
-        if(response.get("success")!=null){
-            String msg = "success";
-            List<Long> successList = (List<Long>) response.get("success");
+        if(response.containsKey("doubleTag")){
+            List<Map<String,Object>> failedList = (List<Map<String,Object>>) response.get("doubleTag");
+            if(CollectionUtils.isNotEmpty(failedList)){
+                for(Map<String,Object> failed : failedList){
+                    responseMessage.getFailed().add(new BatchResponseItem((Long)failed.get("productId"),listMap2Map.get(failed.get("productId")),
+                            "The supplier for product " + failed.get("boutiqueId") + " has been added product group！"));
+                }
+            }
+        }
+        if(response.containsKey("duplicated")){
+            List<Map<String,Object>> failedList = (List<Map<String,Object>>) response.get("duplicated");
+            if(CollectionUtils.isNotEmpty(failedList)){
+                for(Map<String,Object> failed : failedList){
+                    responseMessage.getFailed().add(new BatchResponseItem((Long)failed.get("productId"),listMap2Map.get(failed.get("productId")),
+                            "The supplier for product " + failed.get("boutiqueId") + " repeat add to product group！"));
+                }
+            }
+        }
+        if(response.containsKey("tagRelNo")){
+            List<Map<String,Object>> failedList = (List<Map<String,Object>>) response.get("tagRelNo");
+            if(CollectionUtils.isNotEmpty(failedList)){
+                for(Map<String,Object> failed : failedList){
+                    responseMessage.getFailed().add(new BatchResponseItem((Long)failed.get("productId"),listMap2Map.get(failed.get("productId")),
+                            "The supplier for product " + failed.get("boutiqueId") + " is not included in the product group！"));
+                }
+            }
+
+        }
+        if(response.containsKey("tagRelSuccess")){
+            List<Map<String,Object>> successList = (List<Map<String,Object>>) response.get("tagRelNo");
             if(CollectionUtils.isNotEmpty(successList)){
-                for(Long id : successList){
-                    responseMessage.getSuccess().add(new BatchResponseItem(id,listMap2Map.get(id),msg));
+                for(Map<String,Object> su : successList){
+                    responseMessage.getSuccess().add(new BatchResponseItem((Long) su.get("productId"),listMap2Map.get(su.get("productId")),
+                            "The supplier for product " +su.get("boutiqueId") + "remove success"));
+                }
+            }
+        }
+        if(response.get("success")!=null){
+            List<Map<String,Object>> successList = (List<Map<String,Object>>) response.get("success");
+            if(CollectionUtils.isNotEmpty(successList)){
+                for(Map<String,Object> su : successList){
+                    responseMessage.getSuccess().add(new BatchResponseItem((Long) su.get("productId"),listMap2Map.get(su.get("productId")),
+                            "The supplier for product " +su.get("boutiqueId") + " add to product group success"));
                 }
             }
         }
