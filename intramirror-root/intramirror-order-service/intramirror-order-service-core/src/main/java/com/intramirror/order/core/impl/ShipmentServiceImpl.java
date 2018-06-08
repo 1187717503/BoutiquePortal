@@ -15,6 +15,7 @@ import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.model.SubShipment;
 import com.intramirror.order.api.service.ISubShipmentService;
 import com.intramirror.order.api.service.IViewOrderLinesService;
+import com.intramirror.order.api.service.KafkaUtilService;
 import com.intramirror.order.api.vo.LogisticsProductVO;
 import com.intramirror.order.api.vo.ShipmentSendMailVO;
 import com.intramirror.order.core.mapper.LogisticsProductMapper;
@@ -58,7 +59,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	private IViewOrderLinesService viewOrderLinesService;
 
 	@Autowired
-	private KafkaUtilServiceImpl kafkaUtilService;
+	private KafkaUtilService kafkaUtilService;
 	
 	@Override
 	public void init() {

@@ -11,16 +11,6 @@ public class KafkaProperties {
 
     private String topic;
 
-    private String topic1;
-
-    public String getTopic1() {
-        return topic1;
-    }
-
-    public void setTopic1(String topic1) {
-        this.topic1 = topic1;
-    }
-
     public String getServerName() {
         return serverName;
     }

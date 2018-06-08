@@ -12,6 +12,7 @@ public class KafkaMessageUtil {
 
     public static String kafkaServer;
     public static String orderStatusChangeTopic;
+    public static String orderFinanceTopic;
 
     private final static Logger LOGGER = Logger.getLogger(KafkaMessageUtil.class);
 
@@ -43,5 +44,13 @@ public class KafkaMessageUtil {
 
     public static void setKafkaServer(String kafkaServer) {
         KafkaMessageUtil.kafkaServer = kafkaServer;
+    }
+
+    public static String getOrderFinanceTopic() {
+        return orderFinanceTopic;
+    }
+
+    public static void setOrderFinanceTopic(String orderFinanceTopic) {
+        KafkaMessageUtil.orderFinanceTopic = orderFinanceTopic;
     }
 }

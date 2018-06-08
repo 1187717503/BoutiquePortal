@@ -8,7 +8,7 @@ import com.intramirror.order.api.model.Order;
 import com.intramirror.order.api.service.KafkaUtilService;
 import com.intramirror.order.core.dao.BaseDao;
 import com.intramirror.order.core.mapper.OrderMapper;
-import com.intramirror.product.common.KafkaProperties;
+import com.intramirror.order.core.utils.KafkaMessageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class KafkaUtilServiceImpl extends BaseDao implements KafkaUtilService {
     private IKafkaService kafkaService;
 
     @Autowired
-    private KafkaProperties kafkaProperties;
+    private KafkaMessageUtil kafkaMessageUtil;
 
     private OrderMapper orderMapper;
 
@@ -40,7 +40,7 @@ public class KafkaUtilServiceImpl extends BaseDao implements KafkaUtilService {
 
     @Override
     public void saveOrderFinance(LogisticsProduct logisticsProduct) {
-        logger.info("kafkaServer is:{}; kafkaTopic is:{}", kafkaProperties.getServerName(), kafkaProperties.getTopic1());
+        logger.info("kafkaServer is:{}; kafkaTopic is:{}", kafkaMessageUtil.kafkaServer, kafkaMessageUtil.orderFinanceTopic);
 
         String sMsg ;
 
@@ -79,7 +79,7 @@ public class KafkaUtilServiceImpl extends BaseDao implements KafkaUtilService {
         sMsg = new Gson().toJson(fe);
 
         logger.info("The finance message to be sent to kafka is: " + sMsg);
-        kafkaService.sendMsgToKafka(sMsg, kafkaProperties.getTopic1(), kafkaProperties.getServerName());
+        kafkaService.sendMsgToKafka(sMsg, kafkaMessageUtil.orderFinanceTopic, kafkaMessageUtil.kafkaServer);
     }
 
 
