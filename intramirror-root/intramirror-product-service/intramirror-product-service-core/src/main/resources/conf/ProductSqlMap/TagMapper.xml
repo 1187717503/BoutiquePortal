@@ -135,7 +135,7 @@
         select
         <include refid="Base_Column_List"/>
         from tag
-        where enabled = 1
+        where enabled = 1 and tag_type = 1
         <choose>
             <when test="orderBy == 'tagName'">
                 ORDER BY tag_name
