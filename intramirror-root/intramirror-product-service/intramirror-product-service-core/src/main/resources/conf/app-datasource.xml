@@ -61,6 +61,7 @@
     <bean id="kafkaProrerties" class="com.intramirror.product.common.KafkaProperties">
         <property name="serverName" value="${kafka.product.server}"/>
         <property name="topic" value="${kafka.topic.product.snapshot}"/>
+        <property name="productTopic" value="${kafka.topic.product.change}"/>
     </bean>
 
   

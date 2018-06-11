@@ -11,6 +11,8 @@ public class KafkaProperties {
 
     private String topic;
 
+    private String productTopic;
+
     public String getServerName() {
         return serverName;
     }
@@ -25,5 +27,13 @@ public class KafkaProperties {
 
     public void setTopic(String topic) {
         this.topic = topic;
+    }
+
+    public String getProductTopic() {
+        return productTopic;
+    }
+
+    public void setProductTopic(String productTopic) {
+        this.productTopic = productTopic;
     }
 }

@@ -165,14 +165,15 @@ public class StateMachineController {
     public Response batchOperateProduct(@SessionAttribute(value = "sessionStorage", required = false) Long userId, HttpServletRequest request,
             @PathVariable(value = "action") String action, @RequestBody Map<String, Object> body) {
         BatchResponseMessage responseMessage = new BatchResponseMessage();
-        if(body.get("ids") == null){
-            throw new ValidateException(new ErrorResponse("Parameter missed"));
-        }
-        if(body.get("tagId") == null){
-            throw new ValidateException(new ErrorResponse("Parameter missed"));
-        }
-        Long tagId = Long.valueOf(body.get("tagId").toString());
+
         if(action.equals("addToGroup") || action.equals("removeGroup")){
+            if(body.get("ids") == null){
+                throw new ValidateException(new ErrorResponse("Parameter missed"));
+            }
+            if(body.get("tagId") == null){
+                throw new ValidateException(new ErrorResponse("Parameter missed"));
+            }
+            Long tagId = Long.valueOf(body.get("tagId").toString());
             Map<String,Object> response = new HashMap<>();
             if(action.equals("addToGroup")){
                 Tag tag = iTagService.selectTagByTagId(tagId);
@@ -191,7 +192,10 @@ public class StateMachineController {
                 map.put("sort_num", -1);
                 map.put("tagType",tag.getTagType());
                 iTagService.saveTagProductRel(map,response);
+                // 调用价格变化接口
+
                 calResponseMsg(response,responseMessage,listMap2Map);
+
                 return Response.status(StatusType.SUCCESS).data(responseMessage);
             }else { // removeGroup
 
