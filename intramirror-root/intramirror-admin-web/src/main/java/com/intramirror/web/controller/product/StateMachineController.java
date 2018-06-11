@@ -1,5 +1,7 @@
 package com.intramirror.web.controller.product;
 
+import com.google.gson.Gson;
+import com.intramirror.common.IKafkaService;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.core.common.exception.ValidateException;
 import com.intramirror.core.common.response.ErrorResponse;
@@ -13,13 +15,19 @@ import com.intramirror.product.api.service.ITagService;
 import com.intramirror.product.api.service.SkuService;
 import com.intramirror.product.api.service.content.ContentManagementService;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
+import com.intramirror.product.common.KafkaProperties;
+import com.intramirror.web.common.CommonProperties;
 import com.intramirror.web.common.response.BatchResponseItem;
 import com.intramirror.web.common.response.BatchResponseMessage;
+import com.intramirror.web.config.HttpUtils;
 import static com.intramirror.web.controller.product.StateMachineCoreRule.map2StateEnum;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
-
+import net.sf.json.JSONObject;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -56,6 +64,12 @@ public class StateMachineController {
     private SkuService skuService;
     @Autowired
     private ContentManagementService contentManagementService;
+
+    @Autowired
+    IKafkaService kafkaService;
+
+    @Autowired
+    KafkaProperties kafkaProperties;
 
     @PutMapping(value = "/single/{action}", consumes = "application/json")
     public Response operateProduct(@SessionAttribute(value = "sessionStorage", required = false) Long userId, @PathVariable(value = "action") String action,
@@ -192,8 +206,8 @@ public class StateMachineController {
                 map.put("sort_num", -1);
                 map.put("tagType",tag.getTagType());
                 iTagService.saveTagProductRel(map,response);
-                // 调用价格变化接口
-
+                // 调用价格变化接口 和發送kafaka消息
+                addChangePriceRule(map,response);
                 calResponseMsg(response,responseMessage,listMap2Map);
 
                 return Response.status(StatusType.SUCCESS).data(responseMessage);
@@ -214,8 +228,8 @@ public class StateMachineController {
                         tagProductRelList.add(rel);
                     }
                 }
-
                 contentManagementService.batchDeleteByTagIdAndProductId1(ids,tagId,response);
+                delChangePriceRule(tagId,response);
                 calResponseMsg(response,responseMessage,listMap2Map);
                 return Response.status(StatusType.SUCCESS).data(responseMessage);
 
@@ -240,6 +254,107 @@ public class StateMachineController {
         batchUpdateProductState(userId, originalState, action, validIdsMap, responseMessage);
 
         return Response.status(StatusType.SUCCESS).data(responseMessage);
+    }
+
+    private void delChangePriceRule(Long tagId, Map<String, Object> response) {
+        // 调用改价接口
+        CommonProperties properties = new CommonProperties();
+        String url = properties.getPriceChangeRulePath();
+        List<Long> reDelPIds = new ArrayList<>();// 回滚的pid
+        if(!response.containsKey("tagRelSuccess")){
+            return;
+        }
+        List<Map<String,Object>> success = (List<Map<String,Object>>) response.get("tagRelSuccess");
+        if(CollectionUtils.isNotEmpty(success)){
+            for(Map<String,Object> p : success){
+                Long pid = (Long) p.get("productId");
+                String result = "";
+                try {
+                    result = HttpUtils.httpPost(url+"/"+pid,null);
+                    if(StringUtils.isNotBlank(result)){
+                        JSONObject object = JSONObject.fromObject(result);
+                        if(object.containsKey("status") && "1".equals(object.get("status").toString())){
+                            // 成功 发kafaka
+                            sendPriceChangeRuleMsg(pid);
+                        }else {
+                            reDelPIds.add(pid);
+                        }
+                    }else {
+                        reDelPIds.add(pid);
+                    }
+                }catch (Exception e){
+                    reDelPIds.add(pid);
+                    LOGGER.info("{} product change price error -> {} ",pid,result);
+                }
+
+            }
+            if(CollectionUtils.isNotEmpty(reDelPIds)){
+                Tag tag = iTagService.selectTagByTagId(tagId);
+                Map<String, Object> map = new HashMap<>();
+                map.put("productIdList", reDelPIds);
+                map.put("tag_id", tagId);
+                map.put("sort_num", -1);
+                map.put("tagType",tag.getTagType());
+                iTagService.saveTagProductRel(map,response);
+            }
+        }
+
+    }
+
+    private void addChangePriceRule(Map<String, Object> map, Map<String, Object> response) {
+        // 調用改 价格接口
+        CommonProperties properties = new CommonProperties();
+        String url = properties.getPriceChangeRulePath();
+        List<Long> reDelPIds = new ArrayList<>();// 回滚的pid
+        if(!response.containsKey("success")){
+            return;
+        }
+        List<Map<String,Object>> success = (List<Map<String,Object>>)  response.get("success");
+        if(CollectionUtils.isNotEmpty(success)){
+            for(Map<String,Object> p : success){
+                Long pid = (Long) p.get("productId");
+                String result = "";
+                try {
+                    result = HttpUtils.httpPost(url+"/"+pid,null);
+                    if(StringUtils.isNotBlank(result)){
+                        JSONObject object = JSONObject.fromObject(result);
+                        if(object.containsKey("status") && "1".equals(object.get("status").toString())){
+                            // 成功 发kafaka
+                            sendPriceChangeRuleMsg(pid);
+                        }else {
+                            reDelPIds.add(pid);
+                        }
+                    }else {
+                        reDelPIds.add(pid);
+                    }
+                }catch (Exception e){
+                    reDelPIds.add(pid);
+                    LOGGER.info("{} product change price error -> {} ",pid,result);
+                }
+
+            }
+            if(CollectionUtils.isNotEmpty(reDelPIds)){
+                Long tagId = (Long)map.get("tag_id");
+                contentManagementService.batchDeleteByTagIdAndProductId1(reDelPIds,tagId,response);
+            }
+        }
+    }
+
+    private void sendPriceChangeRuleMsg(Long pid) {
+        if(pid == null) return;
+        Map<String,String> param = new HashMap<>();
+        // { "product_id": "1111", "type": 4}
+        param.put("product_id",pid.toString());
+        param.put("type","4");
+        String msg = new Gson().toJson(param);
+        LOGGER.info("Start to send {} to kafaka {}--->{}",msg,kafkaProperties.getProductTopic(),kafkaProperties.getServerName());
+        try{
+            kafkaService.sendMsgToKafka(msg,kafkaProperties.getProductTopic(), kafkaProperties.getServerName());
+        }catch (Exception e){
+            LOGGER.error(e.getMessage(),e);
+            // error 不回滚
+        }
+
     }
 
     private void calResponseMsg(Map<String, Object> response, BatchResponseMessage responseMessage, Map<Long, Long> listMap2Map) {

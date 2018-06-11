@@ -149,6 +149,7 @@ public class ContentManagementServiceImpl implements ContentManagementService {
     }
 
     @Override
+    @Transactional
     public int batchDeleteByTagIdAndProductId1(List<Long> productIds, Long tagId,Map<String, Object> response) {
         List<Map<String,Object>> failed = new ArrayList<>();
         List<Map<String,Object>> success = new ArrayList<>();

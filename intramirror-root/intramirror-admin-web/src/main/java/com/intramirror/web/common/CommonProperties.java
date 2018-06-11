@@ -13,6 +13,8 @@ public class CommonProperties {
 
     private String ruleExcelPath;
 
+    private String priceChangeRulePath;
+
     public String getAppOrderUrl() {
         return appOrderUrl;
     }
@@ -35,5 +37,13 @@ public class CommonProperties {
 
     public void setRuleExcelPath(String ruleExcelPath) {
         this.ruleExcelPath = ruleExcelPath;
+    }
+
+    public String getPriceChangeRulePath() {
+        return priceChangeRulePath;
+    }
+
+    public void setPriceChangeRulePath(String priceChangeRulePath) {
+        this.priceChangeRulePath = priceChangeRulePath;
     }
 }

@@ -5,7 +5,12 @@ import com.intramirror.common.parameter.StatusType;
 import com.intramirror.core.common.exception.ValidateException;
 import com.intramirror.core.common.response.ErrorResponse;
 import com.intramirror.core.common.response.Response;
-import com.intramirror.product.api.model.*;
+import com.intramirror.product.api.model.Block;
+import com.intramirror.product.api.model.BlockTagRel;
+import com.intramirror.product.api.model.Category;
+import com.intramirror.product.api.model.PriceChangeRuleGroup;
+import com.intramirror.product.api.model.Tag;
+import com.intramirror.product.api.model.TagProductRel;
 import com.intramirror.product.api.service.BlockService;
 import com.intramirror.product.api.service.IPriceChangeRuleGroupService;
 import com.intramirror.product.api.service.ISkuStoreService;
@@ -22,7 +27,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +71,8 @@ public class ContentMgntController {
     private VendorService vendorService;
     @Autowired
     private IPriceChangeRuleGroupService priceChangeRuleGroupService;
+
+
 
     /**
      * Return block info with bind tag.
