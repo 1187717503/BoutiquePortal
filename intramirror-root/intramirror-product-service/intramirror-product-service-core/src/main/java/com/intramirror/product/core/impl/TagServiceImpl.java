@@ -180,4 +180,9 @@ public class TagServiceImpl implements ITagService {
         return tagMapper.selectByPrimaryKey(tagId);
     }
 
+    @Override
+    public void saveTagRel(Map<String, Object> param) {
+        tagProductRelMapper.saveTagProductRel(param);
+    }
+
 }

@@ -71,6 +71,9 @@ public class StateMachineController {
     @Autowired
     KafkaProperties kafkaProperties;
 
+    @Autowired
+    private CommonProperties commonProperties;
+
     @PutMapping(value = "/single/{action}", consumes = "application/json")
     public Response operateProduct(@SessionAttribute(value = "sessionStorage", required = false) Long userId, @PathVariable(value = "action") String action,
             @RequestBody Map<String, Object> body) throws Exception {
@@ -258,8 +261,7 @@ public class StateMachineController {
 
     private void delChangePriceRule(Long tagId, Map<String, Object> response) {
         // 调用改价接口
-        CommonProperties properties = new CommonProperties();
-        String url = properties.getPriceChangeRulePath();
+        String url = commonProperties.getPriceChangeRulePath();
         List<Long> reDelPIds = new ArrayList<>();// 回滚的pid
         if(!response.containsKey("tagRelSuccess")){
             return;
@@ -303,8 +305,7 @@ public class StateMachineController {
 
     private void addChangePriceRule(Map<String, Object> map, Map<String, Object> response) {
         // 調用改 价格接口
-        CommonProperties properties = new CommonProperties();
-        String url = properties.getPriceChangeRulePath();
+        String url = commonProperties.getPriceChangeRulePath();
         List<Long> reDelPIds = new ArrayList<>();// 回滚的pid
         if(!response.containsKey("success")){
             return;
