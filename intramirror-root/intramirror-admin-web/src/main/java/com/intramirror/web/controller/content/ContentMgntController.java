@@ -318,7 +318,17 @@ public class ContentMgntController {
     public Response saveTagProductRel(@PathVariable(value = "tagId") Long tagId, @RequestBody Map<String, Object> body) {
         Long sortNum = body.get("sortNum") == null ? -1 : Long.parseLong(body.get("sortNum").toString());
         Integer tagType = body.get("tagType") == null ? 1 : Integer.valueOf(body.get("tagType").toString());
-        List<Long> productIdList = (List<Long>) body.get("productIdList");
+        List<Long> productIdList = new ArrayList<>();
+        List<Object> list = (List<Object>) body.get("productIdList");
+        if(CollectionUtils.isNotEmpty(list)){
+            for (Object o : list){
+                if(o instanceof Integer){
+                    productIdList.add(Long.valueOf(o.toString()));
+                }else if(o instanceof Long){
+                    productIdList.add((Long) o);
+                }
+            }
+        }
 
         if (productIdList.size() <= 0 || null == tagId) {
             throw new ValidateException(new ErrorResponse("Parameter could not be null!"));
