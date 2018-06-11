@@ -97,6 +97,18 @@ public interface SeasonMapper {
      */
     Map<String,Object> queryImPriceAlgorithm(Object priceChangeRuleId);
 
+    int deleteCategoryBrandRuleException(String price_change_rule_id);
+
+    int insertCategoryBrandRuleException(Map<String,Object> params);
+
+    int deleteProductGroupRule(String price_change_rule_id);
+
+    int insertProductGroupRule(Map<String,Object> params);
+
+    int deleteProductRule(String price_change_rule_id);
+
+    int insertProductRule(Map<String,Object> params);
+
     /**
      * 查找refresh时间
      * @param priceChangeRuleId

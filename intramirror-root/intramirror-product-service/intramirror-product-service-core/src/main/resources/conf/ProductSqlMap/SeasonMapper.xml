@@ -346,6 +346,36 @@
             and a.enabled = 1
     </select>
 
+    <update id="deleteCategoryBrandRuleException" parameterType="java.lang.String">
+        delete from `price_change_rule_category_brand`  where `price_change_rule_id` = #{item.price_change_rule_id,jdbcType=BIGINT} and `exception_flag` = 1 and `level`  = 3
+    </update>
+
+    <update id="insertCategoryBrandRuleException" parameterType="java.util.Map">
+        insert into `price_change_rule_category_brand`(`price_change_rule_id` ,`category_id` ,`level` ,`brand_id` ,`discount_percentage` ,`exception_flag` )
+        values(#{price_change_rule_id,jdbcType=BIGINT},#{category_id,jdbcType=BIGINT},3,#{brand_id,jdbcType=BIGINT},#{discount_percentage,jdbcType=BIGINT},1);
+    </update>
+
+    <update id="deleteProductGroupRule" parameterType="java.lang.String">
+        delete from `price_change_rule_group`  where `price_change_rule_id` = #{item.price_change_rule_id,jdbcType=BIGINT}
+    </update>
+
+    <update id="insertProductGroupRule" parameterType="java.util.Map">
+        insert into `price_change_rule_group`(`price_change_rule_id`, `product_group_id`, `discount_percentage`)
+        values(#{price_change_rule_id,jdbcType=BIGINT},#{product_group_id,jdbcType=BIGINT},#{discount_percentage,jdbcType=BIGINT});
+    </update>
+
+    <update id="deleteProductRule" parameterType="java.lang.String">
+        delete from `price_change_rule_product`  where `price_change_rule_id` = #{item.price_change_rule_id,jdbcType=BIGINT}
+    </update>
+
+    <update id="insertProductRule" parameterType="java.util.Map">
+        insert into `price_change_rule_product`(`price_change_rule_id`, `product_id`, `boutique_id`, `product_name`,
+        `discount_percentage`, `designer_id`, `color_code`)
+        values(#{price_change_rule_id,jdbcType=BIGINT},#{product_id,jdbcType=BIGINT},#{boutique_id,jdbcType=VARCHAR},
+        #{product_name,jdbcType=VARCHAR},#{discount_percentage,jdbcType=BIGINT},#{designer_id,jdbcType=VARCHAR},
+        #{color_code,jdbcType=VARCHAR});
+    </update>
+
     <select id="querySnapShotTimeByRuleId" parameterType="java.lang.Object" resultType="java.util.Map">
         select save_at,updated_at,
         (CASE when save_at &lt; updated_at THEN 1 ELSE 0 END) as refresh

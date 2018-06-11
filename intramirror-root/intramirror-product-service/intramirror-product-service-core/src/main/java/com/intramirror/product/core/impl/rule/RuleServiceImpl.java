@@ -8,14 +8,14 @@ import com.intramirror.product.api.service.rule.IRuleService;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.SeasonMapper;
 import com.intramirror.product.core.mapper.SnapshotPriceRuleMapper;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.text.SimpleDateFormat;
-import java.util.*;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
 
 /**
  * Created by dingyifan on 2017/7/20.
@@ -177,12 +177,38 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
 
     @Transactional
     @Override
-    public boolean changeRule(String price_change_rule_id,List<Map<String,Object>> list) throws Exception {
+    public boolean changeRule(String price_change_rule_id, Map<String, List<Map<String, Object>>> sheetExcelData) throws Exception {
+        List<Map<String, Object>> categoryBrandMapList = sheetExcelData.get("priceRuleList");
+        List<Map<String, Object>> categoryBrandExceptionMapList = sheetExcelData.get("categoryBrandList");
+        List<Map<String, Object>> productGroupList = sheetExcelData.get("productGroupList");
+        List<Map<String, Object>> productList = sheetExcelData.get("productList");
         seasonMapper.deleteCategoryBrandRule(price_change_rule_id);
-        Collections.reverse(list);
-        for(Map<String,Object> params:list) {
+        Collections.reverse(categoryBrandMapList);
+        for (Map<String, Object> params : categoryBrandMapList) {
             seasonMapper.insertCategoryBrandRule(params);
         }
+        if (CollectionUtils.isNotEmpty(categoryBrandExceptionMapList)) {
+            seasonMapper.deleteCategoryBrandRuleException(price_change_rule_id);
+            Collections.reverse(categoryBrandExceptionMapList);
+            for (Map<String, Object> params : categoryBrandExceptionMapList) {
+                seasonMapper.insertCategoryBrandRuleException(params);
+            }
+        }
+        if (CollectionUtils.isNotEmpty(productGroupList)) {
+            seasonMapper.deleteProductGroupRule(price_change_rule_id);
+            Collections.reverse(productGroupList);
+            for (Map<String, Object> params : productGroupList) {
+                seasonMapper.insertProductGroupRule(params);
+            }
+        }
+        if (CollectionUtils.isNotEmpty(productList)) {
+            seasonMapper.deleteProductRule(price_change_rule_id);
+            Collections.reverse(productList);
+            for (Map<String, Object> params : productList) {
+                seasonMapper.insertProductRule(params);
+            }
+        }
+
         SnapshotPriceRule snapshotPriceRule = new SnapshotPriceRule();
         snapshotPriceRule.setPriceChangeRuleId(Long.parseLong(price_change_rule_id));
         snapshotPriceRule.setSaveAt(new Date());
