@@ -200,10 +200,10 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
                 map.put("updated_at",null);
             }
 
-            map.put("refresh_status",snapShotRefreshTime.get("refresh"));// 0  -> false 1 -> true
+            map.put("refresh_status",snapShotRefreshTime.get("refresh"));// 0  -> false 1 -> true 2->無狀態
         }else{
             map.put("updated_at",null);
-            map.put("refresh_status",0);
+            map.put("refresh_status",2);
         }
         return map;
     }
