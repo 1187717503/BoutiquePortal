@@ -51,11 +51,11 @@ public class TagServiceImpl implements ITagService {
         Tag tag = tagMapper.selectByPrimaryKey(tagId);
         List<ProductWithBLOBs> productWithBLOBs =  productMapper.listProductByProductIds(productIdList);
         Map<Long,ProductWithBLOBs> bloBsMap = new HashMap<>();
-        if(tag.getTagType() == 2){ // 爆款 除外 tag 也除外
+        if(tag.getTagType() == 2 || tag.getTagType() == 3){ // 爆款 除外 tag 也除外
             Long vendorId = tag.getVendorId();
             if(CollectionUtils.isNotEmpty(productWithBLOBs)){
                 for(ProductWithBLOBs p : productWithBLOBs){
-                    if(!vendorId.equals(p.getVendorId())){
+                    if(!vendorId.equals(p.getVendorId()) && tag.getTagType() != 3){
                         productIdList.remove(p.getProductId()); // 不在一个vendor的不要加
                         Map<String,Object> map1 = new HashMap<>();
                         map1.put("productId",p.getProductId());
@@ -118,7 +118,7 @@ public class TagServiceImpl implements ITagService {
                     map1.put("boutiqueId",p.getProductCode());
                     listPrdIdDuplicated.add(map1);
                 }
-                if((tag.getTagType() == 2 && vendorTagIds.contains(tag_id))){
+                if((tag.getTagType() == 2 && vendorTagIds.contains(tag_id)) || (tag.getTagType() == 3 && sPrdIdTarget.equals(sPrdIdRes) )){
                     it.remove();
                     ProductWithBLOBs p = bloBsMap.get(Long.valueOf(sPrdIdTarget));
                     if(p == null) continue;
@@ -178,6 +178,11 @@ public class TagServiceImpl implements ITagService {
     public Tag selectTagByTagId(Long tagId) {
         if(tagId == null) return null;
         return tagMapper.selectByPrimaryKey(tagId);
+    }
+
+    @Override
+    public void saveTagRel(Map<String, Object> param) {
+        tagProductRelMapper.saveTagProductRel(param);
     }
 
 }

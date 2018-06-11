@@ -1,5 +1,7 @@
 package com.intramirror.web.controller.content;
 
+import com.google.gson.Gson;
+import com.intramirror.common.IKafkaService;
 import com.intramirror.common.help.StringUtils;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.core.common.exception.ValidateException;
@@ -19,14 +21,18 @@ import com.intramirror.product.api.service.content.ContentManagementService;
 import com.intramirror.product.api.vo.tag.ProductGroupVO;
 import com.intramirror.product.api.vo.tag.TagRequestVO;
 import com.intramirror.product.api.vo.tag.VendorTagVO;
+import com.intramirror.product.common.KafkaProperties;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.VendorService;
+import com.intramirror.web.common.CommonProperties;
+import com.intramirror.web.config.HttpUtils;
 import com.intramirror.web.controller.cache.CategoryCache;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.sf.json.JSONObject;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,8 +78,14 @@ public class ContentMgntController {
     @Autowired
     private IPriceChangeRuleGroupService priceChangeRuleGroupService;
 
+    @Autowired
+    private CommonProperties commonProperties;
 
+    @Autowired
+    IKafkaService kafkaService;
 
+    @Autowired
+    KafkaProperties kafkaProperties;
     /**
      * Return block info with bind tag.
      * @param blockName
@@ -303,9 +315,61 @@ public class ContentMgntController {
     @DeleteMapping(value = "/tags/{tagId}/products/{productId}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public Response removeTagProduct(@PathVariable(value = "tagId") Long tagId, @PathVariable(value = "productId") Long productId) {
+        Tag tag = iTagService.selectTagByTagId(tagId);
         contentManagementService.deleteByTagIdAndProductId(tagId, productId);
+        if(tag.getTagType() !=1){
+            delChangeProductRule(tag,productId);
+        }
         return Response.success();
     }
+
+    private void delChangeProductRule(Tag tag, Long productId) {
+        String url = commonProperties.getPriceChangeRulePath();
+        boolean hasErr = false;
+        String result = "";
+        try {
+            result = HttpUtils.httpPost(url+"/"+productId,null);
+            if(org.apache.commons.lang3.StringUtils.isNotBlank(result)){
+                JSONObject object = JSONObject.fromObject(result);
+                if(object.containsKey("status") && "1".equals(object.get("status").toString())){
+                    // 成功 发kafaka
+                    sendPriceChangeRuleMsg(productId);
+                }else {
+                    hasErr = true;
+                }
+            }else {
+                hasErr = true;
+            }
+        }catch (Exception e){
+            hasErr = true;
+            LOGGER.info("{} product change price error -> {} ",productId,result);
+        }
+        if(hasErr){
+            Map<String,Object> param = new HashMap<>();
+            param.put("tag_id",tag.getTagId());
+            param.put("product_id",productId);
+            param.put("sort_num","-1");
+            param.put("tag_type",tag.getTagType());
+            iTagService.saveTagRel(param);
+        }
+    }
+    private void sendPriceChangeRuleMsg(Long pid) {
+        if(pid == null) return;
+        Map<String,String> param = new HashMap<>();
+        // { "product_id": "1111", "type": 4}
+        param.put("product_id",pid.toString());
+        param.put("type","4");
+        String msg = new Gson().toJson(param);
+        LOGGER.info("Start to send {} to kafaka {}--->{}",msg,kafkaProperties.getProductTopic(),kafkaProperties.getServerName());
+        try{
+            kafkaService.sendMsgToKafka(msg,kafkaProperties.getProductTopic(), kafkaProperties.getServerName());
+        }catch (Exception e){
+            LOGGER.error(e.getMessage(),e);
+            // error 不回滚
+        }
+
+    }
+
     // 删除product的所有tag
     @DeleteMapping(value = "/tags/{tagId}/products")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
@@ -318,7 +382,17 @@ public class ContentMgntController {
     public Response saveTagProductRel(@PathVariable(value = "tagId") Long tagId, @RequestBody Map<String, Object> body) {
         Long sortNum = body.get("sortNum") == null ? -1 : Long.parseLong(body.get("sortNum").toString());
         Integer tagType = body.get("tagType") == null ? 1 : Integer.valueOf(body.get("tagType").toString());
-        List<Long> productIdList = (List<Long>) body.get("productIdList");
+        List<Long> productIdList = new ArrayList<>();
+        List<Object> list = (List<Object>) body.get("productIdList");
+        if(CollectionUtils.isNotEmpty(list)){
+            for (Object o : list){
+                if(o instanceof Integer){
+                    productIdList.add(Long.valueOf(o.toString()));
+                }else if(o instanceof Long){
+                    productIdList.add((Long) o);
+                }
+            }
+        }
 
         if (productIdList.size() <= 0 || null == tagId) {
             throw new ValidateException(new ErrorResponse("Parameter could not be null!"));

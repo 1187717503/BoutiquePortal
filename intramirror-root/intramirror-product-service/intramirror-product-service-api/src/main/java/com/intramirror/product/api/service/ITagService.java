@@ -14,4 +14,5 @@ public interface ITagService {
 
     Tag selectTagByTagId(Long tagId);
 
+    void saveTagRel(Map<String, Object> param);
 }
