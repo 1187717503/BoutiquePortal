@@ -263,6 +263,7 @@ public class StateMachineController {
         // 调用改价接口
         String url = commonProperties.getPriceChangeRulePath();
         List<Long> reDelPIds = new ArrayList<>();// 回滚的pid
+        List<Map<String,Object>> changePriceRrr = new ArrayList<>();
         if (!response.containsKey("tagRelSuccess")) {
             return;
         }
@@ -279,18 +280,22 @@ public class StateMachineController {
                             // 成功 发kafaka
                             sendPriceChangeRuleMsg(pid);
                         } else {
+                            changePriceRrr.add(p);
                             reDelPIds.add(pid);
                         }
                     } else {
+                        changePriceRrr.add(p);
                         reDelPIds.add(pid);
                     }
                 } catch (Exception e) {
                     reDelPIds.add(pid);
+                    changePriceRrr.add(p);
                     LOGGER.info("{} product change price error -> {} ", pid, result);
                 }
 
             }
             if (CollectionUtils.isNotEmpty(reDelPIds)) {
+                response.put("changePriceRrr",changePriceRrr);
                 Tag tag = iTagService.selectTagByTagId(tagId);
                 Map<String, Object> map = new HashMap<>();
                 map.put("productIdList", reDelPIds);
@@ -307,6 +312,7 @@ public class StateMachineController {
         // 調用改 价格接口
         String url = commonProperties.getPriceChangeRulePath();
         List<Long> reDelPIds = new ArrayList<>();// 回滚的pid
+        List<Map<String,Object>> changePriceRrr = new ArrayList<>();
         if (!response.containsKey("success")) {
             return;
         }
@@ -323,18 +329,22 @@ public class StateMachineController {
                             // 成功 发kafaka
                             sendPriceChangeRuleMsg(pid);
                         } else {
+                            changePriceRrr.add(p);
                             reDelPIds.add(pid);
                         }
                     } else {
+                        changePriceRrr.add(p);
                         reDelPIds.add(pid);
                     }
                 } catch (Exception e) {
+                    changePriceRrr.add(p);
                     reDelPIds.add(pid);
                     LOGGER.info("{} product change price error -> {} ", pid, result);
                 }
 
             }
             if (CollectionUtils.isNotEmpty(reDelPIds)) {
+                response.put("changePriceRrr",changePriceRrr);
                 Long tagId = (Long) map.get("tag_id");
                 contentManagementService.batchDeleteByTagIdAndProductId1(reDelPIds, tagId, response);
             }
@@ -393,6 +403,16 @@ public class StateMachineController {
                 for (Map<String, Object> failed : failedList) {
                     responseMessage.getFailed().add(new BatchResponseItem((Long) failed.get("productId"), listMap2Map.get(failed.get("productId")),
                             "The supplier for product boutiqueId = " + failed.get("boutiqueId") + " is not included in the product group！"));
+                }
+            }
+
+        }
+        if (response.containsKey("changePriceRrr")) {
+            List<Map<String, Object>> failedList = (List<Map<String, Object>>) response.get("changePriceRrr");
+            if (CollectionUtils.isNotEmpty(failedList)) {
+                for (Map<String, Object> failed : failedList) {
+                    responseMessage.getFailed().add(new BatchResponseItem((Long) failed.get("productId"), listMap2Map.get(failed.get("productId")),
+                            "The supplier for product boutiqueId = " + failed.get("boutiqueId") + " change price error ！operation failed "));
                 }
             }
 
