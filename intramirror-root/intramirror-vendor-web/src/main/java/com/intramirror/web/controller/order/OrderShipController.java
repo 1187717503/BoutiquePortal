@@ -868,24 +868,34 @@ public class OrderShipController extends BaseController {
         List<Map<String, Object>> chinaList = orderService.getOrderListByShipmentId(conditionMap);
         if( chinaList != null && chinaList.size() > 0 ){
             InvoiceVO chinaInovice = new InvoiceVO();
+            RecipientVO recipientVO = new RecipientVO();
             if(!isDDt){
                 transitWarehouseInvoiceVO.setChinaInvoice(chinaInovice);
+                ShippingProvider shippingProvider = shippingProviderService.getShippingProviderByName("ZSY");
+                recipientVO.setCity(shippingProvider.getAddrCity());
+                recipientVO.setCompanyName(shippingProvider.getTransferConsignee());
+                recipientVO.setPersonName(shippingProvider.getPersonName());
+                recipientVO.setStreetLines(shippingProvider.getTransferAddr());
+                recipientVO.setStreetLines2(shippingProvider.getTransferAddr2());
+                recipientVO.setStreetLines3(shippingProvider.getTransferAddr3());
+                recipientVO.setPostalCode(shippingProvider.getZipCode());
+                recipientVO.setPhoneNumber(shippingProvider.getTransferContact());
+                recipientVO.setCountry(shippingProvider.getAddrCountry());
             }else {
                 ddtInvoiceList.add(chinaInovice);
+                ShippingProvider shippingProvider = shippingProviderService.getShippingProviderByName("DHL2");
+                recipientVO.setCity(shippingProvider.getAddrCity());
+                recipientVO.setCompanyName(shippingProvider.getTransferConsignee());
+                recipientVO.setPersonName(shippingProvider.getPersonName());
+                recipientVO.setStreetLines(shippingProvider.getTransferAddr());
+                recipientVO.setStreetLines2(shippingProvider.getTransferAddr2());
+                recipientVO.setStreetLines3(shippingProvider.getTransferAddr3());
+                recipientVO.setPostalCode(shippingProvider.getZipCode());
+                recipientVO.setPhoneNumber(shippingProvider.getTransferContact());
+                recipientVO.setCountry(shippingProvider.getAddrCountry());
             }
             //获取shipTo地址信息
-            ShippingProvider shippingProvider = shippingProviderService.getShippingProviderByName("ZSY");
 
-            RecipientVO recipientVO = new RecipientVO();
-            recipientVO.setCity(shippingProvider.getAddrCity());
-            recipientVO.setCompanyName(shippingProvider.getTransferConsignee());
-            recipientVO.setPersonName(shippingProvider.getPersonName());
-            recipientVO.setStreetLines(shippingProvider.getTransferAddr());
-            recipientVO.setStreetLines2(shippingProvider.getTransferAddr2());
-            recipientVO.setStreetLines3(shippingProvider.getTransferAddr3());
-            recipientVO.setPostalCode(shippingProvider.getZipCode());
-            recipientVO.setPhoneNumber(shippingProvider.getTransferContact());
-            recipientVO.setCountry(shippingProvider.getAddrCountry());
 
             BigDecimal allTotal = new BigDecimal("0");
             BigDecimal VAT = new BigDecimal("0");
@@ -1017,22 +1027,35 @@ public class OrderShipController extends BaseController {
 
             for (Map<String,Object> elseOrder: elselist){
                 InvoiceVO elseInvoiceVO = new InvoiceVO();
-
                 RecipientVO recipientVO = new RecipientVO();
-                String country = elseOrder.get("user_rec_country") != null ? elseOrder.get("user_rec_country").toString() : "";
-                recipientVO.setCountry(country);
-                String personName = elseOrder.get("user_rec_name") != null ? elseOrder.get("user_rec_name").toString() : "";
-                recipientVO.setPersonName(personName);
-                String province = elseOrder.get("user_rec_province") != null ? elseOrder.get("user_rec_province").toString() : "";
-                recipientVO.setProvince(province);
-                String city = elseOrder.get("user_rec_city") != null ? elseOrder.get("user_rec_city").toString() : "";
-                recipientVO.setCity(city);
-                String addr = elseOrder.get("user_rec_addr") != null ? elseOrder.get("user_rec_addr").toString() : "";
-                recipientVO.setStreetLines(addr);
-                String mobile = elseOrder.get("user_rec_mobile") != null ? elseOrder.get("user_rec_mobile").toString() : "";
-                recipientVO.setPhoneNumber(mobile);
-                String postalCode = elseOrder.get("user_rec_code") != null ? elseOrder.get("user_rec_code").toString() : "";
-                recipientVO.setPostalCode(postalCode);
+                if(isDDt){
+                    ShippingProvider shippingProvider = shippingProviderService.getShippingProviderByName("DHL2");
+                    recipientVO.setCity(shippingProvider.getAddrCity());
+                    recipientVO.setCompanyName(shippingProvider.getTransferConsignee());
+                    recipientVO.setPersonName(shippingProvider.getPersonName());
+                    recipientVO.setStreetLines(shippingProvider.getTransferAddr());
+                    recipientVO.setStreetLines2(shippingProvider.getTransferAddr2());
+                    recipientVO.setStreetLines3(shippingProvider.getTransferAddr3());
+                    recipientVO.setPostalCode(shippingProvider.getZipCode());
+                    recipientVO.setPhoneNumber(shippingProvider.getTransferContact());
+                    recipientVO.setCountry(shippingProvider.getAddrCountry());
+                }else {
+                    String country = elseOrder.get("user_rec_country") != null ? elseOrder.get("user_rec_country").toString() : "";
+                    recipientVO.setCountry(country);
+                    String personName = elseOrder.get("user_rec_name") != null ? elseOrder.get("user_rec_name").toString() : "";
+                    recipientVO.setPersonName(personName);
+                    String province = elseOrder.get("user_rec_province") != null ? elseOrder.get("user_rec_province").toString() : "";
+                    recipientVO.setProvince(province);
+                    String city = elseOrder.get("user_rec_city") != null ? elseOrder.get("user_rec_city").toString() : "";
+                    recipientVO.setCity(city);
+                    String addr = elseOrder.get("user_rec_addr") != null ? elseOrder.get("user_rec_addr").toString() : "";
+                    recipientVO.setStreetLines(addr);
+                    String mobile = elseOrder.get("user_rec_mobile") != null ? elseOrder.get("user_rec_mobile").toString() : "";
+                    recipientVO.setPhoneNumber(mobile);
+                    String postalCode = elseOrder.get("user_rec_code") != null ? elseOrder.get("user_rec_code").toString() : "";
+                    recipientVO.setPostalCode(postalCode);
+                }
+
                 String inPrice = elseOrder.get("in_price")!=null?elseOrder.get("in_price").toString():"";
                 String retailPrice = elseOrder.get("price")!=null?elseOrder.get("price").toString():"";
                 BigDecimal discount = (new BigDecimal(1)).subtract((new BigDecimal(inPrice)).multiply(new BigDecimal("1.22")).divide(new BigDecimal(retailPrice), 2, RoundingMode.HALF_UP));
