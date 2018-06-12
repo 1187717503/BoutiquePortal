@@ -135,7 +135,7 @@
     ) and pcrsg.enabled = 1
   </select>
 
-  <select id="queryRuleByNotHasSesaon" resultType="java.util.Map" parameterType="java.util.Map">
+    <select id="queryRuleByNotHasSesaon" resultType="java.util.Map" parameterType="java.util.Map">
 
     select season_code from season where enabled = 1 and season_code not in (
                     select distinct season_code from price_change_rule_season_group pcrsg where pcrsg.price_change_rule_id in (
@@ -201,7 +201,7 @@
         </if>
     </select>
 
-    <select id="queryAllBrand" resultType="java.util.Map" >
+    <select id="queryAllBrand" resultType="java.util.Map">
         select distinct brand_id,english_name from brand where enabled = 1
     </select>
 
@@ -219,13 +219,13 @@
 
     <select id="queryRuleByConditions" resultType="java.util.Map" parameterType="java.util.Map">
 
-    select price_change_rule_id,`name` from price_change_rule pcr
-    where pcr.price_type = #{price_type,jdbcType=INTEGER} and `status` = #{status,jdbcType=INTEGER} and vendor_id = #{vendor_id,jdbcType=INTEGER}
+        select price_change_rule_id,`name` from price_change_rule pcr
+        where pcr.price_type = #{price_type,jdbcType=INTEGER} and `status` = #{status,jdbcType=INTEGER} and vendor_id = #{vendor_id,jdbcType=INTEGER}
 
-    <if test="category_type != null and category_type != ''">
-        and pcr.category_type=#{category_type,jdbcType=BIGINT}
-    </if>
-  </select>
+        <if test="category_type != null and category_type != ''">
+            and pcr.category_type=#{category_type,jdbcType=BIGINT}
+        </if>
+    </select>
 
     <select id="querySeasonByVendor" resultType="java.util.Map" parameterType="java.util.Map">
 
@@ -377,10 +377,14 @@
     </update>
 
     <select id="querySnapShotTimeByRuleId" parameterType="java.lang.Object" resultType="java.util.Map">
-        select save_at,updated_at,
-        (CASE when save_at &lt; updated_at THEN 1 ELSE 0 END) as refresh
-        from snapshot_price_rule where price_change_rule_id = #{priceChangeRuleId,jdbcType=BIGINT}
-        and enabled = 1
-
+        select s.save_at,s.updated_at,
+        (CASE when s.save_at
+        &lt; s.updated_at THEN
+        1 ELSE 0 END) as refresh
+        from snapshot_price_rule s left join price_change_rule r on
+        s.price_change_rule_id = r.price_change_rule_id
+        where s.price_change_rule_id = #{priceChangeRuleId,jdbcType=BIGINT}
+        and r.status = 1 and r.price_type = 1
+        and s.enabled = 1
     </select>
 </mapper>
