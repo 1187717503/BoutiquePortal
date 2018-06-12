@@ -272,7 +272,7 @@ public class StateMachineController {
                 Long pid = (Long) p.get("productId");
                 String result = "";
                 try {
-                    result = HttpUtils.httpPost(url+"/"+pid,null);
+                    result = HttpUtils.httpPost(url+"/"+pid,pid.toString());
                     if(StringUtils.isNotBlank(result)){
                         JSONObject object = JSONObject.fromObject(result);
                         if(object.containsKey("status") && "1".equals(object.get("status").toString())){
@@ -316,7 +316,7 @@ public class StateMachineController {
                 Long pid = (Long) p.get("productId");
                 String result = "";
                 try {
-                    result = HttpUtils.httpPost(url+"/"+pid,null);
+                    result = HttpUtils.httpPost(url+"/"+pid,pid.toString());
                     if(StringUtils.isNotBlank(result)){
                         JSONObject object = JSONObject.fromObject(result);
                         if(object.containsKey("status") && "1".equals(object.get("status").toString())){

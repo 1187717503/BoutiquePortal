@@ -328,7 +328,7 @@ public class ContentMgntController {
         boolean hasErr = false;
         String result = "";
         try {
-            result = HttpUtils.httpPost(url+"/"+productId,null);
+            result = HttpUtils.httpPost(url+"/"+productId,productId.toString());
             if(org.apache.commons.lang3.StringUtils.isNotBlank(result)){
                 JSONObject object = JSONObject.fromObject(result);
                 if(object.containsKey("status") && "1".equals(object.get("status").toString())){
