@@ -75,7 +75,6 @@ public class PriceChangeRuleController extends BaseController {
     @Autowired
     private PriceTaskController priceTaskController;
 
-
     @RequestMapping(value = "/del/{price_change_rule_id}", method = RequestMethod.POST)
     @ResponseBody
     public Response delActive(@PathVariable(name = "price_change_rule_id") Long price_change_rule_id) throws Exception {
@@ -203,12 +202,12 @@ public class PriceChangeRuleController extends BaseController {
                 Map<String, Object> paramsMap = new HashMap<>();
                 paramsMap.put("price_change_rule_id", price_change_rule_id);
                 //根据参数查询snapshot对应的product id 和 im price的值
-                boolean preview = pcrModel.getPreview_status() == 0? false : true;
+                boolean preview = pcrModel.getPreview_status() == 0 ? false : true;
                 pcrModel.setPreviewImPrice(preview);
-                Map<String,Object> snapShot = priceChangeRule.querySnapShotTimeByRuleId(price_change_rule_id);
-                if(snapShot != null){
+                Map<String, Object> snapShot = priceChangeRule.querySnapShotTimeByRuleId(price_change_rule_id);
+                if (snapShot != null && snapShot.get("updated_at") != null) {
                     pcrModel.setRefreshDate(snapShot.get("updated_at").toString());
-                }else{
+                } else {
                     pcrModel.setRefreshDate(null);
                 }
             }
@@ -343,7 +342,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 修改PriceChangeRuleCategoryBrand
-     *
      * @param map
      * @return
      */
@@ -420,7 +418,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据品牌ID添加下面所有2级类目的PriceChangeRuleCategoryBrand
-     *
      * @param map
      * @return
      */
@@ -453,7 +450,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据品牌ID删除下面所有2级类目的PriceChangeRuleCategoryBrand
-     *
      * @param map
      * @return
      */
@@ -540,7 +536,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 单个添加PriceChangeRuleCategoryBrand
-     *
      * @param map
      * @return
      */
@@ -604,7 +599,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据price_change_rule_category_brand_id 删除PriceChangeRuleCategoryBrand
-     *
      * @param map
      * @return
      */
@@ -624,7 +618,8 @@ public class PriceChangeRuleController extends BaseController {
         try {
             //根据ID删除
             String priceChangeRuleCategoryBrandId = map.get("price_change_rule_category_brand_id").toString();
-            PriceChangeRuleCategoryBrand priceChangeRuleCategoryBrand = priceChangeRuleCategoryBrandService.selectByPrimaryKey(Long.parseLong(priceChangeRuleCategoryBrandId));
+            PriceChangeRuleCategoryBrand priceChangeRuleCategoryBrand = priceChangeRuleCategoryBrandService.selectByPrimaryKey(
+                    Long.parseLong(priceChangeRuleCategoryBrandId));
             int row = priceChangeRuleCategoryBrandService.deletePriceChangeRuleCategoryBrand(Long.parseLong(priceChangeRuleCategoryBrandId));
 
             //判断是否成功
@@ -648,7 +643,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 添加priceChangeRuleProductGroup
-     *
      * @param map
      * @return
      */
@@ -706,7 +700,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据price_change_rule_group_id 删除PriceChangeRuleGroup
-     *
      * @param map
      * @return
      */
@@ -750,7 +743,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 添加PriceChangeRuleProduct
-     *
      * @param map
      * @return
      */
@@ -776,7 +768,7 @@ public class PriceChangeRuleController extends BaseController {
 
             //查询是否存在该商品
             List<ProductWithBLOBs> productWithBLOBsList = null;
-            if (StringUtils.isNotBlank(designerId) && StringUtils.isNotBlank(colorCode) ) {
+            if (StringUtils.isNotBlank(designerId) && StringUtils.isNotBlank(colorCode)) {
                 ProductWithBLOBs productWithBLOBs = new ProductWithBLOBs();
                 productWithBLOBs.setDesignerId(designerId);
                 productWithBLOBs.setColorCode(colorCode);
@@ -835,7 +827,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据price_change_rule_product_id 删除PriceChangeRuleProduct
-     *
      * @param map
      * @return
      */
@@ -879,7 +870,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 修改 SystemProperty 全局默认折扣
-     *
      * @param map
      * @return
      */
@@ -912,7 +902,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 修改PriceChangeRul 修改有效日期
-     *
      * @param map
      * @return
      * @throws Exception
@@ -938,7 +927,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据price_change_rule_id 删除PriceChangeRule
-     *
      * @param map
      * @return
      */
@@ -1172,7 +1160,6 @@ public class PriceChangeRuleController extends BaseController {
         return false;
     }
 
-
     /**
      * 更新ImPriceAlgorithm
      * @param map
@@ -1216,31 +1203,32 @@ public class PriceChangeRuleController extends BaseController {
     @RequestMapping(value = "/changePreviewByBoutique")
     @ResponseBody
     public ResultMessage changePreviewByBoutique(@Param("price_change_rule_id") Long price_change_rule_id, @Param("preview_status") Long preview_status,
-                                       @Param("flag") String flag) {
-        logger.info("PriceChangeRuleController,changePreviewByBoutique,inputParams,price_change_rule_id:{},preview_status:{} ", price_change_rule_id, preview_status);
+            @Param("flag") String flag) {
+        logger.info("PriceChangeRuleController,changePreviewByBoutique,inputParams,price_change_rule_id:{},preview_status:{} ", price_change_rule_id,
+                preview_status);
 
         ResultMessage resultMessage = ResultMessage.getInstance();
 
-        try{
-            synchronized (this){
+        try {
+            synchronized (this) {
                 PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(price_change_rule_id);
-                if(StringUtils.isBlank(flag)){
+                if (StringUtils.isBlank(flag)) {
                     flag = "";
                 }
-                priceRuleSynService.syncPreviewByBoutique(pcrModel.getVendorId(), preview_status, pcrModel.getCategoryType().intValue(),pcrModel.getPriceChangeRuleId(),flag );
+                priceRuleSynService.syncPreviewByBoutique(pcrModel.getVendorId(), preview_status, pcrModel.getCategoryType().intValue(),
+                        pcrModel.getPriceChangeRuleId(), flag);
                 resultMessage.successStatus().putMsg("info", "success !!!");
             }
 
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            logger.error("error message : " +e.getMessage());
+            logger.error("error message : " + e.getMessage());
             resultMessage.errorStatus().putMsg("info", "error message : " + e.getMessage());
         }
-        logger.info("PriceChangeRuleController,changePreviewByBoutique,inputParams,price_change_rule_id:{},preview_status:{}, resultMsg:{}.", price_change_rule_id,
-                preview_status, JSONObject.toJSONString(resultMessage));
+        logger.info("PriceChangeRuleController,changePreviewByBoutique,inputParams,price_change_rule_id:{},preview_status:{}, resultMsg:{}.",
+                price_change_rule_id, preview_status, JSONObject.toJSONString(resultMessage));
         return resultMessage;
     }
-
 
     private int updateSnapshotPriceRuleSaveAt(Long priceChangeRuleId) {
         // 更新snapshot_price_rule数据
