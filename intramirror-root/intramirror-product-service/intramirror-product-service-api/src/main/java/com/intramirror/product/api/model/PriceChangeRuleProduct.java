@@ -200,7 +200,7 @@ public class PriceChangeRuleProduct {
     }
 
     public void setDesignerId(String designerId) {
-        this.designerId = designerId;
+        this.designerId = designerId == null ? null : designerId.trim();
     }
 
     public String getColorCode() {
@@ -208,6 +208,6 @@ public class PriceChangeRuleProduct {
     }
 
     public void setColorCode(String colorCode) {
-        this.colorCode = colorCode;
+        this.colorCode = colorCode == null ? null : colorCode.trim();
     }
 }

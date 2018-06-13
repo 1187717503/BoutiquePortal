@@ -17,23 +17,17 @@ import com.intramirror.user.api.model.User;
 import com.intramirror.web.controller.BaseController;
 import com.intramirror.web.service.PriceChangeRuleService;
 import com.intramirror.web.service.price.PriceRuleSynService;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author wzh
@@ -62,6 +56,9 @@ public class PriceChangeRuleController extends BaseController {
 
     @Autowired
     private PriceChangeRuleService priceChangeRuleService;
+
+    @Autowired
+    private IPriceChangeRuleSeasonGroupService iPriceChangeRuleSeasonGroupService;
 
     @Autowired
     private IProductService productService;
@@ -762,9 +759,9 @@ public class PriceChangeRuleController extends BaseController {
         try {
             String designerId = map.get("designer_id").toString();
             String colorCode = map.get("color_code").toString();
-            String price_change_rule_id = map.get("price_change_rule_id").toString();
+            Long priceChangeRuleId = Long.valueOf(map.get("price_change_rule_id").toString());
 
-            PriceChangeRule pcr = priceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
+            PriceChangeRule pcr = priceChangeRule.selectByPrimaryKey(priceChangeRuleId);
 
             //查询是否存在该商品
             List<ProductWithBLOBs> productWithBLOBsList = null;
@@ -777,7 +774,7 @@ public class PriceChangeRuleController extends BaseController {
                 productWithBLOBsList = productService.getProductByParameter(productWithBLOBs);
             }
 
-            if (productWithBLOBsList == null) {
+            if (productWithBLOBsList == null || productWithBLOBsList.isEmpty()) {
                 result.put("info", "Can't find the goods");
                 return result;
             } else if (productWithBLOBsList.size() > 1) {
@@ -785,9 +782,21 @@ public class PriceChangeRuleController extends BaseController {
                 return result;
             }
             ProductWithBLOBs productWithBLOBs = productWithBLOBsList.get(0);
+            List<PriceChangeRuleSeasonGroup> priceChangeRuleSeasonGroups = iPriceChangeRuleSeasonGroupService.getPriceChangeRuleGroupListByPriceChangeRuleId(priceChangeRuleId);
+
+            Set<String> seasonCodes = new HashSet<>();
+            for (PriceChangeRuleSeasonGroup priceChangeRuleSeasonGroup : priceChangeRuleSeasonGroups) {
+                seasonCodes.add(priceChangeRuleSeasonGroup.getSeasonCode());
+            }
+
+            if (!seasonCodes.contains(productWithBLOBs.getSeasonCode())) {
+                result.put("info", "Wrong Season Code.");
+                return result;
+            }
+
             //判断是否已经存在规则
             PriceChangeRuleProduct priceChangeRuleProductParam = new PriceChangeRuleProduct();
-            priceChangeRuleProductParam.setPriceChangeRuleId(Long.valueOf(price_change_rule_id));
+            priceChangeRuleProductParam.setPriceChangeRuleId(priceChangeRuleId);
             priceChangeRuleProductParam.setDesignerId(designerId);
             priceChangeRuleProductParam.setColorCode(colorCode);
             List<PriceChangeRuleProduct> list = priceChangeRuleProductService.selectByParameter(priceChangeRuleProductParam);
@@ -798,7 +807,7 @@ public class PriceChangeRuleController extends BaseController {
 
             //添加 priceChangeRuleProduct
             PriceChangeRuleProduct priceChangeRuleProduct = new PriceChangeRuleProduct();
-            priceChangeRuleProduct.setPriceChangeRuleId(Long.valueOf(price_change_rule_id));
+            priceChangeRuleProduct.setPriceChangeRuleId(priceChangeRuleId);
             priceChangeRuleProduct.setProductId(productWithBLOBs.getProductId());
             priceChangeRuleProduct.setDesignerId(designerId);
             priceChangeRuleProduct.setColorCode(colorCode);
@@ -812,7 +821,7 @@ public class PriceChangeRuleController extends BaseController {
                 return result;
             }
             // 更新snapshot_price_rule数据
-            updateSnapshotPriceRuleSaveAt(Long.valueOf(price_change_rule_id));
+            updateSnapshotPriceRuleSaveAt(priceChangeRuleId);
             // todo refresh
 
         } catch (Exception e) {
