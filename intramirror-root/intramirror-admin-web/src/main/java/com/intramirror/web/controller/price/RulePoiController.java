@@ -2,13 +2,12 @@ package com.intramirror.web.controller.price;
 
 import com.intramirror.common.help.ExceptionUtils;
 import com.intramirror.common.help.PriceChangeRuleExcelUtils;
-import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.common.utils.DateUtils;
 import com.intramirror.product.api.enums.CategoryTypeEnum;
 import com.intramirror.product.api.model.Category;
 import com.intramirror.product.api.model.PriceChangeRule;
-import com.intramirror.product.api.model.ProductWithBLOBs;
 import com.intramirror.product.api.model.Tag;
+import com.intramirror.product.api.service.IPriceChangeRuleSeasonGroupService;
 import com.intramirror.product.api.service.IProductService;
 import com.intramirror.product.api.service.ITagService;
 import com.intramirror.product.api.service.category.ICategoryService;
@@ -16,7 +15,6 @@ import com.intramirror.product.api.service.price.IPriceChangeRule;
 import com.intramirror.product.api.service.rule.IRuleService;
 import com.intramirror.web.common.CommonProperties;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +56,9 @@ public class RulePoiController {
 
     @Autowired
     private IProductService productService;
+
+    @Autowired
+    private IPriceChangeRuleSeasonGroupService iPriceChangeRuleSeasonGroupService;
 
     @RequestMapping("/download")
     public void download(@Param("price_change_rule_id") String price_change_rule_id,HttpServletResponse response) {
@@ -259,14 +260,14 @@ public class RulePoiController {
         file.transferTo(new File(filePath));
         Map<String, List<Map<String, Object>>> sheetExcelData = PriceChangeRuleExcelUtils.readRuleExcel(filePath, baseDataMap, price_change_rule_id, type);
         //  检查Excel数据的可用性
-        this.checkExcelData(sheetExcelData, type, priceChangeRule.getVendorId());
+        this.checkExcelData(sheetExcelData, type, priceChangeRule.getVendorId(), Long.valueOf(price_change_rule_id));
 
         iRuleService.changeRule(price_change_rule_id, sheetExcelData);
 
         return Response.success();
     }
 
-    private void checkExcelData(Map<String, List<Map<String, Object>>> sheetExcelData, String type, Long vendorId) throws Exception {
+    private void checkExcelData(Map<String, List<Map<String, Object>>> sheetExcelData, String type, Long vendorId, Long priceChangeRuleId) throws Exception {
         List<Map<String, Object>> categoryBrandMapList = sheetExcelData.get("priceRuleList");
         List<Map<String, Object>> categoryBrandExceptionMapList = sheetExcelData.get("categoryBrandList");
         List<Map<String, Object>> productGroupList = sheetExcelData.get("productGroupList");
@@ -299,7 +300,7 @@ public class RulePoiController {
             throw new RuntimeException("Excel品牌数据存在重复。");
         }
 
-        Set<String> categoryBrand3Set = new HashSet<>();
+        /*Set<String> categoryBrand3Set = new HashSet<>();
         for (Map<String, Object> map : categoryBrandExceptionMapList) {
             String value = map.get("brand_id").toString() + "_" + map.get("category_id").toString();
             categoryBrand3Set.add(value);
@@ -315,6 +316,13 @@ public class RulePoiController {
         }
         if (productGroupSet.size() != productGroupList.size()) {
             throw new RuntimeException("Product Group数据存在重复。");
+        }
+
+        //查询priceChangeRule的seasonCode
+        List<PriceChangeRuleSeasonGroup> priceChangeRuleSeasonGroups = iPriceChangeRuleSeasonGroupService.getPriceChangeRuleGroupListByPriceChangeRuleId(priceChangeRuleId);
+        Set<String> seasonCodes = new HashSet<>();
+        for (PriceChangeRuleSeasonGroup priceChangeRuleSeasonGroup : priceChangeRuleSeasonGroups) {
+            seasonCodes.add(priceChangeRuleSeasonGroup.getSeasonCode());
         }
 
         Set<String> productSet = new HashSet<>();
@@ -341,6 +349,10 @@ public class RulePoiController {
                 throw new RuntimeException("Duplicate products exist.");
             }
             ProductWithBLOBs productWithBLOBs = productWithBLOBsList.get(0);
+            //商品的seasonCode要和priceChangeRule保持一致
+            if(!seasonCodes.contains(productWithBLOBs.getSeasonCode())) {
+                throw new RuntimeException("Wrong Season Code.");
+            }
 
             map.put("product_id", productWithBLOBs.getProductId());
             map.put("boutique_id", productWithBLOBs.getProductCode());
@@ -348,7 +360,7 @@ public class RulePoiController {
         }
         if (productSet.size() != productList.size()) {
             throw new RuntimeException("Product数据存在重复。");
-        }
+        }*/
 
     }
 }

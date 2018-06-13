@@ -10,7 +10,6 @@ import com.intramirror.product.api.service.rule.IRuleService;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.SeasonMapper;
 import com.intramirror.product.core.mapper.SnapshotPriceRuleMapper;
-import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -192,7 +191,7 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
         for (Map<String, Object> params : categoryBrandMapList) {
             seasonMapper.insertCategoryBrandRule(params);
         }
-        if (CollectionUtils.isNotEmpty(categoryBrandExceptionMapList)) {
+        /*if (CollectionUtils.isNotEmpty(categoryBrandExceptionMapList)) {
             seasonMapper.deleteCategoryBrandRuleException(price_change_rule_id);
             Collections.reverse(categoryBrandExceptionMapList);
             for (Map<String, Object> params : categoryBrandExceptionMapList) {
@@ -212,7 +211,7 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
             for (Map<String, Object> params : productList) {
                 seasonMapper.insertProductRule(params);
             }
-        }
+        }*/
 
         SnapshotPriceRule snapshotPriceRule = new SnapshotPriceRule();
         snapshotPriceRule.setPriceChangeRuleId(Long.parseLong(price_change_rule_id));

@@ -106,9 +106,9 @@ public class PriceChangeRuleExcelUtils {
 
         HSSFWorkbook workbook = new HSSFWorkbook();
         workbook.createSheet(PRICE_RULE_SHEET_NAME);
-        workbook.createSheet(CATEGORY_BRAND_SHEET_NAME);
-        workbook.createSheet(PRODUCT_GROUP_SHEET_NAME);
-        workbook.createSheet(PRODUCT_SHEET_NAME);
+//        workbook.createSheet(CATEGORY_BRAND_SHEET_NAME);
+//        workbook.createSheet(PRODUCT_GROUP_SHEET_NAME);
+//        workbook.createSheet(PRODUCT_SHEET_NAME);
         workbook.createSheet(HIDDEN_SHEET_NAME);
 
         //设置品牌下拉菜单
@@ -121,12 +121,13 @@ public class PriceChangeRuleExcelUtils {
         } else if (CategoryTypeEnum.KIDS.getCategoryType().equals(type)) {
             generateKidsPriceRuleSheet(workbook, datas);
         }
-        generateBrandCategoryRuleSheet(workbook, categoryBrandMaps);
-        generateProductGroupRuleSheet(workbook, productGroupMaps);
-        generateProductRuleSheet(workbook, productMaps);
+//        generateBrandCategoryRuleSheet(workbook, categoryBrandMaps);
+//        generateProductGroupRuleSheet(workbook, productGroupMaps);
+//        generateProductRuleSheet(workbook, productMaps);
 
         //隐藏下拉框内容sheet
-        workbook.setSheetHidden(4, true);
+//        workbook.setSheetHidden(4, true);
+        workbook.setSheetHidden(1, true);
         FileOutputStream fileOut;
         fileOut = new FileOutputStream(filePath);
         workbook.write(fileOut);
@@ -440,7 +441,7 @@ public class PriceChangeRuleExcelUtils {
         } else if (CategoryTypeEnum.KIDS.getCategoryType().equals(type)) {
             priceRuleList = readKidsPriceRuleSheet(priceRuleSheet, brandMapList, price_change_rule_id);
         }
-        HSSFSheet categoryBrandSheet = workbook.getSheet(CATEGORY_BRAND_SHEET_NAME);
+        /*HSSFSheet categoryBrandSheet = workbook.getSheet(CATEGORY_BRAND_SHEET_NAME);
         List<Map<String, Object>> categoryBrandList = new ArrayList<>();
         if (categoryBrandSheet != null) {
             categoryBrandList = readCategoryBrandSheet(type, categoryBrandSheet, brandMapList, categoryMapList, price_change_rule_id);
@@ -454,12 +455,12 @@ public class PriceChangeRuleExcelUtils {
         List<Map<String, Object>> productList = new ArrayList<>();
         if (categoryBrandSheet != null) {
             productList = readProductSheet(productSheet, price_change_rule_id);
-        }
+        }*/
 
         result.put("priceRuleList", priceRuleList);
-        result.put("categoryBrandList", categoryBrandList);
+        /*result.put("categoryBrandList", categoryBrandList);
         result.put("productGroupList", productGroupList);
-        result.put("productList", productList);
+        result.put("productList", productList);*/
 
         return result;
     }
