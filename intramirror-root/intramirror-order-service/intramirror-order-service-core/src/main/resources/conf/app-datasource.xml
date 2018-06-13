@@ -55,6 +55,7 @@
     <bean id="kafkaMessageUtil" class="com.intramirror.order.core.utils.KafkaMessageUtil" lazy-init="false">
         <property name="kafkaServer" value="${kafka.server}"></property>
         <property name="orderStatusChangeTopic" value="${kafka.topic.order.status}"></property>
+        <property name="orderFinanceTopic" value="${kafka.topic.order.finance}"></property>
     </bean>
 
     <bean id="mailConfig" class="com.intramirror.order.core.utils.MailConfig" lazy-init="false">
