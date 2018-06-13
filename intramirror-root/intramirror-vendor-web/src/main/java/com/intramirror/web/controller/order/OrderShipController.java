@@ -31,6 +31,7 @@ import com.intramirror.web.util.DHLHttpClient;
 import com.intramirror.web.util.ExcelUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -760,6 +761,10 @@ public class OrderShipController extends BaseController {
         shipperVO.setStreetLines3(location.getAddressStreetlines3());
         shipperVO.setCity(location.getAddressCity());
         shipperVO.setCountry("Italy");
+        boolean isDDt = false;
+        if(map.get("ddtFlag")!=null&&"1".equals(map.get("ddtFlag").toString())){
+            isDDt = true;
+        }
 
         //获取Invoice 信息
         logger.info("打印Invoice----获取Invoice信息");
@@ -850,7 +855,35 @@ public class OrderShipController extends BaseController {
             return result;
         }
         resultMap.put("VATNumber", invoice.getVatNum());
-
+        //ddt的invoice
+        InvoiceVO ddtInvoice = new InvoiceVO();
+        List<Map<String,Object>> ddtOrderList = new ArrayList<>();
+        BigDecimal ddtVAT = new BigDecimal(0);
+        BigDecimal ddtAllTotal = new BigDecimal(0);
+        Integer ddtAllQty = 0;
+        if(isDDt){
+            ddtInvoice.setShipperVO(shipperVO);
+            RecipientVO recipientVO = new RecipientVO();
+            ShippingProvider shippingProvider = shippingProviderService.getShippingProviderByName("DHL2");
+            recipientVO.setCity(shippingProvider.getAddrCity());
+            recipientVO.setCompanyName(shippingProvider.getTransferConsignee());
+            recipientVO.setPersonName(shippingProvider.getPersonName());
+            recipientVO.setStreetLines(shippingProvider.getTransferAddr());
+            recipientVO.setStreetLines2(shippingProvider.getTransferAddr2());
+            recipientVO.setStreetLines3(shippingProvider.getTransferAddr3());
+            recipientVO.setPostalCode(shippingProvider.getZipCode());
+            recipientVO.setPhoneNumber(shippingProvider.getTransferContact());
+            recipientVO.setCountry(shippingProvider.getAddrCountry());
+            ddtInvoice.setRecipientVO(recipientVO);
+            ddtInvoice.setList(ddtOrderList);
+            ddtInvoice.setInvoiceTo((String) resultMap.get("InvoiceTo"));
+            ddtInvoice.setInvoiceName((String) resultMap.get("InvoiceName"));
+            ddtInvoice.setInvoicePersonName((String)resultMap.get("contactPersonName"));
+            ddtInvoice.setVatNum((String) resultMap.get("VATNumber"));
+            ddtInvoice.setInvoiceDate((String) resultMap.get("InvoiceDate"));
+            ddtInvoice.setInvoiceNum((String) resultMap.get("InvoiceNumber"));
+            ddtInvoice.setShipmentNo((String) resultMap.get("shipmentNo"));
+        }
 
         //获取发往中国大陆，香港，澳门的订单列表
         Set<Long> shipmentIds =  new HashSet<>();
@@ -863,11 +896,11 @@ public class OrderShipController extends BaseController {
         List<Map<String, Object>> chinaList = orderService.getOrderListByShipmentId(conditionMap);
         if( chinaList != null && chinaList.size() > 0 ){
             InvoiceVO chinaInovice = new InvoiceVO();
-            transitWarehouseInvoiceVO.setChinaInvoice(chinaInovice);
-            //获取shipTo地址信息
-            ShippingProvider shippingProvider = shippingProviderService.getShippingProviderByName("ZSY");
-
             RecipientVO recipientVO = new RecipientVO();
+            if(!isDDt){
+                transitWarehouseInvoiceVO.setChinaInvoice(chinaInovice);
+            }
+            ShippingProvider shippingProvider = shippingProviderService.getShippingProviderByName("ZSY");
             recipientVO.setCity(shippingProvider.getAddrCity());
             recipientVO.setCompanyName(shippingProvider.getTransferConsignee());
             recipientVO.setPersonName(shippingProvider.getPersonName());
@@ -877,7 +910,7 @@ public class OrderShipController extends BaseController {
             recipientVO.setPostalCode(shippingProvider.getZipCode());
             recipientVO.setPhoneNumber(shippingProvider.getTransferContact());
             recipientVO.setCountry(shippingProvider.getAddrCountry());
-
+            //获取shipTo地址信息
             BigDecimal allTotal = new BigDecimal("0");
             BigDecimal VAT = new BigDecimal("0");
             for(Map<String, Object> chinaOrder : chinaList){
@@ -898,7 +931,15 @@ public class OrderShipController extends BaseController {
             }
 
             BigDecimal grandTotal = (VAT.add(allTotal)).setScale(2,BigDecimal.ROUND_HALF_UP);
+            if(isDDt){
+                if(CollectionUtils.isNotEmpty(chinaList)){
+                    ddtInvoice.getList().addAll(chinaList);
+                }
+                ddtAllTotal = ddtAllTotal.add(grandTotal);
+                ddtVAT = ddtVAT.add(VAT);
+                ddtAllQty  = chinaList.size()+ddtAllQty;
 
+            }
             chinaInovice.setList(chinaList);
             chinaInovice.setRecipientVO(recipientVO);
             chinaInovice.setShipperVO(shipperVO);
@@ -921,13 +962,14 @@ public class OrderShipController extends BaseController {
         List<Map<String, Object>> UNlist = orderService.getOrderListByShipmentId(conditionMap);
         if (UNlist != null && UNlist.size() > 0){
             List<InvoiceVO> UNInvoiceList = new ArrayList<>();
-            transitWarehouseInvoiceVO.setUNInvoices(UNInvoiceList);
-
+            if(!isDDt){
+                transitWarehouseInvoiceVO.setUNInvoices(UNInvoiceList);
+            }
             for (Map<String,Object> UNOrder: UNlist){
+                RecipientVO recipientVO = new RecipientVO();
                 InvoiceVO UNInvoiceVO = new InvoiceVO();
                 //欧盟的不显示remake
                 UNInvoiceVO.setRemark(null);
-                RecipientVO recipientVO = new RecipientVO();
                 String country = UNOrder.get("user_rec_country") != null ? UNOrder.get("user_rec_country").toString() : "";
                 recipientVO.setCountry(country);
                 String personName = UNOrder.get("user_rec_name") != null ? UNOrder.get("user_rec_name").toString() : "";
@@ -957,8 +999,15 @@ public class OrderShipController extends BaseController {
                 BigDecimal VAT = total.multiply(taxRate).setScale(2, BigDecimal.ROUND_HALF_UP);
                 BigDecimal grandTotal = (VAT.add(total)).setScale(2,BigDecimal.ROUND_HALF_UP);
 
+
                 List<Map<String, Object>> list = new ArrayList<>();
                 list.add(UNOrder);
+                if(isDDt){
+                    ddtInvoice.getList().addAll(list);
+                    ddtAllTotal = ddtAllTotal.add(grandTotal);
+                    ddtVAT = ddtVAT.add(VAT);
+                    ddtAllQty  = chinaList.size()+ddtAllQty;
+                }
                 UNInvoiceVO.setList(list);
                 UNInvoiceVO.setShipperVO(shipperVO);
                 UNInvoiceVO.setRecipientVO(recipientVO);
@@ -984,11 +1033,11 @@ public class OrderShipController extends BaseController {
         List<Map<String, Object>> elselist = orderService.getOrderListByShipmentId(conditionMap);
         if (elselist != null && elselist.size() > 0) {
             List<InvoiceVO> elseInvoiceList = new ArrayList<>();
-            transitWarehouseInvoiceVO.setOtherInvoices(elseInvoiceList);
-
+            if(!isDDt){
+                transitWarehouseInvoiceVO.setOtherInvoices(elseInvoiceList);
+            }
             for (Map<String,Object> elseOrder: elselist){
                 InvoiceVO elseInvoiceVO = new InvoiceVO();
-
                 RecipientVO recipientVO = new RecipientVO();
                 String country = elseOrder.get("user_rec_country") != null ? elseOrder.get("user_rec_country").toString() : "";
                 recipientVO.setCountry(country);
@@ -1004,6 +1053,7 @@ public class OrderShipController extends BaseController {
                 recipientVO.setPhoneNumber(mobile);
                 String postalCode = elseOrder.get("user_rec_code") != null ? elseOrder.get("user_rec_code").toString() : "";
                 recipientVO.setPostalCode(postalCode);
+
                 String inPrice = elseOrder.get("in_price")!=null?elseOrder.get("in_price").toString():"";
                 String retailPrice = elseOrder.get("price")!=null?elseOrder.get("price").toString():"";
                 BigDecimal discount = (new BigDecimal(1)).subtract((new BigDecimal(inPrice)).multiply(new BigDecimal("1.22")).divide(new BigDecimal(retailPrice), 2, RoundingMode.HALF_UP));
@@ -1020,6 +1070,12 @@ public class OrderShipController extends BaseController {
 
                 List<Map<String, Object>> list = new ArrayList<>();
                 list.add(elseOrder);
+                if(isDDt){
+                    ddtInvoice.getList().addAll(list);
+                    ddtAllTotal = ddtAllTotal.add(grandTotal);
+                    ddtVAT = ddtVAT.add(VAT);
+                    ddtAllQty  = chinaList.size()+ddtAllQty;
+                }
                 elseInvoiceVO.setList(list);
                 elseInvoiceVO.setShipperVO(shipperVO);
                 elseInvoiceVO.setRecipientVO(recipientVO);
@@ -1037,6 +1093,15 @@ public class OrderShipController extends BaseController {
 
                 elseInvoiceList.add(elseInvoiceVO);
             }
+
+        }
+        if(isDDt){
+            List<InvoiceVO> ddtInvoices = new ArrayList<>();
+            ddtInvoice.setGrandTotal(ddtAllTotal.toString());
+            ddtInvoice.setVat(ddtVAT.toString());
+            ddtInvoice.setAllQty(ddtAllQty.toString());
+            ddtInvoices.add(ddtInvoice);
+            transitWarehouseInvoiceVO.setUNInvoices(ddtInvoices);
         }
 
         try {
