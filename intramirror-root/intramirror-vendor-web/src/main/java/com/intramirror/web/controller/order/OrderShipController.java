@@ -1347,8 +1347,8 @@ public class OrderShipController extends BaseController {
         inputVO.setShipmentDate(null);
         try {
             //System.out.println(f1.parse("2015-12-12"));
-            f1.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
-            f2.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
+            f1.setTimeZone(TimeZone.getTimeZone("GMT+02:00"));
+            f2.setTimeZone(TimeZone.getTimeZone("GMT+02:00"));
         } catch (Exception e) {
             e.printStackTrace();
         }
