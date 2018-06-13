@@ -1,5 +1,6 @@
 package com.intramirror.product.core.impl;
 
+import com.intramirror.common.help.StringUtils;
 import com.intramirror.product.api.model.ProductWithBLOBs;
 import com.intramirror.product.api.model.Tag;
 import com.intramirror.product.api.service.ITagService;

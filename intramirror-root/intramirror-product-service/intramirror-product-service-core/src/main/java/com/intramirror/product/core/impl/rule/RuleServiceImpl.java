@@ -2,8 +2,10 @@ package com.intramirror.product.core.impl.rule;
 
 import com.google.gson.Gson;
 import com.intramirror.common.help.StringUtils;
+import com.intramirror.product.api.model.PriceChangeRule;
 import com.intramirror.product.api.model.SnapshotPriceRule;
 import com.intramirror.product.api.service.ISnapshotPriceRuleService;
+import com.intramirror.product.api.service.price.IPriceChangeRule;
 import com.intramirror.product.api.service.rule.IRuleService;
 import com.intramirror.product.core.dao.BaseDao;
 import com.intramirror.product.core.mapper.SeasonMapper;
@@ -24,10 +26,13 @@ import java.util.*;
 public class RuleServiceImpl extends BaseDao implements IRuleService {
 
     private SeasonMapper seasonMapper;
-    private SnapshotPriceRuleMapper snapshotPriceRuleMapper;;
+    private SnapshotPriceRuleMapper snapshotPriceRuleMapper;
 
     @Autowired
     private ISnapshotPriceRuleService snapshotPriceRuleService;
+
+    @Autowired
+    private IPriceChangeRule priceChangeRule;
 
     private static Logger logger = LoggerFactory.getLogger(RuleServiceImpl.class);
 
@@ -39,39 +44,39 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
 
     @Override
     public List<Map<String, Object>> queryRuleByHasSeason(Map<String, Object> params) throws Exception {
-        List<Map<String,Object>> seasonMaps = seasonMapper.queryRuleByHasSeason(params);
-        List<Map<String,Object>> handleMaps = new ArrayList<>();
-        for(Map<String,Object> seasonMap : seasonMaps) {
+        List<Map<String, Object>> seasonMaps = seasonMapper.queryRuleByHasSeason(params);
+        List<Map<String, Object>> handleMaps = new ArrayList<>();
+        for (Map<String, Object> seasonMap : seasonMaps) {
             String name = seasonMap.get("name").toString();
 
             boolean flag = true;
-            for(Map<String,Object> handleMap : handleMaps) {
+            for (Map<String, Object> handleMap : handleMaps) {
                 String hName = handleMap.get("name") == null ? "" : handleMap.get("name").toString();
-                if(name.equals(hName)) {
+                if (name.equals(hName)) {
                     List<Object> objectList = (List<Object>) handleMap.get("season_codes");
                     objectList.add(seasonMap.get("season_code"));
-                    handleMap.put("season_codes",objectList);
+                    handleMap.put("season_codes", objectList);
                     flag = false;
                 }
             }
-            if(flag) {
-                Map<String,Object> map = new HashMap<>();
+            if (flag) {
+                Map<String, Object> map = new HashMap<>();
                 List<Object> stringList = new ArrayList<>();
                 stringList.add(seasonMap.get("season_code"));
-                map.put("name",name);
-                map.put("season_codes",stringList);
-                map.put("price_change_rule_id",seasonMap.get("price_change_rule_id"));
+                map.put("name", name);
+                map.put("season_codes", stringList);
+                map.put("price_change_rule_id", seasonMap.get("price_change_rule_id"));
                 //根据price_change_rule_id查找im_price_algorithm_id 然后 根据id查找name
-                Map<String,Object>  algorithmMap= seasonMapper.queryImPriceAlgorithm(seasonMap.get("price_change_rule_id"));
-                if(algorithmMap != null){
-                    map.put("im_price_algorithm_name",algorithmMap.get("name"));
-                    map.put("im_price_algorithm_id",algorithmMap.get("im_price_algorithm_id"));
-                }else{
-                    map.put("im_price_algorithm_name","");
-                    map.put("im_price_algorithm_id","");
+                Map<String, Object> algorithmMap = seasonMapper.queryImPriceAlgorithm(seasonMap.get("price_change_rule_id"));
+                if (algorithmMap != null) {
+                    map.put("im_price_algorithm_name", algorithmMap.get("name"));
+                    map.put("im_price_algorithm_id", algorithmMap.get("im_price_algorithm_id"));
+                } else {
+                    map.put("im_price_algorithm_name", "");
+                    map.put("im_price_algorithm_id", "");
                 }
                 //snapshot  update_at ||  refresh IM
-                map = this.getSnapShotUpdateTime(seasonMap.get("price_change_rule_id"),map);
+                map = this.getSnapShotUpdateTime(seasonMap.get("price_change_rule_id"), map);
                 handleMaps.add(map);
             }
         }
@@ -85,51 +90,51 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
 
     @Override
     public List<Map<String, Object>> queryRuleByBrand(Map<String, Object> params) throws Exception {
-        List<Map<String,Object>> handleMaps = new ArrayList<>();
-        List<Map<String,Object>> brandMaps = seasonMapper.queryRuleByBrandZero(params);
-        List<Map<String,Object>> newMaps = new ArrayList<>();
-        if(brandMaps != null && brandMaps.size() > 0) {
-            for(Map<String,Object> brandMap : brandMaps) {
+        List<Map<String, Object>> handleMaps = new ArrayList<>();
+        List<Map<String, Object>> brandMaps = seasonMapper.queryRuleByBrandZero(params);
+        List<Map<String, Object>> newMaps = new ArrayList<>();
+        if (brandMaps != null && brandMaps.size() > 0) {
+            for (Map<String, Object> brandMap : brandMaps) {
                 String englishName = brandMap.get("english_name") == null ? "" : brandMap.get("english_name").toString();
                 String brandId = brandMap.get("brand_id").toString();
-                if(StringUtils.isBlank(englishName) && !brandId.equals("0")) {
-                    logger.info("englishName is null !!!{}",new Gson().toJson(brandMap));
+                if (StringUtils.isBlank(englishName) && !brandId.equals("0")) {
+                    logger.info("englishName is null !!!{}", new Gson().toJson(brandMap));
                     continue;
                 }
                 boolean flag = true;
-                for(Map<String,Object> handleMap : handleMaps){
+                for (Map<String, Object> handleMap : handleMaps) {
                     String eName = handleMap.get("brand_id") == null ? "" : handleMap.get("brand_id").toString();
-                    if(brandId.equals(eName)) {
-                        handleMap.put(brandMap.get("category_id").toString(),brandMap.get("discount_percentage"));
+                    if (brandId.equals(eName)) {
+                        handleMap.put(brandMap.get("category_id").toString(), brandMap.get("discount_percentage"));
                         flag = false;
                     }
                 }
 
-                if(flag) {
-                    Map<String,Object> map = new HashMap<>();
-                    if(brandId.equals("0")) {
+                if (flag) {
+                    Map<String, Object> map = new HashMap<>();
+                    if (brandId.equals("0")) {
                         englishName = "Default";
                     }
-                    map.put("english_name",englishName);
-                    map.put("brand_id",brandId);
-//                    map.put("price_change_rule_category_brand_id",brandMap.get("price_change_rule_category_brand_id"));
-                    map.put(brandMap.get("category_id").toString(),brandMap.get("discount_percentage"));
+                    map.put("english_name", englishName);
+                    map.put("brand_id", brandId);
+                    //                    map.put("price_change_rule_category_brand_id",brandMap.get("price_change_rule_category_brand_id"));
+                    map.put(brandMap.get("category_id").toString(), brandMap.get("discount_percentage"));
                     handleMaps.add(map);
                 }
             }
 
-            if(handleMaps != null && handleMaps.size() > 0) {
-                for(Map<String,Object> brandMap : handleMaps) {
+            if (handleMaps != null && handleMaps.size() > 0) {
+                for (Map<String, Object> brandMap : handleMaps) {
                     String brandName = brandMap.get("english_name") == null ? "" : brandMap.get("english_name").toString();
-                    if(brandName.equals("Default")) {
+                    if (brandName.equals("Default")) {
                         newMaps.add(brandMap);
                         break;
                     }
                 }
 
-                for(Map<String,Object> brandMap : handleMaps) {
+                for (Map<String, Object> brandMap : handleMaps) {
                     String brandName = brandMap.get("english_name") == null ? "" : brandMap.get("english_name").toString();
-                    if(!brandName.equals("Default")) {
+                    if (!brandName.equals("Default")) {
                         newMaps.add(brandMap);
                     }
                 }
@@ -146,7 +151,7 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
 
     @Override
     public List<Map<String, Object>> queryNotRuleByBrand(Map<String, Object> params) throws Exception {
-        List<Map<String,Object>> brands = seasonMapper.queryNotRuleByBrand(params);
+        List<Map<String, Object>> brands = seasonMapper.queryNotRuleByBrand(params);
         Collections.sort(brands, new Comparator() {
             @Override
             public int compare(Object o1, Object o2) {
@@ -217,19 +222,25 @@ public class RuleServiceImpl extends BaseDao implements IRuleService {
     }
 
     @Override
-    public Map<String,Object> getSnapShotUpdateTime(Object ruleId,Map<String,Object> map){
-        Map<String,Object> snapShotRefreshTime = seasonMapper.querySnapShotTimeByRuleId(ruleId);
-        if(snapShotRefreshTime != null){
-            if(snapShotRefreshTime.get("updated_at") != null){
-                map.put("updated_at",snapShotRefreshTime.get("updated_at").toString());
-            }else{
-                map.put("updated_at",null);
-            }
+    public Map<String, Object> getSnapShotUpdateTime(Object ruleId, Map<String, Object> map) {
+        PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(Long.parseLong(ruleId.toString()));
+        if (pcrModel != null && pcrModel.getImPriceAlgorithmId() == null) {
+            map.put("updated_at", null);
+            map.put("refresh_status", 2);
+        } else {
+            Map<String, Object> snapShotRefreshTime = seasonMapper.querySnapShotTimeByRuleId(ruleId);
+            if (snapShotRefreshTime != null) {
+                if (snapShotRefreshTime.get("updated_at") != null) {
+                    map.put("updated_at", snapShotRefreshTime.get("updated_at").toString());
+                } else {
+                    map.put("updated_at", null);
+                }
 
-            map.put("refresh_status",snapShotRefreshTime.get("refresh"));// 0  -> false 1 -> true 2->無狀態
-        }else{
-            map.put("updated_at",null);
-            map.put("refresh_status",2);
+                map.put("refresh_status", snapShotRefreshTime.get("refresh"));// 0  -> false 1 -> true 2->無狀態
+            } else {
+                map.put("updated_at", null);
+                map.put("refresh_status", 2);
+            }
         }
         return map;
     }
