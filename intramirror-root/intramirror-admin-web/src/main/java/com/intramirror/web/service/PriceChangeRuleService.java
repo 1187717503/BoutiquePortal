@@ -15,17 +15,17 @@ import com.intramirror.product.api.service.*;
 import com.intramirror.product.api.service.category.ICategoryService;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
 import com.intramirror.user.api.service.VendorService;
-import java.text.MessageFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import spark.utils.CollectionUtils;
+
+import java.text.MessageFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 public class PriceChangeRuleService {
@@ -184,12 +184,7 @@ public class PriceChangeRuleService {
         }
 
         // 添加snapshot_price_rule数据
-        SnapshotPriceRule snapshotPriceRule = new SnapshotPriceRule();
-        snapshotPriceRule.setPriceChangeRuleId(priceChangeRule.getPriceChangeRuleId());
-        snapshotPriceRule.setSaveAt(new Date());
-        snapshotPriceRule.setCreatedAt(new Date());
-        snapshotPriceRule.setStatus(new Byte("0"));
-        snapshotPriceRuleService.insertSelective(snapshotPriceRule);
+        insertSnapshotPriceRule(priceChangeRule.getPriceChangeRuleId());
         // todo refresh
 
         result.put("status", StatusType.SUCCESS);
@@ -720,11 +715,27 @@ public class PriceChangeRuleService {
 
         priceChangeRuleService.updateByPrimaryKeySelective(priceChangeRule);
         // 更新snapshot_price_rule数据
-        updateSnapshotPriceRuleSaveAt(Long.parseLong(map.get("priceChangeRuleId").toString()));
+        Map<String, Object> params = new HashMap<>();
+        params.put("priceChangeRuleIdList", Collections.singletonList(priceChangeRule.getPriceChangeRuleId()));
+        List<SnapshotPriceRule> snapshotPriceRules = snapshotPriceRuleService.getSnapshotPriceRuleByPriceChangeRuleIds(params);
+        if (snapshotPriceRules == null || snapshotPriceRules.isEmpty()) {
+            insertSnapshotPriceRule(priceChangeRule.getPriceChangeRuleId());
+        } else {
+            updateSnapshotPriceRuleSaveAt(priceChangeRule.getPriceChangeRuleId());
+        }
         // todo refresh
 
         result.put("status", StatusType.SUCCESS);
         return result;
+    }
+
+    private int insertSnapshotPriceRule(Long priceChangeRuleId) {
+        SnapshotPriceRule snapshotPriceRule = new SnapshotPriceRule();
+        snapshotPriceRule.setPriceChangeRuleId(priceChangeRuleId);
+        snapshotPriceRule.setSaveAt(new Date());
+        snapshotPriceRule.setCreatedAt(new Date());
+        snapshotPriceRule.setStatus(new Byte("0"));
+        return snapshotPriceRuleService.insertSelective(snapshotPriceRule);
     }
 
     private int updateSnapshotPriceRuleSaveAt(Long priceChangeRuleId) {
