@@ -2,11 +2,10 @@ package com.intramirror.web.controller.price;
 
 import com.intramirror.common.help.ExceptionUtils;
 import com.intramirror.common.help.PriceChangeRuleExcelUtils;
+import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.common.utils.DateUtils;
 import com.intramirror.product.api.enums.CategoryTypeEnum;
-import com.intramirror.product.api.model.Category;
-import com.intramirror.product.api.model.PriceChangeRule;
-import com.intramirror.product.api.model.Tag;
+import com.intramirror.product.api.model.*;
 import com.intramirror.product.api.service.IPriceChangeRuleSeasonGroupService;
 import com.intramirror.product.api.service.IProductService;
 import com.intramirror.product.api.service.ITagService;
@@ -15,6 +14,7 @@ import com.intramirror.product.api.service.price.IPriceChangeRule;
 import com.intramirror.product.api.service.rule.IRuleService;
 import com.intramirror.web.common.CommonProperties;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -300,7 +300,7 @@ public class RulePoiController {
             throw new RuntimeException("Excel品牌数据存在重复。");
         }
 
-        /*Set<String> categoryBrand3Set = new HashSet<>();
+        Set<String> categoryBrand3Set = new HashSet<>();
         for (Map<String, Object> map : categoryBrandExceptionMapList) {
             String value = map.get("brand_id").toString() + "_" + map.get("category_id").toString();
             categoryBrand3Set.add(value);
@@ -360,7 +360,7 @@ public class RulePoiController {
         }
         if (productSet.size() != productList.size()) {
             throw new RuntimeException("Product数据存在重复。");
-        }*/
+        }
 
     }
 }
