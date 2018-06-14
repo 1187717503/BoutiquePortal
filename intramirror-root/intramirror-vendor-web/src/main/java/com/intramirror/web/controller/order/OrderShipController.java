@@ -608,12 +608,19 @@ public class OrderShipController extends BaseController {
 
             //获取Ship From信息
             StockLocation location = stockLocationService.getShipFromLocation(shipment_id);
+            // 获取invoice from
             resultMap.put("companyName",location.getContactCompanyName());
             resultMap.put("personName",location.getContactPersonName());
             resultMap.put("contact",location.getContactPhoneNumber());
             resultMap.put("address",location.getAddressStreetlines());
             resultMap.put("city",location.getAddressCity());
             resultMap.put("country","Italy");
+
+            resultMap.put("invoiceCompanyName",vendor.getCompanyName());
+            resultMap.put("invoicePersonName",vendor.getRegisteredPerson());
+            resultMap.put("invoiceAddress",vendor.getBusinessLicenseLocation());
+            //resultMap.put("invoiceCity",location.getAddressCity());
+            resultMap.put("invoiceCountry","Italy");
 
             logger.info("打印Invoice----获取Deliver To信息");
             List<SubShipment> subShipmentList = subShipmentService.getSubShipmentByShipmentId(shipment_id);
@@ -761,6 +768,12 @@ public class OrderShipController extends BaseController {
         shipperVO.setStreetLines3(location.getAddressStreetlines3());
         shipperVO.setCity(location.getAddressCity());
         shipperVO.setCountry("Italy");
+        ShipperVO invoiceForm = new ShipperVO();
+        invoiceForm.setCompanyName(vendor.getCompanyName());
+        invoiceForm.setPersonName(vendor.getRegisteredPerson());
+        invoiceForm.setStreetLines(vendor.getBusinessLicenseLocation());
+        invoiceForm.setCountry("Italy");
+
         boolean isDDt = false;
         if(map.get("ddtFlag")!=null&&"1".equals(map.get("ddtFlag").toString())){
             isDDt = true;
@@ -943,6 +956,7 @@ public class OrderShipController extends BaseController {
             chinaInovice.setList(chinaList);
             chinaInovice.setRecipientVO(recipientVO);
             chinaInovice.setShipperVO(shipperVO);
+            chinaInovice.setInvoiceFromVO(invoiceForm);
             chinaInovice.setInvoiceTo((String) resultMap.get("InvoiceTo"));
             chinaInovice.setInvoiceName((String) resultMap.get("InvoiceName"));
             chinaInovice.setInvoicePersonName((String)resultMap.get("contactPersonName"));
@@ -1010,6 +1024,7 @@ public class OrderShipController extends BaseController {
                 }
                 UNInvoiceVO.setList(list);
                 UNInvoiceVO.setShipperVO(shipperVO);
+                UNInvoiceVO.setInvoiceFromVO(invoiceForm);
                 UNInvoiceVO.setRecipientVO(recipientVO);
                 UNInvoiceVO.setInvoiceTo((String) resultMap.get("InvoiceTo"));
                 UNInvoiceVO.setInvoiceName((String) resultMap.get("InvoiceName"));
@@ -1078,6 +1093,7 @@ public class OrderShipController extends BaseController {
                 }
                 elseInvoiceVO.setList(list);
                 elseInvoiceVO.setShipperVO(shipperVO);
+                elseInvoiceVO.setInvoiceFromVO(invoiceForm);
                 elseInvoiceVO.setRecipientVO(recipientVO);
                 elseInvoiceVO.setInvoiceTo((String) resultMap.get("InvoiceTo"));
                 elseInvoiceVO.setInvoiceName((String) resultMap.get("InvoiceName"));
