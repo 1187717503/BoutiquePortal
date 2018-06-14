@@ -292,8 +292,8 @@
 
     <insert id="copyPriceChangeRuleProduct" parameterType="java.util.Map">
 
-    insert into price_change_rule_product(price_change_rule_id,product_id,boutique_id,product_name,discount_percentage)
-    select #{insert_price_change_rule_id,jdbcType=INTEGER},product_id,boutique_id,product_name,
+    insert into price_change_rule_product(price_change_rule_id,product_id,boutique_id,product_name,designer_id,color_code,discount_percentage)
+    select #{insert_price_change_rule_id,jdbcType=INTEGER},product_id,boutique_id,product_name,designer_id,color_code,
     case
     when
     (pcrp.discount_percentage - #{discount_percentage,jdbcType=INTEGER}) BETWEEN 0 AND 100
