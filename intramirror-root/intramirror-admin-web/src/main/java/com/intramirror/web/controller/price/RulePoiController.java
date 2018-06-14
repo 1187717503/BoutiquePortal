@@ -319,11 +319,11 @@ public class RulePoiController {
         }
 
         //查询priceChangeRule的seasonCode
-        List<PriceChangeRuleSeasonGroup> priceChangeRuleSeasonGroups = iPriceChangeRuleSeasonGroupService.getPriceChangeRuleGroupListByPriceChangeRuleId(priceChangeRuleId);
-        Set<String> seasonCodes = new HashSet<>();
-        for (PriceChangeRuleSeasonGroup priceChangeRuleSeasonGroup : priceChangeRuleSeasonGroups) {
-            seasonCodes.add(priceChangeRuleSeasonGroup.getSeasonCode());
-        }
+//        List<PriceChangeRuleSeasonGroup> priceChangeRuleSeasonGroups = iPriceChangeRuleSeasonGroupService.getPriceChangeRuleGroupListByPriceChangeRuleId(priceChangeRuleId);
+//        Set<String> seasonCodes = new HashSet<>();
+//        for (PriceChangeRuleSeasonGroup priceChangeRuleSeasonGroup : priceChangeRuleSeasonGroups) {
+//            seasonCodes.add(priceChangeRuleSeasonGroup.getSeasonCode());
+//        }
 
         Set<String> productSet = new HashSet<>();
         for (Map<String, Object> map : productList) {
@@ -350,9 +350,9 @@ public class RulePoiController {
             }
             ProductWithBLOBs productWithBLOBs = productWithBLOBsList.get(0);
             //商品的seasonCode要和priceChangeRule保持一致
-            if(!seasonCodes.contains(productWithBLOBs.getSeasonCode())) {
-                throw new RuntimeException("Wrong Season Code.");
-            }
+//            if(!seasonCodes.contains(productWithBLOBs.getSeasonCode())) {
+//                throw new RuntimeException("Wrong Season Code.");
+//            }
 
             map.put("product_id", productWithBLOBs.getProductId());
             map.put("boutique_id", productWithBLOBs.getProductCode());
