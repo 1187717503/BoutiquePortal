@@ -6,16 +6,19 @@ import com.intramirror.web.VO.InvoiceVO;
 import com.intramirror.web.VO.RecipientVO;
 import com.intramirror.web.VO.ShipperVO;
 import com.intramirror.web.VO.TransitWarehouseInvoiceVO;
-import org.apache.poi.hssf.usermodel.HSSFRichTextString;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellRangeAddress;
-import pk.shoplus.common.utils.StringUtil;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
+import pk.shoplus.common.utils.StringUtil;
 
 /**
  * Created by caowei on 2018/3/14.
@@ -115,12 +118,15 @@ public class ExcelUtil {
 
         //第二行
         ShipperVO shipperVO = invoiceVO.getShipperVO();
+        ShipperVO invoiceFrom = invoiceVO.getInvoiceFromVO();
         String companyName = safeStr(shipperVO.getCompanyName());
         String personName = safeStr(shipperVO.getPersonName());
+        String invoiceCompanyName = safeStr(invoiceFrom.getCompanyName());
+        String invoicePersonName = safeStr(invoiceFrom.getPersonName());
         Row row1 = sheet.createRow(1);
         row1.setHeight((short)550);
         Cell cell11 = row1.createCell(0);
-        cell11.setCellValue(new HSSFRichTextString(companyName+"\n"+personName));
+        cell11.setCellValue(new HSSFRichTextString(invoiceCompanyName+"\n"+invoicePersonName));
         cell11.setCellStyle(cs2);
         Cell cell12 = row1.createCell(2);
         cell12.setCellValue(new HSSFRichTextString(companyName+"\n"+personName));
@@ -130,10 +136,13 @@ public class ExcelUtil {
         String contact = safeStr(shipperVO.getPhoneNumber());
         String address = safeStr(shipperVO.getStreetLines()) + safeStr(shipperVO.getStreetLines2()) + safeStr(shipperVO.getStreetLines3());
         String city = safeStr(shipperVO.getCity());
+        String invoiceContact = safeStr(invoiceFrom.getPhoneNumber());
+        String invoiceAddress = safeStr(invoiceFrom.getStreetLines()) + safeStr(invoiceFrom.getStreetLines2()) + safeStr(invoiceFrom.getStreetLines3());
+        String invoiceCity = safeStr(invoiceFrom.getCity());
         Row row2 = sheet.createRow(2);
         row2.setHeight((short)780);
         Cell cell21 = row2.createCell(0);
-        cell21.setCellValue(new HSSFRichTextString(contact+"\n"+address+"\n"+city));
+        cell21.setCellValue(new HSSFRichTextString(invoiceContact+"\n"+invoiceAddress+"\n"+invoiceCity));
         cell21.setCellStyle(cs2);
         Cell cell22 = row2.createCell(2);
         cell22.setCellValue(new HSSFRichTextString(contact+"\n"+address+"\n"+city));
