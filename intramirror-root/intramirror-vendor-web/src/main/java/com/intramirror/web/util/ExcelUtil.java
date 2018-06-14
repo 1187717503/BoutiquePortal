@@ -454,9 +454,13 @@ public class ExcelUtil {
         //第二行
         String companyName = resultMap.get("companyName") != null ? resultMap.get("companyName").toString() : "";
         String personName = resultMap.get("personName") != null ? resultMap.get("personName").toString() : "";
+
+        String invoiceCompanyName = resultMap.get("invoiceCompanyName") != null ? resultMap.get("invoiceCompanyName").toString() : "";
+        String invoicePersonName = resultMap.get("invoicePersonName") != null ? resultMap.get("invoicePersonName").toString() : "";
+
         Row row1 = sheet.createRow(1);
         Cell cell11 = row1.createCell(0);
-        cell11.setCellValue(new HSSFRichTextString(companyName+"\n"+personName));
+        cell11.setCellValue(new HSSFRichTextString(invoiceCompanyName+"\n"+invoicePersonName));
         cell11.setCellStyle(cs2);
         Cell cell12 = row1.createCell(2);
         cell12.setCellValue(new HSSFRichTextString(companyName+"\n"+personName));
@@ -466,9 +470,13 @@ public class ExcelUtil {
         String contact = resultMap.get("contact") != null ? resultMap.get("contact").toString() : "";
         String address = resultMap.get("address") != null ? resultMap.get("address").toString() : "";
         String city = resultMap.get("city") != null ? resultMap.get("city").toString() : "";
+
+        String invoiceContact = resultMap.get("invoiceContact") != null ? resultMap.get("invoiceContact").toString() : "";
+        String invoiceAddress = resultMap.get("invoiceAddress") != null ? resultMap.get("invoiceAddress").toString() : "";
+        String invoiceCity = resultMap.get("invoiceCity") != null ? resultMap.get("invoiceCity").toString() : "";
         Row row2 = sheet.createRow(2);
         Cell cell21 = row2.createCell(0);
-        cell21.setCellValue(new HSSFRichTextString(contact+"\n"+address+"\n"+city));
+        cell21.setCellValue(new HSSFRichTextString(invoiceContact+"\n"+invoiceAddress+"\n"+invoiceCity));
         cell21.setCellStyle(cs2);
         Cell cell22 = row2.createCell(2);
         cell22.setCellValue(new HSSFRichTextString(contact+"\n"+address+"\n"+city));
