@@ -1300,7 +1300,7 @@ public class OrderShipController extends BaseController {
 
         if(dhlShipment!=null){
             if(dhlShipment.getAwbNum()!=null&&StringUtil.isNotEmpty(dhlShipment.getAwbNum())){
-                String s;
+                /*String s;
                 try {
                     //获取awb文档
                     s = DHLHttpClient.httpGet(DHLHttpClient.queryAWBUrl + dhlShipment.getAwbNum());
@@ -1315,7 +1315,32 @@ public class OrderShipController extends BaseController {
                     jo.put("shipmentNo",shipment.getShipmentNo());
                     result.setData(jo);
                     return result;
+                }*/
+                //删除awb
+                /*Map<String,Object> deleteParams = new HashMap<>();
+                deleteParams.put("awbNo",dhlShipment.getAwbNum());
+                deleteParams.put("requestorName",user.getUsername());
+                deleteParams.put("reason","001");
+                String s;
+                try{
+                    s = DHLHttpClient.httpPost(JsonTransformUtil.toJson(deleteParams), DHLHttpClient.deleteAWBUrl);
+                }catch (Exception e){
+                    logger.error("request fail,params={},url={}",JsonTransformUtil.toJson(deleteParams),DHLHttpClient.deleteAWBUrl);
+                    result.setMsg("DHL service invocation failed");
+                    return result;
                 }
+                if (StringUtil.isEmpty(s)){
+                    logger.error("deleteAWB fail");
+                    result.errorStatus().putMsg("Info", "deleteAWB fail");
+                    return result;
+                }*/
+                //deleteParams.put("shipmentId",map.get("shipmentId"));
+                //deleteParams.put("awbNo","");
+                //subShipmentService.updateSubShipment(deleteParams);
+
+                //删除物流表中awb单号
+                iShipmentService.deleteMilestone(dhlShipment.getAwbNum());
+                logger.info("awb:{}已从物流数据中删除",dhlShipment.getAwbNum());
             }
 
             if (shipment!=null){
@@ -1353,6 +1378,7 @@ public class OrderShipController extends BaseController {
             addParams(inputVO,dhlShipment,fromLocation,containerList,shipment);
             String resultStr;
             try{
+                logger.info("shipmentRequest,params={},url={}",JsonTransformUtil.toJson(inputVO),DHLHttpClient.createAWBUrl);
                 resultStr = DHLHttpClient.httpPost(JsonTransformUtil.toJson(inputVO), DHLHttpClient.createAWBUrl);
             }catch (Exception e){
                 result.addMsg("DHL service invocation failed");
@@ -1369,8 +1395,6 @@ public class OrderShipController extends BaseController {
                     JSONArray notification = shipmentResponse.optJSONArray("Notification");
                     msg = notification.get(0).toString();
                     String message = JSONObject.fromObject(msg).optString("Message");
-                    //int i = message.indexOf("-");
-                    //message = message.substring(0,i);
                     result.addMsg(message);
                     return result;
                 }
@@ -1395,6 +1419,7 @@ public class OrderShipController extends BaseController {
                         iShipmentService.saveMilestone(vo);
                     }
                 }
+                logger.info("shipmentNo:{},新生成awb为{},并同步到物流数据中",shipment.getShipmentNo(),awbNo);
                 return result;
             }
 
