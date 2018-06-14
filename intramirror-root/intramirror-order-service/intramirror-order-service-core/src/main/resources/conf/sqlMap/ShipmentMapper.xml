@@ -11,6 +11,7 @@
 	    <result column="shipment_category" property="shipmentCategory" jdbcType="BIGINT" />
 	    <result column="vendor_id" property="vendorId" jdbcType="BIGINT" />
 	    <result column="shipment_no" property="shipmentNo" jdbcType="VARCHAR" />
+	    <result column="to_type" property="toType" jdbcType="INTEGER" />
 	    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
 	    <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
   	</resultMap>
@@ -87,7 +88,7 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 	WHERE s.vendor_id = #{vendorId,jdbcType=BIGINT} AND s.`status` = #{status,jdbcType=BIGINT}
 	AND s.ship_to_geography = #{shipToGeography,jdbcType=VARCHAR}
 	AND s.ship_from_location_id = #{shipFromLocationId,jdbcType=INTEGER}
-	AND ss.enabled = 1 AND ss.shipment_type_id != 2
+	AND ss.enabled = 1 AND ss.shipment_type_id = 3
 	GROUP BY s.shipment_no
   </select>
   
@@ -198,4 +199,18 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 		VALUE (#{logisticsProductId},#{orderLineNum},#{orderId},#{orderNum},#{userId}
 		,NOW(),#{type},#{awb},#{shipmentType},#{isComplete},NOW(),NOW(),1)
 	</insert>
+
+	<update id="deleteMilestone" parameterType="string">
+		UPDATE logistics_milestone SET is_deleted = 1 WHERE dhl_type = 1 and shipment_code = #{awbNo}
+	</update>
+
+	<select id="getShipmentListByAwbNo" parameterType="string" resultMap="BaseResultMap">
+		SELECT s.* FROM shipment s
+		INNER JOIN sub_shipment ss on ss.shipment_id = s.shipment_id
+		WHERE ss.awb_num in
+		<foreach collection="list" item="awbNo" open="(" close=")" separator=",">
+			#{awbNo}
+		</foreach>
+		GROUP BY s.shipment_id
+	</select>
 </mapper>

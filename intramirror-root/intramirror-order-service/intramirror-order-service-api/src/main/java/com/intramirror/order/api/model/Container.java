@@ -20,7 +20,7 @@ public class Container {
 	/**
 	 * @Fields 容器类型
 	 */
-	private String containerType;
+	private Integer containerType;
 	
 	/**
 	 * @Fields 地理区域
@@ -100,11 +100,11 @@ public class Container {
 		this.containerId = containerId;
 	}
 
-	public String getContainerType() {
+	public Integer getContainerType() {
 		return containerType;
 	}
 
-	public void setContainerType(String containerType) {
+	public void setContainerType(Integer containerType) {
 		this.containerType = containerType;
 	}
 

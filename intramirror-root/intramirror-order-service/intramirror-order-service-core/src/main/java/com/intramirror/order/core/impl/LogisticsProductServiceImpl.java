@@ -276,6 +276,21 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
     }
 
     @Override
+    public LogisticProductContainer getLogisticProductContainer(LogisticProductContainer logisticProductContainer) {
+        LogisticProductContainerExample example = new LogisticProductContainerExample();
+        LogisticProductContainerExample.Criteria criteria = example.createCriteria();
+        criteria.andOrderLineNumEqualTo(logisticProductContainer.getOrderLineNum());
+        criteria.andContainerIdEqualTo(logisticProductContainer.getContainerId());
+        criteria.andIsDeletedEqualTo(0);
+        example.setLimit(1);
+        List<LogisticProductContainer> list = logisticProductContainerMapper.selectByExample(example);
+        if (list!=null&&list.size()>0){
+            return list.get(0);
+        }
+        return null;
+    }
+
+    @Override
     public void updateLogisticProductContainer(LogisticProductContainer logisticProductContainer) {
         LogisticProductContainer record = new LogisticProductContainer();
         record.setIsDeleted(1);

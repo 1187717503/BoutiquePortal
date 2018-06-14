@@ -101,6 +101,12 @@ public interface ILogisticsProductService {
 	 */
 	void updateLogisticProductContainer(LogisticProductContainer logisticProductContainer);
 
+	/**
+	 * 查询carton和订单关联表
+	 * @param logisticProductContainer
+	 * @return
+	 */
+	LogisticProductContainer getLogisticProductContainer(LogisticProductContainer logisticProductContainer);
 
 }
 

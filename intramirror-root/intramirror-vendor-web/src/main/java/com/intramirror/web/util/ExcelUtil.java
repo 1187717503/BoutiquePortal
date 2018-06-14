@@ -307,7 +307,7 @@ public class ExcelUtil {
         Row rowi4 = sheet.createRow(i+4);
         rowi4.setHeight((short)550);
         Cell celli40 = rowi4.createCell(0);
-        celli40.setCellValue("Shipment exempt from VAT - IVA non imponibile Art. 8 1°C L/A DPR 633/72");
+        celli40.setCellValue(invoiceVO.getRemark());
         celli40.setCellStyle(cs5);
 
         //设置表格边框样式

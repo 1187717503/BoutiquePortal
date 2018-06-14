@@ -390,17 +390,13 @@ public class OrderService {
 			//result.setInfoMap(info);
 			//return result;
 			throw new RuntimeException("This Order's consignee address is different than carton's. ");
-		}else{
-			//如果大区一致,且不为空箱子,则比较shipment_type(空箱子ischeck 都为false)
-			//空箱子不需要判断,直接存入   shipment_type 用于判断该箱子是否能存放多个，状态为1 只能存放一个  所以不能在存入
+		}
+		/*else{
+			//shipment_type 用于判断该箱子是否能存放多个，状态为1 只能存放一个  所以不能在存入
 			if(ischeck && shipMentMap.get("shipment_type_id").toString().equals("1")){
-				//result.setMsg("Only one Order can be packed in this carton. ");
-				//info.put("code", StatusType.ORDER_ERROR_CODE);
-				//result.setInfoMap(info);
-				//return result;
 				throw new RuntimeException("Only one Order can be packed in this carton.");
 			}
-		}
+		}*/
 
 		//校验该订单跟箱子所属的Shipment的发货地是否一致,一致则加入
 		if(checkStockLocation(orderMap,shipMentMap)){
@@ -449,9 +445,14 @@ public class OrderService {
 					if (!subShipment.getContact().replace(" ","").equalsIgnoreCase(contact)){
 						throw new RuntimeException("The contact is not consistent with the receiver address information.");
 					}
-
 				}
 			}
+
+			//shipment_type 用于判断该箱子是否能存放多个，状态为1 只能存放一个  所以不能在存入
+			if ("1".equals(shipMentMap.get("shipment_type_id").toString())){
+				throw new RuntimeException("Only one Order can be packed in this carton.");
+			}
+
 		}
 
 
@@ -478,8 +479,11 @@ public class OrderService {
 		productContainer.setVendorId(vendorId);
 		productContainer.setCreateTime(new Date());
 		productContainer.setUpdateTime(new Date());
-		iLogisticsProductService.insertLogisticProductContainer(productContainer);
-		
+		LogisticProductContainer logisticProductContainer = iLogisticsProductService.getLogisticProductContainer(productContainer);
+		if (logisticProductContainer==null){
+			iLogisticsProductService.insertLogisticProductContainer(productContainer);
+		}
+
 		if(row > 0){
 			result.successStatus();
 			

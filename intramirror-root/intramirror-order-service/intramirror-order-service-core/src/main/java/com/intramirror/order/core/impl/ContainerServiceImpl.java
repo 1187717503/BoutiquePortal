@@ -68,11 +68,11 @@ public class ContainerServiceImpl extends BaseDao implements IContainerService{
 		}else{
 			container.setBarcode("");
 		}
-		if (null != map.get("containerType")){
+		/*if (null != map.get("containerType")){
 			container.setContainerType(map.get("containerType").toString());
 		}else{
 			container.setContainerType("");
-		}
+		}*/
 		if (null != map.get("shipmentId")){
 			container.setShipmentId(Long.parseLong(map.get("shipmentId").toString()));
 		}else{
@@ -89,6 +89,7 @@ public class ContainerServiceImpl extends BaseDao implements IContainerService{
 		}else{
 			container.setWeight(new BigDecimal("0"));
 		}
+		container.setContainerType(1);
 		logger.info("perameter "+new Gson().toJson(container));
 		return containerMapper.saveContainerByShipment(container);
 	}

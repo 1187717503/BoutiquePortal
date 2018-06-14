@@ -69,6 +69,7 @@
         <property name="appOrderUrl" value="${app.order.url}"></property>
         <property name="appCheckUrl" value="${app.check.url}"></property>
         <property name="ruleExcelPath" value="${price.rule.path}"></property>
+        <property name="priceChangeRulePath" value="${price.change.rule.path}"></property>
     </bean>
 
 

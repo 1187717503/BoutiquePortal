@@ -1,6 +1,6 @@
 package com.intramirror.order.api.vo;
 
-import java.util.Date;
+import java.util.List;
 
 public class ShippedParam {
     private String orderLineNo;
@@ -15,6 +15,16 @@ public class ShippedParam {
     private String shipToGeography;
     private String shippedAtOrderBy;
     private String statusOrderBy;
+
+    private List<String> awbNos;
+
+    public List<String> getAwbNos() {
+        return awbNos;
+    }
+
+    public void setAwbNos(List<String> awbNos) {
+        this.awbNos = awbNos;
+    }
 
     public String getStockLocation() {
         return stockLocation;

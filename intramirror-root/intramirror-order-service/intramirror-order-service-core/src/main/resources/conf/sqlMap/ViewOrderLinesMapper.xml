@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.intramirror.common.core.mapper.ViewOrderLinesMapper">
+    <resultMap id="BaseResultMap" type="com.intramirror.order.api.vo.ViewOrderLinesVO">
+        <result column="order_line_num" property="order_line_num" jdbcType="VARCHAR"/>
+        <result column="created_at_datetime" property="created_at_datetime" jdbcType="VARCHAR"/>
+        <result column="confirmed_at_datetime" property="confirmed_at_datetime" jdbcType="VARCHAR"/>
+        <result column="packed_at_datetime" property="packed_at_datetime" jdbcType="VARCHAR"/>
+        <result column="shipped_at_datetime" property="shipped_at_datetime" jdbcType="VARCHAR"/>
+        <result column="qty" property="qty" jdbcType="VARCHAR"/>
+        <result column="vendor_name" property="vendor_name" jdbcType="VARCHAR"/>
+        <result column="brand" property="brand" jdbcType="VARCHAR"/>
+        <result column="l1_category" property="l1_category" jdbcType="VARCHAR"/>
+        <result column="l2_category" property="l2_category" jdbcType="VARCHAR"/>
+        <result column="l3_category" property="l3_category" jdbcType="VARCHAR"/>
+        <result column="designer_id" property="designer_id" jdbcType="VARCHAR"/>
+        <result column="color_code" property="color_code" jdbcType="VARCHAR"/>
+        <result column="product_name" property="product_name" jdbcType="VARCHAR"/>
+        <result column="size" property="size" jdbcType="VARCHAR"/>
+        <result column="boutique_price" property="boutique_price" jdbcType="DECIMAL"/>
+        <result column="retail_price" property="retail_price" jdbcType="DECIMAL"/>
+        <result column="stock_location" property="stock_location" jdbcType="VARCHAR"/>
+        <result column="buyer_name" property="buyer_name" jdbcType="VARCHAR"/>
+        <result column="buyer_contact" property="buyer_contact" jdbcType="VARCHAR"/>
+        <result column="consignee" property="consignee" jdbcType="VARCHAR"/>
+        <result column="consignee_mobile" property="consignee_mobile" jdbcType="VARCHAR"/>
+        <result column="ship_to_country" property="ship_to_country" jdbcType="VARCHAR"/>
+        <result column="ship_to_province" property="ship_to_province" jdbcType="VARCHAR"/>
+        <result column="ship_to_area" property="ship_to_area" jdbcType="VARCHAR"/>
+        <result column="ship_to_city" property="ship_to_city" jdbcType="VARCHAR"/>
+        <result column="ship_to_address" property="ship_to_address" jdbcType="VARCHAR"/>
+        <result column="zip_code" property="zip_code" jdbcType="VARCHAR"/>
+        <result column="container_nr" property="container_nr" jdbcType="VARCHAR"/>
+        <result column="height" property="height" jdbcType="VARCHAR"/>
+        <result column="length" property="length" jdbcType="VARCHAR"/>
+        <result column="width" property="width" jdbcType="VARCHAR"/>
+        <result column="weight" property="weight" jdbcType="VARCHAR"/>
+        <result column="shipment_nr" property="shipment_nr" jdbcType="VARCHAR"/>
+        <result column="shipment_status" property="shipment_status" jdbcType="VARCHAR"/>
+        <result column="awb_nb" property="awb_nbr" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="getShipmentListByShipmentNo" parameterType="string" resultMap="BaseResultMap">
+		SELECT
+		  lp.order_line_num                                                       AS order_line_num,
+		  DATE_FORMAT(lp.created_at, '%Y-%m-%d %H:%i:%s')                         AS created_at_datetime,
+		  DATE_FORMAT(lp.confirmed_at, '%Y-%m-%d %H:%i:%s')                       AS confirmed_at_datetime,
+		  DATE_FORMAT(lp.packed_at, '%Y-%m-%d %H:%i:%s')                          AS packed_at_datetime,
+		  DATE_FORMAT(lp.shipped_at, '%Y-%m-%d %H:%i:%s')                         AS shipped_at_datetime,
+		  1                                                                       AS qty,
+		  vrd.vendor_name                                                         AS vendor_name,
+		  brd.english_name                                                        AS brand,
+		  c1.name                                                                 AS l1_category,
+		  c2.name                                                                 AS l2_category,
+		  c3.name                                                                 AS l3_category,
+		  p.designer_id                                                           AS designer_id,
+		  p.color_code                                                            AS color_code,
+		  p.name                                                                  AS product_name,
+		  sku.size                                                                AS size,
+		  lp.in_price                                                             AS boutique_price,
+		  lp.retail_price                                                         AS retail_price,
+		  lp.stock_location                                                       AS stock_location,
+		  ord.wechat                                                              AS buyer_name,
+		  ord.contact_phone                                                       AS buyer_contact,
+		  IF((lp.user_rec_flag = 0), log.user_rec_name, lp.user_rec_name)         AS consignee,
+		  IF((lp.user_rec_flag = 0), log.user_rec_mobile, lp.user_rec_mobile)     AS consignee_mobile,
+		  log.user_rec_country                                                    AS ship_to_country,
+		  IF((lp.user_rec_flag = 0), log.user_rec_province, lp.user_rec_province) AS ship_to_province,
+		  IF((lp.user_rec_flag = 0), log.user_rec_area, lp.user_rec_area)         AS ship_to_area,
+		  IF((lp.user_rec_flag = 0), log.user_rec_city, lp.user_rec_city)         AS ship_to_city,
+		  IF((lp.user_rec_flag = 0), log.user_rec_addr, lp.user_rec_addr)         AS ship_to_address,
+		  IF((lp.user_rec_flag = 0), log.user_rec_code, lp.user_rec_code)         AS zip_code,
+		  con.barcode                                                             AS container_nr,
+		  con.height                                                              AS height,
+		  con.length                                                              AS LENGTH,
+		  con.width                                                               AS width,
+		  con.weight                                                              AS weight,
+		  ship.shipment_no                                                        AS shipment_nr,
+		  (CASE ship.status
+		   WHEN 1
+			 THEN 'Open'
+		   WHEN 2
+			 THEN 'Closed'
+		   WHEN 3
+			 THEN 'Shipped'
+		   WHEN 4
+			 THEN 'Delivered' END
+		  )                                                                       AS shipment_status,
+		  sub_ship.awb_num                                                        AS awb_nbr
+		FROM ((((((((((((((
+			logistics_product lp
+			LEFT JOIN order_logistics ol
+			  ON (ol.order_logistics_id = lp.order_logistics_id)
+		  )
+		  LEFT JOIN `order` ORD
+			ON (ord.order_id = ol.order_id)
+		  )
+		  LEFT JOIN shop_product_sku sps
+			ON (sps.shop_product_sku_id = lp.shop_product_sku_id)
+		  )
+		  LEFT JOIN sku
+			ON (sku.sku_id = sps.sku_id)
+		  )
+		  LEFT JOIN product p
+			ON (p.product_id = sku.product_id)
+		  )
+		  LEFT JOIN category c3
+			ON (c3.category_id = p.category_id)
+		  )
+		  LEFT JOIN category c2
+			ON (c2.category_id = c3.parent_id)
+		  )
+		  LEFT JOIN category c1
+			ON (c1.category_id = c2.parent_id)
+		  )
+		  LEFT JOIN brand brd
+			ON (brd.brand_id = p.brand_id)
+		  )
+		  LEFT JOIN vendor vrd
+			ON (vrd.vendor_id = p.vendor_id)
+		  )
+		  LEFT JOIN logistics LOG
+			ON (log.order_logistics_id = ol.order_logistics_id)
+		  )
+		  LEFT JOIN container con
+			ON (con.container_id = lp.container_id)
+		  )
+		  LEFT JOIN shipment ship
+			ON (ship.shipment_id = con.shipment_id)
+		  )
+		  LEFT JOIN sub_shipment sub_ship
+			ON (sub_ship.shipment_id = ship.shipment_id AND sub_ship.segment_sequence = 1)
+		)
+		WHERE ship.shipment_no = #{shipmentNo}
+		GROUP BY lp.order_line_num
+	</select>
+</mapper>

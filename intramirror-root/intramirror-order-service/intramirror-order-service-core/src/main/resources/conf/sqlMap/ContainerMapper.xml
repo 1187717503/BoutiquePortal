@@ -4,7 +4,7 @@
 
    	<resultMap id="BaseResultMap" type="com.intramirror.order.api.model.Container" >
 	    <id column="container_id" property="containerId" jdbcType="BIGINT" />
-	    <result column="container_type" property="containerType" jdbcType="VARCHAR" />
+	    <result column="container_type" property="containerType" jdbcType="INTEGER" />
 	    <result column="ship_to_geography" property="shipToGeography" jdbcType="VARCHAR" />
 	    <result column="stock_location_id" property="stockLocationId" jdbcType="INTEGER" />
 	    <result column="stock_location" property="stockLocation" jdbcType="INTEGER" />
@@ -21,7 +21,7 @@
 	
 	<insert id="saveContainerByShipment" parameterType="com.intramirror.order.api.model.Container">
    insert into container(container_type,ship_to_geography,status,height,width,length,weight,barcode,created_at,updated_at,shipment_id)
-values(#{containerType,jdbcType=VARCHAR}, #{shipToGeography,jdbcType=VARCHAR},#{status,jdbcType=INTEGER}, #{height,jdbcType=BIGINT},#{width,jdbcType=BIGINT}, #{length,jdbcType=BIGINT}, #{weight,jdbcType=DECIMAL},#{barcode,jdbcType=VARCHAR},#{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP},#{shipmentId,jdbcType=BIGINT})
+values(#{containerType,jdbcType=INTEGER}, #{shipToGeography,jdbcType=VARCHAR},#{status,jdbcType=INTEGER}, #{height,jdbcType=BIGINT},#{width,jdbcType=BIGINT}, #{length,jdbcType=BIGINT}, #{weight,jdbcType=DECIMAL},#{barcode,jdbcType=VARCHAR},#{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP},#{shipmentId,jdbcType=BIGINT})
   	</insert>
   
   

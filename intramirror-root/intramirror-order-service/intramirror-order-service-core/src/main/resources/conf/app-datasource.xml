@@ -57,29 +57,46 @@
         <property name="orderStatusChangeTopic" value="${kafka.topic.order.status}"></property>
     </bean>
 
+    <bean id="mailConfig" class="com.intramirror.order.core.utils.MailConfig" lazy-init="false">
+        <property name="host" value="${mail.mailHost}"></property>
+        <property name="port" value="${mail.mailPort}"></property>
+        <property name="userName" value="${mail.mailUsername}"></property>
+        <property name="password" value="${mail.mailPassword}"></property>
+        <property name="emailFrom" value="${mail.mailFrom}"></property>
+        <property name="timeout" value="${mail.mailTimeout}"></property>
+        <property name="emailTo" value="${mail.mailTo}"></property>
+        <property name="emailToWarehouse" value="${mail.mailToWarehouse}"></property>
+    </bean>
+
     <beans profile="test">
         <context:property-placeholder location="classpath:/test/databases.properties" ignore-unresolvable="true"/>
         <context:property-placeholder location="classpath:/test/common.properties" ignore-unresolvable="true"/>
+        <context:property-placeholder location="classpath:/test/mailConfig.properties" ignore-unresolvable="true"/>
     </beans>
     <beans profile="staging">
         <context:property-placeholder location="classpath:/staging/databases.properties" ignore-unresolvable="true"/>
         <context:property-placeholder location="classpath:/staging/common.properties" ignore-unresolvable="true"/>
+        <context:property-placeholder location="classpath:/staging/mailConfig.properties" ignore-unresolvable="true"/>
     </beans>
     <beans profile="test_local">
         <context:property-placeholder location="classpath:/test_local/databases.properties" ignore-unresolvable="true"/>
         <context:property-placeholder location="classpath:/test_local/common.properties" ignore-unresolvable="true"/>
+        <context:property-placeholder location="classpath:/test_local/mailConfig.properties" ignore-unresolvable="true"/>
     </beans>
     <beans profile="test_ci">
         <context:property-placeholder location="classpath:/test_ci/databases.properties" ignore-unresolvable="true"/>
         <context:property-placeholder location="classpath:/test_ci/common.properties" ignore-unresolvable="true"/>
+        <context:property-placeholder location="classpath:/test_ci/mailConfig.properties" ignore-unresolvable="true"/>
     </beans>
     <beans profile="staging_local">
         <context:property-placeholder location="classpath:/staging_local/databases.properties" ignore-unresolvable="true"/>
         <context:property-placeholder location="classpath:/staging_local/common.properties" ignore-unresolvable="true"/>
+        <context:property-placeholder location="classpath:/staging_local/mailConfig.properties" ignore-unresolvable="true"/>
     </beans>
     <beans profile="prd">
         <context:property-placeholder location="classpath:/prd/databases.properties" ignore-unresolvable="true"/>
         <context:property-placeholder location="classpath:/prd/common.properties" ignore-unresolvable="true"/>
+        <context:property-placeholder location="classpath:/prd/mailConfig.properties" ignore-unresolvable="true"/>
     </beans>
 
 </beans>   
