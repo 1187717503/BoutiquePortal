@@ -223,7 +223,8 @@ public class PriceChangeRuleController extends BaseController {
     }
 
     @RequestMapping(value = "/preview/all/im", method = RequestMethod.POST)
-    public @ResponseBody
+    public
+    @ResponseBody
     ResultMessage previewAllBoutique(@RequestBody Map<String, String> param) throws ParseException {
         ResultMessage resultMessage = ResultMessage.getInstance();
         PriceChangeRule condition = new PriceChangeRule();
@@ -235,7 +236,8 @@ public class PriceChangeRuleController extends BaseController {
         List<PriceChangeRule> priceChangeRules = priceChangeRule.selectByCondition(condition);
         if (priceChangeRules != null && priceChangeRules.size() > 0) {
             for (PriceChangeRule item : priceChangeRules) {
-                changePreview(item.getPriceChangeRuleId(), 1L, "");
+                //                changePreview(item.getPriceChangeRuleId(), 1L, "");
+                changePreviewByBoutique(item.getPriceChangeRuleId(), 1L, "");
             }
         }
         resultMessage.setData(priceChangeRules);
