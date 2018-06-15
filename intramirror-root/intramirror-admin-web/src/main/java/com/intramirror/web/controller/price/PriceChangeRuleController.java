@@ -227,7 +227,7 @@ public class PriceChangeRuleController extends BaseController {
     public ResultMessage previewAllBoutique(@RequestBody Map<String, String> param) throws ParseException {
         ResultMessage resultMessage = ResultMessage.getInstance();
         PriceChangeRule condition = new PriceChangeRule();
-        condition.setPriceType(Byte.valueOf("3"));
+        condition.setPriceType(Byte.valueOf("1"));
         condition.setStatus(1);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
         condition.setValidFrom(sdf.parse(param.get("validFrom")));
