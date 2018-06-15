@@ -1081,6 +1081,55 @@ public class OrderController extends BaseController {
         return message;
     }
 
+    /**
+     * 修改stockLocation
+     * */
+    @RequestMapping(value = "/saveOrderStockLocation", method = RequestMethod.POST)
+    @ResponseBody
+    public ResultMessage saveOrderStockLocation(@RequestBody Map<String, Object> map, HttpServletRequest httpRequest) {
+        logger.info("order saveOrderStockLocation Param : " + new Gson().toJson(map));
+        ResultMessage message = new ResultMessage();
+        try {
+            if (null == map || 0 == map.size()) {
+                logger.info("parameter cannot be null");
+                message.errorStatus().putMsg("info", "Parameter cannot be null");
+                return message;
+            }
+            if (map.get("logistics_product_id") == null || StringUtils.isBlank(map.get("logistics_product_id").toString())) {
+                logger.info("logistics_product_id cannot be null");
+                message.errorStatus().putMsg("info", "logistics_product_id cannot be null");
+                return message;
+            }
+            if(map.get("locationId") == null || StringUtils.isBlank(map.get("locationId").toString())){
+                logger.info("locationId cannot be null");
+                message.errorStatus().putMsg("info", "locationId cannot be null");
+                return message;
+            }
+            if(map.get("stockLocation") == null || StringUtils.isBlank(map.get("stockLocation").toString())){
+                logger.info("stockLocation cannot be null");
+                message.errorStatus().putMsg("info", "stockLocation cannot be null");
+                return message;
+            }
+            Long lpId = Long.valueOf(map.get("logistics_product_id").toString());
+            Integer locationId = Integer.valueOf(map.get("locationId").toString());
+            String stockLocation = map.get("stockLocation").toString();
+            LogisticsProduct logisticsProduct = new LogisticsProduct();
+            logisticsProduct.setLogistics_product_id(lpId);
+            logisticsProduct.setStock_location(stockLocation);
+            logisticsProduct.setStock_location_id(locationId);
+            int result = iLogisticsProductService.updateByLogisticsProduct(logisticsProduct);
+            if (result == 1) {
+                message.successStatus().putMsg("SUCCESS", "result " + result);
+                return message;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("errorMsg : " + e.getMessage());
+            message.errorStatus().putMsg("errorMsg", e.getMessage());
+        }
+        return message;
+    }
+
     @RequestMapping(value = "/getExceptionType", method = RequestMethod.GET)
     @ResponseBody
     public ResultMessage getExceptionType() {

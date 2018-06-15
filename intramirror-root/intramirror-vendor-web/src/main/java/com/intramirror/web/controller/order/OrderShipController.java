@@ -704,6 +704,8 @@ public class OrderShipController extends BaseController {
             resultMap.put("VAT", VAT.setScale(2,BigDecimal.ROUND_HALF_UP).toString());
             resultMap.put("GrandTotal", (VAT.add(allTotal)).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
 
+
+
             String isExcel = map.get("isExcel")!=null?map.get("isExcel").toString():null;
             if(isExcel!=null&&"1".equals(isExcel)){
                 printExcelShipmentInfo(response,resultMap);
