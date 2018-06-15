@@ -1,6 +1,4 @@
 
-USE `ger_sh_staging_db`;
-
 /*Table structure for table `im_price_algorithm` */
 
 DROP TABLE IF EXISTS `im_price_algorithm`;
