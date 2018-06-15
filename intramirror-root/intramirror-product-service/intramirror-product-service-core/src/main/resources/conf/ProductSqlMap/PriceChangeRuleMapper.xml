@@ -888,12 +888,12 @@
 
     <!-- linna pending open preview -->
     <select id="selectSnapshotByChangeRuleId" resultType="java.util.Map" parameterType="java.util.Map">
-        select sh.product_id,sh.im_price,sh.snapshot_price_detail_id  from snapshot_price_rule sn
+        select sh.product_id,sh.im_price,sh.snapshot_price_detail_id from snapshot_price_rule sn
         inner join snapshot_price_detail sh
         on sn.snapshot_price_rule_id = sh.snapshot_price_rule_id
         where sn.status = 0 and sn.enabled = 1 and sh.enabled = 1
         <if test="price_change_rule_id != null and price_change_rule_id != ''">
-            and sn.price_change_rule_id =  #{price_change_rule_id,jdbcType=BIGINT}
+            and sn.price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
         </if>
         <if test="price_change_rule_id == null and price_change_rule_id == ''">
             and sn.price_change_rule_id
@@ -904,29 +904,30 @@
 
 
     <update id="updateProductImPriceByConditions" parameterType="java.util.Map">
-         update product a inner join  (
-         select sp.product_id,sp.im_price from snapshot_price_rule sn
-         inner join snapshot_price_detail sp
-          on sn.snapshot_price_rule_id = sp.snapshot_price_rule_id
-          where sn.status = 0 and sn.enabled = 1 and sp.enabled = 1
-            <if test="price_change_rule_id != null and price_change_rule_id != ''">
-                and sn.price_change_rule_id =  #{price_change_rule_id,jdbcType=BIGINT}
-            </if>
-            <if test="price_change_rule_id == null and price_change_rule_id == ''">
-                and sn.price_change_rule_id
-                in (select price_change_rule_id from price_change_rule where vendor_id = #{vendor_id,jdbcType=BIGINT}
-                and category_type = #{category_type,jdbcType=TINYINT})
-            </if>
-          )b
-          on a.product_id = b.product_id
-          set
-          <if test="preview_status == 0">
-              a.preview_im_price = NULL
-          </if>
-          <if test="preview_status == 1">
-              a.preview_im_price =
-              (CASE WHEN (a.max_im_price > b.im_price) THEN b.im_price ELSE NULL END)
-          </if>
+        update product a inner join (
+        select sp.product_id,sp.im_price from snapshot_price_rule sn
+        inner join snapshot_price_detail sp
+        on sn.snapshot_price_rule_id = sp.snapshot_price_rule_id
+        where sn.status = 0 and sn.enabled = 1 and sp.enabled = 1
+        <if test="price_change_rule_id != null and price_change_rule_id != ''">
+            and sn.price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
+        </if>
+        <if test="price_change_rule_id == null and price_change_rule_id == ''">
+            and sn.price_change_rule_id
+            in (select price_change_rule_id from price_change_rule where price_type = 1 and status = 1 and
+            vendor_id = #{vendor_id,jdbcType=BIGINT}
+            and category_type = #{category_type,jdbcType=TINYINT})
+        </if>
+        )b
+        on a.product_id = b.product_id
+        set
+        <if test="preview_status == 0">
+            a.preview_im_price = NULL
+        </if>
+        <if test="preview_status == 1">
+            a.preview_im_price =
+            (CASE WHEN (a.max_im_price > b.im_price) THEN b.im_price ELSE NULL END)
+        </if>
     </update>
 
     <update id="updateProductImPriceByPrimaryKey" parameterType="java.util.Map">
@@ -939,9 +940,10 @@
         update price_change_rule set preview_status = #{preview_status,jdbcType=INTEGER}
         <where>
             <if test="price_change_rule_id != null and price_change_rule_id != ''">
-                price_change_rule_id =  #{price_change_rule_id,jdbcType=BIGINT}
+                price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
             </if>
             <if test="price_change_rule_id == null and price_change_rule_id == ''">
+                price_type = 1 and status = 1 and
                 vendor_id = #{vendor_id,jdbcType=BIGINT}
                 and category_type = #{category_type,jdbcType=TINYINT}
             </if>
@@ -952,13 +954,13 @@
 
     <update id="updateProductImPriceByProductIds" parameterType="java.util.Map">
         update product set preview_im_price = #{im_price,jdbcType=DECIMAL}
-        WHERE  enabled = 1 and product_id  in(
+        WHERE enabled = 1 and product_id in(
         select sp.product_id,sp.im_price from snapshot_price_rule sn
         inner join snapshot_price_detail sp
         on sn.snapshot_price_rule_id = sp.snapshot_price_rule_id
         where sn.status = 0 and sn.enabled = 1 and sp.enabled = 1
         <if test="price_change_rule_id != null and price_change_rule_id != ''">
-            and sn.price_change_rule_id =  #{price_change_rule_id,jdbcType=BIGINT}
+            and sn.price_change_rule_id = #{price_change_rule_id,jdbcType=BIGINT}
         </if>
         <if test="price_change_rule_id == null and price_change_rule_id == ''">
             and sn.price_change_rule_id
@@ -986,8 +988,8 @@
         where spd.product_id = sp.product_id
         and sp.shop_product_id = sps.shop_product_id
         and spd.enabled = 1
-        and sps.enabled  = 1
-        and sp.enabled  = 1
+        and sps.enabled = 1
+        and sp.enabled = 1
         and spd.snapshot_price_rule_id in
         <foreach item="item" index="index" collection="snapshotPriceRuleIdList" open="(" separator="," close=")">
             #{item}
@@ -1001,7 +1003,7 @@
         p.min_im_price = spd.im_price, p.max_im_price = spd.im_price
         where spd.product_id = p.product_id
         and spd.enabled = 1
-        and p.enabled  = 1
+        and p.enabled = 1
         and spd.snapshot_price_rule_id in
         <foreach item="item" index="index" collection="snapshotPriceRuleIdList" open="(" separator="," close=")">
             #{item}
@@ -1018,13 +1020,13 @@
         p.min_im_price = spd.im_price, p.max_im_price = spd.im_price
         where spd.product_id = s.product_id
         and sps.sku_id = s.sku_id
-        and sps.shop_product_id  = sp.shop_product_id
+        and sps.shop_product_id = sp.shop_product_id
         and spd.product_id = p.product_id
         and spd.enabled = 1
         and s.enabled = 1
-        and sps.enabled  = 1
-        and sp.enabled  = 1
-        and p.enabled  = 1
+        and sps.enabled = 1
+        and sp.enabled = 1
+        and p.enabled = 1
         and spd.snapshot_price_rule_id in
         <foreach item="item" index="index" collection="snapshotPriceRuleIdList" open="(" separator="," close=")">
             #{item}
