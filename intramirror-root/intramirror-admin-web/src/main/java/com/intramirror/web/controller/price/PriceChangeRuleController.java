@@ -223,9 +223,8 @@ public class PriceChangeRuleController extends BaseController {
     }
 
     @RequestMapping(value = "/preview/all/im", method = RequestMethod.POST)
-    public
     @ResponseBody
-    ResultMessage previewAllBoutique(@RequestBody Map<String, String> param) throws ParseException {
+    public ResultMessage previewAllBoutique(@RequestBody Map<String, String> param) throws ParseException {
         ResultMessage resultMessage = ResultMessage.getInstance();
         PriceChangeRule condition = new PriceChangeRule();
         condition.setPriceType(Byte.valueOf("3"));
