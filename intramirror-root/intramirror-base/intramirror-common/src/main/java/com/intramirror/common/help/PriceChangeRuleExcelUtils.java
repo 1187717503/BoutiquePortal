@@ -233,7 +233,7 @@ public class PriceChangeRuleExcelUtils {
     private static void generateKidsPriceRuleSheet(HSSFWorkbook workbook, List<Map<String, Object>> datas) {
         // set sheet name
         int rowLength = 0;
-        HSSFSheet sheet = workbook.createSheet(PRICE_RULE_SHEET_NAME);
+        HSSFSheet sheet = workbook.getSheet(PRICE_RULE_SHEET_NAME);
         HSSFCellStyle cellStyle = workbook.createCellStyle();
         cellStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
 
@@ -298,6 +298,7 @@ public class PriceChangeRuleExcelUtils {
     private static void generateBrandCategoryRuleSheet(HSSFWorkbook workbook, List<Map<String, Object>> categoryBrandMaps) {
         int rowLength = 0;
         HSSFSheet sheet = workbook.getSheet(CATEGORY_BRAND_SHEET_NAME);
+        sheet.setColumnWidth(1, 30 * 256);
         HSSFCellStyle cellStyle = workbook.createCellStyle();
         cellStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
 
@@ -338,9 +339,6 @@ public class PriceChangeRuleExcelUtils {
         CellRangeAddressList categoryAddressList = new CellRangeAddressList(1, 500, 1, 1);
         HSSFDataValidation categoryValidation = new HSSFDataValidation(categoryAddressList, categoryDVConstraint);
         sheet.addValidationData(categoryValidation);
-
-        sheet.autoSizeColumn((short) 1); //调整第二列宽度
-        sheet.autoSizeColumn((short) 2); //调整第三列宽度
     }
 
     private static void generateProductGroupRuleSheet(HSSFWorkbook workbook, List<Map<String, Object>> productGroupMaps) {
