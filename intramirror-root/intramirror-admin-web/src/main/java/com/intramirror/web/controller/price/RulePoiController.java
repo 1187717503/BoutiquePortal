@@ -162,15 +162,16 @@ public class RulePoiController {
     }
 
     private List<Category> getCategoryList(String type) throws Exception {
+        List<Category> categories = new ArrayList<>();
         List<Category> allCategories = iCategoryService.queryActiveCategorys();
         if (CollectionUtils.isNotEmpty(allCategories)) {
+            CategoryTypeEnum categoryType = null;
+            if (type.equals(CategoryTypeEnum.ADULT.getCategoryType())) {
+                categoryType = CategoryTypeEnum.ADULT;
+            } else if (type.equals(CategoryTypeEnum.KIDS.getCategoryType())) {
+                categoryType = CategoryTypeEnum.KIDS;
+            }
             for (Category category_1 : allCategories) {
-                CategoryTypeEnum categoryType = null;
-                if (type.equals(CategoryTypeEnum.ADULT.getCategoryType())) {
-                    categoryType = CategoryTypeEnum.ADULT;
-                } else if (type.equals(CategoryTypeEnum.KIDS.getCategoryType())) {
-                    categoryType = CategoryTypeEnum.KIDS;
-                }
                 List<Long> firstCategoryIds = categoryType.getFirstCategoryIds();
                 if (firstCategoryIds.contains(category_1.getCategoryId())) {
                     if (category_1.getCategoryId().equals(Long.valueOf(1499))) { // Men
@@ -192,10 +193,11 @@ public class RulePoiController {
                             childs.remove(3);
                         }
                     }
+                    categories.add(category_1);
                 }
             }
         }
-        return allCategories;
+        return categories;
     }
 
     private List<Tag> getProductGroupList(Long vendorId) {
