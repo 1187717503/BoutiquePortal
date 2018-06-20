@@ -231,24 +231,12 @@ public class ShipmentController extends BaseController{
 			message.successStatus().putMsg("Info", "SUCCESS").setData(1);
 
 			//如果shipment操作reopen,需要删除awb
-			if (1 == Long.parseLong(map.get("status").toString())){
+			/*if (1 == Long.parseLong(map.get("status").toString())){
 				Shipment shipment = iShipmentService.selectShipmentById(map);
 				SubShipment dhlShipment = null;
 				if (shipment!=null){
-					//String shipToGeography = shipment.getShipToGeography();
-					//if ("European Union".equals(shipToGeography)) {
-						//查询第三段
-						/*map.put("sequence", 3);
-						dhlShipment = subShipmentService.getDHLShipment(map);
-						if (dhlShipment == null) {
-							//查询第二段
-							map.put("sequence", 2);
-							dhlShipment = subShipmentService.getDHLShipment(map);
-						}*/
-					//}else {
-						map.put("sequence", 1);
-						dhlShipment = subShipmentService.getDHLShipment(map);
-					//}
+					map.put("sequence", 1);
+					dhlShipment = subShipmentService.getDHLShipment(map);
 				}
 				if (dhlShipment!=null){
 					if (StringUtil.isNotEmpty(dhlShipment.getAwbNum())){
@@ -282,7 +270,7 @@ public class ShipmentController extends BaseController{
 						iShipmentService.deleteMilestone(dhlShipment.getAwbNum());
 					}
 				}
-			}
+			}*/
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.info("Error Message : " + e.getMessage());

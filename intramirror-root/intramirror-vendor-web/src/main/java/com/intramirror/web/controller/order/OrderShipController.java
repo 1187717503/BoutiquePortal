@@ -608,12 +608,19 @@ public class OrderShipController extends BaseController {
 
             //获取Ship From信息
             StockLocation location = stockLocationService.getShipFromLocation(shipment_id);
+            // 获取invoice from
             resultMap.put("companyName",location.getContactCompanyName());
             resultMap.put("personName",location.getContactPersonName());
             resultMap.put("contact",location.getContactPhoneNumber());
             resultMap.put("address",location.getAddressStreetlines());
             resultMap.put("city",location.getAddressCity());
             resultMap.put("country","Italy");
+
+            resultMap.put("invoiceCompanyName",vendor.getCompanyName());
+            resultMap.put("invoicePersonName",vendor.getRegisteredPerson());
+            resultMap.put("invoiceAddress",vendor.getBusinessLicenseLocation());
+            //resultMap.put("invoiceCity",location.getAddressCity());
+            resultMap.put("invoiceCountry","Italy");
 
             logger.info("打印Invoice----获取Deliver To信息");
             List<SubShipment> subShipmentList = subShipmentService.getSubShipmentByShipmentId(shipment_id);
@@ -697,6 +704,8 @@ public class OrderShipController extends BaseController {
             resultMap.put("VAT", VAT.setScale(2,BigDecimal.ROUND_HALF_UP).toString());
             resultMap.put("GrandTotal", (VAT.add(allTotal)).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
 
+
+
             String isExcel = map.get("isExcel")!=null?map.get("isExcel").toString():null;
             if(isExcel!=null&&"1".equals(isExcel)){
                 printExcelShipmentInfo(response,resultMap);
@@ -761,6 +770,12 @@ public class OrderShipController extends BaseController {
         shipperVO.setStreetLines3(location.getAddressStreetlines3());
         shipperVO.setCity(location.getAddressCity());
         shipperVO.setCountry("Italy");
+        ShipperVO invoiceForm = new ShipperVO();
+        invoiceForm.setCompanyName(vendor.getCompanyName());
+        invoiceForm.setPersonName(vendor.getRegisteredPerson());
+        invoiceForm.setStreetLines(vendor.getBusinessLicenseLocation());
+        invoiceForm.setCountry("Italy");
+
         boolean isDDt = false;
         if(map.get("ddtFlag")!=null&&"1".equals(map.get("ddtFlag").toString())){
             isDDt = true;
@@ -943,6 +958,7 @@ public class OrderShipController extends BaseController {
             chinaInovice.setList(chinaList);
             chinaInovice.setRecipientVO(recipientVO);
             chinaInovice.setShipperVO(shipperVO);
+            chinaInovice.setInvoiceFromVO(invoiceForm);
             chinaInovice.setInvoiceTo((String) resultMap.get("InvoiceTo"));
             chinaInovice.setInvoiceName((String) resultMap.get("InvoiceName"));
             chinaInovice.setInvoicePersonName((String)resultMap.get("contactPersonName"));
@@ -1010,6 +1026,7 @@ public class OrderShipController extends BaseController {
                 }
                 UNInvoiceVO.setList(list);
                 UNInvoiceVO.setShipperVO(shipperVO);
+                UNInvoiceVO.setInvoiceFromVO(invoiceForm);
                 UNInvoiceVO.setRecipientVO(recipientVO);
                 UNInvoiceVO.setInvoiceTo((String) resultMap.get("InvoiceTo"));
                 UNInvoiceVO.setInvoiceName((String) resultMap.get("InvoiceName"));
@@ -1078,6 +1095,7 @@ public class OrderShipController extends BaseController {
                 }
                 elseInvoiceVO.setList(list);
                 elseInvoiceVO.setShipperVO(shipperVO);
+                elseInvoiceVO.setInvoiceFromVO(invoiceForm);
                 elseInvoiceVO.setRecipientVO(recipientVO);
                 elseInvoiceVO.setInvoiceTo((String) resultMap.get("InvoiceTo"));
                 elseInvoiceVO.setInvoiceName((String) resultMap.get("InvoiceName"));
@@ -1300,7 +1318,7 @@ public class OrderShipController extends BaseController {
 
         if(dhlShipment!=null){
             if(dhlShipment.getAwbNum()!=null&&StringUtil.isNotEmpty(dhlShipment.getAwbNum())){
-                String s;
+                /*String s;
                 try {
                     //获取awb文档
                     s = DHLHttpClient.httpGet(DHLHttpClient.queryAWBUrl + dhlShipment.getAwbNum());
@@ -1315,7 +1333,32 @@ public class OrderShipController extends BaseController {
                     jo.put("shipmentNo",shipment.getShipmentNo());
                     result.setData(jo);
                     return result;
+                }*/
+                //删除awb
+                /*Map<String,Object> deleteParams = new HashMap<>();
+                deleteParams.put("awbNo",dhlShipment.getAwbNum());
+                deleteParams.put("requestorName",user.getUsername());
+                deleteParams.put("reason","001");
+                String s;
+                try{
+                    s = DHLHttpClient.httpPost(JsonTransformUtil.toJson(deleteParams), DHLHttpClient.deleteAWBUrl);
+                }catch (Exception e){
+                    logger.error("request fail,params={},url={}",JsonTransformUtil.toJson(deleteParams),DHLHttpClient.deleteAWBUrl);
+                    result.setMsg("DHL service invocation failed");
+                    return result;
                 }
+                if (StringUtil.isEmpty(s)){
+                    logger.error("deleteAWB fail");
+                    result.errorStatus().putMsg("Info", "deleteAWB fail");
+                    return result;
+                }*/
+                //deleteParams.put("shipmentId",map.get("shipmentId"));
+                //deleteParams.put("awbNo","");
+                //subShipmentService.updateSubShipment(deleteParams);
+
+                //删除物流表中awb单号
+                iShipmentService.deleteMilestone(dhlShipment.getAwbNum());
+                logger.info("awb:{}已从物流数据中删除",dhlShipment.getAwbNum());
             }
 
             if (shipment!=null){
@@ -1353,6 +1396,7 @@ public class OrderShipController extends BaseController {
             addParams(inputVO,dhlShipment,fromLocation,containerList,shipment);
             String resultStr;
             try{
+                logger.info("shipmentRequest,params={},url={}",JsonTransformUtil.toJson(inputVO),DHLHttpClient.createAWBUrl);
                 resultStr = DHLHttpClient.httpPost(JsonTransformUtil.toJson(inputVO), DHLHttpClient.createAWBUrl);
             }catch (Exception e){
                 result.addMsg("DHL service invocation failed");
@@ -1369,8 +1413,6 @@ public class OrderShipController extends BaseController {
                     JSONArray notification = shipmentResponse.optJSONArray("Notification");
                     msg = notification.get(0).toString();
                     String message = JSONObject.fromObject(msg).optString("Message");
-                    //int i = message.indexOf("-");
-                    //message = message.substring(0,i);
                     result.addMsg(message);
                     return result;
                 }
@@ -1395,6 +1437,7 @@ public class OrderShipController extends BaseController {
                         iShipmentService.saveMilestone(vo);
                     }
                 }
+                logger.info("shipmentNo:{},新生成awb为{},并同步到物流数据中",shipment.getShipmentNo(),awbNo);
                 return result;
             }
 

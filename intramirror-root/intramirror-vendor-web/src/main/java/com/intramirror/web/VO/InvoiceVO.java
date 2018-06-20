@@ -10,6 +10,7 @@ public class InvoiceVO {
 
     private ShipperVO shipperVO;
 
+    private ShipperVO invoiceFromVO;
     private RecipientVO recipientVO;
 
     private String invoiceTo;
@@ -156,5 +157,13 @@ public class InvoiceVO {
 
     public void setAllQty(String allQty) {
         this.allQty = allQty;
+    }
+
+    public ShipperVO getInvoiceFromVO() {
+        return invoiceFromVO;
+    }
+
+    public void setInvoiceFromVO(ShipperVO invoiceFromVO) {
+        this.invoiceFromVO = invoiceFromVO;
     }
 }
