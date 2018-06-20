@@ -33,20 +33,20 @@
         from price_change_rule_product
         where price_change_rule_product_id = #{priceChangeRuleProductId,jdbcType=BIGINT}
     </select>
-    
-    
+
+
     <select id="selectByPriceChangeRuleId" resultMap="BaseResultMap" parameterType="java.lang.Long">
         select
         <include refid="Base_Column_List"/>
         from price_change_rule_product
         where price_change_rule_id = #{priceChangeRuleId,jdbcType=BIGINT}
     </select>
-    
+
     <select id="selectByParameter" resultMap="BaseResultMap" parameterType="com.intramirror.product.api.model.PriceChangeRuleProduct">
         select
         <include refid="Base_Column_List"/>
         from price_change_rule_product
-        where 1=1 
+        where 1=1
             <if test="priceChangeRuleProductId != null">
                 and price_change_rule_product_id = #{priceChangeRuleProductId,jdbcType=BIGINT}
             </if>
@@ -72,7 +72,7 @@
                 and color_code = #{colorCode,jdbcType=VARCHAR}
             </if>
     </select>
-    
+
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         <!--
           WARNING - @mbggenerated
@@ -81,12 +81,12 @@
         delete from price_change_rule_product
         where price_change_rule_product_id = #{priceChangeRuleProductId,jdbcType=BIGINT}
     </delete>
-    
+
     <delete id="deleteBypriceChangeRuleId" parameterType="java.lang.Long">
         delete from price_change_rule_product
         where price_change_rule_id = #{priceChangeRuleId,jdbcType=BIGINT}
     </delete>
-    
+
     <insert id="insert" parameterType="com.intramirror.product.api.model.PriceChangeRuleProduct">
         <!--
           WARNING - @mbggenerated
@@ -212,5 +212,11 @@
         from price_change_rule_product
         where price_change_rule_id = #{priceChangeRuleId,jdbcType=BIGINT}
     </select>
+
+    <delete id="deleteByDesignerIdAndColorCode" parameterType="com.intramirror.product.api.model.PriceChangeRuleProduct">
+        delete from price_change_rule_product
+        where designer_id = #{designerId,jdbcType=VARCHAR} and color_code = #{colorCode,jdbcType=VARCHAR}
+        and price_change_rule_id = #{priceChangeRuleId,jdbcType=BIGINT}
+    </delete>
 
 </mapper>

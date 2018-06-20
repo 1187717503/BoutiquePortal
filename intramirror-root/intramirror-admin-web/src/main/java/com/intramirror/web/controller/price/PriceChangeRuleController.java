@@ -802,49 +802,32 @@ public class PriceChangeRuleController extends BaseController {
             if (productWithBLOBsList == null || productWithBLOBsList.isEmpty()) {
                 result.put("info", "Can't find the goods");
                 return result;
-            } else if (productWithBLOBsList.size() > 1) {
-                result.put("info", "Duplicate products exist.");
-                return result;
-            }
-            ProductWithBLOBs productWithBLOBs = productWithBLOBsList.get(0);
-            List<PriceChangeRuleSeasonGroup> priceChangeRuleSeasonGroups = iPriceChangeRuleSeasonGroupService.getPriceChangeRuleGroupListByPriceChangeRuleId(
-                    priceChangeRuleId);
-
-            Set<String> seasonCodes = new HashSet<>();
-            for (PriceChangeRuleSeasonGroup priceChangeRuleSeasonGroup : priceChangeRuleSeasonGroups) {
-                seasonCodes.add(priceChangeRuleSeasonGroup.getSeasonCode());
             }
 
-            if (!seasonCodes.contains(productWithBLOBs.getSeasonCode())) {
-                result.put("info", "Wrong Season Code.");
-                return result;
-            }
-
-            //判断是否已经存在规则
+            //先删除已有数据，再添加新的数据
             PriceChangeRuleProduct priceChangeRuleProductParam = new PriceChangeRuleProduct();
             priceChangeRuleProductParam.setPriceChangeRuleId(priceChangeRuleId);
             priceChangeRuleProductParam.setDesignerId(designerId);
             priceChangeRuleProductParam.setColorCode(colorCode);
-            List<PriceChangeRuleProduct> list = priceChangeRuleProductService.selectByParameter(priceChangeRuleProductParam);
-            if (list != null && list.size() > 0) {
-                result.put("info", "Records already exist");
-                return result;
-            }
+            priceChangeRuleProductService.deleteByDesignerIdAndColorCode(priceChangeRuleProductParam);
 
-            //添加 priceChangeRuleProduct
-            PriceChangeRuleProduct priceChangeRuleProduct = new PriceChangeRuleProduct();
-            priceChangeRuleProduct.setPriceChangeRuleId(priceChangeRuleId);
-            priceChangeRuleProduct.setProductId(productWithBLOBs.getProductId());
-            priceChangeRuleProduct.setDesignerId(designerId);
-            priceChangeRuleProduct.setColorCode(colorCode);
-            priceChangeRuleProduct.setBoutiqueId(productWithBLOBs.getProductCode());
-            priceChangeRuleProduct.setProductName(productWithBLOBs.getName());
-            priceChangeRuleProduct.setDiscountPercentage(Long.valueOf("100") - Long.valueOf(map.get("discount_percentage").toString()));
-            priceChangeRuleProductService.insertSelective(priceChangeRuleProduct);
+            //如果查询到多条商品需要全部添加
+            for (ProductWithBLOBs productWithBLOBs : productWithBLOBsList) {
+                //添加 priceChangeRuleProduct
+                PriceChangeRuleProduct priceChangeRuleProduct = new PriceChangeRuleProduct();
+                priceChangeRuleProduct.setPriceChangeRuleId(priceChangeRuleId);
+                priceChangeRuleProduct.setProductId(productWithBLOBs.getProductId());
+                priceChangeRuleProduct.setDesignerId(designerId);
+                priceChangeRuleProduct.setColorCode(colorCode);
+                priceChangeRuleProduct.setBoutiqueId(productWithBLOBs.getProductCode());
+                priceChangeRuleProduct.setProductName(productWithBLOBs.getName());
+                priceChangeRuleProduct.setDiscountPercentage(Long.valueOf("100") - Long.valueOf(map.get("discount_percentage").toString()));
+                priceChangeRuleProductService.insertSelective(priceChangeRuleProduct);
 
-            if (priceChangeRuleProduct.getPriceChangeRuleProductId() == null) {
-                result.put("info", "parameter is incorrect");
-                return result;
+                if (priceChangeRuleProduct.getPriceChangeRuleProductId() == null) {
+                    result.put("info", "parameter is incorrect");
+                    return result;
+                }
             }
             // 更新snapshot_price_rule数据
             updateSnapshotPriceRuleSaveAt(priceChangeRuleId);

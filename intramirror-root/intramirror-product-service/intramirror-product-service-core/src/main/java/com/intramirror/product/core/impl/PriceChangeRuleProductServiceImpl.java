@@ -17,7 +17,7 @@ public class PriceChangeRuleProductServiceImpl extends BaseDao implements IPrice
     private static Logger logger = LoggerFactory.getLogger(PriceChangeRuleProductServiceImpl.class);
 
     private PriceChangeRuleProductMapper priceChangeRuleProductMapper;
-    
+
 	@Override
 	public int deleteByPrimaryKey(Long priceChangeRuleProductId) {
 		return priceChangeRuleProductMapper.deleteByPrimaryKey(priceChangeRuleProductId);
@@ -41,31 +41,36 @@ public class PriceChangeRuleProductServiceImpl extends BaseDao implements IPrice
 	@Override
 	public void init() {
 		priceChangeRuleProductMapper = this.getSqlSession().getMapper(PriceChangeRuleProductMapper.class);
-		
+
 	}
 
 	@Override
 	public int deleteBypriceChangeRuleId(Long priceChangeRuleId) {
-		
+
 		return priceChangeRuleProductMapper.deleteBypriceChangeRuleId(priceChangeRuleId);
 	}
 
 	@Override
 	public List<PriceChangeRuleProduct> selectByPriceChangeRuleId(
 			Long priceChangeRuleId) {
-		
+
 		return priceChangeRuleProductMapper.selectByPriceChangeRuleId(priceChangeRuleId);
 	}
 
 	@Override
 	public List<PriceChangeRuleProduct> selectByParameter(
 			PriceChangeRuleProduct record) {
-	
+
 		return priceChangeRuleProductMapper.selectByParameter(record);
 	}
 
 	@Override
 	public PriceChangeRuleProduct selectByPrimaryKey(Long id) {
 		return priceChangeRuleProductMapper.selectByPrimaryKey(id);
+	}
+
+	@Override
+	public int deleteByDesignerIdAndColorCode(PriceChangeRuleProduct record) {
+		return priceChangeRuleProductMapper.deleteByDesignerIdAndColorCode(record);
 	}
 }

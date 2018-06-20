@@ -437,12 +437,12 @@ public class PriceChangeRuleExcelUtils {
         }
         HSSFSheet productGroupSheet = workbook.getSheet(PRODUCT_GROUP_SHEET_NAME);
         List<Map<String, Object>> productGroupList = new ArrayList<>();
-        if (categoryBrandSheet != null) {
+        if (productGroupSheet != null) {
             productGroupList = readProductGroupSheet(productGroupSheet, productGroupMapList, price_change_rule_id);
         }
         HSSFSheet productSheet = workbook.getSheet(PRODUCT_SHEET_NAME);
         List<Map<String, Object>> productList = new ArrayList<>();
-        if (categoryBrandSheet != null) {
+        if (productSheet != null) {
             productList = readProductSheet(productSheet, price_change_rule_id);
         }
 
@@ -462,7 +462,7 @@ public class PriceChangeRuleExcelUtils {
 
             HSSFRow row=sheet.getRow(j);
 
-            if(row == null || row.getCell(0) == null) {
+            if (row == null || row.getCell(0) == null || StringUtils.isBlank(row.getCell(0).toString())) {
                 break;
             }
             String brand_id = getBrandId(brandMapList, row.getCell(0).getStringCellValue());
@@ -550,11 +550,7 @@ public class PriceChangeRuleExcelUtils {
         for (int j = 2; j < sheet.getPhysicalNumberOfRows(); j++) {//获取每行
             HSSFRow row = sheet.getRow(j);
 
-            if (row == null || row.getCell(0) == null) {
-                break;
-            }
-
-            if (row == null || row.getCell(0) == null) {
+            if (row == null || row.getCell(0) == null || StringUtils.isBlank(row.getCell(0).toString())) {
                 break;
             }
 
@@ -656,17 +652,12 @@ public class PriceChangeRuleExcelUtils {
         for (Map<String, Object> categoryMap : categoryMapList) {
             categoryPathToCategoryMap.put(categoryMap.get("categoryPath").toString(), categoryMap);
         }
-        CategoryTypeEnum categoryType = null;
-        if (type.equals(CategoryTypeEnum.ADULT.getCategoryType())) {
-            categoryType = CategoryTypeEnum.ADULT;
-        } else if (type.equals(CategoryTypeEnum.KIDS.getCategoryType())) {
-            categoryType = CategoryTypeEnum.KIDS;
-        }
 
-        List<Long> secondCategoryIds = categoryType.getSecondCategoryIds();
         for (int j = 1; j < sheet.getPhysicalNumberOfRows(); j++) {//获取每行
             HSSFRow row = sheet.getRow(j);
-            if (row == null || row.getCell(0) == null || row.getCell(1) == null || row.getCell(2) == null) {
+            if (row == null || row.getCell(0) == null || StringUtils.isBlank(row.getCell(0).toString())
+                    || row.getCell(1) == null || StringUtils.isBlank(row.getCell(1).toString())
+                    || row.getCell(2) == null || StringUtils.isBlank(row.getCell(2).toString())) {
                 break;
             }
             String brandName = row.getCell(0).getStringCellValue();
@@ -677,13 +668,9 @@ public class PriceChangeRuleExcelUtils {
 
             Map<String, Object> category = categoryPathToCategoryMap.get(categoryPath);
             if (category == null) {
-                throw new RuntimeException("类目不存在：" + categoryPath);
-            }
-            Long categoryId = Long.parseLong(category.get("categoryId").toString());
-            Long parentId = Long.parseLong(category.get("parentId").toString());
-            if (!secondCategoryIds.contains(parentId)) {
                 throw new RuntimeException("类目不在限定范围内：" + categoryPath);
             }
+            Long categoryId = Long.parseLong(category.get("categoryId").toString());
 
             int dis = 100 - (int) Double.parseDouble(StringUtils.trim(discount));
             if (dis < 0 || dis > 100) {
@@ -711,7 +698,8 @@ public class PriceChangeRuleExcelUtils {
         }
         for (int j = 1; j < sheet.getPhysicalNumberOfRows(); j++) {//获取每行
             HSSFRow row = sheet.getRow(j);
-            if (row == null || row.getCell(0) == null || row.getCell(1) == null) {
+            if (row == null || row.getCell(0) == null || StringUtils.isBlank(row.getCell(0).toString())
+                    || row.getCell(1) == null || StringUtils.isBlank(row.getCell(1).toString())) {
                 break;
             }
             String productGroupName = row.getCell(0).getStringCellValue();
@@ -740,7 +728,9 @@ public class PriceChangeRuleExcelUtils {
         List<Map<String, Object>> readExcelList = new ArrayList<>();
         for (int j = 1; j < sheet.getPhysicalNumberOfRows(); j++) {//获取每行
             HSSFRow row = sheet.getRow(j);
-            if (row == null || row.getCell(0) == null || row.getCell(1) == null || row.getCell(2) == null) {
+            if (row == null || row.getCell(0) == null || StringUtils.isBlank(row.getCell(0).toString())
+                    || row.getCell(1) == null || StringUtils.isBlank(row.getCell(1).toString())
+                    || row.getCell(2) == null || StringUtils.isBlank(row.getCell(2).toString())) {
                 break;
             }
             String designerId = row.getCell(0).getStringCellValue();
