@@ -106,9 +106,9 @@ public class PriceChangeRuleExcelUtils {
 
         HSSFWorkbook workbook = new HSSFWorkbook();
         workbook.createSheet(PRICE_RULE_SHEET_NAME);
-//        workbook.createSheet(CATEGORY_BRAND_SHEET_NAME);
-//        workbook.createSheet(PRODUCT_GROUP_SHEET_NAME);
-//        workbook.createSheet(PRODUCT_SHEET_NAME);
+        workbook.createSheet(CATEGORY_BRAND_SHEET_NAME);
+        workbook.createSheet(PRODUCT_GROUP_SHEET_NAME);
+        workbook.createSheet(PRODUCT_SHEET_NAME);
         workbook.createSheet(HIDDEN_SHEET_NAME);
 
         //设置品牌下拉菜单
@@ -121,13 +121,12 @@ public class PriceChangeRuleExcelUtils {
         } else if (CategoryTypeEnum.KIDS.getCategoryType().equals(type)) {
             generateKidsPriceRuleSheet(workbook, datas);
         }
-//        generateBrandCategoryRuleSheet(workbook, categoryBrandMaps);
-//        generateProductGroupRuleSheet(workbook, productGroupMaps);
-//        generateProductRuleSheet(workbook, productMaps);
+        generateBrandCategoryRuleSheet(workbook, categoryBrandMaps);
+        generateProductGroupRuleSheet(workbook, productGroupMaps);
+        generateProductRuleSheet(workbook, productMaps);
 
         //隐藏下拉框内容sheet
-//        workbook.setSheetHidden(4, true);
-        workbook.setSheetHidden(1, true);
+        workbook.setSheetHidden(4, true);
         FileOutputStream fileOut;
         fileOut = new FileOutputStream(filePath);
         workbook.write(fileOut);
@@ -210,13 +209,7 @@ public class PriceChangeRuleExcelUtils {
                 if (StringUtils.isBlank(cId)) {
                     value = data.get("english_name").toString();
                 } else {
-                    if (data.get(cId) == null) {
-                        value = "100"; // 如果不存在  折扣为100 不打折
-                    } else {
-                        value = data.get(cId).toString();
-                    }
-
-                    value = "" + (100 - Integer.parseInt(value));
+                    value = getDiscountForView(data.get(cId).toString());
                 }
                 HSSFCell cell = row.createCell(i);
                 cell.setCellValue(new HSSFRichTextString(value));
@@ -233,10 +226,14 @@ public class PriceChangeRuleExcelUtils {
         sheet.addValidationData(brandValidation);
     }
 
+    private static String getDiscountForView(String discount) {
+        return String.valueOf(100 - Integer.parseInt(discount == null ? "100" : discount));
+    }
+
     private static void generateKidsPriceRuleSheet(HSSFWorkbook workbook, List<Map<String, Object>> datas) {
         // set sheet name
         int rowLength = 0;
-        HSSFSheet sheet = workbook.createSheet(PRICE_RULE_SHEET_NAME);
+        HSSFSheet sheet = workbook.getSheet(PRICE_RULE_SHEET_NAME);
         HSSFCellStyle cellStyle = workbook.createCellStyle();
         cellStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
 
@@ -281,13 +278,7 @@ public class PriceChangeRuleExcelUtils {
                 if (StringUtils.isBlank(cId)) {
                     value = data.get("english_name").toString();
                 } else {
-                    if (data.get(cId) == null) {
-                        value = "100"; // 如果不存在  折扣为100 不打折
-                    } else {
-                        value = data.get(cId).toString();
-                    }
-
-                    value = "" + (100 - Integer.parseInt(value));
+                    value = getDiscountForView(data.get(cId).toString());
                 }
                 HSSFCell cell = row.createCell(i);
                 cell.setCellValue(new HSSFRichTextString(value));
@@ -307,6 +298,7 @@ public class PriceChangeRuleExcelUtils {
     private static void generateBrandCategoryRuleSheet(HSSFWorkbook workbook, List<Map<String, Object>> categoryBrandMaps) {
         int rowLength = 0;
         HSSFSheet sheet = workbook.getSheet(CATEGORY_BRAND_SHEET_NAME);
+        sheet.setColumnWidth(1, 30 * 256);
         HSSFCellStyle cellStyle = workbook.createCellStyle();
         cellStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
 
@@ -331,7 +323,7 @@ public class PriceChangeRuleExcelUtils {
             categoryCell.setCellValue(categoryPath);
             categoryCell.setCellStyle(cellStyle);
             HSSFCell discountCell = row.createCell(2);
-            discountCell.setCellValue(new HSSFRichTextString(data.get("discount_percentage").toString()));
+            discountCell.setCellValue(new HSSFRichTextString(getDiscountForView(data.get("discount_percentage").toString())));
             discountCell.setCellStyle(cellStyle);
             rowLength++;
         }
@@ -347,9 +339,6 @@ public class PriceChangeRuleExcelUtils {
         CellRangeAddressList categoryAddressList = new CellRangeAddressList(1, 500, 1, 1);
         HSSFDataValidation categoryValidation = new HSSFDataValidation(categoryAddressList, categoryDVConstraint);
         sheet.addValidationData(categoryValidation);
-
-        sheet.autoSizeColumn((short) 1); //调整第二列宽度
-        sheet.autoSizeColumn((short) 2); //调整第三列宽度
     }
 
     private static void generateProductGroupRuleSheet(HSSFWorkbook workbook, List<Map<String, Object>> productGroupMaps) {
@@ -375,7 +364,7 @@ public class PriceChangeRuleExcelUtils {
             productGroupCell.setCellValue(data.get("name").toString());
             productGroupCell.setCellStyle(cellStyle);
             HSSFCell discountCell = row.createCell(1);
-            discountCell.setCellValue(new HSSFRichTextString(data.get("discount_percentage").toString()));
+            discountCell.setCellValue(new HSSFRichTextString(getDiscountForView(data.get("discount_percentage").toString())));
             discountCell.setCellStyle(cellStyle);
             rowLength++;
         }
@@ -416,7 +405,7 @@ public class PriceChangeRuleExcelUtils {
             colorCodeCell.setCellValue(data.get("color_code").toString());
             colorCodeCell.setCellStyle(cellStyle);
             HSSFCell discountCell = row.createCell(2);
-            discountCell.setCellValue(new HSSFRichTextString(data.get("discount_percentage").toString()));
+            discountCell.setCellValue(new HSSFRichTextString(getDiscountForView(data.get("discount_percentage").toString())));
             discountCell.setCellStyle(cellStyle);
             rowLength++;
         }
@@ -441,26 +430,26 @@ public class PriceChangeRuleExcelUtils {
         } else if (CategoryTypeEnum.KIDS.getCategoryType().equals(type)) {
             priceRuleList = readKidsPriceRuleSheet(priceRuleSheet, brandMapList, price_change_rule_id);
         }
-        /*HSSFSheet categoryBrandSheet = workbook.getSheet(CATEGORY_BRAND_SHEET_NAME);
+        HSSFSheet categoryBrandSheet = workbook.getSheet(CATEGORY_BRAND_SHEET_NAME);
         List<Map<String, Object>> categoryBrandList = new ArrayList<>();
         if (categoryBrandSheet != null) {
             categoryBrandList = readCategoryBrandSheet(type, categoryBrandSheet, brandMapList, categoryMapList, price_change_rule_id);
         }
         HSSFSheet productGroupSheet = workbook.getSheet(PRODUCT_GROUP_SHEET_NAME);
         List<Map<String, Object>> productGroupList = new ArrayList<>();
-        if (categoryBrandSheet != null) {
+        if (productGroupSheet != null) {
             productGroupList = readProductGroupSheet(productGroupSheet, productGroupMapList, price_change_rule_id);
         }
         HSSFSheet productSheet = workbook.getSheet(PRODUCT_SHEET_NAME);
         List<Map<String, Object>> productList = new ArrayList<>();
-        if (categoryBrandSheet != null) {
+        if (productSheet != null) {
             productList = readProductSheet(productSheet, price_change_rule_id);
-        }*/
+        }
 
         result.put("priceRuleList", priceRuleList);
-        /*result.put("categoryBrandList", categoryBrandList);
+        result.put("categoryBrandList", categoryBrandList);
         result.put("productGroupList", productGroupList);
-        result.put("productList", productList);*/
+        result.put("productList", productList);
 
         return result;
     }
@@ -473,7 +462,7 @@ public class PriceChangeRuleExcelUtils {
 
             HSSFRow row=sheet.getRow(j);
 
-            if(row == null || row.getCell(0) == null) {
+            if (row == null || row.getCell(0) == null || StringUtils.isBlank(row.getCell(0).getStringCellValue())) {
                 break;
             }
             String brand_id = getBrandId(brandMapList, row.getCell(0).getStringCellValue());
@@ -561,11 +550,7 @@ public class PriceChangeRuleExcelUtils {
         for (int j = 2; j < sheet.getPhysicalNumberOfRows(); j++) {//获取每行
             HSSFRow row = sheet.getRow(j);
 
-            if (row == null || row.getCell(0) == null) {
-                break;
-            }
-
-            if (row == null || row.getCell(0) == null) {
+            if (row == null || row.getCell(0) == null || StringUtils.isBlank(row.getCell(0).getStringCellValue())) {
                 break;
             }
 
@@ -667,34 +652,29 @@ public class PriceChangeRuleExcelUtils {
         for (Map<String, Object> categoryMap : categoryMapList) {
             categoryPathToCategoryMap.put(categoryMap.get("categoryPath").toString(), categoryMap);
         }
-        CategoryTypeEnum categoryType = null;
-        if (type.equals(CategoryTypeEnum.ADULT.getCategoryType())) {
-            categoryType = CategoryTypeEnum.ADULT;
-        } else if (type.equals(CategoryTypeEnum.KIDS.getCategoryType())) {
-            categoryType = CategoryTypeEnum.KIDS;
-        }
 
-        List<Long> secondCategoryIds = categoryType.getSecondCategoryIds();
         for (int j = 1; j < sheet.getPhysicalNumberOfRows(); j++) {//获取每行
             HSSFRow row = sheet.getRow(j);
             if (row == null || row.getCell(0) == null || row.getCell(1) == null || row.getCell(2) == null) {
                 break;
             }
+            row.getCell(0).setCellType(HSSFCell.CELL_TYPE_STRING);
+            row.getCell(1).setCellType(HSSFCell.CELL_TYPE_STRING);
+            row.getCell(2).setCellType(HSSFCell.CELL_TYPE_STRING);
             String brandName = row.getCell(0).getStringCellValue();
             String categoryPath = row.getCell(1).getStringCellValue();
             String discount = row.getCell(2).toString();
+            if (StringUtils.isBlank(brandName) || StringUtils.isBlank(categoryPath) || StringUtils.isBlank(discount)) {
+                break;
+            }
 
             String brand_id = getBrandId(brandMapList, brandName);
 
             Map<String, Object> category = categoryPathToCategoryMap.get(categoryPath);
             if (category == null) {
-                throw new RuntimeException("类目不存在：" + categoryPath);
-            }
-            Long categoryId = Long.parseLong(category.get("categoryId").toString());
-            Long parentId = Long.parseLong(category.get("parentId").toString());
-            if (!secondCategoryIds.contains(parentId)) {
                 throw new RuntimeException("类目不在限定范围内：" + categoryPath);
             }
+            Long categoryId = Long.parseLong(category.get("categoryId").toString());
 
             int dis = 100 - (int) Double.parseDouble(StringUtils.trim(discount));
             if (dis < 0 || dis > 100) {
@@ -725,8 +705,13 @@ public class PriceChangeRuleExcelUtils {
             if (row == null || row.getCell(0) == null || row.getCell(1) == null) {
                 break;
             }
+            row.getCell(0).setCellType(HSSFCell.CELL_TYPE_STRING);
+            row.getCell(1).setCellType(HSSFCell.CELL_TYPE_STRING);
             String productGroupName = row.getCell(0).getStringCellValue();
             String discount = row.getCell(1).toString();
+            if (StringUtils.isBlank(productGroupName) || StringUtils.isBlank(discount)) {
+                break;
+            }
             Map<String, Object> productGroup = productGroupNameToProductGroupMap.get(productGroupName);
             if (productGroup == null) {
                 throw new RuntimeException("Product Group不存在：" + productGroupName);
@@ -754,9 +739,15 @@ public class PriceChangeRuleExcelUtils {
             if (row == null || row.getCell(0) == null || row.getCell(1) == null || row.getCell(2) == null) {
                 break;
             }
+            row.getCell(0).setCellType(HSSFCell.CELL_TYPE_STRING);
+            row.getCell(1).setCellType(HSSFCell.CELL_TYPE_STRING);
+            row.getCell(2).setCellType(HSSFCell.CELL_TYPE_STRING);
             String designerId = row.getCell(0).getStringCellValue();
             String colorCode = row.getCell(1).getStringCellValue();
-            String discount = row.getCell(2).toString();
+            String discount = row.getCell(2).getStringCellValue();
+            if (StringUtils.isBlank(designerId) || StringUtils.isBlank(colorCode) || StringUtils.isBlank(discount)) {
+                break;
+            }
 
             int dis = 100 - (int) Double.parseDouble(StringUtils.trim(discount));
             if (dis < 0 || dis > 100) {
