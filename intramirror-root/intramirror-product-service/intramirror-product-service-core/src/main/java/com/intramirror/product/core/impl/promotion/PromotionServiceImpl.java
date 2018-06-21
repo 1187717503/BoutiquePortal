@@ -1,35 +1,25 @@
 package com.intramirror.product.core.impl.promotion;
 
 import com.alibaba.fastjson.JSONObject;
-import com.intramirror.product.api.entity.promotion.BrandEntity;
-import com.intramirror.product.api.entity.promotion.BrandSort;
-import com.intramirror.product.api.entity.promotion.CategoryEntity;
-import com.intramirror.product.api.entity.promotion.CategorySort;
-import com.intramirror.product.api.entity.promotion.SortPromotion;
-import com.intramirror.product.api.entity.promotion.VendorSort;
+import com.intramirror.product.api.entity.promotion.*;
 import com.intramirror.product.api.enums.PromotionRuleType;
 import com.intramirror.product.api.enums.SortColumn;
 import com.intramirror.product.api.exception.BusinessException;
-import com.intramirror.product.api.model.Category;
-import com.intramirror.product.api.model.Promotion;
-import com.intramirror.product.api.model.PromotionBrandHot;
-import com.intramirror.product.api.model.PromotionExclude;
-import com.intramirror.product.api.model.PromotionInclude;
-import com.intramirror.product.api.model.PromotionRule;
-import com.intramirror.product.api.model.PromotionRuleDetail;
+import com.intramirror.product.api.model.*;
 import com.intramirror.product.api.service.promotion.IPromotionService;
 import com.intramirror.product.core.mapper.CategoryMapper;
 import com.intramirror.product.core.mapper.PromotionBrandHotMapper;
 import com.intramirror.product.core.mapper.PromotionMapper;
 import com.intramirror.product.core.mapper.PromotionRuleMapper;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created on 2018/1/4.
@@ -550,5 +540,20 @@ public class PromotionServiceImpl implements IPromotionService {
             addProductsForIncludeRule(promotion.getPromotionId(), productIds);
             removeExcludeProduct(promotion.getPromotionId());
         }
+    }
+
+    @Override
+    public List<Map<String, Object>> getPromotionBoutiqueHasRuleList(Long promotionId) {
+        return promotionRuleMapper.getPromotionBoutiqueHasRuleList(promotionId);
+    }
+
+    @Override
+    public List<Map<String, Object>> getPromotionBoutiqueProductCountBySeason(Map<String, Object> params) {
+        return promotionRuleMapper.getPromotionBoutiqueProductCountBySeason(params);
+    }
+
+    @Override
+    public Integer getPromotionBoutiqueExcludeProductCount(Long promotionId) {
+        return promotionRuleMapper.getPromotionBoutiqueExcludeProductCount(promotionId);
     }
 }

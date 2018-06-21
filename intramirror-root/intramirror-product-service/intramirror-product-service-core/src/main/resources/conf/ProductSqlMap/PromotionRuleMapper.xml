@@ -663,4 +663,46 @@
         DELETE FROM snapshot_product WHERE promotion_id=#{promotionId, jdbcType=BIGINT} AND product_id IN (SELECT product_id FROM t_promotion_exclude_product WHERE promotion_id=#{promotionId, jdbcType=BIGINT})
     </delete>
 
+    <select id="getPromotionBoutiqueHasRuleList" parameterType="java.lang.Long" resultType="java.util.Map">
+        SELECT
+          v.vendor_id, v.vendor_name
+        FROM
+          vendor v
+        WHERE v.vendor_id IN
+          (SELECT
+            vendor_id
+          FROM
+            t_promotion_include_rule tpir
+          WHERE tpir.promotion_id = #{promotionId, jdbcType=BIGINT}
+          UNION
+          SELECT
+            vendor_id
+          FROM
+            t_promotion_exclude_rule tper
+          WHERE tper.promotion_id = #{promotionId, jdbcType=BIGINT})
+    </select>
+
+    <select id="getPromotionBoutiqueProductCountBySeason" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+          tpir.season_code,
+          CASE
+            WHEN tpir.season_code like '%ss' THEN concat(substring(tpir.season_code, 1, 2), 1)
+            WHEN tpir.season_code like '%fw' THEN concat(substring(tpir.season_code, 1, 2), 2)
+            WHEN tpir.season_code like 'CarryOver' THEN 1
+            WHEN tpir.season_code like 'CloseOut' THEN 0
+          END AS season_code_sort,
+          COUNT(*) as sum
+        FROM
+          t_promotion_include_rule tpir
+          INNER JOIN snapshot_product sp
+            ON sp.promotion_include_rule_id = tpir.promotion_include_rule_id
+        WHERE tpir.promotion_id = #{promotionId, jdbcType=BIGINT} AND tpir.vendor_id=#{vendorId, jdbcType=BIGINT}
+        GROUP BY season_code
+        ORDER BY season_code_sort desc
+    </select>
+
+    <select id="getPromotionBoutiqueExcludeProductCount" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM t_promotion_exclude_product tpep WHERE tpep.promotion_id=#{promotionId, jdbcType=BIGINT}
+    </select>
+
 </mapper>
