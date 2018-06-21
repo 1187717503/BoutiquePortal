@@ -803,6 +803,22 @@ public class PriceChangeRuleController extends BaseController {
                 result.put("info", "Can't find the goods");
                 return result;
             }
+            List<PriceChangeRuleSeasonGroup> priceChangeRuleSeasonGroups = iPriceChangeRuleSeasonGroupService.getPriceChangeRuleGroupListByPriceChangeRuleId(priceChangeRuleId);
+
+            Set<String> seasonCodes = new HashSet<>();
+            for (PriceChangeRuleSeasonGroup priceChangeRuleSeasonGroup : priceChangeRuleSeasonGroups) {
+                seasonCodes.add(priceChangeRuleSeasonGroup.getSeasonCode());
+            }
+
+            List<ProductWithBLOBs> tempProduct = new ArrayList<>();
+            for (ProductWithBLOBs product : productWithBLOBsList) {
+                if (seasonCodes.contains(product.getSeasonCode())) {
+                    tempProduct.add(product);
+                }
+            }
+            if (tempProduct.size() == 0) {
+                throw new RuntimeException("Wrong Season Code.");
+            }
 
             //先删除已有数据，再添加新的数据
             PriceChangeRuleProduct priceChangeRuleProductParam = new PriceChangeRuleProduct();
@@ -812,7 +828,7 @@ public class PriceChangeRuleController extends BaseController {
             priceChangeRuleProductService.deleteByDesignerIdAndColorCode(priceChangeRuleProductParam);
 
             //如果查询到多条商品需要全部添加
-            for (ProductWithBLOBs productWithBLOBs : productWithBLOBsList) {
+            for (ProductWithBLOBs productWithBLOBs : tempProduct) {
                 //添加 priceChangeRuleProduct
                 PriceChangeRuleProduct priceChangeRuleProduct = new PriceChangeRuleProduct();
                 priceChangeRuleProduct.setPriceChangeRuleId(priceChangeRuleId);

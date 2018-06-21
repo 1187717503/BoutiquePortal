@@ -321,18 +321,23 @@ public class RulePoiController {
         }
 
         //查询priceChangeRule的seasonCode
-//        List<PriceChangeRuleSeasonGroup> priceChangeRuleSeasonGroups = iPriceChangeRuleSeasonGroupService.getPriceChangeRuleGroupListByPriceChangeRuleId(priceChangeRuleId);
-//        Set<String> seasonCodes = new HashSet<>();
-//        for (PriceChangeRuleSeasonGroup priceChangeRuleSeasonGroup : priceChangeRuleSeasonGroups) {
-//            seasonCodes.add(priceChangeRuleSeasonGroup.getSeasonCode());
-//        }
+        List<PriceChangeRuleSeasonGroup> priceChangeRuleSeasonGroups = iPriceChangeRuleSeasonGroupService.getPriceChangeRuleGroupListByPriceChangeRuleId(priceChangeRuleId);
+        Set<String> seasonCodes = new HashSet<>();
+        for (PriceChangeRuleSeasonGroup priceChangeRuleSeasonGroup : priceChangeRuleSeasonGroups) {
+            seasonCodes.add(priceChangeRuleSeasonGroup.getSeasonCode());
+        }
 
         Set<String> productSet = new HashSet<>();
+        List<Map<String, Object>> realProductList = new ArrayList<>();
         for (Map<String, Object> map : productList) {
             String designerId = map.get("designer_id").toString();
             String colorCode = map.get("color_code").toString();
             String value = designerId + "_" + colorCode;
-            productSet.add(value);
+            if (productSet.contains(value)) {
+                continue;
+            } else {
+                productSet.add(value);
+            }
 
             //查询是否存在该商品
             List<ProductWithBLOBs> productWithBLOBsList = null;
@@ -345,24 +350,31 @@ public class RulePoiController {
                 productWithBLOBsList = productService.getProductByParameter(productWithBLOBs);
             }
 
-            if (productWithBLOBsList == null) {
-                throw new RuntimeException("Can't find the goods");
-            } else if (productWithBLOBsList.size() > 1) {
-                throw new RuntimeException("Duplicate products exist.");
+            if (productWithBLOBsList == null || productWithBLOBsList.size() == 0) {
+                throw new RuntimeException("Can't find the goods. designer id:" + designerId + "color code:" + colorCode);
             }
-            ProductWithBLOBs productWithBLOBs = productWithBLOBsList.get(0);
             //商品的seasonCode要和priceChangeRule保持一致
-//            if(!seasonCodes.contains(productWithBLOBs.getSeasonCode())) {
-//                throw new RuntimeException("Wrong Season Code.");
-//            }
-
-            map.put("product_id", productWithBLOBs.getProductId());
-            map.put("boutique_id", productWithBLOBs.getProductCode());
-            map.put("product_name", productWithBLOBs.getName());
+            List<ProductWithBLOBs> tempProduct = new ArrayList<>();
+            for (ProductWithBLOBs product : productWithBLOBsList) {
+                if (seasonCodes.contains(product.getSeasonCode())) {
+                    tempProduct.add(product);
+                }
+            }
+            if (tempProduct.size() == 0) {
+                throw new RuntimeException("Wrong Season Code.");
+            }
+            for (ProductWithBLOBs product : tempProduct) {
+                Map<String, Object> productMap = new HashMap<>();
+                productMap.put("product_id", product.getProductId());
+                productMap.put("boutique_id", product.getProductCode());
+                productMap.put("product_name", product.getName());
+                productMap.put("designer_id", designerId);
+                productMap.put("color_code", colorCode);
+                productMap.put("price_change_rule_id", map.get("price_change_rule_id"));
+                productMap.put("discount_percentage", map.get("discount_percentage"));
+                realProductList.add(productMap);
+            }
         }
-        if (productSet.size() != productList.size()) {
-            throw new RuntimeException("Product数据存在重复。");
-        }
-
+        sheetExcelData.put("productList", realProductList);
     }
 }
