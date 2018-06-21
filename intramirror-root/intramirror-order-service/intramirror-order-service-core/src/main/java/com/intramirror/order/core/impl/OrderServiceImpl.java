@@ -237,7 +237,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
     @Override
     public List<Map<String, Object>> getResult(Map<String, Object> params) {
         List<Map<String, Object>> mapList = orderMapper.getShippedOrderListByStatus(params);
-        addProductPropertyMap(mapList);
+       /* addProductPropertyMap(mapList);
         Object shippedParamObj = params.get("shippedParam");
         List<Map<String, Object>> list = new ArrayList<>();
         if(shippedParamObj != null){
@@ -270,8 +270,8 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
             }
         }else {
             return mapList;
-        }
-        return list;
+        }*/
+        return mapList;
     }
 
     @Override

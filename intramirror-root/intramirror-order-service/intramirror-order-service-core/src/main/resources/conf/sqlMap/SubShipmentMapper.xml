@@ -193,7 +193,7 @@
 
     <select id="getSubshipment" resultType="java.lang.Long" parameterType="java.util.Map">
 	SELECT sub_shipment_id FROM sub_shipment
-    WHERE  shipping_segment_id = #{shippingSegmentId,jdbcType=BIGINT} AND segment_sequence=#{segmentSequence,jdbcType=BIGINT}
+    WHERE  segment_sequence=#{segmentSequence,jdbcType=BIGINT}
     AND consignee=#{consignee,jdbcType=VARCHAR} AND ship_to_addr=#{shipToAddr,jdbcType=VARCHAR}
     AND ship_to_emailAddr = #{shipToEamilAddr,jdbcType=VARCHAR} AND postal_code = #{postalCode,jdbcType=VARCHAR}
     AND ship_to_district =#{shipToDistrict,jdbcType=VARCHAR} AND ship_to_city = #{shipToCity,jdbcType=VARCHAR}

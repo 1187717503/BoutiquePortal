@@ -538,7 +538,6 @@
 
     <select id="getShippedOrderListByStatus" resultType="java.util.HashMap" parameterType="java.util.Map">
         SELECT
-
         <choose>
             <when test="count == 1">
                 lp.order_line_num,p.product_id
@@ -550,7 +549,7 @@
                 lp.shipped_at AS shipped_date,sm.shipment_no,s.sku_code,b.english_name as brandName,
                 v.vendor_name,sm.ship_to_geography as geography_name,
                 CASE WHEN p.spu_id IS NULL THEN p.cover_img ELSE spu.cover_img END AS cover_img,
-                p.product_id,lp.stock_location
+                p.product_id,lp.stock_location,p.designer_id as brandID,p.color_code as colorCode
             </otherwise>
         </choose>
 
@@ -572,6 +571,12 @@
         and v.vendor_id = #{vendorId,jdbcType=BIGINT}
         <if test="shippedParam.orderLineNo!=null and shippedParam.orderLineNo!=''">
             and lp.order_line_num=#{shippedParam.orderLineNo}
+        </if>
+        <if test="shippedParam.brandID!=null and shippedParam.brandID!=''">
+            and p.designer_id=#{shippedParam.brandID}
+        </if>
+        <if test="shippedParam.colorCode!=null and shippedParam.colorCode!=''">
+            and p.color_code=#{shippedParam.colorCode}
         </if>
 
         <if test="shippedParam.startDate!= null and shippedParam.endDate != null and shippedParam.startDate!= '' and shippedParam.endDate != ''">
