@@ -96,5 +96,7 @@ public interface PromotionRuleMapper {
     List<Map<String, Object>> getPromotionBoutiqueHasRuleList(Long promotionId);
     List<Map<String, Object>> getPromotionBoutiqueProductCountBySeason(Map<String, Object> params);
     Integer getPromotionBoutiqueExcludeProductCount(Long promotionId);
+    List<Map<String, Object>> listSeasonIncludeRulePromotion(Map<String, Object> params);
+    List<Map<String, Object>> listSeasonExcludeRulePromotion(Map<String, Object> params);
 }
 

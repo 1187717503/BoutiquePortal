@@ -556,4 +556,14 @@ public class PromotionServiceImpl implements IPromotionService {
     public Integer getPromotionBoutiqueExcludeProductCount(Long promotionId) {
         return promotionRuleMapper.getPromotionBoutiqueExcludeProductCount(promotionId);
     }
+
+    @Override
+    public List<Map<String, Object>> listSeasonIncludeRulePromotion(Map<String, Object> params) {
+        return promotionRuleMapper.listSeasonIncludeRulePromotion(params);
+    }
+
+    @Override
+    public List<Map<String, Object>> listSeasonExcludeRulePromotion(Map<String, Object> params) {
+        return promotionRuleMapper.listSeasonExcludeRulePromotion(params);
+    }
 }

@@ -77,4 +77,6 @@ public interface IPromotionService {
      */
     Integer getPromotionBoutiqueExcludeProductCount(Long promotionId);
 
+    List<Map<String, Object>> listSeasonIncludeRulePromotion(Map<String, Object> params);
+    List<Map<String, Object>> listSeasonExcludeRulePromotion(Map<String, Object> params);
 }

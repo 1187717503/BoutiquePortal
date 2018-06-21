@@ -11,9 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.intramirror.web.common.request.ConstantsEntity.EXCLUDE;
 import static com.intramirror.web.common.request.ConstantsEntity.INCLUDE;
@@ -36,12 +34,17 @@ public class PromotionRuleFilterController {
      * @return promotion rules
      */
     @RequestMapping(value = "/{ruleType}", method = RequestMethod.GET)
-    public Response listPromotionRule(@PathVariable("ruleType") String ruleType, @Param("promotionId") Long promotionId) {
+    public Response listPromotionRule(@PathVariable("ruleType") String ruleType, @Param("promotionId") Long promotionId,
+                                      @Param("vendorId") Long vendorId, @Param("seasonCode") String seasonCode) {
         List<Map<String, Object>> data;
+        Map<String, Object> params = new HashMap<>();
+        params.put("promotionId", promotionId);
+        params.put("vendorId", vendorId);
+        params.put("seasonCode", seasonCode);
         if (INCLUDE.equals(ruleType)) {
-            data = promotionService.listIncludeRulePromotion(promotionId);
+            data = promotionService.listSeasonIncludeRulePromotion(params);
         } else if (EXCLUDE.equals(ruleType)) {
-            data = promotionService.listExcludeRulePromotion(promotionId);
+            data = promotionService.listSeasonExcludeRulePromotion(params);
         } else {
             return Response.status(StatusType.FAILURE).data(null);
         }
@@ -53,10 +56,37 @@ public class PromotionRuleFilterController {
             String categorys = rule.get("categorys") == null ? "[]" : rule.get("categorys").toString();
             String brands = rule.get("brands") == null ? "[]" : rule.get("brands").toString();
 
-            JSONArray arrCategorys = JSONArray.parseArray(categorys);
+            List<Map> arrCategorys = JSONArray.parseArray(categorys, Map.class);
             JSONArray arrBrands = JSONArray.parseArray(brands);
+            Set<String> categoryPathSet = new HashSet<>();
+            List<Map> categoryForShow = new ArrayList<>();
+            for (Map category : arrCategorys) {
+                if (category.get("categoryId").toString().equals("-1")) {
+                    categoryForShow.add(category);
+                    break;
+                }
+                String name = category.get("name").toString();
+                String[] pathArr = name.split(" > ");
+                int level = pathArr.length;
+                if (level == 1) {
+                    categoryPathSet.add(name.trim());
+                } else if(level == 2) {
+                    if (categoryPathSet.contains(pathArr[0].trim())) {
+                        continue;
+                    } else {
+                        categoryPathSet.add(name.trim());
+                    }
+                } else if(level == 3) {
+                    if (categoryPathSet.contains(pathArr[0].trim()) || categoryPathSet.contains(pathArr[0].trim() + " > " + pathArr[1].trim())) {
+                        continue;
+                    }
+                } else {
+                    continue;
+                }
+                categoryForShow.add(category);
+            }
 
-            rule.put("categorys", arrCategorys);
+            rule.put("categorys", categoryForShow);
             rule.put("brands", arrBrands);
         }
         return data;

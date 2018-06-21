@@ -705,4 +705,40 @@
         SELECT COUNT(*) FROM t_promotion_exclude_product tpep WHERE tpep.promotion_id=#{promotionId, jdbcType=BIGINT}
     </select>
 
+    <select id="listSeasonIncludeRulePromotion" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT tpir.`promotion_include_rule_id` AS ruleId,
+          tpir.`promotion_id` AS promotionId,
+          tpir.`vendor_id` AS vendorId,
+          tpir.`season_code` AS seasonCode,
+          tpir.`brands`,
+          tpir.`categorys`
+        FROM `t_promotion_include_rule` tpir
+        WHERE tpir.`promotion_id` = #{promotionId}
+        <if test="vendorId != null">
+            AND tpir.`vendor_id` = #{vendorId}
+        </if>
+        <if test="seasonCode != null">
+            AND tpir.`season_code` = #{seasonCode}
+        </if>
+        ORDER BY tpir.`created_at` DESC
+    </select>
+
+    <select id="listSeasonExcludeRulePromotion" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT tper.`promotion_exclude_rule_id` AS ruleId,
+          tper.`promotion_id` AS promotionId,
+          tper.`vendor_id` AS vendorId,
+          tper.`season_code` AS seasonCode,
+          tper.`brands`,
+          tper.`categorys`
+        FROM `t_promotion_exclude_rule` tper
+        WHERE tper.`promotion_id` = #{promotionId}
+        <if test="vendorId != null">
+            AND tper.`vendor_id` = #{vendorId}
+        </if>
+        <if test="seasonCode != null">
+            AND tper.`season_code` = #{seasonCode}
+        </if>
+        ORDER BY tper.`created_at` DESC
+    </select>
+
 </mapper>
