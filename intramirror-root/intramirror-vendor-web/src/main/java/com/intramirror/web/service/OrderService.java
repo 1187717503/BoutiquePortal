@@ -93,8 +93,6 @@ public class OrderService {
 			result.setInfoMap(infoMap);
 			return result;
 		}
-		
-		
 		//封装参数
 		Map<String, Object> conditionMap = new HashMap<String, Object>();
 		conditionMap.put("container_id", Long.parseLong(map.get("containerId").toString()));
@@ -124,7 +122,6 @@ public class OrderService {
 				result.setInfoMap(infoMap);
 				return result;
 			}
-
 			//判断箱子的stockLocation和订单是否一致
 			if(checkStockLocation(currentOrder, container)){
 				result.setMsg("This Order's stock_location is different than carton's");
@@ -132,7 +129,6 @@ public class OrderService {
 				result.setInfoMap(infoMap);
 				return result;
 			}
-
 			//箱子关联Shipment
 			Map<String, Object> updateContainer = new HashMap<String, Object>(); 
 			updateContainer.put("shipment_id",shipment_id);
@@ -142,7 +138,6 @@ public class OrderService {
 			
 			//关联成功，则往箱子里存入订单
 			if(row > 0 ){
-				
 				Map<String, Object> shipMentMap = new HashMap<>();
 				//根据订单大区选择的Shipment   所以只需要用订单的大区即可(只有箱子为空时)
 				//shipMentMap.put("ship_to_geography", currentOrder.get("pack_english_name").toString());
@@ -150,12 +145,14 @@ public class OrderService {
 				shipMentMap.put("shipment_id", Long.parseLong(shipment_id));
 				shipMentMap.put("ship_from_location_id", container.getShipFromLocationId());
 				//获取当前ShipMent 第一段的物流类型(不需要  空箱子不比较shipmentType 直接放入)
-				
-				//订单加入箱子
-				logger.info("order packingOrder updateLogisticsProduct");
-				result =  updateLogisticsProduct(currentOrder,shipMentMap,false,true);
-
-				
+				try {
+					//订单加入箱子
+					logger.info("order packingOrder updateLogisticsProduct");
+					result =  updateLogisticsProduct(currentOrder,shipMentMap,false,true);
+				} catch (Exception e) {
+					logger.error(e.getMessage());
+					throw new RuntimeException("The order failed to be added to the carton.");
+				}
 			}else{
 				result.setMsg("The modification failed. Check that the parameters are correct ");
 				infoMap.put("code", StatusType.ORDER_ERROR_CODE);
@@ -164,11 +161,9 @@ public class OrderService {
 			logger.info("已经选择过shipMent 直接关联，并加入箱子 end");
 			return result;
 		}
-
 		//如果是新箱子，则需要关联Shipment,如果存在符合条件的Shipment有多个则返回列表供选择,如果只有一个则默认存入，没有则需要新建Shipment
 		if(list == null || list.size() == 0){
 			infoMap.put("statusType", StatusType.ORDER_CONTAINER_EMPTY);
-
 			//if (checkPack(result, infoMap, currentOrder, container)) return result;
 			//创建新箱子不用校验stockLocation
 			//判断箱子的geography 跟订单的大区是否一致
@@ -230,21 +225,23 @@ public class OrderService {
 						shipMentMap.put("ship_to_geography", container.getShipToGeography());
 						shipMentMap.put("shipment_id", shipmentId);
 						shipMentMap.put("ship_from_location_id", shipment.getShipFromLocationId());
-
-						//订单加入箱子(已经调用过saveShipmentByOrderId 方法  不需要再次创建)
-						result =  updateLogisticsProduct(currentOrder,shipMentMap,false,false);
+						try {
+							//订单加入箱子(已经调用过saveShipmentByOrderId 方法  不需要再次创建)
+							result =  updateLogisticsProduct(currentOrder,shipMentMap,false,false);
+						} catch (Exception e) {
+							logger.error(e.getMessage());
+							throw new RuntimeException("The order failed to be added to the carton.");
+						}
 					}else{
 						logger.info("order packingOrder 调用containerService.updateContainerByCondition 箱子关联Shipment失败   入参:"+new Gson().toJson(updateContainer));
 						throw new RuntimeException("error updateContainer fail");
 					}
-					
 				}else{
 					//生成shipment 失败
 					result.setInfoMap(infoMap);
 					logger.error("order packingOrder 调用iShipmentService.saveShipmentByOrderId 返回shipmentId为空  入参:"+ new Gson().toJson(orderResult));
 					throw new RuntimeException("error create shipment fail");
 				}
-					
 				//如果匹配的Shipment 只存在一个,就直接关联箱子   并把订单存入箱子
 				}else if(shipmentMapList.size() == 1){
 					logger.info("shipmentMapList size 1  start  ");
@@ -259,18 +256,20 @@ public class OrderService {
 					
 					//关联成功，则往箱子里存入订单
 					if(row > 0 ){
-						
 						Map<String, Object> shipMentMap = shipmentMapList.get(0);
 						//获取当前ShipMent 第一段的物流类型(不需要  空箱子不比较shipmentType 直接放入)
-						
-						//订单加入箱子
-						result =  updateLogisticsProduct(currentOrder,shipMentMap,false,true);
+						try {
+							//订单加入箱子
+							result =  updateLogisticsProduct(currentOrder,shipMentMap,false,true);
+						} catch (Exception e) {
+							logger.error(e.getMessage());
+							throw new RuntimeException("The order failed to be added to the carton.");
+						}
 					}else{
 						logger.info("order packingOrder 箱子关联Shipment 失败 ");
 						result.setInfoMap(infoMap);
 						throw new RuntimeException("error updateContainer fail");
 					}
-				
 				//如果匹配的Shipment 存在多个，则返回列表供选择
 				}else if(shipmentMapList.size() > 1){
 					logger.info("order packingOrder shipmentMapList 存在多条,返回列表供选择");
@@ -278,8 +277,6 @@ public class OrderService {
 					infoMap.put("statusType", StatusType.ORDER_QUERY_LIST);
 					result.setInfoMap(infoMap);
 				}
-			
-		
 		//如果箱子中存在订单，则直接加入箱子
 		}else{
 			logger.info("order packingCheckOrder 箱子不为空    ");
@@ -293,18 +290,19 @@ public class OrderService {
 			Map<String, Object> shipmentMap = iShipmentService.getShipmentTypeById(getShipment);
 			
 			if(shipmentMap != null ){
-				//订单加入箱子
-				result =  updateLogisticsProduct(currentOrder,shipmentMap,true,true);
+				try {
+					//订单加入箱子
+					result =  updateLogisticsProduct(currentOrder,shipmentMap,true,true);
+				} catch (Exception e) {
+					logger.error(e.getMessage());
+					throw new RuntimeException("The order failed to be added to the carton.");
+				}
 			}else{
 				result.setMsg("shipment Query is empty ");
 				infoMap.put("code", StatusType.ORDER_ERROR_CODE);
 				result.setInfoMap(infoMap);
 			}
-			
 		}
-			
-
-		
 		return result;
 	}
 
