@@ -21,15 +21,18 @@ import java.nio.charset.Charset;
 /**
  * Created by caowei on 2018/4/23.
  */
-public class DHLHttpClient {
+public class HttpClientUtil {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(DHLHttpClient.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(HttpClientUtil.class);
 
     public static String createAWBUrl;
 
     public static String queryAWBUrl;
 
     public static String deleteAWBUrl;
+
+    public static String confirmedOrder;
+    public static String shippedOrder;
 
     public static String httpPost(String jsonObj, String url){
         HttpPost post = null;
@@ -122,7 +125,7 @@ public class DHLHttpClient {
     }
 
     public static void setCreateAWBUrl(String createAWBUrl) {
-        DHLHttpClient.createAWBUrl = createAWBUrl;
+        HttpClientUtil.createAWBUrl = createAWBUrl;
     }
 
     public static String getQueryAWBUrl() {
@@ -130,7 +133,7 @@ public class DHLHttpClient {
     }
 
     public static void setQueryAWBUrl(String queryAWBUrl) {
-        DHLHttpClient.queryAWBUrl = queryAWBUrl;
+        HttpClientUtil.queryAWBUrl = queryAWBUrl;
     }
 
     public static String getDeleteAWBUrl() {
@@ -138,6 +141,22 @@ public class DHLHttpClient {
     }
 
     public static void setDeleteAWBUrl(String deleteAWBUrl) {
-        DHLHttpClient.deleteAWBUrl = deleteAWBUrl;
+        HttpClientUtil.deleteAWBUrl = deleteAWBUrl;
+    }
+
+    public static String getConfirmedOrder() {
+        return confirmedOrder;
+    }
+
+    public static void setConfirmedOrder(String confirmedOrder) {
+        HttpClientUtil.confirmedOrder = confirmedOrder;
+    }
+
+    public static String getShippedOrder() {
+        return shippedOrder;
+    }
+
+    public static void setShippedOrder(String shippedOrder) {
+        HttpClientUtil.shippedOrder = shippedOrder;
     }
 }

@@ -27,7 +27,7 @@ import com.intramirror.utils.transform.JsonTransformUtil;
 import com.intramirror.web.VO.*;
 import com.intramirror.web.common.BarcodeUtil;
 import com.intramirror.web.controller.BaseController;
-import com.intramirror.web.util.DHLHttpClient;
+import com.intramirror.web.util.HttpClientUtil;
 import com.intramirror.web.util.ExcelUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -46,6 +46,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -92,9 +93,6 @@ public class OrderShipController extends BaseController {
 
     @Autowired
     private StockLocationService stockLocationService;
-
-    @Autowired
-    private ILogisticsProductService iLogisticsProductService;
 
     /**
      * 获取所有箱子信息
@@ -1321,10 +1319,10 @@ public class OrderShipController extends BaseController {
                 /*String s;
                 try {
                     //获取awb文档
-                    s = DHLHttpClient.httpGet(DHLHttpClient.queryAWBUrl + dhlShipment.getAwbNum());
+                    s = HttpClientUtil.httpGet(HttpClientUtil.queryAWBUrl + dhlShipment.getAwbNum());
                 }catch (Exception e){
                     result.addMsg("DHL service invocation failed");
-                    logger.error("request fail,params={},url={}",JsonTransformUtil.toJson(inputVO),DHLHttpClient.createAWBUrl);
+                    logger.error("request fail,params={},url={}",JsonTransformUtil.toJson(inputVO),HttpClientUtil.createAWBUrl);
                     return result;
                 }
                 if(StringUtil.isNotEmpty(s)){
@@ -1341,9 +1339,9 @@ public class OrderShipController extends BaseController {
                 deleteParams.put("reason","001");
                 String s;
                 try{
-                    s = DHLHttpClient.httpPost(JsonTransformUtil.toJson(deleteParams), DHLHttpClient.deleteAWBUrl);
+                    s = HttpClientUtil.httpPost(JsonTransformUtil.toJson(deleteParams), HttpClientUtil.deleteAWBUrl);
                 }catch (Exception e){
-                    logger.error("request fail,params={},url={}",JsonTransformUtil.toJson(deleteParams),DHLHttpClient.deleteAWBUrl);
+                    logger.error("request fail,params={},url={}",JsonTransformUtil.toJson(deleteParams),HttpClientUtil.deleteAWBUrl);
                     result.setMsg("DHL service invocation failed");
                     return result;
                 }
@@ -1396,11 +1394,11 @@ public class OrderShipController extends BaseController {
             addParams(inputVO,dhlShipment,fromLocation,containerList,shipment);
             String resultStr;
             try{
-                logger.info("shipmentRequest,params={},url={}",JsonTransformUtil.toJson(inputVO),DHLHttpClient.createAWBUrl);
-                resultStr = DHLHttpClient.httpPost(JsonTransformUtil.toJson(inputVO), DHLHttpClient.createAWBUrl);
+                logger.info("shipmentRequest,params={},url={}",JsonTransformUtil.toJson(inputVO), HttpClientUtil.createAWBUrl);
+                resultStr = HttpClientUtil.httpPost(JsonTransformUtil.toJson(inputVO), HttpClientUtil.createAWBUrl);
             }catch (Exception e){
                 result.addMsg("DHL service invocation failed");
-                logger.error("request fail,params={},url={}",JsonTransformUtil.toJson(inputVO),DHLHttpClient.createAWBUrl);
+                logger.error("request fail,params={},url={}",JsonTransformUtil.toJson(inputVO), HttpClientUtil.createAWBUrl);
                 return result;
             }
             if(StringUtil.isNotEmpty(resultStr)){

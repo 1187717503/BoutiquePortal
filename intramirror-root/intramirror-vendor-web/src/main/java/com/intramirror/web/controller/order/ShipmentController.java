@@ -12,9 +12,6 @@ import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.service.*;
 import com.intramirror.order.api.vo.ShipmentSendMailVO;
 import com.intramirror.order.api.vo.ShippedParam;
-import com.intramirror.user.api.model.User;
-import com.intramirror.utils.transform.JsonTransformUtil;
-import com.intramirror.web.util.DHLHttpClient;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +30,6 @@ import com.intramirror.order.api.common.ContainerType;
 import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.model.SubShipment;
 import com.intramirror.web.controller.BaseController;
-import pk.shoplus.common.utils.StringUtil;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -251,9 +247,9 @@ public class ShipmentController extends BaseController{
 						params.put("reason","001");
 						String s;
 						try{
-							s = DHLHttpClient.httpPost(JsonTransformUtil.toJson(params), DHLHttpClient.deleteAWBUrl);
+							s = HttpClientUtil.httpPost(JsonTransformUtil.toJson(params), HttpClientUtil.deleteAWBUrl);
 						}catch (Exception e){
-							logger.error("request fail,params={},url={}",JsonTransformUtil.toJson(params),DHLHttpClient.deleteAWBUrl);
+							logger.error("request fail,params={},url={}",JsonTransformUtil.toJson(params),HttpClientUtil.deleteAWBUrl);
 							message.setMsg("DHL service invocation failed");
 							return message;
 						}

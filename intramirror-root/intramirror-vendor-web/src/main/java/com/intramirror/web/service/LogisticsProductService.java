@@ -2,10 +2,15 @@ package com.intramirror.web.service;
 
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.intramirror.order.api.service.IOrderService;
+import com.intramirror.utils.transform.JsonTransformUtil;
+import com.intramirror.web.util.HttpClientUtil;
+import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +20,8 @@ import com.intramirror.common.parameter.StatusType;
 import com.intramirror.order.api.common.OrderStatusType;
 import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.service.ILogisticsProductService;
+import org.springframework.transaction.annotation.Transactional;
+import pk.shoplus.common.utils.StringUtil;
 
 @Service
 public class LogisticsProductService{
@@ -33,6 +40,7 @@ public class LogisticsProductService{
 	 * @param logisticsProduct
 	 * @return
 	 */
+	@Transactional
 	public Map<String, Object> updateOrderLogisticsStatusById(LogisticsProduct logisticsProduct,int status) {
 		Long logistics_product_id = logisticsProduct.getLogistics_product_id();
 		Map<String, Object> resultMap = new HashMap<String, Object>();
@@ -72,13 +80,34 @@ public class LogisticsProductService{
 			logisticsProductService.updateOrderLogisticsStatusById(logistics_product_id,status);
 			//同时修改order表状态
 			orderService.updateOrderByOrderLogisticsId(oldLogisticsProduct.getOrder_logistics_id(),status);
-//			if(num <= 0){
-//				resultMap.put("info","Status modification failed");
-//				return resultMap;
-//			}
             resultMap.put("status",StatusType.SUCCESS);
+
+            if (status == OrderStatusType.COMFIRMED){
+            	//判断是否是微店订单，即channel_id=6
+				List<String> list = new ArrayList<>();
+				list.add(oldLogisticsProduct.getOrder_line_num());
+				List<String> orderLineNums = orderService.getStyleroomOrder(list);
+				if (orderLineNums!=null&&orderLineNums.size()>0){
+					logger.info("调用微店confirmed接口,orderLineNums:{},url:{}",
+							JsonTransformUtil.toJson(orderLineNums),HttpClientUtil.confirmedOrder);
+					Map<String,Object> map = new HashMap<>();
+					map.put("order_line_nums",orderLineNums);
+					String result = HttpClientUtil.httpPost(JsonTransformUtil.toJson(map), HttpClientUtil.confirmedOrder);
+					if (StringUtil.isNotEmpty(result)){
+						JSONObject object = JSONObject.fromObject(result);
+						String success = object.optString("success");
+						if (success!=null){
+							logger.info("调用微店confirmed接口成功");
+						}else {
+							logger.info("调用微店confirmed接口失败");
+							throw new RuntimeException("Request styleroom service failed.");
+						}
+					}else {
+						throw new RuntimeException("Request styleroom service failed.");
+					}
+				}
+			}
         }
-		
 		return resultMap;
 	}
 

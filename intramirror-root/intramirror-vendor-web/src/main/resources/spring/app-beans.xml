@@ -30,10 +30,12 @@
     <!-- 开启事务控制的注解支持 -->
     <tx:annotation-driven transaction-manager="transactionManager"/>
 
-    <bean id="DHLHttpClinet" class="com.intramirror.web.util.DHLHttpClient">
+    <bean id="DHLHttpClinet" class="com.intramirror.web.util.HttpClientUtil">
         <property name="createAWBUrl" value="${createAWBUrl}"/>
         <property name="queryAWBUrl" value="${queryAWBUrl}"/>
         <property name="deleteAWBUrl" value="${deleteAWBUrl}"/>
+        <property name="confirmedOrder" value="${confirmedOrder}"/>
+        <property name="shippedOrder" value="${shippedOrder}"/>
     </bean>
 
 

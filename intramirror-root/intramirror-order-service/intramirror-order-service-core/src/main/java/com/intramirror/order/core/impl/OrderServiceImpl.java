@@ -476,6 +476,11 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
         return mapList;
     }
 
+    @Override
+    public List<String> getStyleroomOrder(List<String> orderLineNums) {
+        return orderMapper.getStyleroomOrder(orderLineNums);
+    }
+
     private boolean paramCheck(Object obj) {
         return obj != null && StringUtils.isNoneBlank(obj.toString());
     }

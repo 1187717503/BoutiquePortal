@@ -838,4 +838,14 @@
         inner join `order` o on ol.order_id = o.order_id and o.enabled = 1
         where lp.logistics_product_id = #{logisticsProductId} and lp.enabled = 1
     </select>
+
+    <select id="getStyleroomOrder" parameterType="list" resultType="string">
+        SELECT lp.order_line_num FROM logistics_product lp
+        INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+        INNER JOIN `order` o ON ol.order_id = o.order_id
+        WHERE o.channel_id = 6 and lp.order_line_num in
+        <foreach collection="list" item="orderLineNum" open="(" separator="," close=")">
+            #{orderLineNum}
+        </foreach>
+    </select>
 </mapper>
