@@ -12,5 +12,5 @@ public interface IShippingProviderService {
 
     ShippingProvider getShippingProviderByShipmentId(Long shipmentId);
 
-    ShippingProvider getShippingProviderByName(String zsy);
+    ShippingProvider getShippingProviderById(Long id);
 }

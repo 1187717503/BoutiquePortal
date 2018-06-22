@@ -877,7 +877,10 @@ public class OrderShipController extends BaseController {
         if(isDDt){
             ddtInvoice.setShipperVO(shipperVO);
             RecipientVO recipientVO = new RecipientVO();
-            ShippingProvider shippingProvider = shippingProviderService.getShippingProviderByName("DHL2");
+            ShippingProvider shippingProvider = shippingProviderService.getShippingProviderById(5L);// 质检仓地址
+            if(shippingProvider == null){
+                shippingProvider = new ShippingProvider();
+            }
             recipientVO.setCity(shippingProvider.getAddrCity());
             recipientVO.setCompanyName(shippingProvider.getTransferConsignee());
             recipientVO.setPersonName(shippingProvider.getPersonName());
@@ -913,7 +916,10 @@ public class OrderShipController extends BaseController {
             if(!isDDt){
                 transitWarehouseInvoiceVO.setChinaInvoice(chinaInovice);
             }
-            ShippingProvider shippingProvider = shippingProviderService.getShippingProviderByName("ZSY");
+            ShippingProvider shippingProvider = shippingProviderService.getShippingProviderById(4L);//zsy地址
+            if(shippingProvider == null){
+                shippingProvider = new ShippingProvider();
+            }
             recipientVO.setCity(shippingProvider.getAddrCity());
             recipientVO.setCompanyName(shippingProvider.getTransferConsignee());
             recipientVO.setPersonName(shippingProvider.getPersonName());
