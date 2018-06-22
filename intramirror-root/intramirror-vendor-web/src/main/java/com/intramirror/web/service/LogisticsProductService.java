@@ -11,6 +11,7 @@ import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.utils.transform.JsonTransformUtil;
 import com.intramirror.web.util.HttpClientUtil;
 import net.sf.json.JSONObject;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,14 +93,14 @@ public class LogisticsProductService{
 							JsonTransformUtil.toJson(orderLineNums),HttpClientUtil.confirmedOrder);
 					Map<String,Object> map = new HashMap<>();
 					map.put("order_line_nums",orderLineNums);
-					String result = HttpClientUtil.httpPost(JsonTransformUtil.toJson(map), HttpClientUtil.confirmedOrder);
+					String result = HttpClientUtil.doPost(HttpClientUtil.confirmedOrder,JsonTransformUtil.toJson(map),"utf-8");
 					if (StringUtil.isNotEmpty(result)){
 						JSONObject object = JSONObject.fromObject(result);
 						String success = object.optString("success");
-						if (success!=null){
+						if (StringUtil.isNotEmpty(success)){
 							logger.info("调用微店confirmed接口成功");
 						}else {
-							logger.info("调用微店confirmed接口失败");
+							logger.info("调用微店confirmed接口失败,msg:{}",object.optString("error"));
 							throw new RuntimeException("Request styleroom service failed.");
 						}
 					}else {

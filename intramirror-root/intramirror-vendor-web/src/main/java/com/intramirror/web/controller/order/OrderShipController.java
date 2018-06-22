@@ -1004,6 +1004,8 @@ public class OrderShipController extends BaseController {
                 recipientVO.setPhoneNumber(mobile);
                 String postalCode = UNOrder.get("user_rec_code") != null ? UNOrder.get("user_rec_code").toString() : "";
                 recipientVO.setPostalCode(postalCode);
+                String area = UNOrder.get("user_rec_area") != null ? UNOrder.get("user_rec_area").toString() : "";
+                recipientVO.setArea(area);
 
                 String inPrice = UNOrder.get("in_price")!=null?UNOrder.get("in_price").toString():"";
                 String retailPrice = UNOrder.get("price")!=null?UNOrder.get("price").toString():"";

@@ -16,6 +16,15 @@ public class RecipientVO {
     private String countryCode;
     private String country;
     private String province;
+    private String area;
+
+    public String getArea() {
+        return area;
+    }
+
+    public void setArea(String area) {
+        this.area = area;
+    }
 
     public String getProvince() {
         return province;

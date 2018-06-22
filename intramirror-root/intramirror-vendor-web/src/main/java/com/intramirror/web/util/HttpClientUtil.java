@@ -4,19 +4,28 @@ import net.sf.json.JSONObject;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by caowei on 2018/4/23.
@@ -48,7 +57,7 @@ public class HttpClientUtil {
 
             // 构建消息实体
             StringEntity entity = new StringEntity(jsonObj, Charset.forName("UTF-8"));
-            entity.setContentEncoding("UTF-8");
+            entity.setContentEncoding(new BasicHeader("Content-Type", "application/json"));
             // 发送Json格式的数据请求
             entity.setContentType("application/json");
             post.setEntity(entity);
@@ -89,6 +98,47 @@ public class HttpClientUtil {
             }
         }
         return "";
+    }
+
+    public static String doPost(String url, String jsonObj, String charset) {
+
+        String result = null;
+        try {
+            HttpClient httpClient = new SSLClient();
+            HttpPost httpPost = new HttpPost(url);
+
+            LOGGER.info("Post url =>" + url);
+            // 设置参数
+            /*while (iterator.hasNext()) {
+                Map.Entry<String, String> elem = (Map.Entry<String, String>) iterator.next();
+                list.add(new BasicNameValuePair(elem.getKey(), elem.getValue()));
+                LOGGER.info("Post param =>" + elem.getKey() + ":" + elem.getValue());
+            }
+            if (list.size() > 0) {
+                UrlEncodedFormEntity entity = new UrlEncodedFormEntity(list, charset);
+                httpPost.setEntity(entity);
+            }*/
+
+            StringEntity entity = new StringEntity(jsonObj, Charset.forName("UTF-8"));
+            entity.setContentEncoding(new BasicHeader("Content-Type", "application/json"));
+            // 发送Json格式的数据请求
+            entity.setContentType("application/json");
+            httpPost.setEntity(entity);
+            httpPost.getParams().setIntParameter(CoreConnectionPNames.SO_TIMEOUT, 1500);
+            httpPost.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 1000);
+            HttpResponse response = httpClient.execute(httpPost);
+
+            if (response != null) {
+                HttpEntity resEntity = response.getEntity();
+                if (resEntity != null) {
+                    result = EntityUtils.toString(resEntity, charset);
+                }
+            }
+        } catch (Exception ex) {
+            LOGGER.error("Connect time out.", ex);
+
+        }
+        return result;
     }
 
     public static String httpGet(String url){
