@@ -195,12 +195,20 @@
         </trim>
     </insert>
 
-    <delete id="removeIncludeRule" parameterType="Long">
-        DELETE FROM t_promotion_include_rule WHERE promotion_include_rule_id = #{ruleId}
+    <delete id="removeIncludeRule">
+        update t_promotion_include_rule set enabled = 0
+        WHERE promotion_include_rule_id IN
+        <foreach item="item" index="index" collection="ruleIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
     </delete>
 
-    <delete id="removeExcludeRule" parameterType="Long">
-        DELETE FROM t_promotion_exclude_rule WHERE promotion_exclude_rule_id = #{ruleId}
+    <delete id="removeExcludeRule">
+        update t_promotion_exclude_rule set enabled = 0
+        WHERE promotion_exclude_rule_id IN
+        <foreach item="item" index="index" collection="ruleIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
     </delete>
 
     <delete id="removeIncludeRuleDetail" parameterType="Long">

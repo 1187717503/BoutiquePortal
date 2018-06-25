@@ -26,7 +26,7 @@ public interface IPromotionService {
     //2018-4-18 By Jian
     boolean processImportPromotionRule(Integer type, List<PromotionRule> listRule);
 
-    Boolean removePromotionRule(Long ruleId, PromotionRuleType ruleType);
+    Boolean removePromotionRule(List<Long> ruleIds, PromotionRuleType ruleType);
 
     Boolean updatePromotionRule(PromotionRuleType ruleType, PromotionRule rule);
 

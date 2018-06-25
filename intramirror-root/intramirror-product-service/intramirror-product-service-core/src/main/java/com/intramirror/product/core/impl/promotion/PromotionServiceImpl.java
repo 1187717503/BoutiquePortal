@@ -84,32 +84,34 @@ public class PromotionServiceImpl implements IPromotionService {
     @Override
     public boolean processImportPromotionRule(Integer type, List<PromotionRule> listRule) {
         LOGGER.info("Start to save <<import>> promotion include rule.");
-        if(type.equals(0)){
+        if (type.equals(0)) {
             for (PromotionRule rule : listRule) {
                 promotionRuleMapper.insertIncludeRule(rule);
             }
-        }else{
+        } else {
             for (PromotionRule rule : listRule) {
                 promotionRuleMapper.insertExcludeRule(rule);
             }
         }
-        LOGGER.info("==Jian processImportPromotionRule== Type:[{}]  Count:[{}]",type, listRule.size());
+        LOGGER.info("==Jian processImportPromotionRule== Type:[{}]  Count:[{}]", type, listRule.size());
         return true;
     }
 
     @Transactional
     @Override
-    public Boolean removePromotionRule(Long ruleId, PromotionRuleType ruleType) {
+    public Boolean removePromotionRule(List<Long> ruleIds, PromotionRuleType ruleType) {
         Boolean flag = false;
         if (ruleType == PromotionRuleType.INCLUDE_RULE) {
-            if (promotionRuleMapper.removeIncludeRule(ruleId) > 0) {
-                flag = promotionRuleMapper.removeIncludeRuleDetail(ruleId) > 0;
-            }
+//            if (promotionRuleMapper.removeIncludeRule(ruleId) > 0) {
+//                flag = promotionRuleMapper.removeIncludeRuleDetail(ruleId) > 0;
+//            }
+            flag = promotionRuleMapper.removeIncludeRule(ruleIds) > 0;
 
         } else {
-            if (promotionRuleMapper.removeExcludeRule(ruleId) > 0) {
-                flag = promotionRuleMapper.removeExcludeRuleDetail(ruleId) > 0;
-            }
+//            if (promotionRuleMapper.removeExcludeRule(ruleId) > 0) {
+            //                flag = promotionRuleMapper.removeExcludeRuleDetail(ruleId) > 0;
+            //            }
+            flag = promotionRuleMapper.removeExcludeRule(ruleIds) > 0;
         }
 
         return flag;

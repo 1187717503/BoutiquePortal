@@ -91,23 +91,23 @@ public class PromotionManagementController {
             type = PromotionRuleType.EXCLUDE_RULE;
         } else if (INCLUDE_IMPORT.equals(ruleType)) {
             //2018-4-18 Jian
-            Map<String,List<PromotionRuleEntity>> mapRule2Import = dealImportRule(body);
+            Map<String, List<PromotionRuleEntity>> mapRule2Import = dealImportRule(body);
 
             //deal include rule
             List<PromotionRuleEntity> listPreInc = mapRule2Import.get(PR_INC_LIST);
             List<PromotionRule> listRuleInc = new ArrayList<>();
-            if(listPreInc != null) {
-                for(int i=0;i<listPreInc.size();i++){
+            if (listPreInc != null) {
+                for (int i = 0; i < listPreInc.size(); i++) {
                     listRuleInc.add(transformPromotionRule(listPreInc.get(i)));
                 }
-                promotionService.processImportPromotionRule(0,listRuleInc);
+                promotionService.processImportPromotionRule(0, listRuleInc);
             }
 
             //deal exclude rule
             List<PromotionRuleEntity> listPreExc = mapRule2Import.get(PR_EXC_LIST);
             List<PromotionRule> listRuleExc = new ArrayList<>();
-            if(listPreExc != null){
-                for(int i=0;i<listPreExc.size();i++){
+            if (listPreExc != null) {
+                for (int i = 0; i < listPreExc.size(); i++) {
                     listRuleExc.add(transformPromotionRule(listPreExc.get(i)));
                 }
                 promotionService.processImportPromotionRule(1, listRuleExc);
@@ -125,10 +125,10 @@ public class PromotionManagementController {
 
     }
 
-    private Map<String,List<PromotionRuleEntity>> dealImportRule(PromotionRuleEntity body) {
+    private Map<String, List<PromotionRuleEntity>> dealImportRule(PromotionRuleEntity body) {
         List<ImportDataEntity> listImportData = body.getImportData();
-        Map<Long,String> defaultStatus = new HashMap<>();
-        Map<String,List<PromotionRuleEntity>> prMap = new HashMap<>();
+        Map<Long, String> defaultStatus = new HashMap<>();
+        Map<String, List<PromotionRuleEntity>> prMap = new HashMap<>();
 
         List<PromotionRuleEntity> listPreInclude = new ArrayList<>();
         List<PromotionRuleEntity> listPreExclude = new ArrayList<>();
@@ -142,15 +142,15 @@ public class PromotionManagementController {
             List<CategoryEntity> listCategoryInc = new ArrayList<>();
             List<CategoryEntity> listCategoryExc = new ArrayList<>();
 
-            if (idata.getBrandName().equals("Default")){
+            if (idata.getBrandName().equals("Default")) {
                 List<CategoryEntity> listCategoryTmp = idata.getCategorys();
                 for (CategoryEntity ce : listCategoryTmp) {
                     //记录每个default的类目对应的状态
-                    defaultStatus.put(ce.getCategoryId(),ce.getStatus());
+                    defaultStatus.put(ce.getCategoryId(), ce.getStatus());
 
-                    if(ce.getStatus().equals("Y")){
+                    if (ce.getStatus().equals("Y")) {
                         //Include需考虑default配置all brand，Exclude不需要考虑配置All brand
-                        if(listBrandInc.size()<1){
+                        if (listBrandInc.size() < 1) {
                             be.setName("ALL");
                             be.setBrandId(-1L);
                             listBrandInc.add(be);
@@ -158,46 +158,44 @@ public class PromotionManagementController {
 
                         //同时添加2，3级类目
                         listCategoryInc.add(ce);
-                        setCategoryList(ce.getCategoryId(),listCategoryInc);
+                        setCategoryList(ce.getCategoryId(), listCategoryInc);
                         hasInc = true;
                     }
                 }
 
-                if(hasInc){
-                    listPreInclude.add(initPromotionRuleEntity(body,listBrandInc,listCategoryInc));
+                if (hasInc) {
+                    listPreInclude.add(initPromotionRuleEntity(body, listBrandInc, listCategoryInc));
                 }
-            }else{
+            } else {
 
                 List<CategoryEntity> listCategoryTmp = idata.getCategorys();
                 for (CategoryEntity ce : listCategoryTmp) {
-                    if(!defaultStatus.get(ce.getCategoryId()).equals(ce.getStatus())){
-                        if(ce.getStatus().equals("Y")){
-                            generateBrand2CategoryList(idata.getBrandName(),ce,listBrandInc,listCategoryInc);
+                    if (!defaultStatus.get(ce.getCategoryId()).equals(ce.getStatus())) {
+                        if (ce.getStatus().equals("Y")) {
+                            generateBrand2CategoryList(idata.getBrandName(), ce, listBrandInc, listCategoryInc);
                             hasInc = true;
-                        }else{
-                            generateBrand2CategoryList(idata.getBrandName(),ce,listBrandExc,listCategoryExc);
+                        } else {
+                            generateBrand2CategoryList(idata.getBrandName(), ce, listBrandExc, listCategoryExc);
                             hasExc = true;
                         }
                     }
                 }
 
-                if(hasInc){
-                    listPreInclude.add(initPromotionRuleEntity(body,listBrandInc,listCategoryInc));
+                if (hasInc) {
+                    listPreInclude.add(initPromotionRuleEntity(body, listBrandInc, listCategoryInc));
                 }
 
-                if(hasExc){
-                    listPreExclude.add(initPromotionRuleEntity(body,listBrandExc,listCategoryExc));
+                if (hasExc) {
+                    listPreExclude.add(initPromotionRuleEntity(body, listBrandExc, listCategoryExc));
                 }
             }
         }
-        prMap.put(PR_INC_LIST,listPreInclude);
-        prMap.put(PR_EXC_LIST,listPreExclude);
+        prMap.put(PR_INC_LIST, listPreInclude);
+        prMap.put(PR_EXC_LIST, listPreExclude);
         return prMap;
     }
 
-    private PromotionRuleEntity initPromotionRuleEntity(PromotionRuleEntity body,
-                                                        List<BrandEntity> listBrand,
-                                                        List<CategoryEntity> listCategory) {
+    private PromotionRuleEntity initPromotionRuleEntity(PromotionRuleEntity body, List<BrandEntity> listBrand, List<CategoryEntity> listCategory) {
         PromotionRuleEntity pre = new PromotionRuleEntity();
         pre.setPromotionId(body.getPromotionId());
         pre.setRuleId(body.getRuleId());
@@ -208,19 +206,18 @@ public class PromotionManagementController {
         return pre;
     }
 
-    private void generateBrand2CategoryList(String brandName, CategoryEntity ce,
-                             List<BrandEntity> listBrand, List<CategoryEntity> listCategory){
+    private void generateBrand2CategoryList(String brandName, CategoryEntity ce, List<BrandEntity> listBrand, List<CategoryEntity> listCategory) {
         //记录include
-        if(listBrand.size() < 1){
-            setBrandList(brandName,listBrand);
+        if (listBrand.size() < 1) {
+            setBrandList(brandName, listBrand);
         }
 
         //同时添加2，3级类目
         listCategory.add(ce);
-        setCategoryList(ce.getCategoryId(),listCategory);
+        setCategoryList(ce.getCategoryId(), listCategory);
     }
 
-    private void setBrandList(String brandName,List<BrandEntity> listBrand){
+    private void setBrandList(String brandName, List<BrandEntity> listBrand) {
         BrandEntity be = new BrandEntity();
         List<Map<String, Object>> listBrandTmp = productBrandServiceImpl.getBrandByName(brandName);
         if (listBrandTmp.size() == 1) {
@@ -231,7 +228,7 @@ public class PromotionManagementController {
         }
     }
 
-    private void setCategoryList(Long categoryId, List<CategoryEntity> listCategory){
+    private void setCategoryList(Long categoryId, List<CategoryEntity> listCategory) {
         List<Map<String, Object>> listCategoryTmp = productCategoryServiceImpl.getSubCidByPid(categoryId);
         if (listCategoryTmp.size() >= 1) {
             for (Map<String, Object> it : listCategoryTmp) {
@@ -242,9 +239,9 @@ public class PromotionManagementController {
         }
     }
 
-    @DeleteMapping(value = "/promotion/{ruleType}/{ruleId}")
-    public Response removePromotionRule(@PathVariable(value = "ruleType") String ruleType, @PathVariable("ruleId") Long ruleId) {
-        LOGGER.info("Start to remove rule with type {} and ruleId {}.", ruleType, ruleId);
+    @DeleteMapping(value = "/promotion/delete/vendor/{ruleType}")
+    public Response removePromotionRule(@PathVariable(value = "ruleType") String ruleType, @RequestParam("ruleIds") List<Long> ruleIds) {
+        LOGGER.info("Start to remove rule with type {} and ruleId {}.", ruleType, ruleIds);
 
         PromotionRuleType type;
         if (INCLUDE.equals(ruleType)) {
@@ -255,7 +252,11 @@ public class PromotionManagementController {
             return Response.status(StatusType.PARAM_NOT_POSITIVE).build();
         }
 
-        Boolean result = promotionService.removePromotionRule(ruleId, type);
+        if (ruleIds.size() < 1) {
+            return Response.status(StatusType.FAILURE).data("vendor id not found.");
+        }
+
+        Boolean result = promotionService.removePromotionRule(ruleIds, type);
         return Response.status(StatusType.SUCCESS).data(result);
     }
 

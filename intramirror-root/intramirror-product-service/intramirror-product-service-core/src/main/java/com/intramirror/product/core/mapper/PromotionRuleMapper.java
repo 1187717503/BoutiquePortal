@@ -31,9 +31,9 @@ public interface PromotionRuleMapper {
 
     Long insertExcludeRuleDetail(PromotionExclude promotionExclude);
 
-    int removeIncludeRule(Long ruleId);
+    int removeIncludeRule(@Param("ruleIds") List<Long> ruleIds);
 
-    int removeExcludeRule(Long ruleId);
+    int removeExcludeRule(@Param("ruleIds") List<Long> ruleIds);
 
     int removeIncludeRuleDetail(Long ruleId);
 
