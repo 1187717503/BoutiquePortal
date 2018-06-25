@@ -393,6 +393,7 @@
         if(lp.user_rec_flag=0, l.user_rec_area, lp.user_rec_area) as user_rec_area,
         if(lp.user_rec_flag=0, l.user_rec_addr, lp.user_rec_addr) as user_rec_addr,
         ifnull(cm.country, l.user_rec_country) as countryName,
+        l.user_rec_code,
         l.geography_id,
         g.english_name
         FROM logistics_product lp

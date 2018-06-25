@@ -1075,6 +1075,8 @@ public class OrderShipController extends BaseController {
                 recipientVO.setPhoneNumber(mobile);
                 String postalCode = elseOrder.get("user_rec_code") != null ? elseOrder.get("user_rec_code").toString() : "";
                 recipientVO.setPostalCode(postalCode);
+                String area = elseOrder.get("user_rec_area") != null ? elseOrder.get("user_rec_area").toString() : "";
+                recipientVO.setArea(area);
 
                 String inPrice = elseOrder.get("in_price")!=null?elseOrder.get("in_price").toString():"";
                 String retailPrice = elseOrder.get("price")!=null?elseOrder.get("price").toString():"";
