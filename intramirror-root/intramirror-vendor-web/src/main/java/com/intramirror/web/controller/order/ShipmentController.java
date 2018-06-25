@@ -3,15 +3,15 @@
  */
 package com.intramirror.web.controller.order;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.service.*;
+import com.intramirror.order.api.util.HttpClientUtil;
 import com.intramirror.order.api.vo.ShipmentSendMailVO;
 import com.intramirror.order.api.vo.ShippedParam;
+import com.intramirror.utils.transform.JsonTransformUtil;
+import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -420,6 +420,7 @@ public class ShipmentController extends BaseController{
 		if (shipmentList!=null&&shipmentList.size()>0){
 			for (Shipment shipment:shipmentList){
 				if (3!=shipment.getStatus()){
+					List<String> list = new ArrayList<>();
 					iShipmentService.shipmentToShip(shipment.getShipmentId());
 					//修改carton状态
 					Map<String,Object> map = new HashMap<>();
@@ -431,6 +432,7 @@ public class ShipmentController extends BaseController{
 					if (logisticsProducts!=null && logisticsProducts.size()>0){
 						for (LogisticsProduct logisticsProduct:logisticsProducts){
 							kafkaUtilService.saveOrderFinance(logisticsProduct);
+							list.add(logisticsProduct.getOrder_line_num());
 						}
 					}
 					// 起线程发邮件
@@ -445,6 +447,9 @@ public class ShipmentController extends BaseController{
                     }
 					iShipmentService.sendMailForShipped(vo);
 					message.successStatus();
+
+					//调用微店接口ship
+					iShipmentService.styleroomShip(list);
 				}
 			}
 		}
@@ -453,6 +458,4 @@ public class ShipmentController extends BaseController{
 		}
 		return message;
 	}
-	
-	
 }

@@ -5,21 +5,19 @@ package com.intramirror.order.core.impl;
 
 import java.math.BigDecimal;
 import java.text.MessageFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.intramirror.common.help.StringUtils;
 import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.model.SubShipment;
-import com.intramirror.order.api.service.ISubShipmentService;
-import com.intramirror.order.api.service.IViewOrderLinesService;
-import com.intramirror.order.api.service.KafkaUtilService;
+import com.intramirror.order.api.service.*;
+import com.intramirror.order.api.util.HttpClientUtil;
 import com.intramirror.order.api.vo.LogisticsProductVO;
 import com.intramirror.order.api.vo.ShipmentSendMailVO;
 import com.intramirror.order.core.mapper.LogisticsProductMapper;
 import com.intramirror.order.core.utils.ShipMailSendThread;
+import com.intramirror.utils.transform.JsonTransformUtil;
+import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +27,6 @@ import com.google.gson.Gson;
 import com.intramirror.common.core.mapper.SubShipmentMapper;
 import com.intramirror.order.api.common.ContainerType;
 import com.intramirror.order.api.model.Shipment;
-import com.intramirror.order.api.service.IShipmentService;
 import com.intramirror.order.core.dao.BaseDao;
 import com.intramirror.order.core.mapper.LogisticProductShipmentMapper;
 import com.intramirror.order.core.mapper.ShipmentMapper;
@@ -60,6 +57,9 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 
 	@Autowired
 	private KafkaUtilService kafkaUtilService;
+
+	@Autowired
+	private IOrderService orderService;
 	
 	@Override
 	public void init() {
@@ -439,6 +439,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			if (status == 3){
 				//记录发货时间
 				map.put("ship_at",new Date());
+				List<String> list = new ArrayList<>();
 
 				//校验是否生成AWB
 				String awb = checkAWB(shipment.getShipmentId());
@@ -447,6 +448,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
                 if (logisticsProducts!=null && logisticsProducts.size()>0){
                     for (LogisticsProduct logisticsProduct:logisticsProducts){
                         kafkaUtilService.saveOrderFinance(logisticsProduct);
+						list.add(logisticsProduct.getOrder_line_num());
                     }
                 }
 				// 起线程发邮件
@@ -460,6 +462,9 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 					vo.setDestination("China");
 				}
                 sendMail(vo);
+
+				//调用微店接口ship
+				styleroomShip(list);
 			}
 			//如果一直修改状态
 			if (lastStatus == shipment.getStatus()){
@@ -471,6 +476,31 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			}
 		}
 		return result;
+	}
+
+	@Override
+	public void styleroomShip(List<String> list) {
+		//判断是否是微店订单，即channel_id=6
+		List<String> orderLineNums = orderService.getStyleroomOrder(list);
+		if (orderLineNums!=null&&orderLineNums.size()>0){
+            logger.info("调用微店ship接口,orderLineNums:{},url:{}",
+                    JsonTransformUtil.toJson(orderLineNums), HttpClientUtil.shippedOrder);
+            Map<String,Object> params = new HashMap<>();
+            params.put("order_line_nums",orderLineNums);
+            String re = HttpClientUtil.doPost(HttpClientUtil.shippedOrder,JsonTransformUtil.toJson(params),"utf-8");
+            if (StringUtils.isNotBlank(re)){
+                JSONObject object = JSONObject.fromObject(re);
+                String success = object.optString("success");
+                if (StringUtils.isNotBlank(success)){
+                    logger.info("调用微店ship接口成功");
+                }else {
+                    logger.info("调用微店ship接口失败,msg:{}",object.optString("error"));
+                    throw new RuntimeException("Request styleroom service failed.");
+                }
+            }else {
+                throw new RuntimeException("Request styleroom service failed.");
+            }
+        }
 	}
 
 	private String checkAWB(Long shipmentId) {

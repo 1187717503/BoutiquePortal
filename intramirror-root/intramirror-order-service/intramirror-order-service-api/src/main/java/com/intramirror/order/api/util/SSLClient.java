@@ -1,4 +1,4 @@
-package com.intramirror.web.util;
+package com.intramirror.order.api.util;
 
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;

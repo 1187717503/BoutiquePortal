@@ -352,7 +352,7 @@ public class OrderController extends BaseController {
 
         User user = getUser(httpServletRequest);
         ResultMessage message = ResultMessage.getInstance();
-        Map<String, Object> resultMap = new HashMap<String, Object>();
+        Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("status", StatusType.FAILURE);
         try {
             //参数不能为空
@@ -398,7 +398,6 @@ public class OrderController extends BaseController {
             logger.info("errorMsg : " + e.getMessage());
             message.errorStatus().putMsg("errorMsg", e.getMessage());
         }
-
         return message;
     }
 

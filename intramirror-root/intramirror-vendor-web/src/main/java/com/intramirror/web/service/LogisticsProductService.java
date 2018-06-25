@@ -9,9 +9,8 @@ import java.util.Map;
 
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.utils.transform.JsonTransformUtil;
-import com.intramirror.web.util.HttpClientUtil;
+import com.intramirror.order.api.util.HttpClientUtil;
 import net.sf.json.JSONObject;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +32,6 @@ public class LogisticsProductService{
 	private ILogisticsProductService logisticsProductService;
 
 	@Autowired
-	//private ISkuStoreService skuStoreService;
 	private IOrderService orderService;
 	
 	/**
@@ -115,6 +113,4 @@ public class LogisticsProductService{
 	public LogisticsProduct selectById(Long logisProductId) {
 		return logisticsProductService.selectById(logisProductId);
 	}
-
-
 }

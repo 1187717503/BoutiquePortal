@@ -179,4 +179,7 @@ public interface IShipmentService {
 	 */
 	List<LogisticsProduct> getLogisticsProductByShipment(Long shipmentId);
 
+
+	void styleroomShip(List<String> list);
+
 }
