@@ -122,6 +122,12 @@
         <if test="seasonCode != null">
             and season_code = #{seasonCode,jdbcType=VARCHAR}
         </if>
+        <if test="designerId != null">
+            and designer_id = #{designerId,jdbcType=VARCHAR}
+        </if>
+        <if test="colorCode != null">
+            and color_code = #{colorCode,jdbcType=VARCHAR}
+        </if>
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         <!--
@@ -645,6 +651,9 @@
         </if>
         <if test="colorCode != null">
             and color_code = #{colorCode,jdbcType=VARCHAR}
+        </if>
+        <if test="enabled != null">
+            and enabled = #{enabled,jdbcType=BIT}
         </if>
     </select>
 

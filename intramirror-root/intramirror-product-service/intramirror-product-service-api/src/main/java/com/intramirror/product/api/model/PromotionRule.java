@@ -1,6 +1,7 @@
 package com.intramirror.product.api.model;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created on 2018/1/5.
@@ -14,6 +15,7 @@ public class PromotionRule {
     private String brands;
     private String categorys;
     private Date createdAt;
+    private List<String> seasonCodes;
 
     public Long getRuleId() {
         return ruleId;
@@ -69,6 +71,14 @@ public class PromotionRule {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public List<String> getSeasonCodes() {
+        return seasonCodes;
+    }
+
+    public void setSeasonCodes(List<String> seasonCodes) {
+        this.seasonCodes = seasonCodes;
     }
 
     @Override

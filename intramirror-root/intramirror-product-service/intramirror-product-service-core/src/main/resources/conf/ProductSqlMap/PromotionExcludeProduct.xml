@@ -27,11 +27,26 @@
 
     <insert id="insertPromotionExcludeProduct" keyProperty="promotionExcludeProductId"
             parameterType="com.intramirror.product.api.model.PromotionExcludeProduct">
-        insert into `t_promotion_exclude_product`(`promotion_id` ,`product_id` )values(#{promotionId,jdbcType=BIGINT},#{productId,jdbcType=BIGINT});
+        insert into `t_promotion_exclude_product`(`promotion_id` ,`product_id` )
+        values
+        <foreach collection="productIds" item="item" index="index" open="(" close=")" separator=",">
+            #{promotionId,jdbcType=BIGINT},#{item}
+        </foreach>
     </insert>
 
     <delete id="deletePromotionExcludeProduct" parameterType="java.lang.Long">
         delete from `t_promotion_exclude_product` where `promotion_exclude_product_id` = #{promotionExcludeProductId,jdbcType=BIGINT}
     </delete>
+
+    <select id="getPromotionProductIdByParameter" parameterType="java.util.Map" resultType="java.lang.Long">
+        SELECT ep.product_id AS productId
+        FROM `t_promotion_exclude_product` ep
+        where ep.`promotion_id` = #{promotionId,jdbcType=BIGINT}
+        AND ep.`product_id` in
+        <foreach collection="productIds" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+
+    </select>
 
 </mapper>

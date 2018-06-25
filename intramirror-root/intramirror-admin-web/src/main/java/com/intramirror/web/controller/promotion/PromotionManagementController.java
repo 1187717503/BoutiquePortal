@@ -9,38 +9,25 @@ import com.intramirror.product.api.entity.promotion.BrandEntity;
 import com.intramirror.product.api.entity.promotion.CategoryEntity;
 import com.intramirror.product.api.entity.promotion.ImportDataEntity;
 import com.intramirror.product.api.enums.PromotionRuleType;
-import com.intramirror.product.api.model.ProductWithBLOBs;
-import com.intramirror.product.api.model.Promotion;
-import com.intramirror.product.api.model.PromotionBrandHot;
-import com.intramirror.product.api.model.PromotionExcludeProduct;
-import com.intramirror.product.api.model.PromotionRule;
+import com.intramirror.product.api.model.*;
 import com.intramirror.product.api.service.IProductService;
 import com.intramirror.product.api.service.brand.IBrandService;
 import com.intramirror.product.api.service.category.ICategoryService;
 import com.intramirror.product.api.service.promotion.IPromotionExcludeProductService;
 import com.intramirror.product.api.service.promotion.IPromotionService;
-import static com.intramirror.utils.transform.JsonTransformUtil.toJson;
-import static com.intramirror.web.common.request.ConstantsEntity.EXCLUDE;
-import static com.intramirror.web.common.request.ConstantsEntity.INCLUDE;
-import static com.intramirror.web.common.request.ConstantsEntity.INCLUDE_IMPORT;
 import com.intramirror.web.common.request.PromotionRuleEntity;
 import com.intramirror.web.controller.cache.CategoryCache;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
+
+import static com.intramirror.utils.transform.JsonTransformUtil.toJson;
+import static com.intramirror.web.common.request.ConstantsEntity.*;
 
 /**
  * Created on 2018/1/4.
@@ -82,6 +69,9 @@ public class PromotionManagementController {
         LOGGER.info("Save rule with type {}, {}.", ruleType, body);
         if (body.getPromotionId() == null) {
             return Response.status(StatusType.PARAM_NOT_POSITIVE).build();
+        }
+        if (CollectionUtils.isEmpty(body.getSeasonCodes())) {
+            body.setSeasonCodes(Collections.singletonList(body.getSeasonCode()));
         }
 
         PromotionRuleType type;
@@ -200,6 +190,7 @@ public class PromotionManagementController {
         pre.setPromotionId(body.getPromotionId());
         pre.setRuleId(body.getRuleId());
         pre.setSeasonCode(body.getSeasonCode());
+        pre.setSeasonCodes(body.getSeasonCodes());
         pre.setVendorId(body.getVendorId());
         pre.setBrands(listBrand);
         pre.setCategorys(listCategory);
@@ -264,19 +255,34 @@ public class PromotionManagementController {
     public Response savePromotionExcludeProduct(@RequestBody PromotionExcludeProduct promotionExcludeProduct) {
         LOGGER.info("Add promotion exclude product by promotionExcludeProduct: {}", toJson(promotionExcludeProduct));
 
-        ProductWithBLOBs productWithBLOBs = productService.selectByPrimaryKey(promotionExcludeProduct.getProductId());
-        if (productWithBLOBs == null || !productWithBLOBs.getEnabled()) {
-            return Response.status(StatusType.FAILURE).data("product id not found.");
+        ProductWithBLOBs product = new ProductWithBLOBs();
+        product.setProductId(promotionExcludeProduct.getProductId());
+        product.setProductCode(promotionExcludeProduct.getProductCode());
+        product.setDesignerId(promotionExcludeProduct.getDesignerId());
+        product.setColorCode(promotionExcludeProduct.getColorCode());
+        product.setEnabled(true);
+        List<ProductWithBLOBs> productWithBLOBsList = productService.getProductByParameter(product);
+        if (CollectionUtils.isEmpty(productWithBLOBsList)) {
+            return Response.status(StatusType.FAILURE).data("product not found.");
+        }
+        List<Long> productIds = new ArrayList<>();
+        for (ProductWithBLOBs productWithBLOBs : productWithBLOBsList) {
+            productIds.add(productWithBLOBs.getProductId());
         }
 
-        List<Map<String, Object>> promotionExcludeProducts = promotionExcludeProductService.selectByParameter(promotionExcludeProduct);
-        if (promotionExcludeProducts.size() > 0) {
+        Map<String, Object> params= new HashMap<>();
+        params.put("productIds", productIds);
+        params.put("promotionId", promotionExcludeProduct.getPromotionId());
+        List<Long> existsProductIds = promotionExcludeProductService.getPromotionProductIdByParameter(params);
+
+        productIds.removeAll(existsProductIds);
+        if (productIds.size() > 0) {
             return Response.status(StatusType.FAILURE).data("product id already existed.");
         }
-
+        promotionExcludeProduct.setProductIds(productIds);
         promotionExcludeProductService.insertPromotionExcludeProduct(promotionExcludeProduct);
-        promotionExcludeProduct.setName(productWithBLOBs.getName());
-        return Response.status(StatusType.SUCCESS).data(promotionExcludeProduct);
+//        promotionExcludeProduct.setName(productWithBLOBs.getName());
+        return Response.status(StatusType.SUCCESS).build();
     }
 
     @DeleteMapping(value = "/promotion/product/exclude/{promotionExcludeProductId}")
@@ -327,6 +333,7 @@ public class PromotionManagementController {
         promotionRule.setPromotionId(body.getPromotionId());
         promotionRule.setVendorId(body.getVendorId());
         promotionRule.setSeasonCode(body.getSeasonCode());
+        promotionRule.setSeasonCodes(body.getSeasonCodes());
 
         promotionRule.setBrands(JSONArray.toJSONString(body.getBrands()));
         for (CategoryEntity category : body.getCategorys()) {

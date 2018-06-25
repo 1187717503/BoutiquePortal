@@ -17,6 +17,7 @@ public class PromotionRuleEntity {
     Long vendorId;
     String seasonCode;
     Long ruleId;
+    List<String> seasonCodes;
 
     public List<ImportDataEntity> getImportData() {
         return importData;
@@ -72,6 +73,14 @@ public class PromotionRuleEntity {
 
     public void setSeasonCode(String seasonCode) {
         this.seasonCode = seasonCode;
+    }
+
+    public List<String> getSeasonCodes() {
+        return seasonCodes;
+    }
+
+    public void setSeasonCodes(List<String> seasonCodes) {
+        this.seasonCodes = seasonCodes;
     }
 
     @Override
