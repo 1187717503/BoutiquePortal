@@ -48,7 +48,7 @@
         INSERT INTO t_promotion_include_rule
         <trim prefix="(" suffix=")" suffixOverrides=",">
             `promotion_id`,
-            <if test="seasonCode != null">
+            <if test="seasonCodes != null and seasonCodes.size() > 0">
                 `season_code`,
             </if>
             <if test="vendorId != null">
@@ -62,22 +62,25 @@
             </if>
             `created_at`
         </trim>
-        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
-            #{promotionId, jdbcType=BIGINT},
-            <if test="seasonCode != null">
-                #{seasonCode,jdbcType=BIGINT},
-            </if>
-            <if test="vendorId != null">
-                #{vendorId,jdbcType=BIGINT},
-            </if>
-            <if test="categorys != null">
-                #{categorys,jdbcType=LONGVARCHAR},
-            </if>
-            <if test="brands != null">
-                #{brands,jdbcType=LONGVARCHAR},
-            </if>
-            NOW()
-        </trim>
+        VALUES
+        <if test="seasonCodes != null and seasonCodes.size() > 0">
+            <foreach collection="seasonCodes" index="index" item="item" separator=",">
+                (#{promotionId, jdbcType=BIGINT},
+                <if test="seasonCodes != null and seasonCodes.size() > 0">
+                #{item},
+                </if>
+                <if test="vendorId != null">
+                    #{vendorId,jdbcType=BIGINT},
+                </if>
+                <if test="categorys != null">
+                    #{categorys,jdbcType=LONGVARCHAR},
+                </if>
+                <if test="brands != null">
+                    #{brands,jdbcType=LONGVARCHAR},
+                </if>
+                NOW())
+            </foreach>
+        </if>
     </insert>
 
     <insert id="insertExcludeRule" keyProperty="ruleId" useGeneratedKeys="true"
@@ -85,7 +88,7 @@
         INSERT INTO t_promotion_exclude_rule
         <trim prefix="(" suffix=")" suffixOverrides=",">
             `promotion_id`,
-            <if test="seasonCode != null">
+            <if test="seasonCodes != null and seasonCodes.size() > 0">
                 `season_code`,
             </if>
             <if test="vendorId != null">
@@ -99,22 +102,23 @@
             </if>
             `created_at`
         </trim>
-        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
-            #{promotionId, jdbcType=BIGINT},
-            <if test="seasonCode != null">
-                #{seasonCode,jdbcType=BIGINT},
-            </if>
-            <if test="vendorId != null">
-                #{vendorId,jdbcType=BIGINT},
-            </if>
-            <if test="categorys != null">
-                #{categorys,jdbcType=LONGVARCHAR},
-            </if>
-            <if test="brands != null">
-                #{brands,jdbcType=LONGVARCHAR},
-            </if>
-            NOW()
-        </trim>
+        VALUES
+        <if test="seasonCodes != null and seasonCodes.size() > 0">
+            <foreach collection="seasonCodes" index="index" item="item" separator=",">
+                (#{promotionId, jdbcType=BIGINT},
+                #{item},
+                <if test="vendorId != null">
+                    #{vendorId,jdbcType=BIGINT},
+                </if>
+                <if test="categorys != null">
+                    #{categorys,jdbcType=LONGVARCHAR},
+                </if>
+                <if test="brands != null">
+                    #{brands,jdbcType=LONGVARCHAR},
+                </if>
+                NOW())
+            </foreach>
+        </if>
     </insert>
 
     <insert id="insertIncludeRuleDetail" keyProperty="promotionIncludeId" useGeneratedKeys="true"
@@ -285,7 +289,6 @@
       description
       FROM t_promotion_seq
       WHERE promotion_id = #{promotionId}
-      AND `enabled` = TRUE
       ORDER BY `sort` ASC
     </select>
 
@@ -680,6 +683,7 @@
           FROM
             t_promotion_exclude_rule tper
           WHERE tper.promotion_id = #{promotionId, jdbcType=BIGINT})
+        ORDER BY v.vendor_name
     </select>
 
     <select id="getPromotionBoutiqueProductCountBySeason" parameterType="java.util.Map" resultType="java.util.Map">
@@ -709,10 +713,12 @@
         SELECT tpir.`promotion_include_rule_id` AS ruleId,
           tpir.`promotion_id` AS promotionId,
           tpir.`vendor_id` AS vendorId,
+          CASE tpir.`vendor_id` WHEN -1 THEN 'ALL Boutiques' ELSE v.`vendor_name` END AS vendorName,
           tpir.`season_code` AS seasonCode,
           tpir.`brands`,
           tpir.`categorys`
         FROM `t_promotion_include_rule` tpir
+        LEFT JOIN `vendor` v ON (v.`vendor_id` = tpir.`vendor_id` AND v.`enabled` = 1)
         WHERE tpir.`promotion_id` = #{promotionId}
         <if test="vendorId != null">
             AND tpir.`vendor_id` = #{vendorId}
@@ -721,16 +727,21 @@
             AND tpir.`season_code` = #{seasonCode}
         </if>
         ORDER BY tpir.`created_at` DESC
+        <if test="pageSize != null">
+            LIMIT #{start}, #{pageSize}
+        </if>
     </select>
 
     <select id="listSeasonExcludeRulePromotion" parameterType="java.util.Map" resultType="java.util.Map">
         SELECT tper.`promotion_exclude_rule_id` AS ruleId,
           tper.`promotion_id` AS promotionId,
           tper.`vendor_id` AS vendorId,
+          CASE tpir.`vendor_id` WHEN -1 THEN 'ALL Boutiques' ELSE v.`vendor_name` END AS vendorName,
           tper.`season_code` AS seasonCode,
           tper.`brands`,
           tper.`categorys`
         FROM `t_promotion_exclude_rule` tper
+        LEFT JOIN `vendor` v ON (v.`vendor_id` = tper.`vendor_id` AND v.`enabled` = 1)
         WHERE tper.`promotion_id` = #{promotionId}
         <if test="vendorId != null">
             AND tper.`vendor_id` = #{vendorId}
@@ -739,6 +750,33 @@
             AND tper.`season_code` = #{seasonCode}
         </if>
         ORDER BY tper.`created_at` DESC
+        <if test="pageSize != null">
+            LIMIT #{start}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="countSeasonIncludeRulePromotion" parameterType="java.util.Map" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM `t_promotion_include_rule` tpir
+        WHERE tpir.`promotion_id` = #{promotionId}
+        <if test="vendorId != null">
+            AND tpir.`vendor_id` = #{vendorId}
+        </if>
+        <if test="seasonCode != null">
+            AND tpir.`season_code` = #{seasonCode}
+        </if>
+    </select>
+
+    <select id="countSeasonExcludeRulePromotion" parameterType="java.util.Map" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM `t_promotion_exclude_rule` tper
+        WHERE tper.`promotion_id` = #{promotionId}
+        <if test="vendorId != null">
+            AND tper.`vendor_id` = #{vendorId}
+        </if>
+        <if test="seasonCode != null">
+            AND tper.`season_code` = #{seasonCode}
+        </if>
     </select>
 
 </mapper>

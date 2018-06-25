@@ -566,4 +566,14 @@ public class PromotionServiceImpl implements IPromotionService {
     public List<Map<String, Object>> listSeasonExcludeRulePromotion(Map<String, Object> params) {
         return promotionRuleMapper.listSeasonExcludeRulePromotion(params);
     }
+
+    @Override
+    public int countSeasonIncludeRulePromotion(Map<String, Object> params) {
+        return promotionRuleMapper.countSeasonIncludeRulePromotion(params);
+    }
+
+    @Override
+    public int countSeasonExcludeRulePromotion(Map<String, Object> params) {
+        return promotionRuleMapper.countSeasonExcludeRulePromotion(params);
+    }
 }

@@ -3,10 +3,11 @@ package com.intramirror.product.core.impl.promotion;
 import com.intramirror.product.api.model.PromotionExcludeProduct;
 import com.intramirror.product.api.service.promotion.IPromotionExcludeProductService;
 import com.intramirror.product.core.mapper.PromotionExcludeProductMapper;
-import java.util.List;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by dingyifan on 2018/1/5.
@@ -30,5 +31,10 @@ public class PromotionExcludeProductServiceImpl implements IPromotionExcludeProd
     @Override
     public Long insertPromotionExcludeProduct(PromotionExcludeProduct promotionExcludeProduct) {
         return promotionExcludeProductMapper.insertPromotionExcludeProduct(promotionExcludeProduct);
+    }
+
+    @Override
+    public List<Long> getPromotionProductIdByParameter(Map<String, Object> params) {
+        return promotionExcludeProductMapper.getPromotionProductIdByParameter(params);
     }
 }

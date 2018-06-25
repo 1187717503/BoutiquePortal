@@ -35,20 +35,45 @@ public class PromotionRuleFilterController {
      */
     @RequestMapping(value = "/{ruleType}", method = RequestMethod.GET)
     public Response listPromotionRule(@PathVariable("ruleType") String ruleType, @Param("promotionId") Long promotionId,
-                                      @Param("vendorId") Long vendorId, @Param("seasonCode") String seasonCode) {
-        List<Map<String, Object>> data;
+                                      @Param("vendorId") Long vendorId, @Param("seasonCode") String seasonCode,
+                                      @Param("pageNo") Integer pageNo, @Param("pageSize") Integer pageSize) {
+        Map<String, Object> result = new HashMap<>();
+        List<Map<String, Object>> data = new ArrayList<>();
+        int total = 0;
         Map<String, Object> params = new HashMap<>();
         params.put("promotionId", promotionId);
         params.put("vendorId", vendorId);
         params.put("seasonCode", seasonCode);
+
+        boolean pageFlg = pageSize != null && pageNo != null;
+
+        if (pageFlg) {
+            int start = pageNo > 0 ? 0 : (pageNo - 1) * pageNo;
+            params.put("start", start);
+            params.put("pageSize", pageSize);
+        }
         if (INCLUDE.equals(ruleType)) {
-            data = promotionService.listSeasonIncludeRulePromotion(params);
+            if (pageFlg) {
+                total = promotionService.countSeasonIncludeRulePromotion(params);
+            }
+            if (pageFlg && total > 0) {
+                data = promotionService.listSeasonIncludeRulePromotion(params);
+            }
+            result.put("total", total);
+            result.put("data", transFormation(data));
         } else if (EXCLUDE.equals(ruleType)) {
-            data = promotionService.listSeasonExcludeRulePromotion(params);
+            if (pageFlg) {
+                total = promotionService.countSeasonExcludeRulePromotion(params);
+            }
+            if (pageFlg && total > 0) {
+                data = promotionService.listSeasonExcludeRulePromotion(params);
+            }
+            result.put("total", total);
+            result.put("data", transFormation(data));
         } else {
             return Response.status(StatusType.FAILURE).data(null);
         }
-        return Response.status(StatusType.SUCCESS).data(transFormation(data));
+        return Response.status(StatusType.SUCCESS).data(result);
     }
 
     private List<Map<String, Object>> transFormation(List<Map<String, Object>> data) {
@@ -100,7 +125,7 @@ public class PromotionRuleFilterController {
     @RequestMapping(value = "/boutique", method = RequestMethod.GET)
     public Response getPromotionBoutiqueHasRuleList(@Param("promotionId") Long promotionId) {
         if (promotionId == null) {
-            return Response.status(StatusType.PARAM_NOT_POSITIVE).data(null);
+            return Response.status(StatusType.PARAM_NOT_POSITIVE).build();
         }
         List<Map<String, Object>> data = promotionService.getPromotionBoutiqueHasRuleList(promotionId);
         return Response.status(StatusType.SUCCESS).data(data);
@@ -115,7 +140,7 @@ public class PromotionRuleFilterController {
     @RequestMapping(value = "/include/rule/count", method = RequestMethod.GET)
     public Response getPromotionIncludeRuleProductCount(@Param("promotionId") Long promotionId, @Param("vendorId") Long vendorId) {
         if (promotionId == null || vendorId == null) {
-            return Response.status(StatusType.PARAM_NOT_POSITIVE).data(null);
+            return Response.status(StatusType.PARAM_NOT_POSITIVE).build();
         }
         Map<String, Object> params = new HashMap<>();
         params.put("promotionId", promotionId);
@@ -132,7 +157,7 @@ public class PromotionRuleFilterController {
     @RequestMapping(value = "/exclude/product/count", method = RequestMethod.GET)
     public Response getPromotionExcludeProductCount(@Param("promotionId") Long promotionId) {
         if (promotionId == null) {
-            return Response.status(StatusType.PARAM_NOT_POSITIVE).data(null);
+            return Response.status(StatusType.PARAM_NOT_POSITIVE).build();
         }
         Map<String, Object> params = new HashMap<>();
         params.put("promotionId", promotionId);

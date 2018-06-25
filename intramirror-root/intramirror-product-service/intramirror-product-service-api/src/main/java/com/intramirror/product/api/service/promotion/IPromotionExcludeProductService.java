@@ -14,4 +14,6 @@ public interface IPromotionExcludeProductService {
     Long deletePromotionExcludeProduct(Long promotionExcludeProductId);
 
     Long insertPromotionExcludeProduct(PromotionExcludeProduct promotionExcludeProduct);
+
+    List<Long> getPromotionProductIdByParameter(Map<String, Object> params);
 }
