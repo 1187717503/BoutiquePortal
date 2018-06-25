@@ -494,11 +494,10 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
                 if (StringUtils.isNotBlank(success)){
                     logger.info("调用微店ship接口成功");
                 }else {
-                    logger.info("调用微店ship接口失败,msg:{}",object.optString("error"));
-                    throw new RuntimeException("Request styleroom service failed.");
+                    logger.error("调用微店ship接口失败,msg:{}",object.optString("error"));
                 }
             }else {
-                throw new RuntimeException("Request styleroom service failed.");
+				logger.error("调用微店ship接口失败");
             }
         }
 	}
