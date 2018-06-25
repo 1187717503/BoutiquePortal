@@ -1,27 +1,10 @@
 package com.intramirror.web.controller.order;
 
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.logistics.api.model.Invoice;
+import com.intramirror.logistics.api.model.VendorShipment;
 import com.intramirror.logistics.api.service.IInvoiceService;
-import com.intramirror.order.api.common.OrderStatusType;
-import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.service.IContainerService;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderService;
@@ -29,6 +12,18 @@ import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.VendorService;
 import com.intramirror.web.controller.BaseController;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @CrossOrigin
 @Controller
@@ -156,6 +151,31 @@ public class InvoiceController extends BaseController{
 		}
 		return result;
 	}
-	
+	@RequestMapping(value="/update/vendor/invoiceUrl", method = RequestMethod.POST)
+	@ResponseBody
+	public ResultMessage updateVendorInvoiceUrl(@RequestBody VendorShipment vendorShipment,HttpServletRequest httpRequest){
+		ResultMessage result= new ResultMessage();
+		result.errorStatus();
+		User user = this.getUser(httpRequest);
+		if(user == null){
+			result.setMsg("Please log in again");
+			return result;
+		}
+
+		Vendor vendor= null;
+		try {
+			vendor= vendorService.getVendorByUserId(user.getUserId());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if(vendor == null){
+			result.setMsg("Please log in again");
+			return result;
+		}
+		vendorShipment.setVendorId(vendor.getVendorId());
+		invoiceService.saveOrUpdateVendorShipment(vendorShipment);
+		result.setStatus(1);
+		return result;
+	}
 
 }

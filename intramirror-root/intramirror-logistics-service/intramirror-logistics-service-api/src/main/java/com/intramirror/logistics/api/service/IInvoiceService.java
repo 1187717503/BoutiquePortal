@@ -2,6 +2,7 @@ package com.intramirror.logistics.api.service;
 
 import com.intramirror.logistics.api.model.Invoice;
 
+import com.intramirror.logistics.api.model.VendorShipment;
 import java.util.Map;
 
 public interface IInvoiceService {
@@ -81,5 +82,9 @@ public interface IInvoiceService {
      * @return
      */
     Map<String,Object> getMaxDdtNo();
+
+    VendorShipment saveOrUpdateVendorShipment(VendorShipment vendorShipment);
+
+    VendorShipment queryVendorShipmentByShipmentId(Long shipmentId);
 
 }

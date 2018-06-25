@@ -1,7 +1,8 @@
 package com.intramirror.logistics.core.mapper;
 
 import com.intramirror.logistics.api.model.Invoice;
-
+import com.intramirror.logistics.api.model.VendorShipment;
+import java.util.List;
 import java.util.Map;
 
 public interface InvoiceMapper {
@@ -83,4 +84,10 @@ public interface InvoiceMapper {
      * @return
      */
     Map<String,Object> getMaxNum();
+
+    int vendorShipmentUpdateByKey(VendorShipment vendorShipment);
+
+    List<VendorShipment> selectVendorInvoiceByParam(VendorShipment vendorShipment);
+
+    void vendorShipmentInsertSelective(VendorShipment vendorShipment);
 }
