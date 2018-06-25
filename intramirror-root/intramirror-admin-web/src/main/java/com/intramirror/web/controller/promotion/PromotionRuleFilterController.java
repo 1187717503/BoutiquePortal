@@ -56,7 +56,7 @@ public class PromotionRuleFilterController {
             if (pageFlg) {
                 total = promotionService.countSeasonIncludeRulePromotion(params);
             }
-            if (pageFlg && total > 0) {
+            if (!pageFlg || total > 0) {
                 data = promotionService.listSeasonIncludeRulePromotion(params);
             }
             result.put("total", total);
