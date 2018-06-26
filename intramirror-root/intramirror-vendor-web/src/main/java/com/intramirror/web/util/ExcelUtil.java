@@ -201,9 +201,11 @@ public class ExcelUtil {
         //Object o = resultMap.get("DeliverTo") != null ? resultMap.get("DeliverTo") : null;
         if(recipientVO != null){
             name = safeStr(recipientVO.getPersonName()) + " " + safeStr(recipientVO.getPhoneNumber()) + "\n";
-            name += safeStr(recipientVO.getCompanyName()) + "\n";
-            name += safeStr(recipientVO.getProvince()) + "\n";
-            name += safeStr(recipientVO.getStreetLines()) + safeStr(recipientVO.getStreetLines2()) + safeStr(recipientVO.getStreetLines3()) + "\n";
+            if (recipientVO.getCompanyName() != null){
+                name += safeStr(recipientVO.getCompanyName()) + "\n";
+            }
+            name += safeStr(recipientVO.getStreetLines()) + safeStr(recipientVO.getStreetLines2()) + safeStr(recipientVO.getStreetLines3()) +"\n";
+            name += safeStr(recipientVO.getArea())+ "\n";
             name += safeStr(recipientVO.getCity()) + safeStr(recipientVO.getProvince()) + safeStr(recipientVO.getCountry()) + safeStr(recipientVO.getPostalCode());
         }
         cell92.setCellValue(new HSSFRichTextString(name));
@@ -716,7 +718,7 @@ public class ExcelUtil {
         if(StringUtil.isEmpty(s)){
             return "";
         }
-
+        s += " ";
         return s;
     }
 }

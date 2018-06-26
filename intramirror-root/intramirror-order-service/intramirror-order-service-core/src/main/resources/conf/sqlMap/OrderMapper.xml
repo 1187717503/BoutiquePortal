@@ -393,6 +393,7 @@
         if(lp.user_rec_flag=0, l.user_rec_area, lp.user_rec_area) as user_rec_area,
         if(lp.user_rec_flag=0, l.user_rec_addr, lp.user_rec_addr) as user_rec_addr,
         ifnull(cm.country, l.user_rec_country) as countryName,
+        l.user_rec_code,
         l.geography_id,
         g.english_name
         FROM logistics_product lp
@@ -837,5 +838,15 @@
         inner join order_logistics ol on lp.order_logistics_id = ol.order_logistics_id and ol.enabled = 1
         inner join `order` o on ol.order_id = o.order_id and o.enabled = 1
         where lp.logistics_product_id = #{logisticsProductId} and lp.enabled = 1
+    </select>
+
+    <select id="getStyleroomOrder" parameterType="list" resultType="string">
+        SELECT lp.order_line_num FROM logistics_product lp
+        INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+        INNER JOIN `order` o ON ol.order_id = o.order_id
+        WHERE o.channel_id = 6 and lp.order_line_num in
+        <foreach collection="list" item="orderLineNum" open="(" separator="," close=")">
+            #{orderLineNum}
+        </foreach>
     </select>
 </mapper>

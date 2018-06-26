@@ -166,4 +166,6 @@ public interface OrderMapper {
 
     Order getOrderByLpID(Long logisticsProductId);
 
+    List<String> getStyleroomOrder(List<String> orderLineNums);
+
 }

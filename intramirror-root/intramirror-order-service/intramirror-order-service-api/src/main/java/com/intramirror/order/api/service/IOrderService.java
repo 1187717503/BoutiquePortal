@@ -177,4 +177,11 @@ public interface IOrderService {
      */
     List<Map<String, Object>> getOrderListByParams(Map<String, Object> params);
 
+    /**
+     * 从orderLineNums中筛选出属于微店的order
+     * @param orderLineNums
+     * @return
+     */
+    List<String> getStyleroomOrder(List<String> orderLineNums);
+
 }

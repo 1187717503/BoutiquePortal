@@ -3,6 +3,7 @@ package com.intramirror.web.controller.order;
 import com.google.gson.Gson;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.logistics.api.model.Invoice;
+import com.intramirror.logistics.api.model.VendorShipment;
 import com.intramirror.logistics.api.service.IInvoiceService;
 import com.intramirror.main.api.model.AddressCountry;
 import com.intramirror.main.api.model.Geography;
@@ -16,7 +17,12 @@ import com.intramirror.order.api.common.OrderStatusType;
 import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.model.ShippingProvider;
 import com.intramirror.order.api.model.SubShipment;
-import com.intramirror.order.api.service.*;
+import com.intramirror.order.api.service.IContainerService;
+import com.intramirror.order.api.service.IOrderService;
+import com.intramirror.order.api.service.IShipmentService;
+import com.intramirror.order.api.service.IShippingProviderService;
+import com.intramirror.order.api.service.ISubShipmentService;
+import com.intramirror.order.api.util.HttpClientUtil;
 import com.intramirror.order.api.vo.LogisticsProductVO;
 import com.intramirror.product.api.model.Shop;
 import com.intramirror.product.api.service.IShopService;
@@ -24,11 +30,36 @@ import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.VendorService;
 import com.intramirror.utils.transform.JsonTransformUtil;
-import com.intramirror.web.VO.*;
+import com.intramirror.web.VO.DHLInputVO;
+import com.intramirror.web.VO.InvoiceVO;
+import com.intramirror.web.VO.RecipientVO;
+import com.intramirror.web.VO.ShipperVO;
+import com.intramirror.web.VO.TransitWarehouseInvoiceVO;
 import com.intramirror.web.common.BarcodeUtil;
 import com.intramirror.web.controller.BaseController;
-import com.intramirror.web.util.DHLHttpClient;
 import com.intramirror.web.util.ExcelUtil;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.collections.CollectionUtils;
@@ -37,18 +68,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import pk.shoplus.common.utils.StringUtil;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 @CrossOrigin
 @Controller
@@ -92,9 +117,6 @@ public class OrderShipController extends BaseController {
 
     @Autowired
     private StockLocationService stockLocationService;
-
-    @Autowired
-    private ILogisticsProductService iLogisticsProductService;
 
     /**
      * 获取所有箱子信息
@@ -365,9 +387,13 @@ public class OrderShipController extends BaseController {
                 }
             }
 
+            VendorShipment vendorShipment = invoiceService.queryVendorShipmentByShipmentId(Long.parseLong(map.get("shipment_id").toString()));
             shipmentMap.put("carton_qty", shipMentCartonList == null ? 0 : shipMentCartonList.size());
             resultMap.put("cartonList", shipMentCartonList);
             resultMap.put("shipmentInfo", shipmentMap);
+            if(vendorShipment!=null){
+                resultMap.put("vendorShipment",vendorShipment);
+            }
 
             result.successStatus();
             result.setData(resultMap);
@@ -1006,6 +1032,8 @@ public class OrderShipController extends BaseController {
                 recipientVO.setPhoneNumber(mobile);
                 String postalCode = UNOrder.get("user_rec_code") != null ? UNOrder.get("user_rec_code").toString() : "";
                 recipientVO.setPostalCode(postalCode);
+                String area = UNOrder.get("user_rec_area") != null ? UNOrder.get("user_rec_area").toString() : "";
+                recipientVO.setArea(area);
 
                 String inPrice = UNOrder.get("in_price")!=null?UNOrder.get("in_price").toString():"";
                 String retailPrice = UNOrder.get("price")!=null?UNOrder.get("price").toString():"";
@@ -1076,6 +1104,8 @@ public class OrderShipController extends BaseController {
                 recipientVO.setPhoneNumber(mobile);
                 String postalCode = elseOrder.get("user_rec_code") != null ? elseOrder.get("user_rec_code").toString() : "";
                 recipientVO.setPostalCode(postalCode);
+                String area = elseOrder.get("user_rec_area") != null ? elseOrder.get("user_rec_area").toString() : "";
+                recipientVO.setArea(area);
 
                 String inPrice = elseOrder.get("in_price")!=null?elseOrder.get("in_price").toString():"";
                 String retailPrice = elseOrder.get("price")!=null?elseOrder.get("price").toString():"";
@@ -1302,6 +1332,12 @@ public class OrderShipController extends BaseController {
         }
         DHLInputVO inputVO = new DHLInputVO();
         Long shipmentId = Long.parseLong(map.get("shipment_id").toString());
+        // 校验invoice
+        VendorShipment vendorShipment = invoiceService.queryVendorShipmentByShipmentId(shipmentId);
+        if(vendorShipment == null){
+            result.setMsg("Please upload invoice");
+            return result;
+        }
         if (map.get("shipmentDate")!=null){
             Long shipmentDate = Long.parseLong(map.get("shipmentDate").toString());
             inputVO.setShipmentDate(shipmentDate);
@@ -1327,10 +1363,10 @@ public class OrderShipController extends BaseController {
                 /*String s;
                 try {
                     //获取awb文档
-                    s = DHLHttpClient.httpGet(DHLHttpClient.queryAWBUrl + dhlShipment.getAwbNum());
+                    s = HttpClientUtil.httpGet(HttpClientUtil.queryAWBUrl + dhlShipment.getAwbNum());
                 }catch (Exception e){
                     result.addMsg("DHL service invocation failed");
-                    logger.error("request fail,params={},url={}",JsonTransformUtil.toJson(inputVO),DHLHttpClient.createAWBUrl);
+                    logger.error("request fail,params={},url={}",JsonTransformUtil.toJson(inputVO),HttpClientUtil.createAWBUrl);
                     return result;
                 }
                 if(StringUtil.isNotEmpty(s)){
@@ -1347,9 +1383,9 @@ public class OrderShipController extends BaseController {
                 deleteParams.put("reason","001");
                 String s;
                 try{
-                    s = DHLHttpClient.httpPost(JsonTransformUtil.toJson(deleteParams), DHLHttpClient.deleteAWBUrl);
+                    s = HttpClientUtil.httpPost(JsonTransformUtil.toJson(deleteParams), HttpClientUtil.deleteAWBUrl);
                 }catch (Exception e){
-                    logger.error("request fail,params={},url={}",JsonTransformUtil.toJson(deleteParams),DHLHttpClient.deleteAWBUrl);
+                    logger.error("request fail,params={},url={}",JsonTransformUtil.toJson(deleteParams),HttpClientUtil.deleteAWBUrl);
                     result.setMsg("DHL service invocation failed");
                     return result;
                 }
@@ -1402,11 +1438,11 @@ public class OrderShipController extends BaseController {
             addParams(inputVO,dhlShipment,fromLocation,containerList,shipment);
             String resultStr;
             try{
-                logger.info("shipmentRequest,params={},url={}",JsonTransformUtil.toJson(inputVO),DHLHttpClient.createAWBUrl);
-                resultStr = DHLHttpClient.httpPost(JsonTransformUtil.toJson(inputVO), DHLHttpClient.createAWBUrl);
+                logger.info("shipmentRequest,params={},url={}",JsonTransformUtil.toJson(inputVO), HttpClientUtil.createAWBUrl);
+                resultStr = HttpClientUtil.httpPost(JsonTransformUtil.toJson(inputVO), HttpClientUtil.createAWBUrl);
             }catch (Exception e){
                 result.addMsg("DHL service invocation failed");
-                logger.error("request fail,params={},url={}",JsonTransformUtil.toJson(inputVO),DHLHttpClient.createAWBUrl);
+                logger.error("request fail,params={},url={}",JsonTransformUtil.toJson(inputVO), HttpClientUtil.createAWBUrl);
                 return result;
             }
             if(StringUtil.isNotEmpty(resultStr)){

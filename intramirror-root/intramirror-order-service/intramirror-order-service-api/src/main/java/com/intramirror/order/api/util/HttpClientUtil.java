@@ -1,4 +1,4 @@
-package com.intramirror.web.util;
+package com.intramirror.order.api.util;
 
 import net.sf.json.JSONObject;
 import org.apache.http.HttpEntity;
@@ -11,6 +11,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,15 +23,18 @@ import java.nio.charset.Charset;
 /**
  * Created by caowei on 2018/4/23.
  */
-public class DHLHttpClient {
+public class HttpClientUtil {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(DHLHttpClient.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(HttpClientUtil.class);
 
     public static String createAWBUrl;
 
     public static String queryAWBUrl;
 
     public static String deleteAWBUrl;
+
+    public static String confirmedOrder;
+    public static String shippedOrder;
 
     public static String httpPost(String jsonObj, String url){
         HttpPost post = null;
@@ -45,7 +50,7 @@ public class DHLHttpClient {
 
             // 构建消息实体
             StringEntity entity = new StringEntity(jsonObj, Charset.forName("UTF-8"));
-            entity.setContentEncoding("UTF-8");
+            entity.setContentEncoding(new BasicHeader("Content-Type", "application/json"));
             // 发送Json格式的数据请求
             entity.setContentType("application/json");
             post.setEntity(entity);
@@ -88,6 +93,47 @@ public class DHLHttpClient {
         return "";
     }
 
+    public static String doPost(String url, String jsonObj, String charset) {
+
+        String result = null;
+        try {
+            HttpClient httpClient = new SSLClient();
+            HttpPost httpPost = new HttpPost(url);
+
+            LOGGER.info("Post url =>" + url);
+            // 设置参数
+            /*while (iterator.hasNext()) {
+                Map.Entry<String, String> elem = (Map.Entry<String, String>) iterator.next();
+                list.add(new BasicNameValuePair(elem.getKey(), elem.getValue()));
+                LOGGER.info("Post param =>" + elem.getKey() + ":" + elem.getValue());
+            }
+            if (list.size() > 0) {
+                UrlEncodedFormEntity entity = new UrlEncodedFormEntity(list, charset);
+                httpPost.setEntity(entity);
+            }*/
+
+            StringEntity entity = new StringEntity(jsonObj, Charset.forName("UTF-8"));
+            entity.setContentEncoding(new BasicHeader("Content-Type", "application/json"));
+            // 发送Json格式的数据请求
+            entity.setContentType("application/json");
+            httpPost.setEntity(entity);
+            httpPost.getParams().setIntParameter(CoreConnectionPNames.SO_TIMEOUT, 1500);
+            httpPost.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 1000);
+            HttpResponse response = httpClient.execute(httpPost);
+
+            if (response != null) {
+                HttpEntity resEntity = response.getEntity();
+                if (resEntity != null) {
+                    result = EntityUtils.toString(resEntity, charset);
+                }
+            }
+        } catch (Exception ex) {
+            LOGGER.error("Connect time out.", ex);
+
+        }
+        return result;
+    }
+
     public static String httpGet(String url){
         HttpClient client = HttpClients.createDefault();
         HttpGet get = new HttpGet(url);
@@ -122,7 +168,7 @@ public class DHLHttpClient {
     }
 
     public static void setCreateAWBUrl(String createAWBUrl) {
-        DHLHttpClient.createAWBUrl = createAWBUrl;
+        HttpClientUtil.createAWBUrl = createAWBUrl;
     }
 
     public static String getQueryAWBUrl() {
@@ -130,7 +176,7 @@ public class DHLHttpClient {
     }
 
     public static void setQueryAWBUrl(String queryAWBUrl) {
-        DHLHttpClient.queryAWBUrl = queryAWBUrl;
+        HttpClientUtil.queryAWBUrl = queryAWBUrl;
     }
 
     public static String getDeleteAWBUrl() {
@@ -138,6 +184,22 @@ public class DHLHttpClient {
     }
 
     public static void setDeleteAWBUrl(String deleteAWBUrl) {
-        DHLHttpClient.deleteAWBUrl = deleteAWBUrl;
+        HttpClientUtil.deleteAWBUrl = deleteAWBUrl;
+    }
+
+    public static String getConfirmedOrder() {
+        return confirmedOrder;
+    }
+
+    public static void setConfirmedOrder(String confirmedOrder) {
+        HttpClientUtil.confirmedOrder = confirmedOrder;
+    }
+
+    public static String getShippedOrder() {
+        return shippedOrder;
+    }
+
+    public static void setShippedOrder(String shippedOrder) {
+        HttpClientUtil.shippedOrder = shippedOrder;
     }
 }
