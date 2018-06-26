@@ -1,20 +1,27 @@
 /**
- * 
+ *
  */
 package com.intramirror.order.core.impl;
 
-import java.math.BigDecimal;
-import java.text.MessageFormat;
-import java.util.*;
-
+import com.google.gson.Gson;
+import com.intramirror.common.core.mapper.SubShipmentMapper;
 import com.intramirror.common.help.StringUtils;
+import com.intramirror.order.api.common.ContainerType;
 import com.intramirror.order.api.model.LogisticsProduct;
+import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.model.SubShipment;
-import com.intramirror.order.api.service.*;
+import com.intramirror.order.api.service.IOrderService;
+import com.intramirror.order.api.service.IShipmentService;
+import com.intramirror.order.api.service.ISubShipmentService;
+import com.intramirror.order.api.service.KafkaUtilService;
 import com.intramirror.order.api.util.HttpClientUtil;
 import com.intramirror.order.api.vo.LogisticsProductVO;
 import com.intramirror.order.api.vo.ShipmentSendMailVO;
+import com.intramirror.order.core.dao.BaseDao;
+import com.intramirror.order.core.mapper.LogisticProductShipmentMapper;
 import com.intramirror.order.core.mapper.LogisticsProductMapper;
+import com.intramirror.order.core.mapper.ShipmentMapper;
+import com.intramirror.order.core.utils.MailSendManageService;
 import com.intramirror.order.core.utils.ShipMailSendThread;
 import com.intramirror.utils.transform.JsonTransformUtil;
 import net.sf.json.JSONObject;
@@ -23,13 +30,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.google.gson.Gson;
-import com.intramirror.common.core.mapper.SubShipmentMapper;
-import com.intramirror.order.api.common.ContainerType;
-import com.intramirror.order.api.model.Shipment;
-import com.intramirror.order.core.dao.BaseDao;
-import com.intramirror.order.core.mapper.LogisticProductShipmentMapper;
-import com.intramirror.order.core.mapper.ShipmentMapper;
+import java.math.BigDecimal;
+import java.text.MessageFormat;
+import java.util.*;
 
 /**
  * 订单装箱service
@@ -40,27 +43,27 @@ import com.intramirror.order.core.mapper.ShipmentMapper;
 public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 
 	private static Logger logger = LoggerFactory.getLogger(ShipmentServiceImpl.class);
-	
+
 	private ShipmentMapper shipmentMapper;
-	
+
 	private SubShipmentMapper subShipmentMapper;
 
 	private LogisticsProductMapper logisticsProductMapper;
-	
+
 	private LogisticProductShipmentMapper logisticProductShipmentMapper;
 
 	@Autowired
 	private ISubShipmentService subShipmentService;
 
 	@Autowired
-	private IViewOrderLinesService viewOrderLinesService;
+	private MailSendManageService mailSendManageService;
 
 	@Autowired
 	private KafkaUtilService kafkaUtilService;
 
 	@Autowired
 	private IOrderService orderService;
-	
+
 	@Override
 	public void init() {
 		shipmentMapper = this.getSqlSession().getMapper(ShipmentMapper.class);
@@ -68,7 +71,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		logisticProductShipmentMapper = this.getSqlSession().getMapper(LogisticProductShipmentMapper.class);
         logisticsProductMapper = this.getSqlSession().getMapper(LogisticsProductMapper.class);
 	}
-	
+
 	/**
 	 * Confirmed的Order生成Shipment 新的Shipment默认有一个carton
 	 */
@@ -291,11 +294,11 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 				lpsMap.put("subShipmentId", subShipmentId);
 				logisticProductShipmentMapper.insertlpShipment(lpsMap);
 //				}
-				
+
 			}
 		}
 	}
-	
+
 	public Map<String, Object> saveBean(Map<String, Object> map, Date currentDate, Long shipmentId,Long segmentSequence){
 		Map<String, Object> beanMap = new HashMap<String, Object>();
 		beanMap.put("consignee", map.get("consignee")==null?" ":map.get("consignee").toString());
@@ -344,7 +347,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		subShipment.setPostalCode(map.get("zip_code")==null?"":map.get("zip_code").toString());
 		return subShipment;
 	}
-	
+
 	public Map<String, Object> saveBeanByMap(Map<String, Object> map, Date currentDate, Long shipmentId, Long segmentSequence){
 		Map<String, Object> beanMap = new HashMap<String, Object>();
 		beanMap.put("consignee", map.get("transfer_consignee")==null?" ":map.get("transfer_consignee").toString());
@@ -384,7 +387,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	public Map<String, Object> getShipmentTypeById(Map<String, Object> map) {
 		return shipmentMapper.getShipmentTypeById(map);
 	}
-	
+
 	/**
 	 * 根据vendorId大区查询shipment open的列表 如果可以返回第一段
 	 * @return
@@ -392,7 +395,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	public List<Map<String, Object>> getShipmentsByVendor(Map<String, Object> map) {
 		return shipmentMapper.getShipmentsByVendor(map);
 	}
-	
+
 	/**
 	 * 根据vendorId查询vendorCode
 	 * @param vendorId
@@ -401,7 +404,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	public String getVendorCodeById(Long vendorId) {
 		return shipmentMapper.getVendorCodeById(vendorId);
 	}
-	
+
 	/**
 	 * 根据条件查询shipment
 	 * @param shipment
@@ -454,6 +457,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 				// 起线程发邮件
 				ShipmentSendMailVO vo = new ShipmentSendMailVO();
 				vo.setShipmentNo(shipment.getShipmentNo());
+				vo.setShipmentId(shipment.getShipmentId());
 				if (shipment.getToType() == 2) {
 					vo.setDestination("Transit Warehouse");
 				} else if("China Mainland".equals(shipment.getShipToGeography())
@@ -517,7 +521,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	}
 
     private void sendMail(ShipmentSendMailVO shipment){
-        ShipMailSendThread thread = new ShipMailSendThread(shipment, viewOrderLinesService);
+        ShipMailSendThread thread = new ShipMailSendThread(shipment, mailSendManageService);
         thread.run();
     }
 
@@ -570,7 +574,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		Integer maxNo = shipmentMapper.getMaxShipmentNo(noMap);
 		if (null == maxNo)
 			maxNo = 1000001;
-		else 
+		else
 			maxNo ++;
 		//生成shipmentNo
 		shipment.setShipmentNo(top+"SP"+maxNo);

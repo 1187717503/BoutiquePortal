@@ -2,19 +2,21 @@ package com.intramirror.order.core.utils;
 
 import com.google.gson.Gson;
 import com.intramirror.common.help.StringUtils;
-import com.intramirror.common.utils.DateUtils;
+import com.intramirror.order.api.service.IVendorShipmentService;
 import com.intramirror.order.api.service.IViewOrderLinesService;
-import com.intramirror.order.api.vo.MailAttachmentVO;
-import com.intramirror.order.api.vo.MailModelVO;
-import com.intramirror.order.api.vo.ShipmentSendMailVO;
-import com.intramirror.order.api.vo.ViewOrderLinesVO;
-import org.apache.poi.hssf.usermodel.*;
+import com.intramirror.order.api.vo.*;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.mail.MessagingException;
 import java.io.*;
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -23,13 +25,13 @@ import java.util.*;
 public class ShipMailSendThread implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(ShipMailSendThread.class);
 
-    private IViewOrderLinesService viewOrderLinesService;
+    private MailSendManageService mailSendManageService;
 
     private ShipmentSendMailVO shipment;
 
-    public ShipMailSendThread(ShipmentSendMailVO shipment, IViewOrderLinesService viewOrderLinesService) {
+    public ShipMailSendThread(ShipmentSendMailVO shipment, MailSendManageService mailSendManageService) {
         this.shipment = shipment;
-        this.viewOrderLinesService = viewOrderLinesService;
+        this.mailSendManageService = mailSendManageService;
 
     }
 
@@ -40,6 +42,7 @@ public class ShipMailSendThread implements Runnable {
 
         //根据AWB单号查询视图order_line_view获取数据
         logger.info("ShipMailSendThread 查询shipment下的订单列表");
+        IViewOrderLinesService viewOrderLinesService = mailSendManageService.getViewOrderLinesService();
         List<ViewOrderLinesVO> shipmentList = viewOrderLinesService.getShipmentListByShipmentNo(shipment.getShipmentNo());
         if (shipment.getDestination() == null) {
             shipment.setDestination(shipmentList.get(0).getShip_to_country());
@@ -97,19 +100,6 @@ public class ShipMailSendThread implements Runnable {
             }
         }
 
-        logger.info("ShipMailSendThread 设置文件目录路径");
-        String dateStr = DateUtils.getStrDate(new Date(), "yyyyMMddHHmmss");
-        String fileName = dateStr + ".xls";
-        String path = "/opt/data/ship_excel/download/";
-        File file = new File(path);
-        if (!file.exists() && !file.isDirectory()) {
-            file.mkdirs();
-        }
-        String filePath = path + fileName;
-
-        logger.info("ShipMailSendThread 生成shipment文件");
-        generateShipmentExcel("导出文件", shipmentList, filePath);
-
         MailModelVO mailContent = new MailModelVO();
         //设置邮件标题，邮件标题为Shipment No. XXXXX + 【国家】/【Transit warehouse】
         mailContent.setSubject("Shipment No. " + shipment.getShipmentNo() +" AWB No. " + awbNo + "【" + shipment.getDestination() + "】");
@@ -119,12 +109,8 @@ public class ShipMailSendThread implements Runnable {
         } else {
             mailContent.setContent("");
         }
-        //设置附件
-        List<MailAttachmentVO> mailAttachmentVOs = new ArrayList<>();
-        MailAttachmentVO attachmentVO = new MailAttachmentVO();
-        attachmentVO.setFileName(fileName);
-        attachmentVO.setFileUrl(filePath);
-        mailAttachmentVOs.add(attachmentVO);
+
+        List<MailAttachmentVO> mailAttachmentVOs = generateMailAttachmentList(shipmentList);
         mailContent.setAttachments(mailAttachmentVOs);
 
         //设置发送对象
@@ -142,15 +128,113 @@ public class ShipMailSendThread implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("ShipMailSendThread 邮件发送失败", e);
+        } finally {
+            //删除附件文件
+            List<MailAttachmentVO> attachments = mailContent.getAttachments();
+            for (MailAttachmentVO attachment : attachments) {
+                File file = new File(attachment.getFileUrl());
+                if (file.exists() && file.isFile()) {
+                    file.delete();
+                }
+            }
         }
         logger.info("----------Send mail finished.----------");
     }
 
-    private String generateShipmentExcel(String excelName, List<ViewOrderLinesVO> shipmentList, String filePath) {
+    /**
+     * 生成附件列表
+     * @param shipmentList
+     * @return
+     */
+    private List<MailAttachmentVO> generateMailAttachmentList(List<ViewOrderLinesVO> shipmentList) {
+        logger.info("ShipMailSendThread 开始生成附件");
+        //设置附件
+        List<MailAttachmentVO> mailAttachmentVOs = new ArrayList<>();
+
+        String path = "/opt/data/ship_excel/download/";
+        String suffix = String.valueOf(System.currentTimeMillis());
+        String orderLinesFileName = "OrderLines_"+ suffix + ".xls";
+        File file = new File(path);
+        if (!file.exists() && !file.isDirectory()) {
+            file.mkdirs();
+        }
+        String orderLinesFilePath = path + orderLinesFileName;
+
+        logger.info("ShipMailSendThread 生成orderLines文件");
+        generateShipmentExcel(shipmentList, orderLinesFilePath);
+        mailAttachmentVOs.add(new MailAttachmentVO(orderLinesFileName, orderLinesFilePath));
+
+        logger.info("获取boutique invoicing文件");
+        List<MailAttachmentVO> boutiqueInvoiceList = getBoutiqueInvoicing(path, suffix);
+        if (CollectionUtils.isNotEmpty(boutiqueInvoiceList)) {
+            mailAttachmentVOs.addAll(boutiqueInvoiceList);
+        }
+        return mailAttachmentVOs;
+    }
+
+    /**
+     * 获取boutique发送的invoicing文件
+     */
+    private List<MailAttachmentVO> getBoutiqueInvoicing(String path, String suffix) {
+        List<MailAttachmentVO> result = new ArrayList<>();
+
+        IVendorShipmentService vendorShipmentService = mailSendManageService.getVendorShipmentService();
+        List<VendorInvoiceVO> vendorInvoicingList = vendorShipmentService.getVendorInvoicingList(shipment.getShipmentId());
+        for (VendorInvoiceVO vendorInvoiceVO : vendorInvoicingList) {
+            String invoiceUrl = vendorInvoiceVO.getInvoiceUrl();
+            String boutiqueShipmentId = vendorInvoiceVO.getBoutiqueShipmentId() == null ? "" : "_" + vendorInvoiceVO.getBoutiqueShipmentId().toString();
+            String fileSuffix = invoiceUrl.substring(invoiceUrl.lastIndexOf("."));
+            String fileName = vendorInvoiceVO.getVendorName() + boutiqueShipmentId + "_" + suffix + fileSuffix;
+            String targetPath = path + fileName;
+            //将文件下载到服务器
+            downloadFile(invoiceUrl, targetPath);
+            result.add(new MailAttachmentVO(fileName, targetPath));
+        }
+        return result;
+    }
+
+    private void downloadFile(String sourceUrl, String targetPath) {
+        OutputStream os = null;
+        InputStream is = null;
+        try {
+            //获取网络资源
+            URL url = new URL(sourceUrl);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            //超时响应时间为5秒
+            conn.setConnectTimeout(5 * 1000);
+
+            File file = new File(targetPath);
+            is = conn.getInputStream();
+            os = new FileOutputStream(file);
+            int bytesRead = 0;
+            byte[] buffer = new byte[1024];
+            while ((bytesRead = is.read(buffer, 0, buffer.length)) != -1) {
+                os.write(buffer, 0, bytesRead);
+            }
+        } catch (Exception e) {
+            logger.error("File download failed!", e);
+            throw new RuntimeException("File download failed!");
+        } finally {
+            try {
+                if (null != is) {
+                    is.close();
+                }
+                if (null != os) {
+                    os.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                logger.error("文件下载失败！", e);
+            }
+        }
+    }
+
+    private void generateShipmentExcel(List<ViewOrderLinesVO> shipmentList, String filePath) {
         HSSFWorkbook workbook = new HSSFWorkbook();
 
         int rowLength = 0;
-        HSSFSheet sheet = workbook.createSheet(excelName);
+        HSSFSheet sheet = workbook.createSheet("导出文件");
 
         String[] excelHeaders = new String[]{"awb_num", "vendor_name", "stock_location", "order_line_num", "designer_id", "brand", "l1_category", "l2_category", "l3_category", "color_code", "size", "product_name", "buyer_name", "buyer_contact", "ship_to_address", "ship_to_province", "ship_to_city", "ship_to_area", "ship_to_country", "zip_code", "consignee", "consignee_mobile", "container_nr", "height", "length", "width", "weight", "shipment_nr", "shipment_status", "created_at_datetime", "confirmed_at_datetime", "packed_at_datetime", "shipped_at(day)", "qty", "retail_price", "boutique_discount_off", "boutique_price"};
 
@@ -233,7 +317,6 @@ public class ShipMailSendThread implements Runnable {
                 }
             }
         }
-        return filePath;
     }
 
     private String transforNullValue(Object obj) {

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.intramirror.order.core.mapper.VendorShipmentMapper">
+  <resultMap id="vendorInvoicingVO" type="com.intramirror.order.api.vo.VendorInvoiceVO">
+    <result column="vendor_id" jdbcType="BIGINT" property="vendorId" />
+    <result column="vendor_name" jdbcType="VARCHAR" property="vendorName" />
+    <result column="shipment_id" jdbcType="BIGINT" property="shipmentId" />
+    <result column="invoice_url" jdbcType="VARCHAR" property="invoiceUrl" />
+    <result column="boutique_shipment_id" jdbcType="BIGINT" property="boutiqueShipmentId" />
+  </resultMap>
+  <select id="getVendorInvoicingList" resultMap="vendorInvoicingVO" parameterType="java.lang.Long">
+    SELECT
+	   vs.vendor_id, v.vendor_name, vs.shipment_id, vs.invoice_url, vs.boutique_shipment_id
+    FROM
+	  vendor_shipment vs
+    LEFT JOIN vendor v ON vs.vendor_id = v.vendor_id
+    WHERE vs.shipment_id = #{shipmentId}
+    AND vs.is_deleted = 0
+  </select>
+</mapper>

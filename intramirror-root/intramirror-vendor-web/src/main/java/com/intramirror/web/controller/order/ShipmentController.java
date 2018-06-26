@@ -1,37 +1,28 @@
 /**
- * 
+ *
  */
 package com.intramirror.web.controller.order;
 
-import java.util.*;
-
+import com.google.gson.Gson;
+import com.intramirror.common.help.ResultMessage;
+import com.intramirror.order.api.common.ContainerType;
+import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.model.Shipment;
+import com.intramirror.order.api.model.SubShipment;
 import com.intramirror.order.api.service.*;
-import com.intramirror.order.api.util.HttpClientUtil;
 import com.intramirror.order.api.vo.ShipmentSendMailVO;
 import com.intramirror.order.api.vo.ShippedParam;
-import com.intramirror.utils.transform.JsonTransformUtil;
-import net.sf.json.JSONObject;
+import com.intramirror.web.controller.BaseController;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.google.gson.Gson;
-import com.intramirror.common.help.ResultMessage;
-import com.intramirror.order.api.common.ContainerType;
-import com.intramirror.order.api.model.LogisticsProduct;
-import com.intramirror.order.api.model.SubShipment;
-import com.intramirror.web.controller.BaseController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 
 /**
  * @author 袁孟亮
@@ -49,16 +40,16 @@ public class ShipmentController extends BaseController{
 
 	@Autowired
 	private  IOrderService orderService;
-	
+
 	@Autowired
 	private IContainerService containerService;
 
 	@Autowired
 	private ILogisticsProductService logisticsProductService;
-	
+
 	@Autowired
 	private ISubShipmentService subShipmentService;
-	
+
 	@Autowired
 	private ILogisticProductShipmentService logisticProductShipmentService;
 
@@ -89,7 +80,7 @@ public class ShipmentController extends BaseController{
 			if(map.get("shipmentId") == null || StringUtils.isBlank(map.get("shipmentId").toString())){
 				message.errorStatus().putMsg("info", "shipmentId cannot be null");
 				return message;
-			}	
+			}
 			Map<String, Object> orderResult = orderService.getShipmentDetails(map);
 			if (null == orderResult || 0==orderResult.size()){
 				message.errorStatus().putMsg("info", "order result null");
@@ -108,10 +99,10 @@ public class ShipmentController extends BaseController{
 			logger.info("Error Mssage : " + e.getMessage() );
 			message.errorStatus().putMsg("error Message", e.getMessage());
 		}
-		
+
 		return message;
 	}
-	
+
 	/**
 	 * 根据大区，vendorId查询shipment列表
 	 * @param map
@@ -157,7 +148,7 @@ public class ShipmentController extends BaseController{
 		}
 		return message;
 	}
-	
+
 	/**
 	 * 根据shipmentId 查询 shipmentType
 	 * @param map
@@ -193,8 +184,8 @@ public class ShipmentController extends BaseController{
 		}
 		return message;
 	}
-	
-	
+
+
 	@RequestMapping(value="/updateShipmentById", method=RequestMethod.POST)
 	@ResponseBody
 	@Transactional
@@ -339,7 +330,7 @@ public class ShipmentController extends BaseController{
 				Long shipmentId = iShipmentService.newShipment(orderResult);
 				if (shipmentId != null){
 					Map<String, Object> containerMap = new HashMap<>();
-					//获取当前container关联的subShipment 
+					//获取当前container关联的subShipment
 					containerMap.put("containerId", Long.parseLong(map.get("container_id").toString()));
 					List<SubShipment> subList = subShipmentService.getSubShipmentIdByContainerId(containerMap);
 					if (null != subList && 0 < subList.size()){
@@ -374,9 +365,9 @@ public class ShipmentController extends BaseController{
 					containerMap.put("shipment_id", shipmentId);
 					containerMap.put("container_id", Long.parseLong(map.get("container_id").toString()));
 					containerService.updateContainerShipment(containerMap);
-					
+
 					containerMap = new HashMap<>();
-					//获取修改之后container关联的subShipment 
+					//获取修改之后container关联的subShipment
 					containerMap.put("containerId", Long.parseLong(map.get("container_id").toString()));
 					List<SubShipment> newsubList = subShipmentService.getSubShipmentIdByContainerId(containerMap);
 					if (null != subList && 0 < subList.size()){
@@ -438,6 +429,7 @@ public class ShipmentController extends BaseController{
 					// 起线程发邮件
 					ShipmentSendMailVO vo = new ShipmentSendMailVO();
 					vo.setShipmentNo(shipment.getShipmentNo());
+					vo.setShipmentId(shipment.getShipmentId());
 					if (shipment.getToType() == 2) {
 						vo.setDestination("Transit Warehouse");
 					} else if("China Mainland".equals(shipment.getShipToGeography())
@@ -458,4 +450,6 @@ public class ShipmentController extends BaseController{
 		}
 		return message;
 	}
+
+
 }
