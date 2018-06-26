@@ -717,7 +717,7 @@ public class ExcelUtil {
     }
 
     private static String safeStr(String s){
-        if(StringUtil.isEmpty(s)){
+        if(StringUtil.isEmpty(s) || "0".equals(s)){
             return "";
         }
         s += " ";
