@@ -7,6 +7,13 @@ public class MailAttachmentVO {
     private String fileName;
     private String fileUrl;
 
+    public MailAttachmentVO() {}
+
+    public MailAttachmentVO(String fileName, String fileUrl) {
+        this.fileName = fileName;
+        this.fileUrl = fileUrl;
+    }
+
     public String getFileName() {
         return fileName;
     }
