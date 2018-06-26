@@ -915,7 +915,9 @@ public class OrderShipController extends BaseController {
             if(!isDDt){
                 transitWarehouseInvoiceVO.setChinaInvoice(chinaInovice);
             }
-            ShippingProvider shippingProvider = shippingProviderService.getShippingProviderById(4L);//zsy地址
+            //ShippingProvider shippingProvider = shippingProviderService.getShippingProviderById(4L);//zsy地址
+            //2018-6-26修改发票ship to地址为物流第一段供应商地址
+            ShippingProvider shippingProvider = shippingProviderService.getShippingProviderByVendorId(vendor.getVendorId());
             if(shippingProvider == null){
                 shippingProvider = new ShippingProvider();
             }

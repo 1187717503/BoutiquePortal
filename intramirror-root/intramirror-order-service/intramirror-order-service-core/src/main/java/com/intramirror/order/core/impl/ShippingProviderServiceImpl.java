@@ -48,6 +48,10 @@ public class ShippingProviderServiceImpl extends BaseDao implements IShippingPro
 
 		}
 		return null;
+	}
 
+	@Override
+	public ShippingProvider getShippingProviderByVendorId(Long vendorId) {
+		return shippingProviderMapper.getShippingProviderByVendorId(vendorId);
 	}
 }

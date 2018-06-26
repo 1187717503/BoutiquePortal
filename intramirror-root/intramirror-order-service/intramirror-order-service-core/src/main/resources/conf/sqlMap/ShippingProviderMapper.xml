@@ -192,4 +192,13 @@
         WHERE sp.name = #{name,jdbcType=VARCHAR}
     </select>
 
+    <select id="getShippingProviderByVendorId" resultMap="BaseResultMap" parameterType="long">
+        SELECT sp.* FROM shipping_provider sp
+        INNER JOIN shipping_segment ss on (sp.shipping_provider_id = ss.shipping_provider_id and ss.enabled = 1)
+        INNER JOIN vendor_shipping_routing vsr on vsr.shipping_routing_id = ss.shipping_routing_id
+        INNER JOIN shipping_routing sr on sr.shipping_routing_id = ss.shipping_routing_id
+        WHERE ss.segment_sequence = 1 and sr.consignee_country_id = 2 and vsr.vendor_id = #{vendorId}
+        limit 1
+    </select>
+
 </mapper>
