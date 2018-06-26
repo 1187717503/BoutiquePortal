@@ -27,7 +27,9 @@
           tpir.`categorys`
         FROM `t_promotion_exclude_rule` tpir
         LEFT JOIN `vendor` v ON (v.`vendor_id` = tpir.`vendor_id` AND v.`enabled` = 1)
-        WHERE tpir.`promotion_id` = #{promotionId} ORDER BY  tpir.`created_at` DESC
+        WHERE tpir.`promotion_id` = #{promotionId}
+        and tpir.`enabled` = 1
+        ORDER BY  tpir.`created_at` DESC
     </select>
 
     <select id="listIncludeRulePromotion" parameterType="Long" resultType="java.util.Map">
@@ -40,7 +42,9 @@
           tpir.`categorys`
         FROM `t_promotion_include_rule` tpir
         LEFT JOIN `vendor` v ON (v.`vendor_id` = tpir.`vendor_id` AND v.`enabled` = 1)
-        WHERE tpir.`promotion_id` = #{promotionId} ORDER BY  tpir.`created_at` DESC
+        WHERE tpir.`promotion_id` = #{promotionId}
+         and tpir.enabled = 1
+         ORDER BY  tpir.`created_at` DESC
     </select>
 
     <insert id="insertIncludeRule" keyProperty="ruleId" useGeneratedKeys="true"
@@ -67,7 +71,7 @@
             <foreach collection="seasonCodes" index="index" item="item" separator=",">
                 (#{promotionId, jdbcType=BIGINT},
                 <if test="seasonCodes != null and seasonCodes.size() > 0">
-                #{item},
+                    #{item},
                 </if>
                 <if test="vendorId != null">
                     #{vendorId,jdbcType=BIGINT},
@@ -685,12 +689,13 @@
           FROM
             t_promotion_include_rule tpir
           WHERE tpir.promotion_id = #{promotionId, jdbcType=BIGINT}
+          and tpir.enabled = 1
           UNION
           SELECT
             vendor_id
           FROM
             t_promotion_exclude_rule tper
-          WHERE tper.promotion_id = #{promotionId, jdbcType=BIGINT})
+          WHERE tper.promotion_id = #{promotionId, jdbcType=BIGINT} and and tper.enabled = 1)
         ORDER BY v.vendor_name
     </select>
 
@@ -719,14 +724,14 @@
 
     <select id="listSeasonIncludeRulePromotion" parameterType="java.util.Map" resultType="java.util.Map">
         SELECT tpir.`promotion_include_rule_id` AS ruleId,
-          tpir.`promotion_id` AS promotionId,
-          tpir.`vendor_id` AS vendorId,
-          CASE tpir.`vendor_id` WHEN -1 THEN 'ALL Boutiques' ELSE v.`vendor_name` END AS vendorName,
-          tpir.`season_code` AS seasonCode,
-          tpir.`brands`,
-          tpir.`categorys`
+        tpir.`promotion_id` AS promotionId,
+        tpir.`vendor_id` AS vendorId,
+        CASE tpir.`vendor_id` WHEN -1 THEN 'ALL Boutiques' ELSE v.`vendor_name` END AS vendorName,
+        tpir.`season_code` AS seasonCode,
+        tpir.`brands`,
+        tpir.`categorys`
         FROM `t_promotion_include_rule` tpir
-        LEFT JOIN `vendor` v ON (v.`vendor_id` = tpir.`vendor_id` AND v.`enabled` = 1)
+        LEFT JOIN `vendor` v ON (v.`vendor_id` = tpir.`vendor_id` AND v.`enabled` = 1 and tpir.`enabled` = 1)
         WHERE tpir.`promotion_id` = #{promotionId}
         <if test="vendorId != null">
             AND tpir.`vendor_id` = #{vendorId}
@@ -742,14 +747,14 @@
 
     <select id="listSeasonExcludeRulePromotion" parameterType="java.util.Map" resultType="java.util.Map">
         SELECT tper.`promotion_exclude_rule_id` AS ruleId,
-          tper.`promotion_id` AS promotionId,
-          tper.`vendor_id` AS vendorId,
-          CASE tpir.`vendor_id` WHEN -1 THEN 'ALL Boutiques' ELSE v.`vendor_name` END AS vendorName,
-          tper.`season_code` AS seasonCode,
-          tper.`brands`,
-          tper.`categorys`
+        tper.`promotion_id` AS promotionId,
+        tper.`vendor_id` AS vendorId,
+        CASE tpir.`vendor_id` WHEN -1 THEN 'ALL Boutiques' ELSE v.`vendor_name` END AS vendorName,
+        tper.`season_code` AS seasonCode,
+        tper.`brands`,
+        tper.`categorys`
         FROM `t_promotion_exclude_rule` tper
-        LEFT JOIN `vendor` v ON (v.`vendor_id` = tper.`vendor_id` AND v.`enabled` = 1)
+        LEFT JOIN `vendor` v ON (v.`vendor_id` = tper.`vendor_id` AND v.`enabled` = 1 and tper.`enabled` = 1)
         WHERE tper.`promotion_id` = #{promotionId}
         <if test="vendorId != null">
             AND tper.`vendor_id` = #{vendorId}
@@ -767,6 +772,7 @@
         SELECT count(*)
         FROM `t_promotion_include_rule` tpir
         WHERE tpir.`promotion_id` = #{promotionId}
+        and tpir.`enabled` = 1
         <if test="vendorId != null">
             AND tpir.`vendor_id` = #{vendorId}
         </if>
@@ -779,6 +785,7 @@
         SELECT count(*)
         FROM `t_promotion_exclude_rule` tper
         WHERE tper.`promotion_id` = #{promotionId}
+        and tper.`enabled` = 1
         <if test="vendorId != null">
             AND tper.`vendor_id` = #{vendorId}
         </if>
@@ -787,4 +794,8 @@
         </if>
     </select>
 
+    <update id="updatePromotionRefreshAt">
+        update t_promotion set refresh_at = now()
+        where promotion_id = #{promotionId, jdbcType=BIGINT}
+    </update>
 </mapper>

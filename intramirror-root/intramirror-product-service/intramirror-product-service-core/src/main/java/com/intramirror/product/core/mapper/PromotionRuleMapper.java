@@ -94,11 +94,24 @@ public interface PromotionRuleMapper {
     void removeExcludeProductFromSnapshotProduct(Long promotionId);
 
     List<Map<String, Object>> getPromotionBoutiqueHasRuleList(Long promotionId);
+
     List<Map<String, Object>> getPromotionBoutiqueProductCountBySeason(Map<String, Object> params);
+
     Integer getPromotionBoutiqueExcludeProductCount(Long promotionId);
+
     List<Map<String, Object>> listSeasonIncludeRulePromotion(Map<String, Object> params);
+
     List<Map<String, Object>> listSeasonExcludeRulePromotion(Map<String, Object> params);
+
     int countSeasonIncludeRulePromotion(Map<String, Object> params);
+
     int countSeasonExcludeRulePromotion(Map<String, Object> params);
+
+    /**
+     * 更新t_promotion表中refresh_at为当前时间
+     * @param promotionId
+     * @return
+     */
+    int updatePromotionRefreshAt(@Param("promotionId") Long promotionId);
 }
 

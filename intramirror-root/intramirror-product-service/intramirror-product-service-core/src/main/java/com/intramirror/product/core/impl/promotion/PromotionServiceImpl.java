@@ -92,13 +92,13 @@ public class PromotionServiceImpl implements IPromotionService {
     public Boolean removePromotionRule(List<Long> ruleIds, PromotionRuleType ruleType) {
         Boolean flag = false;
         if (ruleType == PromotionRuleType.INCLUDE_RULE) {
-//            if (promotionRuleMapper.removeIncludeRule(ruleId) > 0) {
-//                flag = promotionRuleMapper.removeIncludeRuleDetail(ruleId) > 0;
-//            }
+            //            if (promotionRuleMapper.removeIncludeRule(ruleId) > 0) {
+            //                flag = promotionRuleMapper.removeIncludeRuleDetail(ruleId) > 0;
+            //            }
             flag = promotionRuleMapper.removeIncludeRule(ruleIds) > 0;
 
         } else {
-//            if (promotionRuleMapper.removeExcludeRule(ruleId) > 0) {
+            //            if (promotionRuleMapper.removeExcludeRule(ruleId) > 0) {
             //                flag = promotionRuleMapper.removeExcludeRuleDetail(ruleId) > 0;
             //            }
             flag = promotionRuleMapper.removeExcludeRule(ruleIds) > 0;
@@ -449,6 +449,9 @@ public class PromotionServiceImpl implements IPromotionService {
         }
 
         removeExcludeProduct(promotionId);
+
+        //更新刷新时间
+        promotionRuleMapper.updatePromotionRefreshAt(promotionId);
     }
 
     private void addProductForIncludeRule(Long promotionId, Long productId) {
