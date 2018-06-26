@@ -56,4 +56,6 @@ public interface ShippingProviderMapper {
     List<ShippingProvider> getShippingProviderByShipmentId(Long shipmentId);
 
     List<ShippingProvider> getShippingProviderByName(String name);
+
+    ShippingProvider getShippingProviderByVendorId(Long venodrId);
 }
