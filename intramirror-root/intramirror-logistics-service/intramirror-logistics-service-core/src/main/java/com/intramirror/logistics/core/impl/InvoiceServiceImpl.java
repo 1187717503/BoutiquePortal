@@ -1,5 +1,8 @@
 package com.intramirror.logistics.core.impl;
 
+import com.intramirror.logistics.api.model.VendorShipment;
+import java.util.Date;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,5 +82,29 @@ public class InvoiceServiceImpl extends BaseDao implements IInvoiceService{
 	@Override
 	public Map<String,Object> getMaxDdtNo() {
 		return invoiceMapper.getMaxNum();
+	}
+
+	@Override
+	public VendorShipment saveOrUpdateVendorShipment(VendorShipment vendorShipment) {
+		if(vendorShipment == null) return null;
+		if(vendorShipment.getId() != null){
+			vendorShipment.setUpdateTime(new Date());
+			invoiceMapper.vendorShipmentUpdateByKey(vendorShipment);
+		}else {
+			vendorShipment.setCreateTime(new Date());
+			invoiceMapper.vendorShipmentInsertSelective(vendorShipment);
+		}
+		return vendorShipment;
+	}
+
+	@Override
+	public VendorShipment queryVendorShipmentByShipmentId(Long shipmentId) {
+		VendorShipment vendorShipment = new VendorShipment();
+		vendorShipment.setShipmentId(shipmentId);
+		List<VendorShipment> list =  invoiceMapper.selectVendorInvoiceByParam(vendorShipment);
+		if(list !=null && list.size() >0){
+			return list.get(0);
+		}
+		return null;
 	}
 }
