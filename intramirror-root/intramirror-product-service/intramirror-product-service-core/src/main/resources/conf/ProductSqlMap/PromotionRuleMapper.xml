@@ -695,7 +695,7 @@
             vendor_id
           FROM
             t_promotion_exclude_rule tper
-          WHERE tper.promotion_id = #{promotionId, jdbcType=BIGINT} and and tper.enabled = 1)
+          WHERE tper.promotion_id = #{promotionId, jdbcType=BIGINT} and   tper.enabled = 1)
         ORDER BY v.vendor_name
     </select>
 
@@ -714,6 +714,7 @@
           INNER JOIN snapshot_product sp
             ON sp.promotion_include_rule_id = tpir.promotion_include_rule_id
         WHERE tpir.promotion_id = #{promotionId, jdbcType=BIGINT} AND tpir.vendor_id=#{vendorId, jdbcType=BIGINT}
+        and tpir.enabled = 1
         GROUP BY season_code
         ORDER BY season_code_sort desc
     </select>
