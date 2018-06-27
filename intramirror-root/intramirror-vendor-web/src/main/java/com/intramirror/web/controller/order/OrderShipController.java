@@ -1335,11 +1335,11 @@ public class OrderShipController extends BaseController {
         DHLInputVO inputVO = new DHLInputVO();
         Long shipmentId = Long.parseLong(map.get("shipment_id").toString());
         // 校验invoice
-        VendorShipment vendorShipment = invoiceService.queryVendorShipmentByShipmentId(shipmentId);
+        /*VendorShipment vendorShipment = invoiceService.queryVendorShipmentByShipmentId(shipmentId);
         if(vendorShipment == null){
             result.setMsg("Please upload invoice");
             return result;
-        }
+        }*/
         if (map.get("shipmentDate")!=null){
             Long shipmentDate = Long.parseLong(map.get("shipmentDate").toString());
             inputVO.setShipmentDate(shipmentDate);
