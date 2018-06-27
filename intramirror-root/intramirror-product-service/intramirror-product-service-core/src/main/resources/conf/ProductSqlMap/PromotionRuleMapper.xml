@@ -110,7 +110,9 @@
         <if test="seasonCodes != null and seasonCodes.size() > 0">
             <foreach collection="seasonCodes" index="index" item="item" separator=",">
                 (#{promotionId, jdbcType=BIGINT},
-                #{item},
+                <if test="seasonCodes != null and seasonCodes.size() > 0">
+                    #{item},
+                </if>
                 <if test="vendorId != null">
                     #{vendorId,jdbcType=BIGINT},
                 </if>

@@ -65,7 +65,7 @@ public class PromotionServiceImpl implements IPromotionService {
         } else {
             promotionRuleMapper.insertExcludeRule(rule);
         }
-        insertRuleDetailByRule(rule, ruleType);
+//        insertRuleDetailByRule(rule, ruleType);
 
         return rule;
     }
@@ -112,14 +112,14 @@ public class PromotionServiceImpl implements IPromotionService {
     public Boolean updatePromotionRule(PromotionRuleType ruleType, PromotionRule rule) {
         Boolean flag;
         if (ruleType == PromotionRuleType.INCLUDE_RULE) {
-            flag = promotionRuleMapper.removeIncludeRuleDetail(rule.getRuleId()) > 0;
-            flag = (flag & promotionRuleMapper.updateIncludeRule(rule) > 0);
+//            flag = promotionRuleMapper.removeIncludeRuleDetail(rule.getRuleId()) > 0;
+            flag = promotionRuleMapper.updateIncludeRule(rule) > 0;
 
         } else {
-            flag = promotionRuleMapper.removeExcludeRuleDetail(rule.getRuleId()) > 0;
-            flag = (flag & promotionRuleMapper.updateExcludeRule(rule) > 0);
+//            flag = promotionRuleMapper.removeExcludeRuleDetail(rule.getRuleId()) > 0;
+            flag = promotionRuleMapper.updateExcludeRule(rule) > 0;
         }
-        return flag & (insertRuleDetailByRule(rule, ruleType).size() > 0);
+        return flag;
 
     }
 
