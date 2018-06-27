@@ -191,9 +191,9 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 
 	<insert id="saveMilestone" parameterType="com.intramirror.order.api.vo.LogisticsProductVO">
 		INSERT INTO logistics_milestone(logistics_product_id,order_num,ref_order_id,ref_order_num,
-		user_id,time,type,shipment_code,shipment_type,is_complete,create_time,update_time,dhl_type)
+		user_id,time,type,shipment_code,shipment_type,is_complete,create_time,update_time,dhl_type,is_deleted)
 		VALUE (#{logisticsProductId},#{orderLineNum},#{orderId},#{orderNum},#{userId}
-		,NOW(),#{type},#{awb},#{shipmentType},#{isComplete},NOW(),NOW(),1)
+		,NOW(),#{type},#{awb},#{shipmentType},#{isComplete},NOW(),NOW(),1,0)
 	</insert>
 
 	<update id="deleteMilestone" parameterType="string">

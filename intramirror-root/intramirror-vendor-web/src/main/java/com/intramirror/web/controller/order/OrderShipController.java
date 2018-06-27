@@ -1360,8 +1360,9 @@ public class OrderShipController extends BaseController {
         List<Map<String, Object>> containerList = containerService.getListByShipmentId(params);
         Shipment shipment = iShipmentService.selectShipmentById(params);
 
+        String oldAwbNo = null;
         if(dhlShipment!=null){
-            if(dhlShipment.getAwbNum()!=null&&StringUtil.isNotEmpty(dhlShipment.getAwbNum())){
+            if(StringUtil.isNotEmpty(dhlShipment.getAwbNum())){
                 /*String s;
                 try {
                     //获取awb文档
@@ -1399,10 +1400,7 @@ public class OrderShipController extends BaseController {
                 //deleteParams.put("shipmentId",map.get("shipmentId"));
                 //deleteParams.put("awbNo","");
                 //subShipmentService.updateSubShipment(deleteParams);
-
-                //删除物流表中awb单号
-                iShipmentService.deleteMilestone(dhlShipment.getAwbNum());
-                logger.info("awb:{}已从物流数据中删除",dhlShipment.getAwbNum());
+                oldAwbNo = dhlShipment.getAwbNum();
             }
 
             if (shipment!=null){
@@ -1482,6 +1480,12 @@ public class OrderShipController extends BaseController {
                     }
                 }
                 logger.info("shipmentNo:{},新生成awb为{},并同步到物流数据中",shipment.getShipmentNo(),awbNo);
+
+                if (oldAwbNo != null){
+                    //删除物流表中旧的awb单号
+                    iShipmentService.deleteMilestone(oldAwbNo);
+                    logger.info("awb:{}已从物流数据中删除",oldAwbNo);
+                }
                 return result;
             }
 
