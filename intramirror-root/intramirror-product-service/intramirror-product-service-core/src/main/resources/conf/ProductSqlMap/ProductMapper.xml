@@ -655,6 +655,12 @@
         <if test="enabled != null">
             and enabled = #{enabled,jdbcType=BIT}
         </if>
+        <if test="productIds != null and productIds.size()>0">
+            and product_id in
+            <foreach collection="productIds" item="productId" separator="," open="(" close=")">
+                #{productId}
+            </foreach>
+        </if>
     </select>
 
 </mapper>

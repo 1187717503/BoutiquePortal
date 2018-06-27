@@ -70,9 +70,6 @@ public class PromotionManagementController {
         if (body.getPromotionId() == null) {
             return Response.status(StatusType.PARAM_NOT_POSITIVE).build();
         }
-        if (CollectionUtils.isEmpty(body.getSeasonCodes())) {
-            body.setSeasonCodes(Collections.singletonList(body.getSeasonCode()));
-        }
 
         PromotionRuleType type;
         if (INCLUDE.equals(ruleType)) {
@@ -190,7 +187,6 @@ public class PromotionManagementController {
         pre.setPromotionId(body.getPromotionId());
         pre.setRuleId(body.getRuleId());
         pre.setSeasonCode(body.getSeasonCode());
-        pre.setSeasonCodes(body.getSeasonCodes());
         pre.setVendorId(body.getVendorId());
         pre.setBrands(listBrand);
         pre.setCategorys(listCategory);
@@ -257,6 +253,7 @@ public class PromotionManagementController {
 
         ProductWithBLOBs product = new ProductWithBLOBs();
         product.setProductId(promotionExcludeProduct.getProductId());
+        product.setProductIds(promotionExcludeProduct.getProductIds());
         product.setProductCode(promotionExcludeProduct.getProductCode());
         product.setDesignerId(promotionExcludeProduct.getDesignerId());
         product.setColorCode(promotionExcludeProduct.getColorCode());
@@ -332,8 +329,7 @@ public class PromotionManagementController {
         promotionRule.setRuleId(body.getRuleId());
         promotionRule.setPromotionId(body.getPromotionId());
         promotionRule.setVendorId(body.getVendorId());
-        promotionRule.setSeasonCode(body.getSeasonCode());
-        promotionRule.setSeasonCodes(body.getSeasonCodes());
+        promotionRule.setSeasonCodes(body.getSeasonCode());
 
         promotionRule.setBrands(JSONArray.toJSONString(body.getBrands()));
         for (CategoryEntity category : body.getCategorys()) {

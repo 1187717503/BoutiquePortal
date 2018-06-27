@@ -15,9 +15,8 @@ public class PromotionRuleEntity {
     List<ImportDataEntity> importData;
     Long promotionId;
     Long vendorId;
-    String seasonCode;
+    List<String> seasonCode;
     Long ruleId;
-    List<String> seasonCodes;
 
     public List<ImportDataEntity> getImportData() {
         return importData;
@@ -67,20 +66,12 @@ public class PromotionRuleEntity {
         this.vendorId = vendorId;
     }
 
-    public String getSeasonCode() {
+    public List<String> getSeasonCode() {
         return seasonCode;
     }
 
-    public void setSeasonCode(String seasonCode) {
+    public void setSeasonCode(List<String> seasonCode) {
         this.seasonCode = seasonCode;
-    }
-
-    public List<String> getSeasonCodes() {
-        return seasonCodes;
-    }
-
-    public void setSeasonCodes(List<String> seasonCodes) {
-        this.seasonCodes = seasonCodes;
     }
 
     @Override
