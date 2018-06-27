@@ -148,9 +148,7 @@
     )
   </select>
     <select id="listAllSeasonCode" resultType="string">
-        SELECT season_code
-        FROM season
-        WHERE season.enabled = 1;
+        select s.season_code, cast(s.season_code as decimal(18,2)) as number from season s where s.enabled = 1 order by number desc ;
     </select>
 
     <select id="queryRuleByBrandZero" resultType="java.util.Map" parameterType="java.util.Map">
