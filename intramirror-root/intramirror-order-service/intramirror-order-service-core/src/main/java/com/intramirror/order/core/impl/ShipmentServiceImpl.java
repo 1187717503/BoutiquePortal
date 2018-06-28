@@ -484,6 +484,9 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 
 	@Override
 	public void styleroomShip(List<String> list) {
+	    if (list==null||list.size()==0){
+	        return;
+        }
 		//判断是否是微店订单，即channel_id=6
 		List<String> orderLineNums = orderService.getStyleroomOrder(list);
 		if (orderLineNums!=null&&orderLineNums.size()>0){
