@@ -48,7 +48,7 @@ public class PromotionRuleFilterController {
         boolean pageFlg = pageSize != null && pageNo != null;
 
         if (pageFlg) {
-            int start = pageNo > 0 ? 0 : (pageNo - 1) * pageNo;
+            int start = pageNo <= 0 ? 0 : (pageNo - 1) * pageSize;
             params.put("start", start);
             params.put("pageSize", pageSize);
         }
