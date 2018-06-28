@@ -734,8 +734,8 @@
         tpir.`brands`,
         tpir.`categorys`
         FROM `t_promotion_include_rule` tpir
-        LEFT JOIN `vendor` v ON (v.`vendor_id` = tpir.`vendor_id` AND v.`enabled` = 1 and tpir.`enabled` = 1)
-        WHERE tpir.`promotion_id` = #{promotionId}
+        LEFT JOIN `vendor` v ON (v.`vendor_id` = tpir.`vendor_id` AND v.`enabled` = 1)
+        WHERE tpir.`promotion_id` = #{promotionId} and tpir.`enabled` = 1
         <if test="vendorId != null">
             AND tpir.`vendor_id` = #{vendorId}
         </if>
@@ -757,8 +757,8 @@
         tper.`brands`,
         tper.`categorys`
         FROM `t_promotion_exclude_rule` tper
-        LEFT JOIN `vendor` v ON (v.`vendor_id` = tper.`vendor_id` AND v.`enabled` = 1 and tper.`enabled` = 1)
-        WHERE tper.`promotion_id` = #{promotionId}
+        LEFT JOIN `vendor` v ON (v.`vendor_id` = tper.`vendor_id` AND v.`enabled` = 1)
+        WHERE tper.`promotion_id` = #{promotionId} and tper.`enabled` = 1
         <if test="vendorId != null">
             AND tper.`vendor_id` = #{vendorId}
         </if>
