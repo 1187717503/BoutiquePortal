@@ -752,7 +752,7 @@
         SELECT tper.`promotion_exclude_rule_id` AS ruleId,
         tper.`promotion_id` AS promotionId,
         tper.`vendor_id` AS vendorId,
-        CASE tpir.`vendor_id` WHEN -1 THEN 'ALL Boutiques' ELSE v.`vendor_name` END AS vendorName,
+        CASE tper.`vendor_id` WHEN -1 THEN 'ALL Boutiques' ELSE v.`vendor_name` END AS vendorName,
         tper.`season_code` AS seasonCode,
         tper.`brands`,
         tper.`categorys`
