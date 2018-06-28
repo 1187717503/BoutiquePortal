@@ -15,6 +15,7 @@ public class PromotionExcludeProduct {
     private String productCode;
     private Long vendorId;
     private List<Long> productIds;
+    private List<Long> ruleIds;
 
     public String getName() {
         return name;
@@ -90,6 +91,14 @@ public class PromotionExcludeProduct {
 
     public void setProductIds(List<Long> productIds) {
         this.productIds = productIds;
+    }
+
+    public List<Long> getRuleIds() {
+        return ruleIds;
+    }
+
+    public void setRuleIds(List<Long> ruleIds) {
+        this.ruleIds = ruleIds;
     }
 
     public PromotionExcludeProduct() {

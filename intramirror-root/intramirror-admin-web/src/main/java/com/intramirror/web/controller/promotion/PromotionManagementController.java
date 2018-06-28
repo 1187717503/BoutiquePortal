@@ -273,7 +273,7 @@ public class PromotionManagementController {
         List<Long> existsProductIds = promotionExcludeProductService.getPromotionProductIdByParameter(params);
 
         productIds.removeAll(existsProductIds);
-        if (productIds.size() > 0) {
+        if (productIds.size() == 0) {
             return Response.status(StatusType.FAILURE).data("product id already existed.");
         }
         promotionExcludeProduct.setProductIds(productIds);
@@ -282,11 +282,16 @@ public class PromotionManagementController {
         return Response.status(StatusType.SUCCESS).build();
     }
 
-    @DeleteMapping(value = "/promotion/product/exclude/{promotionExcludeProductId}")
-    public Response removePromotionExcludeProduct(@PathVariable("promotionExcludeProductId") Long promotionExcludeProductId) {
-        LOGGER.info("remove promotion exclude product by promotionExcludeProductId: {}", promotionExcludeProductId);
-
-        Long row = promotionExcludeProductService.deletePromotionExcludeProduct(promotionExcludeProductId);
+    @DeleteMapping(value = "/promotion/product/exclude")
+    public Response removePromotionExcludeProduct(@RequestBody PromotionExcludeProduct promotionExcludeProduct) {
+        List<Long> ruleIds = promotionExcludeProduct.getRuleIds();
+        LOGGER.info("remove promotion exclude product by promotionExcludeProductId: {}", ruleIds.toString());
+        if (CollectionUtils.isEmpty(ruleIds)) {
+            return Response.status(StatusType.FAILURE).data("rule id is empty.");
+        }
+        Map<String, Object> params = new HashMap<>();
+        params.put("ruleIds", ruleIds);
+        Long row = promotionExcludeProductService.deletePromotionExcludeProduct(params);
 
         return Response.status(StatusType.SUCCESS).data(row);
     }

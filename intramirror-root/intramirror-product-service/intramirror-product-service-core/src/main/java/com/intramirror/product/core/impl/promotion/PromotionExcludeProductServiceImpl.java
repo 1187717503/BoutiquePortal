@@ -24,8 +24,8 @@ public class PromotionExcludeProductServiceImpl implements IPromotionExcludeProd
     }
 
     @Override
-    public Long deletePromotionExcludeProduct(Long promotionExcludeProductId) {
-        return promotionExcludeProductMapper.deletePromotionExcludeProduct(promotionExcludeProductId);
+    public Long deletePromotionExcludeProduct(Map<String, Object> params) {
+        return promotionExcludeProductMapper.deletePromotionExcludeProduct(params);
     }
 
     @Override
