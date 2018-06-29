@@ -3,6 +3,7 @@ package com.intramirror.product.core.impl.promotion;
 import com.intramirror.product.api.model.PromotionExcludeProduct;
 import com.intramirror.product.api.service.promotion.IPromotionExcludeProductService;
 import com.intramirror.product.core.mapper.PromotionExcludeProductMapper;
+import com.intramirror.product.core.mapper.PromotionRuleMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,8 @@ public class PromotionExcludeProductServiceImpl implements IPromotionExcludeProd
 
     @Autowired
     private PromotionExcludeProductMapper promotionExcludeProductMapper;
+    @Autowired
+    private PromotionRuleMapper promotionRuleMapper;
 
     @Override
     public List<Map<String, Object>> selectByParameter(PromotionExcludeProduct promotionExcludeProduct) {
@@ -25,11 +28,13 @@ public class PromotionExcludeProductServiceImpl implements IPromotionExcludeProd
 
     @Override
     public Long deletePromotionExcludeProduct(Map<String, Object> params) {
+        promotionRuleMapper.updatePromotionSaveTimes((List<Long>) params.get("ruleIds"));
         return promotionExcludeProductMapper.deletePromotionExcludeProduct(params);
     }
 
     @Override
     public Long insertPromotionExcludeProduct(PromotionExcludeProduct promotionExcludeProduct) {
+        promotionRuleMapper.updatePromotionSaveTime(promotionExcludeProduct.getPromotionId());
         return promotionExcludeProductMapper.insertPromotionExcludeProduct(promotionExcludeProduct);
     }
 

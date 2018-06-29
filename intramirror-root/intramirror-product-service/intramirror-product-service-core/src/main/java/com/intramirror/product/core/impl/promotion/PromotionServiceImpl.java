@@ -65,8 +65,10 @@ public class PromotionServiceImpl implements IPromotionService {
         } else {
             promotionRuleMapper.insertExcludeRule(rule);
         }
-//        insertRuleDetailByRule(rule, ruleType);
+        //        insertRuleDetailByRule(rule, ruleType);
 
+        //update t_promotion [save_at]
+        promotionRuleMapper.updatePromotionSaveTime(rule.getPromotionId());
         return rule;
     }
 
@@ -77,12 +79,17 @@ public class PromotionServiceImpl implements IPromotionService {
         if (type.equals(0)) {
             for (PromotionRule rule : listRule) {
                 promotionRuleMapper.insertIncludeRule(rule);
+                //update t_promotion [save_at]
+                promotionRuleMapper.updatePromotionSaveTime(rule.getPromotionId());
             }
         } else {
             for (PromotionRule rule : listRule) {
                 promotionRuleMapper.insertExcludeRule(rule);
+                //update t_promotion [save_at]
+                promotionRuleMapper.updatePromotionSaveTime(rule.getPromotionId());
             }
         }
+
         LOGGER.info("==Jian processImportPromotionRule== Type:[{}]  Count:[{}]", type, listRule.size());
         return true;
     }
@@ -104,6 +111,7 @@ public class PromotionServiceImpl implements IPromotionService {
             flag = promotionRuleMapper.removeExcludeRule(ruleIds) > 0;
         }
 
+        promotionRuleMapper.updatePromotionSaveTimes(ruleIds);
         return flag;
     }
 
@@ -112,13 +120,15 @@ public class PromotionServiceImpl implements IPromotionService {
     public Boolean updatePromotionRule(PromotionRuleType ruleType, PromotionRule rule) {
         Boolean flag;
         if (ruleType == PromotionRuleType.INCLUDE_RULE) {
-//            flag = promotionRuleMapper.removeIncludeRuleDetail(rule.getRuleId()) > 0;
+            //            flag = promotionRuleMapper.removeIncludeRuleDetail(rule.getRuleId()) > 0;
             flag = promotionRuleMapper.updateIncludeRule(rule) > 0;
 
         } else {
-//            flag = promotionRuleMapper.removeExcludeRuleDetail(rule.getRuleId()) > 0;
+            //            flag = promotionRuleMapper.removeExcludeRuleDetail(rule.getRuleId()) > 0;
             flag = promotionRuleMapper.updateExcludeRule(rule) > 0;
         }
+
+        promotionRuleMapper.updatePromotionSaveTime(rule.getRuleId());
         return flag;
 
     }
@@ -345,6 +355,7 @@ public class PromotionServiceImpl implements IPromotionService {
 
     @Override
     public Integer saveImgForBanner(Promotion promotion) {
+        promotionRuleMapper.updatePromotionSaveTime(promotion.getPromotionId());
         return promotionMapper.updateByPrimaryKeySelective(promotion);
     }
 
@@ -358,6 +369,7 @@ public class PromotionServiceImpl implements IPromotionService {
         return promotionBrandHotMapper.getPromotionBrandHot(promotionId);
     }
 
+    @Transactional
     @Override
     public Integer updatePromotionBrandHot(List<PromotionBrandHot> listPromotionBrandHot) {
         Long promotionId = 0L;
@@ -366,6 +378,7 @@ public class PromotionServiceImpl implements IPromotionService {
         }
 
         if (promotionId != 0) {
+            promotionRuleMapper.updatePromotionSaveTime(promotionId);
             promotionBrandHotMapper.deleteAll(promotionId);
             return promotionBrandHotMapper.insertList(listPromotionBrandHot);
         } else {
@@ -580,5 +593,10 @@ public class PromotionServiceImpl implements IPromotionService {
     @Override
     public int countSeasonExcludeRulePromotion(Map<String, Object> params) {
         return promotionRuleMapper.countSeasonExcludeRulePromotion(params);
+    }
+
+    @Override
+    public int updatePromotionSaveTime(Long promotionId) {
+        return promotionRuleMapper.updatePromotionSaveTime(promotionId);
     }
 }
