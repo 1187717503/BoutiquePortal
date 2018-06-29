@@ -21,6 +21,8 @@ public interface ProductManagementMapper {
 
     List<Map<String, Object>> listProductStateByProductIds(List<Long> productIds);
 
+    List<Map<String, Object>> listProductException(List<Map<String,Object>> productIds);
+
     List<Map<String, Object>> listShopProductIdMappingByProductIds(List<Long> productIds);
 
 }

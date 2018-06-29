@@ -6,6 +6,7 @@ import com.intramirror.common.parameter.StatusType;
 import com.intramirror.core.common.exception.ValidateException;
 import com.intramirror.core.common.response.ErrorResponse;
 import com.intramirror.core.common.response.Response;
+import com.intramirror.core.net.http.OkHttpUtils;
 import com.intramirror.product.api.model.ProductWithBLOBs;
 import com.intramirror.product.api.model.Sku;
 import com.intramirror.product.api.model.Tag;
@@ -16,11 +17,13 @@ import com.intramirror.product.api.service.SkuService;
 import com.intramirror.product.api.service.content.ContentManagementService;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
 import com.intramirror.product.common.KafkaProperties;
+import com.intramirror.product.core.mapper.BoutiqueExceptionMapper;
 import com.intramirror.web.common.CommonProperties;
 import com.intramirror.web.common.response.BatchResponseItem;
 import com.intramirror.web.common.response.BatchResponseMessage;
 import com.intramirror.web.config.HttpUtils;
 import static com.intramirror.web.controller.product.StateMachineCoreRule.map2StateEnum;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -42,6 +45,7 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 
 /**
  * Created on 2017/10/25.
+ *
  * @author YouFeng.Zhu
  */
 @RestController
@@ -259,11 +263,40 @@ public class StateMachineController {
         return Response.status(StatusType.SUCCESS).data(responseMessage);
     }
 
+    @Autowired
+    private BoutiqueExceptionMapper boutiqueExceptionMapper;
+
+    @PutMapping(value = "/batch/acceptchange", consumes = "application/json")
+    public Response batchAcceptChange(@RequestBody Map<String, Object> body) throws IOException {
+        if (body.get("ids") == null) {
+            throw new ValidateException(new ErrorResponse("Parameter missed"));
+        }
+        if (body.get("originalState") == null) {
+            throw new ValidateException(new ErrorResponse("Parameter originalState missed"));
+        }
+
+        List<Map<String, Object>> idsList = (List) body.get("ids");
+
+        for (Map<String, Object> idMap : idsList) {
+            Long productId = Long.parseLong(idMap.get("productId").toString());
+
+            Map<String, Object> seasonChangeMap = boutiqueExceptionMapper.selectSeasonChange(productId);
+            Map<String, Object> priceChangeMap = boutiqueExceptionMapper.selectPriceChange(productId);
+            if (seasonChangeMap != null) {
+                String seasonCode = seasonChangeMap.get("target_data").toString();
+                boutiqueExceptionMapper.updateSeasonByProductId(productId, seasonCode);
+                okhttp3.Response response = OkHttpUtils.post().url(commonProperties.getPriceChangeRulePath() + "/" + productId.intValue()).build().execute();
+
+            }
+        }
+        return null;
+    }
+
     private void delChangePriceRule(Long tagId, Map<String, Object> response) {
         // 调用改价接口
         String url = commonProperties.getPriceChangeRulePath();
         List<Long> reDelPIds = new ArrayList<>();// 回滚的pid
-        List<Map<String,Object>> changePriceRrr = new ArrayList<>();
+        List<Map<String, Object>> changePriceRrr = new ArrayList<>();
         if (!response.containsKey("tagRelSuccess")) {
             return;
         }
@@ -295,7 +328,7 @@ public class StateMachineController {
 
             }
             if (CollectionUtils.isNotEmpty(reDelPIds)) {
-                response.put("changePriceRrr",changePriceRrr);
+                response.put("changePriceRrr", changePriceRrr);
                 Tag tag = iTagService.selectTagByTagId(tagId);
                 Map<String, Object> map = new HashMap<>();
                 map.put("productIdList", reDelPIds);
@@ -312,7 +345,7 @@ public class StateMachineController {
         // 調用改 价格接口
         String url = commonProperties.getPriceChangeRulePath();
         List<Long> reDelPIds = new ArrayList<>();// 回滚的pid
-        List<Map<String,Object>> changePriceRrr = new ArrayList<>();
+        List<Map<String, Object>> changePriceRrr = new ArrayList<>();
         if (!response.containsKey("success")) {
             return;
         }
@@ -344,7 +377,7 @@ public class StateMachineController {
 
             }
             if (CollectionUtils.isNotEmpty(reDelPIds)) {
-                response.put("changePriceRrr",changePriceRrr);
+                response.put("changePriceRrr", changePriceRrr);
                 Long tagId = (Long) map.get("tag_id");
                 contentManagementService.batchDeleteByTagIdAndProductId1(reDelPIds, tagId, response);
             }

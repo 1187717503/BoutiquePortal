@@ -250,6 +250,14 @@
         LIMIT #{start}, #{count};
     </select>
 
+    <select id="listProductException" resultType="java.util.Map" parameterType="java.util.List">
+        select * from boutique_exception be where be.product_id in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.product_id}
+        </foreach>
+        order by be.updated_at desc
+    </select>
+
     <select id="getProductStateByProductId" parameterType="Long" resultType="java.util.HashMap">
         SELECT
             product.product_id,

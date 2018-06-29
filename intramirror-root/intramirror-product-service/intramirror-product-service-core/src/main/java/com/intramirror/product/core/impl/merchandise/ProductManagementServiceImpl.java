@@ -72,6 +72,11 @@ public class ProductManagementServiceImpl implements ProductManagementService {
     }
 
     @Override
+    public List<Map<String, Object>> listProductException(List<Map<String,Object>> productIds) {
+        return productManagementMapper.listProductException(productIds);
+    }
+
+    @Override
     @Transactional
     public void approve(int status, Long productId) {
         updateProductStatusOnly(status, productId);

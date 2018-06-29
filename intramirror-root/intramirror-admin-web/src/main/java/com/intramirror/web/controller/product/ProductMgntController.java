@@ -114,7 +114,6 @@ public class ProductMgntController {
     }
 
     @GetMapping(value = "/list/{state}")
-
     public Response listProductByFilter(
             // @formatter:off
             SearchCondition searchParams,
@@ -137,7 +136,48 @@ public class ProductMgntController {
         if (productList.size() > 0) {
             appendInfo(productList, getStatusEnum(state), searchCondition);
         }
-        return Response.status(StatusType.SUCCESS).data(productList);
+        return Response.status(StatusType.SUCCESS).data(handleBoutqiqueException(productList, searchCondition));
+    }
+
+    private List<Map<String, Object>> handleBoutqiqueException(List<Map<String, Object>> productList, SearchCondition searchCondition) {
+        int shopProductStatus = searchCondition.getShopProductStatus().intValue();
+        int productStatus = searchCondition.getProductStatus().intValue();
+        Integer boutiqueExceptionType = searchCondition.getBoutiqueExceptionType();
+
+        if ((productStatus == 4 || productStatus == 2) && shopProductStatus == 2 && CollectionUtils.isNotEmpty(productList)) {
+
+            List<Map<String, Object>> boutiqueExceptionList = productManagementService.listProductException(productList);
+            for (Map<String, Object> productMap : productList) {
+                int productId = Integer.parseInt(productMap.get("product_id").toString());
+
+                for (Map<String, Object> boutiqueExceptionMap : boutiqueExceptionList) {
+                    int exceptionProductId = Integer.parseInt(boutiqueExceptionMap.get("product_id").toString());
+                    int type = Integer.parseInt(boutiqueExceptionMap.get("type").toString());
+                    if (productId == exceptionProductId && type == 1) {
+                        if (productMap.get("priceChange") == null) {
+                            productMap.put("priceChange", boutiqueExceptionMap);
+                        }
+                    } else if (productId == exceptionProductId && type == 2) {
+                        if (productMap.get("seasonChange") == null) {
+                            productMap.put("seasonChange", boutiqueExceptionMap);
+                        }
+                    }
+                }
+            }
+
+            if (boutiqueExceptionType != null) {
+                List<Map<String, Object>> exceptionProductList = new ArrayList<>();
+                for (Map<String, Object> productMap : productList) {
+                    if (boutiqueExceptionType.intValue() == 1 && productMap.get("priceChange") != null) {
+                        exceptionProductList.add(productMap);
+                    } else if (boutiqueExceptionType.intValue() == 2 && productMap.get("seasonChange") != null) {
+                        exceptionProductList.add(productMap);
+                    }
+                }
+                productList = exceptionProductList;
+            }
+        }
+        return productList;
     }
 
     private SearchCondition initCondition(SearchCondition searchParams, String state, Long categoryId, Integer tagType, Integer pageSize, Integer pageNo) {

@@ -15,6 +15,8 @@ public interface ProductManagementService {
 
     List<Map<String, Object>> listProductService(SearchCondition searchCondition);
 
+    List<Map<String, Object>> listProductException(List<Map<String,Object>> productIds);
+
     //    void updateProductStatus(int status, Long productId);
     //
     //    void updateProductStatusAndNewShopProduct(int status, int shopStatus, Long productId);

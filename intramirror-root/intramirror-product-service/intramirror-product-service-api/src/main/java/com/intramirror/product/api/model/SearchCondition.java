@@ -25,6 +25,7 @@ public class SearchCondition {
     private Integer count;
     private String orderBy;
     private String desc;
+    private Integer boutiqueExceptionType;
 
     private String exception;
 
@@ -317,5 +318,13 @@ public class SearchCondition {
 
     public void setTagTypes(List<Integer> tagTypes) {
         this.tagTypes = tagTypes;
+    }
+
+    public Integer getBoutiqueExceptionType() {
+        return boutiqueExceptionType;
+    }
+
+    public void setBoutiqueExceptionType(Integer boutiqueExceptionType) {
+        this.boutiqueExceptionType = boutiqueExceptionType;
     }
 }
