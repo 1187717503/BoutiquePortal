@@ -293,6 +293,7 @@ public class PromotionManagementController {
         params.put("ruleIds", ruleIds);
         Long row = promotionExcludeProductService.deletePromotionExcludeProduct(params);
 
+
         return Response.status(StatusType.SUCCESS).data(row);
     }
 

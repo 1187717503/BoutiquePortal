@@ -113,5 +113,17 @@ public interface PromotionRuleMapper {
      * @return
      */
     int updatePromotionRefreshAt(@Param("promotionId") Long promotionId);
+
+    /**
+     * @param promotionId
+     * @return
+     */
+    int updatePromotionSaveTime(@Param("promotionId") Long promotionId);
+
+    /**
+     * @param promotionIds
+     * @return
+     */
+    int updatePromotionSaveTimes(@Param("promotionIds") List<Long> promotionIds);
 }
 

@@ -803,4 +803,18 @@
         update t_promotion set refresh_at = now()
         where promotion_id = #{promotionId, jdbcType=BIGINT}
     </update>
+
+    <update id="updatePromotionSaveTime">
+        update t_promotion set save_at = now()
+        where promotion_id = #{promotionId, jdbcType=BIGINT}
+    </update>
+
+    <update id="updatePromotionSaveTimes">
+        update t_promotion set save_at = now()
+        where promotion_id in
+        <foreach item="item" index="index" collection="promotionIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
 </mapper>
