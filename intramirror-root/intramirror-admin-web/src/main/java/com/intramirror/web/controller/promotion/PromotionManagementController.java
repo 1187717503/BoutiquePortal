@@ -326,7 +326,7 @@ public class PromotionManagementController {
         }
 
         PromotionRule promotionRule = transformPromotionRule(body);
-
+        promotionRule.setSeasonCode(promotionRule.getSeasonCodes().get(0));
         return Response.status(StatusType.SUCCESS).data(promotionService.updatePromotionRule(type, promotionRule));
     }
 
