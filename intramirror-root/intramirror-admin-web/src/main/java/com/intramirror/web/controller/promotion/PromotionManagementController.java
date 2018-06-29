@@ -240,7 +240,7 @@ public class PromotionManagementController {
         }
 
         if (ruleIds.size() < 1) {
-            return Response.status(StatusType.FAILURE).data("vendor id not found.");
+            throw new ValidateException(new ErrorResponse("product id already existed."));
         }
 
         Boolean result = promotionService.removePromotionRule(ruleIds, type);
@@ -260,7 +260,7 @@ public class PromotionManagementController {
         product.setEnabled(true);
         List<ProductWithBLOBs> productWithBLOBsList = productService.getProductByParameter(product);
         if (CollectionUtils.isEmpty(productWithBLOBsList)) {
-            return Response.status(StatusType.FAILURE).data("product not found.");
+            throw new ValidateException(new ErrorResponse("product not found."));
         }
         List<Long> productIds = new ArrayList<>();
         for (ProductWithBLOBs productWithBLOBs : productWithBLOBsList) {
@@ -274,7 +274,7 @@ public class PromotionManagementController {
 
         productIds.removeAll(existsProductIds);
         if (productIds.size() == 0) {
-            return Response.status(StatusType.FAILURE).data("product id already existed.");
+            throw new ValidateException(new ErrorResponse("product id already existed."));
         }
         promotionExcludeProduct.setProductIds(productIds);
         promotionExcludeProductService.insertPromotionExcludeProduct(promotionExcludeProduct);
