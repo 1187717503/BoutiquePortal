@@ -454,6 +454,10 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 						list.add(logisticsProduct.getOrder_line_num());
                     }
                 }
+
+				//调用微店接口ship
+				styleroomShip(list);
+
 				// 起线程发邮件
 				ShipmentSendMailVO vo = new ShipmentSendMailVO();
 				vo.setShipmentNo(shipment.getShipmentNo());
@@ -466,9 +470,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 					vo.setDestination("China");
 				}
                 sendMail(vo);
-
-				//调用微店接口ship
-				styleroomShip(list);
+				logger.info("shipmentNo:{},手动ship",shipment.getShipmentNo());
 			}
 			//如果一直修改状态
 			if (lastStatus == shipment.getStatus()){

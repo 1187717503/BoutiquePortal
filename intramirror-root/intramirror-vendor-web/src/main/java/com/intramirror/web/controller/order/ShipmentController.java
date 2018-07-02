@@ -426,6 +426,10 @@ public class ShipmentController extends BaseController{
 							list.add(logisticsProduct.getOrder_line_num());
 						}
 					}
+
+					//调用微店接口ship
+					iShipmentService.styleroomShip(list);
+
 					// 起线程发邮件
 					ShipmentSendMailVO vo = new ShipmentSendMailVO();
 					vo.setShipmentNo(shipment.getShipmentNo());
@@ -439,9 +443,7 @@ public class ShipmentController extends BaseController{
                     }
 					iShipmentService.sendMailForShipped(vo);
 					message.successStatus();
-
-					//调用微店接口ship
-					iShipmentService.styleroomShip(list);
+					logger.info("shipmentNo:{}，自动ship",shipment.getShipmentNo());
 				}
 			}
 		}
