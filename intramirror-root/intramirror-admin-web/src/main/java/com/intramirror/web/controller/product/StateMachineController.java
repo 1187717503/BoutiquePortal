@@ -18,12 +18,14 @@ import com.intramirror.product.api.service.content.ContentManagementService;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
 import com.intramirror.product.common.KafkaProperties;
 import com.intramirror.product.core.mapper.BoutiqueExceptionMapper;
+import com.intramirror.utils.transform.JsonTransformUtil;
 import com.intramirror.web.common.CommonProperties;
 import com.intramirror.web.common.response.BatchResponseItem;
 import com.intramirror.web.common.response.BatchResponseMessage;
 import com.intramirror.web.config.HttpUtils;
 import static com.intramirror.web.controller.product.StateMachineCoreRule.map2StateEnum;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -77,6 +79,9 @@ public class StateMachineController {
 
     @Autowired
     private CommonProperties commonProperties;
+
+    @Autowired
+    private BoutiqueExceptionMapper boutiqueExceptionMapper;
 
     @PutMapping(value = "/single/{action}", consumes = "application/json")
     public Response operateProduct(@SessionAttribute(value = "sessionStorage", required = false) Long userId, @PathVariable(value = "action") String action,
@@ -263,11 +268,8 @@ public class StateMachineController {
         return Response.status(StatusType.SUCCESS).data(responseMessage);
     }
 
-    @Autowired
-    private BoutiqueExceptionMapper boutiqueExceptionMapper;
-
-    @PutMapping(value = "/batch/acceptchange", consumes = "application/json")
-    public Response batchAcceptChange(@RequestBody Map<String, Object> body) throws IOException {
+    @PutMapping(value = "/batch/accept/{type}", consumes = "application/json")
+    public Response batchAcceptChange(@PathVariable("type") Integer type, @RequestBody Map<String, Object> body) throws IOException {
         if (body.get("ids") == null) {
             throw new ValidateException(new ErrorResponse("Parameter missed"));
         }
@@ -276,20 +278,42 @@ public class StateMachineController {
         }
 
         List<Map<String, Object>> idsList = (List) body.get("ids");
-
         for (Map<String, Object> idMap : idsList) {
             Long productId = Long.parseLong(idMap.get("productId").toString());
-
-            Map<String, Object> seasonChangeMap = boutiqueExceptionMapper.selectSeasonChange(productId);
-            Map<String, Object> priceChangeMap = boutiqueExceptionMapper.selectPriceChange(productId);
-            if (seasonChangeMap != null) {
-                String seasonCode = seasonChangeMap.get("target_data").toString();
-                boutiqueExceptionMapper.updateSeasonByProductId(productId, seasonCode);
-                okhttp3.Response response = OkHttpUtils.post().url(commonProperties.getPriceChangeRulePath() + "/" + productId.intValue()).build().execute();
-
-            }
+            Map<String, Object> boutiqueExceptionMap = boutiqueExceptionMapper.selectBoutiqueExceptionByProductIdAndType(productId, type);
+            this.acceptChange(type, boutiqueExceptionMap);
         }
-        return null;
+        return Response.success();
+    }
+
+    private void acceptChange(Integer type, Map<String, Object> boutiqueExceptionMap) throws IOException {
+        // price
+        if (type.intValue() == 1) {
+            String url = commonProperties.getMicroServiceProductServer() + "/price/discount/price";
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("productId", Long.parseLong(boutiqueExceptionMap.get("productId").toString()));
+            map.put("retailPrice", new BigDecimal(boutiqueExceptionMap.get("target_data").toString()));
+            String content = JsonTransformUtil.toJson(map);
+
+            okhttp3.Response response = OkHttpUtils.post().url(url).content(content).build().connTimeOut(10000).readTimeOut(1000L).writeTimeOut(1000L)
+                    .execute();
+            LOGGER.info("acceptPriceChange,url:{},content:{},result:{}", url, content, response.body().string());
+        }
+
+        // season
+        if (type.intValue() == 2) {
+            String url = commonProperties.getMicroServiceProductServer() + "/price/discount/season";
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("productId", Long.parseLong(boutiqueExceptionMap.get("productId").toString()));
+            map.put("seasonCode", new BigDecimal(boutiqueExceptionMap.get("target_data").toString()));
+            String content = JsonTransformUtil.toJson(map);
+
+            okhttp3.Response response = OkHttpUtils.post().url(url).content(content).build().connTimeOut(10000).readTimeOut(1000L).writeTimeOut(1000L)
+                    .execute();
+            LOGGER.info("acceptSeasonChange,url:{},content:{},result:{}", url, content, response.body().string());
+        }
     }
 
     private void delChangePriceRule(Long tagId, Map<String, Object> response) {

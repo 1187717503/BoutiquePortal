@@ -136,12 +136,8 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
-    <select id="selectSeasonChange" resultType="java.util.Map">
-    select * from boutique_exception be where be.type = 2 and be.product_id = #{productId,jdbcType=BIGINT} order by be.updated_at desc  limit 0,1;
-  </select>
-
-    <select id="selectPriceChange" resultType="java.util.Map">
-    select * from boutique_exception be where be.type = 1 and be.product_id = #{productId,jdbcType=BIGINT} order by be.updated_at desc  limit 0,1;
+    <select id="selectBoutiqueExceptionByProductIdAndType" resultType="java.util.Map">
+      select * from boutique_exception be where be.product_id = #{productId,jdbcType=BIGINT} and be.type = #{type,jdbcType=BIGINT} order by be.updated_at desc  limit 0,1;
     </select>
 
     <update id="updateSeasonByProductId">

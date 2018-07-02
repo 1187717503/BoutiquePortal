@@ -18,9 +18,7 @@ public interface BoutiqueExceptionMapper {
 
     int updateByPrimaryKey(BoutiqueException record);
 
-    Map<String, Object> selectSeasonChange(Long productId);
-
-    Map<String, Object> selectPriceChange(Long productId);
+    Map<String, Object> selectBoutiqueExceptionByProductIdAndType(Long productId, Integer type);
 
     int updateSeasonByProductId(Long productId, String seasonCode);
 

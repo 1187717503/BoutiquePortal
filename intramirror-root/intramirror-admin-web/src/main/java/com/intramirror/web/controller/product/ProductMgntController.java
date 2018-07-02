@@ -136,7 +136,8 @@ public class ProductMgntController {
         if (productList.size() > 0) {
             appendInfo(productList, getStatusEnum(state), searchCondition);
         }
-        return Response.status(StatusType.SUCCESS).data(handleBoutqiqueException(productList, searchCondition));
+        List<Map<String, Object>> data = handleBoutqiqueException(productList, searchCondition);
+        return Response.status(StatusType.SUCCESS).data(data);
     }
 
     private List<Map<String, Object>> handleBoutqiqueException(List<Map<String, Object>> productList, SearchCondition searchCondition) {
