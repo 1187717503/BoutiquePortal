@@ -97,21 +97,23 @@ public class PromotionServiceImpl implements IPromotionService {
     @Transactional
     @Override
     public Boolean removePromotionRule(List<Long> ruleIds, PromotionRuleType ruleType) {
+        String tableName = "t_promotion_include_rule";
         Boolean flag = false;
         if (ruleType == PromotionRuleType.INCLUDE_RULE) {
             //            if (promotionRuleMapper.removeIncludeRule(ruleId) > 0) {
             //                flag = promotionRuleMapper.removeIncludeRuleDetail(ruleId) > 0;
             //            }
             flag = promotionRuleMapper.removeIncludeRule(ruleIds) > 0;
-
+            tableName = "t_promotion_include_rule";
         } else {
             //            if (promotionRuleMapper.removeExcludeRule(ruleId) > 0) {
             //                flag = promotionRuleMapper.removeExcludeRuleDetail(ruleId) > 0;
             //            }
             flag = promotionRuleMapper.removeExcludeRule(ruleIds) > 0;
+            tableName = "t_promotion_exclude_rule";
         }
 
-        promotionRuleMapper.updatePromotionSaveTimes(ruleIds);
+        promotionRuleMapper.updatePromotionSaveTimes(tableName,ruleIds);
         return flag;
     }
 

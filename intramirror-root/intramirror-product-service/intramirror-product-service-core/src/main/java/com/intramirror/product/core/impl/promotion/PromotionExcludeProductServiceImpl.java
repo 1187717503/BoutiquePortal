@@ -28,7 +28,7 @@ public class PromotionExcludeProductServiceImpl implements IPromotionExcludeProd
 
     @Override
     public Long deletePromotionExcludeProduct(Map<String, Object> params) {
-        promotionRuleMapper.updatePromotionSaveTimes((List<Long>) params.get("ruleIds"));
+        promotionRuleMapper.updatePromotionSaveTimes("t_promotion_exclude_rule", (List<Long>) params.get("ruleIds"));
         return promotionExcludeProductMapper.deletePromotionExcludeProduct(params);
     }
 

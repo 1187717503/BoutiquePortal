@@ -124,6 +124,6 @@ public interface PromotionRuleMapper {
      * @param promotionIds
      * @return
      */
-    int updatePromotionSaveTimes(@Param("ruleIds") List<Long> promotionIds);
+    int updatePromotionSaveTimes(@Param("tableName")String tableName,@Param("ruleIds") List<Long> promotionIds);
 }
 

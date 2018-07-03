@@ -804,8 +804,7 @@
         where promotion_id = #{promotionId, jdbcType=BIGINT}
     </update>
 
-    <update id="
-">
+    <update id="updatePromotionSaveTime">
         update t_promotion set save_at = now()
         where promotion_id = #{promotionId, jdbcType=BIGINT}
     </update>
@@ -813,9 +812,19 @@
     <update id="updatePromotionSaveTimes">
         update t_promotion set save_at = now()
         where promotion_id in
-        (select promotion_id from t_promotion_include_rule WHERE promotion_include_rule_id IN
-        <foreach item="item" index="index" collection="ruleIds" open="(" separator="," close=")">#{item}
-        </foreach>
+        (select promotion_id from ${tableName}
+        <where>
+            <if test="tableName == 't_promotion_include_rule'">
+                promotion_include_rule_id
+            </if>
+            <if test="tableName == 't_promotion_exclude_rule'">
+                promotion_exclude_rule_id
+            </if>
+            IN
+            <foreach item="item" index="index" collection="ruleIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </where>
         )
     </update>
 </mapper>
