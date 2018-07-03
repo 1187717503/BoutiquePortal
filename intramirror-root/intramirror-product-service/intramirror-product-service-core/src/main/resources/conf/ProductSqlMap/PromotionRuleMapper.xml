@@ -813,7 +813,7 @@
     <update id="updatePromotionSaveTimes">
         update t_promotion set save_at = now()
         where promotion_id in
-        (select promotion_id from t_promotion_include_rule WHERE enabled = 1 and promotion_include_rule_id IN
+        (select promotion_id from t_promotion_include_rule WHERE promotion_include_rule_id IN
         <foreach item="item" index="index" collection="ruleIds" open="(" separator="," close=")">#{item}
         </foreach>
         )
