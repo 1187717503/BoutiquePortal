@@ -42,7 +42,6 @@ public class PromotionSortManageController {
 
         List<Map<String, Object>> data = promotionService.listSortColumn(promotionId);
 
-        promotionService.updatePromotionSaveTime(promotionId);
         return Response.status(StatusType.SUCCESS).data(data);
     }
 
@@ -81,7 +80,6 @@ public class PromotionSortManageController {
                 categorySort.put("name", absCategoryName);
             }
         }
-        promotionService.updatePromotionSaveTime(promotionId);
         return Response.status(StatusType.SUCCESS).data(data);
     }
 
@@ -92,7 +90,7 @@ public class PromotionSortManageController {
         if (sortColumn == null) {
             throw new ValidateException(new ErrorResponse("Column name is not correct."));
         }
-        promotionService.updatePromotionSaveTime(promotionId);
+
         return Response.status(StatusType.SUCCESS).data(promotionService.updateItemsSort(promotionId, sortColumn, body));
     }
 }

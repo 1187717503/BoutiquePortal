@@ -128,7 +128,7 @@ public class PromotionServiceImpl implements IPromotionService {
             flag = promotionRuleMapper.updateExcludeRule(rule) > 0;
         }
 
-        promotionRuleMapper.updatePromotionSaveTime(rule.getRuleId());
+        promotionRuleMapper.updatePromotionSaveTime(rule.getPromotionId());
         return flag;
 
     }
@@ -192,6 +192,7 @@ public class PromotionServiceImpl implements IPromotionService {
             result = updateSimpleSort(promotionId, sortColumn, items);
             break;
         }
+        updatePromotionSaveTime(promotionId);
         return result;
     }
 
