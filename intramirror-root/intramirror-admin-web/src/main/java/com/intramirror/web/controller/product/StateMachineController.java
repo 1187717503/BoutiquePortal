@@ -20,6 +20,7 @@ import com.intramirror.product.common.KafkaProperties;
 import com.intramirror.product.core.mapper.BoutiqueExceptionMapper;
 import com.intramirror.utils.transform.JsonTransformUtil;
 import com.intramirror.web.common.CommonProperties;
+import com.intramirror.web.common.Constants;
 import com.intramirror.web.common.response.BatchResponseItem;
 import com.intramirror.web.common.response.BatchResponseMessage;
 import com.intramirror.web.config.HttpUtils;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import net.sf.json.JSONObject;
+import okhttp3.MediaType;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -98,6 +100,15 @@ public class StateMachineController {
                 throw new ValidateException(new ErrorResponse("Sku hasn't created."));
             }
         }
+
+        // check boutiqueExecption
+        if (originalState == StateEnum.SHOP_PROCESSING) {
+            int count = boutiqueExceptionMapper.countBoutiqueExceptionByProductId(productId);
+            if (count > 0) {
+                throw new ValidateException(new ErrorResponse("Please check the exception goods."));
+            }
+        }
+
         updateProductState((Long) userId, currentState, action, productId, shopProductId);
         return Response.success();
     }
@@ -263,8 +274,8 @@ public class StateMachineController {
 
         Map<Long, Long> validIdsMap = batchValidate(originalState, (List) body.get("ids"), operation, responseMessage);
         validIdsMap = batchFilterIncompleteProductIds(originalState, validIdsMap, operation, responseMessage);
+        validIdsMap = batchFilterExceptionProductIds(originalState, validIdsMap, operation, responseMessage);
         batchUpdateProductState(userId, originalState, action, validIdsMap, responseMessage);
-
         return Response.status(StatusType.SUCCESS).data(responseMessage);
     }
 
@@ -282,36 +293,54 @@ public class StateMachineController {
             Long productId = Long.parseLong(idMap.get("productId").toString());
             Map<String, Object> boutiqueExceptionMap = boutiqueExceptionMapper.selectBoutiqueExceptionByProductIdAndType(productId, type);
             this.acceptChange(type, boutiqueExceptionMap);
+            boutiqueExceptionMapper.deleteBoutiqueExceptionByProductIdAndType(productId, type);
+        }
+        return Response.success();
+    }
+
+    @PutMapping(value = "/batch/ignore/{type}", consumes = "application/json")
+    public Response batchIgnoreChange(@PathVariable("type") Integer type, @RequestBody Map<String, Object> body) throws Exception {
+        if (body.get("ids") == null) {
+            throw new ValidateException(new ErrorResponse("Parameter missed"));
+        }
+        if (body.get("originalState") == null) {
+            throw new ValidateException(new ErrorResponse("Parameter originalState missed"));
+        }
+
+        List<Map<String, Object>> idsList = (List) body.get("ids");
+        for (Map<String, Object> idMap : idsList) {
+            Long productId = Long.parseLong(idMap.get("productId").toString());
+            boutiqueExceptionMapper.deleteBoutiqueExceptionByProductIdAndType(productId, type);
         }
         return Response.success();
     }
 
     private void acceptChange(Integer type, Map<String, Object> boutiqueExceptionMap) throws IOException {
         // price
-        if (type.intValue() == 1) {
+        if (type.intValue() == Constants.boutique_exception_type_price) {
             String url = commonProperties.getMicroServiceProductServer() + "/price/discount/price";
 
             Map<String, Object> map = new HashMap<>();
-            map.put("productId", Long.parseLong(boutiqueExceptionMap.get("productId").toString()));
+            map.put("productId", Long.parseLong(boutiqueExceptionMap.get("product_id").toString()));
             map.put("retailPrice", new BigDecimal(boutiqueExceptionMap.get("target_data").toString()));
             String content = JsonTransformUtil.toJson(map);
 
-            okhttp3.Response response = OkHttpUtils.post().url(url).content(content).build().connTimeOut(10000).readTimeOut(1000L).writeTimeOut(1000L)
-                    .execute();
+            okhttp3.Response response = OkHttpUtils.post().url(url).mediaType(MediaType.parse("application/json")).content(content).build().connTimeOut(10000)
+                    .readTimeOut(1000L).writeTimeOut(1000L).execute();
             LOGGER.info("acceptPriceChange,url:{},content:{},result:{}", url, content, response.body().string());
         }
 
         // season
-        if (type.intValue() == 2) {
+        if (type.intValue() == Constants.boutique_exception_type_season) {
             String url = commonProperties.getMicroServiceProductServer() + "/price/discount/season";
 
             Map<String, Object> map = new HashMap<>();
-            map.put("productId", Long.parseLong(boutiqueExceptionMap.get("productId").toString()));
-            map.put("seasonCode", new BigDecimal(boutiqueExceptionMap.get("target_data").toString()));
+            map.put("productId", Long.parseLong(boutiqueExceptionMap.get("product_id").toString()));
+            map.put("seasonCode", boutiqueExceptionMap.get("target_data").toString());
             String content = JsonTransformUtil.toJson(map);
 
-            okhttp3.Response response = OkHttpUtils.post().url(url).content(content).build().connTimeOut(10000).readTimeOut(1000L).writeTimeOut(1000L)
-                    .execute();
+            okhttp3.Response response = OkHttpUtils.post().url(url).mediaType(MediaType.parse("application/json")).content(content).build().connTimeOut(10000)
+                    .readTimeOut(1000L).writeTimeOut(1000L).execute();
             LOGGER.info("acceptSeasonChange,url:{},content:{},result:{}", url, content, response.body().string());
         }
     }
@@ -531,6 +560,26 @@ public class StateMachineController {
 
         }
         return idsMap;
+    }
+
+    private Map<Long, Long> batchFilterExceptionProductIds(StateEnum originalState, Map<Long, Long> validIdsMap, OperationEnum operation,
+            BatchResponseMessage responseMessage) {
+        if (validIdsMap.size() <= 0) {
+            return validIdsMap;
+        }
+
+        if (originalState == StateEnum.SHOP_PROCESSING) {
+            List<Long> productIds = new LinkedList<>(validIdsMap.keySet());
+            for (Long productId : productIds) {
+                int countException = boutiqueExceptionMapper.countBoutiqueExceptionByProductId(productId);
+                if (countException > 0) {
+                    Long shopProductId = validIdsMap.get(productId);
+                    validIdsMap.remove(productId);
+                    responseMessage.getFailed().add(new BatchResponseItem(productId, shopProductId, "Please check the exception goods."));
+                }
+            }
+        }
+        return validIdsMap;
     }
 
     private Map<Long, Long> batchFilterIncompleteProductIds(StateEnum originalState, Map<Long, Long> validIdsMap, OperationEnum operation,

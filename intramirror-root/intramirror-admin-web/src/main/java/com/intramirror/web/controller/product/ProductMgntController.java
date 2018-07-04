@@ -9,6 +9,7 @@ import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.product.api.service.content.ContentManagementService;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
 import com.intramirror.utils.transform.JsonTransformUtil;
+import com.intramirror.web.common.Constants;
 import com.intramirror.web.controller.cache.CategoryCache;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -77,7 +78,7 @@ public class ProductMgntController {
             }
             productStateCountMap.put(stateEnum, Long.parseLong(item.get("count").toString()));
         }
-        mergeOldState(productStateCountMap);
+        mergeOldState(productStateCountMap, searchCondition);
         countALLState(productStateCountMap);
         return Response.status(StatusType.SUCCESS).data(productStateCountMap);
     }
@@ -90,7 +91,7 @@ public class ProductMgntController {
         return productStateCountMap;
     }
 
-    private void mergeOldState(Map<StateEnum, Long> productStateCountMap) {
+    private void mergeOldState(Map<StateEnum, Long> productStateCountMap, SearchCondition searchCondition) {
         Long countOldProcessing = productStateCountMap.get(StateEnum.OLD_PROCESSING);
         Long countProcessing = productStateCountMap.get(StateEnum.PROCESSING);
         Long countOldShopProcessing = productStateCountMap.get(StateEnum.OLD_SHOP_PROCESSING);
@@ -103,6 +104,14 @@ public class ProductMgntController {
         productStateCountMap.put(StateEnum.SHOP_PROCESSING, countOldShopProcessing + countShopProcessing);
         productStateCountMap.remove(StateEnum.OLD_PROCESSING);
         productStateCountMap.remove(StateEnum.OLD_SHOP_PROCESSING);
+
+        Integer boutiqueExceptionType = searchCondition.getBoutiqueExceptionType();
+        if (boutiqueExceptionType == null || boutiqueExceptionType == Constants.boutique_exception_type_all) {
+            return;
+        }
+
+        Integer countException = productManagementService.countBoutiqueException(boutiqueExceptionType);
+        productStateCountMap.put(StateEnum.SHOP_PROCESSING, countException.longValue());
     }
 
     private void countALLState(Map<StateEnum, Long> productStateCountMap) {
@@ -144,7 +153,6 @@ public class ProductMgntController {
         int shopProductStatus = searchCondition.getShopProductStatus().intValue();
         int productStatus = searchCondition.getProductStatus().intValue();
         Integer boutiqueExceptionType = searchCondition.getBoutiqueExceptionType();
-
         if ((productStatus == 4 || productStatus == 2) && shopProductStatus == 2 && CollectionUtils.isNotEmpty(productList)) {
 
             List<Map<String, Object>> boutiqueExceptionList = productManagementService.listProductException(productList);
@@ -154,11 +162,11 @@ public class ProductMgntController {
                 for (Map<String, Object> boutiqueExceptionMap : boutiqueExceptionList) {
                     int exceptionProductId = Integer.parseInt(boutiqueExceptionMap.get("product_id").toString());
                     int type = Integer.parseInt(boutiqueExceptionMap.get("type").toString());
-                    if (productId == exceptionProductId && type == 1) {
+                    if (productId == exceptionProductId && type == Constants.boutique_exception_type_price) {
                         if (productMap.get("priceChange") == null) {
                             productMap.put("priceChange", boutiqueExceptionMap);
                         }
-                    } else if (productId == exceptionProductId && type == 2) {
+                    } else if (productId == exceptionProductId && type == Constants.boutique_exception_type_season) {
                         if (productMap.get("seasonChange") == null) {
                             productMap.put("seasonChange", boutiqueExceptionMap);
                         }

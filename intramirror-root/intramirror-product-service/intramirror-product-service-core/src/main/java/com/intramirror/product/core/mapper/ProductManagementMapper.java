@@ -25,4 +25,6 @@ public interface ProductManagementMapper {
 
     List<Map<String, Object>> listShopProductIdMappingByProductIds(List<Long> productIds);
 
+    Integer countBoutiqueException(Integer type);
+
 }

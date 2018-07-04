@@ -77,6 +77,11 @@ public class ProductManagementServiceImpl implements ProductManagementService {
     }
 
     @Override
+    public Integer countBoutiqueException(Integer type) {
+        return productManagementMapper.countBoutiqueException(type);
+    }
+
+    @Override
     @Transactional
     public void approve(int status, Long productId) {
         updateProductStatusOnly(status, productId);

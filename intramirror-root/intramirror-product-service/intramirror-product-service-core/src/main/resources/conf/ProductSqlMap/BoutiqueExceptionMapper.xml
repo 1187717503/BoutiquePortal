@@ -136,8 +136,16 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
+    <delete id="deleteBoutiqueExceptionByProductIdAndType">
+        delete from boutique_exception where product_id = #{productId,jdbcType=BIGINT} and type = #{type,jdbcType=TINYINT};
+    </delete>
+
     <select id="selectBoutiqueExceptionByProductIdAndType" resultType="java.util.Map">
       select * from boutique_exception be where be.product_id = #{productId,jdbcType=BIGINT} and be.type = #{type,jdbcType=BIGINT} order by be.updated_at desc  limit 0,1;
+    </select>
+
+    <select id="countBoutiqueExceptionByProductId" resultType="java.lang.Integer">
+        select count(*) as count from boutique_exception where product_id =  #{productId,jdbcType=BIGINT} ;
     </select>
 
     <update id="updateSeasonByProductId">

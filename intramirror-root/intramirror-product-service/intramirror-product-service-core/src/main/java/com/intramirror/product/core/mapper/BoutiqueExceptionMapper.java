@@ -3,6 +3,7 @@ package com.intramirror.product.core.mapper;
 import com.intramirror.product.api.model.BoutiqueException;
 import java.math.BigDecimal;
 import java.util.Map;
+import org.apache.ibatis.annotations.Param;
 
 public interface BoutiqueExceptionMapper {
 
@@ -18,9 +19,13 @@ public interface BoutiqueExceptionMapper {
 
     int updateByPrimaryKey(BoutiqueException record);
 
-    Map<String, Object> selectBoutiqueExceptionByProductIdAndType(Long productId, Integer type);
+    Map<String, Object> selectBoutiqueExceptionByProductIdAndType(@Param("productId") Long productId, @Param("type") Integer type);
 
-    int updateSeasonByProductId(Long productId, String seasonCode);
+    int updateSeasonByProductId(@Param("productId") Long productId, @Param("seasonCode") String seasonCode);
 
-    int updatePriceByProductId(Long productId, BigDecimal retailPrice);
+    int updatePriceByProductId(@Param("productId") Long productId, @Param("retailPrice") BigDecimal retailPrice);
+
+    int deleteBoutiqueExceptionByProductIdAndType(@Param("productId") Long productId, @Param("type") Integer type);
+
+    int countBoutiqueExceptionByProductId(Long productId);
 }
