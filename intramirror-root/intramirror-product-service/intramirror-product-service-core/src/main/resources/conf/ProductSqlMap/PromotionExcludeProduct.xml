@@ -53,4 +53,13 @@
 
     </select>
 
+    <update id="updatePromotionSaveTimesExcludeProduct" parameterType="java.lang.Long">
+        update t_promotion set save_at = now()
+        where promotion_id in(
+        select promotion_id from t_promotion_exclude_product where `promotion_exclude_product_id` in
+        <foreach collection="ruleIds" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>)
+    </update>
+
 </mapper>
