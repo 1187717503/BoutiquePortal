@@ -148,7 +148,10 @@ public class OrderService {
 				try {
 					//订单加入箱子
 					logger.info("order packingOrder updateLogisticsProduct");
-					result =  updateLogisticsProduct(currentOrder,shipMentMap,false,true);
+					result = updateLogisticsProduct(currentOrder, shipMentMap, false, true);
+				}catch(RuntimeException re){
+					logger.error(re.getMessage());
+					throw new RuntimeException(re.getMessage());
 				} catch (Exception e) {
 					logger.error(e.getMessage());
 					throw new RuntimeException("The order failed to be added to the carton.");
@@ -228,6 +231,9 @@ public class OrderService {
 						try {
 							//订单加入箱子(已经调用过saveShipmentByOrderId 方法  不需要再次创建)
 							result =  updateLogisticsProduct(currentOrder,shipMentMap,false,false);
+						}catch(RuntimeException re){
+							logger.error(re.getMessage());
+							throw new RuntimeException(re.getMessage());
 						} catch (Exception e) {
 							logger.error(e.getMessage());
 							throw new RuntimeException("The order failed to be added to the carton.");
@@ -261,6 +267,9 @@ public class OrderService {
 						try {
 							//订单加入箱子
 							result =  updateLogisticsProduct(currentOrder,shipMentMap,false,true);
+						}catch(RuntimeException re){
+							logger.error(re.getMessage());
+							throw new RuntimeException(re.getMessage());
 						} catch (Exception e) {
 							logger.error(e.getMessage());
 							throw new RuntimeException("The order failed to be added to the carton.");
@@ -293,6 +302,9 @@ public class OrderService {
 				try {
 					//订单加入箱子
 					result =  updateLogisticsProduct(currentOrder,shipmentMap,true,true);
+				}catch(RuntimeException re){
+					logger.error(re.getMessage());
+					throw new RuntimeException(re.getMessage());
 				} catch (Exception e) {
 					logger.error(e.getMessage());
 					throw new RuntimeException("The order failed to be added to the carton.");
@@ -321,6 +333,9 @@ public class OrderService {
 				if(stock_location_id.equals(stockLocationId.toString())){
 					flag = false;
 				}
+			}else {
+				//初次添加carton不用判断
+				flag = false;
 			}
 		}
 		return flag;
