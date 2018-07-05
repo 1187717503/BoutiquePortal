@@ -78,10 +78,14 @@ public interface IPromotionService {
     Integer getPromotionBoutiqueExcludeProductCount(Long promotionId);
 
     List<Map<String, Object>> listSeasonIncludeRulePromotion(Map<String, Object> params);
+
     List<Map<String, Object>> listSeasonExcludeRulePromotion(Map<String, Object> params);
 
     int countSeasonIncludeRulePromotion(Map<String, Object> params);
+
     int countSeasonExcludeRulePromotion(Map<String, Object> params);
 
     int updatePromotionSaveTime(Long promotionId);
+
+    List<Long> getExcludeProductGroupByTagId(Long tagId);
 }

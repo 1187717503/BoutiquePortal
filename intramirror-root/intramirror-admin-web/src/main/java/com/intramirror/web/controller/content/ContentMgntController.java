@@ -18,6 +18,7 @@ import com.intramirror.product.api.service.IPriceChangeRuleGroupService;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ITagService;
 import com.intramirror.product.api.service.content.ContentManagementService;
+import com.intramirror.product.api.service.promotion.IPromotionService;
 import com.intramirror.product.api.vo.tag.ProductGroupVO;
 import com.intramirror.product.api.vo.tag.TagRequestVO;
 import com.intramirror.product.api.vo.tag.VendorTagVO;
@@ -86,6 +87,10 @@ public class ContentMgntController {
 
     @Autowired
     KafkaProperties kafkaProperties;
+
+    @Autowired
+    IPromotionService promotionService;
+
     /**
      * Return block info with bind tag.
      * @param blockName
@@ -189,71 +194,73 @@ public class ContentMgntController {
 
     @PostMapping(value = "/tags/list", produces = "application/json")
     public Response getTags(@RequestBody TagRequestVO vo) {
-        Map<String,Object> param = new HashMap<>();
+        Map<String, Object> param = new HashMap<>();
         List<Long> vendors = vo.getVendorIds();
-        if(CollectionUtils.isEmpty(vendors)){
-            if(vo.getVendorId()!=null){
+        if (CollectionUtils.isEmpty(vendors)) {
+            if (vo.getVendorId() != null) {
                 vendors = new ArrayList<>();
                 vendors.add(vo.getVendorId());
             }
-        }else {
+        } else {
             vendors.add(vo.getVendorId());
         }
         List<Integer> types = vo.getTagTypes();
-        if(CollectionUtils.isEmpty(types)){
-            if(vo.getTagType() !=null){
+        if (CollectionUtils.isEmpty(types)) {
+            if (vo.getTagType() != null) {
                 types = new ArrayList<>();
                 types.add(vo.getTagType());
             }
 
-        }else {
+        } else {
             types.add(vo.getTagType());
         }
-        param.put("tagId",vo.getTagId());
-        param.put("vendorIds",vendors);
-        param.put("tagTypes",types);
-        param.put("tagName",vo.getTagName());
-        param.put("orderBy",vo.getOrderBy());
+        param.put("tagId", vo.getTagId());
+        param.put("vendorIds", vendors);
+        param.put("tagTypes", types);
+        param.put("tagName", vo.getTagName());
+        param.put("orderBy", vo.getOrderBy());
         List<Tag> tags = iTagService.getTagsByParam(param);
         return Response.status(StatusType.SUCCESS).data(tags);
     }
+
     @PostMapping(value = "/vendor/productGroup/list", produces = "application/json")
     public Response getVendorTags(@RequestBody TagRequestVO vo) {
         ProductGroupVO resultVo = new ProductGroupVO();
 
         List<Tag> tags = null;
         Response response = getTags(vo);
-        if(response != null){
-            tags = (List<Tag>)response.getData();
+        if (response != null) {
+            tags = (List<Tag>) response.getData();
         }
-        if(CollectionUtils.isNotEmpty(tags)){
-            Map<Long,List<Tag>> venTagMap = new HashMap<>();
-            Map<Long,List<Long>> ventTadIdMap = new HashMap<>();
-            for(Tag tag : tags){
-                if(tag.getTagType() == 3){ // 爆款
+        if (CollectionUtils.isNotEmpty(tags)) {
+            Map<Long, List<Tag>> venTagMap = new HashMap<>();
+            Map<Long, List<Long>> ventTadIdMap = new HashMap<>();
+            for (Tag tag : tags) {
+                if (tag.getTagType() == 3) { // 爆款
                     resultVo.setHot(tag);
                     continue;
                 }
-                if(tag.getVendorId()==null) continue;
+                if (tag.getVendorId() == null)
+                    continue;
                 List<Tag> list = venTagMap.get(tag.getVendorId());
                 List<Long> tagIds = ventTadIdMap.get(tag.getVendorId());
-                if(list == null){
+                if (list == null) {
                     list = new ArrayList<>();
                     tagIds = new ArrayList<>();
-                    venTagMap.put(tag.getVendorId(),list);
-                    ventTadIdMap.put(tag.getVendorId(),tagIds);
+                    venTagMap.put(tag.getVendorId(), list);
+                    ventTadIdMap.put(tag.getVendorId(), tagIds);
                 }
                 list.add(tag);
                 tagIds.add(tag.getTagId());
             }
             List<Vendor> vendors = null;
-            if(venTagMap.size()>0){
+            if (venTagMap.size() > 0) {
                 vendors = vendorService.getVendorByIds(new ArrayList<Long>(venTagMap.keySet()));
             }
-            if(CollectionUtils.isNotEmpty(vendors)){
+            if (CollectionUtils.isNotEmpty(vendors)) {
                 List<VendorTagVO> vendorTagVOS = new ArrayList<>();
                 resultVo.setVendorTagVOs(vendorTagVOS);
-                for(Vendor vendor : vendors){
+                for (Vendor vendor : vendors) {
                     VendorTagVO tagVO = new VendorTagVO();
                     tagVO.setVendorId(vendor.getVendorId());
                     tagVO.setVendorName(vendor.getVendorName());
@@ -270,18 +277,23 @@ public class ContentMgntController {
     @DeleteMapping(value = "/tags/{tagId}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public Response deleteTag(@PathVariable Long tagId) {
-        if(tagId == null){
+        if (tagId == null) {
             throw new ValidateException(new ErrorResponse("The tagId can not be null !"));
         }
         Tag tag = iTagService.selectTagByTagId(tagId);
-        if(tag.getTagType()==1){
+        if (tag.getTagType() == 1) {
             List<BlockTagRel> blockTagRelList = blockService.getBlockTagRelByTagId(tagId);
             if (blockTagRelList.size() >= 1) {
                 throw new ValidateException(new ErrorResponse("The tag has been bound with block and cannot be removed!"));
             }
-        }else {
+        } else if (tag.getTagType() == 2) {
+            List<Long> tagIds = promotionService.getExcludeProductGroupByTagId(tagId);
+            if (tagIds.size() >= 1) {
+                throw new ValidateException(new ErrorResponse("The tag has been bound with campaign and cannot be removed!"));
+            }
+        } else {
             List<PriceChangeRuleGroup> ruleLisr = priceChangeRuleGroupService.getChangeRulesByTagId(tagId);
-            if(CollectionUtils.isNotEmpty(ruleLisr)){
+            if (CollectionUtils.isNotEmpty(ruleLisr)) {
                 throw new ValidateException(new ErrorResponse("The product group has been bound with price rule and cannot be removed!"));
             }
 
@@ -317,8 +329,8 @@ public class ContentMgntController {
     public Response removeTagProduct(@PathVariable(value = "tagId") Long tagId, @PathVariable(value = "productId") Long productId) {
         Tag tag = iTagService.selectTagByTagId(tagId);
         contentManagementService.deleteByTagIdAndProductId(tagId, productId);
-        if(tag.getTagType() !=1){
-            delChangeProductRule(tag,productId);
+        if (tag.getTagType() != 1) {
+            delChangeProductRule(tag, productId);
         }
         return Response.success();
     }
@@ -328,43 +340,45 @@ public class ContentMgntController {
         boolean hasErr = false;
         String result = "";
         try {
-            result = HttpUtils.httpPost(url+"/"+productId,productId.toString());
-            if(org.apache.commons.lang3.StringUtils.isNotBlank(result)){
+            result = HttpUtils.httpPost(url + "/" + productId, productId.toString());
+            if (org.apache.commons.lang3.StringUtils.isNotBlank(result)) {
                 JSONObject object = JSONObject.fromObject(result);
-                if(object.containsKey("status") && "1".equals(object.get("status").toString())){
+                if (object.containsKey("status") && "1".equals(object.get("status").toString())) {
                     // 成功 发kafaka
                     sendPriceChangeRuleMsg(productId);
-                }else {
+                } else {
                     hasErr = true;
                 }
-            }else {
+            } else {
                 hasErr = true;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             hasErr = true;
-            LOGGER.info("{} product change price error -> {} ",productId,result);
+            LOGGER.info("{} product change price error -> {} ", productId, result);
         }
-        if(hasErr){
-            Map<String,Object> param = new HashMap<>();
-            param.put("tag_id",tag.getTagId());
-            param.put("product_id",productId);
-            param.put("sort_num","-1");
-            param.put("tag_type",tag.getTagType());
+        if (hasErr) {
+            Map<String, Object> param = new HashMap<>();
+            param.put("tag_id", tag.getTagId());
+            param.put("product_id", productId);
+            param.put("sort_num", "-1");
+            param.put("tag_type", tag.getTagType());
             iTagService.saveTagRel(param);
         }
     }
+
     private void sendPriceChangeRuleMsg(Long pid) {
-        if(pid == null) return;
-        Map<String,String> param = new HashMap<>();
+        if (pid == null)
+            return;
+        Map<String, String> param = new HashMap<>();
         // { "product_id": "1111", "type": 4}
-        param.put("product_id",pid.toString());
-        param.put("type","4");
+        param.put("product_id", pid.toString());
+        param.put("type", "4");
         String msg = new Gson().toJson(param);
-        LOGGER.info("Start to send {} to kafaka {}--->{}",msg,kafkaProperties.getProductTopic(),kafkaProperties.getServerName());
-        try{
-            kafkaService.sendMsgToKafka(msg,kafkaProperties.getProductTopic(), kafkaProperties.getServerName());
-        }catch (Exception e){
-            LOGGER.error(e.getMessage(),e);
+        LOGGER.info("Start to send {} to kafaka {}--->{}", msg, kafkaProperties.getProductTopic(), kafkaProperties.getServerName());
+        try {
+            kafkaService.sendMsgToKafka(msg, kafkaProperties.getProductTopic(), kafkaProperties.getServerName());
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
             // error 不回滚
         }
 
@@ -384,11 +398,11 @@ public class ContentMgntController {
         Integer tagType = body.get("tagType") == null ? 1 : Integer.valueOf(body.get("tagType").toString());
         List<Long> productIdList = new ArrayList<>();
         List<Object> list = (List<Object>) body.get("productIdList");
-        if(CollectionUtils.isNotEmpty(list)){
-            for (Object o : list){
-                if(o instanceof Integer){
+        if (CollectionUtils.isNotEmpty(list)) {
+            for (Object o : list) {
+                if (o instanceof Integer) {
                     productIdList.add(Long.valueOf(o.toString()));
-                }else if(o instanceof Long){
+                } else if (o instanceof Long) {
                     productIdList.add((Long) o);
                 }
             }
@@ -399,12 +413,12 @@ public class ContentMgntController {
         }
 
         Map<String, Object> map = new HashMap<>();
-        Map<String,Object> response = new HashMap<>();
+        Map<String, Object> response = new HashMap<>();
         map.put("productIdList", productIdList);
         map.put("tag_id", tagId);
         map.put("sort_num", sortNum);
-        map.put("tagType",tagType);
-        iTagService.saveTagProductRel(map,response);
+        map.put("tagType", tagType);
+        iTagService.saveTagProductRel(map, response);
         return Response.success();
     }
 

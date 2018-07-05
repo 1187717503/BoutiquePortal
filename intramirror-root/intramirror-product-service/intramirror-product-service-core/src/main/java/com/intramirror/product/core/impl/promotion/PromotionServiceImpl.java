@@ -113,7 +113,7 @@ public class PromotionServiceImpl implements IPromotionService {
             tableName = "t_promotion_exclude_rule";
         }
 
-        promotionRuleMapper.updatePromotionSaveTimes(tableName,ruleIds);
+        promotionRuleMapper.updatePromotionSaveTimes(tableName, ruleIds);
         return flag;
     }
 
@@ -601,5 +601,10 @@ public class PromotionServiceImpl implements IPromotionService {
     @Override
     public int updatePromotionSaveTime(Long promotionId) {
         return promotionRuleMapper.updatePromotionSaveTime(promotionId);
+    }
+
+    @Override
+    public List<Long> getExcludeProductGroupByTagId(Long tagId) {
+        return promotionRuleMapper.getExcludeProductGroupByTagId(tagId);
     }
 }
