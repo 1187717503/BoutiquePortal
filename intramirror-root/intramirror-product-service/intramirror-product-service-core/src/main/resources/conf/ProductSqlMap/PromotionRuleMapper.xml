@@ -827,4 +827,9 @@
         </where>
         )
     </update>
+
+    <select id="getExcludeProductGroupByTagId" resultType="java.lang.Long" parameterType="java.lang.Long">
+        SELECT tag_id from t_promotion_exclude_product_group
+        where enabled = 1 and tag_id = #{tagId, jdbcType=BIGINT}
+    </select>
 </mapper>
