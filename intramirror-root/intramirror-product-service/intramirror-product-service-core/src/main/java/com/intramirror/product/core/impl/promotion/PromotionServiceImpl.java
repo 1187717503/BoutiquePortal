@@ -602,9 +602,4 @@ public class PromotionServiceImpl implements IPromotionService {
     public int updatePromotionSaveTime(Long promotionId) {
         return promotionRuleMapper.updatePromotionSaveTime(promotionId);
     }
-
-    @Override
-    public List<Long> getExcludeProductGroupByTagId(Long tagId) {
-        return promotionRuleMapper.getExcludeProductGroupByTagId(tagId);
-    }
 }

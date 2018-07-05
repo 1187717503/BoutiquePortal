@@ -86,6 +86,4 @@ public interface IPromotionService {
     int countSeasonExcludeRulePromotion(Map<String, Object> params);
 
     int updatePromotionSaveTime(Long promotionId);
-
-    List<Long> getExcludeProductGroupByTagId(Long tagId);
 }

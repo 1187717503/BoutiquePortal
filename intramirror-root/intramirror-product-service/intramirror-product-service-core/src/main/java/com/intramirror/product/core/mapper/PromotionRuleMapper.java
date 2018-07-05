@@ -125,11 +125,5 @@ public interface PromotionRuleMapper {
      * @return
      */
     int updatePromotionSaveTimes(@Param("tableName") String tableName, @Param("ruleIds") List<Long> promotionIds);
-
-    /**
-     * @param tagId
-     * @return
-     */
-    List<Long> getExcludeProductGroupByTagId(@Param("tagId")Long tagId);
 }
 
