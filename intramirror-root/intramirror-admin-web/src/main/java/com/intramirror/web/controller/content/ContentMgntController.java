@@ -1,7 +1,5 @@
 package com.intramirror.web.controller.content;
 
-import com.google.gson.Gson;
-import com.intramirror.common.IKafkaService;
 import com.intramirror.common.help.StringUtils;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.core.common.exception.ValidateException;
@@ -14,15 +12,14 @@ import com.intramirror.product.api.model.PriceChangeRuleGroup;
 import com.intramirror.product.api.model.Tag;
 import com.intramirror.product.api.model.TagProductRel;
 import com.intramirror.product.api.service.BlockService;
+import com.intramirror.product.api.service.IKafkaManagerService;
 import com.intramirror.product.api.service.IPriceChangeRuleGroupService;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ITagService;
 import com.intramirror.product.api.service.content.ContentManagementService;
-import com.intramirror.product.api.service.promotion.IPromotionService;
 import com.intramirror.product.api.vo.tag.ProductGroupVO;
 import com.intramirror.product.api.vo.tag.TagRequestVO;
 import com.intramirror.product.api.vo.tag.VendorTagVO;
-import com.intramirror.product.common.KafkaProperties;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.VendorService;
 import com.intramirror.web.common.CommonProperties;
@@ -52,6 +49,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created on 2017/11/17.
+ *
  * @author YouFeng.Zhu
  */
 @RestController
@@ -83,13 +81,7 @@ public class ContentMgntController {
     private CommonProperties commonProperties;
 
     @Autowired
-    IKafkaService kafkaService;
-
-    @Autowired
-    KafkaProperties kafkaProperties;
-
-    @Autowired
-    IPromotionService promotionService;
+    private IKafkaManagerService iKafkaManagerService;
 
     /**
      * Return block info with bind tag.
@@ -144,6 +136,7 @@ public class ContentMgntController {
 
     /**
      * Create an new block only.
+     *
      * @param block
      * @return
      */
@@ -156,6 +149,7 @@ public class ContentMgntController {
 
     /**
      * Update block info by block id.
+     *
      * @param blockId
      * @param block
      * @return
@@ -286,11 +280,6 @@ public class ContentMgntController {
             if (blockTagRelList.size() >= 1) {
                 throw new ValidateException(new ErrorResponse("The tag has been bound with block and cannot be removed!"));
             }
-        } else if (tag.getTagType() == 2) {
-            List<Long> tagIds = promotionService.getExcludeProductGroupByTagId(tagId);
-            if (tagIds.size() >= 1) {
-                throw new ValidateException(new ErrorResponse("The tag has been bound with campaign and cannot be removed!"));
-            }
         } else {
             List<PriceChangeRuleGroup> ruleLisr = priceChangeRuleGroupService.getChangeRulesByTagId(tagId);
             if (CollectionUtils.isNotEmpty(ruleLisr)) {
@@ -345,7 +334,7 @@ public class ContentMgntController {
                 JSONObject object = JSONObject.fromObject(result);
                 if (object.containsKey("status") && "1".equals(object.get("status").toString())) {
                     // 成功 发kafaka
-                    sendPriceChangeRuleMsg(productId);
+                    iKafkaManagerService.sendGroupChanged(productId);
                 } else {
                     hasErr = true;
                 }
@@ -364,24 +353,6 @@ public class ContentMgntController {
             param.put("tag_type", tag.getTagType());
             iTagService.saveTagRel(param);
         }
-    }
-
-    private void sendPriceChangeRuleMsg(Long pid) {
-        if (pid == null)
-            return;
-        Map<String, String> param = new HashMap<>();
-        // { "product_id": "1111", "type": 4}
-        param.put("product_id", pid.toString());
-        param.put("type", "4");
-        String msg = new Gson().toJson(param);
-        LOGGER.info("Start to send {} to kafaka {}--->{}", msg, kafkaProperties.getProductTopic(), kafkaProperties.getServerName());
-        try {
-            kafkaService.sendMsgToKafka(msg, kafkaProperties.getProductTopic(), kafkaProperties.getServerName());
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            // error 不回滚
-        }
-
     }
 
     // 删除product的所有tag

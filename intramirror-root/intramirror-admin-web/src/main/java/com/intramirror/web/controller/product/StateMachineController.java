@@ -1,7 +1,5 @@
 package com.intramirror.web.controller.product;
 
-import com.google.gson.Gson;
-import com.intramirror.common.IKafkaService;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.core.common.exception.ValidateException;
 import com.intramirror.core.common.response.ErrorResponse;
@@ -11,12 +9,12 @@ import com.intramirror.product.api.model.ProductWithBLOBs;
 import com.intramirror.product.api.model.Sku;
 import com.intramirror.product.api.model.Tag;
 import com.intramirror.product.api.model.TagProductRel;
+import com.intramirror.product.api.service.IKafkaManagerService;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ITagService;
 import com.intramirror.product.api.service.SkuService;
 import com.intramirror.product.api.service.content.ContentManagementService;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
-import com.intramirror.product.common.KafkaProperties;
 import com.intramirror.product.core.mapper.BoutiqueExceptionMapper;
 import com.intramirror.utils.transform.JsonTransformUtil;
 import com.intramirror.web.common.CommonProperties;
@@ -74,16 +72,13 @@ public class StateMachineController {
     private ContentManagementService contentManagementService;
 
     @Autowired
-    IKafkaService kafkaService;
-
-    @Autowired
-    KafkaProperties kafkaProperties;
-
-    @Autowired
     private CommonProperties commonProperties;
 
     @Autowired
     private BoutiqueExceptionMapper boutiqueExceptionMapper;
+
+    @Autowired
+    private IKafkaManagerService iKafkaManagerService;
 
     @PutMapping(value = "/single/{action}", consumes = "application/json")
     public Response operateProduct(@SessionAttribute(value = "sessionStorage", required = false) Long userId, @PathVariable(value = "action") String action,
@@ -321,13 +316,15 @@ public class StateMachineController {
             String url = commonProperties.getMicroServiceProductServer() + "/price/discount/price";
 
             Map<String, Object> map = new HashMap<>();
-            map.put("productId", Long.parseLong(boutiqueExceptionMap.get("product_id").toString()));
+            Long productId = Long.parseLong(boutiqueExceptionMap.get("product_id").toString());
+            map.put("productId", productId);
             map.put("retailPrice", new BigDecimal(boutiqueExceptionMap.get("target_data").toString()));
             String content = JsonTransformUtil.toJson(map);
 
             okhttp3.Response response = OkHttpUtils.post().url(url).mediaType(MediaType.parse("application/json")).content(content).build().connTimeOut(10000)
                     .readTimeOut(1000L).writeTimeOut(1000L).execute();
             LOGGER.info("acceptPriceChange,url:{},content:{},result:{}", url, content, response.body().string());
+            iKafkaManagerService.sendPriceChanged(productId);
         }
 
         // season
@@ -335,13 +332,15 @@ public class StateMachineController {
             String url = commonProperties.getMicroServiceProductServer() + "/price/discount/season";
 
             Map<String, Object> map = new HashMap<>();
-            map.put("productId", Long.parseLong(boutiqueExceptionMap.get("product_id").toString()));
+            Long productId = Long.parseLong(boutiqueExceptionMap.get("product_id").toString());
+            map.put("productId", productId);
             map.put("seasonCode", boutiqueExceptionMap.get("target_data").toString());
             String content = JsonTransformUtil.toJson(map);
 
             okhttp3.Response response = OkHttpUtils.post().url(url).mediaType(MediaType.parse("application/json")).content(content).build().connTimeOut(10000)
                     .readTimeOut(1000L).writeTimeOut(1000L).execute();
             LOGGER.info("acceptSeasonChange,url:{},content:{},result:{}", url, content, response.body().string());
+            iKafkaManagerService.sendSeasonChanged(productId);
         }
     }
 
@@ -363,8 +362,7 @@ public class StateMachineController {
                     if (StringUtils.isNotBlank(result)) {
                         JSONObject object = JSONObject.fromObject(result);
                         if (object.containsKey("status") && "1".equals(object.get("status").toString())) {
-                            // 成功 发kafaka
-                            sendPriceChangeRuleMsg(pid);
+                            iKafkaManagerService.sendGroupChanged(pid);
                         } else {
                             changePriceRrr.add(p);
                             reDelPIds.add(pid);
@@ -412,8 +410,7 @@ public class StateMachineController {
                     if (StringUtils.isNotBlank(result)) {
                         JSONObject object = JSONObject.fromObject(result);
                         if (object.containsKey("status") && "1".equals(object.get("status").toString())) {
-                            // 成功 发kafaka
-                            sendPriceChangeRuleMsg(pid);
+                            iKafkaManagerService.sendPriceChanged(pid);
                         } else {
                             changePriceRrr.add(p);
                             reDelPIds.add(pid);
@@ -435,24 +432,6 @@ public class StateMachineController {
                 contentManagementService.batchDeleteByTagIdAndProductId1(reDelPIds, tagId, response);
             }
         }
-    }
-
-    private void sendPriceChangeRuleMsg(Long pid) {
-        if (pid == null)
-            return;
-        Map<String, String> param = new HashMap<>();
-        // { "product_id": "1111", "type": 4}
-        param.put("product_id", pid.toString());
-        param.put("type", "4");
-        String msg = new Gson().toJson(param);
-        LOGGER.info("Start to send {} to kafaka {}--->{}", msg, kafkaProperties.getProductTopic(), kafkaProperties.getServerName());
-        try {
-            kafkaService.sendMsgToKafka(msg, kafkaProperties.getProductTopic(), kafkaProperties.getServerName());
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            // error 不回滚
-        }
-
     }
 
     private void calResponseMsg(Map<String, Object> response, BatchResponseMessage responseMessage, Map<Long, Long> listMap2Map) {
