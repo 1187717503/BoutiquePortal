@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.intramirror.order.core.mapper.LogisticsProductMapper">
+
+    <resultMap id="logisProductMap" type="com.intramirror.order.api.model.LogisticsProduct">
+        <id column="logistics_product_id" property="logistics_product_id" jdbcType="BIGINT"/>
+        <result column="order_logistics_id" property="order_logistics_id" jdbcType="BIGINT"/>
+        <result column="shop_product_sku_id" property="shop_product_sku_id" jdbcType="BIGINT"/>
+        <result column="in_price" property="in_price" jdbcType="DECIMAL"/>
+        <result column="sale_price" property="sale_price" jdbcType="DECIMAL"/>
+        <result column="amount" property="amount" jdbcType="BIGINT"/>
+        <result column="fee" property="fee" jdbcType="DECIMAL"/>
+        <result column="deduct_amount" property="deduct_amount" jdbcType="BIGINT"/>
+        <result column="deduct_fee" property="deduct_fee" jdbcType="DECIMAL"/>
+
+        <result column="remain_amount" property="remain_amount" jdbcType="BIGINT"/>
+        <result column="remain_fee" property="remain_fee" jdbcType="DECIMAL"/>
+        <result column="status" property="status" jdbcType="BIGINT"/>
+        <result column="created_at" property="created_at" jdbcType="TIMESTAMP"/>
+        <result column="updated_at" property="updated_at" jdbcType="TIMESTAMP"/>
+        <result column="confirmed_at" property="confirmed_at" jdbcType="TIMESTAMP"/>
+        <result column="picking_at" property="picking_at" jdbcType="TIMESTAMP"/>
+        <result column="est_ship_date" property="est_ship_date" jdbcType="TIMESTAMP"/>
+
+        <result column="packed_at" property="packed_at" jdbcType="TIMESTAMP"/>
+        <result column="shipped_at" property="shipped_at" jdbcType="TIMESTAMP"/>
+        <result column="container_id" property="container_id" jdbcType="BIGINT"/>
+        <result column="invoice_id" property="invoice_id" jdbcType="BIGINT"/>
+
+        <result column="enabled" property="enabled" jdbcType="BIT"/>
+        <result column="order_line_num" property="order_line_num" jdbcType="LONGVARCHAR"/>
+        <result column="vendor_id" property="vendor_id" jdbcType="BIGINT"/>
+        <result column="shipping_fee" property="shipping_fee" jdbcType="DECIMAL"/>
+        <result column="tax_fee" property="tax_fee" jdbcType="DECIMAL"/>
+        <result column="tracking_num" property="tracking_num" jdbcType="LONGVARCHAR"/>
+        <result column="vat_num" property="vat_num" jdbcType="LONGVARCHAR"/>
+        <result column="stock_location" property="stock_location" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <update id="updateByLogisticsProduct" parameterType="com.intramirror.order.api.model.LogisticsProduct">
+
+        update logistics_product
+        <set>
+            <if test="order_logistics_id != null">
+                order_logistics_id = #{order_logistics_id,jdbcType=BIGINT},
+            </if>
+
+            <if test="shop_product_sku_id != null">
+                shop_product_sku_id = #{shop_product_sku_id,jdbcType=BIGINT},
+            </if>
+
+            <if test="in_price != null">
+                in_price = #{in_price,jdbcType=DECIMAL},
+            </if>
+
+            <if test="sale_price != null">
+                sale_price = #{sale_price,jdbcType=DECIMAL},
+            </if>
+
+            <if test="amount != null">
+                amount = #{amount,jdbcType=BIGINT},
+            </if>
+            <if test="fee != null">
+                fee = #{fee,jdbcType=DECIMAL},
+            </if>
+
+            <if test="deduct_amount != null">
+                deduct_amount = #{deduct_amount,jdbcType=BIGINT},
+            </if>
+
+            <if test="deduct_fee != null">
+                deduct_fee = #{deduct_fee,jdbcType=DECIMAL},
+            </if>
+
+            <if test="remain_amount != null">
+                remain_amount = #{remain_amount,jdbcType=BIGINT},
+            </if>
+
+            <if test="remain_fee != null">
+                remain_fee = #{remain_fee,jdbcType=DECIMAL},
+            </if>
+
+            <if test="status != null">
+                status = #{status,jdbcType=BIGINT},
+            </if>
+
+            <if test="created_at != null">
+                created_at = #{created_at,jdbcType=TIMESTAMP},
+            </if>
+
+            <if test="updated_at != null">
+                updated_at = #{updated_at,jdbcType=TIMESTAMP},
+            </if>
+
+            <if test="confirmed_at != null">
+                confirmed_at = #{confirmed_at,jdbcType=TIMESTAMP},
+            </if>
+
+            <if test="picking_at != null">
+                picking_at = #{picking_at,jdbcType=TIMESTAMP},
+            </if>
+
+            <if test="est_ship_date != null">
+                est_ship_date = #{est_ship_date,jdbcType=TIMESTAMP},
+            </if>
+
+            <if test="packed_at != null">
+                packed_at = #{packed_at,jdbcType=TIMESTAMP},
+            </if>
+
+            <if test="shipped_at != null">
+                shipped_at = #{shipped_at,jdbcType=TIMESTAMP},
+            </if>
+
+            <if test="container_id != null">
+                container_id = #{container_id,jdbcType=BIGINT},
+            </if>
+
+            <if test="enabled != null">
+                enabled = #{enabled,jdbcType=BIT},
+            </if>
+
+            <if test="order_line_num != null">
+                order_line_num = #{order_line_num,jdbcType=LONGVARCHAR},
+            </if>
+
+            <if test="vendor_id != null">
+                vendor_id = #{vendor_id,jdbcType=BIGINT},
+            </if>
+
+            <if test="shipping_fee != null">
+                shipping_fee = #{shipping_fee,jdbcType=DECIMAL},
+            </if>
+
+            <if test="tax_fee != null">
+                tax_fee = #{tax_fee,jdbcType=DECIMAL},
+            </if>
+
+            <if test="tracking_num != null">
+                tracking_num = #{tracking_num,jdbcType=LONGVARCHAR},
+            </if>
+
+            <if test="vat_num != null">
+                vat_num = #{vat_num,jdbcType=LONGVARCHAR},
+            </if>
+
+            <if test="stock_location != null">
+                stock_location = #{stock_location,jdbcType=VARCHAR},
+            </if>
+
+            <if test="stock_location_id != null">
+                stock_location_id = #{stock_location_id},
+            </if>
+
+        </set>
+        where logistics_product_id = #{logistics_product_id,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateByContainerId" parameterType="java.util.Map">
+        update logistics_product
+        <set>
+            <if test="invoice_id != null">
+                invoice_id = #{invoice_id,jdbcType=BIGINT},
+            </if>
+        </set>
+        where container_id in
+        <foreach item="item" index="index" collection="container_ids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+
+    <select id="selectById" resultMap="logisProductMap" parameterType="java.lang.Long">
+        SELECT *
+        FROM logistics_product
+        WHERE logistics_product_id = #{logistics_product_id,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectLogisProShipmentById" resultType="java.util.HashMap" parameterType="java.util.Map">
+        <!--  SELECT lps.* FROM logistics_product lp
+        INNER JOIN logistic_product_shipment lps ON lp.logistics_product_id = lps.logistic_product_id
+        where lp.logistics_product_id = #{logistics_product_id,jdbcType=BIGINT} and enabled = 1 -->
+
+        SELECT lps.* FROM logistics_product lp
+        INNER JOIN logistic_product_shipment lps ON lp.logistics_product_id = lps.logistic_product_id
+        INNER JOIN sub_shipment ss ON ss.sub_shipment_id = lps.sub_shipment_id
+        WHERE lp.logistics_product_id = #{logistics_product_id,jdbcType=BIGINT}
+        AND lp.enabled = 1
+        GROUP BY ss.segment_sequence DESC LIMIT 1
+    </select>
+
+
+    <select id="selectByCondition" resultMap="logisProductMap" parameterType="java.util.Map">
+        select *
+        from logistics_product
+        where 1=1
+
+        <if test="logistics_product_id != null">
+            and logistics_product_id = #{logistics_product_id,jdbcType=BIGINT}
+        </if>
+
+        <if test="container_id != null">
+            and container_id = #{container_id,jdbcType=BIGINT}
+        </if>
+
+        <if test="status != null">
+            and status = #{status,jdbcType=BIGINT}
+        </if>
+
+    </select>
+
+    <!-- 根据condition map 来获取 OrderLogistics list -->
+    <select id="getLogisticsProductListByCondition" resultType="com.intramirror.order.api.model.LogisticsProduct" parameterType="java.util.Map">
+        SELECT *
+        FROM logistics_product
+        WHERE order_logistics_id = #{order_logistics_id,jdbcType=BIGINT} AND vendor_id = #{vendor_id,jdbcType=BIGINT} AND enabled = #{enabled,jdbcType=BIT}
+    </select>
+
+    <update id="updateContainerById" parameterType="java.lang.Long">
+        UPDATE logistics_product
+        SET container_id = 0, `status` = 2
+        WHERE logistics_product_id = #{order_logistics_id,jdbcType=BIGINT}
+    </update>
+
+    <insert id="createLogisticsProduct" parameterType="com.intramirror.order.api.model.LogisticsProduct" keyProperty="logistics_product_id">
+        INSERT INTO logistics_product (logistics_product_id, order_logistics_id, shop_product_sku_id,
+                                       in_price, sale_price, amount,
+                                       fee, deduct_amount, deduct_fee,
+                                       remain_amount, remain_fee, status,
+                                       created_at, updated_at, enabled,
+                                       order_line_num, vendor_id, shipping_fee,
+                                       tax_fee, tax_id, tax_input_amt,
+                                       tracking_num, vat_num, container_id,
+                                       invoice_id, confirmed_at, est_ship_date,
+                                       packed_at, shipped_at, retail_price)
+        VALUES (#{logistics_product_id,jdbcType=BIGINT}, #{order_logistics_id,jdbcType=BIGINT}, #{shop_product_sku_id,jdbcType=BIGINT},
+                                                         #{in_price,jdbcType=DECIMAL}, #{sale_price,jdbcType=DECIMAL}, #{amount,jdbcType=BIGINT},
+                                                         #{fee,jdbcType=DECIMAL}, #{deduct_amount,jdbcType=BIGINT}, #{deduct_fee,jdbcType=DECIMAL},
+                                                         #{remain_amount,jdbcType=BIGINT}, #{remain_fee,jdbcType=DECIMAL}, #{status,jdbcType=BIGINT},
+                                                                                                                           #{created_at,jdbcType=TIMESTAMP},
+                                                                                                                           #{updated_at,jdbcType=TIMESTAMP},
+                                                                                                                           #{enabled,jdbcType=BIT},
+                                                                                                                           #{order_line_num,jdbcType=LONGVARCHAR},
+                                                                                                                           #{vendor_id,jdbcType=BIGINT},
+                                                                                                                           #{shipping_fee,jdbcType=DECIMAL},
+                                                                                                                           #{tax_fee,jdbcType=DECIMAL},
+                                                                                                                           #{tax_id,jdbcType=DECIMAL},
+                                                                                                                           #{tax_input_amt,jdbcType=DECIMAL},
+                #{tracking_num,jdbcType=LONGVARCHAR}, #{vat_num,jdbcType=LONGVARCHAR}, #{container_id,jdbcType=BIGINT},
+                #{invoice_id,jdbcType=TIMESTAMP}, #{confirmed_at,jdbcType=TIMESTAMP}, #{est_ship_date,jdbcType=TIMESTAMP},
+                #{packed_at,jdbcType=TIMESTAMP}, #{shipped_at,jdbcType=TIMESTAMP}, #{retail_price,jdbcType=DECIMAL})
+    </insert>
+
+
+    <select id="getOrderInfoByVendorId" resultType="java.util.HashMap" parameterType="java.util.Map">
+        SELECT DISTINCT
+            a.logistics_product_id,
+            a.amount,
+            a.order_line_num,
+            a.fee,
+            a.vendor_id,
+            a.`status`,
+            a.updated_at,
+            a.created_at,
+            c.order_id,
+            c.order_num,
+            p.product_code,
+            p.product_id,
+            s.sku_id,
+            s.in_price,
+            s.sku_code,
+            pspk.`name`,
+            pspv.`value` AS size,
+            l.user_rec_name,
+            l.user_rec_province,
+            l.user_rec_city,
+            l.user_rec_area,
+            l.user_rec_addr,
+            l.user_rec_mobile,
+            l.user_rec_country,
+            l.user_rec_code,
+            pp.ColorCode,
+            pp.BrandID
+        FROM logistics_product a
+            INNER JOIN order_logistics b ON a.order_logistics_id = b.order_logistics_id
+            INNER JOIN `order` c ON b.order_id = c.order_id
+            INNER JOIN shop_product_sku d ON a.shop_product_sku_id = d.shop_product_sku_id
+            INNER JOIN shop_product e ON d.shop_product_id = e.shop_product_id
+            INNER JOIN product p ON e.product_id = p.product_id
+            INNER JOIN sku s ON d.sku_id = s.sku_id
+            INNER JOIN sku_property sp ON s.sku_id = sp.sku_id
+            INNER JOIN product_sku_property_key pspk
+                ON sp.product_sku_property_key_id = pspk.product_sku_property_key_id
+            INNER JOIN product_sku_property_value pspv
+                ON sp.product_sku_property_value_id = pspv.product_sku_property_value_id
+            INNER JOIN vendor v ON a.vendor_id = v.vendor_id
+            INNER JOIN logistics l ON l.order_logistics_id = b.order_logistics_id
+
+            LEFT JOIN (
+                          SELECT
+                              t_pp.product_id,
+                              max(CASE t_pp.key_name
+                                  WHEN 'ColorCode'
+                                      THEN t_pp.`value`
+                                  ELSE '' END) AS ColorCode,
+                              max(CASE t_pp.key_name
+                                  WHEN 'BrandID'
+                                      THEN t_pp.`value`
+                                  ELSE '' END) AS BrandID
+                          FROM product_property t_pp
+                          WHERE t_pp.enabled = 1 AND (t_pp.key_name = 'BrandID' OR t_pp.key_name = 'ColorCode')
+                          GROUP BY t_pp.product_id
+                      ) pp ON p.product_id = pp.product_id
+        WHERE pspk.name = 'Size' AND a.`status` = 1
+              AND a.enabled = 1 AND a.vendor_id = #{vendor_id,jdbcType=BIGINT} AND a.logistics_product_id = #{logistics_product_id,jdbcType=BIGINT}
+        ORDER BY a.logistics_product_id
+        LIMIT 1
+    </select>
+
+
+    <update id="invalidOrderById" parameterType="java.lang.Long">
+        UPDATE logistics_product
+        SET status = -2
+        WHERE enabled = 1 AND
+              status = -1 AND
+              logistics_product_id = #{logisticsProductId,jdbcType=BIGINT}
+    </update>
+
+    <update id="addStockLocation" parameterType="map">
+        UPDATE logistics_product SET stock_location = #{stockLocation,jdbcType=VARCHAR}
+        WHERE logistics_product_id = #{logisProductId,jdbcType=BIGINT}
+    </update>
+</mapper>

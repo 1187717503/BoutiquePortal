@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.intramirror.order.core.mapper.ShipmentMapper">
+	<resultMap id="BaseResultMap" type="com.intramirror.order.api.model.Shipment" >
+	    <id column="shipment_id" property="shipmentId" jdbcType="BIGINT" />
+	    <result column="ship_to_geography" property="shipToGeography" jdbcType="VARCHAR" />
+	    <result column="ship_from_location_id" property="shipFromLocationId" jdbcType="INTEGER" />
+	    <result column="stock_location" property="stockLocation" jdbcType="VARCHAR" />
+	    <result column="status" property="status" jdbcType="BIGINT" />
+	    <result column="shipment_category" property="shipmentCategory" jdbcType="BIGINT" />
+	    <result column="vendor_id" property="vendorId" jdbcType="BIGINT" />
+	    <result column="shipment_no" property="shipmentNo" jdbcType="VARCHAR" />
+	    <result column="to_type" property="toType" jdbcType="INTEGER" />
+	    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+	    <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+  	</resultMap>
+
+	<resultMap id="BaseResultMap1" type="com.intramirror.order.api.vo.LogisticsProductVO">
+		<result column="logistics_product_id" property="logisticsProductId" jdbcType="VARCHAR" />
+		<result column="order_line_num" property="orderLineNum" jdbcType="VARCHAR" />
+		<result column="order_num" property="orderNum" jdbcType="VARCHAR" />
+		<result column="order_id" property="orderId" jdbcType="BIGINT" />
+		<result column="user_id" property="userId" jdbcType="BIGINT" />
+	</resultMap>
+
+	<insert id="save" parameterType="com.intramirror.order.api.model.Shipment" >
+	INSERT INTO shipment(ship_to_geography,consignee,ship_to_addr,ship_to_district,ship_to_city,ship_to_province,ship_to_country,`status`,created_at,updated_at)
+VALUES( #{shipToGeography,jdbcType=VARCHAR},#{consignee,jdbcType=VARCHAR},#{shipToAddr,jdbcType=VARCHAR},#{shipToDistrict,jdbcType=VARCHAR},
+#{shipToCity,jdbcType=VARCHAR},#{shipToProvince,jdbcType=VARCHAR},#{shipToCountry,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},#{createdAt,jdbcType=TIMESTAMP},#{updatedAt,jdbcType=TIMESTAMP})
+	
+	</insert>
+	<insert id="saveShipmentByOrderId" parameterType="com.intramirror.order.api.model.Shipment" >
+    	INSERT INTO shipment(ship_to_geography,`status`,created_at,updated_at,shipment_no,vendor_id,shipment_category,ship_from_location_id
+    	,geography_id,from_type,from_ref_id,to_type,to_ref_id)
+VALUES(#{shipToGeography,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},
+#{createdAt,jdbcType=TIMESTAMP},#{updatedAt,jdbcType=TIMESTAMP},
+#{shipmentNo,jdbcType=VARCHAR},#{vendorId,jdbcType=BIGINT},#{shipmentCategory,jdbcType=BIGINT},#{shipFromLocationId}
+,#{geographyId},#{fromType},#{fromRefId},#{toType},#{toRefId});
+  	</insert>
+  
+  <select id="selectShipmentByOrder" resultType="java.util.HashMap"  parameterType="java.util.Map">
+ 	SELECT st.shipment_type_id ,ac.address_country_id 
+	FROM shipping_segment ss
+	INNER JOIN shipping_routing sr ON (sr.shipping_routing_id = ss.shipping_routing_id)
+	INNER JOIN vendor_shipping_routing vsr ON (vsr.vendor_shipping_routing_id = sr.shipping_routing_id)
+	INNER JOIN shipment_type st ON (st.shipment_type_id = ss.shipment_type_id)
+	INNER JOIN address_country ac ON (ac.address_country_id = sr.consignee_country_id)
+	INNER JOIN geography g ON (ac.geography_id = g.geography_id)
+	INNER JOIN shipping_provider  sp ON (sp.shipping_provider_id = ss.shipping_provider_id)
+	WHERE ss.shipping_routing_id = (SELECT shipping_routing_id FROM shipping_routing 
+	WHERE consigner_country_id = #{consigner_country_id,jdbcType=BIGINT} and consignee_country_id =#{consignee_country_id,jdbcType=BIGINT}) AND vsr.vendor_id=#{vendor_id,jdbcType=BIGINT} AND ss.segment_sequence IN (1,2,3) GROUP BY ss.segment_sequence ASC LIMIT 1;
+  </select>
+  
+  <select id="getShipmentByStatus" resultType="java.util.HashMap"  parameterType="java.util.Map">
+  		SELECT * FROM shipment
+		WHERE `status` = #{status,jdbcType=BIGINT} AND ship_to_geography = #{shipToCountry,jdbcType=VARCHAR}	
+  </select>
+  
+  <select id="getShippmentByType" resultType="java.util.HashMap"  parameterType="java.util.Map">
+  SELECT sp.*,ss.segment_sequence,ss.shipping_segment_id
+	FROM shipping_segment ss
+	INNER JOIN shipping_routing sr ON (sr.shipping_routing_id = ss.shipping_routing_id)
+	INNER JOIN vendor_shipping_routing vsr ON (vsr.shipping_routing_id = sr.shipping_routing_id)
+	INNER JOIN shipment_type st ON (st.shipment_type_id = ss.shipment_type_id)
+	INNER JOIN address_country ac ON (ac.address_country_id = sr.consignee_country_id)
+	INNER JOIN geography g ON (ac.geography_id = g.geography_id)
+	INNER JOIN shipping_provider  sp ON (sp.shipping_provider_id = ss.shipping_provider_id)
+	WHERE ss.shipping_routing_id = (SELECT shipping_routing_id FROM shipping_routing 
+	WHERE consigner_country_id = #{consigner_country_id,jdbcType=BIGINT} and consignee_country_id =#{consignee_country_id,jdbcType=BIGINT})
+	AND vsr.vendor_id=#{vendor_id,jdbcType=BIGINT} AND ss.segment_sequence IN (1,2,3) and ss.enabled = 1 GROUP BY ss.segment_sequence ASC;
+  </select>
+  
+  
+   <insert id="test" parameterType="java.util.Map">
+INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_addr,ship_to_district,ship_to_city,ship_to_province,ship_to_country,`status`,created_at,updated_at,shipment_id)
+ VALUES(
+ #{shippingSegmentId,jdbcType=BIGINT},#{segmentSequence,jdbcType=BIGINT},#{consignee,jdbcType=VARCHAR},
+ #{shipToAddr,jdbcType=VARCHAR},#{shipToDistrict,jdbcType=VARCHAR},#{shipToCity,jdbcType=VARCHAR},
+ #{shipToProvince,jdbcType=VARCHAR},#{shipToCountry,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},#{createdAt,jdbcType=TIMESTAMP},#{updatedAt,jdbcType=TIMESTAMP},#{shipmentId,jdbcType=BIGINT}
+);
+  </insert>
+  
+  <select id="getShipmentsByVendor" resultType="java.util.HashMap"  parameterType="java.util.Map">
+  SELECT s.* FROM shipment s
+  INNER JOIN sub_shipment sub on sub.shipment_id = s.shipment_id
+  INNER JOIN shipping_segment ss ON sub.shipping_segment_id = ss.shipping_segment_id
+	WHERE s.vendor_id = #{vendorId,jdbcType=BIGINT} AND s.`status` = #{status,jdbcType=BIGINT}
+	AND s.ship_to_geography = #{shipToGeography,jdbcType=VARCHAR}
+	AND s.ship_from_location_id = #{shipFromLocationId,jdbcType=INTEGER}
+	AND ss.enabled = 1 AND ss.shipment_type_id = 3
+	GROUP BY s.shipment_no
+  </select>
+  
+  <select id="getShipmentTypeById" resultType="java.util.HashMap"  parameterType="java.util.Map">
+	  SELECT ss.shipment_type_id,s.*  FROM sub_shipment sub
+		INNER JOIN shipment s ON (sub.shipment_id = s.shipment_id)
+		INNER JOIN shipping_segment ss ON (sub.shipping_segment_id = ss.shipping_segment_id)
+		INNER JOIN shipment_type st ON (ss.shipment_type_id = st.shipment_type_id)
+		WHERE sub.shipment_id=#{shipmentId,jdbcType=BIGINT} AND ss.enabled = 1
+		GROUP BY ss.segment_sequence ASC LIMIT 1;
+  </select>
+  
+   <select id="getShipmentInfoById" resultType="java.util.HashMap"  parameterType="java.util.Map">
+	  SELECT ss.shipment_type_id,s.*,i.invoice_num,i.invoice_date,sl.stock_location  FROM sub_shipment sub
+		INNER JOIN shipment s ON (sub.shipment_id = s.shipment_id)
+		INNER JOIN shipping_segment ss ON (sub.shipping_segment_id = ss.shipping_segment_id)
+		INNER JOIN shipment_type st ON (ss.shipment_type_id = st.shipment_type_id)
+		LEFT JOIN invoice i ON (s.shipment_id = i.shipment_id and i.enabled = 1 and i.type = 1)
+		left JOIN stock_location sl on sl.ship_from_location_id = s.ship_from_location_id
+		WHERE sub.shipment_id=#{shipmentId,jdbcType=BIGINT}
+		GROUP BY ss.segment_sequence ASC LIMIT 1;
+  </select>
+  
+   <select id="getVendorCodeById" resultType="java.lang.String"  parameterType="java.lang.Long">
+	  SELECT vendor_code FROM vendor
+		WHERE vendor_id=#{vendorId,jdbcType=BIGINT};
+  </select>
+  
+  <select id="getShipmentId" resultType="java.lang.Long"  parameterType="com.intramirror.order.api.model.Shipment">
+  	SELECT shipment_id FROM shipment
+	WHERE vendor_id=#{vendorId,jdbcType=BIGINT} AND shipment_no = #{shipmentNo,jdbcType=VARCHAR} AND `status` = #{status,jdbcType=BIGINT} AND ship_to_geography = #{shipToGeography,jdbcType=VARCHAR}
+  </select>
+  
+   <select id="getMaxShipmentNo" resultType="java.lang.Integer" parameterType="java.util.Map">
+		select MAX(right(shipment_no,7)) AS maxCode
+		from shipment where shipment_no LIKE "%"#{topName}"%";
+	</select>
+	
+<!-- 	修改shipment状态 -->
+	<update id="updateShipmentStatus" parameterType="java.util.Map">
+		UPDATE shipment
+		SET `status` = #{status,jdbcType=BIGINT}
+		<if test="ship_at != null">
+			, shiped_time = #{ship_at,jdbcType=TIMESTAMP}
+		</if>
+		WHERE shipment_id=#{shipmentId,jdbcType=BIGINT}
+	</update>
+	
+<!-- 	根据shipmentId查询shipment对象 -->
+	<select id="selectShipmentById" resultMap="BaseResultMap" parameterType="java.util.Map">
+		select * from shipment
+		where shipment_id=#{shipmentId,jdbcType=BIGINT};
+	</select>
+	
+<!-- 	根据container查询shipment列表 -->
+<select id="selectContainerId" resultType="com.intramirror.order.api.model.Shipment" parameterType="java.util.Map">
+		SELECT * FROM shipment
+		WHERE shipment_id =#{shipmentId,jdbcType=BIGINT}
+	</select>
+	
+	 <delete id="deleteShipmentById" parameterType="java.util.Map">
+  		DELETE FROM shipment 
+		WHERE shipment_id = #{shipmentId,jdbcType=BIGINT}
+  	</delete>
+  	
+<select id="getShipmentNoById" resultType="java.lang.String" parameterType="java.util.Map">
+		SELECT shipment_no FROM shipment
+		where shipment_id = #{shipmentId,jdbcType=BIGINT};
+</select>
+
+	<select id="getShipmentList" resultMap="BaseResultMap" parameterType="java.util.Map">
+		SELECT s.*,sl.stock_location FROM shipment s
+		INNER JOIN container c ON c.shipment_id = s.shipment_id
+		INNER JOIN logistics_product lp on lp.container_id = c.container_id
+		LEFT JOIN stock_location sl ON sl.location_id = s.ship_from_location_id
+		WHERE lp.`status` = 7 and s.vendor_id = #{vendorId}
+		GROUP BY s.shipment_no
+		<if test="sortByName!=null">
+			<if test="sortByName == 'shipment_status'">
+				ORDER BY s.`status`
+			</if>
+			<if test="sortByName == 'geography_name'">
+				ORDER BY s.ship_to_geography
+			</if>
+			<if test="sortByName == 'shipment_no'">
+				ORDER BY s.shipment_no DESC
+			</if>
+		</if>
+	</select>
+
+	<select id="getCustomValue" parameterType="map" resultType="decimal">
+		SELECT sum(lp.in_price) customValue FROM logistics_product lp
+		INNER JOIN container c on c.container_id = lp.container_id
+		WHERE c.shipment_id = #{shipmentId}
+	</select>
+	
+	<select id="getlogisticsMilestone" parameterType="long" resultMap="BaseResultMap1">
+		SELECT lp.logistics_product_id,lp.order_line_num,o.order_id,o.order_num,o.user_id FROM logistics_product lp
+		INNER JOIN order_logistics ol on ol.order_logistics_id = lp.order_logistics_id
+		INNER JOIN `order` o on ol.order_id = o.order_id
+		INNER JOIN container c on c.container_id = lp.container_id
+		WHERE c.shipment_id = #{shipmentId}
+	</select>
+
+	<insert id="saveMilestone" parameterType="com.intramirror.order.api.vo.LogisticsProductVO">
+		INSERT INTO logistics_milestone(logistics_product_id,order_num,ref_order_id,ref_order_num,
+		user_id,time,type,shipment_code,shipment_type,is_complete,create_time,update_time,dhl_type)
+		VALUE (#{logisticsProductId},#{orderLineNum},#{orderId},#{orderNum},#{userId}
+		,NOW(),#{type},#{awb},#{shipmentType},#{isComplete},NOW(),NOW(),1)
+	</insert>
+
+	<update id="deleteMilestone" parameterType="string">
+		UPDATE logistics_milestone SET is_deleted = 1 WHERE dhl_type = 1 and shipment_code = #{awbNo}
+	</update>
+
+	<select id="getShipmentListByAwbNo" parameterType="string" resultMap="BaseResultMap">
+		SELECT s.* FROM shipment s
+		INNER JOIN sub_shipment ss on ss.shipment_id = s.shipment_id
+		WHERE ss.awb_num in
+		<foreach collection="list" item="awbNo" open="(" close=")" separator=",">
+			#{awbNo}
+		</foreach>
+		GROUP BY s.shipment_id
+	</select>
+</mapper>

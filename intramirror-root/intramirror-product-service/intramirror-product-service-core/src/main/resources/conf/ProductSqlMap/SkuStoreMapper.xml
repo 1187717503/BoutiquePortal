@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.intramirror.product.core.mapper.SkuStoreMapper">
+
+    <resultMap id="BaseResultMap" type="com.intramirror.product.api.model.SkuStore">
+
+        <id column="sku_store_id" property="skuStoreId" jdbcType="BIGINT"/>
+        <result column="sku_id" property="skuId" jdbcType="BIGINT"/>
+        <result column="product_id" property="productId" jdbcType="BIGINT"/>
+        <result column="store" property="store" jdbcType="BIGINT"/>
+        <result column="remind" property="remind" jdbcType="INTEGER"/>
+        <result column="ordered" property="ordered" jdbcType="INTEGER"/>
+        <result column="confirm" property="confirm" jdbcType="INTEGER"/>
+        <result column="ship" property="ship" jdbcType="INTEGER"/>
+        <result column="finished" property="finished" jdbcType="INTEGER"/>
+        <result column="returned" property="returned" jdbcType="INTEGER"/>
+        <result column="changed" property="changed" jdbcType="INTEGER"/>
+        <result column="clear" property="clear" jdbcType="INTEGER"/>
+        <result column="agree_return_rate" property="agreeReturnRate" jdbcType="DECIMAL"/>
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP"/>
+        <result column="enabled" property="enabled" jdbcType="BIT"/>
+        <result column="reserved" property="reserved" jdbcType="BIGINT"/>
+        <result column="confirmed" property="confirmed" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <update id="updateBySkuId" parameterType="java.util.Map">
+
+        update sku_store ss
+        <!-- 取消 -->
+        <if test="statusType == -4 ">
+            <!--         set ss.ordered = ss.ordered - 1  -->
+            set ss.ordered = 0
+        </if>
+
+        <!-- 关闭 -->
+        <if test="statusType == 5 ">
+            set ss.ship = ss.ship - 1, ss.finished = ss.finished + 1
+        </if>
+
+        <!-- 待发货 -->
+        <if test="statusType == 2 ">
+            set ss.ordered = ss.ordered - 1,ss.confirm = ss.confirm + 1
+        </if>
+
+        <!-- 待收货 -->
+        <if test="statusType == 3 ">
+            set ss.confirm = ss.confirm - 1,ss.ship = ss.ship + 1
+        </if>
+
+        <!-- 异常商品，强制清零库存 -->
+        <if test="statusType == 6 ">
+            set ss.`confirmed` = 0,ss.`store` = (0 - abs(cast(ss.`reserved` as signed)))
+        </if>
+        where ss.sku_id = #{skuId,jdbcType=BIGINT}
+
+    </update>
+
+    <update id="confirmSkuStore" parameterType="java.lang.Long">
+        UPDATE sku_store s
+        SET s.reserved = s.reserved - 1,
+        s.confirmed = s.confirmed + 1
+        WHERE sku_store_id = #{skuStoreId,jdbcType=BIGINT}
+    </update>
+
+    <update id="confirmSkuStoreByNegativeStore" parameterType="java.lang.Long">
+        UPDATE sku_store s
+        SET s.store = s.store + 1,
+        s.confirmed = s.confirmed - 1
+        WHERE sku_store_id = #{skuStoreId,jdbcType=BIGINT}
+    </update>
+
+    <update id="cancelSkuStore" parameterType="java.lang.Long">
+        UPDATE sku_store ss, sku s, shop_product_sku sps
+        SET SS.confirmed = SS.confirmed - 1, SS.store = 0
+        WHERE SS.enabled = 1 AND SS.sku_id = s.sku_id
+        AND s.enabled = 1 AND s.sku_id = sps.sku_id
+        AND sps.enabled = 1 AND sps.shop_product_sku_id = #{shopProductSkuId,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectSkuStoreByShopProductSkuId" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        SELECT ss.*
+        FROM sku_store ss
+        INNER JOIN sku s ON (ss.sku_id = s.sku_id AND s.enabled = 1)
+        INNER JOIN shop_product_sku sps ON (s.sku_id = sps.sku_id AND sps.enabled = 1)
+        WHERE sps.enabled = 1 AND sps.shop_product_sku_id = #{shopProductSkuId,jdbcType=BIGINT}
+    </select>
+
+    <select id="listSkuStoreByProductId" resultType="java.util.HashMap" parameterType="java.lang.Long">
+        SELECT
+        sku_store.sku_id,
+        sku_store.sku_store_id,
+        sku_store.store,
+        sku_store.reserved,
+        sku_store.confirmed,
+        sku.`size`
+        FROM sku_store
+        INNER JOIN sku ON sku.sku_id = sku_store.sku_id
+        WHERE sku_store.product_id = #{productId} AND sku_store.enabled = 1;
+    </select>
+
+    <select id="listSkuStoreByProductList" resultType="java.util.HashMap" parameterType="java.util.List">
+        SELECT
+        sku_store.product_id,
+        sku_store.sku_id,
+        sku_store.sku_store_id,
+        sku_store.store,
+        sku_store.reserved,
+        sku_store.confirmed,
+        sku_store.last_check,
+        func_size_map_new(sku_store.product_id,sku.`size`) as size,
+        sku.sku_code as bar_code,
+        product_exception.status as exceptionStatus,
+        product_exception.created_at AS exceptionDate
+        FROM sku_store
+        INNER JOIN sku ON sku.sku_id = sku_store.sku_id
+        LEFT JOIN product_exception ON sku.sku_id = product_exception.sku_id AND product_exception.status != 0
+        WHERE sku_store.product_id IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.product_id}
+        </foreach>
+        AND sku_store.enabled = TRUE AND sku.enabled = TRUE ;
+    </select>
+
+
+    <select id="selectSkuIdByShopProductSkuId" resultType="java.lang.Long" parameterType="java.lang.Long">
+        SELECT sps.sku_id
+        FROM shop_product_sku sps
+        WHERE sps.shop_product_sku_id = #{shopProductSkuId,jdbcType=BIGINT}
+    </select>
+
+    <select id="getSkuStoreBySkuId" resultType="java.util.HashMap">
+        SELECT * FROM sku_store WHERE sku_id in
+        <foreach collection="skuIdString" item="skuId" index="index"
+                 open="(" close=")" separator=",">
+            #{skuId}
+        </foreach>
+    </select>
+
+    <update id="batchExecuteBySql">
+        UPDATE sku_store
+        SET reserved = reserved + #{reservedTwo}, store = store - #{reservedTwo}
+        WHERE sku_id = #{skuId}
+    </update>
+
+    <update id="zeroClearing" parameterType="java.util.Map">
+
+        update `sku_store` ss set ss.`confirmed` = 0,ss.`store` = (0 - abs(cast(ss.`reserved` as signed)))
+        where ss.`enabled` = 1
+        and ss.`product_id` in
+        <foreach collection="productIds" item="productId" index="index"
+                 open="(" close=")" separator=",">
+            #{productId}
+        </foreach>
+        <![CDATA[ and (ss.`last_check` <= #{date,jdbcType=VARCHAR} or ss.`last_check` is null )]]>
+
+    </update>
+
+    <select id="listStockByProductList" resultType="java.util.HashMap" parameterType="java.util.List">
+        SELECT
+        SUM(IF(sku_store.store &lt; 0,0,sku_store.store)) as store,
+        sku_store.product_id
+        FROM sku_store WHERE product_id in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.product_id}
+        </foreach>
+        AND sku_store.enabled=TRUE
+        GROUP BY sku_store.product_id
+    </select>
+
+    <select id="getTotalStockByProductId" resultType="Long" parameterType="Long">
+        SELECT SUM(IF(sku_store.store &lt; 0, 0, sku_store.store)) AS total_stock
+        FROM sku_store
+        WHERE product_id = #{productId} AND sku_store.enabled = TRUE
+
+    </select>
+
+    <select id="listTotalStockByProductIds" resultType="java.util.HashMap">
+        SELECT
+        product_id,
+        SUM(IF(sku_store.store &lt; 0,0,sku_store.store)) AS total_stock
+        FROM sku_store
+        WHERE product_id IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND sku_store.enabled = TRUE
+        GROUP BY product_id
+    </select>
+</mapper>

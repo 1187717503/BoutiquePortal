@@ -1,0 +1,1 @@
+ALTER TABLE `shipment` ADD COLUMN `shipment_category`  int(2) NULL COMMENT '1：发往质检仓的，2：发往用户' AFTER `vendor_id`;

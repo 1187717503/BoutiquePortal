@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.intramirror.order.core.mapper.ContainerMapper" >
+
+   	<resultMap id="BaseResultMap" type="com.intramirror.order.api.model.Container" >
+	    <id column="container_id" property="containerId" jdbcType="BIGINT" />
+	    <result column="container_type" property="containerType" jdbcType="INTEGER" />
+	    <result column="ship_to_geography" property="shipToGeography" jdbcType="VARCHAR" />
+	    <result column="stock_location_id" property="stockLocationId" jdbcType="INTEGER" />
+	    <result column="stock_location" property="stockLocation" jdbcType="INTEGER" />
+	    <result column="status" property="status" jdbcType="INTEGER" />
+	    <result column="height" property="height" jdbcType="BIGINT" />
+	    <result column="width" property="width" jdbcType="BIGINT" />
+	    <result column="length" property="length" jdbcType="BIGINT" />
+	    <result column="weight" property="weight" jdbcType="DECIMAL" />
+	    <result column="barcode" property="barcode" jdbcType="VARCHAR" />
+	    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+	    <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+	    <result column="shipment_id" property="shipmentId" jdbcType="BIGINT" />
+  	</resultMap>
+	
+	<insert id="saveContainerByShipment" parameterType="com.intramirror.order.api.model.Container">
+   insert into container(container_type,ship_to_geography,status,height,width,length,weight,barcode,created_at,updated_at,shipment_id)
+values(#{containerType,jdbcType=INTEGER}, #{shipToGeography,jdbcType=VARCHAR},#{status,jdbcType=INTEGER}, #{height,jdbcType=BIGINT},#{width,jdbcType=BIGINT}, #{length,jdbcType=BIGINT}, #{weight,jdbcType=DECIMAL},#{barcode,jdbcType=VARCHAR},#{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP},#{shipmentId,jdbcType=BIGINT})
+  	</insert>
+  
+  
+	<update id="updateContainerByBarcode"  parameterType="com.intramirror.order.api.model.Container" >
+		UPDATE container
+		<trim prefix="set" suffixOverrides=","  suffix=" WHERE barcode = #{barcode,jdbcType=VARCHAR} ">
+			<if test="length != null" >
+			length =  #{length,jdbcType=BIGINT},
+			</if>
+			<if test="width != null" >
+			width =   #{width,jdbcType=DECIMAL},
+			</if>
+			<if test="height != null" >
+			height =   #{height,jdbcType=BIGINT},
+			</if>
+			<if test="weight != null" >
+			weight =   #{weight,jdbcType=BIGINT},
+			</if>
+		</trim>
+  	</update>
+  
+  <select id="selectContainerByBarcode" resultMap="BaseResultMap" parameterType="java.util.Map" >
+  		select c.*,sl.stock_location from container c
+  		LEFT JOIN stock_location sl ON sl.location_id = c.ship_from_location_id
+		where c.barcode =  #{barcode,jdbcType=VARCHAR} and c.status = #{status,jdbcType=INTEGER}
+  </select>
+  
+   <select id="selectContainerById" resultMap="BaseResultMap" parameterType="java.util.Map" >
+  		select * from container
+		where container_id =  #{container_id,jdbcType=BIGINT}
+  </select>
+  
+  <update id="updateContainerBystatus" parameterType="java.util.Map">
+  	UPDATE container
+		<trim prefix="set" suffixOverrides=","  suffix=" WHERE container_id = #{containerId,jdbcType=BIGINT} ">
+			<if test="status != null" >
+			 status =  #{status,jdbcType=BIGINT},
+			</if>
+		</trim>
+  </update>
+  
+  
+  
+  <update id="updateContainerByCondition" parameterType="java.util.Map">
+  	update container
+    <set >
+      <if test="shipment_id != null" >
+        shipment_id = #{shipment_id,jdbcType=BIGINT},
+      </if>
+	  <if test="ship_from_location_id != null">
+		  ship_from_location_id = #{ship_from_location_id,jdbcType=INTEGER}
+	  </if>
+    </set>
+     where 1=1
+     
+   <if test="container_id != null" >
+       and container_id = #{container_id,jdbcType=BIGINT} 
+   </if>
+    
+   <if test="barcode != null" >
+       and barcode = #{barcode,jdbcType=VARCHAR} 
+   </if>
+   
+  </update>
+  
+  <delete id="deleteContainerById" parameterType="java.util.Map">
+  		DELETE FROM container 
+		WHERE container_id = #{containerId,jdbcType=BIGINT}
+  </delete>
+  
+<!--   生成条形码sql -->
+	<select id="getMaxBarcode" resultType="java.lang.Integer">
+		select MAX(right(barcode,7)) AS maxCode
+		from container;
+	</select>
+	
+
+  <select id="getContainerList" resultType="java.util.HashMap"  parameterType="java.util.Map">
+	SELECT c.container_id,c.barcode,c.ship_to_geography,s.`status` as shipment_status,s.shipment_no,s.shipment_id,
+	c.`status` as container_status,c.barcode,
+	(SELECT count(lp.logistics_product_id) FROM logistics_product lp 
+	WHERE lp.container_id = c.container_id AND lp.enabled = 1 and lp.status = 7) as product_qty
+	FROM container c
+	INNER JOIN shipment s ON c.shipment_id = s.shipment_id
+	WHERE s.vendor_id =  #{vendorId,jdbcType=BIGINT}  
+	
+	<choose>
+        <when test="shipmentStatus != null and shipmentStatus != ''">
+            and s.`status` = #{shipmentStatus,jdbcType=BIGINT}
+        </when>
+        <otherwise>
+            and (s.`status` = 1 or s.`status` = 2)
+        </otherwise>
+    </choose>
+    
+    <if test="ship_to_geography != null" >
+		and (c.ship_to_geography = #{ship_to_geography,jdbcType=VARCHAR})
+    </if>
+	
+			
+    <if test="shipment_status != null" >
+      	order by s.`status` desc
+    </if>
+    		
+    <if test="shipment_no != null" >
+      	order by s.shipment_no desc
+    </if>
+    		
+    <if test="geography_name != null" >
+      	order by c.ship_to_geography asc
+    </if>
+	
+  </select>
+
+	<select id="getShipmentList" resultType="java.util.HashMap"  parameterType="java.util.Map">
+		SELECT * FROM container where shipment_id = #{shipmentId,jdbcType=BIGINT} GROUP BY created_at ASC;
+	</select>
+	
+	<select id="getContainerCount" resultType="java.lang.Integer" parameterType="long">
+		SELECT count(1) FROM logistics_product lp
+		INNER JOIN container c on lp.container_id = c.container_id
+		 WHERE vendor_id = #{vendorId,jdbcType=BIGINT} and lp.`status` = 7
+	</select>
+	
+	<update id="updateContainerShipment" parameterType="java.util.Map">
+		update container
+			SET shipment_id=#{shipment_id,jdbcType=BIGINT}  
+			where container_id= #{container_id,jdbcType=BIGINT}  
+	</update>
+	
+	<update id="updateContainerById"  parameterType="java.util.Map" >
+		UPDATE container
+		<trim prefix="set" suffixOverrides=","  suffix=" WHERE container_id = #{container_id,jdbcType=BIGINT} ">
+			<if test="length != null" >
+			 length =  #{length,jdbcType=BIGINT},
+			</if>
+			<if test="width != null" >
+			width =   #{width,jdbcType=DECIMAL},
+			</if>
+			<if test="height != null" >
+			height =   #{height,jdbcType=BIGINT},
+			</if>
+			<if test="weight != null" >
+			weight =   #{weight,jdbcType=BIGINT},
+			</if>
+			<if test="updated_at != null" >
+			 updated_at =  #{updated_at,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+  	</update>
+  	
+  	<select id="getListByShipmentId" resultType="java.util.HashMap"  parameterType="java.util.Map">
+		SELECT * FROM container where shipment_id = #{shipmentId,jdbcType=BIGINT}
+		<if test="status != null" >
+		and `status`=#{status}
+		</if>
+		GROUP BY created_at ASC;
+	</select>
+	
+	<select id="getContainerById" resultType="java.util.HashMap"  parameterType="java.util.Map">
+		SELECT * FROM container where container_id = #{containerId,jdbcType=BIGINT};
+	</select>
+</mapper>

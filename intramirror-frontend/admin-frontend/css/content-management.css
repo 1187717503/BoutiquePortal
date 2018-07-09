@@ -1,0 +1,156 @@
+.control-pannel {
+    height: 60px;
+    display: flex;
+    line-height: 60px;
+    justify-content: space-between;
+}
+
+input.discount-input {
+    width: 35%;
+    border-bottom: 2px solid #871b55;
+    margin: 0;
+    box-shadow: none;
+}
+
+input.stock-input {
+    width: 40%;
+    border-bottom: 2px solid #871b55;
+    margin: 0;
+    box-shadow: none;
+    text-align: center;
+}
+
+.has-labe-input {
+    display: flex;
+    margin-top: 1rem;
+}
+
+.div-label-text {
+    width: 25%;
+    padding: 5px 5px 0px 0px;
+}
+
+.left-label-text {
+    color: #898989;
+    font-size: 1em;
+    text-align: left;
+    margin-top: 30px;
+}
+
+.center-label-text {
+    color: #000;
+    margin: 5px;
+    line-height: 47px
+}
+.center-label-text.active {
+    color: #000 !important;
+}
+
+.content-seach-btn{
+    height: 47px;
+    line-height: 47px;
+    text-align: right;
+}
+
+.head-detail-row .list-detail-item:nth-child(1) {
+    width: 17%;
+}
+.head-detail-row .list-detail-item:nth-child(2) {
+    width: 17%;
+}
+.head-detail-row .list-detail-item:nth-child(3) {
+    width: 17%;
+}
+.head-detail-row .list-detail-item:nth-child(4) {
+    width: 17%;
+}
+.head-detail-row .list-detail-item:nth-child(5) {
+    width: 16%;
+}
+.head-detail-row .list-detail-item:nth-child(6) {
+    width: 16%;
+}
+.head-detail-row .list-detail-item:nth-child(7) {
+    width: 30%;
+    text-align: center;
+}
+
+.list-detail-row .list-detail-item:nth-child(1) {
+    width: 17%;
+}
+.list-detail-row .list-detail-item:nth-child(2) {
+    width: 17%;
+}
+.list-detail-row .list-detail-item:nth-child(3) {
+    width: 17%;
+}
+.list-detail-row .list-detail-item:nth-child(4) {
+    width: 17%;
+}
+.list-detail-row .list-detail-item:nth-child(5) {
+    width: 16%;
+}
+.list-detail-row .list-detail-item:nth-child(6) {
+    width: 16%;
+}
+.list-detail-row .list-detail-item:nth-child(7) {
+    width: 30%;
+    text-align: center;
+}
+
+.head-detail-row .col {
+    padding: 0px;
+    background-color: #eee;
+}
+.list-detail-row .col {
+    padding: 0px;
+    background-color: #eee;
+}
+.row .col.s8 {
+    margin-left: 0px;
+}
+
+.head-detail-row .list-detail-item.col {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+.head-detail-row.detail-head {
+    min-width: 1075px;
+}
+.list-detail-row .list-detail-item.col {
+    margin-left: 0px;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+.list-detail-row.detail-item {
+    min-width: 1075px;
+}
+
+
+.goods .row {
+    margin-left: 0rem;
+    margin-right: 0rem;
+}
+
+.has-labe-input .discount-input.sale-datepicker {
+    text-align: center;
+    width: 150px;
+}
+
+.has-labe-input .mdi-editor-insert-invitation {
+    font-size: 30px;
+    margin-top: 12px;
+    padding-right: 12px;
+}
+
+.has-labe-input .discount-input {
+    text-align: center;
+}
+
+.z-depth-2 {
+    padding: 0px 12px 0 12px;
+}
+
+.nav-wrapper {
+    background: #FAFAFA;
+}

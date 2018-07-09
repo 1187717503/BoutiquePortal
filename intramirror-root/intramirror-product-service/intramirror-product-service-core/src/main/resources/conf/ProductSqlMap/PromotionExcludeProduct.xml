@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.intramirror.product.core.mapper.PromotionExcludeProductMapper">
+
+    <select id="selectByParameter" parameterType="com.intramirror.product.api.model.PromotionExcludeProduct" resultType="java.util.Map">
+        SELECT
+        ep.promotion_id AS promotionId,
+        ep.promotion_exclude_product_id AS ruleId,
+        ep.product_id AS productId,
+        p.designer_id AS `designerId`,
+        p.color_code AS `colorCode`,
+        p.name AS `productName`,
+        v.vendor_name AS `vendorName`
+        FROM `t_promotion_exclude_product` ep
+        INNER JOIN product p on p.product_id = ep.product_id
+        INNER JOIN vendor v on v.vendor_id = p.vendor_id
+        WHERE ep.enabled=1
+        <if test="promotionExcludeProductId != null">
+            AND ep.`promotion_exclude_product_id` = #{promotionExcludeProductId,jdbcType=BIGINT}
+        </if>
+        <if test="promotionId != null">
+            AND ep.`promotion_id` = #{promotionId,jdbcType=BIGINT}
+        </if>
+        <if test="productId != null">
+            AND ep.`product_id` = #{productId,jdbcType=BIGINT}
+        </if>
+    </select>
+
+    <insert id="insertPromotionExcludeProduct" keyProperty="promotionExcludeProductId"
+            parameterType="com.intramirror.product.api.model.PromotionExcludeProduct">
+        insert into `t_promotion_exclude_product`(`promotion_id` ,`product_id` )
+        values
+        <foreach collection="productIds" item="item" index="index" separator=",">
+            (#{promotionId,jdbcType=BIGINT},#{item})
+        </foreach>
+    </insert>
+
+    <update id="deletePromotionExcludeProduct" parameterType="java.lang.Long">
+        update `t_promotion_exclude_product` set enabled = false where `promotion_exclude_product_id` in
+        <foreach collection="ruleIds" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="getPromotionProductIdByParameter" parameterType="java.util.Map" resultType="java.lang.Long">
+        SELECT ep.product_id AS productId
+        FROM `t_promotion_exclude_product` ep
+        where ep.`promotion_id` = #{promotionId,jdbcType=BIGINT} and ep.enabled=1
+        AND ep.`product_id` in
+        <foreach collection="productIds" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+
+    </select>
+
+    <update id="updatePromotionSaveTimesExcludeProduct" parameterType="java.lang.Long">
+        update t_promotion set save_at = now()
+        where promotion_id in(
+        select promotion_id from t_promotion_exclude_product where `promotion_exclude_product_id` in
+        <foreach collection="ruleIds" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>)
+    </update>
+
+</mapper>

@@ -1,0 +1,835 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.intramirror.product.core.mapper.PromotionRuleMapper">
+
+
+    <select id="listPromotionByBanner" parameterType="Long" resultType="java.util.Map">
+        SELECT
+          start_time AS startTime,
+          promotion_name AS promotionName,
+          updated_at AS updatedAt,
+          banner_id AS bannerId,
+          poster_img AS posterImg,
+          banner_img AS bannerImg,
+          created_at as createdAt,
+          promotion_id AS  promotionId,
+          enabled AS enabled
+        FROM t_promotion WHERE enabled=TRUE AND banner_id = #{bannerId}
+    </select>
+
+    <select id="listExcludeRulePromotion" parameterType="Long" resultType="java.util.Map">
+        SELECT tpir.`promotion_exclude_rule_id` AS ruleId,
+          tpir.`promotion_id` AS promotionId,
+          tpir.`vendor_id` AS vendorId,
+          CASE tpir.`vendor_id` WHEN -1 THEN 'ALL Boutiques' ELSE v.`vendor_name` END AS vendorName,
+          tpir.`season_code` AS seasonCode,
+          tpir.`brands`,
+          tpir.`categorys`
+        FROM `t_promotion_exclude_rule` tpir
+        LEFT JOIN `vendor` v ON (v.`vendor_id` = tpir.`vendor_id` AND v.`enabled` = 1)
+        WHERE tpir.`promotion_id` = #{promotionId}
+        and tpir.`enabled` = 1
+        ORDER BY  tpir.`created_at` DESC
+    </select>
+
+    <select id="listIncludeRulePromotion" parameterType="Long" resultType="java.util.Map">
+        SELECT tpir.`promotion_include_rule_id` AS ruleId,
+          tpir.`promotion_id` AS promotionId,
+          tpir.`vendor_id` AS vendorId,
+          CASE tpir.`vendor_id` WHEN -1 THEN 'ALL Boutiques' ELSE v.`vendor_name` END AS vendorName,
+          tpir.`season_code` AS seasonCode,
+          tpir.`brands`,
+          tpir.`categorys`
+        FROM `t_promotion_include_rule` tpir
+        LEFT JOIN `vendor` v ON (v.`vendor_id` = tpir.`vendor_id` AND v.`enabled` = 1)
+        WHERE tpir.`promotion_id` = #{promotionId}
+         and tpir.enabled = 1
+         ORDER BY  tpir.`created_at` DESC
+    </select>
+
+    <insert id="insertIncludeRule" keyProperty="ruleId" useGeneratedKeys="true"
+            parameterType="com.intramirror.product.api.model.PromotionRule">
+        INSERT INTO t_promotion_include_rule
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            `promotion_id`,
+            <if test="seasonCodes != null and seasonCodes.size() > 0">
+                `season_code`,
+            </if>
+            <if test="vendorId != null">
+                `vendor_id`,
+            </if>
+            <if test="categorys != null">
+                `categorys`,
+            </if>
+            <if test="brands != null">
+                `brands`,
+            </if>
+            `created_at`
+        </trim>
+        VALUES
+        <if test="seasonCodes != null and seasonCodes.size() > 0">
+            <foreach collection="seasonCodes" index="index" item="item" separator=",">
+                (#{promotionId, jdbcType=BIGINT},
+                <if test="seasonCodes != null and seasonCodes.size() > 0">
+                    #{item},
+                </if>
+                <if test="vendorId != null">
+                    #{vendorId,jdbcType=BIGINT},
+                </if>
+                <if test="categorys != null">
+                    #{categorys,jdbcType=LONGVARCHAR},
+                </if>
+                <if test="brands != null">
+                    #{brands,jdbcType=LONGVARCHAR},
+                </if>
+                NOW())
+            </foreach>
+        </if>
+    </insert>
+
+    <insert id="insertExcludeRule" keyProperty="ruleId" useGeneratedKeys="true"
+            parameterType="com.intramirror.product.api.model.PromotionRule">
+        INSERT INTO t_promotion_exclude_rule
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            `promotion_id`,
+            <if test="seasonCodes != null and seasonCodes.size() > 0">
+                `season_code`,
+            </if>
+            <if test="vendorId != null">
+                `vendor_id`,
+            </if>
+            <if test="categorys != null">
+                `categorys`,
+            </if>
+            <if test="brands != null">
+                `brands`,
+            </if>
+            `created_at`
+        </trim>
+        VALUES
+        <if test="seasonCodes != null and seasonCodes.size() > 0">
+            <foreach collection="seasonCodes" index="index" item="item" separator=",">
+                (#{promotionId, jdbcType=BIGINT},
+                <if test="seasonCodes != null and seasonCodes.size() > 0">
+                    #{item},
+                </if>
+                <if test="vendorId != null">
+                    #{vendorId,jdbcType=BIGINT},
+                </if>
+                <if test="categorys != null">
+                    #{categorys,jdbcType=LONGVARCHAR},
+                </if>
+                <if test="brands != null">
+                    #{brands,jdbcType=LONGVARCHAR},
+                </if>
+                NOW())
+            </foreach>
+        </if>
+    </insert>
+
+    <insert id="insertIncludeRuleDetail" keyProperty="promotionIncludeId" useGeneratedKeys="true"
+            parameterType="com.intramirror.product.api.model.PromotionInclude">
+        INSERT INTO t_promotion_include
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            `promotion_include_rule_id`,
+            `promotion_id`,
+            <if test="seasonCode != null">
+                `season_code`,
+            </if>
+            <if test="vendorId != null">
+                `vendor_id`,
+            </if>
+            <if test="categoryId != null">
+                `category_id`,
+            </if>
+            <if test="brandId != null">
+                `brand_id`,
+            </if>
+            `created_at`,`updated_at`
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            #{promotionIncludeRuleId, jdbcType=BIGINT},
+            #{promotionId, jdbcType=BIGINT},
+            <if test="seasonCode != null">
+                #{seasonCode,jdbcType=BIGINT},
+            </if>
+            <if test="vendorId != null">
+                #{vendorId,jdbcType=BIGINT},
+            </if>
+            <if test="categoryId != null">
+                #{categoryId,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="brandId != null">
+                #{brandId,jdbcType=LONGVARCHAR},
+            </if>
+            NOW(), NOW()
+        </trim>
+    </insert>
+
+    <insert id="insertExcludeRuleDetail" keyProperty="promotionExcludeId" useGeneratedKeys="true"
+            parameterType="com.intramirror.product.api.model.PromotionExclude">
+        INSERT INTO t_promotion_exclude
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            `promotion_exclude_rule_id`,
+            `promotion_id`,
+            <if test="seasonCode != null">
+                `season_code`,
+            </if>
+            <if test="vendorId != null">
+                `vendor_id`,
+            </if>
+            <if test="categoryId != null">
+                `category_id`,
+            </if>
+            <if test="brandId != null">
+                `brand_id`,
+            </if>
+            `created_at`,`updated_at`
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            #{promotionExcludeRuleId, jdbcType=BIGINT},
+            #{promotionId, jdbcType=BIGINT},
+            <if test="seasonCode != null">
+                #{seasonCode,jdbcType=BIGINT},
+            </if>
+            <if test="vendorId != null">
+                #{vendorId,jdbcType=BIGINT},
+            </if>
+            <if test="categoryId != null">
+                #{categoryId,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="brandId != null">
+                #{brandId,jdbcType=LONGVARCHAR},
+            </if>
+            NOW(), NOW()
+        </trim>
+    </insert>
+
+    <delete id="removeIncludeRule">
+        update t_promotion_include_rule set enabled = 0
+        WHERE promotion_include_rule_id IN
+        <foreach item="item" index="index" collection="ruleIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="removeExcludeRule">
+        update t_promotion_exclude_rule set enabled = 0
+        WHERE promotion_exclude_rule_id IN
+        <foreach item="item" index="index" collection="ruleIds" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="removeIncludeRuleDetail" parameterType="Long">
+        DELETE FROM t_promotion_include WHERE promotion_include_rule_id = #{ruleId}
+    </delete>
+
+    <delete id="removeExcludeRuleDetail" parameterType="Long">
+        DELETE FROM t_promotion_exclude WHERE promotion_exclude_rule_id = #{ruleId}
+    </delete>
+
+    <update id="updateIncludeRule" parameterType="com.intramirror.product.api.model.PromotionInclude">
+        UPDATE t_promotion_include_rule SET
+        <trim prefix=" " suffixOverrides=",">
+            <choose>
+                <when test="seasonCode != null">
+                    `season_code` = #{seasonCode, jdbcType=VARCHAR},
+                </when>
+                <otherwise>
+                    `season_code` = '-1',
+                </otherwise>
+            </choose>
+
+            <choose>
+                <when test="vendorId != null">
+                    `vendor_id` = #{vendorId, jdbcType=BIGINT},
+                </when>
+                <otherwise>
+                    `vendor_id` = -1,
+                </otherwise>
+            </choose>
+
+            <if test="categorys != null">
+                `categorys` = #{categorys, jdbcType=LONGVARCHAR},
+            </if>
+            <if test="brands != null">
+                `brands` = #{brands, jdbcType=LONGVARCHAR},
+            </if>
+            `created_at` = NOW(),
+        </trim>
+        WHERE promotion_include_rule_id = #{ruleId, jdbcType=BIGINT}
+    </update>
+
+    <update id="updateExcludeRule" parameterType="com.intramirror.product.api.model.PromotionExclude">
+        UPDATE t_promotion_exclude_rule SET
+        <trim prefix=" " suffixOverrides=",">
+            <choose>
+                <when test="seasonCode != null">
+                    `season_code` = #{seasonCode, jdbcType=VARCHAR},
+                </when>
+                <otherwise>
+                    `season_code` = '-1',
+                </otherwise>
+            </choose>
+
+            <choose>
+                <when test="vendorId != null">
+                    `vendor_id` = #{vendorId, jdbcType=BIGINT},
+                </when>
+                <otherwise>
+                    `vendor_id` = -1,
+                </otherwise>
+            </choose>
+
+            <if test="categorys != null">
+                `categorys` = #{categorys, jdbcType=LONGVARCHAR},
+            </if>
+            <if test="brands != null">
+                `brands` = #{brands, jdbcType=LONGVARCHAR},
+            </if>
+            `created_at` = NOW(),
+        </trim>
+        WHERE promotion_exclude_rule_id = #{ruleId, jdbcType=BIGINT}
+    </update>
+
+    <select id="listSortColumn" parameterType="Long" resultType="java.util.Map">
+      SELECT promotion_seq_id AS promotionSeqId,
+      promotion_id AS promotionId,
+      `column_name` AS columnName,
+      seq_type AS seqType,
+      `sort`,
+      enabled,
+      description
+      FROM t_promotion_seq
+      WHERE promotion_id = #{promotionId}
+      ORDER BY `sort` ASC
+    </select>
+
+    <update id="updateSortColumn" parameterType="com.intramirror.product.api.entity.promotion.SortPromotion">
+        UPDATE t_promotion_seq SET
+        <trim prefix=" " suffixOverrides=",">
+            <if test="seqType != null">
+                `seq_type` = #{seqType, jdbcType=TINYINT},
+            </if>
+            <if test="sort != null">
+                `sort` = #{sort, jdbcType=INTEGER},
+            </if>
+            <if test="enabled != null">
+                `enabled` = #{enabled, jdbcType=BIT},
+            </if>
+        </trim>
+        WHERE promotion_seq_id = #{promotionSeqId, jdbcType=BIGINT}
+    </update>
+
+    <select id="getVendorSortItem" parameterType="Long" resultType="java.util.Map">
+        SELECT
+          promotion_vendor_id AS promotionVendorId,
+          promotion_id AS promotionId,
+          vendor_id AS vendorId,
+          vendor_name AS name,
+          sort
+        FROM t_promotion_seq_vendor
+        WHERE promotion_id = #{promotionId}
+    </select>
+    <select id="getBrandSortItem" parameterType="Long" resultType="java.util.Map">
+        SELECT
+        promotion_brand_id AS promotionBrandId,
+        promotion_id AS promotionId,
+        brand_id AS brandId,
+        english_name AS name,
+        sort
+        FROM t_promotion_seq_brand
+        WHERE promotion_id = #{promotionId}
+    </select>
+    <select id="getCategorySortItem" parameterType="Long" resultType="java.util.Map">
+        SELECT
+        promotion_category_id AS promotionCategoryId,
+        promotion_id AS promotionId,
+        category_id AS categoryId,
+        name AS name,
+        sort
+        FROM t_promotion_seq_category
+        WHERE promotion_id = #{promotionId} AND level = 2
+    </select>
+
+    <select id="getSimpleSort" parameterType="com.intramirror.product.api.entity.promotion.SortPromotion" resultType="java.util.Map">
+         SELECT promotion_seq_id AS promotionSeqId,
+          promotion_id AS promotionId,
+          `column_name` AS columnName,
+          seq_type AS seqType,
+          `sort`,
+          enabled,
+          description
+      FROM t_promotion_seq
+      WHERE promotion_id = #{promotionId} AND column_name = #{columnName}
+    </select>
+
+    <update id="updateSimpleSort" parameterType="com.intramirror.product.api.entity.promotion.SortPromotion">
+        UPDATE t_promotion_seq SET seq_type=#{seqType}
+        WHERE promotion_id = #{promotionId} AND column_name ={columnName}
+    </update>
+
+    <delete id="removeBrandSortItems" parameterType="Long">
+        DELETE FROM t_promotion_seq_brand
+        WHERE promotion_id = #{promotionId}
+    </delete>
+
+    <delete id="removeVendorSortItems" parameterType="Long">
+        DELETE FROM t_promotion_seq_vendor
+        WHERE promotion_id = #{promotionId}
+    </delete>
+
+    <delete id="removeCategorySortItems" parameterType="Long">
+        DELETE FROM t_promotion_seq_category
+        WHERE promotion_id = #{promotionId}
+    </delete>
+
+    <insert id="insertBrandSort" keyProperty="promotionBrandId" useGeneratedKeys="true"
+            parameterType="com.intramirror.product.api.entity.promotion.BrandSort">
+        INSERT INTO t_promotion_seq_brand
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            `promotion_id`,
+            <if test="brandId != null">
+                `brand_id`,
+            </if>
+            <if test="name != null">
+                `english_name`,
+            </if>
+            <if test="sort != null">
+                `sort`
+            </if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            #{promotionId, jdbcType=BIGINT},
+            <if test="brandId != null">
+                #{brandId, jdbcType=BIGINT},
+            </if>
+            <if test="name != null">
+                #{name, jdbcType=VARCHAR},
+            </if>
+            <if test="sort != null">
+                #{sort, jdbcType=INTEGER}
+            </if>
+        </trim>
+    </insert>
+
+    <insert id="insertVendorSort" keyProperty="promotionVendorId" useGeneratedKeys="true"
+            parameterType="com.intramirror.product.api.entity.promotion.VendorSort">
+        INSERT INTO t_promotion_seq_vendor
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            `promotion_id`,
+            <if test="vendorId != null">
+                `vendor_id`,
+            </if>
+            <if test="name != null">
+                `vendor_name`,
+            </if>
+            <if test="sort != null">
+                `sort`
+            </if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            #{promotionId, jdbcType=BIGINT},
+            <if test="vendorId != null">
+                #{vendorId, jdbcType=BIGINT},
+            </if>
+            <if test="name != null">
+                #{name, jdbcType=VARCHAR},
+            </if>
+            <if test="sort != null">
+                #{sort, jdbcType=INTEGER}
+            </if>
+        </trim>
+    </insert>
+
+    <insert id="insertCategorySort" keyProperty="promotionCategoryId" useGeneratedKeys="true"
+            parameterType="com.intramirror.product.api.entity.promotion.CategorySort">
+        INSERT INTO t_promotion_seq_category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            `promotion_id`,
+            <if test="categoryId != null">
+                `category_id`,
+            </if>
+            <if test="name != null">
+                `name`,
+            </if>
+            <if test="chineseName != null">
+                `chinese_name`,
+            </if>
+            <if test="parentId != null">
+                `parent_id`,
+            </if>
+            <if test="sort != null">
+                `sort`,
+            </if>
+            <if test="level != null">
+                `level`,
+            </if>
+            <if test="showCodeInt != null">
+                `show_code_int`,
+            </if>
+            <if test="coverImg != null">
+                `cover_img`
+            </if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            #{promotionId, jdbcType=BIGINT},
+            <if test="categoryId != null">
+                #{categoryId, jdbcType=BIGINT},
+            </if>
+            <if test="name != null">
+                #{name, jdbcType=VARCHAR},
+            </if>
+            <if test="chineseName != null">
+                #{chineseName, jdbcType=VARCHAR},
+            </if>
+            <if test="parentId != null">
+                #{parentId, jdbcType=BIGINT},
+            </if>
+            <if test="sort != null">
+                #{sort, jdbcType=INTEGER},
+            </if>
+            <if test="level != null">
+                #{level, jdbcType=INTEGER},
+            </if>
+            <if test="showCodeInt != null">
+                #{showCodeInt, jdbcType=BIGINT},
+            </if>
+            <if test="coverImg != null">
+                #{coverImg, jdbcType=LONGVARCHAR}
+            </if>
+        </trim>
+    </insert>
+
+
+    <select id="listBannerPos" resultType="java.util.Map">
+        select t.banner_id as bannerId,
+        t.banner_pos_id as bannerPosId,
+        t.banner_name as bannerName
+        from t_promotion_banner t where t.enabled = true
+        order by t.banner_pos_id;
+    </select>
+
+    <select id="listPromotionByBannerIds" resultType="java.util.Map">
+        SELECT
+        start_time AS startTime,
+        promotion_name AS promotionName,
+        banner_id AS bannerId,
+        promotion_id AS promotionId
+        FROM t_promotion WHERE enabled=TRUE AND banner_id in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        order by banner_id,start_time DESC
+    </select>
+
+    <update id="updateBannerImg" parameterType="com.intramirror.product.api.model.PromotionExclude">
+        UPDATE t_promotion_exclude_rule SET
+        <trim prefix=" " suffixOverrides=",">
+            <choose>
+                <when test="seasonCode != null">
+                    `season_code` = #{seasonCode, jdbcType=VARCHAR},
+                </when>
+                <otherwise>
+                    `season_code` = '-1',
+                </otherwise>
+            </choose>
+
+            <choose>
+                <when test="vendorId != null">
+                    `vendor_id` = #{vendorId, jdbcType=BIGINT},
+                </when>
+                <otherwise>
+                    `vendor_id` = -1,
+                </otherwise>
+            </choose>
+
+            <if test="categorys != null">
+                `categorys` = #{categorys, jdbcType=LONGVARCHAR},
+            </if>
+            <if test="brands != null">
+                `brands` = #{brands, jdbcType=LONGVARCHAR},
+            </if>
+            `created_at` = NOW(),
+        </trim>
+        WHERE promotion_exclude_rule_id = #{ruleId, jdbcType=BIGINT}
+    </update>
+
+    <delete id="removeSnapshotProduct" parameterType="java.lang.Long">
+        DELETE FROM snapshot_product WHERE promotion_id = #{promotionId, jdbcType=BIGINT}
+    </delete>
+
+    <insert id="generateRuleToSnapshotProduct">
+        INSERT INTO snapshot_product (promotion_id, promotion_include_rule_id, product_id, vendor_sort, brand_sort, category_sort,brand_id, brand_name,
+        season_sort)
+        SELECT #{promotionId, jdbcType=BIGINT} AS promotion_id, #{promotionRuleId, jdbcType=BIGINT} AS promotion_include_rule_id,p.product_id, tpsv.sort AS
+        vendor_sort, tpsb.sort AS brand_sort, tpsc.sort AS category_sort, p.brand_id, b.english_name AS brand_name,
+        CASE
+        WHEN p.season_code like '%ss' THEN concat(substring(p.season_code, 1, 2), 1)
+        WHEN p.season_code like '%fw' THEN concat(substring(p.season_code, 1, 2), 2)
+        WHEN p.season_code like 'CarryOver' THEN
+        CASE WHEN DATE_FORMAT(date_add(now(), interval -6 month), '%c') > 6
+        THEN concat(DATE_FORMAT(date_add(now(), interval -6 month), '%y'), 2)
+        ELSE concat(DATE_FORMAT(date_add(now(), interval -6 month), '%y'), 1) END
+        END AS seasonCode
+        FROM product p
+        INNER JOIN shop_product sp ON p.product_id = sp.product_id
+        INNER JOIN brand b ON b.brand_id = p.brand_id
+        LEFT JOIN t_promotion_seq_brand tpsb ON tpsb.promotion_id = #{promotionId, jdbcType=BIGINT} AND tpsb.brand_id = p.brand_id
+        LEFT JOIN t_promotion_seq_vendor tpsv ON tpsv.promotion_id = #{promotionId, jdbcType=BIGINT} AND tpsv.vendor_id = p.vendor_id
+        LEFT JOIN t_promotion_seq_category tpsc ON tpsc.promotion_id = #{promotionId, jdbcType=BIGINT} AND tpsc.category_id = p.category_id
+        WHERE p.enabled=1 AND sp.enabled=1 AND p.vendor_id=#{vendorId, jdbcType=BIGINT} AND p.season_code = #{seasonCode, jdbcType=VARCHAR}
+        AND NOT EXISTS (SELECT product_id FROM snapshot_product where promotion_id=#{promotionId, jdbcType=BIGINT} AND product_id=p.product_id)
+        AND p.category_id IN
+        <foreach item="item" index="index" collection="category" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+        <if test="brandId != null">
+            AND p.brand_id = #{brandId, jdbcType=BIGINT}
+        </if>
+
+    </insert>
+
+    <select id="addProductForIncludeRule">
+        INSERT INTO snapshot_product (promotion_id, promotion_include_rule_id, product_id, vendor_sort, brand_sort, category_sort,brand_id, brand_name,
+        season_sort)
+        SELECT #{promotionId, jdbcType=BIGINT} AS promotion_id, #{promotionRuleId, jdbcType=BIGINT} AS promotion_include_rule_id,p.product_id, tpsv.sort AS
+        vendor_sort, tpsb.sort AS brand_sort, tpsc.sort AS category_sort, p.brand_id, b.english_name AS brand_name,
+        CASE
+        WHEN p.season_code like '%ss' THEN concat(substring(p.season_code, 1, 2), 1)
+        WHEN p.season_code like '%fw' THEN concat(substring(p.season_code, 1, 2), 2)
+        WHEN p.season_code like 'CarryOver' THEN
+        CASE WHEN DATE_FORMAT(date_add(now(), interval -6 month), '%c') > 6
+        THEN concat(DATE_FORMAT(date_add(now(), interval -6 month), '%y'), 2)
+        ELSE concat(DATE_FORMAT(date_add(now(), interval -6 month), '%y'), 1) END
+        END AS seasonCode
+        FROM product p
+        INNER JOIN brand b ON b.brand_id = p.brand_id
+        LEFT JOIN t_promotion_seq_brand tpsb ON tpsb.promotion_id = #{promotionId, jdbcType=BIGINT} AND tpsb.brand_id = p.brand_id
+        LEFT JOIN t_promotion_seq_vendor tpsv ON tpsv.promotion_id = #{promotionId, jdbcType=BIGINT} AND tpsv.vendor_id = p.vendor_id
+        LEFT JOIN t_promotion_seq_category tpsc ON tpsc.promotion_id = #{promotionId, jdbcType=BIGINT} AND tpsc.category_id = p.category_id
+        WHERE p.enabled=1 AND p.vendor_id=#{vendorId, jdbcType=BIGINT} AND p.season_code = #{seasonCode, jdbcType=VARCHAR} AND p.category_id IN
+        <foreach item="item" index="index" collection="category" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+        <if test="brandId != null">
+            AND p.brand_id = #{brandId, jdbcType=BIGINT}
+        </if>
+        AND p.product_id = #{productId, jdbcType=BIGINT}
+        AND NOT EXISTS (SELECT product_id FROM snapshot_product where promotion_id=#{promotionId, jdbcType=BIGINT} AND product_id=#{productId, jdbcType=BIGINT})
+    </select>
+
+    <select id="addProductsForIncludeRule">
+        INSERT INTO snapshot_product (promotion_id, promotion_include_rule_id, product_id, vendor_sort, brand_sort, category_sort,brand_id, brand_name,
+        season_sort)
+        SELECT #{promotionId, jdbcType=BIGINT} AS promotion_id, #{promotionRuleId, jdbcType=BIGINT} AS promotion_include_rule_id,p.product_id, tpsv.sort AS
+        vendor_sort, tpsb.sort AS brand_sort, tpsc.sort AS category_sort, p.brand_id, b.english_name AS brand_name,
+        CASE
+        WHEN p.season_code like '%ss' THEN concat(substring(p.season_code, 1, 2), 1)
+        WHEN p.season_code like '%fw' THEN concat(substring(p.season_code, 1, 2), 2)
+        WHEN p.season_code like 'CarryOver' THEN
+        CASE WHEN DATE_FORMAT(date_add(now(), interval -6 month), '%c') > 6
+        THEN concat(DATE_FORMAT(date_add(now(), interval -6 month), '%y'), 2)
+        ELSE concat(DATE_FORMAT(date_add(now(), interval -6 month), '%y'), 1) END
+        END AS seasonCode
+        FROM product p
+        INNER JOIN brand b ON b.brand_id = p.brand_id
+        LEFT JOIN t_promotion_seq_brand tpsb ON tpsb.promotion_id = #{promotionId, jdbcType=BIGINT} AND tpsb.brand_id = p.brand_id
+        LEFT JOIN t_promotion_seq_vendor tpsv ON tpsv.promotion_id = #{promotionId, jdbcType=BIGINT} AND tpsv.vendor_id = p.vendor_id
+        LEFT JOIN t_promotion_seq_category tpsc ON tpsc.promotion_id = #{promotionId, jdbcType=BIGINT} AND tpsc.category_id = p.category_id
+        WHERE p.enabled=1 AND p.vendor_id=#{vendorId, jdbcType=BIGINT} AND p.season_code = #{seasonCode, jdbcType=VARCHAR} AND p.category_id IN
+        <foreach item="item" index="index" collection="category" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <if test="brandId != null">
+            AND p.brand_id = #{brandId, jdbcType=BIGINT}
+        </if>
+        AND p.product_id IN
+        <foreach item="product" index="index" collection="productIds" open="(" separator="," close=")">
+            #{product}
+        </foreach>
+        AND p.product_id NOT IN (SELECT product_id FROM snapshot_product where promotion_id=#{promotionId, jdbcType=BIGINT} AND product_id IN
+        <foreach item="product1" index="index" collection="productIds" open="(" separator="," close=")">
+            #{product1}
+        </foreach>
+        )
+    </select>
+
+    <delete id="removeExcludeSnapshotProduct">
+        DELETE FROM snapshot_product WHERE exists (
+        SELECT p.product_id FROM product p
+        WHERE p.season_code = #{seasonCode, jdbcType=VARCHAR}
+        AND p.enabled = 1
+        AND p.vendor_id = #{vendorId, jdbcType=BIGINT}
+        AND p.product_id = snapshot_product.product_id
+        AND p.category_id IN
+        <foreach item="item" index="index" collection="category" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <if test="brandId != null">
+            AND p.brand_id = #{brandId, jdbcType=BIGINT}
+        </if>
+        AND snapshot_product.promotion_id = #{promotionId, jdbcType=BIGINT}
+        )
+        AND promotion_id = #{promotionId, jdbcType=BIGINT}
+    </delete>
+
+
+    <delete id="removeExcludeProductFromSnapshotProduct" parameterType="java.lang.Long">
+        DELETE FROM snapshot_product WHERE promotion_id=#{promotionId, jdbcType=BIGINT} AND product_id IN (SELECT product_id FROM t_promotion_exclude_product WHERE promotion_id=#{promotionId, jdbcType=BIGINT} and enabled=1)
+    </delete>
+
+    <select id="getPromotionBoutiqueHasRuleList" parameterType="java.lang.Long" resultType="java.util.Map">
+        SELECT
+          v.vendor_id, v.vendor_name
+        FROM
+          vendor v
+        WHERE v.vendor_id IN
+          (SELECT
+            vendor_id
+          FROM
+            t_promotion_include_rule tpir
+          WHERE tpir.promotion_id = #{promotionId, jdbcType=BIGINT}
+          and tpir.enabled = 1
+          UNION
+          SELECT
+            vendor_id
+          FROM
+            t_promotion_exclude_rule tper
+          WHERE tper.promotion_id = #{promotionId, jdbcType=BIGINT} and   tper.enabled = 1)
+        ORDER BY v.vendor_name
+    </select>
+
+    <select id="getPromotionBoutiqueProductCountBySeason" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+          tpir.season_code,
+          CASE
+            WHEN tpir.season_code like '%ss' THEN concat(substring(tpir.season_code, 1, 2), 1)
+            WHEN tpir.season_code like '%fw' THEN concat(substring(tpir.season_code, 1, 2), 2)
+            WHEN tpir.season_code like 'CarryOver' THEN 1
+            WHEN tpir.season_code like 'CloseOut' THEN 0
+          END AS season_code_sort,
+          COUNT(*) as sum
+        FROM
+          t_promotion_include_rule tpir
+          INNER JOIN snapshot_product sp
+            ON sp.promotion_include_rule_id = tpir.promotion_include_rule_id
+        WHERE tpir.promotion_id = #{promotionId, jdbcType=BIGINT} AND tpir.vendor_id=#{vendorId, jdbcType=BIGINT}
+        and tpir.enabled = 1
+        GROUP BY season_code
+        ORDER BY season_code_sort desc
+    </select>
+
+    <select id="getPromotionBoutiqueExcludeProductCount" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM t_promotion_exclude_product tpep WHERE tpep.promotion_id=#{promotionId, jdbcType=BIGINT}
+    </select>
+
+    <select id="listSeasonIncludeRulePromotion" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT tpir.`promotion_include_rule_id` AS ruleId,
+        tpir.`promotion_id` AS promotionId,
+        tpir.`vendor_id` AS vendorId,
+        CASE tpir.`vendor_id` WHEN -1 THEN 'ALL Boutiques' ELSE v.`vendor_name` END AS vendorName,
+        tpir.`season_code` AS seasonCode,
+        tpir.`brands`,
+        tpir.`categorys`
+        FROM `t_promotion_include_rule` tpir
+        LEFT JOIN `vendor` v ON (v.`vendor_id` = tpir.`vendor_id` AND v.`enabled` = 1)
+        WHERE tpir.`promotion_id` = #{promotionId} and tpir.`enabled` = 1
+        <if test="vendorId != null">
+            AND tpir.`vendor_id` = #{vendorId}
+        </if>
+        <if test="seasonCode != null">
+            AND tpir.`season_code` = #{seasonCode}
+        </if>
+        ORDER BY tpir.`created_at` DESC
+        <if test="pageSize != null">
+            LIMIT #{start}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="listSeasonExcludeRulePromotion" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT tper.`promotion_exclude_rule_id` AS ruleId,
+        tper.`promotion_id` AS promotionId,
+        tper.`vendor_id` AS vendorId,
+        CASE tper.`vendor_id` WHEN -1 THEN 'ALL Boutiques' ELSE v.`vendor_name` END AS vendorName,
+        tper.`season_code` AS seasonCode,
+        tper.`brands`,
+        tper.`categorys`
+        FROM `t_promotion_exclude_rule` tper
+        LEFT JOIN `vendor` v ON (v.`vendor_id` = tper.`vendor_id` AND v.`enabled` = 1)
+        WHERE tper.`promotion_id` = #{promotionId} and tper.`enabled` = 1
+        <if test="vendorId != null">
+            AND tper.`vendor_id` = #{vendorId}
+        </if>
+        <if test="seasonCode != null">
+            AND tper.`season_code` = #{seasonCode}
+        </if>
+        ORDER BY tper.`created_at` DESC
+        <if test="pageSize != null">
+            LIMIT #{start}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="countSeasonIncludeRulePromotion" parameterType="java.util.Map" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM `t_promotion_include_rule` tpir
+        WHERE tpir.`promotion_id` = #{promotionId}
+        and tpir.`enabled` = 1
+        <if test="vendorId != null">
+            AND tpir.`vendor_id` = #{vendorId}
+        </if>
+        <if test="seasonCode != null">
+            AND tpir.`season_code` = #{seasonCode}
+        </if>
+    </select>
+
+    <select id="countSeasonExcludeRulePromotion" parameterType="java.util.Map" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM `t_promotion_exclude_rule` tper
+        WHERE tper.`promotion_id` = #{promotionId}
+        and tper.`enabled` = 1
+        <if test="vendorId != null">
+            AND tper.`vendor_id` = #{vendorId}
+        </if>
+        <if test="seasonCode != null">
+            AND tper.`season_code` = #{seasonCode}
+        </if>
+    </select>
+
+    <update id="updatePromotionRefreshAt">
+        update t_promotion set refresh_at = now()
+        where promotion_id = #{promotionId, jdbcType=BIGINT}
+    </update>
+
+    <update id="updatePromotionSaveTime">
+        update t_promotion set save_at = now()
+        where promotion_id = #{promotionId, jdbcType=BIGINT}
+    </update>
+
+    <update id="updatePromotionSaveTimes">
+        update t_promotion set save_at = now()
+        where promotion_id in
+        (select promotion_id from ${tableName}
+        <where>
+            <if test="tableName == 't_promotion_include_rule'">
+                promotion_include_rule_id
+            </if>
+            <if test="tableName == 't_promotion_exclude_rule'">
+                promotion_exclude_rule_id
+            </if>
+            IN
+            <foreach item="item" index="index" collection="ruleIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </where>
+        )
+    </update>
+
+    <select id="getExcludeProductGroupByTagId" resultType="java.lang.Long" parameterType="java.lang.Long">
+        SELECT tag_id from t_promotion_exclude_product_group
+        where enabled = 1 and tag_id = #{tagId, jdbcType=BIGINT}
+    </select>
+</mapper>

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  * @date 2016年7月4日下午5:16:03
  *
  */
-@Component
+@Component("productServiceProessor")
 public class ServiceProcessor implements BeanPostProcessor{
 
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {

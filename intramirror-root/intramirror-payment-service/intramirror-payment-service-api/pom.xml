@@ -1,26 +1,35 @@
 <?xml version="1.0"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.intramirror</groupId>
+        <artifactId>intramirror-payment-service</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
     <groupId>com.intramirror</groupId>
-    <artifactId>intramirror-payment-service</artifactId>
+    <artifactId>intramirror-payment-service-api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-  </parent>
-  <groupId>com.intramirror</groupId>
-  <artifactId>intramirror-payment-service-api</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>intramirror-payment-service-api</name>
-  <url>http://maven.apache.org</url>
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+    <name>intramirror-payment-service-api</name>
+    <url>http://maven.apache.org</url>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- start payment sdk 注:此依赖如果报错，可能 本地未安装sdk至maven仓库-->
+        <dependency>
+            <groupId>com.ehking.sdk.core</groupId>
+            <artifactId>ehking-sdk-core</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <!-- end payment sdk -->
+
+    </dependencies>
 </project>

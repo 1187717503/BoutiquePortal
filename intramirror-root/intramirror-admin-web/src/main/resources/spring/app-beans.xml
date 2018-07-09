@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/util 
+        http://www.springframework.org/schema/util/spring-util.xsd
+        http://www.springframework.org/schema/tx 
+        http://www.springframework.org/schema/tx/spring-tx.xsd 
+        http://www.springframework.org/schema/aop 
+        http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- start 加载其它Jar的配置文件 -->
+    <import resource="classpath*:/conf/app-datasource.xml"/>
+    <import resource="classpath*:/spring/database.xml"/>
+    <!-- end 加载其它Jar的配置文件 -->
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!-- 开启事务控制的注解支持 -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!--Spring中bean获取的工具类-->
+    <bean id="springContextUtils" class="com.intramirror.web.common.SpringContextUtils"/>
+
+    <!-- start spring 自动注解,及解决ReponseBody中文乱码问题 -->
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+            <bean id="mappingJacksonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>text/plain;charset=utf-8</value>
+                        <value>text/html;charset=UTF-8</value>
+                        <value>text/json;charset=UTF-8</value>
+                        <value>application/json;charset=utf-8</value>
+                    </list>
+                </property>
+                <property name="objectMapper">
+                    <bean class="com.fasterxml.jackson.databind.ObjectMapper">
+                        <property name="dateFormat">
+                            <bean class="java.text.SimpleDateFormat">
+                                <constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss"/>
+                            </bean>
+                        </property>
+                    </bean>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+    <!-- end spring 自动注解,及解决ReponseBody中文乱码问题 -->
+
+
+    <!-- 自动扫描 -->
+    <context:component-scan base-package="com.intramirror">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <bean name="orderProperties" class="com.intramirror.web.common.CommonProperties">
+        <property name="appOrderUrl" value="${app.order.url}"></property>
+        <property name="appCheckUrl" value="${app.check.url}"></property>
+        <property name="ruleExcelPath" value="${price.rule.path}"></property>
+        <property name="priceChangeRulePath" value="${price.change.rule.path}"></property>
+    </bean>
+
+
+    <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+    </bean>
+
+    <bean id="jedisConnectionFactory"
+          class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+        <property name="hostName" value="${spring.redis.host}"/>
+        <property name="port" value="${spring.redis.port}"/>
+        <property name="poolConfig" ref="jedisPoolConfig"/>
+        <property name="usePool" value="true"/>
+    </bean>
+
+
+    <bean id="redisHttpSessionConfiguration" class="org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration">
+        <property name="redisNamespace" value="micro-service"/>
+        <property name="httpSessionStrategy" ref="headerHttpSessionStrategy"/>
+        <property name="maxInactiveIntervalInSeconds" value="172800"/>
+    </bean>
+
+    <bean id="headerHttpSessionStrategy" class="org.springframework.session.web.http.HeaderHttpSessionStrategy">
+        <property name="headerName" value="token"/>
+    </bean>
+
+    <beans profile="test">
+        <context:property-placeholder location="classpath:test/*.properties" ignore-unresolvable="true"/>
+    </beans>
+
+    <beans profile="staging">
+        <context:property-placeholder location="classpath:staging/*.properties" ignore-unresolvable="true"/>
+    </beans>
+
+    <beans profile="test_ci">
+        <context:property-placeholder location="classpath:test_ci/*.properties" ignore-unresolvable="true"/>
+    </beans>
+ 
+    <beans profile="pressure_test">
+        <context:property-placeholder location="classpath:pressure_test/*.properties" ignore-unresolvable="true"/>
+    </beans>
+
+    <beans profile="test_local">
+        <context:property-placeholder location="classpath:test_local/*.properties" ignore-unresolvable="true"/>
+    </beans>
+
+    <beans profile="staging_local">
+        <context:property-placeholder location="classpath:staging_local/*.properties" ignore-unresolvable="true"/>
+    </beans>
+
+    <beans profile="prd">
+        <context:property-placeholder location="classpath:prd/*.properties" ignore-unresolvable="true"/>
+    </beans>
+</beans>

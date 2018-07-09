@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/util 
+        http://www.springframework.org/schema/util/spring-util.xsd
+        http://www.springframework.org/schema/tx 
+        http://www.springframework.org/schema/tx/spring-tx.xsd 
+        ">
+
+    <!-- start 加载其它Jar的配置文件 -->
+    <import resource="classpath*:/conf/app-datasource.xml"/>
+    <import resource="classpath*:/spring/database.xml"/>
+
+    <!-- end 加载其它Jar的配置文件 -->
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!-- 开启事务控制的注解支持 -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!--Spring中bean获取的工具类-->
+    <bean id="springContextUtils" class="com.intramirror.web.util.SpringContextUtils"/>
+
+    <!-- start spring 自动注解,及解决ReponseBody中文乱码问题 -->
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+            <bean id="mappingJacksonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>text/plain;charset=utf-8</value>
+                        <value>text/html;charset=UTF-8</value>
+                        <value>text/json;charset=UTF-8</value>
+                        <value>application/json;charset=utf-8</value>
+                    </list>
+                </property>
+                <property name="objectMapper">
+                    <bean class="com.fasterxml.jackson.databind.ObjectMapper">
+                        <property name="dateFormat">
+                            <bean class="java.text.SimpleDateFormat">
+                                <constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss"/>
+                            </bean>
+                        </property>
+                    </bean>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+    <!-- end spring 自动注解,及解决ReponseBody中文乱码问题 -->
+
+
+    <!-- 自动扫描 -->
+    <context:component-scan base-package="com.intramirror">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+
+    <!-- 初始化基础配置 -->
+    <util:properties id="common" location="classpath:/properties/common/common.properties"/>
+
+    <!--&lt;!&ndash; RackteMQ Consumer &ndash;&gt;
+    <bean id="msgListener" class="com.intramirror.web.mq.RocketMessageListener"></bean> &lt;!&ndash;Listener配置&ndash;&gt;
+    &lt;!&ndash; 多CID订阅同一个Topic，可以创建多个ConsumerBean&ndash;&gt;
+    <bean id="consumer" class="com.aliyun.openservices.ons.api.bean.ConsumerBean" init-method="start" destroy-method="shutdown">
+        <property name="properties">
+            <map>
+                &lt;!&ndash;<entry key="ConsumerId" value="${ons.consumerid}"/>
+                <entry key="AccessKey" value="${ons.accesskeyid}"/>
+                <entry key="SecretKey" value="${ons.accesskeysecret}"/>
+                <entry key="ONSAddr" value="${ons.address}"/>&ndash;&gt;
+
+                <entry key="ConsumerId" value="CID_ORDER_INVALID"/>
+                <entry key="AccessKey" value="LTAIaFAG0DNogI0N"/>
+                <entry key="SecretKey" value="KtrOrRvgxeOy34jPCphpMzkgsxfv7n"/>
+                <entry key="ONSAddr" value="http://onsaddr-internal.aliyun.com:8080/rocketmq/nsaddr4client-internal"/>
+            </map>
+        </property>
+
+        <property name="subscriptionTable">
+            <map>
+                <entry value-ref="msgListener">
+                    <key>
+                        <bean class="com.aliyun.openservices.ons.api.bean.Subscription">
+                            &lt;!&ndash;<property name="topic" value="${ons.topic}"/>&ndash;&gt;
+                            <property name="topic" value="order_invalid_test"/>
+                            <property name="expression" value="*"/>&lt;!&ndash; MessageType名: 多个messageType 用 “||”分割 &ndash;&gt;
+                        </bean>
+                    </key>
+                </entry>
+            </map>
+
+        </property>
+    </bean>
+-->
+    <bean class="com.intramirror.web.properties.MicroProperties">
+        <property name="baseUrl" value="${micro.baseUrl}"/>
+        <property name="username" value="${micro.job.username}"/>
+        <property name="password" value="${micro.job.password}"/>
+        <property name="bootstrapServers" value="${kafka.bootstrap.servers}"/>
+        <property name="topicProductRawData" value="${kafka.topic.productRawData}"/>
+        <property name="topicStockRawData" value="${kafka.topic.stockRawData}"/>
+        <property name="topicProductResultData" value="${kafka.topic.productResultData}"/>
+        <property name="topicStockResultData" value="${kafka.topic.stockResultData}"/>
+    </bean>
+
+    <beans profile="test">
+        <context:property-placeholder location="classpath:test/*.properties" ignore-unresolvable="true"/>
+    </beans>
+
+    <beans profile="staging">
+        <context:property-placeholder location="classpath:staging/*.properties" ignore-unresolvable="true"/>
+    </beans>
+
+    <beans profile="test_ci">
+        <context:property-placeholder location="classpath:test_ci/*.properties" ignore-unresolvable="true"/>
+    </beans>
+
+    <beans profile="test_local">
+        <context:property-placeholder location="classpath:test_local/*.properties" ignore-unresolvable="true"/>
+    </beans>
+
+    <beans profile="staging_local">
+        <context:property-placeholder location="classpath:staging_local/*.properties" ignore-unresolvable="true"/>
+    </beans>
+
+    <beans profile="prd">
+        <context:property-placeholder location="classpath:prd/*.properties" ignore-unresolvable="true"/>
+    </beans>
+</beans>

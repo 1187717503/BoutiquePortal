@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.intramirror.user.core.mapper.UserMapper">
+    <resultMap id="BaseResultMap" type="com.intramirror.user.api.model.User">
+
+        <id column="user_id" property="userId" jdbcType="BIGINT"/>
+        <result column="username" property="username" jdbcType="VARCHAR"/>
+        <result column="email" property="email" jdbcType="VARCHAR"/>
+        <result column="telephone" property="telephone" jdbcType="VARCHAR"/>
+        <result column="contact_person_name" property="contactPersonName" jdbcType="VARCHAR"/>
+        <result column="password" property="password" jdbcType="VARCHAR"/>
+        <result column="identity_card" property="identityCard" jdbcType="VARCHAR"/>
+        <result column="identity_card_name" property="identityCardName" jdbcType="VARCHAR"/>
+        <result column="electronic_registered_person_id" property="electronicRegisteredPersonId" jdbcType="VARCHAR"/>
+        <result column="user_image" property="userImage" jdbcType="VARCHAR"/>
+        <result column="source" property="source" jdbcType="TINYINT"/>
+        <result column="last_login" property="lastLogin" jdbcType="TIMESTAMP"/>
+        <result column="type" property="type" jdbcType="TINYINT"/>
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP"/>
+        <result column="enabled" property="enabled" jdbcType="BIT"/>
+        <result column="wechat" property="wechat" jdbcType="VARCHAR"/>
+        <result column="contact_phone" property="contactPhone" jdbcType="VARCHAR"/>
+        <result column="area_code" property="areaCode" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="selectColumn">
+    user_id, username, email, telephone, contact_person_name, password, identity_card, 
+    identity_card_name, electronic_registered_person_id, user_image, source, last_login, 
+    type, created_at, updated_at, enabled, wechat, contact_phone, area_code
+  </sql>
+    <sql id="selectTable">
+    user u
+  </sql>
+
+    <select id="getUserByEmailAndEnabled" resultMap="BaseResultMap">
+        SELECT
+        <include refid="selectColumn"/>
+        FROM
+        <include refid="selectTable"/>
+        WHERE
+        u.email =#{email}
+        AND
+        u.enabled=#{enabled}
+    </select>
+
+    <select id="getUserByIdAndEnabled" resultMap="BaseResultMap">
+        SELECT
+        <include refid="selectColumn"/>
+        FROM
+        <include refid="selectTable"/>
+        WHERE
+        u.user_id =#{userId}
+        AND
+        u.enabled=#{enabled}
+    </select>
+</mapper>

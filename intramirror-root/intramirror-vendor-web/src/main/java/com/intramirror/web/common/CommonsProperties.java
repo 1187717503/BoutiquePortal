@@ -9,6 +9,9 @@ public class CommonsProperties {
 	@Value("#{commons.baseUrl}")
 	private String baseUrl;
 
+	@Value("#{commons.orderPath}")
+	private String orderPath;
+
 	public String getBaseUrl() {
 		return baseUrl;
 	}
@@ -17,5 +20,11 @@ public class CommonsProperties {
 		this.baseUrl = baseUrl;
 	}
 
-	
+	public String getOrderPath() {
+		return orderPath;
+	}
+
+	public void setOrderPath(String orderPath) {
+		this.orderPath = orderPath;
+	}
 }

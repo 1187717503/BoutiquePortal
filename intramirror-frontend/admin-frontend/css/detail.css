@@ -1,0 +1,277 @@
+label.placehoder-label {
+	top: -14px;
+	font-size: 0.8rem;
+}
+
+label.text-label {
+	color: #000;
+	font-size: 1rem;
+}
+
+.save-btns {
+	height: 62px;
+	line-height: 62px;
+}
+
+.hompage-pannel {
+	margin-top: 20px;
+	padding-left: 20px;
+	min-width: 1224px;
+}
+
+.hompage-pannel-title {
+	line-height: 60px;
+	font-size: 20px;
+}
+.homepage-img {
+	height: 200px;
+	width: 200px;
+	border: 1px dashed #979797;
+    margin: -32px 0 20px 36px;
+}
+
+.little-button {
+	height: 36px;
+	width: 93px;
+	border: 1px solid #979797;
+	border-radius: 2px;
+	margin-top: 62px;
+	margin-left: 33px;
+	line-height: 36px;
+	color: #979797;
+	cursor: pointer;
+	font-size: 14px;
+	text-align: center;
+}
+
+.prod-item {
+	width: 309px;
+	height: 94px;
+	display: flex;
+	border:1px solid #d8d8d8;
+	background-color: #eee;
+}
+
+.prod-info {
+	width: 180px;
+	background-color: #eee;
+}
+
+.prod-info-line {
+	display: flex;
+	line-height: 24px;
+}
+
+.prod-brand {
+	margin-top: 8px;
+	margin-left: 16px;
+	font-size: 12px;
+	color: #000;
+	width: 72%;
+}
+
+.prod-stock-title {
+	margin-top: 8px;
+	width: 28%;
+	font-size: 12px;
+	color: #000;
+	text-align: center;
+}
+
+.prod-price-discount {
+	margin-left: 16px;
+	font-size: 12px;
+	color: #000;
+	width: 72%;
+}
+
+.prod-stock {
+	width: 28%;
+	font-size: 16px;
+	color: #000;
+	text-align: center;
+}
+
+.img-tag-list {
+	display: flex;
+	margin-top: 4px;
+	justify-content: flex-end;
+	margin-right: 8px;
+}
+
+.image-tag {
+	margin-left: 8px;
+	background-color: #9b9b9b;
+	color: #fff;
+	font-size: 12px;
+	text-align: center;
+	padding: 4px;
+}
+.off-tag {
+	margin-left: 8px;
+	color: #fff;
+	background-color: #871b55;
+	font-size: 12px;
+	text-align: center;
+	padding: 4px;
+}
+
+#upload {
+	margin: 0 auto;
+	margin-top: 12px;
+    margin-bottom: 12px;
+    width: 180px;
+	padding-left: 11px;
+	border: 2px solid rgba(0, 0, 0, 0.3);
+	border-style: dashed;
+	padding: inherit;
+}
+
+.col .dropzone .dz-preview .dz-image {
+    width: 140px;
+	height: 160px;
+	border-radius: 0px;
+}
+
+.col .dropzone .dz-preview:hover .dz-details {
+	margin-left: 8px;
+    margin-top: 20px;
+}
+
+.col .dropzone .dz-preview .dz-details .dz-filename span, .dropzone .dz-preview .dz-details .dz-size span {
+    border-radius: 0px;
+}
+
+.col .dropzone.dz-clickable .dz-message, .dropzone.dz-clickable .dz-message  {
+    width: 140px;
+	height: 132px;
+	padding-top:32px;
+	padding-left:32px;
+}
+.input-field label {
+	font-size: 0.8rem;
+}
+.content-editor {
+	width: 450px;
+/*	max-height: 500px;
+    height: 500px;*/
+    margin-left: 16px;
+    margin-top: 12px;
+}
+
+.left-product-list,.right-product-list {
+	margin-left: 8px;
+	padding: 8px;
+	border: 1px solid #8d8d8d;
+	margin-bottom: 10px;
+	width: 345px !important;
+	max-height: 558px;
+	height: 558px;
+	overflow-y: scroll;
+	overflow-x: hidden;
+}
+
+.left-product-list .prod-item:nth-child(n) {
+	margin-top: 8px;
+}
+
+.left-product-list .prod-item:nth-child(1) {
+	margin-top: 0;
+}
+.right-product-list .prod-item:nth-child(n) {
+	margin-top: 8px;
+}
+
+.right-product-list .prod-item:nth-child(1) {
+	margin-top: 0;
+}
+
+/************************************************/
+.cf:after { visibility: hidden; display: block; font-size: 0; content: " "; clear: both; height: 0; }
+ol {padding: 0; margin: 0;}
+* html .cf { zoom: 1; }
+*:first-child+html .cf { zoom: 1; }
+
+a { color: #2996cc; }
+a:hover { text-decoration: none; }
+
+p { line-height: 1.5em; }
+.small { color: #666; font-size: 0.875em; }
+.large { font-size: 1.25em; }
+
+.dd-handle {
+	display: block;
+}
+
+.dd-handle:hover {color: #2ea8e5; background-color: #fff;}
+.nestable-lists { display: block; clear: both; padding: 30px 0; width: 100%; border: 0; border-top: 2px solid #ddd; border-bottom: 2px solid #ddd; }
+
+.dd-placeholder,
+.dd-empty { margin: 5px 0; padding: 0; min-height: 30px; background: #f2fbff; border: 1px dashed #b6bcbf; box-sizing: border-box; -moz-box-sizing: border-box;}
+
+.dd-empty { border: 1px dashed #bbb; min-height: 100px; background-color: #e5e5e5;
+    background-image: -webkit-linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff), -webkit-linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff);
+    background-image: -moz-linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff), -moz-linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff);
+    background-image: linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff), linear-gradient(45deg, #fff 25%, transparent 25%, transparent 75%, #fff 75%, #fff);
+    background-size: 60px 60px;
+    background-position: 0 0, 30px 30px;
+}
+
+.dd-dragel { position: absolute; pointer-events: none; z-index: 9999; cursor: move !important;}
+.dd-dragel .dd-handle {
+    -webkit-box-shadow: 2px 4px 6px 0 rgba(0,0,0,.1);
+    box-shadow: 2px 4px 6px 0 rgba(0,0,0,.1);
+}
+
+@media only screen and (min-width: 700px) {
+    .dd {width: 30%; }
+    .dd + .dd { margin-left: 2%; }
+}
+
+.dd-hover > .dd-handle {background: #2ea8e5 !important;}
+
+.socialite {display: block;}
+
+/**/
+
+.dragger-able-ele:hover, .dragger-able-ele:active, .dragger-able-ele:focus {
+	cursor: move;
+}
+
+ol.dd-dragel .dragger-able-ele {cursor: move;}
+
+/********************************************/
+.dd-list .prod-item .sort {float: left; margin-left:16px;font-size:12px;color: #000;}
+.product-info-display {float:left;width: 234px;}
+.disp-brand {display:block;white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+
+.block-input-fields {
+	width: 220px;
+	margin-left: 16px;
+	margin-top: -60px;
+	float:left;
+}
+
+.block-upload-pic {
+	float:left;
+	margin-left: 24px;
+	margin-top: -40px;
+}
+
+input[type=text]:focus:not([readonly]), input[type=number]:focus:not([readonly]), input[type=search]:focus:not([readonly]), textarea.materialize-textarea:focus:not([readonly]) {
+	border-bottom:2px solid #871b55;
+	box-shadow: none;
+}
+
+input[type=text], input[type=password], input[type=email], input[type=url], input[type=time], input[type=date], input[type=datetime-local], input[type=tel], input[type=number], input[type=search], textarea.materialize-textarea {
+	height: 2rem;
+}
+
+.preview-pic {
+	cursor: pointer;
+    display: inline-block;
+}
+
+input[type=text]:disabled {
+	border-bottom: 2px solid #871b55;
+}

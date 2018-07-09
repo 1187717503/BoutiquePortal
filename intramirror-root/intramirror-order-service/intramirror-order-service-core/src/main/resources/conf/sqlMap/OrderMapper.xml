@@ -1,0 +1,816 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.intramirror.order.core.mapper.OrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.intramirror.order.api.model.CancelOrderVO">
+        <result column="cover_img" property="cover_img" jdbcType="VARCHAR"/>
+        <result column="product_id" property="product_id" jdbcType="BIGINT"/>
+        <result column="size" property="size" jdbcType="VARCHAR"/>
+        <result column="brandName" property="brandName" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="BIGINT"/>
+        <result column="price" property="price" jdbcType="DECIMAL"/>
+        <result column="in_price" property="in_price" jdbcType="DECIMAL"/>
+        <result column="order_line_num" property="order_line_num" jdbcType="VARCHAR"/>
+        <result column="created_at" property="created_at" jdbcType="TIMESTAMP"/>
+        <result column="cancel_at" property="cancel_at" jdbcType="TIMESTAMP"/>
+        <result column="tax_fee" property="tax_fee" jdbcType="DECIMAL"/>
+    </resultMap>
+
+    <select id="getOrderList" resultType="java.util.HashMap" parameterType="java.util.Map">
+        SELECT
+            DISTINCT
+            o.order_num,
+            o.order_id,
+            o.created_at,
+            o.`status`,
+            o.current_rate,
+            o.total_sale_price_rmb,
+            o.total_shipping_fee_rmb,
+            o.total_tax_rmb,
+            o.total_rmb,
+            l.rec_name,
+            l.rec_mobile,
+            l.user_rec_name,
+            l.user_rec_mobile,
+            l.user_rec_province,
+            l.user_rec_city,
+            l.user_rec_area,
+            l.user_rec_addr,
+            v.vendor_id,
+            u.contact_person_name,
+            o.contact_phone AS telephone,
+            o.wechat        AS contact_info,
+            g.`name`        AS geography_name
+        FROM logistics_product lp
+            INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+            INNER JOIN `order` o ON o.order_id = ol.order_id
+            LEFT JOIN `user` u ON o.user_id = u.user_id
+            LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
+            INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
+            INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
+            INNER JOIN product p ON ( sp.product_id = p.product_id and p.enabled = 1 )
+
+            LEFT JOIN category c ON p.category_id = c.category_id
+            LEFT JOIN brand b ON p.brand_id = b.brand_id
+            LEFT JOIN vendor v ON lp.vendor_id = v.vendor_id
+            LEFT JOIN geography g ON l.geography_id = g.geography_id
+        WHERE lp.`status` = #{status,jdbcType=BIGINT}
+        GROUP BY o.order_num
+        ORDER BY o.created_at DESC
+
+    </select>
+
+    <select id="selectOrderInfo" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+
+        SELECT
+            o.`order_id`,
+            o.`status`  AS order_status,
+            lp.`order_line_num`,
+            lp.`status` AS logis_status,
+            lp.`logistics_product_id`,
+            lp.`vendor_id`
+        FROM `order` o
+            INNER JOIN `order_logistics` ol ON (o.`order_id` = ol.`order_id` AND ol.`enabled` = 1)
+            INNER JOIN `logistics_product` lp ON (ol.`order_logistics_id` = lp.`order_logistics_id` AND lp.`enabled` = 1)
+        WHERE lp.`order_line_num` = #{order_line_num} AND o.`enabled` = 1
+    </select>
+
+    <select id="getOrderListByOrderNumber" resultType="java.util.HashMap" parameterType="java.util.Map">
+        SELECT o.order_num,o.order_id,p.name,p.color_code AS colorCode, p.designer_id AS brandID,s.`size` as size,p.category_id,
+        lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
+        v.vendor_name,p.cover_img,lp.logistics_product_id
+        FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+        INNER JOIN `order` o ON ol.order_id = o.order_id
+        LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
+        INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
+        INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
+        INNER JOIN product p ON (sp.product_id = p.product_id and p.enabled = 1 )
+        INNER JOIN sku s ON (s.sku_id = sps.sku_id and s.enabled = 1)
+        INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
+        WHERE o.order_num in
+        <foreach collection="orderNumbers" item="orderNumber" index="index"
+                 open="(" close=")" separator=",">
+            #{orderNumber}
+        </foreach>
+        and lp.`status` = #{status,jdbcType=BIGINT}
+        GROUP BY lp.order_line_num
+    </select>
+
+
+    <select id="getOrderListByStatus" resultType="java.util.HashMap" parameterType="java.util.Map">
+        SELECT p.product_id,g.pack_group,g.pack_english_name,lp.stock_Location,lp.stock_location_id,sl.ship_from_location_id,
+        o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id, s.`size` as size,p.category_id,
+        lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
+        lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
+        lp.confirmed_at,lp.est_ship_date,lp.packed_at,lp.shipped_at,s.sku_code,usa.address_country_id,b.english_name as brandName,
+        if(lp.user_rec_flag=0, l.user_rec_name, lp.user_rec_name) as user_rec_name,
+        if(lp.user_rec_flag=0, l.user_rec_mobile, lp.user_rec_mobile) as user_rec_mobile,
+        if(lp.user_rec_flag=0, l.user_rec_province, lp.user_rec_province) as user_rec_province,
+        if(lp.user_rec_flag=0, l.user_rec_city, lp.user_rec_city) as user_rec_city,
+        if(lp.user_rec_flag=0, l.user_rec_area, lp.user_rec_area) as user_rec_area,
+        if(lp.user_rec_flag=0, l.user_rec_addr, lp.user_rec_addr) as user_rec_addr,
+        l.user_rec_country,l.geography_id,
+        v.vendor_name,v.vendor_id,v.skip_confirm,g.english_name as geography_name,v.address_country_id as
+        vendor_address_country_id,
+        CASE WHEN p.spu_id IS NULL THEN p.cover_img ELSE spu.cover_img END AS cover_img,
+        lp.logistics_product_id,
+        oe.created_at as oeCreatedAt,oet.description as oeDescription,oe.comments as oeComments,u.email as
+        oeCreatedByuser,
+        oe.modified_at as oeModified,oe.`status` as oeStatus,oe.resolution as oeResolution, uu.email as Resolved
+        FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+        LEFT JOIN stock_location sl on sl.location_id = lp.stock_location_id
+        INNER JOIN `order` o ON ol.order_id = o.order_id
+        LEFT JOIN user_ship_address usa ON o.user_id = usa.user_id
+        LEFT JOIN logistics l ON (lp.order_logistics_id = l.order_logistics_id and l.enabled = 1)
+        LEFT JOIN geography g on l.geography_id = g.geography_id
+        INNER JOIN shop_product_sku sps ON (lp.shop_product_sku_id = sps.shop_product_sku_id)
+        INNER JOIN shop_product sp ON (sps.shop_product_id = sp.shop_product_id)
+        INNER JOIN product p ON (sp.product_id = p.product_id and p.enabled = 1)
+        LEFT JOIN spu on (spu.spu_id = p.spu_id and spu.enabled = 1)
+        INNER JOIN brand b ON (p.brand_id = b.brand_id and b.enabled = 1 )
+        INNER JOIN sku s ON (s.sku_id = sps.sku_id and s.enabled = 1)
+        INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
+        LEFT JOIN order_exception oe ON(oe.logistics_product_id=lp.logistics_product_id AND oe.order_exception_id =
+        (SELECT MAX(oe1.order_exception_id) FROM order_exception oe1 WHERE oe1.logistics_product_id = oe.logistics_product_id))
+        LEFT JOIN order_exception_type oet ON(oet.order_exception_type_id=oe.order_exception_type_id)
+        LEFT JOIN `user` u ON(u.user_id=oe.created_by_user_id)
+        LEFT JOIN `user` uu on(uu.user_id=oe.modified_by_user_id)
+        where lp.`status` = #{status,jdbcType=BIGINT} and lp.enabled = 1
+        and v.vendor_id = #{vendorId,jdbcType=BIGINT}
+        <if test="categoryIds != null and categoryIds.size > 0">
+            and p.category_id in
+            <foreach item="item" index="index" collection="categoryIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="brandId != null">
+            and p.brand_id = #{brandId}
+        </if>
+        <if test="stockLocation != null">
+            and lp.stock_Location = #{stockLocation,jdbcType=VARCHAR}
+        </if>
+        <if test="logisticsProductIds != null and logisticsProductIds.size > 0">
+            and lp.logistics_product_id in
+            <foreach item="item" index="index" collection="logisticsProductIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        GROUP BY lp.order_line_num
+
+        <if test="order_line_num != null">
+            order by lp.order_line_num desc
+        </if>
+
+        <if test="created_at != null">
+            order by o.created_at desc
+        </if>
+
+        <if test="confirmed_at != null">
+            order by lp.confirmed_at desc
+        </if>
+
+        <if test="est_ship_date != null">
+            order by lp.est_ship_date desc
+        </if>
+
+        <if test="geography_name != null">
+            order by g.english_name asc
+        </if>
+    </select>
+
+    <select id="getOrderCancelList" resultMap="BaseResultMap" parameterType="java.util.Map">
+        SELECT
+        o.order_num,
+        o.order_id,
+        o.created_at,
+        o.current_rate,
+        p. `NAME`,
+        p.product_id,
+        s.`size` AS `size`,
+        p.category_id,
+        lp.`retail_price` AS price,
+        lp.`in_price`,
+        lp.`sale_price`,
+        lp.amount,
+        lp.shipping_fee,
+        lp.tax_fee,
+        lp.order_line_num,
+        lp.`status`,
+        lp.confirmed_at,
+        lp.est_ship_date,
+        lp.packed_at,
+        lp.shipped_at,
+        s.sku_code,
+        b.english_name AS brandName,
+        if(lp.user_rec_flag=0, l.user_rec_name, lp.user_rec_name) as user_rec_name,
+        if(lp.user_rec_flag=0, l.user_rec_mobile, lp.user_rec_mobile) as user_rec_mobile,
+        if(lp.user_rec_flag=0, l.user_rec_province, lp.user_rec_province) as user_rec_province,
+        if(lp.user_rec_flag=0, l.user_rec_city, lp.user_rec_city) as user_rec_city,
+        if(lp.user_rec_flag=0, l.user_rec_area, lp.user_rec_area) as user_rec_area,
+        if(lp.user_rec_flag=0, l.user_rec_addr, lp.user_rec_addr) as user_rec_addr,
+        l.user_rec_country,
+        l.geography_id,
+        v.vendor_name,
+        v.vendor_id,
+        v.skip_confirm,
+        v.address_country_id AS vendor_address_country_id,
+        CASE WHEN p.spu_id IS NULL THEN p.cover_img ELSE spu.cover_img END AS cover_img,
+        lp.logistics_product_id,
+        lp.updated_at as cancel_at
+        FROM
+        logistics_product lp
+        INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+        INNER JOIN `order` o ON ol.order_id = o.order_id
+        LEFT JOIN logistics l ON (
+        lp.order_logistics_id = l.order_logistics_id
+        AND l.enabled = 1
+        )
+        INNER JOIN shop_product_sku sps ON (
+        lp.shop_product_sku_id = sps.shop_product_sku_id
+        )
+        INNER JOIN shop_product sp ON (
+        sps.shop_product_id = sp.shop_product_id
+        )
+        INNER JOIN product p ON (
+        sp.product_id = p.product_id
+        AND p.enabled = 1
+        )
+        LEFT JOIN spu on (spu.spu_id = p.spu_id and spu.enabled = 1)
+        INNER JOIN brand b ON (
+        p.brand_id = b.brand_id
+        AND b.enabled = 1
+        )
+        INNER JOIN sku s ON (
+        s.sku_id = sps.sku_id
+        AND s.enabled = 1
+        )
+
+        INNER JOIN vendor v ON (
+        lp.vendor_id = v.vendor_id
+        AND v.enabled = 1
+        )
+        where lp.`status` = #{status,jdbcType=BIGINT} and lp.enabled = 1
+        and v.vendor_id = #{vendorId,jdbcType=BIGINT}
+        <if test="orderNumber != null">
+            AND lp.order_line_num LIKE #{orderNumber}
+        </if>
+        GROUP BY lp.order_line_num
+        <choose>
+            <when test="count == 1">
+
+            </when>
+            <otherwise>
+                order by o.created_at desc
+                limit #{pageNo},#{pageSize}
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="getOrderListByStatusAndContainerId" resultType="java.util.HashMap" parameterType="java.util.Map">
+        SELECT
+            o.order_num,
+            o.order_id,
+            o.created_at,
+            o.current_rate,
+            p.name,
+            p.product_id,
+            s.`size` AS size,
+            p.category_id,
+            lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
+            lp.amount,
+            lp.shipping_fee,
+            lp.tax_fee,
+            lp.order_line_num,
+            lp.`status`,
+            b.english_name AS brandName,
+            v.vendor_name,
+            p.cover_img,
+            lp.logistics_product_id
+        FROM logistics_product lp
+            INNER JOIN container c ON lp.container_id = c.container_id
+            INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+            INNER JOIN `order` o ON ol.order_id = o.order_id
+            LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
+            INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
+            INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
+            INNER JOIN product p ON (sp.product_id = p.product_id and p.enabled = 1)
+            INNER JOIN brand b ON (p.brand_id = b.brand_id AND b.enabled = 1)
+            INNER JOIN sku s ON (s.sku_id = sps.sku_id AND s.enabled = 1)
+            INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
+        WHERE
+              c.container_id = #{containerId,jdbcType=BIGINT}
+              AND lp.`status` = #{status,jdbcType=BIGINT}
+              AND v.vendor_id = #{vendorId,jdbcType=BIGINT}
+        GROUP BY lp.order_line_num
+    </select>
+
+
+    <select id="getOrderLogisticsInfoByIdWithSql" resultType="java.util.HashMap" parameterType="java.lang.Long">
+        SELECT
+            o.order_num,
+            o.order_id,
+            o.created_at,
+            o.current_rate,
+            p.name,
+            p.product_id,
+            p.color_code AS colorCode,
+            p.designer_id AS brandID,
+            s.`size` AS size,
+            p.category_id,
+            lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
+            lp.amount,
+            lp.shipping_fee,
+            lp.tax_fee,
+            lp.order_line_num,
+            lp.`status`,
+            s.sku_code,
+            b.english_name AS brandName,
+            v.vendor_name,
+            v.vendor_id,
+            v.contact,
+            p.cover_img,
+            g.english_name AS geography_name,
+            lp.logistics_product_id,
+            p.product_code
+        FROM logistics_product lp
+            INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+            INNER JOIN `order` o ON ol.order_id = o.order_id
+            INNER JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
+            INNER JOIN geography g ON l.geography_id = g.geography_id
+            INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
+            INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
+            INNER JOIN product p ON (sp.product_id = p.product_id and p.enabled = 1)
+            INNER JOIN brand b ON (p.brand_id = b.brand_id AND b.enabled = 1)
+            INNER JOIN sku s ON (s.sku_id = sps.sku_id AND s.enabled = 1)
+            INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
+        WHERE lp.logistics_product_id = #{logisticsProductId,jdbcType=BIGINT}
+    </select>
+
+
+    <select id="getOrderListByShipmentId" resultType="java.util.HashMap" parameterType="java.util.Map">
+        SELECT
+        o.order_num,
+        o.order_id,
+        o.created_at,
+        o.updated_at as order_updated_at,
+        o.current_rate,
+        p.name,
+        p.product_id,
+        lp.stock_location,
+        s.`size` AS size,
+        p.category_id,
+        lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
+        lp.amount,
+        lp.shipping_fee,
+        lp.tax_fee,
+        lp.order_line_num,
+        lp.`status`,
+        b.english_name AS brandName,
+        v.vendor_name,
+        p.cover_img,
+        lp.logistics_product_id,
+        c.*,
+        c3.name AS categoryName,
+        l.logistics_id,
+        func_country_mapper(l.user_rec_country) as user_rec_country,
+        if(lp.user_rec_flag=0, l.user_rec_name, lp.user_rec_name) as user_rec_name,
+        if(lp.user_rec_flag=0, l.user_rec_mobile, lp.user_rec_mobile) as user_rec_mobile,
+        if(lp.user_rec_flag=0, l.user_rec_province, lp.user_rec_province) as user_rec_province,
+        if(lp.user_rec_flag=0, l.user_rec_city, lp.user_rec_city) as user_rec_city,
+        if(lp.user_rec_flag=0, l.user_rec_area, lp.user_rec_area) as user_rec_area,
+        if(lp.user_rec_flag=0, l.user_rec_addr, lp.user_rec_addr) as user_rec_addr,
+        ifnull(cm.country, l.user_rec_country) as countryName,
+        l.geography_id,
+        g.english_name
+        FROM logistics_product lp
+        INNER JOIN container c ON lp.container_id = c.container_id
+        INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+        INNER JOIN `order` o ON ol.order_id = o.order_id
+        LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
+        LEFT JOIN country_mapper cm on l.user_rec_country = cm.english_name
+        LEFT JOIN geography g ON l.geography_id = g.geography_id
+        INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
+        INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
+        INNER JOIN product p ON (sp.product_id = p.product_id and p.enabled = 1)
+        LEFT JOIN (SELECT *
+        FROM category
+        WHERE `level` = 3 AND enabled = 1) c3 ON (c3.category_id = p.category_id)
+        INNER JOIN brand b ON (p.brand_id = b.brand_id AND b.enabled = 1)
+        INNER JOIN sku s ON (s.sku_id = sps.sku_id AND s.enabled = 1)
+        INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
+        WHERE c.shipment_id IN
+        <foreach collection="shipmentIds" item="shipmentId" open="(" close=")" separator=",">
+            #{shipmentId,jdbcType=BIGINT}
+        </foreach>
+        AND lp.`status` = #{status,jdbcType=BIGINT}
+        AND v.vendor_id = #{vendorId,jdbcType=BIGINT}
+        <if test="packGroup != null">
+            AND g.pack_group = #{packGroup}
+        </if>
+        GROUP BY lp.order_line_num
+    </select>
+
+
+    <select id="getOrderInfoByCondition" resultType="java.util.HashMap" parameterType="java.util.Map">
+        SELECT
+        o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id, p.color_code AS colorCode, p.designer_id AS brandID, s.`size` as
+        size,p.category_id,
+        lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
+        lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,s.sku_code,b.english_name
+        as brandName,l.user_rec_country as userRecCountry,
+        v.vendor_name,
+        CASE WHEN p.spu_id IS NULL THEN p.cover_img ELSE spu.cover_img END AS cover_img,
+        g.english_name as geography_name ,lp.logistics_product_id,v.vendor_id
+        FROM logistics_product lp
+        INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+        INNER JOIN `order` o ON ol.order_id = o.order_id
+        INNER JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id and l.enabled = 1
+        INNER JOIN geography g on l.geography_id = g.geography_id
+        INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
+        INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
+        INNER JOIN product p ON (sp.product_id = p.product_id and p.enabled = 1 )
+        LEFT JOIN spu on (spu.spu_id = p.spu_id and spu.enabled = 1)
+        INNER JOIN brand b ON (p.brand_id = b.brand_id and b.enabled = 1 )
+        INNER JOIN sku s ON (s.sku_id = sps.sku_id and s.enabled = 1)
+        INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
+        where lp.enabled = 1
+        <if test="status != null">
+            and lp.`status` = #{status,jdbcType=BIGINT}
+        </if>
+        <if test="vendorId != null">
+            and v.vendor_id = #{vendorId,jdbcType=BIGINT}
+        </if>
+        and lp.order_line_num = #{orderNumber,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getOrderPaymentByLogisProductId" resultType="java.util.HashMap" parameterType="java.lang.Long">
+        SELECT
+            pt.order_num,
+            lp.amount * lp.sale_price * 100 AS price,
+            pr.request_id,
+            pr.serial_number,
+            o.pay_way,
+            lp.logistics_product_id
+        FROM `order` o
+            LEFT JOIN order_logistics ol ON o.order_id = ol.order_id
+            LEFT JOIN logistics_product lp ON lp.order_logistics_id = ol.order_logistics_id
+            LEFT JOIN payment pt ON pt.order_num = ol.order_id
+            LEFT JOIN payment_result pr ON pr.payment_id = pt.payment_id
+        WHERE lp.logistics_product_id = #{logisticsProductId,jdbcType=BIGINT}
+
+    </select>
+    <!--   根据status统计各个状态的订单数量 -->
+    <select id="getOrderByIsvalidCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+        SELECT COUNT(1)
+        FROM (
+                 SELECT
+                     o.order_num
+                 FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+                     INNER JOIN `order` o ON ol.order_id = o.order_id
+                     LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
+                     INNER JOIN geography g ON l.geography_id = g.geography_id
+                     INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
+                     INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
+                     INNER JOIN product p ON (sp.product_id = p.product_id and p.enabled = 1)
+                     INNER JOIN brand b ON (p.brand_id = b.brand_id AND b.enabled = 1)
+                     INNER JOIN sku s ON (s.sku_id = sps.sku_id AND s.enabled = 1)
+                     INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
+                 WHERE  lp.`status` = #{status,jdbcType=BIGINT}
+                       AND v.vendor_id = #{vendorId,jdbcType=BIGINT}
+                 GROUP BY lp.order_line_num
+             ) AS DD
+    </select>
+    <!--   根据订单号查询物流ID -->
+    <select id="getOrderPaymentInfoByOrderId" resultType="java.util.HashMap" parameterType="java.lang.Integer">
+        SELECT order_logistics_id
+        FROM order_logistics ol
+            LEFT JOIN `order` o ON o.order_id = ol.order_id
+        WHERE o.order_id = #{orderId,jdbcType=BIGINT}
+    </select>
+
+    <!-- 根据订单号查询支付信息 -->
+    <select id="getPaymentInfoByOrderId" resultType="java.util.HashMap" parameterType="java.lang.Integer">
+        SELECT
+            t5.pay_way,
+            t1.order_num,
+            sum(t4.amount * t4.sale_price) AS price,
+            t2.request_id,
+            t2.serial_number,
+            t4.logistics_product_id
+        FROM payment t1, payment_result t2, order_logistics t3, logistics_product t4, `order` t5
+        WHERE t1.payment_id = t2.payment_id AND t3.order_id = t1.order_num
+              AND t3.order_logistics_id = t4.order_logistics_id AND t5.order_id = t3.order_id
+        GROUP BY t2.request_id, t2.serial_number
+                                AND t1.order_num = #{orderId,jdbcType=BIGINT}
+    </select>
+
+    <select id="getOrderByShipment" resultType="com.intramirror.order.api.model.Shipment">
+        SELECT
+            g.`name`            AS ship_to_geography,
+            u.username          AS consignee,
+            if(lp.user_rec_flag=0, l.user_rec_addr, lp.user_rec_addr)     AS ship_to_addr,
+            if(lp.user_rec_flag=0, l.user_rec_area, lp.user_rec_area)     AS ship_to_district,
+            if(lp.user_rec_flag=0, l.user_rec_city, lp.user_rec_city)     AS ship_to_city,
+            if(lp.user_rec_flag=0, l.user_rec_province, lp.user_rec_province) AS ship_to_province,
+            o.`status`,
+            l.user_rec_country  AS ship_to_country
+        FROM logistics_product lp
+            INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+            INNER JOIN `order` o ON o.order_id = ol.order_id
+            LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
+            LEFT JOIN geography g ON l.geography_id = g.geography_id
+            LEFT JOIN `user` u ON o.user_id = u.user_id
+        WHERE lp.logistics_product_id = #{logisticsProductId,jdbcType=BIGINT}
+    </select>
+
+    <select id="getShippedOrderListByStatus" resultType="java.util.HashMap" parameterType="java.util.Map">
+        SELECT
+
+        <choose>
+            <when test="count == 1">
+                lp.order_line_num,p.product_id
+            </when>
+            <otherwise>
+                o.created_at AS order_date,o.current_rate, s.`size` as size,
+                lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
+                lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
+                lp.shipped_at AS shipped_date,sm.shipment_no,s.sku_code,b.english_name as brandName,
+                v.vendor_name,sm.ship_to_geography as geography_name,
+                CASE WHEN p.spu_id IS NULL THEN p.cover_img ELSE spu.cover_img END AS cover_img,
+                p.product_id,lp.stock_location
+            </otherwise>
+        </choose>
+
+        FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+        INNER JOIN `order` o ON ol.order_id = o.order_id
+        LEFT JOIN user_ship_address usa ON o.user_id = usa.user_id
+        LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
+        INNER JOIN geography g on l.geography_id = g.geography_id
+        INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
+        INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
+        INNER JOIN product p ON (sp.product_id = p.product_id and p.enabled = 1)
+        INNER JOIN brand b ON (p.brand_id = b.brand_id and b.enabled = 1 )
+        INNER JOIN sku s ON (s.sku_id = sps.sku_id and s.enabled = 1)
+        INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
+        LEFT JOIN spu on (spu.spu_id = p.spu_id and spu.enabled = 1)
+        LEFT JOIN container c ON (c.container_id = lp.container_id)
+        LEFT JOIN shipment sm on (sm.shipment_id = c.shipment_id)
+        where (lp.`status` = 3 OR lp.`status` = 4)
+        and v.vendor_id = #{vendorId,jdbcType=BIGINT}
+        <if test="shippedParam.orderLineNo!=null and shippedParam.orderLineNo!=''">
+            and lp.order_line_num=#{shippedParam.orderLineNo}
+        </if>
+
+        <if test="shippedParam.startDate!= null and shippedParam.endDate != null and shippedParam.startDate!= '' and shippedParam.endDate != ''">
+            and (lp.shipped_at between #{shippedParam.startDate} and #{shippedParam.endDate})
+        </if>
+        <if test="shippedParam.stockLocation != null and shippedParam.stockLocation != ''">
+            AND lp.stock_location = #{shippedParam.stockLocation}
+        </if>
+        <if test="shippedParam.shipToGeography != null and shippedParam.shipToGeography != ''">
+            AND sm.ship_to_geography = #{shippedParam.shipToGeography}
+        </if>
+        GROUP BY lp.order_line_num
+        <if test="shippedParam.shippedAtOrderBy != null and shippedParam.shippedAtOrderBy != ''">
+            <choose>
+                <when test="shippedParam.shippedAtOrderBy == 'desc'">
+                    ORDER BY lp.shipped_at DESC
+                </when>
+                <otherwise>
+                    ORDER BY lp.shipped_at ASC
+                </otherwise>
+            </choose>
+        </if>
+        <if test="shippedParam.statusOrderBy != null and shippedParam.statusOrderBy != ''">
+            <choose>
+                <when test="shippedParam.statusOrderBy == 'desc'">
+                    ORDER BY lp.status DESC
+                </when>
+                <otherwise>
+                    ORDER BY lp.status ASC
+                </otherwise>
+            </choose>
+        </if>
+        <choose>
+            <when test="count == 1">
+
+            </when>
+            <otherwise>
+                limit #{startPage},#{endPage}
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="getShipmentDetails" resultType="java.util.HashMap" parameterType="java.util.Map">
+        SELECT
+            o.order_num,
+            lp.vendor_id,
+            g.pack_group,
+            g.pack_english_name,
+            if(lp.user_rec_flag=0, l.user_rec_name, lp.user_rec_name)                          AS consignee,
+            if(lp.user_rec_flag=0, l.user_rec_addr, lp.user_rec_addr)                          AS shipToAddr,
+            if(lp.user_rec_flag=0, l.user_rec_area, lp.user_rec_area)                          AS shipToDistrict,
+            if(lp.user_rec_flag=0, l.user_rec_city, lp.user_rec_city)                          AS shipToCity,
+            if(lp.user_rec_flag=0, l.user_rec_province, lp.user_rec_province)                      AS shipToProvince,
+            l.user_rec_country                       AS shipToCountry,
+            v.address_country_id                     AS consigner_country_id,
+            g.english_name                           AS shipToGeography,
+            if(lp.user_rec_flag=0, l.user_rec_code, lp.user_rec_code)                          as zip_code,
+            if(lp.user_rec_flag=0, l.user_rec_mobile, lp.user_rec_mobile)                        as contact,
+            g.geography_id,
+            lp.logistics_product_id,
+            lp.stock_location_id,
+            sl.ship_from_location_id
+        FROM logistics_product lp
+            INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+            INNER JOIN `order` o ON ol.order_id = o.order_id
+            INNER JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
+            INNER JOIN geography g ON l.geography_id = g.geography_id
+            INNER JOIN `user` u ON o.user_id = u.user_id
+            LEFT JOIN user_ship_address us ON (us.user_id = u.user_id)
+            INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
+            INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
+            INNER JOIN product p ON (sp.product_id = p.product_id and p.enabled = 1)
+            INNER JOIN brand b ON (p.brand_id = b.brand_id AND b.enabled = 1)
+            INNER JOIN sku s ON (s.sku_id = sps.sku_id AND s.enabled = 1)
+            INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
+            INNER JOIN stock_location sl on sl.location_id = lp.stock_location_id
+        WHERE lp.enabled = 1
+              AND lp.order_line_num = #{orderNumber,jdbcType=VARCHAR}
+        GROUP BY o.order_num;
+    </select>
+
+    <select id="getShippedCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+        SELECT COUNT(1)
+        FROM (
+                 SELECT lp.order_line_num
+                 FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+                     INNER JOIN `order` o ON ol.order_id = o.order_id
+                     LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
+                     INNER JOIN geography g ON l.geography_id = g.geography_id
+                     INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
+                     INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
+                     INNER JOIN product p ON (sp.product_id = p.product_id and p.enabled = 1)
+                     INNER JOIN brand b ON (p.brand_id = b.brand_id AND b.enabled = 1)
+                     INNER JOIN sku s ON (s.sku_id = sps.sku_id AND s.enabled = 1)
+                     INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
+                     LEFT JOIN shipment sm ON sm.vendor_id = v.vendor_id
+                 WHERE (lp.`status` = 3 OR lp.`status` = 4) AND v.vendor_id = #{vendorId,jdbcType=BIGINT}
+                 GROUP BY lp.order_line_num
+             ) AS DD
+    </select>
+
+    <insert id="createOrder" parameterType="com.intramirror.order.api.model.Order" keyProperty="orderId">
+        INSERT INTO `order` (order_id, order_num, user_id, fee, coupon, coupon_fee, discount, discount_fee, ship_fee, pay_fee, pay_way, online_payment_id, confirmed_at, status, cancel_type, created_at, updated_at, enabled,
+                             tax_fee, current_rate, total_sale_price_rmb, total_shipping_fee_rmb, total_tax_rmb, total_rmb, remaining_rmb, wechat, contact_phone, buyer_name, area_code)
+        VALUES (#{orderId,jdbcType=BIGINT}, #{orderNum,jdbcType=VARCHAR}, #{userId,jdbcType=BIGINT},
+                                            #{fee,jdbcType=DECIMAL}, #{coupon,jdbcType=VARCHAR}, #{couponFee,jdbcType=DECIMAL},
+                                            #{discount,jdbcType=INTEGER}, #{discountFee,jdbcType=DECIMAL}, #{shipFee,jdbcType=DECIMAL},
+                                            #{payFee,jdbcType=DECIMAL}, #{payWay,jdbcType=TINYINT}, #{onlinePaymentId,jdbcType=BIGINT},
+                                                                                                    #{confirmedAt,jdbcType=TIMESTAMP},
+                                                                                                    #{status,jdbcType=INTEGER}, #{cancelType,jdbcType=TINYINT},
+                                                                                                    #{createdAt,jdbcType=TIMESTAMP},
+                                                                                                    #{updatedAt,jdbcType=TIMESTAMP}, #{enabled,jdbcType=BIT},
+                                                                                                    #{taxFee,jdbcType=DECIMAL}, #{currentRate,jdbcType=DECIMAL},
+                                                                                                    #{totalSalePriceRmb,jdbcType=DECIMAL},
+                #{totalShippingFeeRmb,jdbcType=DECIMAL}, #{totalTaxRmb,jdbcType=DECIMAL}, #{totalRmb,jdbcType=VARCHAR}, #{remainingRmb,jdbcType=VARCHAR},
+                #{wechat,jdbcType=VARCHAR}, #{contactPhone,jdbcType=VARCHAR}, #{buyerName,jdbcType=VARCHAR}, #{areaCode,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <select id="atelierSelectOrder" parameterType="java.util.Map" resultType="java.util.Map">
+
+        SELECT DISTINCT
+        lp.`order_line_num`,
+        DATE_FORMAT(lp.`created_at`, '%Y-%m-%d') AS created_at,
+        p.`product_code`,
+        sku.`size` as 'value',
+        sku.`sku_code`,
+        ss.`store`,
+        lp.`status`,
+        ROUND(sku.`in_price`, 2) AS in_price
+        FROM `logistics_product` lp
+        INNER JOIN `shop_product_sku` sps ON (lp.`shop_product_sku_id` = sps.`shop_product_sku_id` AND sps.`enabled` = 1)
+        INNER JOIN `sku` ON (sps.`sku_id` = sku.`sku_id` AND sku.`enabled` = 1)
+        INNER JOIN `sku_store` ss ON (sku.`sku_id` = ss.`sku_id` AND ss.`enabled` = 1)
+        INNER JOIN `product` p ON (sku.`product_id` = p.`product_id` AND p.`enabled` = 1)
+        WHERE DATE_FORMAT(lp.`created_at`, '%Y-%m-%d') = #{create_at,jdbcType=VARCHAR} AND p.`vendor_id` = #{vendor_id,jdbcType=VARCHAR} AND lp.`enabled` = 1
+        <if test="status != null and status != ''">
+            and lp.`status` in
+            <foreach item="item" index="index" collection="status" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="barcode != null and barcode != ''">
+            and sku.`sku_code` = #{barcode,jdbcType=VARCHAR}
+        </if>
+        LIMIT #{offset,jdbcType=INTEGER}, #{limit,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectCreateThreeOrderInfo" parameterType="java.util.Map" resultType="java.util.Map">
+        select lp.`logistics_product_id` ,lp.`order_line_num`,lp.`created_at` from `logistics_product` lp
+        where lp.`vendor_id` in
+        <foreach item="item" index="index" collection="vendors" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and lp.`status` in
+        <foreach item="item" index="index" collection="order_status" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and lp.`plase_order_at` is null ;
+    </select>
+
+    <update id="updateById" parameterType="com.intramirror.order.api.model.Order">
+        update `order`
+        <set>
+            <if test="orderNum != null">
+                order_num = #{orderNum,jdbcType=VARCHAR},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="fee != null">
+                fee = #{fee,jdbcType=DECIMAL},
+            </if>
+            <if test="coupon != null">
+                coupon = #{coupon,jdbcType=VARCHAR},
+            </if>
+            <if test="couponFee != null">
+                coupon_fee = #{couponFee,jdbcType=DECIMAL},
+            </if>
+            <if test="discount != null">
+                discount = #{discount,jdbcType=INTEGER},
+            </if>
+            <if test="discountFee != null">
+                discount_fee = #{discountFee,jdbcType=DECIMAL},
+            </if>
+            <if test="shipFee != null">
+                ship_fee = #{shipFee,jdbcType=DECIMAL},
+            </if>
+            <if test="payFee != null">
+                pay_fee = #{payFee,jdbcType=DECIMAL},
+            </if>
+            <if test="onlinePaymentId != null">
+                online_payment_id = #{onlinePaymentId,jdbcType=BIGINT},
+            </if>
+            <if test="confirmedAt != null">
+                confirmed_at = #{confirmedAt,jdbcType=TIMESTAMP},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="cancelType != null">
+                cancel_type = #{cancelType,jdbcType=TINYINT},
+            </if>
+            <if test="createdAt != null">
+                created_at = #{createdAt,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updatedAt != null">
+                updated_at = #{updatedAt,jdbcType=TIMESTAMP},
+            </if>
+            <if test="enabled != null">
+                enabled = #{enabled,jdbcType=BIT},
+            </if>
+            <if test="taxFee != null">
+                tax_fee = #{taxFee,jdbcType=DECIMAL},
+            </if>
+            <if test="currentRate != null">
+                current_rate = #{currentRate,jdbcType=DECIMAL},
+            </if>
+            <if test="totalSalePriceRmb != null">
+                total_sale_price_rmb = #{totalSalePriceRmb,jdbcType=DECIMAL},
+            </if>
+            <if test="totalShippingFeeRmb != null">
+                total_shipping_fee_rmb = #{totalShippingFeeRmb,jdbcType=DECIMAL},
+            </if>
+            <if test="totalTaxRmb != null">
+                total_tax_rmb = #{totalTaxRmb,jdbcType=DECIMAL},
+            </if>
+            <if test="totalRmb != null">
+                total_rmb = #{totalRmb,jdbcType=VARCHAR},
+            </if>
+            <if test="wechat != null">
+                wechat = #{wechat,jdbcType=VARCHAR},
+            </if>
+            <if test="contactPhone != null">
+                contact_phone = #{contactPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="buyerName != null">
+                buyer_name = #{buyerName,jdbcType=VARCHAR},
+            </if>
+            <if test="areaCode != null">
+                area_code = #{areaCode,jdbcType=VARCHAR}
+            </if>
+        </set>
+        where order_id = #{orderId,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectAddrByCountry" resultType="java.util.Map" parameterType="string">
+        SELECT * FROM address_country WHERE `name` = #{country,jdbcType=VARCHAR}
+    </select>
+
+    <update id="updateOrderByOrderLogisticsId" parameterType="java.util.Map">
+        UPDATE `order` o,order_logistics ol SET o.`status` = #{status,jdbcType=INTEGER}
+        WHERE ol.order_logistics_id = #{orderLogisticsId,jdbcType=INTEGER} and ol.order_id = o.order_id
+    </update>
+</mapper>
