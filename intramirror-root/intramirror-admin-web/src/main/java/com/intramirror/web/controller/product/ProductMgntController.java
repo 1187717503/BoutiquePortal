@@ -1,19 +1,21 @@
 package com.intramirror.web.controller.product;
 
-import com.intramirror.common.help.StringUtils;
 import com.intramirror.common.parameter.StatusType;
+import com.intramirror.core.common.response.Response;
 import com.intramirror.product.api.model.SearchCondition;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ITagService;
 import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.product.api.service.content.ContentManagementService;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
-import com.intramirror.core.common.response.Response;
-import com.intramirror.web.controller.cache.CategoryCache;
 import com.intramirror.utils.transform.JsonTransformUtil;
+import com.intramirror.web.controller.cache.CategoryCache;
 import java.math.BigDecimal;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created on 2017/10/20.
- *
  * @author YouFeng.Zhu
  */
 @RestController
@@ -61,7 +62,7 @@ public class ProductMgntController {
             // @formatter:on
     ) {
 
-        SearchCondition searchCondition = initCondition(searchParams, null, categoryId, tagType,null, null);
+        SearchCondition searchCondition = initCondition(searchParams, null, categoryId, tagType, null, null);
         LOGGER.info("Search condition : {}", JsonTransformUtil.toJson(searchCondition));
         Map<StateEnum, Long> productStateCountMap = initiateCountMap();
         if (isEmptyTag(searchCondition)) {
@@ -124,7 +125,7 @@ public class ProductMgntController {
             @RequestParam(value = "tagType",required = false) Integer tagType
             // @formatter:on
     ) {
-        SearchCondition searchCondition = initCondition(searchParams, state, categoryId,tagType, pageSize, pageNo);
+        SearchCondition searchCondition = initCondition(searchParams, state, categoryId, tagType, pageSize, pageNo);
         LOGGER.info("Search condition : {}", JsonTransformUtil.toJson(searchCondition));
 
         if (isEmptyTag(searchCondition)) {
@@ -139,7 +140,7 @@ public class ProductMgntController {
         return Response.status(StatusType.SUCCESS).data(productList);
     }
 
-    private SearchCondition initCondition(SearchCondition searchParams, String state, Long categoryId,Integer tagType, Integer pageSize, Integer pageNo) {
+    private SearchCondition initCondition(SearchCondition searchParams, String state, Long categoryId, Integer tagType, Integer pageSize, Integer pageNo) {
         SearchCondition searchCondition = searchParams;
         searchCondition.setBoutiqueId(escapeLikeParams(searchParams.getBoutiqueId()));
         searchCondition.setCategoryId(categoryId == null ? null : categoryCache.getAllChildCategory(categoryId));
@@ -149,19 +150,19 @@ public class ProductMgntController {
             searchCondition.setShopProductStatus(getStatusEnum(state).getShopProductStatus());
         }
         List<Integer> types = searchParams.getTagTypes();
-        if(CollectionUtils.isEmpty(types)){
+        if (CollectionUtils.isEmpty(types)) {
             types = new ArrayList<>();
             types.add(1);
         }
-        if(tagType != null){
+        if (tagType != null) {
             types.add(tagType);
         }
         searchCondition.setTagTypes(types);
         List<Long> tagIds = searchParams.getTagIds();
-        if(CollectionUtils.isEmpty(tagIds)){
+        if (CollectionUtils.isEmpty(tagIds)) {
             tagIds = new ArrayList<>();
         }
-        if(searchCondition.getTagId()!=null && searchCondition.getTagId() >0){
+        if (searchCondition.getTagId() != null && searchCondition.getTagId() > 0) {
             tagIds.add(searchCondition.getTagId());
         }
         searchCondition.setTagIds(tagIds);
@@ -196,37 +197,36 @@ public class ProductMgntController {
         setCategoryPath(productList);
         List<Map<String, Object>> skuStoreList = iSkuStoreService.listSkuStoreByProductList(productList);
         List<Map<String, Object>> tagsList = null;
-        if (searchCondition.getTagId() != null || searchCondition.getTagTypes().size()>0) {
-            Map<String,Object> param = new HashMap<>();
+        if (searchCondition.getTagId() != null || searchCondition.getTagTypes().size() > 0) {
+            Map<String, Object> param = new HashMap<>();
             List<Long> pIds = new ArrayList<>();
-            for(Map<String, Object> maps : productList){
+            for (Map<String, Object> maps : productList) {
                 pIds.add(Long.valueOf(maps.get("product_id").toString()));
             }
-            param.put("pIds",pIds);
-            param.put("types",searchCondition.getTagTypes());
+            param.put("pIds", pIds);
+            param.put("types", searchCondition.getTagTypes());
             tagsList = contentManagementService.listTagsByProductIdsAndType(param);
         }
 
         for (Map<String, Object> product : productList) {
             setSkuInfo(product, skuStoreList);
-            if (searchCondition.getTagId() != null || searchCondition.getTagTypes().size()>0) {
+            if (searchCondition.getTagId() != null || searchCondition.getTagTypes().size() > 0) {
                 setTags(product, tagsList);
             }
             setState(product);
 
             getSpuModify(product);
             //如果关联spu有图片，则展示spu的图片
-//            if (product.get("spu_cover_img") != null && StringUtils.isNotBlank(product.get("spu_cover_img").toString())) {
-//                product.put("cover_img", product.get("spu_cover_img"));
-//            }
+            //            if (product.get("spu_cover_img") != null && StringUtils.isNotBlank(product.get("spu_cover_img").toString())) {
+            //                product.put("cover_img", product.get("spu_cover_img"));
+            //            }
         }
     }
 
     //判断spu是否修改过
     private void getSpuModify(Map<String, Object> product) {
-        if ((product.get("desc_modify") != null && (Boolean)product.get("desc_modify"))
-                || (product.get("img_modified") != null && (Boolean)product.get("img_modified"))
-                || (product.get("vendor_id") != null && product.get("vendor_id").toString().equals("-1"))) {
+        if ((product.get("desc_modify") != null && (Boolean) product.get("desc_modify")) || (product.get("img_modified") != null && (Boolean) product.get(
+                "img_modified")) || (product.get("vendor_id") != null && product.get("vendor_id").toString().equals("-1"))) {
             product.put("spuModified", "1");
         } else {
             product.put("spuModified", "0");
@@ -328,7 +328,8 @@ public class ProductMgntController {
         if (input == null) {
             return input;
         }
-        return input.replace("_", "\\_");
+
+        return input.replace("\\", "\\").replace("_", "\\_").trim();
     }
 
     private void setBrandIdAndColorCode(List<Map<String, Object>> productList) {
@@ -353,5 +354,4 @@ public class ProductMgntController {
             }
         }
     }
-
 }
