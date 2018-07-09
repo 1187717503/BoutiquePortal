@@ -329,7 +329,7 @@ public class ProductMgntController {
             return input;
         }
 
-        return input.replace("\\", "\\").replace("_", "\\_").trim();
+        return input.replace("\\", "\\\\").replace("_", "\\_").trim();
     }
 
     private void setBrandIdAndColorCode(List<Map<String, Object>> productList) {
