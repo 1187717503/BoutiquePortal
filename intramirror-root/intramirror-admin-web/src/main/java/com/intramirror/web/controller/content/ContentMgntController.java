@@ -18,6 +18,7 @@ import com.intramirror.product.api.service.IPriceChangeRuleGroupService;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ITagService;
 import com.intramirror.product.api.service.content.ContentManagementService;
+import com.intramirror.product.api.service.promotion.IPromotionService;
 import com.intramirror.product.api.vo.tag.ProductGroupVO;
 import com.intramirror.product.api.vo.tag.TagRequestVO;
 import com.intramirror.product.api.vo.tag.VendorTagVO;
@@ -86,6 +87,9 @@ public class ContentMgntController {
 
     @Autowired
     KafkaProperties kafkaProperties;
+
+    @Autowired
+    IPromotionService promotionService;
 
     /**
      * Return block info with bind tag.
@@ -281,6 +285,11 @@ public class ContentMgntController {
             List<BlockTagRel> blockTagRelList = blockService.getBlockTagRelByTagId(tagId);
             if (blockTagRelList.size() >= 1) {
                 throw new ValidateException(new ErrorResponse("The tag has been bound with block and cannot be removed!"));
+            }
+        } else if (tag.getTagType() == 2) {
+            List<Long> tagIds = promotionService.getExcludeProductGroupByTagId(tagId);
+            if (tagIds.size() >= 1) {
+                throw new ValidateException(new ErrorResponse("The tag has been bound with campaign and cannot be removed!"));
             }
         } else {
             List<PriceChangeRuleGroup> ruleLisr = priceChangeRuleGroupService.getChangeRulesByTagId(tagId);
