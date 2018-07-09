@@ -106,6 +106,10 @@
     <beans profile="test_ci">
         <context:property-placeholder location="classpath:test_ci/*.properties" ignore-unresolvable="true"/>
     </beans>
+ 
+    <beans profile="pressure_test">
+        <context:property-placeholder location="classpath:pressure_test/*.properties" ignore-unresolvable="true"/>
+    </beans>
 
     <beans profile="test_local">
         <context:property-placeholder location="classpath:test_local/*.properties" ignore-unresolvable="true"/>
