@@ -83,5 +83,8 @@
     <beans profile="prd">
         <context:property-placeholder location="classpath*:/prd/*.properties" ignore-unresolvable="true"/>
     </beans>
+    <beans profile="pressure_test">
+        <context:property-placeholder location="classpath*:/pressure_test/*.properties" ignore-unresolvable="true"/>
+    </beans>
 
 </beans>

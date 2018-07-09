@@ -63,6 +63,18 @@
                 </filters>
             </build>
         </profile>
+
+        <profile>
+            <id>pressure_test</id>
+            <properties>
+                <profiles.active>pressure_test</profiles.active>
+            </properties>
+            <build>
+                <filters>
+                    <filter>src/main/resources/pressure_test/dhl.properties</filter>
+                </filters>
+            </build>
+        </profile>
     </profiles>
 
     <dependencies>

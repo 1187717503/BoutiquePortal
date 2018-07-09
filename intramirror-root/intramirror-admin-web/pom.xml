@@ -58,6 +58,12 @@
                 <profiles.active>prd</profiles.active>
             </properties>
         </profile>
+        <profile>
+            <id>pressure_test</id>
+            <properties>
+                <profiles.active>pressure_test</profiles.active>
+            </properties>
+        </profile>
     </profiles>
 
     <dependencies>
