@@ -1,6 +1,6 @@
 package com.intramirror.product.core.impl;
 
-import com.intramirror.common.Constants;
+import com.intramirror.common.ChangedConstants;
 import com.intramirror.common.IKafkaService;
 import com.intramirror.product.api.service.IKafkaManagerService;
 import com.intramirror.product.common.KafkaProperties;
@@ -25,25 +25,25 @@ public class KafkaManagerServiceImpl implements IKafkaManagerService {
 
     @Override
     public void sendGroupChanged(Long productId) {
-        String data = this.generateMsg(productId, Constants.changed_discount);
+        String data = this.generateMsg(productId, ChangedConstants.changed_discount);
         kafkaService.sendMsgToKafka(data, kafkaProperties.getProductTopic(), kafkaProperties.getServerName());
         LOGGER.info("data:{}", data);
     }
 
     @Override
     public void sendSeasonChanged(Long productId) {
-        String seasonData = this.generateMsg(productId, Constants.changed_season_code);
+        String seasonData = this.generateMsg(productId, ChangedConstants.changed_season_code);
         kafkaService.sendMsgToKafka(seasonData, kafkaProperties.getProductTopic(), kafkaProperties.getServerName());
         LOGGER.info("data:{}", seasonData);
 
-        String discountData = this.generateMsg(productId, Constants.changed_discount);
+        String discountData = this.generateMsg(productId, ChangedConstants.changed_discount);
         kafkaService.sendMsgToKafka(discountData, kafkaProperties.getProductTopic(), kafkaProperties.getServerName());
         LOGGER.info("data:{}", discountData);
     }
 
     @Override
     public void sendPriceChanged(Long productId) {
-        String data = this.generateMsg(productId, Constants.changed_discount);
+        String data = this.generateMsg(productId, ChangedConstants.changed_discount);
         kafkaService.sendMsgToKafka(data, kafkaProperties.getProductTopic(), kafkaProperties.getServerName());
         LOGGER.info("data:{}", data);
     }
