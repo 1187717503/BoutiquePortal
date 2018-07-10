@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created on 2017/10/20.
+ *
  * @author YouFeng.Zhu
  */
 @RestController
@@ -174,7 +175,7 @@ public class ProductMgntController {
                 }
             }
 
-            if (boutiqueExceptionType != null) {
+            if (boutiqueExceptionType != null && boutiqueExceptionType != Constants.boutique_exception_type_all) {
                 List<Map<String, Object>> exceptionProductList = new ArrayList<>();
                 for (Map<String, Object> productMap : productList) {
                     if (boutiqueExceptionType.intValue() == 1 && productMap.get("priceChange") != null) {
