@@ -1,5 +1,27 @@
 package com.intramirror.web.controller.content;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.google.gson.Gson;
 import com.intramirror.common.IKafkaService;
 import com.intramirror.common.help.StringUtils;
@@ -8,6 +30,7 @@ import com.intramirror.core.common.exception.ValidateException;
 import com.intramirror.core.common.response.ErrorResponse;
 import com.intramirror.core.common.response.Response;
 import com.intramirror.product.api.model.Block;
+import com.intramirror.product.api.model.BlockDto;
 import com.intramirror.product.api.model.BlockTagRel;
 import com.intramirror.product.api.model.Category;
 import com.intramirror.product.api.model.PriceChangeRuleGroup;
@@ -28,27 +51,8 @@ import com.intramirror.user.api.service.VendorService;
 import com.intramirror.web.common.CommonProperties;
 import com.intramirror.web.config.HttpUtils;
 import com.intramirror.web.controller.cache.CategoryCache;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
 import net.sf.json.JSONObject;
-import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created on 2017/11/17.
@@ -149,7 +153,7 @@ public class ContentMgntController {
      */
     @PostMapping(value = "/blocks", consumes = "application/json")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public Response createBlock(@RequestBody Block block) throws Exception {
+    public Response createBlock(@RequestBody BlockDto block) throws Exception {
         contentManagementService.createBlockWithDefaultTag(block);
         return Response.success();
     }
@@ -161,7 +165,7 @@ public class ContentMgntController {
      * @return
      */
     @PutMapping(value = "/blocks/{blockId}", consumes = "application/json")
-    public Response updateBlock(@PathVariable Long blockId, @RequestBody Block block) {
+    public Response updateBlock(@PathVariable Long blockId, @RequestBody BlockDto block) {
         block.setBlockId(blockId);
         contentManagementService.updateBlockByBlockId(block);
         return Response.success();
