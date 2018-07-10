@@ -1,26 +1,30 @@
 package com.intramirror.web.controller.product;
 
-import com.google.gson.Gson;
-import com.intramirror.common.IKafkaService;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.core.common.exception.ValidateException;
 import com.intramirror.core.common.response.ErrorResponse;
 import com.intramirror.core.common.response.Response;
+import com.intramirror.core.net.http.OkHttpUtils;
 import com.intramirror.product.api.model.ProductWithBLOBs;
 import com.intramirror.product.api.model.Sku;
 import com.intramirror.product.api.model.Tag;
 import com.intramirror.product.api.model.TagProductRel;
+import com.intramirror.product.api.service.IKafkaManagerService;
 import com.intramirror.product.api.service.ISkuStoreService;
 import com.intramirror.product.api.service.ITagService;
 import com.intramirror.product.api.service.SkuService;
 import com.intramirror.product.api.service.content.ContentManagementService;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
-import com.intramirror.product.common.KafkaProperties;
+import com.intramirror.product.core.mapper.BoutiqueExceptionMapper;
+import com.intramirror.utils.transform.JsonTransformUtil;
 import com.intramirror.web.common.CommonProperties;
+import com.intramirror.web.common.Constants;
 import com.intramirror.web.common.response.BatchResponseItem;
 import com.intramirror.web.common.response.BatchResponseMessage;
 import com.intramirror.web.config.HttpUtils;
 import static com.intramirror.web.controller.product.StateMachineCoreRule.map2StateEnum;
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -28,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import net.sf.json.JSONObject;
+import okhttp3.MediaType;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -42,6 +47,7 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 
 /**
  * Created on 2017/10/25.
+ *
  * @author YouFeng.Zhu
  */
 @RestController
@@ -66,13 +72,13 @@ public class StateMachineController {
     private ContentManagementService contentManagementService;
 
     @Autowired
-    IKafkaService kafkaService;
-
-    @Autowired
-    KafkaProperties kafkaProperties;
-
-    @Autowired
     private CommonProperties commonProperties;
+
+    @Autowired
+    private BoutiqueExceptionMapper boutiqueExceptionMapper;
+
+    @Autowired
+    private IKafkaManagerService iKafkaManagerService;
 
     @PutMapping(value = "/single/{action}", consumes = "application/json")
     public Response operateProduct(@SessionAttribute(value = "sessionStorage", required = false) Long userId, @PathVariable(value = "action") String action,
@@ -89,6 +95,15 @@ public class StateMachineController {
                 throw new ValidateException(new ErrorResponse("Sku hasn't created."));
             }
         }
+
+        // check boutiqueExecption
+        if (originalState == StateEnum.SHOP_PROCESSING) {
+            int count = boutiqueExceptionMapper.countBoutiqueExceptionByProductId(productId);
+            if (count > 0) {
+                throw new ValidateException(new ErrorResponse("Please check the exception goods."));
+            }
+        }
+
         updateProductState((Long) userId, currentState, action, productId, shopProductId);
         return Response.success();
     }
@@ -254,16 +269,86 @@ public class StateMachineController {
 
         Map<Long, Long> validIdsMap = batchValidate(originalState, (List) body.get("ids"), operation, responseMessage);
         validIdsMap = batchFilterIncompleteProductIds(originalState, validIdsMap, operation, responseMessage);
+        validIdsMap = batchFilterExceptionProductIds(originalState, validIdsMap, operation, responseMessage);
         batchUpdateProductState(userId, originalState, action, validIdsMap, responseMessage);
-
         return Response.status(StatusType.SUCCESS).data(responseMessage);
+    }
+
+    @PutMapping(value = "/batch/accept/{type}", consumes = "application/json")
+    public Response batchAcceptChange(@PathVariable("type") Integer type, @RequestBody Map<String, Object> body) throws IOException {
+        if (body.get("ids") == null) {
+            throw new ValidateException(new ErrorResponse("Parameter missed"));
+        }
+        if (body.get("originalState") == null) {
+            throw new ValidateException(new ErrorResponse("Parameter originalState missed"));
+        }
+
+        List<Map<String, Object>> idsList = (List) body.get("ids");
+        for (Map<String, Object> idMap : idsList) {
+            Long productId = Long.parseLong(idMap.get("productId").toString());
+            Map<String, Object> boutiqueExceptionMap = boutiqueExceptionMapper.selectBoutiqueExceptionByProductIdAndType(productId, type);
+            this.acceptChange(type, boutiqueExceptionMap);
+            boutiqueExceptionMapper.deleteBoutiqueExceptionByProductIdAndType(productId, type);
+        }
+        return Response.success();
+    }
+
+    @PutMapping(value = "/batch/ignore/{type}", consumes = "application/json")
+    public Response batchIgnoreChange(@PathVariable("type") Integer type, @RequestBody Map<String, Object> body) throws Exception {
+        if (body.get("ids") == null) {
+            throw new ValidateException(new ErrorResponse("Parameter missed"));
+        }
+        if (body.get("originalState") == null) {
+            throw new ValidateException(new ErrorResponse("Parameter originalState missed"));
+        }
+
+        List<Map<String, Object>> idsList = (List) body.get("ids");
+        for (Map<String, Object> idMap : idsList) {
+            Long productId = Long.parseLong(idMap.get("productId").toString());
+            boutiqueExceptionMapper.deleteBoutiqueExceptionByProductIdAndType(productId, type);
+        }
+        return Response.success();
+    }
+
+    private void acceptChange(Integer type, Map<String, Object> boutiqueExceptionMap) throws IOException {
+        // price
+        if (type.intValue() == Constants.boutique_exception_type_price) {
+            String url = commonProperties.getMicroServiceProductServer() + "/price/discount/price";
+
+            Map<String, Object> map = new HashMap<>();
+            Long productId = Long.parseLong(boutiqueExceptionMap.get("product_id").toString());
+            map.put("productId", productId);
+            map.put("retailPrice", new BigDecimal(boutiqueExceptionMap.get("target_data").toString()));
+            String content = JsonTransformUtil.toJson(map);
+
+            okhttp3.Response response = OkHttpUtils.post().url(url).mediaType(MediaType.parse("application/json")).content(content).build().connTimeOut(10000)
+                    .readTimeOut(1000L).writeTimeOut(1000L).execute();
+            LOGGER.info("acceptPriceChange,url:{},content:{},result:{}", url, content, response.body().string());
+            iKafkaManagerService.sendPriceChanged(productId);
+        }
+
+        // season
+        if (type.intValue() == Constants.boutique_exception_type_season) {
+            String url = commonProperties.getMicroServiceProductServer() + "/price/discount/season";
+
+            Map<String, Object> map = new HashMap<>();
+            Long productId = Long.parseLong(boutiqueExceptionMap.get("product_id").toString());
+            map.put("productId", productId);
+            map.put("seasonCode", boutiqueExceptionMap.get("target_data").toString());
+            String content = JsonTransformUtil.toJson(map);
+
+            okhttp3.Response response = OkHttpUtils.post().url(url).mediaType(MediaType.parse("application/json")).content(content).build().connTimeOut(10000)
+                    .readTimeOut(1000L).writeTimeOut(1000L).execute();
+            LOGGER.info("acceptSeasonChange,url:{},content:{},result:{}", url, content, response.body().string());
+            iKafkaManagerService.sendSeasonChanged(productId);
+        }
     }
 
     private void delChangePriceRule(Long tagId, Map<String, Object> response) {
         // 调用改价接口
         String url = commonProperties.getPriceChangeRulePath();
         List<Long> reDelPIds = new ArrayList<>();// 回滚的pid
-        List<Map<String,Object>> changePriceRrr = new ArrayList<>();
+        List<Map<String, Object>> changePriceRrr = new ArrayList<>();
         if (!response.containsKey("tagRelSuccess")) {
             return;
         }
@@ -277,8 +362,7 @@ public class StateMachineController {
                     if (StringUtils.isNotBlank(result)) {
                         JSONObject object = JSONObject.fromObject(result);
                         if (object.containsKey("status") && "1".equals(object.get("status").toString())) {
-                            // 成功 发kafaka
-                            sendPriceChangeRuleMsg(pid);
+                            iKafkaManagerService.sendGroupChanged(pid);
                         } else {
                             changePriceRrr.add(p);
                             reDelPIds.add(pid);
@@ -295,7 +379,7 @@ public class StateMachineController {
 
             }
             if (CollectionUtils.isNotEmpty(reDelPIds)) {
-                response.put("changePriceRrr",changePriceRrr);
+                response.put("changePriceRrr", changePriceRrr);
                 Tag tag = iTagService.selectTagByTagId(tagId);
                 Map<String, Object> map = new HashMap<>();
                 map.put("productIdList", reDelPIds);
@@ -312,7 +396,7 @@ public class StateMachineController {
         // 調用改 价格接口
         String url = commonProperties.getPriceChangeRulePath();
         List<Long> reDelPIds = new ArrayList<>();// 回滚的pid
-        List<Map<String,Object>> changePriceRrr = new ArrayList<>();
+        List<Map<String, Object>> changePriceRrr = new ArrayList<>();
         if (!response.containsKey("success")) {
             return;
         }
@@ -326,8 +410,7 @@ public class StateMachineController {
                     if (StringUtils.isNotBlank(result)) {
                         JSONObject object = JSONObject.fromObject(result);
                         if (object.containsKey("status") && "1".equals(object.get("status").toString())) {
-                            // 成功 发kafaka
-                            sendPriceChangeRuleMsg(pid);
+                            iKafkaManagerService.sendPriceChanged(pid);
                         } else {
                             changePriceRrr.add(p);
                             reDelPIds.add(pid);
@@ -344,29 +427,11 @@ public class StateMachineController {
 
             }
             if (CollectionUtils.isNotEmpty(reDelPIds)) {
-                response.put("changePriceRrr",changePriceRrr);
+                response.put("changePriceRrr", changePriceRrr);
                 Long tagId = (Long) map.get("tag_id");
                 contentManagementService.batchDeleteByTagIdAndProductId1(reDelPIds, tagId, response);
             }
         }
-    }
-
-    private void sendPriceChangeRuleMsg(Long pid) {
-        if (pid == null)
-            return;
-        Map<String, String> param = new HashMap<>();
-        // { "product_id": "1111", "type": 4}
-        param.put("product_id", pid.toString());
-        param.put("type", "4");
-        String msg = new Gson().toJson(param);
-        LOGGER.info("Start to send {} to kafaka {}--->{}", msg, kafkaProperties.getProductTopic(), kafkaProperties.getServerName());
-        try {
-            kafkaService.sendMsgToKafka(msg, kafkaProperties.getProductTopic(), kafkaProperties.getServerName());
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            // error 不回滚
-        }
-
     }
 
     private void calResponseMsg(Map<String, Object> response, BatchResponseMessage responseMessage, Map<Long, Long> listMap2Map) {
@@ -474,6 +539,26 @@ public class StateMachineController {
 
         }
         return idsMap;
+    }
+
+    private Map<Long, Long> batchFilterExceptionProductIds(StateEnum originalState, Map<Long, Long> validIdsMap, OperationEnum operation,
+            BatchResponseMessage responseMessage) {
+        if (validIdsMap.size() <= 0) {
+            return validIdsMap;
+        }
+
+        if (originalState == StateEnum.SHOP_PROCESSING) {
+            List<Long> productIds = new LinkedList<>(validIdsMap.keySet());
+            for (Long productId : productIds) {
+                int countException = boutiqueExceptionMapper.countBoutiqueExceptionByProductId(productId);
+                if (countException > 0) {
+                    Long shopProductId = validIdsMap.get(productId);
+                    validIdsMap.remove(productId);
+                    responseMessage.getFailed().add(new BatchResponseItem(productId, shopProductId, "Please check the exception goods."));
+                }
+            }
+        }
+        return validIdsMap;
     }
 
     private Map<Long, Long> batchFilterIncompleteProductIds(StateEnum originalState, Map<Long, Long> validIdsMap, OperationEnum operation,

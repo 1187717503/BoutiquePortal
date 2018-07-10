@@ -9,6 +9,7 @@ import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.product.api.service.content.ContentManagementService;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
 import com.intramirror.utils.transform.JsonTransformUtil;
+import com.intramirror.web.common.Constants;
 import com.intramirror.web.controller.cache.CategoryCache;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created on 2017/10/20.
+ *
  * @author YouFeng.Zhu
  */
 @RestController
@@ -77,7 +79,7 @@ public class ProductMgntController {
             }
             productStateCountMap.put(stateEnum, Long.parseLong(item.get("count").toString()));
         }
-        mergeOldState(productStateCountMap);
+        mergeOldState(productStateCountMap, searchCondition);
         countALLState(productStateCountMap);
         return Response.status(StatusType.SUCCESS).data(productStateCountMap);
     }
@@ -90,7 +92,7 @@ public class ProductMgntController {
         return productStateCountMap;
     }
 
-    private void mergeOldState(Map<StateEnum, Long> productStateCountMap) {
+    private void mergeOldState(Map<StateEnum, Long> productStateCountMap, SearchCondition searchCondition) {
         Long countOldProcessing = productStateCountMap.get(StateEnum.OLD_PROCESSING);
         Long countProcessing = productStateCountMap.get(StateEnum.PROCESSING);
         Long countOldShopProcessing = productStateCountMap.get(StateEnum.OLD_SHOP_PROCESSING);
@@ -103,6 +105,14 @@ public class ProductMgntController {
         productStateCountMap.put(StateEnum.SHOP_PROCESSING, countOldShopProcessing + countShopProcessing);
         productStateCountMap.remove(StateEnum.OLD_PROCESSING);
         productStateCountMap.remove(StateEnum.OLD_SHOP_PROCESSING);
+
+        Integer boutiqueExceptionType = searchCondition.getBoutiqueExceptionType();
+        if (boutiqueExceptionType == null || boutiqueExceptionType == Constants.boutique_exception_type_all) {
+            return;
+        }
+
+        Integer countException = productManagementService.countBoutiqueException(boutiqueExceptionType);
+        productStateCountMap.put(StateEnum.SHOP_PROCESSING, countException.longValue());
     }
 
     private void countALLState(Map<StateEnum, Long> productStateCountMap) {
@@ -114,7 +124,6 @@ public class ProductMgntController {
     }
 
     @GetMapping(value = "/list/{state}")
-
     public Response listProductByFilter(
             // @formatter:off
             SearchCondition searchParams,
@@ -137,7 +146,48 @@ public class ProductMgntController {
         if (productList.size() > 0) {
             appendInfo(productList, getStatusEnum(state), searchCondition);
         }
-        return Response.status(StatusType.SUCCESS).data(productList);
+        List<Map<String, Object>> data = handleBoutqiqueException(productList, searchCondition);
+        return Response.status(StatusType.SUCCESS).data(data);
+    }
+
+    private List<Map<String, Object>> handleBoutqiqueException(List<Map<String, Object>> productList, SearchCondition searchCondition) {
+        int shopProductStatus = searchCondition.getShopProductStatus().intValue();
+        int productStatus = searchCondition.getProductStatus().intValue();
+        Integer boutiqueExceptionType = searchCondition.getBoutiqueExceptionType();
+        if ((productStatus == 4 || productStatus == 2) && shopProductStatus == 2 && CollectionUtils.isNotEmpty(productList)) {
+
+            List<Map<String, Object>> boutiqueExceptionList = productManagementService.listProductException(productList);
+            for (Map<String, Object> productMap : productList) {
+                int productId = Integer.parseInt(productMap.get("product_id").toString());
+
+                for (Map<String, Object> boutiqueExceptionMap : boutiqueExceptionList) {
+                    int exceptionProductId = Integer.parseInt(boutiqueExceptionMap.get("product_id").toString());
+                    int type = Integer.parseInt(boutiqueExceptionMap.get("type").toString());
+                    if (productId == exceptionProductId && type == Constants.boutique_exception_type_price) {
+                        if (productMap.get("priceChange") == null) {
+                            productMap.put("priceChange", boutiqueExceptionMap);
+                        }
+                    } else if (productId == exceptionProductId && type == Constants.boutique_exception_type_season) {
+                        if (productMap.get("seasonChange") == null) {
+                            productMap.put("seasonChange", boutiqueExceptionMap);
+                        }
+                    }
+                }
+            }
+
+            if (boutiqueExceptionType != null && boutiqueExceptionType != Constants.boutique_exception_type_all) {
+                List<Map<String, Object>> exceptionProductList = new ArrayList<>();
+                for (Map<String, Object> productMap : productList) {
+                    if (boutiqueExceptionType.intValue() == 1 && productMap.get("priceChange") != null) {
+                        exceptionProductList.add(productMap);
+                    } else if (boutiqueExceptionType.intValue() == 2 && productMap.get("seasonChange") != null) {
+                        exceptionProductList.add(productMap);
+                    }
+                }
+                productList = exceptionProductList;
+            }
+        }
+        return productList;
     }
 
     private SearchCondition initCondition(SearchCondition searchParams, String state, Long categoryId, Integer tagType, Integer pageSize, Integer pageNo) {

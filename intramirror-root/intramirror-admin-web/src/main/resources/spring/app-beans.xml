@@ -70,6 +70,7 @@
         <property name="appCheckUrl" value="${app.check.url}"></property>
         <property name="ruleExcelPath" value="${price.rule.path}"></property>
         <property name="priceChangeRulePath" value="${price.change.rule.path}"></property>
+        <property name="microServiceProductServer" value="${micro.service.product.server}"></property>
     </bean>
 
 
