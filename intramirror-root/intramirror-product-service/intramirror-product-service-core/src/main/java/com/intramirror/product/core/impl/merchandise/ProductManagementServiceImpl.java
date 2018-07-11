@@ -4,32 +4,17 @@ import com.google.gson.Gson;
 import com.intramirror.common.IKafkaService;
 import com.intramirror.core.common.exception.ValidateException;
 import com.intramirror.core.common.response.ErrorResponse;
-import com.intramirror.product.api.model.ProductWithBLOBs;
-import com.intramirror.product.api.model.SearchCondition;
-import com.intramirror.product.api.model.Season;
-import com.intramirror.product.api.model.ShopProduct;
-import com.intramirror.product.api.model.ShopProductSku;
-import com.intramirror.product.api.model.ShopProductWithBLOBs;
-import com.intramirror.product.api.model.Sku;
+import com.intramirror.product.api.model.*;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
 import com.intramirror.product.common.KafkaProperties;
-import com.intramirror.product.core.mapper.ProductManagementMapper;
-import com.intramirror.product.core.mapper.ProductMapper;
-import com.intramirror.product.core.mapper.SeasonMapper;
-import com.intramirror.product.core.mapper.ShopProductMapper;
-import com.intramirror.product.core.mapper.ShopProductSkuMapper;
-import com.intramirror.product.core.mapper.SkuMapper;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import com.intramirror.product.core.mapper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
 
 /**
  * Created on 2017/10/30.
@@ -68,7 +53,15 @@ public class ProductManagementServiceImpl implements ProductManagementService {
 
     @Override
     public List<Map<String, Object>> listProductService(SearchCondition searchCondition) {
-        return productManagementMapper.listProductDetailInfo(searchCondition);
+    	List<Map<String, Object>> resultList=productManagementMapper.listProductDetailInfo(searchCondition);
+    	if(resultList!=null&&resultList.size()>0) {
+    		for(Map<String, Object> map:resultList) {
+    			if(map.get("spu_cover_img")!=null) {
+    				map.put("cover_img", map.get("spu_cover_img"));
+    			}
+    		}
+    	}
+        return resultList;
     }
 
     @Override
