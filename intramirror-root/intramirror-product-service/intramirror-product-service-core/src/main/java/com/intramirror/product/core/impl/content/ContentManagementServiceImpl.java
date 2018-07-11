@@ -3,15 +3,7 @@ package com.intramirror.product.core.impl.content;
 import com.intramirror.product.api.model.*;
 import com.intramirror.product.api.service.content.ContentManagementService;
 import com.intramirror.product.core.mapper.*;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.collections.ArrayStack;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.ListUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -19,311 +11,314 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Created on 2017/11/21.
- * 
  * @author YouFeng.Zhu
  */
 @Service
 public class ContentManagementServiceImpl implements ContentManagementService {
-	private final static Logger LOGGER = LoggerFactory.getLogger(ContentManagementServiceImpl.class);
-	@Autowired
-	private ContentManagementMapper contentManagementMapper;
+    private final static Logger LOGGER = LoggerFactory.getLogger(ContentManagementServiceImpl.class);
+    @Autowired
+    private ContentManagementMapper contentManagementMapper;
 
-	@Autowired
-	private BlockMapper blockMapper;
+    @Autowired
+    private BlockMapper blockMapper;
 
-	@Autowired
-	private BlockTagRelMapper blockTagRelMapper;
+    @Autowired
+    private BlockTagRelMapper blockTagRelMapper;
 
-	@Autowired
-	private TagProductRelMapper tagProductRelMapper;
+    @Autowired
+    private TagProductRelMapper tagProductRelMapper;
 
-	@Autowired
-	private TagMapper tagMapper;
+    @Autowired
+    private TagMapper tagMapper;
 
-	@Autowired
-	private ProductMapper productMapper;
+    @Autowired
+    private ProductMapper productMapper;
 
-	@Autowired
-	private BlockContentTemplateRelMapper blockContentTemplateRelMapper;
+    @Autowired
+    private BlockContentTemplateRelMapper blockContentTemplateRelMapper;
 
-	@Autowired
-	private ContentTemplateMapper contentTemplateMapper;
+    @Autowired
+    private ContentTemplateMapper contentTemplateMapper;
 
-	@Autowired
-	private SkuMapper skuMapper;
-	
-	@Override
-	public List<Map<String, Object>> listTagProductInfo(Long tagId) {
-		List<Map<String, Object>> resultList=contentManagementMapper.listTagProductInfo(tagId);
-		if(resultList!=null&&resultList.size()>0) {
-			for(Map<String, Object> map:resultList) {
-				List<Sku> skuList=skuMapper.listSkuInfoByProductId((Long)map.get("product_id"));
-				map.put("product_sku", skuList);
-			}
-		}
-		return resultList;
-	}
+    @Autowired
+    private SkuMapper skuMapper;
 
-	@Override
-	@Transactional
-	public void updateContent(Block block, Tag tag, List<TagProductRel> sort) {
-		updateBlock(block);
-		rebindBlockTag(block, tag.getTagId());
-		updateTagProductSort(tag.getTagId(), sort);
-	}
+    @Override
+    public List<Map<String, Object>> listTagProductInfo(Long tagId) {
+        List<Map<String, Object>> resultList = contentManagementMapper.listTagProductInfo(tagId);
+        if (resultList != null && resultList.size() > 0) {
+            for (Map<String, Object> map : resultList) {
+                List<Sku> skuList = skuMapper.listSkuInfoByProductId((Long) map.get("product_id"));
+                map.put("product_sku", skuList);
+            }
+        }
+        return resultList;
+    }
 
-	@Override
-	public Map<String, Object> getTagAndBlockRelByTagId(Long tagId) {
-		return contentManagementMapper.getTagAndBlockRelByTagId(tagId);
-	}
+    @Override
+    @Transactional
+    public void updateContent(Block block, Tag tag, List<TagProductRel> sort) {
+        updateBlock(block);
+        rebindBlockTag(block, tag.getTagId());
+        updateTagProductSort(tag.getTagId(), sort);
+    }
 
-	@Override
-	public List<Map<String, Object>> listUnbindTag(Long blockId) {
-		return contentManagementMapper.listUnbindTag(blockId);
-	}
+    @Override
+    public Map<String, Object> getTagAndBlockRelByTagId(Long tagId) {
+        return contentManagementMapper.getTagAndBlockRelByTagId(tagId);
+    }
 
-	@Override
-	public List<Long> listTagProductIds(List<Long> tagIds) {
-		Map<String, Object> param = new HashMap<>();
-		param.put("tagIds", tagIds);
-		return contentManagementMapper.listTagProductIds(param);
-	}
+    @Override
+    public List<Map<String, Object>> listUnbindTag(Long blockId) {
+        return contentManagementMapper.listUnbindTag(blockId);
+    }
 
-	@Override
-	public List<Map<String, Object>> listTagsByProductIds(List<Map<String, Object>> productIds) {
-		return contentManagementMapper.listTagsByProductIds(productIds);
-	}
+    @Override
+    public List<Long> listTagProductIds(List<Long> tagIds) {
+        Map<String,Object> param = new HashMap<>();
+        param.put("tagIds",tagIds);
+        return contentManagementMapper.listTagProductIds(param);
+    }
 
-	@Override
-	public List<Map<String, Object>> listTagsByProductIdsAndType(Map<String, Object> param) {
-		return contentManagementMapper.listTagsByProductIdsAndType(param);
-	}
+    @Override
+    public List<Map<String, Object>> listTagsByProductIds(List<Map<String, Object>> productIds) {
+        return contentManagementMapper.listTagsByProductIds(productIds);
+    }
 
-	@Override
-	public List<Long> listAllTagProductIds(List<Integer> tagTypes) {
-		Map<String, Object> param = new HashMap<>();
-		param.put("types", tagTypes);
-		return contentManagementMapper.listAllTagProductIds(param);
-	}
+    @Override
+    public List<Map<String, Object>> listTagsByProductIdsAndType(Map<String, Object> param) {
+        return contentManagementMapper.listTagsByProductIdsAndType(param);
+    }
 
-	@Override
-	public List<Map<String, Object>> listBlockWithTag(String blockName, Integer status, Long tagId, Long modifiedAtFrom,
-			Long modifiedAtTo, int start, int limit, int desc) {
-		return contentManagementMapper.listBlockWithTag(blockName, status, tagId, modifiedAtFrom, modifiedAtTo, start,
-				limit, desc);
-	}
+    @Override
+    public List<Long> listAllTagProductIds(List<Integer> tagTypes) {
+        Map<String,Object> param = new HashMap<>();
+        param.put("types",tagTypes);
+        return contentManagementMapper.listAllTagProductIds(param);
+    }
 
-	@Override
-	public int getBlockSize(String blockName, Integer status, Long tagId, Long modifiedAtFrom, Long modifiedAtTo) {
-		return contentManagementMapper.getBlockSize(blockName, status, tagId, modifiedAtFrom, modifiedAtTo);
-	}
+    @Override
+    public List<Map<String, Object>> listBlockWithTag(String blockName, Integer status, Long tagId, Long modifiedAtFrom, Long modifiedAtTo, int start,
+            int limit, int desc) {
+        return contentManagementMapper.listBlockWithTag(blockName, status, tagId, modifiedAtFrom, modifiedAtTo, start, limit, desc);
+    }
 
-	@Override
-	public Map<String, Object> getBlockWithTagByBlockId(Long blockId) {
-		Map<String, Object> resultMap = contentManagementMapper.getBlockWithTagByBlockId(blockId);
-		if (resultMap != null) {
-			List<BlockContentTemplateRel> blockContentTemplateRelList = blockContentTemplateRelMapper
-					.selectByBlockId(blockId);
-			if (blockContentTemplateRelList != null && blockContentTemplateRelList.size() > 0) {
-				List<BlockContentTemplateRelDto> blockContentTemplateRelDtoList = new ArrayList<>();
-				for (BlockContentTemplateRel blockContentTemplateRel : blockContentTemplateRelList) {
-					BlockContentTemplateRelDto blockContentTemplateRelDto = new BlockContentTemplateRelDto();
-					BeanUtils.copyProperties(blockContentTemplateRel, blockContentTemplateRelDto);
-					blockContentTemplateRelDto.setContentTemplate(
-							contentTemplateMapper.selectByPrimaryKey(blockContentTemplateRel.getContentTemplateId()));
-					blockContentTemplateRelDtoList.add(blockContentTemplateRelDto);
-				}
-				resultMap.put("block.blockContentTemplateRelList", blockContentTemplateRelDtoList);
-			}
-		}
-		return resultMap;
-	}
+    @Override
+    public int getBlockSize(String blockName, Integer status, Long tagId, Long modifiedAtFrom, Long modifiedAtTo) {
+        return contentManagementMapper.getBlockSize(blockName, status, tagId, modifiedAtFrom, modifiedAtTo);
+    }
 
-	@Override
-	@Transactional
-	public int updateBlockByBlockId(Block record) {
-		int row = 0;
-		if (record.getSortOrder() == null) {
-			row = blockMapper.updateByBlockId(record);
-		} else {
-			row = updateBlock(record);
-		}
-		BlockDto blockDto = (BlockDto) record;
-		if (blockDto.getBlockContentTemplateRelList() != null && blockDto.getBlockContentTemplateRelList().size() > 0) {
-			for (BlockContentTemplateRel contentTemplateRel : blockDto.getBlockContentTemplateRelList()) {
-				blockContentTemplateRelMapper.updateByPrimaryKey(contentTemplateRel);
-			}
-		}
-		return row;
-	}
+    @Override
+    public Map<String, Object> getBlockWithTagByBlockId(Long blockId) {
+        Map<String, Object> resultMap = contentManagementMapper.getBlockWithTagByBlockId(blockId);
+        if (resultMap != null) {
+            List<BlockContentTemplateRel> blockContentTemplateRelList = blockContentTemplateRelMapper
+                    .selectByBlockId(blockId);
+            if (blockContentTemplateRelList != null && blockContentTemplateRelList.size() > 0) {
+                List<BlockContentTemplateRelDto> blockContentTemplateRelDtoList = new ArrayList<>();
+                for (BlockContentTemplateRel blockContentTemplateRel : blockContentTemplateRelList) {
+                    BlockContentTemplateRelDto blockContentTemplateRelDto = new BlockContentTemplateRelDto();
+                    BeanUtils.copyProperties(blockContentTemplateRel, blockContentTemplateRelDto);
+                    blockContentTemplateRelDto.setContentTemplate(
+                            contentTemplateMapper.selectByPrimaryKey(blockContentTemplateRel.getContentTemplateId()));
+                    blockContentTemplateRelDtoList.add(blockContentTemplateRelDto);
+                }
+                resultMap.put("block.blockContentTemplateRelList", blockContentTemplateRelDtoList);
+            }
+        }
+        return resultMap;
+    }
 
-	@Override
-	@Transactional
-	public int batchUpdateBlock(List<Block> record) {
-		return blockMapper.batchUpdateBlock(record.get(0).getStatus(), record);
-	}
+    @Override
+    @Transactional
+    public int updateBlockByBlockId(Block record) {
+        int row = 0;
+        if (record.getSortOrder() == null) {
+            row = blockMapper.updateByBlockId(record);
+        } else {
+            row = updateBlock(record);
+        }
+        BlockDto blockDto = (BlockDto) record;
+        if (blockDto.getBlockContentTemplateRelList() != null && blockDto.getBlockContentTemplateRelList().size() > 0) {
+            for (BlockContentTemplateRel contentTemplateRel : blockDto.getBlockContentTemplateRelList()) {
+                blockContentTemplateRelMapper.updateByPrimaryKey(contentTemplateRel);
+            }
+        }
+        return row;
+    }
 
-	@Override
-	@Transactional
-	public int createTag(Tag record) {
-		record.setEnabled(true);
-		return tagMapper.insertSelective(record);
-	}
+    @Override
+    @Transactional
+    public int batchUpdateBlock(List<Block> record) {
+        return blockMapper.batchUpdateBlock(record.get(0).getStatus(), record);
+    }
 
-	@Override
-	@Transactional
-	public int deleteTag(Long tagId) {
-		tagProductRelMapper.deleteByTagId(tagId);
-		// blockTagRelMapper.deleteByTagId(tagId);
-		return tagMapper.deleteByPrimaryKey(tagId);
-	}
+    @Override
+    @Transactional
+    public int createTag(Tag record) {
+        record.setEnabled(true);
+        return tagMapper.insertSelective(record);
+    }
 
-	@Override
-	@Transactional
-	public int deleteByTagIdAndProductId(Long tagId, Long productId) {
-		return tagProductRelMapper.deleteByTagIdAndProductId(tagId, productId);
-	}
+    @Override
+    @Transactional
+    public int deleteTag(Long tagId) {
+        tagProductRelMapper.deleteByTagId(tagId);
+        //blockTagRelMapper.deleteByTagId(tagId);
+        return tagMapper.deleteByPrimaryKey(tagId);
+    }
 
-	@Override
-	@Transactional
-	public int batchDeleteByTagIdAndProductId(List<TagProductRel> listTagProductRel) {
-		return tagProductRelMapper.batchDeleteByTagIdAndProductId(listTagProductRel);
-	}
+    @Override
+    @Transactional
+    public int deleteByTagIdAndProductId(Long tagId, Long productId) {
+        return tagProductRelMapper.deleteByTagIdAndProductId(tagId, productId);
+    }
 
-	@Override
-	@Transactional
-	public int batchDeleteByTagIdAndProductId1(List<Long> productIds, Long tagId, Map<String, Object> response) {
-		List<Map<String, Object>> failed = new ArrayList<>();
-		List<Map<String, Object>> success = new ArrayList<>();
-		if (CollectionUtils.isNotEmpty(productIds)) {
-			Map<Long, ProductWithBLOBs> bloBsMap = new HashMap<>();
-			List<ProductWithBLOBs> productWithBLOBs = productMapper.listProductByProductIds(productIds);
-			if (CollectionUtils.isNotEmpty(productWithBLOBs)) {
-				for (ProductWithBLOBs p : productWithBLOBs) {
-					bloBsMap.put(p.getProductId(), p);
-				}
-			}
-			Map<Long, Object> tagRelMap = new HashMap<>();
-			Map<String, Object> param = new HashMap<>();
-			param.put("productIdList", productIds);
-			param.put("tag_id", tagId);
-			List<Map<String, Object>> mapList = tagProductRelMapper.getByProductAndTagId(param);
-			if (mapList.size() > 0) {
-				for (Map<String, Object> map : mapList) {
-					tagRelMap.put(Long.valueOf(map.get("product_id").toString()), map);
-				}
-			}
-			for (Long id : productIds) {
-				if (!tagRelMap.containsKey(id)) {
-					ProductWithBLOBs p = bloBsMap.get(id);
-					if (p != null) {
-						Map<String, Object> map1 = new HashMap<>();
-						map1.put("productId", p.getProductId());
-						map1.put("boutiqueId", p.getProductCode());
-						failed.add(map1);
-					}
+    @Override
+    @Transactional
+    public int batchDeleteByTagIdAndProductId(List<TagProductRel> listTagProductRel) {
+        return tagProductRelMapper.batchDeleteByTagIdAndProductId(listTagProductRel);
+    }
 
-				} else {
-					tagProductRelMapper.deleteByTagIdAndProductId(tagId, id);
-					ProductWithBLOBs p = bloBsMap.get(id);
-					if (p != null) {
-						Map<String, Object> map1 = new HashMap<>();
-						map1.put("productId", p.getProductId());
-						map1.put("boutiqueId", p.getProductCode());
-						success.add(map1);
-					}
-				}
-			}
-			if (failed.size() > 0) {
-				response.put("tagRelNo", failed);
-			}
-			if (success.size() > 0) {
-				response.put("tagRelSuccess", success);
-			}
-		}
-		return 0;
-	}
+    @Override
+    @Transactional
+    public int batchDeleteByTagIdAndProductId1(List<Long> productIds, Long tagId,Map<String, Object> response) {
+        List<Map<String,Object>> failed = new ArrayList<>();
+        List<Map<String,Object>> success = new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(productIds)){
+            Map<Long,ProductWithBLOBs> bloBsMap = new HashMap<>();
+            List<ProductWithBLOBs> productWithBLOBs =  productMapper.listProductByProductIds(productIds);
+            if(CollectionUtils.isNotEmpty(productWithBLOBs)){
+                for(ProductWithBLOBs p : productWithBLOBs){
+                    bloBsMap.put(p.getProductId(),p);
+                }
+            }
+            Map<Long,Object> tagRelMap = new HashMap<>();
+            Map<String,Object> param = new HashMap<>();
+            param.put("productIdList",productIds);
+            param.put("tag_id",tagId);
+            List<Map<String, Object>> mapList = tagProductRelMapper.getByProductAndTagId(param);
+            if(mapList.size()>0){
+                for(Map<String, Object> map : mapList){
+                    tagRelMap.put(Long.valueOf(map.get("product_id").toString()),map);
+                }
+            }
+            for(Long id : productIds){
+                if(!tagRelMap.containsKey(id)){
+                    ProductWithBLOBs p = bloBsMap.get(id);
+                    if(p!=null){
+                        Map<String,Object> map1 = new HashMap<>();
+                        map1.put("productId",p.getProductId());
+                        map1.put("boutiqueId",p.getProductCode());
+                        failed.add(map1);
+                    }
 
-	@Override
-	@Transactional(rollbackFor = Exception.class)
-	public BlockTagRel createBlockWithDefaultTag(Block block) throws Exception {
-		List<Block> blockList = blockMapper.listBlockBySort(block.getSortOrder());
-		Tag tag = new Tag();
-		tag.setTagName(block.getBlockName());
+                }else {
+                    tagProductRelMapper.deleteByTagIdAndProductId(tagId, id);
+                    ProductWithBLOBs p = bloBsMap.get(id);
+                    if(p!=null){
+                        Map<String,Object> map1 = new HashMap<>();
+                        map1.put("productId",p.getProductId());
+                        map1.put("boutiqueId",p.getProductCode());
+                        success.add(map1);
+                    }
+                }
+            }
+            if(failed.size()>0){
+                response.put("tagRelNo",failed);
+            }
+            if(success.size()>0){
+                response.put("tagRelSuccess",success);
+            }
+        }
+        return 0;
+    }
 
-		if (tagMapper.getTagsByName(tag) != null) {
-			LOGGER.error("Tag name is duplicate {}.", block.getBlockName());
-			throw new Exception("Tag name is duplicate");
-		}
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public BlockTagRel createBlockWithDefaultTag(Block block) throws Exception {
+        List<Block> blockList = blockMapper.listBlockBySort(block.getSortOrder());
+        Tag tag = new Tag();
+        tag.setTagName(block.getBlockName());
 
-		block.setStatus((byte) 1);
-		block.setEnabled(true);
-		blockMapper.insertSelective(block);
-		if (blockList.size() != 0) {
-			blockMapper.batchUpdateSort(blockList);
-		}
+        if (tagMapper.getTagsByName(tag) != null) {
+            LOGGER.error("Tag name is duplicate {}.", block.getBlockName());
+            throw new Exception("Tag name is duplicate");
+        }
 
-		tag.setEnabled(true);
+        block.setStatus((byte) 1);
+        block.setEnabled(true);
+        blockMapper.insertSelective(block);
+        if (blockList.size() != 0) {
+            blockMapper.batchUpdateSort(blockList);
+        }
 
-		int rowNum = tagMapper.insertSelective(tag);
-		LOGGER.info("Create tag for name {}, effect {} rows.", block.getBlockName(), rowNum);
+        tag.setEnabled(true);
 
-		BlockDto blockDto = (BlockDto) block;
-		if (blockDto.getBlockContentTemplateRelList() != null && blockDto.getBlockContentTemplateRelList().size() > 0) {
-			for (BlockContentTemplateRel contentTemplateRel : blockDto.getBlockContentTemplateRelList()) {
-				contentTemplateRel.setEnabled(true);
-				contentTemplateRel.setBlockId(blockDto.getBlockId());
-				blockContentTemplateRelMapper.insertSelective(contentTemplateRel);
-			}
-			LOGGER.info("Create blockContentTemplateRel for name {}, effect {} rows.", block.getBlockName(),
-					blockDto.getBlockContentTemplateRelList().size());
-		}
+        int rowNum = tagMapper.insertSelective(tag);
+        LOGGER.info("Create tag for name {}, effect {} rows.", block.getBlockName(), rowNum);
 
-		BlockTagRel btRel = new BlockTagRel();
-		btRel.setTagId(tag.getTagId());
-		btRel.setBlockId(block.getBlockId());
+        BlockDto blockDto = (BlockDto) block;
+        if (blockDto.getBlockContentTemplateRelList() != null && blockDto.getBlockContentTemplateRelList().size() > 0) {
+            for (BlockContentTemplateRel contentTemplateRel : blockDto.getBlockContentTemplateRelList()) {
+                contentTemplateRel.setEnabled(true);
+                contentTemplateRel.setBlockId(blockDto.getBlockId());
+                blockContentTemplateRelMapper.insertSelective(contentTemplateRel);
+            }
+            LOGGER.info("Create blockContentTemplateRel for name {}, effect {} rows.", block.getBlockName(),
+                    blockDto.getBlockContentTemplateRelList().size());
+        }
 
-		blockTagRelMapper.insertSelective(btRel);
+        BlockTagRel btRel = new BlockTagRel();
+        btRel.setTagId(tag.getTagId());
+        btRel.setBlockId(block.getBlockId());
 
-		return btRel;
-	}
+        blockTagRelMapper.insertSelective(btRel);
 
-	private int updateBlock(Block block) {
-		Block originBlock = blockMapper.selectByPrimaryKey(block.getBlockId());
-		int origSort = originBlock.getSortOrder();
-		int newSort = block.getSortOrder();
+        return btRel;
+    }
 
-		if (newSort < origSort) {
-			blockMapper.updateLeftSort(newSort, origSort);
-		} else if (newSort > origSort) {
-			blockMapper.updateRightSort(origSort, newSort);
-		}
+    private int updateBlock(Block block) {
+        Block originBlock = blockMapper.selectByPrimaryKey(block.getBlockId());
+        int origSort = originBlock.getSortOrder();
+        int newSort = block.getSortOrder();
 
-		return blockMapper.updateByBlockId(block);
-	}
+        if (newSort < origSort) {
+            blockMapper.updateLeftSort(newSort, origSort);
+        } else if (newSort > origSort) {
+            blockMapper.updateRightSort(origSort, newSort);
+        }
 
-	private int rebindBlockTag(Block block, Long tagId) {
-		blockTagRelMapper.deleteByBlockId(block.getBlockId());
-		if (tagId == -1) {
-			return 0;
-		}
-		BlockTagRel btRel = new BlockTagRel();
-		btRel.setBlockId(block.getBlockId());
-		btRel.setTagId(tagId);
-		return blockTagRelMapper.insertSelective(btRel);
-	}
+        return blockMapper.updateByBlockId(block);
+    }
 
-	private int updateTagProductSort(Long tagId, List<TagProductRel> sort) {
-		tagProductRelMapper.deleteByTagId(tagId);
-		if (sort.size() == 0 || tagId == -1) {
-			return 0;
-		}
-		for (TagProductRel tagProductRel : sort) {
-			tagProductRel.setTagId(tagId);
-		}
-		return tagProductRelMapper.batchInsert(sort);
-	}
+    private int rebindBlockTag(Block block, Long tagId) {
+        blockTagRelMapper.deleteByBlockId(block.getBlockId());
+        if (tagId == -1) {
+            return 0;
+        }
+        BlockTagRel btRel = new BlockTagRel();
+        btRel.setBlockId(block.getBlockId());
+        btRel.setTagId(tagId);
+        return blockTagRelMapper.insertSelective(btRel);
+    }
+
+    private int updateTagProductSort(Long tagId, List<TagProductRel> sort) {
+        tagProductRelMapper.deleteByTagId(tagId);
+        if (sort.size() == 0 || tagId == -1) {
+            return 0;
+        }
+        for (TagProductRel tagProductRel : sort) {
+            tagProductRel.setTagId(tagId);
+        }
+        return tagProductRelMapper.batchInsert(sort);
+    }
 
 }
