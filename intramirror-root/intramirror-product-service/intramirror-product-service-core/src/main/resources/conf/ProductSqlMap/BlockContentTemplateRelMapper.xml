@@ -57,7 +57,7 @@
     ,
     <include refid="Blob_Column_List" />
     from block_content_template_rel
-    where block_id = #{blockId,jdbcType=BIGINT}
+    where block_id = #{blockId,jdbcType=BIGINT} AND enabled = TRUE
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
     <!--

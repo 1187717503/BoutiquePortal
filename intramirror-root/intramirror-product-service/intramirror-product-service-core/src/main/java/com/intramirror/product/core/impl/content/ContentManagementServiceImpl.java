@@ -51,9 +51,19 @@ public class ContentManagementServiceImpl implements ContentManagementService {
 	@Autowired
 	private ContentTemplateMapper contentTemplateMapper;
 
+	@Autowired
+	private SkuMapper skuMapper;
+	
 	@Override
 	public List<Map<String, Object>> listTagProductInfo(Long tagId) {
-		return contentManagementMapper.listTagProductInfo(tagId);
+		List<Map<String, Object>> resultList=contentManagementMapper.listTagProductInfo(tagId);
+		if(resultList!=null&&resultList.size()>0) {
+			for(Map<String, Object> map:resultList) {
+				List<Sku> skuList=skuMapper.listSkuInfoByProductId((Long)map.get("product_id"));
+				map.put("product_sku", skuList);
+			}
+		}
+		return resultList;
 	}
 
 	@Override
@@ -140,7 +150,7 @@ public class ContentManagementServiceImpl implements ContentManagementService {
 		} else {
 			row = updateBlock(record);
 		}
-		BlockDto blockDto=(BlockDto)record;
+		BlockDto blockDto = (BlockDto) record;
 		if (blockDto.getBlockContentTemplateRelList() != null && blockDto.getBlockContentTemplateRelList().size() > 0) {
 			for (BlockContentTemplateRel contentTemplateRel : blockDto.getBlockContentTemplateRelList()) {
 				blockContentTemplateRelMapper.updateByPrimaryKey(contentTemplateRel);
@@ -260,7 +270,7 @@ public class ContentManagementServiceImpl implements ContentManagementService {
 		int rowNum = tagMapper.insertSelective(tag);
 		LOGGER.info("Create tag for name {}, effect {} rows.", block.getBlockName(), rowNum);
 
-		BlockDto blockDto=(BlockDto)block;
+		BlockDto blockDto = (BlockDto) block;
 		if (blockDto.getBlockContentTemplateRelList() != null && blockDto.getBlockContentTemplateRelList().size() > 0) {
 			for (BlockContentTemplateRel contentTemplateRel : blockDto.getBlockContentTemplateRelList()) {
 				contentTemplateRel.setEnabled(true);
