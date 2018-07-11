@@ -264,6 +264,7 @@ public class ContentManagementServiceImpl implements ContentManagementService {
 		if (blockDto.getBlockContentTemplateRelList() != null && blockDto.getBlockContentTemplateRelList().size() > 0) {
 			for (BlockContentTemplateRel contentTemplateRel : blockDto.getBlockContentTemplateRelList()) {
 				contentTemplateRel.setEnabled(true);
+				contentTemplateRel.setBlockId(blockDto.getBlockId());
 				blockContentTemplateRelMapper.insertSelective(contentTemplateRel);
 			}
 			LOGGER.info("Create blockContentTemplateRel for name {}, effect {} rows.", block.getBlockName(),
