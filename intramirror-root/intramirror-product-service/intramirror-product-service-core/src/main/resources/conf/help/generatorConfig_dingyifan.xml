@@ -32,21 +32,10 @@
 		<javaClientGenerator targetPackage="com.intramirror.product.core.mapper"
 				targetProject="D:\intramirror\workspace\BoutiquePortal\intramirror-root\intramirror-product-service\intramirror-product-service-core\src\main\java" type="XMLMAPPER" /> <!-- 生成MAP对应Client -->
 
-		<table schema="ger_sh_staging_db" tableName="snapshot_price_rule" domainObjectName="SnapshotPriceRule"
+		<table schema="ger_sh_staging_db" tableName="boutique_exception" domainObjectName="BoutiqueException"
 				enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
 				enableSelectByExample="false" selectByExampleQueryId="false" >
 			<property name="useActualColumnNames" value="false"/>
 		</table>
-		<table schema="ger_sh_staging_db" tableName="snapshot_price_detail" domainObjectName="SnapshotPriceDetail"
-				enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
-				enableSelectByExample="false" selectByExampleQueryId="false" >
-			<property name="useActualColumnNames" value="false"/>
-		</table>
-		<table schema="ger_sh_staging_db" tableName="im_price_algorithm" domainObjectName="ImPriceAlgorithm"
-				enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
-				enableSelectByExample="false" selectByExampleQueryId="false" >
-			<property name="useActualColumnNames" value="false"/>
-		</table>
-
 	</context>
 </generatorConfiguration>
