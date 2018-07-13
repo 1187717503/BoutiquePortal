@@ -54,13 +54,6 @@ public class ProductManagementServiceImpl implements ProductManagementService {
     @Override
     public List<Map<String, Object>> listProductService(SearchCondition searchCondition) {
     	List<Map<String, Object>> resultList=productManagementMapper.listProductDetailInfo(searchCondition);
-    	if(resultList!=null&&resultList.size()>0) {
-    		for(Map<String, Object> map:resultList) {
-    			if(map.get("spu_cover_img")!=null) {
-    				map.put("cover_img", map.get("spu_cover_img"));
-    			}
-    		}
-    	}
         return resultList;
     }
 
