@@ -490,7 +490,7 @@
                      INNER JOIN sku s ON (s.sku_id = sps.sku_id AND s.enabled = 1)
                      INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
                  WHERE  lp.`status` = #{status,jdbcType=BIGINT}
-                       AND v.vendor_id = #{vendorId,jdbcType=BIGINT}
+                       AND v.vendor_id = #{vendorId,jdbcType=BIGINT} and lp.enabled = 1
                  GROUP BY lp.order_line_num
              ) AS DD
     </select>
