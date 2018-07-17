@@ -106,13 +106,13 @@ public class ProductMgntController {
         productStateCountMap.remove(StateEnum.OLD_PROCESSING);
         productStateCountMap.remove(StateEnum.OLD_SHOP_PROCESSING);
 
-        Integer boutiqueExceptionType = searchCondition.getBoutiqueExceptionType();
+        /*Integer boutiqueExceptionType = searchCondition.getBoutiqueExceptionType();
         if (boutiqueExceptionType == null || boutiqueExceptionType == Constants.boutique_exception_type_all) {
             return;
         }
 
         Integer countException = productManagementService.countBoutiqueException(boutiqueExceptionType);
-        productStateCountMap.put(StateEnum.SHOP_PROCESSING, countException.longValue());
+        productStateCountMap.put(StateEnum.SHOP_PROCESSING, countException.longValue());*/
     }
 
     private void countALLState(Map<StateEnum, Long> productStateCountMap) {

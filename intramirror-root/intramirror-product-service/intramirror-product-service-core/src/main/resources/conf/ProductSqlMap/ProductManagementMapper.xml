@@ -51,6 +51,9 @@
         <if test="(stock != null and stock != 0) or (minStock !=null and maxStock !=null)">
             LEFT JOIN view_prod_store_sum ON view_prod_store_sum.product_id = product.product_id
         </if>
+        <if test="boutiqueExceptionType == 1 or boutiqueExceptionType == 2">
+            inner join boutique_exception be on (p.product_id = be.product_id)
+        </if>
         <if test="exception !=  null and exception != 0">
             LEFT JOIN (SELECT
             product_id,
@@ -90,6 +93,11 @@
                     ) price ON price.product_id = product.product_id
                 </if>-->
         WHERE 1=1
+        <if test="boutiqueExceptionType == 1 or boutiqueExceptionType == 2">
+            and be.id in (
+            select max(be.id) from boutique_exception be where be.type = #{boutiqueExceptionType} group by be.product_id
+            )
+        </if>
         <if test="productIds != null">
             AND product.product_id
             <choose>
@@ -326,6 +334,9 @@
         <if test="(stock != null and stock != 0) or (minStock !=null and maxStock !=null)">
             LEFT JOIN view_prod_store_sum ON view_prod_store_sum.product_id = product.product_id
         </if>
+        <if test="boutiqueExceptionType == 1 or boutiqueExceptionType == 2">
+            inner join boutique_exception be on (p.product_id = be.product_id)
+        </if>
         <if test="exception !=  null and exception != 0">
             LEFT JOIN (SELECT
             product_id,
@@ -351,6 +362,11 @@
             </otherwise>
         </choose>
         WHERE product.enabled = TRUE
+        <if test="boutiqueExceptionType == 1 or boutiqueExceptionType == 2">
+            and be.id in (
+            select max(be.id) from boutique_exception be where be.type = #{boutiqueExceptionType} group by be.product_id
+            )
+        </if>
         <if test="productIds != null">
             AND product.product_id
             <choose>
