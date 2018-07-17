@@ -52,7 +52,7 @@
             LEFT JOIN view_prod_store_sum ON view_prod_store_sum.product_id = product.product_id
         </if>
         <if test="boutiqueExceptionType == 1 or boutiqueExceptionType == 2">
-            inner join boutique_exception be on (p.product_id = be.product_id)
+            inner join boutique_exception be on (product.product_id = be.product_id)
         </if>
         <if test="exception !=  null and exception != 0">
             LEFT JOIN (SELECT
