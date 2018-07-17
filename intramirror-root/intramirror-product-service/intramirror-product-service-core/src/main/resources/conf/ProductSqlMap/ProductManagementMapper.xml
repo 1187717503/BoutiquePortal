@@ -51,6 +51,13 @@
         <if test="(stock != null and stock != 0) or (minStock !=null and maxStock !=null)">
             LEFT JOIN view_prod_store_sum ON view_prod_store_sum.product_id = product.product_id
         </if>
+        <if test="promotionIds != null">
+            LEFT JOIN snapshot_product ON snapshot_product.promotion_id IN
+            <foreach item="item" index="index" collection="promotionIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            AND snapshot_product.product_id = product.product_id
+        </if>
         <if test="exception !=  null and exception != 0">
             LEFT JOIN (SELECT
             product_id,
@@ -103,6 +110,9 @@
             <foreach item="item" index="index" collection="productIds" open="(" separator="," close=")">
                 #{item}
             </foreach>
+        </if>
+        <if test="promotionIds != null">
+            AND snapshot_product.snapshot_product_id is null
         </if>
         <if test="productStatus != -1">
             <choose>
@@ -319,6 +329,14 @@
             GROUP BY product_id) exception
             ON product.product_id = exception.product_id
         </if>
+        <if test="promotionIds != null">
+            LEFT JOIN snapshot_product ON
+            snapshot_product.promotion_id IN
+            <foreach item="item" index="index" collection="promotionIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            AND snapshot_product.product_id = product.product_id
+        </if>
         <choose>
             <when test="spuModifyFilter ==  null or spuModifyFilter == 0">
                 LEFT JOIN spu ON spu.spu_id=product.spu_id
@@ -449,7 +467,9 @@
         <if test="saleAtFrom != null and saleAtTo != null">
             AND unix_timestamp(shop_product.sale_at) BETWEEN #{saleAtFrom} AND #{saleAtTo}
         </if>
-
+        <if test="promotionIds != null">
+            AND snapshot_product.snapshot_product_id is null
+        </if>
         GROUP BY product.status, shop_product.status;
     </select>
 

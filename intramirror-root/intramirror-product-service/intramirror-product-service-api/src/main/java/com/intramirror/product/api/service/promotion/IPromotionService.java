@@ -88,4 +88,6 @@ public interface IPromotionService {
     int updatePromotionSaveTime(Long promotionId);
 
     List<Long> getExcludeProductGroupByTagId(Long tagId);
+
+    List<Map<String, Object>> selectPromotionByStatus(Map<String, Integer> params);
 }
