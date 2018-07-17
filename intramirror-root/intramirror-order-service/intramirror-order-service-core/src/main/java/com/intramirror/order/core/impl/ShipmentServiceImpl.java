@@ -305,7 +305,11 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		beanMap.put("personName", map.get("consignee")==null?" ":map.get("consignee").toString());
 		beanMap.put("segmentSequence", segmentSequence);
 		beanMap.put("shippingSegmentId", Long.parseLong(map.get("shippingSegmentId")==null?"0":map.get("shippingSegmentId").toString()));
-		beanMap.put("shipToAddr", map.get("shipToAddr")==null?" ":map.get("shipToAddr").toString());
+		String addr = map.get("shipToAddr") == null ? " " : map.get("shipToAddr").toString();
+		if (addr.length() > 150){
+			throw new RuntimeException("Receiving address information is too long");
+		}
+		beanMap.put("shipToAddr", addr);
 		//beanMap.put("shipToAddr2", map.get("shipToAddr2")==null?" ":map.get("shipToAddr2").toString());
 		//beanMap.put("shipToAddr3", map.get("shipToAddr3")==null?" ":map.get("shipToAddr3").toString());
 		beanMap.put("shipToEamilAddr", "shipment@intramirror.com");
