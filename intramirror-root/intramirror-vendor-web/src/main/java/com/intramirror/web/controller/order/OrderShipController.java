@@ -1522,8 +1522,12 @@ public class OrderShipController extends BaseController {
             shipperVO.setPhoneNumber(fromLocation.getContactPhoneNumber());
             shipperVO.setEmailAddress(fromLocation.getContactEmailAddress());
             shipperVO.setStreetLines(fromLocation.getAddressStreetlines());
-            shipperVO.setStreetLines2(fromLocation.getAddressStreetlines2());
-            shipperVO.setStreetLines3(fromLocation.getAddressStreetlines3());
+            if (StringUtil.isNotEmpty(fromLocation.getAddressStreetlines2())){
+                shipperVO.setStreetLines2(fromLocation.getAddressStreetlines2());
+            }
+            if (StringUtil.isNotEmpty(fromLocation.getAddressStreetlines3())){
+                shipperVO.setStreetLines3(fromLocation.getAddressStreetlines3());
+            }
             shipperVO.setPostalCode(fromLocation.getAddressPostalCode());
             shipperVO.setCountryCode(fromLocation.getAddressCountryCode());
             inputVO.setShipper(shipperVO);
