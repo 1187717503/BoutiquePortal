@@ -57,13 +57,6 @@
         LEFT JOIN shop_product ON shop_product.shop_id = 65 AND shop_product.enabled = TRUE AND shop_product.product_id = product.product_id
         INNER JOIN vendor ON product.vendor_id = vendor.vendor_id AND product.enabled = TRUE
         INNER JOIN brand ON brand.brand_id = product.brand_id AND brand.enabled = TRUE
-        <if test="tagIds != null">
-            INNER JOIN tag_product_rel tpl ON tpl.product_id = product.product_id
-            AND tpl.tag_id IN
-            <foreach item="item" index="index" collection="tagIds" open="(" separator="," close=")">
-                #{item}
-            </foreach>
-        </if>
         <if test="(stock != null and stock != 0) or (minStock !=null and maxStock !=null)">
             LEFT JOIN view_prod_store_sum ON view_prod_store_sum.product_id = product.product_id
         </if>

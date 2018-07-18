@@ -161,23 +161,23 @@ public class ProductMgntController {
             types.add(tagType);
         }
         searchCondition.setTagTypes(types);
-
-        //2018-07-18 Jain 在limit_time项目中优化tagIds的用法，防止tagIds包含的商品过千导致索引失效
         List<Long> tagIds = searchParams.getTagIds();
-        if (!CollectionUtils.isEmpty(tagIds) && tagIds.size() > 0) {
-            searchCondition.setTagIds(tagIds);
-        } else {
-            searchCondition.setTagIds(null);
+        if (CollectionUtils.isEmpty(tagIds)) {
+            tagIds = new ArrayList<>();
         }
-
+        if (searchCondition.getTagId() != null && searchCondition.getTagId() > 0) {
+            tagIds.add(searchCondition.getTagId());
+        }
+        searchCondition.setTagIds(tagIds);
         searchCondition.setStart((pageNo == null || pageNo < 0) ? 0 : (pageNo - 1) * pageSize);
         searchCondition.setCount((pageSize == null || pageSize < 0) ? 25 : pageSize);
         if (searchCondition.getTagId() != null) {
             List<Long> productList = null;
             if (searchCondition.getTagId() == -2 || searchCondition.getTagId() == 1) {
                 productList = contentManagementService.listAllTagProductIds(types);
+            } else if (tagIds.size() > 0) {
+                productList = contentManagementService.listTagProductIds(tagIds);
             }
-
             if (productList != null && productList.size() > 0) {
                 searchCondition.setProductIds(productList);
             }
