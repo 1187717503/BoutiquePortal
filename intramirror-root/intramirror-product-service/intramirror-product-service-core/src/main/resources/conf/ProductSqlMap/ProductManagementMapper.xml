@@ -53,6 +53,9 @@
                 FORCE INDEX(idx_updated_at_enabled)
             </otherwise>
         </choose>
+        <if test="limitTimeTagId != null">
+            inner join tag_product_rel tpl on tpl.tag_id = #{limitTimeTagId} and tpl.product_id = product.product_id
+        </if>
         LEFT JOIN boutique_image ON boutique_image.product_id = product.product_id
         LEFT JOIN shop_product ON shop_product.shop_id = 65 AND shop_product.enabled = TRUE AND shop_product.product_id = product.product_id
         INNER JOIN vendor ON product.vendor_id = vendor.vendor_id AND product.enabled = TRUE

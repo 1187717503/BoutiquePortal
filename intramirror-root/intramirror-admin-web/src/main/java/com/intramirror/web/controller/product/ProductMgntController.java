@@ -63,7 +63,7 @@ public class ProductMgntController {
             // @formatter:on
     ) {
 
-        SearchCondition searchCondition = initCondition(searchParams, null, categoryId, tagType, null, null, null);
+        SearchCondition searchCondition = initCondition(searchParams, null, categoryId, tagType, null, null, null, null);
         LOGGER.info("Search condition : {}", JsonTransformUtil.toJson(searchCondition));
         Map<StateEnum, Long> productStateCountMap = initiateCountMap();
         if (isEmptyTag(searchCondition)) {
@@ -124,10 +124,11 @@ public class ProductMgntController {
             @RequestParam(value = "pageSize",required = false) Integer pageSize,
             @RequestParam(value = "pageNo",required = false) Integer pageNo,
             @RequestParam(value = "tagType",required = false) Integer tagType,
-            @RequestParam(value = "isExcludeCampaign",required = false) Integer isExcludeCampaign
+            @RequestParam(value = "isExcludeCampaign",required = false) Integer isExcludeCampaign,
+            @RequestParam(value = "limitTimeTagId", required = false) Long limitTimeTagId
             // @formatter:on
     ) {
-        SearchCondition searchCondition = initCondition(searchParams, state, categoryId, tagType, pageSize, pageNo, isExcludeCampaign);
+        SearchCondition searchCondition = initCondition(searchParams, state, categoryId, tagType, pageSize, pageNo, isExcludeCampaign, limitTimeTagId);
         LOGGER.info("Search condition : {}", JsonTransformUtil.toJson(searchCondition));
 
         if (isEmptyTag(searchCondition)) {
@@ -142,8 +143,9 @@ public class ProductMgntController {
         return Response.status(StatusType.SUCCESS).data(productList);
     }
 
-    private SearchCondition initCondition(SearchCondition searchParams, String state, Long categoryId, Integer tagType, Integer pageSize, Integer pageNo, Integer isExcludeCampaign) {
+    private SearchCondition initCondition(SearchCondition searchParams, String state, Long categoryId, Integer tagType, Integer pageSize, Integer pageNo, Integer isExcludeCampaign, Long limitTimeTagId) {
         SearchCondition searchCondition = searchParams;
+        searchCondition.setLimitTimeTagId(limitTimeTagId);
         searchCondition.setBoutiqueId(escapeLikeParams(searchParams.getBoutiqueId()));
         searchCondition.setCategoryId(categoryId == null ? null : categoryCache.getAllChildCategory(categoryId));
         searchCondition.setDesignerId(escapeLikeParams(searchParams.getDesignerId()));
