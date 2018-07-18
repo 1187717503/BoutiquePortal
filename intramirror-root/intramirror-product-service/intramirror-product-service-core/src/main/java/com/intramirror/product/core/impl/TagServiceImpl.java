@@ -110,7 +110,8 @@ public class TagServiceImpl implements ITagService {
             Iterator it = productIdList.iterator();
             while (it.hasNext()) {
                 String sPrdIdTarget = it.next().toString();
-                if (tag.getTagType() == 1 && sPrdIdTarget.equals(sPrdIdRes)) {
+                if ((tag.getTagType() == 1 && sPrdIdTarget.equals(sPrdIdRes))
+                    || (tag.getTagType() == 5 && sPrdIdTarget.equals(sPrdIdRes))) {
                     it.remove();
                     ProductWithBLOBs p = bloBsMap.get(Long.valueOf(sPrdIdTarget));
                     if(p == null) continue;
