@@ -155,6 +155,7 @@ public class ProductMgntController {
         if (CollectionUtils.isEmpty(types)) {
             types = new ArrayList<>();
             types.add(1);
+            types.add(5);
         }
         if (tagType != null) {
             types.add(tagType);
