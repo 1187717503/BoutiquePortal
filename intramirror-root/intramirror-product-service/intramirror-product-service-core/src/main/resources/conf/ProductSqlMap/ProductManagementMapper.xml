@@ -44,6 +44,15 @@
         CONVERT(1 - product.preview_im_price / product.min_retail_price , DECIMAL(10, 2)) AS preview_discount,
         CONVERT(1 - shop_product.min_sale_price / product.min_retail_price, DECIMAL(10, 2)) AS sale_discount
         FROM product
+        <choose>
+            <when test="orderBy == 'boutique'"> </when>
+            <when test="orderBy == 'boutiqueId'"> </when>
+            <when test="orderBy == 'season'"> </when>
+            <when test="orderBy == 'designIdAndColorCode'"> </when>
+            <otherwise>
+                FORCE INDEX(idx_updated_at_enabled)
+            </otherwise>
+        </choose>
         LEFT JOIN boutique_image ON boutique_image.product_id = product.product_id
         LEFT JOIN shop_product ON shop_product.shop_id = 65 AND shop_product.enabled = TRUE AND shop_product.product_id = product.product_id
         INNER JOIN vendor ON product.vendor_id = vendor.vendor_id AND product.enabled = TRUE
