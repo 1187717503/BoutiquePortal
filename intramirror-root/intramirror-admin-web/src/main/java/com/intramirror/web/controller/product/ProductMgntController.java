@@ -59,11 +59,13 @@ public class ProductMgntController {
             // @formatter:off
             @RequestParam(value = "categoryId", required = false) Long categoryId,
             @RequestParam(value = "tagType", required = false) Integer tagType,
+            @RequestParam(value = "isExcludeCampaign",required = false) Integer isExcludeCampaign,
+            @RequestParam(value = "limitTimeTagId", required = false) Long limitTimeTagId,
             SearchCondition searchParams
             // @formatter:on
     ) {
 
-        SearchCondition searchCondition = initCondition(searchParams, null, categoryId, tagType, null, null, null, null);
+        SearchCondition searchCondition = initCondition(searchParams, null, categoryId, tagType, null, null, isExcludeCampaign, limitTimeTagId);
         LOGGER.info("Search condition : {}", JsonTransformUtil.toJson(searchCondition));
         Map<StateEnum, Long> productStateCountMap = initiateCountMap();
         if (isEmptyTag(searchCondition)) {

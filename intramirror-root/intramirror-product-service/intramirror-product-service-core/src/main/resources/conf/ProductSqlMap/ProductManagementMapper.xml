@@ -322,6 +322,9 @@
         shop_product.status AS shop_product_status,
         COUNT(product.status) AS count
         FROM product
+        <if test="limitTimeTagId != null">
+            inner join tag_product_rel tpl on tpl.tag_id = #{limitTimeTagId} and tpl.product_id = product.product_id
+        </if>
         LEFT JOIN shop_product ON shop_product.product_id = product.product_id AND shop_product.enabled = TRUE
         <if test="brandId != null">
             INNER JOIN brand ON brand.brand_id = product.brand_id AND brand.enabled = TRUE
