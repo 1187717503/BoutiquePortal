@@ -1544,10 +1544,12 @@ public class OrderShipController extends BaseController {
                 shipToAddr = shipToAddr.substring(0,34);
             }
             recipientVO.setStreetLines(shipToAddr);
-            if (StringUtil.isNotEmpty(dhlShipment.getShipToAddr2())){
+            if (StringUtil.isNotEmpty(dhlShipment.getShipToAddr2())
+                    &&!"0".equals(dhlShipment.getShipToAddr2())){
                 recipientVO.setStreetLines2(dhlShipment.getShipToAddr2());
             }
-            if (StringUtil.isNotEmpty(dhlShipment.getShipToAddr3())){
+            if (StringUtil.isNotEmpty(dhlShipment.getShipToAddr3())
+                    &&!"0".equals(dhlShipment.getShipToAddr3())){
                 recipientVO.setStreetLines3(dhlShipment.getShipToAddr3());
             }
             if(dhlShipment.getPostalCode()!=null){
