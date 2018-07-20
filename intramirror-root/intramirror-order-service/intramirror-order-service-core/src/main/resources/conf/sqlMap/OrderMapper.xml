@@ -125,7 +125,8 @@
         oe.created_at as oeCreatedAt,oet.description as oeDescription,oe.comments as oeComments,u.email as
         oeCreatedByuser,
         oe.modified_at as oeModified,oe.`status` as oeStatus,oe.resolution as oeResolution, uu.email as Resolved,
-        if(t.tax_rate = NULL,0,ROUND(t.tax_rate * lp.in_price,2)) as vat
+        if(t.tax_rate = NULL,0,ROUND(t.tax_rate * lp.in_price,2)) as vat,
+        p.color_code as colorCode,p.designer_id as brandID
         FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
         LEFT JOIN stock_location sl on sl.location_id = lp.stock_location_id
         INNER JOIN `order` o ON ol.order_id = o.order_id
@@ -228,7 +229,8 @@
         v.address_country_id AS vendor_address_country_id,
         CASE WHEN p.spu_id IS NULL THEN p.cover_img ELSE spu.cover_img END AS cover_img,
         lp.logistics_product_id,
-        lp.updated_at as cancel_at
+        lp.updated_at as cancel_at,
+        p.color_code as colorCode,p.designer_id as brandID
         FROM
         logistics_product lp
         INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id

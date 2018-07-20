@@ -343,7 +343,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
         if(orderCancelList != null && orderCancelList.size()>0){
             PageListVO listVO = new PageListVO();
             listVO.setTotal(getOrderCancelCount(params));
-            addProductProperty(orderCancelList);
+            //addProductProperty(orderCancelList);
             listVO.setData(orderCancelList);
             listVO.setCurrPageNo(pageNumber);
             listVO.setPageSize(pageSize);
@@ -472,7 +472,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
             conditionMap.put("logisticsProductIds", params.get("logisticsProductIds"));
         }
         List<Map<String, Object>> mapList = orderMapper.getOrderListByStatus(conditionMap);
-        addProductPropertyMap(mapList);
+        //addProductPropertyMap(mapList);
         return mapList;
     }
 
