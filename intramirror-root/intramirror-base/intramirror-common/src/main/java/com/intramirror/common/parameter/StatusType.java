@@ -677,8 +677,8 @@ public final class StatusType {
 	
 	/** packingOrder -订单打包处理逻辑错误*/
 	public static final int ORDER_ERROR_CODE = 1001;
-	
-	
-	
+
+
+	public static final int ORDER_LINE_NUMBER_INDEX = -9999;
 
 }
