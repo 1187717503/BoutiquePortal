@@ -1507,8 +1507,16 @@ public class OrderShipController extends BaseController {
             boolean maximum = message.contains("maximum");
             String substring = message.substring(i1 + 1, i);
             String s = message.substring(i2+1);
+            String[] split = s.split("/");
+            String filed = "";
+            if (split.length>=3){
+                filed = split[split.length-3]+"."+split[split.length-2]+"."+split[split.length-1];
+            }else {
+                filed = s;
+            }
             if (maximum){
-                msg = substring.trim() + "(35 characters) " + s;
+                msg = substring.trim() + "(35 characters) ";
+                msg += "Filed: "+filed;
             }else {
                 msg = substring.trim() + " " + s;
             }
