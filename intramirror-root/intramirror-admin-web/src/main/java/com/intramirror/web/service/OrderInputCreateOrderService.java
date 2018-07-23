@@ -210,11 +210,7 @@ public class OrderInputCreateOrderService {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd");
                 String date = sdf.format(new Date());
                 Long num = getOrderLineNum(vendorCode + date);
-                if (num > 9999) {
-                    results.put("status", StatusType.ORDER_LINE_NUMBER_INDEX);
-                    return results;
-                }
-                logisticsProduct.setOrder_line_num(vendorCode + date + String.format("%04d", num));
+                logisticsProduct.setOrder_line_num(vendorCode + date + (num < 1000 ? String.format("%04d", num) : num));
 
                 String shopProductSkuIds = obj.getShop_product_sku_id().toString();
                 Map<String, String> objectMap = vendorService.getProductSkuVendorIdMap(shopProductSkuIds.split(","));
@@ -401,10 +397,6 @@ public class OrderInputCreateOrderService {
         Cache cache = Cache.getInstance();
         RAtomicLong ratomicLong = cache.getIncr(vendorCodeDate);
         Long numLong = ratomicLong.getAndIncrement();
-        if (numLong > 9999) {
-            //抛出Exception， 不要恢复0了
-            numLong = 11111L;
-        }
         logger.info("numResult for {} ", numLong);
         return numLong;
     }
