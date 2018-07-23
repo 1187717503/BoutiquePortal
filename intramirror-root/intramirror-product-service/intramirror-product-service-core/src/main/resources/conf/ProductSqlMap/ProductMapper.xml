@@ -592,4 +592,8 @@
         where <![CDATA[ ss.`last_check` < #{lastCheck,jdbcType=VARCHAR} ]]> and ss.`store`  > 0 group by v.`vendor_id`
     </select>
 
+    <select id="getProductByBrandIDAndColorCode" resultType="java.util.HashMap">
+        SELECT * FROM product WHERE color_code = #{colorCode} and designer_id = #{brandId} and enabled = 1
+    </select>
+
 </mapper>

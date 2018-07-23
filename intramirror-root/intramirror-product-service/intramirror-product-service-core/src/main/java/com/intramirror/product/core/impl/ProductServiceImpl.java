@@ -91,4 +91,8 @@ public class ProductServiceImpl extends BaseDao implements IProductService {
         productMapper = this.getSqlSession().getMapper(ProductMapper.class);
     }
 
+    @Override
+    public List<Map<String, Object>> getProductByBrandIDAndColorCode(Map<String, Object> params) {
+        return productMapper.getProductByBrandIDAndColorCode(params);
+    }
 }
