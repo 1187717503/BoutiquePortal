@@ -1456,6 +1456,10 @@ public class OrderShipController extends BaseController {
                     JSONArray notification = shipmentResponse.optJSONArray("Notification");
                     msg = notification.get(0).toString();
                     String message = JSONObject.fromObject(msg).optString("Message");
+                    if (message.contains("[")&&message.contains("]")&&message.contains(":")){
+                        message = convertMsg(message);
+                    }
+                    message = message + ". Please contact customer to adjust! ";
                     result.addMsg(message);
                     return result;
                 }
@@ -1492,6 +1496,32 @@ public class OrderShipController extends BaseController {
 
         }
         return result;
+    }
+
+    public static String convertMsg(String message) {
+        String msg = "";
+        if (StringUtil.isNotEmpty(message)){
+            int i1 = message.indexOf("]");
+            int i2 = message.indexOf(":");
+            int i = message.indexOf("-");
+            boolean maximum = message.contains("maximum");
+            String substring = message.substring(i1 + 1, i);
+            String s = message.substring(i2+1);
+            String[] split = s.split("/");
+            String filed = "";
+            if (split.length>=3){
+                filed = split[split.length-3]+"."+split[split.length-2]+"."+split[split.length-1];
+            }else {
+                filed = s;
+            }
+            if (maximum){
+                msg = substring.trim() + "(35 characters) ";
+                msg += "Filed: "+filed;
+            }else {
+                msg = substring.trim() + " " + s;
+            }
+        }
+        return msg;
     }
 
     private void addParams(DHLInputVO inputVO, SubShipment dhlShipment,StockLocation fromLocation, List<Map<String, Object>> containerList,Shipment shipment) {

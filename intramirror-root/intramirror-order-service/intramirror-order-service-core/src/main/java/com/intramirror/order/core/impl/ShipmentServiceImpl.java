@@ -306,14 +306,18 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		beanMap.put("segmentSequence", segmentSequence);
 		beanMap.put("shippingSegmentId", Long.parseLong(map.get("shippingSegmentId")==null?"0":map.get("shippingSegmentId").toString()));
 		String addr = map.get("shipToAddr") == null ? " " : map.get("shipToAddr").toString();
-		if (addr.length() > 150){
-			throw new RuntimeException("Receiving address information is too long");
+		if (addr.length() > 35){
+			throw new RuntimeException("Receiving address is longer than maximum length (35 characters). Please contact customer to adjust!");
 		}
 		beanMap.put("shipToAddr", addr);
 		//beanMap.put("shipToAddr2", map.get("shipToAddr2")==null?" ":map.get("shipToAddr2").toString());
 		//beanMap.put("shipToAddr3", map.get("shipToAddr3")==null?" ":map.get("shipToAddr3").toString());
 		beanMap.put("shipToEamilAddr", "shipment@intramirror.com");
-		beanMap.put("shipToCity", map.get("shipToCity")==null?" ":map.get("shipToCity").toString());
+        String city = map.get("shipToCity") == null ? "" : map.get("shipToCity").toString();
+        if (StringUtils.isBlank(city)||"0".equals(city)){
+            throw new RuntimeException("The city cannot be empty. Please contact customer to adjust!");
+        }
+        beanMap.put("shipToCity", map.get("shipToCity")==null?" ":map.get("shipToCity").toString());
 		beanMap.put("shipToCountry", map.get("shipToCountry")==null?" ":map.get("shipToCountry").toString());
 		beanMap.put("shipToDistrict", map.get("shipToDistrict")==null?" ":map.get("shipToDistrict").toString());
 		beanMap.put("shipToProvince", map.get("shipToProvince")==null?" ":map.get("shipToProvince").toString());
@@ -322,7 +326,11 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		beanMap.put("updatedAt", currentDate);
 		beanMap.put("createdAt", currentDate);
 		beanMap.put("shipToCountryCode",map.get("countryCode")==null?" ":map.get("countryCode").toString());
-		beanMap.put("postalCode",map.get("zip_code")==null?"":map.get("zip_code").toString());
+        String postalCode = map.get("zip_code") == null ? "" : map.get("zip_code").toString();
+        if (StringUtils.isBlank(postalCode)){
+            throw new RuntimeException("The postcode cannot be empty. Please contact customer to adjust!");
+        }
+        beanMap.put("postalCode",postalCode);
 		beanMap.put("contact",map.get("contact")==null?"":map.get("contact").toString());
 		return beanMap;
 	}
