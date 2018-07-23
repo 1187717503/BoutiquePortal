@@ -397,7 +397,9 @@
         ifnull(cm.country, l.user_rec_country) as countryName,
         l.user_rec_code,
         l.geography_id,
-        g.english_name
+        g.english_name,
+        p.color_code AS colorCode,
+        p.designer_id AS brandID
         FROM logistics_product lp
         INNER JOIN container c ON lp.container_id = c.container_id
         INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id

@@ -170,7 +170,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
             Map<String, Object> conditionMap) {
 
         List<Map<String, Object>> mapList = orderMapper.getOrderListByShipmentId(conditionMap);
-        addProductPropertyMap(mapList);
+        //addProductPropertyMap(mapList);
         Set<Long> ids = new HashSet<>();
         for(Map<String, Object> vo :mapList){
             ids.add(Long.valueOf(vo.get("product_id").toString()));
