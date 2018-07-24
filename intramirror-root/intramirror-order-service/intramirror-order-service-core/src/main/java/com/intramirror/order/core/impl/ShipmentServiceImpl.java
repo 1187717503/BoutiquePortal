@@ -318,6 +318,11 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		if (flag && addr.length() > 35){
 			throw new RuntimeException("Receiving address is longer than maximum length (35 characters). Please contact customer to adjust!");
 		}
+		if (!flag){
+			if (addr.length() > 200){
+				throw new RuntimeException("Receiving address is longer than maximum length (200 characters). Please contact customer to adjust!");
+			}
+		}
 		beanMap.put("shipToAddr", addr);
 		//beanMap.put("shipToAddr2", map.get("shipToAddr2")==null?" ":map.get("shipToAddr2").toString());
 		//beanMap.put("shipToAddr3", map.get("shipToAddr3")==null?" ":map.get("shipToAddr3").toString());
