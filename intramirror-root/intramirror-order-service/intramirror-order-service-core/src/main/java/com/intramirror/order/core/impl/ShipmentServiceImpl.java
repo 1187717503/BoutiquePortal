@@ -301,15 +301,21 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 
 	public Map<String, Object> saveBean(Map<String, Object> map, Date currentDate, Long shipmentId,Long segmentSequence){
 		Map<String, Object> beanMap = new HashMap<String, Object>();
+		String countryCode = map.get("countryCode") == null ? " " : map.get("countryCode").toString();
+		//发往中国大陆，及港澳地区的不用校验地址信息
+		boolean flag = true;
+		if ("CN".equalsIgnoreCase(countryCode)||"HK".equalsIgnoreCase(countryCode)||"MO".equalsIgnoreCase(countryCode)){
+			flag = false;
+		}
 		beanMap.put("consignee", map.get("consignee")==null?" ":map.get("consignee").toString());
 		beanMap.put("personName", map.get("consignee")==null?" ":map.get("consignee").toString());
 		beanMap.put("segmentSequence", segmentSequence);
 		beanMap.put("shippingSegmentId", Long.parseLong(map.get("shippingSegmentId")==null?"0":map.get("shippingSegmentId").toString()));
 		String addr = map.get("shipToAddr") == null ? "" : map.get("shipToAddr").toString();
-		if (StringUtils.isBlank(addr)){
+		if (flag && StringUtils.isBlank(addr)){
 			throw new RuntimeException("The Receiving address cannot be empty. Please contact customer to adjust!");
 		}
-		if (addr.length() > 35){
+		if (flag && addr.length() > 35){
 			throw new RuntimeException("Receiving address is longer than maximum length (35 characters). Please contact customer to adjust!");
 		}
 		beanMap.put("shipToAddr", addr);
@@ -317,7 +323,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		//beanMap.put("shipToAddr3", map.get("shipToAddr3")==null?" ":map.get("shipToAddr3").toString());
 		beanMap.put("shipToEamilAddr", "shipment@intramirror.com");
         String city = map.get("shipToCity") == null ? "" : map.get("shipToCity").toString();
-        if (StringUtils.isBlank(city)||"0".equals(city)){
+        if (flag && StringUtils.isBlank(city)||"0".equals(city)){
             throw new RuntimeException("The city cannot be empty. Please contact customer to adjust!");
         }
         beanMap.put("shipToCity", map.get("shipToCity")==null?" ":map.get("shipToCity").toString());
@@ -328,9 +334,9 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		beanMap.put("status", ContainerType.RECEIVED);
 		beanMap.put("updatedAt", currentDate);
 		beanMap.put("createdAt", currentDate);
-		beanMap.put("shipToCountryCode",map.get("countryCode")==null?" ":map.get("countryCode").toString());
+		beanMap.put("shipToCountryCode",countryCode);
         String postalCode = map.get("zip_code") == null ? "" : map.get("zip_code").toString();
-        if (StringUtils.isBlank(postalCode)){
+        if (flag && StringUtils.isBlank(postalCode)){
             throw new RuntimeException("The postcode cannot be empty. Please contact customer to adjust!");
         }
         beanMap.put("postalCode",postalCode);
