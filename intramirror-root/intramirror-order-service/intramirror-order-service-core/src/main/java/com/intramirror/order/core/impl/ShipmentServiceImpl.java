@@ -323,7 +323,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		//beanMap.put("shipToAddr3", map.get("shipToAddr3")==null?" ":map.get("shipToAddr3").toString());
 		beanMap.put("shipToEamilAddr", "shipment@intramirror.com");
         String city = map.get("shipToCity") == null ? "" : map.get("shipToCity").toString();
-        if (flag && StringUtils.isBlank(city)||"0".equals(city)){
+        if (flag && (StringUtils.isBlank(city)||"0".equals(city))){
             throw new RuntimeException("The city cannot be empty. Please contact customer to adjust!");
         }
         beanMap.put("shipToCity", map.get("shipToCity")==null?" ":map.get("shipToCity").toString());
