@@ -130,7 +130,7 @@ public class ProductManagementServiceImpl implements ProductManagementService {
                     contain = true;
                 }
             }
-            if (contain) {
+            if (!contain) {
                 successProductIds.add(productId);
             }
         }
