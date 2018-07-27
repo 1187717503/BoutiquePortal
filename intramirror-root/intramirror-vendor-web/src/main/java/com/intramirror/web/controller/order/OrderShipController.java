@@ -1516,10 +1516,10 @@ public class OrderShipController extends BaseController {
             }
             if (maximum){
                 msg = substring.trim() + "(35 characters) ";
-                msg += "Filed: "+filed;
             }else {
-                msg = substring.trim() + " " + s;
+                msg = substring.trim() + " ";
             }
+            msg += "Filed: "+filed;
         }
         return msg;
     }
