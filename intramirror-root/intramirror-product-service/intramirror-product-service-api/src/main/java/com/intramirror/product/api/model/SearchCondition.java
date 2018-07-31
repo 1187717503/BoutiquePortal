@@ -47,6 +47,24 @@ public class SearchCondition {
     private List<Integer> tagTypes;
     private List<Long> productIds;
     private String spuModifyFilter;
+    private List<Long> promotionIds;
+    private Long limitTimeTagId;
+
+    public Long getLimitTimeTagId() {
+        return limitTimeTagId;
+    }
+
+    public void setLimitTimeTagId(Long limitTimeTagId) {
+        this.limitTimeTagId = limitTimeTagId;
+    }
+
+    public List<Long> getPromotionIds() {
+        return promotionIds;
+    }
+
+    public void setPromotionIds(List<Long> promotionIds) {
+        this.promotionIds = promotionIds;
+    }
 
     public Integer getProductStatus() {
         return productStatus;

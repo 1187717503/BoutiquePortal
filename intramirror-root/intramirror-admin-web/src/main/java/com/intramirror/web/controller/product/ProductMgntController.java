@@ -8,6 +8,7 @@ import com.intramirror.product.api.service.ITagService;
 import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.product.api.service.content.ContentManagementService;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
+import com.intramirror.product.api.service.promotion.IPromotionService;
 import com.intramirror.utils.transform.JsonTransformUtil;
 import com.intramirror.web.common.Constants;
 import com.intramirror.web.controller.cache.CategoryCache;
@@ -53,18 +54,20 @@ public class ProductMgntController {
     private ISkuStoreService iSkuStoreService;
 
     @Autowired
-    private ITagService tagService;
+    private IPromotionService promotionService;
 
     @GetMapping(value = "/state/count")
     public Response listAllProductStateCount(
             // @formatter:off
             @RequestParam(value = "categoryId", required = false) Long categoryId,
             @RequestParam(value = "tagType", required = false) Integer tagType,
+            @RequestParam(value = "isExcludeCampaign",required = false) Integer isExcludeCampaign,
+            @RequestParam(value = "limitTimeTagId", required = false) Long limitTimeTagId,
             SearchCondition searchParams
             // @formatter:on
     ) {
 
-        SearchCondition searchCondition = initCondition(searchParams, null, categoryId, tagType, null, null);
+        SearchCondition searchCondition = initCondition(searchParams, null, categoryId, tagType, null, null, isExcludeCampaign, limitTimeTagId);
         LOGGER.info("Search condition : {}", JsonTransformUtil.toJson(searchCondition));
         Map<StateEnum, Long> productStateCountMap = initiateCountMap();
         if (isEmptyTag(searchCondition)) {
@@ -131,10 +134,12 @@ public class ProductMgntController {
             @RequestParam(value = "categoryId", required = false) Long categoryId,
             @RequestParam(value = "pageSize",required = false) Integer pageSize,
             @RequestParam(value = "pageNo",required = false) Integer pageNo,
-            @RequestParam(value = "tagType",required = false) Integer tagType
+            @RequestParam(value = "tagType",required = false) Integer tagType,
+            @RequestParam(value = "isExcludeCampaign",required = false) Integer isExcludeCampaign,
+            @RequestParam(value = "limitTimeTagId", required = false) Long limitTimeTagId
             // @formatter:on
     ) {
-        SearchCondition searchCondition = initCondition(searchParams, state, categoryId, tagType, pageSize, pageNo);
+        SearchCondition searchCondition = initCondition(searchParams, state, categoryId, tagType, pageSize, pageNo, isExcludeCampaign, limitTimeTagId);
         LOGGER.info("Search condition : {}", JsonTransformUtil.toJson(searchCondition));
 
         if (isEmptyTag(searchCondition)) {
@@ -190,8 +195,9 @@ public class ProductMgntController {
         return productList;
     }
 
-    private SearchCondition initCondition(SearchCondition searchParams, String state, Long categoryId, Integer tagType, Integer pageSize, Integer pageNo) {
+    private SearchCondition initCondition(SearchCondition searchParams, String state, Long categoryId, Integer tagType, Integer pageSize, Integer pageNo, Integer isExcludeCampaign, Long limitTimeTagId) {
         SearchCondition searchCondition = searchParams;
+        searchCondition.setLimitTimeTagId(limitTimeTagId);
         searchCondition.setBoutiqueId(escapeLikeParams(searchParams.getBoutiqueId()));
         searchCondition.setCategoryId(categoryId == null ? null : categoryCache.getAllChildCategory(categoryId));
         searchCondition.setDesignerId(escapeLikeParams(searchParams.getDesignerId()));
@@ -203,6 +209,7 @@ public class ProductMgntController {
         if (CollectionUtils.isEmpty(types)) {
             types = new ArrayList<>();
             types.add(1);
+            types.add(5);
         }
         if (tagType != null) {
             types.add(tagType);
@@ -230,6 +237,35 @@ public class ProductMgntController {
             }
 
         }
+
+        //2018-07-16 Jain limit time过滤活动商品
+        if(isExcludeCampaign != null && !isExcludeCampaign.equals(0)) {
+            List<Long> listPrd = new ArrayList<>();
+            //当前生效的
+            Map<String, Integer> params = new HashMap<>();
+            params.put("status", 0);
+            List<Map<String, Object>> listActive = promotionService.selectPromotionByStatus(params);
+            if (listActive != null && listActive.size() > 0) {
+                for (Map<String, Object> map : listActive) {
+                    listPrd.add(Long.parseLong(map.get("promotionId").toString()));
+                }
+            }
+
+            //pending的
+            params.put("status", 1);
+            List<Map<String, Object>> listPending = promotionService.selectPromotionByStatus(params);
+            if (listPending != null && listPending.size() > 0) {
+                for (Map<String, Object> map : listPending) {
+                    listPrd.add(Long.parseLong(map.get("promotionId").toString()));
+                }
+            }
+
+            if (listPrd.size() > 0) {
+                searchCondition.setPromotionIds(listPrd);
+                LOGGER.info("listPrd size: " + listPrd.size());
+            }
+        }
+
         return searchCondition;
     }
 

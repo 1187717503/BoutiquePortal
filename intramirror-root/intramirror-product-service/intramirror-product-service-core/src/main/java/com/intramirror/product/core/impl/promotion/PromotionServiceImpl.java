@@ -607,4 +607,9 @@ public class PromotionServiceImpl implements IPromotionService {
     public List<Long> getExcludeProductGroupByTagId(Long tagId) {
         return promotionRuleMapper.getExcludeProductGroupByTagId(tagId);
     }
+
+    @Override
+    public List<Map<String, Object>> selectPromotionByStatus(Map<String, Integer> params) {
+        return promotionMapper.selectPromotionByStatus(params);
+    }
 }
