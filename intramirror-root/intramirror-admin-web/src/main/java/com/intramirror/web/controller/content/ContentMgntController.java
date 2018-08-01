@@ -49,7 +49,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created on 2017/11/17.
- *
  * @author YouFeng.Zhu
  */
 @RestController
@@ -136,7 +135,6 @@ public class ContentMgntController {
 
     /**
      * Create an new block only.
-     *
      * @param block
      * @return
      */
@@ -149,7 +147,6 @@ public class ContentMgntController {
 
     /**
      * Update block info by block id.
-     *
      * @param blockId
      * @param block
      * @return
@@ -390,7 +387,7 @@ public class ContentMgntController {
         map.put("sort_num", sortNum);
         map.put("tagType", tagType);
         iTagService.saveTagProductRel(map, response);
-        return Response.success();
+        return Response.status(StatusType.SUCCESS).data(response);
     }
 
     @GetMapping(value = "/tags/unbind", produces = "application/json")
