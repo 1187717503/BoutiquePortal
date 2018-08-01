@@ -1,6 +1,5 @@
 package com.intramirror.product.core.impl;
 
-import com.intramirror.common.help.StringUtils;
 import com.intramirror.product.api.model.ProductWithBLOBs;
 import com.intramirror.product.api.model.Tag;
 import com.intramirror.product.api.service.ITagService;
@@ -50,7 +49,14 @@ public class TagServiceImpl implements ITagService {
         Long tagId = Long.valueOf(map.get("tag_id").toString());
         Tag tag = tagMapper.selectByPrimaryKey(tagId);
         List<ProductWithBLOBs> productWithBLOBs = productMapper.listProductByProductIds(productIdList);
+
         Map<Long, ProductWithBLOBs> bloBsMap = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(productWithBLOBs)) {
+            for (ProductWithBLOBs p : productWithBLOBs) {
+                bloBsMap.put(p.getProductId(), p);
+            }
+        }
+
         if (tag.getTagType() == 2 || tag.getTagType() == 3) {
             // 爆款 除外 tag 也除外
             Long vendorId = tag.getVendorId();
@@ -63,7 +69,6 @@ public class TagServiceImpl implements ITagService {
                         map1.put("boutiqueId", p.getProductCode());
                         listPrdIdNOVend.add(map1);
                     }
-                    bloBsMap.put(p.getProductId(), p);
                 }
             }
             Map<String, Object> param = new HashMap<>();
@@ -110,10 +115,13 @@ public class TagServiceImpl implements ITagService {
                 String sPrdIdTarget = it.next().toString();
                 if ((tag.getTagType() == 1 || tag.getTagType() == 5) && sPrdIdTarget.equals(dbProductId)) {
                     it.remove();
-
+                    ProductWithBLOBs p = bloBsMap.get(Long.valueOf(sPrdIdTarget));
+                    if (p == null)
+                        continue;
                     Map<String, Object> map1 = new HashMap<>();
-                    map1.put("productId", dbProductId);
-                    // map1.put("boutiqueId", p.getProductCode());
+                    map1.put("productId", p.getProductId());
+                    map1.put("boutiqueId", p.getProductCode());
+
                     listPrdIdDuplicated.add(map1);
                 }
 
