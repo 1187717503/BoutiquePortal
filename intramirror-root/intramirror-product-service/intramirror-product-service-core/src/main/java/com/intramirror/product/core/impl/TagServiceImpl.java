@@ -34,63 +34,62 @@ public class TagServiceImpl implements ITagService {
     @Autowired
     private ProductMapper productMapper;
 
-
     @Override
     @Transactional
-    public int saveTagProductRel(Map<String, Object> map,Map<String,Object> response) {
+    public int saveTagProductRel(Map<String, Object> map, Map<String, Object> response) {
 
-        List<Map<String,Object>> listPrdIdDuplicated = new ArrayList<>();
-        List<Map<String,Object>> listPrdIdNOVend = new ArrayList<>();
-        List<Map<String,Object>> doubleTagIds = new ArrayList<>();
-        List<Map<String,Object>> successTagIds = new ArrayList<>();
+        List<Map<String, Object>> listPrdIdDuplicated = new ArrayList<>();
+        List<Map<String, Object>> listPrdIdNOVend = new ArrayList<>();
+        List<Map<String, Object>> doubleTagIds = new ArrayList<>();
+        List<Map<String, Object>> successTagIds = new ArrayList<>();
         // type = 2 时
-        //1. 不同boutqiue的商品不能加入到group中
+        //1. 不同boutique的商品不能加入到group中
         //2. 同一个商品不能加入两个group中，除非是爆款）
         List<Long> productIdList = (List<Long>) map.get("productIdList");
         List<Long> vendorTagIds = new ArrayList<>();
         Long tagId = Long.valueOf(map.get("tag_id").toString());
         Tag tag = tagMapper.selectByPrimaryKey(tagId);
-        List<ProductWithBLOBs> productWithBLOBs =  productMapper.listProductByProductIds(productIdList);
-        Map<Long,ProductWithBLOBs> bloBsMap = new HashMap<>();
-        if(tag.getTagType() == 2 || tag.getTagType() == 3){ // 爆款 除外 tag 也除外
+        List<ProductWithBLOBs> productWithBLOBs = productMapper.listProductByProductIds(productIdList);
+        Map<Long, ProductWithBLOBs> bloBsMap = new HashMap<>();
+        if (tag.getTagType() == 2 || tag.getTagType() == 3) {
+            // 爆款 除外 tag 也除外
             Long vendorId = tag.getVendorId();
-            if(CollectionUtils.isNotEmpty(productWithBLOBs)){
-                for(ProductWithBLOBs p : productWithBLOBs){
-                    if(!vendorId.equals(p.getVendorId()) && tag.getTagType() != 3){
+            if (CollectionUtils.isNotEmpty(productWithBLOBs)) {
+                for (ProductWithBLOBs p : productWithBLOBs) {
+                    if (!vendorId.equals(p.getVendorId()) && tag.getTagType() != 3) {
                         productIdList.remove(p.getProductId()); // 不在一个vendor的不要加
-                        Map<String,Object> map1 = new HashMap<>();
-                        map1.put("productId",p.getProductId());
-                        map1.put("boutiqueId",p.getProductCode());
+                        Map<String, Object> map1 = new HashMap<>();
+                        map1.put("productId", p.getProductId());
+                        map1.put("boutiqueId", p.getProductCode());
                         listPrdIdNOVend.add(map1);
                     }
-                    bloBsMap.put(p.getProductId(),p);
+                    bloBsMap.put(p.getProductId(), p);
                 }
             }
-            Map<String,Object> param = new HashMap<>();
+            Map<String, Object> param = new HashMap<>();
             List<Integer> types = new ArrayList<>();
             types.add(2);
             List<Long> vendorIds = new ArrayList<>();
             vendorIds.add(vendorId);
-            param.put("vendorIds",vendorIds);
-            param.put("tagTypes",types);
+            param.put("vendorIds", vendorIds);
+            param.put("tagTypes", types);
             List<Tag> tags = tagMapper.getTagsByParam(param);
-            if(CollectionUtils.isNotEmpty(tags)){
-                for(Tag t : tags){
+            if (CollectionUtils.isNotEmpty(tags)) {
+                for (Tag t : tags) {
                     vendorTagIds.add(t.getTagId());
                 }
             }
 
         }
-        Map<String,Object> para = new HashMap<>();
+        Map<String, Object> para = new HashMap<>();
         para.putAll(map);
-        if(tag.getTagType() == 2){
+        if (tag.getTagType() == 2 || tag.getTagType() == 5) {
             para.remove("tag_id");
         }
-        if(CollectionUtils.isNotEmpty(listPrdIdNOVend)){
-            response.put("failed",listPrdIdNOVend);
-            //msg = "The product supplier does not match the product group，productIds:"+listPrdIdNOVend.toString();
+        if (CollectionUtils.isNotEmpty(listPrdIdNOVend)) {
+            response.put("failed", listPrdIdNOVend);
         }
-        if(CollectionUtils.isEmpty(productIdList)){
+        if (CollectionUtils.isEmpty(productIdList)) {
             return 0;
         }
 
@@ -99,59 +98,59 @@ public class TagServiceImpl implements ITagService {
         List<Map<String, Object>> listTagProductRel = tagProductRelMapper.getByProductAndTagId(para);
 
         // 2. 剔重
-        for (int i = 0; i < listTagProductRel.size(); i++) {
-            Map<String, Object> mTagPrdRel = listTagProductRel.get(i);
-            String sPrdIdRes = mTagPrdRel.get("product_id").toString();
+        for (Map<String, Object> mTagPrdRel : listTagProductRel) {
+            String dbProductId = mTagPrdRel.get("product_id").toString();
             Long tag_id = null;
-            if(mTagPrdRel.get("tag_id")!=null){
+            if (mTagPrdRel.get("tag_id") != null) {
                 tag_id = Long.valueOf(mTagPrdRel.get("tag_id").toString());
             }
 
             Iterator it = productIdList.iterator();
             while (it.hasNext()) {
                 String sPrdIdTarget = it.next().toString();
-                if ((tag.getTagType() == 1 && sPrdIdTarget.equals(sPrdIdRes))
-                    || (tag.getTagType() == 5 && sPrdIdTarget.equals(sPrdIdRes))) {
+                if ((tag.getTagType() == 1 || tag.getTagType() == 5) && sPrdIdTarget.equals(dbProductId)) {
                     it.remove();
-                    ProductWithBLOBs p = bloBsMap.get(Long.valueOf(sPrdIdTarget));
-                    if(p == null) continue;
-                    Map<String,Object> map1 = new HashMap<>();
-                    map1.put("productId",p.getProductId());
-                    map1.put("boutiqueId",p.getProductCode());
+
+                    Map<String, Object> map1 = new HashMap<>();
+                    map1.put("productId", dbProductId);
+                    // map1.put("boutiqueId", p.getProductCode());
                     listPrdIdDuplicated.add(map1);
                 }
-                if((tag.getTagType() == 2 && vendorTagIds.contains(tag_id)) || (tag.getTagType() == 3 && sPrdIdTarget.equals(sPrdIdRes) )){
+
+                if ((tag.getTagType() == 2 && vendorTagIds.contains(tag_id)) || (tag.getTagType() == 3 && sPrdIdTarget.equals(dbProductId))) {
                     it.remove();
                     ProductWithBLOBs p = bloBsMap.get(Long.valueOf(sPrdIdTarget));
-                    if(p == null) continue;
-                    Map<String,Object> map1 = new HashMap<>();
-                    map1.put("productId",p.getProductId());
-                    map1.put("boutiqueId",p.getProductCode());
+                    if (p == null)
+                        continue;
+                    Map<String, Object> map1 = new HashMap<>();
+                    map1.put("productId", p.getProductId());
+                    map1.put("boutiqueId", p.getProductCode());
                     doubleTagIds.add(map1);
                 }
             }
         }
-        if(doubleTagIds.size()>0){
-            response.put("doubleTag",doubleTagIds);
+        if (doubleTagIds.size() > 0) {
+            response.put("doubleTag", doubleTagIds);
         }
-        if(listPrdIdDuplicated.size()>0){
-            response.put("duplicated",listPrdIdDuplicated);
+        if (listPrdIdDuplicated.size() > 0) {
+            response.put("duplicated", listPrdIdDuplicated);
         }
 
         logger.info("saveTagProductRel： repeat count [{}]; pass count [{}]", listPrdIdDuplicated.size(), productIdList.size());
 
         if (productIdList.size() <= 0) {
             return 0;
-        }else {
-            for(Long id : productIdList){
+        } else {
+            for (Long id : productIdList) {
                 ProductWithBLOBs p = bloBsMap.get(id);
-                Map<String,Object> map1 = new HashMap<>();
-                if(p == null) continue;
-                map1.put("productId",p.getProductId());
-                map1.put("boutiqueId",p.getProductCode());
+                Map<String, Object> map1 = new HashMap<>();
+                if (p == null)
+                    continue;
+                map1.put("productId", p.getProductId());
+                map1.put("boutiqueId", p.getProductCode());
                 successTagIds.add(map1);
             }
-            response.put("success",successTagIds);
+            response.put("success", successTagIds);
 
         }
 
@@ -159,7 +158,7 @@ public class TagServiceImpl implements ITagService {
         mapToSave.put("tag_id", map.get("tag_id"));
         mapToSave.put("productIdList", map.get("productIdList"));
         mapToSave.put("sort_num", map.get("sort_num"));
-        mapToSave.put("tagType",map.get("tagType"));
+        mapToSave.put("tagType", map.get("tagType"));
 
         return tagProductRelMapper.saveTagProductRel(mapToSave);
     }
@@ -170,15 +169,17 @@ public class TagServiceImpl implements ITagService {
     }
 
     @Override
-    public List<Tag> getTagsByParam(Map<String,Object> param) {
-        if(param == null) return null;
+    public List<Tag> getTagsByParam(Map<String, Object> param) {
+        if (param == null)
+            return null;
         List<Tag> tags = tagMapper.getTagsByParam(param);
         return tags;
     }
 
     @Override
     public Tag selectTagByTagId(Long tagId) {
-        if(tagId == null) return null;
+        if (tagId == null)
+            return null;
         return tagMapper.selectByPrimaryKey(tagId);
     }
 
