@@ -97,7 +97,6 @@
             `block`.title_english,
             `block`.cover_img,
             `block`.content_type,
-            `block`.block_name_2c,
             `block`.title_2c,
             `block`.subtitle_2c,
             `block`.cover_img_2c,
