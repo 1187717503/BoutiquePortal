@@ -1539,7 +1539,8 @@ public class OrderShipController extends BaseController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        inputVO.setAccount("106669563");
+        //更换账号2018-08-02
+        inputVO.setAccount("106841512");
         inputVO.setShipmentTime(f1.format(currentTime)+"T"+f2.format(currentTime));
         inputVO.setDescription("clothing");
         inputVO.setLabelType("PDF");
