@@ -315,15 +315,23 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		if (flag && StringUtils.isBlank(addr)){
 			throw new RuntimeException("The Receiving address cannot be empty. Please contact customer to adjust!");
 		}
-		if (flag && addr.length() > 35){
+		/*if (flag && addr.length() > 105){
 			throw new RuntimeException("Receiving address is longer than maximum length (35 characters). Please contact customer to adjust!");
-		}
-		if (!flag){
+		}*/
+		if (flag){
+			//按空格把过长的地址拆分三段（每段长度不超过35个字符）
+			List<String> address = splitAddress(addr);
+			beanMap.put("shipToAddr", address.get(0).trim());
+			if (StringUtils.isNotBlank(address.get(1)))
+			beanMap.put("shipToAddr2", address.get(1).trim());
+			if (StringUtils.isNotBlank(address.get(2)))
+			beanMap.put("shipToAddr3", address.get(2).trim());
+		}else {
 			if (addr.length() > 200){
 				throw new RuntimeException("Receiving address is longer than maximum length (200 characters). Please contact customer to adjust!");
 			}
+			beanMap.put("shipToAddr", addr);
 		}
-		beanMap.put("shipToAddr", addr);
 		//beanMap.put("shipToAddr2", map.get("shipToAddr2")==null?" ":map.get("shipToAddr2").toString());
 		//beanMap.put("shipToAddr3", map.get("shipToAddr3")==null?" ":map.get("shipToAddr3").toString());
 		beanMap.put("shipToEamilAddr", "shipment@intramirror.com");
@@ -347,6 +355,30 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
         beanMap.put("postalCode",postalCode);
 		beanMap.put("contact",map.get("contact")==null?"":map.get("contact").toString());
 		return beanMap;
+	}
+
+	private List<String> splitAddress(String addr) {
+		List<String> address = new ArrayList<>();
+		if (StringUtils.isBlank(addr)){
+			return address;
+		}else {
+			String[] ss = addr.split(" ");
+			int index = 0;
+			String a = "";
+			while (address.size()<3){
+				for(int i=index; i<ss.length;i++){
+					if (a.length()<=35){
+						a += ss[i] + " ";
+						index = i+1;
+					}else {
+						break;
+					}
+				}
+				address.add(a);
+				a = "";
+			}
+		}
+		return address;
 	}
 
 	private SubShipment saveBeanVO(Map<String, Object> map, Date currentDate, Long shipmentId,Long segmentSequence){
