@@ -96,6 +96,10 @@
             `block`.subtitle,
             `block`.title_english,
             `block`.cover_img,
+            `block`.content_type,
+            `block`.title_2c,
+            `block`.subtitle_2c,
+            `block`.cover_img_2c,
             tag.tag_id,
             tag_name
         FROM `block`
@@ -134,6 +138,7 @@
         block.sort_order,
         block.title,
         block.subtitle,
+        block.content_type,
         tag.tag_id,
         tag.tag_name
         FROM block

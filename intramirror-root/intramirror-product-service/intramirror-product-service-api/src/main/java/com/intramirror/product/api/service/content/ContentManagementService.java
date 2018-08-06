@@ -1,6 +1,7 @@
 package com.intramirror.product.api.service.content;
 
 import com.intramirror.product.api.model.Block;
+import com.intramirror.product.api.model.BlockDto;
 import com.intramirror.product.api.model.BlockTagRel;
 import com.intramirror.product.api.model.Tag;
 import com.intramirror.product.api.model.TagProductRel;
