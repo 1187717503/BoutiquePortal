@@ -371,6 +371,9 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 						a += ss[i] + " ";
 						index = i+1;
 					}else {
+                        String trim = a.trim();
+                        a = trim.substring(0,trim.lastIndexOf(" "));
+                        index--;
 						break;
 					}
 				}
