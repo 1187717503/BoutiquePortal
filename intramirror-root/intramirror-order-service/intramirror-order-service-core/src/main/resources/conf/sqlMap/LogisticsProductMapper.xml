@@ -37,6 +37,7 @@
         <result column="stock_location" property="stock_location" jdbcType="VARCHAR"/>
         <result column="total_rmb" property="total_rmb" jdbcType="DECIMAL"/>
         <result column="im_price" property="im_price" jdbcType="DECIMAL"/>
+        <result column="shipping_method" property="shippingMethod" jdbcType="INTEGER"/>
     </resultMap>
 
     <update id="updateByLogisticsProduct" parameterType="com.intramirror.order.api.model.LogisticsProduct">
@@ -176,6 +177,12 @@
         SELECT *
         FROM logistics_product
         WHERE logistics_product_id = #{logistics_product_id,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectByOrderLineNum" resultMap="logisProductMap" parameterType="java.lang.String">
+        SELECT *
+        FROM logistics_product
+        WHERE order_line_num = #{orderLineNum,jdbcType=LONGVARCHAR}
     </select>
 
     <select id="selectLogisProShipmentById" resultType="java.util.HashMap" parameterType="java.util.Map">

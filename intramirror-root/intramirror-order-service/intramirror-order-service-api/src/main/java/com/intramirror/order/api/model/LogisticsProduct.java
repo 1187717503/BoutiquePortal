@@ -42,6 +42,16 @@ public class LogisticsProduct {
     private BigDecimal total_rmb;
     private BigDecimal im_price;
 
+    private Integer shippingMethod;
+
+    public Integer getShippingMethod() {
+        return shippingMethod;
+    }
+
+    public void setShippingMethod(Integer shippingMethod) {
+        this.shippingMethod = shippingMethod;
+    }
+
     public BigDecimal getTotal_rmb() {
         return total_rmb;
     }

@@ -109,6 +109,7 @@
         SELECT p.product_id,g.pack_group,g.pack_english_name,lp.stock_Location,lp.stock_location_id,sl.ship_from_location_id, lp.change_flag,
         o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id, s.`size` as size,p.category_id,
         lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
+        lp.shipping_method as shipping_method ,
         lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
         lp.confirmed_at,lp.est_ship_date,lp.packed_at,lp.shipped_at,s.sku_code,usa.address_country_id,b.english_name as brandName,
         if(lp.user_rec_flag=0, l.user_rec_name, lp.user_rec_name) as user_rec_name,

@@ -108,5 +108,7 @@ public interface ILogisticsProductService {
 	 */
 	LogisticProductContainer getLogisticProductContainer(LogisticProductContainer logisticProductContainer);
 
+	LogisticsProduct selectByOrderLineNum(String orderLineNum);
+
 }
 
