@@ -363,18 +363,21 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			return address;
 		}else {
 			String[] ss = addr.split(" ");
+			for (int i=0;i<ss.length;i++){
+				if (ss[i].length()>35){
+					ss[i] = ss[i].substring(0,35);
+				}
+			}
 			int index = 0;
 			String a = "";
 			while (address.size()<3){
 				for(int i=index; i<ss.length;i++){
-					if (a.length()<=35){
+					if (a.trim().length()<=35){
 						a += ss[i] + " ";
 						index = i+1;
-					}else {
-                        String trim = a.trim();
-                        a = trim.substring(0,trim.lastIndexOf(" "));
-                        index--;
-						break;
+						if ((i<ss.length-1)&&(a+ss[i+1]).length()>35){
+							break;
+						}
 					}
 				}
 				address.add(a);
