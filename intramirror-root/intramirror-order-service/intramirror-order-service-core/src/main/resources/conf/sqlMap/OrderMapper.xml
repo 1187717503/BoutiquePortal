@@ -299,7 +299,8 @@
             b.english_name AS brandName,
             v.vendor_name,
             p.cover_img,
-            lp.logistics_product_id
+            lp.logistics_product_id,
+            p.color_code as colorCode,p.designer_id as brandID
         FROM logistics_product lp
             INNER JOIN container c ON lp.container_id = c.container_id
             INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
@@ -438,7 +439,8 @@
         as brandName,l.user_rec_country as userRecCountry,
         v.vendor_name,
         CASE WHEN p.spu_id IS NULL THEN p.cover_img ELSE spu.cover_img END AS cover_img,
-        g.english_name as geography_name ,lp.logistics_product_id,v.vendor_id
+        g.english_name as geography_name ,lp.logistics_product_id,v.vendor_id,lp.shipping_method as shippingMethod,
+        p.color_code as colorCode,p.designer_id as brandID
         FROM logistics_product lp
         INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
         INNER JOIN `order` o ON ol.order_id = o.order_id
