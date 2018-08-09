@@ -36,6 +36,7 @@
         <property name="deleteAWBUrl" value="${deleteAWBUrl}"/>
         <property name="confirmedOrder" value="${confirmedOrder}"/>
         <property name="shippedOrder" value="${shippedOrder}"/>
+        <property name="tmsProviderRouteUrl" value="${tms.provider.route.url}"/>
     </bean>
 
 

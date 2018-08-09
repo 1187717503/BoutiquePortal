@@ -3,6 +3,7 @@
  */
 package com.intramirror.order.core.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.google.gson.Gson;
 import com.intramirror.common.core.mapper.SubShipmentMapper;
 import com.intramirror.common.help.StringUtils;
@@ -10,13 +11,12 @@ import com.intramirror.order.api.common.ContainerType;
 import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.model.SubShipment;
-import com.intramirror.order.api.service.IOrderService;
-import com.intramirror.order.api.service.IShipmentService;
-import com.intramirror.order.api.service.ISubShipmentService;
-import com.intramirror.order.api.service.KafkaUtilService;
+import com.intramirror.order.api.service.*;
 import com.intramirror.order.api.util.HttpClientUtil;
+import com.intramirror.order.api.vo.InvokerInputVo;
 import com.intramirror.order.api.vo.LogisticsProductVO;
 import com.intramirror.order.api.vo.ShipmentSendMailVO;
+import com.intramirror.order.api.vo.TransportationRouteVo;
 import com.intramirror.order.core.dao.BaseDao;
 import com.intramirror.order.core.mapper.LogisticProductShipmentMapper;
 import com.intramirror.order.core.mapper.LogisticsProductMapper;
@@ -63,6 +63,9 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 
 	@Autowired
 	private IOrderService orderService;
+
+	@Autowired
+	private ILogisticsProductService iLogisticsProductService;
 
 	@Override
 	public void init() {
@@ -135,8 +138,12 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 					List<Map<String, Object>> listMap = shipmentMapper.getShippmentByType(typeMap);
 					logger.info("result shipmentType:" + new Gson().toJson(listMap));
 					shipmentId = shipmentMapper.getShipmentId(shipment);
-					saveSubShipment(listMap, map,shipmentId,Long.parseLong(
+					Long consigner_country_id =  Long.parseLong(map.get("consigner_country_id").toString());
+					Long consignee_country_id =  Long.parseLong(map.get("consignee_country_id").toString());
+					saveSubShipmentByTms(map,consigner_country_id,consignee_country_id,vendorId,shipmentId,Long.parseLong(
 							map.get("logistics_product_id")==null?"0":map.get("logistics_product_id").toString()));
+					/*saveSubShipment(listMap, map,shipmentId,Long.parseLong(
+							map.get("logistics_product_id")==null?"0":map.get("logistics_product_id").toString()));*/
 					shipment.setShipmentId(shipmentId);
 					return shipment;
 				}
@@ -150,7 +157,11 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 				logger.info("getShipmentId :" + new Gson().toJson(typeMap));
 				List<Map<String, Object>> listMap = shipmentMapper.getShippmentByType(typeMap);
 				logger.info("result shipmentType:" + new Gson().toJson(listMap));
-				saveSubShipment(listMap, map,shipmentId,Long.parseLong(
+//				saveSubShipment(listMap, map,shipmentId,Long.parseLong(
+//						map.get("logistics_product_id")==null?"0":map.get("logistics_product_id").toString()));
+				Long consigner_country_id =  Long.parseLong(map.get("consigner_country_id").toString());
+				Long consignee_country_id =  Long.parseLong(map.get("consignee_country_id").toString());
+				saveSubShipmentByTms(map,consigner_country_id,consignee_country_id,Long.parseLong(map.get("vendor_id").toString()),shipmentId,Long.parseLong(
 						map.get("logistics_product_id")==null?"0":map.get("logistics_product_id").toString()));
 				return shipment;
 			}
@@ -190,6 +201,47 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	@Override
 	public List<Map<String, Object>> getShippmentByType(Map<String, Object> map) {
 		return shipmentMapper.getShippmentByType(map);
+	}
+
+	public void saveSubShipmentByTms(Map<String, Object> map,Long consigner_country_id,Long consignee_country_id, Long vendorId, Long shipmentId, Long logisticProductId){
+		StringBuffer sb = new StringBuffer(HttpClientUtil.tmsProviderRouteUrl);
+		sb.append("?").append("senderCountryId=").append(consigner_country_id).append("&recipientCountryId=")
+				.append(consignee_country_id).append("&invokerId=").append(vendorId).append("&invokerType=1");
+		String json = HttpClientUtil.httpGet(sb.toString());
+		saveSubShipmentReturnId(json,shipmentId,map);
+	}
+
+	private void saveSubShipmentReturnId(String json,Long shipmentId,Map<String, Object> map){
+		if(StringUtils.isNotBlank(json)){
+			List<TransportationRouteVo> routeVos = JSONArray.parseArray(json, TransportationRouteVo.class);
+			if(routeVos!=null&&routeVos.size()>0){
+				Date currentDate = new Date();
+				SubShipment subShipment = new SubShipment();
+				subShipment.setConsignee(map.get("transfer_consignee")==null?"":map.get("transfer_consignee").toString());
+				subShipment.setPersonName(map.get("person_name")==null?"":map.get("person_name").toString());
+				subShipment.setSegmentSequence(routeVos.get(0).getProviderVoList().get(0).getSequence().longValue());
+				subShipment.setShipToAddr(routeVos.get(0).getProviderVoList().get(0).getAddress());
+				subShipment.setShipToAddr2(routeVos.get(0).getProviderVoList().get(0).getAddress2());
+				subShipment.setShipToAddr3(routeVos.get(0).getProviderVoList().get(0).getAddress3());
+				subShipment.setShipToEamilAddr(routeVos.get(0).getProviderVoList().get(0).getEmail());
+				subShipment.setShipToDistrict(routeVos.get(0).getProviderVoList().get(0).getDistrict());
+				subShipment.setShipToCity(routeVos.get(0).getProviderVoList().get(0).getCity());
+				subShipment.setShipToProvince(routeVos.get(0).getProviderVoList().get(0).getProvince());
+				subShipment.setShipToCountry(routeVos.get(0).getProviderVoList().get(0).getCountry());
+				subShipment.setUpdatedAt(currentDate);
+				subShipment.setShipmentId(shipmentId);
+				subShipment.setCreatedAt(currentDate);
+				subShipment.setStatus(ContainerType.RECEIVED);
+				subShipment.setShipToCountryCode(routeVos.get(0).getProviderVoList().get(0).getCountryCode());
+				subShipment.setContact(routeVos.get(0).getProviderVoList().get(0).getContactName());
+				subShipment.setPiva(routeVos.get(0).getProviderVoList().get(0).getTransferPiva());
+				subShipment.setPostalCode(routeVos.get(0).getProviderVoList().get(0).getPostalCode());
+				subShipmentMapper.insertSubshipmentVO(subShipment);
+				if(routeVos.get(0).getProviderVoList().get(1)!=null){
+					subShipmentMapper.insertSubshipment(saveBean(map, currentDate, shipmentId, routeVos.get(0).getProviderVoList().get(1).getSequence().longValue()));
+				}
+			}
+		}
 	}
 
 	public void saveSubShipment(List<Map<String, Object>> map, Map<String, Object> lastMap, Long shipmentId, Long logisticProductId){

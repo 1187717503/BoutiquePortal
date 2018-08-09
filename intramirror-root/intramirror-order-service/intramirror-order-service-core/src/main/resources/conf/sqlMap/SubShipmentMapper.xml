@@ -164,7 +164,7 @@
         where sub_shipment_id = #{subShipmentId,jdbcType=BIGINT}
     </update>
 
-    <insert id="insertSubshipment" parameterType="java.util.Map">
+    <insert id="insertSubshipment" parameterType="java.util.Map" keyProperty="sub_shipment_id">
         INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_addr,ship_to_addr2,ship_to_addr3,ship_to_emailAddr,
         ship_to_district,ship_to_city,ship_to_province,ship_to_country,`status`,created_at,updated_at,shipment_id,ship_to_country_code,
         contact,postal_code,person_name)
@@ -176,7 +176,7 @@
         #{shipToCountryCode,jdbcType=VARCHAR},#{contact,jdbcType=VARCHAR},#{postalCode,jdbcType=VARCHAR},#{personName,jdbcType=VARCHAR});
   </insert>
 
-    <insert id="insertSubshipmentVO" parameterType="com.intramirror.order.api.model.SubShipment">
+    <insert id="insertSubshipmentVO" parameterType="com.intramirror.order.api.model.SubShipment" keyProperty="sub_shipment_id">
         INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_addr,ship_to_addr2,ship_to_addr3,ship_to_emailAddr,
         ship_to_district,ship_to_city,ship_to_province,ship_to_country,`status`
         ,created_at,updated_at,shipment_id,ship_to_country_code,contact,piva,postal_code,person_name)
