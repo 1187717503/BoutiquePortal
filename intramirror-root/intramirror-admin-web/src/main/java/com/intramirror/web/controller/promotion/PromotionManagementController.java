@@ -9,38 +9,25 @@ import com.intramirror.product.api.entity.promotion.BrandEntity;
 import com.intramirror.product.api.entity.promotion.CategoryEntity;
 import com.intramirror.product.api.entity.promotion.ImportDataEntity;
 import com.intramirror.product.api.enums.PromotionRuleType;
-import com.intramirror.product.api.model.ProductWithBLOBs;
-import com.intramirror.product.api.model.Promotion;
-import com.intramirror.product.api.model.PromotionBrandHot;
-import com.intramirror.product.api.model.PromotionExcludeProduct;
-import com.intramirror.product.api.model.PromotionRule;
+import com.intramirror.product.api.model.*;
 import com.intramirror.product.api.service.IProductService;
 import com.intramirror.product.api.service.brand.IBrandService;
 import com.intramirror.product.api.service.category.ICategoryService;
 import com.intramirror.product.api.service.promotion.IPromotionExcludeProductService;
 import com.intramirror.product.api.service.promotion.IPromotionService;
-import static com.intramirror.utils.transform.JsonTransformUtil.toJson;
-import static com.intramirror.web.common.request.ConstantsEntity.EXCLUDE;
-import static com.intramirror.web.common.request.ConstantsEntity.INCLUDE;
-import static com.intramirror.web.common.request.ConstantsEntity.INCLUDE_IMPORT;
 import com.intramirror.web.common.request.PromotionRuleEntity;
 import com.intramirror.web.controller.cache.CategoryCache;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
+
+import static com.intramirror.utils.transform.JsonTransformUtil.toJson;
+import static com.intramirror.web.common.request.ConstantsEntity.*;
 
 /**
  * Created on 2018/1/4.
@@ -68,6 +55,9 @@ public class PromotionManagementController {
     @Autowired
     ICategoryService productCategoryServiceImpl;
 
+    static final String PR_INC_LIST = "ListIncPromotionRule";
+    static final String PR_EXC_LIST = "ListExcPromotionRule";
+
     @GetMapping(value = "/banner/promotion")
     public Response getAllPromotion(@Param(value = "bannerId") Long bannerId) {
         List<Map<String, Object>> result = promotionService.listPromotionByBanner(bannerId);
@@ -88,9 +78,28 @@ public class PromotionManagementController {
             type = PromotionRuleType.EXCLUDE_RULE;
         } else if (INCLUDE_IMPORT.equals(ruleType)) {
             //2018-4-18 Jian
-            List<PromotionRule> listRule = transformImportRule(body);
-            promotionService.processImportPromotionRule(listRule);
-            return Response.status(StatusType.SUCCESS).data(listRule);
+            Map<String, List<PromotionRuleEntity>> mapRule2Import = dealImportRule(body);
+
+            //deal include rule
+            List<PromotionRuleEntity> listPreInc = mapRule2Import.get(PR_INC_LIST);
+            List<PromotionRule> listRuleInc = new ArrayList<>();
+            if (listPreInc != null) {
+                for (int i = 0; i < listPreInc.size(); i++) {
+                    listRuleInc.add(transformPromotionRule(listPreInc.get(i)));
+                }
+                promotionService.processImportPromotionRule(0, listRuleInc);
+            }
+
+            //deal exclude rule
+            List<PromotionRuleEntity> listPreExc = mapRule2Import.get(PR_EXC_LIST);
+            List<PromotionRule> listRuleExc = new ArrayList<>();
+            if (listPreExc != null) {
+                for (int i = 0; i < listPreExc.size(); i++) {
+                    listRuleExc.add(transformPromotionRule(listPreExc.get(i)));
+                }
+                promotionService.processImportPromotionRule(1, listRuleExc);
+            }
+            return Response.status(StatusType.SUCCESS).data(mapRule2Import);
 
         } else {
             return Response.status(StatusType.PARAM_NOT_POSITIVE).build();
@@ -103,57 +112,123 @@ public class PromotionManagementController {
 
     }
 
-    private List<PromotionRule> transformImportRule(PromotionRuleEntity body) throws Exception {
+    private Map<String, List<PromotionRuleEntity>> dealImportRule(PromotionRuleEntity body) {
         List<ImportDataEntity> listImportData = body.getImportData();
-        List<PromotionRule> listRule = new ArrayList<>();
+        Map<Long, String> defaultStatus = new HashMap<>();
+        Map<String, List<PromotionRuleEntity>> prMap = new HashMap<>();
 
+        List<PromotionRuleEntity> listPreInclude = new ArrayList<>();
+        List<PromotionRuleEntity> listPreExclude = new ArrayList<>();
+
+        for (ImportDataEntity idata : listImportData) {
+            Boolean hasInc = false;
+            Boolean hasExc = false;
+            BrandEntity be = new BrandEntity();
+            List<BrandEntity> listBrandInc = new ArrayList<>();
+            List<BrandEntity> listBrandExc = new ArrayList<>();
+            List<CategoryEntity> listCategoryInc = new ArrayList<>();
+            List<CategoryEntity> listCategoryExc = new ArrayList<>();
+
+            if (idata.getBrandName().equals("Default")) {
+                List<CategoryEntity> listCategoryTmp = idata.getCategorys();
+                for (CategoryEntity ce : listCategoryTmp) {
+                    //记录每个default的类目对应的状态
+                    defaultStatus.put(ce.getCategoryId(), ce.getStatus());
+
+                    if (ce.getStatus().equals("Y")) {
+                        //Include需考虑default配置all brand，Exclude不需要考虑配置All brand
+                        if (listBrandInc.size() < 1) {
+                            be.setName("ALL");
+                            be.setBrandId(-1L);
+                            listBrandInc.add(be);
+                        }
+
+                        //同时添加2，3级类目
+                        listCategoryInc.add(ce);
+                        setCategoryList(ce.getCategoryId(), listCategoryInc);
+                        hasInc = true;
+                    }
+                }
+
+                if (hasInc) {
+                    listPreInclude.add(initPromotionRuleEntity(body, listBrandInc, listCategoryInc));
+                }
+            } else {
+
+                List<CategoryEntity> listCategoryTmp = idata.getCategorys();
+                for (CategoryEntity ce : listCategoryTmp) {
+                    if (!defaultStatus.get(ce.getCategoryId()).equals(ce.getStatus())) {
+                        if (ce.getStatus().equals("Y")) {
+                            generateBrand2CategoryList(idata.getBrandName(), ce, listBrandInc, listCategoryInc);
+                            hasInc = true;
+                        } else {
+                            generateBrand2CategoryList(idata.getBrandName(), ce, listBrandExc, listCategoryExc);
+                            hasExc = true;
+                        }
+                    }
+                }
+
+                if (hasInc) {
+                    listPreInclude.add(initPromotionRuleEntity(body, listBrandInc, listCategoryInc));
+                }
+
+                if (hasExc) {
+                    listPreExclude.add(initPromotionRuleEntity(body, listBrandExc, listCategoryExc));
+                }
+            }
+        }
+        prMap.put(PR_INC_LIST, listPreInclude);
+        prMap.put(PR_EXC_LIST, listPreExclude);
+        return prMap;
+    }
+
+    private PromotionRuleEntity initPromotionRuleEntity(PromotionRuleEntity body, List<BrandEntity> listBrand, List<CategoryEntity> listCategory) {
         PromotionRuleEntity pre = new PromotionRuleEntity();
         pre.setPromotionId(body.getPromotionId());
         pre.setRuleId(body.getRuleId());
         pre.setSeasonCode(body.getSeasonCode());
         pre.setVendorId(body.getVendorId());
-
-        for (ImportDataEntity idata : listImportData) {
-            BrandEntity be = new BrandEntity();
-            List<BrandEntity> listBrand = new ArrayList<BrandEntity>();
-            List<CategoryEntity> listCategory = new ArrayList<CategoryEntity>();
-
-            List<Map<String, Object>> listBrandTmp = productBrandServiceImpl.getBrandByName(idata.getBrandName());
-            if (listBrandTmp.size() == 1) {
-                Map<String, Object> brandMap = listBrandTmp.get(0);
-                be.setBrandId(Long.parseLong(brandMap.get("brand_id").toString()));
-                be.setName((String) brandMap.get("english_name"));
-                listBrand.add(be);
-            }
-            pre.setBrands(listBrand);
-            LOGGER.info("==Jian add brandEntity [{}].", listBrand);
-
-            List<CategoryEntity> listCategoryTmp = idata.getCategorys();
-            LOGGER.info("==Jian listCategoryTmp.size() is [{}].", listCategoryTmp.size());
-            for (CategoryEntity ce : listCategoryTmp) {
-                List<Map<String, Object>> listCategoryTmp1 = productCategoryServiceImpl.getSubCidByPid(ce.getCategoryId());
-                listCategory.add(ce);
-                LOGGER.info("==Jian add categoryEntity [{}].", ce);
-                if (listCategoryTmp1.size() >= 1) {
-                    for (Map<String, Object> it : listCategoryTmp1) {
-                        CategoryEntity ceTmp = new CategoryEntity();
-                        ceTmp.setCategoryId(Long.parseLong(it.get("category_id").toString()));
-                        listCategory.add(ceTmp);
-                    }
-                }
-            }
-            pre.setCategorys(listCategory);
-            LOGGER.info("==Jian add categoryEntity [{}].", listCategory);
-
-            PromotionRule promotionRule = transformPromotionRule(pre);
-            listRule.add(promotionRule);
-        }
-        return listRule;
+        pre.setBrands(listBrand);
+        pre.setCategorys(listCategory);
+        return pre;
     }
 
-    @DeleteMapping(value = "/promotion/{ruleType}/{ruleId}")
-    public Response removePromotionRule(@PathVariable(value = "ruleType") String ruleType, @PathVariable("ruleId") Long ruleId) {
-        LOGGER.info("Start to remove rule with type {} and ruleId {}.", ruleType, ruleId);
+    private void generateBrand2CategoryList(String brandName, CategoryEntity ce, List<BrandEntity> listBrand, List<CategoryEntity> listCategory) {
+        //记录include
+        if (listBrand.size() < 1) {
+            setBrandList(brandName, listBrand);
+        }
+
+        //同时添加2，3级类目
+        listCategory.add(ce);
+        setCategoryList(ce.getCategoryId(), listCategory);
+    }
+
+    private void setBrandList(String brandName, List<BrandEntity> listBrand) {
+        BrandEntity be = new BrandEntity();
+        List<Map<String, Object>> listBrandTmp = productBrandServiceImpl.getBrandByName(brandName);
+        if (listBrandTmp.size() == 1) {
+            Map<String, Object> brandMap = listBrandTmp.get(0);
+            be.setBrandId(Long.parseLong(brandMap.get("brand_id").toString()));
+            be.setName((String) brandMap.get("english_name"));
+            listBrand.add(be);
+        }
+    }
+
+    private void setCategoryList(Long categoryId, List<CategoryEntity> listCategory) {
+        List<Map<String, Object>> listCategoryTmp = productCategoryServiceImpl.getSubCidByPid(categoryId);
+        if (listCategoryTmp.size() >= 1) {
+            for (Map<String, Object> it : listCategoryTmp) {
+                CategoryEntity ce = new CategoryEntity();
+                ce.setCategoryId(Long.parseLong(it.get("category_id").toString()));
+                listCategory.add(ce);
+            }
+        }
+    }
+
+    @DeleteMapping(value = "/promotion/delete/vendor/{ruleType}")
+    public Response removePromotionRule(@PathVariable(value = "ruleType") String ruleType, @RequestParam("ruleIds") List<Long> ruleIds) {
+        LOGGER.info("Start to remove rule with type {} and ruleId {}.", ruleType, ruleIds);
 
         PromotionRuleType type;
         if (INCLUDE.equals(ruleType)) {
@@ -164,7 +239,11 @@ public class PromotionManagementController {
             return Response.status(StatusType.PARAM_NOT_POSITIVE).build();
         }
 
-        Boolean result = promotionService.removePromotionRule(ruleId, type);
+        if (ruleIds.size() < 1) {
+            throw new ValidateException(new ErrorResponse("product id already existed."));
+        }
+
+        Boolean result = promotionService.removePromotionRule(ruleIds, type);
         return Response.status(StatusType.SUCCESS).data(result);
     }
 
@@ -172,26 +251,48 @@ public class PromotionManagementController {
     public Response savePromotionExcludeProduct(@RequestBody PromotionExcludeProduct promotionExcludeProduct) {
         LOGGER.info("Add promotion exclude product by promotionExcludeProduct: {}", toJson(promotionExcludeProduct));
 
-        ProductWithBLOBs productWithBLOBs = productService.selectByPrimaryKey(promotionExcludeProduct.getProductId());
-        if (productWithBLOBs == null || !productWithBLOBs.getEnabled()) {
-            return Response.status(StatusType.FAILURE).data("product id not found.");
+        ProductWithBLOBs product = new ProductWithBLOBs();
+        product.setProductId(promotionExcludeProduct.getProductId());
+        product.setProductIds(promotionExcludeProduct.getProductIds());
+        product.setProductCode(promotionExcludeProduct.getProductCode());
+        product.setDesignerId(promotionExcludeProduct.getDesignerId());
+        product.setColorCode(promotionExcludeProduct.getColorCode());
+        product.setEnabled(true);
+        List<ProductWithBLOBs> productWithBLOBsList = productService.getProductByParameter(product);
+        if (CollectionUtils.isEmpty(productWithBLOBsList)) {
+            return Response.status(StatusType.FAILURE).data("product not found.");
+        }
+        List<Long> productIds = new ArrayList<>();
+        for (ProductWithBLOBs productWithBLOBs : productWithBLOBsList) {
+            productIds.add(productWithBLOBs.getProductId());
         }
 
-        List<Map<String, Object>> promotionExcludeProducts = promotionExcludeProductService.selectByParameter(promotionExcludeProduct);
-        if (promotionExcludeProducts.size() > 0) {
+        Map<String, Object> params= new HashMap<>();
+        params.put("productIds", productIds);
+        params.put("promotionId", promotionExcludeProduct.getPromotionId());
+        List<Long> existsProductIds = promotionExcludeProductService.getPromotionProductIdByParameter(params);
+
+        productIds.removeAll(existsProductIds);
+        if (productIds.size() == 0) {
             return Response.status(StatusType.FAILURE).data("product id already existed.");
         }
-
+        promotionExcludeProduct.setProductIds(productIds);
         promotionExcludeProductService.insertPromotionExcludeProduct(promotionExcludeProduct);
-        promotionExcludeProduct.setName(productWithBLOBs.getName());
-        return Response.status(StatusType.SUCCESS).data(promotionExcludeProduct);
+//        promotionExcludeProduct.setName(productWithBLOBs.getName());
+        return Response.status(StatusType.SUCCESS).build();
     }
 
-    @DeleteMapping(value = "/promotion/product/exclude/{promotionExcludeProductId}")
-    public Response removePromotionExcludeProduct(@PathVariable("promotionExcludeProductId") Long promotionExcludeProductId) {
-        LOGGER.info("remove promotion exclude product by promotionExcludeProductId: {}", promotionExcludeProductId);
+    @DeleteMapping(value = "/promotion/product/exclude")
+    public Response removePromotionExcludeProduct(@RequestBody PromotionExcludeProduct promotionExcludeProduct) {
+        List<Long> ruleIds = promotionExcludeProduct.getRuleIds();
+        LOGGER.info("remove promotion exclude product by promotionExcludeProductId: {}", ruleIds.toString());
+        if (CollectionUtils.isEmpty(ruleIds)) {
+            return Response.status(StatusType.FAILURE).data("rule id is empty.");
+        }
+        Map<String, Object> params = new HashMap<>();
+        params.put("ruleIds", ruleIds);
+        Long row = promotionExcludeProductService.deletePromotionExcludeProduct(params);
 
-        Long row = promotionExcludeProductService.deletePromotionExcludeProduct(promotionExcludeProductId);
 
         return Response.status(StatusType.SUCCESS).data(row);
     }
@@ -225,7 +326,7 @@ public class PromotionManagementController {
         }
 
         PromotionRule promotionRule = transformPromotionRule(body);
-
+        promotionRule.setSeasonCode(promotionRule.getSeasonCodes().get(0));
         return Response.status(StatusType.SUCCESS).data(promotionService.updatePromotionRule(type, promotionRule));
     }
 
@@ -234,7 +335,7 @@ public class PromotionManagementController {
         promotionRule.setRuleId(body.getRuleId());
         promotionRule.setPromotionId(body.getPromotionId());
         promotionRule.setVendorId(body.getVendorId());
-        promotionRule.setSeasonCode(body.getSeasonCode());
+        promotionRule.setSeasonCodes(body.getSeasonCode());
 
         promotionRule.setBrands(JSONArray.toJSONString(body.getBrands()));
         for (CategoryEntity category : body.getCategorys()) {
