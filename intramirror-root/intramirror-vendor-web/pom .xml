@@ -26,7 +26,7 @@
             </activation>
             <build>
                 <filters>
-                    <filter>src/main/resources/test/dhl.properties</filter>
+                    <filter>src/main/resources/test/httpUrl.properties</filter>
                 </filters>
             </build>
         </profile>
@@ -37,7 +37,7 @@
             </properties>
             <build>
                 <filters>
-                    <filter>src/main/resources/staging/dhl.properties</filter>
+                    <filter>src/main/resources/staging/httpUrl.properties</filter>
                 </filters>
             </build>
         </profile>
@@ -48,7 +48,7 @@
             </properties>
             <build>
                 <filters>
-                    <filter>src/main/resources/staging_local/dhl.properties</filter>
+                    <filter>src/main/resources/staging_local/httpUrl.properties</filter>
                 </filters>
             </build>
         </profile>
@@ -59,19 +59,7 @@
             </properties>
             <build>
                 <filters>
-                    <filter>src/main/resources/prd/dhl.properties</filter>
-                </filters>
-            </build>
-        </profile>
-
-        <profile>
-            <id>pressure_test</id>
-            <properties>
-                <profiles.active>pressure_test</profiles.active>
-            </properties>
-            <build>
-                <filters>
-                    <filter>src/main/resources/pressure_test/dhl.properties</filter>
+                    <filter>src/main/resources/prd/httpUrl.properties</filter>
                 </filters>
             </build>
         </profile>
