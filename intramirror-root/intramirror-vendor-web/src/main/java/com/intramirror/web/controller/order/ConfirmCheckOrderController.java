@@ -6,6 +6,7 @@ import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.product.api.model.Sku;
+import com.intramirror.product.api.service.IProductService;
 import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.product.api.service.SkuService;
 import io.jsonwebtoken.Claims;
@@ -38,9 +39,8 @@ public class ConfirmCheckOrderController {
     //@Resource(name = "userServiceImpl")
     @Autowired
     private SkuService skuService;
-
     @Autowired
-    private ProductPropertyService productPropertyService;
+    private IProductService productService;
 
     @Autowired
     ILogisticsProductService logisticsProductServiceImpl;
@@ -124,7 +124,7 @@ public class ConfirmCheckOrderController {
             sku = skuService.getSkuBySkuCode(barCode);
             //            result.put("sku", sku);
         } else {
-            mapList = productPropertyService.getProductPropertyByBrandIDAndColorCode(brandId, colorCode);
+            mapList = productService.getProductByBrandIDAndColorCode(map);
             //            result.put("mapList", mapList);
         }
 
@@ -140,7 +140,7 @@ public class ConfirmCheckOrderController {
                     String mapBrandId = maps.get("brandID") == null ? "" : maps.get("brandID").toString();
                     String mapColorCode = maps.get("colorCode") == null ? "" : maps.get("colorCode").toString();
 
-                    //如果是当前自己的brandId喝colorCode保存
+                    //如果是当前自己的brandId和colorCode保存
                     if (mapBrandId.equals(brandId) && mapColorCode.equals(colorCode)) {
                         if (logis != null) {
                             LogisticsProduct upLogis = new LogisticsProduct();

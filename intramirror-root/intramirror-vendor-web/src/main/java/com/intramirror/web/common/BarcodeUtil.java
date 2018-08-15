@@ -180,10 +180,10 @@ public class BarcodeUtil {
         Code128Bean bean = new Code128Bean();
  
         // 精细度
-//        final int dpi = 200;
+        //final int dpi = 200;
         final int dpi = 150;
         // module宽度
-        final double moduleWidth = UnitConv.in2mm(2.2f / dpi);
+        final double moduleWidth = UnitConv.in2mm(2.5f / dpi);
  
         // 配置对象
         bean.setModuleWidth(moduleWidth);

@@ -353,15 +353,45 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 
 	public Map<String, Object> saveBean(Map<String, Object> map, Date currentDate, Long shipmentId,Long segmentSequence){
 		Map<String, Object> beanMap = new HashMap<String, Object>();
+		String countryCode = map.get("countryCode") == null ? " " : map.get("countryCode").toString();
+		//发往中国大陆，及港澳地区的不用校验地址信息
+		boolean flag = true;
+		if ("CN".equalsIgnoreCase(countryCode)||"HK".equalsIgnoreCase(countryCode)||"MO".equalsIgnoreCase(countryCode)){
+			flag = false;
+		}
 		beanMap.put("consignee", map.get("consignee")==null?" ":map.get("consignee").toString());
 		beanMap.put("personName", map.get("consignee")==null?" ":map.get("consignee").toString());
 		beanMap.put("segmentSequence", segmentSequence);
 		beanMap.put("shippingSegmentId", Long.parseLong(map.get("shippingSegmentId")==null?"0":map.get("shippingSegmentId").toString()));
-		beanMap.put("shipToAddr", map.get("shipToAddr")==null?" ":map.get("shipToAddr").toString());
+		String addr = map.get("shipToAddr") == null ? "" : map.get("shipToAddr").toString();
+		if (flag && StringUtils.isBlank(addr)){
+			throw new RuntimeException("The Receiving address cannot be empty. Please contact customer to adjust!");
+		}
+		/*if (flag && addr.length() > 105){
+			throw new RuntimeException("Receiving address is longer than maximum length (35 characters). Please contact customer to adjust!");
+		}*/
+		if (flag){
+			//按空格把过长的地址拆分三段（每段长度不超过35个字符）
+			List<String> address = splitAddress(addr);
+			beanMap.put("shipToAddr", address.get(0).trim());
+			if (StringUtils.isNotBlank(address.get(1)))
+			beanMap.put("shipToAddr2", address.get(1).trim());
+			if (StringUtils.isNotBlank(address.get(2)))
+			beanMap.put("shipToAddr3", address.get(2).trim());
+		}else {
+			if (addr.length() > 200){
+				throw new RuntimeException("Receiving address is longer than maximum length (200 characters). Please contact customer to adjust!");
+			}
+			beanMap.put("shipToAddr", addr);
+		}
 		//beanMap.put("shipToAddr2", map.get("shipToAddr2")==null?" ":map.get("shipToAddr2").toString());
 		//beanMap.put("shipToAddr3", map.get("shipToAddr3")==null?" ":map.get("shipToAddr3").toString());
 		beanMap.put("shipToEamilAddr", "shipment@intramirror.com");
-		beanMap.put("shipToCity", map.get("shipToCity")==null?" ":map.get("shipToCity").toString());
+        String city = map.get("shipToCity") == null ? "" : map.get("shipToCity").toString();
+        if (flag && (StringUtils.isBlank(city)||"0".equals(city))){
+            throw new RuntimeException("The city cannot be empty. Please contact customer to adjust!");
+        }
+        beanMap.put("shipToCity", map.get("shipToCity")==null?" ":map.get("shipToCity").toString());
 		beanMap.put("shipToCountry", map.get("shipToCountry")==null?" ":map.get("shipToCountry").toString());
 		beanMap.put("shipToDistrict", map.get("shipToDistrict")==null?" ":map.get("shipToDistrict").toString());
 		beanMap.put("shipToProvince", map.get("shipToProvince")==null?" ":map.get("shipToProvince").toString());
@@ -369,10 +399,44 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		beanMap.put("status", ContainerType.RECEIVED);
 		beanMap.put("updatedAt", currentDate);
 		beanMap.put("createdAt", currentDate);
-		beanMap.put("shipToCountryCode",map.get("countryCode")==null?" ":map.get("countryCode").toString());
-		beanMap.put("postalCode",map.get("zip_code")==null?"":map.get("zip_code").toString());
+		beanMap.put("shipToCountryCode",countryCode);
+        String postalCode = map.get("zip_code") == null ? "" : map.get("zip_code").toString();
+        if (flag && StringUtils.isBlank(postalCode)){
+            throw new RuntimeException("The postcode cannot be empty. Please contact customer to adjust!");
+        }
+        beanMap.put("postalCode",postalCode);
 		beanMap.put("contact",map.get("contact")==null?"":map.get("contact").toString());
 		return beanMap;
+	}
+
+	private List<String> splitAddress(String addr) {
+		List<String> address = new ArrayList<>();
+		if (StringUtils.isBlank(addr)){
+			return address;
+		}else {
+			String[] ss = addr.split(" ");
+			for (int i=0;i<ss.length;i++){
+				if (ss[i].length()>35){
+					ss[i] = ss[i].substring(0,35);
+				}
+			}
+			int index = 0;
+			String a = "";
+			while (address.size()<3){
+				for(int i=index; i<ss.length;i++){
+					if (a.trim().length()<=35){
+						a += ss[i] + " ";
+						index = i+1;
+						if ((i<ss.length-1)&&(a+ss[i+1]).length()>35){
+							break;
+						}
+					}
+				}
+				address.add(a);
+				a = "";
+			}
+		}
+		return address;
 	}
 
 	private SubShipment saveBeanVO(Map<String, Object> map, Date currentDate, Long shipmentId,Long segmentSequence){

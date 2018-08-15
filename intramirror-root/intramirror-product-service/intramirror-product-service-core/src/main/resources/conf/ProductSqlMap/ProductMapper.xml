@@ -662,5 +662,8 @@
             </foreach>
         </if>
     </select>
+    <select id="getProductByBrandIDAndColorCode" resultType="java.util.HashMap">
+        SELECT * FROM product WHERE color_code = #{colorCode} and designer_id = #{brandId} and enabled = 1
+    </select>
 
 </mapper>

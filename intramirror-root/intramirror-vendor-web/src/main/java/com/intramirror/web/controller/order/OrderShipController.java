@@ -1456,6 +1456,10 @@ public class OrderShipController extends BaseController {
                     JSONArray notification = shipmentResponse.optJSONArray("Notification");
                     msg = notification.get(0).toString();
                     String message = JSONObject.fromObject(msg).optString("Message");
+                    if (message.contains("[")&&message.contains("]")&&message.contains(":")){
+                        message = convertMsg(message);
+                    }
+                    message = message + ". Please contact customer to adjust! ";
                     result.addMsg(message);
                     return result;
                 }
@@ -1494,6 +1498,32 @@ public class OrderShipController extends BaseController {
         return result;
     }
 
+    public static String convertMsg(String message) {
+        String msg = "";
+        if (StringUtil.isNotEmpty(message)){
+            int i1 = message.indexOf("]");
+            int i2 = message.indexOf(":");
+            int i = message.indexOf("-");
+            boolean maximum = message.contains("maximum");
+            String substring = message.substring(i1 + 1, i);
+            String s = message.substring(i2+1);
+            String[] split = s.split("/");
+            String filed = "";
+            if (split.length>=3){
+                filed = split[split.length-3]+"."+split[split.length-2]+"."+split[split.length-1];
+            }else {
+                filed = s;
+            }
+            if (maximum){
+                msg = substring.trim() + "(35 characters) ";
+            }else {
+                msg = substring.trim() + " ";
+            }
+            msg += "Filed: "+filed;
+        }
+        return msg;
+    }
+
     private void addParams(DHLInputVO inputVO, SubShipment dhlShipment,StockLocation fromLocation, List<Map<String, Object>> containerList,Shipment shipment) {
         SimpleDateFormat f1 = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat f2 = new SimpleDateFormat("HH:mm:ssz");
@@ -1509,7 +1539,8 @@ public class OrderShipController extends BaseController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        inputVO.setAccount("106669563");
+        //更换账号2018-08-02
+        inputVO.setAccount("106841512");
         inputVO.setShipmentTime(f1.format(currentTime)+"T"+f2.format(currentTime));
         inputVO.setDescription("clothing");
         inputVO.setLabelType("PDF");
@@ -1522,8 +1553,12 @@ public class OrderShipController extends BaseController {
             shipperVO.setPhoneNumber(fromLocation.getContactPhoneNumber());
             shipperVO.setEmailAddress(fromLocation.getContactEmailAddress());
             shipperVO.setStreetLines(fromLocation.getAddressStreetlines());
-            shipperVO.setStreetLines2(fromLocation.getAddressStreetlines2());
-            shipperVO.setStreetLines3(fromLocation.getAddressStreetlines3());
+            if (StringUtil.isNotEmpty(fromLocation.getAddressStreetlines2())){
+                shipperVO.setStreetLines2(fromLocation.getAddressStreetlines2());
+            }
+            if (StringUtil.isNotEmpty(fromLocation.getAddressStreetlines3())){
+                shipperVO.setStreetLines3(fromLocation.getAddressStreetlines3());
+            }
             shipperVO.setPostalCode(fromLocation.getAddressPostalCode());
             shipperVO.setCountryCode(fromLocation.getAddressCountryCode());
             inputVO.setShipper(shipperVO);
@@ -1540,10 +1575,12 @@ public class OrderShipController extends BaseController {
                 shipToAddr = shipToAddr.substring(0,34);
             }
             recipientVO.setStreetLines(shipToAddr);
-            if (StringUtil.isNotEmpty(dhlShipment.getShipToAddr2())){
+            if (StringUtil.isNotEmpty(dhlShipment.getShipToAddr2())
+                    &&!"0".equals(dhlShipment.getShipToAddr2())){
                 recipientVO.setStreetLines2(dhlShipment.getShipToAddr2());
             }
-            if (StringUtil.isNotEmpty(dhlShipment.getShipToAddr3())){
+            if (StringUtil.isNotEmpty(dhlShipment.getShipToAddr3())
+                    &&!"0".equals(dhlShipment.getShipToAddr3())){
                 recipientVO.setStreetLines3(dhlShipment.getShipToAddr3());
             }
             if(dhlShipment.getPostalCode()!=null){
