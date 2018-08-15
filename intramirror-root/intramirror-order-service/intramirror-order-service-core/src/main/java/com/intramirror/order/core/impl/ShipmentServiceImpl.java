@@ -219,6 +219,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
                         subShipment.setConsignee(map.get("transfer_consignee") == null ? "" : map.get("transfer_consignee").toString());
                         subShipment.setPersonName(map.get("person_name") == null ? "" : map.get("person_name").toString());
                         subShipment.setSegmentSequence(providerVo.getSequence().longValue());
+                        subShipment.setShippingSegmentId(providerVo.getShippingSegmentId());
                         subShipment.setShipToAddr(providerVo.getAddress());
                         subShipment.setShipToAddr2(providerVo.getAddress2());
                         subShipment.setShipToAddr3(providerVo.getAddress3());
@@ -237,7 +238,9 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
                         subShipment.setPostalCode(providerVo.getPostalCode());
                         subShipmentMapper.insertSubshipmentVO(subShipment);
                     }else {
-                        subShipmentMapper.insertSubshipment(saveBean(map, currentDate, shipmentId, providerVo.getSequence().longValue()));
+                        Map<String, Object> bean = saveBean(map, currentDate, shipmentId, providerVo.getSequence().longValue());
+                        bean.put("shippingSegmentId",providerVo.getShippingSegmentId());
+                        subShipmentMapper.insertSubshipment(bean);
                     }
 				}
 			}
