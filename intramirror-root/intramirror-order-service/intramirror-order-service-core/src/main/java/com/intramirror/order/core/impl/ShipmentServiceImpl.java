@@ -13,10 +13,7 @@ import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.model.SubShipment;
 import com.intramirror.order.api.service.*;
 import com.intramirror.order.api.util.HttpClientUtil;
-import com.intramirror.order.api.vo.InvokerInputVo;
-import com.intramirror.order.api.vo.LogisticsProductVO;
-import com.intramirror.order.api.vo.ShipmentSendMailVO;
-import com.intramirror.order.api.vo.TransportationRouteVo;
+import com.intramirror.order.api.vo.*;
 import com.intramirror.order.core.dao.BaseDao;
 import com.intramirror.order.core.mapper.LogisticProductShipmentMapper;
 import com.intramirror.order.core.mapper.LogisticsProductMapper;
@@ -216,29 +213,32 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			List<TransportationRouteVo> routeVos = JSONArray.parseArray(json, TransportationRouteVo.class);
 			if(routeVos!=null&&routeVos.size()>0){
 				Date currentDate = new Date();
-				SubShipment subShipment = new SubShipment();
-				subShipment.setConsignee(map.get("transfer_consignee")==null?"":map.get("transfer_consignee").toString());
-				subShipment.setPersonName(map.get("person_name")==null?"":map.get("person_name").toString());
-				subShipment.setSegmentSequence(routeVos.get(0).getProviderVoList().get(0).getSequence().longValue());
-				subShipment.setShipToAddr(routeVos.get(0).getProviderVoList().get(0).getAddress());
-				subShipment.setShipToAddr2(routeVos.get(0).getProviderVoList().get(0).getAddress2());
-				subShipment.setShipToAddr3(routeVos.get(0).getProviderVoList().get(0).getAddress3());
-				subShipment.setShipToEamilAddr(routeVos.get(0).getProviderVoList().get(0).getEmail());
-				subShipment.setShipToDistrict(routeVos.get(0).getProviderVoList().get(0).getDistrict());
-				subShipment.setShipToCity(routeVos.get(0).getProviderVoList().get(0).getCity());
-				subShipment.setShipToProvince(routeVos.get(0).getProviderVoList().get(0).getProvince());
-				subShipment.setShipToCountry(routeVos.get(0).getProviderVoList().get(0).getCountry());
-				subShipment.setUpdatedAt(currentDate);
-				subShipment.setShipmentId(shipmentId);
-				subShipment.setCreatedAt(currentDate);
-				subShipment.setStatus(ContainerType.RECEIVED);
-				subShipment.setShipToCountryCode(routeVos.get(0).getProviderVoList().get(0).getCountryCode());
-				subShipment.setContact(routeVos.get(0).getProviderVoList().get(0).getContactName());
-				subShipment.setPiva(routeVos.get(0).getProviderVoList().get(0).getTransferPiva());
-				subShipment.setPostalCode(routeVos.get(0).getProviderVoList().get(0).getPostalCode());
-				subShipmentMapper.insertSubshipmentVO(subShipment);
-				if(routeVos.get(0).getProviderVoList().get(1)!=null){
-					subShipmentMapper.insertSubshipment(saveBean(map, currentDate, shipmentId, routeVos.get(0).getProviderVoList().get(1).getSequence().longValue()));
+				for(ProviderVo providerVo:routeVos.get(0).getProviderVoList()){
+					if(StringUtils.isNotBlank(providerVo.getAddress())){
+                        SubShipment subShipment = new SubShipment();
+                        subShipment.setConsignee(map.get("transfer_consignee") == null ? "" : map.get("transfer_consignee").toString());
+                        subShipment.setPersonName(map.get("person_name") == null ? "" : map.get("person_name").toString());
+                        subShipment.setSegmentSequence(providerVo.getSequence().longValue());
+                        subShipment.setShipToAddr(providerVo.getAddress());
+                        subShipment.setShipToAddr2(providerVo.getAddress2());
+                        subShipment.setShipToAddr3(providerVo.getAddress3());
+                        subShipment.setShipToEamilAddr(providerVo.getEmail());
+                        subShipment.setShipToDistrict(providerVo.getDistrict());
+                        subShipment.setShipToCity(providerVo.getCity());
+                        subShipment.setShipToProvince(providerVo.getProvince());
+                        subShipment.setShipToCountry(providerVo.getCountry());
+                        subShipment.setUpdatedAt(currentDate);
+                        subShipment.setShipmentId(shipmentId);
+                        subShipment.setCreatedAt(currentDate);
+                        subShipment.setStatus(ContainerType.RECEIVED);
+                        subShipment.setShipToCountryCode(providerVo.getCountryCode());
+                        subShipment.setContact(providerVo.getContactName());
+                        subShipment.setPiva(providerVo.getTransferPiva());
+                        subShipment.setPostalCode(providerVo.getPostalCode());
+                        subShipmentMapper.insertSubshipmentVO(subShipment);
+                    }else {
+                        subShipmentMapper.insertSubshipment(saveBean(map, currentDate, shipmentId, providerVo.getSequence().longValue()));
+                    }
 				}
 			}
 		}
