@@ -216,8 +216,8 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 				for(ProviderVo providerVo:routeVos.get(0).getProviderVoList()){
 					if(StringUtils.isNotBlank(providerVo.getAddress())){
                         SubShipment subShipment = new SubShipment();
-                        subShipment.setConsignee(map.get("transfer_consignee") == null ? "" : map.get("transfer_consignee").toString());
-                        subShipment.setPersonName(map.get("person_name") == null ? "" : map.get("person_name").toString());
+                        subShipment.setConsignee(providerVo.getCompanyName());
+                        subShipment.setPersonName(providerVo.getContactName());
                         subShipment.setSegmentSequence(providerVo.getSequence().longValue());
                         subShipment.setShippingSegmentId(providerVo.getShippingSegmentId());
                         subShipment.setShipToAddr(providerVo.getAddress());
@@ -233,14 +233,21 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
                         subShipment.setCreatedAt(currentDate);
                         subShipment.setStatus(ContainerType.RECEIVED);
                         subShipment.setShipToCountryCode(providerVo.getCountryCode());
-                        subShipment.setContact(providerVo.getContactName());
+                        subShipment.setContact(providerVo.getPhoneNumber());
                         subShipment.setPiva(providerVo.getTransferPiva());
                         subShipment.setPostalCode(providerVo.getPostalCode());
-                        subShipmentMapper.insertSubshipmentVO(subShipment);
+                        Map beanMap = JsonTransformUtil.readValue(JsonTransformUtil.toJson(subShipment),Map.class);
+                        Long subShipmentId = subShipmentMapper.getSubshipment(beanMap);
+                        if(subShipmentId==null){
+                            subShipmentMapper.insertSubshipmentVO(subShipment);
+                        }
                     }else {
                         Map<String, Object> bean = saveBean(map, currentDate, shipmentId, providerVo.getSequence().longValue());
                         bean.put("shippingSegmentId",providerVo.getShippingSegmentId());
-                        subShipmentMapper.insertSubshipment(bean);
+                        Long subShipmentId = subShipmentMapper.getSubshipment(bean);
+                        if(subShipmentId==null){
+                            subShipmentMapper.insertSubshipment(bean);
+                        }
                     }
 				}
 			}
