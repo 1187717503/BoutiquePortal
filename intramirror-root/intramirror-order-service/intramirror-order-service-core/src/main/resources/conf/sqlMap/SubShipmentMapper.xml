@@ -196,8 +196,8 @@
     WHERE  segment_sequence=#{segmentSequence,jdbcType=BIGINT}
     AND consignee=#{consignee,jdbcType=VARCHAR} AND ship_to_addr=#{shipToAddr,jdbcType=VARCHAR}
     AND ship_to_emailAddr = #{shipToEamilAddr,jdbcType=VARCHAR} AND postal_code = #{postalCode,jdbcType=VARCHAR}
-    AND ship_to_district =#{shipToDistrict,jdbcType=VARCHAR} AND ship_to_city = #{shipToCity,jdbcType=VARCHAR}
-    AND ship_to_province= #{shipToProvince,jdbcType=VARCHAR} AND ship_to_country=#{shipToCountry,jdbcType=VARCHAR}
+    AND ship_to_country=#{shipToCountry,jdbcType=VARCHAR}
+    AND ship_to_city = #{shipToCity,jdbcType=VARCHAR}
     AND contact = #{contact,jdbcType=VARCHAR} AND ship_to_country_code = #{shipToCountryCode,jdbcType=VARCHAR}
     AND `status` = #{status,jdbcType=BIGINT} AND shipment_id = #{shipmentId,jdbcType=BIGINT}
     ORDER BY created_at DESC LIMIT 1;

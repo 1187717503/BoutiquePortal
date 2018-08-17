@@ -86,6 +86,14 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			map.put("pack_english_name","Transit Warehouse");
 		}
 		int result = 0;
+		Long consigner_country_id =  Long.parseLong(map.get("consigner_country_id").toString());
+		Long consignee_country_id = null;
+		if (shipmentCategory == 1){
+			//发往质检仓的，收件id为52
+			consignee_country_id = 52L;
+		}else {
+			consignee_country_id =  Long.parseLong(map.get("consignee_country_id").toString());
+		}
 		Shipment shipment = new Shipment();
 		if (shipmentId == 0){
 			synchronized (shipment){
@@ -135,8 +143,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 					List<Map<String, Object>> listMap = shipmentMapper.getShippmentByType(typeMap);
 					logger.info("result shipmentType:" + new Gson().toJson(listMap));
 					shipmentId = shipmentMapper.getShipmentId(shipment);
-					Long consigner_country_id =  Long.parseLong(map.get("consigner_country_id").toString());
-					Long consignee_country_id =  Long.parseLong(map.get("consignee_country_id").toString());
+
 					saveSubShipmentByTms(map,consigner_country_id,consignee_country_id,vendorId,shipmentId,Long.parseLong(
 							map.get("logistics_product_id")==null?"0":map.get("logistics_product_id").toString()));
 					/*saveSubShipment(listMap, map,shipmentId,Long.parseLong(
@@ -156,8 +163,8 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 				logger.info("result shipmentType:" + new Gson().toJson(listMap));
 //				saveSubShipment(listMap, map,shipmentId,Long.parseLong(
 //						map.get("logistics_product_id")==null?"0":map.get("logistics_product_id").toString()));
-				Long consigner_country_id =  Long.parseLong(map.get("consigner_country_id").toString());
-				Long consignee_country_id =  Long.parseLong(map.get("consignee_country_id").toString());
+				//Long consigner_country_id =  Long.parseLong(map.get("consigner_country_id").toString());
+				//Long consignee_country_id =  Long.parseLong(map.get("consignee_country_id").toString());
 				saveSubShipmentByTms(map,consigner_country_id,consignee_country_id,Long.parseLong(map.get("vendor_id").toString()),shipmentId,Long.parseLong(
 						map.get("logistics_product_id")==null?"0":map.get("logistics_product_id").toString()));
 				return shipment;
