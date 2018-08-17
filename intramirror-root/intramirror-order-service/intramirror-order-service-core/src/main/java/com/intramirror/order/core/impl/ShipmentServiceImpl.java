@@ -227,6 +227,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
                         subShipment.setPersonName(providerVo.getContactName());
                         subShipment.setSegmentSequence(providerVo.getSequence().longValue());
                         subShipment.setShippingSegmentId(providerVo.getShippingSegmentId());
+                        subShipment.setShippingProviderId(providerVo.getProviderId());
                         subShipment.setShipToAddr(providerVo.getAddress());
                         subShipment.setShipToAddr2(providerVo.getAddress2());
                         subShipment.setShipToAddr3(providerVo.getAddress3());
@@ -249,7 +250,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
                             subShipmentMapper.insertSubshipmentVO(subShipment);
                         }
                     }else {
-                        Map<String, Object> bean = saveBean(map, currentDate, shipmentId, providerVo.getSequence().longValue());
+                        Map<String, Object> bean = saveBean(map, currentDate, shipmentId, providerVo);
                         bean.put("shippingSegmentId",providerVo.getShippingSegmentId());
                         Long subShipmentId = subShipmentMapper.getSubshipment(bean);
                         if(subShipmentId==null){
@@ -261,7 +262,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		}
 	}
 
-	public void saveSubShipment(List<Map<String, Object>> map, Map<String, Object> lastMap, Long shipmentId, Long logisticProductId){
+	/*public void saveSubShipment(List<Map<String, Object>> map, Map<String, Object> lastMap, Long shipmentId, Long logisticProductId){
 		//打印入参段
 		logger.info("pararmeter " + new Gson().toJson(map));
 		Map<String, Object> getShipment = new HashMap<>();
@@ -366,10 +367,10 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 
 			}
 		}
-	}
+	}*/
 
-	public Map<String, Object> saveBean(Map<String, Object> map, Date currentDate, Long shipmentId,Long segmentSequence){
-		Map<String, Object> beanMap = new HashMap<String, Object>();
+	public Map<String, Object> saveBean(Map<String, Object> map, Date currentDate, Long shipmentId,ProviderVo providerVo){
+		Map<String, Object> beanMap = new HashMap<>();
 		String countryCode = map.get("countryCode") == null ? " " : map.get("countryCode").toString();
 		//发往中国大陆，及港澳地区的不用校验地址信息
 		boolean flag = true;
@@ -378,7 +379,8 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		}
 		beanMap.put("consignee", map.get("consignee")==null?" ":map.get("consignee").toString());
 		beanMap.put("personName", map.get("consignee")==null?" ":map.get("consignee").toString());
-		beanMap.put("segmentSequence", segmentSequence);
+		beanMap.put("segmentSequence", providerVo.getSequence());
+		beanMap.put("shippingProviderId", providerVo.getProviderId());
 		beanMap.put("shippingSegmentId", Long.parseLong(map.get("shippingSegmentId")==null?"0":map.get("shippingSegmentId").toString()));
 		String addr = map.get("shipToAddr") == null ? "" : map.get("shipToAddr").toString();
 		if (flag && StringUtils.isBlank(addr)){

@@ -7,7 +7,16 @@ import java.util.List;
  */
 public class TransportationRouteVo {
     private String routingName;
+    private Long routingId;
     private List<ProviderVo> providerVoList;
+
+    public Long getRoutingId() {
+        return routingId;
+    }
+
+    public void setRoutingId(Long routingId) {
+        this.routingId = routingId;
+    }
 
     public String getRoutingName() {
         return routingName;
