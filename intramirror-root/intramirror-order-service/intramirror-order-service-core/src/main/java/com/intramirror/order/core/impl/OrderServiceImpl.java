@@ -123,7 +123,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
             conditionMap.put(sortByName, sortByName);
         }
         List<Map<String, Object>> mapList = orderMapper.getOrderListByStatus(conditionMap);
-        addProductPropertyMap(mapList);
+        //addProductPropertyMap(mapList);
         return mapList;
     }
 
@@ -141,7 +141,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
         conditionMap.put("vendorId", vendorId);
         conditionMap.put("containerId", containerId);
         List<Map<String, Object>> mapList = orderMapper.getOrderListByStatusAndContainerId(conditionMap);
-        addProductPropertyMap(mapList);
+        //addProductPropertyMap(mapList);
         return mapList;
     }
 
@@ -150,7 +150,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
             Map<String, Object> map) {
         List<Map<String, Object>> list = orderMapper.getOrderInfoByCondition(map);
         if (list != null && list.size() > 0) {
-            addProductPropertyMap(list);
+            //addProductPropertyMap(list);
             return list.get(0);
         }
         return null;
@@ -355,7 +355,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
 
     }
 
-    public void addProductProperty(List<CancelOrderVO> orderCancelList) {
+    /*public void addProductProperty(List<CancelOrderVO> orderCancelList) {
         Set<Long> ids = new HashSet<>();
         for(CancelOrderVO vo :orderCancelList){
             ids.add(vo.getProduct_id());
@@ -388,7 +388,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
                 }
             }
         }
-    }
+    }*/
 
     @Override
     public void addProductPropertyMap(List<Map<String, Object>> orderList){

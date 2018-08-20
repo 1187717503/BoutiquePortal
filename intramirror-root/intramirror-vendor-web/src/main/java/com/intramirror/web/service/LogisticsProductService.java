@@ -7,10 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSONObject;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.utils.transform.JsonTransformUtil;
 import com.intramirror.order.api.util.HttpClientUtil;
-import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +33,40 @@ public class LogisticsProductService{
 
 	@Autowired
 	private IOrderService orderService;
+
+	@Transactional
+	public void confirmOrder(LogisticsProduct upLogis) {
+
+		logisticsProductService.updateByLogisticsProduct(upLogis);
+
+		//调用修改订单状态
+		//根据id获取当前数据库旧的对象信息
+		updateOrderLogisticsStatusById(upLogis, OrderStatusType.COMFIRMED);
+
+		//confirmed订单（库存操作）
+		try{
+			//查询skuId
+			Map<String, Object> shopProductSku = logisticsProductService.getShopProductSku(upLogis.getLogistics_product_id());
+			if (shopProductSku!=null&&shopProductSku.get("sku_id")!=null){
+				String url = MessageFormat.format(HttpClientUtil.confirmStoreUrl, String.valueOf(shopProductSku.get("sku_id")));
+				Map<String,Object> params = new HashMap<>();
+				params.put("orderLineNumber",upLogis.getOrder_line_num());
+				logger.info("Confirm Request,params={},url={}", JsonTransformUtil.toJson(params), url);
+				String resultStr = HttpClientUtil.httpPost(JsonTransformUtil.toJson(params), url);
+				logger.info("Response Confirm store,message:{}",resultStr);
+				JSONObject jsonObject = JSONObject.parseObject(resultStr);
+				if (StringUtil.isEmpty(resultStr)
+						||jsonObject.getInteger("status") != 1){
+					//sku扣减库存失败
+					throw new RuntimeException("Failed to deduct inventory.");
+				}
+			}else {
+				throw new RuntimeException("Sku is empty!");
+			}
+		}catch (Exception e){
+			throw new RuntimeException("Failed to deduct inventory.");
+		}
+	}
 	
 	/**
 	 * 根据logistics_product_id 修改相关信息
@@ -93,12 +127,12 @@ public class LogisticsProductService{
 					map.put("order_line_nums",orderLineNums);
 					String result = HttpClientUtil.doPost(HttpClientUtil.confirmedOrder,JsonTransformUtil.toJson(map),"utf-8");
 					if (StringUtil.isNotEmpty(result)){
-						JSONObject object = JSONObject.fromObject(result);
-						String success = object.optString("success");
+						JSONObject object = JSONObject.parseObject(result);
+						String success = object.getString("success");
 						if (StringUtil.isNotEmpty(success)){
 							logger.info("调用微店confirmed接口成功");
 						}else {
-							logger.error("调用微店confirmed接口失败,msg:{}",object.optString("error"));
+							logger.error("调用微店confirmed接口失败,msg:{}",object.getString("error"));
 						}
 					}else {
 						logger.error("调用微店confirmed接口失败");

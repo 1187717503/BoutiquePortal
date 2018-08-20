@@ -1,6 +1,8 @@
 package com.intramirror.order.api.util;
 
+import com.intramirror.core.net.http.OkHttpUtils;
 import net.sf.json.JSONObject;
+import okhttp3.Response;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -35,6 +37,7 @@ public class HttpClientUtil {
 
     public static String confirmedOrder;
     public static String shippedOrder;
+    public static String confirmStoreUrl;
 
     public static String tmsProviderRouteUrl;
 
@@ -47,7 +50,7 @@ public class HttpClientUtil {
             // 构造消息头
             post.setHeader("Content-type", "application/json; charset=utf-8");
             //设置超时时间
-            RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(100000).setConnectTimeout(2000).build();//设置请求和传输超时时间
+            RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(30000).setConnectTimeout(2000).build();//设置请求和传输超时时间
             post.setConfig(requestConfig);
 
             // 构建消息实体
@@ -61,11 +64,12 @@ public class HttpClientUtil {
 
             // 检验返回码
             int statusCode = response.getStatusLine().getStatusCode();
+            HttpEntity responseEntity = response.getEntity();
+            String jsonString = EntityUtils.toString(responseEntity);
             if(statusCode != HttpStatus.SC_OK){
                 LOGGER.error("request fail,url={},param={}",url,jsonObj);
+                return jsonString;
             }else{
-                HttpEntity responseEntity = response.getEntity();
-                String jsonString = EntityUtils.toString(responseEntity);
                 JSONObject object = JSONObject.fromObject(jsonString);
                 if(object.optInt("status")!=1){
                     LOGGER.error("msg={}",object.optString("msg"));
@@ -91,6 +95,14 @@ public class HttpClientUtil {
                     e.printStackTrace();
                 }
             }
+        }
+        return "";
+    }
+
+    public static String httpPut(String jsonObj, String url) throws IOException {
+        Response response = OkHttpUtils.put().url(url).requestBody(jsonObj).build().readTimeOut(1000L).connTimeOut(1000L).writeTimeOut(1000L).execute();
+        if (response!=null){
+            return response.body().string();
         }
         return "";
     }
@@ -163,6 +175,14 @@ public class HttpClientUtil {
         }
 
         return "";
+    }
+
+    public static String getConfirmStoreUrl() {
+        return confirmStoreUrl;
+    }
+
+    public static void setConfirmStoreUrl(String confirmStoreUrl) {
+        HttpClientUtil.confirmStoreUrl = confirmStoreUrl;
     }
 
     public static String getCreateAWBUrl() {
