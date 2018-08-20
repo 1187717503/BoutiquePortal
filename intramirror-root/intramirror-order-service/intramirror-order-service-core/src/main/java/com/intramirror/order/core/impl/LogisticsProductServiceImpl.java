@@ -159,7 +159,7 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
 
     @Override
     public int updateByLogisticsProduct(LogisticsProduct logisticsProduct) {
-        sendJPushMsg(logisticsProduct);
+        //sendJPushMsg(logisticsProduct);
         return logisticsProductMapper.updateByLogisticsProduct(logisticsProduct);
     }
 
@@ -300,5 +300,10 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
         criteria.andContainerIdEqualTo(logisticProductContainer.getContainerId());
         criteria.andLogisticsProductIdEqualTo(logisticProductContainer.getLogisticsProductId());
         logisticProductContainerMapper.updateByExampleSelective(record,example);
+    }
+
+    @Override
+    public Map<String, Object> getShopProductSku(Long logisticsProductId) {
+        return logisticsProductMapper.getShopProductSku(logisticsProductId);
     }
 }
