@@ -299,7 +299,8 @@
             b.english_name AS brandName,
             v.vendor_name,
             p.cover_img,
-            lp.logistics_product_id
+            lp.logistics_product_id,
+            p.color_code as colorCode,p.designer_id as brandID
         FROM logistics_product lp
             INNER JOIN container c ON lp.container_id = c.container_id
             INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
