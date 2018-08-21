@@ -32,8 +32,10 @@ public class OrderExceptionTypeServiceImpl extends BaseDao implements IOrderExce
         List<Map<String, Object>> list = new LinkedList<>();
         if (exceptionTypeList != null && exceptionTypeList.size() > 0) {
             for (Map<String, Object> exceptionType : exceptionTypeList) {
-                //过滤type=4的类型
-                if (!"4".equals(exceptionType.get("order_exception_type_id").toString())) {
+                String orderExceptionTypeId = exceptionType.get("order_exception_type_id").toString();
+                //过滤type=4、8的类型
+                if (!"4".equals(orderExceptionTypeId)
+                        &&!"8".equals(orderExceptionTypeId)) {
                     String description = exceptionType.get("description").toString();
                     String[] strings = description.split("-");
                     exceptionType.put("description", strings[0]);
