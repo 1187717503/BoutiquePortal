@@ -437,7 +437,7 @@ public class OrderShipController extends BaseController {
             return result;
         }
         try {
-            if (userId>0) {
+            if (userId != null) {
                 Vendor vendor = vendorService.getVendorByUserId(userId);
                 if (vendor != null){
                     List<StockLocation> stockLocationList = stockLocationService.getStockLocation(vendor.getVendorId());
