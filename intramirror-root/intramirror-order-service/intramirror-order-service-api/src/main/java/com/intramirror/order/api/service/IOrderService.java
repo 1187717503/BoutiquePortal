@@ -24,7 +24,7 @@ public interface IOrderService {
      *
      * @return
      */
-    List<Map<String, Object>> getOrderListByOrderNumber(String numbers, int status);
+    Map<String, Object> getOrderByOrderNumber(String numbers);
 
 
     /**

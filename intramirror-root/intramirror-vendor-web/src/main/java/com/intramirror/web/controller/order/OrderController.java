@@ -686,7 +686,7 @@ public class OrderController extends BaseController {
             return result;
         }
 
-        map.put("vendorId", vendor.getVendorId());
+        //map.put("vendorId", vendor.getVendorId());
 
         //订单装箱
         try {

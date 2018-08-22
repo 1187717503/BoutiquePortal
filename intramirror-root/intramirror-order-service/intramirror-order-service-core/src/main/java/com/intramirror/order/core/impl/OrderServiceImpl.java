@@ -47,11 +47,10 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
     }
 
 
-    public List<Map<String, Object>> getOrderListByOrderNumber(String numbers, int status) {
+    public Map<String, Object> getOrderByOrderNumber(String number) {
         Map<String, Object> param = new HashMap<String, Object>();
-        param.put("orderNumbers", numbers.split(","));
-        param.put("status", status);
-        List<Map<String, Object>> result = orderMapper.getOrderListByOrderNumber(param);
+        param.put("orderNumber", number);
+        Map<String, Object> result = orderMapper.getOrderListByOrderNumber(param);
         logger.info("getOrderListByOrderNumber result:{}", new Gson().toJson(result));
         return result;
     }

@@ -84,24 +84,7 @@
     </select>
 
     <select id="getOrderListByOrderNumber" resultType="java.util.HashMap" parameterType="java.util.Map">
-        SELECT o.order_num,o.order_id,p.name,p.color_code AS colorCode, p.designer_id AS brandID,s.`size` as size,p.category_id,
-        lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
-        v.vendor_name,p.cover_img,lp.logistics_product_id
-        FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
-        INNER JOIN `order` o ON ol.order_id = o.order_id
-        LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
-        INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
-        INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
-        INNER JOIN product p ON (sp.product_id = p.product_id and p.enabled = 1 )
-        INNER JOIN sku s ON (s.sku_id = sps.sku_id and s.enabled = 1)
-        INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
-        WHERE o.order_num in
-        <foreach collection="orderNumbers" item="orderNumber" index="index"
-                 open="(" close=")" separator=",">
-            #{orderNumber}
-        </foreach>
-        and lp.`status` = #{status,jdbcType=BIGINT}
-        GROUP BY lp.order_line_num
+       select * from logistics_product WHERE order_line_num = #{orderNumber} and enabled = 1;
     </select>
 
 
