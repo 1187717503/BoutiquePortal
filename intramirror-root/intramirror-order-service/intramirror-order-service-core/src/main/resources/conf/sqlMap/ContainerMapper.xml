@@ -143,7 +143,11 @@ values(#{containerType,jdbcType=INTEGER}, #{shipToGeography,jdbcType=VARCHAR},#{
 	<select id="getContainerCount" resultType="java.lang.Integer" parameterType="long">
 		SELECT count(1) FROM logistics_product lp
 		INNER JOIN container c on lp.container_id = c.container_id
-		 WHERE vendor_id = #{vendorId,jdbcType=BIGINT} and lp.`status` = 7
+		 WHERE vendor_id in
+		<foreach item="vendorId" index="index" collection="vendorIds" open="(" separator="," close=")">
+			#{vendorId}
+		</foreach>
+		 and lp.`status` = 7
 	</select>
 	
 	<update id="updateContainerShipment" parameterType="java.util.Map">

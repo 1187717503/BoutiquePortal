@@ -60,6 +60,9 @@ public interface StockLocationMapper {
      */
     List<StockLocation> getStockLocationByVendorId(Long vendorId);
 
+
+    List<StockLocation> getStockLocationByVendorIds(List<Long> vendorIds);
+
     /**
      * 根据shipmentId获取发货地信息
      * @param shipment

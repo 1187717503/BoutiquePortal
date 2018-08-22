@@ -9,6 +9,8 @@ import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.common.utils.DateUtils;
 import com.intramirror.main.api.enums.GeographyEnum;
+import com.intramirror.main.api.model.StockLocation;
+import com.intramirror.main.api.service.StockLocationService;
 import com.intramirror.order.api.common.OrderStatusType;
 import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.service.IContainerService;
@@ -39,10 +41,12 @@ import java.net.URLDecoder;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.ConvertUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.slf4j.Logger;
@@ -102,6 +106,9 @@ public class OrderController extends BaseController {
     @Autowired
     private CommonsProperties commonsProperties;
 
+    @Autowired
+    private StockLocationService stockLocationService;
+
     /**
      * 获取订单列表
      * @param map
@@ -130,13 +137,13 @@ public class OrderController extends BaseController {
             return result;
         }
 
-        Vendor vendor = null;
+        List<Vendor> vendors = null;
         try {
-            vendor = vendorService.getVendorByUserId(user.getUserId());
+            vendors = vendorService.getVendorsByUserId(user.getUserId());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (vendor == null) {
+        if (vendors == null) {
             result.setMsg("Please log in again");
             return result;
         }
@@ -152,27 +159,32 @@ public class OrderController extends BaseController {
             categoryIds = categoryCache.getAllChildCategory(Long.parseLong(map.get("categoryId").toString()));
         }
 
-        Long vendorId = vendor.getVendorId();
+//        Long vendorId = vendor.getVendorId();
+        List<Long> vendorIds = vendors.stream().map(Vendor::getVendorId).collect(Collectors.toList());
         String status = map.get("status").toString();
         //根据订单状态查询订单
-        logger.info(MessageFormat.format("order getOrderList 调用接口 orderService.getOrderListByStatus 查询订单信息  入参 status:{0},vendorId:{1},sortByName:{2}",
-                status, vendorId, sortByName));
+        logger.info(MessageFormat.format("order getOrderList 调用接口 orderService.getOrderListByStatus 查询订单信息  入参 status:{0},vendorIds:{1},sortByName:{2}",
+                status, vendorIds, sortByName));
         List<Map<String, Object>> orderList = null;
         PageListVO orderCancelList = null;
+        Map<Long,List<StockLocation>> stockLocationListMap = null;
         if ("6".equals(status)){
             //cancel TAB列表查询
-            map.put("vendorId",vendorId);
+            map.put("vendorIds",vendorIds);
             orderCancelList = orderService.getOrderCancelList(map);
         }else {
             Map<String, Object> params = new HashMap<>();
             params.put("status", status);
-            params.put("vendorId", vendorId);
+            params.put("vendorIds", vendorIds);
             params.put("sortByName", sortByName);
             params.put("categoryIds", categoryIds);
             params.put("brandId", map.get("brandId"));
             params.put("stockLocation", map.get("stockLocation"));
             params.put("logisticsProductIds", map.get("logisticsProductIds"));
             orderList = orderService.getOrderListByParams(params);
+            //根据vendorIds查询所有的stockLocation
+            List<StockLocation> stockLocationList = stockLocationService.getStockLocationByVendorIds(vendorIds);
+            stockLocationListMap = stockLocationList.stream().collect(Collectors.groupingBy(StockLocation::getVendorId));
         }
 
         if (orderList != null && orderList.size() > 0) {
@@ -182,6 +194,9 @@ public class OrderController extends BaseController {
             for (Map<String, Object> info : orderList) {
                 //计算折扣
                 arithmeticalDiscount(info);
+                if(stockLocationListMap!=null){
+                    info.put("stockLocations",stockLocationListMap.get(info.get("vendor_id")));
+                }
             }
         }
         if(orderCancelList!=null
@@ -418,23 +433,23 @@ public class OrderController extends BaseController {
                 return resultMessage;
             }
 
-            Vendor vendor = null;
+            List<Vendor> vendors = null;
             try {
-                vendor = vendorService.getVendorByUserId(user.getUserId());
+                vendors = vendorService.getVendorsByUserId(user.getUserId());
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if (vendor == null) {
+            if (CollectionUtils.isEmpty(vendors)) {
                 resultMessage.setMsg("Please log in again");
                 return resultMessage;
             }
-            Long vendorId = vendor.getVendorId();
+            List<Long> vendorIds = vendors.stream().map(Vendor::getVendorId).collect(Collectors.toList());
             int[] item = { OrderStatusType.PENDING, OrderStatusType.COMFIRMED ,OrderStatusType.CANCELED,OrderStatusType.PICKING};
             Map<String, Object> resultMap = new HashMap<>();
             for (int i = 0; i < item.length; i++) {
                 map = new HashMap<>();
                 map.put("status", item[i]);
-                map.put("vendorId", vendorId);
+                map.put("vendorIds", vendorIds);
                 int result = orderService.getOrderByIsvalidCount(map);
                 if (OrderStatusType.PENDING == item[i])
                     resultMap.put("comfirmed", result);
@@ -455,12 +470,11 @@ public class OrderController extends BaseController {
 
             //readytoship数量
             map = new HashMap<>();
-            map.put("vendorId", vendorId);
+            map.put("vendorIds", vendorIds);
             Integer result = containerService.getContainerCount(map);
             resultMap.put("readyToship", result==null?0:result);
 
             //shippedCount
-            map.put("vendorId", vendorId);
             Integer shippedCount = orderService.getShippedCount(map);
             resultMap.put("shipped", shippedCount==null?0:shippedCount);
 

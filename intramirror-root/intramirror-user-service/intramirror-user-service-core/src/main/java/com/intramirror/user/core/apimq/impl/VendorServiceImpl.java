@@ -62,6 +62,14 @@ public class VendorServiceImpl extends BaseDao implements VendorService {
         }
     }
 
+    public List<Vendor> getVendorsByUserId(Long userId) throws Exception {
+        try {
+            return vendorMapper.getChildVendorListByUserIdAndEnabled(userId, EnabledType.USED);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
     @Override
     public Vendor getVendorByVendorId(Map<String, Object> params) {
         try {

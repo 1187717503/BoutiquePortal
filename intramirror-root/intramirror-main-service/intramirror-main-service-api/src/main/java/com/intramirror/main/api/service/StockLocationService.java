@@ -11,5 +11,7 @@ public interface StockLocationService {
 
     List<StockLocation> getStockLocation(Long vendorId);
 
+    List<StockLocation> getStockLocationByVendorIds(List<Long> vendorIds);
+
     StockLocation getShipFromLocation(Long shipmentId);
 }

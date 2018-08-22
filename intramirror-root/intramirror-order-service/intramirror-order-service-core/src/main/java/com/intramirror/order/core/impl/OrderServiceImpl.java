@@ -15,10 +15,12 @@ import com.intramirror.order.core.mapper.OrderMapper;
 
 import com.intramirror.order.api.vo.PageListVO;
 import com.intramirror.order.core.mapper.ProductPropertyMapper;
+import freemarker.template.utility.NumberUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.NumberUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -118,7 +120,10 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
     public List<Map<String, Object>> getOrderListByStatus(int status, Long vendorId, String sortByName) {
         Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("status", status);
-        conditionMap.put("vendorId", vendorId);
+        if(vendorId==null){
+            vendorId=0l;
+        }
+        conditionMap.put("vendorIds", Arrays.asList(vendorId));
         if (sortByName != null && StringUtils.isNoneBlank(sortByName)) {
             conditionMap.put(sortByName, sortByName);
         }
@@ -453,8 +458,8 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
         if (paramCheck(params.get("status"))) {
             conditionMap.put("status", params.get("status"));
         }
-        if (paramCheck(params.get("vendorId"))) {
-            conditionMap.put("vendorId", params.get("vendorId"));
+        if (paramCheck(params.get("vendorIds"))) {
+            conditionMap.put("vendorIds", params.get("vendorIds"));
         }
         if (paramCheck(params.get("sortByName"))) {
             conditionMap.put(params.get("sortByName").toString(), params.get("sortByName"));
