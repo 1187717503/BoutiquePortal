@@ -9,8 +9,8 @@ import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.common.utils.DateUtils;
 import com.intramirror.main.api.enums.GeographyEnum;
-import com.intramirror.main.api.model.StockLocation;
 import com.intramirror.main.api.service.StockLocationService;
+import com.intramirror.main.api.vo.StockLocationVO;
 import com.intramirror.order.api.common.OrderStatusType;
 import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.service.IContainerService;
@@ -167,7 +167,7 @@ public class OrderController extends BaseController {
                 status, vendorIds, sortByName));
         List<Map<String, Object>> orderList = null;
         PageListVO orderCancelList = null;
-        Map<Long,List<StockLocation>> stockLocationListMap = null;
+        Map<Long,List<StockLocationVO>> stockLocationListMap = null;
         if ("6".equals(status)){
             //cancel TAB列表查询
             map.put("vendorIds",vendorIds);
@@ -183,8 +183,8 @@ public class OrderController extends BaseController {
             params.put("logisticsProductIds", map.get("logisticsProductIds"));
             orderList = orderService.getOrderListByParams(params);
             //根据vendorIds查询所有的stockLocation
-            List<StockLocation> stockLocationList = stockLocationService.getStockLocationByVendorIds(vendorIds);
-            stockLocationListMap = stockLocationList.stream().collect(Collectors.groupingBy(StockLocation::getVendorId));
+            List<StockLocationVO> stockLocationList = stockLocationService.getStockLocationByVendorIds(vendorIds);
+            stockLocationListMap = stockLocationList.stream().collect(Collectors.groupingBy(StockLocationVO::getVendorId));
         }
 
         if (orderList != null && orderList.size() > 0) {

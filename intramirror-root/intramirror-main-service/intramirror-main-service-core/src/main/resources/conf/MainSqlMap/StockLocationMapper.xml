@@ -272,8 +272,15 @@
     select * from stock_location WHERE vendor_id = #{vendorId,jdbcType=BIGINT} AND enabled = 1;
   </select>
 
-  <select id="getStockLocationByVendorIds" parameterType="java.util.ArrayList" resultMap="BaseResultMap">
-    select * from stock_location WHERE
+
+  <resultMap id="GetStockLocationByVendorIdsResultMap" type="com.intramirror.main.api.vo.StockLocationVO">
+
+    <id column="location_id" jdbcType="BIGINT" property="locationId" />
+    <result column="stock_location" jdbcType="VARCHAR" property="stockLocation" />
+    <result column="vendor_id" jdbcType="BIGINT" property="vendorId" />
+  </resultMap>
+  <select id="getStockLocationByVendorIds" parameterType="java.util.ArrayList" resultMap="GetStockLocationByVendorIdsResultMap">
+    select location_id,stock_location,vendor_id from stock_location WHERE
     vendor_id in
     <foreach item="vendorId" index="index" collection="list" open="(" separator="," close=")">
       #{vendorId}
