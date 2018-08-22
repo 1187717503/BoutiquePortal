@@ -593,11 +593,11 @@ public class User {
         this.invited_code = invited_code;
     }
 
-    public boolean isParent() {
+    public boolean getIsParent() {
         return isParent;
     }
 
-    public void setParent(boolean parent) {
+    public void setIsParent(boolean parent) {
         isParent = parent;
     }
 }

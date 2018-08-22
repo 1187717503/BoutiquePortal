@@ -50,10 +50,9 @@ public class UserController extends BaseController {
         }
         try {
             List<Vendor> vendors = vendorService.getVendorsByUserId(user.getUserId());
-            user.setParent(false);
             if(CollectionUtils.isNotEmpty(vendors)){
-                if(CollectionUtils.isNotEmpty(vendors.stream().filter(e -> e.getUserId()!=user.getUserId()).collect(Collectors.toList()))){
-                    user.setParent(true);
+                if(CollectionUtils.isNotEmpty(vendors.stream().filter(e -> !e.getUserId().equals(user.getUserId())).collect(Collectors.toList()))){
+                    user.setIsParent(true);
                 }
             }
         } catch (Exception e) {
