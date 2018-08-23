@@ -137,17 +137,6 @@ public class OrderController extends BaseController {
             return result;
         }
 
-        List<Vendor> vendors = null;
-        try {
-            vendors = vendorService.getVendorsByUserId(user.getUserId());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (vendors == null) {
-            result.setMsg("Please log in again");
-            return result;
-        }
-
         String sortByName = null;
         if (map.get("sortByName") != null) {
             sortByName = map.get("sortByName").toString();
@@ -158,9 +147,23 @@ public class OrderController extends BaseController {
         if (map.get("categoryId") != null) {
             categoryIds = categoryCache.getAllChildCategory(Long.parseLong(map.get("categoryId").toString()));
         }
+        List<Long> vendorIds = null;
+        if(map.get("vendorId") != null){
+            vendorIds = Arrays.asList(Long.parseLong(map.get("categoryId").toString()));
+        }else {
+            List<Vendor> vendors = null;
+            try {
+                vendors = vendorService.getVendorsByUserId(user.getUserId());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (vendors == null) {
+                result.setMsg("Please log in again");
+                return result;
+            }
+            vendorIds = vendors.stream().map(Vendor::getVendorId).collect(Collectors.toList());
+        }
 
-//        Long vendorId = vendor.getVendorId();
-        List<Long> vendorIds = vendors.stream().map(Vendor::getVendorId).collect(Collectors.toList());
         String status = map.get("status").toString();
         //根据订单状态查询订单
         logger.info(MessageFormat.format("order getOrderList 调用接口 orderService.getOrderListByStatus 查询订单信息  入参 status:{0},vendorIds:{1},sortByName:{2}",

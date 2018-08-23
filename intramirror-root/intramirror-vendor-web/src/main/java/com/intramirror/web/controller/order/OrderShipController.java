@@ -463,6 +463,27 @@ public class OrderShipController extends BaseController {
         return result;
     }
 
+    @RequestMapping(value = "/getVendors", method = RequestMethod.GET)
+    @ResponseBody
+    public ResultMessage getVendors(Long userId) {
+        ResultMessage result = new ResultMessage();
+        result.errorStatus();
+        if (userId == null || userId == 0){
+            result.setMsg("parameters vendorId is null ");
+            return result;
+        }
+        try {
+            List<Vendor> vendors=vendorService.getVendorsByUserId(userId);
+            result.successStatus();
+            result.setData(vendors);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setMsg("Query StockLocation list fail,Check parameters, please ");
+            return result;
+        }
+        return result;
+    }
+
     private ResultMessage printExcelShipmentInfo(HttpServletResponse response,Map<String, Object> resultMap) throws IOException {
         String fileName = new Date().getTime() + ".xls";
         ByteArrayOutputStream os = new ByteArrayOutputStream();
