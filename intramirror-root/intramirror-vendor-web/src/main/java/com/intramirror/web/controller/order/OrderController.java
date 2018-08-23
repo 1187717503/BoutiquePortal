@@ -264,11 +264,11 @@ public class OrderController extends BaseController {
             return result;
         }
 
-        Long vendorId = vendor.getVendorId();
+        //Long vendorId = vendor.getVendorId();
 
         Map<String, Object> conditionMap = new HashMap<String, Object>();
         conditionMap.put("status", Integer.parseInt(map.get("status").toString()));
-        conditionMap.put("vendorId", vendorId);
+        //conditionMap.put("vendorId", vendorId);
         conditionMap.put("orderNumber", map.get("orderNumber").toString());
 
         //根据订单orderLineNumber 查询订单详情

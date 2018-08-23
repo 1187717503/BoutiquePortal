@@ -436,7 +436,7 @@
         size,p.category_id,
         lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
         lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,s.sku_code,b.english_name
-        as brandName,l.user_rec_country as userRecCountry,
+        as brandName,l.user_rec_country as userRecCountry,l.express_type,
         v.vendor_name,
         CASE WHEN p.spu_id IS NULL THEN p.cover_img ELSE spu.cover_img END AS cover_img,
         g.english_name as geography_name ,lp.logistics_product_id,v.vendor_id
@@ -455,9 +455,6 @@
         where lp.enabled = 1
         <if test="status != null">
             and lp.`status` = #{status,jdbcType=BIGINT}
-        </if>
-        <if test="vendorId != null">
-            and v.vendor_id = #{vendorId,jdbcType=BIGINT}
         </if>
         and lp.order_line_num = #{orderNumber,jdbcType=VARCHAR}
     </select>
