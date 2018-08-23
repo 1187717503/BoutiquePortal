@@ -22,6 +22,8 @@ public class CancelOrderVO {
     private Date created_at;
     private Date cancel_at;
     private BigDecimal tax_fee;
+    private Long category_id;
+    private String categoryPath;
 
     public BigDecimal getTax_fee() {
         return tax_fee;
@@ -142,5 +144,21 @@ public class CancelOrderVO {
 
     public void setChange_flag(Integer change_flag) {
         this.change_flag = change_flag;
+    }
+
+    public Long getCategory_id() {
+        return category_id;
+    }
+
+    public void setCategory_id(Long category_id) {
+        this.category_id = category_id;
+    }
+
+    public String getCategoryPath() {
+        return categoryPath;
+    }
+
+    public void setCategoryPath(String categoryPath) {
+        this.categoryPath = categoryPath;
     }
 }

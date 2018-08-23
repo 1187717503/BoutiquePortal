@@ -469,8 +469,8 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
         if (paramCheck(params.get("brandId"))) {
             conditionMap.put("brandId", params.get("brandId"));
         }
-        if (paramCheck(params.get("stockLocation"))) {
-            conditionMap.put("stockLocation", params.get("stockLocation"));
+        if (paramCheck(params.get("locationId"))) {
+            conditionMap.put("locationId", params.get("locationId"));
         }
         if (params.get("logisticsProductIds") != null) {
             conditionMap.put("logisticsProductIds", params.get("logisticsProductIds"));

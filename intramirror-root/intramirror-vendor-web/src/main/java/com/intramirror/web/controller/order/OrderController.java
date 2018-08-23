@@ -20,9 +20,11 @@ import com.intramirror.order.api.service.IOrderExceptionTypeService;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.model.CancelOrderVO;
 import com.intramirror.order.api.vo.PageListVO;
+import com.intramirror.product.api.model.Category;
 import com.intramirror.product.api.model.Product;
 import com.intramirror.product.api.service.IProductService;
 import com.intramirror.product.api.service.ISkuStoreService;
+import com.intramirror.product.api.service.category.ICategoryService;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.VendorService;
@@ -109,6 +111,9 @@ public class OrderController extends BaseController {
     @Autowired
     private StockLocationService stockLocationService;
 
+    @Autowired
+    private ICategoryService iCategoryService;
+
     /**
      * 获取订单列表
      * @param map
@@ -149,7 +154,7 @@ public class OrderController extends BaseController {
         }
         List<Long> vendorIds = null;
         if(map.get("vendorId") != null){
-            vendorIds = Arrays.asList(Long.parseLong(map.get("categoryId").toString()));
+            vendorIds = Arrays.asList(Long.parseLong(map.get("vendorId").toString()));
         }else {
             List<Vendor> vendors = null;
             try {
@@ -182,17 +187,15 @@ public class OrderController extends BaseController {
             params.put("sortByName", sortByName);
             params.put("categoryIds", categoryIds);
             params.put("brandId", map.get("brandId"));
-            params.put("stockLocation", map.get("stockLocation"));
+            params.put("locationId", map.get("locationId"));
             params.put("logisticsProductIds", map.get("logisticsProductIds"));
             orderList = orderService.getOrderListByParams(params);
             //根据vendorIds查询所有的stockLocation
             List<StockLocationVO> stockLocationList = stockLocationService.getStockLocationByVendorIds(vendorIds);
             stockLocationListMap = stockLocationList.stream().collect(Collectors.groupingBy(StockLocationVO::getVendorId));
         }
-
+        Map<Long,Category> categoryMap =iCategoryService.queryAllCategoryName();
         if (orderList != null && orderList.size() > 0) {
-
-
             logger.info("order getOrderList 解析订单列表信息  ");
             for (Map<String, Object> info : orderList) {
                 //计算折扣
@@ -200,6 +203,7 @@ public class OrderController extends BaseController {
                 if(stockLocationListMap!=null){
                     info.put("stockLocations",stockLocationListMap.get(info.get("vendor_id")));
                 }
+                info.put("categoryPath",categoryMap.get(info.get("category_id"))==null?"":categoryMap.get(info.get("category_id")).getCategoryPath());
             }
         }
         if(orderCancelList!=null
@@ -218,6 +222,8 @@ public class OrderController extends BaseController {
                 }
                 co.setPrice(new BigDecimal(co.getPrice().toString()).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
                 co.setIn_price(new BigDecimal(co.getIn_price().toString()).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
+
+                co.setCategoryPath(categoryMap.get(co.getCategory_id())==null?"":categoryMap.get(co.getCategory_id()).getCategoryPath());
             }
         }
 
@@ -1267,7 +1273,7 @@ public class OrderController extends BaseController {
         List<Map<String, Object>> orderList = null;
         Map<String, Object> params = new HashMap<>();
         params.put("status", status);
-        params.put("vendorId", vendorId);
+        params.put("vendorIds",  Arrays.asList(vendorId));
         params.put("logisticsProductIds", logisticsProductIdList);
         orderList = orderService.getOrderListByParams(params);
         if (orderList == null || orderList.size() == 0) {
