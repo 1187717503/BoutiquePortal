@@ -568,7 +568,10 @@
         LEFT JOIN container c ON (c.container_id = lp.container_id)
         LEFT JOIN shipment sm on (sm.shipment_id = c.shipment_id)
         where (lp.`status` = 3 OR lp.`status` = 4)
-        and v.vendor_id = #{vendorId,jdbcType=BIGINT}
+        and v.vendor_id in
+        <foreach item="vendorId" index="index" collection="vendorIds" open="(" separator="," close=")">
+            #{vendorId}
+        </foreach>
         <if test="shippedParam.orderLineNo!=null and shippedParam.orderLineNo!=''">
             and lp.order_line_num=#{shippedParam.orderLineNo}
         </if>
@@ -584,6 +587,9 @@
         </if>
         <if test="shippedParam.stockLocation != null and shippedParam.stockLocation != ''">
             AND lp.stock_location = #{shippedParam.stockLocation}
+        </if>
+        <if test="shippedParam.locationId != null and shippedParam.locationId != ''">
+            AND lp.stock_location_id = #{shippedParam.locationId}
         </if>
         <if test="shippedParam.shipToGeography != null and shippedParam.shipToGeography != ''">
             AND sm.ship_to_geography = #{shippedParam.shipToGeography}

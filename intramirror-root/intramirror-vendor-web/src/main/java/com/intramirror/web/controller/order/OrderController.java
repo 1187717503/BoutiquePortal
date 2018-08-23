@@ -1248,32 +1248,38 @@ public class OrderController extends BaseController {
             result.setMsg("Please log in again");
             return result;
         }
-
-        Vendor vendor = null;
+        boolean isParent =false;
+        List<Vendor> vendors = null;
         try {
-            vendor = vendorService.getVendorByUserId(user.getUserId());
+            vendors = vendorService.getVendorsByUserId(user.getUserId());
+            if(CollectionUtils.isNotEmpty(vendors)){
+                if(CollectionUtils.isNotEmpty(vendors.stream().filter(e -> !e.getUserId().equals(user.getUserId())).collect(Collectors.toList()))){
+                    isParent=true;
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (vendor == null) {
+        if (vendors == null) {
             result.setMsg("Please log in again");
             return result;
         }
+        List<Long> vendorIds = vendors.stream().map(Vendor::getVendorId).collect(Collectors.toList());
 
         List<Long> logisticsProductIdList = new ArrayList<>();
         if (map.get("logisticsProductIds") != null && StringUtil.isNotEmpty(map.get("logisticsProductIds").toString())) {
             logisticsProductIdList = Arrays.asList((Long[]) ConvertUtils.convert(map.get("logisticsProductIds").toString().split(","), Long.class));
         }
 
-        Long vendorId = vendor.getVendorId();
+//        Long vendorId = vendor.getVendorId();
         String status = map.get("status").toString();
         //根据订单状态查询订单
-        logger.info(MessageFormat.format("order getOrderList 调用接口 orderService.getOrderListByParams 查询订单信息  入参 status:{0},vendorId:{1},logisticsProductIdList:{2}",
-                status, vendorId, logisticsProductIdList));
+        logger.info(MessageFormat.format("order getOrderList 调用接口 orderService.getOrderListByParams 查询订单信息  入参 status:{0},vendorIds:{1},logisticsProductIdList:{2}",
+                status, vendorIds, logisticsProductIdList));
         List<Map<String, Object>> orderList = null;
         Map<String, Object> params = new HashMap<>();
         params.put("status", status);
-        params.put("vendorIds",  Arrays.asList(vendorId));
+        params.put("vendorIds", vendorIds);
         params.put("logisticsProductIds", logisticsProductIdList);
         orderList = orderService.getOrderListByParams(params);
         if (orderList == null || orderList.size() == 0) {
@@ -1297,7 +1303,7 @@ public class OrderController extends BaseController {
         String filePath = path + fileName;
 
         logger.info("exportOrderList 生成订单文件");
-        generateOrderExcel("Order", orderList, filePath);
+        generateOrderExcel("Order", orderList, filePath,isParent);
 
         File newFile = new File(filePath);
         httpResponse.setHeader("Access-Control-Allow-Origin", "*");
@@ -1337,7 +1343,7 @@ public class OrderController extends BaseController {
         return result;
     }
 
-    private String generateOrderExcel(String excelName, List<Map<String, Object>> orderList, String filePath) {
+    private String generateOrderExcel(String excelName, List<Map<String, Object>> orderList, String filePath,boolean isParent) {
         HSSFWorkbook workbook = new HSSFWorkbook();
 
         int rowLength = 0;
@@ -1346,7 +1352,7 @@ public class OrderController extends BaseController {
         //图片处理
         HSSFPatriarch patriarch = sheet.createDrawingPatriarch();
 
-        String[] excelHeaders = new String[]{"Order Line No.", "Order Date", "Picture", "Brand", "Name", "Designer ID", "Color Code", "Size", "Retail Price", "Purchase Price", "VAT?", "Purchase Discount", "Consignee Geography"};
+        String[] excelHeaders = new String[]{"Order Line No.", "Order Date", "Picture", "Brand", "Name", "Designer ID", "Color Code", "Size", "Retail Price", "Purchase Price", "VAT?", "Purchase Discount", "Consignee Geography","Boutique"};
 
         // 创建表头
         HSSFRow row1 = sheet.createRow(rowLength);
@@ -1375,7 +1381,8 @@ public class OrderController extends BaseController {
                     transforNullValue("€ " + new BigDecimal(order.get("in_price").toString()).setScale(2, BigDecimal.ROUND_HALF_UP).toString()),
                     transforNullValue(GeographyEnum.EUROPEAN_UNION.getId().equals(order.get("geography_id").toString()) ? "incld. VAT" : "excld. VAT"),
                     transforNullValue(order.get("supply_price_discount")),
-                    transforNullValue(order.get("geography_name"))
+                    transforNullValue(order.get("geography_name")),
+                    transforNullValue(order.get("vendor_name"))
             };
             //将数据放到excel中，第三列是图片需要特殊处理
             for (int i = 0; i < excelHeaders.length; i++) {

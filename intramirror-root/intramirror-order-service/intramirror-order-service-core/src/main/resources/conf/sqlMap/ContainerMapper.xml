@@ -106,8 +106,10 @@ values(#{containerType,jdbcType=INTEGER}, #{shipToGeography,jdbcType=VARCHAR},#{
 	WHERE lp.container_id = c.container_id AND lp.enabled = 1 and lp.status = 7) as product_qty
 	FROM container c
 	INNER JOIN shipment s ON c.shipment_id = s.shipment_id
-	WHERE s.vendor_id =  #{vendorId,jdbcType=BIGINT}  
-	
+	WHERE s.vendor_id in
+	<foreach item="vendorId" index="index" collection="vendorIds" open="(" separator="," close=")">
+	  #{vendorId}
+	</foreach>
 	<choose>
         <when test="shipmentStatus != null and shipmentStatus != ''">
             and s.`status` = #{shipmentStatus,jdbcType=BIGINT}

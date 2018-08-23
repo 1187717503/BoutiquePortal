@@ -48,15 +48,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
+import java.util.*;
+import java.util.stream.Collectors;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -143,20 +136,20 @@ public class OrderShipController extends BaseController {
             return result;
         }
 
-        Vendor vendor = null;
+        List<Vendor> vendors = null;
         try {
-            vendor = vendorService.getVendorByUserId(user.getUserId());
+            vendors = vendorService.getVendorsByUserId(user.getUserId());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (vendor == null) {
+        if (vendors == null) {
             result.setMsg("Please log in again");
             return result;
         }
+        List<Long> vendorIds = vendors.stream().map(Vendor::getVendorId).collect(Collectors.toList());
 
         try {
             Map<String, Object> paramtMap = new HashMap<String, Object>();
-            paramtMap.put("vendorId", vendor.getVendorId());
 
             if (map.get("sortByName") != null && StringUtils.isNoneBlank(map.get("sortByName").toString())) {
                 paramtMap.put("sortByName", map.get("sortByName").toString());
@@ -169,6 +162,12 @@ public class OrderShipController extends BaseController {
             if (map.get("ship_to_geography") != null && StringUtils.isNoneBlank(map.get("ship_to_geography").toString())) {
                 paramtMap.put("ship_to_geography", map.get("ship_to_geography").toString());
             }
+
+            if (map.get("vendorId") != null && StringUtils.isNoneBlank(map.get("vendorId").toString())) {
+                vendorIds= Arrays.asList(Long.parseLong(map.get("vendorId").toString()));
+            }
+
+            paramtMap.put("vendorIds", vendorIds);
 
             //获取箱子列表信息
             logger.info("order getReadyToShipCartonList 获取container 列表信息   调用接口containerService.getContainerList 入参:" + new Gson().toJson(paramtMap));

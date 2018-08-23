@@ -161,9 +161,9 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
     }
 
     @Override
-    public PageUtils getShippedOrderListByStatus(Page page, Long vendorId, ShippedParam shippedParam) {
+    public PageUtils getShippedOrderListByStatus(Page page, List<Long> vendorIds, ShippedParam shippedParam) {
         Map<String, Object> conditionMap = new HashMap<String, Object>();
-        conditionMap.put("vendorId", vendorId);
+        conditionMap.put("vendorIds", vendorIds);
         conditionMap.put("shippedParam", shippedParam);
         PageUtils pageUtils = new PageUtils(page, this, conditionMap);
         return pageUtils;

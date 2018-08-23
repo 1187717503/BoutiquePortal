@@ -121,7 +121,7 @@ public interface IOrderService {
      * @param
      * @return
      */
-    PageUtils getShippedOrderListByStatus(Page page, Long vendorId, ShippedParam shippedParam);
+    PageUtils getShippedOrderListByStatus(Page page, List<Long> vendorIds, ShippedParam shippedParam);
 
     /**
      * 根据条件查询订单信息

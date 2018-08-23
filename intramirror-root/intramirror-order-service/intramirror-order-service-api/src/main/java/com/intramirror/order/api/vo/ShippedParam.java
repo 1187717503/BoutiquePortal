@@ -11,6 +11,7 @@ public class ShippedParam {
     private String dateType;
     private Integer pageSize;
     private Integer pageNum;
+    private Long locationId;
     private String stockLocation;
     private String shipToGeography;
     private String shippedAtOrderBy;
@@ -120,5 +121,13 @@ public class ShippedParam {
 
     public void setPageNum(Integer pageNum) {
         this.pageNum = pageNum;
+    }
+
+    public Long getLocationId() {
+        return locationId;
+    }
+
+    public void setLocationId(Long locationId) {
+        this.locationId = locationId;
     }
 }
