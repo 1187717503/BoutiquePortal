@@ -555,24 +555,28 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
         }
 		//判断是否是微店订单，即channel_id=6
 		List<String> orderLineNums = orderService.getStyleroomOrder(list);
-		if (orderLineNums!=null&&orderLineNums.size()>0){
-            logger.info("调用微店ship接口,orderLineNums:{},url:{}",
-                    JsonTransformUtil.toJson(orderLineNums), HttpClientUtil.shippedOrder);
-            Map<String,Object> params = new HashMap<>();
-            params.put("order_line_nums",orderLineNums);
-            String re = HttpClientUtil.doPost(HttpClientUtil.shippedOrder,JsonTransformUtil.toJson(params),"utf-8");
-            if (StringUtils.isNotBlank(re)){
-                JSONObject object = JSONObject.fromObject(re);
-                String success = object.optString("success");
-                if (StringUtils.isNotBlank(success)){
-                    logger.info("调用微店ship接口成功");
-                }else {
-                    logger.error("调用微店ship接口失败,msg:{}",object.optString("error"));
-                }
-            }else {
-				logger.error("调用微店ship接口失败");
-            }
-        }
+		try {
+			if (orderLineNums!=null&&orderLineNums.size()>0){
+				logger.info("调用微店ship接口,orderLineNums:{},url:{}",
+						JsonTransformUtil.toJson(orderLineNums), HttpClientUtil.shippedOrder);
+				Map<String,Object> params = new HashMap<>();
+				params.put("order_line_nums",orderLineNums);
+				String re = HttpClientUtil.doPost(HttpClientUtil.shippedOrder,JsonTransformUtil.toJson(params),"utf-8");
+				if (StringUtils.isNotBlank(re)){
+					JSONObject object = JSONObject.fromObject(re);
+					String success = object.optString("success");
+					if (StringUtils.isNotBlank(success)){
+						logger.info("调用微店ship接口成功");
+					}else {
+						logger.error("调用微店ship接口失败,msg:{}",object.optString("error"));
+					}
+				}else {
+					logger.error("调用微店ship接口失败");
+				}
+			}
+		}catch (Exception e){
+			logger.error("调用微店ship接口失败,msg:{}",e.getMessage());
+		}
 	}
 
 	private String checkAWB(Long shipmentId) {
