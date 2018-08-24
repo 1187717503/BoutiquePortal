@@ -415,7 +415,10 @@
             #{shipmentId,jdbcType=BIGINT}
         </foreach>
         AND lp.`status` = #{status,jdbcType=BIGINT}
-        AND v.vendor_id = #{vendorId,jdbcType=BIGINT}
+        AND v.vendor_id in
+        <foreach item="vendorId" index="index" collection="vendorIds" open="(" separator="," close=")">
+            #{vendorId}
+        </foreach>
         <if test="packGroup != null">
             AND g.pack_group = #{packGroup}
         </if>
