@@ -1352,7 +1352,12 @@ public class OrderController extends BaseController {
         //图片处理
         HSSFPatriarch patriarch = sheet.createDrawingPatriarch();
 
-        String[] excelHeaders = new String[]{"Order Line No.", "Order Date", "Picture", "Brand", "Name", "Designer ID", "Color Code", "Size", "Retail Price", "Purchase Price", "VAT?", "Purchase Discount", "Consignee Geography","Boutique"};
+        String[] excelHeaders = null;
+        if(isParent){
+            excelHeaders=new String[]{"Order Line No.", "Order Date", "Picture", "Brand", "Name", "Designer ID", "Color Code", "Size", "Retail Price", "Purchase Price", "VAT?", "Purchase Discount", "Consignee Geography","Boutique"};
+        }else{
+            excelHeaders=new String[]{"Order Line No.", "Order Date", "Picture", "Brand", "Name", "Designer ID", "Color Code", "Size", "Retail Price", "Purchase Price", "VAT?", "Purchase Discount", "Consignee Geography"};
+        }
 
         // 创建表头
         HSSFRow row1 = sheet.createRow(rowLength);
@@ -1368,22 +1373,42 @@ public class OrderController extends BaseController {
         for (Map<String, Object> order : orderList) {
             row = sheet.createRow(rowLength);
             row.setHeightInPoints(125F);
-            String[] values = {
-                    transforNullValue(order.get("order_line_num")),
-                    transforNullValue(sdf.format(order.get("created_at"))),
-                    transforNullValue(order.get("cover_img")),
-                    transforNullValue(order.get("brandName")),
-                    transforNullValue(order.get("name")),
-                    transforNullValue(order.get("brandID")),
-                    transforNullValue(order.get("colorCode")),
-                    transforNullValue(order.get("size")),
-                    transforNullValue("€ " + new BigDecimal(order.get("price").toString()).setScale(2, BigDecimal.ROUND_HALF_UP).toString()),
-                    transforNullValue("€ " + new BigDecimal(order.get("in_price").toString()).setScale(2, BigDecimal.ROUND_HALF_UP).toString()),
-                    transforNullValue(GeographyEnum.EUROPEAN_UNION.getId().equals(order.get("geography_id").toString()) ? "incld. VAT" : "excld. VAT"),
-                    transforNullValue(order.get("supply_price_discount")),
-                    transforNullValue(order.get("geography_name")),
-                    transforNullValue(order.get("vendor_name"))
-            };
+            String[] values = null;
+            if (isParent){
+                values =new String[]{
+                        transforNullValue(order.get("order_line_num")),
+                        transforNullValue(sdf.format(order.get("created_at"))),
+                        transforNullValue(order.get("cover_img")),
+                        transforNullValue(order.get("brandName")),
+                        transforNullValue(order.get("name")),
+                        transforNullValue(order.get("brandID")),
+                        transforNullValue(order.get("colorCode")),
+                        transforNullValue(order.get("size")),
+                        transforNullValue("€ " + new BigDecimal(order.get("price").toString()).setScale(2, BigDecimal.ROUND_HALF_UP).toString()),
+                        transforNullValue("€ " + new BigDecimal(order.get("in_price").toString()).setScale(2, BigDecimal.ROUND_HALF_UP).toString()),
+                        transforNullValue(GeographyEnum.EUROPEAN_UNION.getId().equals(order.get("geography_id").toString()) ? "incld. VAT" : "excld. VAT"),
+                        transforNullValue(order.get("supply_price_discount")),
+                        transforNullValue(order.get("geography_name")),
+                        transforNullValue(order.get("vendor_name"))
+                };
+            }else {
+                values = new String[]{
+                        transforNullValue(order.get("order_line_num")),
+                        transforNullValue(sdf.format(order.get("created_at"))),
+                        transforNullValue(order.get("cover_img")),
+                        transforNullValue(order.get("brandName")),
+                        transforNullValue(order.get("name")),
+                        transforNullValue(order.get("brandID")),
+                        transforNullValue(order.get("colorCode")),
+                        transforNullValue(order.get("size")),
+                        transforNullValue("€ " + new BigDecimal(order.get("price").toString()).setScale(2, BigDecimal.ROUND_HALF_UP).toString()),
+                        transforNullValue("€ " + new BigDecimal(order.get("in_price").toString()).setScale(2, BigDecimal.ROUND_HALF_UP).toString()),
+                        transforNullValue(GeographyEnum.EUROPEAN_UNION.getId().equals(order.get("geography_id").toString()) ? "incld. VAT" : "excld. VAT"),
+                        transforNullValue(order.get("supply_price_discount")),
+                        transforNullValue(order.get("geography_name"))
+                };
+            }
+
             //将数据放到excel中，第三列是图片需要特殊处理
             for (int i = 0; i < excelHeaders.length; i++) {
                 cell = row.createCell(i);
