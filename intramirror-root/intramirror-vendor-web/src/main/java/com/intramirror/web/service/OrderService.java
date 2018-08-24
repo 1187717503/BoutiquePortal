@@ -100,8 +100,8 @@ public class OrderService {
             result.setInfoMap(infoMap);
             return result;
         }else {
-            result.successStatus();
-            vendorId = Long.parseLong(order.get("vendorId").toString());
+            currentOrder = order;
+            vendorId = Long.parseLong(order.get("vendor_id").toString());
         }
         //封装参数
 		Map<String, Object> conditionMap = new HashMap<String, Object>();
@@ -325,6 +325,7 @@ public class OrderService {
 				result.setInfoMap(infoMap);
 			}
 		}
+		result.successStatus();
 		return result;
 	}
 
