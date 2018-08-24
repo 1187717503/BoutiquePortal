@@ -256,6 +256,7 @@ public class OrderShipController extends BaseController {
                     for (Map<String, Object> shipmentMap:shipMentList){
                         if(shipmentId.equals(Long.parseLong(shipmentMap.get("shipment_id").toString()))){
                             shipmentMap.put("stockLocation",shipment.getStockLocation());
+                            shipmentMap.put("vendorName",shipment.getVendorName());
                             shipmentListMapSort.add(shipmentMap);
                             break;
                         }
