@@ -163,6 +163,9 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 		LEFT JOIN stock_location sl ON sl.location_id = s.ship_from_location_id
 		LEFT JOIN vendor v on s.vendor_id = v.vendor_id
 		WHERE lp.`status` = 7
+		<if test="locationId != null">
+			and s.ship_from_location_id = #{locationId,jdbcType=BIGINT}
+		</if>
 		and s.vendor_id in
 		<foreach item="vendorId" index="index" collection="vendorIds" open="(" separator="," close=")">
 			#{vendorId}

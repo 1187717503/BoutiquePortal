@@ -110,6 +110,9 @@ values(#{containerType,jdbcType=INTEGER}, #{shipToGeography,jdbcType=VARCHAR},#{
 	<foreach item="vendorId" index="index" collection="vendorIds" open="(" separator="," close=")">
 	  #{vendorId}
 	</foreach>
+	<if test="locationId != null">
+	  	and s.ship_from_location_id = #{locationId,jdbcType=BIGINT}
+	</if>
 	<choose>
         <when test="shipmentStatus != null and shipmentStatus != ''">
             and s.`status` = #{shipmentStatus,jdbcType=BIGINT}
