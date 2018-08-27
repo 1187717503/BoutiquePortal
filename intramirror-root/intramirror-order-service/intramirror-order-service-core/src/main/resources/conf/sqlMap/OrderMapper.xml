@@ -419,6 +419,9 @@
         <foreach item="vendorId" index="index" collection="vendorIds" open="(" separator="," close=")">
             #{vendorId}
         </foreach>
+        <if test="locationId != null">
+            and c.ship_from_location_id = #{locationId,jdbcType=BIGINT}
+        </if>
         <if test="packGroup != null">
             AND g.pack_group = #{packGroup}
         </if>
