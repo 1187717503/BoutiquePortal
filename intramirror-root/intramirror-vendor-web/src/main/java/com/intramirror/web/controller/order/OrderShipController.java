@@ -159,6 +159,10 @@ public class OrderShipController extends BaseController {
                 paramtMap.put("shipmentStatus", Integer.parseInt(map.get("shipmentStatus").toString()));
             }
 
+            if (map.get("locationId") != null && StringUtils.isNoneBlank(map.get("locationId").toString())) {
+                paramtMap.put("locationId", Integer.parseInt(map.get("locationId").toString()));
+            }
+
             if (map.get("ship_to_geography") != null && StringUtils.isNoneBlank(map.get("ship_to_geography").toString())) {
                 paramtMap.put("ship_to_geography", map.get("ship_to_geography").toString());
             }

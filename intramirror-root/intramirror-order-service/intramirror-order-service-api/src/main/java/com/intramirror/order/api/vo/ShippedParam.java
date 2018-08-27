@@ -16,6 +16,15 @@ public class ShippedParam {
     private String shipToGeography;
     private String shippedAtOrderBy;
     private String statusOrderBy;
+    private Long vendorId;
+
+    public Long getVendorId() {
+        return vendorId;
+    }
+
+    public void setVendorId(Long vendorId) {
+        this.vendorId = vendorId;
+    }
 
     private List<String> awbNos;
 
