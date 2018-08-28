@@ -15,6 +15,7 @@
         <result column="cancel_at" property="cancel_at" jdbcType="TIMESTAMP"/>
         <result column="tax_fee" property="tax_fee" jdbcType="DECIMAL"/>
         <result column="change_flag" property="change_flag" jdbcType="INTEGER"/>
+        <result column="vendor_name" property="vendorName" jdbcType="VARCHAR"/>
     </resultMap>
 
     <resultMap id="orderMap" type="com.intramirror.order.api.model.Order">

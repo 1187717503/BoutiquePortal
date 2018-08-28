@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-admin-web/intramirror-admin-web.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-admin-web/intramirror-admin-web.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-base/intramirror-base.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-base/intramirror-base.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-base/intramirror-common/intramirror-common.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-base/intramirror-common/intramirror-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-job-web/intramirror-job-web.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-job-web/intramirror-job-web.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-logistics-service/intramirror-logistics-service.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-logistics-service/intramirror-logistics-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-logistics-service/intramirror-logistics-service-api/intramirror-logistics-service-api.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-logistics-service/intramirror-logistics-service-api/intramirror-logistics-service-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-logistics-service/intramirror-logistics-service-core/intramirror-logistics-service-core.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-logistics-service/intramirror-logistics-service-core/intramirror-logistics-service-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-main-service/intramirror-main-service.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-main-service/intramirror-main-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-main-service/intramirror-main-service-api/intramirror-main-service-api.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-main-service/intramirror-main-service-api/intramirror-main-service-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-main-service/intramirror-main-service-core/intramirror-main-service-core.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-main-service/intramirror-main-service-core/intramirror-main-service-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-order-service/intramirror-order-service.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-order-service/intramirror-order-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-order-service/intramirror-order-service-api/intramirror-order-service-api.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-order-service/intramirror-order-service-api/intramirror-order-service-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-order-service/intramirror-order-service-core/intramirror-order-service-core.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-order-service/intramirror-order-service-core/intramirror-order-service-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-payment-service/intramirror-payment-service.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-payment-service/intramirror-payment-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-payment-service/intramirror-payment-service-api/intramirror-payment-service-api.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-payment-service/intramirror-payment-service-api/intramirror-payment-service-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-payment-service/intramirror-payment-service-core/intramirror-payment-service-core.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-payment-service/intramirror-payment-service-core/intramirror-payment-service-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-product-service/intramirror-product-service.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-product-service/intramirror-product-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-product-service/intramirror-product-service-api/intramirror-product-service-api.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-product-service/intramirror-product-service-api/intramirror-product-service-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-product-service/intramirror-product-service-core/intramirror-product-service-core.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-product-service/intramirror-product-service-core/intramirror-product-service-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-root.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-root.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-base/intramirror-shoplus-message/intramirror-shoplus-message.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-base/intramirror-shoplus-message/intramirror-shoplus-message.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-base/intramirror-shoplus-oss/intramirror-shoplus-oss.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-base/intramirror-shoplus-oss/intramirror-shoplus-oss.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-base/intramirror-shoplus-service/intramirror-shoplus-service.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-base/intramirror-shoplus-service/intramirror-shoplus-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-user-service/intramirror-user-service.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-user-service/intramirror-user-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-user-service/intramirror-user-service-api/intramirror-user-service-api.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-user-service/intramirror-user-service-api/intramirror-user-service-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-user-service/intramirror-user-service-core/intramirror-user-service-core.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-user-service/intramirror-user-service-core/intramirror-user-service-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/intramirror-vendor-web/intramirror-vendor-web.iml" filepath="$PROJECT_DIR$/intramirror-root/intramirror-vendor-web/intramirror-vendor-web.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/lib/lib.iml" filepath="$PROJECT_DIR$/intramirror-root/lib/lib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/intramirror-root/lib/LIB-Core/lib-core.iml" filepath="$PROJECT_DIR$/intramirror-root/lib/LIB-Core/lib-core.iml" />
+    </modules>
+  </component>
+</project>

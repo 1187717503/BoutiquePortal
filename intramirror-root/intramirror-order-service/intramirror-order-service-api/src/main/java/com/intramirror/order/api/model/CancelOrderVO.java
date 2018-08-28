@@ -24,6 +24,15 @@ public class CancelOrderVO {
     private BigDecimal tax_fee;
     private Long category_id;
     private String categoryPath;
+    private String vendorName;
+
+    public String getVendorName() {
+        return vendorName;
+    }
+
+    public void setVendorName(String vendorName) {
+        this.vendorName = vendorName;
+    }
 
     public BigDecimal getTax_fee() {
         return tax_fee;

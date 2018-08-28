@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.intramirror:DB-Datasource-Config:1.0.11-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/intramirror/DB-Datasource-Config/1.0.11-SNAPSHOT/DB-Datasource-Config-1.0.11-20180330.081035-139.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/intramirror/DB-Datasource-Config/1.0.11-SNAPSHOT/DB-Datasource-Config-1.0.11-20180330.081035-139-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/intramirror/DB-Datasource-Config/1.0.11-SNAPSHOT/DB-Datasource-Config-1.0.11-20180330.081035-139-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
