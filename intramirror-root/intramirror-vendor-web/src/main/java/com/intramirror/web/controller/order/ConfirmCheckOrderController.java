@@ -1,25 +1,19 @@
 package com.intramirror.web.controller.order;
 
-import com.alibaba.fastjson.JSONObject;
 import com.intramirror.common.Helper;
 import com.intramirror.common.help.ResultMessage;
-import com.intramirror.order.api.common.OrderStatusType;
 import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderService;
-import com.intramirror.order.api.util.HttpClientUtil;
 import com.intramirror.product.api.model.Sku;
 import com.intramirror.product.api.service.IProductService;
 import com.intramirror.product.api.service.SkuService;
-import com.intramirror.utils.transform.JsonTransformUtil;
-import com.intramirror.web.service.LogisticsProductService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.impl.Base64Codec;
 
-import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.servlet.http.HttpServletRequest;
@@ -28,13 +22,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import pk.shoplus.common.utils.StringUtil;
 
 @CrossOrigin
 @Controller
@@ -54,7 +46,7 @@ public class ConfirmCheckOrderController {
     @Autowired
     IOrderService orderService;
     @Autowired
-    private LogisticsProductService logisticsProductService;
+    private ILogisticsProductService logisticsProductServiceImpl;
 
     /**
      * Wang
@@ -143,8 +135,8 @@ public class ConfirmCheckOrderController {
                 if (logisticsProductId != null) {
                     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-                    //LogisticsProduct logis = logisticsProductServiceImpl.selectById(Long.parseLong(logisticsProductId));
-                    LogisticsProduct logis = logisticsProductService.selectById(Long.parseLong(logisticsProductId));
+                    LogisticsProduct logis = logisticsProductServiceImpl.selectById(Long.parseLong(logisticsProductId));
+                    //LogisticsProduct logis = logisticsProductService.selectById(Long.parseLong(logisticsProductId));
                     Map<String, Object> maps = orderService.getOrderLogisticsInfoByIdWithSql(Long.parseLong(logisticsProductId));
                     String mapBrandId = maps.get("brandID") == null ? "" : maps.get("brandID").toString();
                     String mapColorCode = maps.get("colorCode") == null ? "" : maps.get("colorCode").toString();
@@ -165,9 +157,10 @@ public class ConfirmCheckOrderController {
                             }
                             upLogis.setConfirmed_at(Helper.getCurrentUTCTime());
 
-                            upLogis.setOrder_line_num(logis.getOrder_line_num());
+                            logisticsProductServiceImpl.updateByLogisticsProduct(upLogis);
+                            //upLogis.setOrder_line_num(logis.getOrder_line_num());
                             //确认订单
-                            logisticsProductService.confirmOrder(upLogis);
+                            //logisticsProductService.confirmOrder(upLogis);
 
                         } else {
                             result.setMsg("Order does not exist,logisticsProductId:" + logisticsProductId);

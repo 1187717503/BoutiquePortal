@@ -440,8 +440,7 @@
         as brandName,l.user_rec_country as userRecCountry,l.express_type,
         v.vendor_name,
         CASE WHEN p.spu_id IS NULL THEN p.cover_img ELSE spu.cover_img END AS cover_img,
-        g.english_name as geography_name ,lp.logistics_product_id,v.vendor_id,lp.shipping_method as shippingMethod,
-        p.color_code as colorCode,p.designer_id as brandID
+        g.english_name as geography_name ,lp.logistics_product_id,v.vendor_id
         FROM logistics_product lp
         INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
         INNER JOIN `order` o ON ol.order_id = o.order_id
