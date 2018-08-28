@@ -8,6 +8,7 @@
 	    <result column="ship_from_location_id" property="shipFromLocationId" jdbcType="INTEGER" />
 	    <result column="stock_location" property="stockLocation" jdbcType="VARCHAR" />
 	    <result column="status" property="status" jdbcType="BIGINT" />
+		<result column="print_step" property="printStep" jdbcType="INTEGER" />
 	    <result column="shipment_category" property="shipmentCategory" jdbcType="BIGINT" />
 	    <result column="vendor_id" property="vendorId" jdbcType="BIGINT" />
 	    <result column="shipment_no" property="shipmentNo" jdbcType="VARCHAR" />
@@ -130,6 +131,9 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 		<if test="ship_at != null">
 			, shiped_time = #{ship_at,jdbcType=TIMESTAMP}
 		</if>
+		<if test="resetStep != null">
+			, print_step = 0
+		</if>
 		WHERE shipment_id=#{shipmentId,jdbcType=BIGINT}
 	</update>
 	
@@ -208,5 +212,8 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 			#{awbNo}
 		</foreach>
 		GROUP BY s.shipment_id
+	</select>
+	<select id="queryShipmentAwbUrlByAwbNum" parameterType="string">
+		select doc_url from logistics_request WHERE awb_no = #{awbNum} and is_deleted = 0
 	</select>
 </mapper>

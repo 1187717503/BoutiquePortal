@@ -542,6 +542,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			}
 			//如果为编辑箱子，修改箱子状态
 			if (status == 1){
+				map.put("resetStep",1);
 				result = shipmentMapper.updateShipmentStatus(map);
 			}
 		}
@@ -577,6 +578,12 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		}catch (Exception e){
 			logger.error("调用微店ship接口失败,msg:{}",e.getMessage());
 		}
+	}
+
+	@Override
+	public String queryAwbUrlByAwbNum(String awbNum) {
+		String docUrl = shipmentMapper.queryShipmentAwbUrlByAwbNum(awbNum);
+		return docUrl;
 	}
 
 	private String checkAWB(Long shipmentId) {

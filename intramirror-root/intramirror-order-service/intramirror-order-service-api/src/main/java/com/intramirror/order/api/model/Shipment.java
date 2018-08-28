@@ -62,6 +62,8 @@ public class Shipment {
 
 	private Long toRefId;
 
+	private Integer printStep;
+
 	public Long getGeographyId() {
 		return geographyId;
 	}
@@ -166,5 +168,13 @@ public class Shipment {
 
 	public void setShipmentCategory(Integer shipmentCategory) {
 		this.shipmentCategory = shipmentCategory;
+	}
+
+	public Integer getPrintStep() {
+		return printStep;
+	}
+
+	public void setPrintStep(Integer printStep) {
+		this.printStep = printStep;
 	}
 }

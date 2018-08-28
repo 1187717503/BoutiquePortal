@@ -182,4 +182,6 @@ public interface IShipmentService {
 
 	void styleroomShip(List<String> list);
 
+	String queryAwbUrlByAwbNum(String awbNum);
+
 }

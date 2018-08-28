@@ -278,6 +278,30 @@ public class OrderShipController extends BaseController {
 
         return result;
     }
+    @RequestMapping(value = "",method = RequestMethod.POST)
+    @ResponseBody
+    public ResultMessage updateStep(@RequestBody Map<String, Object> map, HttpServletRequest httpRequest){
+        logger.info(" order update step 入参:"+new Gson().toJson(map));
+        ResultMessage result = new ResultMessage();
+        result.errorStatus();
+        Long shipmentId =  Long.parseLong(map.get("shipment_id").toString());
+
+        if (map == null || map.size() == 0 || map.get("print_step") == null || map.get("shipment_id") == null) {
+            result.setMsg("Parameter cannot be empty");
+            return result;
+        }
+
+        User user = this.getUser(httpRequest);
+        if (user == null) {
+            result.setMsg("Please log in again");
+            return result;
+        }
+        Map<String, Object> getShipment = new HashMap<>();
+        getShipment.put("shipmentId", shipmentId);
+        //根据shipmentId 获取shipment 相关信息及物流第一段类型
+        Shipment shipment = iShipmentService.selectShipmentById(getShipment);
+        return result;
+    }
 
 
     /**
@@ -293,6 +317,7 @@ public class OrderShipController extends BaseController {
         logger.info("order getShipmentInfo 入参:" + new Gson().toJson(map));
         ResultMessage result = new ResultMessage();
         result.errorStatus();
+        Long shipmentId =  Long.parseLong(map.get("shipment_id").toString());
 
         if (map == null || map.size() == 0 || map.get("status") == null || map.get("shipment_id") == null) {
             result.setMsg("Parameter cannot be empty");
@@ -334,6 +359,27 @@ public class OrderShipController extends BaseController {
             if (shipmentMap.get("invoice_date") != null && StringUtils.isNotBlank(shipmentMap.get("invoice_date").toString())) {
                 shipmentMap.put("invoice_date", sdf2.format(sdf.parse(shipmentMap.get("invoice_date").toString())));
                 shipmentMap.put("invoice_num",shipmentMap.get("invoiceNum"));
+            }
+            shipmentMap.put("vendor_name",vendor.getVendorName());
+            Integer print_step = Integer.valueOf(shipmentMap.get("print_step").toString());
+            // 添加invoice url
+            if(print_step >= 3){
+                VendorShipment vendorShipment = invoiceService.queryVendorShipmentByShipmentId(shipmentId);
+                if(vendorShipment!=null){
+                    shipmentMap.put("invoice_url",vendorShipment.getInvoiceUrl());
+                }
+            }
+            // 添加awb url
+            if(print_step >= 4){
+                if(shipmentMap.get("awb_num")!=null){
+                    String awb_num = shipmentMap.get("awb_num").toString();
+                    if(org.apache.commons.lang.StringUtils.isNotBlank(awb_num)){
+                        String docUrl = iShipmentService.queryAwbUrlByAwbNum(awb_num);
+                        if(org.apache.commons.lang.StringUtils.isNotBlank(docUrl)) {
+                            shipmentMap.put("awbUrl", docUrl);
+                        }
+                    }
+                }
             }
 
             //获取carton列表
