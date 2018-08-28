@@ -439,12 +439,15 @@
         lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,s.sku_code,b.english_name
         as brandName,l.user_rec_country as userRecCountry,l.express_type,
         v.vendor_name,
+        if(t.tax_rate = NULL,0,ROUND(t.tax_rate * lp.in_price,2)) as vat,
         CASE WHEN p.spu_id IS NULL THEN p.cover_img ELSE spu.cover_img END AS cover_img,
         g.english_name as geography_name ,lp.logistics_product_id,v.vendor_id
         FROM logistics_product lp
         INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
         INNER JOIN `order` o ON ol.order_id = o.order_id
-        INNER JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id and l.enabled = 1
+        INNER JOIN logistics l ON (lp.order_logistics_id = l.order_logistics_id AND l.enabled = 1)
+        INNER JOIN address_country ac on ac.name = l.user_rec_country
+        INNER JOIN tax t on (t.address_country_id = ac.address_country_id and t.tax_type = 1)
         INNER JOIN geography g on l.geography_id = g.geography_id
         INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
         INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
