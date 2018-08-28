@@ -53,8 +53,10 @@ public class ConfirmCheckOrderController {
 
     @Autowired
     IOrderService orderService;
+    //@Autowired
+    //private LogisticsProductService logisticsProductService;
     @Autowired
-    private LogisticsProductService logisticsProductService;
+    private ILogisticsProductService logisticsProductServiceImpl;
 
     /**
      * Wang
@@ -143,8 +145,8 @@ public class ConfirmCheckOrderController {
                 if (logisticsProductId != null) {
                     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-                    //LogisticsProduct logis = logisticsProductServiceImpl.selectById(Long.parseLong(logisticsProductId));
-                    LogisticsProduct logis = logisticsProductService.selectById(Long.parseLong(logisticsProductId));
+                    LogisticsProduct logis = logisticsProductServiceImpl.selectById(Long.parseLong(logisticsProductId));
+                    //LogisticsProduct logis = logisticsProductService.selectById(Long.parseLong(logisticsProductId));
                     Map<String, Object> maps = orderService.getOrderLogisticsInfoByIdWithSql(Long.parseLong(logisticsProductId));
                     String mapBrandId = maps.get("brandID") == null ? "" : maps.get("brandID").toString();
                     String mapColorCode = maps.get("colorCode") == null ? "" : maps.get("colorCode").toString();
@@ -165,9 +167,12 @@ public class ConfirmCheckOrderController {
                             }
                             upLogis.setConfirmed_at(Helper.getCurrentUTCTime());
 
-                            upLogis.setOrder_line_num(logis.getOrder_line_num());
                             //确认订单
-                            logisticsProductService.confirmOrder(upLogis);
+                            logisticsProductServiceImpl.updateByLogisticsProduct(upLogis);
+
+                            //upLogis.setOrder_line_num(logis.getOrder_line_num());
+
+                            //logisticsProductService.confirmOrder(upLogis);
 
                         } else {
                             result.setMsg("Order does not exist,logisticsProductId:" + logisticsProductId);
