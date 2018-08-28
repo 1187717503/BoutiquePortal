@@ -574,7 +574,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	        }
 			//获取上一个状态
 			int lastStatus = ContainerType.getLastStatus(status);
-			if (status == 3){
+			/*if (status == 3){
 				//记录发货时间
 				map.put("ship_at",new Date());
 				List<String> list = new ArrayList<>();
@@ -606,9 +606,44 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 				}
                 sendMail(vo);
 				logger.info("shipmentNo:{},手动ship",shipment.getShipmentNo());
-			}
+			}*/
 			//如果一直修改状态
 			if (lastStatus == shipment.getStatus()){
+				if (status == 3){
+					//记录发货时间
+					map.put("ship_at",new Date());
+					List<String> list = new ArrayList<>();
+
+					//校验是否生成AWB
+					String awb = checkAWB(shipment.getShipmentId());
+					//shipped操作发送消息用来生成资金报表
+					List<LogisticsProduct> logisticsProducts = logisticsProductMapper.getLogisticsProductByShipment(shipment.getShipmentId());
+					if (logisticsProducts!=null && logisticsProducts.size()>0){
+						for (LogisticsProduct logisticsProduct:logisticsProducts){
+							kafkaUtilService.saveOrderFinance(logisticsProduct);
+							list.add(logisticsProduct.getOrder_line_num());
+						}
+					}
+
+					//调用微店接口ship
+					styleroomShip(list);
+
+					// 起线程发邮件
+					ShipmentSendMailVO vo = new ShipmentSendMailVO();
+					vo.setShipmentNo(shipment.getShipmentNo());
+					vo.setShipmentId(shipment.getShipmentId());
+					if (shipment.getToType() == 2) {
+						vo.setDestination("Transit Warehouse");
+					} else if("China Mainland".equals(shipment.getShipToGeography())
+							||"HongKong".equals(shipment.getShipToGeography())
+							||"China excl. Taiwan".equals(shipment.getShipToGeography())) {
+						vo.setDestination("China");
+					}
+					sendMail(vo);
+					logger.info("shipmentNo:{},手动ship",shipment.getShipmentNo());
+				}
+
+
 				result = shipmentMapper.updateShipmentStatus(map);
 			}
 			//如果为编辑箱子，修改箱子状态
