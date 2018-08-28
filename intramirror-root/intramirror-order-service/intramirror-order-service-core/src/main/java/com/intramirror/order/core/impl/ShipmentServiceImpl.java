@@ -13,10 +13,7 @@ import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.model.SubShipment;
 import com.intramirror.order.api.service.*;
 import com.intramirror.order.api.util.HttpClientUtil;
-import com.intramirror.order.api.vo.InvokerInputVo;
-import com.intramirror.order.api.vo.LogisticsProductVO;
-import com.intramirror.order.api.vo.ShipmentSendMailVO;
-import com.intramirror.order.api.vo.TransportationRouteVo;
+import com.intramirror.order.api.vo.*;
 import com.intramirror.order.core.dao.BaseDao;
 import com.intramirror.order.core.mapper.LogisticProductShipmentMapper;
 import com.intramirror.order.core.mapper.LogisticsProductMapper;
@@ -89,6 +86,14 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			map.put("pack_english_name","Transit Warehouse");
 		}
 		int result = 0;
+		Long consigner_country_id =  Long.parseLong(map.get("consigner_country_id").toString());
+		Long consignee_country_id = null;
+		if (shipmentCategory == 1){
+			//发往质检仓的，收件id为52
+			consignee_country_id = 52L;
+		}else {
+			consignee_country_id =  Long.parseLong(map.get("consignee_country_id").toString());
+		}
 		Shipment shipment = new Shipment();
 		if (shipmentId == 0){
 			synchronized (shipment){
@@ -138,8 +143,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 					List<Map<String, Object>> listMap = shipmentMapper.getShippmentByType(typeMap);
 					logger.info("result shipmentType:" + new Gson().toJson(listMap));
 					shipmentId = shipmentMapper.getShipmentId(shipment);
-					Long consigner_country_id =  Long.parseLong(map.get("consigner_country_id").toString());
-					Long consignee_country_id =  Long.parseLong(map.get("consignee_country_id").toString());
+
 					saveSubShipmentByTms(map,consigner_country_id,consignee_country_id,vendorId,shipmentId,Long.parseLong(
 							map.get("logistics_product_id")==null?"0":map.get("logistics_product_id").toString()));
 					/*saveSubShipment(listMap, map,shipmentId,Long.parseLong(
@@ -159,8 +163,8 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 				logger.info("result shipmentType:" + new Gson().toJson(listMap));
 //				saveSubShipment(listMap, map,shipmentId,Long.parseLong(
 //						map.get("logistics_product_id")==null?"0":map.get("logistics_product_id").toString()));
-				Long consigner_country_id =  Long.parseLong(map.get("consigner_country_id").toString());
-				Long consignee_country_id =  Long.parseLong(map.get("consignee_country_id").toString());
+				//Long consigner_country_id =  Long.parseLong(map.get("consigner_country_id").toString());
+				//Long consignee_country_id =  Long.parseLong(map.get("consignee_country_id").toString());
 				saveSubShipmentByTms(map,consigner_country_id,consignee_country_id,Long.parseLong(map.get("vendor_id").toString()),shipmentId,Long.parseLong(
 						map.get("logistics_product_id")==null?"0":map.get("logistics_product_id").toString()));
 				return shipment;
@@ -216,35 +220,49 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			List<TransportationRouteVo> routeVos = JSONArray.parseArray(json, TransportationRouteVo.class);
 			if(routeVos!=null&&routeVos.size()>0){
 				Date currentDate = new Date();
-				SubShipment subShipment = new SubShipment();
-				subShipment.setConsignee(map.get("transfer_consignee")==null?"":map.get("transfer_consignee").toString());
-				subShipment.setPersonName(map.get("person_name")==null?"":map.get("person_name").toString());
-				subShipment.setSegmentSequence(routeVos.get(0).getProviderVoList().get(0).getSequence().longValue());
-				subShipment.setShipToAddr(routeVos.get(0).getProviderVoList().get(0).getAddress());
-				subShipment.setShipToAddr2(routeVos.get(0).getProviderVoList().get(0).getAddress2());
-				subShipment.setShipToAddr3(routeVos.get(0).getProviderVoList().get(0).getAddress3());
-				subShipment.setShipToEamilAddr(routeVos.get(0).getProviderVoList().get(0).getEmail());
-				subShipment.setShipToDistrict(routeVos.get(0).getProviderVoList().get(0).getDistrict());
-				subShipment.setShipToCity(routeVos.get(0).getProviderVoList().get(0).getCity());
-				subShipment.setShipToProvince(routeVos.get(0).getProviderVoList().get(0).getProvince());
-				subShipment.setShipToCountry(routeVos.get(0).getProviderVoList().get(0).getCountry());
-				subShipment.setUpdatedAt(currentDate);
-				subShipment.setShipmentId(shipmentId);
-				subShipment.setCreatedAt(currentDate);
-				subShipment.setStatus(ContainerType.RECEIVED);
-				subShipment.setShipToCountryCode(routeVos.get(0).getProviderVoList().get(0).getCountryCode());
-				subShipment.setContact(routeVos.get(0).getProviderVoList().get(0).getContactName());
-				subShipment.setPiva(routeVos.get(0).getProviderVoList().get(0).getTransferPiva());
-				subShipment.setPostalCode(routeVos.get(0).getProviderVoList().get(0).getPostalCode());
-				subShipmentMapper.insertSubshipmentVO(subShipment);
-				if(routeVos.get(0).getProviderVoList().get(1)!=null){
-					subShipmentMapper.insertSubshipment(saveBean(map, currentDate, shipmentId, routeVos.get(0).getProviderVoList().get(1).getSequence().longValue()));
+				for(ProviderVo providerVo:routeVos.get(0).getProviderVoList()){
+					if(StringUtils.isNotBlank(providerVo.getAddress())){
+                        SubShipment subShipment = new SubShipment();
+                        subShipment.setConsignee(providerVo.getCompanyName());
+                        subShipment.setPersonName(providerVo.getContactName());
+                        subShipment.setSegmentSequence(providerVo.getSequence().longValue());
+                        subShipment.setShippingSegmentId(providerVo.getShippingSegmentId());
+                        subShipment.setShippingProviderId(providerVo.getProviderId());
+                        subShipment.setShipToAddr(providerVo.getAddress());
+                        subShipment.setShipToAddr2(providerVo.getAddress2());
+                        subShipment.setShipToAddr3(providerVo.getAddress3());
+                        subShipment.setShipToEamilAddr(providerVo.getEmail());
+                        subShipment.setShipToDistrict(providerVo.getDistrict());
+                        subShipment.setShipToCity(providerVo.getCity());
+                        subShipment.setShipToProvince(providerVo.getProvince());
+                        subShipment.setShipToCountry(providerVo.getCountry());
+                        subShipment.setUpdatedAt(currentDate);
+                        subShipment.setShipmentId(shipmentId);
+                        subShipment.setCreatedAt(currentDate);
+                        subShipment.setStatus(ContainerType.RECEIVED);
+                        subShipment.setShipToCountryCode(providerVo.getCountryCode());
+                        subShipment.setContact(providerVo.getPhoneNumber());
+                        subShipment.setPiva(providerVo.getTransferPiva());
+                        subShipment.setPostalCode(providerVo.getPostalCode());
+                        Map beanMap = JsonTransformUtil.readValue(JsonTransformUtil.toJson(subShipment),Map.class);
+                        Long subShipmentId = subShipmentMapper.getSubshipment(beanMap);
+                        if(subShipmentId==null){
+                            subShipmentMapper.insertSubshipmentVO(subShipment);
+                        }
+                    }else {
+                        Map<String, Object> bean = saveBean(map, currentDate, shipmentId, providerVo);
+                        bean.put("shippingSegmentId",providerVo.getShippingSegmentId());
+                        Long subShipmentId = subShipmentMapper.getSubshipment(bean);
+                        if(subShipmentId==null){
+                            subShipmentMapper.insertSubshipment(bean);
+                        }
+                    }
 				}
 			}
 		}
 	}
 
-	public void saveSubShipment(List<Map<String, Object>> map, Map<String, Object> lastMap, Long shipmentId, Long logisticProductId){
+	/*public void saveSubShipment(List<Map<String, Object>> map, Map<String, Object> lastMap, Long shipmentId, Long logisticProductId){
 		//打印入参段
 		logger.info("pararmeter " + new Gson().toJson(map));
 		Map<String, Object> getShipment = new HashMap<>();
@@ -349,10 +367,10 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 
 			}
 		}
-	}
+	}*/
 
-	public Map<String, Object> saveBean(Map<String, Object> map, Date currentDate, Long shipmentId,Long segmentSequence){
-		Map<String, Object> beanMap = new HashMap<String, Object>();
+	public Map<String, Object> saveBean(Map<String, Object> map, Date currentDate, Long shipmentId,ProviderVo providerVo){
+		Map<String, Object> beanMap = new HashMap<>();
 		String countryCode = map.get("countryCode") == null ? " " : map.get("countryCode").toString();
 		//发往中国大陆，及港澳地区的不用校验地址信息
 		boolean flag = true;
@@ -361,7 +379,8 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		}
 		beanMap.put("consignee", map.get("consignee")==null?" ":map.get("consignee").toString());
 		beanMap.put("personName", map.get("consignee")==null?" ":map.get("consignee").toString());
-		beanMap.put("segmentSequence", segmentSequence);
+		beanMap.put("segmentSequence", providerVo.getSequence());
+		beanMap.put("shippingProviderId", providerVo.getProviderId());
 		beanMap.put("shippingSegmentId", Long.parseLong(map.get("shippingSegmentId")==null?"0":map.get("shippingSegmentId").toString()));
 		String addr = map.get("shipToAddr") == null ? "" : map.get("shipToAddr").toString();
 		if (flag && StringUtils.isBlank(addr)){

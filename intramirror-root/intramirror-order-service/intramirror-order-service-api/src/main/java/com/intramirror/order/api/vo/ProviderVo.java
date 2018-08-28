@@ -7,6 +7,7 @@ public class ProviderVo {
     private Long providerId;  //供应商id
     private String providerName;  //供应商名称
     private Integer sequence;  //运输路段顺序
+    private Long shippingSegmentId; //运输分段id
     //中转地址
     private String companyName;  //公司名
     private String contactName;  //联系人名
@@ -158,5 +159,13 @@ public class ProviderVo {
 
     public void setPostalCode(String postalCode) {
         this.postalCode = postalCode;
+    }
+
+    public Long getShippingSegmentId() {
+        return shippingSegmentId;
+    }
+
+    public void setShippingSegmentId(Long shippingSegmentId) {
+        this.shippingSegmentId = shippingSegmentId;
     }
 }

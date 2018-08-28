@@ -345,4 +345,10 @@
         INNER JOIN container c  on c.container_id = lp.container_id
         WHERE c.shipment_id = #{shipmentId} and lp.change_flag = 0
     </select>
+
+    <select id="getShopProductSku" resultType="map" parameterType="long">
+        SELECT sps.* FROM shop_product_sku sps
+        INNER JOIN logistics_product lp on lp.shop_product_sku_id = sps.shop_product_sku_id
+        WHERE lp.logistics_product_id = #{logisticsProductId}
+    </select>
 </mapper>

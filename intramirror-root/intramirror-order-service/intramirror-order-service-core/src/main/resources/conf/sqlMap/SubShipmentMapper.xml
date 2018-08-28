@@ -167,25 +167,27 @@
     <insert id="insertSubshipment" parameterType="java.util.Map" keyProperty="sub_shipment_id">
         INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_addr,ship_to_addr2,ship_to_addr3,ship_to_emailAddr,
         ship_to_district,ship_to_city,ship_to_province,ship_to_country,`status`,created_at,updated_at,shipment_id,ship_to_country_code,
-        contact,postal_code,person_name)
+        contact,postal_code,person_name,shipping_provider_id)
          VALUES(
          #{shippingSegmentId,jdbcType=BIGINT},#{segmentSequence,jdbcType=BIGINT},#{consignee,jdbcType=VARCHAR},
          #{shipToAddr,jdbcType=VARCHAR},#{shipToAddr2,jdbcType=VARCHAR},#{shipToAddr3,jdbcType=VARCHAR},#{shipToEamilAddr,jdbcType=VARCHAR},
          #{shipToDistrict,jdbcType=VARCHAR},#{shipToCity,jdbcType=VARCHAR},
          #{shipToProvince,jdbcType=VARCHAR},#{shipToCountry,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},#{createdAt,jdbcType=TIMESTAMP},#{updatedAt,jdbcType=TIMESTAMP},#{shipmentId,jdbcType=BIGINT},
-        #{shipToCountryCode,jdbcType=VARCHAR},#{contact,jdbcType=VARCHAR},#{postalCode,jdbcType=VARCHAR},#{personName,jdbcType=VARCHAR});
+        #{shipToCountryCode,jdbcType=VARCHAR},#{contact,jdbcType=VARCHAR},#{postalCode,jdbcType=VARCHAR},#{personName,jdbcType=VARCHAR},
+        #{shippingProviderId,jdbcType=BIGINT});
   </insert>
 
     <insert id="insertSubshipmentVO" parameterType="com.intramirror.order.api.model.SubShipment" keyProperty="sub_shipment_id">
         INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_addr,ship_to_addr2,ship_to_addr3,ship_to_emailAddr,
         ship_to_district,ship_to_city,ship_to_province,ship_to_country,`status`
-        ,created_at,updated_at,shipment_id,ship_to_country_code,contact,piva,postal_code,person_name)
+        ,created_at,updated_at,shipment_id,ship_to_country_code,contact,piva,postal_code,person_name,shipping_provider_id)
         VALUES(
         #{shippingSegmentId,jdbcType=BIGINT},#{segmentSequence,jdbcType=BIGINT},#{consignee,jdbcType=VARCHAR},
         #{shipToAddr,jdbcType=VARCHAR},#{shipToAddr2,jdbcType=VARCHAR},#{shipToAddr3,jdbcType=VARCHAR},#{shipToEamilAddr,jdbcType=VARCHAR},
         #{shipToDistrict,jdbcType=VARCHAR},#{shipToCity,jdbcType=VARCHAR},
-        #{shipToProvince,jdbcType=VARCHAR},#{shipToCountry,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},#{createdAt,jdbcType=TIMESTAMP},#{updatedAt,jdbcType=TIMESTAMP},#{shipmentId,jdbcType=BIGINT},
-        #{shipToCountryCode,jdbcType=VARCHAR},#{contact,jdbcType=VARCHAR},#{piva,jdbcType=VARCHAR},#{postalCode,jdbcType=VARCHAR},#{personName,jdbcType=VARCHAR});
+        #{shipToProvince,jdbcType=VARCHAR},#{shipToCountry,jdbcType=VARCHAR},#{status,jdbcType=INTEGER},#{createdAt,jdbcType=TIMESTAMP},#{updatedAt,jdbcType=TIMESTAMP},#{shipmentId,jdbcType=BIGINT},
+        #{shipToCountryCode,jdbcType=VARCHAR},#{contact,jdbcType=VARCHAR},#{piva,jdbcType=VARCHAR},#{postalCode,jdbcType=VARCHAR},#{personName,jdbcType=VARCHAR},
+        #{shippingProviderId,jdbcType=BIGINT});
         <selectKey keyProperty="subShipmentId" resultType="java.lang.Long">
             select LAST_INSERT_ID() as subShipmentId
         </selectKey>
@@ -196,8 +198,8 @@
     WHERE  segment_sequence=#{segmentSequence,jdbcType=BIGINT}
     AND consignee=#{consignee,jdbcType=VARCHAR} AND ship_to_addr=#{shipToAddr,jdbcType=VARCHAR}
     AND ship_to_emailAddr = #{shipToEamilAddr,jdbcType=VARCHAR} AND postal_code = #{postalCode,jdbcType=VARCHAR}
-    AND ship_to_district =#{shipToDistrict,jdbcType=VARCHAR} AND ship_to_city = #{shipToCity,jdbcType=VARCHAR}
-    AND ship_to_province= #{shipToProvince,jdbcType=VARCHAR} AND ship_to_country=#{shipToCountry,jdbcType=VARCHAR}
+    AND ship_to_country=#{shipToCountry,jdbcType=VARCHAR}
+    AND ship_to_city = #{shipToCity,jdbcType=VARCHAR}
     AND contact = #{contact,jdbcType=VARCHAR} AND ship_to_country_code = #{shipToCountryCode,jdbcType=VARCHAR}
     AND `status` = #{status,jdbcType=BIGINT} AND shipment_id = #{shipmentId,jdbcType=BIGINT}
     ORDER BY created_at DESC LIMIT 1;
