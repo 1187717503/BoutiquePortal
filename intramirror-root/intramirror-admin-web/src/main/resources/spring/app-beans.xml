@@ -69,6 +69,8 @@
         <property name="appOrderUrl" value="${app.order.url}"></property>
         <property name="appCheckUrl" value="${app.check.url}"></property>
         <property name="ruleExcelPath" value="${price.rule.path}"></property>
+        <property name="priceChangeRulePath" value="${price.change.rule.path}"></property>
+        <property name="microServiceProductServer" value="${micro.service.product.server}"></property>
     </bean>
 
 
@@ -104,6 +106,10 @@
 
     <beans profile="test_ci">
         <context:property-placeholder location="classpath:test_ci/*.properties" ignore-unresolvable="true"/>
+    </beans>
+ 
+    <beans profile="pressure_test">
+        <context:property-placeholder location="classpath:pressure_test/*.properties" ignore-unresolvable="true"/>
     </beans>
 
     <beans profile="test_local">

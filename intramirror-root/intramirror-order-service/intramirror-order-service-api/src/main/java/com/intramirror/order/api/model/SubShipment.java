@@ -87,6 +87,20 @@ public class SubShipment {
      */
 	private String postalCode;
 
+    /**
+     * 供应商id
+     */
+	private Long shippingProviderId;
+
+
+    public Long getShippingProviderId() {
+        return shippingProviderId;
+    }
+
+    public void setShippingProviderId(Long shippingProviderId) {
+        this.shippingProviderId = shippingProviderId;
+    }
+
     public String getPersonName() {
         return personName;
     }

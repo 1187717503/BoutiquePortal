@@ -2,6 +2,7 @@ package com.intramirror.product.api.service.price;
 
 import com.intramirror.common.enums.PriceChangeRuleEnum;
 import com.intramirror.common.help.ResultMessage;
+import com.intramirror.product.api.model.ImPriceAlgorithm;
 import com.intramirror.product.api.model.PriceChangeRule;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public interface IPriceChangeRule {
      * @return true, false
      * @throws Exception
      */
-    boolean updateVendorPrice(int categoryType,String startTime,String endTime) throws Exception;
+    boolean updateVendorPrice(int categoryType, String startTime, String endTime) throws Exception;
 
     boolean updateVendorPrice(Long vendor_id, int categoryType, Long price_change_rule_id) throws Exception;
 
@@ -33,11 +34,12 @@ public interface IPriceChangeRule {
      * @return true, false
      * @throws Exception
      */
-    boolean updateAdminPrice(int categoryType,String startTime,String endTime) throws Exception;
+    boolean updateAdminPrice(int categoryType, String startTime, String endTime) throws Exception;
 
     boolean updateAdminPrice(Long vendor_id, int categoryType, Long price_change_rule_id) throws Exception;
 
     void updateDefaultPrice(PriceChangeRuleEnum.PriceType priceType, Map<String, Object> paramsMap);
+
     List<Map<String, Object>> selectNowActiveRule(Map<String, Object> params);
 
     /**
@@ -45,7 +47,7 @@ public interface IPriceChangeRule {
      * @return true, false
      * @throws Exception
      */
-    boolean updatePreviewPrice(Long vendor_id, Long preview_status, Integer category_type,Long price_change_rule_id,String flag) throws Exception;
+    boolean updatePreviewPrice(Long vendor_id, Long preview_status, Integer category_type, Long price_change_rule_id, String flag) throws Exception;
 
     public String checkSeasonExists(Map<String, Object> params, String season);
 
@@ -88,5 +90,36 @@ public interface IPriceChangeRule {
     List<PriceChangeRule> selectByName(String name, Long vendorId);
 
     List<Map<String, Object>> selRuleByVendorPriceType(Map<String, Object> params);
+
+    List<PriceChangeRule> selectByCondition(PriceChangeRule priceChangeRule);
+
+    int deleteSnapshot(Long price_change_rule_id);
+
+    List<ImPriceAlgorithm> selectAlgorithmsByConditions(Map<String, Object> params);
+
+    ImPriceAlgorithm getAlgorithmById(Long id);
+
+    /**
+     * boutique pending 页面 open / close preview
+     * @param vendor_id
+     * @param preview_status
+     * @param category_type
+     * @param price_change_rule_id
+     * @param flag
+     * @return
+     * @throws Exception
+     */
+    boolean updateProductPreviewPriceByBoutique(Long vendor_id, Long preview_status, Integer category_type, Long price_change_rule_id, String flag)
+            throws Exception;
+
+    boolean synUpdateProductPrice(Long vendor_id, int categoryType, Long price_change_rule_id) throws Exception;
+
+    boolean synUpdateProductPriceByValidFrom(String startTime, String endTime) throws Exception;
+
+    /**
+     * @param id
+     * @return
+     */
+    Map<String, Object> querySnapShotTimeByRuleId(Object id);
 
 }

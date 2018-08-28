@@ -2,6 +2,8 @@ package com.intramirror.product.core.mapper;
 
 import com.intramirror.product.api.model.Tag;
 import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.annotations.Param;
 
 public interface TagMapper {
@@ -52,5 +54,7 @@ public interface TagMapper {
     Tag getTagsByName(Tag tag);
 
     List<Tag> getTagsByDate();
+
+    List<Tag> getTagsByParam(Map<String,Object> param);
 
 }

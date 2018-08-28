@@ -58,6 +58,12 @@
                 <profiles.active>prd</profiles.active>
             </properties>
         </profile>
+        <profile>
+            <id>pressure_test</id>
+            <properties>
+                <profiles.active>pressure_test</profiles.active>
+            </properties>
+        </profile>
     </profiles>
 
     <dependencies>
@@ -139,6 +145,12 @@
         <dependency>
             <groupId>org.springframework.session</groupId>
             <artifactId>spring-session-data-redis</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson</artifactId>
+            <version>3.4.2</version>
         </dependency>
 
         <dependency>

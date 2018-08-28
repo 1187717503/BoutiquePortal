@@ -4,33 +4,21 @@ import com.google.gson.Gson;
 import com.intramirror.common.IKafkaService;
 import com.intramirror.core.common.exception.ValidateException;
 import com.intramirror.core.common.response.ErrorResponse;
-import com.intramirror.product.api.model.ProductWithBLOBs;
-import com.intramirror.product.api.model.SearchCondition;
-import com.intramirror.product.api.model.ShopProduct;
-import com.intramirror.product.api.model.ShopProductSku;
-import com.intramirror.product.api.model.ShopProductWithBLOBs;
-import com.intramirror.product.api.model.Sku;
+import com.intramirror.product.api.model.*;
 import com.intramirror.product.api.service.merchandise.ProductManagementService;
 import com.intramirror.product.common.KafkaProperties;
-import com.intramirror.product.core.mapper.ProductManagementMapper;
-import com.intramirror.product.core.mapper.ProductMapper;
-import com.intramirror.product.core.mapper.ShopProductMapper;
-import com.intramirror.product.core.mapper.ShopProductSkuMapper;
-import com.intramirror.product.core.mapper.SkuMapper;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import com.intramirror.product.core.mapper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.*;
+
 /**
  * Created on 2017/10/30.
+ *
  * @author YouFeng.Zhu
  */
 @Service
@@ -50,6 +38,9 @@ public class ProductManagementServiceImpl implements ProductManagementService {
     private SkuMapper skuMapper;
 
     @Autowired
+    private SeasonMapper seasonMapper;
+
+    @Autowired
     IKafkaService kafkaService;
 
     @Autowired
@@ -62,7 +53,18 @@ public class ProductManagementServiceImpl implements ProductManagementService {
 
     @Override
     public List<Map<String, Object>> listProductService(SearchCondition searchCondition) {
-        return productManagementMapper.listProductDetailInfo(searchCondition);
+    	List<Map<String, Object>> resultList=productManagementMapper.listProductDetailInfo(searchCondition);
+        return resultList;
+    }
+
+    @Override
+    public List<Map<String, Object>> listProductException(List<Map<String,Object>> productIds) {
+        return productManagementMapper.listProductException(productIds);
+    }
+
+    @Override
+    public Integer countBoutiqueException(Integer type) {
+        return productManagementMapper.countBoutiqueException(type);
     }
 
     @Override
@@ -128,7 +130,7 @@ public class ProductManagementServiceImpl implements ProductManagementService {
                     contain = true;
                 }
             }
-            if (contain) {
+            if (!contain) {
                 successProductIds.add(productId);
             }
         }
@@ -389,6 +391,7 @@ public class ProductManagementServiceImpl implements ProductManagementService {
     }
 
     private ShopProductWithBLOBs makeInputShopProductWithBLOBs(int status, Sku sku, ProductWithBLOBs product) {
+        Season season = seasonMapper.selectByPrimaryKey(product.getSeasonCode());
         ShopProductWithBLOBs shopProduct = new ShopProductWithBLOBs();
         shopProduct.setShopId(shopId);
         shopProduct.setShopCategoryId(product.getCategoryId());
@@ -400,6 +403,7 @@ public class ProductManagementServiceImpl implements ProductManagementService {
         shopProduct.setEnabled(true);
         shopProduct.setMinSalePrice(sku.getImPrice());
         shopProduct.setMaxSalePrice(sku.getImPrice());
+        shopProduct.setSeasonSn(season.getSeasonSn());
         return shopProduct;
     }
 
