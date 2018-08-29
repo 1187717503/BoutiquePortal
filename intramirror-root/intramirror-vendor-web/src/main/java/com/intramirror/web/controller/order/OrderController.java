@@ -298,7 +298,10 @@ public class OrderController extends BaseController {
             //计算折扣
             Double salePrice = Double.parseDouble(orderInfo.get("sale_price").toString());
             Double price = Double.parseDouble(orderInfo.get("price").toString());
-            Double inPrice = Double.parseDouble(orderInfo.get("in_price").toString());
+            BigDecimal inPriceDecimal = new BigDecimal(Double.parseDouble(orderInfo.get("in_price").toString()));
+            Double inPrice = inPriceDecimal.doubleValue();
+            orderInfo.put("in_price",inPriceDecimal.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+
 
             BigDecimal sale_price_discount = new BigDecimal((salePrice / price) * 100);
             //				info.put("sale_price_discount",sale_price_discount.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() +" %");
