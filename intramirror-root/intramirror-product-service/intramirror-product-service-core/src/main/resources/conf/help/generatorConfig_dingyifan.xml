@@ -4,7 +4,7 @@
 
 	<!-- mybatis-generator:generate -->
 	<classPathEntry
-			location="/Users/dingyifan/Documents/software/env/maven_house_jz/mysql/mysql-connector-java/5.1.39/mysql-connector-java-5.1.39.jar" /> <!-- 配置JAR驱动 -->
+			location="D:\intramirror\repository\mysql\mysql-connector-java\5.1.39\mysql-connector-java-5.1.39.jar"/>  <!-- 配置JAR驱动 -->
 
 	<context id="context1" targetRuntime="MyBatis3">
 		<commentGenerator>
@@ -13,35 +13,29 @@
 		</commentGenerator>
 
 		<jdbcConnection driverClass="com.mysql.jdbc.Driver"
-						connectionURL="jdbc:mysql://rm-j6ca0o19fn5755pu8o.mysql.rds.aliyuncs.com:3306/intra-mirror-prd?useUnicode=true&amp;characterEncoding=UTF-8"
-						userId="intramirror_db" password="Com105980%" /> <!-- JDBC连接 -->
+				connectionURL="jdbc:mysql://rm-uf66f4a55b173k4cwo.mysql.rds.aliyuncs.com:3306/ger_sh_staging_db?useUnicode=true&amp;characterEncoding=UTF-8"
+				userId="sh_staging_db" password="Sh@Intr@mi55o5" /> <!-- JDBC连接 -->
 
 		<javaTypeResolver>
 			<property name="forceBigDecimals" value="false"/> <!-- 是否使用bigDecimal， false可自动转化以下类型(Long, Integer, Short, etc.) -->
 		</javaTypeResolver>
 
 		<javaModelGenerator targetPackage="com.intramirror.product.api.model"
-							targetProject="/Users/dingyifan/Documents/dev/bak/BoutiquePortal/intramirror-root/intramirror-product-service/intramirror-product-service-api/src/main/java" > <!-- 生成实体地址 -->
+				targetProject="D:\intramirror\workspace\BoutiquePortal\intramirror-root\intramirror-product-service\intramirror-product-service-api\src\main\java" > <!-- 生成实体地址 -->
 			<property name="trimStrings" value="true"/> <!-- 设置string时是否使用trim调用 -->
 		</javaModelGenerator>
 
 		<sqlMapGenerator targetPackage="conf.ProductSqlMap"
-						 targetProject="/Users/dingyifan/Documents/dev/bak/BoutiquePortal/intramirror-root/intramirror-product-service/intramirror-product-service-core/src/main/resources" /> <!-- 生成MapXML文件 -->
+				targetProject="D:\intramirror\workspace\BoutiquePortal\intramirror-root\intramirror-product-service\intramirror-product-service-core\src\main\resources" /> <!-- 生成MapXML文件 -->
 
 		<!-- XMLMAPPER,ANNOTATEDMAPPER -->
 		<javaClientGenerator targetPackage="com.intramirror.product.core.mapper"
-							 targetProject="/Users/dingyifan/Documents/dev/bak/BoutiquePortal/intramirror-root/intramirror-product-service/intramirror-product-service-core/src/main/java" type="XMLMAPPER" /> <!-- 生成MAP对应Client -->
+				targetProject="D:\intramirror\workspace\BoutiquePortal\intramirror-root\intramirror-product-service\intramirror-product-service-core\src\main\java" type="XMLMAPPER" /> <!-- 生成MAP对应Client -->
 
-		<table schema="intra-mirror-prd" tableName="api_error_type" domainObjectName="ApiErrorType"
-			   enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
-			   enableSelectByExample="false" selectByExampleQueryId="false" >
+		<table schema="ger_sh_staging_db" tableName="boutique_exception" domainObjectName="BoutiqueException"
+				enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
+				enableSelectByExample="false" selectByExampleQueryId="false" >
 			<property name="useActualColumnNames" value="false"/>
 		</table>
-		<table schema="intra-mirror-prd" tableName="api_error_processing" domainObjectName="ApiErrorProcessing"
-			   enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
-			   enableSelectByExample="false" selectByExampleQueryId="false" >
-			<property name="useActualColumnNames" value="false"/>
-		</table>
-
 	</context>
 </generatorConfiguration>

@@ -78,6 +78,7 @@ public interface ProductMapper {
 
     List<Map<String, Object>> selectDayNoUpdateSum(Map<String,Object> params);
     List<Map<String, Object>> selectDayUpdateSum(Map<String,Object> params);
+    List<ProductWithBLOBs> getProductByParameter(ProductWithBLOBs record);
 
     List<Map<String,Object>> getProductByBrandIDAndColorCode(Map<String,Object> params);
 

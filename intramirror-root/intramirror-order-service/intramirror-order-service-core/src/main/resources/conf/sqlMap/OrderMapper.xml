@@ -109,6 +109,7 @@
         SELECT p.product_id,g.pack_group,g.pack_english_name,lp.stock_Location,lp.stock_location_id,sl.ship_from_location_id, lp.change_flag,
         o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id, s.`size` as size,p.category_id,
         lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
+        lp.shipping_method as shipping_method ,
         lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
         lp.confirmed_at,lp.est_ship_date,lp.packed_at,lp.shipped_at,s.sku_code,usa.address_country_id,b.english_name as brandName,
         if(lp.user_rec_flag=0, l.user_rec_name, lp.user_rec_name) as user_rec_name,
@@ -438,12 +439,15 @@
         lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,s.sku_code,b.english_name
         as brandName,l.user_rec_country as userRecCountry,l.express_type,
         v.vendor_name,
+        if(t.tax_rate = NULL,0,ROUND(t.tax_rate * lp.in_price,2)) as vat,
         CASE WHEN p.spu_id IS NULL THEN p.cover_img ELSE spu.cover_img END AS cover_img,
-        g.english_name as geography_name ,lp.logistics_product_id,v.vendor_id
+        g.english_name as geography_name ,lp.logistics_product_id,v.vendor_id,lp.shipping_method as shippingMethod
         FROM logistics_product lp
         INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
         INNER JOIN `order` o ON ol.order_id = o.order_id
-        INNER JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id and l.enabled = 1
+        INNER JOIN logistics l ON (lp.order_logistics_id = l.order_logistics_id AND l.enabled = 1)
+        LEFT JOIN address_country ac on ac.name = l.user_rec_country
+        LEFT JOIN tax t on (t.address_country_id = ac.address_country_id and t.tax_type = 1)
         INNER JOIN geography g on l.geography_id = g.geography_id
         INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
         INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id

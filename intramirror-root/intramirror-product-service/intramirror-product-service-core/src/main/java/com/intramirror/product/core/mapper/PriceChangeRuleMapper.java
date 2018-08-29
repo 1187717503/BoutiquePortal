@@ -1,7 +1,6 @@
 package com.intramirror.product.core.mapper;
 
 import com.intramirror.product.api.model.PriceChangeRule;
-
 import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.annotations.Param;
@@ -35,11 +34,6 @@ public interface PriceChangeRuleMapper {
      */
     PriceChangeRule selectByPrimaryKey(Long priceChangeRuleId);
 
-    /**
-     * 根据vendorId name 模糊查询
-     * @param priceChangeRuleId
-     * @return
-     */
     List<PriceChangeRule> selectByName(Map<String, Object> map);
 
     List<Map<String, Object>> selectRuleInActive(Map<String, Object> map);
@@ -112,26 +106,81 @@ public interface PriceChangeRuleMapper {
 
     int updateSkuPriceByImPrice();
 
-    /** 修改shop_product.min_sale_price,shop_product.max_sale_price */
+    /**
+     * 修改shop_product.min_sale_price,shop_product.max_sale_price
+     */
     int updateShopProductSalePrice();
 
-    /** 修改product.retail_price */
+    /**
+     * 修改product.retail_price
+     */
     int updateProductRetailPrice();
 
-    /** 修改product.boutique_price */
+    /**
+     * 修改product.boutique_price
+     */
     int updateProductBoutiquePrice();
 
-    /** 修改product.im_price */
+    /**
+     * 修改product.im_price
+     */
     int updateProductImPrice();
 
-    /** 修改product.preview_im_price */
-    int updateProductPreviewPrice(Long vendor_id);
+    /**
+     * 修改product.preview_im_price
+     */
+
+    int deleteSnapshot(@Param("price_change_rule_id") Long price_change_rule_id);
+
+    int updateProductPreviewPrice(@Param(value = "vendor_id") Long vendor_id, @Param(value = "category_type") Integer category_type,
+            @Param("price_change_rule_id") Long price_change_rule_id);
 
     int updateSkuImPrice();
 
-    int clearProductPreviewPrice(@Param(value = "vendor_id") Long vendor_id, @Param(value = "category_type") Integer category_type,@Param("price_change_rule_id") Long price_change_rule_id);
+    int clearProductPreviewPrice(@Param(value = "vendor_id") Long vendor_id, @Param(value = "category_type") Integer category_type,
+            @Param("price_change_rule_id") Long price_change_rule_id);
 
     int updatePriceChangeRulePreviewStatus(@Param(value = "vendor_id") Long vendor_id, @Param(value = "preview_status") Long preview_status,
-            @Param(value = "category_type") Integer category_type,@Param("price_change_rule_id") Long price_change_rule_id);
+            @Param(value = "category_type") Integer category_type, @Param("price_change_rule_id") Long price_change_rule_id);
+
+    List<PriceChangeRule> selectByCondition(PriceChangeRule priceChangeRule);
+
+    /**
+     * 根据price rule id查询对应的preview的im price的值
+     * @param paramsMap
+     * @return
+     */
+    List<Map<String, Object>> selectSnapshotByChangeRuleId(Map<String, Object> paramsMap);
+
+    /**
+     * 更新preview的imprice的值
+     * @param paramsMap
+     */
+    int updateProductImPriceByPrimaryKey(Map<String, Object> paramsMap);
+
+    /**
+     * 更新preview——status 0 非活动折扣 1 活动折扣
+     * @param paramsMap
+     */
+    int updatePriceChangeRuleById(Map<String, Object> paramsMap);
+
+    /**
+     * piliang gengxin
+     * @param productParams
+     */
+    int updateProductImPriceByProductIds(Map<String, Object> productParams);
+
+    int updateSkuPriceBySnapshot(Map<String, Object> params);
+
+    int updateShopProductPriceBySnapshot(Map<String, Object> params);
+
+    int updateProductPriceBySnapshot(Map<String, Object> params);
+
+    int updatePriceBySnapshot(Map<String, Object> params);
+
+    /**
+     * @param productCondition
+     */
+    int updateProductImPriceByConditions(Map<String, Object> productCondition);
 
 }
