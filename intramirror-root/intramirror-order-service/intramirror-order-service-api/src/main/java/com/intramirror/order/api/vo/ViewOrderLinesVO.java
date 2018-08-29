@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 public class ViewOrderLinesVO {
     private String order_line_num;
     private String order_num;
+    private BigDecimal shipping_fee;
     private String created_at_datetime;
     private String confirmed_at_datetime;
     private String packed_at_datetime;
@@ -58,6 +59,14 @@ public class ViewOrderLinesVO {
 
     public void setOrder_num(String order_num) {
         this.order_num = order_num;
+    }
+
+    public BigDecimal getShipping_fee() {
+        return shipping_fee;
+    }
+
+    public void setShipping_fee(BigDecimal shipping_fee) {
+        this.shipping_fee = shipping_fee;
     }
 
     public String getCreated_at_datetime() {
