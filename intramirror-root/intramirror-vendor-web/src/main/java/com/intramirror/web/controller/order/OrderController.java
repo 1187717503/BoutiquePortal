@@ -1,6 +1,7 @@
 package com.intramirror.web.controller.order;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
@@ -101,6 +102,7 @@ public class OrderController extends BaseController {
 
     @Autowired
     private CommonsProperties commonsProperties;
+
 
     /**
      * 获取订单列表
@@ -296,7 +298,10 @@ public class OrderController extends BaseController {
             //计算折扣
             Double salePrice = Double.parseDouble(orderInfo.get("sale_price").toString());
             Double price = Double.parseDouble(orderInfo.get("price").toString());
-            Double inPrice = Double.parseDouble(orderInfo.get("in_price").toString());
+            BigDecimal inPriceDecimal = new BigDecimal(Double.parseDouble(orderInfo.get("in_price").toString()));
+            Double inPrice = inPriceDecimal.doubleValue();
+            orderInfo.put("in_price",inPriceDecimal.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+
 
             BigDecimal sale_price_discount = new BigDecimal((salePrice / price) * 100);
             //				info.put("sale_price_discount",sale_price_discount.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() +" %");
@@ -674,7 +679,21 @@ public class OrderController extends BaseController {
 
         map.put("vendorId", vendor.getVendorId());
 
-        //订单装箱
+        LogisticsProduct logisticsProduct=iLogisticsProductService.selectByOrderLineNum((String)map.get("orderLineNum"));
+        if(logisticsProduct!=null&&logisticsProduct.getShippingMethod()==1){
+            Map<String,Object> containerParam = Maps.newHashMap();
+            containerParam.put("containerId",map.get("containerId"));
+            Map<String,Object> container = containerService.getContainerById(containerParam);
+            if(container!=null){
+                String shipToGeography = (String) container.get("ship_to_geography");
+                if(!"Transit Warehouse".equals(shipToGeography)){
+                    result.setMsg("This order must to be deliveried to transit warehouse,cause buyer choose the shipping method of Fedex.Please delete this carton and create a new carton to transit warehouse.");
+                    infoMap.put("code", StatusType.ORDER_CHECK_ORDER);
+                    result.setInfoMap(infoMap);
+                    return result;
+                }
+            }
+        }
         try {
             result = orderServiceImpl.packingOrder(map);
         } catch (Exception e) {

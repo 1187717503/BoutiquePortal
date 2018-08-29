@@ -2,7 +2,6 @@ package com.intramirror.web.common;
 
 /**
  * Created by dingyifan on 2017/10/17.
- *
  */
 public class CommonProperties {
 
@@ -12,6 +11,10 @@ public class CommonProperties {
     private String appCheckUrl;
 
     private String ruleExcelPath;
+
+    private String priceChangeRulePath;
+
+    private String microServiceProductServer;
 
     public String getAppOrderUrl() {
         return appOrderUrl;
@@ -35,5 +38,21 @@ public class CommonProperties {
 
     public void setRuleExcelPath(String ruleExcelPath) {
         this.ruleExcelPath = ruleExcelPath;
+    }
+
+    public String getPriceChangeRulePath() {
+        return priceChangeRulePath;
+    }
+
+    public void setPriceChangeRulePath(String priceChangeRulePath) {
+        this.priceChangeRulePath = priceChangeRulePath;
+    }
+
+    public String getMicroServiceProductServer() {
+        return microServiceProductServer;
+    }
+
+    public void setMicroServiceProductServer(String microServiceProductServer) {
+        this.microServiceProductServer = microServiceProductServer;
     }
 }

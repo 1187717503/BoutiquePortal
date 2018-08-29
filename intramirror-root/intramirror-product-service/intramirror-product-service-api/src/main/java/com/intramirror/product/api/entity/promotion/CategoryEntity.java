@@ -10,6 +10,16 @@ public class CategoryEntity {
     private int level;
     private Long parentId;
     private Boolean isDel;
+    private String status;
+
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public Boolean getDel() {
         return isDel;

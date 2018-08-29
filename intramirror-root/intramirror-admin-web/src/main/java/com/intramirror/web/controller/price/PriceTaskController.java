@@ -77,8 +77,8 @@ public class PriceTaskController {
                     logger.info("end selectNowActiveRule,{},params:{},activeRules:{}", type, JsonTransformUtil.toJson(params),
                             JsonTransformUtil.toJson(activeRules));
                     priceRuleSynService.syncBoutique(params);
-                    priceRuleSynService.syncIm(params);
-                    priceRuleSynService.syncAllPriceByTable();
+//                    priceRuleSynService.syncIm(params);
+//                    priceRuleSynService.syncAllPriceByTable();
                 }
             }
 

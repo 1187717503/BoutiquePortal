@@ -59,17 +59,27 @@
 
     <select id="queryAllVendor" resultType="java.util.Map" parameterType="java.util.Map">
 
-        select vendor_id,vendor_name,user_id from vendor v where v.enabled = 1
+        select vendor_id,vendor_name,user_id from vendor v where v.enabled = 1 order by vendor_name
+    </select>
+
+    <select id="queryVendorByIds" resultMap="BaseResultMap" parameterType="java.util.Map">
+        select vendor_id,vendor_name from vendor v where v.enabled = 1
+        AND vendor_id IN
+        <foreach collection="ids" item="ids" index="index"
+                 open="(" close=")" separator=",">
+            #{ids}
+        </foreach>
+        ORDER BY vendor_name ASC
     </select>
 
     <select id="queryRuleVendor" resultType="java.util.Map" parameterType="java.util.Map">
 
         select vendor_id,vendor_name,user_id from vendor v where v.vendor_id in (
-            select distinct vendor_id from price_change_rule pcr
-            where pcr.price_type = #{price_type,jdbcType=INTEGER} and pcr.`status` = #{status,jdbcType=INTEGER}
-            <if test="categoryType != null">
-                and pcr.category_type = #{categoryType,jdbcType=INTEGER}
-            </if>
+        select distinct vendor_id from price_change_rule pcr
+        where pcr.price_type = #{price_type,jdbcType=INTEGER} and pcr.`status` = #{status,jdbcType=INTEGER}
+        <if test="categoryType != null">
+            and pcr.category_type = #{categoryType,jdbcType=INTEGER}
+        </if>
         ) and v.enabled = 1
     </select>
 
@@ -101,4 +111,5 @@
             #{vendorId}
         </foreach>
     </select>
+
 </mapper>

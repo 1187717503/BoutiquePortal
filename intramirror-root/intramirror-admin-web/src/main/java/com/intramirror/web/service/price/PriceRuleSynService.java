@@ -30,8 +30,9 @@ public class PriceRuleSynService {
     public void syncBoutique(Long vendorId, int categoryType, Long priceChangeRuleId) throws Exception {
         synchronized (this) {
             logger.info("syncBoutiqueStart,vendorId:{},categoryType:{},priceChangeRuleId:{}", vendorId, categoryType, priceChangeRuleId);
-            iPriceChangeRule.updateVendorPrice(vendorId, categoryType, priceChangeRuleId);
-            this.syncAllPriceByTable();
+//            iPriceChangeRule.updateVendorPrice(vendorId, categoryType, priceChangeRuleId);
+//            this.syncAllPriceByTable();
+            iPriceChangeRule.synUpdateProductPrice(vendorId, categoryType, priceChangeRuleId);
             logger.info("syncBoutiqueEnd,vendorId:{},categoryType:{},priceChangeRuleId:{}", vendorId, categoryType, priceChangeRuleId);
         }
     }
@@ -50,8 +51,9 @@ public class PriceRuleSynService {
     public void syncBoutique(Map<String, Object> params) throws Exception {
         synchronized (this) {
             logger.info("syncBoutiqueStart");
-            iPriceChangeRule.updateVendorPrice(1, params.get("startTime").toString(), params.get("endTime").toString());
-            iPriceChangeRule.updateVendorPrice(2, params.get("startTime").toString(), params.get("endTime").toString());
+            iPriceChangeRule.synUpdateProductPriceByValidFrom(params.get("startTime").toString(), params.get("endTime").toString());
+//            iPriceChangeRule.updateVendorPrice(1, params.get("startTime").toString(), params.get("endTime").toString());
+//            iPriceChangeRule.updateVendorPrice(2, params.get("startTime").toString(), params.get("endTime").toString());
             logger.info("syncBoutiqueEnd");
         }
     }
@@ -109,4 +111,14 @@ public class PriceRuleSynService {
         }
     }
 
+    // boutique pending页面点击preview
+    public void syncPreviewByBoutique(Long vendorId, Long previewStatus, int categoryType, Long priceChangeRuleId, String flag) throws Exception {
+        synchronized (this) {
+            logger.info("SyncPreviewByBoutiqueStart,vendorId:{},previewStatus:{},categoryType:{},priceChangeRuleId:{},flag:{}", vendorId, previewStatus, categoryType,
+                    priceChangeRuleId, flag);
+            iPriceChangeRule.updateProductPreviewPriceByBoutique(vendorId, previewStatus, categoryType, priceChangeRuleId, flag);
+            logger.info("SyncPreviewByBoutiqueEnd,vendorId:{},previewStatus:{},categoryType:{},priceChangeRuleId:{},flag:{}", vendorId, previewStatus, categoryType,
+                    priceChangeRuleId, flag);
+        }
+    }
 }
