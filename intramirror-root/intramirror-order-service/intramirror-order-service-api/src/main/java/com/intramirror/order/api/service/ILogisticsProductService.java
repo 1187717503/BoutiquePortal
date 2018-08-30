@@ -108,5 +108,13 @@ public interface ILogisticsProductService {
 	 */
 	LogisticProductContainer getLogisticProductContainer(LogisticProductContainer logisticProductContainer);
 
+	LogisticsProduct selectByOrderLineNum(String orderLineNum);
+
+	/**
+	 * 根据logisticsProductId查询skuId
+	 * @param logisticsProductId
+	 * @return
+	 */
+	Map<String,Object> getShopProductSku(Long logisticsProductId);
 }
 

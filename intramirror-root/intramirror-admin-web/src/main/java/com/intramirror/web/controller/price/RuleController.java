@@ -10,11 +10,12 @@ import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ public class RuleController {
     private IRuleService iRuleService;
     @Resource(name = "productPriceChangeRule")
     private IPriceChangeRule iPriceChangeRule;
+
     /**
      * 查询vendor不同status规则中包含的season
      * @param ruleStatus
@@ -237,4 +239,51 @@ public class RuleController {
         return resultMessage;
     }
 
+
+    /**
+     * 异步请求刷新当前refresh im price状态
+     * @param price_change_rule_id
+     * @param flag
+     * @param ruleStatus
+     * @return
+     */
+    @RequestMapping(value = "/select/queryRuleRefreshStatus" ,method = RequestMethod.POST)
+    @ResponseBody
+    public ResultMessage queryRuleRefreshStatus(@Param("price_change_rule_id")String price_change_rule_id,@Param("flag")String flag,
+                                                @Param("ruleStatus") String ruleStatus){
+        ResultMessage resultMessage = ResultMessage.getInstance();
+        try{
+
+            if(StringUtils.isBlank(ruleStatus) || StringUtils.isBlank(price_change_rule_id)){
+                return resultMessage.errorStatus().putMsg("info"," params is null !!!");
+            }
+            List<Map<String,Object>> refreshDateMaps = new ArrayList<>();
+            if(StringUtils.isBlank(flag)){
+                //falg 为空查询当前的season的refresh状态
+                Map<String,Object> refreshDateMap =new HashMap<>();
+                //snapshot  update_at ||  refresh IM
+                refreshDateMap = iRuleService.getSnapShotUpdateTime(price_change_rule_id,refreshDateMap);
+                refreshDateMap.put("price_change_rule_id",price_change_rule_id);
+                refreshDateMaps.add(refreshDateMap);
+                resultMessage.successStatus().putMsg("info","success").setData(refreshDateMaps);
+            }
+            if(flag.equals("all")){
+                PriceChangeRule pcrModel = iPriceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
+                if(pcrModel != null){
+                    Map<String,Object> params = new HashMap<>();
+                    params.put("status",ruleStatus);
+                    params.put("vendor_id",pcrModel.getVendorId());
+                    params.put("price_type",pcrModel.getPriceType());
+                    params.put("categoryType",pcrModel.getCategoryType());
+                    refreshDateMaps =  iRuleService.queryRuleByHasSeason(params);
+                }
+                resultMessage.successStatus().putMsg("info","success").setData(refreshDateMaps);
+            }
+        } catch(Exception e){
+            e.printStackTrace();
+            logger.error(" error message : {}",e.getMessage());
+            resultMessage.errorStatus().putMsg("info","error message : " + e.getMessage());
+        }
+        return resultMessage;
+    }
 }

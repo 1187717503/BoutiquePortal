@@ -2,6 +2,7 @@ package com.intramirror.product.core.mapper;
 
 import com.intramirror.product.api.model.Promotion;
 import java.util.List;
+import java.util.Map;
 
 public interface PromotionMapper {
     /**
@@ -47,4 +48,6 @@ public interface PromotionMapper {
      * @mbggenerated
      */
     int updateByPrimaryKey(Promotion record);
+
+    List<Map<String, Object>> selectPromotionByStatus(Map<String, Integer> params);
 }

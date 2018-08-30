@@ -189,4 +189,29 @@
         description = #{description,jdbcType=VARCHAR}
         where promotion_id = #{promotionId,jdbcType=BIGINT}
     </update>
+
+    <select id="selectPromotionByStatus" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+        p.promotion_id AS promotionId
+        FROM
+        t_promotion p
+        INNER JOIN
+        t_promotion_banner pb ON pb.banner_id = p.banner_id
+        AND pb.banner_pos_id = 1
+        AND pb.enabled = 1
+        WHERE
+        p.enabled = 1
+        <if test="status != null">
+            <choose>
+                <when test="status gt 0">
+                    AND p.start_time &lt;= SYSDATE()
+                    ORDER BY p.start_time DESC
+                    LIMIT 1
+                </when>
+                <otherwise>
+                    AND p.start_time &gt; SYSDATE()
+                </otherwise>
+            </choose>
+        </if>
+    </select>
 </mapper>

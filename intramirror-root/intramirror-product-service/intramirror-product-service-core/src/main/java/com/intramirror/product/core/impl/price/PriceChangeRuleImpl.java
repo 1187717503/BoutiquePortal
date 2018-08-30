@@ -1,28 +1,26 @@
-
-
 package com.intramirror.product.core.impl.price;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.gson.Gson;
 import com.intramirror.common.Contants;
 import com.intramirror.common.enums.PriceChangeRuleEnum;
 import com.intramirror.common.enums.SystemPropertyEnum;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.help.StringUtils;
 import com.intramirror.common.utils.DateUtils;
+import com.intramirror.product.api.exception.BusinessException;
+import com.intramirror.product.api.model.ImPriceAlgorithm;
 import com.intramirror.product.api.model.PriceChangeRule;
 import com.intramirror.product.api.model.PriceChangeRuleSeasonGroup;
+import com.intramirror.product.api.model.SnapshotPriceRule;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
 import com.intramirror.product.core.dao.BaseDao;
-import com.intramirror.product.core.mapper.PriceChangeRuleMapper;
-import com.intramirror.product.core.mapper.PriceChangeRuleSeasonGroupMapper;
-import com.intramirror.product.core.mapper.SeasonMapper;
-import com.intramirror.product.core.mapper.SystemPropertyMapper;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.apache.log4j.Logger;
+import com.intramirror.product.core.mapper.*;
+
+import java.util.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service(value = "productPriceChangeRule")
 public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
 
-    private static Logger logger = Logger.getLogger(PriceChangeRuleImpl.class);
+    private static Logger logger = LoggerFactory.getLogger(PriceChangeRuleImpl.class);
 
     private PriceChangeRuleMapper priceChangeRuleMapper;
 
@@ -41,6 +39,12 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     private SystemPropertyMapper systemPropertyMapper;
 
     private PriceChangeRuleSeasonGroupMapper priceChangeRuleSeasonGroupMapper;
+
+    private ImPriceAlgorithmMapper imPriceAlgorithmMapper;
+
+    private ProductMapper productMapper;
+
+    private SnapshotPriceRuleMapper snapshotPriceRuleMapper;
 
     @Override
     public boolean updateVendorPrice(int categoryType, String startTime, String endTime) {
@@ -217,7 +221,6 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
     }
 
     public static void main(String[] args) {
-        System.out.println(JSONObject.toJSON("12".split(",")));
     }
 
     private int updatePriceByVendor(List<Map<String, Object>> paramsList, Map<String, Object> paramsMap) {
@@ -342,12 +345,30 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         return true;
     }
 
+    @Transactional
+    @Override
+    public boolean updateProductPreviewPriceByBoutique(Long vendor_id, Long preview_status, Integer category_type, Long price_change_rule_id, String flag)
+            throws Exception {
+        if (flag.equalsIgnoreCase("all")) {
+            price_change_rule_id = null;
+        }
+        Map<String, Object> paramsMap = new HashMap<>();
+        paramsMap.put("category_type", category_type);
+        paramsMap.put("vendor_id", vendor_id);
+        paramsMap.put("price_change_rule_id", price_change_rule_id);
+        //更新price_change_rule 的 preview——status  为0 非活动折扣 1 活动折扣
+        paramsMap.put("preview_status", preview_status);
+        priceChangeRuleMapper.updatePriceChangeRuleById(paramsMap);//preview_status
+        priceChangeRuleMapper.updateProductImPriceByConditions(paramsMap);//preview_im_price
+        return true;
+    }
+
     @Override
     public boolean updatePreviewPrice(Long vendor_id, Long preview_status, Integer category_type, Long price_change_rule_id, String flag) throws Exception {
 
         if (preview_status.intValue() == 0) {
             if (flag.equalsIgnoreCase("all")) {
-                price_change_rule_id = null;
+                price_change_rule_id = -1L;
             }
             priceChangeRuleMapper.clearProductPreviewPrice(vendor_id, category_type, price_change_rule_id);
             priceChangeRuleMapper.updatePriceChangeRulePreviewStatus(vendor_id, preview_status, category_type, price_change_rule_id);
@@ -361,7 +382,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             paramsMap.put("category_type", category_type);
             paramsMap.put("vendor_id", vendor_id);
             if (flag.equalsIgnoreCase("all")) {
-                price_change_rule_id = null;
+                price_change_rule_id = -1L;
             } else {
                 paramsMap.put("price_change_rule_id", price_change_rule_id);
             }
@@ -386,7 +407,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             paramsList = this.handleMap(new ArrayList<Map<String, Object>>(), selProductRuleMaps, Contants.num_four, selSeasonGroupRuleMaps);
             this.updateProductPreviewImPrice(paramsList, paramsMap);
 
-            priceChangeRuleMapper.updateProductPreviewPrice(vendor_id);
+            priceChangeRuleMapper.updateProductPreviewPrice(vendor_id, category_type, price_change_rule_id);
             priceChangeRuleMapper.updatePriceChangeRulePreviewStatus(vendor_id, preview_status, category_type, price_change_rule_id);
         }
         return true;
@@ -479,11 +500,13 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
                 //                params.put("price_change_rule_id",map.get("price_change_rule_id"));
                 params.put("vendor_id", map.get("vendor_id"));
                 params.put("price_change_rule_id", map.get("price_change_rule_id"));
+                params.put("category_type", map.get("category_type"));
                 priceChangeRuleMapper.updateRuleInActive(params);
             }
 
             for (Map<String, Object> map : selNowRuleMaps) {
                 params.put("price_change_rule_id", map.get("price_change_rule_id"));
+                params.put("category_type", map.get("category_type"));
                 priceChangeRuleMapper.updateRuleActive(params);
             }
         }
@@ -509,6 +532,9 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         seasonMapper = this.getSqlSession().getMapper(SeasonMapper.class);
         systemPropertyMapper = this.getSqlSession().getMapper(SystemPropertyMapper.class);
         priceChangeRuleSeasonGroupMapper = this.getSqlSession().getMapper(PriceChangeRuleSeasonGroupMapper.class);
+        imPriceAlgorithmMapper = this.getSqlSession().getMapper(ImPriceAlgorithmMapper.class);
+        snapshotPriceRuleMapper = this.getSqlSession().getMapper(SnapshotPriceRuleMapper.class);
+        productMapper = this.getSqlSession().getMapper(ProductMapper.class);
 
     }
 
@@ -608,7 +634,7 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         }
         /** end checked 新规则是否存在 */
 
-        this.copyAllRuleByActivePending(ruleByConditionsMaps, to_vendor_id, discount, true, user_id, PriceChangeRuleEnum.PriceType.IM_PRICE.getCode());
+        this.copyAllRuleByActivePending(ruleByConditionsMaps, to_vendor_id, discount, true, user_id, PriceChangeRuleEnum.PriceType.IM_PRICE.getCode(), null);
         resultMessage.successStatus().putMsg("info", "SUCCESS !!!");
         return resultMessage;
     }
@@ -648,7 +674,9 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         /** end checked 该vendor下是否存在该season_code */
 
         Integer price_type = Integer.parseInt(params.get("price_type").toString());
-        Long price_change_rule_id_new = this.copyAllRuleByActivePending(ruleByConditionsMaps, vendor_id, "0", false, user_id, price_type);
+        Long im_price_algorithm_id = Long.parseLong(params.get("im_price_algorithm_id").toString());
+        Long price_change_rule_id_new = this.copyAllRuleByActivePending(ruleByConditionsMaps, vendor_id, "0", false, user_id, price_type,
+                im_price_algorithm_id);
 
         // create price_season_group
         for (String season_code : season_codes) {
@@ -692,14 +720,14 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
 
         // copy
         Long new_price_change_rule_id = this.copyAllRuleByActivePending(activeMaps, params.get("vendor_id").toString(), "0", true,
-                Long.parseLong(params.get("user_id").toString()), Integer.parseInt(params.get("price_type").toString()));
+                Long.parseLong(params.get("user_id").toString()), Integer.parseInt(params.get("price_type").toString()), null);
         logger.info(" new_price_change_rule_id : " + new_price_change_rule_id);
         resultMessage.successStatus().putMsg("info", "success");
         return resultMessage;
     }
 
     private Long copyAllRuleByActivePending(List<Map<String, Object>> ruleByConditionsMaps, String vendor_id, String discount, boolean insert_season_group_flag,
-            Long user_id, Integer priceType) throws Exception {
+            Long user_id, Integer priceType, Long im_price_algorithm_id) throws Exception {
         Long price_change_rule_id_new = 0L;
         for (Map<String, Object> map : ruleByConditionsMaps) {
             String price_change_rule_id = map.get("price_change_rule_id").toString();
@@ -715,6 +743,11 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
             priceChangeRule.setVendorId(Long.parseLong(vendor_id));
             priceChangeRule.setUserId(user_id);
             priceChangeRule.setCategoryType(oldPriceChangeRule.getCategoryType());
+            if (im_price_algorithm_id == null && oldPriceChangeRule.getImPriceAlgorithmId() == null) {
+                logger.error("oldPriceChangeRule.getImPriceAlgorithmId() is null. price_change_rule_id=" + price_change_rule_id);
+                throw new BusinessException("Im price algorithm can not be empty.");
+            }
+            priceChangeRule.setImPriceAlgorithmId(im_price_algorithm_id == null ? oldPriceChangeRule.getImPriceAlgorithmId() : im_price_algorithm_id);
             priceChangeRuleMapper.insert(priceChangeRule);
             price_change_rule_id_new = priceChangeRule.getPriceChangeRuleId();
             /** end copy price_change_rule */
@@ -751,6 +784,14 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
                 seasonMapper.copyPriceChangeRuleSeasonGroup(insert_price_change_rule_season_group_maps);
                 /** end copy price_change_rule_season_group */
             }
+
+            // 添加snapshot_price_rule数据
+            SnapshotPriceRule snapshotPriceRule = new SnapshotPriceRule();
+            snapshotPriceRule.setPriceChangeRuleId(priceChangeRule.getPriceChangeRuleId());
+            snapshotPriceRule.setSaveAt(new Date());
+            snapshotPriceRule.setCreatedAt(new Date());
+            snapshotPriceRule.setStatus(new Byte("0"));
+            snapshotPriceRuleMapper.insertSelective(snapshotPriceRule);
         }
         return price_change_rule_id_new;
     }
@@ -769,6 +810,92 @@ public class PriceChangeRuleImpl extends BaseDao implements IPriceChangeRule {
         return priceChangeRuleMapper.selRuleByVendorPriceType(params);
     }
 
-    ;
+    @Override
 
+    public List<PriceChangeRule> selectByCondition(PriceChangeRule priceChangeRule) {
+        return priceChangeRuleMapper.selectByCondition(priceChangeRule);
+    }
+
+    public int deleteSnapshot(Long price_change_rule_id) {
+        return priceChangeRuleMapper.deleteSnapshot(price_change_rule_id);
+    }
+
+    @Override
+    public List<ImPriceAlgorithm> selectAlgorithmsByConditions(Map<String, Object> params) {
+        return imPriceAlgorithmMapper.selectByParams(params);
+    }
+
+    @Override
+    public ImPriceAlgorithm getAlgorithmById(Long id) {
+        return imPriceAlgorithmMapper.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public boolean synUpdateProductPrice(Long vendor_id, int categoryType, Long price_change_rule_id) throws Exception {
+        synchronized (this) {
+            Map<String, Object> paramsMap = new HashMap<>();
+            paramsMap.put("price_type", PriceChangeRuleEnum.PriceType.SUPPLY_PRICE.getCode());
+            paramsMap.put("preview_status", "1");
+            paramsMap.put("vendor_id", vendor_id);
+            paramsMap.put("category_type", categoryType);
+            paramsMap.put("price_change_rule_id", price_change_rule_id);
+            List<Map<String, Object>> selSeasonGroupRuleMaps = priceChangeRuleMapper.selectSeasonGroupRule(paramsMap);
+
+            updatePrice(selSeasonGroupRuleMaps);
+            this.updateRuleStatus(paramsMap);
+            return true;
+        }
+    }
+
+    @Override
+    public boolean synUpdateProductPriceByValidFrom(String startTime, String endTime) throws Exception {
+        synchronized (this) {
+            logger.info("updateVendorPrice start");
+            Map<String, Object> paramsMap = new HashMap<>();
+            paramsMap.put("price_type", PriceChangeRuleEnum.PriceType.SUPPLY_PRICE.getCode());
+            paramsMap.put("preview_status", "0");
+            paramsMap.put("startTime", startTime);
+            paramsMap.put("endTime", endTime);
+            List<Map<String, Object>> selSeasonGroupRuleMaps = priceChangeRuleMapper.selectSeasonGroupRule(paramsMap);
+
+            updatePrice(selSeasonGroupRuleMaps);
+            this.updateRuleStatus(paramsMap);
+            return true;
+        }
+    }
+
+    private void updatePrice(List<Map<String, Object>> selSeasonGroupRuleMaps) throws BusinessException {
+        List<Long> priceChangeRuleIdList = new ArrayList<>();
+
+        if (selSeasonGroupRuleMaps != null && selSeasonGroupRuleMaps.size() > 0) {
+            for (Map<String, Object> selSeasonGroupRuleMap : selSeasonGroupRuleMaps) {
+                priceChangeRuleIdList.add(Long.parseLong(selSeasonGroupRuleMap.get("price_change_rule_id").toString()));
+            }
+            Map<String, Object> snapshotPriceRuleParams = new HashMap<>();
+            snapshotPriceRuleParams.put("priceChangeRuleIdList", priceChangeRuleIdList);
+            List<SnapshotPriceRule> snapshotPriceRules = snapshotPriceRuleMapper.getSnapshotPriceRuleByPriceChangeRuleIds(snapshotPriceRuleParams);
+            List<Long> snapshotPriceRuleIdList = new ArrayList<>();
+            for (SnapshotPriceRule snapshotPriceRule : snapshotPriceRules) {
+                if (snapshotPriceRule.getUpdatedAt() == null || snapshotPriceRule.getSaveAt().after(snapshotPriceRule.getUpdatedAt())) {
+                    logger.info("snapshotPriceRule SaveAt > UpdatedAt,snapshotPriceRuleId:{}", snapshotPriceRule.getSnapshotPriceRuleId());
+                    throw new BusinessException("Active fail. Unrefreshed data Exists.");
+                }
+                snapshotPriceRuleIdList.add(snapshotPriceRule.getSnapshotPriceRuleId());
+            }
+            Map<String, Object> params = new HashMap<>();
+            params.put("snapshotPriceRuleIdList", snapshotPriceRuleIdList);
+            logger.info("synUpdateSkuPriceBySnapshot,params:{}", new Gson().toJson(params));
+            priceChangeRuleMapper.updateSkuPriceBySnapshot(params);
+            logger.info("synUpdateShopProductPriceBySnapshot,params:{}", new Gson().toJson(params));
+            priceChangeRuleMapper.updateShopProductPriceBySnapshot(params);
+            logger.info("synUpdateProductPriceBySnapshot,params:{}", new Gson().toJson(params));
+            priceChangeRuleMapper.updateProductPriceBySnapshot(params);
+            logger.info("synUpdateProductPrice is end");
+        }
+    }
+
+    @Override
+    public Map<String, Object> querySnapShotTimeByRuleId(Object id) {
+        return seasonMapper.querySnapShotTimeByRuleId(id);
+    }
 }

@@ -43,6 +43,8 @@ public class Tag {
      *
      * @mbggenerated
      */
+    private Long vendorId;
+    private Integer tagType;
     public Long getTagId() {
         return tagId;
     }
@@ -129,5 +131,21 @@ public class Tag {
      */
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public Long getVendorId() {
+        return vendorId;
+    }
+
+    public void setVendorId(Long vendorId) {
+        this.vendorId = vendorId;
+    }
+
+    public Integer getTagType() {
+        return tagType;
+    }
+
+    public void setTagType(Integer tagType) {
+        this.tagType = tagType;
     }
 }

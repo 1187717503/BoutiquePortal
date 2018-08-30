@@ -1,35 +1,25 @@
 package com.intramirror.product.core.impl.promotion;
 
 import com.alibaba.fastjson.JSONObject;
-import com.intramirror.product.api.entity.promotion.BrandEntity;
-import com.intramirror.product.api.entity.promotion.BrandSort;
-import com.intramirror.product.api.entity.promotion.CategoryEntity;
-import com.intramirror.product.api.entity.promotion.CategorySort;
-import com.intramirror.product.api.entity.promotion.SortPromotion;
-import com.intramirror.product.api.entity.promotion.VendorSort;
+import com.intramirror.product.api.entity.promotion.*;
 import com.intramirror.product.api.enums.PromotionRuleType;
 import com.intramirror.product.api.enums.SortColumn;
 import com.intramirror.product.api.exception.BusinessException;
-import com.intramirror.product.api.model.Category;
-import com.intramirror.product.api.model.Promotion;
-import com.intramirror.product.api.model.PromotionBrandHot;
-import com.intramirror.product.api.model.PromotionExclude;
-import com.intramirror.product.api.model.PromotionInclude;
-import com.intramirror.product.api.model.PromotionRule;
-import com.intramirror.product.api.model.PromotionRuleDetail;
+import com.intramirror.product.api.model.*;
 import com.intramirror.product.api.service.promotion.IPromotionService;
 import com.intramirror.product.core.mapper.CategoryMapper;
 import com.intramirror.product.core.mapper.PromotionBrandHotMapper;
 import com.intramirror.product.core.mapper.PromotionMapper;
 import com.intramirror.product.core.mapper.PromotionRuleMapper;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created on 2018/1/4.
@@ -75,36 +65,55 @@ public class PromotionServiceImpl implements IPromotionService {
         } else {
             promotionRuleMapper.insertExcludeRule(rule);
         }
-        insertRuleDetailByRule(rule, ruleType);
+        //        insertRuleDetailByRule(rule, ruleType);
 
+        //update t_promotion [save_at]
+        promotionRuleMapper.updatePromotionSaveTime(rule.getPromotionId());
         return rule;
     }
 
     @Transactional
     @Override
-    public boolean processImportPromotionRule(List<PromotionRule> listRule) {
+    public boolean processImportPromotionRule(Integer type, List<PromotionRule> listRule) {
         LOGGER.info("Start to save <<import>> promotion include rule.");
-        for (PromotionRule rule : listRule) {
-            promotionRuleMapper.insertIncludeRule(rule);
+        if (type.equals(0)) {
+            for (PromotionRule rule : listRule) {
+                promotionRuleMapper.insertIncludeRule(rule);
+                //update t_promotion [save_at]
+                promotionRuleMapper.updatePromotionSaveTime(rule.getPromotionId());
+            }
+        } else {
+            for (PromotionRule rule : listRule) {
+                promotionRuleMapper.insertExcludeRule(rule);
+                //update t_promotion [save_at]
+                promotionRuleMapper.updatePromotionSaveTime(rule.getPromotionId());
+            }
         }
+
+        LOGGER.info("==Jian processImportPromotionRule== Type:[{}]  Count:[{}]", type, listRule.size());
         return true;
     }
 
     @Transactional
     @Override
-    public Boolean removePromotionRule(Long ruleId, PromotionRuleType ruleType) {
+    public Boolean removePromotionRule(List<Long> ruleIds, PromotionRuleType ruleType) {
+        String tableName = "t_promotion_include_rule";
         Boolean flag = false;
         if (ruleType == PromotionRuleType.INCLUDE_RULE) {
-            if (promotionRuleMapper.removeIncludeRule(ruleId) > 0) {
-                flag = promotionRuleMapper.removeIncludeRuleDetail(ruleId) > 0;
-            }
-
+            //            if (promotionRuleMapper.removeIncludeRule(ruleId) > 0) {
+            //                flag = promotionRuleMapper.removeIncludeRuleDetail(ruleId) > 0;
+            //            }
+            flag = promotionRuleMapper.removeIncludeRule(ruleIds) > 0;
+            tableName = "t_promotion_include_rule";
         } else {
-            if (promotionRuleMapper.removeExcludeRule(ruleId) > 0) {
-                flag = promotionRuleMapper.removeExcludeRuleDetail(ruleId) > 0;
-            }
+            //            if (promotionRuleMapper.removeExcludeRule(ruleId) > 0) {
+            //                flag = promotionRuleMapper.removeExcludeRuleDetail(ruleId) > 0;
+            //            }
+            flag = promotionRuleMapper.removeExcludeRule(ruleIds) > 0;
+            tableName = "t_promotion_exclude_rule";
         }
 
+        promotionRuleMapper.updatePromotionSaveTimes(tableName, ruleIds);
         return flag;
     }
 
@@ -113,14 +122,16 @@ public class PromotionServiceImpl implements IPromotionService {
     public Boolean updatePromotionRule(PromotionRuleType ruleType, PromotionRule rule) {
         Boolean flag;
         if (ruleType == PromotionRuleType.INCLUDE_RULE) {
-            flag = promotionRuleMapper.removeIncludeRuleDetail(rule.getRuleId()) > 0;
-            flag = (flag & promotionRuleMapper.updateIncludeRule(rule) > 0);
+            //            flag = promotionRuleMapper.removeIncludeRuleDetail(rule.getRuleId()) > 0;
+            flag = promotionRuleMapper.updateIncludeRule(rule) > 0;
 
         } else {
-            flag = promotionRuleMapper.removeExcludeRuleDetail(rule.getRuleId()) > 0;
-            flag = (flag & promotionRuleMapper.updateExcludeRule(rule) > 0);
+            //            flag = promotionRuleMapper.removeExcludeRuleDetail(rule.getRuleId()) > 0;
+            flag = promotionRuleMapper.updateExcludeRule(rule) > 0;
         }
-        return flag & (insertRuleDetailByRule(rule, ruleType).size() > 0);
+
+        promotionRuleMapper.updatePromotionSaveTime(rule.getPromotionId());
+        return flag;
 
     }
 
@@ -183,6 +194,7 @@ public class PromotionServiceImpl implements IPromotionService {
             result = updateSimpleSort(promotionId, sortColumn, items);
             break;
         }
+        updatePromotionSaveTime(promotionId);
         return result;
     }
 
@@ -346,6 +358,7 @@ public class PromotionServiceImpl implements IPromotionService {
 
     @Override
     public Integer saveImgForBanner(Promotion promotion) {
+        promotionRuleMapper.updatePromotionSaveTime(promotion.getPromotionId());
         return promotionMapper.updateByPrimaryKeySelective(promotion);
     }
 
@@ -359,6 +372,7 @@ public class PromotionServiceImpl implements IPromotionService {
         return promotionBrandHotMapper.getPromotionBrandHot(promotionId);
     }
 
+    @Transactional
     @Override
     public Integer updatePromotionBrandHot(List<PromotionBrandHot> listPromotionBrandHot) {
         Long promotionId = 0L;
@@ -367,6 +381,7 @@ public class PromotionServiceImpl implements IPromotionService {
         }
 
         if (promotionId != 0) {
+            promotionRuleMapper.updatePromotionSaveTime(promotionId);
             promotionBrandHotMapper.deleteAll(promotionId);
             return promotionBrandHotMapper.insertList(listPromotionBrandHot);
         } else {
@@ -450,6 +465,9 @@ public class PromotionServiceImpl implements IPromotionService {
         }
 
         removeExcludeProduct(promotionId);
+
+        //更新刷新时间
+        promotionRuleMapper.updatePromotionRefreshAt(promotionId);
     }
 
     private void addProductForIncludeRule(Long promotionId, Long productId) {
@@ -543,5 +561,55 @@ public class PromotionServiceImpl implements IPromotionService {
             addProductsForIncludeRule(promotion.getPromotionId(), productIds);
             removeExcludeProduct(promotion.getPromotionId());
         }
+    }
+
+    @Override
+    public List<Map<String, Object>> getPromotionBoutiqueHasRuleList(Long promotionId) {
+        return promotionRuleMapper.getPromotionBoutiqueHasRuleList(promotionId);
+    }
+
+    @Override
+    public List<Map<String, Object>> getPromotionBoutiqueProductCountBySeason(Map<String, Object> params) {
+        return promotionRuleMapper.getPromotionBoutiqueProductCountBySeason(params);
+    }
+
+    @Override
+    public Integer getPromotionBoutiqueExcludeProductCount(Long promotionId) {
+        return promotionRuleMapper.getPromotionBoutiqueExcludeProductCount(promotionId);
+    }
+
+    @Override
+    public List<Map<String, Object>> listSeasonIncludeRulePromotion(Map<String, Object> params) {
+        return promotionRuleMapper.listSeasonIncludeRulePromotion(params);
+    }
+
+    @Override
+    public List<Map<String, Object>> listSeasonExcludeRulePromotion(Map<String, Object> params) {
+        return promotionRuleMapper.listSeasonExcludeRulePromotion(params);
+    }
+
+    @Override
+    public int countSeasonIncludeRulePromotion(Map<String, Object> params) {
+        return promotionRuleMapper.countSeasonIncludeRulePromotion(params);
+    }
+
+    @Override
+    public int countSeasonExcludeRulePromotion(Map<String, Object> params) {
+        return promotionRuleMapper.countSeasonExcludeRulePromotion(params);
+    }
+
+    @Override
+    public int updatePromotionSaveTime(Long promotionId) {
+        return promotionRuleMapper.updatePromotionSaveTime(promotionId);
+    }
+
+    @Override
+    public List<Long> getExcludeProductGroupByTagId(Long tagId) {
+        return promotionRuleMapper.getExcludeProductGroupByTagId(tagId);
+    }
+
+    @Override
+    public List<Map<String, Object>> selectPromotionByStatus(Map<String, Integer> params) {
+        return promotionMapper.selectPromotionByStatus(params);
     }
 }

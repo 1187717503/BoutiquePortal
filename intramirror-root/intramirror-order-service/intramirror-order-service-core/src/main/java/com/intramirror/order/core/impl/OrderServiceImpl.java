@@ -359,7 +359,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
 
     }
 
-    public void addProductProperty(List<CancelOrderVO> orderCancelList) {
+    /*public void addProductProperty(List<CancelOrderVO> orderCancelList) {
         Set<Long> ids = new HashSet<>();
         for(CancelOrderVO vo :orderCancelList){
             ids.add(vo.getProduct_id());
@@ -392,7 +392,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
                 }
             }
         }
-    }
+    }*/
 
     @Override
     public void addProductPropertyMap(List<Map<String, Object>> orderList){

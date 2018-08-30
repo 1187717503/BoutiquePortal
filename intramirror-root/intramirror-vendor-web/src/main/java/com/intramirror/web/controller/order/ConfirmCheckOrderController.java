@@ -7,20 +7,19 @@ import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.product.api.model.Sku;
 import com.intramirror.product.api.service.IProductService;
-import com.intramirror.product.api.service.ProductPropertyService;
 import com.intramirror.product.api.service.SkuService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.impl.Base64Codec;
+
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -34,6 +33,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/order")
 public class ConfirmCheckOrderController {
 
+    private static final Logger logger = LoggerFactory.getLogger(ConfirmCheckOrderController.class);
+
     private String jwtSecret = "qazxswedcvfr543216yhnmju70plmjkiu89";
 
     //@Resource(name = "userServiceImpl")
@@ -43,10 +44,9 @@ public class ConfirmCheckOrderController {
     private IProductService productService;
 
     @Autowired
-    ILogisticsProductService logisticsProductServiceImpl;
-
-    @Autowired
     IOrderService orderService;
+    @Autowired
+    private ILogisticsProductService logisticsProductServiceImpl;
 
     /**
      * Wang
@@ -119,7 +119,7 @@ public class ConfirmCheckOrderController {
         }
 
         Sku sku = null;
-        List<Map<String, Object>> mapList = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> mapList = new ArrayList<>();
         if (barCode != null) {
             sku = skuService.getSkuBySkuCode(barCode);
             //            result.put("sku", sku);
@@ -131,11 +131,12 @@ public class ConfirmCheckOrderController {
         if (sku != null || (mapList != null && mapList.size() > 0)) {
             result.successStatus();
 
-            try {
+            try{
                 if (logisticsProductId != null) {
                     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
                     LogisticsProduct logis = logisticsProductServiceImpl.selectById(Long.parseLong(logisticsProductId));
+                    //LogisticsProduct logis = logisticsProductService.selectById(Long.parseLong(logisticsProductId));
                     Map<String, Object> maps = orderService.getOrderLogisticsInfoByIdWithSql(Long.parseLong(logisticsProductId));
                     String mapBrandId = maps.get("brandID") == null ? "" : maps.get("brandID").toString();
                     String mapColorCode = maps.get("colorCode") == null ? "" : maps.get("colorCode").toString();
@@ -155,7 +156,11 @@ public class ConfirmCheckOrderController {
                                 upLogis.setStock_location_id(stockLocationId);
                             }
                             upLogis.setConfirmed_at(Helper.getCurrentUTCTime());
+
                             logisticsProductServiceImpl.updateByLogisticsProduct(upLogis);
+                            //upLogis.setOrder_line_num(logis.getOrder_line_num());
+                            //确认订单
+                            //logisticsProductService.confirmOrder(upLogis);
 
                         } else {
                             result.setMsg("Order does not exist,logisticsProductId:" + logisticsProductId);
@@ -164,15 +169,12 @@ public class ConfirmCheckOrderController {
                         result.errorStatus().putMsg("error", "noMatching parm").setData("noMatching parm");
                         return result;
                     }
-
                 }
-
-            } catch (Exception e) {
-                e.printStackTrace();
+            }catch (Exception e){
+                result.errorStatus().setMsg(e.getMessage());
+                return result;
             }
-
         }
-
         return result;
     }
 

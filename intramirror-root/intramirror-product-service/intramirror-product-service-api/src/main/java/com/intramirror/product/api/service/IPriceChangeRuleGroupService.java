@@ -53,9 +53,12 @@ public interface IPriceChangeRuleGroupService {
     
     /**
      * 根据条件 查询
-     * @param PriceChangeRuleGroup
+     * @param record
      * @return
      */
     List<PriceChangeRuleGroup>  selectByParameter(PriceChangeRuleGroup record);
-    
+
+    PriceChangeRuleGroup selectByPrimaryKey(Long id);
+
+    List<PriceChangeRuleGroup> getChangeRulesByTagId(Long tagId);
 }

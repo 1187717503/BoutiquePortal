@@ -21,5 +21,7 @@ public interface VendorService {
 
     List<Map<String, Object>> getAllVendorCountryById(String[] vendorIds);
 
+    List<Vendor> getVendorByIds(List<Long> ids);
+
 
 }
