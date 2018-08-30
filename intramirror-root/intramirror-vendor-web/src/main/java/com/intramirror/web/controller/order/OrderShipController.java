@@ -326,7 +326,8 @@ public class OrderShipController extends BaseController {
 
 
         try {
-            map.put("vendorId", vendor.getVendorId());
+            //map.put("vendorId", vendor.getVendorId());
+            map.put("vendorIds", Arrays.asList(vendor.getVendorId()));
 
             Map<String, Object> getShipment = new HashMap<>();
             getShipment.put("shipmentId", Long.parseLong(map.get("shipment_id").toString()));
