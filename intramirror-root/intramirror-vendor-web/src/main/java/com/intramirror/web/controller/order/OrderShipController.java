@@ -313,21 +313,22 @@ public class OrderShipController extends BaseController {
             return result;
         }
 
-        Vendor vendor = null;
+        List<Vendor> vendors = new ArrayList<>();
         try {
-            vendor = vendorService.getVendorByUserId(user.getUserId());
+            vendors = vendorService.getVendorsByUserId(user.getUserId());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (vendor == null) {
+        if (CollectionUtils.isEmpty(vendors)) {
             result.setMsg("Please log in again");
             return result;
         }
 
+        List<Long> vendorIds = vendors.stream().map(Vendor::getVendorId).collect(Collectors.toList());
 
         try {
             //map.put("vendorId", vendor.getVendorId());
-            map.put("vendorIds", Arrays.asList(vendor.getVendorId()));
+            map.put("vendorIds", vendorIds);
 
             Map<String, Object> getShipment = new HashMap<>();
             getShipment.put("shipmentId", Long.parseLong(map.get("shipment_id").toString()));
