@@ -257,7 +257,7 @@ public class ShipMailSendThread implements Runnable {
                     transforNullValue(order.getStock_location()),
                     transforNullValue(order.getOrder_line_num()),
                     transforNullValue(order.getOrder_num()),
-                    transforNullValue(order.getShipping_fee()),
+                    transforNullValue((order.getShipping_fee().multiply(order.getCurrent_rate())).setScale(2,BigDecimal.ROUND_HALF_UP)),
                     transforNullValue(order.getDesigner_id()),
                     transforNullValue(order.getBrand()),
                     transforNullValue(order.getL1_category()),
