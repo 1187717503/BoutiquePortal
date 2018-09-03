@@ -8,6 +8,7 @@ import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.product.api.model.Sku;
 import com.intramirror.product.api.service.IProductService;
 import com.intramirror.product.api.service.SkuService;
+import com.intramirror.web.service.LogisticsProductService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
@@ -46,7 +47,7 @@ public class ConfirmCheckOrderController {
     @Autowired
     IOrderService orderService;
     @Autowired
-    private ILogisticsProductService logisticsProductServiceImpl;
+    private LogisticsProductService logisticsProductService;
 
     /**
      * Wang
@@ -135,8 +136,8 @@ public class ConfirmCheckOrderController {
                 if (logisticsProductId != null) {
                     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-                    LogisticsProduct logis = logisticsProductServiceImpl.selectById(Long.parseLong(logisticsProductId));
-                    //LogisticsProduct logis = logisticsProductService.selectById(Long.parseLong(logisticsProductId));
+                    //LogisticsProduct logis = logisticsProductServiceImpl.selectById(Long.parseLong(logisticsProductId));
+                    LogisticsProduct logis = logisticsProductService.selectById(Long.parseLong(logisticsProductId));
                     Map<String, Object> maps = orderService.getOrderLogisticsInfoByIdWithSql(Long.parseLong(logisticsProductId));
                     String mapBrandId = maps.get("brandID") == null ? "" : maps.get("brandID").toString();
                     String mapColorCode = maps.get("colorCode") == null ? "" : maps.get("colorCode").toString();
@@ -157,10 +158,10 @@ public class ConfirmCheckOrderController {
                             }
                             upLogis.setConfirmed_at(Helper.getCurrentUTCTime());
 
-                            logisticsProductServiceImpl.updateByLogisticsProduct(upLogis);
-                            //upLogis.setOrder_line_num(logis.getOrder_line_num());
+                            //logisticsProductServiceImpl.updateByLogisticsProduct(upLogis);
+                            upLogis.setOrder_line_num(logis.getOrder_line_num());
                             //确认订单
-                            //logisticsProductService.confirmOrder(upLogis);
+                            logisticsProductService.confirmOrder(upLogis);
 
                         } else {
                             result.setMsg("Order does not exist,logisticsProductId:" + logisticsProductId);
