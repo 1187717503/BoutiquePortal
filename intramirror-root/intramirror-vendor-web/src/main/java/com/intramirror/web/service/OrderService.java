@@ -1,10 +1,7 @@
 package com.intramirror.web.service;
 
 import java.text.MessageFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.intramirror.order.api.model.*;
 import org.apache.commons.lang3.StringUtils;
@@ -586,7 +583,7 @@ public class OrderService {
 			//如果当前数据为container里面的最后一个商品删除container与shipment关联
 			Long vendor_id = list.get(0).getVendor_id();
 			int status = OrderStatusType.READYTOSHIP;
-			List<Map<String, Object>> orderMap = orderService.getOrderListByStatusAndContainerId(containerId, status, vendor_id);
+			List<Map<String, Object>> orderMap = orderService.getOrderListByStatusAndContainerId(containerId, status, Arrays.asList(vendor_id));
 			if (orderMap == null || orderMap.size() == 0){
 				Map<String, Object> uMap = new HashMap<>();
 				uMap.put("container_id", containerId);

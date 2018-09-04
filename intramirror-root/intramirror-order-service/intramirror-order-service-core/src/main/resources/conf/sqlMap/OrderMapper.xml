@@ -310,7 +310,11 @@
         WHERE
               c.container_id = #{containerId,jdbcType=BIGINT}
               AND lp.`status` = #{status,jdbcType=BIGINT}
-              AND v.vendor_id = #{vendorId,jdbcType=BIGINT}
+              AND v.vendor_id IN
+              <foreach collection="vendorIds" item="vendorId" open="(" separator="," close=")">
+                   #{vendorId}
+              </foreach>
+
         GROUP BY lp.order_line_num
     </select>
 

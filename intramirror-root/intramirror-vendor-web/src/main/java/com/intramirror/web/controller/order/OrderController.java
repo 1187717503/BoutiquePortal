@@ -595,24 +595,26 @@ public class OrderController extends BaseController {
             return result;
         }
 
-        Vendor vendor = null;
+        List<Vendor> vendors = null;
         try {
-            vendor = vendorService.getVendorByUserId(user.getUserId());
+            vendors = vendorService.getVendorsByUserId(user.getUserId());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (vendor == null) {
+        if (CollectionUtils.isEmpty(vendors)) {
             result.setMsg("Please log in again");
             return result;
         }
+
+        List<Long> vendorIds = vendors.stream().map(Vendor::getVendorId).collect(Collectors.toList());
 
         try {
             //获取PackOrderorder列表
             logger.info(MessageFormat
                     .format("order getPackOrderList 调用接口getOrderListByStatusAndContainerId 获取箱子内订单列表 入参 containerId:{0},status:{1},vendorId:{2}",
-                            map.get("containerId").toString(), map.get("status").toString(), vendor.getVendorId()));
+                            map.get("containerId").toString(), map.get("status").toString(), vendorIds.toArray()));
             List<Map<String, Object>> packList = orderService.getOrderListByStatusAndContainerId(Integer.parseInt(map.get("containerId").toString()),
-                    Integer.parseInt(map.get("status").toString()), vendor.getVendorId());
+                    Integer.parseInt(map.get("status").toString()), vendorIds);
 
             //			if(packList != null && packList.size() > 0){
             //				//遍历获取所有商品ID
