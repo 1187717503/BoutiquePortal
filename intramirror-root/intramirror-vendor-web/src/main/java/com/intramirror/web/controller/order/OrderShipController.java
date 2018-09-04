@@ -582,7 +582,9 @@ public class OrderShipController extends BaseController {
         ResultMessage result = new ResultMessage();
         result.errorStatus();
 
-        if (map == null || map.size() == 0 || map.get("status") == null || map.get("shipment_id") == null) {
+        if (map == null || map.size() == 0 || map.get("status") == null
+                || map.get("shipment_id") == null
+                || map.get("vendorId") == null) {
             result.setMsg("Parameter cannot be empty");
             return result;
         }
@@ -603,6 +605,15 @@ public class OrderShipController extends BaseController {
             result.setMsg("Please log in again");
             return result;
         }
+
+        Long vendorId = Long.valueOf(map.get("vendorId").toString());
+
+        if (map.get("shipment_id") == null) {
+            result.setMsg("Parameter cannot be empty");
+            return result;
+        }
+
+        //List<Long> vendorIds = vendors.stream().map(Vendor::getVendorId).collect(Collectors.toList());
 
         //获取ddt number
         long shipment_id = Long.parseLong(map.get("shipment_id").toString());
@@ -625,7 +636,7 @@ public class OrderShipController extends BaseController {
                     newInvoice.setDdtNum(maxDdtNo);
                     newInvoice.setInvoiceNum("");
                     newInvoice.setShipmentId(shipment_id);
-                    newInvoice.setVendorId(vendor.getVendorId());
+                    newInvoice.setVendorId(vendorId);
                     newInvoice.setInvoiceDate(new Date());
                     newInvoice.setVatNum("");
                     invoiceService.insertSelective(newInvoice);
@@ -641,7 +652,7 @@ public class OrderShipController extends BaseController {
         }
 
         try {
-            map.put("vendorId", vendor.getVendorId());
+            map.put("vendorIds", Arrays.asList(vendorId));
             Map<String, Object> getShipment = new HashMap<>();
             getShipment.put("shipmentId", shipment_id);
 
@@ -800,7 +811,9 @@ public class OrderShipController extends BaseController {
         ResultMessage result = new ResultMessage();
         result.errorStatus();
 
-        if (map == null || map.size() == 0 || map.get("status") == null || map.get("shipment_id") == null) {
+        if (map == null || map.size() == 0 || map.get("status") == null
+                || map.get("shipment_id") == null
+                || map.get("vendorId") == null) {
             result.setMsg("Parameter cannot be empty");
             return result;
         }
@@ -821,6 +834,8 @@ public class OrderShipController extends BaseController {
             result.setMsg("Please log in again");
             return result;
         }
+
+        Long vendorId = Long.valueOf(map.get("vendorId").toString());
 
         TransitWarehouseInvoiceVO transitWarehouseInvoiceVO = new TransitWarehouseInvoiceVO();
         long shipment_id = Long.parseLong(map.get("shipment_id").toString());
@@ -871,7 +886,7 @@ public class OrderShipController extends BaseController {
             newInvoice.setDdtNum(maxDdtNo);
             newInvoice.setInvoiceNum("");
             newInvoice.setShipmentId(shipment_id);
-            newInvoice.setVendorId(vendor.getVendorId());
+            newInvoice.setVendorId(vendorId);
             newInvoice.setInvoiceDate(new Date());
             newInvoice.setVatNum("");
             newInvoice.setType(2);
@@ -900,7 +915,7 @@ public class OrderShipController extends BaseController {
             resultMap.put("contactPersonName", shop.getContactPersonName());
         }
 
-        map.put("vendorId", vendor.getVendorId());
+        map.put("vendorIds", Arrays.asList(vendorId));
         Map<String, Object> getShipment = new HashMap<>();
         getShipment.put("shipmentId", shipment_id);
 
@@ -974,7 +989,7 @@ public class OrderShipController extends BaseController {
         shipmentIds.add(shipment_id);
         Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("status", map.get("status"));
-        conditionMap.put("vendorId", vendor.getVendorId());
+        conditionMap.put("vendorId", vendorId);
         conditionMap.put("shipmentIds", shipmentIds);
         conditionMap.put("packGroup", 1);
         List<Map<String, Object>> chinaList = orderService.getOrderListByShipmentId(conditionMap);
@@ -1231,7 +1246,8 @@ public class OrderShipController extends BaseController {
         ResultMessage result = new ResultMessage();
         result.errorStatus();
 
-        if (map == null || map.size() == 0 || map.get("status") == null || map.get("shipment_id") == null) {
+        if (map == null || map.size() == 0 || map.get("status") == null
+                || map.get("shipment_id") == null) {
             result.setMsg("Parameter cannot be empty");
             return result;
         }
@@ -1242,19 +1258,21 @@ public class OrderShipController extends BaseController {
             return result;
         }
 
-        Vendor vendor = null;
+        List<Vendor> vendors = null;
         try {
-            vendor = vendorService.getVendorByUserId(user.getUserId());
+            vendors = vendorService.getVendorsByUserId(user.getUserId());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (vendor == null) {
+        if (CollectionUtils.isEmpty(vendors)) {
             result.setMsg("Please log in again");
             return result;
         }
 
+        List<Long> vendorIds = vendors.stream().map(Vendor::getVendorId).collect(Collectors.toList());
+
         try {
-            map.put("vendorId", vendor.getVendorId());
+            map.put("vendorIds", vendorIds);
 
             Map<String, Object> getShipment = new HashMap<String, Object>();
             getShipment.put("shipmentId", Long.parseLong(map.get("shipment_id").toString()));
