@@ -136,6 +136,15 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 		</if>
 		WHERE shipment_id=#{shipmentId,jdbcType=BIGINT}
 	</update>
+	<!--修改shipment step-->
+	<update id="updatePrintStep" parameterType="java.util.Map">
+		UPDATE shipment
+		SET `print_step` = #{print_step,jdbcType=BIGINT}
+		<if test="resetStep != null">
+			, print_step = 0
+		</if>
+		WHERE shipment_id=#{shipment_id,jdbcType=BIGINT}
+	</update>
 	
 <!-- 	根据shipmentId查询shipment对象 -->
 	<select id="selectShipmentById" resultMap="BaseResultMap" parameterType="java.util.Map">
@@ -213,7 +222,7 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 		</foreach>
 		GROUP BY s.shipment_id
 	</select>
-	<select id="queryShipmentAwbUrlByAwbNum" parameterType="string">
+	<select id="queryShipmentAwbUrlByAwbNum" parameterType="string" resultType="string">
 		select doc_url from logistics_request WHERE awb_no = #{awbNum} and is_deleted = 0
 	</select>
 </mapper>

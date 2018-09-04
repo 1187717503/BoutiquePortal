@@ -136,4 +136,6 @@ public interface ShipmentMapper {
 	List<Shipment> getShipmentListByAwbNo(List<String> awbNos);
 
 	String queryShipmentAwbUrlByAwbNum(String awbNum);
+
+	int updatePrintStep(Map<String, Object> updateStepMap);
 }

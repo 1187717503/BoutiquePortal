@@ -184,4 +184,5 @@ public interface IShipmentService {
 
 	String queryAwbUrlByAwbNum(String awbNum);
 
+	int updatePrintStep(Map<String, Object> updateStepMap);
 }

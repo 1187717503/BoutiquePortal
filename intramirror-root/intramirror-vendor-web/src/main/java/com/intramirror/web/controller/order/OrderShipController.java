@@ -278,7 +278,7 @@ public class OrderShipController extends BaseController {
 
         return result;
     }
-    @RequestMapping(value = "",method = RequestMethod.POST)
+    @RequestMapping(value = "/updateStep",method = RequestMethod.POST)
     @ResponseBody
     public ResultMessage updateStep(@RequestBody Map<String, Object> map, HttpServletRequest httpRequest){
         logger.info(" order update step 入参:"+new Gson().toJson(map));
@@ -296,10 +296,22 @@ public class OrderShipController extends BaseController {
             result.setMsg("Please log in again");
             return result;
         }
+        Integer printStep = Integer.valueOf(map.get("print_step").toString());
         Map<String, Object> getShipment = new HashMap<>();
         getShipment.put("shipmentId", shipmentId);
-        //根据shipmentId 获取shipment 相关信息及物流第一段类型
+        //根据shipmentId 获取shipment
         Shipment shipment = iShipmentService.selectShipmentById(getShipment);
+        if(printStep - shipment.getPrintStep() > 1){
+            result.setMsg("Print step is incorrect");
+            return result;
+        }
+        Map<String, Object> updateStepMap = new HashMap<>();
+        updateStepMap.put("print_step",printStep);
+        updateStepMap.put("shipment_id",shipmentId);
+        int re = iShipmentService.updatePrintStep(updateStepMap);
+        if(re >0){
+            result.setMsg("update step success");
+        }
         return result;
     }
 
