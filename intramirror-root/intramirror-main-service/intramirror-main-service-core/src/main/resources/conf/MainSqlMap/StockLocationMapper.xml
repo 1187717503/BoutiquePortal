@@ -272,6 +272,22 @@
     select * from stock_location WHERE vendor_id = #{vendorId,jdbcType=BIGINT} AND enabled = 1;
   </select>
 
+
+  <resultMap id="GetStockLocationByVendorIdsResultMap" type="com.intramirror.main.api.vo.StockLocationVO">
+
+    <id column="location_id" jdbcType="BIGINT" property="locationId" />
+    <result column="stock_location" jdbcType="VARCHAR" property="stockLocation" />
+    <result column="vendor_id" jdbcType="BIGINT" property="vendorId" />
+  </resultMap>
+  <select id="getStockLocationByVendorIds" parameterType="java.util.ArrayList" resultMap="GetStockLocationByVendorIdsResultMap">
+    select location_id,stock_location,vendor_id from stock_location WHERE
+    vendor_id in
+    <foreach item="vendorId" index="index" collection="list" open="(" separator="," close=")">
+      #{vendorId}
+    </foreach>
+    AND enabled = 1;
+  </select>
+
   <select id="getShipFromLocation" parameterType="long" resultMap="BaseResultMap">
     select sl.* from stock_location sl
     INNER JOIN shipment s on s.ship_from_location_id = sl.location_id

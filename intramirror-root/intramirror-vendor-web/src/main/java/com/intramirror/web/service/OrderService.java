@@ -67,9 +67,9 @@ public class OrderService {
         String orderLineNum = map.get("orderLineNum").toString();
         Map<String,Object> currentOrder = null;
         
-		Long vendorId =Long.parseLong(map.get("vendorId").toString());
+		Long vendorId = null;
 		//根据订单状态查询订单
-		logger.info(MessageFormat.format("order packingOrder 调用接口getOrderListByStatus 查询订单信息 入参  status:{0},vendorId:{1}",map.get("status").toString(),vendorId));
+		/*logger.info(MessageFormat.format("order packingOrder 调用接口getOrderListByStatus 查询订单信息 入参  status:{0},vendorId:{1}",map.get("status").toString(),vendorId));
 		List<Map<String,Object>> orderList = orderService.getOrderListByStatus(Integer.parseInt(map.get("status").toString()),vendorId,null);
 		if(orderList ==null || orderList.size() == 0){
 			result.setMsg("The current order list is empty");
@@ -78,7 +78,6 @@ public class OrderService {
 			return result;
 		}
 		
-		//校验order_line_num  是否在CONFIRMED中存在
 		logger.info("order packingOrder 校验订单是否存在   orderLineNum:"+orderLineNum);
 		for(Map<String,Object> info :orderList){
 			if(orderLineNum.equalsIgnoreCase(info.get("order_line_num").toString())){
@@ -92,8 +91,19 @@ public class OrderService {
 			infoMap.put("code", StatusType.ORDER_ERROR_CODE);
 			result.setInfoMap(infoMap);
 			return result;
-		}
-		//封装参数
+		}*/
+        //校验order_line_num  是否在CONFIRMED中存在
+        Map<String, Object> order = orderService.getOrderByOrderNumber(orderLineNum);
+        if (order==null|| !"2".equals(String.valueOf(order.get("status")))){
+            result.setMsg("Order does not exist");
+            infoMap.put("code", StatusType.ORDER_ERROR_CODE);
+            result.setInfoMap(infoMap);
+            return result;
+        }else {
+            currentOrder = order;
+            vendorId = Long.parseLong(order.get("vendor_id").toString());
+        }
+        //封装参数
 		Map<String, Object> conditionMap = new HashMap<String, Object>();
 		conditionMap.put("container_id", Long.parseLong(map.get("containerId").toString()));
 		conditionMap.put("status", OrderStatusType.READYTOSHIP);
@@ -315,6 +325,7 @@ public class OrderService {
 				result.setInfoMap(infoMap);
 			}
 		}
+		result.successStatus();
 		return result;
 	}
 

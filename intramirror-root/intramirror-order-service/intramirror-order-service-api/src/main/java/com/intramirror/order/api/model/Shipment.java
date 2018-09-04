@@ -29,6 +29,8 @@ public class Shipment {
 	private Integer shipFromLocationId;
 
 	private String stockLocation;
+
+	private String vendorName;
 	/**
 	 * @Fields 状态
 	 */
@@ -166,5 +168,13 @@ public class Shipment {
 
 	public void setShipmentCategory(Integer shipmentCategory) {
 		this.shipmentCategory = shipmentCategory;
+	}
+
+	public String getVendorName() {
+		return vendorName;
+	}
+
+	public void setVendorName(String vendorName) {
+		this.vendorName = vendorName;
 	}
 }

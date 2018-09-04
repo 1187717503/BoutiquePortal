@@ -11,10 +11,20 @@ public class ShippedParam {
     private String dateType;
     private Integer pageSize;
     private Integer pageNum;
+    private Long locationId;
     private String stockLocation;
     private String shipToGeography;
     private String shippedAtOrderBy;
     private String statusOrderBy;
+    private Long vendorId;
+
+    public Long getVendorId() {
+        return vendorId;
+    }
+
+    public void setVendorId(Long vendorId) {
+        this.vendorId = vendorId;
+    }
 
     private List<String> awbNos;
 
@@ -120,5 +130,13 @@ public class ShippedParam {
 
     public void setPageNum(Integer pageNum) {
         this.pageNum = pageNum;
+    }
+
+    public Long getLocationId() {
+        return locationId;
+    }
+
+    public void setLocationId(Long locationId) {
+        this.locationId = locationId;
     }
 }

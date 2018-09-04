@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/intramirror-root" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/intramirror-admin-web" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/intramirror-base" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/intramirror-base/intramirror-common" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/intramirror-base/intramirror-shoplus-message" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/intramirror-base/intramirror-shoplus-oss" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/intramirror-base/intramirror-shoplus-service" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/intramirror-job-web" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/intramirror-logistics-service" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/intramirror-logistics-service/intramirror-logistics-service-api" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/intramirror-logistics-service/intramirror-logistics-service-core" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/intramirror-main-service" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/intramirror-main-service/intramirror-main-service-api" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/intramirror-main-service/intramirror-main-service-core" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/intramirror-order-service" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/intramirror-order-service/intramirror-order-service-api" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/intramirror-order-service/intramirror-order-service-core" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/intramirror-payment-service" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/intramirror-payment-service/intramirror-payment-service-api" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/intramirror-payment-service/intramirror-payment-service-core" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/intramirror-product-service" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/intramirror-product-service/intramirror-product-service-api" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/intramirror-product-service/intramirror-product-service-core" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/intramirror-user-service" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/intramirror-user-service/intramirror-user-service-api" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/intramirror-user-service/intramirror-user-service-core" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/intramirror-vendor-web" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/lib" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/intramirror-root/lib/LIB-Core" charset="UTF-8" />
+  </component>
+</project>
