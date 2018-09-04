@@ -42,7 +42,7 @@
     select 
     <include refid="Base_Column_List" />
     from stock_location
-    where location_id = #{locationId,jdbcType=BIGINT}
+    where location_id = #{locationId,jdbcType=BIGINT} and enabled = 1
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     <!--

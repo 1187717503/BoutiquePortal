@@ -27,7 +27,7 @@ public class StockLocationServiceImpl extends BaseDao implements StockLocationSe
     }
 
     @Override
-    public List<StockLocation> getStockLocation(Long vendorId) {
+    public List<StockLocation> getStockLocations(Long vendorId) {
         List<StockLocation> locationList = stockLocationMapper.getStockLocationByVendorId(vendorId);
         return locationList;
     }
@@ -44,5 +44,10 @@ public class StockLocationServiceImpl extends BaseDao implements StockLocationSe
     @Override
     public StockLocation getShipFromLocation(Long shipmentId) {
         return stockLocationMapper.getShipFromLocation(shipmentId);
+    }
+
+    @Override
+    public StockLocation getStockLocation(Long locationId) {
+        return stockLocationMapper.selectByPrimaryKey(locationId);
     }
 }

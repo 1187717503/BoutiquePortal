@@ -97,7 +97,7 @@ public class CategoryServiceImpl extends BaseDao implements ICategoryService {
                 category.setParentId(parentId);
 
                 if (parentPath != null) {
-                    category.setCategoryPath(parentPath + ">" + name);
+                    category.setCategoryPath(parentPath + " > " + name);
                 } else {
                     category.setCategoryPath(name);
                 }

@@ -450,7 +450,7 @@ public class OrderShipController extends BaseController {
             if (userId != null) {
                 Vendor vendor = vendorService.getVendorByUserId(userId);
                 if (vendor != null){
-                    List<StockLocation> stockLocationList = stockLocationService.getStockLocation(vendor.getVendorId());
+                    List<StockLocation> stockLocationList = stockLocationService.getStockLocations(vendor.getVendorId());
                     result.successStatus();
                     result.setData(stockLocationList);
                 }else {
@@ -458,7 +458,7 @@ public class OrderShipController extends BaseController {
                     return result;
                 }
             }else if(vendorId>0){
-                List<StockLocation> stockLocationList = stockLocationService.getStockLocation(vendorId);
+                List<StockLocation> stockLocationList = stockLocationService.getStockLocations(vendorId);
                 result.successStatus();
                 result.setData(stockLocationList);
             }else {

@@ -90,7 +90,7 @@ public class ConfirmCheckOrderController {
         String estShipDate = null;
         String logisticsProductId = null;
         String stockLocation = null;
-        Integer stockLocationId = null;
+        Long stockLocationId = null;
 
         if (map.get("barCode") != null && StringUtils.isNotBlank(map.get("barCode").toString()) && !map.get("barCode").toString().equals("#")) {
             barCode = map.get("barCode").toString();
@@ -116,7 +116,7 @@ public class ConfirmCheckOrderController {
             stockLocation = map.get("stockLocation").toString();
         }
         if (map.get("stockLocationId") != null && StringUtils.isNotBlank(map.get("stockLocationId").toString())) {
-            stockLocationId = Integer.parseInt(map.get("stockLocationId").toString());
+            stockLocationId = Long.valueOf(map.get("stockLocationId").toString());
         }
 
         Sku sku = null;

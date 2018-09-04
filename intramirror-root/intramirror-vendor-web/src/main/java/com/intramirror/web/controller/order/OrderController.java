@@ -10,6 +10,7 @@ import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.common.utils.DateUtils;
 import com.intramirror.main.api.enums.GeographyEnum;
+import com.intramirror.main.api.model.StockLocation;
 import com.intramirror.main.api.service.StockLocationService;
 import com.intramirror.main.api.vo.StockLocationVO;
 import com.intramirror.order.api.common.OrderStatusType;
@@ -1146,18 +1147,15 @@ public class OrderController extends BaseController {
                 message.errorStatus().putMsg("info", "locationId cannot be null");
                 return message;
             }
-            if(map.get("stockLocation") == null || StringUtils.isBlank(map.get("stockLocation").toString())){
-                logger.info("stockLocation cannot be null");
-                message.errorStatus().putMsg("info", "stockLocation cannot be null");
-                return message;
-            }
             Long lpId = Long.valueOf(map.get("logistics_product_id").toString());
-            Integer locationId = Integer.valueOf(map.get("locationId").toString());
-            String stockLocation = map.get("stockLocation").toString();
+            Long locationId = Long.valueOf(map.get("locationId").toString());
+            StockLocation stockLocation = stockLocationService.getStockLocation(locationId);
             LogisticsProduct logisticsProduct = new LogisticsProduct();
             logisticsProduct.setLogistics_product_id(lpId);
-            logisticsProduct.setStock_location(stockLocation);
             logisticsProduct.setStock_location_id(locationId);
+            if (stockLocation!=null){
+                logisticsProduct.setStock_location(stockLocation.getStockLocation());
+            }
             int result = iLogisticsProductService.updateByLogisticsProduct(logisticsProduct);
             if (result == 1) {
                 message.successStatus().putMsg("SUCCESS", "result " + result);

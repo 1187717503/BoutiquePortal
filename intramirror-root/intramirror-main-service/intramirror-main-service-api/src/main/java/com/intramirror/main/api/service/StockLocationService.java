@@ -11,9 +11,11 @@ import java.util.Map;
  */
 public interface StockLocationService {
 
-    List<StockLocation> getStockLocation(Long vendorId);
+    List<StockLocation> getStockLocations(Long vendorId);
 
     List<StockLocationVO> getStockLocationByVendorIds(List<Long> vendorIds);
 
     StockLocation getShipFromLocation(Long shipmentId);
+
+    StockLocation getStockLocation(Long locationId);
 }
