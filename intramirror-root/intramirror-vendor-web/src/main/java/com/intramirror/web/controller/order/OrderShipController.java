@@ -613,15 +613,7 @@ public class OrderShipController extends BaseController {
             return result;
         }
 
-        if (!vendorId.equals(vendor.getVendorId())){
-            //取子买手店信息
-            Map<String,Object> params = new HashMap<>();
-            params.put("vendor_id",vendorId);
-            Vendor vendorByVendorId = vendorService.getVendorByVendorId(params);
-            if (vendorByVendorId!=null){
-                vendor = vendorByVendorId;
-            }
-        }
+        vendor = getVendor(vendor, vendorId);
 
         //List<Long> vendorIds = vendors.stream().map(Vendor::getVendorId).collect(Collectors.toList());
 
@@ -856,6 +848,8 @@ public class OrderShipController extends BaseController {
         }
 
         Long vendorId = Long.valueOf(shipmentMap.get("vendor_id").toString());
+
+        vendor = getVendor(vendor, vendorId);
 
         TransitWarehouseInvoiceVO transitWarehouseInvoiceVO = new TransitWarehouseInvoiceVO();
 
@@ -1241,6 +1235,19 @@ public class OrderShipController extends BaseController {
         }
 
         return result;
+    }
+
+    private Vendor getVendor(Vendor vendor, Long vendorId) {
+        if (!vendorId.equals(vendor.getVendorId())){
+            //取子买手店信息
+            Map<String,Object> params = new HashMap<>();
+            params.put("vendor_id",vendorId);
+            Vendor vendorByVendorId = vendorService.getVendorByVendorId(params);
+            if (vendorByVendorId!=null){
+                vendor = vendorByVendorId;
+            }
+        }
+        return vendor;
     }
 
     /**
