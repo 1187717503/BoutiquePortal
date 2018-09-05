@@ -382,7 +382,7 @@ public class OrderShipController extends BaseController {
                 shipmentMap.put("invoice_date", sdf2.format(sdf.parse(shipmentMap.get("invoice_date").toString())));
                 shipmentMap.put("invoice_num",shipmentMap.get("invoiceNum"));
             }
-            shipmentMap.put("vendor_name",vendor.getVendorName());
+            //shipmentMap.put("vendor_name",vendor.getVendorName());
             Integer print_step = Integer.valueOf(shipmentMap.get("print_step").toString());
             // 添加invoice url
             if(print_step >= 3){
