@@ -822,8 +822,7 @@ public class OrderShipController extends BaseController {
         result.errorStatus();
 
         if (map == null || map.size() == 0 || map.get("status") == null
-                || map.get("shipment_id") == null
-                || map.get("vendorId") == null) {
+                || map.get("shipment_id") == null) {
             result.setMsg("Parameter cannot be empty");
             return result;
         }
@@ -844,11 +843,22 @@ public class OrderShipController extends BaseController {
             result.setMsg("Please log in again");
             return result;
         }
+        long shipment_id = Long.parseLong(map.get("shipment_id").toString());
+        //根据shipmentId 获取shipment 相关信息及物流第一段类型
+        logger.info("打印Invoice----根据shipmentId 获取shipment 相关信息及物流第一段类型,开始获取");
+        Map<String, Object> getShipment = new HashMap<>();
+        getShipment.put("shipmentId", shipment_id);
+        Map<String, Object> shipmentMap = iShipmentService.getShipmentTypeById(getShipment);
+        if (shipmentMap == null || shipmentMap.size() == 0) {
+            logger.info("获取失败");
+            result.setMsg("Query Shipment fail,Check parameters, please ");
+            return result;
+        }
 
-        Long vendorId = Long.valueOf(map.get("vendorId").toString());
+        Long vendorId = Long.valueOf(shipmentMap.get("vendor_id").toString());
 
         TransitWarehouseInvoiceVO transitWarehouseInvoiceVO = new TransitWarehouseInvoiceVO();
-        long shipment_id = Long.parseLong(map.get("shipment_id").toString());
+
 
         //获取Ship From信息
         StockLocation location = stockLocationService.getShipFromLocation(shipment_id);
@@ -926,17 +936,7 @@ public class OrderShipController extends BaseController {
         }
 
         map.put("vendorIds", Arrays.asList(vendorId));
-        Map<String, Object> getShipment = new HashMap<>();
-        getShipment.put("shipmentId", shipment_id);
 
-        //根据shipmentId 获取shipment 相关信息及物流第一段类型
-        logger.info("打印Invoice----根据shipmentId 获取shipment 相关信息及物流第一段类型,开始获取");
-        Map<String, Object> shipmentMap = iShipmentService.getShipmentTypeById(getShipment);
-        if (shipmentMap == null || shipmentMap.size() == 0) {
-            logger.info("获取失败");
-            result.setMsg("Query Shipment fail,Check parameters, please ");
-            return result;
-        }
         resultMap.put("shipmentNo",shipmentMap.get("shipment_no"));
         logger.info("打印Invoice----获取shipment相关信息及物流第一段类型成功");
 
@@ -999,7 +999,7 @@ public class OrderShipController extends BaseController {
         shipmentIds.add(shipment_id);
         Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("status", map.get("status"));
-        conditionMap.put("vendorId", vendorId);
+        conditionMap.put("vendorIds", Arrays.asList(vendorId));
         conditionMap.put("shipmentIds", shipmentIds);
         conditionMap.put("packGroup", 1);
         List<Map<String, Object>> chinaList = orderService.getOrderListByShipmentId(conditionMap);
