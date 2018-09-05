@@ -613,6 +613,16 @@ public class OrderShipController extends BaseController {
             return result;
         }
 
+        if (!vendorId.equals(vendor.getVendorId())){
+            //取子买手店信息
+            Map<String,Object> params = new HashMap<>();
+            params.put("vendor_id",vendorId);
+            Vendor vendorByVendorId = vendorService.getVendorByVendorId(params);
+            if (vendorByVendorId!=null){
+                vendor = vendorByVendorId;
+            }
+        }
+
         //List<Long> vendorIds = vendors.stream().map(Vendor::getVendorId).collect(Collectors.toList());
 
         //获取ddt number
