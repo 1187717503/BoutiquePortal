@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @CrossOrigin
@@ -57,18 +58,18 @@ public class ShippedController extends BaseController {
             return result;
         }
 
-        Vendor vendor = null;
+        List<Vendor> vendors = null;
         try {
-            vendor = vendorService.getVendorByUserId(user.getUserId());
+            vendors = vendorService.getVendorsByUserId(user.getUserId());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (vendor == null) {
+        if (vendors == null) {
             result.setMsg("Please log in again");
             return result;
         }
+        List<Long> vendorIds = vendors.stream().map(Vendor::getVendorId).collect(Collectors.toList());
 
-        Long vendorId = vendor.getVendorId();
         Page page = new Page();
         if (shippedParam.getPageNum() == null) {
             shippedParam.setPageNum(1);
@@ -79,7 +80,7 @@ public class ShippedController extends BaseController {
         page.setCurrentPage(shippedParam.getPageNum());
         page.setPageSize(shippedParam.getPageSize());
         //根据订单状态查询订单
-        PageUtils pageUtils = orderService.getShippedOrderListByStatus(page, vendorId, shippedParam);
+        PageUtils pageUtils = orderService.getShippedOrderListByStatus(page, vendorIds, shippedParam);
 
         List<Map<String, Object>> orderList = pageUtils.getResult();
         if (orderList != null && orderList.size() > 0) {

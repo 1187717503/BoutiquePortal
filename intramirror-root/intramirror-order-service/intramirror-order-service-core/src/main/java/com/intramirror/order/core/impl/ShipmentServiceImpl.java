@@ -612,6 +612,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			//如果一直修改状态
 			if (lastStatus == shipment.getStatus()){
 				if (status == 3){
+                    logger.info("shipmentNo:{},手动ship",shipment.getShipmentNo());
 					//记录发货时间
 					map.put("ship_at",new Date());
 					List<String> list = new ArrayList<>();
@@ -642,10 +643,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 						vo.setDestination("China");
 					}
 					sendMail(vo);
-					logger.info("shipmentNo:{},手动ship",shipment.getShipmentNo());
 				}
-
-
 				result = shipmentMapper.updateShipmentStatus(map);
 			}
 			//如果为编辑箱子，修改箱子状态
@@ -740,7 +738,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 
     private void sendMail(ShipmentSendMailVO shipment){
         ShipMailSendThread thread = new ShipMailSendThread(shipment, mailSendManageService);
-        thread.run();
+        new Thread(thread).start();
     }
 
 	@Override

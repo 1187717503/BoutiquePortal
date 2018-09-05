@@ -1,8 +1,10 @@
 package com.intramirror.main.core.mapper;
 
 import com.intramirror.main.api.model.StockLocation;
+import com.intramirror.main.api.vo.StockLocationVO;
 
 import java.util.List;
+import java.util.Map;
 
 public interface StockLocationMapper {
     /**
@@ -59,6 +61,9 @@ public interface StockLocationMapper {
      * @return
      */
     List<StockLocation> getStockLocationByVendorId(Long vendorId);
+
+
+    List<StockLocationVO> getStockLocationByVendorIds(List<Long> vendorIds);
 
     /**
      * 根据shipmentId获取发货地信息

@@ -15,10 +15,12 @@ import com.intramirror.order.core.mapper.OrderMapper;
 
 import com.intramirror.order.api.vo.PageListVO;
 import com.intramirror.order.core.mapper.ProductPropertyMapper;
+import freemarker.template.utility.NumberUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.NumberUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -45,11 +47,10 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
     }
 
 
-    public List<Map<String, Object>> getOrderListByOrderNumber(String numbers, int status) {
+    public Map<String, Object> getOrderByOrderNumber(String number) {
         Map<String, Object> param = new HashMap<String, Object>();
-        param.put("orderNumbers", numbers.split(","));
-        param.put("status", status);
-        List<Map<String, Object>> result = orderMapper.getOrderListByOrderNumber(param);
+        param.put("orderNumber", number);
+        Map<String, Object> result = orderMapper.getOrderListByOrderNumber(param);
         logger.info("getOrderListByOrderNumber result:{}", new Gson().toJson(result));
         return result;
     }
@@ -118,7 +119,10 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
     public List<Map<String, Object>> getOrderListByStatus(int status, Long vendorId, String sortByName) {
         Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("status", status);
-        conditionMap.put("vendorId", vendorId);
+        if(vendorId==null){
+            vendorId=0l;
+        }
+        conditionMap.put("vendorIds", Arrays.asList(vendorId));
         if (sortByName != null && StringUtils.isNoneBlank(sortByName)) {
             conditionMap.put(sortByName, sortByName);
         }
@@ -135,10 +139,10 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
      */
     @Override
     public List<Map<String, Object>> getOrderListByStatusAndContainerId(
-            long containerId, int status, Long vendorId) {
+            long containerId, int status, List<Long> vendorIds) {
         Map<String, Object> conditionMap = new HashMap<String, Object>();
         conditionMap.put("status", status);
-        conditionMap.put("vendorId", vendorId);
+        conditionMap.put("vendorIds", vendorIds);
         conditionMap.put("containerId", containerId);
         List<Map<String, Object>> mapList = orderMapper.getOrderListByStatusAndContainerId(conditionMap);
         //addProductPropertyMap(mapList);
@@ -157,9 +161,9 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
     }
 
     @Override
-    public PageUtils getShippedOrderListByStatus(Page page, Long vendorId, ShippedParam shippedParam) {
+    public PageUtils getShippedOrderListByStatus(Page page, List<Long> vendorIds, ShippedParam shippedParam) {
         Map<String, Object> conditionMap = new HashMap<String, Object>();
-        conditionMap.put("vendorId", vendorId);
+        conditionMap.put("vendorIds", vendorIds);
         conditionMap.put("shippedParam", shippedParam);
         PageUtils pageUtils = new PageUtils(page, this, conditionMap);
         return pageUtils;
@@ -453,8 +457,8 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
         if (paramCheck(params.get("status"))) {
             conditionMap.put("status", params.get("status"));
         }
-        if (paramCheck(params.get("vendorId"))) {
-            conditionMap.put("vendorId", params.get("vendorId"));
+        if (paramCheck(params.get("vendorIds"))) {
+            conditionMap.put("vendorIds", params.get("vendorIds"));
         }
         if (paramCheck(params.get("sortByName"))) {
             conditionMap.put(params.get("sortByName").toString(), params.get("sortByName"));
@@ -465,8 +469,8 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
         if (paramCheck(params.get("brandId"))) {
             conditionMap.put("brandId", params.get("brandId"));
         }
-        if (paramCheck(params.get("stockLocation"))) {
-            conditionMap.put("stockLocation", params.get("stockLocation"));
+        if (paramCheck(params.get("locationId"))) {
+            conditionMap.put("locationId", params.get("locationId"));
         }
         if (params.get("logisticsProductIds") != null) {
             conditionMap.put("logisticsProductIds", params.get("logisticsProductIds"));

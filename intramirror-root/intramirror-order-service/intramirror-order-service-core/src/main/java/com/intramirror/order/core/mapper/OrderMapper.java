@@ -24,7 +24,7 @@ public interface OrderMapper {
      * @param param
      * @return
      */
-    List<Map<String, Object>> getOrderListByOrderNumber(Map<String, Object> param);
+    Map<String, Object> getOrderListByOrderNumber(Map<String, Object> param);
 
 
     /**

@@ -15,6 +15,7 @@
         <result column="cancel_at" property="cancel_at" jdbcType="TIMESTAMP"/>
         <result column="tax_fee" property="tax_fee" jdbcType="DECIMAL"/>
         <result column="change_flag" property="change_flag" jdbcType="INTEGER"/>
+        <result column="vendor_name" property="vendorName" jdbcType="VARCHAR"/>
     </resultMap>
 
     <resultMap id="orderMap" type="com.intramirror.order.api.model.Order">
@@ -84,24 +85,11 @@
     </select>
 
     <select id="getOrderListByOrderNumber" resultType="java.util.HashMap" parameterType="java.util.Map">
-        SELECT o.order_num,o.order_id,p.name,p.color_code AS colorCode, p.designer_id AS brandID,s.`size` as size,p.category_id,
-        lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
-        v.vendor_name,p.cover_img,lp.logistics_product_id
-        FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
-        INNER JOIN `order` o ON ol.order_id = o.order_id
-        LEFT JOIN logistics l ON lp.order_logistics_id = l.order_logistics_id
-        INNER JOIN shop_product_sku sps ON lp.shop_product_sku_id = sps.shop_product_sku_id
-        INNER JOIN shop_product sp ON sps.shop_product_id = sp.shop_product_id
-        INNER JOIN product p ON (sp.product_id = p.product_id and p.enabled = 1 )
-        INNER JOIN sku s ON (s.sku_id = sps.sku_id and s.enabled = 1)
-        INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
-        WHERE o.order_num in
-        <foreach collection="orderNumbers" item="orderNumber" index="index"
-                 open="(" close=")" separator=",">
-            #{orderNumber}
-        </foreach>
-        and lp.`status` = #{status,jdbcType=BIGINT}
-        GROUP BY lp.order_line_num
+       SELECT lp.*,g.pack_english_name,sl.ship_from_location_id,g.pack_group FROM logistics_product lp
+        INNER JOIN logistics l on (l.order_logistics_id = lp.order_logistics_id and l.enabled = 1)
+        LEFT JOIN geography g on (l.geography_id = g.geography_id and g.enabled = 1)
+        LEFT JOIN stock_location sl on (sl.location_id = lp.stock_location_id and sl.enabled = 1)
+        WHERE lp.order_line_num = #{orderNumber} and lp.enabled = 1;
     </select>
 
 
@@ -149,7 +137,10 @@
         LEFT JOIN `user` u ON(u.user_id=oe.created_by_user_id)
         LEFT JOIN `user` uu on(uu.user_id=oe.modified_by_user_id)
         where lp.`status` = #{status,jdbcType=BIGINT} and lp.enabled = 1
-        and v.vendor_id = #{vendorId,jdbcType=BIGINT}
+        and v.vendor_id in
+        <foreach item="vendorId" index="index" collection="vendorIds" open="(" separator="," close=")">
+            #{vendorId}
+        </foreach>
         <if test="categoryIds != null and categoryIds.size > 0">
             and p.category_id in
             <foreach item="item" index="index" collection="categoryIds" open="(" separator="," close=")">
@@ -159,8 +150,8 @@
         <if test="brandId != null">
             and p.brand_id = #{brandId}
         </if>
-        <if test="stockLocation != null">
-            and lp.stock_Location = #{stockLocation,jdbcType=VARCHAR}
+        <if test="locationId != null">
+            and lp.stock_location_id = #{locationId,jdbcType=BIGINT}
         </if>
         <if test="logisticsProductIds != null and logisticsProductIds.size > 0">
             and lp.logistics_product_id in
@@ -265,7 +256,10 @@
         AND v.enabled = 1
         )
         where lp.`status` = #{status,jdbcType=BIGINT} and lp.enabled = 1
-        and v.vendor_id = #{vendorId,jdbcType=BIGINT}
+        and v.vendor_id in
+        <foreach item="vendorId" index="index" collection="vendorIds" open="(" separator="," close=")">
+            #{vendorId}
+        </foreach>
         <if test="orderNumber != null">
             AND lp.order_line_num LIKE #{orderNumber}
         </if>
@@ -316,7 +310,11 @@
         WHERE
               c.container_id = #{containerId,jdbcType=BIGINT}
               AND lp.`status` = #{status,jdbcType=BIGINT}
-              AND v.vendor_id = #{vendorId,jdbcType=BIGINT}
+              AND v.vendor_id IN
+              <foreach collection="vendorIds" item="vendorId" open="(" separator="," close=")">
+                   #{vendorId}
+              </foreach>
+
         GROUP BY lp.order_line_num
     </select>
 
@@ -423,7 +421,13 @@
             #{shipmentId,jdbcType=BIGINT}
         </foreach>
         AND lp.`status` = #{status,jdbcType=BIGINT}
-        AND v.vendor_id = #{vendorId,jdbcType=BIGINT}
+        AND v.vendor_id in
+        <foreach item="vendorId" index="index" collection="vendorIds" open="(" separator="," close=")">
+            #{vendorId}
+        </foreach>
+        <if test="locationId != null">
+            and c.ship_from_location_id = #{locationId,jdbcType=BIGINT}
+        </if>
         <if test="packGroup != null">
             AND g.pack_group = #{packGroup}
         </if>
@@ -496,7 +500,12 @@
                      INNER JOIN sku s ON (s.sku_id = sps.sku_id AND s.enabled = 1)
                      INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
                  WHERE  lp.`status` = #{status,jdbcType=BIGINT}
-                       AND v.vendor_id = #{vendorId,jdbcType=BIGINT} and lp.enabled = 1
+                       AND
+                        v.vendor_id in
+                        <foreach item="vendorId" index="index" collection="vendorIds" open="(" separator="," close=")">
+                            #{vendorId}
+                        </foreach>
+                       and lp.enabled = 1
                  GROUP BY lp.order_line_num
              ) AS DD
     </select>
@@ -575,7 +584,10 @@
         LEFT JOIN container c ON (c.container_id = lp.container_id)
         LEFT JOIN shipment sm on (sm.shipment_id = c.shipment_id)
         where (lp.`status` = 3 OR lp.`status` = 4)
-        and v.vendor_id = #{vendorId,jdbcType=BIGINT}
+        and v.vendor_id in
+        <foreach item="vendorId" index="index" collection="vendorIds" open="(" separator="," close=")">
+            #{vendorId}
+        </foreach>
         <if test="shippedParam.orderLineNo!=null and shippedParam.orderLineNo!=''">
             and lp.order_line_num=#{shippedParam.orderLineNo}
         </if>
@@ -591,6 +603,9 @@
         </if>
         <if test="shippedParam.stockLocation != null and shippedParam.stockLocation != ''">
             AND lp.stock_location = #{shippedParam.stockLocation}
+        </if>
+        <if test="shippedParam.locationId != null and shippedParam.locationId != ''">
+            AND lp.stock_location_id = #{shippedParam.locationId}
         </if>
         <if test="shippedParam.shipToGeography != null and shippedParam.shipToGeography != ''">
             AND sm.ship_to_geography = #{shippedParam.shipToGeography}
@@ -680,7 +695,11 @@
                      INNER JOIN sku s ON (s.sku_id = sps.sku_id AND s.enabled = 1)
                      INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
                      LEFT JOIN shipment sm ON sm.vendor_id = v.vendor_id
-                 WHERE (lp.`status` = 3 OR lp.`status` = 4) AND v.vendor_id = #{vendorId,jdbcType=BIGINT}
+                 WHERE (lp.`status` = 3 OR lp.`status` = 4)
+                 AND v.vendor_id in
+                    <foreach item="vendorId" index="index" collection="vendorIds" open="(" separator="," close=")">
+                        #{vendorId}
+                    </foreach>
                  GROUP BY lp.order_line_num
              ) AS DD
     </select>

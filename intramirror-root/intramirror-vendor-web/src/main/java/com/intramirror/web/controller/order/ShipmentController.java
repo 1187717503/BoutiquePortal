@@ -415,6 +415,7 @@ public class ShipmentController extends BaseController{
 		if (shipmentList!=null&&shipmentList.size()>0){
 			for (Shipment shipment:shipmentList){
 				if (3!=shipment.getStatus()){
+					logger.info("shipmentNo:{}，自动ship",shipment.getShipmentNo());
 					List<String> list = new ArrayList<>();
 					iShipmentService.shipmentToShip(shipment.getShipmentId());
 					//修改carton状态
@@ -447,7 +448,7 @@ public class ShipmentController extends BaseController{
                     }
 					iShipmentService.sendMailForShipped(vo);
 					message.successStatus();
-					logger.info("shipmentNo:{}，自动ship",shipment.getShipmentNo());
+
 				}
 			}
 		}

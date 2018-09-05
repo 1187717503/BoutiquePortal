@@ -63,6 +63,17 @@
                 </filters>
             </build>
         </profile>
+        <profile>
+            <id>test_local</id>
+            <properties>
+                <profiles.active>test_local</profiles.active>
+            </properties>
+            <build>
+                <filters>
+                    <filter>src/main/resources/test_local/httpUrl.properties</filter>
+                </filters>
+            </build>
+        </profile>
     </profiles>
 
     <dependencies>
