@@ -182,4 +182,7 @@ public interface IShipmentService {
 
 	void styleroomShip(List<String> list);
 
+	String queryAwbUrlByAwbNum(String awbNum);
+
+	int updatePrintStep(Map<String, Object> updateStepMap);
 }

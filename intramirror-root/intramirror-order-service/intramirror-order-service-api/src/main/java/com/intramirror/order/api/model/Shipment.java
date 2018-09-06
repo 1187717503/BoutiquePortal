@@ -64,6 +64,8 @@ public class Shipment {
 
 	private Long toRefId;
 
+	private Integer printStep;
+
 	public Long getGeographyId() {
 		return geographyId;
 	}
@@ -176,5 +178,13 @@ public class Shipment {
 
 	public void setVendorName(String vendorName) {
 		this.vendorName = vendorName;
+	}
+
+	public Integer getPrintStep() {
+		return printStep;
+	}
+
+	public void setPrintStep(Integer printStep) {
+		this.printStep = printStep;
 	}
 }

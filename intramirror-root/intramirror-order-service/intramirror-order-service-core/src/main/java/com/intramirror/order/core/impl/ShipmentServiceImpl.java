@@ -21,7 +21,9 @@ import com.intramirror.order.core.mapper.ShipmentMapper;
 import com.intramirror.order.core.utils.MailSendManageService;
 import com.intramirror.order.core.utils.ShipMailSendThread;
 import com.intramirror.utils.transform.JsonTransformUtil;
+import com.sun.corba.se.spi.ior.ObjectKey;
 import net.sf.json.JSONObject;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -646,6 +648,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			}
 			//如果为编辑箱子，修改箱子状态
 			if (status == 1){
+				map.put("resetStep",0);
 				result = shipmentMapper.updateShipmentStatus(map);
 			}
 		}
@@ -681,6 +684,42 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		}catch (Exception e){
 			logger.error("调用微店ship接口失败,msg:{}",e.getMessage());
 		}
+	}
+
+	@Override
+	public String queryAwbUrlByAwbNum(String awbNum) {
+		String docUrl = shipmentMapper.queryShipmentAwbUrlByAwbNum(awbNum);
+		return docUrl;
+	}
+
+	@Override
+	public int updatePrintStep(Map<String, Object> updateStepMap) {
+		int printStep = Integer.valueOf(updateStepMap.get("print_step").toString());
+		Long shipmentId = Long.valueOf(updateStepMap.get("shipment_id").toString());
+		Map<String,Object> getShipmentMap = new HashMap<>();
+		getShipmentMap.put("shipmentId",shipmentId);
+		Shipment shipment = shipmentMapper.selectShipmentById(getShipmentMap);
+		logger.info("print step is {},update print step {}",shipment.getPrintStep(),printStep);
+		if(shipment.getPrintStep() == 4 && printStep == 3){ // undo 这种情况要清楚awb 删除awb清除milestone物流信息
+			List<SubShipment> subShipments = subShipmentMapper.getSubShipmentByShipmentId(shipmentId);
+			SubShipment subShipment = null;
+			if(CollectionUtils.isNotEmpty(subShipments)){
+				for(SubShipment sub : subShipments){
+					if(sub.getSegmentSequence().equals(1L)){
+						subShipment = sub;
+						break;
+					}
+				}
+			}
+			if(subShipment != null && StringUtils.isNotBlank(subShipment.getAwbNum())){
+				logger.info("删除milestone信息，awbNum:{}",subShipment.getAwbNum());
+				shipmentMapper.deleteMilestone(subShipment.getAwbNum()); // 删除milestone
+				subShipment.setAwbNum(null);
+				logger.info("更新subShipment，subShipmentId:{}",subShipment.getSubShipmentId());
+				subShipmentMapper.updateByPrimaryKey(subShipment);
+			}
+		}
+		return shipmentMapper.updatePrintStep(updateStepMap);
 	}
 
 	private String checkAWB(Long shipmentId) {

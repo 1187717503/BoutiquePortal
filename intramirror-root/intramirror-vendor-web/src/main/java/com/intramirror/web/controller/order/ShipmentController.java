@@ -10,8 +10,11 @@ import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.model.SubShipment;
 import com.intramirror.order.api.service.*;
+import com.intramirror.order.api.util.HttpClientUtil;
 import com.intramirror.order.api.vo.ShipmentSendMailVO;
 import com.intramirror.order.api.vo.ShippedParam;
+import com.intramirror.user.api.model.User;
+import com.intramirror.utils.transform.JsonTransformUtil;
 import com.intramirror.web.controller.BaseController;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -20,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import pk.shoplus.common.utils.StringUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -218,7 +222,7 @@ public class ShipmentController extends BaseController{
 			message.successStatus().putMsg("Info", "SUCCESS").setData(1);
 
 			//如果shipment操作reopen,需要删除awb
-			/*if (1 == Long.parseLong(map.get("status").toString())){
+			if (1 == Long.parseLong(map.get("status").toString())){
 				Shipment shipment = iShipmentService.selectShipmentById(map);
 				SubShipment dhlShipment = null;
 				if (shipment!=null){
@@ -257,7 +261,7 @@ public class ShipmentController extends BaseController{
 						iShipmentService.deleteMilestone(dhlShipment.getAwbNum());
 					}
 				}
-			}*/
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.info("Error Message : " + e.getMessage());
