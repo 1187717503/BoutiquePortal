@@ -1176,7 +1176,7 @@ public class OrderShipController extends BaseController {
                     ddtInvoice.getList().addAll(list);
                     ddtAllTotal = ddtAllTotal.add(grandTotal);
                     ddtVAT = ddtVAT.add(VAT);
-                    ddtAllQty  = chinaList.size()+ddtAllQty;
+                    ddtAllQty  = UNlist.size()+ddtAllQty;
                 }
                 UNInvoiceVO.setList(list);
                 UNInvoiceVO.setShipperVO(shipperVO);
@@ -1247,7 +1247,7 @@ public class OrderShipController extends BaseController {
                     ddtInvoice.getList().addAll(list);
                     ddtAllTotal = ddtAllTotal.add(grandTotal);
                     ddtVAT = ddtVAT.add(VAT);
-                    ddtAllQty  = chinaList.size()+ddtAllQty;
+                    ddtAllQty  = elselist.size()+ddtAllQty;
                 }
                 elseInvoiceVO.setList(list);
                 elseInvoiceVO.setShipperVO(shipperVO);
