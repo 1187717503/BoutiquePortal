@@ -1018,6 +1018,7 @@ public class OrderShipController extends BaseController {
         List<Map<String,Object>> ddtOrderList = new ArrayList<>();
         BigDecimal ddtVAT = new BigDecimal(0);
         BigDecimal ddtAllTotal = new BigDecimal(0);
+        BigDecimal ddtGrandTotal = new BigDecimal(0);
         Integer ddtAllQty = 0;
         if(isDDt){
             ddtInvoice.setShipperVO(shipperVO);
@@ -1102,7 +1103,8 @@ public class OrderShipController extends BaseController {
                 if(CollectionUtils.isNotEmpty(chinaList)){
                     ddtInvoice.getList().addAll(chinaList);
                 }
-                ddtAllTotal = ddtAllTotal.add(grandTotal);
+                ddtGrandTotal = ddtGrandTotal.add(grandTotal);
+                ddtAllTotal = ddtAllTotal.add(allTotal);
                 ddtVAT = ddtVAT.add(VAT);
                 ddtAllQty  = chinaList.size()+ddtAllQty;
 
@@ -1169,14 +1171,14 @@ public class OrderShipController extends BaseController {
                 BigDecimal VAT = total.multiply(taxRate).setScale(2, BigDecimal.ROUND_HALF_UP);
                 BigDecimal grandTotal = (VAT.add(total)).setScale(2,BigDecimal.ROUND_HALF_UP);
 
-
                 List<Map<String, Object>> list = new ArrayList<>();
                 list.add(UNOrder);
                 if(isDDt){
                     ddtInvoice.getList().addAll(list);
-                    ddtAllTotal = ddtAllTotal.add(grandTotal);
+                    ddtAllTotal = ddtAllTotal.add(total);
+                    ddtGrandTotal = ddtGrandTotal.add(grandTotal);
                     ddtVAT = ddtVAT.add(VAT);
-                    ddtAllQty  = UNlist.size()+ddtAllQty;
+                    ddtAllQty++;
                 }
                 UNInvoiceVO.setList(list);
                 UNInvoiceVO.setShipperVO(shipperVO);
@@ -1245,9 +1247,10 @@ public class OrderShipController extends BaseController {
                 list.add(elseOrder);
                 if(isDDt){
                     ddtInvoice.getList().addAll(list);
-                    ddtAllTotal = ddtAllTotal.add(grandTotal);
+                    ddtAllTotal = ddtAllTotal.add(total);
+                    ddtGrandTotal = ddtGrandTotal.add(grandTotal);
                     ddtVAT = ddtVAT.add(VAT);
-                    ddtAllQty  = elselist.size()+ddtAllQty;
+                    ddtAllQty++;
                 }
                 elseInvoiceVO.setList(list);
                 elseInvoiceVO.setShipperVO(shipperVO);
@@ -1271,7 +1274,8 @@ public class OrderShipController extends BaseController {
         }
         if(isDDt){
             List<InvoiceVO> ddtInvoices = new ArrayList<>();
-            ddtInvoice.setGrandTotal(ddtAllTotal.toString());
+            ddtInvoice.setGrandTotal(ddtGrandTotal.toString());
+            ddtInvoice.setAllTotal(ddtAllTotal.setScale(2,BigDecimal.ROUND_HALF_UP).toString());
             ddtInvoice.setVat(ddtVAT.toString());
             ddtInvoice.setAllQty(ddtAllQty.toString());
             ddtInvoices.add(ddtInvoice);
