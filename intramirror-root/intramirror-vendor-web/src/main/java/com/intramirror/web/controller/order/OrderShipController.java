@@ -318,6 +318,7 @@ public class OrderShipController extends BaseController {
         updateStepMap.put("shipment_id",shipmentId);
         int re = iShipmentService.updatePrintStep(updateStepMap);
         if(re >0){
+            result.successStatus();
             result.setMsg("update step success");
         }
         return result;
