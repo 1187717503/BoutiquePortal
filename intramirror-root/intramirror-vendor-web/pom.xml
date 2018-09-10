@@ -74,6 +74,17 @@
                 </filters>
             </build>
         </profile>
+        <profile>
+            <id>performance</id>
+            <properties>
+                <profiles.active>performance</profiles.active>
+            </properties>
+            <build>
+                <filters>
+                    <filter>src/main/resources/performance/httpUrl.properties</filter>
+                </filters>
+            </build>
+        </profile>
     </profiles>
 
     <dependencies>
