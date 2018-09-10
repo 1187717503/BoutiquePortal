@@ -44,6 +44,9 @@
 	<beans profile="staging">
 		<context:property-placeholder location="classpath:/staging/databases.properties" ignore-unresolvable="true" />
 	</beans>
+	<beans profile="performance">
+		<context:property-placeholder location="classpath:/performance/databases.properties" ignore-unresolvable="true" />
+	</beans>
 	<beans profile="test_local">
         <context:property-placeholder location="classpath:/test_local/databases.properties" ignore-unresolvable="true"/>
     </beans>
