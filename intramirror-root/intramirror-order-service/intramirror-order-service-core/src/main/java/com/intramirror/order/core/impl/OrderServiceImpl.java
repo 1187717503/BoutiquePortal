@@ -4,13 +4,11 @@ import com.google.gson.Gson;
 import com.intramirror.common.help.IPageService;
 import com.intramirror.common.help.Page;
 import com.intramirror.common.help.PageUtils;
-import com.intramirror.order.api.model.Order;
-import com.intramirror.order.api.model.Shipment;
+import com.intramirror.order.api.model.*;
 import com.intramirror.order.api.service.IOrderService;
-import com.intramirror.order.api.model.CancelOrderVO;
-import com.intramirror.order.api.model.ProductPropertyVO;
 import com.intramirror.order.api.vo.ShippedParam;
 import com.intramirror.order.core.dao.BaseDao;
+import com.intramirror.order.core.mapper.MemberPointsErrorLogMapper;
 import com.intramirror.order.core.mapper.OrderMapper;
 
 import com.intramirror.order.api.vo.PageListVO;
@@ -20,8 +18,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.NumberUtils;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -32,10 +32,12 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
 
     private OrderMapper orderMapper;
     private ProductPropertyMapper productPropertyMapper;
+    private MemberPointsErrorLogMapper memberPointsErrorLogMapper;
 
     public void init() {
         orderMapper = this.getSqlSession().getMapper(OrderMapper.class);
         productPropertyMapper = this.getSqlSession().getMapper(ProductPropertyMapper.class);
+        memberPointsErrorLogMapper = this.getSqlSession().getMapper(MemberPointsErrorLogMapper.class);
     }
 
     public List<Map<String, Object>> getOrderList(int status) {
@@ -483,6 +485,56 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
     @Override
     public List<String> getStyleroomOrder(List<String> orderLineNums) {
         return orderMapper.getStyleroomOrder(orderLineNums);
+    }
+
+    @Override
+    public Map<String, Object> getUserGrowthInfo(String orderLineNum) {
+        Map<String, Object> map = orderMapper.getUserGrowthInfo(orderLineNum);
+        if (map != null){
+            Map<String,Object> userGrowthInfo = new HashMap<>();
+            String orderTotalRmb = map.get("orderTotalRmd") != null ? map.get("orderTotalRmd").toString() : "1";
+            String orderPaymentAmt = map.get("orderPaymentAmt") != null ? map.get("orderPaymentAmt").toString() : "0";
+            String totalRmb = map.get("total_rmb") != null ? map.get("total_rmb").toString() : "0";
+            userGrowthInfo.put("userId",map.get("user_id"));
+            if (map.get("geography_id")!=null&&map.get("geography_id").equals(1)){
+                userGrowthInfo.put("isMainland",0);
+            }else {
+                userGrowthInfo.put("isMainland",1);
+            }
+            userGrowthInfo.put("orderAmt",totalRmb);
+            BigDecimal orderTotalRmbDec = new BigDecimal(orderTotalRmb);
+            BigDecimal orderPaymentAmtRmbDec = new BigDecimal(orderPaymentAmt);
+            BigDecimal totalRmbRmbDec = new BigDecimal(totalRmb);
+            BigDecimal paymentAmt = orderPaymentAmtRmbDec.divide(orderTotalRmbDec, 4).multiply(totalRmbRmbDec).setScale(2, BigDecimal.ROUND_HALF_UP);
+            userGrowthInfo.put("paymentAmt",paymentAmt.toString());
+            userGrowthInfo.put("orderLineNum",orderLineNum);
+            return userGrowthInfo;
+        }
+        return null;
+    }
+
+    @Override
+    public void insertMemberPointsErrorLog(MemberPointsErrorLog errorLog) {
+        memberPointsErrorLogMapper.insertSelective(errorLog);
+    }
+
+    @Override
+    public MemberPointsErrorLog getMemberPointsErrorLog(String oderLineNum) {
+        MemberPointsErrorLogExample example = new MemberPointsErrorLogExample();
+        MemberPointsErrorLogExample.Criteria criteria = example.createCriteria();
+        criteria.andOrderLineNumEqualTo(oderLineNum);
+        criteria.andIsDeletedEqualTo(0);
+        example.setLimit(1);
+        List<MemberPointsErrorLog> logs = memberPointsErrorLogMapper.selectByExample(example);
+        if (!CollectionUtils.isEmpty(logs)){
+            return logs.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public void updateMemberPointsErrorLog(MemberPointsErrorLog errorLog) {
+        memberPointsErrorLogMapper.updateByPrimaryKeySelective(errorLog);
     }
 
     private boolean paramCheck(Object obj) {

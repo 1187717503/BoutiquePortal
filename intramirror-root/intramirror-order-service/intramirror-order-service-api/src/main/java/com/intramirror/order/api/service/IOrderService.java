@@ -2,6 +2,7 @@ package com.intramirror.order.api.service;
 
 import com.intramirror.common.help.Page;
 import com.intramirror.common.help.PageUtils;
+import com.intramirror.order.api.model.MemberPointsErrorLog;
 import com.intramirror.order.api.model.Order;
 import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.vo.ShippedParam;
@@ -183,5 +184,18 @@ public interface IOrderService {
      * @return
      */
     List<String> getStyleroomOrder(List<String> orderLineNums);
+
+    /**
+     * 获取会员积分相关信息
+     * @param orderLineNum
+     * @return
+     */
+    Map<String,Object> getUserGrowthInfo(String orderLineNum);
+
+    void insertMemberPointsErrorLog(MemberPointsErrorLog errorLog);
+
+    MemberPointsErrorLog getMemberPointsErrorLog(String oderLineNum);
+
+    void updateMemberPointsErrorLog(MemberPointsErrorLog errorLog);
 
 }

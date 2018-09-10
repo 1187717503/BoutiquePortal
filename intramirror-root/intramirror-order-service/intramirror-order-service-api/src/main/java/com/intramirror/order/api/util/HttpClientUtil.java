@@ -28,18 +28,14 @@ import java.nio.charset.Charset;
 public class HttpClientUtil {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(HttpClientUtil.class);
-
     public static String createAWBUrl;
-
     public static String queryAWBUrl;
-
     public static String deleteAWBUrl;
-
     public static String confirmedOrder;
     public static String shippedOrder;
     public static String confirmStoreUrl;
-
     public static String tmsProviderRouteUrl;
+    public static String appMemberPointsUrl;
 
     public static String httpPost(String jsonObj, String url){
         HttpPost post = null;
@@ -231,5 +227,13 @@ public class HttpClientUtil {
 
     public static void setShippedOrder(String shippedOrder) {
         HttpClientUtil.shippedOrder = shippedOrder;
+    }
+
+    public static String getAppMemberPointsUrl() {
+        return appMemberPointsUrl;
+    }
+
+    public static void setAppMemberPointsUrl(String appMemberPointsUrl) {
+        HttpClientUtil.appMemberPointsUrl = appMemberPointsUrl;
     }
 }

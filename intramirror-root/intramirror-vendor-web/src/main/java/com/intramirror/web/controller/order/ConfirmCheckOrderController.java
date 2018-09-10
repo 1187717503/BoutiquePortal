@@ -1,10 +1,13 @@
 package com.intramirror.web.controller.order;
 
+import com.alibaba.fastjson.JSONObject;
 import com.intramirror.common.Helper;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.order.api.model.LogisticsProduct;
+import com.intramirror.order.api.model.MemberPointsErrorLog;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderService;
+import com.intramirror.order.api.util.HttpClientUtil;
 import com.intramirror.product.api.model.Sku;
 import com.intramirror.product.api.service.IProductService;
 import com.intramirror.product.api.service.SkuService;
@@ -23,11 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import pk.shoplus.common.utils.StringUtil;
 
 @CrossOrigin
 @Controller
@@ -38,7 +38,6 @@ public class ConfirmCheckOrderController {
 
     private String jwtSecret = "qazxswedcvfr543216yhnmju70plmjkiu89";
 
-    //@Resource(name = "userServiceImpl")
     @Autowired
     private SkuService skuService;
     @Autowired
@@ -163,6 +162,8 @@ public class ConfirmCheckOrderController {
                             //确认订单
                             logisticsProductService.confirmOrder(upLogis);
 
+                            //会员系统积分
+                            logisticsProductService.updateMemberCredits(logis.getOrder_line_num());
                         } else {
                             result.setMsg("Order does not exist,logisticsProductId:" + logisticsProductId);
                         }
@@ -173,6 +174,30 @@ public class ConfirmCheckOrderController {
                 }
             }catch (Exception e){
                 result.errorStatus().setMsg(e.getMessage());
+                return result;
+            }
+        }
+        return result;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/memberPoints", method = RequestMethod.POST)
+    public ResultMessage memberPoints(@RequestParam String orderLineNum){
+        ResultMessage result = new ResultMessage();
+        result.errorStatus();
+        MemberPointsErrorLog log = orderService.getMemberPointsErrorLog(orderLineNum);
+        if (log != null){
+            result.successStatus();
+            String res = HttpClientUtil.httpPost(log.getRequestBody(), HttpClientUtil.appMemberPointsUrl);
+            JSONObject jsonObject = JSONObject.parseObject(res);
+            if (StringUtil.isEmpty(res)
+                    ||jsonObject.getInteger("status") != 1){
+                result.setMsg(res);
+                return result;
+            }else {
+                log.setIsDeleted(1);
+                orderService.updateMemberPointsErrorLog(log);
+                result.successStatus();
                 return result;
             }
         }

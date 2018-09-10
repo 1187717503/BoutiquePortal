@@ -874,4 +874,13 @@
             #{orderLineNum}
         </foreach>
     </select>
+
+    <select id="getUserGrowthInfo" parameterType="string" resultType="map">
+        SELECT o.total_rmb orderTotalRmd, o.payment_amt orderPaymentAmt,o.user_id,
+        l.geography_id,lp.total_rmb FROM logistics_product lp
+        INNER JOIN order_logistics ol on ol.order_logistics_id = lp.order_logistics_id
+        INNER JOIN `order` o on o.order_id = ol.order_id
+        INNER JOIN logistics l on lp.order_logistics_id = l.order_logistics_id
+        WHERE lp.order_line_num = #{orderLineNum}
+    </select>
 </mapper>

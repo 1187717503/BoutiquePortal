@@ -2,13 +2,14 @@ package com.intramirror.web.service;
 
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.alibaba.fastjson.JSONObject;
+import com.intramirror.order.api.model.MemberPointsErrorLog;
 import com.intramirror.order.api.service.IOrderService;
+import com.intramirror.order.core.mapper.MemberPointsErrorLogMapper;
+import com.intramirror.order.core.mapper.OrderMapper;
+import com.intramirror.order.core.mapper.ProductPropertyMapper;
 import com.intramirror.utils.transform.JsonTransformUtil;
 import com.intramirror.order.api.util.HttpClientUtil;
 import org.slf4j.Logger;
@@ -141,6 +142,35 @@ public class LogisticsProductService{
 			}
         }
 		return resultMap;
+	}
+
+	public void updateMemberCredits(String orderLineNum){
+		Map<String, Object> userGrowthInfo = orderService.getUserGrowthInfo(orderLineNum);
+		try{
+			if (userGrowthInfo!=null){
+				logger.info("App MemberPoints Request,params={},url={}", JsonTransformUtil.toJson(userGrowthInfo), HttpClientUtil.appMemberPointsUrl);
+				String resultStr = HttpClientUtil.httpPost(JsonTransformUtil.toJson(userGrowthInfo), HttpClientUtil.appMemberPointsUrl);
+				logger.info("Response App MemberPoints,message:{}",resultStr);
+				JSONObject jsonObject = JSONObject.parseObject(resultStr);
+				if (StringUtil.isEmpty(resultStr)
+						||jsonObject.getInteger("status") != 1){
+					logger.error("订单会员积分更新失败，orderLineNum:{}",orderLineNum);
+					//保存错误请求记录
+					MemberPointsErrorLog log = new MemberPointsErrorLog();
+					log.setCreateTime(new Date());
+					log.setOrderLineNum(orderLineNum);
+					log.setRequestBody(JsonTransformUtil.toJson(userGrowthInfo));
+					log.setResponseBody(resultStr);
+					orderService.insertMemberPointsErrorLog(log);
+				}else {
+					logger.info("订单会员积分更新成功，orderLineNum:{}",orderLineNum);
+				}
+			}else {
+				logger.error("会员积分更新参数有误，orderLineNum:{}",orderLineNum);
+			}
+		}catch (Exception e){
+			logger.error("订单会员积分请求异常，orderLineNum:{}",orderLineNum);
+		}
 	}
 
 	public LogisticsProduct selectById(Long logisProductId) {

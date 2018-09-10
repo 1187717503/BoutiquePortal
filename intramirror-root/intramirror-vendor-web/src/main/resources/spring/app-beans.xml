@@ -38,6 +38,7 @@
         <property name="shippedOrder" value="${shippedOrder}"/>
         <property name="tmsProviderRouteUrl" value="${tms.provider.route.url}"/>
         <property name="confirmStoreUrl" value="${confirmStoreUrl}"/>
+        <property name="appMemberPointsUrl" value="${appMemberPointsUrl}"/>
     </bean>
 
 

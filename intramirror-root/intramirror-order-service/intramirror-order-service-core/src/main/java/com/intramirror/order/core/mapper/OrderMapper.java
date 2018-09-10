@@ -168,4 +168,6 @@ public interface OrderMapper {
 
     List<String> getStyleroomOrder(List<String> orderLineNums);
 
+    Map<String, Object> getUserGrowthInfo(String orderLineNum);
+
 }
