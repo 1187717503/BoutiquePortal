@@ -87,6 +87,11 @@ public class ProductServiceImpl extends BaseDao implements IProductService {
     }
 
     @Override
+    public List<ProductWithBLOBs> getProductByParameter(ProductWithBLOBs record) {
+        return productMapper.getProductByParameter(record);
+    }
+
+    @Override
     public void init() {
         productMapper = this.getSqlSession().getMapper(ProductMapper.class);
     }

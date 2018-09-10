@@ -3,6 +3,9 @@
 <mapper namespace="com.intramirror.common.core.mapper.ViewOrderLinesMapper">
     <resultMap id="BaseResultMap" type="com.intramirror.order.api.vo.ViewOrderLinesVO">
         <result column="order_line_num" property="order_line_num" jdbcType="VARCHAR"/>
+		<result column="order_num" property="order_num" jdbcType="VARCHAR"/>
+		<result column="shipping_fee" property="shipping_fee" jdbcType="DECIMAL"/>
+		<result column="current_rate" property="current_rate" jdbcType="DECIMAL"/>
         <result column="created_at_datetime" property="created_at_datetime" jdbcType="VARCHAR"/>
         <result column="confirmed_at_datetime" property="confirmed_at_datetime" jdbcType="VARCHAR"/>
         <result column="packed_at_datetime" property="packed_at_datetime" jdbcType="VARCHAR"/>
@@ -43,6 +46,9 @@
     <select id="getShipmentListByShipmentNo" parameterType="string" resultMap="BaseResultMap">
 		SELECT
 		  lp.order_line_num                                                       AS order_line_num,
+		  lp.shipping_fee														  AS shipping_fee,
+	  		ord.current_rate													 AS current_rate,
+		  ord.order_num															  AS order_num,
 		  DATE_FORMAT(lp.created_at, '%Y-%m-%d %H:%i:%s')                         AS created_at_datetime,
 		  DATE_FORMAT(lp.confirmed_at, '%Y-%m-%d %H:%i:%s')                       AS confirmed_at_datetime,
 		  DATE_FORMAT(lp.packed_at, '%Y-%m-%d %H:%i:%s')                          AS packed_at_datetime,

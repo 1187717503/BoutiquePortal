@@ -89,4 +89,30 @@ public interface SeasonMapper {
     List<Map<String, Object>> querySeasonByVendor(Map<String, Object> params);
 
     List<String> listAllSeasonCode();
+
+    /**
+     * 根据price_change_rule_id查找im_price_algorithm_id 然后 根据id查找name
+     * @param priceChangeRuleId
+     * @return
+     */
+    Map<String,Object> queryImPriceAlgorithm(Object priceChangeRuleId);
+
+    int deleteCategoryBrandRuleException(String price_change_rule_id);
+
+    int insertCategoryBrandRuleException(Map<String,Object> params);
+
+    int deleteProductGroupRule(String price_change_rule_id);
+
+    int insertProductGroupRule(Map<String,Object> params);
+
+    int deleteProductRule(String price_change_rule_id);
+
+    int insertProductRule(Map<String,Object> params);
+
+    /**
+     * 查找refresh时间
+     * @param priceChangeRuleId
+     * @return
+     */
+    Map<String,Object> querySnapShotTimeByRuleId(Object priceChangeRuleId);
 }

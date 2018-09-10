@@ -53,6 +53,7 @@
         <property name="appOrderUrl" value="${app.order.url}"></property>
         <property name="appCheckUrl" value="${app.check.url}"></property>
         <property name="ruleExcelPath" value="${price.rule.path}"></property>
+        <property name="ruleExcelPath" value="${price.rule.path}"></property>
     </bean>
 
     <bean class="com.intramirror.web.controller.cache.CategoryCache" init-method="init"/>

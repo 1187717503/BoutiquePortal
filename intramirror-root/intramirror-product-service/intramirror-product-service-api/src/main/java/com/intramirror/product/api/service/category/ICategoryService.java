@@ -12,6 +12,8 @@ public interface ICategoryService {
 
     List<Category> queryActiveCategorys() throws Exception;
 
+    Map<Long,Category> queryAllCategoryName();
+
     List<Category> listAllCategoryByConditions();
 
     List<Map<String, Object>> queryCategoryListByConditions(Category category) throws Exception;

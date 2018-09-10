@@ -38,9 +38,19 @@ public class LogisticsProduct {
     private Date picking_at;
 
     private String stock_location;
-    private Integer stock_location_id;
+    private Long stock_location_id;
     private BigDecimal total_rmb;
     private BigDecimal im_price;
+
+    private Integer shippingMethod;
+
+    public Integer getShippingMethod() {
+        return shippingMethod;
+    }
+
+    public void setShippingMethod(Integer shippingMethod) {
+        this.shippingMethod = shippingMethod;
+    }
 
     public BigDecimal getTotal_rmb() {
         return total_rmb;
@@ -58,11 +68,11 @@ public class LogisticsProduct {
         this.im_price = im_price;
     }
 
-    public Integer getStock_location_id() {
+    public Long getStock_location_id() {
         return stock_location_id;
     }
 
-    public void setStock_location_id(Integer stock_location_id) {
+    public void setStock_location_id(Long stock_location_id) {
         this.stock_location_id = stock_location_id;
     }
 

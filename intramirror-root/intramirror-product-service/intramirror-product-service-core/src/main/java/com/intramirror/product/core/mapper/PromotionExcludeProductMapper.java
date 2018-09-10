@@ -11,7 +11,11 @@ public interface PromotionExcludeProductMapper {
 
     List<Map<String, Object>> selectByParameter(PromotionExcludeProduct promotionExcludeProduct);
 
-    Long deletePromotionExcludeProduct(Long promotionExcludeProductId);
+    Long deletePromotionExcludeProduct(Map<String, Object> params);
 
     Long insertPromotionExcludeProduct(PromotionExcludeProduct promotionExcludeProduct);
+
+    List<Long> getPromotionProductIdByParameter(Map<String, Object> params);
+
+    Long updatePromotionSaveTimesExcludeProduct(Map<String, Object> params);
 }

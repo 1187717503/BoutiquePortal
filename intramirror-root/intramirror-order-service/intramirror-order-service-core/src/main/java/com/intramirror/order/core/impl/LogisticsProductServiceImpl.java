@@ -291,6 +291,11 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
     }
 
     @Override
+    public LogisticsProduct selectByOrderLineNum(String orderLineNum) {
+        return logisticsProductMapper.selectByOrderLineNum(orderLineNum);
+    }
+
+    @Override
     public void updateLogisticProductContainer(LogisticProductContainer logisticProductContainer) {
         LogisticProductContainer record = new LogisticProductContainer();
         record.setIsDeleted(1);

@@ -13,11 +13,15 @@ public interface VendorService {
 
     Vendor getVendorByUserId(Long userId) throws Exception;
 
+    List<Vendor> getVendorsByUserId(Long userId) throws Exception;
+
     Vendor getVendorByVendorId(Map<String, Object> params);
 
     Map<String, String> getProductSkuVendorIdMap(String[] shopProductSkuIds);
 
     List<Map<String, Object>> getAllVendorCountryById(String[] vendorIds);
+
+    List<Vendor> getVendorByIds(List<Long> ids);
 
 
 }

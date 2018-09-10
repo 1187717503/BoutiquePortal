@@ -61,13 +61,18 @@ public class PriceChangeRuleSeasonGroupServiceImpl extends BaseDao implements IP
     }
 
     @Override
+    public List<PriceChangeRuleSeasonGroup> getPriceChangeRuleGroupListByPriceChangeRuleId(Long priceChangeRuleId) {
+        return priceChangeRuleSeasonGroupMapper.getPriceChangeRuleGroupListByPriceChangeRuleId(priceChangeRuleId);
+    }
+
+    @Override
     public void init() {
         priceChangeRuleSeasonGroupMapper = this.getSqlSession().getMapper(PriceChangeRuleSeasonGroupMapper.class);
     }
 
 	@Override
 	public int deleteByPriceChangeRuleId(Long priceChangeRuleId) {
-		
+
 		return priceChangeRuleSeasonGroupMapper.deleteByPriceChangeRuleId(priceChangeRuleId);
 	}
 

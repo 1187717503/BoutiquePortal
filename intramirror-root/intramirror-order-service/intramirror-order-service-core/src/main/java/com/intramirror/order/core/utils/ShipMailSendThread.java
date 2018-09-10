@@ -236,7 +236,7 @@ public class ShipMailSendThread implements Runnable {
         int rowLength = 0;
         HSSFSheet sheet = workbook.createSheet("导出文件");
 
-        String[] excelHeaders = new String[]{"awb_num", "vendor_name", "stock_location", "order_line_num", "designer_id", "brand", "l1_category", "l2_category", "l3_category", "color_code", "size", "product_name", "buyer_name", "buyer_contact", "ship_to_address", "ship_to_province", "ship_to_city", "ship_to_area", "ship_to_country", "zip_code", "consignee", "consignee_mobile", "container_nr", "height", "length", "width", "weight", "shipment_nr", "shipment_status", "created_at_datetime", "confirmed_at_datetime", "packed_at_datetime", "shipped_at(day)", "qty", "retail_price", "boutique_discount_off", "boutique_price"};
+        String[] excelHeaders = new String[]{"awb_num", "vendor_name", "stock_location", "order_line_num","order_num","shipping_fee", "designer_id", "brand", "l1_category", "l2_category", "l3_category", "color_code", "size", "product_name", "buyer_name", "buyer_contact", "ship_to_address", "ship_to_province", "ship_to_city", "ship_to_area", "ship_to_country", "zip_code", "consignee", "consignee_mobile", "container_nr", "height", "length", "width", "weight", "shipment_nr", "shipment_status", "created_at_datetime", "confirmed_at_datetime", "packed_at_datetime", "shipped_at(day)", "qty", "retail_price", "boutique_discount_off", "boutique_price"};
 
         // 创建表头
         HSSFRow row1 = sheet.createRow(rowLength);
@@ -256,6 +256,8 @@ public class ShipMailSendThread implements Runnable {
                     transforNullValue(order.getVendor_name()),
                     transforNullValue(order.getStock_location()),
                     transforNullValue(order.getOrder_line_num()),
+                    transforNullValue(order.getOrder_num()),
+                    transforNullValue((order.getShipping_fee().multiply(order.getCurrent_rate())).setScale(2,BigDecimal.ROUND_HALF_UP)),
                     transforNullValue(order.getDesigner_id()),
                     transforNullValue(order.getBrand()),
                     transforNullValue(order.getL1_category()),

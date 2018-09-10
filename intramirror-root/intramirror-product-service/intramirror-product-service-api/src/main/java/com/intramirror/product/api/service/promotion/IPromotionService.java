@@ -24,9 +24,9 @@ public interface IPromotionService {
     PromotionRule processPromotionRule(PromotionRule rule, PromotionRuleType ruleType);
 
     //2018-4-18 By Jian
-    boolean processImportPromotionRule(List<PromotionRule> listRule);
+    boolean processImportPromotionRule(Integer type, List<PromotionRule> listRule);
 
-    Boolean removePromotionRule(Long ruleId, PromotionRuleType ruleType);
+    Boolean removePromotionRule(List<Long> ruleIds, PromotionRuleType ruleType);
 
     Boolean updatePromotionRule(PromotionRuleType ruleType, PromotionRule rule);
 
@@ -55,4 +55,39 @@ public interface IPromotionService {
     void refreshSnapshotForAddProduct(Long productId);
 
     void refreshBatchSnapshotForAddProduct(List<Long> productIds);
+
+    /**
+     * 查询已设置规则的vendor
+     * @param promotionId
+     * @return
+     */
+    List<Map<String, Object>> getPromotionBoutiqueHasRuleList(Long promotionId);
+
+    /**
+     * 查询promotion中vendor的每个season的商品数量
+     * @param params
+     * @return
+     */
+    List<Map<String, Object>> getPromotionBoutiqueProductCountBySeason(Map<String, Object> params);
+
+    /**
+     * 查询promotion排除的商品数量
+     * @param promotionId
+     * @return
+     */
+    Integer getPromotionBoutiqueExcludeProductCount(Long promotionId);
+
+    List<Map<String, Object>> listSeasonIncludeRulePromotion(Map<String, Object> params);
+
+    List<Map<String, Object>> listSeasonExcludeRulePromotion(Map<String, Object> params);
+
+    int countSeasonIncludeRulePromotion(Map<String, Object> params);
+
+    int countSeasonExcludeRulePromotion(Map<String, Object> params);
+
+    int updatePromotionSaveTime(Long promotionId);
+
+    List<Long> getExcludeProductGroupByTagId(Long tagId);
+
+    List<Map<String, Object>> selectPromotionByStatus(Map<String, Integer> params);
 }

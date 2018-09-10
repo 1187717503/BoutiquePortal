@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.intramirror.order.api.model.LogisticsProduct;
+import org.apache.ibatis.annotations.Param;
 
 public interface LogisticsProductMapper {
 
@@ -81,4 +82,6 @@ public interface LogisticsProductMapper {
     List<LogisticsProduct> getLogisticsProductByShipment(Long shipmentId);
 
     Map<String,Object> getShopProductSku(Long logisticsProductId);
+
+    LogisticsProduct selectByOrderLineNum(@Param("orderLineNum") String orderLineNum);
 }

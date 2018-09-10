@@ -99,10 +99,10 @@ public class CopyRuleController extends BaseController {
     @RequestMapping("/seasonVendor")
     @ResponseBody
     public ResultMessage seasonVendor(@Param("price_change_rule_id") String price_change_rule_id, @Param("seasons") String seasons,
-            @Param("vendor_id") String vendor_id, @Param("price_type") String price_type, HttpServletRequest httpRequest) {
+            @Param("vendor_id") String vendor_id, @Param("price_type") String price_type, @Param("im_price_algorithm_id") String im_price_algorithm_id, HttpServletRequest httpRequest) {
         ResultMessage resultMessage = ResultMessage.getInstance();
         try {
-            if (StringUtils.isBlank(price_change_rule_id) || seasons == null || seasons.length() == 0) {
+            if (StringUtils.isBlank(price_change_rule_id) || seasons == null || seasons.length() == 0 || StringUtils.isBlank(im_price_algorithm_id)) {
                 return resultMessage.errorStatus().putMsg("info", "params is error !!!");
             }
 
@@ -111,6 +111,7 @@ public class CopyRuleController extends BaseController {
             params.put("seasons", seasons);
             params.put("vendor_id", vendor_id);
             params.put("price_type", price_type);
+            params.put("im_price_algorithm_id", im_price_algorithm_id);
 
             // select user_id
             Vendor vendor = iQueryVendorService.queryVendorByVendorId(params);

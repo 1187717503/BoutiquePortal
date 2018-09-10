@@ -31,9 +31,9 @@ public interface PromotionRuleMapper {
 
     Long insertExcludeRuleDetail(PromotionExclude promotionExclude);
 
-    int removeIncludeRule(Long ruleId);
+    int removeIncludeRule(@Param("ruleIds") List<Long> ruleIds);
 
-    int removeExcludeRule(Long ruleId);
+    int removeExcludeRule(@Param("ruleIds") List<Long> ruleIds);
 
     int removeIncludeRuleDetail(Long ruleId);
 
@@ -92,5 +92,44 @@ public interface PromotionRuleMapper {
             @Param("productIds") List<Long> productIds);
 
     void removeExcludeProductFromSnapshotProduct(Long promotionId);
+
+    List<Map<String, Object>> getPromotionBoutiqueHasRuleList(Long promotionId);
+
+    List<Map<String, Object>> getPromotionBoutiqueProductCountBySeason(Map<String, Object> params);
+
+    Integer getPromotionBoutiqueExcludeProductCount(Long promotionId);
+
+    List<Map<String, Object>> listSeasonIncludeRulePromotion(Map<String, Object> params);
+
+    List<Map<String, Object>> listSeasonExcludeRulePromotion(Map<String, Object> params);
+
+    int countSeasonIncludeRulePromotion(Map<String, Object> params);
+
+    int countSeasonExcludeRulePromotion(Map<String, Object> params);
+
+    /**
+     * 更新t_promotion表中refresh_at为当前时间
+     * @param promotionId
+     * @return
+     */
+    int updatePromotionRefreshAt(@Param("promotionId") Long promotionId);
+
+    /**
+     * @param promotionId
+     * @return
+     */
+    int updatePromotionSaveTime(@Param("promotionId") Long promotionId);
+
+    /**
+     * @param promotionIds
+     * @return
+     */
+    int updatePromotionSaveTimes(@Param("tableName") String tableName, @Param("ruleIds") List<Long> promotionIds);
+
+    /**
+     * @param tagId
+     * @return
+     */
+    List<Long> getExcludeProductGroupByTagId(@Param("tagId") Long tagId);
 }
 

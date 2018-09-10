@@ -39,6 +39,8 @@ public class HttpClientUtil {
     public static String shippedOrder;
     public static String confirmStoreUrl;
 
+    public static String tmsProviderRouteUrl;
+
     public static String httpPost(String jsonObj, String url){
         HttpPost post = null;
         try {
@@ -163,8 +165,8 @@ public class HttpClientUtil {
                 LOGGER.error("msg={}",object.optString("msg"));
                 return object.toString();
             }else {
-                JSONObject data = object.optJSONObject("data");
-                return data.toString();
+                return object.getString("data");
+//                return data.toString();
             }
         } catch (ClientProtocolException e) {
             e.printStackTrace();
@@ -217,6 +219,14 @@ public class HttpClientUtil {
 
     public static String getShippedOrder() {
         return shippedOrder;
+    }
+
+    public static String getTmsProviderRouteUrl() {
+        return tmsProviderRouteUrl;
+    }
+
+    public static void setTmsProviderRouteUrl(String tmsProviderRouteUrl) {
+        HttpClientUtil.tmsProviderRouteUrl = tmsProviderRouteUrl;
     }
 
     public static void setShippedOrder(String shippedOrder) {

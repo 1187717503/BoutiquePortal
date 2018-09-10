@@ -17,7 +17,9 @@ public interface IRuleService {
     List<Map<String,Object>> queryAllBrand() throws Exception;
     List<Map<String,Object>> queryRuleByGroup(Map<String,Object> params) throws Exception;
     List<Map<String,Object>> queryRuleByProduct(Map<String,Object> params) throws Exception;
-    boolean changeRule(String price_change_rule_id,List<Map<String,Object>> list) throws Exception;
+    boolean changeRule(String price_change_rule_id,Map<String, List<Map<String,Object>>> map) throws Exception;
+
+    Map<String,Object> getSnapShotUpdateTime(Object ruleId,Map<String,Object> map) throws Exception;
     /** end im rule page select */
 
 }

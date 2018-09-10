@@ -1,6 +1,7 @@
 package com.intramirror.web.controller.order;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
@@ -9,6 +10,9 @@ import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.common.utils.DateUtils;
 import com.intramirror.main.api.enums.GeographyEnum;
+import com.intramirror.main.api.model.StockLocation;
+import com.intramirror.main.api.service.StockLocationService;
+import com.intramirror.main.api.vo.StockLocationVO;
 import com.intramirror.order.api.common.OrderStatusType;
 import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.service.IContainerService;
@@ -18,9 +22,11 @@ import com.intramirror.order.api.service.IOrderExceptionTypeService;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.model.CancelOrderVO;
 import com.intramirror.order.api.vo.PageListVO;
+import com.intramirror.product.api.model.Category;
 import com.intramirror.product.api.model.Product;
 import com.intramirror.product.api.service.IProductService;
 import com.intramirror.product.api.service.ISkuStoreService;
+import com.intramirror.product.api.service.category.ICategoryService;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.VendorService;
@@ -39,10 +45,12 @@ import java.net.URLDecoder;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.ConvertUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.slf4j.Logger;
@@ -102,6 +110,12 @@ public class OrderController extends BaseController {
     @Autowired
     private CommonsProperties commonsProperties;
 
+    @Autowired
+    private StockLocationService stockLocationService;
+
+    @Autowired
+    private ICategoryService iCategoryService;
+
     /**
      * 获取订单列表
      * @param map
@@ -130,17 +144,6 @@ public class OrderController extends BaseController {
             return result;
         }
 
-        Vendor vendor = null;
-        try {
-            vendor = vendorService.getVendorByUserId(user.getUserId());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (vendor == null) {
-            result.setMsg("Please log in again");
-            return result;
-        }
-
         String sortByName = null;
         if (map.get("sortByName") != null) {
             sortByName = map.get("sortByName").toString();
@@ -151,37 +154,58 @@ public class OrderController extends BaseController {
         if (map.get("categoryId") != null) {
             categoryIds = categoryCache.getAllChildCategory(Long.parseLong(map.get("categoryId").toString()));
         }
+        List<Long> vendorIds = null;
+        if(map.get("vendorId") != null){
+            vendorIds = Arrays.asList(Long.parseLong(map.get("vendorId").toString()));
+        }else {
+            List<Vendor> vendors = null;
+            try {
+                vendors = vendorService.getVendorsByUserId(user.getUserId());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (vendors == null) {
+                result.setMsg("Please log in again");
+                return result;
+            }
+            vendorIds = vendors.stream().map(Vendor::getVendorId).collect(Collectors.toList());
+        }
 
-        Long vendorId = vendor.getVendorId();
         String status = map.get("status").toString();
         //根据订单状态查询订单
-        logger.info(MessageFormat.format("order getOrderList 调用接口 orderService.getOrderListByStatus 查询订单信息  入参 status:{0},vendorId:{1},sortByName:{2}",
-                status, vendorId, sortByName));
+        logger.info(MessageFormat.format("order getOrderList 调用接口 orderService.getOrderListByStatus 查询订单信息  入参 status:{0},vendorIds:{1},sortByName:{2}",
+                status, vendorIds, sortByName));
         List<Map<String, Object>> orderList = null;
         PageListVO orderCancelList = null;
+        Map<Long,List<StockLocationVO>> stockLocationListMap = null;
         if ("6".equals(status)){
             //cancel TAB列表查询
-            map.put("vendorId",vendorId);
+            map.put("vendorIds",vendorIds);
             orderCancelList = orderService.getOrderCancelList(map);
         }else {
             Map<String, Object> params = new HashMap<>();
             params.put("status", status);
-            params.put("vendorId", vendorId);
+            params.put("vendorIds", vendorIds);
             params.put("sortByName", sortByName);
             params.put("categoryIds", categoryIds);
             params.put("brandId", map.get("brandId"));
-            params.put("stockLocation", map.get("stockLocation"));
+            params.put("locationId", map.get("locationId"));
             params.put("logisticsProductIds", map.get("logisticsProductIds"));
             orderList = orderService.getOrderListByParams(params);
+            //根据vendorIds查询所有的stockLocation
+            List<StockLocationVO> stockLocationList = stockLocationService.getStockLocationByVendorIds(vendorIds);
+            stockLocationListMap = stockLocationList.stream().collect(Collectors.groupingBy(StockLocationVO::getVendorId));
         }
-
+        Map<Long,Category> categoryMap =iCategoryService.queryAllCategoryName();
         if (orderList != null && orderList.size() > 0) {
-
-
             logger.info("order getOrderList 解析订单列表信息  ");
             for (Map<String, Object> info : orderList) {
                 //计算折扣
                 arithmeticalDiscount(info);
+                if(stockLocationListMap!=null){
+                    info.put("stockLocations",stockLocationListMap.get(info.get("vendor_id")));
+                }
+                info.put("categoryPath",categoryMap.get(info.get("category_id"))==null?"":categoryMap.get(info.get("category_id")).getCategoryPath());
             }
         }
         if(orderCancelList!=null
@@ -200,6 +224,8 @@ public class OrderController extends BaseController {
                 }
                 co.setPrice(new BigDecimal(co.getPrice().toString()).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
                 co.setIn_price(new BigDecimal(co.getIn_price().toString()).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
+
+                co.setCategoryPath(categoryMap.get(co.getCategory_id())==null?"":categoryMap.get(co.getCategory_id()).getCategoryPath());
             }
         }
 
@@ -264,11 +290,11 @@ public class OrderController extends BaseController {
             return result;
         }
 
-        Long vendorId = vendor.getVendorId();
+        //Long vendorId = vendor.getVendorId();
 
         Map<String, Object> conditionMap = new HashMap<String, Object>();
         conditionMap.put("status", Integer.parseInt(map.get("status").toString()));
-        conditionMap.put("vendorId", vendorId);
+        //conditionMap.put("vendorId", vendorId);
         conditionMap.put("orderNumber", map.get("orderNumber").toString());
 
         //根据订单orderLineNumber 查询订单详情
@@ -296,7 +322,10 @@ public class OrderController extends BaseController {
             //计算折扣
             Double salePrice = Double.parseDouble(orderInfo.get("sale_price").toString());
             Double price = Double.parseDouble(orderInfo.get("price").toString());
-            Double inPrice = Double.parseDouble(orderInfo.get("in_price").toString());
+            BigDecimal inPriceDecimal = new BigDecimal(Double.parseDouble(orderInfo.get("in_price").toString()));
+            Double inPrice = inPriceDecimal.doubleValue();
+            orderInfo.put("in_price",inPriceDecimal.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
+
 
             BigDecimal sale_price_discount = new BigDecimal((salePrice / price) * 100);
             //				info.put("sale_price_discount",sale_price_discount.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() +" %");
@@ -418,23 +447,23 @@ public class OrderController extends BaseController {
                 return resultMessage;
             }
 
-            Vendor vendor = null;
+            List<Vendor> vendors = null;
             try {
-                vendor = vendorService.getVendorByUserId(user.getUserId());
+                vendors = vendorService.getVendorsByUserId(user.getUserId());
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if (vendor == null) {
+            if (CollectionUtils.isEmpty(vendors)) {
                 resultMessage.setMsg("Please log in again");
                 return resultMessage;
             }
-            Long vendorId = vendor.getVendorId();
+            List<Long> vendorIds = vendors.stream().map(Vendor::getVendorId).collect(Collectors.toList());
             int[] item = { OrderStatusType.PENDING, OrderStatusType.COMFIRMED ,OrderStatusType.CANCELED,OrderStatusType.PICKING};
             Map<String, Object> resultMap = new HashMap<>();
             for (int i = 0; i < item.length; i++) {
                 map = new HashMap<>();
                 map.put("status", item[i]);
-                map.put("vendorId", vendorId);
+                map.put("vendorIds", vendorIds);
                 int result = orderService.getOrderByIsvalidCount(map);
                 if (OrderStatusType.PENDING == item[i])
                     resultMap.put("comfirmed", result);
@@ -455,12 +484,11 @@ public class OrderController extends BaseController {
 
             //readytoship数量
             map = new HashMap<>();
-            map.put("vendorId", vendorId);
+            map.put("vendorIds", vendorIds);
             Integer result = containerService.getContainerCount(map);
             resultMap.put("readyToship", result==null?0:result);
 
             //shippedCount
-            map.put("vendorId", vendorId);
             Integer shippedCount = orderService.getShippedCount(map);
             resultMap.put("shipped", shippedCount==null?0:shippedCount);
 
@@ -567,24 +595,26 @@ public class OrderController extends BaseController {
             return result;
         }
 
-        Vendor vendor = null;
+        List<Vendor> vendors = null;
         try {
-            vendor = vendorService.getVendorByUserId(user.getUserId());
+            vendors = vendorService.getVendorsByUserId(user.getUserId());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (vendor == null) {
+        if (CollectionUtils.isEmpty(vendors)) {
             result.setMsg("Please log in again");
             return result;
         }
+
+        List<Long> vendorIds = vendors.stream().map(Vendor::getVendorId).collect(Collectors.toList());
 
         try {
             //获取PackOrderorder列表
             logger.info(MessageFormat
                     .format("order getPackOrderList 调用接口getOrderListByStatusAndContainerId 获取箱子内订单列表 入参 containerId:{0},status:{1},vendorId:{2}",
-                            map.get("containerId").toString(), map.get("status").toString(), vendor.getVendorId()));
+                            map.get("containerId").toString(), map.get("status").toString(), vendorIds.toArray()));
             List<Map<String, Object>> packList = orderService.getOrderListByStatusAndContainerId(Integer.parseInt(map.get("containerId").toString()),
-                    Integer.parseInt(map.get("status").toString()), vendor.getVendorId());
+                    Integer.parseInt(map.get("status").toString()), vendorIds);
 
             //			if(packList != null && packList.size() > 0){
             //				//遍历获取所有商品ID
@@ -672,8 +702,23 @@ public class OrderController extends BaseController {
             return result;
         }
 
-        map.put("vendorId", vendor.getVendorId());
+        //map.put("vendorId", vendor.getVendorId());
 
+        LogisticsProduct logisticsProduct=iLogisticsProductService.selectByOrderLineNum((String)map.get("orderLineNum"));
+        if(logisticsProduct!=null&&logisticsProduct.getShippingMethod()==1){
+            Map<String,Object> containerParam = Maps.newHashMap();
+            containerParam.put("containerId",map.get("containerId"));
+            Map<String,Object> container = containerService.getContainerById(containerParam);
+            if(container!=null){
+                String shipToGeography = (String) container.get("ship_to_geography");
+                if(!"Transit Warehouse".equals(shipToGeography)){
+                    result.setMsg("This order must to be deliveried to transit warehouse,cause buyer choose the shipping method of Fedex.Please delete this carton and create a new carton to transit warehouse.");
+                    infoMap.put("code", StatusType.ORDER_CHECK_ORDER);
+                    result.setInfoMap(infoMap);
+                    return result;
+                }
+            }
+        }
         //订单装箱
         try {
             result = orderServiceImpl.packingOrder(map);
@@ -1104,18 +1149,15 @@ public class OrderController extends BaseController {
                 message.errorStatus().putMsg("info", "locationId cannot be null");
                 return message;
             }
-            if(map.get("stockLocation") == null || StringUtils.isBlank(map.get("stockLocation").toString())){
-                logger.info("stockLocation cannot be null");
-                message.errorStatus().putMsg("info", "stockLocation cannot be null");
-                return message;
-            }
             Long lpId = Long.valueOf(map.get("logistics_product_id").toString());
-            Integer locationId = Integer.valueOf(map.get("locationId").toString());
-            String stockLocation = map.get("stockLocation").toString();
+            Long locationId = Long.valueOf(map.get("locationId").toString());
+            StockLocation stockLocation = stockLocationService.getStockLocation(locationId);
             LogisticsProduct logisticsProduct = new LogisticsProduct();
             logisticsProduct.setLogistics_product_id(lpId);
-            logisticsProduct.setStock_location(stockLocation);
             logisticsProduct.setStock_location_id(locationId);
+            if (stockLocation!=null){
+                logisticsProduct.setStock_location(stockLocation.getStockLocation());
+            }
             int result = iLogisticsProductService.updateByLogisticsProduct(logisticsProduct);
             if (result == 1) {
                 message.successStatus().putMsg("SUCCESS", "result " + result);
@@ -1225,32 +1267,38 @@ public class OrderController extends BaseController {
             result.setMsg("Please log in again");
             return result;
         }
-
-        Vendor vendor = null;
+        boolean isParent =false;
+        List<Vendor> vendors = null;
         try {
-            vendor = vendorService.getVendorByUserId(user.getUserId());
+            vendors = vendorService.getVendorsByUserId(user.getUserId());
+            if(CollectionUtils.isNotEmpty(vendors)){
+                if(CollectionUtils.isNotEmpty(vendors.stream().filter(e -> !e.getUserId().equals(user.getUserId())).collect(Collectors.toList()))){
+                    isParent=true;
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (vendor == null) {
+        if (vendors == null) {
             result.setMsg("Please log in again");
             return result;
         }
+        List<Long> vendorIds = vendors.stream().map(Vendor::getVendorId).collect(Collectors.toList());
 
         List<Long> logisticsProductIdList = new ArrayList<>();
         if (map.get("logisticsProductIds") != null && StringUtil.isNotEmpty(map.get("logisticsProductIds").toString())) {
             logisticsProductIdList = Arrays.asList((Long[]) ConvertUtils.convert(map.get("logisticsProductIds").toString().split(","), Long.class));
         }
 
-        Long vendorId = vendor.getVendorId();
+//        Long vendorId = vendor.getVendorId();
         String status = map.get("status").toString();
         //根据订单状态查询订单
-        logger.info(MessageFormat.format("order getOrderList 调用接口 orderService.getOrderListByParams 查询订单信息  入参 status:{0},vendorId:{1},logisticsProductIdList:{2}",
-                status, vendorId, logisticsProductIdList));
+        logger.info(MessageFormat.format("order getOrderList 调用接口 orderService.getOrderListByParams 查询订单信息  入参 status:{0},vendorIds:{1},logisticsProductIdList:{2}",
+                status, vendorIds, logisticsProductIdList));
         List<Map<String, Object>> orderList = null;
         Map<String, Object> params = new HashMap<>();
         params.put("status", status);
-        params.put("vendorId", vendorId);
+        params.put("vendorIds", vendorIds);
         params.put("logisticsProductIds", logisticsProductIdList);
         orderList = orderService.getOrderListByParams(params);
         if (orderList == null || orderList.size() == 0) {
@@ -1274,7 +1322,7 @@ public class OrderController extends BaseController {
         String filePath = path + fileName;
 
         logger.info("exportOrderList 生成订单文件");
-        generateOrderExcel("Order", orderList, filePath);
+        generateOrderExcel("Order", orderList, filePath,isParent);
 
         File newFile = new File(filePath);
         httpResponse.setHeader("Access-Control-Allow-Origin", "*");
@@ -1314,7 +1362,7 @@ public class OrderController extends BaseController {
         return result;
     }
 
-    private String generateOrderExcel(String excelName, List<Map<String, Object>> orderList, String filePath) {
+    private String generateOrderExcel(String excelName, List<Map<String, Object>> orderList, String filePath,boolean isParent) {
         HSSFWorkbook workbook = new HSSFWorkbook();
 
         int rowLength = 0;
@@ -1323,7 +1371,12 @@ public class OrderController extends BaseController {
         //图片处理
         HSSFPatriarch patriarch = sheet.createDrawingPatriarch();
 
-        String[] excelHeaders = new String[]{"Order Line No.", "Order Date", "Picture", "Brand", "Name", "Designer ID", "Color Code", "Size", "Retail Price", "Purchase Price", "VAT?", "Purchase Discount", "Consignee Geography"};
+        String[] excelHeaders = null;
+        if(isParent){
+            excelHeaders=new String[]{"Order Line No.", "Order Date", "Picture", "Brand", "Name", "Designer ID", "Color Code", "Size", "Retail Price", "Purchase Price", "VAT?", "Purchase Discount", "Consignee Geography","Boutique"};
+        }else{
+            excelHeaders=new String[]{"Order Line No.", "Order Date", "Picture", "Brand", "Name", "Designer ID", "Color Code", "Size", "Retail Price", "Purchase Price", "VAT?", "Purchase Discount", "Consignee Geography"};
+        }
 
         // 创建表头
         HSSFRow row1 = sheet.createRow(rowLength);
@@ -1339,21 +1392,42 @@ public class OrderController extends BaseController {
         for (Map<String, Object> order : orderList) {
             row = sheet.createRow(rowLength);
             row.setHeightInPoints(125F);
-            String[] values = {
-                    transforNullValue(order.get("order_line_num")),
-                    transforNullValue(sdf.format(order.get("created_at"))),
-                    transforNullValue(order.get("cover_img")),
-                    transforNullValue(order.get("brandName")),
-                    transforNullValue(order.get("name")),
-                    transforNullValue(order.get("brandID")),
-                    transforNullValue(order.get("colorCode")),
-                    transforNullValue(order.get("size")),
-                    transforNullValue("€ " + new BigDecimal(order.get("price").toString()).setScale(2, BigDecimal.ROUND_HALF_UP).toString()),
-                    transforNullValue("€ " + new BigDecimal(order.get("in_price").toString()).setScale(2, BigDecimal.ROUND_HALF_UP).toString()),
-                    transforNullValue(GeographyEnum.EUROPEAN_UNION.getId().equals(order.get("geography_id").toString()) ? "incld. VAT" : "excld. VAT"),
-                    transforNullValue(order.get("supply_price_discount")),
-                    transforNullValue(order.get("geography_name"))
-            };
+            String[] values = null;
+            if (isParent){
+                values =new String[]{
+                        transforNullValue(order.get("order_line_num")),
+                        transforNullValue(sdf.format(order.get("created_at"))),
+                        transforNullValue(order.get("cover_img")),
+                        transforNullValue(order.get("brandName")),
+                        transforNullValue(order.get("name")),
+                        transforNullValue(order.get("brandID")),
+                        transforNullValue(order.get("colorCode")),
+                        transforNullValue(order.get("size")),
+                        transforNullValue("€ " + new BigDecimal(order.get("price").toString()).setScale(2, BigDecimal.ROUND_HALF_UP).toString()),
+                        transforNullValue("€ " + new BigDecimal(order.get("in_price").toString()).setScale(2, BigDecimal.ROUND_HALF_UP).toString()),
+                        transforNullValue(GeographyEnum.EUROPEAN_UNION.getId().equals(order.get("geography_id").toString()) ? "incld. VAT" : "excld. VAT"),
+                        transforNullValue(order.get("supply_price_discount")),
+                        transforNullValue(order.get("geography_name")),
+                        transforNullValue(order.get("vendor_name"))
+                };
+            }else {
+                values = new String[]{
+                        transforNullValue(order.get("order_line_num")),
+                        transforNullValue(sdf.format(order.get("created_at"))),
+                        transforNullValue(order.get("cover_img")),
+                        transforNullValue(order.get("brandName")),
+                        transforNullValue(order.get("name")),
+                        transforNullValue(order.get("brandID")),
+                        transforNullValue(order.get("colorCode")),
+                        transforNullValue(order.get("size")),
+                        transforNullValue("€ " + new BigDecimal(order.get("price").toString()).setScale(2, BigDecimal.ROUND_HALF_UP).toString()),
+                        transforNullValue("€ " + new BigDecimal(order.get("in_price").toString()).setScale(2, BigDecimal.ROUND_HALF_UP).toString()),
+                        transforNullValue(GeographyEnum.EUROPEAN_UNION.getId().equals(order.get("geography_id").toString()) ? "incld. VAT" : "excld. VAT"),
+                        transforNullValue(order.get("supply_price_discount")),
+                        transforNullValue(order.get("geography_name"))
+                };
+            }
+
             //将数据放到excel中，第三列是图片需要特殊处理
             for (int i = 0; i < excelHeaders.length; i++) {
                 cell = row.createCell(i);

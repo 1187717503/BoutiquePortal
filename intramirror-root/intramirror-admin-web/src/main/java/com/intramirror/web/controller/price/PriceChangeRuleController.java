@@ -10,21 +10,14 @@ import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.core.common.response.StatusCode;
-import com.intramirror.product.api.model.PriceChangeRule;
-import com.intramirror.product.api.model.PriceChangeRuleCategoryBrand;
-import com.intramirror.product.api.model.PriceChangeRuleGroup;
-import com.intramirror.product.api.model.PriceChangeRuleProduct;
-import com.intramirror.product.api.model.ProductWithBLOBs;
-import com.intramirror.product.api.service.IPriceChangeRuleCategoryBrandService;
-import com.intramirror.product.api.service.IPriceChangeRuleGroupService;
-import com.intramirror.product.api.service.IPriceChangeRuleProductService;
-import com.intramirror.product.api.service.IProductService;
-import com.intramirror.product.api.service.ISystemPropertyService;
+import com.intramirror.product.api.model.*;
+import com.intramirror.product.api.service.*;
 import com.intramirror.product.api.service.price.IPriceChangeRule;
 import com.intramirror.user.api.model.User;
 import com.intramirror.web.controller.BaseController;
 import com.intramirror.web.service.PriceChangeRuleService;
 import com.intramirror.web.service.price.PriceRuleSynService;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -36,11 +29,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
 
 /**
  * @author wzh
@@ -71,10 +62,16 @@ public class PriceChangeRuleController extends BaseController {
     private PriceChangeRuleService priceChangeRuleService;
 
     @Autowired
+    private IPriceChangeRuleSeasonGroupService iPriceChangeRuleSeasonGroupService;
+
+    @Autowired
     private IProductService productService;
 
     @Autowired
     private ISystemPropertyService iSystemPropertyService;
+
+    @Autowired
+    private ISnapshotPriceRuleService iSnapshotPriceRuleService;
 
     @Autowired
     private PriceTaskController priceTaskController;
@@ -188,12 +185,32 @@ public class PriceChangeRuleController extends BaseController {
         try {
             if (StringUtils.isBlank(price_change_rule_id))
                 return resultMessage.errorStatus().putMsg("info", "params is null !!!");
+            //查询price_change_rule信息
             PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
 
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-            if (pcrModel != null && pcrModel.getValidFrom() != null) {
-                pcrModel.setValidFromStr(simpleDateFormat.format(pcrModel.getValidFrom()));
+            if (pcrModel != null) {
+                if (pcrModel.getValidFrom() != null) {
+                    pcrModel.setValidFromStr(simpleDateFormat.format(pcrModel.getValidFrom()));
+                }
+                if (pcrModel.getImPriceAlgorithmId() != null) {
+                    ImPriceAlgorithm algorithm = priceChangeRule.getAlgorithmById(pcrModel.getImPriceAlgorithmId());
+                    if (algorithm != null) {
+                        pcrModel.setImPriceAlgorithmName(algorithm.getName());
+                    }
+                }
+                Map<String, Object> paramsMap = new HashMap<>();
+                paramsMap.put("price_change_rule_id", price_change_rule_id);
+                //根据参数查询snapshot对应的product id 和 im price的值
+                boolean preview = pcrModel.getPreview_status() == 0 ? false : true;
+                pcrModel.setPreviewImPrice(preview);
+                Map<String, Object> snapShot = priceChangeRule.querySnapShotTimeByRuleId(price_change_rule_id);
+                if (snapShot != null && snapShot.get("updated_at") != null) {
+                    pcrModel.setRefreshDate(snapShot.get("updated_at").toString());
+                } else {
+                    pcrModel.setRefreshDate(null);
+                }
             }
 
             resultMessage.successStatus().putMsg("info", "success !!!").setData(pcrModel);
@@ -205,9 +222,29 @@ public class PriceChangeRuleController extends BaseController {
         return resultMessage;
     }
 
+    @RequestMapping(value = "/preview/all/im", method = RequestMethod.POST)
+    @ResponseBody
+    public ResultMessage previewAllBoutique(@RequestBody Map<String, String> param) throws ParseException {
+        ResultMessage resultMessage = ResultMessage.getInstance();
+        PriceChangeRule condition = new PriceChangeRule();
+        condition.setPriceType(Byte.valueOf("1"));
+        condition.setStatus(1);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+        condition.setValidFrom(sdf.parse(param.get("validFrom")));
+
+        List<PriceChangeRule> priceChangeRules = priceChangeRule.selectByCondition(condition);
+        if (priceChangeRules != null && priceChangeRules.size() > 0) {
+            for (PriceChangeRule item : priceChangeRules) {
+                //                changePreview(item.getPriceChangeRuleId(), 1L, "");
+                changePreviewByBoutique(item.getPriceChangeRuleId(), 1L, "");
+            }
+        }
+        resultMessage.setData(priceChangeRules);
+        return resultMessage;
+    }
+
     @RequestMapping("/changepreview")
     @ResponseBody
-
     public ResultMessage changePreview(@Param("price_change_rule_id") Long price_change_rule_id, @Param("preview_status") Long preview_status,
             @Param("flag") String flag) {
         logger.info("PriceChangeRuleController,changePreview,inputParams,price_change_rule_id:{},preview_status:{} ", price_change_rule_id, preview_status);
@@ -327,7 +364,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 修改PriceChangeRuleCategoryBrand
-     *
      * @param map
      * @return
      */
@@ -374,6 +410,9 @@ public class PriceChangeRuleController extends BaseController {
                     result.put("info", "parameter is incorrect");
                     return result;
                 }
+                // 更新snapshot_price_rule数据
+                updateSnapshotPriceRuleSaveAt(priceChangeRuleCategory.get("price_change_rule_id").getAsLong());
+                // todo refresh
 
                 //修改
             } else {
@@ -384,6 +423,9 @@ public class PriceChangeRuleController extends BaseController {
                     result.put("info", "parameter is incorrect");
                     return result;
                 }
+                // 更新snapshot_price_rule数据
+                updateSnapshotPriceRuleSaveAt(priceChangeRuleCategory.get("price_change_rule_id").getAsLong());
+                // todo refresh
             }
 
         } catch (Exception e) {
@@ -398,7 +440,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据品牌ID添加下面所有2级类目的PriceChangeRuleCategoryBrand
-     *
      * @param map
      * @return
      */
@@ -431,7 +472,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据品牌ID删除下面所有2级类目的PriceChangeRuleCategoryBrand
-     *
      * @param map
      * @return
      */
@@ -518,7 +558,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 单个添加PriceChangeRuleCategoryBrand
-     *
      * @param map
      * @return
      */
@@ -566,6 +605,9 @@ public class PriceChangeRuleController extends BaseController {
                 result.put("info", "parameter is incorrect");
                 return result;
             }
+            // 更新snapshot_price_rule数据
+            updateSnapshotPriceRuleSaveAt(priceChangeRuleCategory.get("price_change_rule_id").getAsLong());
+            // todo refresh
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -579,7 +621,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据price_change_rule_category_brand_id 删除PriceChangeRuleCategoryBrand
-     *
      * @param map
      * @return
      */
@@ -599,6 +640,8 @@ public class PriceChangeRuleController extends BaseController {
         try {
             //根据ID删除
             String priceChangeRuleCategoryBrandId = map.get("price_change_rule_category_brand_id").toString();
+            PriceChangeRuleCategoryBrand priceChangeRuleCategoryBrand = priceChangeRuleCategoryBrandService.selectByPrimaryKey(
+                    Long.parseLong(priceChangeRuleCategoryBrandId));
             int row = priceChangeRuleCategoryBrandService.deletePriceChangeRuleCategoryBrand(Long.parseLong(priceChangeRuleCategoryBrandId));
 
             //判断是否成功
@@ -607,6 +650,9 @@ public class PriceChangeRuleController extends BaseController {
             } else {
                 result.put("info", "delete priceChangeRuleCategoryBrand fail");
             }
+            // 更新snapshot_price_rule数据
+            updateSnapshotPriceRuleSaveAt(priceChangeRuleCategoryBrand.getPriceChangeRuleId());
+            // todo refresh
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -619,7 +665,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 添加priceChangeRuleProductGroup
-     *
      * @param map
      * @return
      */
@@ -661,6 +706,9 @@ public class PriceChangeRuleController extends BaseController {
                 result.put("info", "parameter is incorrect");
                 return result;
             }
+            // 更新snapshot_price_rule数据
+            updateSnapshotPriceRuleSaveAt(priceChangeRuleGroupjson.get("price_change_rule_id").getAsLong());
+            // todo refresh
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -674,7 +722,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据price_change_rule_group_id 删除PriceChangeRuleGroup
-     *
      * @param map
      * @return
      */
@@ -694,6 +741,7 @@ public class PriceChangeRuleController extends BaseController {
         try {
             //根据ID删除
             String priceChangeRuleGroupId = map.get("price_change_rule_group_id").toString();
+            PriceChangeRuleGroup priceChangeRuleGroup = priceChangeRuleGroupService.selectByPrimaryKey(Long.parseLong(priceChangeRuleGroupId));
             int row = priceChangeRuleGroupService.deleteByPrimaryKey(Long.parseLong(priceChangeRuleGroupId));
 
             //判断是否成功
@@ -702,6 +750,9 @@ public class PriceChangeRuleController extends BaseController {
             } else {
                 result.put("info", "delete priceChangeRuleGroup fail");
             }
+            // 更新snapshot_price_rule数据
+            updateSnapshotPriceRuleSaveAt(priceChangeRuleGroup.getPriceChangeRuleId());
+            // todo refresh
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -714,7 +765,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 添加PriceChangeRuleProduct
-     *
      * @param map
      * @return
      */
@@ -732,50 +782,72 @@ public class PriceChangeRuleController extends BaseController {
         }
 
         try {
-            String productCode = map.get("product_code").toString();
-            String price_change_rule_id = map.get("price_change_rule_id").toString();
+            String designerId = map.get("designer_id").toString();
+            String colorCode = map.get("color_code").toString();
+            Long priceChangeRuleId = Long.valueOf(map.get("price_change_rule_id").toString());
 
-            PriceChangeRule pcr = priceChangeRule.selectByPrimaryKey(Long.parseLong(price_change_rule_id));
+            PriceChangeRule pcr = priceChangeRule.selectByPrimaryKey(priceChangeRuleId);
 
             //查询是否存在该商品
-            ProductWithBLOBs nproductWithBLOBs = null;
-            if (StringUtils.isNotBlank(productCode)) {
+            List<ProductWithBLOBs> productWithBLOBsList = null;
+            if (StringUtils.isNotBlank(designerId) && StringUtils.isNotBlank(colorCode)) {
                 ProductWithBLOBs productWithBLOBs = new ProductWithBLOBs();
-                productWithBLOBs.setProductCode(productCode);
+                productWithBLOBs.setDesignerId(designerId);
+                productWithBLOBs.setColorCode(colorCode);
                 productWithBLOBs.setEnabled(EnabledType.USED);
                 productWithBLOBs.setVendorId(pcr.getVendorId());
-                nproductWithBLOBs = productService.selectByParameter(productWithBLOBs);
+                productWithBLOBsList = productService.getProductByParameter(productWithBLOBs);
             }
 
-            if (nproductWithBLOBs == null) {
+            if (productWithBLOBsList == null || productWithBLOBsList.isEmpty()) {
                 result.put("info", "Can't find the goods");
                 return result;
+            }
+            List<PriceChangeRuleSeasonGroup> priceChangeRuleSeasonGroups = iPriceChangeRuleSeasonGroupService.getPriceChangeRuleGroupListByPriceChangeRuleId(priceChangeRuleId);
 
+            Set<String> seasonCodes = new HashSet<>();
+            for (PriceChangeRuleSeasonGroup priceChangeRuleSeasonGroup : priceChangeRuleSeasonGroups) {
+                seasonCodes.add(priceChangeRuleSeasonGroup.getSeasonCode());
             }
 
-            //判断是否已经存在规则
+            List<ProductWithBLOBs> tempProduct = new ArrayList<>();
+            for (ProductWithBLOBs product : productWithBLOBsList) {
+                if (seasonCodes.contains(product.getSeasonCode())) {
+                    tempProduct.add(product);
+                }
+            }
+            if (tempProduct.size() == 0) {
+                throw new RuntimeException("Wrong Season Code.");
+            }
+
+            //先删除已有数据，再添加新的数据
             PriceChangeRuleProduct priceChangeRuleProductParam = new PriceChangeRuleProduct();
-            priceChangeRuleProductParam.setPriceChangeRuleId(Long.valueOf(price_change_rule_id));
-            priceChangeRuleProductParam.setBoutiqueId(productCode);
-            List<PriceChangeRuleProduct> list = priceChangeRuleProductService.selectByParameter(priceChangeRuleProductParam);
-            if (list != null && list.size() > 0) {
-                result.put("info", "Records already exist");
-                return result;
-            }
+            priceChangeRuleProductParam.setPriceChangeRuleId(priceChangeRuleId);
+            priceChangeRuleProductParam.setDesignerId(designerId);
+            priceChangeRuleProductParam.setColorCode(colorCode);
+            priceChangeRuleProductService.deleteByDesignerIdAndColorCode(priceChangeRuleProductParam);
 
-            //添加 priceChangeRuleProduct
-            PriceChangeRuleProduct priceChangeRuleProduct = new PriceChangeRuleProduct();
-            priceChangeRuleProduct.setPriceChangeRuleId(Long.valueOf(price_change_rule_id));
-            priceChangeRuleProduct.setProductId(nproductWithBLOBs.getProductId());
-            priceChangeRuleProduct.setBoutiqueId(nproductWithBLOBs.getProductCode());
-            priceChangeRuleProduct.setProductName(nproductWithBLOBs.getName());
-            priceChangeRuleProduct.setDiscountPercentage(Long.valueOf("100") - Long.valueOf(map.get("discount_percentage").toString()));
-            priceChangeRuleProductService.insertSelective(priceChangeRuleProduct);
+            //如果查询到多条商品需要全部添加
+            for (ProductWithBLOBs productWithBLOBs : tempProduct) {
+                //添加 priceChangeRuleProduct
+                PriceChangeRuleProduct priceChangeRuleProduct = new PriceChangeRuleProduct();
+                priceChangeRuleProduct.setPriceChangeRuleId(priceChangeRuleId);
+                priceChangeRuleProduct.setProductId(productWithBLOBs.getProductId());
+                priceChangeRuleProduct.setDesignerId(designerId);
+                priceChangeRuleProduct.setColorCode(colorCode);
+                priceChangeRuleProduct.setBoutiqueId(productWithBLOBs.getProductCode());
+                priceChangeRuleProduct.setProductName(productWithBLOBs.getName());
+                priceChangeRuleProduct.setDiscountPercentage(Long.valueOf("100") - Long.valueOf(map.get("discount_percentage").toString()));
+                priceChangeRuleProductService.insertSelective(priceChangeRuleProduct);
 
-            if (priceChangeRuleProduct.getPriceChangeRuleProductId() == null) {
-                result.put("info", "parameter is incorrect");
-                return result;
+                if (priceChangeRuleProduct.getPriceChangeRuleProductId() == null) {
+                    result.put("info", "parameter is incorrect");
+                    return result;
+                }
             }
+            // 更新snapshot_price_rule数据
+            updateSnapshotPriceRuleSaveAt(priceChangeRuleId);
+            // todo refresh
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -789,7 +861,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据price_change_rule_product_id 删除PriceChangeRuleProduct
-     *
      * @param map
      * @return
      */
@@ -809,6 +880,7 @@ public class PriceChangeRuleController extends BaseController {
         try {
             //根据ID删除
             String priceChangeRuleProductId = map.get("price_change_rule_product_id").toString();
+            PriceChangeRuleProduct priceChangeRuleProduct = priceChangeRuleProductService.selectByPrimaryKey(Long.parseLong(priceChangeRuleProductId));
             int row = priceChangeRuleProductService.deleteByPrimaryKey(Long.parseLong(priceChangeRuleProductId));
 
             //判断是否成功
@@ -817,6 +889,9 @@ public class PriceChangeRuleController extends BaseController {
             } else {
                 result.put("info", "delete priceChangeRuleProduct fail");
             }
+            // 更新snapshot_price_rule数据
+            updateSnapshotPriceRuleSaveAt(priceChangeRuleProduct.getPriceChangeRuleId());
+            // todo refresh
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -829,7 +904,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 修改 SystemProperty 全局默认折扣
-     *
      * @param map
      * @return
      */
@@ -862,7 +936,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 修改PriceChangeRul 修改有效日期
-     *
      * @param map
      * @return
      * @throws Exception
@@ -888,7 +961,6 @@ public class PriceChangeRuleController extends BaseController {
 
     /**
      * 根据price_change_rule_id 删除PriceChangeRule
-     *
      * @param map
      * @return
      */
@@ -952,7 +1024,7 @@ public class PriceChangeRuleController extends BaseController {
             return false;
         }
 
-        if (params.get("categoryType") == null || StringUtils.isBlank(params.get("categoryType").toString())) {
+        if (params.get("imPriceAlgorithmId") == null || StringUtils.isBlank(params.get("imPriceAlgorithmId").toString())) {
             return false;
         }
 
@@ -1006,7 +1078,10 @@ public class PriceChangeRuleController extends BaseController {
      */
     public static boolean checkCreatePriceChangeRuleProductParams(Map<String, Object> params) {
 
-        if (params.get("product_code") == null || StringUtils.isBlank(params.get("product_code").toString())) {
+        if (params.get("designer_id") == null || StringUtils.isBlank(params.get("designer_id").toString())) {
+            return false;
+        }
+        if (params.get("color_code") == null || StringUtils.isBlank(params.get("color_code").toString())) {
             return false;
         }
 
@@ -1119,4 +1194,81 @@ public class PriceChangeRuleController extends BaseController {
         return false;
     }
 
+    /**
+     * 更新ImPriceAlgorithm
+     * @param map
+     * @return
+     */
+    @RequestMapping(value = "/updatePriceRuleImAlgorithm", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> updatePriceRuleImAlgorithm(@RequestBody Map<String, Object> map) {
+        logger.info("updatePriceRuleImAlgorithm param:" + new Gson().toJson(map));
+        Map<String, Object> result = new HashMap<String, Object>();
+        result.put("status", StatusType.FAILURE);
+
+        //校验
+        if (map.get("priceChangeRuleId") == null || StringUtils.isBlank(map.get("priceChangeRuleId").toString())) {
+            result.put("info", "Parameter cannot be null");
+            return result;
+        }
+        if (map.get("imPriceAlgorithmId") == null || StringUtils.isBlank(map.get("imPriceAlgorithmId").toString())) {
+            result.put("info", "Parameter cannot be null");
+            return result;
+        }
+        try {
+            result = priceChangeRuleService.updatePriceChangeRuleImAlgorithm(map);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("info", "Update ImPriceAlgorithm fail ");
+            return result;
+        }
+
+        return result;
+    }
+
+    /**
+     * changePreviewByBoutique
+     * boutique pending open / close preview
+     * @param price_change_rule_id
+     * @param preview_status
+     * @param flag
+     * @return
+     */
+    @RequestMapping(value = "/changePreviewByBoutique")
+    @ResponseBody
+    public ResultMessage changePreviewByBoutique(@Param("price_change_rule_id") Long price_change_rule_id, @Param("preview_status") Long preview_status,
+            @Param("flag") String flag) {
+        logger.info("PriceChangeRuleController,changePreviewByBoutique,inputParams,price_change_rule_id:{},preview_status:{} ", price_change_rule_id,
+                preview_status);
+
+        ResultMessage resultMessage = ResultMessage.getInstance();
+
+        try {
+            synchronized (this) {
+                PriceChangeRule pcrModel = priceChangeRule.selectByPrimaryKey(price_change_rule_id);
+                if (StringUtils.isBlank(flag)) {
+                    flag = "";
+                }
+                priceRuleSynService.syncPreviewByBoutique(pcrModel.getVendorId(), preview_status, pcrModel.getCategoryType().intValue(),
+                        pcrModel.getPriceChangeRuleId(), flag);
+                resultMessage.successStatus().putMsg("info", "success !!!");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("error message : " + e.getMessage());
+            resultMessage.errorStatus().putMsg("info", "error message : " + e.getMessage());
+        }
+        logger.info("PriceChangeRuleController,changePreviewByBoutique,inputParams,price_change_rule_id:{},preview_status:{}, resultMsg:{}.",
+                price_change_rule_id, preview_status, JSONObject.toJSONString(resultMessage));
+        return resultMessage;
+    }
+
+    private int updateSnapshotPriceRuleSaveAt(Long priceChangeRuleId) {
+        // 更新snapshot_price_rule数据
+        SnapshotPriceRule snapshotPriceRule = new SnapshotPriceRule();
+        snapshotPriceRule.setPriceChangeRuleId(priceChangeRuleId);
+        snapshotPriceRule.setSaveAt(new Date());
+        return iSnapshotPriceRuleService.updateSaveAtByPriceChangeRuleId(snapshotPriceRule);
+    }
 }

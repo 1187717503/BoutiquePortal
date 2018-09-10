@@ -48,15 +48,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
+import java.util.*;
+import java.util.stream.Collectors;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -143,20 +136,20 @@ public class OrderShipController extends BaseController {
             return result;
         }
 
-        Vendor vendor = null;
+        List<Vendor> vendors = null;
         try {
-            vendor = vendorService.getVendorByUserId(user.getUserId());
+            vendors = vendorService.getVendorsByUserId(user.getUserId());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (vendor == null) {
+        if (vendors == null) {
             result.setMsg("Please log in again");
             return result;
         }
+        List<Long> vendorIds = vendors.stream().map(Vendor::getVendorId).collect(Collectors.toList());
 
         try {
             Map<String, Object> paramtMap = new HashMap<String, Object>();
-            paramtMap.put("vendorId", vendor.getVendorId());
 
             if (map.get("sortByName") != null && StringUtils.isNoneBlank(map.get("sortByName").toString())) {
                 paramtMap.put("sortByName", map.get("sortByName").toString());
@@ -166,9 +159,23 @@ public class OrderShipController extends BaseController {
                 paramtMap.put("shipmentStatus", Integer.parseInt(map.get("shipmentStatus").toString()));
             }
 
+            if (map.get("locationId") != null && StringUtils.isNoneBlank(map.get("locationId").toString())) {
+                paramtMap.put("locationId", Integer.parseInt(map.get("locationId").toString()));
+            }
+
             if (map.get("ship_to_geography") != null && StringUtils.isNoneBlank(map.get("ship_to_geography").toString())) {
                 paramtMap.put("ship_to_geography", map.get("ship_to_geography").toString());
             }
+
+            if (map.get("locationId") != null && StringUtils.isNoneBlank(map.get("locationId").toString())) {
+                paramtMap.put("locationId", map.get("locationId").toString());
+            }
+
+            if (map.get("vendorId") != null && StringUtils.isNoneBlank(map.get("vendorId").toString())) {
+                vendorIds= Arrays.asList(Long.parseLong(map.get("vendorId").toString()));
+            }
+
+            paramtMap.put("vendorIds", vendorIds);
 
             //获取箱子列表信息
             logger.info("order getReadyToShipCartonList 获取container 列表信息   调用接口containerService.getContainerList 入参:" + new Gson().toJson(paramtMap));
@@ -257,6 +264,7 @@ public class OrderShipController extends BaseController {
                     for (Map<String, Object> shipmentMap:shipMentList){
                         if(shipmentId.equals(Long.parseLong(shipmentMap.get("shipment_id").toString()))){
                             shipmentMap.put("stockLocation",shipment.getStockLocation());
+                            shipmentMap.put("vendorName",shipment.getVendorName());
                             shipmentListMapSort.add(shipmentMap);
                             break;
                         }
@@ -278,6 +286,43 @@ public class OrderShipController extends BaseController {
 
         return result;
     }
+    @RequestMapping(value = "/updateStep",method = RequestMethod.POST)
+    @ResponseBody
+    public ResultMessage updateStep(@RequestBody Map<String, Object> map, HttpServletRequest httpRequest){
+        logger.info(" order update step 入参:"+new Gson().toJson(map));
+        ResultMessage result = new ResultMessage();
+        result.errorStatus();
+        Long shipmentId =  Long.parseLong(map.get("shipment_id").toString());
+
+        if (map == null || map.size() == 0 || map.get("print_step") == null || map.get("shipment_id") == null) {
+            result.setMsg("Parameter cannot be empty");
+            return result;
+        }
+
+        User user = this.getUser(httpRequest);
+        if (user == null) {
+            result.setMsg("Please log in again");
+            return result;
+        }
+        Integer printStep = Integer.valueOf(map.get("print_step").toString());
+        Map<String, Object> getShipment = new HashMap<>();
+        getShipment.put("shipmentId", shipmentId);
+        //根据shipmentId 获取shipment
+        Shipment shipment = iShipmentService.selectShipmentById(getShipment);
+        if(printStep - shipment.getPrintStep() > 1){
+            result.setMsg("Print step is incorrect");
+            return result;
+        }
+        Map<String, Object> updateStepMap = new HashMap<>();
+        updateStepMap.put("print_step",printStep);
+        updateStepMap.put("shipment_id",shipmentId);
+        int re = iShipmentService.updatePrintStep(updateStepMap);
+        if(re >0){
+            result.successStatus();
+            result.setMsg("update step success");
+        }
+        return result;
+    }
 
 
     /**
@@ -293,6 +338,7 @@ public class OrderShipController extends BaseController {
         logger.info("order getShipmentInfo 入参:" + new Gson().toJson(map));
         ResultMessage result = new ResultMessage();
         result.errorStatus();
+        Long shipmentId =  Long.parseLong(map.get("shipment_id").toString());
 
         if (map == null || map.size() == 0 || map.get("status") == null || map.get("shipment_id") == null) {
             result.setMsg("Parameter cannot be empty");
@@ -305,20 +351,22 @@ public class OrderShipController extends BaseController {
             return result;
         }
 
-        Vendor vendor = null;
+        List<Vendor> vendors = new ArrayList<>();
         try {
-            vendor = vendorService.getVendorByUserId(user.getUserId());
+            vendors = vendorService.getVendorsByUserId(user.getUserId());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (vendor == null) {
+        if (CollectionUtils.isEmpty(vendors)) {
             result.setMsg("Please log in again");
             return result;
         }
 
+        List<Long> vendorIds = vendors.stream().map(Vendor::getVendorId).collect(Collectors.toList());
 
         try {
-            map.put("vendorId", vendor.getVendorId());
+            //map.put("vendorId", vendor.getVendorId());
+            map.put("vendorIds", vendorIds);
 
             Map<String, Object> getShipment = new HashMap<>();
             getShipment.put("shipmentId", Long.parseLong(map.get("shipment_id").toString()));
@@ -334,6 +382,27 @@ public class OrderShipController extends BaseController {
             if (shipmentMap.get("invoice_date") != null && StringUtils.isNotBlank(shipmentMap.get("invoice_date").toString())) {
                 shipmentMap.put("invoice_date", sdf2.format(sdf.parse(shipmentMap.get("invoice_date").toString())));
                 shipmentMap.put("invoice_num",shipmentMap.get("invoiceNum"));
+            }
+            //shipmentMap.put("vendor_name",vendor.getVendorName());
+            Integer print_step = Integer.valueOf(shipmentMap.get("print_step").toString());
+            // 添加invoice url
+            if(print_step >= 3){
+                VendorShipment vendorShipment = invoiceService.queryVendorShipmentByShipmentId(shipmentId);
+                if(vendorShipment!=null){
+                    shipmentMap.put("invoice_url",vendorShipment.getInvoiceUrl());
+                }
+            }
+            // 添加awb url
+            if(print_step >= 4){
+                if(shipmentMap.get("awb_num")!=null){
+                    String awb_num = shipmentMap.get("awb_num").toString();
+                    if(org.apache.commons.lang.StringUtils.isNotBlank(awb_num)){
+                        String docUrl = iShipmentService.queryAwbUrlByAwbNum(awb_num);
+                        if(org.apache.commons.lang.StringUtils.isNotBlank(docUrl)) {
+                            shipmentMap.put("awbUrl", docUrl);
+                        }
+                    }
+                }
             }
 
             //获取carton列表
@@ -429,7 +498,43 @@ public class OrderShipController extends BaseController {
 
     @RequestMapping(value = "/getStockLocation", method = RequestMethod.GET)
     @ResponseBody
-    public ResultMessage getStockLocation(Long userId) {
+    public ResultMessage getStockLocation(Long userId,Long vendorId) {
+        ResultMessage result = new ResultMessage();
+        result.errorStatus();
+        if ((userId == null || userId == 0)&&(vendorId == null || vendorId == 0)){
+            result.setMsg("parameters vendorId is null ");
+            return result;
+        }
+        try {
+            if (userId != null) {
+                Vendor vendor = vendorService.getVendorByUserId(userId);
+                if (vendor != null){
+                    List<StockLocation> stockLocationList = stockLocationService.getStockLocations(vendor.getVendorId());
+                    result.successStatus();
+                    result.setData(stockLocationList);
+                }else {
+                    result.setMsg("此用户未注册买手店");
+                    return result;
+                }
+            }else if(vendorId>0){
+                List<StockLocation> stockLocationList = stockLocationService.getStockLocations(vendorId);
+                result.successStatus();
+                result.setData(stockLocationList);
+            }else {
+                result.setMsg("Parameter error.");
+                return result;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setMsg("Query StockLocation list fail,Check parameters, please ");
+            return result;
+        }
+        return result;
+    }
+
+    @RequestMapping(value = "/getVendors", method = RequestMethod.GET)
+    @ResponseBody
+    public ResultMessage getVendors(Long userId) {
         ResultMessage result = new ResultMessage();
         result.errorStatus();
         if (userId == null || userId == 0){
@@ -437,15 +542,9 @@ public class OrderShipController extends BaseController {
             return result;
         }
         try {
-            Vendor vendor = vendorService.getVendorByUserId(userId);
-            if (vendor != null){
-                List<StockLocation> stockLocationList = stockLocationService.getStockLocation(vendor.getVendorId());
-                result.successStatus();
-                result.setData(stockLocationList);
-            }else {
-                result.setMsg("此用户未注册买手店");
-                return result;
-            }
+            List<Vendor> vendors=vendorService.getVendorsByUserId(userId);
+            result.successStatus();
+            result.setData(vendors);
         } catch (Exception e) {
             e.printStackTrace();
             result.setMsg("Query StockLocation list fail,Check parameters, please ");
@@ -542,7 +641,9 @@ public class OrderShipController extends BaseController {
         ResultMessage result = new ResultMessage();
         result.errorStatus();
 
-        if (map == null || map.size() == 0 || map.get("status") == null || map.get("shipment_id") == null) {
+        if (map == null || map.size() == 0 || map.get("status") == null
+                || map.get("shipment_id") == null
+                || map.get("vendorId") == null) {
             result.setMsg("Parameter cannot be empty");
             return result;
         }
@@ -563,6 +664,17 @@ public class OrderShipController extends BaseController {
             result.setMsg("Please log in again");
             return result;
         }
+
+        Long vendorId = Long.valueOf(map.get("vendorId").toString());
+
+        if (map.get("shipment_id") == null) {
+            result.setMsg("Parameter cannot be empty");
+            return result;
+        }
+
+        vendor = getVendor(vendor, vendorId);
+
+        //List<Long> vendorIds = vendors.stream().map(Vendor::getVendorId).collect(Collectors.toList());
 
         //获取ddt number
         long shipment_id = Long.parseLong(map.get("shipment_id").toString());
@@ -585,7 +697,7 @@ public class OrderShipController extends BaseController {
                     newInvoice.setDdtNum(maxDdtNo);
                     newInvoice.setInvoiceNum("");
                     newInvoice.setShipmentId(shipment_id);
-                    newInvoice.setVendorId(vendor.getVendorId());
+                    newInvoice.setVendorId(vendorId);
                     newInvoice.setInvoiceDate(new Date());
                     newInvoice.setVatNum("");
                     invoiceService.insertSelective(newInvoice);
@@ -601,7 +713,7 @@ public class OrderShipController extends BaseController {
         }
 
         try {
-            map.put("vendorId", vendor.getVendorId());
+            map.put("vendorIds", Arrays.asList(vendorId));
             Map<String, Object> getShipment = new HashMap<>();
             getShipment.put("shipmentId", shipment_id);
 
@@ -760,7 +872,8 @@ public class OrderShipController extends BaseController {
         ResultMessage result = new ResultMessage();
         result.errorStatus();
 
-        if (map == null || map.size() == 0 || map.get("status") == null || map.get("shipment_id") == null) {
+        if (map == null || map.size() == 0 || map.get("status") == null
+                || map.get("shipment_id") == null) {
             result.setMsg("Parameter cannot be empty");
             return result;
         }
@@ -781,9 +894,24 @@ public class OrderShipController extends BaseController {
             result.setMsg("Please log in again");
             return result;
         }
+        long shipment_id = Long.parseLong(map.get("shipment_id").toString());
+        //根据shipmentId 获取shipment 相关信息及物流第一段类型
+        logger.info("打印Invoice----根据shipmentId 获取shipment 相关信息及物流第一段类型,开始获取");
+        Map<String, Object> getShipment = new HashMap<>();
+        getShipment.put("shipmentId", shipment_id);
+        Map<String, Object> shipmentMap = iShipmentService.getShipmentTypeById(getShipment);
+        if (shipmentMap == null || shipmentMap.size() == 0) {
+            logger.info("获取失败");
+            result.setMsg("Query Shipment fail,Check parameters, please ");
+            return result;
+        }
+
+        Long vendorId = Long.valueOf(shipmentMap.get("vendor_id").toString());
+
+        vendor = getVendor(vendor, vendorId);
 
         TransitWarehouseInvoiceVO transitWarehouseInvoiceVO = new TransitWarehouseInvoiceVO();
-        long shipment_id = Long.parseLong(map.get("shipment_id").toString());
+
 
         //获取Ship From信息
         StockLocation location = stockLocationService.getShipFromLocation(shipment_id);
@@ -831,7 +959,7 @@ public class OrderShipController extends BaseController {
             newInvoice.setDdtNum(maxDdtNo);
             newInvoice.setInvoiceNum("");
             newInvoice.setShipmentId(shipment_id);
-            newInvoice.setVendorId(vendor.getVendorId());
+            newInvoice.setVendorId(vendorId);
             newInvoice.setInvoiceDate(new Date());
             newInvoice.setVatNum("");
             newInvoice.setType(2);
@@ -860,18 +988,8 @@ public class OrderShipController extends BaseController {
             resultMap.put("contactPersonName", shop.getContactPersonName());
         }
 
-        map.put("vendorId", vendor.getVendorId());
-        Map<String, Object> getShipment = new HashMap<>();
-        getShipment.put("shipmentId", shipment_id);
+        map.put("vendorIds", Arrays.asList(vendorId));
 
-        //根据shipmentId 获取shipment 相关信息及物流第一段类型
-        logger.info("打印Invoice----根据shipmentId 获取shipment 相关信息及物流第一段类型,开始获取");
-        Map<String, Object> shipmentMap = iShipmentService.getShipmentTypeById(getShipment);
-        if (shipmentMap == null || shipmentMap.size() == 0) {
-            logger.info("获取失败");
-            result.setMsg("Query Shipment fail,Check parameters, please ");
-            return result;
-        }
         resultMap.put("shipmentNo",shipmentMap.get("shipment_no"));
         logger.info("打印Invoice----获取shipment相关信息及物流第一段类型成功");
 
@@ -901,6 +1019,7 @@ public class OrderShipController extends BaseController {
         List<Map<String,Object>> ddtOrderList = new ArrayList<>();
         BigDecimal ddtVAT = new BigDecimal(0);
         BigDecimal ddtAllTotal = new BigDecimal(0);
+        BigDecimal ddtGrandTotal = new BigDecimal(0);
         Integer ddtAllQty = 0;
         if(isDDt){
             ddtInvoice.setShipperVO(shipperVO);
@@ -934,7 +1053,7 @@ public class OrderShipController extends BaseController {
         shipmentIds.add(shipment_id);
         Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("status", map.get("status"));
-        conditionMap.put("vendorId", vendor.getVendorId());
+        conditionMap.put("vendorIds", Arrays.asList(vendorId));
         conditionMap.put("shipmentIds", shipmentIds);
         conditionMap.put("packGroup", 1);
         List<Map<String, Object>> chinaList = orderService.getOrderListByShipmentId(conditionMap);
@@ -985,7 +1104,8 @@ public class OrderShipController extends BaseController {
                 if(CollectionUtils.isNotEmpty(chinaList)){
                     ddtInvoice.getList().addAll(chinaList);
                 }
-                ddtAllTotal = ddtAllTotal.add(grandTotal);
+                ddtGrandTotal = ddtGrandTotal.add(grandTotal);
+                ddtAllTotal = ddtAllTotal.add(allTotal);
                 ddtVAT = ddtVAT.add(VAT);
                 ddtAllQty  = chinaList.size()+ddtAllQty;
 
@@ -1052,14 +1172,14 @@ public class OrderShipController extends BaseController {
                 BigDecimal VAT = total.multiply(taxRate).setScale(2, BigDecimal.ROUND_HALF_UP);
                 BigDecimal grandTotal = (VAT.add(total)).setScale(2,BigDecimal.ROUND_HALF_UP);
 
-
                 List<Map<String, Object>> list = new ArrayList<>();
                 list.add(UNOrder);
                 if(isDDt){
                     ddtInvoice.getList().addAll(list);
-                    ddtAllTotal = ddtAllTotal.add(grandTotal);
+                    ddtAllTotal = ddtAllTotal.add(total);
+                    ddtGrandTotal = ddtGrandTotal.add(grandTotal);
                     ddtVAT = ddtVAT.add(VAT);
-                    ddtAllQty  = chinaList.size()+ddtAllQty;
+                    ddtAllQty++;
                 }
                 UNInvoiceVO.setList(list);
                 UNInvoiceVO.setShipperVO(shipperVO);
@@ -1128,9 +1248,10 @@ public class OrderShipController extends BaseController {
                 list.add(elseOrder);
                 if(isDDt){
                     ddtInvoice.getList().addAll(list);
-                    ddtAllTotal = ddtAllTotal.add(grandTotal);
+                    ddtAllTotal = ddtAllTotal.add(total);
+                    ddtGrandTotal = ddtGrandTotal.add(grandTotal);
                     ddtVAT = ddtVAT.add(VAT);
-                    ddtAllQty  = chinaList.size()+ddtAllQty;
+                    ddtAllQty++;
                 }
                 elseInvoiceVO.setList(list);
                 elseInvoiceVO.setShipperVO(shipperVO);
@@ -1154,7 +1275,8 @@ public class OrderShipController extends BaseController {
         }
         if(isDDt){
             List<InvoiceVO> ddtInvoices = new ArrayList<>();
-            ddtInvoice.setGrandTotal(ddtAllTotal.toString());
+            ddtInvoice.setGrandTotal(ddtGrandTotal.toString());
+            ddtInvoice.setAllTotal(ddtAllTotal.setScale(2,BigDecimal.ROUND_HALF_UP).toString());
             ddtInvoice.setVat(ddtVAT.toString());
             ddtInvoice.setAllQty(ddtAllQty.toString());
             ddtInvoices.add(ddtInvoice);
@@ -1178,6 +1300,19 @@ public class OrderShipController extends BaseController {
         return result;
     }
 
+    private Vendor getVendor(Vendor vendor, Long vendorId) {
+        if (!vendorId.equals(vendor.getVendorId())){
+            //取子买手店信息
+            Map<String,Object> params = new HashMap<>();
+            params.put("vendor_id",vendorId);
+            Vendor vendorByVendorId = vendorService.getVendorByVendorId(params);
+            if (vendorByVendorId!=null){
+                vendor = vendorByVendorId;
+            }
+        }
+        return vendor;
+    }
+
     /**
      * packingList
      *
@@ -1191,7 +1326,8 @@ public class OrderShipController extends BaseController {
         ResultMessage result = new ResultMessage();
         result.errorStatus();
 
-        if (map == null || map.size() == 0 || map.get("status") == null || map.get("shipment_id") == null) {
+        if (map == null || map.size() == 0 || map.get("status") == null
+                || map.get("shipment_id") == null) {
             result.setMsg("Parameter cannot be empty");
             return result;
         }
@@ -1202,19 +1338,21 @@ public class OrderShipController extends BaseController {
             return result;
         }
 
-        Vendor vendor = null;
+        List<Vendor> vendors = null;
         try {
-            vendor = vendorService.getVendorByUserId(user.getUserId());
+            vendors = vendorService.getVendorsByUserId(user.getUserId());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (vendor == null) {
+        if (CollectionUtils.isEmpty(vendors)) {
             result.setMsg("Please log in again");
             return result;
         }
 
+        List<Long> vendorIds = vendors.stream().map(Vendor::getVendorId).collect(Collectors.toList());
+
         try {
-            map.put("vendorId", vendor.getVendorId());
+            map.put("vendorIds", vendorIds);
 
             Map<String, Object> getShipment = new HashMap<String, Object>();
             getShipment.put("shipmentId", Long.parseLong(map.get("shipment_id").toString()));

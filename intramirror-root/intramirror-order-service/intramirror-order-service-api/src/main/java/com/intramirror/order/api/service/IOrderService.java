@@ -24,7 +24,7 @@ public interface IOrderService {
      *
      * @return
      */
-    List<Map<String, Object>> getOrderListByOrderNumber(String numbers, int status);
+    Map<String, Object> getOrderByOrderNumber(String numbers);
 
 
     /**
@@ -84,7 +84,7 @@ public interface IOrderService {
      * @param status
      * @return
      */
-    List<Map<String, Object>> getOrderListByStatusAndContainerId(long containerId, int status, Long vendorId);
+    List<Map<String, Object>> getOrderListByStatusAndContainerId(long containerId, int status, List<Long> vendorId);
     
     
     
@@ -121,7 +121,7 @@ public interface IOrderService {
      * @param
      * @return
      */
-    PageUtils getShippedOrderListByStatus(Page page, Long vendorId, ShippedParam shippedParam);
+    PageUtils getShippedOrderListByStatus(Page page, List<Long> vendorIds, ShippedParam shippedParam);
 
     /**
      * 根据条件查询订单信息

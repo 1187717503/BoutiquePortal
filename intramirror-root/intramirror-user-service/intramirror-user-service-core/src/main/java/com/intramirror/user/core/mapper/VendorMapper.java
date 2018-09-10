@@ -9,9 +9,13 @@ import java.util.Map;
 public interface VendorMapper {
     List<Vendor> getVendorListByUserIdAndEnabled(@Param("userId") Long userId, @Param("enabled") Boolean enabled);
 
+    List<Vendor> getChildVendorListByUserIdAndEnabled(@Param("userId") Long userId, @Param("enabled") Boolean enabled);
+
     List<Map<String, Object>> queryAllVendor(Map<String, Object> params);
 
     List<Map<String, Object>> queryRuleVendor(Map<String, Object> params);
+
+    List<Vendor> queryVendorByIds(Map<String,Object> param);
 
     Vendor queryVendorByVendorId(Map<String, Object> params);
 
