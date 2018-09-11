@@ -152,7 +152,7 @@ public class ShipMailSendThread implements Runnable {
         List<MailAttachmentVO> mailAttachmentVOs = new ArrayList<>();
 
         String path = "/opt/data/ship_excel/download/";
-        String suffix = String.valueOf(System.currentTimeMillis());
+        String suffix = String.valueOf(System.currentTimeMillis()) + String.valueOf(Math.random() * 100);
         String orderLinesFileName = "OrderLines_"+ suffix + ".xls";
         File file = new File(path);
         if (!file.exists() && !file.isDirectory()) {
