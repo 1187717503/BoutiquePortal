@@ -513,6 +513,7 @@ public class OrderService {
 			saveShipmentParam.put("shipmentId", shipmentId);
 			Map<String, Object> orderResult = orderService.getShipmentDetails(saveShipmentParam);
 			orderResult.put("shipmentId", shipmentId);
+			orderResult.put("shipment_category",shipMentMap.get("shipment_category"));
 
 			if(isSaveSubShipment){
 				//添加第三段物流
