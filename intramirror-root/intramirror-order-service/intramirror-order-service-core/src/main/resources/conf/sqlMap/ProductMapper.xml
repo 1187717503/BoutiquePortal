@@ -400,4 +400,7 @@
       product_group_id = #{productGroupId,jdbcType=BIGINT}
     where product_id = #{productId,jdbcType=BIGINT}
   </update>
+  <select id="getCompositionByProductId" resultType="java.lang.String">
+    SELECT s.composition from spu s,product p where p.spu_id=s.spu_id and p.product_id=#{productId}
+  </select>
 </mapper>

@@ -14,6 +14,7 @@ import com.intramirror.order.core.dao.BaseDao;
 import com.intramirror.order.core.mapper.OrderMapper;
 
 import com.intramirror.order.api.vo.PageListVO;
+import com.intramirror.order.core.mapper.ProductMapper;
 import com.intramirror.order.core.mapper.ProductPropertyMapper;
 import freemarker.template.utility.NumberUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -32,10 +33,12 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
 
     private OrderMapper orderMapper;
     private ProductPropertyMapper productPropertyMapper;
+    private ProductMapper productMapper;
 
     public void init() {
         orderMapper = this.getSqlSession().getMapper(OrderMapper.class);
         productPropertyMapper = this.getSqlSession().getMapper(ProductPropertyMapper.class);
+        productMapper = this.getSqlSession().getMapper(ProductMapper.class);
     }
 
     public List<Map<String, Object>> getOrderList(int status) {
@@ -212,6 +215,16 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
                 }
             }
         }
+        for(Map<String, Object> vo :mapList){
+            /*for(ProductPropertyVO pp:vos1){
+                if(Long.valueOf(vo.get("product_id").toString()).equals(pp.getProductId())){
+                    vo.put("Composition",pp.getValue());
+                    break;
+                }
+            }*/
+            vo.put("spuComposition",productMapper.getCompositionByProductId(Long.valueOf(vo.get("product_id").toString())));
+        }
+
         return mapList;
     }
 

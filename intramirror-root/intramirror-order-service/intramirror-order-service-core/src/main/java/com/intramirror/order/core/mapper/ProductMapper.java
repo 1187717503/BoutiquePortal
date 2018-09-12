@@ -2,6 +2,7 @@ package com.intramirror.order.core.mapper;
 
 import com.intramirror.order.api.model.Product;
 import com.intramirror.order.api.model.ProductWithBLOBs;
+import org.apache.ibatis.annotations.Param;
 
 public interface ProductMapper {
     /**
@@ -59,4 +60,6 @@ public interface ProductMapper {
      * @mbggenerated
      */
     int updateByPrimaryKey(Product record);
+
+    String getCompositionByProductId(@Param("productId") Long productId);
 }
