@@ -524,7 +524,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
             BigDecimal orderTotalRmbDec = new BigDecimal(orderTotalRmb);
             BigDecimal orderPaymentAmtRmbDec = new BigDecimal(orderPaymentAmt);
             BigDecimal totalRmbRmbDec = new BigDecimal(totalRmb);
-            BigDecimal paymentAmt = orderPaymentAmtRmbDec.divide(orderTotalRmbDec, 4).multiply(totalRmbRmbDec).setScale(2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal paymentAmt = orderPaymentAmtRmbDec.multiply(totalRmbRmbDec).divide(orderTotalRmbDec, 2,BigDecimal.ROUND_HALF_UP);
             userGrowthInfo.put("paymentAmt",paymentAmt.toString());
             userGrowthInfo.put("orderLineNum",orderLineNum);
             userGrowthInfo.put("orderNum",map.get("order_num"));
