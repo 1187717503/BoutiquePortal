@@ -515,7 +515,7 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
             String orderPaymentAmt = map.get("orderPaymentAmt") != null ? map.get("orderPaymentAmt").toString() : "0";
             String totalRmb = map.get("total_rmb") != null ? map.get("total_rmb").toString() : "0";
             userGrowthInfo.put("userId",map.get("user_id"));
-            if (map.get("geography_id")!=null&&"1".equals(map.get("geography_id"))){
+            if (map.get("geography_id")!=null&&"1".equals(map.get("geography_id").toString())){
                 userGrowthInfo.put("isMainland",1);
             }else {
                 userGrowthInfo.put("isMainland",0);
