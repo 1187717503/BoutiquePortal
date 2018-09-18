@@ -719,7 +719,15 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 				subShipmentMapper.updateByPrimaryKey(subShipment);
 			}
 		}
+		if(printStep == 2 && shipment.getPrintStep() == 3){  // undo 这种情况需要重新设置awb_advance
+			updateStepMap.put("awb_advance",0);
+		}
 		return shipmentMapper.updatePrintStep(updateStepMap);
+	}
+
+	@Override
+	public void updateShipmentAwbAdvance(Map<String, Object> awbAdvanceMap) {
+		shipmentMapper.updateShipmentAwbAdvance(awbAdvanceMap);
 	}
 
 	private String checkAWB(Long shipmentId) {
