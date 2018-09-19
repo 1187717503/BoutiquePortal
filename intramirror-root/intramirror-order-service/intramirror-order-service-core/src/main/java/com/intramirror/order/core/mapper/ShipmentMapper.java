@@ -138,4 +138,6 @@ public interface ShipmentMapper {
 	String queryShipmentAwbUrlByAwbNum(String awbNum);
 
 	int updatePrintStep(Map<String, Object> updateStepMap);
+
+	void updateShipmentAwbAdvance(Map<String, Object> awbAdvanceMap);
 }
