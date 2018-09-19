@@ -393,9 +393,7 @@ public class OrderShipController extends BaseController {
                 if(vendorShipment!=null){
                     shipmentMap.put("invoice_url",vendorShipment.getInvoiceUrl());
                 }
-            }
-            // 添加awb url
-            if(print_step >= 4){
+                // 添加awb url
                 if(shipmentMap.get("awb_num")!=null){
                     String awb_num = shipmentMap.get("awb_num").toString();
                     if(org.apache.commons.lang.StringUtils.isNotBlank(awb_num)){
