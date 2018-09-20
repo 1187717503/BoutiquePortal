@@ -33,4 +33,15 @@ public class AddressCountryServiceImpl extends BaseDao implements AddressCountry
 
         return addressCountryMapper.getAddressCountryByGeographyId(geographyId);
     }
+
+    @Override
+    public List<AddressCountry> getList() {
+        List<AddressCountry> list = addressCountryMapper.getList();
+        return list;
+    }
+
+    @Override
+    public AddressCountry getAddressCountryByCountryCode(String countryCode) {
+        return addressCountryMapper.getAddressCountryByCountryCode(countryCode);
+    }
 }

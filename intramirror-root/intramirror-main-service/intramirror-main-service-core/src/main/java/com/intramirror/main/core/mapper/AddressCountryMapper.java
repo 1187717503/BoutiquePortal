@@ -1,6 +1,7 @@
 package com.intramirror.main.core.mapper;
 
 import com.intramirror.main.api.model.AddressCountry;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -57,4 +58,6 @@ public interface AddressCountryMapper {
     AddressCountry getAddressCountryByName(String name);
 
     List<Map<String, Object>> getAddressCountryByGeographyId(Long geographyId);
+    List<AddressCountry> getList();
+    AddressCountry getAddressCountryByCountryCode(@Param("countryCode") String countryCode);
 }

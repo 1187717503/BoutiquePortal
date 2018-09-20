@@ -23,5 +23,5 @@ public interface VendorService {
 
     List<Vendor> getVendorByIds(List<Long> ids);
 
-
+    void updateByPrimaryKeySelective(Vendor vendor);
 }

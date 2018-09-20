@@ -37,4 +37,9 @@ public class UserServiceImpl extends BaseDao implements UserService {
             throw e;
         }
     }
+
+    @Override
+    public void changePwd(Long userId, String pwd) {
+        userMapper.updatePwd(userId,pwd);
+    }
 }

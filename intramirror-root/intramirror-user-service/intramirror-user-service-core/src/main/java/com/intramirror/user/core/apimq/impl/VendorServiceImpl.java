@@ -112,4 +112,9 @@ public class VendorServiceImpl extends BaseDao implements VendorService {
         param.put("ids",ids);
         return vendorMapper.queryVendorByIds(param);
     }
+
+    @Override
+    public void updateByPrimaryKeySelective(Vendor vendor) {
+         vendorMapper.updateByPrimaryKeySelective(vendor);
+    }
 }

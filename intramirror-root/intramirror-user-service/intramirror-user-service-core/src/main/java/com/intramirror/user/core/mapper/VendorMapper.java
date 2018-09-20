@@ -22,4 +22,6 @@ public interface VendorMapper {
     List<Map<String, Object>> getProductSkuVendorIdMap(@Param("skuIds") String[] skuIds);
 
     List<Map<String, Object>> getAllVendorCountryById(@Param("vendorIds") String[] vendorIds);
+
+    void updateByPrimaryKeySelective(Vendor vendor);
 }

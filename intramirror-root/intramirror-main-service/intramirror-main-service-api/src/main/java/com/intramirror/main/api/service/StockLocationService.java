@@ -18,4 +18,10 @@ public interface StockLocationService {
     StockLocation getShipFromLocation(Long shipmentId);
 
     StockLocation getStockLocation(Long locationId);
+
+    void createStockLocation(StockLocation stockLocation);
+
+    void updateStockLocation(StockLocation stockLocation);
+
+    void deleteStockLocation(Long locationId);
 }

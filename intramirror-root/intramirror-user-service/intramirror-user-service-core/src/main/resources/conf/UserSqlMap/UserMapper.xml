@@ -53,4 +53,8 @@
         AND
         u.enabled=#{enabled}
     </select>
+
+    <update id="updatePwd">
+        UPDATE user set `password`=#{pwd} where user_id=#{userId}
+    </update>
 </mapper>

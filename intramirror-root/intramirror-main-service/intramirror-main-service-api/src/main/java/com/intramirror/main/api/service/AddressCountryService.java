@@ -10,4 +10,6 @@ public interface AddressCountryService {
 
     AddressCountry getAddressCountryByName(String name);
     List<Map<String,Object>> getAddressCountryByGeographyId(Long geographyId);
+    List<AddressCountry> getList();
+    AddressCountry getAddressCountryByCountryCode(String countryCode);
 }
