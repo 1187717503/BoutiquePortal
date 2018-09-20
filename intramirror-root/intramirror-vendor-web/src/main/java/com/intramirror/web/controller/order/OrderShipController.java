@@ -316,6 +316,7 @@ public class OrderShipController extends BaseController {
         Map<String, Object> updateStepMap = new HashMap<>();
         updateStepMap.put("print_step",printStep);
         updateStepMap.put("shipment_id",shipmentId);
+
         int re = iShipmentService.updatePrintStep(updateStepMap);
         if(re >0){
             result.successStatus();
@@ -359,6 +360,7 @@ public class OrderShipController extends BaseController {
         }
         if (CollectionUtils.isEmpty(vendors)) {
             result.setMsg("Please log in again");
+
             return result;
         }
 
@@ -391,9 +393,7 @@ public class OrderShipController extends BaseController {
                 if(vendorShipment!=null){
                     shipmentMap.put("invoice_url",vendorShipment.getInvoiceUrl());
                 }
-            }
-            // 添加awb url
-            if(print_step >= 4){
+                // 添加awb url
                 if(shipmentMap.get("awb_num")!=null){
                     String awb_num = shipmentMap.get("awb_num").toString();
                     if(org.apache.commons.lang.StringUtils.isNotBlank(awb_num)){
@@ -463,7 +463,37 @@ public class OrderShipController extends BaseController {
             if(vendorShipment!=null){
                 resultMap.put("vendorShipment",vendorShipment);
             }
-
+            // 获取收货人信息
+            Map<String, Object> dhlMap = new HashMap<>();
+            dhlMap.put("shipmentId",shipmentId);
+            dhlMap.put("sequence","1");
+            SubShipment dhlShipment = subShipmentService.getDHLShipment(dhlMap);
+            RecipientVO recipientVO = new RecipientVO();
+            recipientVO.setCity(dhlShipment.getShipToCity());
+            recipientVO.setCompanyName(dhlShipment.getConsignee());
+            recipientVO.setPersonName(dhlShipment.getPersonName());
+            recipientVO.setPhoneNumber(dhlShipment.getContact());
+            recipientVO.setEmailAddress(dhlShipment.getShipToEamilAddr());
+            String shipToAddr = dhlShipment.getShipToAddr();
+            if (shipToAddr.length()>35){
+                shipToAddr = shipToAddr.substring(0,34);
+            }
+            recipientVO.setStreetLines(shipToAddr);
+            if (StringUtil.isNotEmpty(dhlShipment.getShipToAddr2())
+                    &&!"0".equals(dhlShipment.getShipToAddr2())){
+                recipientVO.setStreetLines2(dhlShipment.getShipToAddr2());
+            }
+            if (StringUtil.isNotEmpty(dhlShipment.getShipToAddr3())
+                    &&!"0".equals(dhlShipment.getShipToAddr3())){
+                recipientVO.setStreetLines3(dhlShipment.getShipToAddr3());
+            }
+            if(dhlShipment.getPostalCode()!=null){
+                recipientVO.setPostalCode(dhlShipment.getPostalCode());
+            }else {
+                recipientVO.setPostalCode("101731");
+            }
+            recipientVO.setCountryCode(dhlShipment.getShipToCountryCode());
+            shipmentMap.put("recipient",recipientVO);
             result.successStatus();
             result.setData(resultMap);
 
@@ -1608,8 +1638,19 @@ public class OrderShipController extends BaseController {
                 subShipmentService.updateSubShipment(params);
                 result.successStatus();
                 jo.put("shipmentNo",shipment.getShipmentNo());
+                jo.put("recipient",inputVO.getRecipient());
                 jo.remove("status");
                 result.setData(jo);
+
+                // if awbAdvance = 1  提前生成的 更新shipment信息
+                Map<String,Object> awbAdvanceMap = new HashMap<>();
+                awbAdvanceMap.put("shipment_id",shipmentId);
+                if(map.containsKey("awbAdvance") && map.get("awbAdvance").toString().equals("1")){
+                    awbAdvanceMap.put("awbAdvance",1);
+                }else {
+                    awbAdvanceMap.put("awbAdvance",0);
+                }
+                iShipmentService.updateShipmentAwbAdvance(awbAdvanceMap);
 
                 //保存awb单号
                 List<LogisticsProductVO> productVOList = iShipmentService.getlogisticsMilestone(shipmentId);

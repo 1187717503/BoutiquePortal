@@ -515,16 +515,16 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
             String orderPaymentAmt = map.get("orderPaymentAmt") != null ? map.get("orderPaymentAmt").toString() : "0";
             String totalRmb = map.get("total_rmb") != null ? map.get("total_rmb").toString() : "0";
             userGrowthInfo.put("userId",map.get("user_id"));
-            if (map.get("geography_id")!=null&&map.get("geography_id").equals(1)){
-                userGrowthInfo.put("isMainland",0);
-            }else {
+            if (map.get("geography_id")!=null&&"1".equals(map.get("geography_id").toString())){
                 userGrowthInfo.put("isMainland",1);
+            }else {
+                userGrowthInfo.put("isMainland",0);
             }
             userGrowthInfo.put("orderAmt",totalRmb);
             BigDecimal orderTotalRmbDec = new BigDecimal(orderTotalRmb);
             BigDecimal orderPaymentAmtRmbDec = new BigDecimal(orderPaymentAmt);
             BigDecimal totalRmbRmbDec = new BigDecimal(totalRmb);
-            BigDecimal paymentAmt = orderPaymentAmtRmbDec.divide(orderTotalRmbDec, 4).multiply(totalRmbRmbDec).setScale(2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal paymentAmt = orderPaymentAmtRmbDec.multiply(totalRmbRmbDec).divide(orderTotalRmbDec, 2,BigDecimal.ROUND_HALF_UP);
             userGrowthInfo.put("paymentAmt",paymentAmt.toString());
             userGrowthInfo.put("orderLineNum",orderLineNum);
             userGrowthInfo.put("orderNum",map.get("order_num"));

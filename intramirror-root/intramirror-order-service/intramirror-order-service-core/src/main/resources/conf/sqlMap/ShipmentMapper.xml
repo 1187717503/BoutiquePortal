@@ -143,8 +143,17 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 		UPDATE shipment
 		SET `print_step` = #{print_step,jdbcType=BIGINT}
 		<if test="resetStep != null">
-			, print_step = 0
+			, print_step = 0 , awb_advance = 0
 		</if>
+		<if test="awb_advance != null">
+			, awb_advance = 0
+		</if>
+		WHERE shipment_id=#{shipment_id,jdbcType=BIGINT}
+	</update>
+	<!--updateShipmentAwbAdvance-->
+	<update id="updateShipmentAwbAdvance" parameterType="java.util.Map">
+		UPDATE shipment
+		SET `awb_advance` = #{awbAdvance,jdbcType=BIGINT}
 		WHERE shipment_id=#{shipment_id,jdbcType=BIGINT}
 	</update>
 	
