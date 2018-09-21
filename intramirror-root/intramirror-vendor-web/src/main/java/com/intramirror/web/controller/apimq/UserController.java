@@ -181,6 +181,39 @@ public class UserController extends BaseController {
         return result;
 
     }
+
+    @RequestMapping(value = "/checkforget", method = RequestMethod.GET)
+    @ResponseBody
+    public Map change4forget(@RequestParam(required = true) String email, @RequestParam(required = true)String createDate) throws Exception {
+        Map<String, Object> result = new HashMap<>();
+        try{
+            User user = userService.getUserByEmail(email, EnabledType.USED);
+            Date create = DateUtils.getDateByStr(createDate);
+            if(StringUtil.isEmpty(email)||createDate==null||create==null||user==null){
+                result.put("status",StatusType.FAILURE);
+                result.put("message","link error");
+                return result;
+            }
+            PasswordMail passwordMail = passwordMailService.getNewPasswordMail(email);
+            if(passwordMail==null){
+                result.put("status",StatusType.FAILURE);
+                result.put("message","link error");
+                return result;
+            }
+            if(!DateUtils.getformatDate(create).equals(DateUtils.getformatDate(passwordMail.getCreate_date()))||passwordMail.getIs_change()==1||DateUtils.getDatePool4Hour(create,new Date())>2){
+                result.put("status",StatusType.MAIL_URL_EXPRIRED);
+                result.put("message","This link has been expired,please back to login to send link for changing password");
+                return result;
+            }
+            result.put("status",StatusType.SUCCESS);
+        }catch (Exception e){
+            logger.error("check发邮件改密码异常"+e.getMessage(),e);
+            result.put("status",StatusType.FAILURE);
+            result.put("message","System error");
+        }
+        return result;
+
+    }
     private void sendEmail(String toEmail,String subject,String content){
         MailModelVO mailContent = new MailModelVO();
         mailContent.setToEmails(toEmail);
