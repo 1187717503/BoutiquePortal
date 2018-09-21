@@ -24,4 +24,6 @@ public interface StockLocationService {
     void updateStockLocation(StockLocation stockLocation);
 
     void deleteStockLocation(Long locationId);
+
+    List<StockLocation> getStockLocationByFrom(Long fromLocationId);
 }

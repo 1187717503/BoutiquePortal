@@ -52,7 +52,7 @@ public class StockLocationController extends BaseController {
                 if(stockLocationFrom!=null){
                     stockLocation.setShipFromLocationName(stockLocationFrom.getStockLocation());
                 }
-                stockLocation.setContactPhoneNumber((stockLocation.getAreaCode()==null?"":stockLocation.getAreaCode())+stockLocation.getContactPhoneNumber());
+                stockLocation.setFullContactPhoneNumber((stockLocation.getAreaCode()==null?"":stockLocation.getAreaCode())+stockLocation.getContactPhoneNumber());
                 String fullAddress = (stockLocation.getAddressStreetlines()==null?"":stockLocation.getAddressStreetlines())+(stockLocation.getAddressStreetlines2()==null?"":stockLocation.getAddressStreetlines2())
                         +(stockLocation.getAddressStreetlines3()==null?"":stockLocation.getAddressStreetlines3());
                 stockLocation.setFullAddress(fullAddress);
@@ -149,8 +149,14 @@ public class StockLocationController extends BaseController {
     public Map deleteStockLocation(HttpServletRequest httpRequest, Long stockLocationId) {
         Map<String, Object> result = new HashMap<>();
         try {
-            stockLocationService.deleteStockLocation(stockLocationId);
-            result.put("status", StatusType.SUCCESS);
+            List<StockLocation> list = stockLocationService.getStockLocationByFrom(stockLocationId);
+            if(list==null||list.size()==0){
+                stockLocationService.deleteStockLocation(stockLocationId);
+                result.put("status", StatusType.SUCCESS);
+            }else{
+                result.put("status", StatusType.FAILURE);
+                result.put("message", "Current location is using by others as shipping location");
+            }
         } catch (Exception e) {
             result.put("status", StatusType.FAILURE);
             logger.error("删除stockLocation列表异常："+e.getMessage(),e);

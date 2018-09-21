@@ -306,4 +306,11 @@
     WHERE s.shipment_id = #{shipmentId,jdbcType=BIGINT}
   </select>
 
+  <select id="getStockLocationByFrom" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from stock_location
+    where ship_from_location_id = #{fromLocationId,jdbcType=BIGINT} and enabled = 1
+  </select>
+
 </mapper>

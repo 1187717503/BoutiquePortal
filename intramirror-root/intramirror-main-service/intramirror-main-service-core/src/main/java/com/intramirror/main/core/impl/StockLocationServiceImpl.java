@@ -65,4 +65,9 @@ public class StockLocationServiceImpl extends BaseDao implements StockLocationSe
     public void deleteStockLocation(Long locationId) {
         stockLocationMapper.deleteByPrimaryKey(locationId);
     }
+
+    @Override
+    public List<StockLocation> getStockLocationByFrom(Long fromLocationId) {
+        return stockLocationMapper.getStockLocationByFrom(fromLocationId);
+    }
 }

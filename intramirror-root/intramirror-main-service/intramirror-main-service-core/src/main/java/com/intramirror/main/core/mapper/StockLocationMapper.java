@@ -2,6 +2,7 @@ package com.intramirror.main.core.mapper;
 
 import com.intramirror.main.api.model.StockLocation;
 import com.intramirror.main.api.vo.StockLocationVO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -71,4 +72,6 @@ public interface StockLocationMapper {
      * @return
      */
     StockLocation getShipFromLocation(Long shipment);
+
+    List<StockLocation> getStockLocationByFrom(@Param("fromLocationId") Long fromLocationId);
 }
