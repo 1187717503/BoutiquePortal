@@ -1,6 +1,7 @@
 package com.intramirror.web.controller.apimq;
 
 import com.intramirror.common.parameter.StatusType;
+import com.intramirror.main.api.service.PostCodeService;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.model.VendorPayment;
@@ -33,6 +34,8 @@ public class VendorPaymentController extends BaseController {
 
     @Autowired
     private VendorService vendorService;
+    @Autowired
+    private PostCodeService postCodeService;
 
     @RequestMapping(value = "/getByVendorId", method = RequestMethod.GET)
     @ResponseBody
@@ -58,7 +61,7 @@ public class VendorPaymentController extends BaseController {
         Map<String, Object> stringObjectMap = new HashMap<String, Object>();
         try{
             if(StringUtil.isNotEmpty(vendorPayment.getPostalCode1())&&vendorPayment.getCountry1()!=null){
-                String pattent = getPattent(Long.parseLong(vendorPayment.getCountry1()));
+                String pattent = getPattent(vendorPayment.getCountry1());
                 if(pattent!=null){
                     Pattern r = Pattern.compile(pattent);
                     Matcher m = r.matcher(vendorPayment.getPostalCode1());
@@ -71,7 +74,7 @@ public class VendorPaymentController extends BaseController {
             }
 
             if(StringUtil.isNotEmpty(vendorPayment.getPostalCod2())&&vendorPayment.getCountry2()!=null){
-                String pattent = getPattent(Long.parseLong(vendorPayment.getCountry2()));
+                String pattent = getPattent(vendorPayment.getCountry2());
                 if(pattent!=null){
                     Pattern r = Pattern.compile(pattent);
                     Matcher m = r.matcher(vendorPayment.getPostalCod2());
@@ -81,6 +84,16 @@ public class VendorPaymentController extends BaseController {
                         return stringObjectMap;
                     }
                 }
+            }
+            if(postCodeService.getByCountryId(vendorPayment.getCountry1(),vendorPayment.getCity1())==null){
+                stringObjectMap.put("status", StatusType.FAILURE);
+                stringObjectMap.put("message","city error");
+                return stringObjectMap;
+            }
+            if(postCodeService.getByCountryId(vendorPayment.getCountry2(),vendorPayment.getCity2())==null){
+                stringObjectMap.put("status", StatusType.FAILURE);
+                stringObjectMap.put("message","city error");
+                return stringObjectMap;
             }
             User user = super.getUser(httpRequest);
             Vendor vendor = vendorService.getVendorByUserId(user.getUserId());
@@ -104,7 +117,7 @@ public class VendorPaymentController extends BaseController {
         Map<String, Object> stringObjectMap = new HashMap<String, Object>();
         try{
             if(StringUtil.isNotEmpty(vendorPayment.getPostalCode1())&&vendorPayment.getCountry1()!=null){
-                String pattent = getPattent(Long.parseLong(vendorPayment.getCountry1()));
+                String pattent = getPattent(vendorPayment.getCountry1());
                 if(pattent!=null){
                     Pattern r = Pattern.compile(pattent);
                     Matcher m = r.matcher(vendorPayment.getPostalCode1());
@@ -116,7 +129,7 @@ public class VendorPaymentController extends BaseController {
                 }
             }
             if(StringUtil.isNotEmpty(vendorPayment.getPostalCod2())&&vendorPayment.getCountry2()!=null){
-                String pattent = getPattent(Long.parseLong(vendorPayment.getCountry2()));
+                String pattent = getPattent(vendorPayment.getCountry2());
                 if(pattent!=null){
                     Pattern r = Pattern.compile(pattent);
                     Matcher m = r.matcher(vendorPayment.getPostalCod2());
@@ -126,6 +139,16 @@ public class VendorPaymentController extends BaseController {
                         return stringObjectMap;
                     }
                 }
+            }
+            if(postCodeService.getByCountryId(vendorPayment.getCountry1(),vendorPayment.getCity1())==null){
+                stringObjectMap.put("status", StatusType.FAILURE);
+                stringObjectMap.put("message","city error");
+                return stringObjectMap;
+            }
+            if(postCodeService.getByCountryId(vendorPayment.getCountry2(),vendorPayment.getCity2())==null){
+                stringObjectMap.put("status", StatusType.FAILURE);
+                stringObjectMap.put("message","city error");
+                return stringObjectMap;
             }
             vendorPayment.setUpdatedAt(new Date());
             vendorPaymentService.updateVendorPayment(vendorPayment);

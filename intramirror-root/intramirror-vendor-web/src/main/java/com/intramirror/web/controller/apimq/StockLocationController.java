@@ -5,6 +5,7 @@ import com.intramirror.main.api.model.AddressCountry;
 import com.intramirror.main.api.model.StockLocation;
 import com.intramirror.main.api.model.StockLocationDto;
 import com.intramirror.main.api.service.AddressCountryService;
+import com.intramirror.main.api.service.PostCodeService;
 import com.intramirror.main.api.service.StockLocationService;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
@@ -35,6 +36,8 @@ public class StockLocationController extends BaseController {
     private AddressCountryService addressCountryService;
     @Autowired
     private VendorService vendorService;
+    @Autowired
+    private PostCodeService postCodeService;
 
     @RequestMapping(value = "/getStockLocationList", method = RequestMethod.GET)
     @ResponseBody
@@ -84,6 +87,11 @@ public class StockLocationController extends BaseController {
                     }
                 }
             }
+            if(postCodeService.getByCountryCode(stockLocation.getAddressCountryCode(),stockLocation.getAddressCity())==null){
+                result.put("status", StatusType.FAILURE);
+                result.put("message","city error");
+                return result;
+            }
             User user = super.getUser(httpRequest);
             Vendor vendor = vendorService.getVendorByUserId(user.getUserId());
             stockLocation.setEnabled(true);
@@ -91,13 +99,14 @@ public class StockLocationController extends BaseController {
             stockLocation.setUpdateAt(new Date());
             stockLocation.setVendorId(vendor.getVendorId());
             stockLocationService.createStockLocation(stockLocation);
-            if(stockLocation.getShipFromLocationId()==-1){
+            if(stockLocation.getShipFromLocationId()!=null&&stockLocation.getShipFromLocationId()==-1){
                 stockLocation.setShipFromLocationId(stockLocation.getLocationId());
                 stockLocationService.updateStockLocation(stockLocation);
             }
             result.put("status", StatusType.SUCCESS);
         } catch (Exception e) {
             result.put("status", StatusType.FAILURE);
+            result.put("message", "System error");
             logger.error("创建stockLocation列表异常："+e.getMessage(),e);
         }
         return result;
@@ -119,6 +128,11 @@ public class StockLocationController extends BaseController {
                         return result;
                     }
                 }
+            }
+            if(postCodeService.getByCountryCode(stockLocation.getAddressCountryCode(),stockLocation.getAddressCity())==null){
+                result.put("status", StatusType.FAILURE);
+                result.put("message","city error");
+                return result;
             }
             stockLocation.setUpdateAt(new Date());
             stockLocationService.updateStockLocation(stockLocation);

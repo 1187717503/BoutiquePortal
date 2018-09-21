@@ -681,4 +681,7 @@ public final class StatusType {
 
 	public static final int ORDER_LINE_NUMBER_INDEX = -9999;
 
+	public static final int MAIL_URL_EXPRIRED = -10000;
+
+
 }

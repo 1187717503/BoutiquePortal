@@ -27,4 +27,14 @@ public class PostCodeServiceImpl extends BaseDao implements PostCodeService {
     public List<Map<String, String>> getCityNameByCountryCodeAndCityName(String code, String cityName) {
         return postCodeMapper.getCityNameByCountryCodeAndCityName(code,cityName);
     }
+
+    @Override
+    public PostCode getByCountryCode(String code, String cityName) {
+        return postCodeMapper.getByCountryCode(code, cityName);
+    }
+
+    @Override
+    public PostCode getByCountryId(Long countryId, String cityName) {
+        return postCodeMapper.getByCountryId(countryId,cityName);
+    }
 }

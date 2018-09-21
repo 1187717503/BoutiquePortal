@@ -10,4 +10,8 @@ public interface PostCodeService {
     List<Map<String,String>> getCityNameByCountryIdAndCityName(Long countryId, String cityName);
 
     List<Map<String,String>> getCityNameByCountryCodeAndCityName(String code,String cityName);
+
+    PostCode getByCountryCode(String code, String cityName);
+
+    PostCode getByCountryId(Long countryId,String cityName);
 }

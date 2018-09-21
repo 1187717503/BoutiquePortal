@@ -58,4 +58,8 @@ public interface PostCodeMapper {
     List<Map<String,String>> getCityNameByCountryIdAndCityName(@Param("countryId") Long countryId,@Param("cityName")String cityName);
 
     List<Map<String, String>> getCityNameByCountryCodeAndCityName(@Param("code")String code, @Param("cityName")String cityName);
+
+    PostCode getByCountryCode(@Param("code")String code, @Param("cityName")String cityName);
+
+    PostCode getByCountryId(@Param("countryId") Long countryId,@Param("cityName")String cityName);
 }

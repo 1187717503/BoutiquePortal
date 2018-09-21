@@ -2,6 +2,7 @@ package com.intramirror.web.controller.apimq;
 
 import com.intramirror.common.parameter.StatusType;
 import com.intramirror.main.api.model.AddressCountry;
+import com.intramirror.main.api.service.PostCodeService;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.VendorService;
@@ -29,6 +30,8 @@ public class VendorController extends BaseController {
 
     @Autowired
     private VendorService vendorService;
+    @Autowired
+    private PostCodeService postCodeService;
 
     @RequestMapping(value = "/getVendor", method = RequestMethod.GET)
     @ResponseBody
@@ -66,6 +69,11 @@ public class VendorController extends BaseController {
                         return result;
                     }
                 }
+            }
+            if(postCodeService.getByCountryId(vendor.getAddressCountryId(),vendor.getCity())==null){
+                result.put("status", StatusType.FAILURE);
+                result.put("message","city error");
+                return result;
             }
             vendorService.updateByPrimaryKeySelective(vendor);
             result.put("status", StatusType.SUCCESS);

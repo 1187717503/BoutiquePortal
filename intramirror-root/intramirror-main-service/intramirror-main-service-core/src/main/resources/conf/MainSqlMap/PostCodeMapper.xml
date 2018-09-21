@@ -146,5 +146,12 @@
       and city_name like CONCAT(#{cityName},'%')
   </select>
 
+  <select id="getByCountryCode" resultMap="BaseResultMap">
+    SELECT * from post_code where country_code=#{code} and city_name=#{cityName} LIMIT 1
+  </select>
+
+  <select id="getByCountryId" resultMap="BaseResultMap">
+    SELECT * from post_code where country_id=#{countryId} and city_name=#{cityName} LIMIT 1
+  </select>
 
 </mapper>

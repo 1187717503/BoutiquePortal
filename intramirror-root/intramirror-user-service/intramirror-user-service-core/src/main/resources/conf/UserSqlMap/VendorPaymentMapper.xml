@@ -16,13 +16,13 @@
     <result column="beneficiary_address" property="beneficiaryAddress" jdbcType="VARCHAR" />
     <result column="city1" property="city1" jdbcType="VARCHAR" />
     <result column="postal_code1" property="postalCode1" jdbcType="VARCHAR" />
-    <result column="country1" property="country1" jdbcType="VARCHAR" />
+    <result column="country1" property="country1" jdbcType="BIGINT" />
     <result column="beneficiary_bank_name" property="beneficiaryBankName" jdbcType="VARCHAR" />
     <result column="account_num" property="accountNum" jdbcType="VARCHAR" />
     <result column="beneficiary_bank_address" property="beneficiaryBankAddress" jdbcType="VARCHAR" />
     <result column="city2" property="city2" jdbcType="VARCHAR" />
     <result column="postal_cod2" property="postalCod2" jdbcType="VARCHAR" />
-    <result column="country2" property="country2" jdbcType="VARCHAR" />
+    <result column="country2" property="country2" jdbcType="BIGINT" />
     <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
     <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
     <result column="area_code" property="areaCode" jdbcType="VARCHAR" />
@@ -70,9 +70,9 @@
     values (#{vendorPaymentId,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{vendorId,jdbcType=BIGINT}, 
       #{beneficiaryName,jdbcType=VARCHAR}, #{contactPerson,jdbcType=VARCHAR}, #{contactEmail,jdbcType=VARCHAR}, 
       #{contactPhone,jdbcType=VARCHAR}, #{beneficiaryAddress,jdbcType=VARCHAR}, #{city1,jdbcType=VARCHAR}, 
-      #{postalCode1,jdbcType=VARCHAR}, #{country1,jdbcType=VARCHAR}, #{beneficiaryBankName,jdbcType=VARCHAR}, 
+      #{postalCode1,jdbcType=VARCHAR}, #{country1,jdbcType=BIGINT}, #{beneficiaryBankName,jdbcType=VARCHAR},
       #{accountNum,jdbcType=VARCHAR}, #{beneficiaryBankAddress,jdbcType=VARCHAR}, #{city2,jdbcType=VARCHAR}, 
-      #{postalCod2,jdbcType=VARCHAR}, #{country2,jdbcType=VARCHAR}, #{createdAt,jdbcType=TIMESTAMP}, 
+      #{postalCod2,jdbcType=VARCHAR}, #{country2,jdbcType=BIGINT}, #{createdAt,jdbcType=TIMESTAMP},
       #{updatedAt,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.intramirror.user.api.model.VendorPayment" >
@@ -178,7 +178,7 @@
         #{postalCode1,jdbcType=VARCHAR},
       </if>
       <if test="country1 != null" >
-        #{country1,jdbcType=VARCHAR},
+        #{country1,jdbcType=BIGINT},
       </if>
       <if test="beneficiaryBankName != null" >
         #{beneficiaryBankName,jdbcType=VARCHAR},
@@ -196,7 +196,7 @@
         #{postalCod2,jdbcType=VARCHAR},
       </if>
       <if test="country2 != null" >
-        #{country2,jdbcType=VARCHAR},
+        #{country2,jdbcType=BIGINT},
       </if>
       <if test="createdAt != null" >
         #{createdAt,jdbcType=TIMESTAMP},
@@ -241,7 +241,7 @@
         postal_code1 = #{postalCode1,jdbcType=VARCHAR},
       </if>
       <if test="country1 != null" >
-        country1 = #{country1,jdbcType=VARCHAR},
+        country1 = #{country1,jdbcType=BIGINT},
       </if>
       <if test="beneficiaryBankName != null" >
         beneficiary_bank_name = #{beneficiaryBankName,jdbcType=VARCHAR},
@@ -259,7 +259,7 @@
         postal_cod2 = #{postalCod2,jdbcType=VARCHAR},
       </if>
       <if test="country2 != null" >
-        country2 = #{country2,jdbcType=VARCHAR},
+        country2 = #{country2,jdbcType=BIGINT},
       </if>
       <if test="createdAt != null" >
         created_at = #{createdAt,jdbcType=TIMESTAMP},
@@ -289,13 +289,13 @@
       beneficiary_address = #{beneficiaryAddress,jdbcType=VARCHAR},
       city1 = #{city1,jdbcType=VARCHAR},
       postal_code1 = #{postalCode1,jdbcType=VARCHAR},
-      country1 = #{country1,jdbcType=VARCHAR},
+      country1 = #{country1,jdbcType=BIGINT},
       beneficiary_bank_name = #{beneficiaryBankName,jdbcType=VARCHAR},
       account_num = #{accountNum,jdbcType=VARCHAR},
       beneficiary_bank_address = #{beneficiaryBankAddress,jdbcType=VARCHAR},
       city2 = #{city2,jdbcType=VARCHAR},
       postal_cod2 = #{postalCod2,jdbcType=VARCHAR},
-      country2 = #{country2,jdbcType=VARCHAR},
+      country2 = #{country2,jdbcType=BIGINT},
       created_at = #{createdAt,jdbcType=TIMESTAMP},
       updated_at = #{updatedAt,jdbcType=TIMESTAMP}
     where vendor_payment_id = #{vendorPaymentId,jdbcType=BIGINT}

@@ -33,6 +33,15 @@ public class DateUtils {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(calendar.getTime());
     }
 
+    public static Date getDateByStr(String date) {
+        try {
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public static String getTimeByMinuteGMT(int minute) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.MINUTE, calendar.get(Calendar.MINUTE) - minute);
@@ -85,5 +94,12 @@ public class DateUtils {
         return false;
         /*Sun Sep 24 10:54:09 CST 2017---Sun Sep 24 10:54:10 CST 2017
         false*/
+    }
+
+    public static int getDatePool4Hour(Date fromDate,Date toDate){
+        long from = fromDate.getTime();
+        long to = toDate.getTime();
+        int hours = (int) ((to - from)/(1000 * 60 * 60));
+        return hours;
     }
 }
