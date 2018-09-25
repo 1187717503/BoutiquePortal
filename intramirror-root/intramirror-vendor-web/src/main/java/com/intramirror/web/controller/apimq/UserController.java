@@ -113,7 +113,7 @@ public class UserController extends BaseController {
 
     @RequestMapping(value = "/forgetPwd", method = RequestMethod.GET)
     @ResponseBody
-    public Map changePwd(@RequestParam(required = true) String email) throws Exception {
+    public Map forgetPwd(@RequestParam(required = true) String email) throws Exception {
         User user = userService.getUserByEmail(email, EnabledType.USED);
         Map<String, Object> stringObjectMap = new HashMap<String, Object>();
         if (Helper.checkNotNull(user)) {
@@ -122,7 +122,7 @@ public class UserController extends BaseController {
             Date now = new Date();
             PasswordMail passwordMail = new PasswordMail();
             passwordMail.setEmail(email);
-            passwordMail.setCreate_date(now);
+            passwordMail.setCreate_date(DateUtils.getDateByStr(DateUtils.getStrDate(now,"yyyy-MM-dd HH:mm:ss")));
             passwordMail.setIs_change(0);
             StringBuffer url = new StringBuffer(changePwdUrl);
             url.append("?createDate=").append(DateUtils.getStrDate(now,"yyyy-MM-dd HH:mm:ss")).append("&email=")
@@ -200,6 +200,8 @@ public class UserController extends BaseController {
                 result.put("message","link error");
                 return result;
             }
+            System.out.println(!DateUtils.getformatDate(create).equals(DateUtils.getformatDate(passwordMail.getCreate_date())));
+            System.out.println(DateUtils.getDatePool4Hour(create,new Date())>2);
             if(!DateUtils.getformatDate(create).equals(DateUtils.getformatDate(passwordMail.getCreate_date()))||passwordMail.getIs_change()==1||DateUtils.getDatePool4Hour(create,new Date())>2){
                 result.put("status",StatusType.MAIL_URL_EXPRIRED);
                 result.put("message","This link has been expired,please back to login to send link for changing password");

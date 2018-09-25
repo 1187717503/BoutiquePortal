@@ -139,6 +139,7 @@
 
     <select id="getList" resultMap="BaseResultMap">
         SELECT ac.*,cm.english_name from address_country ac LEFT JOIN country_mapper cm on ac.`name`=cm.country
+        where address_country_id != 52
     </select>
 
     <select id="getAddressCountryByCountryCode" resultMap="BaseResultMap">
