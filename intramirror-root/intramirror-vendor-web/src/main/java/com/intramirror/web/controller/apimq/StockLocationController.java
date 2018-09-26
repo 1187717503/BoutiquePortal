@@ -139,6 +139,7 @@ public class StockLocationController extends BaseController {
                 return result;
             }
             stockLocation.setUpdateAt(new Date());
+            stockLocation.setContactPhoneNumber(stockLocation.getAreaCode()+stockLocation.getContactPhoneNumber());
             stockLocationService.updateStockLocation(stockLocation);
             result.put("status", StatusType.SUCCESS);
         } catch (Exception e) {
