@@ -172,13 +172,15 @@ public class ConfirmCheckOrderController {
                         //会员系统积分
                         logisticsProductService.updateMemberCredits(logis.getOrder_line_num());
                     } else {
-                        result.setMsg("Order does not exist,logisticsProductId:" + logisticsProductId);
+                        result.errorStatus().setMsg("Order does not exist,logisticsProductId:" + logisticsProductId);
                     }
                 }
             }catch (Exception e){
                 result.errorStatus().setMsg(e.getMessage());
                 return result;
             }
+        }else {
+            result.setMsg("Designer-ID or Color-Code is incorrect");
         }
         return result;
     }
