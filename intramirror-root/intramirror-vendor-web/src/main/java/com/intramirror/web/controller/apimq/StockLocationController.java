@@ -150,7 +150,7 @@ public class StockLocationController extends BaseController {
         Map<String, Object> result = new HashMap<>();
         try {
             List<StockLocation> list = stockLocationService.getStockLocationByFrom(stockLocationId);
-            if((list==null||list.size()==0)||(list.size()==1&&list.get(0).getLocationId()==stockLocationId)){
+            if((list==null||list.size()==0)||(list.size()==1&&list.get(0).getLocationId().equals(stockLocationId))){
                 stockLocationService.deleteStockLocation(stockLocationId);
                 result.put("status", StatusType.SUCCESS);
             }else{
