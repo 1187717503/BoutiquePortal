@@ -142,40 +142,45 @@ public class ConfirmCheckOrderController {
                     String mapColorCode = maps.get("colorCode") == null ? "" : maps.get("colorCode").toString();
 
                     //如果是当前自己的brandId和colorCode保存
-                    if (mapBrandId.equals(brandId) && mapColorCode.equals(colorCode)) {
-                        if (logis != null) {
-                            LogisticsProduct upLogis = new LogisticsProduct();
-                            upLogis.setLogistics_product_id(logis.getLogistics_product_id());
-                            if (stockLocation != null) {
-                                upLogis.setStock_location(stockLocation);
-                            }
-                            if (estShipDate != null) {
-                                upLogis.setEst_ship_date(sdf.parse(estShipDate));
-                            }
-                            if (stockLocationId !=null ){
-                                upLogis.setStock_location_id(stockLocationId);
-                            }
-                            upLogis.setConfirmed_at(Helper.getCurrentUTCTime());
-
-                            //logisticsProductServiceImpl.updateByLogisticsProduct(upLogis);
-                            upLogis.setOrder_line_num(logis.getOrder_line_num());
-                            //确认订单
-                            logisticsProductService.confirmOrder(upLogis);
-
-                            //会员系统积分
-                            logisticsProductService.updateMemberCredits(logis.getOrder_line_num());
-                        } else {
-                            result.setMsg("Order does not exist,logisticsProductId:" + logisticsProductId);
-                        }
-                    } else {
-                        result.errorStatus().putMsg("error", "noMatching parm").setData("noMatching parm");
+                    if (!mapBrandId.equals(brandId)){
+                        result.errorStatus().setMsg("Designer-ID is incorrect");
                         return result;
+                    }
+                    if (!mapColorCode.equals(colorCode)){
+                        result.errorStatus().setMsg("Color-Code is incorrect");
+                        return result;
+                    }
+                    if (logis != null) {
+                        LogisticsProduct upLogis = new LogisticsProduct();
+                        upLogis.setLogistics_product_id(logis.getLogistics_product_id());
+                        if (stockLocation != null) {
+                            upLogis.setStock_location(stockLocation);
+                        }
+                        if (estShipDate != null) {
+                            upLogis.setEst_ship_date(sdf.parse(estShipDate));
+                        }
+                        if (stockLocationId !=null ){
+                            upLogis.setStock_location_id(stockLocationId);
+                        }
+                        upLogis.setConfirmed_at(Helper.getCurrentUTCTime());
+
+                        //logisticsProductServiceImpl.updateByLogisticsProduct(upLogis);
+                        upLogis.setOrder_line_num(logis.getOrder_line_num());
+                        //确认订单
+                        logisticsProductService.confirmOrder(upLogis);
+
+                        //会员系统积分
+                        logisticsProductService.updateMemberCredits(logis.getOrder_line_num());
+                    } else {
+                        result.errorStatus().setMsg("Order does not exist,logisticsProductId:" + logisticsProductId);
                     }
                 }
             }catch (Exception e){
                 result.errorStatus().setMsg(e.getMessage());
                 return result;
             }
+        }else {
+            result.setMsg("Designer-ID or Color-Code is incorrect");
         }
         return result;
     }
