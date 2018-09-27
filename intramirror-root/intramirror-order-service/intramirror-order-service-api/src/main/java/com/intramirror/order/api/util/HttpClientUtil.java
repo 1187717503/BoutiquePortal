@@ -1,5 +1,6 @@
 package com.intramirror.order.api.util;
 
+import com.intramirror.common.help.StringUtils;
 import com.intramirror.core.net.http.OkHttpUtils;
 import net.sf.json.JSONObject;
 import okhttp3.Response;
@@ -50,11 +51,13 @@ public class HttpClientUtil {
             post.setConfig(requestConfig);
 
             // 构建消息实体
-            StringEntity entity = new StringEntity(jsonObj, Charset.forName("UTF-8"));
-            entity.setContentEncoding(new BasicHeader("Content-Type", "application/json"));
-            // 发送Json格式的数据请求
-            entity.setContentType("application/json");
-            post.setEntity(entity);
+            if(StringUtils.isNotBlank(jsonObj)){
+                StringEntity entity = new StringEntity(jsonObj, Charset.forName("UTF-8"));
+                entity.setContentEncoding(new BasicHeader("Content-Type", "application/json"));
+                // 发送Json格式的数据请求
+                entity.setContentType("application/json");
+                post.setEntity(entity);
+            }
 
             HttpResponse response = httpClient.execute(post);
 
