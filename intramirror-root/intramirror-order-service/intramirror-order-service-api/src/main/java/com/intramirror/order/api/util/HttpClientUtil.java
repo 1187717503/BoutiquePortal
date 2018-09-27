@@ -7,6 +7,7 @@ import okhttp3.Response;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
@@ -22,6 +23,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by caowei on 2018/4/23.
@@ -37,6 +41,15 @@ public class HttpClientUtil {
     public static String confirmStoreUrl;
     public static String tmsProviderRouteUrl;
     public static String appMemberPointsUrl;
+    public static String order_capture_confirm;
+
+    public static String getOrder_capture_confirm() {
+        return order_capture_confirm;
+    }
+
+    public static void setOrder_capture_confirm(String order_capture_confirm) {
+        HttpClientUtil.order_capture_confirm = order_capture_confirm;
+    }
 
     public static String httpPost(String jsonObj, String url){
         HttpPost post = null;
@@ -81,6 +94,61 @@ public class HttpClientUtil {
                     }
                     data.put("status",1);
                     return data!=null?data.toString():"request success";
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally{
+            if(post != null){
+                try {
+                    post.releaseConnection();
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return "";
+    }
+
+    public static String httpPostNoHandle(String jsonObj, String url){
+        HttpPost post = null;
+        try {
+            HttpClient httpClient = HttpClients.createDefault();
+
+            post = new HttpPost(url);
+            // 构造消息头
+            post.setHeader("Content-type", "application/json; charset=utf-8");
+            //设置超时时间
+            RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(30000).setConnectTimeout(2000).build();//设置请求和传输超时时间
+            post.setConfig(requestConfig);
+
+            // 构建消息实体
+            if(StringUtils.isNotBlank(jsonObj)){
+                StringEntity entity = new StringEntity(jsonObj, Charset.forName("UTF-8"));
+                entity.setContentEncoding(new BasicHeader("Content-Type", "application/json"));
+                // 发送Json格式的数据请求
+                entity.setContentType("application/json");
+                post.setEntity(entity);
+            }
+
+            HttpResponse response = httpClient.execute(post);
+
+            // 检验返回码
+            int statusCode = response.getStatusLine().getStatusCode();
+            HttpEntity responseEntity = response.getEntity();
+            String jsonString = EntityUtils.toString(responseEntity);
+            if(statusCode != HttpStatus.SC_OK){
+                LOGGER.error("request fail,url={},param={}",url,jsonObj);
+                return jsonString;
+            }else{
+                JSONObject object = JSONObject.fromObject(jsonString);
+                if(object.optInt("status")!=1){
+                    LOGGER.error("msg={}",object.optString("msg"));
+                    return object.toString();
+                }else {
+                    JSONObject data = object.optJSONObject("data");
+                    return data!=null?data.toString():"";
                 }
             }
         } catch (Exception e) {

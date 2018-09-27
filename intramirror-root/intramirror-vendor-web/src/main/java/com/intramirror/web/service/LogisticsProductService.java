@@ -36,15 +36,13 @@ public class LogisticsProductService{
 	@Autowired
 	private IOrderService orderService;
 
-	@Value("${order_capture_confirm}")
-	private String order_capture_confirm;
-
 	@Transactional
 	public void confirmOrder(LogisticsProduct upLogis) {
 
-		String url = order_capture_confirm+upLogis.getLogistics_product_id();
+		String url = HttpClientUtil.order_capture_confirm+upLogis.getLogistics_product_id();
 		logger.info("Confirm Request,url={}", url);
-		String resultStr = HttpClientUtil.httpPost(null,url);
+		String resultStr = HttpClientUtil.httpPostNoHandle(null,url);
+		logger.info("Response ConfirmOrder,message:{}",resultStr);
 		if(StringUtil.isNotEmpty(resultStr)){
 			net.sf.json.JSONObject object = net.sf.json.JSONObject.fromObject(resultStr);
 			if(object.optInt("status")!=1){
