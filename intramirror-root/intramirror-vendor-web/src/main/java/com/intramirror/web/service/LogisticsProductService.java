@@ -39,16 +39,18 @@ public class LogisticsProductService{
 	@Transactional
 	public void confirmOrder(LogisticsProduct upLogis) {
 
-		String url = HttpClientUtil.order_capture_confirm+upLogis.getLogistics_product_id();
+		String url = HttpClientUtil.order_capture_confirm;
 		logger.info("Confirm Request,url={}", url);
-		String resultStr = HttpClientUtil.httpPostNoHandle(null,url);
+		String resultStr = HttpClientUtil.httpPostNoHandle("{\"logisticsProductId\":\"" + upLogis.getLogistics_product_id() + "\"}",url);
 		logger.info("Response ConfirmOrder,message:{}",resultStr);
-		if(StringUtil.isNotEmpty(resultStr)){
-			net.sf.json.JSONObject object = net.sf.json.JSONObject.fromObject(resultStr);
-			if(object.optInt("status")!=1){
-				throw new RuntimeException(object.optString("msg"));
-			}
+		com.alibaba.fastjson.JSONObject jsonObject = com.alibaba.fastjson.JSONObject.parseObject(resultStr);
+		if (StringUtil.isEmpty(resultStr)
+				||jsonObject.getInteger("status") != 1){
+
+			throw new RuntimeException(jsonObject.getString("msg"));
 		}
+
+
 		/*logisticsProductService.updateByLogisticsProduct(upLogis);
 
 		//调用修改订单状态

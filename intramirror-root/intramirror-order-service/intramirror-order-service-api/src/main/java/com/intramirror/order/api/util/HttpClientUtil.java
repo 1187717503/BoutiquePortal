@@ -120,37 +120,20 @@ public class HttpClientUtil {
             // 构造消息头
             post.setHeader("Content-type", "application/json; charset=utf-8");
             //设置超时时间
-            RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(30000).setConnectTimeout(2000).build();//设置请求和传输超时时间
+            RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(100000).setConnectTimeout(2000).build();//设置请求和传输超时时间
             post.setConfig(requestConfig);
 
             // 构建消息实体
-            if(StringUtils.isNotBlank(jsonObj)){
-                StringEntity entity = new StringEntity(jsonObj, Charset.forName("UTF-8"));
-                entity.setContentEncoding(new BasicHeader("Content-Type", "application/json"));
-                // 发送Json格式的数据请求
-                entity.setContentType("application/json");
-                post.setEntity(entity);
-            }
+            StringEntity entity = new StringEntity(jsonObj, Charset.forName("UTF-8"));
+            entity.setContentEncoding("UTF-8");
+            // 发送Json格式的数据请求
+            entity.setContentType("application/json");
+            post.setEntity(entity);
 
             HttpResponse response = httpClient.execute(post);
 
-            // 检验返回码
-            int statusCode = response.getStatusLine().getStatusCode();
             HttpEntity responseEntity = response.getEntity();
-            String jsonString = EntityUtils.toString(responseEntity);
-            if(statusCode != HttpStatus.SC_OK){
-                LOGGER.error("request fail,url={},param={}",url,jsonObj);
-                return jsonString;
-            }else{
-                JSONObject object = JSONObject.fromObject(jsonString);
-                if(object.optInt("status")!=1){
-                    LOGGER.error("msg={}",object.optString("msg"));
-                    return object.toString();
-                }else {
-                    JSONObject data = object.optJSONObject("data");
-                    return data!=null?data.toString():"";
-                }
-            }
+            return EntityUtils.toString(responseEntity);
         } catch (Exception e) {
             e.printStackTrace();
         }finally{

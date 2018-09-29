@@ -169,9 +169,11 @@ public class ConfirmCheckOrderController {
                         //logisticsProductServiceImpl.updateByLogisticsProduct(upLogis);
                         upLogis.setOrder_line_num(logis.getOrder_line_num());
                         //确认订单
-                        iLogisticsProductService.updateByLogisticsProduct(upLogis);
+
                         
                         logisticsProductService.confirmOrder(upLogis);
+
+                        iLogisticsProductService.updateByLogisticsProduct(upLogis);
 
                         //会员系统积分
                         logisticsProductService.updateMemberCredits(logis.getOrder_line_num());
