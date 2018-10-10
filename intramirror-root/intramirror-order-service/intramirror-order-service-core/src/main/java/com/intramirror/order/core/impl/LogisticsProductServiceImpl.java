@@ -159,7 +159,8 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
 
     @Override
     public int updateByLogisticsProduct(LogisticsProduct logisticsProduct) {
-        sendJPushMsg(logisticsProduct);
+        LogisticsProduct dbLogisticsProduct = this.selectById(logisticsProduct.getLogistics_product_id());
+        sendJPushMsg(dbLogisticsProduct);
         return logisticsProductMapper.updateByLogisticsProduct(logisticsProduct);
     }
 
