@@ -52,6 +52,9 @@ public class StockLocationController extends BaseController {
                 if(stockLocationFrom!=null){
                     stockLocation.setShipFromLocationName(stockLocationFrom.getStockLocation());
                 }
+                if(StringUtil.isNotEmpty(stockLocation.getAreaCode())){
+                    stockLocation.setContactPhoneNumber(stockLocation.getContactPhoneNumber().replace(stockLocation.getAreaCode(),""));
+                }
                 stockLocation.setFullContactPhoneNumber((stockLocation.getAreaCode()==null?"":stockLocation.getAreaCode())+stockLocation.getContactPhoneNumber());
                 String fullAddress = (stockLocation.getAddressStreetlines()==null?"":stockLocation.getAddressStreetlines())+(stockLocation.getAddressStreetlines2()==null?"":stockLocation.getAddressStreetlines2())
                         +(stockLocation.getAddressStreetlines3()==null?"":stockLocation.getAddressStreetlines3());
@@ -98,6 +101,7 @@ public class StockLocationController extends BaseController {
             stockLocation.setCreateAt(new Date());
             stockLocation.setUpdateAt(new Date());
             stockLocation.setVendorId(vendor.getVendorId());
+            stockLocation.setContactPhoneNumber(stockLocation.getAreaCode()+stockLocation.getContactPhoneNumber());
             stockLocationService.createStockLocation(stockLocation);
             if(stockLocation.getShipFromLocationId()!=null&&stockLocation.getShipFromLocationId()==-1){
                 stockLocation.setShipFromLocationId(stockLocation.getLocationId());
@@ -135,6 +139,7 @@ public class StockLocationController extends BaseController {
                 return result;
             }
             stockLocation.setUpdateAt(new Date());
+            stockLocation.setContactPhoneNumber(stockLocation.getAreaCode()+stockLocation.getContactPhoneNumber());
             stockLocationService.updateStockLocation(stockLocation);
             result.put("status", StatusType.SUCCESS);
         } catch (Exception e) {
