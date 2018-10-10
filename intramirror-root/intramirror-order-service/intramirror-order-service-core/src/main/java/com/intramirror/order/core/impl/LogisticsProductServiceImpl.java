@@ -61,7 +61,7 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
         // JPush 2017-12-28
         // 变更为picking状态不需要push
         if (status != OrderStatusType.PICKING){
-            sendJPushMsg(logisticsProduct);
+//            sendJPushMsg(logisticsProduct);
             logger.info("JPush 已经塞入线程池处理");
         }
 
@@ -159,13 +159,20 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
 
     @Override
     public int updateByLogisticsProduct(LogisticsProduct logisticsProduct) {
-        LogisticsProduct dbLogisticsProduct = this.selectById(logisticsProduct.getLogistics_product_id());
-        sendJPushMsg(dbLogisticsProduct);
+
         return logisticsProductMapper.updateByLogisticsProduct(logisticsProduct);
     }
 
+    @Override
+    public int updateByLogisticsProduct4Jpush(Integer oldStatus,LogisticsProduct logisticsProduct) {
+        LogisticsProduct dbLogisticsProduct = this.selectById(logisticsProduct.getLogistics_product_id());
+        sendJPushMsg(oldStatus,dbLogisticsProduct);
+        return logisticsProductMapper.updateByLogisticsProduct(logisticsProduct);
+    }
+
+
     //JPush --2017-12-27
-    private void sendJPushMsg(LogisticsProduct logisticsProduct) {
+    private void sendJPushMsg(Integer oldStatus,LogisticsProduct logisticsProduct) {
         logger.info("JPush通知 开始");
         if (logisticsProduct.getLogistics_product_id() == null || logisticsProduct.getStatus() == null) {
             logger.info("JPush Failed：LP入参为空");
@@ -182,8 +189,8 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
         }
 
         //根据主键查询，只有一条才正常
-        LogisticsProduct oldLp = list.get(0);
-        if (oldLp.getStatus() == logisticsProduct.getStatus()) {
+//        LogisticsProduct oldLp = list.get(0);
+        if (oldStatus == logisticsProduct.getStatus()) {
             logger.info("JPush Failed： Status无变化");
             return;
         }
