@@ -693,10 +693,8 @@
                      INNER JOIN product p ON (sp.product_id = p.product_id and p.enabled = 1)
                      INNER JOIN brand b ON (p.brand_id = b.brand_id AND b.enabled = 1)
                      INNER JOIN sku s ON (s.sku_id = sps.sku_id AND s.enabled = 1)
-                     INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
-                     LEFT JOIN shipment sm ON sm.vendor_id = v.vendor_id
                  WHERE (lp.`status` = 3 OR lp.`status` = 4)
-                 AND v.vendor_id in
+                 AND lp.vendor_id in
                     <foreach item="vendorId" index="index" collection="vendorIds" open="(" separator="," close=")">
                         #{vendorId}
                     </foreach>
