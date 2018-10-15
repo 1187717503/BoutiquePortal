@@ -6,6 +6,7 @@ import com.intramirror.main.api.service.PostCodeService;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.VendorService;
+import com.intramirror.utils.transform.JsonTransformUtil;
 import com.intramirror.web.controller.BaseController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +57,7 @@ public class VendorController extends BaseController {
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     @ResponseBody
     public Map getCountry(HttpServletRequest httpRequest,@RequestBody Vendor vendor) {
+        logger.info("更新vendor："+JsonTransformUtil.toJson(vendor));
         Map<String, Object> result = new HashMap<>();
         try {
             if(StringUtil.isNotEmpty(vendor.getPostalCode())&&vendor.getAddressCountryId()!=null){

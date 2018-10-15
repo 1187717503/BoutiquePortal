@@ -7,6 +7,7 @@ import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.model.VendorPayment;
 import com.intramirror.user.api.service.VendorPaymentService;
 import com.intramirror.user.api.service.VendorService;
+import com.intramirror.utils.transform.JsonTransformUtil;
 import com.intramirror.web.controller.BaseController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +59,7 @@ public class VendorPaymentController extends BaseController {
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     @ResponseBody
     public Map create(HttpServletRequest httpRequest,@RequestBody VendorPayment vendorPayment) throws Exception {
+        logger.info("创建vendorPayment:"+JsonTransformUtil.toJson(vendorPayment));
         Map<String, Object> stringObjectMap = new HashMap<String, Object>();
         try{
             if(StringUtil.isNotEmpty(vendorPayment.getPostalCode1())&&vendorPayment.getCountry1()!=null){
@@ -114,6 +116,7 @@ public class VendorPaymentController extends BaseController {
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     @ResponseBody
     public Map update(@RequestBody VendorPayment vendorPayment) throws Exception {
+        logger.info("更新vendorPayment:"+JsonTransformUtil.toJson(vendorPayment));
         Map<String, Object> stringObjectMap = new HashMap<String, Object>();
         try{
             if(StringUtil.isNotEmpty(vendorPayment.getPostalCode1())&&vendorPayment.getCountry1()!=null){

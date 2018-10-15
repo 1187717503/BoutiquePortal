@@ -10,6 +10,7 @@ import com.intramirror.main.api.service.StockLocationService;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.VendorService;
+import com.intramirror.utils.transform.JsonTransformUtil;
 import com.intramirror.web.controller.BaseController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +77,7 @@ public class StockLocationController extends BaseController {
     @RequestMapping(value = "/createStockLocation", method = RequestMethod.POST)
     @ResponseBody
     public Map createStockLocation(HttpServletRequest httpRequest, @RequestBody StockLocation stockLocation) {
+        logger.info("创建stockLocation:"+JsonTransformUtil.toJson(stockLocation));
         Map<String, Object> result = new HashMap<>();
         try {
             if(StringUtil.isNotEmpty(stockLocation.getAddressPostalCode())&&stockLocation.getAddressCountryCode()!=null){
@@ -119,6 +121,7 @@ public class StockLocationController extends BaseController {
     @RequestMapping(value = "/updateStockLocation", method = RequestMethod.POST)
     @ResponseBody
     public Map updateStockLocation(HttpServletRequest httpRequest, @RequestBody StockLocation stockLocation) {
+        logger.info("更新stockLocation:"+JsonTransformUtil.toJson(stockLocation));
         Map<String, Object> result = new HashMap<>();
         try {
             if(StringUtil.isNotEmpty(stockLocation.getAddressPostalCode())&&stockLocation.getAddressCountryCode()!=null){
@@ -152,6 +155,7 @@ public class StockLocationController extends BaseController {
     @RequestMapping(value = "/deleteStockLocation", method = RequestMethod.GET)
     @ResponseBody
     public Map deleteStockLocation(HttpServletRequest httpRequest, Long stockLocationId) {
+        logger.info("删除stockLocation:"+stockLocationId);
         Map<String, Object> result = new HashMap<>();
         try {
             List<StockLocation> list = stockLocationService.getStockLocationByFrom(stockLocationId);
