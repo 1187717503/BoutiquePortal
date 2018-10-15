@@ -8,9 +8,6 @@ import com.intramirror.order.api.model.MemberPointsErrorLog;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.util.HttpClientUtil;
-import com.intramirror.product.api.model.Sku;
-import com.intramirror.product.api.service.IProductService;
-import com.intramirror.product.api.service.SkuService;
 import com.intramirror.web.service.LogisticsProductService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -37,11 +34,6 @@ public class ConfirmCheckOrderController {
     private static final Logger logger = LoggerFactory.getLogger(ConfirmCheckOrderController.class);
 
     private String jwtSecret = "qazxswedcvfr543216yhnmju70plmjkiu89";
-
-    @Autowired
-    private SkuService skuService;
-    @Autowired
-    private IProductService productService;
 
     @Autowired
     IOrderService orderService;
@@ -176,25 +168,25 @@ public class ConfirmCheckOrderController {
                     }
                     upLogis.setConfirmed_at(Helper.getCurrentUTCTime());
 
-                        //logisticsProductServiceImpl.updateByLogisticsProduct(upLogis);
-                        upLogis.setOrder_line_num(logis.getOrder_line_num());
-                        //确认订单
-                        LogisticsProduct old = logisticsProductService.selectById(upLogis.getLogistics_product_id());
-                        Integer oldStatus = old==null?null:old.getStatus();
-                        logisticsProductService.confirmOrder(upLogis);
+                    //logisticsProductServiceImpl.updateByLogisticsProduct(upLogis);
+                    upLogis.setOrder_line_num(logis.getOrder_line_num());
+                    //确认订单
+                    LogisticsProduct old = logisticsProductService.selectById(upLogis.getLogistics_product_id());
+                    Integer oldStatus = old==null?null:old.getStatus();
+                    logisticsProductService.confirmOrder(upLogis);
 
-                        iLogisticsProductService.updateByLogisticsProduct4Jpush(oldStatus,upLogis);
+                    iLogisticsProductService.updateByLogisticsProduct4Jpush(oldStatus,upLogis);
 
-                        //会员系统积分
-                        logisticsProductService.updateMemberCredits(logis.getOrder_line_num());
-                    } else {
-                        result.errorStatus().setMsg("Order does not exist,logisticsProductId:" + logisticsProductId);
-                    }
+                    //会员系统积分
+                    logisticsProductService.updateMemberCredits(logis.getOrder_line_num());
+                } else {
+                    result.errorStatus().setMsg("Order does not exist,logisticsProductId:" + logisticsProductId);
                 }
-            }catch (Exception e){
-                result.errorStatus().setMsg(e.getMessage());
-                return result;
             }
+        }catch (Exception e){
+            result.errorStatus().setMsg(e.getMessage());
+            return result;
+        }
         return result;
     }
 
