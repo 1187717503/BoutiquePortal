@@ -118,7 +118,7 @@ public class ConfirmCheckOrderController {
             stockLocationId = Long.valueOf(map.get("stockLocationId").toString());
         }
 
-        Sku sku = null;
+        /*Sku sku = null;
         List<Map<String, Object>> mapList = new ArrayList<>();
         if (barCode != null) {
             sku = skuService.getSkuBySkuCode(barCode);
@@ -126,21 +126,22 @@ public class ConfirmCheckOrderController {
         } else {
             mapList = productService.getProductByBrandIDAndColorCode(map);
             //            result.put("mapList", mapList);
-        }
+        }*/
 
-        if (sku != null || (mapList != null && mapList.size() > 0)) {
-            result.successStatus();
+        //if (sku != null || (mapList != null && mapList.size() > 0)) {
 
-            try{
-                if (logisticsProductId != null) {
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-                    //LogisticsProduct logis = logisticsProductServiceImpl.selectById(Long.parseLong(logisticsProductId));
-                    LogisticsProduct logis = logisticsProductService.selectById(Long.parseLong(logisticsProductId));
-                    Map<String, Object> maps = orderService.getOrderLogisticsInfoByIdWithSql(Long.parseLong(logisticsProductId));
+        try{
+            if (logisticsProductId != null) {
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+                //LogisticsProduct logis = logisticsProductServiceImpl.selectById(Long.parseLong(logisticsProductId));
+                LogisticsProduct logis = logisticsProductService.selectById(Long.parseLong(logisticsProductId));
+                Map<String, Object> maps = orderService.getOrderLogisticsInfoByIdWithSql(Long.parseLong(logisticsProductId));
+
+                if (barCode == null){
                     String mapBrandId = maps.get("brandID") == null ? "" : maps.get("brandID").toString();
                     String mapColorCode = maps.get("colorCode") == null ? "" : maps.get("colorCode").toString();
-
                     //如果是当前自己的brandId和colorCode保存
                     if (!mapBrandId.equals(brandId)){
                         result.errorStatus().setMsg("Designer-ID is incorrect");
@@ -150,38 +151,48 @@ public class ConfirmCheckOrderController {
                         result.errorStatus().setMsg("Color-Code is incorrect");
                         return result;
                     }
-                    if (logis != null) {
-                        LogisticsProduct upLogis = new LogisticsProduct();
-                        upLogis.setLogistics_product_id(logis.getLogistics_product_id());
-                        if (stockLocation != null) {
-                            upLogis.setStock_location(stockLocation);
-                        }
-                        if (estShipDate != null) {
-                            upLogis.setEst_ship_date(sdf.parse(estShipDate));
-                        }
-                        if (stockLocationId !=null ){
-                            upLogis.setStock_location_id(stockLocationId);
-                        }
-                        upLogis.setConfirmed_at(Helper.getCurrentUTCTime());
-
-                        //logisticsProductServiceImpl.updateByLogisticsProduct(upLogis);
-                        upLogis.setOrder_line_num(logis.getOrder_line_num());
-                        //确认订单
-                        logisticsProductService.confirmOrder(upLogis);
-
-                        //会员系统积分
-                        logisticsProductService.updateMemberCredits(logis.getOrder_line_num());
-                    } else {
-                        result.errorStatus().setMsg("Order does not exist,logisticsProductId:" + logisticsProductId);
+                }else {
+                    String skuCode = maps.get("sku_code").toString();
+                    if (!barCode.equals(skuCode)){
+                        result.errorStatus().setMsg("product code is incorrect");
+                        return result;
                     }
                 }
-            }catch (Exception e){
-                result.errorStatus().setMsg(e.getMessage());
-                return result;
+                result.successStatus();
+
+                if (logis != null) {
+                    LogisticsProduct upLogis = new LogisticsProduct();
+                    upLogis.setLogistics_product_id(logis.getLogistics_product_id());
+                    if (stockLocation != null) {
+                        upLogis.setStock_location(stockLocation);
+                    }
+                    if (estShipDate != null) {
+                        upLogis.setEst_ship_date(sdf.parse(estShipDate));
+                    }
+                    if (stockLocationId !=null ){
+                        upLogis.setStock_location_id(stockLocationId);
+                    }
+                    upLogis.setConfirmed_at(Helper.getCurrentUTCTime());
+
+                    //logisticsProductServiceImpl.updateByLogisticsProduct(upLogis);
+                    upLogis.setOrder_line_num(logis.getOrder_line_num());
+                    //确认订单
+                    logisticsProductService.confirmOrder(upLogis);
+
+                    //会员系统积分
+                    logisticsProductService.updateMemberCredits(logis.getOrder_line_num());
+                } else {
+                    result.errorStatus().setMsg("Order does not exist,logisticsProductId:" + logisticsProductId);
+                }
             }
-        }else {
-            result.setMsg("Designer-ID or Color-Code is incorrect");
+        }catch (Exception e){
+            result.errorStatus().setMsg(e.getMessage());
+            return result;
         }
+        /*}else {
+            if (barCode != null)
+            result.setMsg("Designer-ID or Color-Code is incorrect");
+        }*/
         return result;
     }
 
