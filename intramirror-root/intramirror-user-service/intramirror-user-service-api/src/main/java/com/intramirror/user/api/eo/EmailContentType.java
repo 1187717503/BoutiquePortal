@@ -53,4 +53,12 @@ public enum EmailContentType {
         }
         return treeMap;
     }
+    public static EmailContentType getEmailContentTypeByCode(Integer code){
+        for(EmailContentType emailContentType : EmailContentType.values()){
+            if(code==emailContentType.getCode()){
+                return emailContentType;
+            }
+        }
+        return null;
+    }
 }
