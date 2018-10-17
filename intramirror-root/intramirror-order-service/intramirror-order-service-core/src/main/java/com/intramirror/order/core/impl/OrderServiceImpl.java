@@ -241,16 +241,9 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
         List<Map<String, Object>> list = orderMapper.getShipmentDetails(conditionMap);
         if (list != null && list.size() > 0) {
             Map<String, Object> map = list.get(0);
-            Object shipToCountry = map.get("shipToCountry");
+            Object shipToCountry = map.get("consignee_country_id");
             if(shipToCountry!=null){
-                String country = "";
-                if("China".equals(shipToCountry.toString())
-                        ||"中国大陆".equals(shipToCountry.toString())){
-                    country = "中国";
-                }else {
-                    country = shipToCountry.toString();
-                }
-                Map<String, Object> addrCountry = orderMapper.selectAddrByCountry(country);
+                Map<String, Object> addrCountry = orderMapper.selectAddrByCountry(Long.valueOf(shipToCountry.toString()));
                 map.put("consignee_country_id",Integer.valueOf(addrCountry.get("address_country_id").toString()));
                 map.put("countryCode",addrCountry.get("country_code").toString());
                 return map;

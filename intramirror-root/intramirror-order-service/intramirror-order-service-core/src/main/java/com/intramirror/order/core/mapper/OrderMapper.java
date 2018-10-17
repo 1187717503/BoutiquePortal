@@ -153,10 +153,10 @@ public interface OrderMapper {
 
     /**
      *  根据国家名查询address_country
-     * @param country
+     * @param countryId
      * @return
      */
-    Map<String, Object> selectAddrByCountry(String country);
+    Map<String, Object> selectAddrByCountry(Long countryId);
 
     /**
      * 修改order状态

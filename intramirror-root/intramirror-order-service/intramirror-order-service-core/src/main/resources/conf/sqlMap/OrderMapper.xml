@@ -653,6 +653,7 @@
             if(lp.user_rec_flag=0, l.user_rec_city, lp.user_rec_city)                          AS shipToCity,
             if(lp.user_rec_flag=0, l.user_rec_province, lp.user_rec_province)                      AS shipToProvince,
             l.user_rec_country                       AS shipToCountry,
+            l.address_country_id                     AS consignee_country_id,
             v.address_country_id                     AS consigner_country_id,
             g.english_name                           AS shipToGeography,
             if(lp.user_rec_flag=0, l.user_rec_code, lp.user_rec_code)                          as zip_code,
@@ -847,8 +848,8 @@
         where order_id = #{orderId,jdbcType=BIGINT}
     </update>
 
-    <select id="selectAddrByCountry" resultType="java.util.Map" parameterType="string">
-        SELECT * FROM address_country WHERE `name` = #{country,jdbcType=VARCHAR}
+    <select id="selectAddrByCountry" resultType="java.util.Map" parameterType="long">
+        SELECT * FROM address_country WHERE address_country_id = #{countryId}
     </select>
 
     <update id="updateOrderByOrderLogisticsId" parameterType="java.util.Map">
