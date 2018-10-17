@@ -39,9 +39,9 @@ public class OrderNotificationEmailController extends BaseController {
     public Map getOrderNotificationEmailList(HttpServletRequest httpRequest) {
         Map<String, Object> result = new HashMap<>();
         try {
-            /*User user = super.getUser(httpRequest);
-            Vendor vendor = vendorService.getVendorByUserId(user.getUserId());*/
-            List<OrderNotificationEmail> list = orderNotificationEmailService.selectByVendorId(26L);
+            User user = super.getUser(httpRequest);
+            Vendor vendor = vendorService.getVendorByUserId(user.getUserId());
+            List<OrderNotificationEmail> list = orderNotificationEmailService.selectByVendorId(vendor.getVendorId());
             for(OrderNotificationEmail orderNotificationEmail:list){
                 String emailContent = orderNotificationEmail.getEmailContent();
                 String[] emailContentArray = emailContent.split(",");
