@@ -40,9 +40,9 @@ public class LogisticsProductService{
 	public void confirmOrder(LogisticsProduct upLogis) {
 
 		String url = HttpClientUtil.order_capture_confirm;
-		logger.info("Confirm Request,url={}", url);
+		logger.info("Confirm Request,url={},logisticsProductId={}", url,upLogis.getLogistics_product_id());
 		String resultStr = HttpClientUtil.httpPostNoHandle("{\"logisticsProductId\":\"" + upLogis.getLogistics_product_id() + "\"}",url);
-		logger.info("Response ConfirmOrder,message:{}",resultStr);
+		logger.info("Response ConfirmOrder,logisticsProductId={},message:{}",upLogis.getLogistics_product_id(),resultStr);
 		com.alibaba.fastjson.JSONObject jsonObject = com.alibaba.fastjson.JSONObject.parseObject(resultStr);
 		if (StringUtil.isEmpty(resultStr)
 				||jsonObject.getInteger("status") != 1){
