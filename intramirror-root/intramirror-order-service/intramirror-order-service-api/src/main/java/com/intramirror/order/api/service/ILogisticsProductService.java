@@ -74,6 +74,8 @@ public interface ILogisticsProductService {
 	 * @return
 	 */
 	int updateByLogisticsProduct (LogisticsProduct logisticsProduct);
+
+	int updateByLogisticsProduct4Jpush(Integer oldStatus,LogisticsProduct logisticsProduct);
 	
 	/**
 	 * 根据Id修改container关联

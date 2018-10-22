@@ -8,9 +8,6 @@ import com.intramirror.order.api.model.MemberPointsErrorLog;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.util.HttpClientUtil;
-import com.intramirror.product.api.model.Sku;
-import com.intramirror.product.api.service.IProductService;
-import com.intramirror.product.api.service.SkuService;
 import com.intramirror.web.service.LogisticsProductService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -39,14 +36,11 @@ public class ConfirmCheckOrderController {
     private String jwtSecret = "qazxswedcvfr543216yhnmju70plmjkiu89";
 
     @Autowired
-    private SkuService skuService;
-    @Autowired
-    private IProductService productService;
-
-    @Autowired
     IOrderService orderService;
     @Autowired
     private LogisticsProductService logisticsProductService;
+    @Autowired
+    private ILogisticsProductService iLogisticsProductService;
 
     /**
      * Wang
@@ -177,7 +171,11 @@ public class ConfirmCheckOrderController {
                     //logisticsProductServiceImpl.updateByLogisticsProduct(upLogis);
                     upLogis.setOrder_line_num(logis.getOrder_line_num());
                     //确认订单
+                    LogisticsProduct old = logisticsProductService.selectById(upLogis.getLogistics_product_id());
+                    Integer oldStatus = old==null?null:old.getStatus();
                     logisticsProductService.confirmOrder(upLogis);
+
+                    iLogisticsProductService.updateByLogisticsProduct4Jpush(oldStatus,upLogis);
 
                     //会员系统积分
                     logisticsProductService.updateMemberCredits(logis.getOrder_line_num());
@@ -189,10 +187,6 @@ public class ConfirmCheckOrderController {
             result.errorStatus().setMsg(e.getMessage());
             return result;
         }
-        /*}else {
-            if (barCode != null)
-            result.setMsg("Designer-ID or Color-Code is incorrect");
-        }*/
         return result;
     }
 

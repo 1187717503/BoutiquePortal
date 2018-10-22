@@ -15,6 +15,7 @@ import com.intramirror.order.api.util.HttpClientUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.intramirror.common.parameter.StatusType;
@@ -38,7 +39,19 @@ public class LogisticsProductService{
 	@Transactional
 	public void confirmOrder(LogisticsProduct upLogis) {
 
-		logisticsProductService.updateByLogisticsProduct(upLogis);
+		String url = HttpClientUtil.order_capture_confirm;
+		logger.info("Confirm Request,url={},logisticsProductId={}", url,upLogis.getLogistics_product_id());
+		String resultStr = HttpClientUtil.httpPostNoHandle("{\"logisticsProductId\":\"" + upLogis.getLogistics_product_id() + "\"}",url);
+		logger.info("Response ConfirmOrder,logisticsProductId={},message:{}",upLogis.getLogistics_product_id(),resultStr);
+		com.alibaba.fastjson.JSONObject jsonObject = com.alibaba.fastjson.JSONObject.parseObject(resultStr);
+		if (StringUtil.isEmpty(resultStr)
+				||jsonObject.getInteger("status") != 1){
+
+			throw new RuntimeException(jsonObject.getString("msg"));
+		}
+
+
+		/*logisticsProductService.updateByLogisticsProduct(upLogis);
 
 		//调用修改订单状态
 		//根据id获取当前数据库旧的对象信息
@@ -66,7 +79,7 @@ public class LogisticsProductService{
 			}
 		}catch (Exception e){
 			throw new RuntimeException("Failed to deduct inventory.");
-		}
+		}*/
 	}
 	
 	/**

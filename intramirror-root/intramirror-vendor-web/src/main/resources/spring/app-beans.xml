@@ -39,6 +39,7 @@
         <property name="tmsProviderRouteUrl" value="${tms.provider.route.url}"/>
         <property name="confirmStoreUrl" value="${confirmStoreUrl}"/>
         <property name="appMemberPointsUrl" value="${appMemberPointsUrl}"/>
+        <property name="order_capture_confirm" value="${order_capture_confirm}"/>
     </bean>
 
 
