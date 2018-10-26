@@ -193,7 +193,7 @@ public class OrderNotificationEmailController extends BaseController {
         }else if(Week.Saturday.name().equals(week)){
             weekDay = 6;
         }else if(Week.Sunday.name().equals(week)){
-            weekDay = 7;
+            weekDay = 0;
         }
         return Integer.parseInt(String.valueOf(weekDay)+hourMin);
     }
