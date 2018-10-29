@@ -43,7 +43,13 @@
         <property name="dataSource" ref="dataSource"/>
         <property name="typeAliasesPackage" value="com.yfding.spring.model"></property>
         <property name="configLocation" value="classpath:conf/mybatis-config.xml"/>
-        <property name="mapperLocations" value="classpath:conf/sqlMap/*.xml"></property>
+        <!--<property name="mapperLocations" value="classpath:conf/sqlMap/*.xml"></property>-->
+        <property name="mapperLocations">
+            <array>
+                <value>classpath:conf/sqlMap/*.xml</value>
+                <value>classpath:conf/sqlMap/ext/*.xml</value>
+            </array>
+        </property>
     </bean>
 
     <bean id="orderSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">

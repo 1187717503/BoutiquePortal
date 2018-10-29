@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.intramirror.order.core.mapper.ext.ReportExtMapper" >
+
+   	<resultMap id="BaseResultMap" type="com.intramirror.order.api.vo.ReportVO" >
+	    <result column="converpic" property="result" jdbcType="VARCHAR" />
+	    <result column="designerId" property="designerId" jdbcType="VARCHAR" />
+	    <result column="colorCode" property="colorCode" jdbcType="VARCHAR" />
+	    <result column="retailPrice" property="retailPrice" jdbcType="DECIMAL" />
+	    <result column="boutiquePrice" property="boutiquePrice" jdbcType="DECIMAL" />
+	    <result column="size" property="size" jdbcType="VARCHAR" />
+	    <result column="categoryName" property="categoryName" jdbcType="VARCHAR" />
+	    <result column="brandName" property="brandName" jdbcType="VARCHAR" />
+	    <result column="seasonCode" property="seasonCode" jdbcType="VARCHAR" />
+	    <result column="stock" property="stock" jdbcType="INTEGER" />
+  	</resultMap>
+	<resultMap id="seasonResultMap" type="com.intramirror.order.api.vo.SeasonVO">
+		<result column="seasonCode" property="seasonCode" jdbcType="VARCHAR" />
+		<result column="seasonSn" property="seasonSn" jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="searchByParam" resultType="com.intramirror.order.api.vo.ReportVO" parameterType="com.intramirror.order.api.vo.ReportRequestVO">
+		SELECT
+			s.coverpic as converpic,
+			p.designer_id as designerId,
+			p.color_code as colorCode,
+			p.min_retail_price as retailPrice,
+			p.min_boutique_price as boutiquePrice,
+			p.boutique_discount boutiqueDiscount,
+			s.size as size,
+			CONCAT_WS("->" , c2. NAME , c1. NAME , c. NAME) categoryName ,
+			b.english_name as brandName ,
+			p.season_code as seasonCode,
+			ss.store as stock
+		FROM
+			sku s
+		LEFT JOIN sku_store ss ON(ss.sku_id = s.sku_id)
+		LEFT JOIN product p ON(p.product_id = s.product_id)
+		LEFT JOIN brand b ON(b.brand_id = p.brand_id)
+		LEFT JOIN category c ON(c.category_id = p.category_id)
+		LEFT JOIN category c1 ON(c1.category_id = c.parent_id)
+		LEFT JOIN category c2 ON(c2.category_id = c1.parent_id)
+		WHERE p.enabled = 1
+		<if test="vendorId != null" >
+			and p.vendor_id =  #{vendorId,jdbcType=BIGINT}
+		</if>
+		<if test="designerId != null" >
+			and p.designer_id =  #{designerId,jdbcType=VARCHAR}
+		</if>
+		<if test="colorCode != null" >
+			and p.color_code =  #{colorCode,jdbcType=VARCHAR}
+		</if>
+		<if test="brandId != null" >
+			and p.brand_id =  #{brandId,jdbcType=BIGINT}
+		</if>
+        <if test="categoryId != null" >
+            and p.category_id =  #{categoryId,jdbcType=BIGINT}
+        </if>
+        <if test="seasonCode != null" >
+            and p.season_code =  #{seasonCode,jdbcType=VARCHAR}
+        </if>
+		ORDER BY ss.last_check desc
+		LIMIT #{start},#{pageSize};
+	</select>
+
+    <select id="countByParam" resultType="long" parameterType="com.intramirror.order.api.vo.ReportRequestVO">
+        SELECT
+         count(*)
+        FROM
+        sku s
+        LEFT JOIN sku_store ss ON(ss.sku_id = s.sku_id)
+        LEFT JOIN product p ON(p.product_id = s.product_id)
+        LEFT JOIN brand b ON(b.brand_id = p.brand_id)
+        LEFT JOIN category c ON(c.category_id = p.category_id)
+        LEFT JOIN category c1 ON(c1.category_id = c.parent_id)
+        LEFT JOIN category c2 ON(c2.category_id = c1.parent_id)
+        WHERE p.enabled = 1
+        <if test="vendorId != null" >
+            and p.vendor_id =  #{vendorId,jdbcType=BIGINT}
+        </if>
+        <if test="designerId != null" >
+            and p.designer_id =  #{designerId,jdbcType=VARCHAR}
+        </if>
+        <if test="colorCode != null" >
+            and p.color_code =  #{colorCode,jdbcType=VARCHAR}
+        </if>
+        <if test="brandId != null" >
+            and p.brand_id =  #{brandId,jdbcType=BIGINT}
+        </if>
+        <if test="categoryId != null" >
+            and p.category_id =  #{categoryId,jdbcType=BIGINT}
+        </if>
+        <if test="seasonCode != null" >
+            and p.season_code =  #{seasonCode,jdbcType=VARCHAR}
+        </if>
+    </select>
+
+    <select id="queryAllSeason" resultMap="seasonResultMap">
+        select season_code as seasonCode,season_sn as seasonSn from season where enabled = 1 ORDER BY season_sort desc
+    </select>
+
+    <select id="queryVendorIdByUserId" resultType="long" parameterType="long">
+        select vendor_id from vendor where user_id = #{userId,jdbcType=BIGINT}
+    </select>
+
+
+</mapper>
