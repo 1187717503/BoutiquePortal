@@ -20,7 +20,7 @@
 	</resultMap>
 	<select id="searchByParam" resultType="com.intramirror.order.api.vo.ReportVO" parameterType="com.intramirror.order.api.vo.ReportRequestVO">
 		SELECT
-			s.coverpic as converpic,
+			p.cover_img as converpic,
 			p.designer_id as designerId,
 			p.color_code as colorCode,
 			p.min_retail_price as retailPrice,
