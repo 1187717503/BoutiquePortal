@@ -10,6 +10,7 @@ import com.intramirror.order.core.impl.ext.ReportExtServiceImpl;
 import com.intramirror.user.api.model.User;
 import com.intramirror.web.common.CommonsProperties;
 import com.intramirror.web.controller.BaseController;
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.slf4j.Logger;
@@ -43,6 +44,7 @@ public class ReportController extends BaseController{
     @ResponseBody
     public Object search(@RequestBody ReportRequestVO requestVO,HttpServletRequest httpRequest){
         ResultMessage resultMessage = ResultMessage.getInstance();
+        checkRequestVo(requestVO);
         User user = this.getUser(httpRequest);
         Long vendorId = reportExtService.queryVendorIdByUserId(user.getUserId());
         requestVO.setVendorId(vendorId);
@@ -57,6 +59,7 @@ public class ReportController extends BaseController{
     @ResponseBody
     public Object count(@RequestBody ReportRequestVO requestVO,HttpServletRequest httpRequest){
         ResultMessage resultMessage = ResultMessage.getInstance();
+        checkRequestVo(requestVO);
         User user = this.getUser(httpRequest);
         Long vendorId = reportExtService.queryVendorIdByUserId(user.getUserId());
         requestVO.setVendorId(vendorId);
@@ -82,6 +85,7 @@ public class ReportController extends BaseController{
     @ResponseBody
     public Object download(@RequestBody ReportRequestVO requestVO, HttpServletRequest httpRequest, HttpServletResponse httpResponse){
         ResultMessage resultMessage = ResultMessage.getInstance();
+        checkRequestVo(requestVO);
         User user = this.getUser(httpRequest);
         Long vendorId = reportExtService.queryVendorIdByUserId(user.getUserId());
         requestVO.setVendorId(vendorId);
@@ -136,6 +140,18 @@ public class ReportController extends BaseController{
         }
         resultMessage.successStatus();
         return resultMessage;
+    }
+
+    private void checkRequestVo(ReportRequestVO requestVO) {
+        if(StringUtils.isBlank(requestVO.getColorCode())){
+            requestVO.setColorCode(null);
+        }
+        if(StringUtils.isBlank(requestVO.getDesignerId())){
+            requestVO.setDesignerId(null);
+        }
+        if (StringUtils.isBlank(requestVO.getSeasonCode())){
+            requestVO.setSeasonCode(null);
+        }
     }
 
     private String generateReportExcel(String excelName, ReportResponseVO vo, String filePath) {
