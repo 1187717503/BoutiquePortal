@@ -13,6 +13,7 @@ import com.intramirror.web.controller.BaseController;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,15 +21,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @CrossOrigin
 @Controller
@@ -89,9 +88,27 @@ public class ReportController extends BaseController{
         User user = this.getUser(httpRequest);
         Long vendorId = reportExtService.queryVendorIdByUserId(user.getUserId());
         requestVO.setVendorId(vendorId);
-        requestVO.setStart(0);
-        requestVO.setPageSize(Integer.MAX_VALUE);
-        ReportResponseVO vo= reportExtService.search(requestVO);
+        requestVO.setPageSize(10000);
+        requestVO.setPageNum(1);
+        int pageNum = requestVO.getPageNum();
+        List<ReportVO> reportVOS = new ArrayList<>();
+        while (true){
+            try{
+                ReportResponseVO vo= reportExtService.search(requestVO);
+                if(org.apache.commons.collections.CollectionUtils.isNotEmpty(vo.getReportVOS())){
+                    reportVOS.addAll(vo.getReportVOS());
+                }else {
+                    break;
+                }
+                pageNum++;
+                requestVO.setPageNum(pageNum);
+            }catch (Exception e){
+                logger.error(e.getMessage(),e);
+                break;
+            }
+
+        }
+
         String dateStr = DateUtils.getStrDate(new Date(), "yyyyMMddHHmmss");
         String name = "Product_" + dateStr + ".xls";
         String path = commonsProperties.getOrderPath() + "download/";
@@ -102,12 +119,49 @@ public class ReportController extends BaseController{
         String filePath = path + name;
 
         logger.info("exportOrderList 生成订单文件");
-        generateReportExcel("product",vo, filePath);
+        //generateReportExcel("product",reportVOS, filePath);
 
-        File newFile = new File(filePath);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+
+        try {
+            generateReportExcel("product",reportVOS).write(os);
+            byte[] content = os.toByteArray();
+            InputStream is = new ByteArrayInputStream(content);
+            // 设置response参数，可以打开下载页面
+            httpResponse.reset();
+            httpResponse.setHeader("Access-Control-Allow-Origin", "*");
+            httpResponse.setContentType("application/vnd.ms-excel;charset=utf-8");
+            httpResponse.setHeader("Content-Disposition", "attachment;filename=" + new String(name.getBytes(), "iso-8859-1"));
+            ServletOutputStream out = httpResponse.getOutputStream();
+            BufferedInputStream bis = null;
+            BufferedOutputStream bos = null;
+            try {
+                bis = new BufferedInputStream(is);
+                bos = new BufferedOutputStream(out);
+                byte[] buff = new byte[2048];
+                int bytesRead;
+                // Simple read/write loop.
+                while (-1 != (bytesRead = bis.read(buff, 0, buff.length))) {
+                    bos.write(buff, 0, bytesRead);
+                }
+            } catch (final IOException e) {
+                throw e;
+            } finally {
+                if (bis != null)
+                    bis.close();
+                if (bos != null)
+                    bos.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        /*File newFile = new File(filePath);
         httpResponse.setHeader("Access-Control-Allow-Origin", "*");
         httpResponse.setContentType("application/vnd.ms-excel;charset=utf-8");
         httpResponse.setHeader("Content-Disposition", "attachment;filename=" + name);
+
         byte[] buffer = new byte[1024];
         FileInputStream fis = null;
         BufferedInputStream bis = null;
@@ -137,7 +191,7 @@ public class ReportController extends BaseController{
                     e.printStackTrace();
                 }
             }
-        }
+        }*/
         resultMessage.successStatus();
         return resultMessage;
     }
@@ -154,7 +208,7 @@ public class ReportController extends BaseController{
         }
     }
 
-    private String generateReportExcel(String excelName, ReportResponseVO vo, String filePath) {
+    private Workbook generateReportExcel(String excelName, List<ReportVO> reportVOS) {
         HSSFWorkbook workbook = new HSSFWorkbook();
 
         int rowLength = 0;
@@ -175,7 +229,6 @@ public class ReportController extends BaseController{
         HSSFCell cell = null;
         HSSFSheet sheet = null;
         FileOutputStream fileOut = null;
-        List<ReportVO> reportVOS = vo.getReportVOS();
         int ro = 0;
         if(org.apache.commons.collections.CollectionUtils.isNotEmpty(reportVOS)){
             for(ReportVO reportVO : reportVOS){
@@ -227,22 +280,7 @@ public class ReportController extends BaseController{
                 rowLength ++;
             }
         }
-        try {
-
-            fileOut = new FileOutputStream(filePath);
-            workbook.write(fileOut);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (fileOut != null) {
-                try {
-                    fileOut.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return filePath;
+        return workbook;
     }
 
 }
