@@ -3,6 +3,7 @@
 <mapper namespace="com.intramirror.order.core.mapper.ext.ReportExtMapper" >
 
    	<resultMap id="BaseResultMap" type="com.intramirror.order.api.vo.ReportVO" >
+		<result column="skuId" property="skuId" jdbcType="BIGINT" />
 	    <result column="converpic" property="result" jdbcType="VARCHAR" />
 	    <result column="designerId" property="designerId" jdbcType="VARCHAR" />
 	    <result column="colorCode" property="colorCode" jdbcType="VARCHAR" />
@@ -20,6 +21,7 @@
 	</resultMap>
 	<select id="searchByParam" resultType="com.intramirror.order.api.vo.ReportVO" parameterType="com.intramirror.order.api.vo.ReportRequestVO">
 		SELECT
+			s.sku_id as skuId,
 			p.cover_img as converpic,
 			p.designer_id as designerId,
 			p.color_code as colorCode,

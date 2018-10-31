@@ -3,6 +3,7 @@ package com.intramirror.order.api.vo;
 import java.math.BigDecimal;
 
 public class ReportVO {
+    private Long skuId;
     private String converpic;
     private String designerId;
     private String colorCode;
@@ -47,14 +48,14 @@ public class ReportVO {
         this.retailPrice = retailPrice;
     }
 
-    /*public Integer getBoutiqueDiscount() {
-        return boutiqueDiscount;
+    public Long getSkuId() {
+        return skuId;
     }
 
-    public void setBoutiqueDiscount(Integer boutiqueDiscount) {
-        this.boutiqueDiscount = boutiqueDiscount;
+    public void setSkuId(Long skuId) {
+        this.skuId = skuId;
     }
-*/
+
     public String getSize() {
         return size;
     }
