@@ -59,6 +59,14 @@
         <if test="seasonCode != null" >
             and p.season_code =  #{seasonCode,jdbcType=VARCHAR}
         </if>
+		<if test="hasStock != null" >
+			<if test="hasStock == 0">
+				and ss.stock = 0
+			</if>
+			<if test="hasStock == 1">
+				and ss.stock > 0
+			</if>
+		</if>
 		ORDER BY ss.last_check desc
 		LIMIT #{start},#{pageSize};
 	</select>
@@ -93,6 +101,14 @@
         <if test="seasonCode != null" >
             and p.season_code =  #{seasonCode,jdbcType=VARCHAR}
         </if>
+		<if test="hasStock != null" >
+			<if test="hasStock == 0">
+				and ss.stock = 0
+			</if>
+			<if test="hasStock == 1">
+				and ss.stock > 0
+			</if>
+		</if>
     </select>
 
     <select id="queryAllSeason" resultMap="seasonResultMap">

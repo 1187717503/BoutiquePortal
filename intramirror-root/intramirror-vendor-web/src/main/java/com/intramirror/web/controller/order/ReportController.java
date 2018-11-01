@@ -88,9 +88,9 @@ public class ReportController extends BaseController{
         User user = this.getUser(httpRequest);
         Long vendorId = reportExtService.queryVendorIdByUserId(user.getUserId());
         requestVO.setVendorId(vendorId);
-        requestVO.setPageSize(10000);
-        requestVO.setPageNum(1);
-        int pageNum = requestVO.getPageNum();
+        /*requestVO.setPageSize(10000);
+        requestVO.setPageNum(1);*/
+        /*int pageNum = requestVO.getPageNum();
         List<ReportVO> reportVOS = new ArrayList<>();
         while (true){
             try{
@@ -107,24 +107,17 @@ public class ReportController extends BaseController{
                 break;
             }
 
-        }
-
-        String dateStr = DateUtils.getStrDate(new Date(), "yyyyMMddHHmmss");
-        String name = "Product_" + dateStr + ".xls";
-        String path = commonsProperties.getOrderPath() + "download/";
-        File file = new File(path);
-        if (!file.exists() && !file.isDirectory()) {
-            file.mkdirs();
-        }
-        String filePath = path + name;
+        }*/
+        ReportResponseVO vo= reportExtService.search(requestVO);
 
         logger.info("exportOrderList 生成订单文件");
         //generateReportExcel("product",reportVOS, filePath);
-
+        String dateStr = DateUtils.getStrDate(new Date(), "yyyyMMddHHmmss");
+        String name = "Product_" + dateStr + ".xls";
         ByteArrayOutputStream os = new ByteArrayOutputStream();
 
         try {
-            generateReportExcel("product",reportVOS).write(os);
+            generateReportExcel("product",vo.getReportVOS()).write(os);
             byte[] content = os.toByteArray();
             InputStream is = new ByteArrayInputStream(content);
             // 设置response参数，可以打开下载页面
