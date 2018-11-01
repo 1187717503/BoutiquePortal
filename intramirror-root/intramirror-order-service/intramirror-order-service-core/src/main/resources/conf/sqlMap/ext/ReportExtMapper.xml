@@ -103,7 +103,7 @@
         </if>
 		<if test="hasStock != null" >
 			<if test="hasStock == 0">
-				and ss.store = 0
+				and <![CDATA[ ss.store <= 0 ]]>
 			</if>
 			<if test="hasStock == 1">
 				and ss.store > 0
