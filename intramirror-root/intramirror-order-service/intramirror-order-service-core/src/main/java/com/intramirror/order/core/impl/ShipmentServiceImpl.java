@@ -15,13 +15,11 @@ import com.intramirror.order.api.service.*;
 import com.intramirror.order.api.util.HttpClientUtil;
 import com.intramirror.order.api.vo.*;
 import com.intramirror.order.core.dao.BaseDao;
-import com.intramirror.order.core.mapper.LogisticProductShipmentMapper;
 import com.intramirror.order.core.mapper.LogisticsProductMapper;
 import com.intramirror.order.core.mapper.ShipmentMapper;
 import com.intramirror.order.core.utils.MailSendManageService;
 import com.intramirror.order.core.utils.ShipMailSendThread;
 import com.intramirror.utils.transform.JsonTransformUtil;
-import com.sun.corba.se.spi.ior.ObjectKey;
 import net.sf.json.JSONObject;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -49,8 +47,6 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 
 	private LogisticsProductMapper logisticsProductMapper;
 
-	private LogisticProductShipmentMapper logisticProductShipmentMapper;
-
 	@Autowired
 	private ISubShipmentService subShipmentService;
 
@@ -63,14 +59,11 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	@Autowired
 	private IOrderService orderService;
 
-	@Autowired
-	private ILogisticsProductService iLogisticsProductService;
 
 	@Override
 	public void init() {
 		shipmentMapper = this.getSqlSession().getMapper(ShipmentMapper.class);
 		subShipmentMapper = this.getSqlSession().getMapper(SubShipmentMapper.class);
-		logisticProductShipmentMapper = this.getSqlSession().getMapper(LogisticProductShipmentMapper.class);
         logisticsProductMapper = this.getSqlSession().getMapper(LogisticsProductMapper.class);
 	}
 
@@ -200,10 +193,10 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		return shipmentMapper.selectShipmentByOrder(map);
 	}
 	/**
-	 * 根据订单号查询shipmentt TYPE
-	 * @param map
-	 * @return map
-	 */
+     * 根据订单号查询shipmentt TYPE
+     * @param map
+     * @return map
+     */
 	@Override
 	public List<Map<String, Object>> getShippmentByType(Map<String, Object> map) {
 		return shipmentMapper.getShippmentByType(map);

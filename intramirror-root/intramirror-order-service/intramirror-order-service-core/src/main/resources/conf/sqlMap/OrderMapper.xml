@@ -85,7 +85,8 @@
     </select>
 
     <select id="getOrderListByOrderNumber" resultType="java.util.HashMap" parameterType="java.util.Map">
-       SELECT lp.*,g.pack_english_name,sl.ship_from_location_id,g.pack_group FROM logistics_product lp
+       SELECT lp.*,g.pack_english_name,sl.ship_from_location_id,g.pack_group,l.address_country_id AS country_id
+        FROM logistics_product lp
         INNER JOIN logistics l on (l.order_logistics_id = lp.order_logistics_id and l.enabled = 1)
         LEFT JOIN geography g on (l.geography_id = g.geography_id)
         LEFT JOIN stock_location sl on (sl.location_id = lp.stock_location_id and sl.enabled = 1)
