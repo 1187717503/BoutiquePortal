@@ -99,6 +99,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 				Long vendorId = Long.parseLong(map.get("vendor_id").toString());
 				Object shipFromLocation_id = map.get("ship_from_location_id");
 				Integer locationId = Integer.parseInt(shipFromLocation_id!=null?shipFromLocation_id.toString():"0");
+				Integer shippingMethod = map.get("shipping_method") != null ? Integer.valueOf(map.get("shipping_method").toString()) : null;
 				String top = shipmentMapper.getVendorCodeById(vendorId);
 				Map<String, Object> noMap = new HashMap<>();
 				noMap.put("topName", top+"SP");
@@ -115,6 +116,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 				shipment.setCreatedAt(currentDate);
 				shipment.setUpdatedAt(currentDate);
 				shipment.setShipmentCategory(shipmentCategory);
+				shipment.setShippingMethod(shippingMethod);
 				//wms需要的信息
 				shipment.setFromType(1); //买手店发货
 				shipment.setFromRefId(vendorId);
@@ -611,7 +613,11 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 					List<String> list = new ArrayList<>();
 
 					//校验是否生成AWB
-					String awb = checkAWB(shipment.getShipmentId());
+					if (2 == shipment.getShippingMethod()||"COMO".equals(shipment.getShipToGeography())){
+						//如果此shipment是发往COMO的就不需要校验AWB是否生成
+					}else {
+						checkAWB(shipment.getShipmentId());
+					}
 					//shipped操作发送消息用来生成资金报表
 					List<LogisticsProduct> logisticsProducts = logisticsProductMapper.getLogisticsProductByShipment(shipment.getShipmentId());
 					if (logisticsProducts!=null && logisticsProducts.size()>0){

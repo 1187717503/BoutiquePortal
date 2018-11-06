@@ -13,6 +13,16 @@ public class TransitWarehouseInvoiceVO {
 
     private List<InvoiceVO> otherInvoices;
 
+    private List<InvoiceVO> comoInvoice;
+
+    public List<InvoiceVO> getComoInvoice() {
+        return comoInvoice;
+    }
+
+    public void setComoInvoice(List<InvoiceVO> comoInvoice) {
+        this.comoInvoice = comoInvoice;
+    }
+
     public InvoiceVO getChinaInvoice() {
         return chinaInvoice;
     }

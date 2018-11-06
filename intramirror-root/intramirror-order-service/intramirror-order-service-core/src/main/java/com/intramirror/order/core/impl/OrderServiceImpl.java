@@ -223,17 +223,11 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
                 }
             }
         }
-        for(Map<String, Object> vo :mapList){
-            /*for(ProductPropertyVO pp:vos1){
-                if(Long.valueOf(vo.get("product_id").toString()).equals(pp.getProductId())){
-                    vo.put("Composition",pp.getValue());
-                    break;
-                }
-            }*/
-            vo.put("spuComposition",productMapper.getCompositionByProductId(Long.valueOf(vo.get("product_id").toString())));
-        }
 
         return mapList;
+        /*for(Map<String, Object> vo :mapList){
+            vo.put("spuComposition",productMapper.getCompositionByProductId(Long.valueOf(vo.get("product_id").toString())));
+        }*/
     }
 
     @Override

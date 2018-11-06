@@ -400,7 +400,8 @@
         l.geography_id,
         g.english_name,
         p.color_code AS colorCode,
-        p.designer_id AS brandID
+        p.designer_id AS brandID,
+        spu.composition as spuComposition
         FROM logistics_product lp
         INNER JOIN container c ON lp.container_id = c.container_id
         INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
@@ -417,6 +418,7 @@
         INNER JOIN brand b ON (p.brand_id = b.brand_id AND b.enabled = 1)
         INNER JOIN sku s ON (s.sku_id = sps.sku_id AND s.enabled = 1)
         INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id AND v.enabled = 1)
+        LEFT JOIN spu ON p.spu_id = spu.spu_id
         WHERE c.shipment_id IN
         <foreach collection="shipmentIds" item="shipmentId" open="(" close=")" separator=",">
             #{shipmentId,jdbcType=BIGINT}
