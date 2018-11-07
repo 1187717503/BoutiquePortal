@@ -664,7 +664,8 @@
             g.geography_id,
             lp.logistics_product_id,
             lp.stock_location_id,
-            sl.ship_from_location_id
+            sl.ship_from_location_id,
+            lp.shipping_method
         FROM logistics_product lp
             INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
             INNER JOIN `order` o ON ol.order_id = o.order_id

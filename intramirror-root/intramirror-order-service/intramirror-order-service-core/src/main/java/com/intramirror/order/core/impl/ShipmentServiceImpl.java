@@ -141,8 +141,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 					logger.info("result shipmentType:" + new Gson().toJson(listMap));
 					shipmentId = shipmentMapper.getShipmentId(shipment);
 
-					saveSubShipmentByTms(map,consigner_country_id,consignee_country_id,vendorId,shipmentId,Long.parseLong(
-							map.get("logistics_product_id")==null?"0":map.get("logistics_product_id").toString()));
+					saveSubShipmentByTms(map,consigner_country_id,consignee_country_id,vendorId,shipmentId);
 					/*saveSubShipment(listMap, map,shipmentId,Long.parseLong(
 							map.get("logistics_product_id")==null?"0":map.get("logistics_product_id").toString()));*/
 					shipment.setShipmentId(shipmentId);
@@ -162,8 +161,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 //						map.get("logistics_product_id")==null?"0":map.get("logistics_product_id").toString()));
 				//Long consigner_country_id =  Long.parseLong(map.get("consigner_country_id").toString());
 				//Long consignee_country_id =  Long.parseLong(map.get("consignee_country_id").toString());
-				saveSubShipmentByTms(map,consigner_country_id,consignee_country_id,Long.parseLong(map.get("vendor_id").toString()),shipmentId,Long.parseLong(
-						map.get("logistics_product_id")==null?"0":map.get("logistics_product_id").toString()));
+				saveSubShipmentByTms(map,consigner_country_id,consignee_country_id,Long.parseLong(map.get("vendor_id").toString()),shipmentId);
 				return shipment;
 			}
 		}
@@ -204,7 +202,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		return shipmentMapper.getShippmentByType(map);
 	}
 
-	public void saveSubShipmentByTms(Map<String, Object> map,Long consigner_country_id,Long consignee_country_id, Long vendorId, Long shipmentId, Long logisticProductId){
+	public void saveSubShipmentByTms(Map<String, Object> map,Long consigner_country_id,Long consignee_country_id, Long vendorId, Long shipmentId){
 		StringBuffer sb = new StringBuffer(HttpClientUtil.tmsProviderRouteUrl);
 		sb.append("?").append("senderCountryId=").append(consigner_country_id).append("&recipientCountryId=")
 				.append(consignee_country_id).append("&invokerId=").append(vendorId).append("&invokerType=1");
