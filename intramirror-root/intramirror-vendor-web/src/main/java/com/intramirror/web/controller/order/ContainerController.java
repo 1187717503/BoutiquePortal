@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.intramirror.order.api.model.*;
+import com.intramirror.web.util.RedisUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,8 @@ public class ContainerController {
 	
 	@Autowired
 	private ILogisticProductShipmentService logisticProductShipmentService;
+	@Autowired
+	private RedisUtil redisUtil;
 	
 	/**
 	 * 新增箱子
@@ -334,6 +337,7 @@ public class ContainerController {
 		ResultMessage message = ResultMessage.getInstance();
 		String barCode = "CTN";
 		try {
+			redisUtil.set("hfsdu","ashjdu",324);
 			Integer maxCode = containerService.getMaxBarcode();
 			if (null == maxCode)
 				maxCode = 1000001;
