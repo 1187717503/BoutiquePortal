@@ -1352,7 +1352,7 @@ public class OrderShipController extends BaseController {
 
         Vendor vendor = null;
         try {
-            vendor = vendorService.getVendorByUserId(519l);
+            vendor = vendorService.getVendorByUserId(user.getUserId());
         } catch (Exception e) {
             e.printStackTrace();
         }
