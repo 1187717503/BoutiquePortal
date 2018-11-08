@@ -1,7 +1,8 @@
-package com.intramirror.web.util;
+package com.intramirror.order.api.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
@@ -12,13 +13,11 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by caowei on 2018/11/8.
  */
-public class RedisUtil {
+@Service
+public class RedisService {
 
+    @Autowired
     private RedisTemplate<String, Object> redisTemplate;
-
-    public void setRedisTemplate(RedisTemplate<String, Object> redisTemplate) {
-        this.redisTemplate = redisTemplate;
-    }
 
     /**
      * 指定缓存失效时间

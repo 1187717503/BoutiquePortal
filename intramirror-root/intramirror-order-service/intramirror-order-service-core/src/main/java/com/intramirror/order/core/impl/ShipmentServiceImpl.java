@@ -13,15 +13,15 @@ import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.model.SubShipment;
 import com.intramirror.order.api.service.*;
 import com.intramirror.order.api.util.HttpClientUtil;
+import com.intramirror.order.api.util.RedisService;
+import com.intramirror.order.api.util.SpringContextUtil;
 import com.intramirror.order.api.vo.*;
 import com.intramirror.order.core.dao.BaseDao;
-import com.intramirror.order.core.mapper.LogisticProductShipmentMapper;
 import com.intramirror.order.core.mapper.LogisticsProductMapper;
 import com.intramirror.order.core.mapper.ShipmentMapper;
 import com.intramirror.order.core.utils.MailSendManageService;
 import com.intramirror.order.core.utils.ShipMailSendThread;
 import com.intramirror.utils.transform.JsonTransformUtil;
-import com.sun.corba.se.spi.ior.ObjectKey;
 import net.sf.json.JSONObject;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -49,8 +49,6 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 
 	private LogisticsProductMapper logisticsProductMapper;
 
-	private LogisticProductShipmentMapper logisticProductShipmentMapper;
-
 	@Autowired
 	private ISubShipmentService subShipmentService;
 
@@ -64,13 +62,13 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	private IOrderService orderService;
 
 	@Autowired
-	private ILogisticsProductService iLogisticsProductService;
+	private RedisService redisService;
+
 
 	@Override
 	public void init() {
 		shipmentMapper = this.getSqlSession().getMapper(ShipmentMapper.class);
 		subShipmentMapper = this.getSqlSession().getMapper(SubShipmentMapper.class);
-		logisticProductShipmentMapper = this.getSqlSession().getMapper(LogisticProductShipmentMapper.class);
         logisticsProductMapper = this.getSqlSession().getMapper(LogisticsProductMapper.class);
 	}
 
@@ -109,11 +107,19 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 				String top = shipmentMapper.getVendorCodeById(vendorId);
 				Map<String, Object> noMap = new HashMap<>();
 				noMap.put("topName", top+"SP");
-				Integer maxNo = shipmentMapper.getMaxShipmentNo(noMap);
-				if (null == maxNo)
-					maxNo = 1000001;
-				else
-					maxNo ++;
+				String key = SpringContextUtil.getActiveProfile() + ":shipment:barcode";
+				Integer maxNo;
+				Object o = redisService.get(key);
+				if (o != null && StringUtils.isNotBlank(o.toString())){
+					maxNo = Integer.valueOf(o.toString()) + 1;
+				}else {
+					maxNo = shipmentMapper.getMaxShipmentNo(noMap);
+					if (null == maxNo)
+						maxNo = 1000001;
+					else
+						maxNo++;
+				}
+				redisService.set(key,maxNo);
 				//生成shipmentNo
 				shipment.setShipmentNo(top+"SP"+maxNo);
 				shipment.setVendorId(vendorId);
