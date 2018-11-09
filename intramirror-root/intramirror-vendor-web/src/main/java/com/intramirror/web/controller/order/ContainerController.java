@@ -9,7 +9,6 @@ import java.util.Map;
 
 import com.intramirror.order.api.model.*;
 import com.intramirror.order.api.util.RedisService;
-import com.intramirror.order.api.util.SpringContextUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -337,7 +336,7 @@ public class ContainerController {
 	@ResponseBody
 	public ResultMessage getBarcode(){
 		ResultMessage message = ResultMessage.getInstance();
-		String key = SpringContextUtil.getActiveProfile() + ":container:barcode";
+		String key = "container:barcode";
 		String barCode = "CTN";
 		try {
 			synchronized (this){

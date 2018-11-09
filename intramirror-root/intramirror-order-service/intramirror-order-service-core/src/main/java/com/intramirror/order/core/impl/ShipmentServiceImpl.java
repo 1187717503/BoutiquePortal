@@ -14,7 +14,6 @@ import com.intramirror.order.api.model.SubShipment;
 import com.intramirror.order.api.service.*;
 import com.intramirror.order.api.util.HttpClientUtil;
 import com.intramirror.order.api.util.RedisService;
-import com.intramirror.order.api.util.SpringContextUtil;
 import com.intramirror.order.api.vo.*;
 import com.intramirror.order.core.dao.BaseDao;
 import com.intramirror.order.core.mapper.LogisticsProductMapper;
@@ -107,7 +106,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 				String top = shipmentMapper.getVendorCodeById(vendorId);
 				Map<String, Object> noMap = new HashMap<>();
 				noMap.put("topName", top+"SP");
-				String key = SpringContextUtil.getActiveProfile() + ":shipment:barcode:" + top;
+				String key = "shipment:barcode:" + top;
 				Integer maxNo;
 				Object o = redisService.get(key);
 				if (o != null && StringUtils.isNotBlank(o.toString())){
