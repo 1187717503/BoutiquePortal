@@ -107,7 +107,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 				String top = shipmentMapper.getVendorCodeById(vendorId);
 				Map<String, Object> noMap = new HashMap<>();
 				noMap.put("topName", top+"SP");
-				String key = SpringContextUtil.getActiveProfile() + ":shipment:barcode";
+				String key = SpringContextUtil.getActiveProfile() + ":shipment:barcode:" + top;
 				Integer maxNo;
 				Object o = redisService.get(key);
 				if (o != null && StringUtils.isNotBlank(o.toString())){
