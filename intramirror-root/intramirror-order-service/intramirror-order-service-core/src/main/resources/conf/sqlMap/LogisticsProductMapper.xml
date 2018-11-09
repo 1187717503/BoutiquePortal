@@ -351,4 +351,28 @@
         INNER JOIN logistics_product lp on lp.shop_product_sku_id = sps.shop_product_sku_id
         WHERE lp.logistics_product_id = #{logisticsProductId}
     </select>
+
+    <select id="queryLogisticProductConfirm" resultType="map" parameterType="long">
+        SELECT
+            oe.`status` AS oeStatus,
+            lp.`status`,
+            sl.location_id AS locationId,
+            sl.stock_location AS stockLocation
+        FROM
+            logistics_product lp
+        LEFT JOIN stock_location sl on (sl.vendor_id = lp.vendor_id and sl.enabled = 1)
+        LEFT JOIN order_exception oe ON (
+            oe.logistics_product_id = lp.logistics_product_id
+            AND oe.order_exception_id = (
+                SELECT
+                    MAX(oe1.order_exception_id)
+                FROM
+                    order_exception oe1
+                WHERE
+                    oe1.logistics_product_id = oe.logistics_product_id
+            )
+        )
+        WHERE  lp.logistics_product_id = #{logisticsProductId}
+        AND lp.enabled = 1
+    </select>
 </mapper>

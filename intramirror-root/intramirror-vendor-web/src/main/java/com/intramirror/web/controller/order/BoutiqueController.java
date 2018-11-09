@@ -42,23 +42,63 @@ public class BoutiqueController {
         ResultMessage result = new ResultMessage();
         result.errorStatus();
 
-        String logisticsProductId = null;
+        Long logisticsProductId = null;
         String stockLocation = null;
         Long stockLocationId = null;
 
         if (map.get("logisticsProductId") != null && StringUtils.isNotBlank(map.get("logisticsProductId").toString())) {
-            logisticsProductId = map.get("logisticsProductId").toString();
+            logisticsProductId = Long.valueOf(map.get("logisticsProductId").toString());
+        }else {
+            result.setMsg("logisticsProductId不能为空");
+            result.setCode(400);
+            return result;
         }
         if (map.get("stockLocation") != null && StringUtils.isNotBlank(map.get("stockLocation").toString())) {
             stockLocation = map.get("stockLocation").toString();
         }
         if (map.get("stockLocationId") != null && StringUtils.isNotBlank(map.get("stockLocationId").toString())) {
             stockLocationId = Long.valueOf(map.get("stockLocationId").toString());
+        }else {
+            result.setMsg("stockLocationId不能为空");
+            result.setCode(400);
+            return result;
+        }
+        List<Map<String, Object>> productConfirm = iLogisticsProductService.queryLogisticProductConfirm(logisticsProductId);
+        if (CollectionUtils.isEmpty(productConfirm)){
+            result.setCode(100);
+            result.setMsg("不存在此订单信息");
+            return result;
+        }
+        Map<String, Object> confirmMap = productConfirm.get(0);
+        if (confirmMap.get("oeStatus")!=null&&"1".equals(confirmMap.get("oeStatus").toString())){
+            result.setCode(410);
+            result.setMsg("异常订单不能confirm");
+            return result;
+        }
+        if (confirmMap.get("status")==null||!"1".equals(confirmMap.get("status").toString())
+                ||!"8".equals(confirmMap.get("status").toString())){
+            result.setCode(430);
+            result.setMsg("订单状态异常，不能confirm");
+            return result;
+        }
+        boolean flag = true; //stocklocation是否有效
+        for (Map map1 :productConfirm){
+            if (map1.get("locationId") != null
+                    && stockLocationId.equals(Integer.valueOf(map1.get("locationId").toString()))){
+                stockLocation = map1.get("stockLocation").toString();
+                flag = false;
+                break;
+            }
+        }
+        if (!flag){
+            result.setCode(420);
+            result.setMsg("stock location无效");
+            return result;
         }
         try{
             if (logisticsProductId != null) {
 
-                LogisticsProduct logis = logisticsProductService.selectById(Long.parseLong(logisticsProductId));
+                LogisticsProduct logis = logisticsProductService.selectById(logisticsProductId);
 
                 result.successStatus();
 
@@ -89,6 +129,7 @@ public class BoutiqueController {
             }
         }catch (Exception e){
             result.errorStatus().setMsg(e.getMessage());
+            result.setCode(100);
             return result;
         }
         return result;

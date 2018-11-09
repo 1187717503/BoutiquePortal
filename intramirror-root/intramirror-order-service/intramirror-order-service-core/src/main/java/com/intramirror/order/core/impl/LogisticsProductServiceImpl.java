@@ -319,4 +319,9 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
     public Map<String, Object> getShopProductSku(Long logisticsProductId) {
         return logisticsProductMapper.getShopProductSku(logisticsProductId);
     }
+
+    @Override
+    public List<Map<String, Object>> queryLogisticProductConfirm(Long logisticsProductId) {
+        return logisticsProductMapper.queryLogisticProductConfirm(logisticsProductId);
+    }
 }
