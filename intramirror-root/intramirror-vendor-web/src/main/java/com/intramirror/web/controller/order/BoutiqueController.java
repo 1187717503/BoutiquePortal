@@ -81,12 +81,12 @@ public class BoutiqueController {
             result.setMsg("订单状态异常，不能confirm");
             return result;
         }
-        boolean flag = true; //stocklocation是否有效
+        boolean flag = false; //stocklocation是否有效
         for (Map map1 :productConfirm){
             if (map1.get("locationId") != null
                     && stockLocationId.equals(Integer.valueOf(map1.get("locationId").toString()))){
                 stockLocation = map1.get("stockLocation").toString();
-                flag = false;
+                flag = true;
                 break;
             }
         }
