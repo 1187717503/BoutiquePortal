@@ -88,9 +88,9 @@ public class ReportController extends BaseController{
         User user = this.getUser(httpRequest);
         Long vendorId = reportExtService.queryVendorIdByUserId(user.getUserId());
         requestVO.setVendorId(vendorId);
-        requestVO.setPageSize(10000);
-        requestVO.setPageNum(1);
-        int pageNum = requestVO.getPageNum();
+        /*requestVO.setPageSize(10000);
+        requestVO.setPageNum(1);*/
+        /*int pageNum = requestVO.getPageNum();
         List<ReportVO> reportVOS = new ArrayList<>();
         while (true){
             try{
@@ -107,24 +107,17 @@ public class ReportController extends BaseController{
                 break;
             }
 
-        }
-
-        String dateStr = DateUtils.getStrDate(new Date(), "yyyyMMddHHmmss");
-        String name = "Product_" + dateStr + ".xls";
-        String path = commonsProperties.getOrderPath() + "download/";
-        File file = new File(path);
-        if (!file.exists() && !file.isDirectory()) {
-            file.mkdirs();
-        }
-        String filePath = path + name;
+        }*/
+        ReportResponseVO vo= reportExtService.search(requestVO);
 
         logger.info("exportOrderList 生成订单文件");
         //generateReportExcel("product",reportVOS, filePath);
-
+        String dateStr = DateUtils.getStrDate(new Date(), "yyyyMMddHHmmss");
+        String name = "Product_" + dateStr + ".xls";
         ByteArrayOutputStream os = new ByteArrayOutputStream();
 
         try {
-            generateReportExcel("product",reportVOS).write(os);
+            generateReportExcel("product",vo.getReportVOS()).write(os);
             byte[] content = os.toByteArray();
             InputStream is = new ByteArrayInputStream(content);
             // 设置response参数，可以打开下载页面
@@ -199,12 +192,23 @@ public class ReportController extends BaseController{
     private void checkRequestVo(ReportRequestVO requestVO) {
         if(StringUtils.isBlank(requestVO.getColorCode())){
             requestVO.setColorCode(null);
+        }else {
+            requestVO.setColorCode(requestVO.getColorCode().trim());
         }
         if(StringUtils.isBlank(requestVO.getDesignerId())){
             requestVO.setDesignerId(null);
+        }else {
+            requestVO.setDesignerId(requestVO.getDesignerId().trim());
         }
         if (StringUtils.isBlank(requestVO.getSeasonCode())){
             requestVO.setSeasonCode(null);
+        }else {
+            requestVO.setSeasonCode(requestVO.getSeasonCode().trim());
+        }
+        if(StringUtils.isBlank(requestVO.getBoutiqueId())){
+            requestVO.setBoutiqueId(null);
+        }else {
+            requestVO.setBoutiqueId(requestVO.getBoutiqueId().trim());
         }
     }
 
@@ -215,7 +219,7 @@ public class ReportController extends BaseController{
 
 
         String[] excelHeaders = null;
-        excelHeaders=new String[]{"designer_id", "color_code", "size", "retail_price", "boutique_price", "category", "brand_name", "season_code", "stock"};
+        excelHeaders=new String[]{"boutique_id","designer_id", "color_code", "size", "retail_price", "boutique_price", "category", "brand_name", "season_code", "stock"};
 
         // 创建表头
         /*HSSFRow row1 = sheet.createRow(rowLength);
@@ -250,32 +254,35 @@ public class ReportController extends BaseController{
                 ro ++;
                 row = sheet.createRow(rowLength);
                 cell = row.createCell(0);
-                cell.setCellValue(reportVO.getDesignerId());
+                cell.setCellValue(reportVO.getBoutiqueId());
 
                 cell = row.createCell(1);
-                cell.setCellValue(reportVO.getColorCode());
+                cell.setCellValue(reportVO.getDesignerId());
 
                 cell = row.createCell(2);
-                cell.setCellValue(reportVO.getSize());
+                cell.setCellValue(reportVO.getColorCode());
 
                 cell = row.createCell(3);
-                cell.setCellValue(reportVO.getRetailPrice()!=null?reportVO.getRetailPrice().setScale(4, RoundingMode.HALF_UP).toString():"");
+                cell.setCellValue(reportVO.getSize());
 
                 cell = row.createCell(4);
-                cell.setCellValue(reportVO.getBoutiquePrice()!=null?reportVO.getBoutiquePrice().setScale(4, RoundingMode.HALF_UP).toString():"");
+                cell.setCellValue(reportVO.getRetailPrice()!=null?reportVO.getRetailPrice().setScale(4, RoundingMode.HALF_UP).toString():"");
 
                 cell = row.createCell(5);
+                cell.setCellValue(reportVO.getBoutiquePrice()!=null?reportVO.getBoutiquePrice().setScale(4, RoundingMode.HALF_UP).toString():"");
+
+                cell = row.createCell(6);
 
 //                cell.setCellStyle();
                 cell.setCellValue(reportVO.getCategoryName());
 
-                cell = row.createCell(6);
+                cell = row.createCell(7);
                 cell.setCellValue(reportVO.getBrandName());
 
-                cell = row.createCell(7);
+                cell = row.createCell(8);
                 cell.setCellValue(reportVO.getSeasonCode());
 
-                cell = row.createCell(8);
+                cell = row.createCell(9);
                 cell.setCellValue(reportVO.getStock()!=null?reportVO.getStock():0);
                 rowLength ++;
             }

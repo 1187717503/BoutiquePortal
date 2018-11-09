@@ -171,8 +171,7 @@ public class ConfirmCheckOrderController {
                     //logisticsProductServiceImpl.updateByLogisticsProduct(upLogis);
                     upLogis.setOrder_line_num(logis.getOrder_line_num());
                     //确认订单
-                    LogisticsProduct old = logisticsProductService.selectById(upLogis.getLogistics_product_id());
-                    Integer oldStatus = old==null?null:old.getStatus();
+                    Integer oldStatus = logis.getStatus();
                     logisticsProductService.confirmOrder(upLogis);
 
                     iLogisticsProductService.updateByLogisticsProduct4Jpush(oldStatus,upLogis);

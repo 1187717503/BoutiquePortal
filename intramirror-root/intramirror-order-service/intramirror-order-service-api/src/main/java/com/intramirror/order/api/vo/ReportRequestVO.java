@@ -10,6 +10,8 @@ public class ReportRequestVO {
     private Integer pageNum = 1;
     private Integer start = 0; // limit start pageSize
     private Long vendorId;
+    private Integer hasStock; // 0:没库存 1：有库存
+    private String boutiqueId; // product->productCode
 
     public String getDesignerId() {
         return designerId;
@@ -81,5 +83,21 @@ public class ReportRequestVO {
 
     public void setVendorId(Long vendorId) {
         this.vendorId = vendorId;
+    }
+
+    public Integer getHasStock() {
+        return hasStock;
+    }
+
+    public void setHasStock(Integer hasStock) {
+        this.hasStock = hasStock;
+    }
+
+    public String getBoutiqueId() {
+        return boutiqueId;
+    }
+
+    public void setBoutiqueId(String boutiqueId) {
+        this.boutiqueId = boutiqueId;
     }
 }

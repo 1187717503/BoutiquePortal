@@ -7,6 +7,7 @@
 	    <result column="converpic" property="result" jdbcType="VARCHAR" />
 	    <result column="designerId" property="designerId" jdbcType="VARCHAR" />
 	    <result column="colorCode" property="colorCode" jdbcType="VARCHAR" />
+		<result column="boutiqueId" property="boutiqueId" jdbcType="VARCHAR" />
 	    <result column="retailPrice" property="retailPrice" jdbcType="DECIMAL" />
 	    <result column="boutiquePrice" property="boutiquePrice" jdbcType="DECIMAL" />
 	    <result column="size" property="size" jdbcType="VARCHAR" />
@@ -25,6 +26,7 @@
 			p.cover_img as converpic,
 			p.designer_id as designerId,
 			p.color_code as colorCode,
+			p.product_code as boutiqueId,
 			s.price as retailPrice,
 			s.in_price as boutiquePrice,
 			s.size as size,
@@ -56,9 +58,20 @@
         <if test="categoryId != null" >
             and p.category_id =  #{categoryId,jdbcType=BIGINT}
         </if>
+		<if test="boutiqueId != null" >
+			and p.product_code =  #{boutiqueId,jdbcType=VARCHAR}
+		</if>
         <if test="seasonCode != null" >
             and p.season_code =  #{seasonCode,jdbcType=VARCHAR}
         </if>
+		<if test="hasStock != null" >
+			<if test="hasStock == 0">
+				and ss.store = 0
+			</if>
+			<if test="hasStock == 1">
+				and ss.store > 0
+			</if>
+		</if>
 		ORDER BY ss.last_check desc
 		LIMIT #{start},#{pageSize};
 	</select>
@@ -90,9 +103,20 @@
         <if test="categoryId != null" >
             and p.category_id =  #{categoryId,jdbcType=BIGINT}
         </if>
+		<if test="boutiqueId != null" >
+			and p.product_code =  #{boutiqueId,jdbcType=VARCHAR}
+		</if>
         <if test="seasonCode != null" >
             and p.season_code =  #{seasonCode,jdbcType=VARCHAR}
         </if>
+		<if test="hasStock != null" >
+			<if test="hasStock == 0">
+				and <![CDATA[ ss.store <= 0 ]]>
+			</if>
+			<if test="hasStock == 1">
+				and ss.store > 0
+			</if>
+		</if>
     </select>
 
     <select id="queryAllSeason" resultMap="seasonResultMap">

@@ -15,6 +15,7 @@ public class ReportVO {
     private String brandName;
     private String seasonCode;
     private Integer stock;
+    private String boutiqueId; // product->productCode
 
     public String getConverpic() {
         return converpic;
@@ -102,5 +103,13 @@ public class ReportVO {
 
     public void setBoutiquePrice(BigDecimal boutiquePrice) {
         this.boutiquePrice = boutiquePrice;
+    }
+
+    public String getBoutiqueId() {
+        return boutiqueId;
+    }
+
+    public void setBoutiqueId(String boutiqueId) {
+        this.boutiqueId = boutiqueId;
     }
 }
