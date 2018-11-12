@@ -13,15 +13,14 @@ import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.model.SubShipment;
 import com.intramirror.order.api.service.*;
 import com.intramirror.order.api.util.HttpClientUtil;
+import com.intramirror.order.api.util.RedisService;
 import com.intramirror.order.api.vo.*;
 import com.intramirror.order.core.dao.BaseDao;
-import com.intramirror.order.core.mapper.LogisticProductShipmentMapper;
 import com.intramirror.order.core.mapper.LogisticsProductMapper;
 import com.intramirror.order.core.mapper.ShipmentMapper;
 import com.intramirror.order.core.utils.MailSendManageService;
 import com.intramirror.order.core.utils.ShipMailSendThread;
 import com.intramirror.utils.transform.JsonTransformUtil;
-import com.sun.corba.se.spi.ior.ObjectKey;
 import net.sf.json.JSONObject;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -49,8 +48,6 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 
 	private LogisticsProductMapper logisticsProductMapper;
 
-	private LogisticProductShipmentMapper logisticProductShipmentMapper;
-
 	@Autowired
 	private ISubShipmentService subShipmentService;
 
@@ -64,13 +61,13 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	private IOrderService orderService;
 
 	@Autowired
-	private ILogisticsProductService iLogisticsProductService;
+	private RedisService redisService;
+
 
 	@Override
 	public void init() {
 		shipmentMapper = this.getSqlSession().getMapper(ShipmentMapper.class);
 		subShipmentMapper = this.getSqlSession().getMapper(SubShipmentMapper.class);
-		logisticProductShipmentMapper = this.getSqlSession().getMapper(LogisticProductShipmentMapper.class);
         logisticsProductMapper = this.getSqlSession().getMapper(LogisticsProductMapper.class);
 	}
 
@@ -106,14 +103,23 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 				Long vendorId = Long.parseLong(map.get("vendor_id").toString());
 				Object shipFromLocation_id = map.get("ship_from_location_id");
 				Integer locationId = Integer.parseInt(shipFromLocation_id!=null?shipFromLocation_id.toString():"0");
+				Integer shippingMethod = map.get("shipping_method") != null ? Integer.valueOf(map.get("shipping_method").toString()) : null;
 				String top = shipmentMapper.getVendorCodeById(vendorId);
 				Map<String, Object> noMap = new HashMap<>();
 				noMap.put("topName", top+"SP");
-				Integer maxNo = shipmentMapper.getMaxShipmentNo(noMap);
-				if (null == maxNo)
-					maxNo = 1000001;
-				else
-					maxNo ++;
+				String key = "shipment:barcode:" + top;
+				Integer maxNo;
+				Object o = redisService.get(key);
+				if (o != null && StringUtils.isNotBlank(o.toString())){
+					maxNo = Integer.valueOf(o.toString()) + 1;
+				}else {
+					maxNo = shipmentMapper.getMaxShipmentNo(noMap);
+					if (null == maxNo)
+						maxNo = 1000001;
+					else
+						maxNo++;
+				}
+				redisService.set(key,maxNo);
 				//生成shipmentNo
 				shipment.setShipmentNo(top+"SP"+maxNo);
 				shipment.setVendorId(vendorId);
@@ -122,6 +128,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 				shipment.setCreatedAt(currentDate);
 				shipment.setUpdatedAt(currentDate);
 				shipment.setShipmentCategory(shipmentCategory);
+				shipment.setShippingMethod(shippingMethod);
 				//wms需要的信息
 				shipment.setFromType(1); //买手店发货
 				shipment.setFromRefId(vendorId);
@@ -146,8 +153,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 					logger.info("result shipmentType:" + new Gson().toJson(listMap));
 					shipmentId = shipmentMapper.getShipmentId(shipment);
 
-					saveSubShipmentByTms(map,consigner_country_id,consignee_country_id,vendorId,shipmentId,Long.parseLong(
-							map.get("logistics_product_id")==null?"0":map.get("logistics_product_id").toString()));
+					saveSubShipmentByTms(map,consigner_country_id,consignee_country_id,vendorId,shipmentId);
 					/*saveSubShipment(listMap, map,shipmentId,Long.parseLong(
 							map.get("logistics_product_id")==null?"0":map.get("logistics_product_id").toString()));*/
 					shipment.setShipmentId(shipmentId);
@@ -167,8 +173,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 //						map.get("logistics_product_id")==null?"0":map.get("logistics_product_id").toString()));
 				//Long consigner_country_id =  Long.parseLong(map.get("consigner_country_id").toString());
 				//Long consignee_country_id =  Long.parseLong(map.get("consignee_country_id").toString());
-				saveSubShipmentByTms(map,consigner_country_id,consignee_country_id,Long.parseLong(map.get("vendor_id").toString()),shipmentId,Long.parseLong(
-						map.get("logistics_product_id")==null?"0":map.get("logistics_product_id").toString()));
+				saveSubShipmentByTms(map,consigner_country_id,consignee_country_id,Long.parseLong(map.get("vendor_id").toString()),shipmentId);
 				return shipment;
 			}
 		}
@@ -200,16 +205,16 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		return shipmentMapper.selectShipmentByOrder(map);
 	}
 	/**
-	 * 根据订单号查询shipmentt TYPE
-	 * @param map
-	 * @return map
-	 */
+     * 根据订单号查询shipmentt TYPE
+     * @param map
+     * @return map
+     */
 	@Override
 	public List<Map<String, Object>> getShippmentByType(Map<String, Object> map) {
 		return shipmentMapper.getShippmentByType(map);
 	}
 
-	public void saveSubShipmentByTms(Map<String, Object> map,Long consigner_country_id,Long consignee_country_id, Long vendorId, Long shipmentId, Long logisticProductId){
+	public void saveSubShipmentByTms(Map<String, Object> map,Long consigner_country_id,Long consignee_country_id, Long vendorId, Long shipmentId){
 		StringBuffer sb = new StringBuffer(HttpClientUtil.tmsProviderRouteUrl);
 		sb.append("?").append("senderCountryId=").append(consigner_country_id).append("&recipientCountryId=")
 				.append(consignee_country_id).append("&invokerId=").append(vendorId).append("&invokerType=1");
@@ -618,7 +623,11 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 					List<String> list = new ArrayList<>();
 
 					//校验是否生成AWB
-					String awb = checkAWB(shipment.getShipmentId());
+					if (2 == shipment.getShippingMethod()||"COMO".equals(shipment.getShipToGeography())){
+						//如果此shipment是发往COMO的就不需要校验AWB是否生成
+					}else {
+						checkAWB(shipment.getShipmentId());
+					}
 					//shipped操作发送消息用来生成资金报表
 					List<LogisticsProduct> logisticsProducts = logisticsProductMapper.getLogisticsProductByShipment(shipment.getShipmentId());
 					if (logisticsProducts!=null && logisticsProducts.size()>0){

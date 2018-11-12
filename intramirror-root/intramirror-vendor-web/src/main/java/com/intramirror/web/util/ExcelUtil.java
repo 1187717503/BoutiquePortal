@@ -47,6 +47,12 @@ public class ExcelUtil {
             }
         }
 
+        List<InvoiceVO> comoInvoices = twInvoiceVO.getComoInvoice();
+        if(comoInvoices != null){
+            for(InvoiceVO invoiceVO : comoInvoices){
+                generateSheet(wb, invoiceVO);
+            }
+        }
         return wb;
     }
 

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.intramirror.order.api.model.*;
+import com.intramirror.order.api.util.RedisService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IShipmentService;
 import com.intramirror.order.api.service.ISubShipmentService;
 import com.intramirror.web.common.BarcodeUtil;
+import pk.shoplus.common.utils.StringUtil;
 
 
 /**
@@ -53,7 +55,9 @@ public class ContainerController {
 	
 	@Autowired
 	private ILogisticProductShipmentService logisticProductShipmentService;
-	
+	@Autowired
+	private RedisService redisService;
+
 	/**
 	 * 新增箱子
 	 * @param map
@@ -332,16 +336,26 @@ public class ContainerController {
 	@ResponseBody
 	public ResultMessage getBarcode(){
 		ResultMessage message = ResultMessage.getInstance();
+		String key = "container:barcode";
 		String barCode = "CTN";
 		try {
-			Integer maxCode = containerService.getMaxBarcode();
-			if (null == maxCode)
-				maxCode = 1000001;
-			else 
-				maxCode ++;
-			barCode+=maxCode;
-			message.successStatus().addMsg("info SUCCESS").setData(barCode);
-			return message;
+			synchronized (this){
+				Integer maxCode;
+				Object o = redisService.get(key);
+				if (o != null && StringUtil.isNotEmpty(o.toString())){
+					maxCode = Integer.valueOf(o.toString()) + 1;
+				}else {
+					maxCode = containerService.getMaxBarcode();
+					if (null == maxCode)
+						maxCode = 1000001;
+					else
+						maxCode ++;
+				}
+				redisService.set(key,maxCode);
+				barCode+=maxCode;
+				message.successStatus().addMsg("info SUCCESS").setData(barCode);
+				return message;
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(" error Message : "+ e.getMessage());
