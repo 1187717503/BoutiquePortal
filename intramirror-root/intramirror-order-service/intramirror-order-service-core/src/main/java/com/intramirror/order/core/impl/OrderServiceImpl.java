@@ -36,17 +36,12 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
 
     private MemberPointsErrorLogMapper memberPointsErrorLogMapper;
 
-    private ProductMapper productMapper;
 
 
     public void init() {
         orderMapper = this.getSqlSession().getMapper(OrderMapper.class);
         productPropertyMapper = this.getSqlSession().getMapper(ProductPropertyMapper.class);
-
         memberPointsErrorLogMapper = this.getSqlSession().getMapper(MemberPointsErrorLogMapper.class);
-
-        productMapper = this.getSqlSession().getMapper(ProductMapper.class);
-
     }
 
     public List<Map<String, Object>> getOrderList(int status) {
