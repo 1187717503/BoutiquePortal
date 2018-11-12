@@ -87,10 +87,4 @@ public interface LogisticsProductMapper {
 
     List<Map<String, Object>> queryLogisticProductConfirm(Long logisticsProductId);
 
-    /**
-     * 获取收件国家id和发件国家id
-     * @param orderLineNum
-     * @return
-     */
-    Map<String,Integer> queryCountryId(String orderLineNum);
 }

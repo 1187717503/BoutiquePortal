@@ -60,4 +60,11 @@ public interface TaxMapper {
     List<Map<String, Object>> getTaxRateListById(@Param("fromCountryId") String fromCountryId,@Param("taxType") String taxType);
 
     List<Tax> getTaxByAddressCountryId(Long addressCountryId);
+
+    /**
+     * 获取收件国家id和发件国家id
+     * @param orderLineNum
+     * @return
+     */
+    Map<String,Object> queryCountryId(String orderLineNum);
 }

@@ -376,15 +376,4 @@
         AND lp.enabled = 1
     </select>
 
-    <select id="queryCountryId" resultType="map" parameterType="string">
-        SELECT v.address_country_id consignorCountryId,ac.geography_id consignorGeographyId,
-        l.address_country_id consigneeCountryId,ac1.geography_id consigneeGeographyId,t.tax_rate taxRate
-        FROM logistics_product lp
-        INNER JOIN vendor v on v.vendor_id = lp.vendor_id
-        INNER JOIN logistics l on l.order_logistics_id = lp.order_logistics_id
-        INNER JOIN address_country ac on ac.address_country_id = v.address_country_id
-        INNER JOIN address_country ac1 on ac1.address_country_id = l.address_country_id
-        LEFT JOIN tax t on (t.address_country_id = v.address_country_id and t.tax_type = 1)
-        WHERE lp.order_line_num = #{orderLineNum}
-    </select>
 </mapper>

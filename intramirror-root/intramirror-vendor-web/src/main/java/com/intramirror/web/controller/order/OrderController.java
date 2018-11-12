@@ -12,14 +12,11 @@ import com.intramirror.common.utils.DateUtils;
 import com.intramirror.main.api.enums.GeographyEnum;
 import com.intramirror.main.api.model.StockLocation;
 import com.intramirror.main.api.service.StockLocationService;
+import com.intramirror.main.api.service.TaxService;
 import com.intramirror.main.api.vo.StockLocationVO;
 import com.intramirror.order.api.common.OrderStatusType;
 import com.intramirror.order.api.model.LogisticsProduct;
-import com.intramirror.order.api.service.IContainerService;
-import com.intramirror.order.api.service.ILogisticsProductService;
-import com.intramirror.order.api.service.IOrderExceptionService;
-import com.intramirror.order.api.service.IOrderExceptionTypeService;
-import com.intramirror.order.api.service.IOrderService;
+import com.intramirror.order.api.service.*;
 import com.intramirror.order.api.model.CancelOrderVO;
 import com.intramirror.order.api.vo.PageListVO;
 import com.intramirror.product.api.model.Category;
@@ -115,6 +112,8 @@ public class OrderController extends BaseController {
 
     @Autowired
     private ICategoryService iCategoryService;
+    @Autowired
+    private TaxService taxService;
 
     /**
      * 获取订单列表
@@ -215,6 +214,7 @@ public class OrderController extends BaseController {
                 CancelOrderVO co = (CancelOrderVO)o;
                 Double price = Double.parseDouble(co.getPrice().toString());
                 Double inPrice = Double.parseDouble(co.getIn_price().toString());
+                BigDecimal tax = taxService.calculateTax(co.getOrder_line_num());
 
                 BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + 0.22) / price) * 100);
                 if (supply_price_discount.intValue() > 100 || supply_price_discount.intValue() < 0) {
@@ -239,6 +239,10 @@ public class OrderController extends BaseController {
     }
 
     private void arithmeticalDiscount(Map<String, Object> info) {
+        //获取税率
+        String orderLineNum = info.get("order_line_num").toString();
+        BigDecimal tax = taxService.calculateTax(orderLineNum);
+
         String priceStr = info.get("price").toString();
         String inPriceStr = info.get("in_price").toString();
         Double price = Double.parseDouble(priceStr);
