@@ -218,4 +218,11 @@
         LEFT JOIN tax t on (t.address_country_id = v.address_country_id and t.tax_type = 1)
         WHERE lp.order_line_num = #{orderLineNum}
     </select>
+
+    <select id="calculateDiscountTax" resultMap="BaseResultMap" parameterType="string">
+        SELECT t.* from tax t
+        INNER JOIN vendor v ON v.address_country_id = t.address_country_id
+        INNER JOIN logistics_product lp on lp.vendor_id = v.vendor_id
+        WHERE lp.order_line_num = #{orderLineNum} and t.tax_type = 1 limit 1;
+    </select>
 </mapper>

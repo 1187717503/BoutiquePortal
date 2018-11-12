@@ -831,7 +831,7 @@ public class OrderShipController extends BaseController {
                     BigDecimal total = new BigDecimal(Double.parseDouble(container.get("in_price").toString()) * Double.parseDouble(container.get("amount").toString())).setScale(2,BigDecimal.ROUND_HALF_UP);
                     container.put("in_price",new BigDecimal(container.get("in_price").toString()).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
                     //获取欧盟的信息
-                    Geography geography = geographyService.getGeographyById(3l);
+                    /*Geography geography = geographyService.getGeographyById(3l);
                     logger.info("打印Invoice----获取VAT信息");
                     //获取当前shipment的信息
                     Map<String, Object> shipmentPramMap = new HashMap<>();
@@ -850,6 +850,12 @@ public class OrderShipController extends BaseController {
                                 VAT = VAT.add(new BigDecimal(Double.parseDouble(container.get("in_price").toString())).multiply(tax.getTaxRate())).setScale(2,BigDecimal.ROUND_HALF_UP);
                             }
                         }
+                    }*/
+                    String orderLineNum = container.get("order_line_num").toString();
+                    BigDecimal tax = taxService.calculateTax(orderLineNum);
+                    if (tax != null) {
+                        logger.info("打印Invoice----计算VAT的值");
+                        VAT = VAT.add(new BigDecimal(Double.parseDouble(container.get("in_price").toString())).multiply(tax)).setScale(2,BigDecimal.ROUND_HALF_UP);
                     }
                     allTotal = allTotal.add(total);
                     container.put("Total", total);
@@ -1113,17 +1119,21 @@ public class OrderShipController extends BaseController {
             BigDecimal allTotal = new BigDecimal("0");
             BigDecimal VAT = new BigDecimal("0");
             for(Map<String, Object> chinaOrder : chinaList){
-                Object countryName = chinaOrder.get("countryName").equals("中国大陆") ? "中国" : chinaOrder.get("countryName");
+                /*Object countryName = chinaOrder.get("countryName").equals("中国大陆") ? "中国" : chinaOrder.get("countryName");
                 AddressCountry addressCountry = addressCountryService.getAddressCountryByName(countryName.toString());
                 Tax tax = taxService.getTaxByAddressCountryId(addressCountry.getAddressCountryId());
-                BigDecimal taxRate = tax.getTaxRate() == null ? new BigDecimal("0") : tax.getTaxRate();
+                BigDecimal taxRate = tax.getTaxRate() == null ? new BigDecimal("0") : tax.getTaxRate();*/
+                String orderLineNum = chinaOrder.get("order_line_num").toString();
+                BigDecimal taxRate = taxService.calculateTax(orderLineNum);
                 BigDecimal total = new BigDecimal(Double.parseDouble(chinaOrder.get("in_price").toString()) * Double.parseDouble(chinaOrder.get("amount").toString())).setScale(2, BigDecimal.ROUND_HALF_UP);
                 VAT = VAT.add(total.multiply(taxRate).setScale(2, BigDecimal.ROUND_HALF_UP));
                 allTotal = allTotal.add(total);
 
                 String inPrice = chinaOrder.get("in_price")!=null?chinaOrder.get("in_price").toString():"";
                 String retailPrice = chinaOrder.get("price")!=null?chinaOrder.get("price").toString():"";
-                BigDecimal discount = (new BigDecimal(1)).subtract((new BigDecimal(inPrice)).multiply(new BigDecimal("1.22")).divide(new BigDecimal(retailPrice), 2, RoundingMode.HALF_UP));
+
+                double discountTax = getDiscountTax(orderLineNum);
+                BigDecimal discount = (new BigDecimal(1)).subtract((new BigDecimal(inPrice)).multiply(new BigDecimal(discountTax)).divide(new BigDecimal(retailPrice), 2, RoundingMode.HALF_UP));
                 chinaOrder.put("discount", discount.multiply(new BigDecimal("100")).setScale(0, BigDecimal.ROUND_HALF_UP).toString() + "%");
                 chinaOrder.put("in_price", (new BigDecimal(inPrice).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
                 chinaOrder.put("price", (new BigDecimal(retailPrice).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
@@ -1190,14 +1200,17 @@ public class OrderShipController extends BaseController {
 
                 String inPrice = UNOrder.get("in_price")!=null?UNOrder.get("in_price").toString():"";
                 String retailPrice = UNOrder.get("price")!=null?UNOrder.get("price").toString():"";
-                BigDecimal discount = (new BigDecimal(1)).subtract((new BigDecimal(inPrice)).multiply(new BigDecimal("1.22")).divide(new BigDecimal(retailPrice), 2, RoundingMode.HALF_UP));
+                String orderLineNum = UNOrder.get("order_line_num").toString();
+                double discountTax = getDiscountTax(orderLineNum);
+                BigDecimal discount = (new BigDecimal(1)).subtract((new BigDecimal(inPrice)).multiply(new BigDecimal(discountTax)).divide(new BigDecimal(retailPrice), 2, RoundingMode.HALF_UP));
                 UNOrder.put("discount", discount.multiply(new BigDecimal("100")).setScale(0, BigDecimal.ROUND_HALF_UP).toString() + "%");
                 UNOrder.put("in_price", (new BigDecimal(inPrice).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
                 UNOrder.put("price", (new BigDecimal(retailPrice).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
 
-                AddressCountry addressCountry = addressCountryService.getAddressCountryByName(UNOrder.get("countryName").toString());
+                /*AddressCountry addressCountry = addressCountryService.getAddressCountryByName(UNOrder.get("countryName").toString());
                 Tax tax = taxService.getTaxByAddressCountryId(addressCountry.getAddressCountryId());
-                BigDecimal taxRate = tax.getTaxRate() == null ? new BigDecimal("0") : tax.getTaxRate();
+                BigDecimal taxRate = tax.getTaxRate() == null ? new BigDecimal("0") : tax.getTaxRate();*/
+                BigDecimal taxRate = taxService.calculateTax(orderLineNum);
                 BigDecimal total = new BigDecimal(Double.parseDouble(UNOrder.get("in_price").toString()) * Double.parseDouble(UNOrder.get("amount").toString())).setScale(2, BigDecimal.ROUND_HALF_UP);
                 BigDecimal VAT = total.multiply(taxRate).setScale(2, BigDecimal.ROUND_HALF_UP);
                 BigDecimal grandTotal = (VAT.add(total)).setScale(2,BigDecimal.ROUND_HALF_UP);
@@ -1262,14 +1275,17 @@ public class OrderShipController extends BaseController {
 
                 String inPrice = elseOrder.get("in_price")!=null?elseOrder.get("in_price").toString():"";
                 String retailPrice = elseOrder.get("price")!=null?elseOrder.get("price").toString():"";
-                BigDecimal discount = (new BigDecimal(1)).subtract((new BigDecimal(inPrice)).multiply(new BigDecimal("1.22")).divide(new BigDecimal(retailPrice), 2, RoundingMode.HALF_UP));
+                String orderLineNum = elseOrder.get("order_line_num").toString();
+                double discountTax = getDiscountTax(orderLineNum);
+                BigDecimal discount = (new BigDecimal(1)).subtract((new BigDecimal(inPrice)).multiply(new BigDecimal(discountTax)).divide(new BigDecimal(retailPrice), 2, RoundingMode.HALF_UP));
                 elseOrder.put("discount", discount.multiply(new BigDecimal("100")).setScale(0, BigDecimal.ROUND_HALF_UP).toString() + "%");
                 elseOrder.put("in_price", (new BigDecimal(inPrice).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
                 elseOrder.put("price", (new BigDecimal(retailPrice).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
 
-                AddressCountry addressCountry = addressCountryService.getAddressCountryByName(elseOrder.get("countryName").toString());
+                /*AddressCountry addressCountry = addressCountryService.getAddressCountryByName(elseOrder.get("countryName").toString());
                 Tax tax = taxService.getTaxByAddressCountryId(addressCountry.getAddressCountryId());
-                BigDecimal taxRate = tax.getTaxRate() == null ? new BigDecimal("0") : tax.getTaxRate();
+                BigDecimal taxRate = tax.getTaxRate() == null ? new BigDecimal("0") : tax.getTaxRate();*/
+                BigDecimal taxRate = taxService.calculateTax(orderLineNum);
                 BigDecimal total = new BigDecimal(Double.parseDouble(elseOrder.get("in_price").toString()) * Double.parseDouble(elseOrder.get("amount").toString())).setScale(2, BigDecimal.ROUND_HALF_UP);
                 BigDecimal VAT = total.multiply(taxRate).setScale(2, BigDecimal.ROUND_HALF_UP);
                 BigDecimal grandTotal = (VAT.add(total)).setScale(2,BigDecimal.ROUND_HALF_UP);
@@ -1328,6 +1344,17 @@ public class OrderShipController extends BaseController {
         }
 
         return result;
+    }
+
+    private double getDiscountTax(String orderLineNum) {
+        Tax tax = taxService.calculateDiscountTax(orderLineNum);
+        double discountTax;
+        if (tax != null){
+            discountTax = tax.getTaxRate().doubleValue() + 1;
+        }else {
+            discountTax = 1;
+        }
+        return discountTax;
     }
 
     private Vendor getVendor(Vendor vendor, Long vendorId) {

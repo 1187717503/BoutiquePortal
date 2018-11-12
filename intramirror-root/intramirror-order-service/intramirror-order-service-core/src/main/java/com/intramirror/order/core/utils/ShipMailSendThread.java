@@ -2,6 +2,8 @@ package com.intramirror.order.core.utils;
 
 import com.google.gson.Gson;
 import com.intramirror.common.help.StringUtils;
+import com.intramirror.main.api.model.Tax;
+import com.intramirror.main.api.service.TaxService;
 import com.intramirror.order.api.service.IVendorShipmentService;
 import com.intramirror.order.api.service.IViewOrderLinesService;
 import com.intramirror.order.api.vo.*;
@@ -29,9 +31,12 @@ public class ShipMailSendThread implements Runnable {
 
     private ShipmentSendMailVO shipment;
 
-    public ShipMailSendThread(ShipmentSendMailVO shipment, MailSendManageService mailSendManageService) {
+    private TaxService taxService;
+
+    public ShipMailSendThread(ShipmentSendMailVO shipment, MailSendManageService mailSendManageService,TaxService taxService) {
         this.shipment = shipment;
         this.mailSendManageService = mailSendManageService;
+        this.taxService = taxService;
 
     }
 
@@ -250,7 +255,14 @@ public class ShipMailSendThread implements Runnable {
         HSSFCell cell = null;
         for (ViewOrderLinesVO order : shipmentList) {
             row = sheet.createRow(rowLength);
-            String boutiqueDiscountOff = new BigDecimal(100).subtract(order.getBoutique_price().multiply(new BigDecimal(122)).divide(order.getRetail_price(), 4, BigDecimal.ROUND_HALF_DOWN)).setScale(2, BigDecimal.ROUND_HALF_UP).toString() + "%";
+            Tax tax = taxService.calculateDiscountTax(order.getOrder_line_num());
+            double discountTax;
+            if (tax != null){
+                discountTax = tax.getTaxRate().doubleValue() * 100 + 100;
+            }else {
+                discountTax = 100;
+            }
+            String boutiqueDiscountOff = new BigDecimal(100).subtract(order.getBoutique_price().multiply(new BigDecimal(discountTax)).divide(order.getRetail_price(), 4, BigDecimal.ROUND_HALF_DOWN)).setScale(2, BigDecimal.ROUND_HALF_UP).toString() + "%";
             String[] values = {
                     transforNullValue(order.getAwb_nbr()),
                     transforNullValue(order.getVendor_name()),

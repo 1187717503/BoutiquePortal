@@ -67,4 +67,6 @@ public interface TaxMapper {
      * @return
      */
     Map<String,Object> queryCountryId(String orderLineNum);
+
+    Tax calculateDiscountTax(String orderLineNum);
 }

@@ -21,4 +21,11 @@ public interface TaxService {
      * @return
      */
     BigDecimal calculateTax(String orderLineNum);
+
+    /**
+     * 获取折扣税率
+     * @param orderLineNum
+     * @return
+     */
+    Tax calculateDiscountTax(String orderLineNum);
 }

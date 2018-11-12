@@ -87,4 +87,9 @@ public class TaxServiceImpl extends BaseDao implements TaxService {
         }
         return new BigDecimal(0);
     }
+
+    @Override
+    public Tax calculateDiscountTax(String orderLineNum) {
+        return taxMapper.calculateDiscountTax(orderLineNum);
+    }
 }

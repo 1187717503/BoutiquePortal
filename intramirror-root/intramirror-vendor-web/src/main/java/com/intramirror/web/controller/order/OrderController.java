@@ -11,6 +11,7 @@ import com.intramirror.common.parameter.StatusType;
 import com.intramirror.common.utils.DateUtils;
 import com.intramirror.main.api.enums.GeographyEnum;
 import com.intramirror.main.api.model.StockLocation;
+import com.intramirror.main.api.model.Tax;
 import com.intramirror.main.api.service.StockLocationService;
 import com.intramirror.main.api.service.TaxService;
 import com.intramirror.main.api.vo.StockLocationVO;
@@ -214,9 +215,15 @@ public class OrderController extends BaseController {
                 CancelOrderVO co = (CancelOrderVO)o;
                 Double price = Double.parseDouble(co.getPrice().toString());
                 Double inPrice = Double.parseDouble(co.getIn_price().toString());
-                BigDecimal tax = taxService.calculateTax(co.getOrder_line_num());
+                Tax tax = taxService.calculateDiscountTax(co.getOrder_line_num());
+                double discountTax;
+                if (tax != null){
+                    discountTax = tax.getTaxRate().doubleValue();
+                }else {
+                    discountTax = 0;
+                }
 
-                BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + 0.22) / price) * 100);
+                BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + discountTax) / price) * 100);
                 if (supply_price_discount.intValue() > 100 || supply_price_discount.intValue() < 0) {
                     co.setSupply_price_discount(0 + " %");
                 } else {
@@ -241,14 +248,20 @@ public class OrderController extends BaseController {
     private void arithmeticalDiscount(Map<String, Object> info) {
         //获取税率
         String orderLineNum = info.get("order_line_num").toString();
-        BigDecimal tax = taxService.calculateTax(orderLineNum);
+        Tax tax = taxService.calculateDiscountTax(orderLineNum);
+        double discountTax;
+        if (tax != null){
+            discountTax = tax.getTaxRate().doubleValue();
+        }else {
+            discountTax = 0;
+        }
 
         String priceStr = info.get("price").toString();
         String inPriceStr = info.get("in_price").toString();
         Double price = Double.parseDouble(priceStr);
         Double inPrice = Double.parseDouble(inPriceStr);
 
-        BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + 0.22) / price) * 100);
+        BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + discountTax) / price) * 100);
         if (supply_price_discount.intValue() > 100 || supply_price_discount.intValue() < 0) {
             info.put("supply_price_discount", 0 + " %");
         } else {
@@ -335,7 +348,17 @@ public class OrderController extends BaseController {
             //				info.put("sale_price_discount",sale_price_discount.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() +" %");
             orderInfo.put("sale_price_discount", (100 - sale_price_discount.setScale(0, BigDecimal.ROUND_HALF_UP).intValue()) + " %");
 
-            BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + 0.22) / price) * 100);
+
+            //获取税率
+            String orderLineNum = orderInfo.get("order_line_num").toString();
+            Tax tax = taxService.calculateDiscountTax(orderLineNum);
+            double discountTax;
+            if (tax != null){
+                discountTax = tax.getTaxRate().doubleValue();
+            }else {
+                discountTax = 0;
+            }
+            BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + discountTax) / price) * 100);
             //			orderInfo.put("supply_price_discount", (100 -supply_price_discount.setScale(0,BigDecimal.ROUND_HALF_UP).intValue())+" %");
             if (supply_price_discount.intValue() > 100 || supply_price_discount.intValue() < 0) {
                 orderInfo.put("supply_price_discount", 0 + " %");

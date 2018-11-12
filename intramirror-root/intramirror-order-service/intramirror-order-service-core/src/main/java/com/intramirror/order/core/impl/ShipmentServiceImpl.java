@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.google.gson.Gson;
 import com.intramirror.common.core.mapper.SubShipmentMapper;
 import com.intramirror.common.help.StringUtils;
+import com.intramirror.main.api.service.TaxService;
 import com.intramirror.order.api.common.ContainerType;
 import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.model.Shipment;
@@ -49,7 +50,6 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 
 	private LogisticsProductMapper logisticsProductMapper;
 
-	private LogisticProductShipmentMapper logisticProductShipmentMapper;
 
 	@Autowired
 	private ISubShipmentService subShipmentService;
@@ -62,15 +62,14 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 
 	@Autowired
 	private IOrderService orderService;
-
 	@Autowired
-	private ILogisticsProductService iLogisticsProductService;
+	private TaxService taxService;
+
 
 	@Override
 	public void init() {
 		shipmentMapper = this.getSqlSession().getMapper(ShipmentMapper.class);
 		subShipmentMapper = this.getSqlSession().getMapper(SubShipmentMapper.class);
-		logisticProductShipmentMapper = this.getSqlSession().getMapper(LogisticProductShipmentMapper.class);
         logisticsProductMapper = this.getSqlSession().getMapper(LogisticsProductMapper.class);
 	}
 
@@ -746,7 +745,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	}
 
     private void sendMail(ShipmentSendMailVO shipment){
-        ShipMailSendThread thread = new ShipMailSendThread(shipment, mailSendManageService);
+        ShipMailSendThread thread = new ShipMailSendThread(shipment, mailSendManageService,taxService);
         new Thread(thread).start();
     }
 

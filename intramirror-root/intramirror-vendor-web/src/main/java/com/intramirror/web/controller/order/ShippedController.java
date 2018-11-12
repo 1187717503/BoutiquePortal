@@ -3,6 +3,8 @@ package com.intramirror.web.controller.order;
 import com.intramirror.common.help.Page;
 import com.intramirror.common.help.PageUtils;
 import com.intramirror.common.help.ResultMessage;
+import com.intramirror.main.api.model.Tax;
+import com.intramirror.main.api.service.TaxService;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.vo.ShippedParam;
 import com.intramirror.user.api.model.User;
@@ -34,6 +36,8 @@ public class ShippedController extends BaseController {
 
     @Autowired
     private VendorService vendorService;
+    @Autowired
+    private TaxService taxService;
 
 
     @RequestMapping(value = "/getShippedList", method = RequestMethod.POST)
@@ -112,8 +116,17 @@ public class ShippedController extends BaseController {
                     BigDecimal sale_price_discount = new BigDecimal((salePrice / price) * 100);
     //				info.put("sale_price_discount",sale_price_discount.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() +" %");
                     info.put("sale_price_discount", (100 - sale_price_discount.intValue()) + " %");
+                    //获取税率
+                    String orderLineNum = info.get("order_line_num").toString();
+                    Tax tax = taxService.calculateDiscountTax(orderLineNum);
+                    double discountTax;
+                    if (tax != null){
+                        discountTax = tax.getTaxRate().doubleValue();
+                    }else {
+                        discountTax = 0;
+                    }
 
-                    BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + 0.22) / price) * 100);
+                    BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + discountTax) / price) * 100);
                     info.put("supply_price_discount", (100 - supply_price_discount.intValue()) + " %");
                 }
             }
