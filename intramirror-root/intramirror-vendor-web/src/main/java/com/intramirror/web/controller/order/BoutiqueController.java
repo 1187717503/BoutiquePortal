@@ -75,8 +75,8 @@ public class BoutiqueController {
             result.setMsg("异常订单不能confirm");
             return result;
         }
-        if (confirmMap.get("status")==null||!"1".equals(confirmMap.get("status").toString())
-                ||!"8".equals(confirmMap.get("status").toString())){
+        if (confirmMap.get("status")==null||(!"1".equals(confirmMap.get("status").toString())
+                &&!"8".equals(confirmMap.get("status").toString()))){
             result.setCode(430);
             result.setMsg("订单状态异常，不能confirm");
             return result;
@@ -84,7 +84,7 @@ public class BoutiqueController {
         boolean flag = false; //stocklocation是否有效
         for (Map map1 :productConfirm){
             if (map1.get("locationId") != null
-                    && stockLocationId.equals(Integer.valueOf(map1.get("locationId").toString()))){
+                    && stockLocationId.equals(Long.valueOf(map1.get("locationId").toString()))){
                 stockLocation = map1.get("stockLocation").toString();
                 flag = true;
                 break;
