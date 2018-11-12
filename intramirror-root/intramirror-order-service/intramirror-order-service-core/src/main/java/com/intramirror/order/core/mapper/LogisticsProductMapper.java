@@ -84,4 +84,6 @@ public interface LogisticsProductMapper {
     Map<String,Object> getShopProductSku(Long logisticsProductId);
 
     LogisticsProduct selectByOrderLineNum(@Param("orderLineNum") String orderLineNum);
+
+    List<Map<String, Object>> queryLogisticProductConfirm(Long logisticsProductId);
 }

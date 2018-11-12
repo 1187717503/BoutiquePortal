@@ -118,5 +118,7 @@ public interface ILogisticsProductService {
 	 * @return
 	 */
 	Map<String,Object> getShopProductSku(Long logisticsProductId);
+
+	List<Map<String, Object>> queryLogisticProductConfirm(Long logisticsProductId);
 }
 

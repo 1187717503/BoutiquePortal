@@ -13,6 +13,16 @@ public class ResultMessage {
     private Object data;
     private String msg;
     private Map<String,Object> infoMap;
+    private int code;
+
+
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
 
     public int getStatus() {
         return status;
