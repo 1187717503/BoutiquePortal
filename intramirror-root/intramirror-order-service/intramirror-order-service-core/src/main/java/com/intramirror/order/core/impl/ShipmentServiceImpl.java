@@ -623,7 +623,8 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 					List<String> list = new ArrayList<>();
 
 					//校验是否生成AWB
-					if (2 == shipment.getShippingMethod()||"COMO".equals(shipment.getShipToGeography())){
+					if (shipment.getShippingMethod() != null&&
+							(2 == shipment.getShippingMethod()||"COMO".equals(shipment.getShipToGeography()))){
 						//如果此shipment是发往COMO的就不需要校验AWB是否生成
 					}else {
 						checkAWB(shipment.getShipmentId());
