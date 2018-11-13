@@ -1475,8 +1475,9 @@ public class OrderController extends BaseController {
             try {
                 //添加域名替换
                 pictureUrl = pictureUrl.replace("image.intramirror.com", "sha-oss-static.oss-cn-shanghai.aliyuncs.com");
-                //获取网络图片
-                URL url = new URL(pictureUrl);
+                //获取网络图片 ,压缩图片
+                //URL url = new URL(pictureUrl);
+                URL url = new URL(pictureUrl+"?x-oss-process=image/resize,m_fill,w_110,limit_0/auto-orient,0/quality,q_90");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
                 //超时响应时间为5秒
