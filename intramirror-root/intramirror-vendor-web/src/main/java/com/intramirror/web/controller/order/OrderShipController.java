@@ -5,11 +5,9 @@ import com.intramirror.common.help.ResultMessage;
 import com.intramirror.logistics.api.model.Invoice;
 import com.intramirror.logistics.api.model.VendorShipment;
 import com.intramirror.logistics.api.service.IInvoiceService;
-import com.intramirror.main.api.model.AddressCountry;
 import com.intramirror.main.api.model.Geography;
 import com.intramirror.main.api.model.StockLocation;
 import com.intramirror.main.api.model.Tax;
-import com.intramirror.main.api.service.AddressCountryService;
 import com.intramirror.main.api.service.GeographyService;
 import com.intramirror.main.api.service.StockLocationService;
 import com.intramirror.main.api.service.TaxService;
@@ -92,22 +90,14 @@ public class OrderShipController extends BaseController {
 
     @Autowired
     private IInvoiceService invoiceService;
-
     @Autowired
     private IShopService shopService;
-
     @Autowired
     private IShippingProviderService shippingProviderService;
-
     @Autowired
     private ISubShipmentService subShipmentService;
-
     @Autowired
     private TaxService taxService;
-
-    @Autowired
-    private AddressCountryService addressCountryService;
-
     @Autowired
     private StockLocationService stockLocationService;
 
@@ -1476,46 +1466,25 @@ public class OrderShipController extends BaseController {
             transitWarehouseInvoiceVO.setChinaInvoice(invoiceVO);
             //获取shipTo地址信息
             BigDecimal VAT = new BigDecimal(0);
-            BigDecimal grandTotal = new BigDecimal(0);
             BigDecimal allTotal = new BigDecimal(0);
             for(Map<String, Object> order : orderList){
 
-
-                /*String country = order.get("user_rec_country") != null ? order.get("user_rec_country").toString() : "";
-                recipientVO.setCountry(country);
-                String personName = order.get("user_rec_name") != null ? order.get("user_rec_name").toString() : "";
-                recipientVO.setPersonName(personName);
-                String province = order.get("user_rec_province") != null ? order.get("user_rec_province").toString() : "";
-                recipientVO.setProvince(province);
-                String city = order.get("user_rec_city") != null ? order.get("user_rec_city").toString() : "";
-                recipientVO.setCity(city);
-                String addr = order.get("user_rec_addr") != null ? order.get("user_rec_addr").toString() : "";
-                recipientVO.setStreetLines(addr);
-                String mobile = order.get("user_rec_mobile") != null ? order.get("user_rec_mobile").toString() : "";
-                recipientVO.setPhoneNumber(mobile);
-                String postalCode = order.get("user_rec_code") != null ? order.get("user_rec_code").toString() : "";
-                recipientVO.setPostalCode(postalCode);
-                String area = order.get("user_rec_area") != null ? order.get("user_rec_area").toString() : "";
-                recipientVO.setArea(area);*/
-
-
-                Object countryName = order.get("countryName").equals("中国大陆") ? "中国" : order.get("countryName");
-                AddressCountry addressCountry = addressCountryService.getAddressCountryByName(countryName.toString());
-                Tax tax = taxService.getTaxByAddressCountryId(addressCountry.getAddressCountryId());
-                BigDecimal taxRate = tax.getTaxRate() == null ? new BigDecimal("0") : tax.getTaxRate();
+                String orderLineNum = order.get("order_line_num").toString();
+                BigDecimal taxRate = taxService.calculateTax(orderLineNum);
                 BigDecimal total = new BigDecimal(Double.parseDouble(order.get("in_price").toString()) * Double.parseDouble(order.get("amount").toString())).setScale(2, BigDecimal.ROUND_HALF_UP);
                 VAT = VAT.add(total.multiply(taxRate).setScale(2, BigDecimal.ROUND_HALF_UP));
                 allTotal = allTotal.add(total);
 
                 String inPrice = order.get("in_price")!=null?order.get("in_price").toString():"";
                 String retailPrice = order.get("price")!=null?order.get("price").toString():"";
-                BigDecimal discount = (new BigDecimal(1)).subtract((new BigDecimal(inPrice)).multiply(new BigDecimal("1.22")).divide(new BigDecimal(retailPrice), 2, RoundingMode.HALF_UP));
+                double discountTax = getDiscountTax(orderLineNum);
+                BigDecimal discount = (new BigDecimal(1)).subtract((new BigDecimal(inPrice)).multiply(new BigDecimal(discountTax)).divide(new BigDecimal(retailPrice), 2, RoundingMode.HALF_UP));
                 order.put("discount", discount.multiply(new BigDecimal("100")).setScale(0, BigDecimal.ROUND_HALF_UP).toString() + "%");
                 order.put("in_price", (new BigDecimal(inPrice).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
                 order.put("price", (new BigDecimal(retailPrice).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
 
             }
-            grandTotal = (VAT.add(allTotal)).setScale(2,BigDecimal.ROUND_HALF_UP);
+            BigDecimal grandTotal = (VAT.add(allTotal)).setScale(2,BigDecimal.ROUND_HALF_UP);
             invoiceVO.setList(orderList);
             invoiceVO.setRecipientVO(recipientVO);
             invoiceVO.setShipperVO(shipperVO);
