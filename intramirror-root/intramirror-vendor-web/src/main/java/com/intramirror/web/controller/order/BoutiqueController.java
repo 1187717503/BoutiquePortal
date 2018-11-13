@@ -1,12 +1,17 @@
 package com.intramirror.web.controller.order;
 
+import com.alibaba.fastjson.JSONObject;
 import com.intramirror.common.Helper;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.main.api.model.StockLocation;
 import com.intramirror.main.api.service.StockLocationService;
 import com.intramirror.order.api.model.LogisticsProduct;
+import com.intramirror.order.api.model.ShipEmailLog;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderService;
+import com.intramirror.order.api.vo.MailModelVO;
+import com.intramirror.order.core.utils.MailSendManageService;
+import com.intramirror.order.core.utils.MailSendUtil;
 import com.intramirror.web.service.LogisticsProductService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -14,10 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by caowei on 2018/11/9.
@@ -35,6 +37,8 @@ public class BoutiqueController {
     private ILogisticsProductService iLogisticsProductService;
     @Autowired
     private StockLocationService stockLocationService;
+    @Autowired
+    private MailSendManageService mailSendManageService;
 
     @RequestMapping(value = "/confirmOrder", method = RequestMethod.POST)
     @ResponseBody
@@ -163,6 +167,33 @@ public class BoutiqueController {
             e.printStackTrace();
             result.setMsg("Query StockLocation list fail,Check parameters, please ");
             return result;
+        }
+        return result;
+    }
+
+    @RequestMapping(value = "/shipEmail", method = RequestMethod.GET)
+    @ResponseBody
+    public ResultMessage shipEmail(@RequestParam String shipmentNo) {
+        ResultMessage result = new ResultMessage();
+        result.errorStatus();
+
+        try{
+            ShipEmailLog emailLog = mailSendManageService.getEmailLog(shipmentNo);
+            if (emailLog != null){
+                String emailBody = emailLog.getEmailBody();
+                MailModelVO modelVO = JSONObject.parseObject(emailBody, MailModelVO.class);
+                MailSendUtil.sendMail(modelVO);
+
+                //更新log
+                emailLog.setIsDeleted(1);
+                emailLog.setUpdateTime(new Date());
+                mailSendManageService.updateEmailLog(emailLog);
+                result.successStatus();
+            }else {
+                result.setMsg("emailLog为空");
+            }
+        }catch (Exception e){
+            result.setMsg("shipmentNo："+shipmentNo +"，重推失败");
         }
         return result;
     }

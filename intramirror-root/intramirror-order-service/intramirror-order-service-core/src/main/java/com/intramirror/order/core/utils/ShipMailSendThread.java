@@ -1,6 +1,6 @@
 package com.intramirror.order.core.utils;
 
-import com.google.gson.Gson;
+import com.alibaba.fastjson.JSONObject;
 import com.intramirror.common.help.StringUtils;
 import com.intramirror.order.api.service.IVendorShipmentService;
 import com.intramirror.order.api.service.IViewOrderLinesService;
@@ -123,13 +123,14 @@ public class ShipMailSendThread implements Runnable {
 
         boolean flag = true; //是否删除附件文件
         try {
-            logger.info("ShipMailSendThread 开始发送邮件 content={}", new Gson().toJson(mailContent));
+            logger.info("ShipMailSendThread 开始发送邮件 content={}", JSONObject.toJSONString(mailContent));
             MailSendUtil.sendMail(mailContent);
             logger.info("ShipMailSendThread 邮件发送完成，shipmentNo:{}",shipment.getShipmentNo());
         } catch (Exception e) {
             flag = false;
             e.printStackTrace();
-            logger.error("ShipMailSendThread 邮件发送失败，shipmentNo:{},errorMsg:{}",shipment.getShipmentNo(), e);
+            logger.error("ShipMailSendThread 邮件发送失败，shipmentNo:{},errorMsg:{}",shipment.getShipmentNo(), e.getMessage());
+            mailSendManageService.insertShipEmailLog(shipment.getShipmentNo(), JSONObject.toJSONString(mailContent),e.getMessage());
         } finally {
             if (flag){
                 //删除附件文件
