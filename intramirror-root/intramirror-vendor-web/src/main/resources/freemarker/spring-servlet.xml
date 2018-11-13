@@ -46,6 +46,5 @@
 	</bean>
 
 
-
 	<bean class="com.intramirror.web.common.cache.CategoryCache" init-method="init"/>
 </beans>

@@ -1357,6 +1357,196 @@ public class OrderShipController extends BaseController {
         return discountTax;
     }
 
+    @RequestMapping(value = "/printComoInvoice", method = RequestMethod.POST)
+    @ResponseBody
+    public ResultMessage printComoInvoice(@RequestBody Map<String,Object> map, HttpServletRequest httpRequest,HttpServletResponse response) {
+        Map<String, Object> resultMap = new HashMap<>();
+        ResultMessage result = new ResultMessage();
+        result.errorStatus();
+
+
+        if (map == null || map.size() == 0 || map.get("status") == null
+                || map.get("shipment_id") == null) {
+            result.setMsg("Parameter cannot be empty");
+            return result;
+        }
+
+        User user = this.getUser(httpRequest);
+        if (user == null) {
+            result.setMsg("Please log in again");
+            return result;
+        }
+
+        Vendor vendor = null;
+        try {
+            vendor = vendorService.getVendorByUserId(user.getUserId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (vendor == null) {
+            result.setMsg("Please log in again");
+            return result;
+        }
+        long shipment_id = Long.parseLong(map.get("shipment_id").toString());
+        //根据shipmentId 获取shipment 相关信息及物流第一段类型
+        logger.info("打印Invoice----根据shipmentId 获取shipment 相关信息及物流第一段类型,开始获取");
+        Map<String, Object> getShipment = new HashMap<>();
+        getShipment.put("shipmentId", shipment_id);
+        Map<String, Object> shipmentMap = iShipmentService.getShipmentTypeById(getShipment);
+        if (shipmentMap == null || shipmentMap.size() == 0) {
+            logger.info("获取失败");
+            result.setMsg("Query Shipment fail,Check parameters, please ");
+            return result;
+        }
+
+        Long vendorId = Long.valueOf(shipmentMap.get("vendor_id").toString());
+
+        vendor = getVendor(vendor, vendorId);
+
+        TransitWarehouseInvoiceVO transitWarehouseInvoiceVO = new TransitWarehouseInvoiceVO();
+
+        //获取Ship From信息
+        StockLocation location = stockLocationService.getShipFromLocation(shipment_id);
+        ShipperVO shipperVO = new ShipperVO();
+        shipperVO.setCompanyName(location.getContactCompanyName());
+        shipperVO.setPersonName(location.getContactPersonName());
+        shipperVO.setPhoneNumber(location.getContactPhoneNumber());
+        shipperVO.setStreetLines(location.getAddressStreetlines());
+        shipperVO.setStreetLines2(location.getAddressStreetlines2());
+        shipperVO.setStreetLines3(location.getAddressStreetlines3());
+        shipperVO.setCity(location.getAddressCity());
+        shipperVO.setCountry("Italy");
+        ShipperVO invoiceForm = new ShipperVO();
+        invoiceForm.setCompanyName(vendor.getCompanyName());
+        invoiceForm.setPersonName(vendor.getRegisteredPerson());
+        invoiceForm.setStreetLines(vendor.getBusinessLicenseLocation());
+        invoiceForm.setCountry("Italy");
+
+
+        //获取Invoice 信息
+        logger.info("打印Invoice----获取Invoice信息");
+        Map<String, Object> invoiceMap = new HashMap<>();
+        invoiceMap.put("type", 1);
+        invoiceMap.put("shipmentId", shipment_id);
+        Invoice invoice = invoiceService.getInvoiceByMap(invoiceMap);
+        if (invoice!=null){
+            //获取Invoice To信息
+            logger.info("打印Invoice----获取Invoice To信息");
+            Shop shop = shopService.selectByPrimaryKey(65l);
+            resultMap.put("InvoiceTo", shop.getBusinessLicenseLocation());
+            resultMap.put("InvoiceName", shop.getShopName());
+            resultMap.put("contactPersonName", shop.getContactPersonName());
+        }
+
+        map.put("vendorIds", Arrays.asList(vendorId));
+
+        resultMap.put("shipmentNo",shipmentMap.get("shipment_no"));
+        logger.info("打印Invoice----获取shipment相关信息及物流第一段类型成功");
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
+        resultMap.put("InvoiceNumber", invoice.getInvoiceNum());
+        if (invoice.getInvoiceDate() != null) {
+            String invoiceDate = sdf.format(invoice.getInvoiceDate());
+            try {
+                resultMap.put("InvoiceDate", sdf2.format(sdf.parse(invoiceDate)));
+            } catch (ParseException e) {
+                logger.error("Query container list fail invoiceDate="+invoiceDate, e);
+                result.setMsg("Query container list fail,Check parameters, please ");
+                return result;
+            }
+        } else {
+            result.setMsg("invoiceDate is null ");
+            return result;
+        }
+        resultMap.put("VATNumber", invoice.getVatNum());
+
+        //获取发往中国大陆，香港，澳门的订单列表
+        RecipientVO recipientVO = new RecipientVO();
+        recipientVO.setCountry("Via Manzoni 19 Montano Lucino， 22070， Como，Italy");
+        Set<Long> shipmentIds =  new HashSet<>();
+        shipmentIds.add(shipment_id);
+        Map<String, Object> conditionMap = new HashMap<>();
+        conditionMap.put("status", map.get("status"));
+        conditionMap.put("vendorIds", Arrays.asList(vendorId));
+        conditionMap.put("shipmentIds", shipmentIds);
+        List<Map<String, Object>> orderList = orderService.getOrderListByShipmentId(conditionMap);
+        if( orderList != null && orderList.size() > 0 ){
+            InvoiceVO invoiceVO = new InvoiceVO();
+            transitWarehouseInvoiceVO.setChinaInvoice(invoiceVO);
+            //获取shipTo地址信息
+            BigDecimal VAT = new BigDecimal(0);
+            BigDecimal grandTotal = new BigDecimal(0);
+            BigDecimal allTotal = new BigDecimal(0);
+            for(Map<String, Object> order : orderList){
+
+
+                /*String country = order.get("user_rec_country") != null ? order.get("user_rec_country").toString() : "";
+                recipientVO.setCountry(country);
+                String personName = order.get("user_rec_name") != null ? order.get("user_rec_name").toString() : "";
+                recipientVO.setPersonName(personName);
+                String province = order.get("user_rec_province") != null ? order.get("user_rec_province").toString() : "";
+                recipientVO.setProvince(province);
+                String city = order.get("user_rec_city") != null ? order.get("user_rec_city").toString() : "";
+                recipientVO.setCity(city);
+                String addr = order.get("user_rec_addr") != null ? order.get("user_rec_addr").toString() : "";
+                recipientVO.setStreetLines(addr);
+                String mobile = order.get("user_rec_mobile") != null ? order.get("user_rec_mobile").toString() : "";
+                recipientVO.setPhoneNumber(mobile);
+                String postalCode = order.get("user_rec_code") != null ? order.get("user_rec_code").toString() : "";
+                recipientVO.setPostalCode(postalCode);
+                String area = order.get("user_rec_area") != null ? order.get("user_rec_area").toString() : "";
+                recipientVO.setArea(area);*/
+
+
+                Object countryName = order.get("countryName").equals("中国大陆") ? "中国" : order.get("countryName");
+                AddressCountry addressCountry = addressCountryService.getAddressCountryByName(countryName.toString());
+                Tax tax = taxService.getTaxByAddressCountryId(addressCountry.getAddressCountryId());
+                BigDecimal taxRate = tax.getTaxRate() == null ? new BigDecimal("0") : tax.getTaxRate();
+                BigDecimal total = new BigDecimal(Double.parseDouble(order.get("in_price").toString()) * Double.parseDouble(order.get("amount").toString())).setScale(2, BigDecimal.ROUND_HALF_UP);
+                VAT = VAT.add(total.multiply(taxRate).setScale(2, BigDecimal.ROUND_HALF_UP));
+                allTotal = allTotal.add(total);
+
+                String inPrice = order.get("in_price")!=null?order.get("in_price").toString():"";
+                String retailPrice = order.get("price")!=null?order.get("price").toString():"";
+                BigDecimal discount = (new BigDecimal(1)).subtract((new BigDecimal(inPrice)).multiply(new BigDecimal("1.22")).divide(new BigDecimal(retailPrice), 2, RoundingMode.HALF_UP));
+                order.put("discount", discount.multiply(new BigDecimal("100")).setScale(0, BigDecimal.ROUND_HALF_UP).toString() + "%");
+                order.put("in_price", (new BigDecimal(inPrice).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+                order.put("price", (new BigDecimal(retailPrice).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+
+            }
+            grandTotal = (VAT.add(allTotal)).setScale(2,BigDecimal.ROUND_HALF_UP);
+            invoiceVO.setList(orderList);
+            invoiceVO.setRecipientVO(recipientVO);
+            invoiceVO.setShipperVO(shipperVO);
+            invoiceVO.setInvoiceFromVO(invoiceForm);
+            invoiceVO.setInvoiceTo((String) resultMap.get("InvoiceTo"));
+            invoiceVO.setInvoiceName((String) resultMap.get("InvoiceName"));
+            invoiceVO.setInvoicePersonName((String)resultMap.get("contactPersonName"));
+            invoiceVO.setVatNum((String) resultMap.get("VATNumber"));
+            invoiceVO.setInvoiceDate((String) resultMap.get("InvoiceDate"));
+            invoiceVO.setInvoiceNum((String) resultMap.get("InvoiceNumber"));
+            invoiceVO.setShipmentNo((String) resultMap.get("shipmentNo"));
+            invoiceVO.setGrandTotal(grandTotal.toString());
+            invoiceVO.setAllTotal(allTotal.toString());
+            invoiceVO.setVat(VAT.toString());
+            invoiceVO.setAllQty(String.valueOf(orderList.size()));
+            invoiceVO.setRemark("Shipment exempt from VAT - IVA non imponibile Art. 8 1°C L/A DPR 633/72");
+        }
+
+        try {
+            printExcelShipmentInfo(response, transitWarehouseInvoiceVO);
+            result.successStatus();
+            result.setData(transitWarehouseInvoiceVO);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setMsg("Query container list fail,Check parameters, please ");
+            return result;
+        }
+
+        return result;
+    }
+
     private Vendor getVendor(Vendor vendor, Long vendorId) {
         if (!vendorId.equals(vendor.getVendorId())){
             //取子买手店信息

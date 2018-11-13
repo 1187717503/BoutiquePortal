@@ -66,6 +66,19 @@ public class Shipment {
 
 	private Integer printStep;
 
+	/**
+	 * 发货类型
+	 */
+	private Integer shippingMethod;
+
+	public Integer getShippingMethod() {
+		return shippingMethod;
+	}
+
+	public void setShippingMethod(Integer shippingMethod) {
+		this.shippingMethod = shippingMethod;
+	}
+
 	public Long getGeographyId() {
 		return geographyId;
 	}

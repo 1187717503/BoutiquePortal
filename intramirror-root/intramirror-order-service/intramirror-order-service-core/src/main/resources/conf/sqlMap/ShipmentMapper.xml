@@ -16,6 +16,7 @@
 	    <result column="to_type" property="toType" jdbcType="INTEGER" />
 	    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
 	    <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+		<result column="shipping_method" property="shippingMethod" jdbcType="INTEGER" />
   	</resultMap>
 
 	<resultMap id="BaseResultMap1" type="com.intramirror.order.api.vo.LogisticsProductVO">
@@ -34,11 +35,11 @@ VALUES( #{shipToGeography,jdbcType=VARCHAR},#{consignee,jdbcType=VARCHAR},#{ship
 	</insert>
 	<insert id="saveShipmentByOrderId" parameterType="com.intramirror.order.api.model.Shipment" >
     	INSERT INTO shipment(ship_to_geography,`status`,created_at,updated_at,shipment_no,vendor_id,shipment_category,ship_from_location_id
-    	,geography_id,from_type,from_ref_id,to_type,to_ref_id)
-VALUES(#{shipToGeography,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},
-#{createdAt,jdbcType=TIMESTAMP},#{updatedAt,jdbcType=TIMESTAMP},
-#{shipmentNo,jdbcType=VARCHAR},#{vendorId,jdbcType=BIGINT},#{shipmentCategory,jdbcType=BIGINT},#{shipFromLocationId}
-,#{geographyId},#{fromType},#{fromRefId},#{toType},#{toRefId});
+    	,geography_id,from_type,from_ref_id,to_type,to_ref_id,shipping_method)
+		VALUES(#{shipToGeography,jdbcType=VARCHAR},#{status,jdbcType=BIGINT},
+		#{createdAt,jdbcType=TIMESTAMP},#{updatedAt,jdbcType=TIMESTAMP},
+		#{shipmentNo,jdbcType=VARCHAR},#{vendorId,jdbcType=BIGINT},#{shipmentCategory,jdbcType=BIGINT},#{shipFromLocationId}
+		,#{geographyId},#{fromType},#{fromRefId},#{toType},#{toRefId},#{shippingMethod});
   	</insert>
   
   <select id="selectShipmentByOrder" resultType="java.util.HashMap"  parameterType="java.util.Map">

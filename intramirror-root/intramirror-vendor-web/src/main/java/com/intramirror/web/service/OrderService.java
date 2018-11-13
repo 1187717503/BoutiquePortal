@@ -21,10 +21,6 @@ import com.intramirror.order.api.service.ILogisticProductShipmentService;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.service.IShipmentService;
-import com.intramirror.order.api.service.ISubShipmentService;
-import com.intramirror.product.api.service.ISkuStoreService;
-import com.intramirror.product.api.service.ProductPropertyService;
-import com.intramirror.user.api.service.VendorService;
 
 @Service
 public class OrderService {
@@ -101,10 +97,11 @@ public class OrderService {
             vendorId = Long.parseLong(order.get("vendor_id").toString());
         }
         //封装参数
-		Map<String, Object> conditionMap = new HashMap<String, Object>();
-		conditionMap.put("container_id", Long.parseLong(map.get("containerId").toString()));
+		Map<String, Object> conditionMap = new HashMap<>();
+		long containerId = Long.parseLong(map.get("containerId").toString());
+		conditionMap.put("container_id", containerId);
 		conditionMap.put("status", OrderStatusType.READYTOSHIP);
-		currentOrder.put("containerId", Long.parseLong(map.get("containerId").toString()));
+		currentOrder.put("containerId", containerId);
 		currentOrder.put("vendorId",vendorId);
 		
 		//检查判断该箱子是否存在订单
@@ -113,8 +110,8 @@ public class OrderService {
 		String shipment_id = map.get("shipment_id").toString();
 		
 		//获取箱子信息
-		Map<String, Object> selectContainer = new HashMap<String, Object>(); 
-		selectContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
+		Map<String, Object> selectContainer = new HashMap<>();
+		selectContainer.put("container_id", containerId);
 		Container container =  containerService.selectContainerById(selectContainer);
 		
 		//如果为空箱子，并且已经选择过shipMent 则直接关联，并加入箱子
@@ -200,7 +197,7 @@ public class OrderService {
 			//如果为空  新建Shipment
 			if(shipmentMapList == null || shipmentMapList.size() == 0  ){
 				logger.info("order packingOrder shipmentMapList is null ");
-				Map<String, Object> saveShipmentParam = new HashMap<String, Object>();
+				Map<String, Object> saveShipmentParam = new HashMap<>();
 				saveShipmentParam.put("orderNumber", orderLineNum);
 				saveShipmentParam.put("shipment_id", 0);
 
@@ -216,11 +213,12 @@ public class OrderService {
 				}
 				//接口返回shipmentId
 				logger.info("order packingOrder 添加sub_shipment物流信息   调用接口   iShipmentService.saveShipmentByOrderId 入参:"+new Gson().toJson(orderResult));
+				orderResult.put("pack_english_name",container.getShipToGeography());
 				Shipment shipment = iShipmentService.saveShipmentByOrderId(orderResult);
 				if (shipment != null && shipment.getShipmentId() != null){
 					Long shipmentId = shipment.getShipmentId();
 					//箱子关联Shipment
-					Map<String, Object> updateContainer = new HashMap<String, Object>(); 
+					Map<String, Object> updateContainer = new HashMap<>();
 					updateContainer.put("shipment_id", shipmentId);
 					updateContainer.put("container_id", Long.parseLong(map.get("containerId").toString()));
 					updateContainer.put("ship_from_location_id",shipment.getShipFromLocationId());
@@ -229,7 +227,7 @@ public class OrderService {
 					
 					//关联成功，则往箱子里存入订单
 					if(updateContainerRow > 0 ){
-						Map<String, Object> shipMentMap = new HashMap<String, Object>();
+						Map<String, Object> shipMentMap = new HashMap<>();
 						//根据订单大区创建的Shipment   所以只需要用订单的大区即可(只有箱子为空时)
 						//shipMentMap.put("ship_to_geography", currentOrder.get("pack_english_name").toString());
 						shipMentMap.put("ship_to_geography", container.getShipToGeography());
@@ -354,7 +352,11 @@ public class OrderService {
 		boolean flag = true;
 		if (container != null){
 			String packEnglishName = currentOrder.get("pack_english_name").toString();
-			String shipToGeography = "";
+			String packGroup = currentOrder.get("pack_group").toString();
+			String addressCountryId = currentOrder.get("country_id")!=null?
+					currentOrder.get("country_id").toString():"";
+            String shippingMethod = currentOrder.get("shipping_method") != null ? currentOrder.get("shipping_method").toString() : "0";
+            String shipToGeography = "";
 			if(container instanceof Container){
 				shipToGeography = ((Container)container).getShipToGeography();
 			}else if (container instanceof Map){
@@ -363,11 +365,14 @@ public class OrderService {
 			if ("Transit Warehouse".equals(shipToGeography)){
 				//如果是发往质检仓就不需要验证
 				flag = false;
-			}else if("1".equals(currentOrder.get("pack_group").toString())){
+			}else if ("COMO".equals(shipToGeography)){
+				//如果是走荷兰邮政，订单必须是到中国大陆的，而且是选定走COMO运输的
+				if ("2".equals(addressCountryId)&&"2".equals(shippingMethod)){
+					flag = false;
+				}
+			}else if("1".equals(packGroup)){
 				//如果是去往China excl. Taiwan
-				if("China Mainland".equals(shipToGeography)
-						||"HongKong".equals(shipToGeography)
-						||"China excl. Taiwan".equals(shipToGeography)){
+				if("China excl. Taiwan".equals(shipToGeography)){
 					flag = false;
 				}
 			}else {
@@ -375,8 +380,15 @@ public class OrderService {
 					flag = false;
 				}
 			}
-		}
 
+			//如果是走荷兰邮政的，不能直发其他大区
+            if ("2".equals(shippingMethod)){
+			    if (!"COMO".equals(shipToGeography)){
+			        //如果不是发往COMO就报错
+                    flag = true;
+                }
+            }
+		}
 		return flag;
 	}
 
@@ -405,7 +417,7 @@ public class OrderService {
 		//校验该订单跟箱子所属的Shipment的目的地是否一致,一致则加入,是否分段运输，发货员自行判断
 		logger.info("order updateLogisticsProduct 装箱校验  1.大区是否一致 2.是否为空箱子 3.shipment_type");
 		//如果大区不一致，直接返回
-		if(checkShipToGeography(orderMap,shipMentMap)){
+		if(ischeck && checkShipToGeography(orderMap,shipMentMap)){
 			//result.setMsg("This Order's consignee address is different than carton's. ");
 			//info.put("code", StatusType.ORDER_ERROR_CODE);
 			//result.setInfoMap(info);
