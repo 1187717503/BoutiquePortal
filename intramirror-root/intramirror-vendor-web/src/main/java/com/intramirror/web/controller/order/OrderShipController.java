@@ -1435,6 +1435,8 @@ public class OrderShipController extends BaseController {
         resultMap.put("VATNumber", invoice.getVatNum());
 
         //获取发往中国大陆，香港，澳门的订单列表
+        RecipientVO recipientVO = new RecipientVO();
+        recipientVO.setCountry("Via Manzoni 19 Montano Lucino， 22070， Como，Italy");
         Set<Long> shipmentIds =  new HashSet<>();
         shipmentIds.add(shipment_id);
         Map<String, Object> conditionMap = new HashMap<>();
@@ -1443,16 +1445,16 @@ public class OrderShipController extends BaseController {
         conditionMap.put("shipmentIds", shipmentIds);
         List<Map<String, Object>> orderList = orderService.getOrderListByShipmentId(conditionMap);
         if( orderList != null && orderList.size() > 0 ){
-            List<InvoiceVO> invoiceList = new ArrayList<>();
-            transitWarehouseInvoiceVO.setComoInvoice(invoiceList);
+            InvoiceVO invoiceVO = new InvoiceVO();
+            transitWarehouseInvoiceVO.setChinaInvoice(invoiceVO);
             //获取shipTo地址信息
-            BigDecimal VAT = new BigDecimal("0");
+            BigDecimal VAT = new BigDecimal(0);
+            BigDecimal grandTotal = new BigDecimal(0);
+            BigDecimal allTotal = new BigDecimal(0);
             for(Map<String, Object> order : orderList){
-                RecipientVO recipientVO = new RecipientVO();
-                InvoiceVO invoiceVO = new InvoiceVO();
-                //欧盟的不显示remake
-                invoiceVO.setRemark(null);
-                String country = order.get("user_rec_country") != null ? order.get("user_rec_country").toString() : "";
+
+
+                /*String country = order.get("user_rec_country") != null ? order.get("user_rec_country").toString() : "";
                 recipientVO.setCountry(country);
                 String personName = order.get("user_rec_name") != null ? order.get("user_rec_name").toString() : "";
                 recipientVO.setPersonName(personName);
@@ -1467,7 +1469,8 @@ public class OrderShipController extends BaseController {
                 String postalCode = order.get("user_rec_code") != null ? order.get("user_rec_code").toString() : "";
                 recipientVO.setPostalCode(postalCode);
                 String area = order.get("user_rec_area") != null ? order.get("user_rec_area").toString() : "";
-                recipientVO.setArea(area);
+                recipientVO.setArea(area);*/
+
 
                 Object countryName = order.get("countryName").equals("中国大陆") ? "中国" : order.get("countryName");
                 AddressCountry addressCountry = addressCountryService.getAddressCountryByName(countryName.toString());
@@ -1475,6 +1478,7 @@ public class OrderShipController extends BaseController {
                 BigDecimal taxRate = tax.getTaxRate() == null ? new BigDecimal("0") : tax.getTaxRate();
                 BigDecimal total = new BigDecimal(Double.parseDouble(order.get("in_price").toString()) * Double.parseDouble(order.get("amount").toString())).setScale(2, BigDecimal.ROUND_HALF_UP);
                 VAT = VAT.add(total.multiply(taxRate).setScale(2, BigDecimal.ROUND_HALF_UP));
+                allTotal = allTotal.add(total);
 
                 String inPrice = order.get("in_price")!=null?order.get("in_price").toString():"";
                 String retailPrice = order.get("price")!=null?order.get("price").toString():"";
@@ -1483,29 +1487,24 @@ public class OrderShipController extends BaseController {
                 order.put("in_price", (new BigDecimal(inPrice).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
                 order.put("price", (new BigDecimal(retailPrice).setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
 
-                BigDecimal grandTotal = (VAT.add(total)).setScale(2,BigDecimal.ROUND_HALF_UP);
-
-                List<Map<String, Object>> list = new ArrayList<>();
-                list.add(order);
-
-                invoiceVO.setList(list);
-                invoiceVO.setRecipientVO(recipientVO);
-                invoiceVO.setShipperVO(shipperVO);
-                invoiceVO.setInvoiceFromVO(invoiceForm);
-                invoiceVO.setInvoiceTo((String) resultMap.get("InvoiceTo"));
-                invoiceVO.setInvoiceName((String) resultMap.get("InvoiceName"));
-                invoiceVO.setInvoicePersonName((String)resultMap.get("contactPersonName"));
-                invoiceVO.setVatNum((String) resultMap.get("VATNumber"));
-                invoiceVO.setInvoiceDate((String) resultMap.get("InvoiceDate"));
-                invoiceVO.setInvoiceNum((String) resultMap.get("InvoiceNumber"));
-                invoiceVO.setShipmentNo((String) resultMap.get("shipmentNo"));
-                invoiceVO.setGrandTotal(grandTotal.toString());
-                invoiceVO.setAllTotal(total.toString());
-                invoiceVO.setVat(VAT.toString());
-                invoiceVO.setAllQty(String.valueOf(list.size()));
-                invoiceVO.setRemark("Shipment exempt from VAT - IVA non imponibile Art. 8 1°C L/A DPR 633/72");
-                invoiceList.add(invoiceVO);
             }
+            grandTotal = (VAT.add(allTotal)).setScale(2,BigDecimal.ROUND_HALF_UP);
+            invoiceVO.setList(orderList);
+            invoiceVO.setRecipientVO(recipientVO);
+            invoiceVO.setShipperVO(shipperVO);
+            invoiceVO.setInvoiceFromVO(invoiceForm);
+            invoiceVO.setInvoiceTo((String) resultMap.get("InvoiceTo"));
+            invoiceVO.setInvoiceName((String) resultMap.get("InvoiceName"));
+            invoiceVO.setInvoicePersonName((String)resultMap.get("contactPersonName"));
+            invoiceVO.setVatNum((String) resultMap.get("VATNumber"));
+            invoiceVO.setInvoiceDate((String) resultMap.get("InvoiceDate"));
+            invoiceVO.setInvoiceNum((String) resultMap.get("InvoiceNumber"));
+            invoiceVO.setShipmentNo((String) resultMap.get("shipmentNo"));
+            invoiceVO.setGrandTotal(grandTotal.toString());
+            invoiceVO.setAllTotal(allTotal.toString());
+            invoiceVO.setVat(VAT.toString());
+            invoiceVO.setAllQty(String.valueOf(orderList.size()));
+            invoiceVO.setRemark("Shipment exempt from VAT - IVA non imponibile Art. 8 1°C L/A DPR 633/72");
         }
 
         try {
