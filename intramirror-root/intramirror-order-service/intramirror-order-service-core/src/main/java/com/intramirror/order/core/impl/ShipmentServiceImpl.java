@@ -744,6 +744,20 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		shipmentMapper.updateShipmentAwbAdvance(awbAdvanceMap);
 	}
 
+	@Override
+	public Map<String,Object> getShipmentByOrderLineNum(String orderLineNum) {
+		Map<String,Object> map = new HashMap<>();
+		Shipment shipment = shipmentMapper.getShipmentByOrderLineNum(orderLineNum);
+		if (shipment != null){
+			map.put("shipment",shipment);
+			//查询此shipment下所有订单
+			List<String> nums = shipmentMapper.getOrderLineNumsByShipment(shipment.getShipmentId());
+			map.put("orderLineNum",nums);
+			return map;
+		}
+		return null;
+	}
+
 	private String checkAWB(Long shipmentId) {
 		Map<String,Object> params = new HashMap<>();
 		params.put("shipmentId",shipmentId);
@@ -877,8 +891,11 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	}
 
 	@Override
-	public void shipmentToShip(Long shipmentId) {
-		checkAWB(shipmentId);
+	public void shipmentToShip(Shipment shipment) {
+		Long shipmentId = shipment.getShipmentId();
+		if (!"COMO".equals(shipment.getShipToGeography())){
+			checkAWB(shipmentId);
+		}
 
 		Map<String,Object> map = new HashMap<>();
 		map.put("shipmentId",shipmentId);

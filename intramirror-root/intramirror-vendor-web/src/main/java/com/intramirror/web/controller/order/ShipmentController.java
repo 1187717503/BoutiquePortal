@@ -405,6 +405,7 @@ public class ShipmentController extends BaseController{
 	public ResultMessage shipped(@RequestBody ShippedParam param) {
 		logger.info("shipped parameter : " + new Gson().toJson(param));
 		ResultMessage message = ResultMessage.getInstance();
+		message.errorStatus();
 		List<String> awbNos = param.getAwbNos();
 		if (null == awbNos || 0 == awbNos.size()){
 			logger.info("awbNos cannot be null");
@@ -415,40 +416,7 @@ public class ShipmentController extends BaseController{
 		if (shipmentList!=null&&shipmentList.size()>0){
 			for (Shipment shipment:shipmentList){
 				if (3!=shipment.getStatus()){
-					logger.info("shipmentNo:{}，自动ship",shipment.getShipmentNo());
-					List<String> list = new ArrayList<>();
-					iShipmentService.shipmentToShip(shipment.getShipmentId());
-					//修改carton状态
-					Map<String,Object> map = new HashMap<>();
-					map.put("shipmentId",shipment.getShipmentId());
-					map.put("status",3);
-					updateContainerStatus(map);
-					//shipped操作发送消息用来生成资金报表
-					List<LogisticsProduct> logisticsProducts = iShipmentService.getLogisticsProductByShipment(shipment.getShipmentId());
-					if (logisticsProducts!=null && logisticsProducts.size()>0){
-						for (LogisticsProduct logisticsProduct:logisticsProducts){
-							kafkaUtilService.saveOrderFinance(logisticsProduct);
-							list.add(logisticsProduct.getOrder_line_num());
-						}
-					}
-
-					//调用微店接口ship
-					iShipmentService.styleroomShip(list);
-
-					// 起线程发邮件
-					ShipmentSendMailVO vo = new ShipmentSendMailVO();
-					vo.setShipmentNo(shipment.getShipmentNo());
-					vo.setShipmentId(shipment.getShipmentId());
-					if (shipment.getToType() == 2) {
-						vo.setDestination("Transit Warehouse");
-					} else if("China Mainland".equals(shipment.getShipToGeography())
-                            ||"HongKong".equals(shipment.getShipToGeography())
-                            ||"China excl. Taiwan".equals(shipment.getShipToGeography())) {
-                        vo.setDestination("China");
-                    }
-					iShipmentService.sendMailForShipped(vo);
-					message.successStatus();
-
+					shippedOrder(message, shipment);
 				}
 			}
 		}
@@ -457,6 +425,62 @@ public class ShipmentController extends BaseController{
 		}
 		return message;
 	}
+
+	@RequestMapping(value="/shipToComo", method=RequestMethod.POST)
+	@ResponseBody
+	@Transactional
+	public ResultMessage shipToComo(@RequestParam String orderLineNum) {
+		logger.info("shipped orderLineNum : {}", orderLineNum);
+		ResultMessage message = ResultMessage.getInstance();
+		message.errorStatus();
+
+		Map<String, Object> shipmentMap = iShipmentService.getShipmentByOrderLineNum(orderLineNum);
+		if (shipmentMap != null){
+			Shipment shipment = (Shipment)shipmentMap.get("shipment");
+			if (3!=shipment.getStatus()){
+				shippedOrder(message, shipment);
+				List<String> nums = (List<String>)shipmentMap.get("orderLineNum");
+				message.setData(nums);
+			}
+		}
+		return message;
+	}
+
+	private void shippedOrder(ResultMessage message, Shipment shipment) {
+		logger.info("shipmentNo:{}，自动ship",shipment.getShipmentNo());
+		List<String> list = new ArrayList<>();
+		iShipmentService.shipmentToShip(shipment);
+		//修改carton状态
+		Map<String,Object> map = new HashMap<>();
+		map.put("shipmentId",shipment.getShipmentId());
+		map.put("status",3);
+		updateContainerStatus(map);
+		//shipped操作发送消息用来生成资金报表
+		List<LogisticsProduct> logisticsProducts = iShipmentService.getLogisticsProductByShipment(shipment.getShipmentId());
+		if (logisticsProducts!=null && logisticsProducts.size()>0){
+            for (LogisticsProduct logisticsProduct:logisticsProducts){
+                kafkaUtilService.saveOrderFinance(logisticsProduct);
+                list.add(logisticsProduct.getOrder_line_num());
+            }
+        }
+
+		//调用微店接口ship
+		iShipmentService.styleroomShip(list);
+
+		// 起线程发邮件
+		ShipmentSendMailVO vo = new ShipmentSendMailVO();
+		vo.setShipmentNo(shipment.getShipmentNo());
+		vo.setShipmentId(shipment.getShipmentId());
+		if (shipment.getToType() == 2) {
+            vo.setDestination("Transit Warehouse");
+        } else if("China excl. Taiwan".equals(shipment.getShipToGeography())) {
+			vo.setDestination("China");
+		}
+		iShipmentService.sendMailForShipped(vo);
+		message.successStatus();
+	}
+
+
 
 
 }
