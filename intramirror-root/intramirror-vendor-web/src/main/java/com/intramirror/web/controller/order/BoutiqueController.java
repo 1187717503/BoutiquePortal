@@ -178,8 +178,9 @@ public class BoutiqueController {
         result.errorStatus();
 
         try{
-            ShipEmailLog emailLog = mailSendManageService.getEmailLog(shipmentNo);
-            if (emailLog != null){
+            List<ShipEmailLog> emailLogs = mailSendManageService.getEmailLog(shipmentNo);
+            if (CollectionUtils.isNotEmpty(emailLogs)){
+                ShipEmailLog emailLog = emailLogs.get(0);
                 String emailBody = emailLog.getEmailBody();
                 MailModelVO modelVO = JSONObject.parseObject(emailBody, MailModelVO.class);
                 MailSendUtil.sendMail(modelVO);

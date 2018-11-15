@@ -45,20 +45,15 @@ public class MailSendManageService extends BaseDao {
         shipEmailLogMapper.insertSelective(log);
     }
 
-    public ShipEmailLog getEmailLog(String shipmentNo){
-        if (shipmentNo == null){
-            return null;
-        }
+    public List<ShipEmailLog> getEmailLog(String shipmentNo){
         ShipEmailLogExample example = new ShipEmailLogExample();
         ShipEmailLogExample.Criteria criteria = example.createCriteria();
-        criteria.andShipmentNoEqualTo(shipmentNo);
-        criteria.andIsDeletedEqualTo(0);
-        example.setLimit(1);
-        List<ShipEmailLog> list = shipEmailLogMapper.selectByExample(example);
-        if (CollectionUtils.isNotEmpty(list)){
-            return list.get(0);
+        if (shipmentNo != null){
+            criteria.andShipmentNoEqualTo(shipmentNo);
+            example.setLimit(1);
         }
-        return null;
+        criteria.andIsDeletedEqualTo(0);
+        return shipEmailLogMapper.selectByExample(example);
     }
 
     public void updateEmailLog(ShipEmailLog shipEmailLog){

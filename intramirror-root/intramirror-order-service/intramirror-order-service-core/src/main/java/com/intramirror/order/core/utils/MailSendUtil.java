@@ -52,7 +52,7 @@ public class MailSendUtil {
      * @throws MessagingException 异常
      * @throws UnsupportedEncodingException 异常
      */
-    public static void sendMail(MailModelVO mailModelVO) throws MessagingException,UnsupportedEncodingException {
+    public static void sendMail(MailModelVO mailModelVO) throws MessagingException {
         logger.info("sendMail params={}", new Gson().toJson(mailModelVO));
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         // 设置utf-8或GBK编码，否则邮件会有乱码
