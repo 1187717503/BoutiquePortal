@@ -78,7 +78,7 @@
 	</select>
 
     <select id="countByParam" resultType="long" parameterType="com.intramirror.order.api.vo.ReportRequestVO">
-        SELECT COUNT (*) FROM (
+        SELECT COUNT(*) FROM (
 			SELECT
 			(CAST(ss.store as signed) + CAST(ss.confirmed as signed) + CAST(ss.reserved as signed) + CAST(ss.locked as signed))  as stock
 			FROM
