@@ -33,7 +33,7 @@
 			CONCAT_WS("->" , c2. NAME , c1. NAME , c. NAME) categoryName ,
 			b.english_name as brandName ,
 			p.season_code as seasonCode,
-			(ss.store + ss.confirmed + ss.reserved + ss.locked)  as stock
+			(CAST(ss.store as signed) + CAST(ss.confirmed as signed) + CAST(ss.reserved as signed) + CAST(ss.locked as signed))  as stock
 		FROM
 			sku s
 		LEFT JOIN sku_store ss ON(ss.sku_id = s.sku_id)
