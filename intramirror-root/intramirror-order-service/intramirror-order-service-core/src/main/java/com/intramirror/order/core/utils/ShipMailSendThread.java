@@ -262,7 +262,7 @@ public class ShipMailSendThread implements Runnable {
             }else {
                 discountTax = 100;
             }
-            String boutiqueDiscountOff = new BigDecimal(100).subtract(order.getBoutique_price().multiply(new BigDecimal(discountTax)).divide(order.getRetail_price(), 4, BigDecimal.ROUND_HALF_DOWN)).setScale(2, BigDecimal.ROUND_HALF_UP).toString() + "%";
+            String boutiqueDiscountOff = new BigDecimal(100).subtract(order.getBoutique_price().multiply(new BigDecimal(discountTax)).divide(order.getRetail_price(), 4, BigDecimal.ROUND_HALF_DOWN)).setScale(0, BigDecimal.ROUND_HALF_UP).toString() + "%";
             String[] values = {
                     transforNullValue(order.getAwb_nbr()),
                     transforNullValue(order.getVendor_name()),
