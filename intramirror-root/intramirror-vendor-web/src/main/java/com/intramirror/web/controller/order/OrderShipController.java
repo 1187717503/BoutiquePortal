@@ -1705,6 +1705,7 @@ public class OrderShipController extends BaseController {
         if (map.get("pickupLocation")!=null){
             inputVO.setPickupLocation(map.get("pickupLocation").toString());
         }
+        inputVO.setPickupType("pickup");
         Map<String,Object> params = new HashMap<>();
         //查询close状态纸箱
         //params.put("status",2);
@@ -1766,14 +1767,6 @@ public class OrderShipController extends BaseController {
                     }else {
                         inputVO.setServiceType("U");
                     }
-                    //查询第三段
-                    /*params.put("sequence",3);
-                    dhlShipment = subShipmentService.getDHLShipment(params);
-                    if (dhlShipment==null){
-                        //查询第二段
-                        params.put("sequence",2);
-                        dhlShipment = subShipmentService.getDHLShipment(params);
-                    }*/
                 }else if ("Transit Warehouse".equals(shipToGeography)){
                     inputVO.setServiceType("N");
                 }else {
