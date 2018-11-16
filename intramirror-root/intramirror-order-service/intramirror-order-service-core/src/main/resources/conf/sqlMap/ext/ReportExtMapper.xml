@@ -21,6 +21,7 @@
 		<result column="seasonSn" property="seasonSn" jdbcType="VARCHAR" />
 	</resultMap>
 	<select id="searchByParam" resultType="com.intramirror.order.api.vo.ReportVO" parameterType="com.intramirror.order.api.vo.ReportRequestVO">
+
 		SELECT
 			s.sku_id as skuId,
 			p.cover_img as converpic,
@@ -66,10 +67,10 @@
         </if>
 		<if test="hasStock != null" >
 			<if test="hasStock == 0">
-				and <![CDATA[ stock <= 0 ]]>
+				HAVING <![CDATA[ stock <= 0 ]]>
 			</if>
 			<if test="hasStock == 1">
-				and stock > 0
+				HAVING stock > 0
 			</if>
 		</if>
 		ORDER BY ss.last_check desc
@@ -111,10 +112,10 @@
         </if>
 		<if test="hasStock != null" >
 			<if test="hasStock == 0">
-				and <![CDATA[ stock <= 0 ]]>
+				HAVING <![CDATA[ stock <= 0 ]]>
 			</if>
 			<if test="hasStock == 1">
-				and stock > 0
+				HAVING stock > 0
 			</if>
 		</if>
     </select>
