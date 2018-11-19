@@ -1,12 +1,13 @@
 package com.intramirror.web.controller.order;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
 import com.intramirror.common.help.ResultMessage;
 import com.intramirror.common.utils.DateUtils;
-import com.intramirror.order.api.vo.ReportRequestVO;
-import com.intramirror.order.api.vo.ReportResponseVO;
-import com.intramirror.order.api.vo.ReportVO;
-import com.intramirror.order.api.vo.SeasonVO;
+import com.intramirror.order.api.vo.*;
 import com.intramirror.order.core.impl.ext.ReportExtServiceImpl;
+import com.intramirror.product.api.model.Brand;
 import com.intramirror.user.api.model.User;
 import com.intramirror.web.common.CommonsProperties;
 import com.intramirror.web.controller.BaseController;
@@ -20,12 +21,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
+import pk.shoplus.common.utils.StringUtil;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.math.RoundingMode;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -42,14 +46,18 @@ public class ReportController extends BaseController{
     @PostMapping(value = "/search")
     @ResponseBody
     public Object search(@RequestBody ReportRequestVO requestVO,HttpServletRequest httpRequest){
+        Long start = System.currentTimeMillis();
         ResultMessage resultMessage = ResultMessage.getInstance();
         checkRequestVo(requestVO);
         User user = this.getUser(httpRequest);
+        logger.info("根据request获取user信息耗时：{}",System.currentTimeMillis() - start);
         Long vendorId = reportExtService.queryVendorIdByUserId(user.getUserId());
+        logger.info("根据vendorId信息耗时：{}",System.currentTimeMillis() - start);
         requestVO.setVendorId(vendorId);
         ReportResponseVO vo = reportExtService.search(requestVO);
         resultMessage.setData(vo);
         resultMessage.successStatus();
+        logger.info("查询search数据耗时：{}",System.currentTimeMillis() - start);
         return resultMessage;
     }
 
@@ -76,6 +84,18 @@ public class ReportController extends BaseController{
         ResultMessage resultMessage = ResultMessage.getInstance();
         List<SeasonVO> seasonVOS = reportExtService.queryAllSeason();
         resultMessage.setData(seasonVOS);
+        resultMessage.successStatus();
+        return resultMessage;
+    }
+
+    @GetMapping(value = "/queryVendorBrand")
+    @ResponseBody
+    public Object queryVendorBrand(HttpServletRequest httpRequest){
+        ResultMessage resultMessage = ResultMessage.getInstance();
+        User user = this.getUser(httpRequest);
+        Long vendorId = reportExtService.queryVendorIdByUserId(user.getUserId());
+        List<BrandVO> brandVOS = reportExtService.queryVendorBrand(vendorId);
+        resultMessage.setData(brandVOS);
         resultMessage.successStatus();
         return resultMessage;
     }
@@ -196,21 +216,15 @@ public class ReportController extends BaseController{
 
         int rowLength = 0;
 
-
         String[] excelHeaders = null;
-        excelHeaders=new String[]{"boutique_id","designer_id", "color_code", "size", "retail_price", "boutique_price", "category", "brand_name", "season_code", "stock"};
-
-        // 创建表头
-        /*HSSFRow row1 = sheet.createRow(rowLength);
-        for (int i = 0, iLen = excelHeaders.length; i < iLen; i++) {
-            HSSFCell cell = row1.createCell(i);
-            cell.setCellValue(excelHeaders[i]);
-        }*/
+        //excelHeaders=new String[]{"boutique_id","designer_id", "color_code", "size", "retail_price", "boutique_price", "category", "brand_name", "season_code", "stock"};
+        excelHeaders=new String[]{"boutique_image","brand_name","season_code", "designer_id","color_code", "boutique_id","category","size", "retail_price", "boutique_price", "discount", "stock"};
 
         //rowLength++;
         HSSFRow row = null;
         HSSFCell cell = null;
         HSSFSheet sheet = null;
+        HSSFPatriarch patriarch = null;
         FileOutputStream fileOut = null;
         int ro = 0;
         if(org.apache.commons.collections.CollectionUtils.isNotEmpty(reportVOS)){
@@ -218,6 +232,8 @@ public class ReportController extends BaseController{
                 if(ro % 60000 == 0){
                     rowLength = 0;
                     sheet = workbook.createSheet(excelName+ (ro / 60000));
+                    //图片处理
+                    patriarch = sheet.createDrawingPatriarch();
                     HSSFRow row1 = sheet.createRow(rowLength);
                     for (int i = 0, iLen = excelHeaders.length; i < iLen; i++) {
                         HSSFCell cellHe = row1.createCell(i);
@@ -230,43 +246,86 @@ public class ReportController extends BaseController{
                     }
                     rowLength ++;
                 }
+                 /*boutique_image*/
                 ro ++;
                 row = sheet.createRow(rowLength);
-                cell = row.createCell(0);
-                cell.setCellValue(reportVO.getBoutiqueId());
+                row.setHeight((short) 900);
+                String urlList = reportVO.getConverpic();
+                if(StringUtil.isNotEmpty(urlList)){
+                    JsonArray urlJsonArray = new JsonParser().parse(urlList).getAsJsonArray();
+                    generateProductImage(workbook, patriarch, new Gson().fromJson(urlJsonArray.get(0), String.class), 0, rowLength);
+                }
 
                 cell = row.createCell(1);
-                cell.setCellValue(reportVO.getDesignerId());
+                cell.setCellValue(reportVO.getBrandName());
 
                 cell = row.createCell(2);
-                cell.setCellValue(reportVO.getColorCode());
+                cell.setCellValue(reportVO.getSeasonCode());
 
                 cell = row.createCell(3);
-                cell.setCellValue(reportVO.getSize());
+                cell.setCellValue(reportVO.getDesignerId());
 
                 cell = row.createCell(4);
-                cell.setCellValue(reportVO.getRetailPrice()!=null?reportVO.getRetailPrice().setScale(4, RoundingMode.HALF_UP).toString():"");
-
+                cell.setCellValue(reportVO.getColorCode());
                 cell = row.createCell(5);
-                cell.setCellValue(reportVO.getBoutiquePrice()!=null?reportVO.getBoutiquePrice().setScale(4, RoundingMode.HALF_UP).toString():"");
-
+                cell.setCellValue(reportVO.getBoutiqueId());
                 cell = row.createCell(6);
-
-//                cell.setCellStyle();
                 cell.setCellValue(reportVO.getCategoryName());
 
                 cell = row.createCell(7);
-                cell.setCellValue(reportVO.getBrandName());
+                cell.setCellValue(reportVO.getSize());
 
                 cell = row.createCell(8);
-                cell.setCellValue(reportVO.getSeasonCode());
+                cell.setCellValue(reportVO.getRetailPrice()!=null?reportVO.getRetailPrice().setScale(4, RoundingMode.HALF_UP).toString():"");
 
                 cell = row.createCell(9);
+                cell.setCellValue(reportVO.getBoutiquePrice()!=null?reportVO.getBoutiquePrice().setScale(4, RoundingMode.HALF_UP).toString():"");
+
+                cell = row.createCell(10);
+                cell.setCellValue(reportVO.getBoutiqueDiscount());
+
+                cell = row.createCell(11);
                 cell.setCellValue(reportVO.getStock()!=null?reportVO.getStock():0);
                 rowLength ++;
             }
         }
         return workbook;
+    }
+
+
+    private void generateProductImage(HSSFWorkbook workbook, HSSFPatriarch patriarch, String pictureUrl, int i, int j) {
+        //处理商品图片
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(pictureUrl)) {
+            try {
+                //添加域名替换
+                pictureUrl = pictureUrl.replace("image.intramirror.com", "sha-oss-static.oss-cn-shanghai.aliyuncs.com");
+                //获取网络图片 ,压缩图片
+                //URL url = new URL(pictureUrl);
+                URL url = new URL(pictureUrl+"?x-oss-process=image/resize,m_fill,w_110,limit_0/auto-orient,0/quality,q_90");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                //超时响应时间为5秒
+                conn.setConnectTimeout(5 * 1000);
+                InputStream inStream = conn.getInputStream();
+                ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                int len = 0;
+                while ((len = inStream.read(buffer)) != -1) {
+                    outStream.write(buffer, 0, len);
+                }
+                inStream.close();
+                byte[] data = outStream.toByteArray();
+                //anchor主要用于设置图片的属性
+                HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 0, 0, (short) i, j, (short) (i + 1), j + 1);
+                //Sets the anchor type （图片在单元格的位置）
+                //0 = Move and size with Cells, 2 = Move but don't size with cells, 3 = Don't move or size with cells.
+                anchor.setAnchorType(0);
+                patriarch.createPicture(anchor, workbook.addPicture(data, HSSFWorkbook.PICTURE_TYPE_JPEG));
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }

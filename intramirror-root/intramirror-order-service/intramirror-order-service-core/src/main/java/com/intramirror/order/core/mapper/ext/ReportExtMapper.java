@@ -1,5 +1,6 @@
 package com.intramirror.order.core.mapper.ext;
 
+import com.intramirror.order.api.vo.BrandVO;
 import com.intramirror.order.api.vo.ReportRequestVO;
 import com.intramirror.order.api.vo.ReportVO;
 import com.intramirror.order.api.vo.SeasonVO;
@@ -17,4 +18,6 @@ public interface ReportExtMapper {
     List<SeasonVO> queryAllSeason();
 
     Long queryVendorIdByUserId(Long userId);
+
+    List<BrandVO> queryVendorBrand(Long vendorId);
 }

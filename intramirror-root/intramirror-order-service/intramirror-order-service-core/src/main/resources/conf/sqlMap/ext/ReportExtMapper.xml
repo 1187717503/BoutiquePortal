@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.intramirror.order.core.mapper.ext.ReportExtMapper" >
 
-   	<resultMap id="BaseResultMap" type="com.intramirror.order.api.vo.ReportVO" >
+   	<!--<resultMap id="BaseResultMap" type="com.intramirror.order.api.vo.ReportVO" >
 		<result column="skuId" property="skuId" jdbcType="BIGINT" />
 	    <result column="converpic" property="result" jdbcType="VARCHAR" />
 	    <result column="designerId" property="designerId" jdbcType="VARCHAR" />
@@ -20,6 +20,10 @@
 		<result column="seasonCode" property="seasonCode" jdbcType="VARCHAR" />
 		<result column="seasonSn" property="seasonSn" jdbcType="VARCHAR" />
 	</resultMap>
+	<resultMap id="brandResultMap" type="com.intramirror.order.api.vo.BrandVO">
+		<result column="brandId" property="brandId" javaType="BIGINT"/>
+		<result column="englishName" property="englishName" javaType="VARCHAR"/>
+	</resultMap>-->
 	<select id="searchByParam" resultType="com.intramirror.order.api.vo.ReportVO" parameterType="com.intramirror.order.api.vo.ReportRequestVO">
 
 		SELECT
@@ -28,6 +32,7 @@
 			p.designer_id as designerId,
 			p.color_code as colorCode,
 			p.product_code as boutiqueId,
+			p.boutique_discount as boutiqueDiscount,
 			s.price as retailPrice,
 			s.in_price as boutiquePrice,
 			s.size as size,
@@ -73,7 +78,7 @@
 				HAVING stock > 0
 			</if>
 		</if>
-		ORDER BY ss.last_check desc
+		ORDER BY b.english_name asc,p.season_code asc,p.designer_id asc,p.color_code asc,s.size asc
 		LIMIT #{start},#{pageSize};
 	</select>
 
@@ -123,13 +128,17 @@
 
     </select>
 
-    <select id="queryAllSeason" resultMap="seasonResultMap">
+    <select id="queryAllSeason" resultType="com.intramirror.order.api.vo.SeasonVO">
         select season_code as seasonCode,season_sn as seasonSn from season where enabled = 1 ORDER BY season_sort desc
     </select>
 
     <select id="queryVendorIdByUserId" resultType="long" parameterType="long">
         select vendor_id from vendor where user_id = #{userId,jdbcType=BIGINT}
     </select>
+
+	<select id="queryVendorBrand" resultType="com.intramirror.order.api.vo.BrandVO" parameterType="long">
+		select DISTINCT b.brand_id as brandId,b.english_name as englishName from brand b left join product p on(p.brand_id = b.brand_id) where p.vendor_id = #{vendorId,jdbcType=BIGINT} and b.enabled = 1
+	</select>
 
 
 </mapper>

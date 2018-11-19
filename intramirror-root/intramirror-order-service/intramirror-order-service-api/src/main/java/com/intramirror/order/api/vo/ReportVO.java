@@ -9,7 +9,7 @@ public class ReportVO {
     private String colorCode;
     private BigDecimal retailPrice; // min_retail_price
     private BigDecimal boutiquePrice; // min_boutique_price
-    //private Integer boutiqueDiscount;
+    private Integer boutiqueDiscount;
     private String size;
     private String categoryName;
     private String brandName;
@@ -111,5 +111,13 @@ public class ReportVO {
 
     public void setBoutiqueId(String boutiqueId) {
         this.boutiqueId = boutiqueId;
+    }
+
+    public Integer getBoutiqueDiscount() {
+        return boutiqueDiscount;
+    }
+
+    public void setBoutiqueDiscount(Integer boutiqueDiscount) {
+        this.boutiqueDiscount = boutiqueDiscount;
     }
 }

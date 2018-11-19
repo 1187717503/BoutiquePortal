@@ -1,9 +1,6 @@
 package com.intramirror.order.core.impl.ext;
 
-import com.intramirror.order.api.vo.ReportRequestVO;
-import com.intramirror.order.api.vo.ReportResponseVO;
-import com.intramirror.order.api.vo.ReportVO;
-import com.intramirror.order.api.vo.SeasonVO;
+import com.intramirror.order.api.vo.*;
 import com.intramirror.order.core.dao.BaseDao;
 import com.intramirror.order.core.mapper.ext.ReportExtMapper;
 import org.springframework.stereotype.Service;
@@ -41,5 +38,9 @@ public class ReportExtServiceImpl extends BaseDao{
     public Long queryVendorIdByUserId(Long userId){
         Long vendorId = reportExtMapper.queryVendorIdByUserId(userId);
         return vendorId;
+    }
+
+    public List<BrandVO> queryVendorBrand(Long vendorId) {
+        return reportExtMapper.queryVendorBrand(vendorId);
     }
 }
