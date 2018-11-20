@@ -1,6 +1,6 @@
 package com.intramirror.order.core.utils;
 
-import com.google.gson.Gson;
+import com.alibaba.fastjson.JSONObject;
 import com.intramirror.common.help.StringUtils;
 import com.intramirror.main.api.model.Tax;
 import com.intramirror.main.api.service.TaxService;
@@ -136,20 +136,25 @@ public class ShipMailSendThread implements Runnable {
             mailContent.setToEmails(MailConfig.emailTo);
         }
 
+        boolean flag = true; //是否删除附件文件
         try {
-            logger.info("ShipMailSendThread 开始发送邮件 content={}", new Gson().toJson(mailContent));
+            logger.info("ShipMailSendThread 开始发送邮件 content={}", JSONObject.toJSONString(mailContent));
             MailSendUtil.sendMail(mailContent);
-            logger.info("ShipMailSendThread 邮件发送完成");
+            logger.info("ShipMailSendThread 邮件发送完成，shipmentNo:{}",shipment.getShipmentNo());
         } catch (Exception e) {
+            flag = false;
             e.printStackTrace();
-            logger.error("ShipMailSendThread 邮件发送失败", e);
+            logger.error("ShipMailSendThread 邮件发送失败，shipmentNo:{},errorMsg:{}",shipment.getShipmentNo(), e.getMessage());
+            mailSendManageService.insertShipEmailLog(shipment.getShipmentNo(), JSONObject.toJSONString(mailContent),e.getMessage());
         } finally {
-            //删除附件文件
-            List<MailAttachmentVO> attachments = mailContent.getAttachments();
-            for (MailAttachmentVO attachment : attachments) {
-                File file = new File(attachment.getFileUrl());
-                if (file.exists() && file.isFile()) {
-                    file.delete();
+            if (flag){
+                //删除附件文件
+                List<MailAttachmentVO> attachments = mailContent.getAttachments();
+                for (MailAttachmentVO attachment : attachments) {
+                    File file = new File(attachment.getFileUrl());
+                    if (file.exists() && file.isFile()) {
+                        file.delete();
+                    }
                 }
             }
         }
