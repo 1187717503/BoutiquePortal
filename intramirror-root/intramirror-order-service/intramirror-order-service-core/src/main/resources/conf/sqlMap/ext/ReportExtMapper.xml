@@ -21,6 +21,7 @@
 		<result column="seasonSn" property="seasonSn" jdbcType="VARCHAR" />
 	</resultMap>
 	<select id="searchByParam" resultType="com.intramirror.order.api.vo.ReportVO" parameterType="com.intramirror.order.api.vo.ReportRequestVO">
+
 		SELECT
 			s.sku_id as skuId,
 			p.cover_img as converpic,
@@ -33,7 +34,7 @@
 			CONCAT_WS("->" , c2. NAME , c1. NAME , c. NAME) categoryName ,
 			b.english_name as brandName ,
 			p.season_code as seasonCode,
-			ss.store as stock
+			(CAST(ss.store as signed) + CAST(ss.confirmed as signed) + CAST(ss.reserved as signed) + CAST(ss.locked as signed))  as stock
 		FROM
 			sku s
 		LEFT JOIN sku_store ss ON(ss.sku_id = s.sku_id)
@@ -66,10 +67,10 @@
         </if>
 		<if test="hasStock != null" >
 			<if test="hasStock == 0">
-				and ss.store = 0
+				HAVING <![CDATA[ stock <= 0 ]]>
 			</if>
 			<if test="hasStock == 1">
-				and ss.store > 0
+				HAVING stock > 0
 			</if>
 		</if>
 		ORDER BY ss.last_check desc
@@ -77,46 +78,49 @@
 	</select>
 
     <select id="countByParam" resultType="long" parameterType="com.intramirror.order.api.vo.ReportRequestVO">
-        SELECT
-         count(*)
-        FROM
-        sku s
-        LEFT JOIN sku_store ss ON(ss.sku_id = s.sku_id)
-        LEFT JOIN product p ON(p.product_id = s.product_id)
-        LEFT JOIN brand b ON(b.brand_id = p.brand_id)
-        LEFT JOIN category c ON(c.category_id = p.category_id)
-        LEFT JOIN category c1 ON(c1.category_id = c.parent_id)
-        LEFT JOIN category c2 ON(c2.category_id = c1.parent_id)
-        WHERE p.enabled = 1
-        <if test="vendorId != null" >
-            and p.vendor_id =  #{vendorId,jdbcType=BIGINT}
-        </if>
-        <if test="designerId != null" >
-            and p.designer_id =  #{designerId,jdbcType=VARCHAR}
-        </if>
-        <if test="colorCode != null" >
-            and p.color_code =  #{colorCode,jdbcType=VARCHAR}
-        </if>
-        <if test="brandId != null" >
-            and p.brand_id =  #{brandId,jdbcType=BIGINT}
-        </if>
-        <if test="categoryId != null" >
-            and p.category_id =  #{categoryId,jdbcType=BIGINT}
-        </if>
-		<if test="boutiqueId != null" >
-			and p.product_code =  #{boutiqueId,jdbcType=VARCHAR}
-		</if>
-        <if test="seasonCode != null" >
-            and p.season_code =  #{seasonCode,jdbcType=VARCHAR}
-        </if>
-		<if test="hasStock != null" >
-			<if test="hasStock == 0">
-				and <![CDATA[ ss.store <= 0 ]]>
+        SELECT COUNT(*) FROM (
+			SELECT
+			(CAST(ss.store as signed) + CAST(ss.confirmed as signed) + CAST(ss.reserved as signed) + CAST(ss.locked as signed))  as stock
+			FROM
+			sku s
+			LEFT JOIN sku_store ss ON(ss.sku_id = s.sku_id)
+			LEFT JOIN product p ON(p.product_id = s.product_id)
+			LEFT JOIN brand b ON(b.brand_id = p.brand_id)
+			LEFT JOIN category c ON(c.category_id = p.category_id)
+			LEFT JOIN category c1 ON(c1.category_id = c.parent_id)
+			LEFT JOIN category c2 ON(c2.category_id = c1.parent_id)
+			WHERE p.enabled = 1
+			<if test="vendorId != null" >
+				and p.vendor_id =  #{vendorId,jdbcType=BIGINT}
 			</if>
-			<if test="hasStock == 1">
-				and ss.store > 0
+			<if test="designerId != null" >
+				and p.designer_id =  #{designerId,jdbcType=VARCHAR}
 			</if>
-		</if>
+			<if test="colorCode != null" >
+				and p.color_code =  #{colorCode,jdbcType=VARCHAR}
+			</if>
+			<if test="brandId != null" >
+				and p.brand_id =  #{brandId,jdbcType=BIGINT}
+			</if>
+			<if test="categoryId != null" >
+				and p.category_id =  #{categoryId,jdbcType=BIGINT}
+			</if>
+			<if test="boutiqueId != null" >
+				and p.product_code =  #{boutiqueId,jdbcType=VARCHAR}
+			</if>
+			<if test="seasonCode != null" >
+				and p.season_code =  #{seasonCode,jdbcType=VARCHAR}
+			</if>
+			<if test="hasStock != null" >
+				<if test="hasStock == 0">
+					HAVING <![CDATA[ stock <= 0 ]]>
+				</if>
+				<if test="hasStock == 1">
+					HAVING stock > 0
+				</if>
+			</if>
+		) t
+
     </select>
 
     <select id="queryAllSeason" resultMap="seasonResultMap">

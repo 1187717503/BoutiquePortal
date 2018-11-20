@@ -88,30 +88,9 @@ public class ReportController extends BaseController{
         User user = this.getUser(httpRequest);
         Long vendorId = reportExtService.queryVendorIdByUserId(user.getUserId());
         requestVO.setVendorId(vendorId);
-        /*requestVO.setPageSize(10000);
-        requestVO.setPageNum(1);*/
-        /*int pageNum = requestVO.getPageNum();
-        List<ReportVO> reportVOS = new ArrayList<>();
-        while (true){
-            try{
-                ReportResponseVO vo= reportExtService.search(requestVO);
-                if(org.apache.commons.collections.CollectionUtils.isNotEmpty(vo.getReportVOS())){
-                    reportVOS.addAll(vo.getReportVOS());
-                }else {
-                    break;
-                }
-                pageNum++;
-                requestVO.setPageNum(pageNum);
-            }catch (Exception e){
-                logger.error(e.getMessage(),e);
-                break;
-            }
-
-        }*/
         ReportResponseVO vo= reportExtService.search(requestVO);
 
         logger.info("exportOrderList 生成订单文件");
-        //generateReportExcel("product",reportVOS, filePath);
         String dateStr = DateUtils.getStrDate(new Date(), "yyyyMMddHHmmss");
         String name = "Product_" + dateStr + ".xls";
         ByteArrayOutputStream os = new ByteArrayOutputStream();
