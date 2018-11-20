@@ -28,7 +28,8 @@ public class BoutiqueSchedule {
     @Autowired
     private MailSendManageService mailSendManageService;
 
-    @Scheduled(cron = "0 0 0 1/1 * ?")
+    //@Scheduled(cron = "0 0 23 1/1 * ?")
+    @Scheduled(cron = "0 0/2 * * * ?")
     public void retryShipEmail() {
         List<ShipEmailLog> emailLogs = mailSendManageService.getEmailLog(null);
         if (CollectionUtils.isNotEmpty(emailLogs)) {
