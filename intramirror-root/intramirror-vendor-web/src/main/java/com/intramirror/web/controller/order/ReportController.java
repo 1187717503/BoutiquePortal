@@ -252,8 +252,13 @@ public class ReportController extends BaseController{
                 row.setHeight((short) 900);
                 String urlList = reportVO.getConverpic();
                 if(StringUtil.isNotEmpty(urlList)){
-                    JsonArray urlJsonArray = new JsonParser().parse(urlList).getAsJsonArray();
-                    generateProductImage(workbook, patriarch, new Gson().fromJson(urlJsonArray.get(0), String.class), 0, rowLength);
+                    try{
+                        JsonArray urlJsonArray = new JsonParser().parse(urlList).getAsJsonArray();
+                        generateProductImage(workbook, patriarch, new Gson().fromJson(urlJsonArray.get(0), String.class), 0, rowLength);
+                    }catch (Exception e){
+                       logger.error("图片urlList异常：{}",urlList);
+                    }
+
                 }
 
                 cell = row.createCell(1);
