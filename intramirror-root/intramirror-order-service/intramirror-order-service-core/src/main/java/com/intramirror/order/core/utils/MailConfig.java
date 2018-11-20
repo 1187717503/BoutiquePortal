@@ -12,6 +12,15 @@ public class MailConfig {
     public static String timeout;
     public static String emailTo;
     public static String emailToWarehouse;
+    public static String emailToComo;
+
+    public static String getEmailToComo() {
+        return emailToComo;
+    }
+
+    public static void setEmailToComo(String emailToComo) {
+        MailConfig.emailToComo = emailToComo;
+    }
 
     public static String getHost() {
         return host;

@@ -107,7 +107,14 @@ public class ShipMailSendThread implements Runnable {
 
         MailModelVO mailContent = new MailModelVO();
         //设置邮件标题，邮件标题为Shipment No. XXXXX + 【国家】/【Transit warehouse】
-        mailContent.setSubject("Shipment No. " + shipment.getShipmentNo() +" AWB No. " + awbNo + "【" + shipment.getDestination() + "】");
+        String subject;
+        if ("COMO".equals(shipment.getDestination())){
+            //发往荷兰邮政
+            subject = "Shipment No. " + shipment.getShipmentNo() + "【" + shipment.getDestination() + "】";
+        } else{
+            subject = "Shipment No. " + shipment.getShipmentNo() +" AWB No. " + awbNo + "【" + shipment.getDestination() + "】";
+        }
+        mailContent.setSubject(subject);
         //设置邮件正文
         if (!orders.isEmpty()) {
             mailContent.setContent(getContent(orders));
@@ -122,6 +129,9 @@ public class ShipMailSendThread implements Runnable {
         //如果是发给质检仓的邮件
         if ("Transit Warehouse".equals(shipment.getDestination())) {
             mailContent.setToEmails(MailConfig.emailToWarehouse);
+        } else if ("COMO".equals(shipment.getDestination())){
+            //发往荷兰邮政
+            mailContent.setToEmails(MailConfig.emailToComo);
         } else {
             mailContent.setToEmails(MailConfig.emailTo);
         }

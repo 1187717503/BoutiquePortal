@@ -73,6 +73,7 @@
         <property name="timeout" value="${mail.mailTimeout}"></property>
         <property name="emailTo" value="${mail.mailTo}"></property>
         <property name="emailToWarehouse" value="${mail.mailToWarehouse}"></property>
+        <property name="emailToComo" value="${mail.mailToComo}"></property>
     </bean>
 
     <beans profile="test">
