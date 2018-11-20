@@ -216,7 +216,7 @@
         INNER JOIN address_country ac on ac.address_country_id = v.address_country_id
         INNER JOIN address_country ac1 on ac1.address_country_id = l.address_country_id
         LEFT JOIN tax t on (t.address_country_id = v.address_country_id and t.tax_type = 1)
-        WHERE lp.order_line_num = #{orderLineNum}
+        WHERE lp.order_line_num = #{orderLineNum} limit 1;
     </select>
 
     <select id="calculateDiscountTax" resultMap="BaseResultMap" parameterType="string">
