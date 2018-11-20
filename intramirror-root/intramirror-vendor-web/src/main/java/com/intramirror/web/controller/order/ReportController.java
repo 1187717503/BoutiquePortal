@@ -254,7 +254,9 @@ public class ReportController extends BaseController{
                 if(StringUtil.isNotEmpty(urlList)){
                     try{
                         JsonArray urlJsonArray = new JsonParser().parse(urlList).getAsJsonArray();
-                        generateProductImage(workbook, patriarch, new Gson().fromJson(urlJsonArray.get(0), String.class), 0, rowLength);
+                        if(urlJsonArray.size()>0){
+                            generateProductImage(workbook, patriarch, new Gson().fromJson(urlJsonArray.get(0), String.class), 0, rowLength);
+                        }
                     }catch (Exception e){
                        logger.error("图片urlList异常：{}",urlList);
                     }
