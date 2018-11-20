@@ -475,6 +475,8 @@ public class ShipmentController extends BaseController{
             vo.setDestination("Transit Warehouse");
         } else if("China excl. Taiwan".equals(shipment.getShipToGeography())) {
 			vo.setDestination("China");
+		}else {
+			vo.setDestination(shipment.getShipToGeography());
 		}
 		iShipmentService.sendMailForShipped(vo);
 		message.successStatus();
