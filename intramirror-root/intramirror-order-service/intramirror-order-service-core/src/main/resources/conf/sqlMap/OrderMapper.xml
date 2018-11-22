@@ -99,7 +99,7 @@
         o.order_num,o.order_id,o.created_at,o.current_rate,p.name,p.product_id, s.`size` as size,p.category_id,
         lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
         lp.shipping_method as shipping_method ,
-        lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,
+        lp.amount,lp.shipping_fee,lp.order_line_num,lp.`status`,
         lp.confirmed_at,lp.est_ship_date,lp.packed_at,lp.shipped_at,s.sku_code,usa.address_country_id,b.english_name as brandName,
         if(lp.user_rec_flag=0, l.user_rec_name, lp.user_rec_name) as user_rec_name,
         if(lp.user_rec_flag=0, l.user_rec_mobile, lp.user_rec_mobile) as user_rec_mobile,
@@ -115,7 +115,7 @@
         oe.created_at as oeCreatedAt,oet.description as oeDescription,oe.comments as oeComments,u.email as
         oeCreatedByuser,
         oe.modified_at as oeModified,oe.`status` as oeStatus,oe.resolution as oeResolution, uu.email as Resolved,
-        if(t.tax_rate = NULL,0,ROUND(t.tax_rate * lp.in_price,2)) as vat,
+        -- if(t.tax_rate = NULL,0,ROUND(t.tax_rate * lp.in_price,2)) as vat,
         p.color_code as colorCode,p.designer_id as brandID
         FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
         LEFT JOIN stock_location sl on sl.location_id = lp.stock_location_id
@@ -197,7 +197,6 @@
         lp.`sale_price`,
         lp.amount,
         lp.shipping_fee,
-        lp.tax_fee,
         lp.order_line_num,
         lp.`status`,
         lp.confirmed_at,

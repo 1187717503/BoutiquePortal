@@ -233,6 +233,13 @@ public class OrderController extends BaseController {
                 co.setIn_price(new BigDecimal(co.getIn_price().toString()).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
 
                 co.setCategoryPath(categoryMap.get(co.getCategory_id())==null?"":categoryMap.get(co.getCategory_id()).getCategoryPath());
+
+                //计算vat
+                BigDecimal bigDecimal = taxService.calculateTax(co.getOrder_line_num());
+                double taxRate = bigDecimal.doubleValue();
+                if (taxRate > 0){
+                    co.setTax_fee(new BigDecimal(inPrice * taxRate).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
+                }
             }
         }
 
@@ -255,7 +262,6 @@ public class OrderController extends BaseController {
         }else {
             discountTax = 0;
         }
-
         String priceStr = info.get("price").toString();
         String inPriceStr = info.get("in_price").toString();
         Double price = Double.parseDouble(priceStr);
@@ -270,6 +276,11 @@ public class OrderController extends BaseController {
         //四舍五入金额
         info.put("price",new BigDecimal(priceStr).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
         info.put("in_price",new BigDecimal(inPriceStr).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
+
+        BigDecimal calculateTax = taxService.calculateTax(orderLineNum);
+        if (calculateTax.doubleValue() > 0){
+            info.put("vat",new BigDecimal(inPrice * calculateTax.doubleValue()).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
+        }
     }
 
     /**
