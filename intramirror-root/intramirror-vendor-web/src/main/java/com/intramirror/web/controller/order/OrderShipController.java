@@ -1798,7 +1798,7 @@ public class OrderShipController extends BaseController {
                 if(object.optInt("status")!=1) {
                     //获取DHL报错信息
                     String msg = object.optString("msg");
-                    JSONObject jsonObject = JSONObject.fromObject(msg);
+                    /*JSONObject jsonObject = JSONObject.fromObject(msg);
                     JSONObject shipmentResponse = jsonObject.optJSONObject("ShipmentResponse");
                     JSONArray notification = shipmentResponse.optJSONArray("Notification");
                     msg = notification.get(0).toString();
@@ -1806,8 +1806,8 @@ public class OrderShipController extends BaseController {
                     if (message.contains("[")&&message.contains("]")&&message.contains(":")){
                         message = convertMsg(message);
                     }
-                    message = message + ". Please contact customer to adjust! ";
-                    result.addMsg(message);
+                    message = message + ". Please contact customer to adjust! ";*/
+                    result.addMsg(msg);
                     return result;
                 }
                 JSONObject jo = JSONObject.fromObject(resultStr);
