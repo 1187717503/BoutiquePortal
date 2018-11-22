@@ -21,7 +21,7 @@ public class CancelOrderVO {
     private String order_line_num;
     private Date created_at;
     private Date cancel_at;
-    private BigDecimal tax_fee;
+    private String tax_fee;
     private Long category_id;
     private String categoryPath;
     private String vendorName;
@@ -34,13 +34,14 @@ public class CancelOrderVO {
         this.vendorName = vendorName;
     }
 
-    public BigDecimal getTax_fee() {
+    public String getTax_fee() {
         return tax_fee;
     }
 
-    public void setTax_fee(BigDecimal tax_fee) {
+    public void setTax_fee(String tax_fee) {
         this.tax_fee = tax_fee;
     }
+
     private Integer change_flag;
 
     public Long getProduct_id() {

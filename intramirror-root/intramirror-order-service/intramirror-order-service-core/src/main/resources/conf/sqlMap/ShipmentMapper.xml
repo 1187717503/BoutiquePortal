@@ -245,4 +245,18 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 	<select id="queryShipmentAwbUrlByAwbNum" parameterType="string" resultType="string">
 		select doc_url from logistics_request WHERE awb_no = #{awbNum} and is_deleted = 0
 	</select>
+
+	<select id="getShipmentByOrderLineNum" parameterType="string" resultMap="BaseResultMap">
+		select DISTINCT s.* from shipment s
+		INNER JOIN container c on c.shipment_id = s.shipment_id
+		INNER JOIN logistics_product lp on lp.container_id = c.container_id
+		WHERE lp.order_line_num = #{orderLineNum} AND lp.status = 7 and s.status = 2 and c.status = 2
+	</select>
+
+	<select id="getOrderLineNumsByShipment" parameterType="long" resultType="string">
+		select lp.order_line_num from logistics_product lp
+		INNER JOIN container c on c.container_id = lp.container_id
+		INNER JOIN shipment s on s.shipment_id = c.shipment_id
+		WHERE s.shipment_id = #{shipmentId} and s.status = 2 and lp.status = 7 and c.status = 2;
+	</select>
 </mapper>

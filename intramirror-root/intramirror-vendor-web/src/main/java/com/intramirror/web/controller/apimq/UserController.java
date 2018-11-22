@@ -225,8 +225,6 @@ public class UserController extends BaseController {
             MailSendUtil.sendMail(mailContent);
         } catch (MessagingException e) {
             e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
         }
     }
 

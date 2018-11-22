@@ -140,4 +140,13 @@ public interface ShipmentMapper {
 	int updatePrintStep(Map<String, Object> updateStepMap);
 
 	void updateShipmentAwbAdvance(Map<String, Object> awbAdvanceMap);
+
+	/**
+	 * 根据订单号获取shipment
+	 * @param orderLineNum
+	 * @return
+	 */
+	Shipment getShipmentByOrderLineNum(String orderLineNum);
+
+	List<String> getOrderLineNumsByShipment(Long shipmentId);
 }

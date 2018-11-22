@@ -162,9 +162,9 @@ public interface IShipmentService {
 
 	/**
 	 * shipment发货
-	 * @param shipmentId
+	 * @param shipment
 	 */
-	void shipmentToShip(Long shipmentId);
+	void shipmentToShip(Shipment shipment);
 
     /**
      * shipped状态发邮件
@@ -187,4 +187,11 @@ public interface IShipmentService {
 	int updatePrintStep(Map<String, Object> updateStepMap);
 
 	void updateShipmentAwbAdvance(Map<String, Object> awbAdvanceMap);
+
+	/**
+	 * 根据订单号获取shipment
+	 * @param orderLineNum
+	 * @return
+	 */
+	Map<String,Object> getShipmentByOrderLineNum(String orderLineNum);
 }
