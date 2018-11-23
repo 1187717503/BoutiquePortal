@@ -22,6 +22,16 @@ public class DHLInputVO {
     private String labelTemplate;
     private String specialPickupInstruction;
     private String pickupLocation;
+    private String pickupType;
+
+
+    public String getPickupType() {
+        return pickupType;
+    }
+
+    public void setPickupType(String pickupType) {
+        this.pickupType = pickupType;
+    }
 
     public String getSpecialPickupInstruction() {
         return specialPickupInstruction;
