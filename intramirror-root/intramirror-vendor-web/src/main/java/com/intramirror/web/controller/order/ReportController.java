@@ -218,7 +218,7 @@ public class ReportController extends BaseController{
 
         String[] excelHeaders = null;
         //excelHeaders=new String[]{"boutique_id","designer_id", "color_code", "size", "retail_price", "boutique_price", "category", "brand_name", "season_code", "stock"};
-        excelHeaders=new String[]{"boutique_image","brand_name","season_code", "designer_id","color_code", "boutique_id","category","size", "retail_price", "boutique_price", "discount", "stock"};
+        excelHeaders=new String[]{"brand_name","season_code", "designer_id","color_code", "boutique_id","category","size", "retail_price", "boutique_price", "discount", "stock"};
 
         //rowLength++;
         HSSFRow row = null;
@@ -249,7 +249,7 @@ public class ReportController extends BaseController{
                  /*boutique_image*/
                 ro ++;
                 row = sheet.createRow(rowLength);
-                row.setHeight((short) 900);
+                /*row.setHeight((short) 900);
                 String urlList = reportVO.getConverpic();
                 if(StringUtil.isNotEmpty(urlList)){
                     try{
@@ -261,37 +261,37 @@ public class ReportController extends BaseController{
                        logger.error("图片urlList异常：{}",urlList);
                     }
 
-                }
+                }*/
 
-                cell = row.createCell(1);
+                cell = row.createCell(0);
                 cell.setCellValue(reportVO.getBrandName());
 
-                cell = row.createCell(2);
+                cell = row.createCell(1);
                 cell.setCellValue(reportVO.getSeasonCode());
 
-                cell = row.createCell(3);
+                cell = row.createCell(2);
                 cell.setCellValue(reportVO.getDesignerId());
 
-                cell = row.createCell(4);
+                cell = row.createCell(3);
                 cell.setCellValue(reportVO.getColorCode());
-                cell = row.createCell(5);
+                cell = row.createCell(4);
                 cell.setCellValue(reportVO.getBoutiqueId());
-                cell = row.createCell(6);
+                cell = row.createCell(5);
                 cell.setCellValue(reportVO.getCategoryName());
 
-                cell = row.createCell(7);
+                cell = row.createCell(6);
                 cell.setCellValue(reportVO.getSize());
 
-                cell = row.createCell(8);
+                cell = row.createCell(7);
                 cell.setCellValue(reportVO.getRetailPrice()!=null?reportVO.getRetailPrice().setScale(4, RoundingMode.HALF_UP).toString():"");
 
-                cell = row.createCell(9);
+                cell = row.createCell(8);
                 cell.setCellValue(reportVO.getBoutiquePrice()!=null?reportVO.getBoutiquePrice().setScale(4, RoundingMode.HALF_UP).toString():"");
 
-                cell = row.createCell(10);
+                cell = row.createCell(9);
                 cell.setCellValue(reportVO.getBoutiqueDiscount() + "%");
 
-                cell = row.createCell(11);
+                cell = row.createCell(10);
                 cell.setCellValue(reportVO.getStock()!=null?reportVO.getStock():0);
                 rowLength ++;
             }
