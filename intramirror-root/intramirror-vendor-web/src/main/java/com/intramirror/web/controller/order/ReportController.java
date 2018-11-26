@@ -289,7 +289,7 @@ public class ReportController extends BaseController{
                 cell.setCellValue(reportVO.getBoutiquePrice()!=null?reportVO.getBoutiquePrice().setScale(4, RoundingMode.HALF_UP).toString():"");
 
                 cell = row.createCell(10);
-                cell.setCellValue(reportVO.getBoutiqueDiscount());
+                cell.setCellValue(reportVO.getBoutiqueDiscount() + "%");
 
                 cell = row.createCell(11);
                 cell.setCellValue(reportVO.getStock()!=null?reportVO.getStock():0);
