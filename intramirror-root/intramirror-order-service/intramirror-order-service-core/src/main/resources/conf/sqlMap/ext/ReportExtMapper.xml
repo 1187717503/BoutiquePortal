@@ -31,6 +31,7 @@
 			p.cover_img as converpic,
 			p.designer_id as designerId,
 			p.color_code as colorCode,
+			v.vendor_name as boutique,
 			p.product_code as boutiqueId,
 			p.boutique_discount as boutiqueDiscount,
 			s.price as retailPrice,
@@ -44,13 +45,17 @@
 			sku s
 		LEFT JOIN sku_store ss ON(ss.sku_id = s.sku_id)
 		LEFT JOIN product p ON(p.product_id = s.product_id)
+		LEFT JOIN vendor v ON(v.vendor_id = p.vendor_id)
 		LEFT JOIN brand b ON(b.brand_id = p.brand_id)
 		LEFT JOIN category c ON(c.category_id = p.category_id)
 		LEFT JOIN category c1 ON(c1.category_id = c.parent_id)
 		LEFT JOIN category c2 ON(c2.category_id = c1.parent_id)
 		WHERE p.enabled = 1
-		<if test="vendorId != null" >
-			and p.vendor_id =  #{vendorId,jdbcType=BIGINT}
+		<if test="vendorIds != null" >
+			and p.vendor_id in
+			<foreach collection="vendorIds" item="vendorId" separator="," close=")" open="(">
+				#{vendorId}
+			</foreach>
 		</if>
 		<if test="designerId != null" >
 			and p.designer_id =  #{designerId,jdbcType=VARCHAR}
@@ -90,13 +95,17 @@
 			sku s
 			LEFT JOIN sku_store ss ON(ss.sku_id = s.sku_id)
 			LEFT JOIN product p ON(p.product_id = s.product_id)
+			LEFT JOIN vendor v ON(v.vendor_id = p.vendor_id)
 			LEFT JOIN brand b ON(b.brand_id = p.brand_id)
 			LEFT JOIN category c ON(c.category_id = p.category_id)
 			LEFT JOIN category c1 ON(c1.category_id = c.parent_id)
 			LEFT JOIN category c2 ON(c2.category_id = c1.parent_id)
 			WHERE p.enabled = 1
-			<if test="vendorId != null" >
-				and p.vendor_id =  #{vendorId,jdbcType=BIGINT}
+			<if test="vendorIds != null" >
+				and p.vendor_id in
+				<foreach collection="vendorIds" item="vendorId" separator="," close=")" open="(">
+					#{vendorId}
+				</foreach>
 			</if>
 			<if test="designerId != null" >
 				and p.designer_id =  #{designerId,jdbcType=VARCHAR}
@@ -136,8 +145,33 @@
         select vendor_id from vendor where user_id = #{userId,jdbcType=BIGINT}
     </select>
 
-	<select id="queryVendorBrand" resultType="com.intramirror.order.api.vo.BrandVO" parameterType="long">
-		select DISTINCT b.brand_id as brandId,b.english_name as englishName from brand b left join product p on(p.brand_id = b.brand_id) where p.vendor_id = #{vendorId,jdbcType=BIGINT} and b.enabled = 1
+	<select id="queryVendorBrand" resultType="com.intramirror.order.api.vo.BrandVO" parameterType="list">
+		select DISTINCT b.brand_id as brandId,b.english_name as englishName from brand b left join product p on(p.brand_id = b.brand_id) where b.enabled = 1 and p.vendor_id IN
+		<foreach collection="vendorIds" index="index" open="(" close=")" separator="," item="id">
+			#{id}
+		</foreach>
+	</select>
+
+	<select id="queryVendorIdsByParentId" resultType="long" parameterType="long">
+		select vendor_id from vendor where parent_id = #{vendorId,jdbcType=BIGINT} and enabled = 1
+	</select>
+
+	<select id="queryVendorsByUserId" resultType="com.intramirror.order.api.vo.VendorVO" parameterType="long">
+		SELECT DISTINCT
+			v1.vendor_id vendorId ,
+			v1.vendor_code vendorCode ,
+			v1.vendor_name vendorName
+		FROM
+			vendor v1
+		LEFT JOIN vendor v2 ON(
+			v1.vendor_id = v2.vendor_id
+			OR v2.vendor_id = v1.parent_id
+		)
+		WHERE
+			v2.user_id = #{userId,jdbcType=BIGINT}
+			and v1.enabled = 1 and v2.enabled = 1
+		ORDER BY
+			v1.parent_id ASC
 	</select>
 
 

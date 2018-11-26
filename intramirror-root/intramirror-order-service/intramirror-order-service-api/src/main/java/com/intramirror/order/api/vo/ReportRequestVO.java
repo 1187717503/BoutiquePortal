@@ -1,5 +1,7 @@
 package com.intramirror.order.api.vo;
 
+import java.util.List;
+
 public class ReportRequestVO {
     private String designerId;
     private String colorCode;
@@ -10,6 +12,7 @@ public class ReportRequestVO {
     private Integer pageNum = 1;
     private Integer start = 0; // limit start pageSize
     private Long vendorId;
+    private List<Long> vendorIds;
     private Integer hasStock; // 0:没库存 1：有库存
     private String boutiqueId; // product->productCode
 
@@ -99,5 +102,13 @@ public class ReportRequestVO {
 
     public void setBoutiqueId(String boutiqueId) {
         this.boutiqueId = boutiqueId;
+    }
+
+    public List<Long> getVendorIds() {
+        return vendorIds;
+    }
+
+    public void setVendorIds(List<Long> vendorIds) {
+        this.vendorIds = vendorIds;
     }
 }

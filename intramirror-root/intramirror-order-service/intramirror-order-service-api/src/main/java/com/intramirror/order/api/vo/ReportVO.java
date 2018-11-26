@@ -16,6 +16,7 @@ public class ReportVO {
     private String seasonCode;
     private Integer stock;
     private String boutiqueId; // product->productCode
+    private String boutique; // 买手店名称 vendor_name
 
     public String getConverpic() {
         return converpic;
@@ -119,5 +120,13 @@ public class ReportVO {
 
     public void setBoutiqueDiscount(Integer boutiqueDiscount) {
         this.boutiqueDiscount = boutiqueDiscount;
+    }
+
+    public String getBoutique() {
+        return boutique;
+    }
+
+    public void setBoutique(String boutique) {
+        this.boutique = boutique;
     }
 }

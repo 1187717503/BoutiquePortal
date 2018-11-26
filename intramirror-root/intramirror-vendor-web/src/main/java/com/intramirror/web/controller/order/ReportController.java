@@ -49,11 +49,23 @@ public class ReportController extends BaseController{
         Long start = System.currentTimeMillis();
         ResultMessage resultMessage = ResultMessage.getInstance();
         checkRequestVo(requestVO);
-        User user = this.getUser(httpRequest);
-        logger.info("根据request获取user信息耗时：{}",System.currentTimeMillis() - start);
-        Long vendorId = reportExtService.queryVendorIdByUserId(user.getUserId());
-        logger.info("根据vendorId信息耗时：{}",System.currentTimeMillis() - start);
-        requestVO.setVendorId(vendorId);
+        List<Long> vendorIds = new ArrayList<>();
+        if(requestVO.getVendorId() == null){
+            User user = this.getUser(httpRequest);
+            logger.info("根据request获取user信息耗时：{}",System.currentTimeMillis() - start);
+            Long vendorId = reportExtService.queryVendorIdByUserId(user.getUserId());
+            // 查询子vendorId
+            List<Long> childVendorIds = reportExtService.queryVendorIdsByParentId(vendorId);
+            logger.info("根据vendorId信息耗时：{}",System.currentTimeMillis() - start);
+            requestVO.setVendorId(vendorId);
+            vendorIds.add(vendorId);
+            if(org.apache.commons.collections.CollectionUtils.isNotEmpty(childVendorIds)){
+                vendorIds.addAll(childVendorIds);
+            }
+        }else {
+            vendorIds.add(requestVO.getVendorId());
+        }
+        requestVO.setVendorIds(vendorIds);
         ReportResponseVO vo = reportExtService.search(requestVO);
         resultMessage.setData(vo);
         resultMessage.successStatus();
@@ -67,9 +79,21 @@ public class ReportController extends BaseController{
     public Object count(@RequestBody ReportRequestVO requestVO,HttpServletRequest httpRequest){
         ResultMessage resultMessage = ResultMessage.getInstance();
         checkRequestVo(requestVO);
-        User user = this.getUser(httpRequest);
-        Long vendorId = reportExtService.queryVendorIdByUserId(user.getUserId());
-        requestVO.setVendorId(vendorId);
+        List<Long> vendorIds = new ArrayList<>();
+        if(requestVO.getVendorId() == null){
+            User user = this.getUser(httpRequest);
+            Long vendorId = reportExtService.queryVendorIdByUserId(user.getUserId());
+            // 查询子vendorId
+            List<Long> childVendorIds = reportExtService.queryVendorIdsByParentId(vendorId);
+            requestVO.setVendorId(vendorId);
+            vendorIds.add(vendorId);
+            if(org.apache.commons.collections.CollectionUtils.isNotEmpty(childVendorIds)){
+                vendorIds.addAll(childVendorIds);
+            }
+        }else {
+            vendorIds.add(requestVO.getVendorId());
+        }
+        requestVO.setVendorIds(vendorIds);
         Integer count = reportExtService.count(requestVO);
         Map<String,Integer> countMap = new HashMap<>();
         countMap.put("count",count);
@@ -92,10 +116,30 @@ public class ReportController extends BaseController{
     @ResponseBody
     public Object queryVendorBrand(HttpServletRequest httpRequest){
         ResultMessage resultMessage = ResultMessage.getInstance();
+
+        List<Long> vendorIds = new ArrayList<>();
         User user = this.getUser(httpRequest);
         Long vendorId = reportExtService.queryVendorIdByUserId(user.getUserId());
-        List<BrandVO> brandVOS = reportExtService.queryVendorBrand(vendorId);
+        // 查询子vendorId
+        List<Long> childVendorIds = reportExtService.queryVendorIdsByParentId(vendorId);
+        vendorIds.add(vendorId);
+        if(org.apache.commons.collections.CollectionUtils.isNotEmpty(childVendorIds)){
+            vendorIds.addAll(childVendorIds);
+        }
+
+        List<BrandVO> brandVOS = reportExtService.queryVendorBrand(vendorIds);
         resultMessage.setData(brandVOS);
+        resultMessage.successStatus();
+        return resultMessage;
+    }
+
+    @GetMapping(value = "/queryVendorList")
+    @ResponseBody
+    public Object queryVendorList(HttpServletRequest httpRequest){
+        ResultMessage resultMessage = ResultMessage.getInstance();
+        User user = this.getUser(httpRequest);
+        List<VendorVO> vendorVOS = reportExtService.queryVendorsByUserId(user.getUserId());
+        resultMessage.setData(vendorVOS);
         resultMessage.successStatus();
         return resultMessage;
     }
@@ -105,9 +149,21 @@ public class ReportController extends BaseController{
     public Object download(@RequestBody ReportRequestVO requestVO, HttpServletRequest httpRequest, HttpServletResponse httpResponse){
         ResultMessage resultMessage = ResultMessage.getInstance();
         checkRequestVo(requestVO);
-        User user = this.getUser(httpRequest);
-        Long vendorId = reportExtService.queryVendorIdByUserId(user.getUserId());
-        requestVO.setVendorId(vendorId);
+        List<Long> vendorIds = new ArrayList<>();
+        if(requestVO.getVendorId() == null){
+            User user = this.getUser(httpRequest);
+            Long vendorId = reportExtService.queryVendorIdByUserId(user.getUserId());
+            // 查询子vendorId
+            List<Long> childVendorIds = reportExtService.queryVendorIdsByParentId(vendorId);
+            requestVO.setVendorId(vendorId);
+            vendorIds.add(vendorId);
+            if(org.apache.commons.collections.CollectionUtils.isNotEmpty(childVendorIds)){
+                vendorIds.addAll(childVendorIds);
+            }
+        }else {
+            vendorIds.add(requestVO.getVendorId());
+        }
+        requestVO.setVendorIds(vendorIds);
         ReportResponseVO vo= reportExtService.search(requestVO);
 
         logger.info("exportOrderList 生成订单文件");
@@ -218,7 +274,7 @@ public class ReportController extends BaseController{
 
         String[] excelHeaders = null;
         //excelHeaders=new String[]{"boutique_id","designer_id", "color_code", "size", "retail_price", "boutique_price", "category", "brand_name", "season_code", "stock"};
-        excelHeaders=new String[]{"brand_name","season_code", "designer_id","color_code", "boutique_id","category","size", "retail_price", "boutique_price", "discount", "stock"};
+        excelHeaders=new String[]{"brand_name","season_code", "designer_id","color_code", "boutique","boutique_id","category","size", "retail_price", "boutique_price", "discount", "stock"};
 
         //rowLength++;
         HSSFRow row = null;
@@ -275,23 +331,26 @@ public class ReportController extends BaseController{
                 cell = row.createCell(3);
                 cell.setCellValue(reportVO.getColorCode());
                 cell = row.createCell(4);
-                cell.setCellValue(reportVO.getBoutiqueId());
+                cell.setCellValue(reportVO.getBoutique());
+
                 cell = row.createCell(5);
+                cell.setCellValue(reportVO.getBoutiqueId());
+                cell = row.createCell(6);
                 cell.setCellValue(reportVO.getCategoryName());
 
-                cell = row.createCell(6);
+                cell = row.createCell(7);
                 cell.setCellValue(reportVO.getSize());
 
-                cell = row.createCell(7);
+                cell = row.createCell(8);
                 cell.setCellValue(reportVO.getRetailPrice()!=null?reportVO.getRetailPrice().setScale(4, RoundingMode.HALF_UP).toString():"");
 
-                cell = row.createCell(8);
+                cell = row.createCell(9);
                 cell.setCellValue(reportVO.getBoutiquePrice()!=null?reportVO.getBoutiquePrice().setScale(4, RoundingMode.HALF_UP).toString():"");
 
-                cell = row.createCell(9);
+                cell = row.createCell(10);
                 cell.setCellValue(reportVO.getBoutiqueDiscount() + "%");
 
-                cell = row.createCell(10);
+                cell = row.createCell(11);
                 cell.setCellValue(reportVO.getStock()!=null?reportVO.getStock():0);
                 rowLength ++;
             }
