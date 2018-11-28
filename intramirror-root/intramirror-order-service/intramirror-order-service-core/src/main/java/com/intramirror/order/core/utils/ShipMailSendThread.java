@@ -136,29 +136,31 @@ public class ShipMailSendThread implements Runnable {
             mailContent.setToEmails(MailConfig.emailTo);
         }
 
-        boolean flag = true; //是否删除附件文件
-        try {
-            logger.info("ShipMailSendThread 开始发送邮件 content={}", JSONObject.toJSONString(mailContent));
-            MailSendUtil.sendMail(mailContent);
-            logger.info("ShipMailSendThread 邮件发送完成，shipmentNo:{}",shipment.getShipmentNo());
-        } catch (Exception e) {
-            flag = false;
-            e.printStackTrace();
-            logger.error("ShipMailSendThread 邮件发送失败，shipmentNo:{},errorMsg:{}",shipment.getShipmentNo(), e.getMessage());
-            mailSendManageService.insertShipEmailLog(shipment.getShipmentNo(), JSONObject.toJSONString(mailContent),e.getMessage());
-        } finally {
-            if (flag){
-                //删除附件文件
-                List<MailAttachmentVO> attachments = mailContent.getAttachments();
-                for (MailAttachmentVO attachment : attachments) {
-                    File file = new File(attachment.getFileUrl());
-                    if (file.exists() && file.isFile()) {
-                        file.delete();
+        synchronized (mailContent){
+            boolean flag = true; //是否删除附件文件
+            try {
+                logger.info("ShipMailSendThread 开始发送邮件 content={}", JSONObject.toJSONString(mailContent));
+                MailSendUtil.sendMail(mailContent);
+                logger.info("ShipMailSendThread 邮件发送完成，shipmentNo:{}",shipment.getShipmentNo());
+            } catch (Exception e) {
+                flag = false;
+                e.printStackTrace();
+                logger.error("ShipMailSendThread 邮件发送失败，shipmentNo:{},errorMsg:{}",shipment.getShipmentNo(), e.getMessage());
+                mailSendManageService.insertShipEmailLog(shipment.getShipmentNo(), JSONObject.toJSONString(mailContent),e.getMessage());
+            } finally {
+                if (flag){
+                    //删除附件文件
+                    List<MailAttachmentVO> attachments = mailContent.getAttachments();
+                    for (MailAttachmentVO attachment : attachments) {
+                        File file = new File(attachment.getFileUrl());
+                        if (file.exists() && file.isFile()) {
+                            file.delete();
+                        }
                     }
                 }
             }
+            logger.info("----------Send mail finished.----------");
         }
-        logger.info("----------Send mail finished.----------");
     }
 
     /**
