@@ -40,7 +40,15 @@ public class ReportExtServiceImpl extends BaseDao{
         return vendorId;
     }
 
-    public List<BrandVO> queryVendorBrand(Long vendorId) {
-        return reportExtMapper.queryVendorBrand(vendorId);
+    public List<BrandVO> queryVendorBrand(List<Long> vendorIds) {
+        return reportExtMapper.queryVendorBrand(vendorIds);
+    }
+
+    public List<Long> queryVendorIdsByParentId(Long vendorId){
+        return reportExtMapper.queryVendorIdsByParentId(vendorId);
+    }
+
+    public List<VendorVO> queryVendorsByUserId(Long userId){
+        return reportExtMapper.queryVendorsByUserId(userId);
     }
 }

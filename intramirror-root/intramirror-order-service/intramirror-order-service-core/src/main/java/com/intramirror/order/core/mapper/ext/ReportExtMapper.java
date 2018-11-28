@@ -1,9 +1,7 @@
 package com.intramirror.order.core.mapper.ext;
 
-import com.intramirror.order.api.vo.BrandVO;
-import com.intramirror.order.api.vo.ReportRequestVO;
-import com.intramirror.order.api.vo.ReportVO;
-import com.intramirror.order.api.vo.SeasonVO;
+import com.intramirror.order.api.vo.*;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -19,5 +17,9 @@ public interface ReportExtMapper {
 
     Long queryVendorIdByUserId(Long userId);
 
-    List<BrandVO> queryVendorBrand(Long vendorId);
+    List<BrandVO> queryVendorBrand(@Param("vendorIds") List<Long> vendorIds);
+
+    List<Long> queryVendorIdsByParentId(Long vendorId);
+
+    List<VendorVO> queryVendorsByUserId(Long userId);
 }

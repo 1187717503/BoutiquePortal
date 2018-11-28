@@ -4,6 +4,7 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.support.SqlSessionDaoSupport;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * 注入sqlSessionTemplate,使用SqlSessionDaoSupport
@@ -22,5 +23,6 @@ public abstract class BaseDao extends SqlSessionDaoSupport{
 	
 	/** 初始化Mapper */
 	public abstract void init();
-	
+
+
 }
