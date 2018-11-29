@@ -1787,23 +1787,36 @@ public class OrderShipController extends BaseController {
 
             if ("IT".equalsIgnoreCase(countryCode)){
                 inputVO.setPickupType("pickup");
+            }else {
+                Calendar calendar = Calendar.getInstance();
+                calendar.add(Calendar.DAY_OF_YEAR, 1);
+                Date currentTime = calendar.getTime();
+                //获取意大利时间,再往后延一天
+                inputVO.setShipmentDate(currentTime.getTime());
             }
 
             if (shipment!=null){
                 String shipToGeography = shipment.getShipToGeography();
-                if ("European Union".equals(shipToGeography)){
+                /*if ("European Union".equals(shipToGeography)){
                     if (countryCode.equalsIgnoreCase(dhlShipment.getShipToCountryCode())){
                         inputVO.setServiceType("N");
                     }else {
                         inputVO.setServiceType("U");
                     }
-                }else if ("Transit Warehouse".equals(shipToGeography)){
+                }else*/
+                if ("Transit Warehouse".equals(shipToGeography)){
                     if ("IT".equalsIgnoreCase(countryCode)){
                         inputVO.setServiceType("N");
                     }else {
-                        inputVO.setServiceType("U");
+                        inputVO.setServiceType("P");
                     }
-                }else {
+                }else if ("Other".equalsIgnoreCase(shipToGeography)){
+                    if (countryCode.equalsIgnoreCase(dhlShipment.getShipToCountryCode())){
+                        inputVO.setServiceType("N");
+                    }else {
+                        inputVO.setServiceType("P");
+                    }
+                } else {
                     inputVO.setServiceType("P");
                 }
             }
@@ -1925,8 +1938,8 @@ public class OrderShipController extends BaseController {
         inputVO.setShipmentDate(null);
         try {
             //System.out.println(f1.parse("2015-12-12"));
-            f1.setTimeZone(TimeZone.getTimeZone("GMT+02:00"));
-            f2.setTimeZone(TimeZone.getTimeZone("GMT+02:00"));
+            f1.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
+            f2.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
         } catch (Exception e) {
             e.printStackTrace();
         }
