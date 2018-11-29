@@ -1726,7 +1726,7 @@ public class OrderShipController extends BaseController {
         if (map.get("pickupLocation")!=null){
             inputVO.setPickupLocation(map.get("pickupLocation").toString());
         }
-        inputVO.setPickupType("pickup");
+
         Map<String,Object> params = new HashMap<>();
         //查询close状态纸箱
         //params.put("status",2);
@@ -1779,22 +1779,34 @@ public class OrderShipController extends BaseController {
                 //subShipmentService.updateSubShipment(deleteParams);
                 oldAwbNo = dhlShipment.getAwbNum();
             }
+            StockLocation fromLocation = stockLocationService.getShipFromLocation(shipmentId);
+            String countryCode = "IT";
+            if (fromLocation != null){
+                countryCode = fromLocation.getAddressCountryCode();
+            }
+
+            if ("IT".equalsIgnoreCase(countryCode)){
+                inputVO.setPickupType("pickup");
+            }
 
             if (shipment!=null){
                 String shipToGeography = shipment.getShipToGeography();
                 if ("European Union".equals(shipToGeography)){
-                    if ("IT".equalsIgnoreCase(dhlShipment.getShipToCountryCode())){
+                    if (countryCode.equalsIgnoreCase(dhlShipment.getShipToCountryCode())){
                         inputVO.setServiceType("N");
                     }else {
                         inputVO.setServiceType("U");
                     }
                 }else if ("Transit Warehouse".equals(shipToGeography)){
-                    inputVO.setServiceType("N");
+                    if ("IT".equalsIgnoreCase(countryCode)){
+                        inputVO.setServiceType("N");
+                    }else {
+                        inputVO.setServiceType("U");
+                    }
                 }else {
                     inputVO.setServiceType("P");
                 }
             }
-            StockLocation fromLocation = stockLocationService.getShipFromLocation(shipmentId);
 
             if ("P".equalsIgnoreCase(inputVO.getServiceType())){
                 //只有类型ServiceType=P时才需要customsValue
