@@ -33,7 +33,7 @@
 			p.color_code as colorCode,
 			v.vendor_name as boutique,
 			p.product_code as boutiqueId,
-			p.boutique_discount as boutiqueDiscount,
+			IF((p.boutique_discount = NULL ), 0, 100-p.boutique_discount) AS boutiqueDiscount,
 			s.price as retailPrice,
 			s.in_price as boutiquePrice,
 			s.size as size,
