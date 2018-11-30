@@ -101,7 +101,8 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
   </select>
   
    <select id="getShipmentInfoById" resultType="java.util.HashMap"  parameterType="java.util.Map">
-	  SELECT ss.shipment_type_id,s.*,i.invoice_num invoiceNum,i.invoice_date,sl.stock_location,sub.awb_num,v.vendor_name  FROM sub_shipment sub
+	  SELECT ss.shipment_type_id,s.*,i.invoice_num invoiceNum,i.invoice_date,sl.stock_location,sub.awb_num,v.vendor_name,sl.address_country_code as countryCode
+	    FROM sub_shipment sub
 		INNER JOIN shipment s ON (sub.shipment_id = s.shipment_id)
 		INNER JOIN shipping_segment ss ON (sub.shipping_segment_id = ss.shipping_segment_id)
 		INNER JOIN shipment_type st ON (ss.shipment_type_id = st.shipment_type_id)
