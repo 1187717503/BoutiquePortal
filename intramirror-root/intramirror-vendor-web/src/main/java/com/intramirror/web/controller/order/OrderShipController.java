@@ -5,9 +5,11 @@ import com.intramirror.common.help.ResultMessage;
 import com.intramirror.logistics.api.model.Invoice;
 import com.intramirror.logistics.api.model.VendorShipment;
 import com.intramirror.logistics.api.service.IInvoiceService;
+import com.intramirror.main.api.model.AddressCountry;
 import com.intramirror.main.api.model.Geography;
 import com.intramirror.main.api.model.StockLocation;
 import com.intramirror.main.api.model.Tax;
+import com.intramirror.main.api.service.AddressCountryService;
 import com.intramirror.main.api.service.GeographyService;
 import com.intramirror.main.api.service.StockLocationService;
 import com.intramirror.main.api.service.TaxService;
@@ -75,19 +77,14 @@ public class OrderShipController extends BaseController {
 
     @Autowired
     private IOrderService orderService;
-
     @Autowired
     private VendorService vendorService;
-
     @Autowired
     private IShipmentService iShipmentService;
-
     @Autowired
     private IContainerService containerService;
-
     @Autowired
     private GeographyService geographyService;
-
     @Autowired
     private IInvoiceService invoiceService;
     @Autowired
@@ -100,6 +97,8 @@ public class OrderShipController extends BaseController {
     private TaxService taxService;
     @Autowired
     private StockLocationService stockLocationService;
+    @Autowired
+    private AddressCountryService addressCountryService;
 
     /**
      * 获取所有箱子信息
@@ -766,19 +765,24 @@ public class OrderShipController extends BaseController {
 
             //获取Ship From信息
             StockLocation location = stockLocationService.getShipFromLocation(shipment_id);
+            AddressCountry country = addressCountryService.getAddressCountryByCountryCode(location.getAddressCountryCode());
+            String countryName = "Italy";
+            if (country != null){
+                countryName = country.getEnglishName();
+            }
             // 获取invoice from
             resultMap.put("companyName",location.getContactCompanyName());
             resultMap.put("personName",location.getContactPersonName());
             resultMap.put("contact",location.getContactPhoneNumber());
             resultMap.put("address",location.getAddressStreetlines());
             resultMap.put("city",location.getAddressCity());
-            resultMap.put("country","Italy");
+            resultMap.put("country",countryName);
 
             resultMap.put("invoiceCompanyName",vendor.getCompanyName());
             resultMap.put("invoicePersonName",vendor.getRegisteredPerson());
             resultMap.put("invoiceAddress",vendor.getBusinessLicenseLocation());
             //resultMap.put("invoiceCity",location.getAddressCity());
-            resultMap.put("invoiceCountry","Italy");
+            resultMap.put("invoiceCountry",countryName);
 
             logger.info("打印Invoice----获取Deliver To信息");
             List<SubShipment> subShipmentList = subShipmentService.getSubShipmentByShipmentId(shipment_id);
@@ -941,6 +945,11 @@ public class OrderShipController extends BaseController {
 
         //获取Ship From信息
         StockLocation location = stockLocationService.getShipFromLocation(shipment_id);
+        AddressCountry addressCountry = addressCountryService.getAddressCountryByCountryCode(location.getAddressCountryCode());
+        String countryName = "Italy";
+        if (addressCountry != null){
+            countryName = addressCountry.getEnglishName();
+        }
         ShipperVO shipperVO = new ShipperVO();
         shipperVO.setCompanyName(location.getContactCompanyName());
         shipperVO.setPersonName(location.getContactPersonName());
@@ -949,12 +958,12 @@ public class OrderShipController extends BaseController {
         shipperVO.setStreetLines2(location.getAddressStreetlines2());
         shipperVO.setStreetLines3(location.getAddressStreetlines3());
         shipperVO.setCity(location.getAddressCity());
-        shipperVO.setCountry("Italy");
+        shipperVO.setCountry(countryName);
         ShipperVO invoiceForm = new ShipperVO();
         invoiceForm.setCompanyName(vendor.getCompanyName());
         invoiceForm.setPersonName(vendor.getRegisteredPerson());
         invoiceForm.setStreetLines(vendor.getBusinessLicenseLocation());
-        invoiceForm.setCountry("Italy");
+        invoiceForm.setCountry(countryName);
 
         boolean isDDt = false;
         if(map.get("ddtFlag")!=null&&"1".equals(map.get("ddtFlag").toString())){
@@ -1347,6 +1356,13 @@ public class OrderShipController extends BaseController {
         return discountTax;
     }
 
+    /**
+     * 发往COMO的发票
+     * @param map
+     * @param httpRequest
+     * @param response
+     * @return
+     */
     @RequestMapping(value = "/printComoInvoice", method = RequestMethod.POST)
     @ResponseBody
     public ResultMessage printComoInvoice(@RequestBody Map<String,Object> map, HttpServletRequest httpRequest,HttpServletResponse response) {
@@ -1397,6 +1413,11 @@ public class OrderShipController extends BaseController {
 
         //获取Ship From信息
         StockLocation location = stockLocationService.getShipFromLocation(shipment_id);
+        AddressCountry addressCountry = addressCountryService.getAddressCountryByCountryCode(location.getAddressCountryCode());
+        String countryName = "Italy";
+        if (addressCountry != null){
+            countryName = addressCountry.getEnglishName();
+        }
         ShipperVO shipperVO = new ShipperVO();
         shipperVO.setCompanyName(location.getContactCompanyName());
         shipperVO.setPersonName(location.getContactPersonName());
@@ -1405,12 +1426,12 @@ public class OrderShipController extends BaseController {
         shipperVO.setStreetLines2(location.getAddressStreetlines2());
         shipperVO.setStreetLines3(location.getAddressStreetlines3());
         shipperVO.setCity(location.getAddressCity());
-        shipperVO.setCountry("Italy");
+        shipperVO.setCountry(countryName);
         ShipperVO invoiceForm = new ShipperVO();
         invoiceForm.setCompanyName(vendor.getCompanyName());
         invoiceForm.setPersonName(vendor.getRegisteredPerson());
         invoiceForm.setStreetLines(vendor.getBusinessLicenseLocation());
-        invoiceForm.setCountry("Italy");
+        invoiceForm.setCountry(countryName);
 
 
         //获取Invoice 信息
@@ -1705,7 +1726,7 @@ public class OrderShipController extends BaseController {
         if (map.get("pickupLocation")!=null){
             inputVO.setPickupLocation(map.get("pickupLocation").toString());
         }
-        inputVO.setPickupType("pickup");
+
         Map<String,Object> params = new HashMap<>();
         //查询close状态纸箱
         //params.put("status",2);
@@ -1758,22 +1779,47 @@ public class OrderShipController extends BaseController {
                 //subShipmentService.updateSubShipment(deleteParams);
                 oldAwbNo = dhlShipment.getAwbNum();
             }
+            StockLocation fromLocation = stockLocationService.getShipFromLocation(shipmentId);
+            String countryCode = "IT";
+            if (fromLocation != null){
+                countryCode = fromLocation.getAddressCountryCode();
+            }
+
+            if ("IT".equalsIgnoreCase(countryCode)){
+                inputVO.setPickupType("pickup");
+            }else {
+                Calendar calendar = Calendar.getInstance();
+                calendar.add(Calendar.DAY_OF_YEAR, 1);
+                Date currentTime = calendar.getTime();
+                //获取意大利时间,再往后延一天
+                inputVO.setShipmentDate(currentTime.getTime());
+            }
 
             if (shipment!=null){
                 String shipToGeography = shipment.getShipToGeography();
-                if ("European Union".equals(shipToGeography)){
-                    if ("IT".equalsIgnoreCase(dhlShipment.getShipToCountryCode())){
+                /*if ("European Union".equals(shipToGeography)){
+                    if (countryCode.equalsIgnoreCase(dhlShipment.getShipToCountryCode())){
                         inputVO.setServiceType("N");
                     }else {
                         inputVO.setServiceType("U");
                     }
-                }else if ("Transit Warehouse".equals(shipToGeography)){
-                    inputVO.setServiceType("N");
-                }else {
+                }else*/
+                if ("Transit Warehouse".equals(shipToGeography)){
+                    if ("IT".equalsIgnoreCase(countryCode)){
+                        inputVO.setServiceType("N");
+                    }else {
+                        inputVO.setServiceType("P");
+                    }
+                }else if ("Other".equalsIgnoreCase(shipToGeography)){
+                    if (countryCode.equalsIgnoreCase(dhlShipment.getShipToCountryCode())){
+                        inputVO.setServiceType("N");
+                    }else {
+                        inputVO.setServiceType("P");
+                    }
+                } else {
                     inputVO.setServiceType("P");
                 }
             }
-            StockLocation fromLocation = stockLocationService.getShipFromLocation(shipmentId);
 
             if ("P".equalsIgnoreCase(inputVO.getServiceType())){
                 //只有类型ServiceType=P时才需要customsValue
@@ -1892,8 +1938,8 @@ public class OrderShipController extends BaseController {
         inputVO.setShipmentDate(null);
         try {
             //System.out.println(f1.parse("2015-12-12"));
-            f1.setTimeZone(TimeZone.getTimeZone("GMT+02:00"));
-            f2.setTimeZone(TimeZone.getTimeZone("GMT+02:00"));
+            f1.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
+            f2.setTimeZone(TimeZone.getTimeZone("GMT+01:00"));
         } catch (Exception e) {
             e.printStackTrace();
         }
