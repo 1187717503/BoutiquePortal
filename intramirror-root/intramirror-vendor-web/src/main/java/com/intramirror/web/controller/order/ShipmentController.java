@@ -412,11 +412,15 @@ public class ShipmentController extends BaseController{
 			message.errorStatus().putMsg("Info", "awbNos cannot be null");
 			return message;
 		}
-		List<Shipment> shipmentList = iShipmentService.getShipmentList(awbNos);
-		if (shipmentList!=null&&shipmentList.size()>0){
-			for (Shipment shipment:shipmentList){
-				if (3!=shipment.getStatus()){
-					shippedOrder(message, shipment);
+		List<Shipment> shipmentList = null;
+		//防止并发调用自动ship，导致邮件重复发送
+		synchronized (param){
+			shipmentList = iShipmentService.getShipmentList(awbNos);
+			if (shipmentList!=null&&shipmentList.size()>0){
+				for (Shipment shipment:shipmentList){
+					if (3!=shipment.getStatus()){
+						shippedOrder(message, shipment);
+					}
 				}
 			}
 		}
