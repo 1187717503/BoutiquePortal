@@ -136,7 +136,7 @@ public class ShipMailSendThread implements Runnable {
             mailContent.setToEmails(MailConfig.emailTo);
         }
 
-        synchronized (mailContent){
+        synchronized (this){
             boolean flag = true; //是否删除附件文件
             try {
                 logger.info("ShipMailSendThread 开始发送邮件 content={}", JSONObject.toJSONString(mailContent));
