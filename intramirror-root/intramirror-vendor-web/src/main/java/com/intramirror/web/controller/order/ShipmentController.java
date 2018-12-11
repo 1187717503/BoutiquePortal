@@ -401,7 +401,6 @@ public class ShipmentController extends BaseController{
 
 	@RequestMapping(value="/shipped", method=RequestMethod.POST)
 	@ResponseBody
-	@Transactional
 	public ResultMessage shipped(@RequestBody ShippedParam param) {
 		logger.info("shipped parameter : " + new Gson().toJson(param));
 		ResultMessage message = ResultMessage.getInstance();
@@ -432,25 +431,27 @@ public class ShipmentController extends BaseController{
 
 	@RequestMapping(value="/shipToComo", method=RequestMethod.POST)
 	@ResponseBody
-	@Transactional
 	public ResultMessage shipToComo(@RequestParam String orderLineNum) {
 		logger.info("shipped orderLineNum : {}", orderLineNum);
 		ResultMessage message = ResultMessage.getInstance();
 		message.errorStatus();
 
-		Map<String, Object> shipmentMap = iShipmentService.getShipmentByOrderLineNum(orderLineNum);
-		if (shipmentMap != null){
-			Shipment shipment = (Shipment)shipmentMap.get("shipment");
-			if (3!=shipment.getStatus()){
-				shippedOrder(message, shipment);
-				List<String> nums = (List<String>)shipmentMap.get("orderLineNum");
-				message.setData(nums);
+		synchronized (this) {
+			Map<String, Object> shipmentMap = iShipmentService.getShipmentByOrderLineNum(orderLineNum);
+			if (shipmentMap != null) {
+				Shipment shipment = (Shipment) shipmentMap.get("shipment");
+				if (3 != shipment.getStatus()) {
+					shippedOrder(message, shipment);
+					List<String> nums = (List<String>) shipmentMap.get("orderLineNum");
+					message.setData(nums);
+				}
 			}
 		}
 		return message;
 	}
 
-	private void shippedOrder(ResultMessage message, Shipment shipment) {
+	@Transactional
+	public void shippedOrder(ResultMessage message, Shipment shipment) {
 		logger.info("shipmentNo:{}，自动ship",shipment.getShipmentNo());
 		List<String> list = new ArrayList<>();
 		iShipmentService.shipmentToShip(shipment);
