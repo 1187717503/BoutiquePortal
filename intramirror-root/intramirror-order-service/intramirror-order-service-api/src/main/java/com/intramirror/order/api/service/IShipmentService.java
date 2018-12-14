@@ -7,6 +7,7 @@ import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.model.SubShipment;
 import com.intramirror.order.api.vo.LogisticsProductVO;
+import com.intramirror.order.api.vo.ShipmentInputVO;
 import com.intramirror.order.api.vo.ShipmentSendMailVO;
 
 import java.math.BigDecimal;
@@ -194,4 +195,7 @@ public interface IShipmentService {
 	 * @return
 	 */
 	Map<String,Object> getShipmentByOrderLineNum(String orderLineNum);
+
+    void saveAwb(ShipmentInputVO inputVO);
+
 }

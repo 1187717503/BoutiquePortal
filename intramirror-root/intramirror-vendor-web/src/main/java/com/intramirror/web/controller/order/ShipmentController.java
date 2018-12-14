@@ -15,6 +15,7 @@ import com.intramirror.order.api.vo.ShipmentSendMailVO;
 import com.intramirror.order.api.vo.ShippedParam;
 import com.intramirror.user.api.model.User;
 import com.intramirror.utils.transform.JsonTransformUtil;
+import com.intramirror.order.api.vo.ShipmentInputVO;
 import com.intramirror.web.controller.BaseController;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -446,6 +447,27 @@ public class ShipmentController extends BaseController{
 					message.setData(nums);
 				}
 			}
+		}
+		return message;
+	}
+
+	@RequestMapping(value="/saveAwb", method=RequestMethod.POST)
+	@ResponseBody
+	public ResultMessage saveAwb(@RequestBody ShipmentInputVO inputVO) {
+		logger.info("保存线下生成AWB，请求参数：{}", inputVO);
+		ResultMessage message = ResultMessage.getInstance();
+		message.errorStatus();
+		if (StringUtil.isEmpty(inputVO.getAwbNo())){
+			throw new RuntimeException("The awb number cannot be empty!");
+		}
+		if (inputVO.getShipmentId() == null){
+			throw new RuntimeException("The shipmentId cannot be empty!");
+		}
+		try {
+			iShipmentService.saveAwb(inputVO);
+			message.successStatus();
+		}catch (Exception e){
+			logger.error(e.getMessage());
 		}
 		return message;
 	}
