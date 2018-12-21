@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.text.MessageFormat;
@@ -756,6 +757,42 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			return map;
 		}
 		return null;
+	}
+
+	@Override
+	@Transactional
+	public void saveAwb(ShipmentInputVO inputVO) {
+		Map<String,Object> params = new HashMap<>();
+		Long shipmentId = inputVO.getShipmentId();
+		String awbNo = inputVO.getAwbNo();
+		params.put("shipmentId", shipmentId);
+		params.put("sequence",1);
+		SubShipment dhlShipment = subShipmentService.getDHLShipment(params);
+		String oldAwb = null;
+		if (dhlShipment != null && dhlShipment.getAwbNum() != null){
+			oldAwb = dhlShipment.getAwbNum();
+		}
+		params.put("awbNo",awbNo);
+		subShipmentService.updateSubShipment(params);
+
+		//保存awb单号
+		List<LogisticsProductVO> productVOList = getlogisticsMilestone(shipmentId);
+		if (productVOList != null && productVOList.size() > 0 ){
+			for (LogisticsProductVO vo:productVOList){
+				vo.setAwb(awbNo);
+				vo.setIsComplete(0);
+				vo.setShipmentType(3);
+				vo.setType(4);
+				saveMilestone(vo);
+			}
+		}
+		logger.info("shipmentId:{},新生成awb为{},并同步到物流数据中",shipmentId,awbNo);
+
+		if (oldAwb != null){
+			//删除物流表中旧的awb单号
+			deleteMilestone(oldAwb);
+			logger.info("awb:{}已从物流数据中删除",oldAwb);
+		}
 	}
 
 	private String checkAWB(Long shipmentId) {
