@@ -33,7 +33,7 @@
 			p.color_code as colorCode,
 			v.vendor_name as boutique,
 			p.product_code as boutiqueId,
-			CONVERT(1 - s.in_price / s.price * (t.`tax_rate`+1), DECIMAL(10, 2)) AS boutiqueDiscount,
+			CONVERT(1 - s.in_price / s.price * (t.`tax_rate`+1), DECIMAL(10, 2)) * 100 AS boutiqueDiscount,
 			s.price as retailPrice,
 			s.in_price as boutiquePrice,
 			s.size as size,
