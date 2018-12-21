@@ -447,7 +447,7 @@
         lp.`retail_price` as price,lp.`in_price`,lp.`sale_price`,
         lp.amount,lp.shipping_fee,lp.tax_fee,lp.order_line_num,lp.`status`,s.sku_code,b.english_name
         as brandName,l.user_rec_country as userRecCountry,l.express_type,
-        v.vendor_name,
+        v.vendor_name,o.user_id,o.contact_phone,
         if(t.tax_rate = NULL,0,ROUND(t.tax_rate * lp.in_price,2)) as vat,
         CASE WHEN p.spu_id IS NULL THEN p.cover_img ELSE spu.cover_img END AS cover_img,
         g.english_name as geography_name ,lp.logistics_product_id,v.vendor_id,lp.shipping_method as shippingMethod
