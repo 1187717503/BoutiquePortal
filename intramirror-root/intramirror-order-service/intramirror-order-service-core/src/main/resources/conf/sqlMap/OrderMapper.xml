@@ -107,6 +107,7 @@
         if(lp.user_rec_flag=0, l.user_rec_city, lp.user_rec_city) as user_rec_city,
         if(lp.user_rec_flag=0, l.user_rec_area, lp.user_rec_area) as user_rec_area,
         if(lp.user_rec_flag=0, l.user_rec_addr, lp.user_rec_addr) as user_rec_addr,
+        lps.season_code as season_code,
         l.user_rec_country,l.geography_id,
         v.vendor_name,v.vendor_id,v.skip_confirm,g.english_name as geography_name,v.address_country_id as
         vendor_address_country_id,
@@ -119,6 +120,7 @@
         p.color_code as colorCode,p.designer_id as brandID
         FROM logistics_product lp INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
         LEFT JOIN stock_location sl on sl.location_id = lp.stock_location_id
+        LEFT JOIN logistics_product_snapshot lps on(lp.logistics_product_id = lps.logistics_product_id)
         INNER JOIN `order` o ON ol.order_id = o.order_id
         LEFT JOIN user_ship_address usa ON o.user_id = usa.user_id
         LEFT JOIN logistics l ON (lp.order_logistics_id = l.order_logistics_id and l.enabled = 1)
@@ -218,6 +220,7 @@
         v.vendor_id,
         v.skip_confirm,
         v.address_country_id AS vendor_address_country_id,
+        lps.season_code as season_code,
         CASE WHEN p.spu_id IS NULL THEN p.cover_img ELSE spu.cover_img END AS cover_img,
         lp.logistics_product_id,
         lp.updated_at as cancel_at,
@@ -225,6 +228,7 @@
         FROM
         logistics_product lp
         INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
+        LEFT JOIN logistics_product_snapshot lps on(lp.logistics_product_id = lps.logistics_product_id)
         INNER JOIN `order` o ON ol.order_id = o.order_id
         LEFT JOIN logistics l ON (
         lp.order_logistics_id = l.order_logistics_id
