@@ -33,7 +33,7 @@
 			p.color_code as colorCode,
 			v.vendor_name as boutique,
 			p.product_code as boutiqueId,
-			IF((p.boutique_discount = NULL ), 0, 100-p.boutique_discount) AS boutiqueDiscount,
+			CONVERT(1 - s.in_price / s.price * (t.`tax_rate`+1), DECIMAL(10, 2)) AS boutiqueDiscount,
 			s.price as retailPrice,
 			s.in_price as boutiquePrice,
 			s.size as size,
@@ -50,6 +50,7 @@
 		LEFT JOIN category c ON(c.category_id = p.category_id)
 		LEFT JOIN category c1 ON(c1.category_id = c.parent_id)
 		LEFT JOIN category c2 ON(c2.category_id = c1.parent_id)
+		LEFT JOIN tax t on(v.address_country_id = t.address_country_id)
 		WHERE p.enabled = 1
 		<if test="vendorIds != null" >
 			and p.vendor_id in
