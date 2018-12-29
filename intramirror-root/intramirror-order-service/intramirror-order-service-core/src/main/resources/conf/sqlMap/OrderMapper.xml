@@ -450,7 +450,6 @@
         v.vendor_name,o.user_id,o.contact_phone,
         if(t.tax_rate = NULL,0,ROUND(t.tax_rate * lp.in_price,2)) as vat,
         CASE WHEN p.spu_id IS NULL THEN p.cover_img ELSE spu.cover_img END AS cover_img,
-        CONCAT_WS("->" , c2. NAME , c1. NAME , c. NAME) categoryName ,
         g.english_name as geography_name ,lp.logistics_product_id,v.vendor_id,lp.shipping_method as shippingMethod
         FROM logistics_product lp
         INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
@@ -465,9 +464,6 @@
         INNER JOIN brand b ON (p.brand_id = b.brand_id and b.enabled = 1 )
         INNER JOIN sku s ON (s.sku_id = sps.sku_id and s.enabled = 1)
         INNER JOIN vendor v ON (lp.vendor_id = v.vendor_id and v.enabled = 1)
-        LEFT JOIN category c ON(c.category_id = p.category_id)
-        LEFT JOIN category c1 ON(c1.category_id = c.parent_id)
-        LEFT JOIN category c2 ON(c2.category_id = c1.parent_id)
         where lp.enabled = 1
         <if test="status != null">
             and lp.`status` = #{status,jdbcType=BIGINT}
