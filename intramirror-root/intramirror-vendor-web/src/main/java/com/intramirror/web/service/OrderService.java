@@ -526,7 +526,7 @@ public class OrderService {
 			Map<String, Object> orderResult = orderService.getShipmentDetails(saveShipmentParam);
 			orderResult.put("shipmentId", shipmentId);
 			orderResult.put("shipment_category",shipMentMap.get("shipment_category"));
-
+            orderResult.put("pack_english_name",shipMentMap.get("ship_to_geography"));
 			if(isSaveSubShipment){
 				//添加第三段物流
 				logger.info("order updateLogisticsProduct 添加sub_shipment物流信息   调用接口   iShipmentService.saveShipmentByOrderId 入参:"+new Gson().toJson(orderResult));

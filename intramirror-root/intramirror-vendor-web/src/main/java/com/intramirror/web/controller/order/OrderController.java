@@ -742,7 +742,7 @@ public class OrderController extends BaseController {
 
         //map.put("vendorId", vendor.getVendorId());
 
-        LogisticsProduct logisticsProduct=iLogisticsProductService.selectByOrderLineNum((String)map.get("orderLineNum"));
+        LogisticsProduct logisticsProduct=iLogisticsProductService.selectByOrderLineNum(map.get("orderLineNum").toString());
         if(logisticsProduct!=null&&logisticsProduct.getShippingMethod()==1){
             Map<String,Object> containerParam = Maps.newHashMap();
             containerParam.put("containerId",map.get("containerId"));
