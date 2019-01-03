@@ -701,6 +701,9 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 					}else {
 						checkAWB(shipment.getShipmentId());
 					}
+					syncOrderToWarehouse(shipment);
+
+
 					//shipped操作发送消息用来生成资金报表
 					List<LogisticsProduct> logisticsProducts = logisticsProductMapper.getLogisticsProductByShipment(shipment.getShipmentId());
 					if (logisticsProducts!=null && logisticsProducts.size()>0){
@@ -735,6 +738,30 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			}
 		}
 		return result;
+	}
+
+	private void syncOrderToWarehouse(Shipment shipment) {
+		//如果是发往中国大陆的shipment，需要同步一份数据到third_warehouse
+		if ("China excl. Taiwan".equalsIgnoreCase(shipment.getShipToGeography())){
+            //获取这批货的订单详情数据
+            List<ThirdWarehouse> orderDetailList = thirdWarehouseMapper.getOrderDetailList(shipment.getShipmentNo());
+            if (CollectionUtils.isEmpty(orderDetailList)){
+                throw new RuntimeException("The order list is empty.shipmentNo:"+shipment.getShipmentNo());
+            }
+            List<String> orderLineNumList = new ArrayList<>();
+            for (ThirdWarehouse thirdWarehouse:orderDetailList){
+                Date currentDate = new Date();
+                thirdWarehouse.setOverseaShipmentShipTime(currentDate);
+                thirdWarehouse.setCreateTime(currentDate);
+                thirdWarehouse.setUpdateTime(currentDate);
+                //库存状态  1. 待收货  2. 已收货 3.已发货  4.异常收货
+                thirdWarehouse.setStockStatus((byte)1);
+                thirdWarehouseMapper.insertSelective(thirdWarehouse);
+
+                orderLineNumList.add(thirdWarehouse.getOrderLineNum());
+            }
+            logger.info("发货到中国大陆同步订单到第三方仓库的单号：{}",orderLineNumList);
+        }
 	}
 
 	@Override
@@ -1008,22 +1035,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		shipmentMapper.updateShipmentStatus(map);
 
 		//如果是发往中国大陆的shipment，需要同步一份数据到third_warehouse
-		if ("China excl. Taiwan".equalsIgnoreCase(shipment.getShipToGeography())){
-			//获取这批货的订单详情数据
-			List<ThirdWarehouse> list = thirdWarehouseMapper.getOrderDetailList(shipment.getShipmentNo());
-			if (CollectionUtils.isEmpty(list)){
-				throw new RuntimeException("The order list is empty.shipmentNo:"+shipment.getShipmentNo());
-			}
-			for (ThirdWarehouse thirdWarehouse:list){
-				Date currentDate = new Date();
-				thirdWarehouse.setOverseaShipmentShipTime(currentDate);
-				thirdWarehouse.setCreateTime(currentDate);
-				thirdWarehouse.setUpdateTime(currentDate);
-				//库存状态  1. 待收货  2. 已收货 3.已发货  4.异常收货
-				thirdWarehouse.setStockStatus((byte)1);
-				thirdWarehouseMapper.insert(thirdWarehouse);
-			}
-		}
+		syncOrderToWarehouse(shipment);
 	}
 
 	@Override
