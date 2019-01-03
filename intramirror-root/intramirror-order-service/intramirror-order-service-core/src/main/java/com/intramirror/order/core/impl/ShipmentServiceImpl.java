@@ -6,14 +6,12 @@ package com.intramirror.order.core.impl;
 import com.alibaba.fastjson.JSONArray;
 import com.google.gson.Gson;
 import com.intramirror.common.core.mapper.SubShipmentMapper;
+import com.intramirror.common.core.mapper.ThirdWarehouseMapper;
 import com.intramirror.common.core.mapper.TransitWarehouseMapper;
 import com.intramirror.common.help.StringUtils;
 import com.intramirror.main.api.service.TaxService;
 import com.intramirror.order.api.common.ContainerType;
-import com.intramirror.order.api.model.LogisticsProduct;
-import com.intramirror.order.api.model.Shipment;
-import com.intramirror.order.api.model.SubShipment;
-import com.intramirror.order.api.model.TransitWarehouse;
+import com.intramirror.order.api.model.*;
 import com.intramirror.order.api.service.*;
 import com.intramirror.order.api.util.HttpClientUtil;
 import com.intramirror.order.api.util.RedisService;
@@ -50,6 +48,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	private SubShipmentMapper subShipmentMapper;
 	private LogisticsProductMapper logisticsProductMapper;
 	private TransitWarehouseMapper transitWarehouseMapper;
+	private ThirdWarehouseMapper thirdWarehouseMapper;
 
 	@Autowired
 	private ISubShipmentService subShipmentService;
@@ -74,6 +73,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		subShipmentMapper = this.getSqlSession().getMapper(SubShipmentMapper.class);
         logisticsProductMapper = this.getSqlSession().getMapper(LogisticsProductMapper.class);
         transitWarehouseMapper = this.getSqlSession().getMapper(TransitWarehouseMapper.class);
+		thirdWarehouseMapper = this.getSqlSession().getMapper(ThirdWarehouseMapper.class);
 	}
 
 	/**
@@ -1010,7 +1010,19 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		//如果是发往中国大陆的shipment，需要同步一份数据到third_warehouse
 		if ("China excl. Taiwan".equalsIgnoreCase(shipment.getShipToGeography())){
 			//获取这批货的订单详情数据
-			shipmentMapper.getOrderDetailList(shipment.getShipmentNo());
+			List<ThirdWarehouse> list = thirdWarehouseMapper.getOrderDetailList(shipment.getShipmentNo());
+			if (CollectionUtils.isEmpty(list)){
+				throw new RuntimeException("The order list is empty.shipmentNo:"+shipment.getShipmentNo());
+			}
+			for (ThirdWarehouse thirdWarehouse:list){
+				Date currentDate = new Date();
+				thirdWarehouse.setOverseaShipmentShipTime(currentDate);
+				thirdWarehouse.setCreateTime(currentDate);
+				thirdWarehouse.setUpdateTime(currentDate);
+				//库存状态  1. 待收货  2. 已收货 3.已发货  4.异常收货
+				thirdWarehouse.setStockStatus((byte)1);
+				thirdWarehouseMapper.insert(thirdWarehouse);
+			}
 		}
 	}
 

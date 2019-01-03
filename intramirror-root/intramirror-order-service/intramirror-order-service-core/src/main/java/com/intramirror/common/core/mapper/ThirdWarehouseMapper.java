@@ -78,4 +78,6 @@ public interface ThirdWarehouseMapper {
      * @mbg.generated
      */
     int updateByPrimaryKey(ThirdWarehouse record);
+
+    List<ThirdWarehouse> getOrderDetailList(String shipmentNo);
 }

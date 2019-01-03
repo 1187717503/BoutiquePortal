@@ -150,5 +150,4 @@ public interface ShipmentMapper {
 
 	List<String> getOrderLineNumsByShipment(Long shipmentId);
 
-	void getOrderDetailList(String shipmentNo);
 }
