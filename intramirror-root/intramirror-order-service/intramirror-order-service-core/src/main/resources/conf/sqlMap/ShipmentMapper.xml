@@ -260,4 +260,17 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 		INNER JOIN shipment s on s.shipment_id = c.shipment_id
 		WHERE s.shipment_id = #{shipmentId} and s.status = 2 and lp.status = 7 and c.status = 2;
 	</select>
+
+	<select id="" parameterType="string" resultMap="">
+		SELECT s.shipment_no,ss.awb_num,lp.order_line_num,lps.cover_img,v.sorting_type,lps.brand_id,lps.category_id,p.designer_id,p.color_code,lps.size,b.english_name brand_name
+		FROM logistics_product lp
+		INNER JOIN logistics_product_snapshot lps on lps.logistics_product_id = lp.logistics_product_id
+		INNER JOIN vendor v on v.vendor_id = lp.vendor_id
+		INNER JOIN container c on c.container_id = lp.container_id
+		INNER JOIN shipment s on s.shipment_id = c.shipment_id
+		INNER JOIN sub_shipment ss on ss.shipment_id = s.shipment_id and ss.segment_sequence = 1
+		INNER JOIN product p on p.product_id = lps.product_id and p.enabled = 1
+		INNER JOIN brand b on b.brand_id = lps.brand_id
+		WHERE v.enabled = 1  and  s.shipment_no = #{shipmentNo};
+	</select>
 </mapper>

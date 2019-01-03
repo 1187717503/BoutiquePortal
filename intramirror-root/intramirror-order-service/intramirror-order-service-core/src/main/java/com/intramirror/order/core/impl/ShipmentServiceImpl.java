@@ -1006,6 +1006,12 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		map.put("shipmentId",shipmentId);
 		map.put("status",3);
 		shipmentMapper.updateShipmentStatus(map);
+
+		//如果是发往中国大陆的shipment，需要同步一份数据到third_warehouse
+		if ("China excl. Taiwan".equalsIgnoreCase(shipment.getShipToGeography())){
+			//获取这批货的订单详情数据
+			shipmentMapper.getOrderDetailList(shipment.getShipmentNo());
+		}
 	}
 
 	@Override
