@@ -85,15 +85,15 @@
             </build>
         </profile>
         <profile>
-            <id>performance</id>
+            <id>pressure_test</id>
             <properties>
-                <profiles.active>performance</profiles.active>
+                <profiles.active>pressure_test</profiles.active>
             </properties>
             <build>
                 <filters>
-                    <filter>src/main/resources/performance/httpUrl.properties</filter>
-                    <filter>src/main/resources/performance/passwordMail.properties</filter>
-                    <filter>src/main/resources/performance/common.properties</filter>
+                    <filter>src/main/resources/pressure_test/httpUrl.properties</filter>
+                    <filter>src/main/resources/pressure_test/passwordMail.properties</filter>
+                    <filter>src/main/resources/pressure_test/common.properties</filter>
                 </filters>
             </build>
         </profile>
