@@ -289,7 +289,11 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			List<TransportationRouteVo> routeVos = JSONArray.parseArray(json, TransportationRouteVo.class);
 			if(routeVos!=null&&routeVos.size()>0){
 				Date currentDate = new Date();
-				for(ProviderVo providerVo:routeVos.get(0).getProviderVoList()){
+				List<ProviderVo> providerVoList = routeVos.get(0).getProviderVoList();
+				if (CollectionUtils.isEmpty(providerVoList)){
+					throw new RuntimeException("Logistics routing is not configured.");
+				}
+				for(ProviderVo providerVo: providerVoList){
 					if(StringUtils.isNotBlank(providerVo.getAddress())){
                         SubShipment subShipment = new SubShipment();
                         subShipment.setConsignee(providerVo.getCompanyName());
