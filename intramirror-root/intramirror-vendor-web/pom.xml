@@ -97,6 +97,20 @@
                 </filters>
             </build>
         </profile>
+
+        <profile>
+            <id>performance</id>
+            <properties>
+                <profiles.active>performance</profiles.active>
+            </properties>
+            <build>
+                <filters>
+                    <filter>src/main/resources/performance/httpUrl.properties</filter>
+                    <filter>src/main/resources/performance/passwordMail.properties</filter>
+                    <filter>src/main/resources/performance/common.properties</filter>
+                </filters>
+            </build>
+        </profile>
     </profiles>
 
     <dependencies>
