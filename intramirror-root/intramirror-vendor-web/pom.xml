@@ -111,6 +111,20 @@
                 </filters>
             </build>
         </profile>
+
+        <profile>
+            <id>performance_local</id>
+            <properties>
+                <profiles.active>performance_local</profiles.active>
+            </properties>
+            <build>
+                <filters>
+                    <filter>src/main/resources/performance_local/httpUrl.properties</filter>
+                    <filter>src/main/resources/performance_local/passwordMail.properties</filter>
+                    <filter>src/main/resources/performance_local/common.properties</filter>
+                </filters>
+            </build>
+        </profile>
     </profiles>
 
     <dependencies>
