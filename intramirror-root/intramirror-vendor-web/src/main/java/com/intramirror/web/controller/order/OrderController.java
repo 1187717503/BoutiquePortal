@@ -1498,7 +1498,7 @@ public class OrderController extends BaseController {
                 if (i == 2) {
                     String urlList = values[i];
                     JsonArray urlJsonArray = new JsonParser().parse(urlList).getAsJsonArray();
-                    generateProductImage(workbook, patriarch, new Gson().fromJson(urlJsonArray.get(0), String.class), i, rowLength);
+                    generateProductImage(workbook, patriarch, urlJsonArray.size()>0?new Gson().fromJson(urlJsonArray.get(0), String.class):"", i, rowLength);
                 } else {
                     cell.setCellValue(values[i]);
                 }
