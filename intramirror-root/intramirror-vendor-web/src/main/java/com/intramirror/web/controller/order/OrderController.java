@@ -1430,7 +1430,7 @@ public class OrderController extends BaseController {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm");
         for (Map<String, Object> order : orderList) {
             Long vendorId = Long.valueOf(order.get("vendor_id").toString());
-            if(vendorId == 110 || vendorId == 138 || vendorId == 141){
+            if(vendorId == 110 || vendorId == 138 || vendorId == 141 || vendorId == 26){
                 showAdd = true;
             }else {
                 showAdd = false;
