@@ -703,7 +703,6 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 					}
 					syncOrderToWarehouse(shipment);
 
-
 					//shipped操作发送消息用来生成资金报表
 					List<LogisticsProduct> logisticsProducts = logisticsProductMapper.getLogisticsProductByShipment(shipment.getShipmentId());
 					if (logisticsProducts!=null && logisticsProducts.size()>0){
@@ -760,7 +759,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 
                 orderLineNumList.add(thirdWarehouse.getOrderLineNum());
             }
-            logger.info("发货到中国大陆同步订单到第三方仓库的单号：{}",orderLineNumList);
+            logger.info("shipmentNo:{},发货到中国大陆同步订单到第三方仓库的单号：{}",shipment.getShipmentNo(),orderLineNumList);
         }
 	}
 

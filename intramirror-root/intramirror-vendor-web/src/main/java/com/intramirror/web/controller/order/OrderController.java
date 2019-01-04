@@ -333,6 +333,40 @@ public class OrderController extends BaseController {
             return result;
         }
 
+        //处理打印标记
+        String printFlag = null;
+        if (orderInfo.get("countryId") != null &&
+                ("3".equals(orderInfo.get("countryId").toString()) || "4".equals(orderInfo.get("countryId").toString()))){
+            printFlag = "*LOCAL*";
+        }
+        String shippingMethod = orderInfo.get("shippingMethod") == null ? "" : orderInfo.get("shippingMethod").toString();
+        if ("1".equals(shippingMethod)) {
+            printFlag = "*【Fedex】* Transit Warehouse";
+        }else if ("2".equals(shippingMethod)) {
+            printFlag = "*COMO*";
+        }
+
+        String expressType = orderInfo.get("express_type") == null ? "" : orderInfo.get("express_type").toString();
+        String geographyGroupId = orderInfo.get("geographyGroupId") == null ? "" : orderInfo.get("geographyGroupId").toString();
+        if ("1".equals(geographyGroupId) && "0".equals(shippingMethod)){
+            //发往中国大陆
+            String sortingType = orderInfo.get("sortingType") == null ? "" : orderInfo.get("sortingType").toString();
+            if ("1".equals(expressType)){
+                if ("1".equals(sortingType)){
+                    printFlag = "*COE(CC Zhang)*";
+                }else if ("2".equals(sortingType)){
+                    printFlag = "*ZSY(CC Zhang)*";
+                }
+            }else{
+                if ("1".equals(sortingType)){
+                    printFlag = "*COE*";
+                }else if ("2".equals(sortingType)){
+                    printFlag = "*ZSY*";
+                }
+            }
+        }
+        orderInfo.put("printFlag",printFlag);
+
         if (orderInfo != null) {
             logger.info("order getOrderDetail 解析订单详情,计算价格折扣");
             //汇率
@@ -401,6 +435,7 @@ public class OrderController extends BaseController {
         //		}else{
         //			orderInfo.put("skuBarcodeUrl", null);
         //		}
+
 
         result.successStatus();
         result.setData(orderInfo);
