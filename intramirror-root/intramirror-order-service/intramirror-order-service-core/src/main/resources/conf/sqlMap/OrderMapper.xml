@@ -107,6 +107,7 @@
         if(lp.user_rec_flag=0, l.user_rec_city, lp.user_rec_city) as user_rec_city,
         if(lp.user_rec_flag=0, l.user_rec_area, lp.user_rec_area) as user_rec_area,
         if(lp.user_rec_flag=0, l.user_rec_addr, lp.user_rec_addr) as user_rec_addr,
+        if(lp.user_rec_flag=0, l.user_rec_code, lp.user_rec_code) as user_rec_code,
         lps.season_code as season_code,
         l.user_rec_country,l.geography_id,
         v.vendor_name,v.vendor_id,v.skip_confirm,g.english_name as geography_name,v.address_country_id as

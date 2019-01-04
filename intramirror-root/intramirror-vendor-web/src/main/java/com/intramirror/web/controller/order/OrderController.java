@@ -1411,9 +1411,9 @@ public class OrderController extends BaseController {
 
         String[] excelHeaders = null;
         if(isParent){
-            excelHeaders=new String[]{"Order Line No.", "Order Date", "Picture", "Brand", "Name", "Designer ID", "Color Code", "Size", "Retail Price", "Purchase Price", "VAT?", "Purchase Discount", "Consignee Geography","Boutique"};
+            excelHeaders=new String[]{"Order Line No.", "Order Date", "Picture", "Brand", "Name", "Designer ID", "Color Code", "Season","Size", "Retail Price", "Purchase Price", "VAT?", "Purchase Discount", "Consignee Geography","Boutique","Consignee Name","Consignee Contact","Country","Province","City","Area","Consignee Address","Zip Code"};
         }else{
-            excelHeaders=new String[]{"Order Line No.", "Order Date", "Picture", "Brand", "Name", "Designer ID", "Color Code", "Size", "Retail Price", "Purchase Price", "VAT?", "Purchase Discount", "Consignee Geography"};
+            excelHeaders=new String[]{"Order Line No.", "Order Date", "Picture", "Brand", "Name", "Designer ID", "Color Code", "Season", "Size", "Retail Price", "Purchase Price", "VAT?", "Purchase Discount", "Consignee Geography","Consignee Name","Consignee Contact","Country","Province","City","Area","Consignee Address","Zip Code"};
         }
 
         // 创建表头
@@ -1426,8 +1426,15 @@ public class OrderController extends BaseController {
         rowLength++;
         HSSFRow row = null;
         HSSFCell cell = null;
+        boolean showAdd = false;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm");
         for (Map<String, Object> order : orderList) {
+            Long addressCountryId =  Long.valueOf(order.get("vendor_address_country_id").toString());
+            if(addressCountryId == 2 || addressCountryId == 3 || addressCountryId == 4){
+                showAdd = true;
+            }else {
+                showAdd = false;
+            }
             row = sheet.createRow(rowLength);
             row.setHeightInPoints(125F);
             String[] values = null;
@@ -1440,13 +1447,23 @@ public class OrderController extends BaseController {
                         transforNullValue(order.get("name")),
                         transforNullValue(order.get("brandID")),
                         transforNullValue(order.get("colorCode")),
+                        transforNullValue(order.get("season_code")),
                         transforNullValue(order.get("size")),
                         transforNullValue("€ " + new BigDecimal(order.get("price").toString()).setScale(2, BigDecimal.ROUND_HALF_UP).toString()),
                         transforNullValue("€ " + new BigDecimal(order.get("in_price").toString()).setScale(2, BigDecimal.ROUND_HALF_UP).toString()),
                         transforNullValue(GeographyEnum.EUROPEAN_UNION.getId().equals(order.get("geography_id").toString()) ? "incld. VAT" : "excld. VAT"),
                         transforNullValue(order.get("supply_price_discount")),
                         transforNullValue(order.get("geography_name")),
-                        transforNullValue(order.get("vendor_name"))
+                        transforNullValue(order.get("vendor_name")),
+                        transforNullValue(showAdd == true ? order.get("user_rec_name"):null),
+                        transforNullValue(showAdd == true ?order.get("user_rec_mobile"):null),
+                        transforNullValue(showAdd == true ?order.get("user_rec_country"):null),
+                        transforNullValue(showAdd == true ?order.get("user_rec_province"):null),
+                        transforNullValue(showAdd == true ?order.get("user_rec_city"):null),
+                        transforNullValue(showAdd == true ?order.get("user_rec_area"):null),
+                        transforNullValue(showAdd == true ?order.get("user_rec_addr"):null),
+                        transforNullValue(showAdd == true ?order.get("user_rec_code"):null)
+
                 };
             }else {
                 values = new String[]{
@@ -1457,12 +1474,21 @@ public class OrderController extends BaseController {
                         transforNullValue(order.get("name")),
                         transforNullValue(order.get("brandID")),
                         transforNullValue(order.get("colorCode")),
+                        transforNullValue(order.get("season_code")),
                         transforNullValue(order.get("size")),
                         transforNullValue("€ " + new BigDecimal(order.get("price").toString()).setScale(2, BigDecimal.ROUND_HALF_UP).toString()),
                         transforNullValue("€ " + new BigDecimal(order.get("in_price").toString()).setScale(2, BigDecimal.ROUND_HALF_UP).toString()),
                         transforNullValue(GeographyEnum.EUROPEAN_UNION.getId().equals(order.get("geography_id").toString()) ? "incld. VAT" : "excld. VAT"),
                         transforNullValue(order.get("supply_price_discount")),
-                        transforNullValue(order.get("geography_name"))
+                        transforNullValue(order.get("geography_name")),
+                        transforNullValue(showAdd == true ? order.get("user_rec_name"):null),
+                        transforNullValue(showAdd == true ?order.get("user_rec_mobile"):null),
+                        transforNullValue(showAdd == true ?order.get("user_rec_country"):null),
+                        transforNullValue(showAdd == true ?order.get("user_rec_province"):null),
+                        transforNullValue(showAdd == true ?order.get("user_rec_city"):null),
+                        transforNullValue(showAdd == true ?order.get("user_rec_area"):null),
+                        transforNullValue(showAdd == true ?order.get("user_rec_addr"):null),
+                        transforNullValue(showAdd == true ?order.get("user_rec_code"):null)
                 };
             }
 
