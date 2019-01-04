@@ -129,9 +129,8 @@ public class ShipMailSendThread implements Runnable {
         //如果是发给质检仓的邮件
         if ("Transit Warehouse".equals(shipment.getDestination())) {
             mailContent.setToEmails(MailConfig.emailToWarehouse);
-        } else if ("COMO".equals(shipment.getDestination())){
-            //发往荷兰邮政
-            mailContent.setToEmails(MailConfig.emailToComo);
+        } else if ("China".equals(shipment.getDestination())){
+            mailContent.setToEmails(MailConfig.emailToChina);
         } else {
             mailContent.setToEmails(MailConfig.emailTo);
         }
@@ -159,8 +158,79 @@ public class ShipMailSendThread implements Runnable {
                     }
                 }
             }
+
+            //给AIAI发邮件
+            if ("China".equals(shipment.getDestination())) {
+                flag = true;
+                try {
+                    mailContent.setSubject("Shipment No. " + shipment.getShipmentNo() + "【China】");
+                    mailContent.setToEmails(MailConfig.emailToAiai);
+                    List<MailAttachmentVO> mailAttachmentVOList = generateMailAttachmentListNoInvoice(shipmentList);
+                    mailContent.setAttachments(mailAttachmentVOList);
+                    logger.info("ShipMailSendThread 开始发送邮件 to Aiai content={}", JSONObject.toJSONString(mailContent));
+                    MailSendUtil.sendMail(mailContent);
+                    logger.info("ShipMailSendThread 邮件发送完成 to Aiai，shipmentNo:{}", shipment.getShipmentNo());
+                } catch (Exception e) {
+                    flag = false;
+                    e.printStackTrace();
+                    logger.error("ShipMailSendThread 邮件发送失败 to Aiai，shipmentNo:{},errorMsg:{}", shipment.getShipmentNo(), e.getMessage());
+                    mailSendManageService.insertShipEmailLog(shipment.getShipmentNo(), JSONObject.toJSONString(mailContent), e.getMessage());
+                } finally {
+                    if (flag) {
+                        //删除附件文件
+                        List<MailAttachmentVO> attachments = mailContent.getAttachments();
+                        for (MailAttachmentVO attachment : attachments) {
+                            File file = new File(attachment.getFileUrl());
+                            if (file.exists() && file.isFile()) {
+                                file.delete();
+                            }
+                        }
+                    }
+                }
+            }
             logger.info("----------Send mail finished.----------");
         }
+    }
+
+    private List<MailAttachmentVO> generateMailAttachmentListNoInvoice(List<ViewOrderLinesVO> shipmentList) {
+        logger.info("ShipMailSendThread 开始生成附件");
+        //设置附件
+        List<MailAttachmentVO> mailAttachmentVOs = new ArrayList<>();
+
+        String path = "/opt/data/ship_excel/download/";
+        String suffix = String.valueOf(System.currentTimeMillis()) + String.valueOf(Math.random() * 100);
+        String orderLinesFileNameCoe = "COE-OrderLines_"+ suffix + ".xls";
+        String orderLinesFileNameZsy = "ZSY-OrderLines_"+ suffix + ".xls";
+        File file = new File(path);
+        if (!file.exists() && !file.isDirectory()) {
+            file.mkdirs();
+        }
+
+        List<ViewOrderLinesVO> coeList = new ArrayList<>();
+        List<ViewOrderLinesVO> zsyList = new ArrayList<>();
+        for (ViewOrderLinesVO viewOrderLinesVO:shipmentList){
+            if (viewOrderLinesVO.getSortingType() == 1){
+                coeList.add(viewOrderLinesVO);
+            }else {
+                zsyList.add(viewOrderLinesVO);
+            }
+        }
+
+        String orderLinesFilePath = path + orderLinesFileNameCoe;
+        if (!coeList.isEmpty()){
+            logger.info("ShipMailSendThread 生成coe_orderLines文件");
+            generateShipmentExcel(coeList, orderLinesFilePath);
+            mailAttachmentVOs.add(new MailAttachmentVO(orderLinesFileNameCoe, orderLinesFilePath));
+        }
+
+        if (!zsyList.isEmpty()){
+            orderLinesFilePath = path + orderLinesFileNameZsy;
+            logger.info("ShipMailSendThread 生成zsy_orderLines文件");
+            generateShipmentExcel(zsyList, orderLinesFilePath);
+            mailAttachmentVOs.add(new MailAttachmentVO(orderLinesFileNameZsy, orderLinesFilePath));
+        }
+
+        return mailAttachmentVOs;
     }
 
     /**

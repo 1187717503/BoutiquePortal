@@ -10,16 +10,25 @@ public class MailConfig {
     public static String password;
     public static String emailFrom;
     public static String timeout;
-    public static String emailTo;
+    public static String emailToChina;
     public static String emailToWarehouse;
-    public static String emailToComo;
+    public static String emailTo;
+    public static String emailToAiai;
 
-    public static String getEmailToComo() {
-        return emailToComo;
+    public static String getEmailToAiai() {
+        return emailToAiai;
     }
 
-    public static void setEmailToComo(String emailToComo) {
-        MailConfig.emailToComo = emailToComo;
+    public static void setEmailToAiai(String emailToAiai) {
+        MailConfig.emailToAiai = emailToAiai;
+    }
+
+    public static String getEmailTo() {
+        return emailTo;
+    }
+
+    public static void setEmailTo(String emailTo) {
+        MailConfig.emailTo = emailTo;
     }
 
     public static String getHost() {
@@ -70,12 +79,12 @@ public class MailConfig {
         MailConfig.timeout = timeout;
     }
 
-    public static String getEmailTo() {
-        return emailTo;
+    public static String getEmailToChina() {
+        return emailToChina;
     }
 
-    public static void setEmailTo(String emailTo) {
-        MailConfig.emailTo = emailTo;
+    public static void setEmailToChina(String emailToChina) {
+        MailConfig.emailToChina = emailToChina;
     }
 
     public static String getEmailToWarehouse() {

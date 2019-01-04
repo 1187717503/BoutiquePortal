@@ -46,6 +46,16 @@ public class ViewOrderLinesVO {
     private String shipment_status;
     private String awb_nbr;
 
+    private Integer sortingType;
+
+    public Integer getSortingType() {
+        return sortingType;
+    }
+
+    public void setSortingType(Integer sortingType) {
+        this.sortingType = sortingType;
+    }
+
     public String getOrder_line_num() {
         return order_line_num;
     }
