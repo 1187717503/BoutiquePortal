@@ -743,18 +743,24 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		//如果是发往中国大陆的shipment，需要同步一份数据到third_warehouse
 		if ("China excl. Taiwan".equalsIgnoreCase(shipment.getShipToGeography())){
             //获取这批货的订单详情数据
-            List<ThirdWarehouse> orderDetailList = thirdWarehouseMapper.getOrderDetailList(shipment.getShipmentNo());
+            List<ThirdWarehouseVO> orderDetailList = thirdWarehouseMapper.getOrderDetailList(shipment.getShipmentNo());
             if (CollectionUtils.isEmpty(orderDetailList)){
                 throw new RuntimeException("The order list is empty.shipmentNo:"+shipment.getShipmentNo());
             }
             List<String> orderLineNumList = new ArrayList<>();
-            for (ThirdWarehouse thirdWarehouse:orderDetailList){
+            for (ThirdWarehouseVO thirdWarehouse:orderDetailList){
                 Date currentDate = new Date();
                 thirdWarehouse.setOverseaShipmentShipTime(currentDate);
                 thirdWarehouse.setCreateTime(currentDate);
                 thirdWarehouse.setUpdateTime(currentDate);
                 //库存状态  1. 待收货  2. 已收货 3.已发货  4.异常收货
                 thirdWarehouse.setStockStatus((byte)1);
+                if (thirdWarehouse.getAddressCountryId() != null){
+                	if (3 == thirdWarehouse.getAddressCountryId() || 4 == thirdWarehouse.getAddressCountryId()){
+                		//港澳本地单
+                		thirdWarehouse.setSortingType((byte)0);
+					}
+				}
                 thirdWarehouseMapper.insertSelective(thirdWarehouse);
 
                 orderLineNumList.add(thirdWarehouse.getOrderLineNum());

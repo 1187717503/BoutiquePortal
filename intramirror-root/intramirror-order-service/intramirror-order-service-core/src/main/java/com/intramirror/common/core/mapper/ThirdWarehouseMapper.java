@@ -2,6 +2,7 @@ package com.intramirror.common.core.mapper;
 
 import com.intramirror.order.api.model.ThirdWarehouse;
 import com.intramirror.order.api.model.ThirdWarehouseExample;
+import com.intramirror.order.api.vo.ThirdWarehouseVO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -79,5 +80,5 @@ public interface ThirdWarehouseMapper {
      */
     int updateByPrimaryKey(ThirdWarehouse record);
 
-    List<ThirdWarehouse> getOrderDetailList(String shipmentNo);
+    List<ThirdWarehouseVO> getOrderDetailList(String shipmentNo);
 }
