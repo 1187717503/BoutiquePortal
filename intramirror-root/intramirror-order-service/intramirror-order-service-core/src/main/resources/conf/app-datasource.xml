@@ -92,6 +92,11 @@
         <context:property-placeholder location="classpath:/performance/common.properties" ignore-unresolvable="true"/>
         <context:property-placeholder location="classpath:/performance/mailConfig.properties" ignore-unresolvable="true"/>
     </beans>
+    <beans profile="performance_local">
+        <context:property-placeholder location="classpath:/performance_local/databases.properties" ignore-unresolvable="true"/>
+        <context:property-placeholder location="classpath:/performance_local/common.properties" ignore-unresolvable="true"/>
+        <context:property-placeholder location="classpath:/performance_local/mailConfig.properties" ignore-unresolvable="true"/>
+    </beans>
     <beans profile="test_local">
         <context:property-placeholder location="classpath:/test_local/databases.properties" ignore-unresolvable="true"/>
         <context:property-placeholder location="classpath:/test_local/common.properties" ignore-unresolvable="true"/>

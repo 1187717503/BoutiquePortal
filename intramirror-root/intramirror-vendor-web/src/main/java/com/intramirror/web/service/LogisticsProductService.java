@@ -36,7 +36,6 @@ public class LogisticsProductService{
 	@Autowired
 	private IOrderService orderService;
 
-	@Transactional
 	public void confirmOrder(LogisticsProduct upLogis) {
 
 		String url = HttpClientUtil.order_capture_confirm;

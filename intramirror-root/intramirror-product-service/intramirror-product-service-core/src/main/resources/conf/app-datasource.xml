@@ -74,6 +74,9 @@
     <beans profile="performance">
         <context:property-placeholder location="classpath*:/performance/*.properties" ignore-unresolvable="true"/>
     </beans>
+    <beans profile="performance_local">
+        <context:property-placeholder location="classpath*:/performance_local/*.properties" ignore-unresolvable="true"/>
+    </beans>
     <beans profile="test_local">
         <context:property-placeholder location="classpath*:/test_local/*.properties" ignore-unresolvable="true"/>
     </beans>
