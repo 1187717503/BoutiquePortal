@@ -45,6 +45,15 @@ public class ViewOrderLinesVO {
     private String shipment_nr;
     private String shipment_status;
     private String awb_nbr;
+    private String channel;
+
+    public String getChannel() {
+        return channel;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
+    }
 
     public String getOrder_line_num() {
         return order_line_num;
