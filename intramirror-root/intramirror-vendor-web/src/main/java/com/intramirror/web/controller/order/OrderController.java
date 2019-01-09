@@ -358,10 +358,12 @@ public class OrderController extends BaseController {
                     printFlag = "*ZSY(CC Zhang)*";
                 }
             }else{
-                if ("1".equals(sortingType)){
-                    printFlag = "*COE*";
-                }else if ("2".equals(sortingType)){
-                    printFlag = "*ZSY*";
+                if (printFlag == null){
+                    if ("1".equals(sortingType)){
+                        printFlag = "*COE*";
+                    }else if ("2".equals(sortingType)){
+                        printFlag = "*ZSY*";
+                    }
                 }
             }
         }

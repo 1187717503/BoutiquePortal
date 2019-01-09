@@ -7,6 +7,15 @@ import com.intramirror.order.api.model.ThirdWarehouse;
  */
 public class ThirdWarehouseVO extends ThirdWarehouse {
     private Integer addressCountryId;
+    private Integer expressType;
+
+    public Integer getExpressType() {
+        return expressType;
+    }
+
+    public void setExpressType(Integer expressType) {
+        this.expressType = expressType;
+    }
 
     public Integer getAddressCountryId() {
         return addressCountryId;

@@ -93,7 +93,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		String shipToGeography = map.get("pack_english_name") == null ? " " : map.get("pack_english_name").toString();
 		Shipment shipment = new Shipment();
 		if (shipmentId == 0){
-			synchronized (shipment){
+			synchronized (this){
 				//获取当前时间
 				Date currentDate = new Date();
 				//保存对象信息
@@ -755,7 +755,8 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
                 thirdWarehouse.setUpdateTime(currentDate);
                 //库存状态  1. 待收货  2. 已收货 3.已发货  4.异常收货
                 thirdWarehouse.setStockStatus((byte)1);
-                if (thirdWarehouse.getAddressCountryId() != null){
+				int expressType = thirdWarehouse.getExpressType() == null ? 0 : thirdWarehouse.getExpressType();
+				if (thirdWarehouse.getAddressCountryId() != null && expressType == 0){
                 	if (3 == thirdWarehouse.getAddressCountryId() || 4 == thirdWarehouse.getAddressCountryId()){
                 		//港澳本地单
                 		thirdWarehouse.setSortingType((byte)0);
