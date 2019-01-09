@@ -1446,9 +1446,9 @@ public class OrderController extends BaseController {
 
         String[] excelHeaders = null;
         if(isParent){
-            excelHeaders=new String[]{"Order Line No.", "Order Date", "Picture", "Brand", "Name", "Designer ID", "Color Code", "Season","Size", "Retail Price", "Purchase Price", "VAT?", "Purchase Discount", "Consignee Geography","Boutique","Consignee Name","Consignee Contact","Country","Province","City","Area","Consignee Address","Zip Code"};
+            excelHeaders=new String[]{"Order Line No.", "Order Date", "Picture", "Brand", "Name", "Designer ID", "Color Code", "Season","Size", "Retail Price", "Purchase Price", "VAT?", "Purchase Discount", "Consignee Geography","Boutique","Consignee Name","Consignee Contact","Country","Province","City","Area","Consignee Address","Zip Code","Channel Name"};
         }else{
-            excelHeaders=new String[]{"Order Line No.", "Order Date", "Picture", "Brand", "Name", "Designer ID", "Color Code", "Season", "Size", "Retail Price", "Purchase Price", "VAT?", "Purchase Discount", "Consignee Geography","Consignee Name","Consignee Contact","Country","Province","City","Area","Consignee Address","Zip Code"};
+            excelHeaders=new String[]{"Order Line No.", "Order Date", "Picture", "Brand", "Name", "Designer ID", "Color Code", "Season", "Size", "Retail Price", "Purchase Price", "VAT?", "Purchase Discount", "Consignee Geography","Consignee Name","Consignee Contact","Country","Province","City","Area","Consignee Address","Zip Code","Channel Name"};
         }
 
         // 创建表头
@@ -1503,7 +1503,8 @@ public class OrderController extends BaseController {
                         transforNullValue(showAdd == true ?order.get("user_rec_city"):null),
                         transforNullValue(showAdd == true ?order.get("user_rec_area"):null),
                         transforNullValue(showAdd == true ?order.get("user_rec_addr"):null),
-                        transforNullValue(showAdd == true ?order.get("user_rec_code"):null)
+                        transforNullValue(showAdd == true ?order.get("user_rec_code"):null),
+                        transforNullValue(order.get("channelName"))
 
                 };
             }else {
@@ -1529,7 +1530,8 @@ public class OrderController extends BaseController {
                         transforNullValue(showAdd == true ?order.get("user_rec_city"):null),
                         transforNullValue(showAdd == true ?order.get("user_rec_area"):null),
                         transforNullValue(showAdd == true ?order.get("user_rec_addr"):null),
-                        transforNullValue(showAdd == true ?order.get("user_rec_code"):null)
+                        transforNullValue(showAdd == true ?order.get("user_rec_code"):null),
+                        transforNullValue(order.get("channelName"))
                 };
             }
 
