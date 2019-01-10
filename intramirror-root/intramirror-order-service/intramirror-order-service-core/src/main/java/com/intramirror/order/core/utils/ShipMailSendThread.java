@@ -209,7 +209,7 @@ public class ShipMailSendThread implements Runnable {
         List<ViewOrderLinesVO> coeList = new ArrayList<>();
         List<ViewOrderLinesVO> zsyList = new ArrayList<>();
         for (ViewOrderLinesVO viewOrderLinesVO:shipmentList){
-            if (viewOrderLinesVO.getSortingType() == 1){
+            if (viewOrderLinesVO.getSortingType() != null && viewOrderLinesVO.getSortingType() == 1){
                 coeList.add(viewOrderLinesVO);
             }else {
                 zsyList.add(viewOrderLinesVO);
