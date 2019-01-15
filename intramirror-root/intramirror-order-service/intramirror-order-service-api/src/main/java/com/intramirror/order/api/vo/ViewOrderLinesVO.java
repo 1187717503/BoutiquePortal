@@ -46,6 +46,15 @@ public class ViewOrderLinesVO {
     private String shipment_status;
     private String awb_nbr;
     private String channel;
+    private BigDecimal salePrice;
+
+    public BigDecimal getSalePrice() {
+        return salePrice;
+    }
+
+    public void setSalePrice(BigDecimal salePrice) {
+        this.salePrice = salePrice;
+    }
 
     public String getChannel() {
         return channel;
