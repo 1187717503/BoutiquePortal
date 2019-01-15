@@ -42,13 +42,14 @@
         <result column="shipment_status" property="shipment_status" jdbcType="VARCHAR"/>
         <result column="awb_nb" property="awb_nbr" jdbcType="VARCHAR"/>
         <result column="channel" property="channel" jdbcType="VARCHAR"/>
+        <result column="sale_price" property="salePrice" jdbcType="DECIMAL"/>
     </resultMap>
 
     <select id="getShipmentListByShipmentNo" parameterType="string" resultMap="BaseResultMap">
 		SELECT
 		  lp.order_line_num                                                       AS order_line_num,
 		  lp.shipping_fee														  AS shipping_fee,
-	  		ord.current_rate													 AS current_rate,
+	  	  ord.current_rate													      AS current_rate,
 		  ord.order_num															  AS order_num,
 		  DATE_FORMAT(lp.created_at, '%Y-%m-%d %H:%i:%s')                         AS created_at_datetime,
 		  DATE_FORMAT(lp.confirmed_at, '%Y-%m-%d %H:%i:%s')                       AS confirmed_at_datetime,
@@ -94,7 +95,8 @@
 			 THEN 'Delivered' END
 		  )                                                                       AS shipment_status,
 		  sub_ship.awb_num                                                        AS awb_nbr,
-		  ch.`name`                                                               AS channel
+		  ch.`name`                                                               AS channel,
+		  lp.sale_price
 		FROM
 			logistics_product lp
 			LEFT JOIN order_logistics ol

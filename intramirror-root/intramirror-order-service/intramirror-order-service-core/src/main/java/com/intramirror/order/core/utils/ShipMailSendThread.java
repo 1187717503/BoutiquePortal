@@ -258,7 +258,7 @@ public class ShipMailSendThread implements Runnable {
         int rowLength = 0;
         HSSFSheet sheet = workbook.createSheet("导出文件");
 
-        String[] excelHeaders = new String[]{"awb_num", "vendor_name", "stock_location", "order_line_num","order_num","shipping_fee", "designer_id", "brand", "l1_category", "l2_category", "l3_category", "color_code", "size", "product_name", "buyer_name", "buyer_contact", "ship_to_address", "ship_to_province", "ship_to_city", "ship_to_area", "ship_to_country", "zip_code", "consignee", "consignee_mobile", "container_nr", "height", "length", "width", "weight", "shipment_nr", "shipment_status", "created_at_datetime", "confirmed_at_datetime", "packed_at_datetime", "shipped_at(day)", "qty", "retail_price", "boutique_discount_off", "boutique_price","channel"};
+        String[] excelHeaders = new String[]{"awb_num", "vendor_name", "stock_location", "order_line_num","order_num","shipping_fee", "designer_id", "brand", "l1_category", "l2_category", "l3_category", "color_code", "size", "product_name", "buyer_name", "buyer_contact", "ship_to_address", "ship_to_province", "ship_to_city", "ship_to_area", "ship_to_country", "zip_code", "consignee", "consignee_mobile", "container_nr", "height", "length", "width", "weight", "shipment_nr", "shipment_status", "created_at_datetime", "confirmed_at_datetime", "packed_at_datetime", "shipped_at(day)", "qty", "retail_price", "boutique_discount_off", "boutique_price","channel","sale_price"};
 
         // 创建表头
         HSSFRow row1 = sheet.createRow(rowLength);
@@ -320,7 +320,8 @@ public class ShipMailSendThread implements Runnable {
                     transforNullValue(order.getRetail_price() == null ? null :order.getRetail_price().setScale(2, BigDecimal.ROUND_HALF_UP)),
                     transforNullValue(boutiqueDiscountOff),
                     transforNullValue(order.getBoutique_price() == null ? null :order.getBoutique_price().setScale(2, BigDecimal.ROUND_HALF_UP)),
-                    transforNullValue(order.getChannel())
+                    transforNullValue(order.getChannel()),
+                    transforNullValue(order.getSalePrice())
             };
             //将数据放到excel中
             for (int i = 0; i < excelHeaders.length; i++) {
