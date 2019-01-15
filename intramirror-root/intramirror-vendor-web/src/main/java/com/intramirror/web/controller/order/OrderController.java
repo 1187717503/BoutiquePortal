@@ -350,24 +350,20 @@ public class OrderController extends BaseController {
         String geographyGroupId = orderInfo.get("geographyGroupId") == null ? "" : orderInfo.get("geographyGroupId").toString();
         if ("1".equals(geographyGroupId) && "0".equals(shippingMethod)){
             //发往中国大陆
-            //String sortingType = orderInfo.get("sortingType") == null ? "" : orderInfo.get("sortingType").toString();
+            String sortingType = orderInfo.get("sortingType") == null ? "" : orderInfo.get("sortingType").toString();
             if ("1".equals(expressType)){
-                /*if ("1".equals(sortingType)){
+                if ("1".equals(sortingType)){
                     printFlag = "*COE(CC Zhang)*";
                 }else if ("2".equals(sortingType)){
                     printFlag = "*ZSY(CC Zhang)*";
-                }*/
-                //临时都发COE
-                printFlag = "*COE(CC Zhang)*";
+                }
             }else{
                 if (printFlag == null){
-                    /*if ("1".equals(sortingType)){
+                    if ("1".equals(sortingType)){
                         printFlag = "*COE*";
                     }else if ("2".equals(sortingType)){
                         printFlag = "*ZSY*";
-                    }*/
-                    //临时都发COE
-                    printFlag = "*COE*";
+                    }
                 }
             }
         }
