@@ -64,6 +64,16 @@ public class ViewOrderLinesVO {
         this.channel = channel;
     }
 
+    private Integer sortingType;
+
+    public Integer getSortingType() {
+        return sortingType;
+    }
+
+    public void setSortingType(Integer sortingType) {
+        this.sortingType = sortingType;
+    }
+
     public String getOrder_line_num() {
         return order_line_num;
     }

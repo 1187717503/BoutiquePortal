@@ -41,6 +41,7 @@
         <result column="shipment_nr" property="shipment_nr" jdbcType="VARCHAR"/>
         <result column="shipment_status" property="shipment_status" jdbcType="VARCHAR"/>
         <result column="awb_nb" property="awb_nbr" jdbcType="VARCHAR"/>
+        <result column="sorting_type" property="sortingType" jdbcType="INTEGER"/>
         <result column="channel" property="channel" jdbcType="VARCHAR"/>
         <result column="sale_price" property="salePrice" jdbcType="DECIMAL"/>
     </resultMap>
@@ -95,6 +96,7 @@
 			 THEN 'Delivered' END
 		  )                                                                       AS shipment_status,
 		  sub_ship.awb_num                                                        AS awb_nbr,
+		  vrd.sorting_type,
 		  ch.`name`                                                               AS channel,
 		  lp.sale_price
 		FROM

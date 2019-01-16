@@ -83,34 +83,34 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
   <select id="getShipmentsByVendor" resultType="java.util.HashMap"  parameterType="java.util.Map">
   SELECT s.* FROM shipment s
   INNER JOIN sub_shipment sub on sub.shipment_id = s.shipment_id
-  INNER JOIN shipping_segment ss ON sub.shipping_segment_id = ss.shipping_segment_id
+  LEFT JOIN shipping_segment ss ON (sub.shipping_segment_id = ss.shipping_segment_id AND ss.enabled = 1 AND ss.shipment_type_id = 3)
 	WHERE s.vendor_id = #{vendorId,jdbcType=BIGINT} AND s.`status` = #{status,jdbcType=BIGINT}
 	AND s.ship_to_geography = #{shipToGeography,jdbcType=VARCHAR}
 	AND s.ship_from_location_id = #{shipFromLocationId,jdbcType=INTEGER}
-	AND ss.enabled = 1 AND ss.shipment_type_id = 3
+
 	GROUP BY s.shipment_no
   </select>
   
   <select id="getShipmentTypeById" resultType="java.util.HashMap"  parameterType="java.util.Map">
 	  SELECT ss.shipment_type_id,s.*  FROM sub_shipment sub
 		INNER JOIN shipment s ON (sub.shipment_id = s.shipment_id)
-		INNER JOIN shipping_segment ss ON (sub.shipping_segment_id = ss.shipping_segment_id)
-		INNER JOIN shipment_type st ON (ss.shipment_type_id = st.shipment_type_id)
-		WHERE sub.shipment_id=#{shipmentId,jdbcType=BIGINT} AND ss.enabled = 1
-		GROUP BY ss.segment_sequence ASC LIMIT 1;
+		LEFT JOIN shipping_segment ss ON (sub.shipping_segment_id = ss.shipping_segment_id and ss.segment_sequence = 1 AND ss.enabled = 1)
+		LEFT JOIN shipment_type st ON (ss.shipment_type_id = st.shipment_type_id)
+		WHERE sub.shipment_id=#{shipmentId,jdbcType=BIGINT}
+		LIMIT 1;
   </select>
   
    <select id="getShipmentInfoById" resultType="java.util.HashMap"  parameterType="java.util.Map">
 	  SELECT ss.shipment_type_id,s.*,i.invoice_num invoiceNum,i.invoice_date,sl.stock_location,sub.awb_num,v.vendor_name,sl.address_country_code as countryCode
 	    FROM sub_shipment sub
 		INNER JOIN shipment s ON (sub.shipment_id = s.shipment_id)
-		INNER JOIN shipping_segment ss ON (sub.shipping_segment_id = ss.shipping_segment_id)
-		INNER JOIN shipment_type st ON (ss.shipment_type_id = st.shipment_type_id)
+		LEFT JOIN shipping_segment ss ON (sub.shipping_segment_id = ss.shipping_segment_id and ss.segment_sequence = 1)
+		LEFT JOIN shipment_type st ON (ss.shipment_type_id = st.shipment_type_id)
 		INNER JOIN vendor v ON v.vendor_id = s.vendor_id
 		LEFT JOIN invoice i ON (s.shipment_id = i.shipment_id and i.enabled = 1 and i.type = 1)
 		left JOIN stock_location sl on sl.ship_from_location_id = s.ship_from_location_id
 		WHERE sub.shipment_id=#{shipmentId,jdbcType=BIGINT}
-		GROUP BY ss.segment_sequence ASC LIMIT 1;
+		LIMIT 1;
   </select>
   
    <select id="getVendorCodeById" resultType="java.lang.String"  parameterType="java.lang.Long">
@@ -260,4 +260,5 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 		INNER JOIN shipment s on s.shipment_id = c.shipment_id
 		WHERE s.shipment_id = #{shipmentId} and s.status = 2 and lp.status = 7 and c.status = 2;
 	</select>
+
 </mapper>

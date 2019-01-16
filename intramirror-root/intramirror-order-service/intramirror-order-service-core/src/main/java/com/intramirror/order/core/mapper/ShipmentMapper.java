@@ -149,4 +149,5 @@ public interface ShipmentMapper {
 	Shipment getShipmentByOrderLineNum(String orderLineNum);
 
 	List<String> getOrderLineNumsByShipment(Long shipmentId);
+
 }
