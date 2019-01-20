@@ -8,10 +8,10 @@ import org.apache.ibatis.annotations.Param;
  * Created on 2019/1/20.
  *
  * @author yfding
- *
  */
 public interface CcZhangOrderEmailExtMapper {
 
     List<CcZhangOrderEmailDTO> selectOrderByActionType(@Param("actionType") Long actionType);
 
+    int updateSendEmailFlag(@Param("ccZhangOrderEmailId") Long ccZhangOrderEmailId);
 }

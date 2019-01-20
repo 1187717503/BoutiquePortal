@@ -7,7 +7,7 @@ package com.intramirror.order.api.common.enums;
  */
 public enum CcZhangOrderEmailActionTypeEnum {
 
-    confirmed(1L, "confimed"), shipped(2L, "shipped");
+    confirmed(1L, "Confirmed"), shipped(2L, "Shipped");
 
     private Long actionType;
 
