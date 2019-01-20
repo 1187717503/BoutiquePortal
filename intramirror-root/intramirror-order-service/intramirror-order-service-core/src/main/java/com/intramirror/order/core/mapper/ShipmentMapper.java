@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.vo.LogisticsProductVO;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * @author 123
@@ -149,5 +150,9 @@ public interface ShipmentMapper {
 	Shipment getShipmentByOrderLineNum(String orderLineNum);
 
 	List<String> getOrderLineNumsByShipment(Long shipmentId);
+
+	Map<String,Object> getCartoonType(@Param("shipmentId") Long shipmentId);
+
+	int doRepeatShipmentCode(@Param("logisticsProductId") Long logisticsProductId,@Param("shipmentCode") String shipmentCode);
 
 }
