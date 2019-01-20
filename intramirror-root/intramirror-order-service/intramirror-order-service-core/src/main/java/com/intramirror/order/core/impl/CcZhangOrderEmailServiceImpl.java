@@ -1,12 +1,9 @@
 package com.intramirror.order.core.impl;
 
-import com.intramirror.common.email.EmailUtils;
 import com.intramirror.common.excel.EasyPoiUtil;
 import com.intramirror.order.api.common.enums.CcZhangOrderEmailActionTypeEnum;
 import com.intramirror.order.api.dto.CcZhangOrderEmailDTO;
 import com.intramirror.order.api.service.ICcZhangOrderEmailService;
-import com.intramirror.order.api.vo.ConfirmedExcelVO;
-import com.intramirror.order.api.vo.ShippedExcelVO;
 import com.intramirror.order.core.dao.BaseDao;
 import com.intramirror.order.core.mapper.ext.CcZhangOrderEmailExtMapper;
 import com.intramirror.order.core.properties.CcZhangEmailProperties;
@@ -17,7 +14,6 @@ import java.util.Date;
 import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.client.utils.DateUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -77,19 +73,17 @@ public class CcZhangOrderEmailServiceImpl extends BaseDao implements ICcZhangOrd
 
     @Override
     public void confirmedOrderToEmail() {
-        List<ConfirmedExcelVO> objects = new ArrayList<>();
-        handle(confirmedTitle, CcZhangOrderEmailActionTypeEnum.confirmed, objects, confirmedEmailTitle, ccZhangEmailProperties.getConfirmedFrom(),
+        handle(confirmedTitle, CcZhangOrderEmailActionTypeEnum.confirmed, confirmedEmailTitle, ccZhangEmailProperties.getConfirmedFrom(),
                 ccZhangEmailProperties.getConfirmedPassword(), ccZhangEmailProperties.getConfirmedTo());
     }
 
     @Override
     public void shippedOrderToEmail() {
-        List<ShippedExcelVO> objects = new ArrayList<>();
-        handle(shippedTitle, CcZhangOrderEmailActionTypeEnum.shipped, objects, shippedEmailTitle, ccZhangEmailProperties.getShippedFrom(),
+        handle(shippedTitle, CcZhangOrderEmailActionTypeEnum.shipped, shippedEmailTitle, ccZhangEmailProperties.getShippedFrom(),
                 ccZhangEmailProperties.getShippedPassword(), ccZhangEmailProperties.getShippedTo());
     }
 
-    private void handle(String title, CcZhangOrderEmailActionTypeEnum ccZhangOrderEmailActionTypeEnum, Object objects, List<String> titles, String from,
+    private void handle(String title, CcZhangOrderEmailActionTypeEnum ccZhangOrderEmailActionTypeEnum, List<String> titles, String from,
             String password, String to) {
         try {
             LogContext context = new LogContext(ccZhangOrderEmailActionTypeEnum.getActionType(), "CcZhangOrderEmail");
@@ -99,9 +93,9 @@ public class CcZhangOrderEmailServiceImpl extends BaseDao implements ICcZhangOrd
             if (CollectionUtils.isEmpty(ccZhangOrderEmailDTOList)) {
                 LogUtil.info(context, "No mail needs to be sent.");
             }
-            BeanUtils.copyProperties(ccZhangOrderEmailDTOList, objects, List.class);
-            easyPoiUtil.createSimpleExcel(titles, (List<Object>) objects, path);
-            EmailUtils.sendAttachment(from, password, title, to, path);
+//            BeanUtils.copyProperties(ccZhangOrderEmailDTOList, objects, List.class);
+//            easyPoiUtil.createSimpleExcel(titles, (List<Object>) objects, path);
+//            EmailUtils.sendAttachment(from, password, title, to, path);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -17,7 +17,7 @@
         <result column="buyerContact" property="buyerContact" jdbcType="VARCHAR"/>
         <result column="salePrice" property="salePrice" jdbcType="VARCHAR"/>
         <result column="ems" property="ems" jdbcType="VARCHAR"/>
-        <result column="ignoreCcZhangOrderEmailId" property="ignoreCcZhangOrderEmailId" jdbcType="VARCHAR"/>
+        <result column="ccZhangOrderEmailId" property="ignoreCcZhangOrderEmailId" jdbcType="VARCHAR"/>
     </resultMap>
 
     <select id="selectOrderByActionType" resultMap="CcZhangOrderEmailDTOResultMap">
