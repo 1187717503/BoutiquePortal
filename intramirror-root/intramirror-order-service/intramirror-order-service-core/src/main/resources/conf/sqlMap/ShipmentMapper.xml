@@ -261,4 +261,17 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
 		WHERE s.shipment_id = #{shipmentId} and s.status = 2 and lp.status = 7 and c.status = 2;
 	</select>
 
+	<select id="getCartoonType" resultType="java.util.Map" parameterType="java.lang.Long">
+		SELECT l.express_type,l.address_country_id,lp.address_country_id as address_country_id_product,v.address_country_id as address_country_id_vendor
+,v.sorting_type,lp.logistics_product_id,lp.order_line_num,o.order_num,o.user_id,o.order_id,c.container_id
+from container c INNER JOIN logistics_product lp on c.container_id = lp.container_id
+INNER JOIN logistics l on lp.order_logistics_id = l.order_logistics_id INNER JOIN vendor v on v.vendor_id = lp.vendor_id
+INNER JOIN order_logistics ol on lp.order_logistics_id=ol.order_logistics_id INNER JOIN `order` o on ol.order_id=o.order_id
+where c.shipment_id = #{shipmentId}
+	</select>
+
+	<select id="doRepeatShipmentCode" resultType="int">
+		SELECT COUNT(1) from logistics_milestone where logistics_product_id = #{logisticsProductId} and shipment_code = #{shipmentCode} LIMIT 1
+	</select>
+
 </mapper>

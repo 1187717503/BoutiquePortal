@@ -17,8 +17,7 @@ import com.intramirror.order.api.util.HttpClientUtil;
 import com.intramirror.order.api.util.RedisService;
 import com.intramirror.order.api.vo.*;
 import com.intramirror.order.core.dao.BaseDao;
-import com.intramirror.order.core.mapper.LogisticsProductMapper;
-import com.intramirror.order.core.mapper.ShipmentMapper;
+import com.intramirror.order.core.mapper.*;
 import com.intramirror.order.core.utils.MailSendManageService;
 import com.intramirror.order.core.utils.ShipMailSendThread;
 import com.intramirror.utils.transform.JsonTransformUtil;
@@ -49,6 +48,9 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	private LogisticsProductMapper logisticsProductMapper;
 	private TransitWarehouseMapper transitWarehouseMapper;
 	private ThirdWarehouseMapper thirdWarehouseMapper;
+	private CczhangOrderEmailMapper cczhangOrderEmailMapper;
+	private LogisticsMilestoneMapper logisticsMilestoneMapper;
+	private ContainerMapper containerMapper;
 
 	@Autowired
 	private ISubShipmentService subShipmentService;
@@ -74,6 +76,9 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
         logisticsProductMapper = this.getSqlSession().getMapper(LogisticsProductMapper.class);
         transitWarehouseMapper = this.getSqlSession().getMapper(TransitWarehouseMapper.class);
 		thirdWarehouseMapper = this.getSqlSession().getMapper(ThirdWarehouseMapper.class);
+		cczhangOrderEmailMapper = this.getSqlSession().getMapper(CczhangOrderEmailMapper.class);
+		logisticsMilestoneMapper = this.getSqlSession().getMapper(LogisticsMilestoneMapper.class);
+		containerMapper = this.getSqlSession().getMapper(ContainerMapper.class);
 	}
 
 	/**
@@ -896,6 +901,99 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			logger.info("awb:{}已从物流数据中删除",oldAwb);
 		}
 	}
+
+	@Override
+	public int getCartoonType(Long shippmentId) throws Exception{
+		Map<String,Object> map = shipmentMapper.getCartoonType(shippmentId);
+		if(map == null){
+			throw new RuntimeException("this cartoon have no order");
+		}
+		//香港特殊订单
+		if("1".equals(map.get("express_type").toString())){
+			return 0;
+		}
+		//大陆店
+		if("2".equals(map.get("address_country_id_vendor").toString())){
+			return 1;
+		}
+		//香港店
+		if("3".equals(map.get("address_country_id_vendor").toString())){
+			String addressCountryId = map.get("address_country_id_product") == null? map.get("address_country_id").toString():map.get("address_country_id_product").toString();
+			//发往大陆使用ems其他使用顺丰
+			if("2".equals(addressCountryId)){
+				return 0;
+			}
+			return 1;
+		}
+
+		throw new RuntimeException("error vendor");
+	}
+
+	@Override
+	@Transactional
+	public void ship4hkAndMainLandVendor(Long shipmentId, String shippmentCode, Integer logisticsType)throws Exception {
+		Map<String,Object> map = shipmentMapper.getCartoonType(shipmentId);
+		if(map == null){
+			throw new RuntimeException("this cartoon have no order");
+		}
+		//验证shippmentCode是否重复
+		if(logisticsType.intValue() == 1){
+			shippmentCode = "SF"+shippmentCode;
+		}
+		Long logisticsProductId = Long.parseLong(map.get("logistics_product_id").toString());
+		int count = shipmentMapper.doRepeatShipmentCode(logisticsProductId,shippmentCode);
+		if(count>0){
+			throw new RuntimeException("The logistic No. has been used");
+		}
+		Date now = new Date();
+		if("1".equals(map.get("express_type").toString())){
+			CczhangOrderEmail cczhangOrderEmail = new CczhangOrderEmail();
+			cczhangOrderEmail.setActionType(2);
+			cczhangOrderEmail.setCreateTime(now);
+			cczhangOrderEmail.setIsDeteled(0);
+			cczhangOrderEmail.setOrderLineNum(map.get("order_line_num").toString());
+			cczhangOrderEmail.setSendEmail(0);
+			cczhangOrderEmail.setShipmentCode(shippmentCode);
+			cczhangOrderEmail.setUpdateTime(now);
+			cczhangOrderEmailMapper.insertSelective(cczhangOrderEmail);
+		}else{
+			LogisticsMilestone logisticsMilestone = new LogisticsMilestone();
+			logisticsMilestone.setCreateTime(now);
+			logisticsMilestone.setDhlType(1);
+			logisticsMilestone.setIsComplete(0);
+			logisticsMilestone.setIsDeleted(0);
+			logisticsMilestone.setIsReturn(0);
+			logisticsMilestone.setIsShip(0);
+			logisticsMilestone.setIsSubscription(0);
+			logisticsMilestone.setLogisticsProductId(logisticsProductId);
+			logisticsMilestone.setOrderNum(map.get("order_line_num").toString());
+			logisticsMilestone.setRefOrderId(Long.parseLong(map.get("order_id").toString()));
+			logisticsMilestone.setRefOrderNum(map.get("order_num").toString());
+			logisticsMilestone.setShipmentCode(shippmentCode);
+			logisticsMilestone.setTime(now);
+			logisticsMilestone.setType(4);
+			logisticsMilestone.setUpdateTime(now);
+			logisticsMilestone.setUserId(Long.parseLong(map.get("user_id").toString()));
+			if(logisticsType.intValue() == 1){
+				logisticsMilestone.setShipmentType(4);
+			}else{
+				logisticsMilestone.setShipmentType(Integer.parseInt(map.get("sorting_type").toString()));
+			}
+			logisticsMilestoneMapper.insertSelective(logisticsMilestone);
+		}
+		Map<String,Object> shipmentStatusMap = new HashMap<>();
+		shipmentStatusMap.put("status",3);
+		shipmentStatusMap.put("ship_at",now);
+		shipmentStatusMap.put("shipmentId",shipmentId);
+		shipmentMapper.updateShipmentStatus(shipmentStatusMap);
+
+		Map<String,Object> containnerStatusMap = new HashMap<>();
+		containnerStatusMap.put("status",3);
+		containnerStatusMap.put("containerId",Long.parseLong(map.get("container_id").toString()));
+		containerMapper.updateContainerBystatus(containnerStatusMap);
+	}
+
+
 
 	private String checkAWB(Long shipmentId) {
 		Map<String,Object> params = new HashMap<>();
