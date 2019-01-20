@@ -6,12 +6,16 @@ import com.intramirror.order.api.common.enums.CcZhangOrderEmailActionTypeEnum;
 import com.intramirror.order.api.dto.CcZhangOrderEmailDTO;
 import com.intramirror.order.api.service.ICcZhangOrderEmailService;
 import com.intramirror.order.api.vo.ConfirmedExcelVO;
+import com.intramirror.order.api.vo.ShippedExcelVO;
+import com.intramirror.order.core.dao.BaseDao;
 import com.intramirror.order.core.mapper.ext.CcZhangOrderEmailExtMapper;
-import java.io.IOException;
+import com.intramirror.order.core.properties.CcZhangEmailProperties;
+import com.intramirror.utils.LogUtil.LogContext;
+import com.intramirror.utils.LogUtil.LogUtil;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.annotation.Resource;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.client.utils.DateUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,23 +27,28 @@ import org.springframework.stereotype.Service;
  * @author yfding
  */
 @Service
-public class CcZhangOrderEmailServiceImpl implements ICcZhangOrderEmailService {
+public class CcZhangOrderEmailServiceImpl extends BaseDao implements ICcZhangOrderEmailService {
+
+    private CcZhangOrderEmailExtMapper ccZhangOrderEmailExtMapper;
+
+    @Override
+    public void init() {
+        ccZhangOrderEmailExtMapper = this.getSqlSession().getMapper(CcZhangOrderEmailExtMapper.class);
+    }
 
     @Autowired
     private EasyPoiUtil easyPoiUtil;
 
-    @Resource
-    private CcZhangOrderEmailExtMapper ccZhangOrderEmailExtMapper;
+    @Autowired
+    private CcZhangEmailProperties ccZhangEmailProperties;
 
     private static final String confirmedTitle = "香港店张公司客人已确认订单列表";
 
     private static final String shippedTitle = "香港店张公司客人已发货订单列表(含E特快快递单号)";
 
-    private static final String confirmedPath = "/Users/yfding/Downloads/orderExcel";
-
     private static final List<String> confirmedEmailTitle = new ArrayList<>();
 
-    private static final List<String> reservedEmailTitle = new ArrayList<>();
+    private static final List<String> shippedEmailTitle = new ArrayList<>();
 
     {
         confirmedEmailTitle.add("Order Number");
@@ -56,35 +65,46 @@ public class CcZhangOrderEmailServiceImpl implements ICcZhangOrderEmailService {
         confirmedEmailTitle.add("Buyer Contact");
         confirmedEmailTitle.add(" Sale Price");
 
-        reservedEmailTitle.add("Order Number");
-        reservedEmailTitle.add("Order Line Number");
-        reservedEmailTitle.add("EMS");
-        reservedEmailTitle.add("Designer Id");
-        reservedEmailTitle.add("Color Code");
-        reservedEmailTitle.add("Brand");
-        reservedEmailTitle.add("Season");
-        reservedEmailTitle.add("Product Name");
+        shippedEmailTitle.add("Order Number");
+        shippedEmailTitle.add("Order Line Number");
+        shippedEmailTitle.add("EMS");
+        shippedEmailTitle.add("Designer Id");
+        shippedEmailTitle.add("Color Code");
+        shippedEmailTitle.add("Brand");
+        shippedEmailTitle.add("Season");
+        shippedEmailTitle.add("Product Name");
     }
 
     @Override
     public void confirmedOrderToEmail() {
-        String path = confirmedPath + confirmedEmailTitle + "_" + DateUtils.formatDate(new Date(), "yyyyMMdd") + ".xls";
-        List<CcZhangOrderEmailDTO> ccZhangOrderEmailDTOList = ccZhangOrderEmailExtMapper.selectOrderByActionType(
-                CcZhangOrderEmailActionTypeEnum.confirmed.getActionType());
-        List<ConfirmedExcelVO> confirmedExcelVOS = new ArrayList<>();
-        BeanUtils.copyProperties(ccZhangOrderEmailDTOList, confirmedExcelVOS, List.class);
-        try {
-            easyPoiUtil.createSimpleExcel(confirmedEmailTitle, (List<Object>) (Object) confirmedExcelVOS, path);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        List<ConfirmedExcelVO> objects = new ArrayList<>();
+        handle(confirmedTitle, CcZhangOrderEmailActionTypeEnum.confirmed, objects, confirmedEmailTitle, ccZhangEmailProperties.getConfirmedFrom(),
+                ccZhangEmailProperties.getConfirmedPassword(), ccZhangEmailProperties.getConfirmedTo());
     }
 
     @Override
     public void shippedOrderToEmail() {
-        ccZhangOrderEmailExtMapper.selectOrderByActionType(CcZhangOrderEmailActionTypeEnum.shipped.getActionType());
-
+        List<ShippedExcelVO> objects = new ArrayList<>();
+        handle(shippedTitle, CcZhangOrderEmailActionTypeEnum.shipped, objects, shippedEmailTitle, ccZhangEmailProperties.getShippedFrom(),
+                ccZhangEmailProperties.getShippedPassword(), ccZhangEmailProperties.getShippedTo());
     }
+
+    private void handle(String title, CcZhangOrderEmailActionTypeEnum ccZhangOrderEmailActionTypeEnum, Object objects, List<String> titles, String from,
+            String password, String to) {
+        try {
+            LogContext context = new LogContext(ccZhangOrderEmailActionTypeEnum.getActionType(), "CcZhangOrderEmail");
+            String path = ccZhangEmailProperties.getPath() + title + "_" + DateUtils.formatDate(new Date(), "yyyyMMdd") + ".xls";
+            List<CcZhangOrderEmailDTO> ccZhangOrderEmailDTOList = ccZhangOrderEmailExtMapper.selectOrderByActionType(
+                    ccZhangOrderEmailActionTypeEnum.getActionType());
+            if (CollectionUtils.isEmpty(ccZhangOrderEmailDTOList)) {
+                LogUtil.info(context, "No mail needs to be sent.");
+            }
+            BeanUtils.copyProperties(ccZhangOrderEmailDTOList, objects, List.class);
+            easyPoiUtil.createSimpleExcel(titles, (List<Object>) objects, path);
+            EmailUtils.sendAttachment(from, password, title, to, path);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

@@ -15,6 +15,8 @@ public class CcZhangEmailProperties {
     private String shippedPassword;
     private String shippedTo;
 
+    private String path;
+
     public String getConfirmedFrom() {
         return confirmedFrom;
     }
@@ -63,4 +65,11 @@ public class CcZhangEmailProperties {
         this.shippedTo = shippedTo;
     }
 
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
 }
