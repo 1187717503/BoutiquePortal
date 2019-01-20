@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.intramirror.order.core.mapper.ext.CcZhangOrderEmailExtMapper">
+
+    <resultMap id="CcZhangOrderEmailDTOResultMap" type="com.intramirror.order.api.dto.CcZhangOrderEmailDTO">
+        <result column="orderNumber" property="orderNumber" jdbcType="VARCHAR"/>
+        <result column="orderLineNumber" property="orderLineNumber" jdbcType="VARCHAR"/>
+        <result column="designerId" property="designerId" jdbcType="VARCHAR"/>
+        <result column="colorCode" property="colorCode" jdbcType="VARCHAR"/>
+        <result column="brandName" property="brandName" jdbcType="VARCHAR"/>
+        <result column="seasonCode" property="seasonCode" jdbcType="VARCHAR"/>
+        <result column="size" property="size" jdbcType="VARCHAR"/>
+        <result column="productName" property="productName" jdbcType="VARCHAR"/>
+        <result column="shippingFee" property="shippingFee" jdbcType="VARCHAR"/>
+        <result column="l3Category" property="l3Category" jdbcType="VARCHAR"/>
+        <result column="buyerName" property="buyerName" jdbcType="VARCHAR"/>
+        <result column="buyerContact" property="buyerContact" jdbcType="VARCHAR"/>
+        <result column="salePrice" property="salePrice" jdbcType="VARCHAR"/>
+        <result column="ems" property="ems" jdbcType="VARCHAR"/>
+        <result column="ignoreCcZhangOrderEmailId" property="ignoreCcZhangOrderEmailId" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="selectOrderByActionType" resultMap="CcZhangOrderEmailDTOResultMap">
+        select
+        o.`order_num` as orderNumber,
+        c.`order_line_num` as orderLineNumber,
+        p.`designer_id` as designerId ,
+        p.`color_code` as colorCode,
+        b.`english_name` as brandName ,
+        p.`season_code` as  seasonCode,
+        s.`size` as size ,
+        case when spu.`spu_name`  is not null  then spu.`spu_name`  else p.`name`  end as productName,
+        lp.`shipping_fee`  as shippingFee,
+        c3.`name`  as l3Category,
+        o.`wechat`  as buyerName,
+        o.`contact_phone`  as buyerContact,
+        lp.`im_price`  as salePrice,
+        c.`shipment_code`  as ems,
+        c.`id`  as ccZhangOrderEmailId
+        from `cczhang_order_email`  c
+        inner join `logistics_product`  lp on (lp.`order_line_num` = c.`order_line_num`  and lp.`enabled`  = true)
+        inner join `order_logistics`  ol on (ol.`order_logistics_id` = lp.`order_logistics_id` and ol.`enabled`  = true)
+        inner join `order`  o on (o.`order_id` = ol.`order_id`  and o.`enabled`  = true)
+        inner join `shop_product_sku`  sps on (sps.`shop_product_sku_id` = lp.`shop_product_sku_id`  )
+        inner join `sku`  s on (s.`sku_id` = sps.`sku_id`  and s.`enabled`  = true)
+        inner join `shop_product`  sp on (sp.`shop_product_id` = sps.`shop_product_id` )
+        inner join `product`  p on (p.`product_id` = sp.`product_id`  and p.`enabled`  = true)
+        inner join `category`  c3 on (c3.`category_id` = p.`category_id`  and c3.`enabled`  = true)
+        inner join `category`  c2 on (c2.`category_id` = c3.`parent_id`  and c2.`enabled`  = true)
+        inner join `category`  c1 on (c1.`category_id` = c2.`parent_id`  and c1.`enabled`  = true)
+        left join `spu`  spu on (spu.`spu_id` = p.`spu_id`  and spu.`enabled`  = true)
+        inner join `brand`  b on (b.`brand_id` = p.`brand_id`  and b.`enabled`  = true)
+        where c.`send_email`  = 0 and c.`is_deteled`  = 0 and c.`action_type`  = #{actionType} ;
+    </select>
+
+</mapper>
