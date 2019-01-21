@@ -9,12 +9,15 @@ import com.intramirror.jpush.entity.OrderStatusUpdateEntity;
 import com.intramirror.jpush.enums.EmActionType;
 import com.intramirror.order.api.common.OrderStatusType;
 import com.intramirror.order.api.dto.OrderStatusChangeMsgDTO;
+import com.intramirror.order.api.model.CczhangOrderEmail;
 import com.intramirror.order.api.model.LogisticProductContainer;
 import com.intramirror.order.api.model.LogisticProductContainerExample;
 import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.core.dao.BaseDao;
+import com.intramirror.order.core.mapper.CczhangOrderEmailMapper;
 import com.intramirror.order.core.mapper.LogisticProductContainerMapper;
+import com.intramirror.order.core.mapper.LogisticsMapper;
 import com.intramirror.order.core.mapper.LogisticsProductMapper;
 
 import java.util.*;
@@ -40,9 +43,12 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
 
     private LogisticProductContainerMapper logisticProductContainerMapper;
 
+    private CczhangOrderEmailMapper cczhangOrderEmailMapper;
+
     public void init() {
         logisticsProductMapper = this.getSqlSession().getMapper(LogisticsProductMapper.class);
         logisticProductContainerMapper = this.getSqlSession().getMapper(LogisticProductContainerMapper.class);
+        cczhangOrderEmailMapper = this.getSqlSession().getMapper(CczhangOrderEmailMapper.class);
     }
 
     /**
@@ -323,5 +329,26 @@ public class LogisticsProductServiceImpl extends BaseDao implements ILogisticsPr
     @Override
     public List<Map<String, Object>> queryLogisticProductConfirm(Long logisticsProductId) {
         return logisticsProductMapper.queryLogisticProductConfirm(logisticsProductId);
+    }
+
+    @Override
+    public void saveConfirmCczhangOrderEmail(Long logisticsProductId,String orderLineNum) {
+        Long addressCountryId = logisticsProductMapper.getVendorAddressCountryIdBylogisticsProductId(logisticsProductId);
+
+        if(addressCountryId.intValue() == 2 || addressCountryId.intValue() == 3){
+            int expressType = logisticsProductMapper.getExpressTypeBylogisticsProductId(logisticsProductId);
+            if(expressType == 1){
+                Date now = new Date();
+                CczhangOrderEmail cczhangOrderEmail = new CczhangOrderEmail();
+                cczhangOrderEmail.setActionType(1);
+                cczhangOrderEmail.setCreateTime(now);
+                cczhangOrderEmail.setIsDeteled(0);
+                cczhangOrderEmail.setOrderLineNum(orderLineNum);
+                cczhangOrderEmail.setSendEmail(0);
+                cczhangOrderEmail.setUpdateTime(now);
+                cczhangOrderEmailMapper.insertSelective(cczhangOrderEmail);
+            }
+
+        }
     }
 }
