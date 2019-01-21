@@ -53,4 +53,8 @@
         where c.`send_email`  = 0 and c.`is_deteled`  = 0 and c.`action_type`  = #{actionType} ;
     </select>
 
+    <delete id="updateSendEmailFlag">
+        update cczhang_order_email set send_email = 1,send_email_time=now() where id = #{ccZhangOrderEmailId}
+    </delete>
+
 </mapper>

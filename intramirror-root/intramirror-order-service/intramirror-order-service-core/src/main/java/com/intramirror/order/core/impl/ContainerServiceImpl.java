@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.intramirror.order.core.mapper.VendorShipmentMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -30,10 +31,13 @@ public class ContainerServiceImpl extends BaseDao implements IContainerService{
 	private static Logger logger = LoggerFactory.getLogger(ContainerServiceImpl.class);
 	
 	private ContainerMapper containerMapper;
+
+	private VendorShipmentMapper vendorShipmentMapper;
 	
 	@Override
 	public void init() {
 		containerMapper = this.getSqlSession().getMapper(ContainerMapper.class);
+		vendorShipmentMapper = this.getSqlSession().getMapper(VendorShipmentMapper.class);
 	}
 	
 	/**
@@ -74,7 +78,15 @@ public class ContainerServiceImpl extends BaseDao implements IContainerService{
 			container.setContainerType("");
 		}*/
 		if (null != map.get("shipmentId")){
-			container.setShipmentId(Long.parseLong(map.get("shipmentId").toString()));
+			Long shipmentId = Long.parseLong(map.get("shipmentId").toString());
+			// 香港或者中国大陆买手店 直接新增carton
+			Long vendorAddressCountryId = vendorShipmentMapper.getVendorAddressCountryIdByShipmentId(shipmentId);
+			if(vendorAddressCountryId == 1 || vendorAddressCountryId == 2 ){ // 中国大陆的和中国香港的店
+				container.setShipmentId(0L);
+
+			}else {
+				container.setShipmentId(shipmentId);
+			}
 		}else{
 			//默认设置为0
 			container.setShipmentId(Long.parseLong("0"));

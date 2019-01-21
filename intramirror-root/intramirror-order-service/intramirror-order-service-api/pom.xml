@@ -1,74 +1,84 @@
 <?xml version="1.0"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.intramirror</groupId>
+        <artifactId>intramirror-order-service</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
     <groupId>com.intramirror</groupId>
-    <artifactId>intramirror-order-service</artifactId>
+    <artifactId>intramirror-order-service-api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-  </parent>
-  <groupId>com.intramirror</groupId>
-  <artifactId>intramirror-order-service-api</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>intramirror-order-service-api</name>
-  <url>http://maven.apache.org</url>
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    
-    	<!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
-		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>fastjson</artifactId>
-			<version>1.2.24</version>
-		</dependency>
+    <name>intramirror-order-service-api</name>
+    <url>http://maven.apache.org</url>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>com.intramirror</groupId>
-      <artifactId>intramirror-common</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
-    </dependency>
-		
-		<dependency>
+        <!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.24</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.intramirror</groupId>
+            <artifactId>intramirror-common</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.4</version>
         </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.5</version>
-    </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.5</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.7.5</version>
-    </dependency>
-      <dependency>
-          <groupId>com.intramirror</groupId>
-          <artifactId>lib-web-common</artifactId>
-          <version>1.0.11-SNAPSHOT</version>
-      </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.5</version>
+        </dependency>
+        <dependency>
+            <groupId>com.intramirror</groupId>
+            <artifactId>lib-web-common</artifactId>
+            <version>1.0.12-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.poi</groupId>
+                    <artifactId>poi</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.poi</groupId>
+                    <artifactId>poi-ooxml</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-    <!-- redis cache related.....start -->
-    <dependency>
-      <groupId>org.springframework.data</groupId>
-      <artifactId>spring-data-redis</artifactId>
-      <version>1.6.0.RELEASE</version>
-    </dependency>
-    <dependency>
-      <groupId>redis.clients</groupId>
-      <artifactId>jedis</artifactId>
-      <version>2.7.3</version>
-    </dependency>
-    <!-- redis cache related.....end -->
+        <!-- redis cache related.....start -->
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-redis</artifactId>
+            <version>1.6.0.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>2.7.3</version>
+        </dependency>
+        <!-- redis cache related.....end -->
 
-  </dependencies>
+    </dependencies>
 </project>
