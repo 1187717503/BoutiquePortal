@@ -13,4 +13,9 @@ public interface VendorShipmentMapper {
      * @return
      */
     List<VendorInvoiceVO> getVendorInvoicingList(Long shipmentId);
+
+    /**
+     * 根据shipmentId获取该vendor的addressCountryId
+     * */
+    Long getVendorAddressCountryIdByShipmentId(Long shipmentId);
 }
