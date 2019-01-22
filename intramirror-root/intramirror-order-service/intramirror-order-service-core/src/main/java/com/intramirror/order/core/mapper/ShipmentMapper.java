@@ -151,7 +151,7 @@ public interface ShipmentMapper {
 
 	List<String> getOrderLineNumsByShipment(Long shipmentId);
 
-	Map<String,Object> getCartoonType(@Param("shipmentId") Long shipmentId);
+	List<Map<String,Object>> getCartoonType(@Param("shipmentId") Long shipmentId);
 
 	int doRepeatShipmentCode(@Param("logisticsProductId") Long logisticsProductId,@Param("shipmentCode") String shipmentCode);
 
