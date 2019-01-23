@@ -940,7 +940,11 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 
 	@Override
 	public int getCartoonType(Long shippmentId) throws Exception{
-		Map<String,Object> map = shipmentMapper.getCartoonType(shippmentId);
+		List<Map<String,Object>> list = shipmentMapper.getCartoonType(shippmentId);
+		Map<String,Object> map = list.get(0);
+		if(!"3".equals(map.get("address_country_id_vendor").toString()) && !"2".equals(map.get("address_country_id_vendor").toString())){
+			throw new RuntimeException("error shipmentId");
+		}
 		if(map == null){
 			throw new RuntimeException("this cartoon have no order");
 		}
@@ -968,7 +972,11 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	@Override
 	@Transactional
 	public void ship4hkAndMainLandVendor(Long shipmentId, String shippmentCode, Integer logisticsType)throws Exception {
-		Map<String,Object> map = shipmentMapper.getCartoonType(shipmentId);
+		List<Map<String,Object>> list = shipmentMapper.getCartoonType(shipmentId);
+		Map<String,Object> map = list.get(0);
+		if(!"3".equals(map.get("address_country_id_vendor").toString()) && !"2".equals(map.get("address_country_id_vendor").toString())){
+			throw new RuntimeException("error shipmentId");
+		}
 		if(map == null){
 			throw new RuntimeException("this cartoon have no order");
 		}
