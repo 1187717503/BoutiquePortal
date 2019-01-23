@@ -108,6 +108,11 @@ public class OrderService {
 		logger.info(MessageFormat.format("order packingOrder 获取箱子内订单列表 判断是否为空箱  iLogisticsProductService.selectByCondition 入参:{0}",new Gson().toJson(conditionMap)));
 		List<LogisticsProduct> list = iLogisticsProductService.selectByCondition(conditionMap);
 		String shipment_id = map.get("shipment_id").toString();
+		boolean isHkChainVendor = false;
+		Long vaddressCountryId = Long.valueOf(map.get("v_address_country_id").toString());
+		if(vaddressCountryId == 2 || vaddressCountryId == 3){
+			isHkChainVendor = true;
+		}
 		
 		//获取箱子信息
 		Map<String, Object> selectContainer = new HashMap<>();
@@ -119,15 +124,15 @@ public class OrderService {
 			logger.info("order packingOrder 已经选择过shipMent 直接关联，并加入箱子 ");
 			infoMap.put("statusType", StatusType.ORDER_CONTAINER_EMPTY);
 			
-			//判断箱子的geography 跟订单的大区是否一致
-			if(checkShipToGeography(currentOrder, container)){
+			//判断箱子的geography 跟订单的大区是否一致  香港店不校验
+			if(!isHkChainVendor && checkShipToGeography(currentOrder, container)){
 				result.setMsg("This Order's ship-to geography is different than carton's");
 				infoMap.put("code", StatusType.ORDER_ERROR_CODE);
 				result.setInfoMap(infoMap);
 				return result;
 			}
 			//判断箱子的stockLocation和订单是否一致
-			if(checkStockLocation(currentOrder, container)){
+			if(!isHkChainVendor && checkStockLocation(currentOrder, container)){
 				result.setMsg("This Order's stock_location is different than carton's");
 				infoMap.put("code", StatusType.ORDER_ERROR_CODE);
 				result.setInfoMap(infoMap);
@@ -174,28 +179,29 @@ public class OrderService {
 			//if (checkPack(result, infoMap, currentOrder, container)) return result;
 			//创建新箱子不用校验stockLocation
 			//判断箱子的geography 跟订单的大区是否一致
-			if(checkShipToGeography(currentOrder, container)){
+			if(!isHkChainVendor && checkShipToGeography(currentOrder, container)){
 				result.setMsg("This Order's ship-to geography is different than carton's");
 				infoMap.put("code", StatusType.ORDER_ERROR_CODE);
 				result.setInfoMap(infoMap);
 				return result;
 			}
+			List<Map<String, Object>> shipmentMapList = Collections.EMPTY_LIST;
+			if(!isHkChainVendor){
+				Map<String, Object> selectShipmentParam = new HashMap<>();
+				//selectShipmentParam.put("shipToGeography", currentOrder.get("pack_english_name").toString());
+				selectShipmentParam.put("shipToGeography", container.getShipToGeography());
 
-			Map<String, Object> selectShipmentParam = new HashMap<>();
-			//selectShipmentParam.put("shipToGeography", currentOrder.get("pack_english_name").toString());
-			selectShipmentParam.put("shipToGeography", container.getShipToGeography());
+				//shipment 状态
+				selectShipmentParam.put("status", ContainerType.OPEN);
+				selectShipmentParam.put("vendorId", vendorId);
+				selectShipmentParam.put("shipFromLocationId",currentOrder.get("ship_from_location_id"));
 
-			//shipment 状态
-			selectShipmentParam.put("status", ContainerType.OPEN);
-			selectShipmentParam.put("vendorId", vendorId);
-			selectShipmentParam.put("shipFromLocationId",currentOrder.get("ship_from_location_id"));
-			
-			//查询shipment
-			logger.info("order packingOrder 查询shipment 列表  iShipmentService.getShipmentsByVendor 入参:"+new Gson().toJson(selectShipmentParam));
-			List<Map<String, Object>> shipmentMapList = iShipmentService.getShipmentsByVendor(selectShipmentParam);
-			
-			//如果为空  新建Shipment
-			if(shipmentMapList == null || shipmentMapList.size() == 0  ){
+				//查询shipment
+				logger.info("order packingOrder 查询shipment 列表  iShipmentService.getShipmentsByVendor 入参:"+new Gson().toJson(selectShipmentParam));
+				shipmentMapList = iShipmentService.getShipmentsByVendor(selectShipmentParam);
+			}
+			//如果为空  新建Shipment  遵循 香港店 一个shipment一个箱子的原则
+			if(isHkChainVendor || shipmentMapList == null || shipmentMapList.size() == 0  ){
 				logger.info("order packingOrder shipmentMapList is null ");
 				Map<String, Object> saveShipmentParam = new HashMap<>();
 				saveShipmentParam.put("orderNumber", orderLineNum);
@@ -293,6 +299,7 @@ public class OrderService {
 				}
 		//如果箱子中存在订单，则直接加入箱子
 		}else{
+
 			logger.info("order packingCheckOrder 箱子不为空    ");
 			infoMap.put("statusType", StatusType.ORDER_CONTAINER_NOT_EMPTY);
 			
@@ -302,7 +309,30 @@ public class OrderService {
 			//根据shipmentId 获取shipment 相关信息及物流第一段类型
 			logger.info("order packingOrder 获取shipment 及第一段物流信息   调用接口 iShipmentService.getShipmentTypeById 入参:"+new Gson().toJson(getShipment));
 			Map<String, Object> shipmentMap = iShipmentService.getShipmentTypeById(getShipment);
-			
+			// 如果是香港店  需要做订单校验
+			if(isHkChainVendor){
+				Long orderCountryId = Long.valueOf(currentOrder.get("country_id").toString());
+				Integer express_type = Integer.valueOf(currentOrder.get("express_type").toString());
+				if(orderCountryId == 2 || express_type == 1){ // 中国单或者香港特殊单
+					result.setMsg("One cartoon only can contain one order ");
+					infoMap.put("code", StatusType.ORDER_ERROR_CODE);
+					result.setInfoMap(infoMap);
+					return result;
+				}
+				if(orderCountryId == 3 || orderCountryId == 4){ // 港澳单
+					for (LogisticsProduct lp :list){
+						Map<String, Object> orderMap = orderService.getOrderByOrderNumber(lp.getOrder_line_num());
+						if(checkHKOrderSameUser(currentOrder,orderMap)){
+							result.setMsg("This Order's consignee name or address is different than existing orders");
+							infoMap.put("code", StatusType.ORDER_ERROR_CODE);
+							result.setInfoMap(infoMap);
+							return result;
+						}
+					}
+
+				}
+
+			}
 			if(shipmentMap != null ){
 				try {
 					//订单加入箱子
@@ -315,13 +345,78 @@ public class OrderService {
 					throw new RuntimeException("The order failed to be added to the carton.");
 				}
 			}else{
-				result.setMsg("shipment Query is empty ");
+				result.setMsg("shipment Query is empty");
 				infoMap.put("code", StatusType.ORDER_ERROR_CODE);
 				result.setInfoMap(infoMap);
 			}
 		}
 		result.successStatus();
 		return result;
+	}
+
+	private boolean checkHKOrderSameUser(Map<String, Object> currentOrder, Map<String, Object> orderMap) {
+		boolean isOk = true;
+		if(currentOrder.get("u_user_rec_name") == null || orderMap.get("u_user_rec_name") ==null ){
+			isOk = false;
+			return isOk;
+		}else {
+			if(!currentOrder.get("u_user_rec_name").toString().equals(orderMap.get("u_user_rec_name").toString())){
+				isOk = false;
+				return isOk;
+			}
+		}
+
+		if(currentOrder.get("u_user_rec_mobile") == null || orderMap.get("user_rec_mobile") ==null ){
+			isOk = false;
+			return isOk;
+		}else {
+			if(!currentOrder.get("u_user_rec_mobile").toString().equals(orderMap.get("u_user_rec_mobile").toString())){
+				isOk = false;
+				return isOk;
+			}
+		}
+
+		if(currentOrder.get("u_user_rec_province") == null || orderMap.get("u_user_rec_province") ==null ){
+			isOk = false;
+			return isOk;
+		}else {
+			if(!currentOrder.get("u_user_rec_province").toString().equals(orderMap.get("u_user_rec_province").toString())){
+				isOk = false;
+				return isOk;
+			}
+		}
+
+		if(currentOrder.get("u_user_rec_city") == null || orderMap.get("u_user_rec_city") ==null ){
+			isOk = false;
+			return isOk;
+		}else {
+			if(!currentOrder.get("u_user_rec_city").toString().equals(orderMap.get("u_user_rec_city").toString())){
+				isOk = false;
+				return isOk;
+			}
+		}
+
+		if(currentOrder.get("u_user_rec_area") == null || orderMap.get("u_user_rec_area") ==null ){
+			isOk = false;
+			return isOk;
+		}else {
+			if(!currentOrder.get("u_user_rec_area").toString().equals(orderMap.get("u_user_rec_area").toString())){
+				isOk = false;
+				return isOk;
+			}
+		}
+
+		/*if(currentOrder.get("u_user_rec_code") == null || orderMap.get("u_user_rec_code") ==null ){
+			isOk = false;
+			return isOk;
+		}else {
+			if(!currentOrder.get("u_user_rec_code").toString().equals(orderMap.get("u_user_rec_code").toString())){
+				isOk = false;
+				return isOk;
+			}
+		}*/
+
+		return isOk;
 	}
 
 	private boolean checkStockLocation(Map<String, Object> currentOrder, Object container) {
