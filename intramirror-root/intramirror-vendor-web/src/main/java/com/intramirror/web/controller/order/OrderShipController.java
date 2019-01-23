@@ -135,9 +135,9 @@ public class OrderShipController extends BaseController {
             result.setMsg("Please log in again");
             return result;
         }
-        Boolean showShipe = true;
+        Boolean showShipe = false;
         if(vendors.get(0).getAddressCountryId() == 2 || vendors.get(0).getAddressCountryId() == 3){
-            showShipe = false;
+            showShipe = true;
         }
 
         List<Long> vendorIds = vendors.stream().map(Vendor::getVendorId).collect(Collectors.toList());
