@@ -1030,6 +1030,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		LogisticsProduct record = new LogisticsProduct();
 		record.setStatus(3);
 		record.setLogistics_product_id(logisticsProductId);
+		record.setShipped_at(now);
 		logisticsProductMapper.updateByLogisticsProduct(record);
 
 		Map<String,Object> shipmentStatusMap = new HashMap<>();
