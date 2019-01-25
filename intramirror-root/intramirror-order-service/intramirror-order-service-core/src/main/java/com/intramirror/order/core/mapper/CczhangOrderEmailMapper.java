@@ -1,6 +1,7 @@
 package com.intramirror.order.core.mapper;
 
 import com.intramirror.order.api.model.CczhangOrderEmail;
+import org.apache.ibatis.annotations.Param;
 
 public interface CczhangOrderEmailMapper {
     /**
@@ -50,4 +51,6 @@ public interface CczhangOrderEmailMapper {
      * @mbggenerated
      */
     int updateByPrimaryKey(CczhangOrderEmail record);
+
+    int doRepeatShipmentCode(@Param("shipmentCode") String shipmentCode);
 }

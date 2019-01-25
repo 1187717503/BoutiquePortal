@@ -989,6 +989,10 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		if(count>0){
 			throw new RuntimeException("The logistic No. has been used");
 		}
+		int ccCount = cczhangOrderEmailMapper.doRepeatShipmentCode(shippmentCode);
+		if(ccCount>0){
+			throw new RuntimeException("The logistic No. has been used");
+		}
 		Date now = new Date();
 		if("1".equals(map.get("express_type").toString())){
 			CczhangOrderEmail cczhangOrderEmail = new CczhangOrderEmail();

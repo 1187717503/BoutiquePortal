@@ -171,4 +171,7 @@
       is_deteled = #{isDeteled,jdbcType=INTEGER}
     where id = #{id,jdbcType=BIGINT}
   </update>
+  <select id="doRepeatShipmentCode" resultType="int">
+    select count(1) from cczhang_order_email where shipment_code = #{shipmentCode,jdbcType=VARCHAR} limit 1
+  </select>
 </mapper>
