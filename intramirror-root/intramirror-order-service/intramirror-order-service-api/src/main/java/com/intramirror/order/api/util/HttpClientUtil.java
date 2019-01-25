@@ -228,6 +228,7 @@ public class HttpClientUtil {
         return "";
     }
 
+
     public static String getConfirmStoreUrl() {
         return confirmStoreUrl;
     }
@@ -291,4 +292,13 @@ public class HttpClientUtil {
     public static void setAppMemberPointsUrl(String appMemberPointsUrl) {
         HttpClientUtil.appMemberPointsUrl = appMemberPointsUrl;
     }
+
+    public static String getTableuaTokenUrl() {
+        return tableuaTokenUrl;
+    }
+
+    public static void setTableuaTokenUrl(String tableuaTokenUrl) {
+        HttpClientUtil.tableuaTokenUrl = tableuaTokenUrl;
+    }
+
 }
