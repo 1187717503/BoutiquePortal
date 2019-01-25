@@ -42,6 +42,7 @@ public class HttpClientUtil {
     public static String tmsProviderRouteUrl;
     public static String appMemberPointsUrl;
     public static String order_capture_confirm;
+    public static String tableuaTokenUrl;
 
     public static String getOrder_capture_confirm() {
         return order_capture_confirm;
