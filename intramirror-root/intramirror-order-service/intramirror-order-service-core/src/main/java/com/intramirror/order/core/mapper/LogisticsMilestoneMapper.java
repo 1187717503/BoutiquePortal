@@ -1,6 +1,7 @@
 package com.intramirror.order.core.mapper;
 
 import com.intramirror.order.api.model.LogisticsMilestone;
+import org.apache.ibatis.annotations.Param;
 
 public interface LogisticsMilestoneMapper {
     /**
@@ -50,4 +51,6 @@ public interface LogisticsMilestoneMapper {
      * @mbggenerated
      */
     int updateByPrimaryKey(LogisticsMilestone record);
+
+    int setDeleteByOrderAndType(@Param("orderLineNum") String orderLineNum, @Param("type")int type);
 }

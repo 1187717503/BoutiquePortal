@@ -299,4 +299,11 @@
       is_deleted = #{isDeleted,jdbcType=INTEGER}
     where id = #{id,jdbcType=BIGINT}
   </update>
+  
+  <update id="setDeleteByOrderAndType">
+    update logistics_milestone
+    set
+      is_deleted = 1
+    where type = #{type,jdbcType=INTEGER} and order_num = #{orderLineNum,jdbcType=VARCHAR}
+  </update>
 </mapper>

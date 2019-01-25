@@ -1001,6 +1001,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			cczhangOrderEmail.setUpdateTime(now);
 			cczhangOrderEmailMapper.insertSelective(cczhangOrderEmail);
 		}else{
+			logisticsMilestoneMapper.setDeleteByOrderAndType(map.get("order_line_num").toString(),4);
 			LogisticsMilestone logisticsMilestone = new LogisticsMilestone();
 			logisticsMilestone.setCreateTime(now);
 			logisticsMilestone.setDhlType(1);
@@ -1025,6 +1026,12 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			}
 			logisticsMilestoneMapper.insertSelective(logisticsMilestone);
 		}
+
+		LogisticsProduct record = new LogisticsProduct();
+		record.setStatus(3);
+		record.setLogistics_product_id(logisticsProductId);
+		logisticsProductMapper.updateByLogisticsProduct(record);
+
 		Map<String,Object> shipmentStatusMap = new HashMap<>();
 		shipmentStatusMap.put("status",3);
 		shipmentStatusMap.put("ship_at",now);
