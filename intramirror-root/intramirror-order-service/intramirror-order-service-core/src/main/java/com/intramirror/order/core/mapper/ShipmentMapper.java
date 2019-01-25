@@ -153,6 +153,6 @@ public interface ShipmentMapper {
 
 	List<Map<String,Object>> getCartoonType(@Param("shipmentId") Long shipmentId);
 
-	int doRepeatShipmentCode(@Param("logisticsProductId") Long logisticsProductId,@Param("shipmentCode") String shipmentCode);
+	int doRepeatShipmentCode(@Param("shipmentCode") String shipmentCode);
 
 }

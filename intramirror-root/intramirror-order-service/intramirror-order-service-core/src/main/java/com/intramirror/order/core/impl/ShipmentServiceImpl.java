@@ -985,7 +985,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			shippmentCode = "SF"+shippmentCode;
 		}
 		Long logisticsProductId = Long.parseLong(map.get("logistics_product_id").toString());
-		int count = shipmentMapper.doRepeatShipmentCode(logisticsProductId,shippmentCode);
+		int count = shipmentMapper.doRepeatShipmentCode(shippmentCode);
 		if(count>0){
 			throw new RuntimeException("The logistic No. has been used");
 		}

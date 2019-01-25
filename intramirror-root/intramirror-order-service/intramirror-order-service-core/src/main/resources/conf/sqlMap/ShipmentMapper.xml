@@ -271,7 +271,7 @@ where c.shipment_id = #{shipmentId}
 	</select>
 
 	<select id="doRepeatShipmentCode" resultType="int">
-		SELECT COUNT(1) from logistics_milestone where logistics_product_id = #{logisticsProductId} and shipment_code = #{shipmentCode} LIMIT 1
+		SELECT COUNT(1) from logistics_milestone where shipment_code = #{shipmentCode} LIMIT 1
 	</select>
 
 </mapper>
