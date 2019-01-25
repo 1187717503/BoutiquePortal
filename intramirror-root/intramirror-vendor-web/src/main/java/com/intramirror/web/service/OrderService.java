@@ -370,7 +370,7 @@ public class OrderService {
 			}
 		}
 
-		if(currentOrder.get("u_user_rec_mobile") == null || orderMap.get("user_rec_mobile") ==null ){
+		if(currentOrder.get("u_user_rec_mobile") == null || orderMap.get("u_user_rec_mobile") ==null ){
 			isOk = false;
 			return isOk;
 		}else {
