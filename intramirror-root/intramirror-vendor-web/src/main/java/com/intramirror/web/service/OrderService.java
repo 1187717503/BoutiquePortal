@@ -209,6 +209,10 @@ public class OrderService {
 
 				//获取需要的参数
 				Map<String, Object> orderResult = orderService.getShipmentDetails(saveShipmentParam);
+				if (orderResult == null || orderResult.size()==0){
+					logger.error("获取订单信息异常The order failed to be added to the carton.");
+					throw new RuntimeException("The order failed to be added to the carton.");
+				}
 				//默认为0
 				orderResult.put("shipmentId", 0);
 				//如果是发往质检仓
