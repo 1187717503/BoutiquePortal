@@ -1006,36 +1006,43 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			cczhangOrderEmailMapper.insertSelective(cczhangOrderEmail);
 		}else{
 			logisticsMilestoneMapper.setDeleteByOrderAndType(map.get("order_line_num").toString(),4);
-			LogisticsMilestone logisticsMilestone = new LogisticsMilestone();
-			logisticsMilestone.setCreateTime(now);
-			logisticsMilestone.setDhlType(1);
-			logisticsMilestone.setIsComplete(0);
-			logisticsMilestone.setIsDeleted(0);
-			logisticsMilestone.setIsReturn(0);
-			logisticsMilestone.setIsShip(0);
-			logisticsMilestone.setIsSubscription(0);
-			logisticsMilestone.setLogisticsProductId(logisticsProductId);
-			logisticsMilestone.setOrderNum(map.get("order_line_num").toString());
-			logisticsMilestone.setRefOrderId(Long.parseLong(map.get("order_id").toString()));
-			logisticsMilestone.setRefOrderNum(map.get("order_num").toString());
-			logisticsMilestone.setShipmentCode(shippmentCode);
-			logisticsMilestone.setTime(now);
-			logisticsMilestone.setType(4);
-			logisticsMilestone.setUpdateTime(now);
-			logisticsMilestone.setUserId(Long.parseLong(map.get("user_id").toString()));
-			if(logisticsType.intValue() == 1){
-				logisticsMilestone.setShipmentType(4);
-			}else{
-				logisticsMilestone.setShipmentType(Integer.parseInt(map.get("sorting_type").toString()));
-			}
-			logisticsMilestoneMapper.insertSelective(logisticsMilestone);
+			String finalShippmentCode = shippmentCode;
+			list.forEach(e ->{
+				LogisticsMilestone logisticsMilestone = new LogisticsMilestone();
+				logisticsMilestone.setCreateTime(now);
+				logisticsMilestone.setDhlType(1);
+				logisticsMilestone.setIsComplete(0);
+				logisticsMilestone.setIsDeleted(0);
+				logisticsMilestone.setIsReturn(0);
+				logisticsMilestone.setIsShip(0);
+				logisticsMilestone.setIsSubscription(0);
+				logisticsMilestone.setLogisticsProductId(Long.parseLong(e.get("logistics_product_id").toString()));
+				logisticsMilestone.setOrderNum(e.get("order_line_num").toString());
+				logisticsMilestone.setRefOrderId(Long.parseLong(e.get("order_id").toString()));
+				logisticsMilestone.setRefOrderNum(e.get("order_num").toString());
+				logisticsMilestone.setShipmentCode(finalShippmentCode);
+				logisticsMilestone.setTime(now);
+				logisticsMilestone.setType(4);
+				logisticsMilestone.setUpdateTime(now);
+				logisticsMilestone.setUserId(Long.parseLong(e.get("user_id").toString()));
+				if(logisticsType.intValue() == 1){
+					logisticsMilestone.setShipmentType(4);
+				}else{
+					logisticsMilestone.setShipmentType(Integer.parseInt(map.get("sorting_type").toString()));
+				}
+				logisticsMilestoneMapper.insertSelective(logisticsMilestone);
+			});
+
 		}
 
-		LogisticsProduct record = new LogisticsProduct();
-		record.setStatus(3);
-		record.setLogistics_product_id(logisticsProductId);
-		record.setShipped_at(now);
-		logisticsProductMapper.updateByLogisticsProduct(record);
+		list.forEach(e->{
+			LogisticsProduct record = new LogisticsProduct();
+			record.setStatus(3);
+			record.setLogistics_product_id(Long.parseLong(e.get("logistics_product_id").toString()));
+			record.setShipped_at(now);
+			logisticsProductMapper.updateByLogisticsProduct(record);
+		});
+
 
 		Map<String,Object> shipmentStatusMap = new HashMap<>();
 		shipmentStatusMap.put("status",3);
