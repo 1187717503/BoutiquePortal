@@ -340,7 +340,7 @@ public class OrderService {
 			if(shipmentMap != null ){
 				try {
 					//订单加入箱子
-					result =  updateLogisticsProduct(currentOrder,shipmentMap,true,true);
+					result =  updateLogisticsProduct(currentOrder,shipmentMap,!isHkChainVendor,true);
 				}catch(RuntimeException re){
 					logger.error(re.getMessage());
 					throw new RuntimeException(re.getMessage());
