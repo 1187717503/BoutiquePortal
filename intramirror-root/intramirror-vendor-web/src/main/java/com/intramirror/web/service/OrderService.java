@@ -326,7 +326,7 @@ public class OrderService {
 				if(orderCountryId == 3 || orderCountryId == 4){ // 港澳单
 					for (LogisticsProduct lp :list){
 						Map<String, Object> orderMap = orderService.getOrderByOrderNumber(lp.getOrder_line_num());
-						if(checkHKOrderSameUser(currentOrder,orderMap)){
+						if(!checkHKOrderSameUser(currentOrder,orderMap)){
 							result.setMsg("This Order's consignee name or address is different than existing orders");
 							infoMap.put("code", StatusType.ORDER_ERROR_CODE);
 							result.setInfoMap(infoMap);
