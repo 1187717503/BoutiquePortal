@@ -318,7 +318,7 @@ public class OrderService {
 				Long orderCountryId = Long.valueOf(currentOrder.get("country_id").toString());
 				Integer express_type = Integer.valueOf(currentOrder.get("express_type").toString());
 				if(orderCountryId == 2 || express_type == 1){ // 中国单或者香港特殊单
-					result.setMsg("One cartoon only can contain one order ");
+					result.setMsg("One carton only can contain one order ");
 					infoMap.put("code", StatusType.ORDER_ERROR_CODE);
 					result.setInfoMap(infoMap);
 					return result;
