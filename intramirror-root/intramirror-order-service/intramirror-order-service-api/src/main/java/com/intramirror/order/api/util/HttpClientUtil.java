@@ -1,9 +1,10 @@
 package com.intramirror.order.api.util;
 
+import com.google.gson.Gson;
 import com.intramirror.common.help.StringUtils;
 import com.intramirror.core.net.http.OkHttpUtils;
 import net.sf.json.JSONObject;
-import okhttp3.Response;
+import okhttp3.*;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -13,6 +14,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
@@ -23,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -146,6 +149,28 @@ public class HttpClientUtil {
                     e.printStackTrace();
                 }
             }
+        }
+        return "";
+    }
+
+    public static String httpPostTableuaToken(){
+        try {
+            OkHttpClient client = new OkHttpClient();
+            MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+            RequestBody body = RequestBody.create(mediaType, "username=leo.zhuang%40intramirror.com");
+            Request request = new Request.Builder()
+                    .url(tableuaTokenUrl)
+                    .post(body)
+                    .addHeader("content-type", "application/x-www-form-urlencoded")
+                    .addHeader("cache-control", "no-cache")
+                    .build();
+
+            Response response = client.newCall(request).execute();
+            String ret = response.body().string();
+            return ret;
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return "";
     }
