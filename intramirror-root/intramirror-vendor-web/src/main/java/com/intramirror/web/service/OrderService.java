@@ -318,7 +318,7 @@ public class OrderService {
 				Long orderCountryId = Long.valueOf(currentOrder.get("country_id").toString());
 				Integer express_type = Integer.valueOf(currentOrder.get("express_type").toString());
 				if(orderCountryId == 2 || express_type == 1){ // 中国单或者香港特殊单
-					result.setMsg("One cartoon only can contain one order ");
+					result.setMsg("One carton only can contain one order ");
 					infoMap.put("code", StatusType.ORDER_ERROR_CODE);
 					result.setInfoMap(infoMap);
 					return result;
@@ -326,7 +326,7 @@ public class OrderService {
 				if(orderCountryId == 3 || orderCountryId == 4){ // 港澳单
 					for (LogisticsProduct lp :list){
 						Map<String, Object> orderMap = orderService.getOrderByOrderNumber(lp.getOrder_line_num());
-						if(checkHKOrderSameUser(currentOrder,orderMap)){
+						if(!checkHKOrderSameUser(currentOrder,orderMap)){
 							result.setMsg("This Order's consignee name or address is different than existing orders");
 							infoMap.put("code", StatusType.ORDER_ERROR_CODE);
 							result.setInfoMap(infoMap);
@@ -340,7 +340,7 @@ public class OrderService {
 			if(shipmentMap != null ){
 				try {
 					//订单加入箱子
-					result =  updateLogisticsProduct(currentOrder,shipmentMap,true,true);
+					result =  updateLogisticsProduct(currentOrder,shipmentMap,!isHkChainVendor,true);
 				}catch(RuntimeException re){
 					logger.error(re.getMessage());
 					throw new RuntimeException(re.getMessage());
@@ -370,7 +370,7 @@ public class OrderService {
 			}
 		}
 
-		if(currentOrder.get("u_user_rec_mobile") == null || orderMap.get("user_rec_mobile") ==null ){
+		if(currentOrder.get("u_user_rec_mobile") == null || orderMap.get("u_user_rec_mobile") ==null ){
 			isOk = false;
 			return isOk;
 		}else {

@@ -946,7 +946,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			throw new RuntimeException("error shipmentId");
 		}
 		if(map == null){
-			throw new RuntimeException("this cartoon have no order");
+			throw new RuntimeException("this carton have no order");
 		}
 		//香港特殊订单
 		if("1".equals(map.get("express_type").toString())){
@@ -978,7 +978,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			throw new RuntimeException("error shipmentId");
 		}
 		if(map == null){
-			throw new RuntimeException("this cartoon have no order");
+			throw new RuntimeException("this carton have no order");
 		}
 		//验证shippmentCode是否重复
 		if(logisticsType.intValue() == 1){
