@@ -357,7 +357,8 @@
             p.cover_img,
             g.english_name AS geography_name,
             lp.logistics_product_id,
-            p.product_code
+            p.product_code,
+            lp.shipping_method
         FROM logistics_product lp
             INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
             INNER JOIN `order` o ON ol.order_id = o.order_id
