@@ -317,16 +317,16 @@ public class OrderService {
 			if(isHkChainVendor){
 				Long orderCountryId = Long.valueOf(currentOrder.get("country_id").toString());
 				Integer express_type = Integer.valueOf(currentOrder.get("express_type").toString());
-				if(orderCountryId == 2 || express_type == 1){ // 中国单或者香港特殊单
+				if(express_type == 1){ // 中国单或者香港特殊单
 					result.setMsg("One carton only can contain one order ");
 					infoMap.put("code", StatusType.ORDER_ERROR_CODE);
 					result.setInfoMap(infoMap);
 					return result;
 				}
-				if(orderCountryId == 3 || orderCountryId == 4){ // 港澳单
+				if(orderCountryId == 2 || orderCountryId == 3 || orderCountryId == 4){ // 国内地址 或者港澳单
 					for (LogisticsProduct lp :list){
 						Map<String, Object> orderMap = orderService.getOrderByOrderNumber(lp.getOrder_line_num());
-						if(!checkHKOrderSameUser(currentOrder,orderMap)){
+						if(!checkOrderSameUser(currentOrder,orderMap)){
 							result.setMsg("This Order's consignee name or address is different than existing orders");
 							infoMap.put("code", StatusType.ORDER_ERROR_CODE);
 							result.setInfoMap(infoMap);
@@ -358,7 +358,7 @@ public class OrderService {
 		return result;
 	}
 
-	private boolean checkHKOrderSameUser(Map<String, Object> currentOrder, Map<String, Object> orderMap) {
+	private boolean checkOrderSameUser(Map<String, Object> currentOrder, Map<String, Object> orderMap) {
 		boolean isOk = true;
 		if(currentOrder.get("u_user_rec_name") == null || orderMap.get("u_user_rec_name") ==null ){
 			isOk = false;
