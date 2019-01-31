@@ -175,5 +175,17 @@
 			v1.parent_id ASC
 	</select>
 
+	<select id="queryVendorByUserId" resultType="com.intramirror.order.api.vo.VendorVO" parameterType="long">
+		SELECT
+		v.vendor_id vendorId ,
+		v.vendor_code vendorCode ,
+		v.vendor_name vendorName
+		FROM
+		vendor v
+		WHERE
+		v.user_id = #{userId,jdbcType=BIGINT}
+		and v.enabled = 1
+	</select>
+
 
 </mapper>

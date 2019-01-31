@@ -34,10 +34,10 @@ public class TableuaController extends BaseController{
             resultMessage.setMsg("user info error!");
             return resultMessage;
         }
-        List<VendorVO> vendorVOS = reportExtService.queryVendorsByUserId(user.getUserId().longValue());
+        VendorVO vendorVO = reportExtService.queryVendorByUserId(user.getUserId().longValue());
         String ret = HttpClientUtil.httpPostTableuaToken();
         Map<String,Object> retMap = new HashMap<>();
-        retMap.put("vendorList",vendorVOS);
+        retMap.put("vendorName",vendorVO == null ? "":vendorVO.getVendorName());
         retMap.put("tableuaToken",ret);
         resultMessage.setStatus(1);
         resultMessage.setData(retMap);
