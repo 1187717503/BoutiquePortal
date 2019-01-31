@@ -58,6 +58,7 @@ public class ShipMailSendThread implements Runnable {
         Set<String> orderLineNums = new HashSet<>();
         List<ViewOrderLinesVO> orders = new ArrayList<>();
         String awbNo = "";
+        Boolean isBcShipment = false;
         for (ViewOrderLinesVO viewOrderLinesVO : shipmentList) {
             if (StringUtils.isBlank(awbNo)) {
                 awbNo = viewOrderLinesVO.getAwb_nbr();
@@ -81,6 +82,9 @@ public class ShipMailSendThread implements Runnable {
                 buyerContactOrderListMap.put(consignee_mobile, contactOrderList);
             }
             contactOrderList.add(viewOrderLinesVO);
+            if(viewOrderLinesVO.getShippingMethod() == 1){
+                isBcShipment = true;
+            }
         }
         for (Map.Entry<String, List<ViewOrderLinesVO>> entry : consigneeOrderListMap.entrySet()) {
             if (entry.getValue().size() >= 3) {
@@ -107,6 +111,9 @@ public class ShipMailSendThread implements Runnable {
 
         MailModelVO mailContent = new MailModelVO();
         //设置邮件标题，邮件标题为Shipment No. XXXXX + 【国家】/【Transit warehouse】
+        if(isBcShipment){
+            shipment.setDestination("B2C-WMS");
+        }
         String subject;
         if ("COMO".equals(shipment.getDestination())){
             //发往荷兰邮政
