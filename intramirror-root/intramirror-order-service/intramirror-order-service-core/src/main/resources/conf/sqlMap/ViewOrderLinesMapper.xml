@@ -44,6 +44,7 @@
         <result column="sorting_type" property="sortingType" jdbcType="INTEGER"/>
         <result column="channel" property="channel" jdbcType="VARCHAR"/>
         <result column="sale_price" property="salePrice" jdbcType="DECIMAL"/>
+		<result column="shipping_method" property="shippingMethod" jdbcType="INTEGER"/>
     </resultMap>
 
     <select id="getShipmentListByShipmentNo" parameterType="string" resultMap="BaseResultMap">
@@ -96,9 +97,9 @@
 			 THEN 'Delivered' END
 		  )                                                                       AS shipment_status,
 		  sub_ship.awb_num                                                        AS awb_nbr,
-		  ch.`name`                                                               AS channel,
 		  vrd.sorting_type,
-		  lp.sale_price
+		  ch.`name`                                                               AS channel,
+		  lp.sale_price,lp.shipping_method
 		FROM
 			logistics_product lp
 			LEFT JOIN order_logistics ol

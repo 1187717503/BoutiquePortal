@@ -3,7 +3,11 @@ package com.intramirror.web.service;
 import java.text.MessageFormat;
 import java.util.*;
 
+import com.intramirror.common.IKafkaService;
+import com.intramirror.order.api.dto.OrderStatusChangeMsgDTO;
 import com.intramirror.order.api.model.*;
+import com.intramirror.order.core.utils.KafkaMessageUtil;
+import com.intramirror.product.api.exception.BusinessException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +44,9 @@ public class OrderService {
 	
 	@Autowired
 	private ILogisticProductShipmentService logisticProductShipmentService;
-	
+	@Autowired
+	IKafkaService kafkaService;
+
 	
 	
 	/**
@@ -493,6 +499,7 @@ public class OrderService {
 		logger.info("order updateLogisticsProduct 添加订单与箱子的关联  ");
 		long containerId = Long.parseLong(orderMap.get("containerId").toString());
 		long logisticsProductId = Long.parseLong(orderMap.get("logistics_product_id").toString());
+		String orderLineNum = orderMap.get("order_line_num").toString();
 		LogisticsProduct logisticsProduct = new LogisticsProduct();
 		logisticsProduct.setLogistics_product_id(logisticsProductId);
 		logisticsProduct.setContainer_id(containerId);
@@ -500,9 +507,9 @@ public class OrderService {
 		logisticsProduct.setPacked_at(Helper.getCurrentUTCTime());
 		logger.info("order updateLogisticsProduct 添加订单与箱子的关联 并修改状态  调用接口iLogisticsProductService.updateByLogisticsProduct 订单修改前状态:"+orderMap.get("status").toString()+"  入参:"+new Gson().toJson(logisticsProduct));
 		int row = iLogisticsProductService.updateByLogisticsProduct(logisticsProduct);
+		sendKafka(orderLineNum,logisticsProductId, OrderStatusType.READYTOSHIP);
 		//添加订单跟箱子的关联,与wms系统关联
 		long vendorId = Long.parseLong(orderMap.get("vendorId").toString());
-		String orderLineNum = orderMap.get("order_line_num").toString();
 		LogisticProductContainer productContainer = new LogisticProductContainer();
 		productContainer.setContainerId(containerId);
 		productContainer.setLogisticsProductId(logisticsProductId);
@@ -540,9 +547,23 @@ public class OrderService {
 		result.setInfoMap(info);
 		return result;
 	}
-	
-	
-	
+
+	private void sendKafka(String orderLineNum, long logisticsProductId, int status) {
+		logger.info("send order status change kafka,status:"+ status);
+		Gson gson = new Gson();
+
+		OrderStatusChangeMsgDTO orderStatusChangeMsgDTO = new OrderStatusChangeMsgDTO();
+		orderStatusChangeMsgDTO.setLogisticsProductId(logisticsProductId);
+		orderStatusChangeMsgDTO.setOrderLineNum(orderLineNum);
+		orderStatusChangeMsgDTO.setStatus(status);
+		orderStatusChangeMsgDTO.setTriggerTime((new Date()).getTime());
+
+		String msg = gson.toJson(orderStatusChangeMsgDTO);
+
+		KafkaMessageUtil.sendMsgToOrderChangeKafka(msg,kafkaService);
+	}
+
+
 	/**
 	 * 删除订单
 	 * @param 
@@ -580,6 +601,11 @@ public class OrderService {
 		logisticProductContainer.setLogisticsProductId(logisticsProductId);
 		logisticProductContainer.setContainerId(containerId);
 		iLogisticsProductService.updateLogisticProductContainer(logisticProductContainer);
+		LogisticsProduct product = iLogisticsProductService.selectById(logisticsProductId);
+		if (product == null){
+			throw new BusinessException("LogisticsProduct is null ,logisticsProductId = " + logisticsProductId);
+		}
+		sendKafka(product.getOrder_line_num(), logisticsProductId,OrderStatusType.COMFIRMED);
 
 		if(row > 0){
 			//查询相关的logisProShipmentInfo 表获取sub_shipment_id
