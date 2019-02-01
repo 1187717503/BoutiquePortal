@@ -3,12 +3,17 @@
  */
 package com.intramirror.web.controller.order;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.intramirror.common.IKafkaService;
+import com.intramirror.order.api.common.OrderStatusType;
+import com.intramirror.order.api.dto.OrderStatusChangeMsgDTO;
 import com.intramirror.order.api.model.*;
 import com.intramirror.order.api.util.RedisService;
+import com.intramirror.order.core.utils.KafkaMessageUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +62,8 @@ public class ContainerController {
 	private ILogisticProductShipmentService logisticProductShipmentService;
 	@Autowired
 	private RedisService redisService;
+	@Autowired
+	IKafkaService kafkaService;
 
 	/**
 	 * 新增箱子
@@ -306,6 +313,7 @@ public class ContainerController {
 						submap.put("logisticProductId", logisticsProduct.getLogistics_product_id());
 						logisticProductShipmentService.deleteBylogisticProductId(submap);
 						logisticProductService.updateContainerById(logisticsProduct.getLogistics_product_id());
+						sendKafkaToConfirm(logisticsProduct);
 						//删除关联（wms）
 						LogisticProductContainer logisticProductContainer = new LogisticProductContainer();
 						logisticProductContainer.setLogisticsProductId(logisticsProduct.getLogistics_product_id());
@@ -331,7 +339,25 @@ public class ContainerController {
 		}
 		return message;
 	}
-	
+
+	private void sendKafkaToConfirm(LogisticsProduct logisticsProduct) {
+		if (logisticsProduct == null){
+			return;
+		}
+		logger.info("send order status change kafka,status:2");
+		Gson gson = new Gson();
+
+		OrderStatusChangeMsgDTO orderStatusChangeMsgDTO = new OrderStatusChangeMsgDTO();
+		orderStatusChangeMsgDTO.setLogisticsProductId(logisticsProduct.getLogistics_product_id());
+		orderStatusChangeMsgDTO.setOrderLineNum(logisticsProduct.getOrder_line_num());
+		orderStatusChangeMsgDTO.setStatus(OrderStatusType.COMFIRMED);
+		orderStatusChangeMsgDTO.setTriggerTime((new Date()).getTime());
+
+		String msg = gson.toJson(orderStatusChangeMsgDTO);
+
+		KafkaMessageUtil.sendMsgToOrderChangeKafka(msg,kafkaService);
+	}
+
 	@RequestMapping(value="/getBarcode", method=RequestMethod.GET)
 	@ResponseBody
 	public ResultMessage getBarcode(){
