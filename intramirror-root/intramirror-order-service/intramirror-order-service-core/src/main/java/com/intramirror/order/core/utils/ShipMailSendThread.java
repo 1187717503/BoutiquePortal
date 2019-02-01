@@ -58,6 +58,7 @@ public class ShipMailSendThread implements Runnable {
         Set<String> orderLineNums = new HashSet<>();
         List<ViewOrderLinesVO> orders = new ArrayList<>();
         String awbNo = "";
+        Boolean isBcShipment = false;
         for (ViewOrderLinesVO viewOrderLinesVO : shipmentList) {
             if (StringUtils.isBlank(awbNo)) {
                 awbNo = viewOrderLinesVO.getAwb_nbr();
@@ -81,6 +82,9 @@ public class ShipMailSendThread implements Runnable {
                 buyerContactOrderListMap.put(consignee_mobile, contactOrderList);
             }
             contactOrderList.add(viewOrderLinesVO);
+            if(viewOrderLinesVO.getShippingMethod() == 1){
+                isBcShipment = true;
+            }
         }
         for (Map.Entry<String, List<ViewOrderLinesVO>> entry : consigneeOrderListMap.entrySet()) {
             if (entry.getValue().size() >= 3) {
@@ -112,7 +116,7 @@ public class ShipMailSendThread implements Runnable {
             //发往荷兰邮政
             subject = "Shipment No. " + shipment.getShipmentNo() + "【" + shipment.getDestination() + "】";
         } else{
-            subject = "Shipment No. " + shipment.getShipmentNo() +" AWB No. " + awbNo + "【" + shipment.getDestination() + "】";
+            subject = "Shipment No. " + shipment.getShipmentNo() +" AWB No. " + awbNo + "【" + (isBcShipment ? "B2C-WMS" : shipment.getDestination()) + "】";
         }
         mailContent.setSubject(subject);
         //设置邮件正文

@@ -1,0 +1,14 @@
+**/.settings/
+**/.classpath
+**/.project
+
+**/bin
+**/target
+
+.DS_Store
+.idea/
+
+*.iml
+*.swp
+*.swo
+*.swn

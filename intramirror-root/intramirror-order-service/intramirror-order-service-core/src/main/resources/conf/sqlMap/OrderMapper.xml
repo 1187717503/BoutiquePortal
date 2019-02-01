@@ -405,7 +405,8 @@
         g.english_name,
         p.color_code AS colorCode,
         p.designer_id AS brandID,
-        spu.composition as spuComposition
+        spu.composition as spuComposition,
+        lp.shipping_method
         FROM logistics_product lp
         INNER JOIN container c ON lp.container_id = c.container_id
         INNER JOIN order_logistics ol ON lp.order_logistics_id = ol.order_logistics_id
