@@ -317,13 +317,16 @@ public class OrderService {
 			if(isHkChainVendor){
 				Long orderCountryId = Long.valueOf(currentOrder.get("country_id").toString());
 				Integer express_type = Integer.valueOf(currentOrder.get("express_type").toString());
-				if(express_type == 1){ // 中国单或者香港特殊单
+
+				// 大陆店 香港件 || 香港店 大陆件 || 特殊单
+				if((vaddressCountryId == 2 && (orderCountryId == 3 || orderCountryId == 4)) ||(vaddressCountryId == 3 && orderCountryId == 2) ||express_type == 1){ // 中国单或者香港特殊单
 					result.setMsg("One carton only can contain one order ");
 					infoMap.put("code", StatusType.ORDER_ERROR_CODE);
 					result.setInfoMap(infoMap);
 					return result;
 				}
-				if(orderCountryId == 2 || orderCountryId == 3 || orderCountryId == 4){ // 国内地址 或者港澳单
+				// 香港店 港澳件 || 大陆店 大陆件
+				if((vaddressCountryId == 3 &&  (orderCountryId == 3 || orderCountryId == 4)) || (vaddressCountryId == 2 && orderCountryId == 2)){ // 国内地址 或者港澳单
 					for (LogisticsProduct lp :list){
 						Map<String, Object> orderMap = orderService.getOrderByOrderNumber(lp.getOrder_line_num());
 						if(!checkOrderSameUser(currentOrder,orderMap)){
