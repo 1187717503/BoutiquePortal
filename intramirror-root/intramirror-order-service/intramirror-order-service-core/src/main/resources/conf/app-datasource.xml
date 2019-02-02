@@ -64,6 +64,18 @@
         <property name="orderFinanceTopic" value="${kafka.topic.order.finance}"></property>
     </bean>
 
+    <bean id="ccZhangEmailProperties" class="com.intramirror.order.core.properties.CcZhangEmailProperties">
+        <property name="confirmedFrom" value="${cczhang.confirmed.from}"></property>
+        <property name="confirmedPassword" value="${cczhang.confirmed.password}"></property>
+        <property name="confirmedTo" value="${cczhang.confirmed.to}"></property>
+
+        <property name="shippedFrom" value="${cczhang.shipped.from}"></property>
+        <property name="shippedPassword" value="${cczhang.shipped.password}"></property>
+        <property name="shippedTo" value="${cczhang.shipped.to}"></property>
+
+        <property name="path" value="${cczhang.excel.path}"></property>
+    </bean>
+
     <bean id="mailConfig" class="com.intramirror.order.core.utils.MailConfig" lazy-init="false">
         <property name="host" value="${mail.mailHost}"></property>
         <property name="port" value="${mail.mailPort}"></property>

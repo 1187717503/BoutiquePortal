@@ -778,6 +778,8 @@ public class OrderController extends BaseController {
         }
 
         //map.put("vendorId", vendor.getVendorId());
+        // 为香港店和中国店准备数据
+        map.put("v_address_country_id",vendor.getAddressCountryId());
 
         LogisticsProduct logisticsProduct=iLogisticsProductService.selectByOrderLineNum(map.get("orderLineNum").toString());
         if(logisticsProduct!=null&&logisticsProduct.getShippingMethod()==1){

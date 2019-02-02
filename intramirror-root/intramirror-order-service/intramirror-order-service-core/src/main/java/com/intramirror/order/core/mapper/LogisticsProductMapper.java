@@ -87,4 +87,9 @@ public interface LogisticsProductMapper {
 
     List<Map<String, Object>> queryLogisticProductConfirm(Long logisticsProductId);
 
+    Long getVendorAddressCountryIdBylogisticsProductId(Long logisticsProductId);
+
+    int getExpressTypeBylogisticsProductId(Long logisticsProductId);
+
+
 }

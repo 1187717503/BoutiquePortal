@@ -43,7 +43,7 @@
 			    <property name="useActualColumnNames" value="false"/>
 			</table>-->
 
-		<table schema="intra-mirror-prd" tableName="vendor" domainObjectName="Vendor"
+		<table schema="intra-mirror-prd" tableName="logistics_milestone" domainObjectName="LogisticsMilestone"
 			   enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
 			   enableSelectByExample="false" selectByExampleQueryId="false" >
 			<property name="useActualColumnNames" value="false"/>

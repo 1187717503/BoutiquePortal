@@ -135,9 +135,15 @@ public class OrderShipController extends BaseController {
             result.setMsg("Please log in again");
             return result;
         }
+        Boolean showShipe = false;
+        if(vendors.get(0).getAddressCountryId() == 2 || vendors.get(0).getAddressCountryId() == 3){
+            showShipe = true;
+        }
+
         List<Long> vendorIds = vendors.stream().map(Vendor::getVendorId).collect(Collectors.toList());
 
         try {
+
             Map<String, Object> paramtMap = new HashMap<String, Object>();
 
             if (map.get("sortByName") != null && StringUtils.isNoneBlank(map.get("sortByName").toString())) {
@@ -262,6 +268,13 @@ public class OrderShipController extends BaseController {
             }else {
                 shipmentListMapSort = shipMentList;
             }
+
+            Boolean finalShowShipe = showShipe;
+            shipmentListMapSort.forEach(s ->{
+                if(s != null){
+                    s.put("showShipe", finalShowShipe);
+                }
+            });
 
             result.successStatus();
             result.setData(shipmentListMapSort);

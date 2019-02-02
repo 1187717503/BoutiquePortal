@@ -120,5 +120,7 @@ public interface ILogisticsProductService {
 	Map<String,Object> getShopProductSku(Long logisticsProductId);
 
 	List<Map<String, Object>> queryLogisticProductConfirm(Long logisticsProductId);
+
+	void saveConfirmCczhangOrderEmail(Long logisticsProductId,String orderLineNum);
 }
 
