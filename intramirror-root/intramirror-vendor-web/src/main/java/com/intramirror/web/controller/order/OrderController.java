@@ -1468,18 +1468,18 @@ public class OrderController extends BaseController {
         boolean showAdd = false;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm");
         for (Map<String, Object> order : orderList) {
-            Long vendorId = Long.valueOf(order.get("vendor_id").toString());
+            /*Long vendorId = Long.valueOf(order.get("vendor_id").toString());
             if(vendorId == 110 || vendorId == 138 || vendorId == 141){
                 showAdd = true;
             }else {
                 showAdd = false;
-            }
-            /*Long addressCountryId =  Long.valueOf(order.get("vendor_address_country_id").toString());
+            }*/
+            Long addressCountryId =  Long.valueOf(order.get("vendor_address_country_id").toString());
             if(addressCountryId == 2 || addressCountryId == 3 || addressCountryId == 4){
                 showAdd = true;
             }else {
                 showAdd = false;
-            }*/
+            }
             row = sheet.createRow(rowLength);
             row.setHeightInPoints(125F);
             String[] values = null;
