@@ -159,10 +159,10 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 					if(vaddressCountryId != null && (vaddressCountryId == 2 || vaddressCountryId == 3)) { // 中国香港和中国大陆的店
 						saveCoeSubShipment(shipmentId);
 					}else {
-						/*if ("China excl. Taiwan".equalsIgnoreCase(shipToGeography)){
+						if ("China excl. Taiwan".equalsIgnoreCase(shipToGeography)){
 							//发往中国大陆的通过桂邦中转
 							saveSubShipment(map,shipmentId,new Date());
-						}else {*/
+						}else {
 							Long consigner_country_id =  Long.parseLong(map.get("consigner_country_id").toString());
 							Long consignee_country_id = null;
 							if (shipmentCategory == 1){
@@ -172,8 +172,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 								consignee_country_id =  Long.parseLong(map.get("consignee_country_id").toString());
 							}
 							saveSubShipmentByTms(map,consigner_country_id,consignee_country_id,vendorId,shipmentId);
-						//}
-
+						}
 					}
 
 					shipment.setShipmentId(shipmentId);
@@ -195,10 +194,10 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 //						map.get("logistics_product_id")==null?"0":map.get("logistics_product_id").toString()));
 					//Long consigner_country_id =  Long.parseLong(map.get("consigner_country_id").toString());
 					//Long consignee_country_id =  Long.parseLong(map.get("consignee_country_id").toString());
-				/*if ("China excl. Taiwan".equalsIgnoreCase(shipToGeography)){
+				if ("China excl. Taiwan".equalsIgnoreCase(shipToGeography)){
 					//发往中国大陆的通过桂邦中转
 					saveSubShipment(map,shipmentId,new Date());
-				}else {*/
+				}else {
 					Long consigner_country_id = Long.parseLong(map.get("consigner_country_id").toString());
 					Long consignee_country_id = null;
 					if (shipmentCategory == 1) {
@@ -208,9 +207,8 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 						consignee_country_id = Long.parseLong(map.get("consignee_country_id").toString());
 					}
 					saveSubShipmentByTms(map, consigner_country_id, consignee_country_id, Long.parseLong(map.get("vendor_id").toString()), shipmentId);
-					//}
+					}
 				}
-
 				return shipment;
 			}
 		}
@@ -743,7 +741,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 						checkAWB(shipment.getShipmentId());
 					}
 					//临时修改，暂时不同步
-					//syncOrderToWarehouse(shipment);
+					syncOrderToWarehouse(shipment);
 
 					//shipped操作发送消息用来生成资金报表
 					List<LogisticsProduct> logisticsProducts = logisticsProductMapper.getLogisticsProductByShipment(shipment.getShipmentId());
@@ -803,6 +801,12 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
                 		//港澳本地单
                 		thirdWarehouse.setSortingType((byte)0);
 					}
+				}
+				//获取图片
+				String spuImage = thirdWarehouse.getSpuImage();
+				if (StringUtils.isNotBlank(spuImage) && !"[]".equals(spuImage)){
+					//商品图片取spu图片
+					thirdWarehouse.setOrderImage(spuImage);
 				}
                 thirdWarehouseMapper.insertSelective(thirdWarehouse);
 
@@ -1204,7 +1208,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 
 		//如果是发往中国大陆的shipment，需要同步一份数据到third_warehouse
 		//临时修改，暂时不同步
-		//syncOrderToWarehouse(shipment);
+		syncOrderToWarehouse(shipment);
 	}
 
 	@Override

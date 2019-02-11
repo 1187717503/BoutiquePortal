@@ -8,6 +8,16 @@ import com.intramirror.order.api.model.ThirdWarehouse;
 public class ThirdWarehouseVO extends ThirdWarehouse {
     private Integer addressCountryId;
     private Integer expressType;
+    private String spuImage;
+
+
+    public String getSpuImage() {
+        return spuImage;
+    }
+
+    public void setSpuImage(String spuImage) {
+        this.spuImage = spuImage;
+    }
 
     public Integer getExpressType() {
         return expressType;

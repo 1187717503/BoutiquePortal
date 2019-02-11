@@ -164,7 +164,7 @@ public class ShipMailSendThread implements Runnable {
             }
 
             //给AIAI发邮件
-            /*if ("China".equals(shipment.getDestination())) {
+            if ("China".equals(shipment.getDestination())) {
                 flag = true;
                 try {
                     mailContent.setSubject("Shipment No. " + shipment.getShipmentNo() + "【China】");
@@ -191,7 +191,7 @@ public class ShipMailSendThread implements Runnable {
                         }
                     }
                 }
-            }*/
+            }
             logger.info("----------Send mail finished.----------");
         }
     }
