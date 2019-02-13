@@ -262,4 +262,7 @@
         where vendor_id = #{vendorId,jdbcType=BIGINT}
     </update>
 
+    <select id="selectAllowImportProductByVendorId" resultType="java.lang.Long">
+        select allow_import_product from vendor_job_config where vendor_id = #{vendorId};
+    </select>
 </mapper>
