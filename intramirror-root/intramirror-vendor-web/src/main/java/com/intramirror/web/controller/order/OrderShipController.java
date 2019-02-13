@@ -774,7 +774,7 @@ public class OrderShipController extends BaseController {
                 result.setMsg("invoiceDate is null ");
                 return result;
             }
-            resultMap.put("VATNumber", invoice.getVatNum());
+
 
             //获取Ship From信息
             StockLocation location = stockLocationService.getShipFromLocation(shipment_id);
@@ -794,6 +794,7 @@ public class OrderShipController extends BaseController {
             resultMap.put("invoiceCompanyName",vendor.getCompanyName());
             resultMap.put("invoicePersonName",vendor.getRegisteredPerson());
             resultMap.put("invoiceAddress",vendor.getBusinessLicenseLocation());
+            resultMap.put("VATNumber", vendor.getBusinessLicenseNumber());
             //resultMap.put("invoiceCity",location.getAddressCity());
             resultMap.put("invoiceCountry",countryName);
 
