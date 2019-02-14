@@ -191,6 +191,7 @@ public class OrderController extends BaseController {
             params.put("brandId", map.get("brandId"));
             params.put("locationId", map.get("locationId"));
             params.put("logisticsProductIds", map.get("logisticsProductIds"));
+            params.put("shippingMethod",map.get("shippingMethod"));
             orderList = orderService.getOrderListByParams(params);
             //根据vendorIds查询所有的stockLocation
             List<StockLocationVO> stockLocationList = stockLocationService.getStockLocationByVendorIds(vendorIds);
