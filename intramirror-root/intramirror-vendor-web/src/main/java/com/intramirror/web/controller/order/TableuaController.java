@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -19,13 +20,14 @@ import java.util.Map;
 
 @CrossOrigin
 @Controller
-@RequestMapping("/table")
+@RequestMapping("/bi")
 public class TableuaController extends BaseController{
 
     @Autowired
     private ReportExtServiceImpl reportExtService;
 
-    @GetMapping("/tableua")
+    @ResponseBody
+    @GetMapping("/tableua/token")
     public Object getTableuaToken(HttpServletRequest httpRequest){
         ResultMessage resultMessage = ResultMessage.getInstance();
         User user = this.getUser(httpRequest);
