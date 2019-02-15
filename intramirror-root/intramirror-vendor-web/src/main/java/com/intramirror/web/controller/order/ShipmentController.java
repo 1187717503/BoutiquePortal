@@ -509,7 +509,47 @@ public class ShipmentController extends BaseController{
 		message.successStatus();
 	}
 
+	/**
+	 * 香港和大陆买手店获取物流类型
+	 * @param shipmentId
+	 * @return
+	 */
+	@GetMapping("getLogisticsType")
+	@ResponseBody
+	public ResultMessage getCartoonType(@RequestParam(value = "shipmentId",required = true)Long shipmentId){
+		ResultMessage resultMessage = new ResultMessage();
+		try{
+			int type = iShipmentService.getCartoonType(shipmentId);
+			resultMessage.successStatus().setData(type);
+		}catch(Exception e){
+			resultMessage.errorStatus().addMsg(e.getMessage());
+			logger.error("香港和大陆买手店获取物流类型，异常："+e.getMessage(),e);
+		}
+		return resultMessage;
+	}
 
+	/**
+	 * 香港和大陆买手店发货
+	 * @param shipmentId
+	 * @param shippmentCode
+	 * @param logisticsType
+	 * @return
+	 */
+	@GetMapping("ship4hkAndMainLandVendor")
+	@ResponseBody
+	public ResultMessage ship4hkAndMainLandVendor(@RequestParam(value = "shipmentId",required = true)Long shipmentId,
+										@RequestParam(value = "shippmentCode",required = true)String shippmentCode,
+										@RequestParam(value = "logisticsType",required = true)Integer logisticsType){
+		ResultMessage resultMessage = new ResultMessage();
+		try{
+			iShipmentService.ship4hkAndMainLandVendor(shipmentId,shippmentCode,logisticsType);
+			resultMessage.successStatus();
+		}catch(Exception e){
+			resultMessage.errorStatus().addMsg(e.getMessage());
+			logger.error("香港和大陆买手店发货，异常："+e.getMessage(),e);
+		}
+		return resultMessage;
+	}
 
 
 }

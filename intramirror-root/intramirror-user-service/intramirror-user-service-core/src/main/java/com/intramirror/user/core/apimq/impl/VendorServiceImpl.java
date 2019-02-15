@@ -1,6 +1,5 @@
 package com.intramirror.user.core.apimq.impl;
 
-
 import com.intramirror.common.parameter.EnabledType;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.model.VendorApplication;
@@ -29,7 +28,6 @@ public class VendorServiceImpl extends BaseDao implements VendorService {
         vendorMapper = this.getSqlSession().getMapper(VendorMapper.class);
         vendorApplicationMapper = this.getSqlSession().getMapper(VendorApplicationMapper.class);
     }
-
 
     public VendorApplication getVendorApplicationByUserId(Long userId) throws Exception {
         try {
@@ -107,14 +105,20 @@ public class VendorServiceImpl extends BaseDao implements VendorService {
 
     @Override
     public List<Vendor> getVendorByIds(List<Long> ids) {
-        if(CollectionUtils.isEmpty(ids)) return null;
-        Map<String,Object> param = new HashMap<>();
-        param.put("ids",ids);
+        if (CollectionUtils.isEmpty(ids))
+            return null;
+        Map<String, Object> param = new HashMap<>();
+        param.put("ids", ids);
         return vendorMapper.queryVendorByIds(param);
     }
 
     @Override
     public void updateByPrimaryKeySelective(Vendor vendor) {
-         vendorMapper.updateByPrimaryKeySelective(vendor);
+        vendorMapper.updateByPrimaryKeySelective(vendor);
+    }
+
+    @Override
+    public Long selectAllowImportProductByVendorId(Long vendorId) {
+        return vendorMapper.selectAllowImportProductByVendorId(vendorId);
     }
 }

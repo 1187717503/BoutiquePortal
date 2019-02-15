@@ -17,4 +17,8 @@
     WHERE vs.shipment_id = #{shipmentId}
     AND vs.is_deleted = 0
   </select>
+
+  <select id="getVendorAddressCountryIdByShipmentId" resultType="java.lang.Long" parameterType="java.lang.Long">
+    select v.address_country_id from vendor v left join shipment s on (v.vendor_id = s.vendor_id) where s.shipment_id = #{shipmentId}
+ </select>
 </mapper>

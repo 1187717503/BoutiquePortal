@@ -191,6 +191,7 @@ public class OrderController extends BaseController {
             params.put("brandId", map.get("brandId"));
             params.put("locationId", map.get("locationId"));
             params.put("logisticsProductIds", map.get("logisticsProductIds"));
+            params.put("shippingMethod",map.get("shippingMethod"));
             orderList = orderService.getOrderListByParams(params);
             //根据vendorIds查询所有的stockLocation
             List<StockLocationVO> stockLocationList = stockLocationService.getStockLocationByVendorIds(vendorIds);
@@ -778,6 +779,8 @@ public class OrderController extends BaseController {
         }
 
         //map.put("vendorId", vendor.getVendorId());
+        // 为香港店和中国店准备数据
+        map.put("v_address_country_id",vendor.getAddressCountryId());
 
         LogisticsProduct logisticsProduct=iLogisticsProductService.selectByOrderLineNum(map.get("orderLineNum").toString());
         if(logisticsProduct!=null&&logisticsProduct.getShippingMethod()==1){
@@ -1466,18 +1469,18 @@ public class OrderController extends BaseController {
         boolean showAdd = false;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm");
         for (Map<String, Object> order : orderList) {
-            Long vendorId = Long.valueOf(order.get("vendor_id").toString());
+            /*Long vendorId = Long.valueOf(order.get("vendor_id").toString());
             if(vendorId == 110 || vendorId == 138 || vendorId == 141){
                 showAdd = true;
             }else {
                 showAdd = false;
-            }
-            /*Long addressCountryId =  Long.valueOf(order.get("vendor_address_country_id").toString());
+            }*/
+            Long addressCountryId =  Long.valueOf(order.get("vendor_address_country_id").toString());
             if(addressCountryId == 2 || addressCountryId == 3 || addressCountryId == 4){
                 showAdd = true;
             }else {
                 showAdd = false;
-            }*/
+            }
             row = sheet.createRow(rowLength);
             row.setHeightInPoints(125F);
             String[] values = null;

@@ -198,4 +198,8 @@ public interface IShipmentService {
 
     void saveAwb(ShipmentInputVO inputVO);
 
+	int getCartoonType(Long shippmentId)throws Exception;
+
+	void ship4hkAndMainLandVendor(Long shipmentId,String shippmentCode,Integer logisticsType)throws Exception;
+
 }

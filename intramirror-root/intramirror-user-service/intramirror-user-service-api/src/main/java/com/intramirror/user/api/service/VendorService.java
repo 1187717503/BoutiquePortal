@@ -1,6 +1,5 @@
 package com.intramirror.user.api.service;
 
-
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.model.VendorApplication;
 
@@ -24,4 +23,6 @@ public interface VendorService {
     List<Vendor> getVendorByIds(List<Long> ids);
 
     void updateByPrimaryKeySelective(Vendor vendor);
+
+    Long selectAllowImportProductByVendorId(Long vendorId);
 }

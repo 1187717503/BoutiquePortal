@@ -376,4 +376,14 @@
         AND lp.enabled = 1
     </select>
 
+    <select id="getVendorAddressCountryIdBylogisticsProductId" resultType="long" parameterType="long">
+      SELECT v.address_country_id from logistics_product lp INNER JOIN vendor v on lp.vendor_id=v.vendor_id
+      where lp.logistics_product_id=#{logisticsProductId}
+    </select>
+
+    <select id="getExpressTypeBylogisticsProductId" resultType="int" parameterType="long">
+        SELECT express_type from logistics_product lp INNER JOIN logistics l on lp.order_logistics_id=l.order_logistics_id
+        where lp.logistics_product_id=#{logisticsProductId}
+    </select>
+
 </mapper>

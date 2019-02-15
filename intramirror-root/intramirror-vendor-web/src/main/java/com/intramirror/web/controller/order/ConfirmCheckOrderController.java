@@ -174,6 +174,8 @@ public class ConfirmCheckOrderController {
                     Integer oldStatus = logis.getStatus();
                     logisticsProductService.confirmOrder(upLogis);
 
+                    iLogisticsProductService.saveConfirmCczhangOrderEmail(upLogis.getLogistics_product_id(),upLogis.getOrder_line_num());
+
                     iLogisticsProductService.updateByLogisticsProduct4Jpush(oldStatus,upLogis);
 
                     //会员系统积分

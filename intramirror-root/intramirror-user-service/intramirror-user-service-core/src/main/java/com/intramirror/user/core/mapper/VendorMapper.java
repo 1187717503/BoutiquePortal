@@ -15,7 +15,7 @@ public interface VendorMapper {
 
     List<Map<String, Object>> queryRuleVendor(Map<String, Object> params);
 
-    List<Vendor> queryVendorByIds(Map<String,Object> param);
+    List<Vendor> queryVendorByIds(Map<String, Object> param);
 
     Vendor queryVendorByVendorId(Map<String, Object> params);
 
@@ -24,4 +24,6 @@ public interface VendorMapper {
     List<Map<String, Object>> getAllVendorCountryById(@Param("vendorIds") String[] vendorIds);
 
     void updateByPrimaryKeySelective(Vendor vendor);
+
+    Long selectAllowImportProductByVendorId(@Param("vendorId") Long vendorId);
 }

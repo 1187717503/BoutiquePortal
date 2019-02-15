@@ -47,6 +47,7 @@ public class ViewOrderLinesVO {
     private String awb_nbr;
     private String channel;
     private BigDecimal salePrice;
+    private Integer shippingMethod;
 
     public BigDecimal getSalePrice() {
         return salePrice;
@@ -384,5 +385,13 @@ public class ViewOrderLinesVO {
 
     public void setAwb_nbr(String awb_nbr) {
         this.awb_nbr = awb_nbr;
+    }
+
+    public Integer getShippingMethod() {
+        return shippingMethod;
+    }
+
+    public void setShippingMethod(Integer shippingMethod) {
+        this.shippingMethod = shippingMethod;
     }
 }
