@@ -268,11 +268,15 @@ public class OrderController extends BaseController {
         Double price = Double.parseDouble(priceStr);
         Double inPrice = Double.parseDouble(inPriceStr);
 
-        BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + discountTax) / price) * 100);
-        if (supply_price_discount.intValue() > 100 || supply_price_discount.intValue() < 0) {
+        if (price == 0){
             info.put("supply_price_discount", 0 + " %");
-        } else {
-            info.put("supply_price_discount", (100 - supply_price_discount.setScale(0, BigDecimal.ROUND_HALF_UP).intValue()) + " %");
+        }else {
+            BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + discountTax) / price) * 100);
+            if (supply_price_discount.intValue() > 100 || supply_price_discount.intValue() < 0) {
+                info.put("supply_price_discount", 0 + " %");
+            } else {
+                info.put("supply_price_discount", (100 - supply_price_discount.setScale(0, BigDecimal.ROUND_HALF_UP).intValue()) + " %");
+            }
         }
         //四舍五入金额
         info.put("price",new BigDecimal(priceStr).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
