@@ -155,6 +155,7 @@ public class HttpClientUtil {
 
     public static String httpPostTableuaToken(){
         try {
+            LOGGER.info("开始获取tableua token");
             OkHttpClient client = new OkHttpClient();
             MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
             RequestBody body = RequestBody.create(mediaType, "username=leo.zhuang%40intramirror.com");
@@ -167,6 +168,7 @@ public class HttpClientUtil {
 
             Response response = client.newCall(request).execute();
             String ret = response.body().string();
+            LOGGER.info("获取 token返回:{}",ret);
             return ret;
 
         } catch (Exception e) {
