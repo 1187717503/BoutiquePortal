@@ -158,7 +158,7 @@ public class HttpClientUtil {
             LOGGER.info("开始获取tableua token，{}",tableuaTokenUrl);
             OkHttpClient client = new OkHttpClient();
             MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
-            RequestBody body = RequestBody.create(mediaType, "username=leo.zhuang%40intramirror.com");
+            RequestBody body = RequestBody.create(mediaType, "username=ceci.chen%40intramirror.com");
             Request request = new Request.Builder()
                     .url(tableuaTokenUrl)
                     .post(body)
