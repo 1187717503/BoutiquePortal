@@ -81,7 +81,7 @@ public class ContainerServiceImpl extends BaseDao implements IContainerService{
 			Long shipmentId = Long.parseLong(map.get("shipmentId").toString());
 			// 香港或者中国大陆买手店 直接新增carton
 			Long vendorAddressCountryId = vendorShipmentMapper.getVendorAddressCountryIdByShipmentId(shipmentId);
-			if(vendorAddressCountryId == 1 || vendorAddressCountryId == 2 ){ // 中国大陆的和中国香港的店
+			if(vendorAddressCountryId == 2 || vendorAddressCountryId == 3 ){ // 中国大陆的和中国香港的店
 				container.setShipmentId(0L);
 
 			}else {
