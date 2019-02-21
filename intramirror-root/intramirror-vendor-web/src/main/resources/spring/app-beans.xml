@@ -39,6 +39,7 @@
         <property name="confirmStoreUrl" value="${confirmStoreUrl}"/>
         <property name="appMemberPointsUrl" value="${appMemberPointsUrl}"/>
         <property name="order_capture_confirm" value="${order_capture_confirm}"/>
+        <property name="tableuaTokenUrl" value="${tableua.token.url}"/>
     </bean>
 
     <!-- redis config start -->
