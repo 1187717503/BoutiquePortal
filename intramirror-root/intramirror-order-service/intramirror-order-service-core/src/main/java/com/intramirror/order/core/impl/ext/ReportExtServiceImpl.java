@@ -3,6 +3,7 @@ package com.intramirror.order.core.impl.ext;
 import com.intramirror.order.api.vo.*;
 import com.intramirror.order.core.dao.BaseDao;
 import com.intramirror.order.core.mapper.ext.ReportExtMapper;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,5 +51,13 @@ public class ReportExtServiceImpl extends BaseDao{
 
     public List<VendorVO> queryVendorsByUserId(Long userId){
         return reportExtMapper.queryVendorsByUserId(userId);
+    }
+
+    public VendorVO queryVendorByUserId(Long userId){
+        List<VendorVO> vendorVOS = reportExtMapper.queryVendorByUserId(userId);
+        if(CollectionUtils.isNotEmpty(vendorVOS)){
+            return vendorVOS.get(0);
+        }
+        return null;
     }
 }

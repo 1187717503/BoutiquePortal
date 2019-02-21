@@ -22,4 +22,6 @@ public interface ReportExtMapper {
     List<Long> queryVendorIdsByParentId(Long vendorId);
 
     List<VendorVO> queryVendorsByUserId(Long userId);
+
+    List<VendorVO> queryVendorByUserId(Long userId);
 }
