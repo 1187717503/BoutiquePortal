@@ -11,6 +11,7 @@ import com.intramirror.common.core.mapper.TransitWarehouseMapper;
 import com.intramirror.common.help.StringUtils;
 import com.intramirror.main.api.service.TaxService;
 import com.intramirror.order.api.common.ContainerType;
+import com.intramirror.order.api.common.LogisticsType;
 import com.intramirror.order.api.model.*;
 import com.intramirror.order.api.service.*;
 import com.intramirror.order.api.util.HttpClientUtil;
@@ -943,9 +944,9 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	}
 
 	@Override
-	public int getCartoonType(Long shippmentId) throws Exception{
-		List<Map<String,Object>> list = shipmentMapper.getCartoonType(shippmentId);
-		Map<String,Object> map = list.get(0);
+	public int getCartoonType(Long shipmentId) {
+		List<Map<String,Object>> list = shipmentMapper.getCartoonType(shipmentId);
+		Map<String, Object> map = list.get(0);
 		if(!"3".equals(map.get("address_country_id_vendor").toString()) && !"2".equals(map.get("address_country_id_vendor").toString())){
 			throw new RuntimeException("error shipmentId");
 		}
@@ -954,20 +955,32 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		}
 		//香港特殊订单
 		if("1".equals(map.get("express_type").toString())){
-			return 0;
+			return LogisticsType.EMS;
 		}
 		//大陆店
 		if("2".equals(map.get("address_country_id_vendor").toString())){
-			return 1;
+			if ("ZNW".equals(map.get("vendor_code").toString())){
+				//Z&W店用中通发货
+				return LogisticsType.ZHONG_TONG;
+			}
+			return LogisticsType.SHUN_FENG;
 		}
 		//香港店
 		if("3".equals(map.get("address_country_id_vendor").toString())){
-			String addressCountryId = map.get("address_country_id_product") == null? map.get("address_country_id").toString():map.get("address_country_id_product").toString();
+			String addressCountryId = map.get("address_country_id").toString();
 			//发往大陆使用ems其他使用顺丰
 			if("2".equals(addressCountryId)){
-				return 0;
+				return LogisticsType.EMS;
 			}
-			return 1;
+
+			if ("MUS".equals(map.get("vendor_code").toString())){
+				if ("3".equals(addressCountryId) || "4".equals(addressCountryId)){
+					//Muse店用本地件宅急便发货
+					return LogisticsType.ZHAI_JI_BIAN;
+				}
+
+			}
+			return LogisticsType.SHUN_FENG;
 		}
 
 		throw new RuntimeException("error vendor");
@@ -975,7 +988,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 
 	@Override
 	@Transactional
-	public void ship4hkAndMainLandVendor(Long shipmentId, String shippmentCode, Integer logisticsType)throws Exception {
+	public void ship4hkAndMainLandVendor(Long shipmentId, String shipmentCode, Integer logisticsType)throws Exception {
 		List<Map<String,Object>> list = shipmentMapper.getCartoonType(shipmentId);
 		Map<String,Object> map = list.get(0);
 		if(!"3".equals(map.get("address_country_id_vendor").toString()) && !"2".equals(map.get("address_country_id_vendor").toString())){
@@ -984,16 +997,15 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		if(map == null){
 			throw new RuntimeException("this carton have no order");
 		}
-		//验证shippmentCode是否重复
+		//验证shipmentCode是否重复
 		if(logisticsType.intValue() == 1){
-			shippmentCode = "SF"+shippmentCode;
+			shipmentCode = "SF"+shipmentCode;
 		}
-		Long logisticsProductId = Long.parseLong(map.get("logistics_product_id").toString());
-		int count = shipmentMapper.doRepeatShipmentCode(shippmentCode);
+		int count = shipmentMapper.doRepeatShipmentCode(shipmentCode);
 		if(count>0){
 			throw new RuntimeException("The logistic No. has been used");
 		}
-		int ccCount = cczhangOrderEmailMapper.doRepeatShipmentCode(shippmentCode);
+		int ccCount = cczhangOrderEmailMapper.doRepeatShipmentCode(shipmentCode);
 		if(ccCount>0){
 			throw new RuntimeException("The logistic No. has been used");
 		}
@@ -1005,13 +1017,14 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 			cczhangOrderEmail.setIsDeteled(0);
 			cczhangOrderEmail.setOrderLineNum(map.get("order_line_num").toString());
 			cczhangOrderEmail.setSendEmail(0);
-			cczhangOrderEmail.setShipmentCode(shippmentCode);
+			cczhangOrderEmail.setShipmentCode(shipmentCode);
 			cczhangOrderEmail.setUpdateTime(now);
 			cczhangOrderEmailMapper.insertSelective(cczhangOrderEmail);
 		}else{
 			logisticsMilestoneMapper.setDeleteByOrderAndType(map.get("order_line_num").toString(),4);
-			String finalShippmentCode = shippmentCode;
+			String finalShipmentCode = shipmentCode;
 			list.forEach(e ->{
+				long logisticsProductId = Long.parseLong(e.get("logistics_product_id").toString());
 				LogisticsMilestone logisticsMilestone = new LogisticsMilestone();
 				logisticsMilestone.setCreateTime(now);
 				logisticsMilestone.setDhlType(1);
@@ -1020,33 +1033,34 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 				logisticsMilestone.setIsReturn(0);
 				logisticsMilestone.setIsShip(0);
 				logisticsMilestone.setIsSubscription(0);
-				logisticsMilestone.setLogisticsProductId(Long.parseLong(e.get("logistics_product_id").toString()));
+				logisticsMilestone.setLogisticsProductId(logisticsProductId);
 				logisticsMilestone.setOrderNum(e.get("order_line_num").toString());
 				logisticsMilestone.setRefOrderId(Long.parseLong(e.get("order_id").toString()));
 				logisticsMilestone.setRefOrderNum(e.get("order_num").toString());
-				logisticsMilestone.setShipmentCode(finalShippmentCode);
+				logisticsMilestone.setShipmentCode(finalShipmentCode);
 				logisticsMilestone.setTime(now);
 				logisticsMilestone.setType(4);
 				logisticsMilestone.setUpdateTime(now);
 				logisticsMilestone.setUserId(Long.parseLong(e.get("user_id").toString()));
-				if(logisticsType.intValue() == 1){
+				if(logisticsType.intValue() == LogisticsType.SHUN_FENG){
 					logisticsMilestone.setShipmentType(4);
-				}else{
+				}else if (logisticsType.intValue() == LogisticsType.ZHONG_TONG) {
+                    logisticsMilestone.setShipmentType(7);
+                }else if (logisticsType.intValue() == LogisticsType.ZHAI_JI_BIAN) {
+				    logisticsMilestone.setShipmentType(8);
+                }else {
 					logisticsMilestone.setShipmentType(Integer.parseInt(map.get("sorting_type").toString()));
 				}
 				logisticsMilestoneMapper.insertSelective(logisticsMilestone);
+
+				LogisticsProduct record = new LogisticsProduct();
+				record.setStatus(3);
+				record.setLogistics_product_id(logisticsProductId);
+				record.setShipped_at(now);
+				logisticsProductMapper.updateByLogisticsProduct(record);
 			});
 
 		}
-
-		list.forEach(e->{
-			LogisticsProduct record = new LogisticsProduct();
-			record.setStatus(3);
-			record.setLogistics_product_id(Long.parseLong(e.get("logistics_product_id").toString()));
-			record.setShipped_at(now);
-			logisticsProductMapper.updateByLogisticsProduct(record);
-		});
-
 
 		Map<String,Object> shipmentStatusMap = new HashMap<>();
 		shipmentStatusMap.put("status",3);
@@ -1054,10 +1068,10 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		shipmentStatusMap.put("shipmentId",shipmentId);
 		shipmentMapper.updateShipmentStatus(shipmentStatusMap);
 
-		Map<String,Object> containnerStatusMap = new HashMap<>();
-		containnerStatusMap.put("status",3);
-		containnerStatusMap.put("containerId",Long.parseLong(map.get("container_id").toString()));
-		containerMapper.updateContainerBystatus(containnerStatusMap);
+		Map<String,Object> containerStatusMap = new HashMap<>();
+		containerStatusMap.put("status",3);
+		containerStatusMap.put("containerId",Long.parseLong(map.get("container_id").toString()));
+		containerMapper.updateContainerBystatus(containerStatusMap);
 	}
 
 

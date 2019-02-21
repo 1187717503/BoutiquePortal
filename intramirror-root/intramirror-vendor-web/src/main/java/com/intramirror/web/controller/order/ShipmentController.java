@@ -516,7 +516,7 @@ public class ShipmentController extends BaseController{
 	 */
 	@GetMapping("getLogisticsType")
 	@ResponseBody
-	public ResultMessage getCartoonType(@RequestParam(value = "shipmentId",required = true)Long shipmentId){
+	public ResultMessage getCartoonType(@RequestParam Long shipmentId){
 		ResultMessage resultMessage = new ResultMessage();
 		try{
 			int type = iShipmentService.getCartoonType(shipmentId);
