@@ -1215,4 +1215,9 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 	public List<LogisticsProduct> getLogisticsProductByShipment(Long shipmentId) {
 		return logisticsProductMapper.getLogisticsProductByShipment(shipmentId);
 	}
+
+	@Override
+	public void deleteSubShipment(Long containerId) {
+		shipmentMapper.deleteSubShipment(containerId);
+	}
 }

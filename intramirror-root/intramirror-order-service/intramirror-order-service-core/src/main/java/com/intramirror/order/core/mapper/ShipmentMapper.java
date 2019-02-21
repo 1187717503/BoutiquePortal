@@ -155,4 +155,7 @@ public interface ShipmentMapper {
 
 	int doRepeatShipmentCode(@Param("shipmentCode") String shipmentCode);
 
+
+	void deleteSubShipment(Long containerId);
+
 }

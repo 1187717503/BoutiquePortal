@@ -51,7 +51,7 @@
 		LEFT JOIN category c1 ON(c1.category_id = c.parent_id)
 		LEFT JOIN category c2 ON(c2.category_id = c1.parent_id)
 		LEFT JOIN tax t on(v.address_country_id = t.address_country_id)
-		WHERE p.enabled = 1
+		WHERE p.enabled = 1 and t.tax_type = 1
 		<if test="vendorIds != null" >
 			and p.vendor_id in
 			<foreach collection="vendorIds" item="vendorId" separator="," close=")" open="(">

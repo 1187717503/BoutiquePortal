@@ -21,7 +21,6 @@ import com.intramirror.common.parameter.StatusType;
 import com.intramirror.order.api.common.ContainerType;
 import com.intramirror.order.api.common.OrderStatusType;
 import com.intramirror.order.api.service.IContainerService;
-import com.intramirror.order.api.service.ILogisticProductShipmentService;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.service.IShipmentService;
@@ -42,8 +41,6 @@ public class OrderService {
 	@Autowired
 	private IContainerService containerService;
 	
-	@Autowired
-	private ILogisticProductShipmentService logisticProductShipmentService;
 	@Autowired
 	IKafkaService kafkaService;
 
@@ -710,7 +707,7 @@ public class OrderService {
 		sendKafka(product.getOrder_line_num(), logisticsProductId,OrderStatusType.COMFIRMED);
 
 		if(row > 0){
-			//查询相关的logisProShipmentInfo 表获取sub_shipment_id
+			/*//查询相关的logisProShipmentInfo 表获取sub_shipment_id
 			Map<String,Object> logisProShipmentInfo = iLogisticsProductService.selectLogisProShipmentById(Long.parseLong(map.get("logistics_product_id").toString()));
 
 			//根据sub_shipment_id 删除sub_shipment
@@ -720,7 +717,10 @@ public class OrderService {
 
 				logger.info("order deleteOrder 删除订单相关联的 logisticProductShipment 调用接口  logisticProductShipmentService.deleteById sub_shipment_id:"+logisProShipmentInfo.get("sub_shipment_id").toString());
 				logisticProductShipmentService.deleteById(Long.parseLong(logisProShipmentInfo.get("sub_shipment_id").toString()));
-			}
+			}*/
+			//删除sub_shipment中此订单地址信息
+			clearOrderAddress(containerId);
+
 			//如果当前数据为container里面的最后一个商品删除container与shipment关联
 			Long vendor_id = list.get(0).getVendor_id();
 			int status = OrderStatusType.READYTOSHIP;
@@ -739,6 +739,19 @@ public class OrderService {
 
 		
 		return result;
+	}
+
+	private void clearOrderAddress(Long containerId) {
+		Map<String,Object> params = new HashMap<>();
+		params.put("container_id",containerId);
+		Container container = containerService.selectContainerById(params);
+		if (container != null){
+			if ("Other".equals(container.getShipToGeography())){
+				//只有发往其他国家的需要清除sub_shipment中订单地址信息
+				iShipmentService.deleteSubShipment(containerId);
+			}
+		}
+
 	}
 
 }

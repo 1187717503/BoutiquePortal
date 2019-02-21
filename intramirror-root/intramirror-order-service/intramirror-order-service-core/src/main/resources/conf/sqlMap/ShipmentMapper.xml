@@ -175,8 +175,17 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
   		DELETE FROM shipment 
 		WHERE shipment_id = #{shipmentId,jdbcType=BIGINT}
   	</delete>
-  	
-<select id="getShipmentNoById" resultType="java.lang.String" parameterType="java.util.Map">
+
+    <update id="deleteSubShipment" parameterType="long">
+		UPDATE sub_shipment ss,
+		 container c
+		SET ss.shipment_id = 0
+		WHERE
+			c.shipment_id = ss.shipment_id
+		AND c.container_id = #{containerId}
+	</update>
+
+    <select id="getShipmentNoById" resultType="java.lang.String" parameterType="java.util.Map">
 		SELECT shipment_no FROM shipment
 		where shipment_id = #{shipmentId,jdbcType=BIGINT};
 </select>

@@ -202,4 +202,10 @@ public interface IShipmentService {
 
 	void ship4hkAndMainLandVendor(Long shipmentId,String shippmentCode,Integer logisticsType)throws Exception;
 
+	/**
+	 * 删除sub_shipment地址关联
+	 * @param containerId
+	 */
+	void deleteSubShipment(Long containerId);
+
 }
