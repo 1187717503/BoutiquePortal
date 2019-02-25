@@ -1053,14 +1053,16 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 				}
 				logisticsMilestoneMapper.insertSelective(logisticsMilestone);
 
-				LogisticsProduct record = new LogisticsProduct();
-				record.setStatus(3);
-				record.setLogistics_product_id(logisticsProductId);
-				record.setShipped_at(now);
-				logisticsProductMapper.updateByLogisticsProduct(record);
 			});
-
 		}
+
+		list.forEach(e->{
+			LogisticsProduct record = new LogisticsProduct();
+			record.setStatus(3);
+			record.setLogistics_product_id(Long.parseLong(e.get("logistics_product_id").toString()));
+			record.setShipped_at(now);
+			logisticsProductMapper.updateByLogisticsProduct(record);
+		});
 
 		Map<String,Object> shipmentStatusMap = new HashMap<>();
 		shipmentStatusMap.put("status",3);
