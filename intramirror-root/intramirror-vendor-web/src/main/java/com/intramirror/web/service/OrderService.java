@@ -121,7 +121,12 @@ public class OrderService {
 		Map<String, Object> selectContainer = new HashMap<>();
 		selectContainer.put("container_id", containerId);
 		Container container =  containerService.selectContainerById(selectContainer);
-		
+
+		int status = container.getStatus();
+		if (status == 3){
+			throw new RuntimeException("Carton status is error.");
+		}
+
 		//如果为空箱子，并且已经选择过shipMent 则直接关联，并加入箱子
 		if(StringUtils.isNoneBlank(shipment_id) && (list == null || list.size() == 0)){
 			logger.info("order packingOrder 已经选择过shipMent 直接关联，并加入箱子 ");
