@@ -584,7 +584,14 @@
                 lp.shipped_at AS shipped_date,sm.shipment_no,s.sku_code,b.english_name as brandName,
                 v.vendor_name,sm.ship_to_geography as geography_name,
                 CASE WHEN p.spu_id IS NULL THEN p.cover_img ELSE spu.cover_img END AS cover_img,
-                p.product_id,lp.stock_location,p.designer_id as brandID,p.color_code as colorCode
+                p.product_id,lp.stock_location,p.designer_id as brandID,p.color_code as colorCode,
+                func_country_mapper(l.user_rec_country) as user_rec_country,
+                if(lp.user_rec_flag=0, l.user_rec_name, lp.user_rec_name) as user_rec_name,
+                if(lp.user_rec_flag=0, l.user_rec_mobile, lp.user_rec_mobile) as user_rec_mobile,
+                if(lp.user_rec_flag=0, l.user_rec_province, lp.user_rec_province) as user_rec_province,
+                if(lp.user_rec_flag=0, l.user_rec_city, lp.user_rec_city) as user_rec_city,
+                if(lp.user_rec_flag=0, l.user_rec_area, lp.user_rec_area) as user_rec_area,
+                if(lp.user_rec_flag=0, l.user_rec_addr, lp.user_rec_addr) as user_rec_addr
             </otherwise>
         </choose>
 
