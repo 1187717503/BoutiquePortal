@@ -224,11 +224,15 @@ public class OrderController extends BaseController {
                     discountTax = 0;
                 }
 
-                BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + discountTax) / price) * 100);
-                if (supply_price_discount.intValue() > 100 || supply_price_discount.intValue() < 0) {
-                    co.setSupply_price_discount(0 + " %");
+                if (price == 0){
+                    co.setSupply_price_discount( 0 + " %");
                 } else {
-                    co.setSupply_price_discount ((100 - supply_price_discount.setScale(0, BigDecimal.ROUND_HALF_UP).intValue()) + " %");
+                    BigDecimal supply_price_discount = new BigDecimal((inPrice * (1 + discountTax) / price) * 100);
+                    if (supply_price_discount.intValue() > 100 || supply_price_discount.intValue() < 0) {
+                        co.setSupply_price_discount(0 + " %");
+                    } else {
+                        co.setSupply_price_discount ((100 - supply_price_discount.setScale(0, BigDecimal.ROUND_HALF_UP).intValue()) + " %");
+                    }
                 }
                 co.setPrice(new BigDecimal(co.getPrice().toString()).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
                 co.setIn_price(new BigDecimal(co.getIn_price().toString()).setScale(2,BigDecimal.ROUND_HALF_UP).toString());
