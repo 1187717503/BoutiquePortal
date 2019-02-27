@@ -227,6 +227,11 @@ public class OrderService {
 				//接口返回shipmentId
 				logger.info("order packingOrder 添加sub_shipment物流信息   调用接口   iShipmentService.saveShipmentByOrderId 入参:"+new Gson().toJson(orderResult));
 				orderResult.put("pack_english_name",container.getShipToGeography());
+				if(isHkChainVendor){
+					orderResult.put("pack_english_name","China excl. Taiwan");
+				}else {
+					orderResult.put("pack_english_name",container.getShipToGeography());
+				}
 				Shipment shipment = iShipmentService.saveShipmentByOrderId(orderResult);
 				if (shipment != null && shipment.getShipmentId() != null){
 					Long shipmentId = shipment.getShipmentId();
