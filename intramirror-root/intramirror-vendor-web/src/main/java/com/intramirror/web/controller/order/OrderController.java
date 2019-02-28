@@ -20,6 +20,7 @@ import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.service.*;
 import com.intramirror.order.api.model.CancelOrderVO;
 import com.intramirror.order.api.vo.PageListVO;
+import com.intramirror.order.api.vo.ReconciliationVO;
 import com.intramirror.product.api.model.Category;
 import com.intramirror.product.api.model.Product;
 import com.intramirror.product.api.service.IProductService;
@@ -28,6 +29,7 @@ import com.intramirror.product.api.service.category.ICategoryService;
 import com.intramirror.user.api.model.User;
 import com.intramirror.user.api.model.Vendor;
 import com.intramirror.user.api.service.VendorService;
+import com.intramirror.web.VO.TransitWarehouseInvoiceVO;
 import com.intramirror.web.common.CommonsProperties;
 import com.intramirror.web.controller.BaseController;
 import com.intramirror.web.common.cache.CategoryCache;
@@ -40,17 +42,21 @@ import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.intramirror.web.util.ExcelUtil;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -963,65 +969,6 @@ public class OrderController extends BaseController {
         return false;
     }
 
-    //    /**
-    //     * 回调接口
-    //     *
-    //     * @return
-    //     */
-    //<<<<<<< HEAD
-    //    @RequestMapping(value = "/orderRefundCallback")
-    //    @ResponseBody
-    //    public ResultMessage orderRefundCallback(@RequestBody Map<String, Object> map) {
-    //        logger.info("info parameter :" + new Gson().toJson(map));
-    //        ResultMessage message = ResultMessage.getInstance();
-    //        try {
-    //            //校验入参
-    //            if (null == map || 0 == map.size()) {
-    //                message.successStatus().putMsg("info", "Parameter cannot be null");
-    //                logger.info("info parameter cannot be null");
-    //                return message;
-    //            }
-    //            if (null == map.get("logisProductId") || StringUtils.isBlank(map.get("logisProductId").toString())) {
-    //                message.successStatus().putMsg("info", "logisProductId cannot be null");
-    //                logger.info("info logisProductId  cannot be null");
-    //                return message;
-    //            }
-    //            if (null == map.get("status") || StringUtils.isBlank(map.get("status").toString())) {
-    //                message.successStatus().putMsg("info", "status cannot be null");
-    //                logger.info("info status  cannot be null");
-    //                return message;
-    //            }
-    //            Long logisProductId = Long.parseLong(map.get("logisProductId").toString());
-    //            int status = Integer.parseInt(map.get("status").toString());
-    //
-    //            //回调接口只支持取消
-    //            if (OrderStatusType.CANCELED != status) {
-    //                message.successStatus().putMsg("info", "status not is 6");
-    //                logger.info("info status not is 6");
-    //                return message;
-    //            }
-    //            logger.info(logisProductId + "： 进入退款回调流程!!");
-    //            Map<String, Object> resultMap = logisticsProductService.updateOrderLogisticsStatusById(logisProductId, status);
-    //            //获取SKU
-    //            LogisticsProduct oldLogisticsProduct = iLogisticsProductService.selectById(logisProductId);
-    //            //开始修改库存
-    //            if (StatusType.SUCCESS == Integer.parseInt(resultMap.get("status").toString())) {
-    //                //如果成功，释放库存
-    //                Long skuId = skuStoreService.selectSkuIdByShopProductSkuId(oldLogisticsProduct.getShop_product_sku_id());
-    //                int result = skuStoreService.updateBySkuId(OrderStatusType.REFUND, skuId);
-    //                message.successStatus().putMsg("Info", "SUCCESS").setData(result);
-    //                logger.info(logisProductId + "===========>>>>>释放库存");
-    //                return message;
-    //            }
-    //            message.successStatus().putMsg("Info", "当前状态不符合状态机扭转请检查");
-    //            logger.info("退款回调结束!!");
-    //        } catch (Exception e) {
-    //            e.printStackTrace();
-    //            logger.info("errorMsg : " + e.getMessage());
-    //            message.errorStatus().putMsg("errorMsg", e.getMessage());
-    //        }
-    //        return message;
-    //=======
     @RequestMapping(value = "/orderRefundCallback")
     @ResponseBody
     public ResultMessage orderRefundCallback(@RequestBody Map<String, Object> map) {
@@ -1077,88 +1024,6 @@ public class OrderController extends BaseController {
         }
         return message;
     }
-
-    /*
-   public ResultMessage updateLogisticsProduct(Map<String, Object> orderMap, Map<String, Object> shipMentMap, boolean ischeck, boolean isSaveSubShipment) {
-        logger.info(MessageFormat
-                .format("order updateLogisticsProduct 订单装箱 入参信息   orderMap:{0},shipMentMap:{1},ischeck:{2},isSaveSubShipment:{3}", new Gson().toJson(orderMap),
-                        new Gson().toJson(shipMentMap), ischeck, isSaveSubShipment));
-        ResultMessage result = new ResultMessage();
-        Map<String, Object> info = new HashMap<String, Object>();
-        if (ischeck) {
-            info.put("statusType", StatusType.ORDER_CONTAINER_NOT_EMPTY);
-        } else {
-            info.put("statusType", StatusType.ORDER_CONTAINER_EMPTY);
-        }
-        result.errorStatus();
-
-        //校验该订单跟箱子所属的Shipment的目的地是否一致,一致则加入,是否分段运输，发货员自行判断
-        logger.info("order updateLogisticsProduct 装箱校验  1.大区是否一致 2.是否为空箱子 3.shipment_type");
-
-        //如果大区不一致，直接返回
-        if (!orderMap.get("geography_name").toString().equals(shipMentMap.get("ship_to_geography").toString())) {
-            result.setMsg("This Order's consignee address is different than carton's. ");
-            info.put("code", StatusType.ORDER_ERROR_CODE);
-            result.setInfoMap(info);
-            return result;
-        }
-
-        //如果大区一致,且不为空箱子,则比较shipment_type(空箱子ischeck 都为false)
-        if (orderMap.get("geography_name").toString().equals(shipMentMap.get("ship_to_geography").toString())) {
-
-            //空箱子不需要判断,直接存入   shipment_type 用于判断该箱子是否能存放多个，状态为1 只能存放一个  所以不能在存入
-            if (ischeck && shipMentMap.get("shipment_type_id").toString().equals("1")) {
-                result.setMsg("Only one Order can be packed in this carton. ");
-                info.put("code", StatusType.ORDER_ERROR_CODE);
-                result.setInfoMap(info);
-                return result;
-            }
-
-            //			//比较具体地址 省市区
-            //			}else if(shipMentMap.get("shipment_type_id").toString().equals("2")){
-            //
-            //
-            //			}else if(shipMentMap.get("shipment_type_id").toString().equals("3")){
-            //
-            //			}
-
-        }
-
-        //添加订单跟箱子的关联,并修改状态为READYTOSHIP
-        logger.info("order updateLogisticsProduct 添加订单与箱子的关联  ");
-        LogisticsProduct logisticsProduct = new LogisticsProduct();
-        logisticsProduct.setLogistics_product_id(Long.parseLong(orderMap.get("logistics_product_id").toString()));
-        logisticsProduct.setContainer_id(Long.parseLong(orderMap.get("containerId").toString()));
-        logisticsProduct.setStatus(OrderStatusType.READYTOSHIP);
-        logisticsProduct.setPacked_at(Helper.getCurrentUTCTime());
-        logger.info("order updateLogisticsProduct 添加订单与箱子的关联 并修改状态  调用接口iLogisticsProductService.updateByLogisticsProduct 订单修改前状态:" + orderMap.get("status")
-                .toString() + "  入参:" + new Gson().toJson(logisticsProduct));
-        int row = iLogisticsProductService.updateByLogisticsProduct(logisticsProduct);
-
-        if (row > 0) {
-            result.successStatus();
-
-            Map<String, Object> saveShipmentParam = new HashMap<String, Object>();
-            saveShipmentParam.put("orderNumber", orderMap.get("order_line_num").toString());
-            saveShipmentParam.put("shipmentId", Long.parseLong(shipMentMap.get("shipment_id").toString()));
-            Map<String, Object> orderResult = orderService.getShipmentDetails(saveShipmentParam);
-            orderResult.put("shipmentId", Long.parseLong(shipMentMap.get("shipment_id").toString()));
-
-            if (isSaveSubShipment) {
-                //添加第三段物流
-                logger.info(
-                        "order updateLogisticsProduct 添加sub_shipment物流信息   调用接口   iShipmentService.saveShipmentByOrderId 入参:" + new Gson().toJson(orderResult));
-                iShipmentService.saveShipmentByOrderId(orderResult);
-            }
-
-        } else {
-            info.put("code", StatusType.ORDER_ERROR_CODE);
-            result.setInfoMap(info);
-            result.setMsg("Package failure");
-        }
-        result.setInfoMap(info);
-        return result;
-    }*/
 
     @RequestMapping(value = "/saveUserComment", method = RequestMethod.POST)
     @ResponseBody
@@ -1327,7 +1192,39 @@ public class OrderController extends BaseController {
         return message;
     }
 
+    @RequestMapping(value = "/reconciliation", method = RequestMethod.POST)
+    public ResultMessage reconciliation(@RequestBody ReconciliationVO inputVO, HttpServletRequest httpRequest, HttpServletResponse response){
+        ResultMessage result = new ResultMessage();
+        result.errorStatus();
 
+        User user = this.getUser(httpRequest);
+        if (user == null) {
+            result.setMsg("Please login again");
+            return result;
+        }
+
+        List<Long> vendorIds = null;
+        List<Vendor> vendors = null;
+        try {
+            vendors = vendorService.getVendorsByUserId(user.getUserId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (vendors == null) {
+            result.setMsg("Please login again");
+            return result;
+        }
+        try {
+            vendorIds = vendors.stream().map(Vendor::getVendorId).collect(Collectors.toList());
+            inputVO.setVendorIds(vendorIds);
+            List<ReconciliationVO> list = orderService.reconciliationExport(inputVO);
+            generateOrderReconciliationExcel(list,response);
+            result.successStatus();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 
     /**
      * 导出订单列表
@@ -1446,6 +1343,88 @@ public class OrderController extends BaseController {
         }
         result.successStatus();
         return result;
+    }
+
+    private void generateOrderReconciliationExcel(List<ReconciliationVO> list,HttpServletResponse response) throws IOException {
+        HSSFWorkbook workbook = new HSSFWorkbook();
+
+        int rowLength = 0;
+        HSSFSheet sheet = workbook.createSheet("statement of account");
+
+        String[] excelHeaders = new String[]{"order line nrb", "brand name", "designer id", "category name","currency","retail price", "boutique price", "settlement status", "download status"};
+
+        // 创建表头
+        HSSFRow row1 = sheet.createRow(rowLength);
+        for (int i = 0, iLen = excelHeaders.length; i < iLen; i++) {
+            HSSFCell cell = row1.createCell(i);
+            cell.setCellValue(excelHeaders[i]);
+        }
+
+        rowLength++;
+        HSSFRow row = null;
+        HSSFCell cell = null;
+        for (ReconciliationVO vo : list) {
+            row = sheet.createRow(rowLength);
+            String[] values = {
+                    transforNullValue(vo.getOrderLineNum()),
+                    transforNullValue(vo.getBrandName()),
+                    transforNullValue(vo.getDesignerId()),
+                    transforNullValue(vo.getCategoryName()),
+                    transforNullValue(vo.getCurrency()),
+                    transforNullValue(vo.getOriginalPrice()),
+                    transforNullValue(vo.getOriginalBoutiquePrice()),
+                    "1".equals(transforNullValue(vo.getSettlementStatus()))? "未结算":"2".equals(transforNullValue(vo.getSettlementStatus()))?"已结算":"异常",
+                    "0".equals(transforNullValue(vo.getIsDownload()))? "未下载":"1".equals(transforNullValue(vo.getIsDownload()))?"已下载":"异常"
+            };
+            //将数据放到excel中
+            for (int i = 0; i < excelHeaders.length; i++) {
+                cell = row.createCell(i);
+                cell.setCellValue(values[i]);
+            }
+            rowLength++;
+        }
+        //宽度自适应
+        for (int i = 0; i < excelHeaders.length; i++) {
+            sheet.autoSizeColumn(i, true);
+        }
+        writeFile(workbook, response);
+    }
+
+    private void writeFile(Workbook workbook, HttpServletResponse response) throws IOException {
+
+        String fileName = new Date().getTime() + ".xls";
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        try {
+            workbook.write(os);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        byte[] content = os.toByteArray();
+        InputStream is = new ByteArrayInputStream(content);
+        // 设置response参数，可以打开下载页面
+        response.reset();
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setContentType("application/vnd.ms-excel;charset=utf-8");
+        response.setHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes(), "iso-8859-1"));
+        ServletOutputStream out = response.getOutputStream();
+        BufferedInputStream bis = null;
+        BufferedOutputStream bos = null;
+        try {
+            bis = new BufferedInputStream(is);
+            bos = new BufferedOutputStream(out);
+            byte[] buff = new byte[2048];
+            int bytesRead;
+            while (-1 != (bytesRead = bis.read(buff, 0, buff.length))) {
+                bos.write(buff, 0, bytesRead);
+            }
+        } catch (final IOException e) {
+            throw e;
+        } finally {
+            if (bis != null)
+                bis.close();
+            if (bos != null)
+                bos.close();
+        }
     }
 
     private String generateOrderExcel(String excelName, List<Map<String, Object>> orderList, String filePath,boolean isParent) {

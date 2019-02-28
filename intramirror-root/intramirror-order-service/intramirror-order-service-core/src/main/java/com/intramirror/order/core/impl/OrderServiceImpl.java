@@ -6,21 +6,20 @@ import com.intramirror.common.help.Page;
 import com.intramirror.common.help.PageUtils;
 import com.intramirror.order.api.model.*;
 import com.intramirror.order.api.service.IOrderService;
+import com.intramirror.order.api.vo.ReconciliationVO;
 import com.intramirror.order.api.vo.ShippedParam;
 import com.intramirror.order.core.dao.BaseDao;
 import com.intramirror.order.core.mapper.MemberPointsErrorLogMapper;
 import com.intramirror.order.core.mapper.OrderMapper;
 
 import com.intramirror.order.api.vo.PageListVO;
-import com.intramirror.order.core.mapper.ProductMapper;
 import com.intramirror.order.core.mapper.ProductPropertyMapper;
-import freemarker.template.utility.NumberUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.NumberUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -362,40 +361,6 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
 
     }
 
-    /*public void addProductProperty(List<CancelOrderVO> orderCancelList) {
-        Set<Long> ids = new HashSet<>();
-        for(CancelOrderVO vo :orderCancelList){
-            ids.add(vo.getProduct_id());
-        }
-        Map<String,Object> map = new HashMap<>();
-        map.put("ids",ids);
-        map.put("keyName","ColorCode");
-        List<ProductPropertyVO> vos = productPropertyMapper.getProductProperty(map);
-        if(vos!=null&&vos.size()>0){
-            for(CancelOrderVO vo :orderCancelList){
-                for(ProductPropertyVO pp:vos){
-                    if(vo.getProduct_id().equals(pp.getProductId())){
-                        vo.setColorCode(pp.getValue());
-                        break;
-                    }
-                }
-            }
-        }
-        Map<String,Object> map1 = new HashMap<>();
-        map1.put("ids",ids);
-        map1.put("keyName","BrandID");
-        List<ProductPropertyVO> vos1 = productPropertyMapper.getProductProperty(map1);
-        if(vos1!=null&&vos1.size()>0){
-            for(CancelOrderVO vo :orderCancelList){
-                for(ProductPropertyVO pp:vos1){
-                    if(vo.getProduct_id().equals(pp.getProductId())){
-                        vo.setBrandID(pp.getValue());
-                        break;
-                    }
-                }
-            }
-        }
-    }*/
 
     @Override
     public void addProductPropertyMap(List<Map<String, Object>> orderList){
@@ -540,6 +505,43 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
     @Override
     public void updateMemberPointsErrorLog(MemberPointsErrorLog errorLog) {
         memberPointsErrorLogMapper.updateByPrimaryKeySelective(errorLog);
+    }
+
+    @Transactional
+    @Override
+    public List<ReconciliationVO> reconciliationExport(ReconciliationVO inputVO) {
+        List<ReconciliationVO> list = orderMapper.reconciliationExport(inputVO);
+        List<ReconciliationVO> voList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(list)){
+            for (ReconciliationVO reconciliationVO:list){
+                if (reconciliationVO.getReconciliationStatementId() == null){
+                    reconciliationVO.setIsDownload(0);  //未下载
+                    reconciliationVO.setSettlementStatus(1);  //未结算
+                    //记录下载对账数据
+                    orderMapper.saveReconciliation(reconciliationVO.getOrderLineNum());
+                }else {
+                    reconciliationVO.setIsDownload(1);
+                }
+                //计算原始boutique price
+                if (reconciliationVO.getOriginalBoutiquePrice() == null){
+                    Integer discountOff = reconciliationVO.getDiscountOff() == null ? 0 : reconciliationVO.getDiscountOff();
+                    Integer originalPrice = reconciliationVO.getOriginalPrice() == null ? 0 : reconciliationVO.getOriginalPrice().intValue();
+                    reconciliationVO.setOriginalPrice(new BigDecimal(originalPrice));
+                    BigDecimal decimal = new BigDecimal(originalPrice).multiply(new BigDecimal(100 - discountOff)).setScale(2, BigDecimal.ROUND_HALF_UP);
+                    reconciliationVO.setOriginalBoutiquePrice(decimal);
+                }
+                Integer status = reconciliationVO.getSettlementStatus() == null ? 1 : reconciliationVO.getSettlementStatus();
+                Integer settlementStatus = inputVO.getSettlementStatus();
+                if (settlementStatus != null ){
+                    if (settlementStatus.equals(status)){
+                        voList.add(reconciliationVO);
+                    }
+                }else {
+                    voList.add(reconciliationVO);
+                }
+            }
+        }
+        return voList;
     }
 
     private boolean paramCheck(Object obj) {

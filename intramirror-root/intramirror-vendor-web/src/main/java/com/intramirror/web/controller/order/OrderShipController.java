@@ -585,49 +585,15 @@ public class OrderShipController extends BaseController {
         return result;
     }
 
-    private ResultMessage printExcelShipmentInfo(HttpServletResponse response,Map<String, Object> resultMap) throws IOException {
+    private ResultMessage printExcelShipmentInfo(HttpServletResponse response, Object obj) throws IOException {
         String fileName = new Date().getTime() + ".xls";
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         try {
-            ExcelUtil.createWorkBook(resultMap).write(os);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        byte[] content = os.toByteArray();
-        InputStream is = new ByteArrayInputStream(content);
-        // 设置response参数，可以打开下载页面
-        response.reset();
-        response.setHeader("Access-Control-Allow-Origin", "*");
-        response.setContentType("application/vnd.ms-excel;charset=utf-8");
-        response.setHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes(), "iso-8859-1"));
-        ServletOutputStream out = response.getOutputStream();
-        BufferedInputStream bis = null;
-        BufferedOutputStream bos = null;
-        try {
-            bis = new BufferedInputStream(is);
-            bos = new BufferedOutputStream(out);
-            byte[] buff = new byte[2048];
-            int bytesRead;
-            // Simple read/write loop.
-            while (-1 != (bytesRead = bis.read(buff, 0, buff.length))) {
-                bos.write(buff, 0, bytesRead);
+            if (obj instanceof TransitWarehouseInvoiceVO){
+                ExcelUtil.createWorkBook((TransitWarehouseInvoiceVO)obj).write(os);
+            }else if (obj instanceof Map){
+                ExcelUtil.createWorkBook((Map<String, Object>) obj).write(os);
             }
-        } catch (final IOException e) {
-            throw e;
-        } finally {
-            if (bis != null)
-                bis.close();
-            if (bos != null)
-                bos.close();
-        }
-        return null;
-    }
-
-    private ResultMessage printExcelShipmentInfo(HttpServletResponse response, TransitWarehouseInvoiceVO invoiceVO) throws IOException {
-        String fileName = new Date().getTime() + ".xls";
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        try {
-            ExcelUtil.createWorkBook(invoiceVO).write(os);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -5,6 +5,7 @@ import com.intramirror.common.help.PageUtils;
 import com.intramirror.order.api.model.MemberPointsErrorLog;
 import com.intramirror.order.api.model.Order;
 import com.intramirror.order.api.model.Shipment;
+import com.intramirror.order.api.vo.ReconciliationVO;
 import com.intramirror.order.api.vo.ShippedParam;
 import com.intramirror.order.api.vo.PageListVO;
 
@@ -197,5 +198,12 @@ public interface IOrderService {
     MemberPointsErrorLog getMemberPointsErrorLog(String oderLineNum);
 
     void updateMemberPointsErrorLog(MemberPointsErrorLog errorLog);
+
+    /**
+     * 获取对账信息
+     * @param vo
+     * @return
+     */
+    List<ReconciliationVO> reconciliationExport(ReconciliationVO vo);
 
 }

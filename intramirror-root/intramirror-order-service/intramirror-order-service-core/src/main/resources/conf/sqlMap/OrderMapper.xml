@@ -740,6 +740,10 @@
                 #{wechat,jdbcType=VARCHAR}, #{contactPhone,jdbcType=VARCHAR}, #{buyerName,jdbcType=VARCHAR}, #{areaCode,jdbcType=VARCHAR}
         )
     </insert>
+    <insert id="saveReconciliation" parameterType="string">
+        INSERT into reconciliation_statement (order_line_num,user_type,is_download,settlement_status,create_time,update_time)
+              VALUES (#{orderLineNum},2,1,1,now(),now())
+    </insert>
 
     <select id="atelierSelectOrder" parameterType="java.util.Map" resultType="java.util.Map">
 
@@ -901,5 +905,31 @@
         INNER JOIN `order` o on o.order_id = ol.order_id
         INNER JOIN logistics l on lp.order_logistics_id = l.order_logistics_id
         WHERE lp.order_line_num = #{orderLineNum}
+    </select>
+    <select id="reconciliationExport" resultType="com.intramirror.order.api.vo.ReconciliationVO" parameterType="com.intramirror.order.api.vo.ReconciliationVO">
+        SELECT lp.order_line_num orderLineNum,b.english_name brandName,lps.designer_id designerId,
+            c.chinese_name categoryName,v.original_price_unit currency,
+            lps.original_price originalPrice,lps.original_boutique_price originalBoutiquePrice,
+            rs.settlement_status settlementStatus,rs.id reconciliationStatementId,
+            lps.boutique_discount_off discountOff
+            FROM logistics_product lp
+            INNER JOIN logistics_product_snapshot lps on lp.logistics_product_id = lps.logistics_product_id and lps.enabled = 1
+            INNER JOIN brand b on b.brand_id = lps.brand_id and b.enabled = 1
+            INNER JOIN category c on c.category_id = lps.category_id and c.enabled = 1
+            INNER JOIN vendor v on v.vendor_id = lp.vendor_id and v.enabled = 1
+            LEFT JOIN reconciliation_statement rs on rs.order_line_num = lp.order_line_num and rs.is_deleted = 0 and rs.user_type = 2
+            WHERE lp.`status` in (2,7,3,4) and lp.vendor_id in
+            <foreach collection="vendorIds" item="vendorId" separator="," open="(" close=")">
+                #{vendorId}
+            </foreach>
+            <if test="createDateStart != null">
+                and lp.created_at >= #{createDateStart}
+            </if>
+            <if test="createDateEnd != null">
+                and lp.created_at &lt; #{createDateEnd}
+            </if>
+            <if test="orderLineNum != null">
+                and lp.order_line_num = #{orderLineNum}
+            </if>
     </select>
 </mapper>

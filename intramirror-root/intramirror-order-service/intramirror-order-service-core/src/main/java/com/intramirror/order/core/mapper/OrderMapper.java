@@ -6,6 +6,7 @@ import java.util.Map;
 import com.intramirror.order.api.model.Order;
 import com.intramirror.order.api.model.Shipment;
 import com.intramirror.order.api.model.CancelOrderVO;
+import com.intramirror.order.api.vo.ReconciliationVO;
 
 public interface OrderMapper {
 
@@ -170,4 +171,7 @@ public interface OrderMapper {
 
     Map<String, Object> getUserGrowthInfo(String orderLineNum);
 
+    List<ReconciliationVO> reconciliationExport(ReconciliationVO vo);
+
+    void saveReconciliation(String orderLineNum);
 }
