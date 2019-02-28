@@ -1203,7 +1203,7 @@ public class OrderController extends BaseController {
             return result;
         }
 
-        List<Long> vendorIds = null;
+        List<Long> vendorIds;
         List<Vendor> vendors = null;
         try {
             vendors = vendorService.getVendorsByUserId(user.getUserId());
@@ -1217,6 +1217,9 @@ public class OrderController extends BaseController {
         try {
             vendorIds = vendors.stream().map(Vendor::getVendorId).collect(Collectors.toList());
             inputVO.setVendorIds(vendorIds);
+            if (StringUtil.isNotEmpty(inputVO.getOrderLineNum())){
+                inputVO.setOrderLineNum(inputVO.getOrderLineNum().trim());
+            }
             List<ReconciliationVO> list = orderService.reconciliationExport(inputVO);
             generateOrderReconciliationExcel(list,response);
             result.successStatus();
