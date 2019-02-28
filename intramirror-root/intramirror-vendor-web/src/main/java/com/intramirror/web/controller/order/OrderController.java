@@ -1193,6 +1193,7 @@ public class OrderController extends BaseController {
     }
 
     @RequestMapping(value = "/reconciliation", method = RequestMethod.POST)
+    @ResponseBody
     public ResultMessage reconciliation(@RequestBody ReconciliationVO inputVO, HttpServletRequest httpRequest, HttpServletResponse response){
         ResultMessage result = new ResultMessage();
         result.errorStatus();
