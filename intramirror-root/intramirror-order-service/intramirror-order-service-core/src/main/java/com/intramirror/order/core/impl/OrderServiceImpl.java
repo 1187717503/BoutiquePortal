@@ -513,12 +513,13 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
         List<ReconciliationVO> list = orderMapper.reconciliationExport(inputVO);
         List<ReconciliationVO> voList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(list)){
+            List<String> orders = new ArrayList<>();
             for (ReconciliationVO reconciliationVO:list){
                 if (reconciliationVO.getReconciliationStatementId() == null){
                     reconciliationVO.setIsDownload(0);  //未下载
                     reconciliationVO.setSettlementStatus(1);  //未结算
                     //记录下载对账数据
-                    orderMapper.saveReconciliation(reconciliationVO.getOrderLineNum());
+                    orders.add(reconciliationVO.getOrderLineNum());
                 }else {
                     reconciliationVO.setIsDownload(1);
                 }
@@ -539,6 +540,9 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
                 }else {
                     voList.add(reconciliationVO);
                 }
+            }
+            if (CollectionUtils.isNotEmpty(orders)){
+                orderMapper.saveReconciliation(orders);
             }
         }
         return voList;

@@ -740,9 +740,12 @@
                 #{wechat,jdbcType=VARCHAR}, #{contactPhone,jdbcType=VARCHAR}, #{buyerName,jdbcType=VARCHAR}, #{areaCode,jdbcType=VARCHAR}
         )
     </insert>
-    <insert id="saveReconciliation" parameterType="string">
+    <insert id="saveReconciliation" parameterType="list">
         INSERT into reconciliation_statement (order_line_num,user_type,is_download,settlement_status,create_time,update_time)
-              VALUES (#{orderLineNum},2,1,1,now(),now())
+              VALUES
+              <foreach collection="list" item="orderLineNum" open="" close="" separator=",">
+                  (#{orderLineNum},2,1,1,now(),now())
+              </foreach>
     </insert>
 
     <select id="atelierSelectOrder" parameterType="java.util.Map" resultType="java.util.Map">
@@ -931,5 +934,6 @@
             <if test="orderLineNum != null">
                 and lp.order_line_num = #{orderLineNum}
             </if>
+            group by lp.order_line_num
     </select>
 </mapper>

@@ -173,5 +173,5 @@ public interface OrderMapper {
 
     List<ReconciliationVO> reconciliationExport(ReconciliationVO vo);
 
-    void saveReconciliation(String orderLineNum);
+    void saveReconciliation(List<String> orderLineNum);
 }
