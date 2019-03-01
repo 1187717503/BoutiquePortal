@@ -76,11 +76,15 @@ public class UserController extends BaseController {
             result.put("status", StatusType.FAILURE);
             return result;
         }
+        Long addressCountryId = null;
         try {
             List<Vendor> vendors = vendorService.getVendorsByUserId(user.getUserId());
             if(CollectionUtils.isNotEmpty(vendors)){
                 if(CollectionUtils.isNotEmpty(vendors.stream().filter(e -> !e.getUserId().equals(user.getUserId())).collect(Collectors.toList()))){
                     user.setIsParent(true);
+                }
+                if (addressCountryId == null){
+                    addressCountryId = vendors.get(0).getAddressCountryId();
                 }
             }
         } catch (Exception e) {
@@ -88,6 +92,7 @@ public class UserController extends BaseController {
         }
         result.put("status", StatusType.SUCCESS);
         result.put("user", user);
+        result.put("addressCountryId",addressCountryId);
         return result;
     }
 
