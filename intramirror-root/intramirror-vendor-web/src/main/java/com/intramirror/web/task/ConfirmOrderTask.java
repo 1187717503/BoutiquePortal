@@ -48,6 +48,10 @@ public class ConfirmOrderTask implements Callable<Boolean> {
             return false;
         }
         Long stockLocationId = orderVO.getStockLocationId();
+        LogisticsProduct logis = iLogisticsProductService.selectById(logisticsProductId);
+        if (logis != null) {
+            orderVO.setOrderLineNum(logis.getOrder_line_num());
+        }
         List<Map<String, Object>> productConfirm = iLogisticsProductService.queryLogisticProductConfirm(logisticsProductId);
         if (CollectionUtils.isEmpty(productConfirm)){
             logger.error("不存在此订单信息,logisticsProductId:{}",logisticsProductId);
@@ -77,12 +81,7 @@ public class ConfirmOrderTask implements Callable<Boolean> {
             return false;
         }
         try{
-            LogisticsProduct logis = iLogisticsProductService.selectById(logisticsProductId);
-
-            if (logis != null) {
-                orderVO.setOrderLineNum(logis.getOrder_line_num());
-                orderService.confirmOrder(logis,stockLocation,stockLocationId);
-            }
+            orderService.confirmOrder(logis,stockLocation,stockLocationId);
         }catch (Exception e){
             logger.error(e.getMessage());
             return false;
