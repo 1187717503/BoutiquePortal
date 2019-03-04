@@ -2,10 +2,15 @@ package com.intramirror.web.service;
 
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import com.intramirror.common.IKafkaService;
 import com.intramirror.order.api.dto.OrderStatusChangeMsgDTO;
 import com.intramirror.order.api.model.*;
+import com.intramirror.order.api.vo.ConfirmOrderVO;
 import com.intramirror.order.core.utils.KafkaMessageUtil;
 import com.intramirror.product.api.exception.BusinessException;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +39,8 @@ public class OrderService {
 	
 	@Autowired
 	private ILogisticsProductService iLogisticsProductService;
+	@Autowired
+	private LogisticsProductService logisticsProductService;
 	
 	@Autowired
 	private IShipmentService iShipmentService;
@@ -756,7 +763,31 @@ public class OrderService {
 				iShipmentService.deleteSubShipment(containerId);
 			}
 		}
+	}
 
+	public void confirmOrder(LogisticsProduct logisticsProduct, String stockLocation, Long stockLocationId) {
+		LogisticsProduct upLogis = new LogisticsProduct();
+		upLogis.setLogistics_product_id(logisticsProduct.getLogistics_product_id());
+		if (stockLocation != null) {
+			upLogis.setStock_location(stockLocation);
+		}
+
+		if (stockLocationId !=null ){
+			upLogis.setStock_location_id(stockLocationId);
+		}
+		upLogis.setConfirmed_at(Helper.getCurrentUTCTime());
+
+		upLogis.setOrder_line_num(logisticsProduct.getOrder_line_num());
+		//确认订单
+		Integer oldStatus = logisticsProduct.getStatus();
+		logisticsProductService.confirmOrder(upLogis);
+
+		iLogisticsProductService.saveConfirmCczhangOrderEmail(upLogis.getLogistics_product_id(),upLogis.getOrder_line_num());
+
+		iLogisticsProductService.updateByLogisticsProduct4Jpush(oldStatus,upLogis);
+
+		//会员系统积分
+		logisticsProductService.updateMemberCredits(logisticsProduct.getOrder_line_num());
 	}
 
 }

@@ -8,11 +8,11 @@ import com.intramirror.main.api.service.StockLocationService;
 import com.intramirror.order.api.model.LogisticsProduct;
 import com.intramirror.order.api.model.ShipEmailLog;
 import com.intramirror.order.api.service.ILogisticsProductService;
-import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.vo.MailModelVO;
 import com.intramirror.order.core.utils.MailSendManageService;
 import com.intramirror.order.core.utils.MailSendUtil;
 import com.intramirror.web.service.LogisticsProductService;
+import com.intramirror.web.service.OrderService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ import java.util.*;
 public class BoutiqueController {
 
     @Autowired
-    IOrderService orderService;
+    OrderService orderService;
     @Autowired
     private LogisticsProductService logisticsProductService;
     @Autowired
@@ -107,26 +107,7 @@ public class BoutiqueController {
                 result.successStatus();
 
                 if (logis != null) {
-                    LogisticsProduct upLogis = new LogisticsProduct();
-                    upLogis.setLogistics_product_id(logis.getLogistics_product_id());
-                    if (stockLocation != null) {
-                        upLogis.setStock_location(stockLocation);
-                    }
-
-                    if (stockLocationId !=null ){
-                        upLogis.setStock_location_id(stockLocationId);
-                    }
-                    upLogis.setConfirmed_at(Helper.getCurrentUTCTime());
-
-                    upLogis.setOrder_line_num(logis.getOrder_line_num());
-                    //确认订单
-                    Integer oldStatus = logis.getStatus();
-                    logisticsProductService.confirmOrder(upLogis);
-
-                    iLogisticsProductService.updateByLogisticsProduct4Jpush(oldStatus,upLogis);
-
-                    //会员系统积分
-                    logisticsProductService.updateMemberCredits(logis.getOrder_line_num());
+                    orderService.confirmOrder(logis,stockLocation,stockLocationId);
                 } else {
                     result.errorStatus().setMsg("Order does not exist,logisticsProductId:" + logisticsProductId);
                 }

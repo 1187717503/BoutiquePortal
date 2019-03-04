@@ -8,7 +8,10 @@ import com.intramirror.order.api.model.MemberPointsErrorLog;
 import com.intramirror.order.api.service.ILogisticsProductService;
 import com.intramirror.order.api.service.IOrderService;
 import com.intramirror.order.api.util.HttpClientUtil;
+import com.intramirror.order.api.vo.ConfirmOrderVO;
 import com.intramirror.web.service.LogisticsProductService;
+import com.intramirror.web.service.OrderService;
+import com.intramirror.web.task.ConfirmOrderTask;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
@@ -17,7 +20,10 @@ import io.jsonwebtoken.impl.Base64Codec;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.*;
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,11 +38,15 @@ import pk.shoplus.common.utils.StringUtil;
 public class ConfirmCheckOrderController {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfirmCheckOrderController.class);
+    private static ExecutorService executor = Executors.newFixedThreadPool(5);
+    private static CompletionService<Boolean> completionService = new ExecutorCompletionService<>(executor);
 
     private String jwtSecret = "qazxswedcvfr543216yhnmju70plmjkiu89";
 
     @Autowired
-    IOrderService orderService;
+    IOrderService iorderService;
+    @Autowired
+    OrderService orderService;
     @Autowired
     private LogisticsProductService logisticsProductService;
     @Autowired
@@ -131,7 +141,7 @@ public class ConfirmCheckOrderController {
 
                 //LogisticsProduct logis = logisticsProductServiceImpl.selectById(Long.parseLong(logisticsProductId));
                 LogisticsProduct logis = logisticsProductService.selectById(Long.parseLong(logisticsProductId));
-                Map<String, Object> maps = orderService.getOrderLogisticsInfoByIdWithSql(Long.parseLong(logisticsProductId));
+                Map<String, Object> maps = iorderService.getOrderLogisticsInfoByIdWithSql(Long.parseLong(logisticsProductId));
 
                 if (barCode == null){
                     String mapBrandId = maps.get("brandID") == null ? "" : maps.get("brandID").toString();
@@ -155,31 +165,7 @@ public class ConfirmCheckOrderController {
                 result.successStatus();
 
                 if (logis != null) {
-                    LogisticsProduct upLogis = new LogisticsProduct();
-                    upLogis.setLogistics_product_id(logis.getLogistics_product_id());
-                    if (stockLocation != null) {
-                        upLogis.setStock_location(stockLocation);
-                    }
-                    if (estShipDate != null) {
-                        upLogis.setEst_ship_date(sdf.parse(estShipDate));
-                    }
-                    if (stockLocationId !=null ){
-                        upLogis.setStock_location_id(stockLocationId);
-                    }
-                    upLogis.setConfirmed_at(Helper.getCurrentUTCTime());
-
-                    //logisticsProductServiceImpl.updateByLogisticsProduct(upLogis);
-                    upLogis.setOrder_line_num(logis.getOrder_line_num());
-                    //确认订单
-                    Integer oldStatus = logis.getStatus();
-                    logisticsProductService.confirmOrder(upLogis);
-
-                    iLogisticsProductService.saveConfirmCczhangOrderEmail(upLogis.getLogistics_product_id(),upLogis.getOrder_line_num());
-
-                    iLogisticsProductService.updateByLogisticsProduct4Jpush(oldStatus,upLogis);
-
-                    //会员系统积分
-                    logisticsProductService.updateMemberCredits(logis.getOrder_line_num());
+                    orderService.confirmOrder(logis,stockLocation,stockLocationId);
                 } else {
                     result.errorStatus().setMsg("Order does not exist,logisticsProductId:" + logisticsProductId);
                 }
@@ -191,12 +177,56 @@ public class ConfirmCheckOrderController {
         return result;
     }
 
+    @RequestMapping(value = "/batch/confirmOrder", method = RequestMethod.POST)
+    @ResponseBody
+    public ResultMessage batchConfirmOrder(@RequestBody List<ConfirmOrderVO> orderVOList) {
+        ResultMessage result = new ResultMessage();
+        result.errorStatus();
+
+        if (CollectionUtils.isEmpty(orderVOList)){
+            result.setMsg("The order cannot be empty");
+            return result;
+        }else if (orderVOList.size()>5){
+            result.setMsg("Confirm order no more than 5");
+            return result;
+        }
+
+        try{
+            for (ConfirmOrderVO confirmOrderVO:orderVOList){
+                ConfirmOrderTask orderTask = new ConfirmOrderTask(confirmOrderVO, orderService, iLogisticsProductService);
+                completionService.submit(orderTask);
+            }
+            int trueFlag = 0;
+            int falseFlag = 0;
+            for (ConfirmOrderVO confirmOrderVO:orderVOList){
+                Future<Boolean> take = completionService.take();
+                Boolean aBoolean = take.get();
+                confirmOrderVO.setConfirmFlag(aBoolean);
+                if (aBoolean){
+                    trueFlag ++;
+                }else {
+                    falseFlag ++;
+                }
+            }
+            Map<String,Object> date = new HashMap<>();
+            date.put("orderConfirmList",orderVOList);
+            date.put("trueFlag",trueFlag);
+            date.put("falseFlag",falseFlag);
+            result.setData(date);
+            result.successStatus();
+        }catch (Exception e){
+            result.errorStatus().setMsg(e.getMessage());
+            return result;
+        }
+        return result;
+    }
+
     @ResponseBody
     @RequestMapping(value = "/memberPoints", method = RequestMethod.POST)
     public ResultMessage memberPoints(@RequestParam String orderLineNum){
         ResultMessage result = new ResultMessage();
         result.errorStatus();
-        MemberPointsErrorLog log = orderService.getMemberPointsErrorLog(orderLineNum);
+        MemberPointsErrorLog log = iorderService.getMemberPointsErrorLog(orderLineNum);
         if (log != null){
             result.successStatus();
             String res = HttpClientUtil.httpPost(log.getRequestBody(), HttpClientUtil.appMemberPointsUrl);
@@ -207,7 +237,7 @@ public class ConfirmCheckOrderController {
                 return result;
             }else {
                 log.setIsDeleted(1);
-                orderService.updateMemberPointsErrorLog(log);
+                iorderService.updateMemberPointsErrorLog(log);
                 result.successStatus();
                 return result;
             }
