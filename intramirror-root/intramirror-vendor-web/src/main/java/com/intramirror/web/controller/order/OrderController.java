@@ -1377,7 +1377,7 @@ public class OrderController extends BaseController {
                     transforNullValue(vo.getCurrency()),
                     transforNullValue(vo.getOriginalPrice()),
                     transforNullValue(vo.getOriginalBoutiquePrice()),
-                    "1".equals(transforNullValue(vo.getSettlementStatus()))? "unsettlement":"2".equals(transforNullValue(vo.getSettlementStatus()))?"Settled":"Exception",
+                    "1".equals(transforNullValue(vo.getSettlementStatus()))? "Unsettlement":"2".equals(transforNullValue(vo.getSettlementStatus()))?"Settled":"Exception",
                     "0".equals(transforNullValue(vo.getIsDownload()))? "Undownloaded":"1".equals(transforNullValue(vo.getIsDownload()))?"Downloaded":"Exception"
             };
             //将数据放到excel中
