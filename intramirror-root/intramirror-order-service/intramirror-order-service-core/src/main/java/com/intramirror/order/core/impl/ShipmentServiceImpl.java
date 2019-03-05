@@ -250,7 +250,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 		subShipment.setConsignee(transitWarehouse.getContactCompanyname());
 		subShipment.setPersonName(transitWarehouse.getContactPersonname());
 		subShipment.setSegmentSequence(1L);
-		//subShipment.setShippingSegmentId(null);
+		subShipment.setShippingSegmentId(4L);
 		//subShipment.setShippingProviderId(null);
 		subShipment.setShipToAddr(transitWarehouse.getAddressStreetlines());
 		subShipment.setShipToAddr2(transitWarehouse.getAddressStreetlines2());
