@@ -1377,8 +1377,8 @@ public class OrderController extends BaseController {
                     transforNullValue(vo.getCurrency()),
                     transforNullValue(vo.getOriginalPrice()),
                     transforNullValue(vo.getOriginalBoutiquePrice()),
-                    "1".equals(transforNullValue(vo.getSettlementStatus()))? "未结算":"2".equals(transforNullValue(vo.getSettlementStatus()))?"已结算":"异常",
-                    "0".equals(transforNullValue(vo.getIsDownload()))? "未下载":"1".equals(transforNullValue(vo.getIsDownload()))?"已下载":"异常"
+                    "1".equals(transforNullValue(vo.getSettlementStatus()))? "Unsettlement":"2".equals(transforNullValue(vo.getSettlementStatus()))?"Settled":"Exception",
+                    "0".equals(transforNullValue(vo.getIsDownload()))? "Not downloaded":"1".equals(transforNullValue(vo.getIsDownload()))?"Downloaded":"Exception"
             };
             //将数据放到excel中
             for (int i = 0; i < excelHeaders.length; i++) {
