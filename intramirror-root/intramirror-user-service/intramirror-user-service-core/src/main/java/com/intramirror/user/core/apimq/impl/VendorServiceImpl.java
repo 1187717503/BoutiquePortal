@@ -121,4 +121,9 @@ public class VendorServiceImpl extends BaseDao implements VendorService {
     public Long selectAllowImportProductByVendorId(Long vendorId) {
         return vendorMapper.selectAllowImportProductByVendorId(vendorId);
     }
+
+    @Override
+    public String selectVendorProperty(String key) {
+        return vendorMapper.selectVendorProperty(key);
+    }
 }

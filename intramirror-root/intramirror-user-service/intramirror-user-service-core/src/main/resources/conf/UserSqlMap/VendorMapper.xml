@@ -265,4 +265,7 @@
     <select id="selectAllowImportProductByVendorId" resultType="java.lang.Long">
         select allow_import_product from vendor_job_config where vendor_id = #{vendorId};
     </select>
+    <select id="selectVendorProperty" resultType="java.lang.String" parameterType="string">
+        SELECT system_property_value FROM system_property WHERE system_property_name = #{propertyKey}
+    </select>
 </mapper>
