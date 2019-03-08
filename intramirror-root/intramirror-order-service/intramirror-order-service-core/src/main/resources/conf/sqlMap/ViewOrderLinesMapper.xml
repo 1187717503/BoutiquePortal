@@ -109,7 +109,7 @@
 		  LEFT JOIN logistics_product_snapshot lps
 		  	on (lp.logistics_product_id = lps.logistics_product_id)
 		  LEFT JOIN product p
-			ON (p.product_id = sku.product_id)
+			ON (p.product_id = lps.product_id)
 		  LEFT JOIN category c3
 			ON (c3.category_id = p.category_id)
 		  LEFT JOIN category c2
@@ -194,7 +194,7 @@
 		  LEFT JOIN logistics_product_snapshot lps
 		  on (lp.logistics_product_id = lps.logistics_product_id)
 		  LEFT JOIN product p
-			ON (p.product_id = sku.product_id)
+			ON (p.product_id = lps.product_id)
 		  LEFT JOIN category c3
 			ON (c3.category_id = p.category_id)
 		  LEFT JOIN category c2
