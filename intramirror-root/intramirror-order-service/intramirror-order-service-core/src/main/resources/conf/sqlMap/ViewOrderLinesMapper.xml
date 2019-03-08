@@ -66,7 +66,7 @@
 		  p.designer_id                                                           AS designer_id,
 		  p.color_code                                                            AS color_code,
 		  p.name                                                                  AS product_name,
-		  sku.size                                                                AS size,
+		  lps.size                                                                AS size,
 		  lp.in_price                                                             AS boutique_price,
 		  lp.retail_price                                                         AS retail_price,
 		  lp.stock_location                                                       AS stock_location,
@@ -106,10 +106,8 @@
 			  ON (ol.order_logistics_id = lp.order_logistics_id)
 		  LEFT JOIN `order` ORD
 			ON (ord.order_id = ol.order_id)
-		  LEFT JOIN shop_product_sku sps
-			ON (sps.shop_product_sku_id = lp.shop_product_sku_id)
-		  LEFT JOIN sku
-			ON (sku.sku_id = sps.sku_id)
+		  LEFT JOIN logistics_product_snapshot lps
+		  	on (lp.logistics_product_id = lps.logistics_product_id)
 		  LEFT JOIN product p
 			ON (p.product_id = sku.product_id)
 		  LEFT JOIN category c3
@@ -153,7 +151,7 @@
 		  p.designer_id                                                           AS designer_id,
 		  p.color_code                                                            AS color_code,
 		  p.name                                                                  AS product_name,
-		  sku.size                                                                AS size,
+		  lps.size                                                                AS size,
 		  lp.in_price                                                             AS boutique_price,
 		  lp.retail_price                                                         AS retail_price,
 		  lp.stock_location                                                       AS stock_location,
@@ -193,10 +191,8 @@
 			  ON (ol.order_logistics_id = lp.order_logistics_id)
 		  LEFT JOIN `order` ORD
 			ON (ord.order_id = ol.order_id)
-		  LEFT JOIN shop_product_sku sps
-			ON (sps.shop_product_sku_id = lp.shop_product_sku_id)
-		  LEFT JOIN sku
-			ON (sku.sku_id = sps.sku_id)
+		  LEFT JOIN logistics_product_snapshot lps
+		  on (lp.logistics_product_id = lps.logistics_product_id)
 		  LEFT JOIN product p
 			ON (p.product_id = sku.product_id)
 		  LEFT JOIN category c3
