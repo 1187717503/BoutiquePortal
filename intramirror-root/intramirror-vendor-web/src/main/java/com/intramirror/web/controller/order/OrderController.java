@@ -796,7 +796,7 @@ public class OrderController extends BaseController {
         // 为香港店和中国店准备数据
         map.put("v_address_country_id",vendor.getAddressCountryId());
 
-        LogisticsProduct logisticsProduct=iLogisticsProductService.selectByOrderLineNum(map.get("orderLineNum").toString());
+        /*LogisticsProduct logisticsProduct=iLogisticsProductService.selectByOrderLineNum(map.get("orderLineNum").toString());
         if(logisticsProduct!=null&&logisticsProduct.getShippingMethod()==1){
             Map<String,Object> containerParam = Maps.newHashMap();
             containerParam.put("containerId",map.get("containerId"));
@@ -810,7 +810,7 @@ public class OrderController extends BaseController {
                     return result;
                 }
             }
-        }
+        }*/
         //订单装箱
         try {
             result = orderServiceImpl.packingOrder(map);
