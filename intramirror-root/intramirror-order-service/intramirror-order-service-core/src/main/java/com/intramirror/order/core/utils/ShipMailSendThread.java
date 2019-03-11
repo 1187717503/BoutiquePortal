@@ -116,7 +116,7 @@ public class ShipMailSendThread implements Runnable {
             //发往荷兰邮政
             subject = "Shipment No. " + shipment.getShipmentNo() + "【" + shipment.getDestination() + "】";
         } else{
-            subject = "Shipment No. " + shipment.getShipmentNo() +" AWB No. " + awbNo + "【" + (isBcShipment ? "BC(EU-WH)" : shipment.getDestination()) + "】";
+            subject = "Shipment No. " + shipment.getShipmentNo() +" AWB No. " + awbNo + "【" + (isBcShipment ? "BC" : shipment.getDestination()) + "】";
         }
         mailContent.setSubject(subject);
         //设置邮件正文
