@@ -171,7 +171,7 @@ public class ConfirmCheckOrderController {
                 }
             }
         }catch (Exception e){
-            result.errorStatus().setMsg(e.toString());
+            result.errorStatus().setMsg(e.getMessage());
             return result;
         }
         return result;
