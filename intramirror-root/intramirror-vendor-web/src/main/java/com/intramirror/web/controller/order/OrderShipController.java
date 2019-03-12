@@ -135,9 +135,9 @@ public class OrderShipController extends BaseController {
             result.setMsg("Please log in again");
             return result;
         }
-        Boolean showShipe = false;
+        Boolean showShip = false;
         if(vendors.get(0).getAddressCountryId() == 2 || vendors.get(0).getAddressCountryId() == 3){
-            showShipe = true;
+            showShip = true;
         }
 
         List<Long> vendorIds = vendors.stream().map(Vendor::getVendorId).collect(Collectors.toList());
@@ -269,10 +269,10 @@ public class OrderShipController extends BaseController {
                 shipmentListMapSort = shipMentList;
             }
 
-            Boolean finalShowShipe = showShipe;
+            Boolean finalShowShipe = showShip;
             shipmentListMapSort.forEach(s ->{
                 if(s != null){
-                    s.put("showShipe", finalShowShipe);
+                    s.put("showShip", finalShowShipe);
                 }
             });
 
