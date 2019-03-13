@@ -83,11 +83,11 @@ INSERT INTO sub_shipment(shipping_segment_id,segment_sequence,consignee,ship_to_
   <select id="getShipmentsByVendor" resultType="java.util.HashMap"  parameterType="java.util.Map">
   SELECT s.* FROM shipment s
   INNER JOIN sub_shipment sub on sub.shipment_id = s.shipment_id
-  LEFT JOIN shipping_segment ss ON (sub.shipping_segment_id = ss.shipping_segment_id AND ss.enabled = 1 AND ss.shipment_type_id = 3)
+  INNER JOIN shipping_segment ss ON (sub.shipping_segment_id = ss.shipping_segment_id )
 	WHERE s.vendor_id = #{vendorId,jdbcType=BIGINT} AND s.`status` = #{status,jdbcType=BIGINT}
 	AND s.ship_to_geography = #{shipToGeography,jdbcType=VARCHAR}
 	AND s.ship_from_location_id = #{shipFromLocationId,jdbcType=INTEGER}
-
+	AND ss.enabled = 1 AND ss.shipment_type_id = 3
 	GROUP BY s.shipment_no
   </select>
   

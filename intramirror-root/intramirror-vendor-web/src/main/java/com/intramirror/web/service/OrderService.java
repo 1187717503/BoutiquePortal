@@ -785,14 +785,18 @@ public class OrderService {
 		upLogis.setOrder_line_num(logisticsProduct.getOrder_line_num());
 		//确认订单
 		Integer oldStatus = logisticsProduct.getStatus();
-		logisticsProductService.confirmOrder(upLogis);
+		if (oldStatus == OrderStatusType.PENDING || oldStatus == OrderStatusType.PICKING){
+			logisticsProductService.confirmOrder(upLogis);
 
-		iLogisticsProductService.saveConfirmCczhangOrderEmail(upLogis.getLogistics_product_id(),upLogis.getOrder_line_num());
+			iLogisticsProductService.saveConfirmCczhangOrderEmail(upLogis.getLogistics_product_id(),upLogis.getOrder_line_num());
 
-		iLogisticsProductService.updateByLogisticsProduct4Jpush(oldStatus,upLogis);
+			iLogisticsProductService.updateByLogisticsProduct4Jpush(oldStatus,upLogis);
 
-		//会员系统积分
-		logisticsProductService.updateMemberCredits(logisticsProduct.getOrder_line_num());
+			//会员系统积分
+			logisticsProductService.updateMemberCredits(logisticsProduct.getOrder_line_num());
+		}else {
+			throw new RuntimeException("The order status cannot be confirm");
+		}
 	}
 
 }
