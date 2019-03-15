@@ -524,11 +524,12 @@ public class OrderServiceImpl extends BaseDao implements IOrderService, IPageSer
                     reconciliationVO.setIsDownload(1);
                 }
                 //计算原始boutique price
-                if (reconciliationVO.getOriginalBoutiquePrice() == null){
-                    Integer discountOff = reconciliationVO.getDiscountOff() == null ? 0 : reconciliationVO.getDiscountOff();
-                    Integer originalPrice = reconciliationVO.getOriginalPrice() == null ? 0 : reconciliationVO.getOriginalPrice().intValue();
+                if (reconciliationVO.getOriginalBoutiquePrice() == null
+                        || reconciliationVO.getOriginalBoutiquePrice().intValue() == 0){
+                    double discountOff = reconciliationVO.getDiscountOff();
+                    double originalPrice = reconciliationVO.getOriginalPrice() == null ? 0 : reconciliationVO.getOriginalPrice().doubleValue();
                     reconciliationVO.setOriginalPrice(new BigDecimal(originalPrice));
-                    BigDecimal decimal = new BigDecimal(originalPrice).multiply(new BigDecimal(100 - discountOff)).setScale(2, BigDecimal.ROUND_HALF_UP);
+                    BigDecimal decimal = new BigDecimal(originalPrice).multiply(new BigDecimal((100 - discountOff)/100)).setScale(4, BigDecimal.ROUND_HALF_UP);
                     reconciliationVO.setOriginalBoutiquePrice(decimal);
                 }
                 Integer status = reconciliationVO.getSettlementStatus() == null ? 1 : reconciliationVO.getSettlementStatus();

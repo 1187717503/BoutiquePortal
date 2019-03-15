@@ -18,7 +18,7 @@ public class ReconciliationVO {
     private BigDecimal originalBoutiquePrice;
     private Integer settlementStatus;
     private Long reconciliationStatementId;
-    private Integer discountOff;
+    private double discountOff;
     private Integer isDownload;
     private String createDateStart;
     private String createDateEnd;
@@ -80,11 +80,11 @@ public class ReconciliationVO {
         this.reconciliationStatementId = reconciliationStatementId;
     }
 
-    public Integer getDiscountOff() {
+    public double getDiscountOff() {
         return discountOff;
     }
 
-    public void setDiscountOff(Integer discountOff) {
+    public void setDiscountOff(double discountOff) {
         this.discountOff = discountOff;
     }
 
