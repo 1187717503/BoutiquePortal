@@ -356,7 +356,7 @@ public class OrderController extends BaseController {
         }
         String shippingMethod = orderInfo.get("shippingMethod") == null ? "" : orderInfo.get("shippingMethod").toString();
         if ("1".equals(shippingMethod)) {
-            printFlag = "*【Fedex】* Transit Warehouse";
+            printFlag = "*【Fedex】* ";
         }else if ("2".equals(shippingMethod)) {
             printFlag = "*COMO*";
         }
