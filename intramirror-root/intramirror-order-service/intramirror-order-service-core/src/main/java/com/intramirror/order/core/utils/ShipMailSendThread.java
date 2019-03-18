@@ -169,7 +169,9 @@ public class ShipMailSendThread implements Runnable {
                 try {
                     mailContent.setSubject("Shipment No. " + shipment.getShipmentNo() + "【China】");
                     mailContent.setToEmails(MailConfig.emailToAiai);
-                    List<MailAttachmentVO> mailAttachmentVOList = generateMailAttachmentListNoInvoice(shipmentList);
+                    //发给aiai申报的订单，不包含港澳件和BC件
+                    List<ViewOrderLinesVO> orderList = viewOrderLinesService.getOrderListToDeclare(shipment.getShipmentNo());
+                    List<MailAttachmentVO> mailAttachmentVOList = generateMailAttachmentListNoInvoice(orderList);
                     mailContent.setAttachments(mailAttachmentVOList);
                     logger.info("ShipMailSendThread 开始发送邮件 to Aiai content={}", JSONObject.toJSONString(mailContent));
                     MailSendUtil.sendMail(mailContent);

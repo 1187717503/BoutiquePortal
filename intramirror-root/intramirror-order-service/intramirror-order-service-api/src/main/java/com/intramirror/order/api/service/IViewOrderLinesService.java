@@ -19,4 +19,11 @@ public interface IViewOrderLinesService {
 	 * @return
 	 */
 	List<ViewOrderLinesVO> getShipmentListByShipmentNo(String shipmentNo);
+
+	/**
+	 * 获取需申报的订单列表
+	 * @param shipmentNo
+	 * @return
+	 */
+    List<ViewOrderLinesVO> getOrderListToDeclare(String shipmentNo);
 }
