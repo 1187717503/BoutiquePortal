@@ -804,7 +804,7 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
 					}
 				}
 				// bc订单
-				if(expressType == 1){
+				if(thirdWarehouse.getShippingMethod() != null &&  thirdWarehouse.getShippingMethod() == 1){
 					thirdWarehouse.setSortingType((byte)3);
 				}
 				//获取图片
