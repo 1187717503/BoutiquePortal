@@ -58,6 +58,7 @@ public class CcZhangOrderEmailServiceImpl extends BaseDao implements ICcZhangOrd
     {
         confirmedEmailTitle.add("Order Number");
         confirmedEmailTitle.add("Order Line Number");
+        confirmedEmailTitle.add("Boutique");
         confirmedEmailTitle.add("Designer Id");
         confirmedEmailTitle.add("Color Code");
         confirmedEmailTitle.add("Brand");
@@ -73,6 +74,7 @@ public class CcZhangOrderEmailServiceImpl extends BaseDao implements ICcZhangOrd
         shippedEmailTitle.add("Order Number");
         shippedEmailTitle.add("Order Line Number");
         shippedEmailTitle.add("EMS");
+        shippedEmailTitle.add("Boutique");
         shippedEmailTitle.add("Designer Id");
         shippedEmailTitle.add("Color Code");
         shippedEmailTitle.add("Brand");

@@ -8,6 +8,7 @@ package com.intramirror.order.api.vo;
 public class ConfirmedExcelVO {
     private String orderNumber;
     private String orderLineNumber;
+    private String boutique;
     private String designerId;
     private String colorCode;
     private String brandName;
@@ -122,5 +123,13 @@ public class ConfirmedExcelVO {
 
     public void setSalePrice(String salePrice) {
         this.salePrice = salePrice;
+    }
+
+    public String getBoutique() {
+        return boutique;
+    }
+
+    public void setBoutique(String boutique) {
+        this.boutique = boutique;
     }
 }
