@@ -199,7 +199,13 @@ public class ConfirmCheckOrderController {
             int trueFlag = 0;
             int falseFlag = 0;
             for (ConfirmOrderVO confirmOrderVO:orderVOList){
-                completionService.take();
+                Future<Boolean> take = completionService.take();
+                Boolean aBoolean = take.get();
+                if (aBoolean){
+                    trueFlag ++;
+                }else {
+                    falseFlag ++;
+                }
             }
             Map<String,Object> date = new HashMap<>();
             date.put("orderConfirmList",orderVOList);
