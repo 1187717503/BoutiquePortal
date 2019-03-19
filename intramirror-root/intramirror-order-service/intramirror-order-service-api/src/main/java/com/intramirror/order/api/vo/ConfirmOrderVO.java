@@ -8,7 +8,7 @@ public class ConfirmOrderVO {
     private String orderLineNum;
     private String stockLocation;
     private Long stockLocationId;
-    private Boolean confirmFlag;
+    private boolean confirmFlag;
     private String failMsg;
 
 
@@ -20,11 +20,11 @@ public class ConfirmOrderVO {
         this.failMsg = failMsg;
     }
 
-    public Boolean getConfirmFlag() {
+    public boolean isConfirmFlag() {
         return confirmFlag;
     }
 
-    public void setConfirmFlag(Boolean confirmFlag) {
+    public void setConfirmFlag(boolean confirmFlag) {
         this.confirmFlag = confirmFlag;
     }
 

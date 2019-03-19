@@ -89,10 +89,10 @@ public class ConfirmOrderTask implements Callable<Boolean> {
         }
         try{
             orderService.confirmOrder(logis,stockLocation,stockLocationId);
+            orderVO.setConfirmFlag(true);
         }catch (Exception e){
             logger.error(e.getMessage());
             orderVO.setFailMsg(e.getMessage());
-            return false;
         }
         return true;
     }
