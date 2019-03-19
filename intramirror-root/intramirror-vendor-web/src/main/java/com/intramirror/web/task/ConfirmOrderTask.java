@@ -93,6 +93,7 @@ public class ConfirmOrderTask implements Callable<Boolean> {
         }catch (Exception e){
             logger.error(e.getMessage());
             orderVO.setFailMsg(e.getMessage());
+            return false;
         }
         return true;
     }
