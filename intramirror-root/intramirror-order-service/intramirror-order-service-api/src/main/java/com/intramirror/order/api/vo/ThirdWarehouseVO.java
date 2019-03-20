@@ -10,6 +10,8 @@ public class ThirdWarehouseVO extends ThirdWarehouse {
     private Integer expressType;
     private String spuImage;
 
+    private Integer shippingMethod;
+
 
     public String getSpuImage() {
         return spuImage;
@@ -33,5 +35,13 @@ public class ThirdWarehouseVO extends ThirdWarehouse {
 
     public void setAddressCountryId(Integer addressCountryId) {
         this.addressCountryId = addressCountryId;
+    }
+
+    public Integer getShippingMethod() {
+        return shippingMethod;
+    }
+
+    public void setShippingMethod(Integer shippingMethod) {
+        this.shippingMethod = shippingMethod;
     }
 }

@@ -26,6 +26,7 @@
     <result column="is_deleted" jdbcType="INTEGER" property="isDeleted" />
     <result column="address_country_id" jdbcType="INTEGER" property="addressCountryId" />
     <result column="express_type" jdbcType="INTEGER" property="expressType" />
+    <result column="shipping_method" jdbcType="INTEGER" property="shippingMethod" />
     <result column="spu_image" jdbcType="VARCHAR" property="spuImage" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -466,7 +467,7 @@
     SELECT s.shipment_no oversea_shipment_no,ss.awb_num awb_no,lp.order_line_num,
     lps.cover_img order_image,lps.spu_cover_img spu_image,v.sorting_type,lps.brand_id,lps.category_id,
     p.designer_id,p.color_code,lps.size,b.english_name brand_name,l.address_country_id addressCountryId,
-    l.express_type
+    l.express_type,lp.shipping_method
     FROM logistics_product lp
     INNER JOIN logistics l on l.order_logistics_id = lp.order_logistics_id
     LEFT JOIN logistics_product_snapshot lps on lps.logistics_product_id = lp.logistics_product_id

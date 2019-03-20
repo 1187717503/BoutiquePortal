@@ -803,6 +803,10 @@ public class ShipmentServiceImpl extends BaseDao implements IShipmentService{
                 		thirdWarehouse.setSortingType((byte)0);
 					}
 				}
+				// bc订单
+				if(thirdWarehouse.getShippingMethod() != null &&  thirdWarehouse.getShippingMethod() == 1){
+					thirdWarehouse.setSortingType((byte)3);
+				}
 				//获取图片
 				String spuImage = thirdWarehouse.getSpuImage();
 				if (StringUtils.isNotBlank(spuImage) && !"[]".equals(spuImage)){

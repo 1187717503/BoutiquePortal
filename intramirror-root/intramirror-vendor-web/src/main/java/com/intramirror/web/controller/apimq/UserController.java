@@ -30,10 +30,7 @@ import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static pk.shoplus.common.utils.StringUtil.byteArrayToHexString;
@@ -45,11 +42,7 @@ public class UserController extends BaseController {
 
     private static Logger logger = LoggerFactory.getLogger(UserController.class);
 
-//    private String jwtSecret = "qazxswedcvfr543216yhnmju70plmjkiu89";
-
-    //@Resource(name = "userServiceImpl")
-//    @Autowired
-//    private UserService userService;
+    private static final String propertyKey = "batch_confirm_vendorIds";
 
     @Autowired
     private VendorService vendorService;
@@ -77,7 +70,9 @@ public class UserController extends BaseController {
             return result;
         }
         Long addressCountryId = null;
+        boolean isBatchConfirm = false;
         try {
+            String s = vendorService.selectVendorProperty(propertyKey);
             List<Vendor> vendors = vendorService.getVendorsByUserId(user.getUserId());
             if(CollectionUtils.isNotEmpty(vendors)){
                 if(CollectionUtils.isNotEmpty(vendors.stream().filter(e -> !e.getUserId().equals(user.getUserId())).collect(Collectors.toList()))){
@@ -86,6 +81,15 @@ public class UserController extends BaseController {
                 if (addressCountryId == null){
                     addressCountryId = vendors.get(0).getAddressCountryId();
                 }
+
+                if (StringUtil.isNotEmpty(s)){
+                    for (Vendor v:vendors){
+                        if (Arrays.asList(s.split(",")).contains(v.getVendorCode())){
+                            isBatchConfirm = true;
+                        }
+                    }
+                }
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -93,6 +97,7 @@ public class UserController extends BaseController {
         result.put("status", StatusType.SUCCESS);
         result.put("user", user);
         result.put("addressCountryId",addressCountryId);
+        result.put("isBatchConfirm",isBatchConfirm);
         return result;
     }
 

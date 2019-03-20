@@ -9,6 +9,16 @@ public class ConfirmOrderVO {
     private String stockLocation;
     private Long stockLocationId;
     private Boolean confirmFlag;
+    private String failMsg;
+
+
+    public String getFailMsg() {
+        return failMsg;
+    }
+
+    public void setFailMsg(String failMsg) {
+        this.failMsg = failMsg;
+    }
 
     public Boolean getConfirmFlag() {
         return confirmFlag;

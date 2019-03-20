@@ -25,4 +25,6 @@ public interface VendorService {
     void updateByPrimaryKeySelective(Vendor vendor);
 
     Long selectAllowImportProductByVendorId(Long vendorId);
+
+    String selectVendorProperty(String key);
 }
