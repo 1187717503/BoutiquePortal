@@ -9,6 +9,7 @@ public class CcZhangOrderEmailDTO {
     private String ignoreCcZhangOrderEmailId;
     private String orderNumber;
     private String orderLineNumber;
+    private String boutique;
     private String designerId;
     private String colorCode;
     private String brandName;
@@ -140,5 +141,13 @@ public class CcZhangOrderEmailDTO {
 
     public void setEms(String ems) {
         this.ems = ems;
+    }
+
+    public String getBoutique() {
+        return boutique;
+    }
+
+    public void setBoutique(String boutique) {
+        this.boutique = boutique;
     }
 }

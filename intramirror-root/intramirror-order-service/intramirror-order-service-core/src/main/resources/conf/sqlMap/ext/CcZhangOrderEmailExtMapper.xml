@@ -5,6 +5,7 @@
     <resultMap id="CcZhangOrderEmailDTOResultMap" type="com.intramirror.order.api.dto.CcZhangOrderEmailDTO">
         <result column="orderNumber" property="orderNumber" jdbcType="VARCHAR"/>
         <result column="orderLineNumber" property="orderLineNumber" jdbcType="VARCHAR"/>
+        <result column="boutique" property="boutique" jdbcType="VARCHAR"/>
         <result column="designerId" property="designerId" jdbcType="VARCHAR"/>
         <result column="colorCode" property="colorCode" jdbcType="VARCHAR"/>
         <result column="brandName" property="brandName" jdbcType="VARCHAR"/>
@@ -24,6 +25,7 @@
         select
         o.`order_num` as orderNumber,
         c.`order_line_num` as orderLineNumber,
+        v.vendor_name as boutique,
         p.`designer_id` as designerId ,
         p.`color_code` as colorCode,
         b.`english_name` as brandName ,
@@ -41,6 +43,7 @@
         inner join `logistics_product`  lp on (lp.`order_line_num` = c.`order_line_num`  and lp.`enabled`  = true)
         inner join `order_logistics`  ol on (ol.`order_logistics_id` = lp.`order_logistics_id` and ol.`enabled`  = true)
         inner join `order`  o on (o.`order_id` = ol.`order_id`  and o.`enabled`  = true)
+        inner join `vendor`  v on (lp.`vendor_id` = v.`vendor_id`  and v.`enabled`  = true)
         inner join `shop_product_sku`  sps on (sps.`shop_product_sku_id` = lp.`shop_product_sku_id`  )
         inner join `sku`  s on (s.`sku_id` = sps.`sku_id`  and s.`enabled`  = true)
         inner join `shop_product`  sp on (sp.`shop_product_id` = sps.`shop_product_id` )
