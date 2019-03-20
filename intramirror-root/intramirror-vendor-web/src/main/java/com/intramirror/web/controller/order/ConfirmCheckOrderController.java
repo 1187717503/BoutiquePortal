@@ -201,7 +201,6 @@ public class ConfirmCheckOrderController {
             for (ConfirmOrderVO confirmOrderVO:orderVOList){
                 Future<Boolean> take = completionService.take();
                 Boolean aBoolean = take.get();
-                confirmOrderVO.setConfirmFlag(aBoolean);
                 if (aBoolean){
                     trueFlag ++;
                 }else {

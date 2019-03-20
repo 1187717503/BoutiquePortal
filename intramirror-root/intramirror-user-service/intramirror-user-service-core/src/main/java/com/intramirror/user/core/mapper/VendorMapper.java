@@ -26,4 +26,8 @@ public interface VendorMapper {
     void updateByPrimaryKeySelective(Vendor vendor);
 
     Long selectAllowImportProductByVendorId(@Param("vendorId") Long vendorId);
+
+    String selectVendorProperty(String key);
+
+
 }

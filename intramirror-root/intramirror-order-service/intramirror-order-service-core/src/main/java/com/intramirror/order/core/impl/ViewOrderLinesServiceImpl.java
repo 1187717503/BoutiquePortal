@@ -31,4 +31,9 @@ public class ViewOrderLinesServiceImpl extends BaseDao implements IViewOrderLine
     public List<ViewOrderLinesVO> getShipmentListByShipmentNo(String shipmentNo) {
         return viewOrderLinesMapper.getShipmentListByShipmentNo(shipmentNo);
     }
+
+    @Override
+    public List<ViewOrderLinesVO> getOrderListToDeclare(String shipmentNo) {
+        return viewOrderLinesMapper.getOrderListToDeclare(shipmentNo);
+    }
 }

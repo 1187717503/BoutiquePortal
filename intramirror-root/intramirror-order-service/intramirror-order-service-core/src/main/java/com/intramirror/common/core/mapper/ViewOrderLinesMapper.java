@@ -7,4 +7,6 @@ import java.util.List;
 public interface ViewOrderLinesMapper {
 
     List<ViewOrderLinesVO> getShipmentListByShipmentNo(String shipmentNo);
+
+    List<ViewOrderLinesVO> getOrderListToDeclare(String shipmentNo);
 }

@@ -35,32 +35,42 @@ public class ConfirmOrderTask implements Callable<Boolean> {
     public Boolean call() throws Exception {
         if (orderVO.getLogisticsProductId() == null){
             logger.error("LogisticsProductId不能为空");
+            orderVO.setFailMsg("LogisticsProductId不能为空");
             return false;
         }
         Long logisticsProductId = orderVO.getLogisticsProductId();
         if (orderVO.getStockLocation() == null){
             logger.error("StockLocation不能为空");
+            orderVO.setFailMsg("StockLocation不能为空");
             return false;
         }
         String stockLocation = orderVO.getStockLocation();
         if (orderVO.getStockLocationId() == null){
             logger.error("StockLocationId不能为空");
+            orderVO.setFailMsg("StockLocation不能为空");
             return false;
         }
         Long stockLocationId = orderVO.getStockLocationId();
+        LogisticsProduct logis = iLogisticsProductService.selectById(logisticsProductId);
+        if (logis != null) {
+            orderVO.setOrderLineNum(logis.getOrder_line_num());
+        }
         List<Map<String, Object>> productConfirm = iLogisticsProductService.queryLogisticProductConfirm(logisticsProductId);
         if (CollectionUtils.isEmpty(productConfirm)){
             logger.error("不存在此订单信息,logisticsProductId:{}",logisticsProductId);
+            orderVO.setFailMsg("不存在此订单信息,logisticsProductId:"+logisticsProductId);
             return false;
         }
         Map<String, Object> confirmMap = productConfirm.get(0);
         if (confirmMap.get("oeStatus")!=null&&"1".equals(confirmMap.get("oeStatus").toString())){
             logger.error("异常订单不能confirm,logisticsProductId:{}",logisticsProductId);
+            orderVO.setFailMsg("异常订单不能confirm,logisticsProductId:"+logisticsProductId);
             return false;
         }
         if (confirmMap.get("status")==null||(!"1".equals(confirmMap.get("status").toString())
                 &&!"8".equals(confirmMap.get("status").toString()))){
             logger.error("订单状态异常，不能confirm,logisticsProductId:{}",logisticsProductId);
+            orderVO.setFailMsg("订单状态异常，不能confirm,logisticsProductId:"+logisticsProductId);
             return false;
         }
         boolean flag = false; //stockLocation是否有效
@@ -74,17 +84,15 @@ public class ConfirmOrderTask implements Callable<Boolean> {
         }
         if (!flag){
             logger.error("stockLocation无有效,logisticsProductId:{}",logisticsProductId);
+            orderVO.setFailMsg("stockLocation无有效,logisticsProductId:"+logisticsProductId);
             return false;
         }
         try{
-            LogisticsProduct logis = iLogisticsProductService.selectById(logisticsProductId);
-
-            if (logis != null) {
-                orderVO.setOrderLineNum(logis.getOrder_line_num());
-                orderService.confirmOrder(logis,stockLocation,stockLocationId);
-            }
+            orderService.confirmOrder(logis,stockLocation,stockLocationId);
+            orderVO.setConfirmFlag(true);
         }catch (Exception e){
             logger.error(e.getMessage());
+            orderVO.setFailMsg(e.getMessage());
             return false;
         }
         return true;
