@@ -96,7 +96,7 @@
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
             <optional>false</optional>
-            <version>1.11.22</version>
+            <version>1.12.261</version>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>
